@@ -1,3 +1,112 @@
-h1 {
-  color: orange;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* To start tailwind: npx tailwindcss -i ./src/index.css -o ./dist/output.css --watch */
+
+/*Zero styles*/
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+*,
+*:before,
+*:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+:focus,
+:active {
+  outline: none;
+}
+a:focus,
+a:active {
+  outline: none;
+}
+
+nav,
+footer,
+header,
+aside {
+  display: block;
+}
+
+html,
+body,
+#root {
+  font-family: 'Montserrat', sans-serif;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  font-size: 100%;
+  line-height: 1;
+  font-size: 14px;
+  -ms-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+#root {
+  background-image: url("../public/img//BlueBg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+input,
+button,
+textarea {
+  font-family: inherit;
+}
+
+input::-ms-clear {
+  display: none;
+}
+button {
+  cursor: pointer;
+}
+button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+a,
+a:visited {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: none;
+}
+.note__preview ul,
+.note__preview li {
+  list-style: inside !important;
+}
+
+.note__preview ol li {
+  list-style: numbers inside !important;
+}
+
+.note__preview a {
+  text-decoration: underline;
+}
+
+.note__preview a:hover {
+  text-decoration: none;
+}
+
+.note__preview p {
+  min-height: 1rem;
+}
+
+img {
+  vertical-align: top;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: 400;
 }
