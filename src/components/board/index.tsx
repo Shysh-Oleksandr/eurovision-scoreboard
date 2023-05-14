@@ -1,29 +1,43 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-import countries from '../../data/countries.json';
-import { Country } from '../../models';
+import { Country, ScoreboardAction } from '../../models';
 
 import CountryItem from './CountryItem';
 
-const qualifiedCountries = countries.filter((country) => country.isQualified);
-const countriesHalfLength = Math.ceil(qualifiedCountries.length / 2);
+type Props = {
+  countries: Country[];
+  dispatch: React.Dispatch<ScoreboardAction>;
+};
 
-const Board = (): JSX.Element => {
+const Board = ({ countries, dispatch }: Props): JSX.Element => {
+  const sortedCountries = useMemo(
+    () => [...countries].sort((a, b) => b.points - a.points),
+    [countries],
+  );
+
+  const countriesHalfLength = Math.ceil(sortedCountries.length / 2);
+
   return (
     <div className="w-2/3 flex gap-x-6 h-full">
       <div className="w-1/2 h-full">
-        {qualifiedCountries
+        {sortedCountries
           .slice(0, countriesHalfLength)
           .map((country: Country) => (
-            <CountryItem key={country.code} country={country} />
+            <CountryItem
+              key={country.code}
+              country={country}
+              dispatch={dispatch}
+            />
           ))}
       </div>
       <div className="w-1/2 h-full">
-        {qualifiedCountries
-          .slice(countriesHalfLength)
-          .map((country: Country) => (
-            <CountryItem key={country.code} country={country} />
-          ))}
+        {sortedCountries.slice(countriesHalfLength).map((country: Country) => (
+          <CountryItem
+            key={country.code}
+            country={country}
+            dispatch={dispatch}
+          />
+        ))}
       </div>
     </div>
   );
