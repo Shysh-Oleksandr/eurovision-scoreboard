@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { countriesLength } from '../../data';
+import { COUNTRIES_LENGTH } from '../../data';
 import { ScoreboardAction } from '../../models';
 
 import CountryInfo from './CountryInfo';
@@ -22,11 +22,11 @@ const ControlsPanel = ({
   shouldShowLastPoints,
   dispatch,
 }: Props): JSX.Element => {
-  const countriesLeft = countriesLength - votingCountryIndex;
+  const countriesLeft = COUNTRIES_LENGTH - votingCountryIndex;
 
   return (
-    <div className="flex-1 mb-[6px]">
-      <div className="pb-2">
+    <div className="flex-1 mb-[6px] pt-1">
+      <div className="pb-3">
         <h3 className="text-2xl text-white">
           {isJuryVoting ? 'Jury voting' : 'Televote'}
         </h3>
@@ -36,8 +36,10 @@ const ControlsPanel = ({
         dispatch={dispatch}
         shouldShowLastPoints={shouldShowLastPoints}
         countriesLeft={countriesLeft}
+        isJuryVoting={isJuryVoting}
+        votingCountryIndex={votingCountryIndex}
       />
-      <VotingPointsInfo votingPoints={votingPoints} />
+      {isJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
     </div>
   );
 };

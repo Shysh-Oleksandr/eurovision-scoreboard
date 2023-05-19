@@ -1,17 +1,19 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 
-import { pointsArray } from '../../data';
+import { POINTS_ARRAY } from '../../data';
+import allCountries from '../../data/countries.json';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 
 import BoardHeader from './BoardHeader';
 import CountryItem from './CountryItem';
 
-const MAX_COUNTRY_WITH_POINTS = pointsArray.length;
+const MAX_COUNTRY_WITH_POINTS = POINTS_ARRAY.length;
 
 type Props = {
   countries: Country[];
   isJuryVoting: boolean;
   votingPoints: number;
+  votingCountryIndex: number;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
@@ -19,6 +21,7 @@ const Board = ({
   countries,
   isJuryVoting,
   votingPoints,
+  votingCountryIndex,
   dispatch,
 }: Props): JSX.Element => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
@@ -34,6 +37,8 @@ const Board = ({
     () => countries.filter((country) => country.lastReceivedPoints).length,
     [countries],
   );
+
+  const votingCountry = allCountries[votingCountryIndex] as Country;
 
   const hasCountryFinishedVoting =
     countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS;
@@ -67,7 +72,7 @@ const Board = ({
       }
 
       dispatch({
-        type: ScoreboardActionKind.GIVE_POINTS,
+        type: ScoreboardActionKind.GIVE_JURY_POINTS,
         payload: { countryCode },
       });
     },
@@ -81,10 +86,11 @@ const Board = ({
         country={country}
         isJuryVoting={isJuryVoting}
         hasCountryFinishedVoting={hasCountryFinishedVoting}
+        isActive={country.code === votingCountry?.code}
         onClick={onClick}
       />
     ),
-    [hasCountryFinishedVoting, isJuryVoting, onClick],
+    [hasCountryFinishedVoting, votingCountry, isJuryVoting, onClick],
   );
 
   return (
@@ -93,6 +99,8 @@ const Board = ({
         isJuryVoting={isJuryVoting}
         votingPoints={votingPoints}
         countries={countries}
+        votingCountry={votingCountry}
+        dispatch={dispatch}
         onClick={onClick}
       />
       <div className="w-full flex gap-x-6 h-full">

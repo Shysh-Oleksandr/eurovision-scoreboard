@@ -6,6 +6,7 @@ type Props = {
   country: Country;
   hasCountryFinishedVoting: boolean;
   isJuryVoting: boolean;
+  isActive: boolean;
   onClick: (countryCode: string) => void;
 };
 
@@ -13,9 +14,10 @@ const CountryItem = ({
   country,
   hasCountryFinishedVoting,
   isJuryVoting,
+  isActive,
   onClick,
 }: Props) => {
-  const isVoted = country.lastReceivedPoints !== 0;
+  const isVoted = country.lastReceivedPoints !== 0 || country.isVotingFinished;
   const isDisabled = (isVoted && !hasCountryFinishedVoting) || !isJuryVoting;
 
   return (
@@ -24,7 +26,7 @@ const CountryItem = ({
         isDisabled
           ? ''
           : 'cursor-pointer transition-all duration-300 hover:bg-sky-100'
-      }`}
+      } ${isActive ? 'outline outline-4 outline-blue-950 rounded-sm' : ''}`}
       disabled={isDisabled}
       onClick={() => onClick(country.code)}
     >

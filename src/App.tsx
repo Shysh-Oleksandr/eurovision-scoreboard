@@ -17,6 +17,7 @@ export const App = () => {
           countries={state.countries}
           votingPoints={state.votingPoints}
           isJuryVoting={state.isJuryVoting}
+          votingCountryIndex={state.votingCountryIndex}
           dispatch={dispatch}
         />
         <ControlsPanel

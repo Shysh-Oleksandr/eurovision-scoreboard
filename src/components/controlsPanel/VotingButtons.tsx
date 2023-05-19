@@ -3,15 +3,21 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';
 
+import TelevoteInput from './TelevoteInput';
+
 type Props = {
   shouldShowLastPoints: boolean;
+  isJuryVoting: boolean;
   countriesLeft: number;
+  votingCountryIndex: number;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
 const VotingButtons = ({
   shouldShowLastPoints,
+  isJuryVoting,
   countriesLeft,
+  votingCountryIndex,
   dispatch,
 }: Props) => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
@@ -52,9 +58,17 @@ const VotingButtons = ({
 
   return (
     <div className="bg-blue-950 w-full pt-2 pb-4">
-      <div className="px-4">
-        <Button label="Vote randomly" onClick={voteRandomly} />
-      </div>
+      {isJuryVoting ? (
+        <div className="px-4">
+          <Button label="Vote randomly" onClick={voteRandomly} />
+        </div>
+      ) : (
+        <TelevoteInput
+          votingCountryIndex={votingCountryIndex}
+          dispatch={dispatch}
+        />
+      )}
+
       <div className="w-full bg-slate-600 h-[1px] my-4"></div>
       <div className="px-4">
         <Button
