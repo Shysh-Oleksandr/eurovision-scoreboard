@@ -5,12 +5,18 @@ import { Country } from '../../models';
 type Props = {
   country: Country;
   hasCountryFinishedVoting: boolean;
+  isJuryVoting: boolean;
   onClick: (countryCode: string) => void;
 };
 
-const CountryItem = ({ country, hasCountryFinishedVoting, onClick }: Props) => {
+const CountryItem = ({
+  country,
+  hasCountryFinishedVoting,
+  isJuryVoting,
+  onClick,
+}: Props) => {
   const isVoted = country.lastReceivedPoints !== 0;
-  const isDisabled = isVoted && !hasCountryFinishedVoting;
+  const isDisabled = (isVoted && !hasCountryFinishedVoting) || !isJuryVoting;
 
   return (
     <button

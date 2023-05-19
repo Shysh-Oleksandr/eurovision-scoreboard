@@ -74,6 +74,19 @@ const Board = ({
     [countriesWithPointsLength, dispatch],
   );
 
+  const renderItem = useCallback(
+    (country: Country) => (
+      <CountryItem
+        key={country.code}
+        country={country}
+        isJuryVoting={isJuryVoting}
+        hasCountryFinishedVoting={hasCountryFinishedVoting}
+        onClick={onClick}
+      />
+    ),
+    [hasCountryFinishedVoting, isJuryVoting, onClick],
+  );
+
   return (
     <div className="w-2/3 h-full">
       <BoardHeader
@@ -86,26 +99,12 @@ const Board = ({
         <div className="w-1/2 h-full">
           {sortedCountries
             .slice(0, countriesHalfLength)
-            .map((country: Country) => (
-              <CountryItem
-                key={country.code}
-                country={country}
-                hasCountryFinishedVoting={hasCountryFinishedVoting}
-                onClick={onClick}
-              />
-            ))}
+            .map((country: Country) => renderItem(country))}
         </div>
         <div className="w-1/2 h-full">
           {sortedCountries
             .slice(countriesHalfLength)
-            .map((country: Country) => (
-              <CountryItem
-                key={country.code}
-                country={country}
-                hasCountryFinishedVoting={hasCountryFinishedVoting}
-                onClick={onClick}
-              />
-            ))}
+            .map((country: Country) => renderItem(country))}
         </div>
       </div>
     </div>
