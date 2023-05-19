@@ -9,7 +9,7 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
   const votingCountryData = countries[votingCountryIndex];
 
   return (
-    <div className="bg-blue-950 w-full py-2 px-4">
+    <div className="bg-blue-950 w-full pb-2 pt-4 px-4">
       <h4 className="text-white uppercase text-2xl">
         {votingCountryData?.name || ''}
       </h4>

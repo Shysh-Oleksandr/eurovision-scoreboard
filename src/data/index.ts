@@ -1,3 +1,5 @@
+import countries from './countries.json';
+
 export const pointsArray = new Array(10).fill(0).map((_, index) => {
   const points = index + 1;
 
@@ -7,3 +9,5 @@ export const pointsArray = new Array(10).fill(0).map((_, index) => {
 
   return points;
 });
+
+export const countriesLength = countries.length;

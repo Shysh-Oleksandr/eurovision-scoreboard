@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { countriesLength } from '../../data';
 import { ScoreboardAction } from '../../models';
 
 import CountryInfo from './CountryInfo';
@@ -21,6 +22,8 @@ const ControlsPanel = ({
   shouldShowLastPoints,
   dispatch,
 }: Props): JSX.Element => {
+  const countriesLeft = countriesLength - votingCountryIndex;
+
   return (
     <div className="flex-1 mb-[6px]">
       <div className="pb-2">
@@ -32,6 +35,7 @@ const ControlsPanel = ({
       <VotingButtons
         dispatch={dispatch}
         shouldShowLastPoints={shouldShowLastPoints}
+        countriesLeft={countriesLeft}
       />
       <VotingPointsInfo votingPoints={votingPoints} />
     </div>

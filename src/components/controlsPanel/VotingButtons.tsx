@@ -5,10 +5,15 @@ import Button from '../Button';
 
 type Props = {
   shouldShowLastPoints: boolean;
+  countriesLeft: number;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
-const VotingButtons = ({ shouldShowLastPoints, dispatch }: Props) => {
+const VotingButtons = ({
+  shouldShowLastPoints,
+  countriesLeft,
+  dispatch,
+}: Props) => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
 
   const voteRandomly = useCallback(() => {
@@ -28,6 +33,16 @@ const VotingButtons = ({ shouldShowLastPoints, dispatch }: Props) => {
     }, 3000);
   }, [dispatch]);
 
+  const finishVoting = useCallback(() => {
+    new Array(countriesLeft).fill(0).map(() => {
+      dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_POINTS });
+
+      timerId.current = setTimeout(() => {
+        dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
+      }, 3000);
+    });
+  }, [countriesLeft, dispatch]);
+
   useEffect(() => {
     if (shouldShowLastPoints && timerId.current) {
       clearTimeout(timerId.current);
@@ -36,8 +51,18 @@ const VotingButtons = ({ shouldShowLastPoints, dispatch }: Props) => {
   }, [shouldShowLastPoints]);
 
   return (
-    <div className="bg-blue-950 w-full py-2 px-4">
-      <Button label="Vote randomly" onClick={voteRandomly} />
+    <div className="bg-blue-950 w-full pt-2 pb-4">
+      <div className="px-4">
+        <Button label="Vote randomly" onClick={voteRandomly} />
+      </div>
+      <div className="w-full bg-slate-600 h-[1px] my-4"></div>
+      <div className="px-4">
+        <Button
+          label="Finish randomly"
+          onClick={finishVoting}
+          className="w-full"
+        />
+      </div>
     </div>
   );
 };
