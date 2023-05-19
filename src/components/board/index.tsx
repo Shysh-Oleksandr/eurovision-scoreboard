@@ -3,7 +3,10 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { pointsArray } from '../../data';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 
+import BoardHeader from './BoardHeader';
 import CountryItem from './CountryItem';
+
+const MAX_COUNTRY_WITH_POINTS = pointsArray.length;
 
 type Props = {
   countries: Country[];
@@ -27,14 +30,21 @@ const Board = ({
 
   const countriesHalfLength = Math.ceil(sortedCountries.length / 2);
 
-  const onPress = useCallback(
-    (countryCode: string) => {
-      const countriesWithPointsLength = countries.filter(
-        (country) => country.lastReceivedPoints,
-      ).length;
+  const countriesWithPointsLength = useMemo(
+    () => countries.filter((country) => country.lastReceivedPoints).length,
+    [countries],
+  );
 
+  const hasCountryFinishedVoting =
+    countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS;
+
+  const onClick = useCallback(
+    (countryCode: string) => {
       // Clear timer and reset points if there's a timer and we give '1' point
-      if (timerId.current && countriesWithPointsLength === pointsArray.length) {
+      if (
+        timerId.current &&
+        countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS
+      ) {
         clearTimeout(timerId.current);
         timerId.current = null;
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
@@ -42,13 +52,13 @@ const Board = ({
       // Reset points if there's was a random vote and we give '1' point
       if (
         !timerId.current &&
-        countriesWithPointsLength === pointsArray.length
+        countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS
       ) {
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
       }
 
       // Set timer to display last received points after giving '12' points
-      if (countriesWithPointsLength === pointsArray.length - 1) {
+      if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
         timerId.current = setTimeout(() => {
           timerId.current = null;
 
@@ -61,20 +71,17 @@ const Board = ({
         payload: { countryCode },
       });
     },
-    [countries, dispatch],
+    [countriesWithPointsLength, dispatch],
   );
 
   return (
     <div className="w-2/3 h-full">
-      <div className="pb-2">
-        <h3 className="text-2xl text-white">
-          {isJuryVoting
-            ? `Choose a country to give ${votingPoints} point${
-                votingPoints === 1 ? '' : 's'
-              }`
-            : ''}
-        </h3>
-      </div>
+      <BoardHeader
+        isJuryVoting={isJuryVoting}
+        votingPoints={votingPoints}
+        countries={countries}
+        onClick={onClick}
+      />
       <div className="w-full flex gap-x-6 h-full">
         <div className="w-1/2 h-full">
           {sortedCountries
@@ -83,7 +90,8 @@ const Board = ({
               <CountryItem
                 key={country.code}
                 country={country}
-                onPress={onPress}
+                hasCountryFinishedVoting={hasCountryFinishedVoting}
+                onClick={onClick}
               />
             ))}
         </div>
@@ -94,7 +102,8 @@ const Board = ({
               <CountryItem
                 key={country.code}
                 country={country}
-                onPress={onPress}
+                hasCountryFinishedVoting={hasCountryFinishedVoting}
+                onClick={onClick}
               />
             ))}
         </div>

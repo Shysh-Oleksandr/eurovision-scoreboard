@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { ScoreboardAction, ScoreboardActionKind } from '../../models';
+import Button from '../Button';
 
 type Props = {
   shouldShowLastPoints: boolean;
@@ -10,7 +11,7 @@ type Props = {
 const VotingButtons = ({ shouldShowLastPoints, dispatch }: Props) => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
 
-  const voteRandomly = () => {
+  const voteRandomly = useCallback(() => {
     if (timerId.current) {
       clearTimeout(timerId.current);
       timerId.current = null;
@@ -19,14 +20,13 @@ const VotingButtons = ({ shouldShowLastPoints, dispatch }: Props) => {
     dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_POINTS });
 
     dispatch({
-      type: ScoreboardActionKind.SET_SHOW_LAST_POINTS,
-      payload: { shouldShowLastPoints: false },
+      type: ScoreboardActionKind.HIDE_LAST_RECEIVED_POINTS,
     });
 
     timerId.current = setTimeout(() => {
       dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
     }, 3000);
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     if (shouldShowLastPoints && timerId.current) {
@@ -37,12 +37,7 @@ const VotingButtons = ({ shouldShowLastPoints, dispatch }: Props) => {
 
   return (
     <div className="bg-blue-950 w-full py-2 px-4">
-      <button
-        className="bg-blue-900 px-5 py-3 text-white font-medium uppercase rounded-md shadow-lg transition-colors duration-300 hover:bg-blue-800"
-        onClick={voteRandomly}
-      >
-        Vote randomly
-      </button>
+      <Button label="Vote randomly" onClick={voteRandomly} />
     </div>
   );
 };

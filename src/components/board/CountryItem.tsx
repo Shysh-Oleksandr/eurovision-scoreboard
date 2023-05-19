@@ -4,21 +4,23 @@ import { Country } from '../../models';
 
 type Props = {
   country: Country;
-  onPress: (countryCode: string) => void;
+  hasCountryFinishedVoting: boolean;
+  onClick: (countryCode: string) => void;
 };
 
-const CountryItem = ({ country, onPress }: Props) => {
+const CountryItem = ({ country, hasCountryFinishedVoting, onClick }: Props) => {
   const isVoted = country.lastReceivedPoints !== 0;
+  const isDisabled = isVoted && !hasCountryFinishedVoting;
 
   return (
     <button
       className={`flex justify-between bg-white mb-[6px] h-10 w-full ${
-        isVoted
+        isDisabled
           ? ''
           : 'cursor-pointer transition-all duration-300 hover:bg-sky-100'
       }`}
-      disabled={isVoted}
-      onClick={() => onPress(country.code)}
+      disabled={isDisabled}
+      onClick={() => onClick(country.code)}
     >
       <div className="flex items-center">
         <img

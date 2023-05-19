@@ -129,10 +129,10 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
         }),
       };
     }
-    case ScoreboardActionKind.SET_SHOW_LAST_POINTS:
+    case ScoreboardActionKind.HIDE_LAST_RECEIVED_POINTS:
       return {
         ...state,
-        shouldShowLastPoints: !!payload?.shouldShowLastPoints,
+        shouldShowLastPoints: false,
       };
 
     default:
