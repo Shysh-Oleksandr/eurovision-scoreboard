@@ -10,18 +10,16 @@ export interface Country {
 export enum ScoreboardActionKind {
   GIVE_POINTS = 'GIVE_POINTS',
   GIVE_RANDOM_POINTS = 'GIVE_RANDOM_POINTS',
+  RESET_LAST_POINTS = 'RESET_LAST_POINTS',
+  SET_SHOW_LAST_POINTS = 'SET_SHOW_LAST_POINTS',
 }
 
 export interface ScoreboardAction {
   type: ScoreboardActionKind;
-  payload?: string;
-}
-
-export interface ScoreboardState {
-  countries: Country[];
-  isJuryVoting: boolean;
-  votingCountryIndex: number;
-  votingPoints: number;
+  payload?: {
+    countryCode?: string;
+    shouldShowLastPoints?: boolean;
+  };
 }
 
 export interface CountryWithPoints {

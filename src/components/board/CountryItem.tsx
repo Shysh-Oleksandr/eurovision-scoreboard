@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { Country } from '../../models';
 
 type Props = {
   country: Country;
-  dispatch: React.Dispatch<ScoreboardAction>;
+  onPress: (countryCode: string) => void;
 };
 
-const CountryItem = ({ country, dispatch }: Props) => {
+const CountryItem = ({ country, onPress }: Props) => {
   const isVoted = country.lastReceivedPoints !== 0;
 
   return (
@@ -18,12 +18,7 @@ const CountryItem = ({ country, dispatch }: Props) => {
           : 'cursor-pointer transition-all duration-300 hover:bg-sky-100'
       }`}
       disabled={isVoted}
-      onClick={() =>
-        dispatch({
-          type: ScoreboardActionKind.GIVE_POINTS,
-          payload: country.code,
-        })
-      }
+      onClick={() => onPress(country.code)}
     >
       <div className="flex items-center">
         <img
