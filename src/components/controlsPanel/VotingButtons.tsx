@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
+import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';
 
 import TelevoteInput from './TelevoteInput';
 
 type Props = {
+  countries: Country[];
   shouldShowLastPoints: boolean;
   isJuryVoting: boolean;
   countriesLeft: number;
@@ -14,6 +16,7 @@ type Props = {
 };
 
 const VotingButtons = ({
+  countries,
   shouldShowLastPoints,
   isJuryVoting,
   countriesLeft,
@@ -40,14 +43,40 @@ const VotingButtons = ({
   }, [dispatch]);
 
   const finishVoting = useCallback(() => {
-    new Array(countriesLeft).fill(0).map(() => {
-      dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_POINTS });
+    if (isJuryVoting) {
+      new Array(countriesLeft).fill(0).map(() => {
+        dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_POINTS });
+      });
 
       timerId.current = setTimeout(() => {
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
       }, 3000);
-    });
-  }, [countriesLeft, dispatch]);
+    } else {
+      const filteredCountries = countries.filter(
+        (country) => !country.isVotingFinished,
+      );
+      const sortedCountries = [...filteredCountries].sort(
+        (a, b) => b.points - a.points,
+      );
+
+      sortedCountries.map((votingCountry) => {
+        const votingCountryPlace =
+          countries.findIndex(
+            (country) => country.code === votingCountry.code,
+          ) + 1;
+
+        const randomVotingPoints = getRandomTelevotePoints(votingCountryPlace);
+
+        dispatch({
+          type: ScoreboardActionKind.GIVE_TELEVOTE_POINTS,
+          payload: {
+            countryCode: votingCountry.code,
+            votingPoints: randomVotingPoints,
+          },
+        });
+      });
+    }
+  }, [countries, countriesLeft, dispatch, isJuryVoting]);
 
   useEffect(() => {
     if (shouldShowLastPoints && timerId.current) {

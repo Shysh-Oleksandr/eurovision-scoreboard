@@ -1,13 +1,16 @@
 import React, { useCallback } from 'react';
 
+import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';
+import StartOverButton from '../StartOverButton';
 
 type Props = {
   countries: Country[];
   isJuryVoting: boolean;
   votingPoints: number;
   votingCountry: Country;
+  winnerCountry: Country | null;
   onClick: (countryCode: string) => void;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
@@ -17,29 +20,28 @@ const BoardHeader = ({
   isJuryVoting,
   votingPoints,
   votingCountry,
+  winnerCountry,
   onClick,
   dispatch,
 }: Props): JSX.Element => {
+  const votingText = isJuryVoting
+    ? `Choose a country to give ${votingPoints} point${
+        votingPoints === 1 ? '' : 's'
+      }`
+    : `Enter televote points for ${votingCountry?.name}`;
+
   const chooseRandomly = useCallback(() => {
     if (!isJuryVoting) {
-      // TODO: change logic depending on the index
-      const randomNumber = Math.random();
-      const isBigNumber = randomNumber > 0.8;
-      const isHugeNumber = randomNumber > 0.95;
-      const isSmallNumber = randomNumber < 0.2;
+      const votingCountryPlace =
+        countries.findIndex((country) => country.code === votingCountry.code) +
+        1;
 
-      const bigRandomNumber = Math.random() * (isHugeNumber ? 450 : 220);
-      const smallRandomNumber = Math.random() * 30;
-      const randomCoefficient = isBigNumber ? bigRandomNumber : randomNumber;
-
-      const randomVotingPoints = Math.round(
-        isSmallNumber ? smallRandomNumber : randomCoefficient,
-      );
+      const randomVotingPoints = getRandomTelevotePoints(votingCountryPlace);
 
       dispatch({
         type: ScoreboardActionKind.GIVE_TELEVOTE_POINTS,
         payload: {
-          countryCode: votingCountry.code,
+          countryCode: votingCountry?.code,
           votingPoints: randomVotingPoints,
         },
       });
@@ -57,18 +59,20 @@ const BoardHeader = ({
     const randomCountryCode = countriesWithoutPoints[randomCountryIndex].code;
 
     onClick(randomCountryCode);
-  }, [countries, votingCountry.code, isJuryVoting, dispatch, onClick]);
+  }, [countries, votingCountry?.code, isJuryVoting, dispatch, onClick]);
 
   return (
     <div className="pb-2 flex flex-row w-full justify-between items-center">
       <h3 className="text-2xl text-white">
-        {isJuryVoting
-          ? `Choose a country to give ${votingPoints} point${
-              votingPoints === 1 ? '' : 's'
-            }`
-          : `Enter televote points for ${votingCountry.name}`}
+        {winnerCountry
+          ? `${winnerCountry.name} is the winner of Eurovision!`
+          : votingText}
       </h3>
-      <Button label="Choose randomly" onClick={chooseRandomly} />
+      {winnerCountry ? (
+        <StartOverButton dispatch={dispatch} className="w-1/4" />
+      ) : (
+        <Button label="Choose randomly" onClick={chooseRandomly} />
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { POINTS_ARRAY } from './../data';
+import { POINTS_ARRAY, QUALIFIED_COUNTRIES } from './../data';
 import countries from './../data/countries.json';
 import { getNextVotingPoints } from './../helpers/getNextVotingPoints';
 import {
@@ -8,9 +8,7 @@ import {
   ScoreboardActionKind,
 } from './../models';
 
-const qualifiedCountries = countries.filter((country) => country.isQualified);
-
-const initialCountries: Country[] = qualifiedCountries.map((country) => ({
+const initialCountries: Country[] = QUALIFIED_COUNTRIES.map((country) => ({
   ...country,
   points: 0,
   lastReceivedPoints: 0,
@@ -22,6 +20,7 @@ interface ScoreboardState {
   votingCountryIndex: number;
   votingPoints: number;
   shouldShowLastPoints: boolean;
+  winnerCountry: Country | null;
 }
 
 export const initialState: ScoreboardState = {
@@ -29,7 +28,8 @@ export const initialState: ScoreboardState = {
   isJuryVoting: true,
   votingCountryIndex: 0,
   votingPoints: 1,
-  shouldShowLastPoints: false,
+  shouldShowLastPoints: true,
+  winnerCountry: null,
 };
 
 function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
@@ -53,13 +53,17 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
       !country.isVotingFinished && country.code !== payload?.countryCode,
   );
 
-  const lastCountryCodeByPoints = [...countriesLeft].sort(
-    (a, b) => a.points - b.points,
-  )[0].code;
+  const lastCountryCodeByPoints = countriesLeft.length
+    ? [...countriesLeft].sort((a, b) => b.points - a.points)[
+        countriesLeft.length - 1
+      ].code
+    : '';
 
   const lastCountryByPointsIndex = countries.findIndex(
     (country) => country.code === lastCountryCodeByPoints,
   );
+
+  const isVotingOver = lastCountryByPointsIndex === -1;
 
   switch (type) {
     case ScoreboardActionKind.GIVE_JURY_POINTS: {
@@ -85,23 +89,34 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
       };
     }
     case ScoreboardActionKind.GIVE_TELEVOTE_POINTS: {
+      const mappedCountries = state.countries.map((country) => {
+        if (country.code === payload?.countryCode) {
+          return {
+            ...country,
+            points: country.points + (payload?.votingPoints ?? 0),
+            lastReceivedPoints: payload?.votingPoints ?? 0,
+            isVotingFinished: true,
+          };
+        }
+
+        return country;
+      });
+
+      let winnerCountry = null;
+
+      if (isVotingOver) {
+        winnerCountry = mappedCountries.reduce((prev, current) => {
+          return prev.points > current.points ? prev : current;
+        });
+      }
+
       return {
         ...state,
         votingCountryIndex: lastCountryByPointsIndex,
         isJuryVoting: false,
-        shouldShowLastPoints: true,
-        countries: state.countries.map((country) => {
-          if (country.code === payload?.countryCode) {
-            return {
-              ...country,
-              points: country.points + (payload?.votingPoints ?? 0),
-              lastReceivedPoints: payload?.votingPoints ?? 0,
-              isVotingFinished: true,
-            };
-          }
-
-          return country;
-        }),
+        shouldShowLastPoints: false,
+        winnerCountry,
+        countries: mappedCountries,
       };
     }
 
@@ -128,28 +143,42 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
         countriesWithPoints.push({ code: randomCountry.code, points });
       });
 
+      const mappedCountries = state.countries.map((country) => {
+        const randomlyReceivedPoints =
+          countriesWithPoints.find(
+            (countryWithPoints) => countryWithPoints.code === country.code,
+          )?.points || 0;
+
+        return {
+          ...country,
+          points: country.points + randomlyReceivedPoints,
+          lastReceivedPoints:
+            randomlyReceivedPoints ||
+            (shouldResetLastPoints ? 0 : country.lastReceivedPoints),
+        };
+      });
+
+      let televoteCountryIndex = lastCountryByPointsIndex;
+
+      if (isJuryVotingOver) {
+        const lastCountryCodeByPoints = [...mappedCountries].sort(
+          (a, b) => b.points - a.points,
+        )[mappedCountries.length - 1].code;
+
+        televoteCountryIndex = countries.findIndex(
+          (country) => country.code === lastCountryCodeByPoints,
+        );
+      }
+
       return {
         ...state,
         votingPoints: 1,
         votingCountryIndex: isJuryVotingOver
-          ? lastCountryByPointsIndex
+          ? televoteCountryIndex
           : state.votingCountryIndex + 1,
         isJuryVoting: !isJuryVotingOver,
         shouldShowLastPoints: true,
-        countries: state.countries.map((country) => {
-          const randomlyReceivedPoints =
-            countriesWithPoints.find(
-              (countryWithPoints) => countryWithPoints.code === country.code,
-            )?.points || 0;
-
-          return {
-            ...country,
-            points: country.points + randomlyReceivedPoints,
-            lastReceivedPoints:
-              randomlyReceivedPoints ||
-              (shouldResetLastPoints ? 0 : country.lastReceivedPoints),
-          };
-        }),
+        countries: mappedCountries,
       };
     }
 
@@ -169,6 +198,9 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
         ...state,
         shouldShowLastPoints: false,
       };
+
+    case ScoreboardActionKind.START_OVER:
+      return initialState;
 
     default:
       return state;

@@ -14,6 +14,7 @@ export enum ScoreboardActionKind {
   GIVE_RANDOM_POINTS = 'GIVE_RANDOM_POINTS',
   RESET_LAST_POINTS = 'RESET_LAST_POINTS',
   HIDE_LAST_RECEIVED_POINTS = 'HIDE_LAST_RECEIVED_POINTS',
+  START_OVER = 'START_OVER',
 }
 
 export interface ScoreboardAction {

@@ -1,28 +1,36 @@
 import React from 'react';
 
 import { COUNTRIES_LENGTH } from '../../data';
-import { ScoreboardAction } from '../../models';
+import { Country, ScoreboardAction } from '../../models';
 
 import CountryInfo from './CountryInfo';
 import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
 type Props = {
+  countries: Country[];
   votingCountryIndex: number;
   votingPoints: number;
   isJuryVoting: boolean;
   shouldShowLastPoints: boolean;
+  isVotingOver: boolean;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
 const ControlsPanel = ({
+  countries,
   votingCountryIndex,
   votingPoints,
   isJuryVoting,
   shouldShowLastPoints,
+  isVotingOver,
   dispatch,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
   const countriesLeft = COUNTRIES_LENGTH - votingCountryIndex;
+
+  if (isVotingOver) {
+    return null;
+  }
 
   return (
     <div className="flex-1 mb-[6px] pt-1">
@@ -34,6 +42,7 @@ const ControlsPanel = ({
       {isJuryVoting && <CountryInfo votingCountryIndex={votingCountryIndex} />}
       <VotingButtons
         dispatch={dispatch}
+        countries={countries}
         shouldShowLastPoints={shouldShowLastPoints}
         countriesLeft={countriesLeft}
         isJuryVoting={isJuryVoting}

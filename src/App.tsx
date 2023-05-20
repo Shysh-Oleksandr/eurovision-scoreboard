@@ -5,6 +5,7 @@ import '/dist/output.css';
 
 import Board from './components/board';
 import ControlsPanel from './components/controlsPanel';
+import WinnerModal from './components/WinnerModal';
 import scoreboardReducer, { initialState } from './state/reducer';
 
 export const App = () => {
@@ -17,17 +18,21 @@ export const App = () => {
           countries={state.countries}
           votingPoints={state.votingPoints}
           isJuryVoting={state.isJuryVoting}
+          winnerCountry={state.winnerCountry}
           votingCountryIndex={state.votingCountryIndex}
           dispatch={dispatch}
         />
         <ControlsPanel
+          countries={state.countries}
           votingCountryIndex={state.votingCountryIndex}
           votingPoints={state.votingPoints}
           isJuryVoting={state.isJuryVoting}
           shouldShowLastPoints={state.shouldShowLastPoints}
+          isVotingOver={!!state.winnerCountry}
           dispatch={dispatch}
         />
       </div>
+      <WinnerModal winnerCountry={state.winnerCountry} dispatch={dispatch} />
     </div>
   );
 };

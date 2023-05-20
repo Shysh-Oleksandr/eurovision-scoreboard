@@ -14,6 +14,10 @@ export const COUNTRIES_LENGTH = countries.length;
 
 const countryVotingPoints = POINTS_ARRAY.reduce((prev, curr) => prev + curr, 0);
 
+export const QUALIFIED_COUNTRIES = countries.filter(
+  (country) => country.isQualified,
+);
+
 export const TOTAL_TELEVOTE_POINTS =
   countryVotingPoints * (COUNTRIES_LENGTH - 1);
 export const MAX_POSSIBLE_TELEVOTE_POINTS = 12 * (COUNTRIES_LENGTH - 1);

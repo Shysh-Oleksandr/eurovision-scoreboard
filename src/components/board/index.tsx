@@ -12,6 +12,7 @@ const MAX_COUNTRY_WITH_POINTS = POINTS_ARRAY.length;
 type Props = {
   countries: Country[];
   isJuryVoting: boolean;
+  winnerCountry: Country | null;
   votingPoints: number;
   votingCountryIndex: number;
   dispatch: React.Dispatch<ScoreboardAction>;
@@ -20,6 +21,7 @@ type Props = {
 const Board = ({
   countries,
   isJuryVoting,
+  winnerCountry,
   votingPoints,
   votingCountryIndex,
   dispatch,
@@ -86,7 +88,7 @@ const Board = ({
         country={country}
         isJuryVoting={isJuryVoting}
         hasCountryFinishedVoting={hasCountryFinishedVoting}
-        isActive={country.code === votingCountry?.code}
+        isActive={country.code === votingCountry?.code && !isJuryVoting}
         onClick={onClick}
       />
     ),
@@ -98,8 +100,9 @@ const Board = ({
       <BoardHeader
         isJuryVoting={isJuryVoting}
         votingPoints={votingPoints}
-        countries={countries}
+        countries={sortedCountries}
         votingCountry={votingCountry}
+        winnerCountry={winnerCountry}
         dispatch={dispatch}
         onClick={onClick}
       />

@@ -16,7 +16,7 @@ const TelevoteInput = ({ votingCountryIndex, dispatch }: Props) => {
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
-  const votingCountryCode = allCountries[votingCountryIndex].code;
+  const votingCountryCode = allCountries[votingCountryIndex]?.code || '';
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
