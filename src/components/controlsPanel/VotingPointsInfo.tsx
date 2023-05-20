@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { pointsArray } from '../../data';
+import { POINTS_ARRAY } from '../../data';
 
 type Props = { votingPoints: number };
 
 const VotingPointsInfo = ({ votingPoints }: Props) => {
   return (
     <div className="flex justify-between w-full mt-6">
-      {pointsArray.map((points) => {
+      {POINTS_ARRAY.map((points) => {
         const isActive = points === votingPoints;
 
         return (

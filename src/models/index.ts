@@ -5,23 +5,24 @@ export interface Country {
   flag: string;
   points: number;
   lastReceivedPoints: number;
+  isVotingFinished?: boolean;
 }
 
 export enum ScoreboardActionKind {
-  GIVE_POINTS = 'GIVE_POINTS',
+  GIVE_JURY_POINTS = 'GIVE_JURY_POINTS',
+  GIVE_TELEVOTE_POINTS = 'GIVE_TELEVOTE_POINTS',
   GIVE_RANDOM_POINTS = 'GIVE_RANDOM_POINTS',
+  RESET_LAST_POINTS = 'RESET_LAST_POINTS',
+  HIDE_LAST_RECEIVED_POINTS = 'HIDE_LAST_RECEIVED_POINTS',
+  START_OVER = 'START_OVER',
 }
 
 export interface ScoreboardAction {
   type: ScoreboardActionKind;
-  payload?: string;
-}
-
-export interface ScoreboardState {
-  countries: Country[];
-  isJuryVoting: boolean;
-  votingCountryIndex: number;
-  votingPoints: number;
+  payload?: {
+    countryCode?: string;
+    votingPoints?: number;
+  };
 }
 
 export interface CountryWithPoints {

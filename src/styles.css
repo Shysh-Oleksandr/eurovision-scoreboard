@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* To start tailwind: npx tailwindcss -i ./src/index.css -o ./dist/output.css --watch */
+/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch */
 
 /*Zero styles*/
 * {
