@@ -20,6 +20,7 @@ interface ScoreboardState {
   votingCountryIndex: number;
   votingPoints: number;
   shouldShowLastPoints: boolean;
+  shouldClearPoints: boolean;
   winnerCountry: Country | null;
 }
 
@@ -29,6 +30,7 @@ export const initialState: ScoreboardState = {
   votingCountryIndex: 0,
   votingPoints: 1,
   shouldShowLastPoints: true,
+  shouldClearPoints: false,
   winnerCountry: null,
 };
 
@@ -75,6 +77,7 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
           : nextVotingCountryIndex,
         isJuryVoting: !isJuryVotingOver,
         shouldShowLastPoints: !shouldResetLastPoints,
+        shouldClearPoints: isJuryVotingOver,
         countries: state.countries.map((country) => {
           if (country.code === payload?.countryCode) {
             return {
@@ -115,12 +118,13 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
         votingCountryIndex: lastCountryByPointsIndex,
         isJuryVoting: false,
         shouldShowLastPoints: false,
+        shouldClearPoints: true,
         winnerCountry,
         countries: mappedCountries,
       };
     }
 
-    case ScoreboardActionKind.GIVE_RANDOM_POINTS: {
+    case ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS: {
       const countriesWithPoints: CountryWithPoints[] = [];
 
       const pointsLeftArray = POINTS_ARRAY.filter(
@@ -177,6 +181,7 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
           ? televoteCountryIndex
           : state.votingCountryIndex + 1,
         isJuryVoting: !isJuryVotingOver,
+        shouldClearPoints: isJuryVotingOver,
         shouldShowLastPoints: true,
         countries: mappedCountries,
       };

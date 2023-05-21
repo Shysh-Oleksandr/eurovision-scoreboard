@@ -38,7 +38,7 @@ const CountryItem = ({
           : 'cursor-pointer transition-all duration-300 hover:bg-sky-100'
       } ${country.isVotingFinished ? 'bg-blue-900' : 'bg-white'} ${
         isActive
-          ? 'outline outline-2 outline-blue-500 rounded-sm bg-blue-700'
+          ? 'outline outline-2 outline-blue-500 rounded-sm !bg-blue-700'
           : ''
       }`}
       disabled={isDisabled}

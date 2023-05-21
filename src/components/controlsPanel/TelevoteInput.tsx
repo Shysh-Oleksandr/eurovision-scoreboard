@@ -9,10 +9,15 @@ const NUMBER_REGEX = /^\d*$/;
 
 type Props = {
   votingCountryIndex: number;
+  isFirstTelevoteCountry: boolean;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
-const TelevoteInput = ({ votingCountryIndex, dispatch }: Props) => {
+const TelevoteInput = ({
+  votingCountryIndex,
+  isFirstTelevoteCountry,
+  dispatch,
+}: Props) => {
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
@@ -47,6 +52,12 @@ const TelevoteInput = ({ votingCountryIndex, dispatch }: Props) => {
     }
 
     setEnteredPoints('');
+
+    if (isFirstTelevoteCountry) {
+      dispatch({
+        type: ScoreboardActionKind.RESET_LAST_POINTS,
+      });
+    }
 
     dispatch({
       type: ScoreboardActionKind.GIVE_TELEVOTE_POINTS,

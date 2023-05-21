@@ -32,6 +32,15 @@ const BoardHeader = ({
 
   const chooseRandomly = useCallback(() => {
     if (!isJuryVoting) {
+      const isFirstTelevoteCountry =
+        countries.filter((country) => country.isVotingFinished).length === 0;
+
+      if (isFirstTelevoteCountry) {
+        dispatch({
+          type: ScoreboardActionKind.RESET_LAST_POINTS,
+        });
+      }
+
       const votingCountryPlace =
         countries.findIndex((country) => country.code === votingCountry.code) +
         1;

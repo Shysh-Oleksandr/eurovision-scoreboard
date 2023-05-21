@@ -29,6 +29,7 @@ export const App = () => {
           isJuryVoting={state.isJuryVoting}
           shouldShowLastPoints={state.shouldShowLastPoints}
           isVotingOver={!!state.winnerCountry}
+          shouldClearPoints={state.shouldClearPoints}
           dispatch={dispatch}
         />
       </div>
