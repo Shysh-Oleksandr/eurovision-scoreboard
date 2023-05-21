@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
@@ -12,6 +12,7 @@ type Props = {
   isJuryVoting: boolean;
   countriesLeft: number;
   votingCountryIndex: number;
+  shouldClearPoints: boolean;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
@@ -21,9 +22,15 @@ const VotingButtons = ({
   isJuryVoting,
   countriesLeft,
   votingCountryIndex,
+  shouldClearPoints,
   dispatch,
 }: Props) => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
+
+  const isFirstTelevoteCountry = useMemo(
+    () => countries.filter((country) => country.isVotingFinished).length === 0,
+    [countries],
+  );
 
   const voteRandomly = useCallback(() => {
     if (timerId.current) {
@@ -31,7 +38,7 @@ const VotingButtons = ({
       timerId.current = null;
     }
 
-    dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_POINTS });
+    dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS });
 
     dispatch({
       type: ScoreboardActionKind.HIDE_LAST_RECEIVED_POINTS,
@@ -45,7 +52,7 @@ const VotingButtons = ({
   const finishVoting = useCallback(() => {
     if (isJuryVoting) {
       new Array(countriesLeft).fill(0).map(() => {
-        dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_POINTS });
+        dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS });
       });
 
       timerId.current = setTimeout(() => {
@@ -79,27 +86,28 @@ const VotingButtons = ({
   }, [countries, countriesLeft, dispatch, isJuryVoting]);
 
   useEffect(() => {
-    if (shouldShowLastPoints && timerId.current) {
+    if ((shouldShowLastPoints || shouldClearPoints) && timerId.current) {
       clearTimeout(timerId.current);
       timerId.current = null;
     }
-  }, [shouldShowLastPoints]);
+  }, [shouldShowLastPoints, shouldClearPoints]);
 
   return (
-    <div className="bg-blue-950 w-full pt-2 pb-4">
+    <div className="bg-blue-950 w-full pt-2 lg:pb-4 pb-3">
       {isJuryVoting ? (
-        <div className="px-4">
+        <div className="lg:px-4 px-3">
           <Button label="Vote randomly" onClick={voteRandomly} />
         </div>
       ) : (
         <TelevoteInput
           votingCountryIndex={votingCountryIndex}
+          isFirstTelevoteCountry={isFirstTelevoteCountry}
           dispatch={dispatch}
         />
       )}
 
-      <div className="w-full bg-slate-600 h-[1px] my-4"></div>
-      <div className="px-4">
+      <div className="w-full bg-slate-600 h-[1px] lg:my-4 my-3"></div>
+      <div className="lg:px-4 px-3">
         <Button
           label="Finish randomly"
           onClick={finishVoting}

@@ -32,6 +32,15 @@ const BoardHeader = ({
 
   const chooseRandomly = useCallback(() => {
     if (!isJuryVoting) {
+      const isFirstTelevoteCountry =
+        countries.filter((country) => country.isVotingFinished).length === 0;
+
+      if (isFirstTelevoteCountry) {
+        dispatch({
+          type: ScoreboardActionKind.RESET_LAST_POINTS,
+        });
+      }
+
       const votingCountryPlace =
         countries.findIndex((country) => country.code === votingCountry.code) +
         1;
@@ -63,7 +72,7 @@ const BoardHeader = ({
 
   return (
     <div className="pb-2 flex flex-row w-full justify-between items-center">
-      <h3 className="text-2xl text-white">
+      <h3 className="lg:text-2xl text-xl text-white">
         {winnerCountry
           ? `${winnerCountry.name} is the winner of Eurovision!`
           : votingText}

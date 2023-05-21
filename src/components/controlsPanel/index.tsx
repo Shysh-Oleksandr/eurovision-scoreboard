@@ -13,6 +13,7 @@ type Props = {
   votingPoints: number;
   isJuryVoting: boolean;
   shouldShowLastPoints: boolean;
+  shouldClearPoints: boolean;
   isVotingOver: boolean;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
@@ -23,6 +24,7 @@ const ControlsPanel = ({
   votingPoints,
   isJuryVoting,
   shouldShowLastPoints,
+  shouldClearPoints,
   isVotingOver,
   dispatch,
 }: Props): JSX.Element | null => {
@@ -33,9 +35,9 @@ const ControlsPanel = ({
   }
 
   return (
-    <div className="flex-1 mb-[6px] pt-1">
-      <div className="pb-3">
-        <h3 className="text-2xl text-white">
+    <div className="flex-1 mb-[6px] md:pt-1 pt-4">
+      <div className="md:pb-3 pb-1">
+        <h3 className="lg:text-2xl text-xl text-white">
           {isJuryVoting ? 'Jury voting' : 'Televote'}
         </h3>
       </div>
@@ -47,6 +49,7 @@ const ControlsPanel = ({
         countriesLeft={countriesLeft}
         isJuryVoting={isJuryVoting}
         votingCountryIndex={votingCountryIndex}
+        shouldClearPoints={shouldClearPoints}
       />
       {isJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
     </div>
