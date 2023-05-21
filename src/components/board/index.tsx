@@ -96,7 +96,7 @@ const Board = ({
   );
 
   return (
-    <div className="w-2/3 h-full">
+    <div className={`${winnerCountry ? '' : 'md:w-2/3'} w-full h-full`}>
       <BoardHeader
         isJuryVoting={isJuryVoting}
         votingPoints={votingPoints}
@@ -106,7 +106,7 @@ const Board = ({
         dispatch={dispatch}
         onClick={onClick}
       />
-      <div className="w-full flex gap-x-6 h-full">
+      <div className="w-full flex lg:gap-x-6 md:gap-x-4 gap-x-3 h-full">
         <div className="w-1/2 h-full">
           {sortedCountries
             .slice(0, countriesHalfLength)

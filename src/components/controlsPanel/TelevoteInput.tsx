@@ -66,13 +66,13 @@ const TelevoteInput = ({
   };
 
   return (
-    <div className="px-4 mt-1">
-      <label className="text-xl text-white" htmlFor="televoteInput">
+    <div className="lg:px-4 px-3 mt-1">
+      <label className="lg:text-xl text-lg text-white" htmlFor="televoteInput">
         Enter televote points
       </label>
       <div className="flex">
         <input
-          className="w-full py-3 px-2 mt-2 rounded-md bg-blue-900 transition-colors duration-300 placeholder:text-gray-400 text-white border-solid border-transparent border-b-2 hover:bg-blue-800 focus:bg-blue-800 focus:border-white "
+          className="w-full lg:pt-3 md:pt-2 pt-1 lg:pb-2 md:pb-1 pb-[2px] px-2 mt-2 rounded-md bg-blue-900 transition-colors duration-300 placeholder:text-gray-400 text-white lg:text-base text-sm border-solid border-transparent border-b-2 hover:bg-blue-800 focus:bg-blue-800 focus:border-white "
           name="televoteInput"
           id="televoteInput"
           type="number"
@@ -80,9 +80,17 @@ const TelevoteInput = ({
           value={enteredPoints}
           onChange={handleInputChange}
         />
-        <Button label="Vote" onClick={handleVoting} className="mt-2 ml-2" />
+        <Button
+          label="Vote"
+          onClick={handleVoting}
+          className="mt-2 ml-2 md:px-4 !px-6"
+        />
       </div>
-      {error !== '' && <h5 className="text-red-600 text-base ml-2">{error}</h5>}
+      {error !== '' && (
+        <h5 className="text-red-500 lg:text-base text-sm lg:ml-2 ml-1 lg:pt-0 pt-1">
+          {error}
+        </h5>
+      )}
     </div>
   );
 };

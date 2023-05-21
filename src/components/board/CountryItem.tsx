@@ -32,7 +32,7 @@ const CountryItem = ({
 
   return (
     <button
-      className={`flex justify-between shadow-md mb-[6px] h-10 w-full ${
+      className={`flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
         isDisabled
           ? ''
           : 'cursor-pointer transition-all duration-300 hover:bg-sky-100'
@@ -48,10 +48,10 @@ const CountryItem = ({
         <img
           src={country.flag}
           alt={`${country.name} flag`}
-          className="w-14 h-10 bg-white"
+          className="lg:w-14 md:w-12 w-10 lg:h-10 md:h-9 h-8 bg-white"
         />
         <h4
-          className={`uppercase ml-1 font-bold text-lg ${
+          className={`uppercase text-left ml-1 font-bold lg:text-lg sm:text-base md:leading-4 text-[13px] ${
             country.isVotingFinished || isActive
               ? 'text-white'
               : 'text-blue-950'
@@ -62,18 +62,18 @@ const CountryItem = ({
       </div>
       <div className="flex h-full">
         {isVoted && !isVotingFinished && (
-          <div className="bg-yellow-300 h-full w-10">
-            <h6 className="text-pink-500 text-lg font-semibold h-full items-center flex justify-center">
+          <div className="bg-yellow-300 h-full lg:w-10 md:w-9 w-8">
+            <h6 className="text-pink-500 lg:text-lg sm:text-base text-[13px] font-semibold h-full items-center flex justify-center">
               {country.lastReceivedPoints}
             </h6>
           </div>
         )}
         <div
-          className={`h-full w-10 ${
+          className={`h-full lg:w-10 md:w-9 w-8 ${
             country.isVotingFinished ? 'bg-blue-600' : 'bg-pink-500'
           }`}
         >
-          <h6 className="text-white text-lg font-semibold h-full items-center flex justify-center">
+          <h6 className="text-white lg:text-lg sm:text-base text-[13px] font-semibold h-full items-center flex justify-center">
             {country.points}
           </h6>
         </div>

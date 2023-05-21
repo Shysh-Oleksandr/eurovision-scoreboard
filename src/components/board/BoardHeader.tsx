@@ -72,7 +72,7 @@ const BoardHeader = ({
 
   return (
     <div className="pb-2 flex flex-row w-full justify-between items-center">
-      <h3 className="text-2xl text-white">
+      <h3 className="lg:text-2xl text-xl text-white">
         {winnerCountry
           ? `${winnerCountry.name} is the winner of Eurovision!`
           : votingText}
