@@ -116,6 +116,14 @@ h6 {
   column-gap: 0.75rem;
 }
 
+.triangle {
+  width: 1rem;
+  position: absolute;
+  left: calc(-1rem + 1px);
+  z-index: 25;
+  height: 100%;
+}
+
 @media (min-width: 768px) {
   .container-wrapping-flip-move > div {
     column-gap: 1rem;
@@ -127,4 +135,3 @@ h6 {
     column-gap: 1.5rem;
   }
 }
-

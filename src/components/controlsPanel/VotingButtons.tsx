@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
+import { ANIMATION_DURATION } from '../../data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';
@@ -46,7 +47,7 @@ const VotingButtons = ({
 
     timerId.current = setTimeout(() => {
       dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
-    }, 3000);
+    }, ANIMATION_DURATION);
   }, [dispatch]);
 
   const finishVoting = useCallback(() => {
@@ -65,7 +66,7 @@ const VotingButtons = ({
 
       timerId.current = setTimeout(() => {
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
-      }, 3000);
+      }, ANIMATION_DURATION);
     } else {
       const filteredCountries = countries.filter(
         (country) => !country.isVotingFinished,

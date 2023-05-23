@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import FlipMove from 'react-flip-move';
 
-import { POINTS_ARRAY } from '../../data';
+import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data';
 import allCountries from '../../data/countries.json';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 
@@ -65,15 +65,13 @@ const Board = ({
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
       }
 
-      // const isJuryVotingOver = votingCountryIndex === allCountries.length - 1;
-
       // Set timer to display last received points if we give '12' points and it's not the last country
       if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
         timerId.current = setTimeout(() => {
           timerId.current = null;
 
           dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
-        }, 3000);
+        }, ANIMATION_DURATION);
       }
 
       dispatch({
@@ -117,7 +115,7 @@ const Board = ({
         onClick={onClick}
       />
       <div className="container-wrapping-flip-move">
-        <FlipMove duration={500}>
+        <FlipMove duration={500} delay={500}>
           {sortedCountries.map((country: Country) => renderItem(country))}
         </FlipMove>
       </div>
