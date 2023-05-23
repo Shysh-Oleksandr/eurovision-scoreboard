@@ -991,6 +991,10 @@ video {
   transition-duration: 300ms;
 }
 
+.duration-1000 {
+  transition-duration: 1000ms;
+}
+
 /* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch */
 
 /*Zero styles*/

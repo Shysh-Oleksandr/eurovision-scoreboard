@@ -4,8 +4,8 @@ import { Country } from '../../models';
 
 type Props = {
   country: Country;
-  hasCountryFinishedVoting: boolean;
   isJuryVoting: boolean;
+  hasCountryFinishedVoting: boolean;
   isActive: boolean;
   onClick: (countryCode: string) => void;
 };
@@ -16,8 +16,8 @@ const CountryItem = forwardRef(
     {
       country,
       hasCountryFinishedVoting,
-      isJuryVoting,
       isActive,
+      isJuryVoting,
       onClick,
     }: Props,
     ref: React.ForwardedRef<HTMLButtonElement>,
@@ -48,10 +48,10 @@ const CountryItem = forwardRef(
     return (
       <button
         ref={ref}
-        className={`flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
+        className={`flex justify-between shadow-md  lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
           isDisabled
             ? ''
-            : 'cursor-pointer transition-all duration-300 hover:bg-sky-100'
+            : 'cursor-pointer transition-colors duration-300 hover:bg-sky-100'
         } ${country.isVotingFinished ? 'bg-blue-900' : 'bg-white'} ${
           isActive
             ? 'outline outline-2 outline-blue-500 rounded-sm !bg-blue-700'
