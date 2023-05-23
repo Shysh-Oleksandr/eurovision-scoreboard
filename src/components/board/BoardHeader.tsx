@@ -73,9 +73,14 @@ const BoardHeader = ({
   return (
     <div className="pb-2 flex flex-row w-full justify-between items-center">
       <h3 className="lg:text-2xl text-xl text-white">
-        {winnerCountry
-          ? `${winnerCountry.name} is the winner of Eurovision!`
-          : votingText}
+        {winnerCountry ? (
+          <>
+            <span className="font-semibold">{winnerCountry.name}</span> is the
+            winner of Eurovision!
+          </>
+        ) : (
+          votingText
+        )}
       </h3>
       {winnerCountry ? (
         <StartOverButton dispatch={dispatch} className="w-1/4" />

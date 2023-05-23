@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import FlipMove from 'react-flip-move';
 
 import { POINTS_ARRAY } from '../../data';
@@ -16,6 +16,7 @@ type Props = {
   winnerCountry: Country | null;
   votingPoints: number;
   votingCountryIndex: number;
+  shouldShowLastPoints: boolean;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
@@ -25,6 +26,7 @@ const Board = ({
   winnerCountry,
   votingPoints,
   votingCountryIndex,
+  shouldShowLastPoints,
   dispatch,
 }: Props): JSX.Element => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
@@ -63,13 +65,10 @@ const Board = ({
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
       }
 
-      const isJuryVotingOver = votingCountryIndex === allCountries.length - 1;
+      // const isJuryVotingOver = votingCountryIndex === allCountries.length - 1;
 
       // Set timer to display last received points if we give '12' points and it's not the last country
-      if (
-        countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1 &&
-        !isJuryVotingOver
-      ) {
+      if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
         timerId.current = setTimeout(() => {
           timerId.current = null;
 
@@ -82,7 +81,7 @@ const Board = ({
         payload: { countryCode },
       });
     },
-    [countriesWithPointsLength, dispatch, votingCountryIndex],
+    [countriesWithPointsLength, dispatch],
   );
 
   const renderItem = useCallback(
@@ -98,6 +97,13 @@ const Board = ({
     ),
     [hasCountryFinishedVoting, votingCountry, isJuryVoting, onClick],
   );
+
+  useEffect(() => {
+    if (!shouldShowLastPoints && timerId.current) {
+      clearTimeout(timerId.current);
+      timerId.current = null;
+    }
+  }, [shouldShowLastPoints]);
 
   return (
     <div className={`${winnerCountry ? '' : 'md:w-2/3'} w-full h-full`}>

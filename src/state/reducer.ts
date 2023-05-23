@@ -183,7 +183,7 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
           ? televoteCountryIndex
           : state.votingCountryIndex + 1,
         isJuryVoting: !isJuryVotingOver,
-        shouldShowLastPoints: true,
+        shouldShowLastPoints: !payload?.isRandomFinishing,
         countries: mappedCountries,
       };
     }

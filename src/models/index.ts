@@ -22,6 +22,7 @@ export interface ScoreboardAction {
   payload?: {
     countryCode?: string;
     votingPoints?: number;
+    isRandomFinishing?: boolean;
   };
 }
 
