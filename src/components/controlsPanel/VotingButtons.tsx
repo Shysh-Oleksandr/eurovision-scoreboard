@@ -59,6 +59,11 @@ const VotingButtons = ({
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
       }, 3000);
     } else {
+      if (timerId.current) {
+        clearTimeout(timerId.current);
+        timerId.current = null;
+      }
+
       const filteredCountries = countries.filter(
         (country) => !country.isVotingFinished,
       );

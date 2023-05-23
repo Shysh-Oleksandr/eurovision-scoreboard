@@ -20,7 +20,8 @@
   "license": "ISC",
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-flip-move": "^3.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.21.8",

@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
+import FlipMove from 'react-flip-move';
 
 import { POINTS_ARRAY } from '../../data';
 import allCountries from '../../data/countries.json';
@@ -33,8 +34,6 @@ const Board = ({
     [countries],
   );
 
-  const countriesHalfLength = Math.ceil(sortedCountries.length / 2);
-
   const countriesWithPointsLength = useMemo(
     () => countries.filter((country) => country.lastReceivedPoints).length,
     [countries],
@@ -64,8 +63,13 @@ const Board = ({
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
       }
 
-      // Set timer to display last received points after giving '12' points
-      if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
+      const isJuryVotingOver = votingCountryIndex === allCountries.length - 1;
+
+      // Set timer to display last received points if we give '12' points and it's not the last country
+      if (
+        countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1 &&
+        !isJuryVotingOver
+      ) {
         timerId.current = setTimeout(() => {
           timerId.current = null;
 
@@ -78,7 +82,7 @@ const Board = ({
         payload: { countryCode },
       });
     },
-    [countriesWithPointsLength, dispatch],
+    [countriesWithPointsLength, dispatch, votingCountryIndex],
   );
 
   const renderItem = useCallback(
@@ -106,17 +110,10 @@ const Board = ({
         dispatch={dispatch}
         onClick={onClick}
       />
-      <div className="w-full flex lg:gap-x-6 md:gap-x-4 gap-x-3 h-full">
-        <div className="w-1/2 h-full">
-          {sortedCountries
-            .slice(0, countriesHalfLength)
-            .map((country: Country) => renderItem(country))}
-        </div>
-        <div className="w-1/2 h-full">
-          {sortedCountries
-            .slice(countriesHalfLength)
-            .map((country: Country) => renderItem(country))}
-        </div>
+      <div className="container-wrapping-flip-move">
+        <FlipMove duration={500}>
+          {sortedCountries.map((country: Country) => renderItem(country))}
+        </FlipMove>
       </div>
     </div>
   );

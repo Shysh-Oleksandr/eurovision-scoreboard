@@ -110,3 +110,21 @@ h6 {
   font-size: inherit;
   font-weight: 400;
 }
+/* ---------------------------------------------------- */
+.container-wrapping-flip-move > div {
+  columns: 2;
+  column-gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .container-wrapping-flip-move > div {
+    column-gap: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-wrapping-flip-move > div {
+    column-gap: 1.5rem;
+  }
+}
+
