@@ -89,6 +89,7 @@ const Board = ({
         country={country}
         isJuryVoting={isJuryVoting}
         hasCountryFinishedVoting={hasCountryFinishedVoting}
+        isVotingCountry={country.code === votingCountry?.code && isJuryVoting}
         isActive={country.code === votingCountry?.code && !isJuryVoting}
         onClick={onClick}
       />

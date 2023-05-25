@@ -16,6 +16,7 @@ type Props = {
   isJuryVoting: boolean;
   hasCountryFinishedVoting: boolean;
   isActive: boolean;
+  isVotingCountry: boolean;
   onClick: (countryCode: string) => void;
 };
 
@@ -27,6 +28,7 @@ const CountryItem = forwardRef(
       hasCountryFinishedVoting,
       isActive,
       isJuryVoting,
+      isVotingCountry,
       onClick,
     }: Props,
     ref: React.ForwardedRef<HTMLButtonElement>,
@@ -37,7 +39,10 @@ const CountryItem = forwardRef(
 
     const isVoted =
       country.lastReceivedPoints !== 0 || country.isVotingFinished;
-    const isDisabled = (isVoted && !hasCountryFinishedVoting) || !isJuryVoting;
+    const isDisabled =
+      (isVoted && !hasCountryFinishedVoting) ||
+      isVotingCountry ||
+      !isJuryVoting;
 
     const shouldShowLastPoints = Boolean(isVoted && !isVotingFinished);
 
@@ -52,7 +57,14 @@ const CountryItem = forwardRef(
       springsDouzeParallelogramBlue,
       springsDouzeParallelogramYellow,
       springsDouzeContainer,
-    } = useAnimatePoints(shouldShowLastPoints, isDouzePoints);
+      springsActive,
+    } = useAnimatePoints(
+      shouldShowLastPoints,
+      isDouzePoints,
+      isActive,
+      isJuryVoting,
+      !!country.isVotingFinished,
+    );
 
     useEffect(() => {
       if (country.isVotingFinished && !timerId.current) {
@@ -80,17 +92,14 @@ const CountryItem = forwardRef(
     }, [isDouzePoints]);
 
     return (
-      <button
+      <animated.button
         ref={ref}
-        className={`relative flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
+        style={springsActive}
+        className={`relative bg-white outline outline-blue-500 flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
           isDisabled
             ? ''
             : 'cursor-pointer transition-colors duration-300 hover:bg-sky-100'
-        } ${country.isVotingFinished ? 'bg-blue-900' : 'bg-white'} ${
-          isActive
-            ? 'outline outline-2 outline-blue-500 rounded-sm !bg-blue-700'
-            : ''
-        }`}
+        } ${isActive ? 'rounded-sm' : ''}`}
         disabled={isDisabled}
         onClick={() => onClick(country.code)}
       >
@@ -116,13 +125,7 @@ const CountryItem = forwardRef(
             alt={`${country.name} flag`}
             className="lg:w-14 md:w-12 w-10 lg:h-10 md:h-9 h-8 bg-white self-start"
           />
-          <h4
-            className={`uppercase text-left ml-1 font-bold xl:text-lg lg:text-[1.05rem] pr-2 sm:text-base md:leading-4 text-[13px] ${
-              country.isVotingFinished || isActive
-                ? 'text-white'
-                : 'text-blue-950'
-            }`}
-          >
+          <h4 className="uppercase text-left ml-1 font-bold xl:text-lg lg:text-[1.05rem] pr-2 sm:text-base md:leading-4 text-[13px]">
             {country.name}
           </h4>
         </div>
@@ -152,7 +155,7 @@ const CountryItem = forwardRef(
             </h6>
           </div>
         </div>
-      </button>
+      </animated.button>
     );
   },
 );

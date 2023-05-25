@@ -21,14 +21,25 @@ type ReturnType = {
   springsDouzeContainer: {
     opacity: SpringValue<number>;
   };
+  springsActive: {
+    outlineWidth: SpringValue<number>;
+    backgroundColor: SpringValue<string>;
+    color: SpringValue<string>;
+  };
 };
 
 const useAnimatePoints = (
   shouldShowLastPoints: boolean,
   isDouzePoints: boolean,
+  isActive: boolean,
+  isJuryVoting: boolean,
+  isVotingFinished: boolean,
 ): ReturnType => {
   const isFirstRender = useRef(true);
 
+  const [springsActive, apiActive] = useSpring(() => ({
+    from: { outlineWidth: 0, backgroundColor: '#fff', color: '#172554' },
+  }));
   const [springsContainer, apiContainer] = useSpring(() => ({
     from: { x: 36, opacity: 0 },
   }));
@@ -156,12 +167,58 @@ const useAnimatePoints = (
     shouldShowLastPoints,
   ]);
 
+  useEffect(() => {
+    if (isJuryVoting) {
+      apiActive.start({
+        to: { outlineWidth: 0, backgroundColor: '#fff', color: '#172554' },
+        config: { duration: 500, easing: easings.easeInOutCubic },
+      });
+
+      return;
+    }
+
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+
+      return;
+    }
+
+    if (isActive) {
+      apiActive.start({
+        from: {
+          outlineWidth: 0,
+          backgroundColor: '#fff',
+          color: '#172554',
+        },
+        to: {
+          outlineWidth: 2,
+          backgroundColor: '#1d4ed8',
+          color: '#fff',
+        },
+        config: { duration: 500, easing: easings.easeInOutCubic },
+      });
+    } else if (isVotingFinished) {
+      apiActive.start({
+        from: {
+          outlineWidth: 2,
+          backgroundColor: '#1d4ed8',
+        },
+        to: {
+          outlineWidth: 0,
+          backgroundColor: '#1e3a8a',
+        },
+        config: { duration: 500, easing: easings.easeInOutCubic },
+      });
+    }
+  }, [apiActive, isActive, isVotingFinished, isJuryVoting]);
+
   return {
     springsContainer,
     springsText,
     springsDouzeParallelogramBlue,
     springsDouzeParallelogramYellow,
     springsDouzeContainer,
+    springsActive,
   };
 };
 
