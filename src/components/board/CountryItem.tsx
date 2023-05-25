@@ -41,8 +41,18 @@ const CountryItem = forwardRef(
 
     const shouldShowLastPoints = Boolean(isVoted && !isVotingFinished);
 
-    const { springsContainer, springsText } =
-      useAnimatePoints(shouldShowLastPoints);
+    const isDouzePoints = country.lastReceivedPoints === 12;
+
+    const [showDouzePointsAnimation, setShowDouzePointsAnimation] =
+      useState(isDouzePoints);
+
+    const {
+      springsContainer,
+      springsText,
+      springsDouzeParallelogramBlue,
+      springsDouzeParallelogramYellow,
+      springsDouzeContainer,
+    } = useAnimatePoints(shouldShowLastPoints, isDouzePoints);
 
     useEffect(() => {
       if (country.isVotingFinished && !timerId.current) {
@@ -59,10 +69,20 @@ const CountryItem = forwardRef(
       }
     }, [country.isVotingFinished]);
 
+    useEffect(() => {
+      if (isDouzePoints) {
+        setShowDouzePointsAnimation(true);
+      } else {
+        setTimeout(() => {
+          setShowDouzePointsAnimation(false);
+        }, 1000);
+      }
+    }, [isDouzePoints]);
+
     return (
       <button
         ref={ref}
-        className={`flex justify-between shadow-md  lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
+        className={`relative flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
           isDisabled
             ? ''
             : 'cursor-pointer transition-colors duration-300 hover:bg-sky-100'
@@ -74,6 +94,22 @@ const CountryItem = forwardRef(
         disabled={isDisabled}
         onClick={() => onClick(country.code)}
       >
+        {showDouzePointsAnimation && (
+          <animated.div
+            style={springsDouzeContainer}
+            className="absolute overflow-hidden left-0 right-0 top-0 bottom-0 z-40 bg-yellow-300 flex justify-center items-center"
+          >
+            <h4 className="text-pink-500 text-xl font-bold">12 POINTS</h4>
+            <animated.div
+              style={springsDouzeParallelogramBlue}
+              className="absolute h-full w-[25%] bg-blue-700 z-50"
+            />
+            <animated.div
+              style={springsDouzeParallelogramYellow}
+              className="absolute -translate-x-28 h-full w-[25%] bg-pink-500 z-50"
+            />
+          </animated.div>
+        )}
         <div className="flex items-center">
           <img
             src={country.flag}

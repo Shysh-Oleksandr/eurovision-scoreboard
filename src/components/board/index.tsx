@@ -115,7 +115,7 @@ const Board = ({
         onClick={onClick}
       />
       <div className="container-wrapping-flip-move">
-        <FlipMove duration={500} delay={500}>
+        <FlipMove duration={500} delay={hasCountryFinishedVoting ? 1000 : 500}>
           {sortedCountries.map((country: Country) => renderItem(country))}
         </FlipMove>
       </div>
