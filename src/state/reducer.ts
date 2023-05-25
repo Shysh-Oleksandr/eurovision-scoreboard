@@ -127,6 +127,8 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
       const isJuryVotingOver =
         state.votingCountryIndex === countries.length - 1;
 
+      const votingCountryCode = countries[state.votingCountryIndex].code;
+
       const countriesWithPoints: CountryWithPoints[] = [];
 
       const pointsLeftArray = POINTS_ARRAY.filter(
@@ -138,7 +140,9 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
           (country) =>
             !countriesWithPoints.some(
               (countryWithPoints) => countryWithPoints.code === country.code,
-            ) && !country.lastReceivedPoints,
+            ) &&
+            !country.lastReceivedPoints &&
+            country.code !== votingCountryCode,
         );
 
         const randomCountryIndex = Math.floor(
