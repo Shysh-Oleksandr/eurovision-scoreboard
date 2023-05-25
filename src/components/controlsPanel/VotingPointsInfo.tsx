@@ -21,7 +21,7 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
               className={`lg:text-xl text-lg ${
                 isActive
                   ? 'text-pink-500 font-bold'
-                  : 'text-blue-700 font-semibold'
+                  : 'text-blue-800 font-semibold'
               }`}
             >
               {points}

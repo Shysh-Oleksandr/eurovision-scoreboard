@@ -7,9 +7,9 @@ import useAnimatePoints from '../../hooks/useAnimatePoints';
 import { Country } from '../../models';
 import RoundedTriangle from '../RoundedTriangle';
 
-const PINK_COLOR = '#ec4899';
-const BLUE_COLOR = '#2563eb';
-const YELLOW_COLOR = '#fde047';
+const PINK_COLOR = '#fd0184';
+const BLUE_COLOR = '#0041fd';
+const YELLOW_COLOR = '#fef700';
 
 type Props = {
   country: Country;
@@ -95,7 +95,7 @@ const CountryItem = forwardRef(
       <animated.button
         ref={ref}
         style={springsActive}
-        className={`relative bg-white outline outline-blue-500 flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full ${
+        className={`relative bg-white outline outline-blue-500 flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
           isDisabled
             ? ''
             : 'cursor-pointer transition-colors duration-300 hover:bg-sky-100'
@@ -108,7 +108,9 @@ const CountryItem = forwardRef(
             style={springsDouzeContainer}
             className="absolute overflow-hidden left-0 right-0 top-0 bottom-0 z-40 bg-yellow-300 flex justify-center items-center"
           >
-            <h4 className="text-pink-500 text-xl font-bold">12 POINTS</h4>
+            <h4 className="text-pink-500 lg:text-xl md:text-lg xs:text-base text-sm font-bold">
+              12 POINTS
+            </h4>
             <animated.div
               style={springsDouzeParallelogramBlue}
               className="absolute h-full w-[25%] bg-blue-700 z-50"
@@ -123,9 +125,9 @@ const CountryItem = forwardRef(
           <img
             src={country.flag}
             alt={`${country.name} flag`}
-            className="lg:w-14 md:w-12 w-10 lg:h-10 md:h-9 h-8 bg-white self-start"
+            className="lg:w-14 md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-white self-start min-w-[36px]"
           />
-          <h4 className="uppercase text-left ml-1 font-bold xl:text-lg lg:text-[1.05rem] pr-2 sm:text-base md:leading-4 text-[13px]">
+          <h4 className="uppercase text-left ml-1 font-bold xl:text-lg lg:text-[1.05rem] xs:pr-2 pr-0 sm:text-base md:leading-4 xs:text-[13px] text-xs xs:break-normal break-all">
             {country.name}
           </h4>
         </div>
@@ -136,7 +138,7 @@ const CountryItem = forwardRef(
           >
             <RoundedTriangle color={YELLOW_COLOR} />
             <animated.h6
-              className="text-pink-500 lg:text-lg sm:text-base text-[13px] font-semibold h-full items-center flex justify-center"
+              className="text-pink-500 lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center"
               style={springsText}
             >
               {country.lastReceivedPoints}
@@ -150,7 +152,7 @@ const CountryItem = forwardRef(
             <RoundedTriangle
               color={country.isVotingFinished ? BLUE_COLOR : PINK_COLOR}
             />
-            <h6 className="text-white lg:text-lg sm:text-base text-[13px] font-semibold h-full items-center flex justify-center">
+            <h6 className="text-white lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center">
               {country.points}
             </h6>
           </div>

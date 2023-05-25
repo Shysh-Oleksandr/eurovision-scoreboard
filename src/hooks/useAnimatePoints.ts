@@ -2,6 +2,10 @@ import { useEffect, useRef } from 'react';
 
 import { SpringValue, easings, useSpring } from '@react-spring/web';
 
+const WHITE_COLOR = '#fff';
+const DARK_BLUE_COLOR = '#1b1c87';
+const BLUE_COLOR = '#0239d9';
+
 type ReturnType = {
   springsContainer: {
     x: SpringValue<number>;
@@ -33,12 +37,16 @@ const useAnimatePoints = (
   isDouzePoints: boolean,
   isActive: boolean,
   isJuryVoting: boolean,
-  isVotingFinished: boolean,
+  isCountryVotingFinished: boolean,
 ): ReturnType => {
   const isFirstRender = useRef(true);
 
   const [springsActive, apiActive] = useSpring(() => ({
-    from: { outlineWidth: 0, backgroundColor: '#fff', color: '#172554' },
+    from: {
+      outlineWidth: 0,
+      backgroundColor: WHITE_COLOR,
+      color: DARK_BLUE_COLOR,
+    },
   }));
   const [springsContainer, apiContainer] = useSpring(() => ({
     from: { x: 36, opacity: 0 },
@@ -170,15 +178,13 @@ const useAnimatePoints = (
   useEffect(() => {
     if (isJuryVoting) {
       apiActive.start({
-        to: { outlineWidth: 0, backgroundColor: '#fff', color: '#172554' },
+        to: {
+          outlineWidth: 0,
+          backgroundColor: WHITE_COLOR,
+          color: DARK_BLUE_COLOR,
+        },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
-
-      return;
-    }
-
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
 
       return;
     }
@@ -187,30 +193,32 @@ const useAnimatePoints = (
       apiActive.start({
         from: {
           outlineWidth: 0,
-          backgroundColor: '#fff',
-          color: '#172554',
+          backgroundColor: WHITE_COLOR,
+          color: DARK_BLUE_COLOR,
         },
         to: {
           outlineWidth: 2,
-          backgroundColor: '#1d4ed8',
-          color: '#fff',
+          backgroundColor: BLUE_COLOR,
+          color: WHITE_COLOR,
         },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
-    } else if (isVotingFinished) {
+    } else if (isCountryVotingFinished) {
       apiActive.start({
         from: {
           outlineWidth: 2,
-          backgroundColor: '#1d4ed8',
+          backgroundColor: BLUE_COLOR,
+          color: WHITE_COLOR,
         },
         to: {
           outlineWidth: 0,
-          backgroundColor: '#1e3a8a',
+          backgroundColor: DARK_BLUE_COLOR,
+          color: WHITE_COLOR,
         },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
     }
-  }, [apiActive, isActive, isVotingFinished, isJuryVoting]);
+  }, [apiActive, isActive, isCountryVotingFinished, isJuryVoting]);
 
   return {
     springsContainer,

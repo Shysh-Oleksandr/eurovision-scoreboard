@@ -38,7 +38,7 @@ const WinnerModal = ({ winnerCountry, dispatch }: Props) => {
         </h4>
         <StartOverButton
           dispatch={dispatch}
-          className="!py-2 sm:text-base text-xs sm:w-auto sm:!px-10 w-full"
+          className="!py-3 sm:text-base text-xs sm:w-auto sm:!px-12 w-full"
         />
       </div>
     </div>

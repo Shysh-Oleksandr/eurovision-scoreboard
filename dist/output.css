@@ -526,6 +526,12 @@ video {
   width: 100%;
 }
 
+@media (min-width: 480px) {
+  .container {
+    max-width: 480px;
+  }
+}
+
 @media (min-width: 640px) {
   .container {
     max-width: 640px;
@@ -693,6 +699,14 @@ video {
   width: 100%;
 }
 
+.min-w-\[40px\] {
+  min-width: 40px;
+}
+
+.min-w-\[36px\] {
+  min-width: 36px;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -743,6 +757,10 @@ video {
   overflow: hidden;
 }
 
+.break-all {
+  word-break: break-all;
+}
+
 .rounded-md {
   border-radius: 0.375rem;
 }
@@ -770,27 +788,27 @@ video {
 
 .bg-blue-600 {
   --tw-bg-opacity: 1;
-  background-color: rgb(37 99 235 / var(--tw-bg-opacity));
+  background-color: rgb(0 65 253 / var(--tw-bg-opacity));
 }
 
 .bg-blue-700 {
   --tw-bg-opacity: 1;
-  background-color: rgb(29 78 216 / var(--tw-bg-opacity));
+  background-color: rgb(0 67 254 / var(--tw-bg-opacity));
 }
 
 .bg-blue-900 {
   --tw-bg-opacity: 1;
-  background-color: rgb(30 58 138 / var(--tw-bg-opacity));
+  background-color: rgb(12 14 137 / var(--tw-bg-opacity));
 }
 
 .bg-blue-950 {
   --tw-bg-opacity: 1;
-  background-color: rgb(23 37 84 / var(--tw-bg-opacity));
+  background-color: rgb(2 3 94 / var(--tw-bg-opacity));
 }
 
 .bg-pink-500 {
   --tw-bg-opacity: 1;
-  background-color: rgb(236 72 153 / var(--tw-bg-opacity));
+  background-color: rgb(253 1 132 / var(--tw-bg-opacity));
 }
 
 .bg-slate-600 {
@@ -805,7 +823,7 @@ video {
 
 .bg-yellow-300 {
   --tw-bg-opacity: 1;
-  background-color: rgb(253 224 71 / var(--tw-bg-opacity));
+  background-color: rgb(254 247 0 / var(--tw-bg-opacity));
 }
 
 .bg-opacity-60 {
@@ -817,9 +835,9 @@ video {
   padding-right: 1.5rem !important;
 }
 
-.\!py-2 {
-  padding-top: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
+.\!py-3 {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
 }
 
 .px-2 {
@@ -899,6 +917,14 @@ video {
   padding-top: 2rem;
 }
 
+.pr-0 {
+  padding-right: 0px;
+}
+
+.pr-4 {
+  padding-right: 1rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -952,24 +978,14 @@ video {
   text-transform: uppercase;
 }
 
-.text-blue-700 {
+.text-blue-800 {
   --tw-text-opacity: 1;
-  color: rgb(29 78 216 / var(--tw-text-opacity));
-}
-
-.text-blue-950 {
-  --tw-text-opacity: 1;
-  color: rgb(23 37 84 / var(--tw-text-opacity));
+  color: rgb(25 64 190 / var(--tw-text-opacity));
 }
 
 .text-pink-500 {
   --tw-text-opacity: 1;
-  color: rgb(236 72 153 / var(--tw-text-opacity));
-}
-
-.text-red-500 {
-  --tw-text-opacity: 1;
-  color: rgb(239 68 68 / var(--tw-text-opacity));
+  color: rgb(253 1 132 / var(--tw-text-opacity));
 }
 
 .text-slate-400 {
@@ -1004,22 +1020,12 @@ video {
   outline-style: solid;
 }
 
-.outline-0 {
-  outline-width: 0px;
-}
-
 .outline-blue-500 {
   outline-color: #3b82f6;
 }
 
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
 }
 
 .transition-colors {
@@ -1192,7 +1198,7 @@ h6 {
 
 .hover\:bg-blue-800:hover {
   --tw-bg-opacity: 1;
-  background-color: rgb(30 64 175 / var(--tw-bg-opacity));
+  background-color: rgb(25 64 190 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-sky-100:hover {
@@ -1207,7 +1213,39 @@ h6 {
 
 .focus\:bg-blue-800:focus {
   --tw-bg-opacity: 1;
-  background-color: rgb(30 64 175 / var(--tw-bg-opacity));
+  background-color: rgb(25 64 190 / var(--tw-bg-opacity));
+}
+
+@media (min-width: 480px) {
+  .xs\:h-8 {
+    height: 2rem;
+  }
+
+  .xs\:w-10 {
+    width: 2.5rem;
+  }
+
+  .xs\:break-normal {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .xs\:break-all {
+    word-break: break-all;
+  }
+
+  .xs\:pr-2 {
+    padding-right: 0.5rem;
+  }
+
+  .xs\:text-\[13px\] {
+    font-size: 13px;
+  }
+
+  .xs\:text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
 }
 
 @media (min-width: 640px) {
@@ -1215,9 +1253,9 @@ h6 {
     width: auto;
   }
 
-  .sm\:\!px-10 {
-    padding-left: 2.5rem !important;
-    padding-right: 2.5rem !important;
+  .sm\:\!px-12 {
+    padding-left: 3rem !important;
+    padding-right: 3rem !important;
   }
 
   .sm\:px-3 {
@@ -1337,6 +1375,11 @@ h6 {
   .md\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+
+  .md\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 
   .md\:leading-4 {
