@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import FlipMove from 'react-flip-move';
 
-import { POINTS_ARRAY } from '../../data';
+import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data';
 import allCountries from '../../data/countries.json';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 
@@ -15,6 +16,7 @@ type Props = {
   winnerCountry: Country | null;
   votingPoints: number;
   votingCountryIndex: number;
+  shouldShowLastPoints: boolean;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
@@ -24,6 +26,7 @@ const Board = ({
   winnerCountry,
   votingPoints,
   votingCountryIndex,
+  shouldShowLastPoints,
   dispatch,
 }: Props): JSX.Element => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
@@ -32,8 +35,6 @@ const Board = ({
     () => [...countries].sort((a, b) => b.points - a.points),
     [countries],
   );
-
-  const countriesHalfLength = Math.ceil(sortedCountries.length / 2);
 
   const countriesWithPointsLength = useMemo(
     () => countries.filter((country) => country.lastReceivedPoints).length,
@@ -64,13 +65,13 @@ const Board = ({
         dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
       }
 
-      // Set timer to display last received points after giving '12' points
+      // Set timer to display last received points if we give '12' points and it's not the last country
       if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
         timerId.current = setTimeout(() => {
           timerId.current = null;
 
           dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
-        }, 3000);
+        }, ANIMATION_DURATION);
       }
 
       dispatch({
@@ -88,12 +89,20 @@ const Board = ({
         country={country}
         isJuryVoting={isJuryVoting}
         hasCountryFinishedVoting={hasCountryFinishedVoting}
+        isVotingCountry={country.code === votingCountry?.code && isJuryVoting}
         isActive={country.code === votingCountry?.code && !isJuryVoting}
         onClick={onClick}
       />
     ),
     [hasCountryFinishedVoting, votingCountry, isJuryVoting, onClick],
   );
+
+  useEffect(() => {
+    if (!shouldShowLastPoints && timerId.current) {
+      clearTimeout(timerId.current);
+      timerId.current = null;
+    }
+  }, [shouldShowLastPoints]);
 
   return (
     <div className={`${winnerCountry ? '' : 'md:w-2/3'} w-full h-full`}>
@@ -106,17 +115,10 @@ const Board = ({
         dispatch={dispatch}
         onClick={onClick}
       />
-      <div className="w-full flex lg:gap-x-6 md:gap-x-4 gap-x-3 h-full">
-        <div className="w-1/2 h-full">
-          {sortedCountries
-            .slice(0, countriesHalfLength)
-            .map((country: Country) => renderItem(country))}
-        </div>
-        <div className="w-1/2 h-full">
-          {sortedCountries
-            .slice(countriesHalfLength)
-            .map((country: Country) => renderItem(country))}
-        </div>
+      <div className="container-wrapping-flip-move">
+        <FlipMove duration={500} delay={hasCountryFinishedVoting ? 1000 : 500}>
+          {sortedCountries.map((country: Country) => renderItem(country))}
+        </FlipMove>
       </div>
     </div>
   );

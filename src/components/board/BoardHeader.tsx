@@ -24,11 +24,18 @@ const BoardHeader = ({
   onClick,
   dispatch,
 }: Props): JSX.Element => {
-  const votingText = isJuryVoting
-    ? `Choose a country to give ${votingPoints} point${
-        votingPoints === 1 ? '' : 's'
-      }`
-    : `Enter televote points for ${votingCountry?.name}`;
+  const votingText = isJuryVoting ? (
+    <>
+      Choose a country to give{' '}
+      <span className="font-medium">{votingPoints}</span> point
+      {votingPoints === 1 ? '' : 's'}
+    </>
+  ) : (
+    <>
+      Enter televote points for{' '}
+      <span className="font-medium">{votingCountry?.name}</span>
+    </>
+  );
 
   const chooseRandomly = useCallback(() => {
     if (!isJuryVoting) {
@@ -73,9 +80,14 @@ const BoardHeader = ({
   return (
     <div className="pb-2 flex flex-row w-full justify-between items-center">
       <h3 className="lg:text-2xl text-xl text-white">
-        {winnerCountry
-          ? `${winnerCountry.name} is the winner of Eurovision!`
-          : votingText}
+        {winnerCountry ? (
+          <>
+            <span className="font-semibold">{winnerCountry.name}</span> is the
+            winner of Eurovision!
+          </>
+        ) : (
+          votingText
+        )}
       </h3>
       {winnerCountry ? (
         <StartOverButton dispatch={dispatch} className="w-1/4" />

@@ -37,12 +37,6 @@ export const initialState: ScoreboardState = {
 function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
   const { type, payload } = action;
 
-  const isNextVotingCountry = state.votingPoints === 12;
-  const nextVotingCountryIndex =
-    state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
-
-  const isJuryVotingOver = nextVotingCountryIndex === countries.length - 1;
-
   const countriesWithPointsLength = state.countries.filter(
     (country) => country.lastReceivedPoints,
   ).length;
@@ -69,6 +63,12 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
 
   switch (type) {
     case ScoreboardActionKind.GIVE_JURY_POINTS: {
+      const isNextVotingCountry = state.votingPoints === 12;
+      const nextVotingCountryIndex =
+        state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
+
+      const isJuryVotingOver = nextVotingCountryIndex === countries.length;
+
       return {
         ...state,
         votingPoints: getNextVotingPoints(state.votingPoints),
@@ -77,7 +77,6 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
           : nextVotingCountryIndex,
         isJuryVoting: !isJuryVotingOver,
         shouldShowLastPoints: !shouldResetLastPoints,
-        shouldClearPoints: isJuryVotingOver,
         countries: state.countries.map((country) => {
           if (country.code === payload?.countryCode) {
             return {
@@ -125,6 +124,11 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
     }
 
     case ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS: {
+      const isJuryVotingOver =
+        state.votingCountryIndex === countries.length - 1;
+
+      const votingCountryCode = countries[state.votingCountryIndex].code;
+
       const countriesWithPoints: CountryWithPoints[] = [];
 
       const pointsLeftArray = POINTS_ARRAY.filter(
@@ -136,7 +140,9 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
           (country) =>
             !countriesWithPoints.some(
               (countryWithPoints) => countryWithPoints.code === country.code,
-            ) && !country.lastReceivedPoints,
+            ) &&
+            !country.lastReceivedPoints &&
+            country.code !== votingCountryCode,
         );
 
         const randomCountryIndex = Math.floor(
@@ -181,8 +187,7 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
           ? televoteCountryIndex
           : state.votingCountryIndex + 1,
         isJuryVoting: !isJuryVotingOver,
-        shouldClearPoints: isJuryVotingOver,
-        shouldShowLastPoints: true,
+        shouldShowLastPoints: !payload?.isRandomFinishing,
         countries: mappedCountries,
       };
     }

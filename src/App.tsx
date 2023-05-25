@@ -20,6 +20,7 @@ export const App = () => {
           isJuryVoting={state.isJuryVoting}
           winnerCountry={state.winnerCountry}
           votingCountryIndex={state.votingCountryIndex}
+          shouldShowLastPoints={state.shouldShowLastPoints}
           dispatch={dispatch}
         />
         <ControlsPanel

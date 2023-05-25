@@ -22,7 +22,7 @@ const WinnerModal = ({ winnerCountry, dispatch }: Props) => {
 
   return (
     <div
-      className="w-full h-full absolute top-0 bottom-0 left-0 right-0 z-10 bg-black bg-opacity-60 flex justify-center items-center"
+      className="w-full h-full absolute top-0 bottom-0 left-0 right-0 z-50 bg-black bg-opacity-60 flex justify-center items-center"
       onClick={() => setShowModal(false)}
     >
       <div
@@ -38,7 +38,7 @@ const WinnerModal = ({ winnerCountry, dispatch }: Props) => {
         </h4>
         <StartOverButton
           dispatch={dispatch}
-          className="!py-2 sm:text-base text-xs sm:w-auto sm:!px-10 w-full"
+          className="!py-3 sm:text-base text-xs sm:w-auto sm:!px-12 w-full"
         />
       </div>
     </div>
