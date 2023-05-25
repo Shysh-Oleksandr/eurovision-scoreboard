@@ -655,10 +655,6 @@ video {
   height: 1.75rem;
 }
 
-.h-8 {
-  height: 2rem;
-}
-
 .h-\[1px\] {
   height: 1px;
 }
@@ -673,10 +669,6 @@ video {
 
 .w-1\/4 {
   width: 25%;
-}
-
-.w-10 {
-  width: 2.5rem;
 }
 
 .w-2\/3 {
@@ -699,12 +691,8 @@ video {
   width: 100%;
 }
 
-.min-w-\[40px\] {
-  min-width: 40px;
-}
-
-.min-w-\[36px\] {
-  min-width: 36px;
+.min-w-\[32px\] {
+  min-width: 32px;
 }
 
 .flex-1 {
@@ -816,6 +804,10 @@ video {
   background-color: rgb(71 85 105 / var(--tw-bg-opacity));
 }
 
+.bg-transparent {
+  background-color: transparent;
+}
+
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -885,12 +877,12 @@ video {
   padding-bottom: 2px;
 }
 
-.pr-1 {
-  padding-right: 0.25rem;
+.pr-0 {
+  padding-right: 0px;
 }
 
-.pr-2 {
-  padding-right: 0.5rem;
+.pr-1 {
+  padding-right: 0.25rem;
 }
 
 .pr-\[0\.6rem\] {
@@ -917,24 +909,12 @@ video {
   padding-top: 2rem;
 }
 
-.pr-0 {
-  padding-right: 0px;
-}
-
-.pr-4 {
-  padding-right: 1rem;
-}
-
 .text-left {
   text-align: left;
 }
 
 .text-center {
   text-align: center;
-}
-
-.text-\[13px\] {
-  font-size: 13px;
 }
 
 .text-base {
@@ -1036,6 +1016,10 @@ video {
 
 .duration-300 {
   transition-duration: 300ms;
+}
+
+.duration-500 {
+  transition-duration: 500ms;
 }
 
 /* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch */
@@ -1172,6 +1156,16 @@ h6 {
   height: 100%;
 }
 
+.blinker {
+  animation: blinker 0.8s ease-out;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (min-width: 768px) {
   .container-wrapping-flip-move > div {
     -moz-column-gap: 1rem;
@@ -1225,13 +1219,13 @@ h6 {
     width: 2.5rem;
   }
 
+  .xs\:min-w-\[40px\] {
+    min-width: 40px;
+  }
+
   .xs\:break-normal {
     overflow-wrap: normal;
     word-break: normal;
-  }
-
-  .xs\:break-all {
-    word-break: break-all;
   }
 
   .xs\:pr-2 {
@@ -1314,6 +1308,10 @@ h6 {
     width: 2.25rem;
   }
 
+  .md\:min-w-\[48px\] {
+    min-width: 48px;
+  }
+
   .md\:flex-row {
     flex-direction: row;
   }
@@ -1372,14 +1370,14 @@ h6 {
     padding-top: 0.5rem;
   }
 
-  .md\:text-sm {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-  }
-
   .md\:text-lg {
     font-size: 1.125rem;
     line-height: 1.75rem;
+  }
+
+  .md\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
   }
 
   .md\:leading-4 {
@@ -1421,10 +1419,6 @@ h6 {
     height: 5px;
   }
 
-  .lg\:w-14 {
-    width: 3.5rem;
-  }
-
   .lg\:w-2\/5 {
     width: 40%;
   }
@@ -1439,6 +1433,14 @@ h6 {
 
   .lg\:w-\[2\.8rem\] {
     width: 2.8rem;
+  }
+
+  .lg\:w-\[50px\] {
+    width: 50px;
+  }
+
+  .lg\:min-w-\[50px\] {
+    min-width: 50px;
   }
 
   .lg\:gap-x-6 {

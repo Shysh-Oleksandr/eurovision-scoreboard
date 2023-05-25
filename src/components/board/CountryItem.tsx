@@ -125,7 +125,7 @@ const CountryItem = forwardRef(
           <img
             src={country.flag}
             alt={`${country.name} flag`}
-            className="lg:w-14 md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-white self-start min-w-[36px]"
+            className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-white self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px]"
           />
           <h4 className="uppercase text-left ml-1 font-bold xl:text-lg lg:text-[1.05rem] xs:pr-2 pr-0 sm:text-base md:leading-4 xs:text-[13px] text-xs xs:break-normal break-all">
             {country.name}

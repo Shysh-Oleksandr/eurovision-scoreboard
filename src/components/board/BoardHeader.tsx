@@ -24,11 +24,18 @@ const BoardHeader = ({
   onClick,
   dispatch,
 }: Props): JSX.Element => {
-  const votingText = isJuryVoting
-    ? `Choose a country to give ${votingPoints} point${
-        votingPoints === 1 ? '' : 's'
-      }`
-    : `Enter televote points for ${votingCountry?.name}`;
+  const votingText = isJuryVoting ? (
+    <>
+      Choose a country to give{' '}
+      <span className="font-medium">{votingPoints}</span> point
+      {votingPoints === 1 ? '' : 's'}
+    </>
+  ) : (
+    <>
+      Enter televote points for{' '}
+      <span className="font-medium">{votingCountry?.name}</span>
+    </>
+  );
 
   const chooseRandomly = useCallback(() => {
     if (!isJuryVoting) {

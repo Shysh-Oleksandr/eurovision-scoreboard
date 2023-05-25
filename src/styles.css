@@ -124,6 +124,16 @@ h6 {
   height: 100%;
 }
 
+.blinker {
+  animation: blinker 0.8s ease-out;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (min-width: 768px) {
   .container-wrapping-flip-move > div {
     column-gap: 1rem;
