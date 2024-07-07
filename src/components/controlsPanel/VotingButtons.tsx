@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { ANIMATION_DURATION } from '../../data';
+import { ANIMATION_DURATION } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';

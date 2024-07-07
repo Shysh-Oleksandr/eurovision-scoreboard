@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { easings, useSpring, animated } from '@react-spring/web';
 
-import { POINTS_ARRAY } from '../../data';
+import { POINTS_ARRAY } from '../../data/data';
 
 type Props = { votingPoints: number };
 

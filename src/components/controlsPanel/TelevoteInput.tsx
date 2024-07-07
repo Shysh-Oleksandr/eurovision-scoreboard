@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 
-import { MAX_POSSIBLE_TELEVOTE_POINTS } from '../../data';
+import { getMaxPossibleTelevotePoints } from '../../data/data';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';
 
@@ -44,9 +44,11 @@ const TelevoteInput = ({
       return;
     }
 
-    if (votingPoints > MAX_POSSIBLE_TELEVOTE_POINTS) {
+    const maxPossibleTelevotePoints = getMaxPossibleTelevotePoints();
+
+    if (votingPoints > maxPossibleTelevotePoints) {
       setError(
-        `The maximum possible televote points are ${MAX_POSSIBLE_TELEVOTE_POINTS}`,
+        `The maximum possible televote points are ${maxPossibleTelevotePoints}`,
       );
 
       return;

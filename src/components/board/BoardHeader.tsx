@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { useAppContext } from '../../state/AppContext';
 import Button from '../Button';
-import StartOverButton from '../StartOverButton';
 
 type Props = {
   countries: Country[];
@@ -24,6 +24,8 @@ const BoardHeader = ({
   onClick,
   dispatch,
 }: Props): JSX.Element => {
+  const { selectedYear } = useAppContext();
+
   const votingText = isJuryVoting ? (
     <>
       Choose a country to give{' '}
@@ -83,15 +85,13 @@ const BoardHeader = ({
         {winnerCountry ? (
           <>
             <span className="font-semibold">{winnerCountry.name}</span> is the
-            winner of Eurovision!
+            winner of Eurovision {selectedYear}!
           </>
         ) : (
           votingText
         )}
       </h3>
-      {winnerCountry ? (
-        <StartOverButton dispatch={dispatch} className="w-1/4" />
-      ) : (
+      {!winnerCountry && (
         <Button label="Choose randomly" onClick={chooseRandomly} />
       )}
     </div>

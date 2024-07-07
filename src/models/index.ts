@@ -1,12 +1,15 @@
-export interface Country {
+export type BaseCountry = {
   name: string;
   code: string;
-  isQualified: boolean;
   flag: string;
+  isQualified: boolean;
+};
+
+export type Country = BaseCountry & {
   points: number;
   lastReceivedPoints: number;
   isVotingFinished?: boolean;
-}
+};
 
 export enum ScoreboardActionKind {
   GIVE_JURY_POINTS = 'GIVE_JURY_POINTS',

@@ -1,9 +1,10 @@
-import { AVERAGE_VOTING_POINTS, QUALIFIED_COUNTRIES } from '../data';
+import { getAverageVotingPoints, getQualifiedCountries } from '../data/data';
 
 export function getRandomTelevotePoints(countryJuryPlace: number) {
   const randomNumber = Math.random();
 
-  const inFirstHalfByJury = countryJuryPlace < QUALIFIED_COUNTRIES.length / 2;
+  const inFirstHalfByJury =
+    countryJuryPlace < getQualifiedCountries().length / 2;
 
   const isBigNumber = randomNumber > 0.75 || inFirstHalfByJury;
   const isHugeNumber =
@@ -21,7 +22,7 @@ export function getRandomTelevotePoints(countryJuryPlace: number) {
   );
 
   const points = Math.round(
-    (AVERAGE_VOTING_POINTS / 20) *
+    (getAverageVotingPoints() / 20) *
       Math.round(Math.random() * randomVotingPoints),
   );
 

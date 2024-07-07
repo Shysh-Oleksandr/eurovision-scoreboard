@@ -1,30 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
+
+type SelectBoxProps = {
+  options: { label: string; value: string }[];
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+};
 
 /**
  * A select box component.
  *
  * @param options - An array of objects containing the label and value of each option.
- * @param defaultValue - The default value of the select box.
+ * @param value - The current value of the select box.
+ * @param onChange - The change handler function for the select box.
  * @returns The select box component.
  */
-const SelectBox: React.FC<{
-  options: { label: string; value: string }[];
-  defaultValue: string;
-}> = ({ options, defaultValue }): JSX.Element => {
-  const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
-
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    setSelectedValue(event.target.value);
-  };
-
+const SelectBox: React.FC<SelectBoxProps> = ({ options, value, onChange }) => {
   return (
     <select
-      value={selectedValue}
-      onChange={handleChange}
+      value={value}
+      onChange={onChange}
       className="select lg:text-base md:text-sm text-xs lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] w-[120px]"
     >
       {options.map((option) => (
-        <option key={option.label} value={option.value}>
+        <option key={option.value} value={option.value}>
           {option.label}
         </option>
       ))}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { ANIMATION_DURATION } from '../../../data';
+import { ANIMATION_DURATION } from '../../../data/data';
 
 const useVotingFinished = (isVotingFinished: boolean) => {
   const timerId = useRef<NodeJS.Timeout | null>(null);

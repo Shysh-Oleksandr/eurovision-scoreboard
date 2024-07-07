@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-import { COUNTRIES_LENGTH } from '../../data';
-import countries from '../../data/countries.json';
 import { getSequenceNumber } from '../../helpers/getSequenceNumber';
+import { useGetCountries } from '../../hooks/useGetCountries';
 
 type Props = { votingCountryIndex: number };
 
 const CountryInfo = ({ votingCountryIndex }: Props) => {
   const [shouldBlink, setShouldBlink] = useState(false);
 
-  const votingCountryData = countries[votingCountryIndex];
+  const allCountries = useGetCountries();
+
+  const votingCountryData = allCountries[votingCountryIndex];
 
   useEffect(() => {
     if (votingCountryIndex === 0) return;
@@ -34,7 +35,7 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
         <span className="font-medium">
           {getSequenceNumber(votingCountryIndex + 1)}
         </span>{' '}
-        of <span className="font-medium">{COUNTRIES_LENGTH}</span> countries
+        of <span className="font-medium">{allCountries.length}</span> countries
       </h5>
     </div>
   );

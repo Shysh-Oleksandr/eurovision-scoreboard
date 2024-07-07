@@ -719,28 +719,16 @@ video {
   width: 2rem;
 }
 
+.w-\[120px\] {
+  width: 120px;
+}
+
 .w-\[25\%\] {
   width: 25%;
 }
 
 .w-full {
   width: 100%;
-}
-
-.w-\[300px\] {
-  width: 300px;
-}
-
-.w-\[200px\] {
-  width: 200px;
-}
-
-.w-\[150px\] {
-  width: 150px;
-}
-
-.w-\[120px\] {
-  width: 120px;
 }
 
 .min-w-\[32px\] {
@@ -813,6 +801,10 @@ video {
 
 .rounded-sm {
   border-radius: 0.125rem;
+}
+
+.border-\[3px\] {
+  border-width: 3px;
 }
 
 .border-b-2 {
@@ -961,14 +953,6 @@ video {
 
 .pt-4 {
   padding-top: 1rem;
-}
-
-.pr-8 {
-  padding-right: 2rem;
-}
-
-.pr-12 {
-  padding-right: 3rem;
 }
 
 .text-left {
@@ -1133,7 +1117,7 @@ body,
 }
 
 #root {
-  background-image: url("../public/img//BlueBg.jpg");
+  background-image: url('../public/img//BlueBg.jpg');
   background-size: cover;
   background-position: center;
 }
@@ -1260,8 +1244,13 @@ h6 {
   outline: 0;
   font: inherit;
   /* Personalize */
-  background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg) no-repeat right 0.8em center / 1.4em,
-    linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
+  background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
+      no-repeat right 0.8em center / 1.4em,
+    linear-gradient(
+      to left,
+      rgba(255, 255, 255, 0.3) 3em,
+      rgba(255, 255, 255, 0.2) 3em
+    );
   color: white;
   border-radius: 0.25em;
   box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
@@ -1278,6 +1267,64 @@ h6 {
   option {
     color: inherit;
     background-color: white;
+  }
+}
+
+.animated-border {
+  display: grid;
+  place-content: center;
+  color: white;
+  text-shadow: 0 1px 0 #000;
+  --border-angle: 0turn;
+  --main-bg: conic-gradient(
+    from var(--border-angle),
+    #0c0e89,
+    #02035e 5%,
+    #02035e 60%,
+    #0c0e89 95%
+  );
+  border: solid 3px transparent;
+  --gradient-border: conic-gradient(
+    from var(--border-angle),
+    transparent 25%,
+    #08f,
+    #fd0184 99%,
+    transparent
+  );
+  background: 
+    /* padding-box clip this background in to the overall element except the border. */ var(
+        --main-bg
+      )
+      padding-box,
+    /* border-box extends this background to the border space */
+      var(--gradient-border) border-box,
+    /* Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background. */
+      var(--main-bg) border-box;
+  background-position: center center;
+  transition: all;
+  animation: bg-spin 3s linear infinite;
+  &:hover {
+    --main-bg: conic-gradient(
+      from var(--border-angle),
+      #0c0e9f,
+      #050775 5%,
+      #050775 60%,
+      #0c0e9f 95%
+    );
+  }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+
+  inherits: true;
+
+  initial-value: 0turn;
+}
+
+@keyframes bg-spin {
+  to {
+    --border-angle: 1turn;
   }
 }
 

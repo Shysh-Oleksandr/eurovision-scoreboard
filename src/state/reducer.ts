@@ -1,5 +1,10 @@
-import { POINTS_ARRAY, QUALIFIED_COUNTRIES } from './../data';
-import countries from './../data/countries.json';
+import {
+  getAllCountries,
+  getCountriesLength,
+  getInitialCountries,
+  POINTS_ARRAY,
+} from '../data/data';
+
 import { getNextVotingPoints } from './../helpers/getNextVotingPoints';
 import {
   Country,
@@ -18,11 +23,7 @@ interface ScoreboardState {
   winnerCountry: Country | null;
 }
 
-const initialCountries: Country[] = QUALIFIED_COUNTRIES.map((country) => ({
-  ...country,
-  points: 0,
-  lastReceivedPoints: 0,
-}));
+const initialCountries: Country[] = getInitialCountries();
 
 export const initialState: ScoreboardState = {
   countries: initialCountries,
@@ -69,7 +70,7 @@ const handleGiveJuryPoints = (state: ScoreboardState, payload: any) => {
   const isNextVotingCountry = state.votingPoints === 12;
   const nextVotingCountryIndex =
     state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
-  const isJuryVotingOver = nextVotingCountryIndex === countries.length;
+  const isJuryVotingOver = nextVotingCountryIndex === getCountriesLength();
 
   return {
     ...state,
@@ -138,8 +139,9 @@ const handleGiveTelevotePoints = (state: ScoreboardState, payload: any) => {
 };
 
 const handleGiveRandomJuryPoints = (state: ScoreboardState, payload: any) => {
-  const isJuryVotingOver = state.votingCountryIndex === countries.length - 1;
-  const votingCountryCode = countries[state.votingCountryIndex].code;
+  const isJuryVotingOver =
+    state.votingCountryIndex === getCountriesLength() - 1;
+  const votingCountryCode = getAllCountries()[state.votingCountryIndex].code;
 
   const countriesWithPoints: CountryWithPoints[] = [];
 
@@ -212,7 +214,9 @@ const handleHideLastReceivedPoints = (state: ScoreboardState) => ({
   shouldShowLastPoints: false,
 });
 
-const handleStartOver = () => initialState;
+const handleStartOver = (): ScoreboardState => {
+  return { ...initialState, countries: getInitialCountries() };
+};
 
 function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
   const { type, payload } = action;
