@@ -1,8 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 
 import { MAX_POSSIBLE_TELEVOTE_POINTS } from '../../data';
-import allCountries from '../../data/countries.json';
-import { ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';
 
 const NUMBER_REGEX = /^\d*$/;
@@ -10,18 +9,20 @@ const NUMBER_REGEX = /^\d*$/;
 type Props = {
   votingCountryIndex: number;
   isFirstTelevoteCountry: boolean;
+  countries: Country[];
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
 const TelevoteInput = ({
   votingCountryIndex,
   isFirstTelevoteCountry,
+  countries,
   dispatch,
 }: Props) => {
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
-  const votingCountryCode = allCountries[votingCountryIndex]?.code || '';
+  const votingCountryCode = countries[votingCountryIndex]?.code || '';
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;

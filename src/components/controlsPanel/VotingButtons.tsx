@@ -111,6 +111,7 @@ const VotingButtons = ({
         <TelevoteInput
           votingCountryIndex={votingCountryIndex}
           isFirstTelevoteCountry={isFirstTelevoteCountry}
+          countries={countries}
           dispatch={dispatch}
         />
       )}

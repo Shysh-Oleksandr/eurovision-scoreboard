@@ -41,7 +41,11 @@ const Board = ({
     [countries],
   );
 
-  const votingCountry = allCountries[votingCountryIndex] as Country;
+  const votingCountry = useMemo(() => {
+    if (isJuryVoting) return allCountries[votingCountryIndex] as Country;
+
+    return countries[votingCountryIndex] as Country;
+  }, [countries, isJuryVoting, votingCountryIndex]);
 
   const hasCountryFinishedVoting =
     countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS;

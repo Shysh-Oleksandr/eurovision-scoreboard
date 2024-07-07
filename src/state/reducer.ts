@@ -8,12 +8,6 @@ import {
   ScoreboardActionKind,
 } from './../models';
 
-const initialCountries: Country[] = QUALIFIED_COUNTRIES.map((country) => ({
-  ...country,
-  points: 0,
-  lastReceivedPoints: 0,
-}));
-
 interface ScoreboardState {
   countries: Country[];
   isJuryVoting: boolean;
@@ -23,6 +17,12 @@ interface ScoreboardState {
   shouldClearPoints: boolean;
   winnerCountry: Country | null;
 }
+
+const initialCountries: Country[] = QUALIFIED_COUNTRIES.map((country) => ({
+  ...country,
+  points: 0,
+  lastReceivedPoints: 0,
+}));
 
 export const initialState: ScoreboardState = {
   countries: initialCountries,
@@ -34,184 +34,202 @@ export const initialState: ScoreboardState = {
   winnerCountry: null,
 };
 
-function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
-  const { type, payload } = action;
+const shouldResetLastPoints = (countriesWithPoints: CountryWithPoints[]) =>
+  countriesWithPoints.length === POINTS_ARRAY.length;
 
-  const countriesWithPointsLength = state.countries.filter(
-    (country) => country.lastReceivedPoints,
-  ).length;
-
-  const shouldResetLastPoints =
-    countriesWithPointsLength === POINTS_ARRAY.length;
-
-  const countriesLeft = state.countries.filter(
-    (country) =>
-      !country.isVotingFinished && country.code !== payload?.countryCode,
+const getRemainingCountries = (
+  countries: Country[],
+  countryCode: string | undefined,
+) =>
+  countries.filter(
+    (country) => !country.isVotingFinished && country.code !== countryCode,
   );
 
-  const lastCountryCodeByPoints = countriesLeft.length
-    ? [...countriesLeft].sort((a, b) => b.points - a.points)[
-        countriesLeft.length - 1
+const getLastCountryCodeByPoints = (remainingCountries: Country[]) =>
+  remainingCountries.length
+    ? remainingCountries.slice().sort((a, b) => b.points - a.points)[
+        remainingCountries.length - 1
       ].code
     : '';
 
-  const lastCountryByPointsIndex = countries.findIndex(
-    (country) => country.code === lastCountryCodeByPoints,
+const getLastCountryIndexByPoints = (
+  countries: Country[],
+  countryCode: string,
+) => countries.findIndex((country) => country.code === countryCode);
+
+const isVotingOver = (lastCountryIndexByPoints: number) =>
+  lastCountryIndexByPoints === -1;
+
+const handleGiveJuryPoints = (state: ScoreboardState, payload: any) => {
+  const countriesWithPoints = state.countries.filter(
+    (country) => country.lastReceivedPoints !== 0,
   );
+  const shouldReset = shouldResetLastPoints(countriesWithPoints);
 
-  const isVotingOver = lastCountryByPointsIndex === -1;
+  const isNextVotingCountry = state.votingPoints === 12;
+  const nextVotingCountryIndex =
+    state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
+  const isJuryVotingOver = nextVotingCountryIndex === countries.length;
 
-  switch (type) {
-    case ScoreboardActionKind.GIVE_JURY_POINTS: {
-      const isNextVotingCountry = state.votingPoints === 12;
-      const nextVotingCountryIndex =
-        state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
-
-      const isJuryVotingOver = nextVotingCountryIndex === countries.length;
-
-      return {
-        ...state,
-        votingPoints: getNextVotingPoints(state.votingPoints),
-        votingCountryIndex: isJuryVotingOver
-          ? lastCountryByPointsIndex
-          : nextVotingCountryIndex,
-        isJuryVoting: !isJuryVotingOver,
-        shouldShowLastPoints: !shouldResetLastPoints,
-        countries: state.countries.map((country) => {
-          if (country.code === payload?.countryCode) {
-            return {
-              ...country,
-              points: country.points + state.votingPoints,
-              lastReceivedPoints: state.votingPoints,
-            };
-          }
-
-          return country;
-        }),
-      };
-    }
-    case ScoreboardActionKind.GIVE_TELEVOTE_POINTS: {
-      const mappedCountries = state.countries.map((country) => {
-        if (country.code === payload?.countryCode) {
-          return {
-            ...country,
-            points: country.points + (payload?.votingPoints ?? 0),
-            lastReceivedPoints: payload?.votingPoints ?? 0,
-            isVotingFinished: true,
-          };
-        }
-
-        return country;
-      });
-
-      let winnerCountry = null;
-
-      if (isVotingOver) {
-        winnerCountry = mappedCountries.reduce((prev, current) => {
-          return prev.points > current.points ? prev : current;
-        });
-      }
-
-      return {
-        ...state,
-        votingCountryIndex: lastCountryByPointsIndex,
-        isJuryVoting: false,
-        shouldShowLastPoints: false,
-        shouldClearPoints: true,
-        winnerCountry,
-        countries: mappedCountries,
-      };
-    }
-
-    case ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS: {
-      const isJuryVotingOver =
-        state.votingCountryIndex === countries.length - 1;
-
-      const votingCountryCode = countries[state.votingCountryIndex].code;
-
-      const countriesWithPoints: CountryWithPoints[] = [];
-
-      const pointsLeftArray = POINTS_ARRAY.filter(
-        (points) => points >= state.votingPoints,
-      );
-
-      pointsLeftArray.forEach((points) => {
-        const countriesWithoutPoints = state.countries.filter(
-          (country) =>
-            !countriesWithPoints.some(
-              (countryWithPoints) => countryWithPoints.code === country.code,
-            ) &&
-            !country.lastReceivedPoints &&
-            country.code !== votingCountryCode,
-        );
-
-        const randomCountryIndex = Math.floor(
-          Math.random() * countriesWithoutPoints.length,
-        );
-        const randomCountry = countriesWithoutPoints[randomCountryIndex];
-
-        countriesWithPoints.push({ code: randomCountry.code, points });
-      });
-
-      const mappedCountries = state.countries.map((country) => {
-        const randomlyReceivedPoints =
-          countriesWithPoints.find(
-            (countryWithPoints) => countryWithPoints.code === country.code,
-          )?.points || 0;
-
+  return {
+    ...state,
+    votingPoints: getNextVotingPoints(state.votingPoints),
+    votingCountryIndex: isJuryVotingOver
+      ? getLastCountryIndexByPoints(
+          state.countries,
+          getLastCountryCodeByPoints(
+            getRemainingCountries(state.countries, payload?.countryCode),
+          ),
+        )
+      : nextVotingCountryIndex,
+    isJuryVoting: !isJuryVotingOver,
+    shouldShowLastPoints: !shouldReset,
+    countries: state.countries.map((country) => {
+      if (country.code === payload?.countryCode) {
         return {
           ...country,
-          points: country.points + randomlyReceivedPoints,
-          lastReceivedPoints:
-            randomlyReceivedPoints ||
-            (shouldResetLastPoints ? 0 : country.lastReceivedPoints),
+          points: country.points + state.votingPoints,
+          lastReceivedPoints: state.votingPoints,
         };
-      });
-
-      let televoteCountryIndex = lastCountryByPointsIndex;
-
-      if (isJuryVotingOver) {
-        const lastCountryCodeByPoints = [...mappedCountries].sort(
-          (a, b) => b.points - a.points,
-        )[mappedCountries.length - 1].code;
-
-        televoteCountryIndex = countries.findIndex(
-          (country) => country.code === lastCountryCodeByPoints,
-        );
       }
 
+      return country;
+    }),
+  };
+};
+
+const handleGiveTelevotePoints = (state: ScoreboardState, payload: any) => {
+  const updatedCountries = state.countries.map((country) => {
+    if (country.code === payload?.countryCode) {
       return {
-        ...state,
-        votingPoints: 1,
-        votingCountryIndex: isJuryVotingOver
-          ? televoteCountryIndex
-          : state.votingCountryIndex + 1,
-        isJuryVoting: !isJuryVotingOver,
-        shouldShowLastPoints: !payload?.isRandomFinishing,
-        countries: mappedCountries,
+        ...country,
+        points: country.points + (payload?.votingPoints ?? 0),
+        lastReceivedPoints: payload?.votingPoints ?? 0,
+        isVotingFinished: true,
       };
     }
 
-    case ScoreboardActionKind.RESET_LAST_POINTS: {
-      return {
-        ...state,
-        countries: state.countries.map((country) => {
-          return {
-            ...country,
-            lastReceivedPoints: 0,
-          };
-        }),
-      };
-    }
+    return country;
+  });
+
+  const lastCountryIndexByPoints = getLastCountryIndexByPoints(
+    state.countries,
+    getLastCountryCodeByPoints(
+      getRemainingCountries(state.countries, payload?.countryCode),
+    ),
+  );
+  const isVotingFinished = isVotingOver(lastCountryIndexByPoints);
+
+  const winnerCountry = isVotingFinished
+    ? updatedCountries.reduce((prev, current) =>
+        prev.points > current.points ? prev : current,
+      )
+    : null;
+
+  return {
+    ...state,
+    votingCountryIndex: lastCountryIndexByPoints,
+    isJuryVoting: false,
+    shouldShowLastPoints: false,
+    shouldClearPoints: true,
+    winnerCountry,
+    countries: updatedCountries,
+  };
+};
+
+const handleGiveRandomJuryPoints = (state: ScoreboardState, payload: any) => {
+  const isJuryVotingOver = state.votingCountryIndex === countries.length - 1;
+  const votingCountryCode = countries[state.votingCountryIndex].code;
+
+  const countriesWithPoints: CountryWithPoints[] = [];
+
+  const pointsLeftArray = POINTS_ARRAY.filter(
+    (points) => points >= state.votingPoints,
+  );
+
+  pointsLeftArray.forEach((points) => {
+    const availableCountries = state.countries.filter(
+      (country) =>
+        !countriesWithPoints.some(
+          (countryWithPoints) => countryWithPoints.code === country.code,
+        ) &&
+        !country.lastReceivedPoints &&
+        country.code !== votingCountryCode,
+    );
+
+    const randomCountryIndex = Math.floor(
+      Math.random() * availableCountries.length,
+    );
+    const randomCountry = availableCountries[randomCountryIndex];
+
+    countriesWithPoints.push({ code: randomCountry.code, points });
+  });
+
+  const updatedCountries = state.countries.map((country) => {
+    const receivedPoints =
+      countriesWithPoints.find(
+        (countryWithPoints) => countryWithPoints.code === country.code,
+      )?.points || 0;
+
+    return {
+      ...country,
+      points: country.points + receivedPoints,
+      lastReceivedPoints:
+        receivedPoints ||
+        (shouldResetLastPoints(countriesWithPoints)
+          ? 0
+          : country.lastReceivedPoints),
+    };
+  });
+
+  const televoteCountryIndex = getLastCountryIndexByPoints(
+    state.countries,
+    getLastCountryCodeByPoints(updatedCountries),
+  );
+
+  return {
+    ...state,
+    votingPoints: 1,
+    votingCountryIndex: isJuryVotingOver
+      ? televoteCountryIndex
+      : state.votingCountryIndex + 1,
+    isJuryVoting: !isJuryVotingOver,
+    shouldShowLastPoints: !payload?.isRandomFinishing,
+    countries: updatedCountries,
+  };
+};
+
+const handleResetLastPoints = (state: ScoreboardState) => ({
+  ...state,
+  countries: state.countries.map((country) => ({
+    ...country,
+    lastReceivedPoints: 0,
+  })),
+});
+
+const handleHideLastReceivedPoints = (state: ScoreboardState) => ({
+  ...state,
+  shouldShowLastPoints: false,
+});
+
+const handleStartOver = () => initialState;
+
+function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
+  const { type, payload } = action;
+
+  switch (type) {
+    case ScoreboardActionKind.GIVE_JURY_POINTS:
+      return handleGiveJuryPoints(state, payload);
+    case ScoreboardActionKind.GIVE_TELEVOTE_POINTS:
+      return handleGiveTelevotePoints(state, payload);
+    case ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS:
+      return handleGiveRandomJuryPoints(state, payload);
+    case ScoreboardActionKind.RESET_LAST_POINTS:
+      return handleResetLastPoints(state);
     case ScoreboardActionKind.HIDE_LAST_RECEIVED_POINTS:
-      return {
-        ...state,
-        shouldShowLastPoints: false,
-      };
-
+      return handleHideLastReceivedPoints(state);
     case ScoreboardActionKind.START_OVER:
-      return initialState;
-
+      return handleStartOver();
     default:
       return state;
   }
