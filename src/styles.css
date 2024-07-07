@@ -112,7 +112,7 @@ h6 {
 }
 /* ---------------------------------------------------- */
 .container-wrapping-flip-move > div {
-  columns: 2;
+  columns: 1;
   column-gap: 0.75rem;
 }
 
@@ -134,6 +134,12 @@ h6 {
   }
 }
 
+@media (min-width: 512px) {
+  .container-wrapping-flip-move > div {
+    columns: 2;
+  }
+}
+
 @media (min-width: 768px) {
   .container-wrapping-flip-move > div {
     column-gap: 1rem;
@@ -143,5 +149,34 @@ h6 {
 @media (min-width: 1024px) {
   .container-wrapping-flip-move > div {
     column-gap: 1.5rem;
+  }
+}
+
+/* <select> styles */
+.select {
+  /* Reset */
+  appearance: none;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  /* Personalize */
+  background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg) no-repeat right 0.8em center / 1.4em,
+    linear-gradient(to left, rgba(255, 255, 255, 0.3) 3em, rgba(255, 255, 255, 0.2) 3em);
+  color: white;
+  border-radius: 0.25em;
+  box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  /* Remove IE arrow */
+  &::-ms-expand {
+    display: none;
+  }
+  /* Remove focus outline */
+  &:focus {
+    outline: none;
+  }
+  /* <option> colors */
+  option {
+    color: inherit;
+    background-color: white;
   }
 }
