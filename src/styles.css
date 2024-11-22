@@ -3,6 +3,30 @@
 @tailwind utilities;
 /* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch */
 
+@layer base {
+  html {
+  --color-primary-600: #9868d2;
+  --color-primary-700: #8c60c2;
+  --color-primary-800: #4e2c7c;
+  --color-primary-900: #37185f;
+  --color-primary-950: #27064e;
+  --color-secondary-500: #22809c;
+  --color-tertiary-300: #fef700;
+  --bg-image: url('../public/img//PurpleBg2024.jpg');
+  }
+}
+
+html[data-theme="theme2023"] {
+  --color-primary-600: #0041fd;
+  --color-primary-700: #0043fe;
+  --color-primary-800: #1940be;
+  --color-primary-900: #0c0e89;
+  --color-primary-950: #02035e;
+  --color-secondary-500: #fd0184;
+  --color-tertiary-300: #fef700;
+  --bg-image: url('../public/img//BlueBg2023.jpg');
+  }
+
 /*Zero styles*/
 * {
   padding: 0;
@@ -48,7 +72,7 @@ body,
 }
 
 #root {
-  background-image: url('../public/img//BlueBg.jpg');
+  background-image: var(--bg-image);
   background-size: cover;
   background-position: center;
 }

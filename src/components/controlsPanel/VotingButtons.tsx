@@ -102,7 +102,7 @@ const VotingButtons = ({
   }, [shouldShowLastPoints, shouldClearPoints]);
 
   return (
-    <div className="bg-blue-950 w-full pt-2 lg:pb-4 pb-3">
+    <div className="bg-primary-950 w-full pt-2 lg:pb-4 pb-3">
       {isJuryVoting ? (
         <div className="lg:px-4 px-3">
           <Button label="Vote randomly" onClick={voteRandomly} />

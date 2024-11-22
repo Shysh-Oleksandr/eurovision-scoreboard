@@ -75,7 +75,7 @@ const TelevoteInput = ({
       </label>
       <div className="flex">
         <input
-          className="w-full lg:pt-3 md:pt-2 pt-1 lg:pb-2 md:pb-1 pb-[2px] px-2 mt-2 rounded-md bg-blue-900 transition-colors duration-300 placeholder:text-gray-400 text-white lg:text-base text-sm border-solid border-transparent border-b-2 hover:bg-blue-800 focus:bg-blue-800 focus:border-white "
+          className="w-full lg:pt-3 md:pt-2 pt-1 lg:pb-2 md:pb-1 pb-[2px] px-2 mt-2 rounded-md bg-primary-900 transition-colors duration-300 placeholder:text-gray-400 text-white lg:text-base text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
           name="televoteInput"
           id="televoteInput"
           type="number"
@@ -90,7 +90,7 @@ const TelevoteInput = ({
         />
       </div>
       {error !== '' && (
-        <h5 className="text-pink-500 lg:text-base text-sm lg:ml-2 ml-1 lg:pt-2 pt-1">
+        <h5 className="text-secondary-500 lg:text-base text-sm lg:ml-2 ml-1 lg:pt-2 pt-1">
           {error}
         </h5>
       )}

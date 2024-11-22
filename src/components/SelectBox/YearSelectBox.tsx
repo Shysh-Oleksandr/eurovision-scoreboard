@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Year } from '../../config';
 import { reinitializeCountriesData } from '../../data/data';
@@ -37,6 +37,12 @@ export const YearSelectBox = ({ dispatch }: Props) => {
 
     dispatch({ type: ScoreboardActionKind.START_OVER });
   };
+
+  useEffect(() => {
+    document
+      .querySelector('html')
+      ?.setAttribute('data-theme', `theme${selectedYear}`);
+  }, [selectedYear]);
 
   return (
     <div className="sm:ml-8 ml-3 flex items-center space-x-4">

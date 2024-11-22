@@ -4,18 +4,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        yellow: {
-          300: '#fef700',
+        tertiary: {
+          300: 'var(--color-tertiary-300)',
         },
-        pink: {
-          500: '#fd0184',
+        secondary: {
+          500: 'var(--color-secondary-500)',
         },
-        blue: {
-          600: '#0041fd',
-          700: '#0043fe',
-          800: '#1940be',
-          900: '#0c0e89',
-          950: '#02035e',
+        primary: {
+          600: 'var(--color-primary-600)',
+          700: 'var(--color-primary-700)',
+          800: 'var(--color-primary-800)',
+          900: 'var(--color-primary-900)',
+          950: 'var(--color-primary-950)',
         },
       },
       screens: {

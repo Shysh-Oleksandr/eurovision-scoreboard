@@ -9,9 +9,9 @@ import RoundedTriangle from '../RoundedTriangle';
 import DouzePointsAnimation from './DouzePointsAnimation';
 import { useVotingFinished, useDouzePointsAnimation } from './hooks';
 
-const PINK_COLOR = '#fd0184';
-const BLUE_COLOR = '#0041fd';
-const YELLOW_COLOR = '#fef700';
+const SECONDARY_COLOR = '#fd0184'; // getCSSVariable('--color-secondary-500');
+const PRIMARY_COLOR = '#0041fd'; // getCSSVariable('--color-primary-600');
+const TERTIARY_COLOR = '#fef700'; //getCSSVariable('--color-tertiary-300');
 
 type Props = {
   country: Country;
@@ -64,7 +64,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       <animated.button
         ref={ref}
         style={springsActive}
-        className={`relative bg-white outline outline-blue-500 flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
+        className={`relative bg-white outline outline-primary-500 flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
           isDisabled
             ? ''
             : 'cursor-pointer transition-colors duration-300 hover:bg-sky-100'
@@ -91,12 +91,12 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         </div>
         <div className="flex h-full">
           <animated.div
-            className="bg-yellow-300 relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8"
+            className="bg-tertiary-300 relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8"
             style={springsContainer}
           >
-            <RoundedTriangle color={YELLOW_COLOR} />
+            <RoundedTriangle color={TERTIARY_COLOR} />
             <animated.h6
-              className="text-pink-500 lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center"
+              className="text-secondary-500 lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center"
               style={springsText}
             >
               {country.lastReceivedPoints}
@@ -104,11 +104,11 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
           </animated.div>
           <div
             className={`relative h-full z-20 lg:w-[2.57rem] pr-1 md:w-9 w-8 ${
-              country.isVotingFinished ? 'bg-blue-600' : 'bg-pink-500'
+              country.isVotingFinished ? 'bg-primary-600' : 'bg-secondary-500'
             }`}
           >
             <RoundedTriangle
-              color={country.isVotingFinished ? BLUE_COLOR : PINK_COLOR}
+              color={country.isVotingFinished ? PRIMARY_COLOR : SECONDARY_COLOR}
             />
             <h6 className="text-white lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center">
               {country.points}
