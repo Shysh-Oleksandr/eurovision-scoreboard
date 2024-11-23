@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import FlipMove from 'react-flip-move';
 
-import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data';
-import allCountries from '../../data/countries.json';
+import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data/data';
+import { useGetCountries } from '../../hooks/useGetCountries';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 
 import BoardHeader from './BoardHeader';
@@ -31,6 +31,8 @@ const Board = ({
 }: Props): JSX.Element => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
 
+  const allCountries = useGetCountries();
+
   const sortedCountries = useMemo(
     () => [...countries].sort((a, b) => b.points - a.points),
     [countries],
@@ -41,10 +43,20 @@ const Board = ({
     [countries],
   );
 
-  const votingCountry = allCountries[votingCountryIndex] as Country;
+  const votingCountry = useMemo(() => {
+    if (isJuryVoting) return allCountries[votingCountryIndex] as Country;
+
+    return countries[votingCountryIndex] as Country;
+  }, [allCountries, countries, isJuryVoting, votingCountryIndex]);
 
   const hasCountryFinishedVoting =
     countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS;
+
+  const flipMoveDelay = useMemo(() => {
+    if (votingCountryIndex === 0 && votingPoints === 1) return 0;
+
+    return hasCountryFinishedVoting ? 1000 : 500;
+  }, [hasCountryFinishedVoting, votingCountryIndex, votingPoints]);
 
   const onClick = useCallback(
     (countryCode: string) => {
@@ -116,7 +128,7 @@ const Board = ({
         onClick={onClick}
       />
       <div className="container-wrapping-flip-move">
-        <FlipMove duration={500} delay={hasCountryFinishedVoting ? 1000 : 500}>
+        <FlipMove duration={500} delay={flipMoveDelay}>
           {sortedCountries.map((country: Country) => renderItem(country))}
         </FlipMove>
       </div>

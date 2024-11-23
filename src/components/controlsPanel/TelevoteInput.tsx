@@ -1,8 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 
-import { MAX_POSSIBLE_TELEVOTE_POINTS } from '../../data';
-import allCountries from '../../data/countries.json';
-import { ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { getMaxPossibleTelevotePoints } from '../../data/data';
+import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
 import Button from '../Button';
 
 const NUMBER_REGEX = /^\d*$/;
@@ -10,18 +9,20 @@ const NUMBER_REGEX = /^\d*$/;
 type Props = {
   votingCountryIndex: number;
   isFirstTelevoteCountry: boolean;
+  countries: Country[];
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
 const TelevoteInput = ({
   votingCountryIndex,
   isFirstTelevoteCountry,
+  countries,
   dispatch,
 }: Props) => {
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
-  const votingCountryCode = allCountries[votingCountryIndex]?.code || '';
+  const votingCountryCode = countries[votingCountryIndex]?.code || '';
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -43,9 +44,11 @@ const TelevoteInput = ({
       return;
     }
 
-    if (votingPoints > MAX_POSSIBLE_TELEVOTE_POINTS) {
+    const maxPossibleTelevotePoints = getMaxPossibleTelevotePoints();
+
+    if (votingPoints > maxPossibleTelevotePoints) {
       setError(
-        `The maximum possible televote points are ${MAX_POSSIBLE_TELEVOTE_POINTS}`,
+        `The maximum possible televote points are ${maxPossibleTelevotePoints}`,
       );
 
       return;
@@ -72,7 +75,7 @@ const TelevoteInput = ({
       </label>
       <div className="flex">
         <input
-          className="w-full lg:pt-3 md:pt-2 pt-1 lg:pb-2 md:pb-1 pb-[2px] px-2 mt-2 rounded-md bg-blue-900 transition-colors duration-300 placeholder:text-gray-400 text-white lg:text-base text-sm border-solid border-transparent border-b-2 hover:bg-blue-800 focus:bg-blue-800 focus:border-white "
+          className="w-full lg:pt-3 md:pt-2 pt-1 lg:pb-2 md:pb-1 pb-[2px] px-2 mt-2 rounded-md bg-primary-900 transition-colors duration-300 placeholder:text-gray-400 text-white lg:text-base text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
           name="televoteInput"
           id="televoteInput"
           type="number"
@@ -87,7 +90,7 @@ const TelevoteInput = ({
         />
       </div>
       {error !== '' && (
-        <h5 className="text-pink-500 lg:text-base text-sm lg:ml-2 ml-1 lg:pt-2 pt-1">
+        <h5 className="text-countryItem-douzePointsBlock2 lg:text-base text-sm lg:ml-2 ml-1 lg:pt-2 pt-1">
           {error}
         </h5>
       )}

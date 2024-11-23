@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { COUNTRIES_LENGTH } from '../../data';
+import { getCountriesLength } from '../../data/data';
 import { Country, ScoreboardAction } from '../../models';
 
 import CountryInfo from './CountryInfo';
@@ -28,7 +28,7 @@ const ControlsPanel = ({
   isVotingOver,
   dispatch,
 }: Props): JSX.Element | null => {
-  const countriesLeft = COUNTRIES_LENGTH - votingCountryIndex;
+  const countriesLeft = getCountriesLength() - votingCountryIndex;
 
   if (isVotingOver) {
     return null;

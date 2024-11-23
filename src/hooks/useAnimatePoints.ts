@@ -1,10 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { SpringValue, easings, useSpring } from '@react-spring/web';
 
-const WHITE_COLOR = '#fff';
-const DARK_BLUE_COLOR = '#1b1c87';
-const BLUE_COLOR = '#0239d9';
+import { getCSSVariable } from '../helpers/getCssVariable';
 
 type ReturnType = {
   springsContainer: {
@@ -39,13 +37,27 @@ const useAnimatePoints = (
   isJuryVoting: boolean,
   isCountryVotingFinished: boolean,
 ): ReturnType => {
+  const DEFAULT_BG_COLOR = getCSSVariable('--color-country-item-bg');
+  const UNFINISHED_TELEVOTE_TEXT_COLOR = getCSSVariable(
+    '--color-country-item-televote-unfinished-text',
+  );
+  const TELEVOTE_TEXT_COLOR = getCSSVariable(
+    '--color-country-item-televote-text',
+  );
+  const FINISHED_VOTING_COLOR = getCSSVariable(
+    '--color-country-item-televote-finished-bg',
+  );
+  const ACTIVE_VOTING_COLOR = getCSSVariable(
+    '--color-country-item-televote-active-bg',
+  );
+
   const isFirstRender = useRef(true);
 
   const [springsActive, apiActive] = useSpring(() => ({
     from: {
       outlineWidth: 0,
-      backgroundColor: WHITE_COLOR,
-      color: DARK_BLUE_COLOR,
+      backgroundColor: DEFAULT_BG_COLOR,
+      color: UNFINISHED_TELEVOTE_TEXT_COLOR,
     },
   }));
   const [springsContainer, apiContainer] = useSpring(() => ({
@@ -180,8 +192,8 @@ const useAnimatePoints = (
       apiActive.start({
         to: {
           outlineWidth: 0,
-          backgroundColor: WHITE_COLOR,
-          color: DARK_BLUE_COLOR,
+          backgroundColor: DEFAULT_BG_COLOR,
+          color: UNFINISHED_TELEVOTE_TEXT_COLOR,
         },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
@@ -193,13 +205,13 @@ const useAnimatePoints = (
       apiActive.start({
         from: {
           outlineWidth: 0,
-          backgroundColor: WHITE_COLOR,
-          color: DARK_BLUE_COLOR,
+          backgroundColor: DEFAULT_BG_COLOR,
+          color: UNFINISHED_TELEVOTE_TEXT_COLOR,
         },
         to: {
           outlineWidth: 2,
-          backgroundColor: BLUE_COLOR,
-          color: WHITE_COLOR,
+          backgroundColor: ACTIVE_VOTING_COLOR,
+          color: TELEVOTE_TEXT_COLOR,
         },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
@@ -207,27 +219,47 @@ const useAnimatePoints = (
       apiActive.start({
         from: {
           outlineWidth: 2,
-          backgroundColor: BLUE_COLOR,
-          color: WHITE_COLOR,
+          backgroundColor: ACTIVE_VOTING_COLOR,
+          color: TELEVOTE_TEXT_COLOR,
         },
         to: {
           outlineWidth: 0,
-          backgroundColor: DARK_BLUE_COLOR,
-          color: WHITE_COLOR,
+          backgroundColor: FINISHED_VOTING_COLOR,
+          color: TELEVOTE_TEXT_COLOR,
         },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
     }
-  }, [apiActive, isActive, isCountryVotingFinished, isJuryVoting]);
+  }, [
+    ACTIVE_VOTING_COLOR,
+    DEFAULT_BG_COLOR,
+    TELEVOTE_TEXT_COLOR,
+    FINISHED_VOTING_COLOR,
+    apiActive,
+    isActive,
+    isCountryVotingFinished,
+    isJuryVoting,
+    UNFINISHED_TELEVOTE_TEXT_COLOR,
+  ]);
 
-  return {
-    springsContainer,
-    springsText,
-    springsDouzeParallelogramBlue,
-    springsDouzeParallelogramYellow,
-    springsDouzeContainer,
-    springsActive,
-  };
+  return useMemo(
+    () => ({
+      springsContainer,
+      springsText,
+      springsDouzeParallelogramBlue,
+      springsDouzeParallelogramYellow,
+      springsDouzeContainer,
+      springsActive,
+    }),
+    [
+      springsActive,
+      springsContainer,
+      springsDouzeContainer,
+      springsDouzeParallelogramBlue,
+      springsDouzeParallelogramYellow,
+      springsText,
+    ],
+  );
 };
 
 export default useAnimatePoints;

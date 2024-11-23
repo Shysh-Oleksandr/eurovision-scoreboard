@@ -1,7 +1,59 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch */
+/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./src/output.css --watch */
+
+@layer base {
+  html {
+    --color-primary-800: #4e2c7c;
+    --color-primary-900: #37185f;
+    --color-primary-950: #27064e;
+    --color-country-item-points-bg: #c93ebe;
+    --color-country-item-televote-text: #fffbfd;
+    --color-country-item-televote-unfinished-text: #fffbfd;
+    --color-country-item-televote-points-bg: #9868d2;
+    --color-country-item-televote-active-bg: #9868d2;
+    --color-country-item-televote-finished-bg: #3b1162; 
+    --color-country-item-televote-outline: #de84ef;
+    --color-country-item-last-points-bg: #2698bb;
+    --color-country-item-last-points-text: #fffbfd;
+    --color-country-item-bg: #622898;
+    --color-country-item-hover-bg: #501f7f;
+    --color-country-item-text: #fffbfd;
+    --color-country-item-douze-points-bg: #de4ed2;
+    --color-country-item-douze-points-text: #3d0887;
+    --color-country-item-douze-points-block1: #710bb6;
+    --color-country-item-douze-points-block2: #2698bb;
+    --color-panel-info-active-bg: #530b97;
+    --color-panel-info-active-text: #2798bb;
+    --bg-image: url('../public/img/PurpleBg2024.jpg');
+  }
+}
+
+html[data-theme='theme2023'] {
+  --color-primary-800: #1940be;
+  --color-primary-900: #0c0e89;
+  --color-primary-950: #02035e;
+  --color-country-item-points-bg: #fd0184;
+  --color-country-item-televote-text: #fff;
+  --color-country-item-televote-unfinished-text: #1b1b1c;
+  --color-country-item-televote-points-bg: #0041fd;
+  --color-country-item-televote-active-bg: #0239d9;
+  --color-country-item-televote-finished-bg: #1b1c87;  
+  --color-country-item-televote-outline: #3b82f6;
+  --color-country-item-last-points-bg: #fef700;
+  --color-country-item-last-points-text: #fd0184;
+  --color-country-item-bg: #fff;
+  --color-country-item-hover-bg: #e0f2fe;
+  --color-country-item-text: #1b1b1c;
+  --color-country-item-douze-points-bg: #fef700;
+  --color-country-item-douze-points-text: #fd0184;
+  --color-country-item-douze-points-block1: #0043fe;
+  --color-country-item-douze-points-block2: #fd0184;
+  --color-panel-info-active-bg: #fef700;
+  --color-panel-info-active-text: #fd0184;
+  --bg-image: url('../public/img/BlueBg2023.jpg');
+}
 
 /*Zero styles*/
 * {
@@ -45,10 +97,14 @@ body,
   -ms-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  background-color: var(--color-primary-800);
 }
 
-#root {
-  background-image: url("../public/img//BlueBg.jpg");
+#main {
+  background-image: var(
+    --bg-image,
+    url('../public/img/PurpleBg2024.jpg')
+  ) !important;
   background-size: cover;
   background-position: center;
 }
@@ -112,7 +168,7 @@ h6 {
 }
 /* ---------------------------------------------------- */
 .container-wrapping-flip-move > div {
-  columns: 2;
+  columns: 1;
   column-gap: 0.75rem;
 }
 
@@ -134,6 +190,12 @@ h6 {
   }
 }
 
+@media (min-width: 512px) {
+  .container-wrapping-flip-move > div {
+    columns: 2;
+  }
+}
+
 @media (min-width: 768px) {
   .container-wrapping-flip-move > div {
     column-gap: 1rem;
@@ -143,5 +205,102 @@ h6 {
 @media (min-width: 1024px) {
   .container-wrapping-flip-move > div {
     column-gap: 1.5rem;
+  }
+}
+
+/* <select> styles */
+.select {
+  /* Reset */
+  appearance: none;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  /* Personalize */
+  background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
+      no-repeat right 0.8em center / 1.4em,
+    linear-gradient(
+      to left,
+      rgba(255, 255, 255, 0.3) 3em,
+      rgba(255, 255, 255, 0.2) 3em
+    );
+  color: white;
+  border-radius: 0.25em;
+  box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  /* Remove IE arrow */
+  &::-ms-expand {
+    display: none;
+  }
+  /* Remove focus outline */
+  &:focus {
+    outline: none;
+  }
+  /* <option> colors */
+  option {
+    color: inherit;
+    background-color: white;
+  }
+}
+
+.animated-border {
+  display: grid;
+  place-content: center;
+  color: white;
+  text-shadow: 0 1px 0 #000;
+
+  --border-angle: 0turn;
+  --main-bg: conic-gradient(
+    from var(--border-angle),
+    #0c0e89,
+    #02035e 5%,
+    #02035e 60%,
+    #0c0e89 95%
+  );
+
+  border: solid 3px transparent;
+  --gradient-border: conic-gradient(
+    from var(--border-angle),
+    transparent 25%,
+    #08f,
+    #fd0184 99%,
+    transparent
+  );
+
+  background: 
+    /* padding-box clip this background in to the overall element except the border. */ var(
+        --main-bg
+      )
+      padding-box,
+    /* border-box extends this background to the border space */
+      var(--gradient-border) border-box,
+    /* Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background. */
+      var(--main-bg) border-box;
+
+  background-position: center center;
+
+  transition: all;
+
+  animation: bg-spin 3s linear infinite;
+
+  &:hover {
+    --main-bg: conic-gradient(
+      from var(--border-angle),
+      #0c0e9f,
+      #050775 5%,
+      #050775 60%,
+      #0c0e9f 95%
+    );
+  }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0turn;
+}
+
+@keyframes bg-spin {
+  to {
+    --border-angle: 1turn;
   }
 }

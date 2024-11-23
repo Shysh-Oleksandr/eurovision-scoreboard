@@ -1,5 +1,5 @@
 /*
-! tailwindcss v3.3.2 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.4 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -32,9 +32,11 @@
 4. Use the user's configured `sans` font-family by default.
 5. Use the user's configured `sans` font-feature-settings by default.
 6. Use the user's configured `sans` font-variation-settings by default.
+7. Disable tap highlights on iOS
 */
 
-html {
+html,
+:host {
   line-height: 1.5;
   /* 1 */
   -webkit-text-size-adjust: 100%;
@@ -44,12 +46,14 @@ html {
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
   font-variation-settings: normal;
   /* 6 */
+  -webkit-tap-highlight-color: transparent;
+  /* 7 */
 }
 
 /*
@@ -121,8 +125,10 @@ strong {
 }
 
 /*
-1. Use the user's configured `mono` font family by default.
-2. Correct the odd `em` font sizing in all browsers.
+1. Use the user's configured `mono` font-family by default.
+2. Use the user's configured `mono` font-feature-settings by default.
+3. Use the user's configured `mono` font-variation-settings by default.
+4. Correct the odd `em` font sizing in all browsers.
 */
 
 code,
@@ -131,8 +137,12 @@ samp,
 pre {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   /* 1 */
-  font-size: 1em;
+  font-feature-settings: normal;
   /* 2 */
+  font-variation-settings: normal;
+  /* 3 */
+  font-size: 1em;
+  /* 4 */
 }
 
 /*
@@ -191,11 +201,17 @@ select,
 textarea {
   font-family: inherit;
   /* 1 */
+  font-feature-settings: inherit;
+  /* 1 */
+  font-variation-settings: inherit;
+  /* 1 */
   font-size: 100%;
   /* 1 */
   font-weight: inherit;
   /* 1 */
   line-height: inherit;
+  /* 1 */
+  letter-spacing: inherit;
   /* 1 */
   color: inherit;
   /* 1 */
@@ -220,9 +236,9 @@ select {
 */
 
 button,
-[type='button'],
-[type='reset'],
-[type='submit'] {
+input:where([type='button']),
+input:where([type='reset']),
+input:where([type='submit']) {
   -webkit-appearance: button;
   /* 1 */
   background-color: transparent;
@@ -342,6 +358,14 @@ menu {
 }
 
 /*
+Reset default styling for dialogs.
+*/
+
+dialog {
+  padding: 0;
+}
+
+/*
 Prevent resizing textareas horizontally by default.
 */
 
@@ -422,6 +446,31 @@ video {
   display: none;
 }
 
+html {
+  --color-primary-800: #4e2c7c;
+  --color-primary-900: #37185f;
+  --color-primary-950: #27064e;
+  --color-country-item-points-bg: #c93ebe;
+  --color-country-item-televote-text: #fffbfd;
+  --color-country-item-televote-unfinished-text: #fffbfd;
+  --color-country-item-televote-points-bg: #9868d2;
+  --color-country-item-televote-active-bg: #9868d2;
+  --color-country-item-televote-finished-bg: #3b1162;
+  --color-country-item-televote-outline: #de84ef;
+  --color-country-item-last-points-bg: #2698bb;
+  --color-country-item-last-points-text: #fffbfd;
+  --color-country-item-bg: #622898;
+  --color-country-item-hover-bg: #501f7f;
+  --color-country-item-text: #fffbfd;
+  --color-country-item-douze-points-bg: #de4ed2;
+  --color-country-item-douze-points-text: #3d0887;
+  --color-country-item-douze-points-block1: #710bb6;
+  --color-country-item-douze-points-block2: #2698bb;
+  --color-panel-info-active-bg: #530b97;
+  --color-panel-info-active-text: #2798bb;
+  --bg-image: url('../public/img/PurpleBg2024.jpg');
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -470,6 +519,10 @@ video {
   --tw-backdrop-opacity:  ;
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
+  --tw-contain-size:  ;
+  --tw-contain-layout:  ;
+  --tw-contain-paint:  ;
+  --tw-contain-style:  ;
 }
 
 ::backdrop {
@@ -520,6 +573,10 @@ video {
   --tw-backdrop-opacity:  ;
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
+  --tw-contain-size:  ;
+  --tw-contain-layout:  ;
+  --tw-contain-paint:  ;
+  --tw-contain-style:  ;
 }
 
 .container {
@@ -627,6 +684,10 @@ video {
   margin-left: 0.5rem;
 }
 
+.ml-3 {
+  margin-left: 0.75rem;
+}
+
 .mt-1 {
   margin-top: 0.25rem;
 }
@@ -667,10 +728,6 @@ video {
   width: 50%;
 }
 
-.w-1\/4 {
-  width: 25%;
-}
-
 .w-2\/3 {
   width: 66.666667%;
 }
@@ -681,6 +738,10 @@ video {
 
 .w-8 {
   width: 2rem;
+}
+
+.w-\[120px\] {
+  width: 120px;
 }
 
 .w-\[25\%\] {
@@ -737,6 +798,12 @@ video {
        column-gap: 0.75rem;
 }
 
+.space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(1rem * var(--tw-space-x-reverse));
+  margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
 .self-start {
   align-self: flex-start;
 }
@@ -757,6 +824,10 @@ video {
   border-radius: 0.125rem;
 }
 
+.border-\[3px\] {
+  border-width: 3px;
+}
+
 .border-b-2 {
   border-bottom-width: 2px;
 }
@@ -769,34 +840,49 @@ video {
   border-color: transparent;
 }
 
+.\!bg-countryItem-lastPointsBg {
+  background-color: var(--color-country-item-last-points-bg) !important;
+}
+
+.\!bg-countryItem-pointsBg {
+  background-color: var(--color-country-item-points-bg) !important;
+}
+
+.\!bg-countryItem-televotePointsBg {
+  background-color: var(--color-country-item-televote-points-bg) !important;
+}
+
 .bg-black {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity));
 }
 
-.bg-blue-600 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 65 253 / var(--tw-bg-opacity));
+.bg-countryItem-douzePointsBg {
+  background-color: var(--color-country-item-douze-points-bg);
 }
 
-.bg-blue-700 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(0 67 254 / var(--tw-bg-opacity));
+.bg-countryItem-douzePointsBlock1 {
+  background-color: var(--color-country-item-douze-points-block1);
 }
 
-.bg-blue-900 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(12 14 137 / var(--tw-bg-opacity));
+.bg-countryItem-douzePointsBlock2 {
+  background-color: var(--color-country-item-douze-points-block2);
 }
 
-.bg-blue-950 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(2 3 94 / var(--tw-bg-opacity));
+.bg-panelInfo-activeBg {
+  background-color: var(--color-panel-info-active-bg);
 }
 
-.bg-pink-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(253 1 132 / var(--tw-bg-opacity));
+.bg-panelInfo-activeText {
+  background-color: var(--color-panel-info-active-text);
+}
+
+.bg-primary-900 {
+  background-color: var(--color-primary-900);
+}
+
+.bg-primary-950 {
+  background-color: var(--color-primary-950);
 }
 
 .bg-slate-600 {
@@ -811,11 +897,6 @@ video {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
-}
-
-.bg-yellow-300 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 247 0 / var(--tw-bg-opacity));
 }
 
 .bg-opacity-60 {
@@ -852,9 +933,9 @@ video {
   padding-bottom: 1.5rem;
 }
 
-.py-\[6px\] {
-  padding-top: 6px;
-  padding-bottom: 6px;
+.py-\[10px\] {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .pb-1 {
@@ -903,10 +984,6 @@ video {
 
 .pt-4 {
   padding-top: 1rem;
-}
-
-.pt-8 {
-  padding-top: 2rem;
 }
 
 .text-left {
@@ -958,14 +1035,24 @@ video {
   text-transform: uppercase;
 }
 
-.text-blue-800 {
-  --tw-text-opacity: 1;
-  color: rgb(25 64 190 / var(--tw-text-opacity));
+.text-countryItem-douzePointsBlock2 {
+  color: var(--color-country-item-douze-points-block2);
 }
 
-.text-pink-500 {
-  --tw-text-opacity: 1;
-  color: rgb(253 1 132 / var(--tw-text-opacity));
+.text-countryItem-douzePointsText {
+  color: var(--color-country-item-douze-points-text);
+}
+
+.text-countryItem-lastPointsText {
+  color: var(--color-country-item-last-points-text);
+}
+
+.text-panelInfo-activeText {
+  color: var(--color-panel-info-active-text);
+}
+
+.text-primary-800 {
+  color: var(--color-primary-800);
 }
 
 .text-slate-400 {
@@ -1000,8 +1087,8 @@ video {
   outline-style: solid;
 }
 
-.outline-blue-500 {
-  outline-color: #3b82f6;
+.outline-countryItem-televoteOutline {
+  outline-color: var(--color-country-item-televote-outline);
 }
 
 .filter {
@@ -1022,7 +1109,32 @@ video {
   transition-duration: 500ms;
 }
 
-/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch */
+/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./src/output.css --watch */
+
+html[data-theme='theme2023'] {
+  --color-primary-800: #1940be;
+  --color-primary-900: #0c0e89;
+  --color-primary-950: #02035e;
+  --color-country-item-points-bg: #fd0184;
+  --color-country-item-televote-text: #fff;
+  --color-country-item-televote-unfinished-text: #1b1b1c;
+  --color-country-item-televote-points-bg: #0041fd;
+  --color-country-item-televote-active-bg: #0239d9;
+  --color-country-item-televote-finished-bg: #1b1c87;
+  --color-country-item-televote-outline: #3b82f6;
+  --color-country-item-last-points-bg: #fef700;
+  --color-country-item-last-points-text: #fd0184;
+  --color-country-item-bg: #fff;
+  --color-country-item-hover-bg: #e0f2fe;
+  --color-country-item-text: #1b1b1c;
+  --color-country-item-douze-points-bg: #fef700;
+  --color-country-item-douze-points-text: #fd0184;
+  --color-country-item-douze-points-block1: #0043fe;
+  --color-country-item-douze-points-block2: #fd0184;
+  --color-panel-info-active-bg: #fef700;
+  --color-panel-info-active-text: #fd0184;
+  --bg-image: url('../public/img/BlueBg2023.jpg');
+}
 
 /*Zero styles*/
 
@@ -1068,10 +1180,14 @@ body,
   -ms-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  background-color: var(--color-primary-800);
 }
 
-#root {
-  background-image: url("../public/img//BlueBg.jpg");
+#main {
+  background-image: var(
+    --bg-image,
+    url('../public/img/PurpleBg2024.jpg')
+  ) !important;
   background-size: cover;
   background-position: center;
 }
@@ -1142,8 +1258,8 @@ h6 {
 /* ---------------------------------------------------- */
 
 .container-wrapping-flip-move > div {
-  -moz-columns: 2;
-       columns: 2;
+  -moz-columns: 1;
+       columns: 1;
   -moz-column-gap: 0.75rem;
        column-gap: 0.75rem;
 }
@@ -1166,6 +1282,13 @@ h6 {
   }
 }
 
+@media (min-width: 512px) {
+  .container-wrapping-flip-move > div {
+    -moz-columns: 2;
+         columns: 2;
+  }
+}
+
 @media (min-width: 768px) {
   .container-wrapping-flip-move > div {
     -moz-column-gap: 1rem;
@@ -1180,6 +1303,101 @@ h6 {
   }
 }
 
+/* <select> styles */
+
+.select {
+  /* Reset */
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  /* Personalize */
+  background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
+      no-repeat right 0.8em center / 1.4em,
+    linear-gradient(
+      to left,
+      rgba(255, 255, 255, 0.3) 3em,
+      rgba(255, 255, 255, 0.2) 3em
+    );
+  color: white;
+  border-radius: 0.25em;
+  box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  /* Remove IE arrow */
+  &::-ms-expand {
+    display: none;
+  }
+  /* Remove focus outline */
+  &:focus {
+    outline: none;
+  }
+  /* <option> colors */
+  option {
+    color: inherit;
+    background-color: white;
+  }
+}
+
+.animated-border {
+  display: grid;
+  place-content: center;
+  color: white;
+  text-shadow: 0 1px 0 #000;
+  --border-angle: 0turn;
+  --main-bg: conic-gradient(
+    from var(--border-angle),
+    #0c0e89,
+    #02035e 5%,
+    #02035e 60%,
+    #0c0e89 95%
+  );
+  border: solid 3px transparent;
+  --gradient-border: conic-gradient(
+    from var(--border-angle),
+    transparent 25%,
+    #08f,
+    #fd0184 99%,
+    transparent
+  );
+  background: 
+    /* padding-box clip this background in to the overall element except the border. */ var(
+        --main-bg
+      )
+      padding-box,
+    /* border-box extends this background to the border space */
+      var(--gradient-border) border-box,
+    /* Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background. */
+      var(--main-bg) border-box;
+  background-position: center center;
+  transition: all;
+  animation: bg-spin 3s linear infinite;
+  &:hover {
+    --main-bg: conic-gradient(
+      from var(--border-angle),
+      #0c0e9f,
+      #050775 5%,
+      #050775 60%,
+      #0c0e9f 95%
+    );
+  }
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+
+  inherits: true;
+
+  initial-value: 0turn;
+}
+
+@keyframes bg-spin {
+  to {
+    --border-angle: 1turn;
+  }
+}
+
 .placeholder\:text-gray-400::-moz-placeholder {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity));
@@ -1190,14 +1408,12 @@ h6 {
   color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
-.hover\:bg-blue-800:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(25 64 190 / var(--tw-bg-opacity));
+.hover\:\!bg-countryItem-hoverBg:hover {
+  background-color: var(--color-country-item-hover-bg) !important;
 }
 
-.hover\:bg-sky-100:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(224 242 254 / var(--tw-bg-opacity));
+.hover\:bg-primary-800:hover {
+  background-color: var(--color-primary-800);
 }
 
 .focus\:border-white:focus {
@@ -1205,9 +1421,8 @@ h6 {
   border-color: rgb(255 255 255 / var(--tw-border-opacity));
 }
 
-.focus\:bg-blue-800:focus {
-  --tw-bg-opacity: 1;
-  background-color: rgb(25 64 190 / var(--tw-bg-opacity));
+.focus\:bg-primary-800:focus {
+  background-color: var(--color-primary-800);
 }
 
 @media (min-width: 480px) {
@@ -1243,6 +1458,10 @@ h6 {
 }
 
 @media (min-width: 640px) {
+  .sm\:ml-8 {
+    margin-left: 2rem;
+  }
+
   .sm\:w-auto {
     width: auto;
   }
@@ -1265,6 +1484,10 @@ h6 {
   .sm\:py-8 {
     padding-top: 2rem;
     padding-bottom: 2rem;
+  }
+
+  .sm\:pt-4 {
+    padding-top: 1rem;
   }
 
   .sm\:text-2xl {
@@ -1341,11 +1564,6 @@ h6 {
     padding-bottom: 3rem;
   }
 
-  .md\:py-2 {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-
   .md\:pb-1 {
     padding-bottom: 0.25rem;
   }
@@ -1362,12 +1580,12 @@ h6 {
     padding-top: 0.25rem;
   }
 
-  .md\:pt-12 {
-    padding-top: 3rem;
-  }
-
   .md\:pt-2 {
     padding-top: 0.5rem;
+  }
+
+  .md\:pt-6 {
+    padding-top: 1.5rem;
   }
 
   .md\:text-lg {
@@ -1490,10 +1708,6 @@ h6 {
     padding-bottom: 1rem;
   }
 
-  .lg\:pt-16 {
-    padding-top: 4rem;
-  }
-
   .lg\:pt-2 {
     padding-top: 0.5rem;
   }
@@ -1504,6 +1718,14 @@ h6 {
 
   .lg\:pt-4 {
     padding-top: 1rem;
+  }
+
+  .lg\:pt-5 {
+    padding-top: 1.25rem;
+  }
+
+  .lg\:pt-8 {
+    padding-top: 2rem;
   }
 
   .lg\:text-2xl {
