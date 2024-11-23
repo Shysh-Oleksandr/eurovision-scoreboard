@@ -447,14 +447,28 @@ video {
 }
 
 html {
-  --color-primary-600: #9868d2;
-  --color-primary-700: #8c60c2;
   --color-primary-800: #4e2c7c;
   --color-primary-900: #37185f;
   --color-primary-950: #27064e;
-  --color-secondary-500: #22809c;
-  --color-tertiary-300: #fef700;
-  --bg-image: url('../public/img//PurpleBg2024.jpg');
+  --color-country-item-points-bg: #c93ebe;
+  --color-country-item-televote-text: #fffbfd;
+  --color-country-item-televote-unfinished-text: #fffbfd;
+  --color-country-item-televote-points-bg: #9868d2;
+  --color-country-item-televote-active-bg: #9868d2;
+  --color-country-item-televote-finished-bg: #3b1162;
+  --color-country-item-televote-outline: #de84ef;
+  --color-country-item-last-points-bg: #2698bb;
+  --color-country-item-last-points-text: #fffbfd;
+  --color-country-item-bg: #622898;
+  --color-country-item-hover-bg: #501f7f;
+  --color-country-item-text: #fffbfd;
+  --color-country-item-douze-points-bg: #de4ed2;
+  --color-country-item-douze-points-text: #3d0887;
+  --color-country-item-douze-points-block1: #710bb6;
+  --color-country-item-douze-points-block2: #2698bb;
+  --color-panel-info-active-bg: #530b97;
+  --color-panel-info-active-text: #2798bb;
+  --bg-image: url('../public/img/PurpleBg2024.jpg');
 }
 
 *, ::before, ::after {
@@ -826,17 +840,41 @@ html {
   border-color: transparent;
 }
 
+.\!bg-countryItem-lastPointsBg {
+  background-color: var(--color-country-item-last-points-bg) !important;
+}
+
+.\!bg-countryItem-pointsBg {
+  background-color: var(--color-country-item-points-bg) !important;
+}
+
+.\!bg-countryItem-televotePointsBg {
+  background-color: var(--color-country-item-televote-points-bg) !important;
+}
+
 .bg-black {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity));
 }
 
-.bg-primary-600 {
-  background-color: var(--color-primary-600);
+.bg-countryItem-douzePointsBg {
+  background-color: var(--color-country-item-douze-points-bg);
 }
 
-.bg-primary-700 {
-  background-color: var(--color-primary-700);
+.bg-countryItem-douzePointsBlock1 {
+  background-color: var(--color-country-item-douze-points-block1);
+}
+
+.bg-countryItem-douzePointsBlock2 {
+  background-color: var(--color-country-item-douze-points-block2);
+}
+
+.bg-panelInfo-activeBg {
+  background-color: var(--color-panel-info-active-bg);
+}
+
+.bg-panelInfo-activeText {
+  background-color: var(--color-panel-info-active-text);
 }
 
 .bg-primary-900 {
@@ -847,17 +885,9 @@ html {
   background-color: var(--color-primary-950);
 }
 
-.bg-secondary-500 {
-  background-color: var(--color-secondary-500);
-}
-
 .bg-slate-600 {
   --tw-bg-opacity: 1;
   background-color: rgb(71 85 105 / var(--tw-bg-opacity));
-}
-
-.bg-tertiary-300 {
-  background-color: var(--color-tertiary-300);
 }
 
 .bg-transparent {
@@ -1005,12 +1035,24 @@ html {
   text-transform: uppercase;
 }
 
-.text-primary-800 {
-  color: var(--color-primary-800);
+.text-countryItem-douzePointsBlock2 {
+  color: var(--color-country-item-douze-points-block2);
 }
 
-.text-secondary-500 {
-  color: var(--color-secondary-500);
+.text-countryItem-douzePointsText {
+  color: var(--color-country-item-douze-points-text);
+}
+
+.text-countryItem-lastPointsText {
+  color: var(--color-country-item-last-points-text);
+}
+
+.text-panelInfo-activeText {
+  color: var(--color-panel-info-active-text);
+}
+
+.text-primary-800 {
+  color: var(--color-primary-800);
 }
 
 .text-slate-400 {
@@ -1045,6 +1087,10 @@ html {
   outline-style: solid;
 }
 
+.outline-countryItem-televoteOutline {
+  outline-color: var(--color-country-item-televote-outline);
+}
+
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -1063,17 +1109,31 @@ html {
   transition-duration: 500ms;
 }
 
-/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./dist/output.css --watch */
+/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./src/output.css --watch */
 
-html[data-theme="theme2023"] {
-  --color-primary-600: #0041fd;
-  --color-primary-700: #0043fe;
+html[data-theme='theme2023'] {
   --color-primary-800: #1940be;
   --color-primary-900: #0c0e89;
   --color-primary-950: #02035e;
-  --color-secondary-500: #fd0184;
-  --color-tertiary-300: #fef700;
-  --bg-image: url('../public/img//BlueBg2023.jpg');
+  --color-country-item-points-bg: #fd0184;
+  --color-country-item-televote-text: #fff;
+  --color-country-item-televote-unfinished-text: #1b1b1c;
+  --color-country-item-televote-points-bg: #0041fd;
+  --color-country-item-televote-active-bg: #0239d9;
+  --color-country-item-televote-finished-bg: #1b1c87;
+  --color-country-item-televote-outline: #3b82f6;
+  --color-country-item-last-points-bg: #fef700;
+  --color-country-item-last-points-text: #fd0184;
+  --color-country-item-bg: #fff;
+  --color-country-item-hover-bg: #e0f2fe;
+  --color-country-item-text: #1b1b1c;
+  --color-country-item-douze-points-bg: #fef700;
+  --color-country-item-douze-points-text: #fd0184;
+  --color-country-item-douze-points-block1: #0043fe;
+  --color-country-item-douze-points-block2: #fd0184;
+  --color-panel-info-active-bg: #fef700;
+  --color-panel-info-active-text: #fd0184;
+  --bg-image: url('../public/img/BlueBg2023.jpg');
 }
 
 /*Zero styles*/
@@ -1120,10 +1180,14 @@ body,
   -ms-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  background-color: var(--color-primary-800);
 }
 
-#root {
-  background-image: var(--bg-image);
+#main {
+  background-image: var(
+    --bg-image,
+    url('../public/img/PurpleBg2024.jpg')
+  ) !important;
   background-size: cover;
   background-position: center;
 }
@@ -1344,13 +1408,12 @@ h6 {
   color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
-.hover\:bg-primary-800:hover {
-  background-color: var(--color-primary-800);
+.hover\:\!bg-countryItem-hoverBg:hover {
+  background-color: var(--color-country-item-hover-bg) !important;
 }
 
-.hover\:bg-sky-100:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(224 242 254 / var(--tw-bg-opacity));
+.hover\:bg-primary-800:hover {
+  background-color: var(--color-primary-800);
 }
 
 .focus\:border-white:focus {

@@ -34,13 +34,13 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
           <div
             key={points}
             className={`lg:w-8 w-7 lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${
-              isActive ? 'bg-tertiary-300' : 'bg-primary-950'
+              isActive ? 'bg-panelInfo-activeBg' : 'bg-primary-950'
             }`}
           >
             <h6
               className={`lg:text-xl text-lg transition-colors duration-500 ${
                 isActive
-                  ? 'text-secondary-500 font-bold'
+                  ? 'text-panelInfo-activeText font-bold'
                   : 'text-primary-800 font-semibold'
               }`}
             >
@@ -49,7 +49,7 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
             <animated.div
               style={springsActive}
               className={`block w-full lg:h-[5px] h-1 ${
-                isActive ? 'bg-secondary-500' : 'bg-transparent'
+                isActive ? 'bg-panelInfo-activeText' : 'bg-transparent'
               } absolute bottom-0 z-20`}
             />
           </div>

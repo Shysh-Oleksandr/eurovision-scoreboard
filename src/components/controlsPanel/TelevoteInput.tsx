@@ -90,7 +90,7 @@ const TelevoteInput = ({
         />
       </div>
       {error !== '' && (
-        <h5 className="text-secondary-500 lg:text-base text-sm lg:ml-2 ml-1 lg:pt-2 pt-1">
+        <h5 className="text-countryItem-douzePointsBlock2 lg:text-base text-sm lg:ml-2 ml-1 lg:pt-2 pt-1">
           {error}
         </h5>
       )}
