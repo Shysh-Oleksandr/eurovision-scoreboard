@@ -3,58 +3,6 @@
 @tailwind utilities;
 /* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./src/output.css --watch */
 
-@layer base {
-  html {
-    --color-primary-800: #4e2c7c;
-    --color-primary-900: #37185f;
-    --color-primary-950: #27064e;
-    --color-country-item-points-bg: #c93ebe;
-    --color-country-item-televote-text: #fffbfd;
-    --color-country-item-televote-unfinished-text: #fffbfd;
-    --color-country-item-televote-points-bg: #9868d2;
-    --color-country-item-televote-active-bg: #9868d2;
-    --color-country-item-televote-finished-bg: #3b1162; 
-    --color-country-item-televote-outline: #de84ef;
-    --color-country-item-last-points-bg: #2698bb;
-    --color-country-item-last-points-text: #fffbfd;
-    --color-country-item-bg: #622898;
-    --color-country-item-hover-bg: #501f7f;
-    --color-country-item-text: #fffbfd;
-    --color-country-item-douze-points-bg: #de4ed2;
-    --color-country-item-douze-points-text: #3d0887;
-    --color-country-item-douze-points-block1: #710bb6;
-    --color-country-item-douze-points-block2: #2698bb;
-    --color-panel-info-active-bg: #530b97;
-    --color-panel-info-active-text: #2798bb;
-    --bg-image: url('../public/img/PurpleBg2024.jpg');
-  }
-}
-
-html[data-theme='theme2023'] {
-  --color-primary-800: #1940be;
-  --color-primary-900: #0c0e89;
-  --color-primary-950: #02035e;
-  --color-country-item-points-bg: #fd0184;
-  --color-country-item-televote-text: #fff;
-  --color-country-item-televote-unfinished-text: #1b1b1c;
-  --color-country-item-televote-points-bg: #0041fd;
-  --color-country-item-televote-active-bg: #0239d9;
-  --color-country-item-televote-finished-bg: #1b1c87;  
-  --color-country-item-televote-outline: #3b82f6;
-  --color-country-item-last-points-bg: #fef700;
-  --color-country-item-last-points-text: #fd0184;
-  --color-country-item-bg: #fff;
-  --color-country-item-hover-bg: #e0f2fe;
-  --color-country-item-text: #1b1b1c;
-  --color-country-item-douze-points-bg: #fef700;
-  --color-country-item-douze-points-text: #fd0184;
-  --color-country-item-douze-points-block1: #0043fe;
-  --color-country-item-douze-points-block2: #fd0184;
-  --color-panel-info-active-bg: #fef700;
-  --color-panel-info-active-text: #fd0184;
-  --bg-image: url('../public/img/BlueBg2023.jpg');
-}
-
 /*Zero styles*/
 * {
   padding: 0;
@@ -97,16 +45,6 @@ body,
   -ms-text-size-adjust: 100%;
   -moz-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  background-color: var(--color-primary-800);
-}
-
-#main {
-  background-image: var(
-    --bg-image,
-    url('../public/img/PurpleBg2024.jpg')
-  ) !important;
-  background-size: cover;
-  background-position: center;
 }
 
 input,

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { SpringValue, easings, useSpring } from '@react-spring/web';
 
-import { getCSSVariable } from '../helpers/getCssVariable';
+import { useThemeColor } from '../theme/useThemeColor';
 
 type ReturnType = {
   springsContainer: {
@@ -37,19 +37,19 @@ const useAnimatePoints = (
   isJuryVoting: boolean,
   isCountryVotingFinished: boolean,
 ): ReturnType => {
-  const DEFAULT_BG_COLOR = getCSSVariable('--color-country-item-bg');
-  const UNFINISHED_TELEVOTE_TEXT_COLOR = getCSSVariable(
-    '--color-country-item-televote-unfinished-text',
-  );
-  const TELEVOTE_TEXT_COLOR = getCSSVariable(
-    '--color-country-item-televote-text',
-  );
-  const FINISHED_VOTING_COLOR = getCSSVariable(
-    '--color-country-item-televote-finished-bg',
-  );
-  const ACTIVE_VOTING_COLOR = getCSSVariable(
-    '--color-country-item-televote-active-bg',
-  );
+  const [
+    DEFAULT_BG_COLOR,
+    UNFINISHED_TELEVOTE_TEXT_COLOR,
+    TELEVOTE_TEXT_COLOR,
+    FINISHED_VOTING_COLOR,
+    ACTIVE_VOTING_COLOR,
+  ] = useThemeColor([
+    'countryItem.bg',
+    'countryItem.televoteUnfinishedText',
+    'countryItem.televoteText',
+    'countryItem.televoteFinishedBg',
+    'countryItem.televoteActiveBg',
+  ]);
 
   const isFirstRender = useRef(true);
 
@@ -79,14 +79,8 @@ const useAnimatePoints = (
       from: { left: '-50%', transform: 'skewX(45deg)' },
     }));
 
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-
-      return;
-    }
-
-    const parallelogramsAnimation = {
+  const parallelogramsAnimation = useMemo(
+    () => ({
       from: {
         left: '-20%',
         transform: 'skewX(45deg)',
@@ -96,7 +90,16 @@ const useAnimatePoints = (
         transform: 'skewX(-45deg)',
       },
       config: { duration: 1000, easing: easings.easeInOutCubic },
-    };
+    }),
+    [],
+  );
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+
+      return;
+    }
 
     if (isDouzePoints) {
       apiDouzeContainer.start({
@@ -106,9 +109,7 @@ const useAnimatePoints = (
         config: { duration: 400, easing: easings.easeInOutCubic },
       });
 
-      apiDouzeParallelogramBlue.start({
-        ...parallelogramsAnimation,
-      });
+      apiDouzeParallelogramBlue.start(parallelogramsAnimation);
       apiDouzeParallelogramYellow.start({
         ...parallelogramsAnimation,
         from: {
@@ -185,6 +186,7 @@ const useAnimatePoints = (
     apiText,
     isDouzePoints,
     shouldShowLastPoints,
+    parallelogramsAnimation,
   ]);
 
   useEffect(() => {

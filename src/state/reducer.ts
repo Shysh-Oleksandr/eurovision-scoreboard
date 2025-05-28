@@ -21,7 +21,6 @@ interface ScoreboardState {
   shouldShowLastPoints: boolean;
   shouldClearPoints: boolean;
   winnerCountry: Country | null;
-  triggerRerender: boolean;
 }
 
 const initialCountries: Country[] = getInitialCountries();
@@ -34,7 +33,6 @@ export const initialState: ScoreboardState = {
   shouldShowLastPoints: true,
   shouldClearPoints: false,
   winnerCountry: null,
-  triggerRerender: false,
 };
 
 const shouldResetLastPoints = (countriesWithPoints: CountryWithPoints[]) =>
@@ -65,7 +63,7 @@ const isVotingOver = (lastCountryIndexByPoints: number) =>
 
 const handleGiveJuryPoints = (state: ScoreboardState, payload: any) => {
   const countriesWithPoints = state.countries.filter(
-    (country) => country.lastReceivedPoints !== 0,
+    (country) => country.lastReceivedPoints !== null,
   );
   const shouldReset = shouldResetLastPoints(countriesWithPoints);
 
@@ -107,9 +105,9 @@ const handleGiveTelevotePoints = (state: ScoreboardState, payload: any) => {
       return {
         ...country,
         points: country.points + (payload?.votingPoints ?? 0),
-        lastReceivedPoints: payload?.votingPoints ?? 0,
+        lastReceivedPoints: payload?.votingPoints ?? null,
         isVotingFinished: true,
-      };
+      } as Country;
     }
 
     return country;
@@ -157,7 +155,7 @@ const handleGiveRandomJuryPoints = (state: ScoreboardState, payload: any) => {
         !countriesWithPoints.some(
           (countryWithPoints) => countryWithPoints.code === country.code,
         ) &&
-        !country.lastReceivedPoints &&
+        country.lastReceivedPoints === null &&
         country.code !== votingCountryCode,
     );
 
@@ -181,7 +179,7 @@ const handleGiveRandomJuryPoints = (state: ScoreboardState, payload: any) => {
       lastReceivedPoints:
         receivedPoints ||
         (shouldResetLastPoints(countriesWithPoints)
-          ? 0
+          ? null
           : country.lastReceivedPoints),
     };
   });
@@ -207,17 +205,13 @@ const handleResetLastPoints = (state: ScoreboardState) => ({
   ...state,
   countries: state.countries.map((country) => ({
     ...country,
-    lastReceivedPoints: 0,
+    lastReceivedPoints: null,
   })),
 });
 
 const handleHideLastReceivedPoints = (state: ScoreboardState) => ({
   ...state,
   shouldShowLastPoints: false,
-});
-const triggerRerender = (state: ScoreboardState) => ({
-  ...state,
-  triggerRerender: !state.triggerRerender,
 });
 
 const handleStartOver = (): ScoreboardState => {
@@ -238,8 +232,6 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
       return handleResetLastPoints(state);
     case ScoreboardActionKind.HIDE_LAST_RECEIVED_POINTS:
       return handleHideLastReceivedPoints(state);
-    case ScoreboardActionKind.TRIGGER_RERENDER:
-      return triggerRerender(state);
     case ScoreboardActionKind.START_OVER:
       return handleStartOver();
     default:

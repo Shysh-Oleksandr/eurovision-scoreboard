@@ -4,14 +4,15 @@ const getRadialGradient = (color: string) =>
   `radial-gradient(160% 183% at left -65% top -65%, transparent 99%, ${color})`;
 
 type Props = {
-  color: string;
+  color?: string;
+  className?: string;
 };
 
-const RoundedTriangle = ({ color }: Props) => (
+const RoundedTriangle = ({ color, className }: Props) => (
   <div
-    className="triangle"
+    className={`triangle ${className || ''}`}
     style={{
-      backgroundImage: getRadialGradient(color),
+      backgroundImage: color ? getRadialGradient(color) : undefined,
     }}
   />
 );

@@ -30,7 +30,6 @@ const Board = ({
   dispatch,
 }: Props): JSX.Element => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
-
   const allCountries = useGetCountries();
 
   const sortedCountries = useMemo(
@@ -39,7 +38,8 @@ const Board = ({
   );
 
   const countriesWithPointsLength = useMemo(
-    () => countries.filter((country) => country.lastReceivedPoints).length,
+    () =>
+      countries.filter((country) => country.lastReceivedPoints !== null).length,
     [countries],
   );
 
@@ -49,8 +49,10 @@ const Board = ({
     return countries[votingCountryIndex] as Country;
   }, [allCountries, countries, isJuryVoting, votingCountryIndex]);
 
-  const hasCountryFinishedVoting =
-    countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS;
+  const hasCountryFinishedVoting = useMemo(
+    () => countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS,
+    [countriesWithPointsLength],
+  );
 
   const flipMoveDelay = useMemo(() => {
     if (votingCountryIndex === 0 && votingPoints === 1) return 0;
@@ -58,32 +60,22 @@ const Board = ({
     return hasCountryFinishedVoting ? 1000 : 500;
   }, [hasCountryFinishedVoting, votingCountryIndex, votingPoints]);
 
+  const handleResetPoints = useCallback(() => {
+    if (timerId.current) {
+      clearTimeout(timerId.current);
+      timerId.current = null;
+    }
+    dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
+  }, [dispatch]);
+
   const onClick = useCallback(
     (countryCode: string) => {
-      // Clear timer and reset points if there's a timer and we give '1' point
-      if (
-        timerId.current &&
-        countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS
-      ) {
-        clearTimeout(timerId.current);
-        timerId.current = null;
-        dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
-      }
-      // Reset points if there's was a random vote and we give '1' point
-      if (
-        !timerId.current &&
-        countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS
-      ) {
-        dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
+      if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS) {
+        handleResetPoints();
       }
 
-      // Set timer to display last received points if we give '12' points and it's not the last country
       if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
-        timerId.current = setTimeout(() => {
-          timerId.current = null;
-
-          dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
-        }, ANIMATION_DURATION);
+        timerId.current = setTimeout(handleResetPoints, ANIMATION_DURATION);
       }
 
       dispatch({
@@ -91,7 +83,7 @@ const Board = ({
         payload: { countryCode },
       });
     },
-    [countriesWithPointsLength, dispatch],
+    [countriesWithPointsLength, dispatch, handleResetPoints],
   );
 
   const renderItem = useCallback(
@@ -129,11 +121,11 @@ const Board = ({
       />
       <div className="container-wrapping-flip-move">
         <FlipMove duration={500} delay={flipMoveDelay}>
-          {sortedCountries.map((country: Country) => renderItem(country))}
+          {sortedCountries.map(renderItem)}
         </FlipMove>
       </div>
     </div>
   );
 };
 
-export default Board;
+export default React.memo(Board);

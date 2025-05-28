@@ -5,12 +5,24 @@ import ControlsPanel from '../components/controlsPanel';
 import { YearSelectBox } from '../components/SelectBox/YearSelectBox';
 import WinnerModal from '../components/WinnerModal';
 import scoreboardReducer, { initialState } from '../state/reducer';
+import { ThemeProvider, useTheme } from '../theme/ThemeContext';
 
-export const Main = () => {
+const MainContent = () => {
   const [state, dispatch] = useReducer(scoreboardReducer, initialState);
+  const { theme } = useTheme();
 
   return (
-    <div className="w-full h-full" id="main">
+    <div
+      className="w-full h-full"
+      id="main"
+      style={{
+        backgroundImage: `url(${theme.backgroundImage})`,
+        backgroundColor: theme.colors.primary[800],
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
       <div className="lg:pt-8 md:pt-6 pt-4">
         <YearSelectBox dispatch={dispatch} />
         <div className="xl:px-[15%] lg:px-[10%] md:px-[6%] sm:px-8 px-4 lg:pb-16 md:pb-12 pb-8 lg:pt-5 sm:pt-4 pt-2 w-full">
@@ -42,5 +54,13 @@ export const Main = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+export const Main = () => {
+  return (
+    <ThemeProvider>
+      <MainContent />
+    </ThemeProvider>
   );
 };

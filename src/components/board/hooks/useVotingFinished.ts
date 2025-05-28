@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ANIMATION_DURATION } from '../../../data/data';
 
 const useVotingFinished = (isVotingFinished: boolean) => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
   const [isFinished, setIsFinished] = useState(false);
+
+  const clearTimer = useCallback(() => {
+    if (timerId.current) {
+      clearTimeout(timerId.current);
+      timerId.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (isVotingFinished && !timerId.current) {
@@ -14,11 +21,12 @@ const useVotingFinished = (isVotingFinished: boolean) => {
     }
 
     if (!isVotingFinished && timerId.current) {
-      clearTimeout(timerId.current);
-      timerId.current = null;
+      clearTimer();
       setIsFinished(false);
     }
-  }, [isVotingFinished]);
+
+    return clearTimer;
+  }, [isVotingFinished, clearTimer]);
 
   return isFinished;
 };
