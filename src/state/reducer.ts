@@ -21,7 +21,6 @@ interface ScoreboardState {
   shouldShowLastPoints: boolean;
   shouldClearPoints: boolean;
   winnerCountry: Country | null;
-  triggerRerender: boolean;
 }
 
 const initialCountries: Country[] = getInitialCountries();
@@ -34,7 +33,6 @@ export const initialState: ScoreboardState = {
   shouldShowLastPoints: true,
   shouldClearPoints: false,
   winnerCountry: null,
-  triggerRerender: false,
 };
 
 const shouldResetLastPoints = (countriesWithPoints: CountryWithPoints[]) =>
@@ -215,10 +213,6 @@ const handleHideLastReceivedPoints = (state: ScoreboardState) => ({
   ...state,
   shouldShowLastPoints: false,
 });
-const triggerRerender = (state: ScoreboardState) => ({
-  ...state,
-  triggerRerender: !state.triggerRerender,
-});
 
 const handleStartOver = (): ScoreboardState => {
   return { ...initialState, countries: getInitialCountries() };
@@ -238,8 +232,6 @@ function scoreboardReducer(state: ScoreboardState, action: ScoreboardAction) {
       return handleResetLastPoints(state);
     case ScoreboardActionKind.HIDE_LAST_RECEIVED_POINTS:
       return handleHideLastReceivedPoints(state);
-    case ScoreboardActionKind.TRIGGER_RERENDER:
-      return triggerRerender(state);
     case ScoreboardActionKind.START_OVER:
       return handleStartOver();
     default:

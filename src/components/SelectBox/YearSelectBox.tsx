@@ -38,14 +38,6 @@ export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
     dispatch({ type: ScoreboardActionKind.START_OVER });
   };
 
-  // Workaround to fix the issue with the wrong countries colors when changing the year as first action
-  React.useEffect(() => {
-    setTimeout(() => {
-      dispatch({ type: ScoreboardActionKind.TRIGGER_RERENDER });
-    }, 1050);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   React.useEffect(() => {
     document.querySelector('html')?.setAttribute('data-theme', `theme${year}`);
   }, [year]);
