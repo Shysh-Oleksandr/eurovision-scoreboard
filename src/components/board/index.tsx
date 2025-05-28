@@ -38,7 +38,8 @@ const Board = ({
   );
 
   const countriesWithPointsLength = useMemo(
-    () => countries.filter((country) => country.lastReceivedPoints).length,
+    () =>
+      countries.filter((country) => country.lastReceivedPoints !== null).length,
     [countries],
   );
 
@@ -127,4 +128,4 @@ const Board = ({
   );
 };
 
-export default Board;
+export default React.memo(Board);

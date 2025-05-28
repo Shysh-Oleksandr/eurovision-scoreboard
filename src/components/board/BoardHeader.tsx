@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
-import { useAppContext } from '../../state/AppContext';
+import { useTheme } from '../../theme/ThemeContext';
 import Button from '../Button';
 
 type Props = {
@@ -24,7 +24,7 @@ const BoardHeader = ({
   onClick,
   dispatch,
 }: Props): JSX.Element => {
-  const { selectedYear } = useAppContext();
+  const { year } = useTheme();
 
   const votingText = isJuryVoting ? (
     <>
@@ -68,7 +68,7 @@ const BoardHeader = ({
     }
 
     const countriesWithoutPoints = countries.filter(
-      (country) => !country.lastReceivedPoints,
+      (country) => country.lastReceivedPoints === null,
     );
 
     const randomCountryIndex = Math.floor(
@@ -85,7 +85,7 @@ const BoardHeader = ({
         {winnerCountry ? (
           <>
             <span className="font-semibold">{winnerCountry.name}</span> is the
-            winner of Eurovision {selectedYear}!
+            winner of Eurovision {year}!
           </>
         ) : (
           votingText

@@ -28,7 +28,7 @@ export const getInitialCountries = () => {
   return getQualifiedCountries().map((country) => ({
     ...country,
     points: 0,
-    lastReceivedPoints: 0,
+    lastReceivedPoints: null,
   }));
 };
 

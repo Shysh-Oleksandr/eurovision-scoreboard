@@ -65,7 +65,7 @@ const isVotingOver = (lastCountryIndexByPoints: number) =>
 
 const handleGiveJuryPoints = (state: ScoreboardState, payload: any) => {
   const countriesWithPoints = state.countries.filter(
-    (country) => country.lastReceivedPoints !== 0,
+    (country) => country.lastReceivedPoints !== null,
   );
   const shouldReset = shouldResetLastPoints(countriesWithPoints);
 
@@ -107,9 +107,9 @@ const handleGiveTelevotePoints = (state: ScoreboardState, payload: any) => {
       return {
         ...country,
         points: country.points + (payload?.votingPoints ?? 0),
-        lastReceivedPoints: payload?.votingPoints ?? 0,
+        lastReceivedPoints: payload?.votingPoints ?? null,
         isVotingFinished: true,
-      };
+      } as Country;
     }
 
     return country;
@@ -157,7 +157,7 @@ const handleGiveRandomJuryPoints = (state: ScoreboardState, payload: any) => {
         !countriesWithPoints.some(
           (countryWithPoints) => countryWithPoints.code === country.code,
         ) &&
-        !country.lastReceivedPoints &&
+        country.lastReceivedPoints === null &&
         country.code !== votingCountryCode,
     );
 
@@ -181,7 +181,7 @@ const handleGiveRandomJuryPoints = (state: ScoreboardState, payload: any) => {
       lastReceivedPoints:
         receivedPoints ||
         (shouldResetLastPoints(countriesWithPoints)
-          ? 0
+          ? null
           : country.lastReceivedPoints),
     };
   });
@@ -207,7 +207,7 @@ const handleResetLastPoints = (state: ScoreboardState) => ({
   ...state,
   countries: state.countries.map((country) => ({
     ...country,
-    lastReceivedPoints: 0,
+    lastReceivedPoints: null,
   })),
 });
 

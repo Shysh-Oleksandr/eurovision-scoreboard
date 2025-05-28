@@ -7,7 +7,7 @@ export type BaseCountry = {
 
 export type Country = BaseCountry & {
   points: number;
-  lastReceivedPoints: number;
+  lastReceivedPoints: number | null;
   isVotingFinished?: boolean;
 };
 
