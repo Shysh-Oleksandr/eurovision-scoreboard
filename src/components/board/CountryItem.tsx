@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 
 import { animated } from '@react-spring/web';
 
@@ -58,24 +58,37 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       !!country.isVotingFinished,
     );
 
-    const isVoted =
-      country.lastReceivedPoints !== 0 || country.isVotingFinished;
-    const isDisabled =
-      (isVoted && !hasCountryFinishedVoting) ||
-      isVotingCountry ||
-      !isJuryVoting;
+    const isVoted = useMemo(
+      () => country.lastReceivedPoints !== 0 || country.isVotingFinished,
+      [country.lastReceivedPoints, country.isVotingFinished],
+    );
+
+    const isDisabled = useMemo(
+      () =>
+        (isVoted && !hasCountryFinishedVoting) ||
+        isVotingCountry ||
+        !isJuryVoting,
+      [isVoted, hasCountryFinishedVoting, isVotingCountry, isJuryVoting],
+    );
+
+    const handleClick = useMemo(
+      () => () => onClick(country.code),
+      [onClick, country.code],
+    );
+
+    const buttonClassName = `relative outline outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
+      isDisabled
+        ? ''
+        : 'cursor-pointer transition-colors duration-300 hover:!bg-countryItem-hoverBg'
+    } ${isActive ? 'rounded-sm' : ''}`;
 
     return (
       <animated.button
         ref={ref}
         style={springsActive}
-        className={`relative outline outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
-          isDisabled
-            ? ''
-            : 'cursor-pointer transition-colors duration-300 hover:!bg-countryItem-hoverBg'
-        } ${isActive ? 'rounded-sm' : ''}`}
+        className={buttonClassName}
         disabled={isDisabled}
-        onClick={() => onClick(country.code)}
+        onClick={handleClick}
       >
         {isJuryVoting && showDouzePointsAnimation && (
           <DouzePointsAnimation
@@ -133,4 +146,4 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
 
 CountryItem.displayName = 'CountryItem';
 
-export default CountryItem;
+export default React.memo(CountryItem);
