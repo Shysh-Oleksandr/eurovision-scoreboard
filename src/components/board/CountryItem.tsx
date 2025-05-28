@@ -77,7 +77,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         disabled={isDisabled}
         onClick={() => onClick(country.code)}
       >
-        {showDouzePointsAnimation && (
+        {isJuryVoting && showDouzePointsAnimation && (
           <DouzePointsAnimation
             springsDouzeContainer={springsDouzeContainer}
             springsDouzeParallelogramBlue={springsDouzeParallelogramBlue}

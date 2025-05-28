@@ -214,7 +214,7 @@ export const COUNTRIES_2024: BaseCountry[] = [
   {
     name: 'Ukraine',
     code: 'UA',
-    flag: 'https://www.worldometers.info//img/flags/small/tn_up-flag.gif',
+    flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Flag_of_Ukraine.svg/250px-Flag_of_Ukraine.svg.png',
     isQualified: true,
   },
   {
