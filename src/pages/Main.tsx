@@ -16,7 +16,7 @@ const MainContent = () => {
       className={`w-full h-full theme-${year}`}
       id="main"
       style={{
-        backgroundColor: theme.colors.primary[800],
+        backgroundColor: theme.colors.appBgColor,
       }}
     >
       <div className="lg:pt-8 md:pt-6 pt-4">

@@ -41,7 +41,7 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
               className={`lg:text-xl text-lg transition-colors duration-500 ${
                 isActive
                   ? 'text-panelInfo-activeText font-bold'
-                  : 'text-primary-800 font-semibold'
+                  : 'text-panelInfo-inactiveText font-semibold'
               }`}
             >
               {points}

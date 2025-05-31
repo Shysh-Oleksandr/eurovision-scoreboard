@@ -8,6 +8,7 @@ export const themes: ThemeRecord = {
         900: '#0c0e89',
         950: '#02035e',
       },
+      appBgColor: '#1f3496',
       countryItem: {
         bg: '#fff',
         hoverBg: '#e0f2fe',
@@ -32,6 +33,7 @@ export const themes: ThemeRecord = {
       panelInfo: {
         activeBg: '#fef700',
         activeText: '#fd0184',
+        inactiveText: '#1940be',
       },
     },
   },
@@ -42,6 +44,7 @@ export const themes: ThemeRecord = {
         900: '#37185f',
         950: '#27064e',
       },
+      appBgColor: '#4e2c7c',
       countryItem: {
         bg: '#622898',
         hoverBg: '#501f7f',
@@ -66,16 +69,18 @@ export const themes: ThemeRecord = {
       panelInfo: {
         activeBg: '#530b97',
         activeText: '#2798bb',
+        inactiveText: '#4e2c7c',
       },
     },
   },
   '2025': {
     colors: {
       primary: {
-        800: '#5b1ca1',
+        800: '#551a97',
         900: '#3f1371',
         950: '#320d4e',
       },
+      appBgColor: '#3a0451',
       countryItem: {
         bg: '#6224b9',
         hoverBg: '#511b9c',
@@ -100,6 +105,7 @@ export const themes: ThemeRecord = {
       panelInfo: {
         activeBg: '#530b97',
         activeText: '#c206cd',
+        inactiveText: '#6426a9',
       },
     },
   },

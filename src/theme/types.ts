@@ -6,6 +6,7 @@ export interface ThemeColors {
     900: string;
     950: string;
   };
+  appBgColor: string;
   countryItem: {
     bg: string;
     hoverBg: string;
@@ -30,6 +31,7 @@ export interface ThemeColors {
   panelInfo: {
     activeBg: string;
     activeText: string;
+    inactiveText: string;
   };
 }
 
