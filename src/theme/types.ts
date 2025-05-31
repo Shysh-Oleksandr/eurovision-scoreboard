@@ -37,7 +37,7 @@ export interface ThemeColors {
 
 export interface Theme {
   colors: ThemeColors;
-  backgroundImage?: string;
+  hostingCountryLogo?: string;
 }
 
 export type ThemeRecord = Record<Year, Theme>;

@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
-  const { year, setYear } = useTheme();
+  const { theme, year, setYear } = useTheme();
 
   const [localYear, setLocalYear] = useState(year);
 
@@ -45,6 +45,11 @@ export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
 
   return (
     <div className="sm:ml-8 ml-3 flex items-center space-x-4">
+      <img
+        src={theme.hostingCountryLogo}
+        alt="Hosting country logo"
+        className="w-10 h-10"
+      />
       <SelectBox
         options={options}
         value={localYear}

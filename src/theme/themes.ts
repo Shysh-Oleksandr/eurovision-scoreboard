@@ -36,6 +36,7 @@ export const themes: ThemeRecord = {
         inactiveText: '#1940be',
       },
     },
+    hostingCountryLogo: require('../assets/hostingCountryLogos/HostingCountry2023.svg'), // Got it from "https://commons.wikimedia.org/wiki/File:Eurovision_Song_Contest_heart_Switzerland_white.svg"
   },
   '2024': {
     colors: {
@@ -72,6 +73,7 @@ export const themes: ThemeRecord = {
         inactiveText: '#4e2c7c',
       },
     },
+    hostingCountryLogo: require('../assets/hostingCountryLogos/HostingCountry2024.svg'),
   },
   '2025': {
     colors: {
@@ -108,5 +110,6 @@ export const themes: ThemeRecord = {
         inactiveText: '#6426a9',
       },
     },
+    hostingCountryLogo: require('../assets/hostingCountryLogos/HostingCountry2025.svg'),
   },
 };
