@@ -9,3 +9,5 @@ coverage-ts
 
 .eslintcache
 .vscode/
+
+.DS_Store

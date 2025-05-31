@@ -1,15 +1,19 @@
 import { Year } from '../config';
 import { BaseCountry } from '../models';
 
-import { COUNTRIES_2023, COUNTRIES_2024 } from './countries/';
+import { COUNTRIES_2023, COUNTRIES_2024, COUNTRIES_2025 } from './countries';
 
 export const getCountriesData = (year?: Year) => {
   switch (year) {
     case '2023':
       return COUNTRIES_2023;
 
-    default:
+    case '2024':
       return COUNTRIES_2024;
+
+    case '2025':
+    default:
+      return COUNTRIES_2025;
   }
 };
 

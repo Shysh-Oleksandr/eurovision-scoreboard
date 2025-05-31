@@ -17,6 +17,7 @@ type Props = {
   votingPoints: number;
   votingCountryIndex: number;
   shouldShowLastPoints: boolean;
+  isVotingOver: boolean;
   dispatch: React.Dispatch<ScoreboardAction>;
 };
 
@@ -27,6 +28,7 @@ const Board = ({
   votingPoints,
   votingCountryIndex,
   shouldShowLastPoints,
+  isVotingOver,
   dispatch,
 }: Props): JSX.Element => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
@@ -87,7 +89,7 @@ const Board = ({
   );
 
   const renderItem = useCallback(
-    (country: Country) => (
+    (country: Country, index: number) => (
       <CountryItem
         key={country.code}
         country={country}
@@ -96,9 +98,17 @@ const Board = ({
         isVotingCountry={country.code === votingCountry?.code && isJuryVoting}
         isActive={country.code === votingCountry?.code && !isJuryVoting}
         onClick={onClick}
+        isVotingOver={isVotingOver}
+        index={index}
       />
     ),
-    [hasCountryFinishedVoting, votingCountry, isJuryVoting, onClick],
+    [
+      hasCountryFinishedVoting,
+      votingCountry,
+      isJuryVoting,
+      onClick,
+      isVotingOver,
+    ],
   );
 
   useEffect(() => {

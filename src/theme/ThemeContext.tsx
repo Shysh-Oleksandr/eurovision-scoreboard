@@ -9,19 +9,22 @@ import React, {
 import type { Year } from '../config';
 
 import { themes } from './themes';
-import type { Theme } from './types';
+import { themesInfo } from './themesInfo';
+import type { Theme, ThemeInfo } from './types';
 
 interface ThemeContextType {
   year: Year;
   theme: Theme;
+  themeInfo: ThemeInfo;
   setYear: (year: Year) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [year, setYear] = useState<Year>('2024');
+  const [year, setYear] = useState<Year>('2025');
   const theme = themes[year];
+  const themeInfo = themesInfo[year];
 
   // Apply initial theme class
   useEffect(() => {
@@ -32,13 +35,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const handleSetYear = (newYear: Year) => {
     setYear(newYear);
     // Remove all theme classes
-    document.documentElement.classList.remove('theme-2023', 'theme-2024');
+    document.documentElement.classList.remove(
+      'theme-2023',
+      'theme-2024',
+      'theme-2025',
+    );
     // Add the new theme class
     document.documentElement.classList.add(`theme-${newYear}`);
   };
 
   return (
-    <ThemeContext.Provider value={{ year, theme, setYear: handleSetYear }}>
+    <ThemeContext.Provider
+      value={{ year, theme, themeInfo, setYear: handleSetYear }}
+    >
       {children}
     </ThemeContext.Provider>
   );

@@ -26,7 +26,7 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
   }, [apiActive, votingPoints]);
 
   return (
-    <div className="flex justify-between w-full lg:mt-6 md:mt-4 mt-3 overflow-hidden">
+    <div className="flex justify-between w-full lg:mt-6 md:mt-4 mt-3 overflow-hidden rounded-sm">
       {POINTS_ARRAY.map((points) => {
         const isActive = points === votingPoints;
 
@@ -41,7 +41,7 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
               className={`lg:text-xl text-lg transition-colors duration-500 ${
                 isActive
                   ? 'text-panelInfo-activeText font-bold'
-                  : 'text-primary-800 font-semibold'
+                  : 'text-panelInfo-inactiveText font-semibold'
               }`}
             >
               {points}
