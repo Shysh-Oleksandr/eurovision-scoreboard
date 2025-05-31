@@ -20,7 +20,7 @@ const useVotingFinished = (isVotingFinished: boolean) => {
       }, ANIMATION_DURATION);
     }
 
-    if (!isVotingFinished && timerId.current) {
+    if (!isVotingFinished) {
       clearTimer();
       setIsFinished(false);
     }
