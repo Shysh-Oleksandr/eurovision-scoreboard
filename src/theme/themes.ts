@@ -105,7 +105,7 @@ export const themes: ThemeRecord = {
         douzePointsText: '#0e2986',
         douzePointsBlock1: '#710bb6',
         douzePointsBlock2: '#2698bb',
-        placeContainerBg: '#9e21de',
+        placeContainerBg: '#7919ab',
         placeText: '#fffbfd',
       },
       panelInfo: {

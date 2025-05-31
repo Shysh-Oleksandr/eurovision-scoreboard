@@ -921,6 +921,16 @@ video {
   --tw-bg-opacity: 0.6;
 }
 
+.object-contain {
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.object-cover {
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
 .\!px-6 {
   padding-left: 1.5rem !important;
   padding-right: 1.5rem !important;
@@ -1233,7 +1243,7 @@ video {
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
   --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
-  --twc-countryItem-placeContainerBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
   --twc-countryItem-placeText: 330 100% 99.2%;
   --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
   --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
