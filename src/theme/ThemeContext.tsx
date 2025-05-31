@@ -20,7 +20,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [year, setYear] = useState<Year>('2024');
+  const [year, setYear] = useState<Year>('2025');
   const theme = themes[year];
 
   // Apply initial theme class
@@ -32,7 +32,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const handleSetYear = (newYear: Year) => {
     setYear(newYear);
     // Remove all theme classes
-    document.documentElement.classList.remove('theme-2023', 'theme-2024');
+    document.documentElement.classList.remove(
+      'theme-2023',
+      'theme-2024',
+      'theme-2025',
+    );
     // Add the new theme class
     document.documentElement.classList.add(`theme-${newYear}`);
   };

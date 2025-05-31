@@ -9,18 +9,14 @@ import { ThemeProvider, useTheme } from '../theme/ThemeContext';
 
 const MainContent = () => {
   const [state, dispatch] = useReducer(scoreboardReducer, initialState);
-  const { theme } = useTheme();
+  const { theme, year } = useTheme();
 
   return (
     <div
-      className="w-full h-full"
+      className={`w-full h-full theme-${year}`}
       id="main"
       style={{
-        backgroundImage: `url(${theme.backgroundImage})`,
         backgroundColor: theme.colors.primary[800],
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
       }}
     >
       <div className="lg:pt-8 md:pt-6 pt-4">

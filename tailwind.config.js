@@ -21,6 +21,9 @@ module.exports = {
         2024: {
           ...themes['2024'].colors,
         },
+        2025: {
+          ...themes['2025'].colors,
+        },
       },
       {
         produceThemeClass: (themeName) => `theme-${themeName}`,

@@ -23,7 +23,7 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
   }, [votingCountryIndex]);
 
   return (
-    <div className="bg-primary-950 w-full pb-2 lg:pt-4 pt-3 lg:px-4 px-3">
+    <div className="bg-primary-950 w-full pb-2 lg:pt-4 pt-3 lg:px-4 px-3 rounded-md">
       <h4
         className={`text-white uppercase lg:text-2xl text-xl ${
           shouldBlink ? 'blinker' : ''

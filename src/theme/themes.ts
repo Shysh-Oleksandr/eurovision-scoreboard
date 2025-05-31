@@ -1,6 +1,3 @@
-import BlueBg2023 from '../data/bgImages/BlueBg2023.jpg';
-import PurpleBg2024 from '../data/bgImages/PurpleBg2024.jpg';
-
 import { ThemeRecord } from './types';
 
 export const themes: ThemeRecord = {
@@ -16,13 +13,16 @@ export const themes: ThemeRecord = {
         hoverBg: '#e0f2fe',
         text: '#1b1b1c',
         pointsBg: '#fd0184',
+        juryPointsText: '#0041fd',
         televotePointsBg: '#0041fd',
         televoteActiveBg: '#0239d9',
-        televoteText: '#fff',
+        televotePointsText: '#fff',
+        televoteCountryText: '#fff',
         televoteUnfinishedText: '#1b1b1c',
         televoteFinishedBg: '#1b1c87',
         televoteOutline: '#3b82f6',
-        lastPointsBg: '#fef700',
+        juryLastPointsBg: '#fef700',
+        televoteLastPointsBg: '#fef700',
         lastPointsText: '#fd0184',
         douzePointsBg: '#fef700',
         douzePointsText: '#fd0184',
@@ -34,7 +34,6 @@ export const themes: ThemeRecord = {
         activeText: '#fd0184',
       },
     },
-    backgroundImage: BlueBg2023,
   },
   '2024': {
     colors: {
@@ -48,13 +47,16 @@ export const themes: ThemeRecord = {
         hoverBg: '#501f7f',
         text: '#fffbfd',
         pointsBg: '#c93ebe',
+        juryPointsText: '#9868d2',
         televotePointsBg: '#9868d2',
         televoteActiveBg: '#9868d2',
-        televoteText: '#fffbfd',
+        televotePointsText: '#fffbfd',
+        televoteCountryText: '#fffbfd',
         televoteUnfinishedText: '#fffbfd',
         televoteFinishedBg: '#3b1162',
         televoteOutline: '#de84ef',
-        lastPointsBg: '#2698bb',
+        juryLastPointsBg: '#2698bb',
+        televoteLastPointsBg: '#2698bb',
         lastPointsText: '#fffbfd',
         douzePointsBg: '#de4ed2',
         douzePointsText: '#3d0887',
@@ -66,6 +68,39 @@ export const themes: ThemeRecord = {
         activeText: '#2798bb',
       },
     },
-    backgroundImage: PurpleBg2024,
+  },
+  '2025': {
+    colors: {
+      primary: {
+        800: '#5b1ca1',
+        900: '#3f1371',
+        950: '#320d4e',
+      },
+      countryItem: {
+        bg: '#6224b9',
+        hoverBg: '#511b9c',
+        text: '#fefefe',
+        pointsBg: '#fefefe',
+        juryPointsText: '#010002',
+        televotePointsBg: '#fefefe',
+        televoteActiveBg: '#8138e7',
+        televotePointsText: '#010002',
+        televoteCountryText: '#fefefe',
+        televoteUnfinishedText: '#fefefe',
+        televoteFinishedBg: '#bb01c5',
+        televoteOutline: '#a088c2',
+        juryLastPointsBg: '#bb01c5',
+        televoteLastPointsBg: '#9e21de',
+        lastPointsText: '#fefefe',
+        douzePointsBg: '#05d9d9',
+        douzePointsText: '#0e2986',
+        douzePointsBlock1: '#710bb6',
+        douzePointsBlock2: '#2698bb',
+      },
+      panelInfo: {
+        activeBg: '#530b97',
+        activeText: '#c206cd',
+      },
+    },
   },
 };

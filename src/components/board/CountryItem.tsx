@@ -31,11 +31,13 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
     },
     ref,
   ) => {
-    const [lastPointsBg, televotePointsBg, pointsBg] = useThemeColor([
-      'countryItem.lastPointsBg',
-      'countryItem.televotePointsBg',
-      'countryItem.pointsBg',
-    ]);
+    const [juryLastPointsBg, televoteLastPointsBg, televotePointsBg, pointsBg] =
+      useThemeColor([
+        'countryItem.juryLastPointsBg',
+        'countryItem.televoteLastPointsBg',
+        'countryItem.televotePointsBg',
+        'countryItem.pointsBg',
+      ]);
     const isVotingFinished = useVotingFinished(!!country.isVotingFinished);
     const isDouzePoints = country.lastReceivedPoints === 12;
     const showDouzePointsAnimation = useDouzePointsAnimation(isDouzePoints);
@@ -106,19 +108,35 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
             alt={`${country.name} flag`}
             className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-white self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px]"
           />
-          <h4 className="uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] xs:pr-2 pr-0 sm:text-base md:leading-4 xs:text-[13px] text-xs xs:break-normal break-all">
+          <h4
+            className={`uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] xs:pr-2 pr-0 ${
+              country.name.length > 10 && !isVotingFinished
+                ? 'md:text-xs'
+                : 'md:text-sm'
+            } md:leading-4 text-base xs:break-normal break-all`}
+          >
             {country.name}
           </h4>
         </div>
         <div className="flex h-full">
           <animated.div
             style={springsContainer}
-            className="relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8 bg-countryItem-lastPointsBg"
+            className={`relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8 ${
+              country.isVotingFinished
+                ? `bg-countryItem-televoteLastPointsBg`
+                : `bg-countryItem-juryLastPointsBg`
+            }`}
           >
-            <RoundedTriangle color={lastPointsBg} />
+            <RoundedTriangle
+              color={
+                country.isVotingFinished
+                  ? televoteLastPointsBg
+                  : juryLastPointsBg
+              }
+            />
             <animated.h6
               style={springsText}
-              className="lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center text-countryItem-lastPointsText"
+              className="lg:text-lg md:text-sm text-xs font-semibold h-full items-center flex justify-center text-countryItem-lastPointsText"
             >
               {country.lastReceivedPoints}
             </animated.h6>
@@ -133,7 +151,9 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
             <RoundedTriangle
               color={country.isVotingFinished ? televotePointsBg : pointsBg}
             />
-            <h6 className="lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center text-countryItem-televoteText">
+            <h6
+              className={`lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center text-countryItem-televotePointsText`}
+            >
               {country.points}
             </h6>
           </div>

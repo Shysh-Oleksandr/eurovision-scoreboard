@@ -840,14 +840,19 @@ video {
   background-color: hsl(var(--twc-countryItem-douzePointsBlock2) / var(--twc-countryItem-douzePointsBlock2-opacity, var(--tw-bg-opacity)));
 }
 
-.bg-countryItem-lastPointsBg {
+.bg-countryItem-juryLastPointsBg {
   --tw-bg-opacity: 1;
-  background-color: hsl(var(--twc-countryItem-lastPointsBg) / var(--twc-countryItem-lastPointsBg-opacity, var(--tw-bg-opacity)));
+  background-color: hsl(var(--twc-countryItem-juryLastPointsBg) / var(--twc-countryItem-juryLastPointsBg-opacity, var(--tw-bg-opacity)));
 }
 
 .bg-countryItem-pointsBg {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--twc-countryItem-pointsBg) / var(--twc-countryItem-pointsBg-opacity, var(--tw-bg-opacity)));
+}
+
+.bg-countryItem-televoteLastPointsBg {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--twc-countryItem-televoteLastPointsBg) / var(--twc-countryItem-televoteLastPointsBg-opacity, var(--tw-bg-opacity)));
 }
 
 .bg-countryItem-televotePointsBg {
@@ -1040,9 +1045,9 @@ video {
   color: hsl(var(--twc-countryItem-lastPointsText) / var(--twc-countryItem-lastPointsText-opacity, var(--tw-text-opacity)));
 }
 
-.text-countryItem-televoteText {
+.text-countryItem-televotePointsText {
   --tw-text-opacity: 1;
-  color: hsl(var(--twc-countryItem-televoteText) / var(--twc-countryItem-televoteText-opacity, var(--tw-text-opacity)));
+  color: hsl(var(--twc-countryItem-televotePointsText) / var(--twc-countryItem-televotePointsText-opacity, var(--tw-text-opacity)));
 }
 
 .text-countryItem-text {
@@ -1122,13 +1127,16 @@ video {
   --twc-countryItem-hoverBg: 204 93.8% 93.7%;
   --twc-countryItem-text: 240 1.8% 10.8%;
   --twc-countryItem-pointsBg: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-juryPointsText: 224.60000000000002 100% 49.6%;
   --twc-countryItem-televotePointsBg: 224.60000000000002 100% 49.6%;
   --twc-countryItem-televoteActiveBg: 224.70000000000005 98.2% 42.9%;
-  --twc-countryItem-televoteText: 0 0% 100%;
+  --twc-countryItem-televotePointsText: 0 0% 100%;
+  --twc-countryItem-televoteCountryText: 0 0% 100%;
   --twc-countryItem-televoteUnfinishedText: 240 1.8% 10.8%;
   --twc-countryItem-televoteFinishedBg: 239.39999999999998 66.7% 31.8%;
   --twc-countryItem-televoteOutline: 217.20000000000005 91.2% 59.8%;
-  --twc-countryItem-lastPointsBg: 58.30000000000001 100% 49.8%;
+  --twc-countryItem-juryLastPointsBg: 58.30000000000001 100% 49.8%;
+  --twc-countryItem-televoteLastPointsBg: 58.30000000000001 100% 49.8%;
   --twc-countryItem-lastPointsText: 328.79999999999995 99.2% 49.8%;
   --twc-countryItem-douzePointsBg: 58.30000000000001 100% 49.8%;
   --twc-countryItem-douzePointsText: 328.79999999999995 99.2% 49.8%;
@@ -1146,13 +1154,16 @@ video {
   --twc-countryItem-hoverBg: 270.6 60.8% 31%;
   --twc-countryItem-text: 330 100% 99.2%;
   --twc-countryItem-pointsBg: 304.70000000000005 56.3% 51.6%;
+  --twc-countryItem-juryPointsText: 267.20000000000005 54.1% 61.6%;
   --twc-countryItem-televotePointsBg: 267.20000000000005 54.1% 61.6%;
   --twc-countryItem-televoteActiveBg: 267.20000000000005 54.1% 61.6%;
-  --twc-countryItem-televoteText: 330 100% 99.2%;
+  --twc-countryItem-televotePointsText: 330 100% 99.2%;
+  --twc-countryItem-televoteCountryText: 330 100% 99.2%;
   --twc-countryItem-televoteUnfinishedText: 330 100% 99.2%;
   --twc-countryItem-televoteFinishedBg: 271.1 70.4% 22.5%;
   --twc-countryItem-televoteOutline: 290.5 77% 72.7%;
-  --twc-countryItem-lastPointsBg: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-juryLastPointsBg: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-televoteLastPointsBg: 194.10000000000002 66.2% 44.1%;
   --twc-countryItem-lastPointsText: 330 100% 99.2%;
   --twc-countryItem-douzePointsBg: 305 68.6% 58.8%;
   --twc-countryItem-douzePointsText: 265 88.8% 28%;
@@ -1160,6 +1171,33 @@ video {
   --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
   --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
   --twc-panelInfo-activeText: 194.20000000000005 65.5% 44.3%;
+}
+
+.theme-2025,[data-theme="2025"] {
+  --twc-primary-800: 268.4 70.4% 37.1%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
 }
 
 /* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./src/output.css --watch */
@@ -1274,6 +1312,26 @@ h6 {
 }
 
 /* ---------------------------------------------------- */
+
+#main {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#main.theme-2023 {
+  background-image: url('/src/data/bgImages/BlueBg2023.jpg');
+}
+
+#main.theme-2024 {
+  background-image: url('/src/data/bgImages/PurpleBg2024.jpg');
+}
+
+#main.theme-2025 {
+  background-image: url('/src/data/bgImages/PurpleBg2025.jpg');
+}
 
 .container-wrapping-flip-move > div {
   -moz-columns: 1;
@@ -1617,6 +1675,11 @@ h6 {
   .md\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+
+  .md\:text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
 
   .md\:leading-4 {

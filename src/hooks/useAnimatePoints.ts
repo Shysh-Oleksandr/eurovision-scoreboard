@@ -40,13 +40,13 @@ const useAnimatePoints = (
   const [
     DEFAULT_BG_COLOR,
     UNFINISHED_TELEVOTE_TEXT_COLOR,
-    TELEVOTE_TEXT_COLOR,
+    TELEVOTE_COUNTRY_TEXT_COLOR,
     FINISHED_VOTING_COLOR,
     ACTIVE_VOTING_COLOR,
   ] = useThemeColor([
     'countryItem.bg',
     'countryItem.televoteUnfinishedText',
-    'countryItem.televoteText',
+    'countryItem.televoteCountryText',
     'countryItem.televoteFinishedBg',
     'countryItem.televoteActiveBg',
   ]);
@@ -213,7 +213,7 @@ const useAnimatePoints = (
         to: {
           outlineWidth: 2,
           backgroundColor: ACTIVE_VOTING_COLOR,
-          color: TELEVOTE_TEXT_COLOR,
+          color: TELEVOTE_COUNTRY_TEXT_COLOR,
         },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
@@ -222,12 +222,12 @@ const useAnimatePoints = (
         from: {
           outlineWidth: 2,
           backgroundColor: ACTIVE_VOTING_COLOR,
-          color: TELEVOTE_TEXT_COLOR,
+          color: TELEVOTE_COUNTRY_TEXT_COLOR,
         },
         to: {
           outlineWidth: 0,
           backgroundColor: FINISHED_VOTING_COLOR,
-          color: TELEVOTE_TEXT_COLOR,
+          color: TELEVOTE_COUNTRY_TEXT_COLOR,
         },
         config: { duration: 500, easing: easings.easeInOutCubic },
       });
@@ -235,7 +235,7 @@ const useAnimatePoints = (
   }, [
     ACTIVE_VOTING_COLOR,
     DEFAULT_BG_COLOR,
-    TELEVOTE_TEXT_COLOR,
+    TELEVOTE_COUNTRY_TEXT_COLOR,
     FINISHED_VOTING_COLOR,
     apiActive,
     isActive,

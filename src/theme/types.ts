@@ -11,13 +11,16 @@ export interface ThemeColors {
     hoverBg: string;
     text: string;
     pointsBg: string;
+    juryPointsText: string;
     televotePointsBg: string;
     televoteActiveBg: string;
-    televoteText: string;
+    televotePointsText: string;
+    televoteCountryText: string;
     televoteUnfinishedText: string;
     televoteFinishedBg: string;
     televoteOutline: string;
-    lastPointsBg: string;
+    juryLastPointsBg: string;
+    televoteLastPointsBg: string;
     lastPointsText: string;
     douzePointsBg: string;
     douzePointsText: string;
@@ -32,7 +35,7 @@ export interface ThemeColors {
 
 export interface Theme {
   colors: ThemeColors;
-  backgroundImage: string;
+  backgroundImage?: string;
 }
 
 export type ThemeRecord = Record<Year, Theme>;

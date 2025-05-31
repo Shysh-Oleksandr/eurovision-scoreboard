@@ -124,6 +124,11 @@ export const COMMON_COUNTRIES: Record<
     code: 'MT',
     flag: 'https://www.worldometers.info//img/flags/small/tn_mt-flag.gif',
   },
+  Montenegro: {
+    name: 'Montenegro',
+    code: 'ME',
+    flag: 'https://www.worldometers.info//img/flags/small/tn_me-flag.gif',
+  },
   Moldova: {
     name: 'Moldova',
     code: 'MD',
