@@ -921,11 +921,6 @@ video {
   --tw-bg-opacity: 0.6;
 }
 
-.object-contain {
-  -o-object-fit: contain;
-     object-fit: contain;
-}
-
 .object-cover {
   -o-object-fit: cover;
      object-fit: cover;
@@ -1372,15 +1367,15 @@ h6 {
 }
 
 #main.theme-2023 {
-  background-image: url('/src/assets/bgImages/BlueBg2023.jpg');
+  background-image: url('/src/assets/bgImages/BlueBg2023.webp');
 }
 
 #main.theme-2024 {
-  background-image: url('/src/assets/bgImages/PurpleBg2024.jpg');
+  background-image: url('/src/assets/bgImages/PurpleBg2024.webp');
 }
 
 #main.theme-2025 {
-  background-image: url('/src/assets/bgImages/PurpleBg2025.jpg');
+  background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
 }
 
 .container-wrapping-flip-move > div {
