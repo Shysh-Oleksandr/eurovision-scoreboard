@@ -45,7 +45,11 @@ export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
 
   return (
     <div className="sm:ml-8 ml-3 flex items-center space-x-4">
-      <SelectBox options={options} value={year} onChange={handleYearChange} />
+      <SelectBox
+        options={options}
+        value={localYear}
+        onChange={handleYearChange}
+      />
       <Button
         label="Restart"
         onClick={handleRestart}
