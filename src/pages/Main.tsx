@@ -30,6 +30,7 @@ const MainContent = () => {
               winnerCountry={state.winnerCountry}
               votingCountryIndex={state.votingCountryIndex}
               shouldShowLastPoints={state.shouldShowLastPoints}
+              isVotingOver={!!state.winnerCountry}
               dispatch={dispatch}
             />
             <ControlsPanel

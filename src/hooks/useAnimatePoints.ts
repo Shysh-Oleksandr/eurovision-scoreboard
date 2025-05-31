@@ -28,6 +28,12 @@ type ReturnType = {
     backgroundColor: SpringValue<string>;
     color: SpringValue<string>;
   };
+  springsPlaceContainer: {
+    width: SpringValue<number>;
+  };
+  springsPlaceText: {
+    opacity: SpringValue<number>;
+  };
 };
 
 const useAnimatePoints = (
@@ -36,6 +42,7 @@ const useAnimatePoints = (
   isActive: boolean,
   isJuryVoting: boolean,
   isCountryVotingFinished: boolean,
+  isVotingOver: boolean,
 ): ReturnType => {
   const [
     DEFAULT_BG_COLOR,
@@ -78,6 +85,14 @@ const useAnimatePoints = (
     useSpring(() => ({
       from: { left: '-50%', transform: 'skewX(45deg)' },
     }));
+
+  const [springsPlaceContainer, apiPlaceContainer] = useSpring(() => ({
+    from: { width: 0 },
+  }));
+
+  const [springsPlaceText, apiPlaceText] = useSpring(() => ({
+    from: { opacity: 0 },
+  }));
 
   const parallelogramsAnimation = useMemo(
     () => ({
@@ -178,14 +193,43 @@ const useAnimatePoints = (
         config: { duration: 0 },
       });
     }
+
+    if (isVotingOver) {
+      apiPlaceContainer.start({
+        from: { width: 0 },
+        to: { width: 40 }, // 40px = w-10 (2.5rem)
+        config: { duration: 300, easing: easings.easeInOutCubic },
+      });
+
+      apiPlaceText.start({
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+        config: { duration: 300, easing: easings.easeInOutCubic },
+      });
+    } else {
+      apiPlaceContainer.start({
+        from: { width: 40 },
+        to: { width: 0 },
+        config: { duration: 300, easing: easings.easeInOutCubic },
+      });
+
+      apiPlaceText.start({
+        from: { opacity: 1 },
+        to: { opacity: 0 },
+        config: { duration: 300, easing: easings.easeInOutCubic },
+      });
+    }
   }, [
     apiContainer,
     apiDouzeContainer,
     apiDouzeParallelogramBlue,
     apiDouzeParallelogramYellow,
     apiText,
+    apiPlaceContainer,
+    apiPlaceText,
     isDouzePoints,
     shouldShowLastPoints,
+    isVotingOver,
     parallelogramsAnimation,
   ]);
 
@@ -252,6 +296,8 @@ const useAnimatePoints = (
       springsDouzeParallelogramYellow,
       springsDouzeContainer,
       springsActive,
+      springsPlaceContainer,
+      springsPlaceText,
     }),
     [
       springsActive,
@@ -260,6 +306,8 @@ const useAnimatePoints = (
       springsDouzeParallelogramBlue,
       springsDouzeParallelogramYellow,
       springsText,
+      springsPlaceContainer,
+      springsPlaceText,
     ],
   );
 };

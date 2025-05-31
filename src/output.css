@@ -863,6 +863,11 @@ video {
   background-color: hsl(var(--twc-countryItem-juryLastPointsBg) / var(--twc-countryItem-juryLastPointsBg-opacity, var(--tw-bg-opacity)));
 }
 
+.bg-countryItem-placeContainerBg {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--twc-countryItem-placeContainerBg) / var(--twc-countryItem-placeContainerBg-opacity, var(--tw-bg-opacity)));
+}
+
 .bg-countryItem-pointsBg {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--twc-countryItem-pointsBg) / var(--twc-countryItem-pointsBg-opacity, var(--tw-bg-opacity)));
@@ -1063,6 +1068,11 @@ video {
   color: hsl(var(--twc-countryItem-lastPointsText) / var(--twc-countryItem-lastPointsText-opacity, var(--tw-text-opacity)));
 }
 
+.text-countryItem-placeText {
+  --tw-text-opacity: 1;
+  color: hsl(var(--twc-countryItem-placeText) / var(--twc-countryItem-placeText-opacity, var(--tw-text-opacity)));
+}
+
 .text-countryItem-televotePointsText {
   --tw-text-opacity: 1;
   color: hsl(var(--twc-countryItem-televotePointsText) / var(--twc-countryItem-televotePointsText-opacity, var(--tw-text-opacity)));
@@ -1161,6 +1171,8 @@ video {
   --twc-countryItem-douzePointsText: 328.79999999999995 99.2% 49.8%;
   --twc-countryItem-douzePointsBlock1: 224.20000000000005 100% 49.8%;
   --twc-countryItem-douzePointsBlock2: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-placeContainerBg: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-placeText: 0 0% 100%;
   --twc-panelInfo-activeBg: 58.30000000000001 100% 49.8%;
   --twc-panelInfo-activeText: 328.79999999999995 99.2% 49.8%;
   --twc-panelInfo-inactiveText: 225.79999999999995 76.7% 42.2%;
@@ -1190,6 +1202,8 @@ video {
   --twc-countryItem-douzePointsText: 265 88.8% 28%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
   --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 271.1 58.3% 37.6%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
   --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
   --twc-panelInfo-activeText: 194.20000000000005 65.5% 44.3%;
   --twc-panelInfo-inactiveText: 265.5 47.6% 32.9%;
@@ -1219,6 +1233,8 @@ video {
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
   --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
   --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
   --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
   --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;

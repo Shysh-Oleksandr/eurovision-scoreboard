@@ -29,6 +29,8 @@ export const themes: ThemeRecord = {
         douzePointsText: '#fd0184',
         douzePointsBlock1: '#0043fe',
         douzePointsBlock2: '#fd0184',
+        placeContainerBg: '#fd0184',
+        placeText: '#fff',
       },
       panelInfo: {
         activeBg: '#fef700',
@@ -36,7 +38,6 @@ export const themes: ThemeRecord = {
         inactiveText: '#1940be',
       },
     },
-    hostingCountryLogo: require('../assets/hostingCountryLogos/HostingCountry2023.svg'), // Got it from "https://commons.wikimedia.org/wiki/File:Eurovision_Song_Contest_heart_Switzerland_white.svg"
   },
   '2024': {
     colors: {
@@ -66,6 +67,8 @@ export const themes: ThemeRecord = {
         douzePointsText: '#3d0887',
         douzePointsBlock1: '#710bb6',
         douzePointsBlock2: '#2698bb',
+        placeContainerBg: '#622898',
+        placeText: '#fffbfd',
       },
       panelInfo: {
         activeBg: '#530b97',
@@ -73,7 +76,6 @@ export const themes: ThemeRecord = {
         inactiveText: '#4e2c7c',
       },
     },
-    hostingCountryLogo: require('../assets/hostingCountryLogos/HostingCountry2024.svg'),
   },
   '2025': {
     colors: {
@@ -103,6 +105,8 @@ export const themes: ThemeRecord = {
         douzePointsText: '#0e2986',
         douzePointsBlock1: '#710bb6',
         douzePointsBlock2: '#2698bb',
+        placeContainerBg: '#9e21de',
+        placeText: '#fffbfd',
       },
       panelInfo: {
         activeBg: '#530b97',
@@ -110,6 +114,5 @@ export const themes: ThemeRecord = {
         inactiveText: '#6426a9',
       },
     },
-    hostingCountryLogo: require('../assets/hostingCountryLogos/HostingCountry2025.svg'),
   },
 };

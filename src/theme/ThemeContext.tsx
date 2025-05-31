@@ -9,11 +9,13 @@ import React, {
 import type { Year } from '../config';
 
 import { themes } from './themes';
-import type { Theme } from './types';
+import { themesInfo } from './themesInfo';
+import type { Theme, ThemeInfo } from './types';
 
 interface ThemeContextType {
   year: Year;
   theme: Theme;
+  themeInfo: ThemeInfo;
   setYear: (year: Year) => void;
 }
 
@@ -22,6 +24,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [year, setYear] = useState<Year>('2025');
   const theme = themes[year];
+  const themeInfo = themesInfo[year];
 
   // Apply initial theme class
   useEffect(() => {
@@ -42,7 +45,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ThemeContext.Provider value={{ year, theme, setYear: handleSetYear }}>
+    <ThemeContext.Provider
+      value={{ year, theme, themeInfo, setYear: handleSetYear }}
+    >
       {children}
     </ThemeContext.Provider>
   );

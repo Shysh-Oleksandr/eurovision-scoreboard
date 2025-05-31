@@ -27,6 +27,8 @@ export interface ThemeColors {
     douzePointsText: string;
     douzePointsBlock1: string;
     douzePointsBlock2: string;
+    placeContainerBg: string;
+    placeText: string;
   };
   panelInfo: {
     activeBg: string;
@@ -37,7 +39,11 @@ export interface ThemeColors {
 
 export interface Theme {
   colors: ThemeColors;
-  hostingCountryLogo?: string;
+}
+
+export interface ThemeInfo {
+  hostingCountryLogo: string;
 }
 
 export type ThemeRecord = Record<Year, Theme>;
+export type ThemeInfoRecord = Record<Year, ThemeInfo>;
