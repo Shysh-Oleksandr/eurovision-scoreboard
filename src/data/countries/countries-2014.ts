@@ -1,0 +1,45 @@
+import { BaseCountry } from '../../models';
+
+import { COMMON_COUNTRIES } from './common-countries';
+
+export const COUNTRIES_2014: BaseCountry[] = [
+  { ...COMMON_COUNTRIES.Armenia, isQualified: true },
+  { ...COMMON_COUNTRIES.Austria, isQualified: true },
+  { ...COMMON_COUNTRIES.Azerbaijan, isQualified: true },
+  { ...COMMON_COUNTRIES.Belarus, isQualified: true },
+  { ...COMMON_COUNTRIES.Denmark, isQualified: true },
+  { ...COMMON_COUNTRIES.Finland, isQualified: true },
+  { ...COMMON_COUNTRIES.France, isQualified: true },
+  { ...COMMON_COUNTRIES.Germany, isQualified: true },
+  { ...COMMON_COUNTRIES.Greece, isQualified: true },
+  { ...COMMON_COUNTRIES.Hungary, isQualified: true },
+  { ...COMMON_COUNTRIES.Iceland, isQualified: true },
+  { ...COMMON_COUNTRIES.Italy, isQualified: true },
+  { ...COMMON_COUNTRIES.Malta, isQualified: true },
+  { ...COMMON_COUNTRIES.Montenegro, isQualified: true },
+  { ...COMMON_COUNTRIES.Netherlands, isQualified: true },
+  { ...COMMON_COUNTRIES.Norway, isQualified: true },
+  { ...COMMON_COUNTRIES.Poland, isQualified: true },
+  { ...COMMON_COUNTRIES.Romania, isQualified: true },
+  { ...COMMON_COUNTRIES.Russia, isQualified: true },
+  { ...COMMON_COUNTRIES.SanMarino, isQualified: true },
+  { ...COMMON_COUNTRIES.Slovenia, isQualified: true },
+  { ...COMMON_COUNTRIES.Spain, isQualified: true },
+  { ...COMMON_COUNTRIES.Sweden, isQualified: true },
+  { ...COMMON_COUNTRIES.Switzerland, isQualified: true },
+  { ...COMMON_COUNTRIES.Ukraine, isQualified: true },
+  { ...COMMON_COUNTRIES.UnitedKingdom, isQualified: true },
+
+  // Not qualified
+  { ...COMMON_COUNTRIES.Albania, isQualified: false },
+  { ...COMMON_COUNTRIES.Belgium, isQualified: false },
+  { ...COMMON_COUNTRIES.Estonia, isQualified: false },
+  { ...COMMON_COUNTRIES.Georgia, isQualified: false },
+  { ...COMMON_COUNTRIES.Ireland, isQualified: false },
+  { ...COMMON_COUNTRIES.Israel, isQualified: false },
+  { ...COMMON_COUNTRIES.Latvia, isQualified: false },
+  { ...COMMON_COUNTRIES.Lithuania, isQualified: false },
+  { ...COMMON_COUNTRIES.Moldova, isQualified: false },
+  { ...COMMON_COUNTRIES.NorthMacedonia, isQualified: false },
+  { ...COMMON_COUNTRIES.Portugal, isQualified: false },
+];

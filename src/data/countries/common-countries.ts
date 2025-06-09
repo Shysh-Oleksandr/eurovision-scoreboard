@@ -1,10 +1,5 @@
-import { BaseCountry } from '../../models';
-
 // Flags from https://geotargetly.com/free-flags
-export const COMMON_COUNTRIES: Record<
-  string,
-  Omit<BaseCountry, 'isQualified'>
-> = {
+export const COMMON_COUNTRIES = {
   Albania: {
     name: 'Albania',
     code: 'AL',
@@ -34,6 +29,21 @@ export const COMMON_COUNTRIES: Record<
     name: 'Belgium',
     code: 'BE',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca15aa291bbcca0a86b_be.svg',
+  },
+  Belarus: {
+    name: 'Belarus',
+    code: 'BY',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1f35dfe3396b5dd9880e_by.svg',
+  },
+  BosniaHerzegovina: {
+    name: 'Bosnia & Herzegovina',
+    code: 'BA',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca15eba5d4654214c13_ba.svg',
+  },
+  Bulgaria: {
+    name: 'Bulgaria',
+    code: 'BG',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca1e0e5dccc20382df3_bg.svg',
   },
   Croatia: {
     name: 'Croatia',
@@ -84,6 +94,11 @@ export const COMMON_COUNTRIES: Record<
     name: 'Greece',
     code: 'GR',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a5aba7827ebf258495_gr.svg',
+  },
+  Hungary: {
+    name: 'Hungary',
+    code: 'HU',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a7c671b1a7680bfc12_hu.svg',
   },
   Iceland: {
     name: 'Iceland',
@@ -140,6 +155,11 @@ export const COMMON_COUNTRIES: Record<
     code: 'NL',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4384aaebf8633cc754a0_nl.svg',
   },
+  NorthMacedonia: {
+    name: 'North Macedonia',
+    code: 'MK',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437bfd208d55c8ac5c07_mk.svg',
+  },
   Norway: {
     name: 'Norway',
     code: 'NO',
@@ -159,6 +179,11 @@ export const COMMON_COUNTRIES: Record<
     name: 'Romania',
     code: 'RO',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438655e2bbac5000efa6_ro.svg',
+  },
+  Russia: {
+    name: 'Russia',
+    code: 'RU',
+    flag: 'https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg',
   },
   SanMarino: {
     name: 'San Marino',

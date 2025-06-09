@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 
 import { Year } from '../../config';
-import { reinitializeCountriesData } from '../../data/data';
+import { reinitializeCountriesData, SUPPORTED_YEARS } from '../../data/data';
 import { ScoreboardActionKind } from '../../models';
 import { useTheme } from '../../theme/ThemeContext';
 import Button from '../Button';
 
 import SelectBox from '.';
 
-const options = [
-  { value: '2023', label: '2023' },
-  { value: '2024', label: '2024' },
-  { value: '2025', label: '2025' },
-];
+const options = SUPPORTED_YEARS.map((year) => ({
+  value: year.toString(),
+  label: year.toString(),
+}));
 
 interface Props {
   dispatch: React.Dispatch<any>;

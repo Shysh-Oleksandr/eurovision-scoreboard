@@ -115,12 +115,15 @@ h6 {
 }
 
 #main.theme-2023 {
-  background-image: url('/src/assets/bgImages/BlueBg2023.webp');
+  background-image: url('/src/assets/bgImages/BlueBg2023.webp') !important;
 }
 #main.theme-2024 {
-  background-image: url('/src/assets/bgImages/PurpleBg2024.webp');
+  background-image: url('/src/assets/bgImages/PurpleBg2024.webp') !important;
 }
 #main.theme-2025 {
+  background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
+}
+#main.theme-default {
   background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
 }
 

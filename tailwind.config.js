@@ -1,6 +1,7 @@
 const { createThemes } = require('tw-colors');
 
-const { themes } = require('./src/theme/themes');
+const { SUPPORTED_YEARS } = require('./src/data/data');
+const { getThemeForYear } = require('./src/theme/themes');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -14,17 +15,12 @@ module.exports = {
   },
   plugins: [
     createThemes(
-      {
-        2023: {
-          ...themes['2023'].colors,
-        },
-        2024: {
-          ...themes['2024'].colors,
-        },
-        2025: {
-          ...themes['2025'].colors,
-        },
-      },
+      Object.fromEntries(
+        SUPPORTED_YEARS.map((year) => [
+          year.toString(),
+          getThemeForYear(year.toString()).colors,
+        ]),
+      ),
       {
         produceThemeClass: (themeName) => `theme-${themeName}`,
       },
