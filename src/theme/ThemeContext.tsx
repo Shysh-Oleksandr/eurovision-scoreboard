@@ -1,14 +1,15 @@
 import React, {
   createContext,
-  useContext,
-  useState,
   ReactNode,
+  useContext,
   useEffect,
+  useState,
 } from 'react';
 
 import type { Year } from '../config';
+import { SUPPORTED_YEARS } from '../data/data';
 
-import { themes } from './themes';
+import { getThemeForYear } from './themes';
 import { themesInfo } from './themesInfo';
 import type { Theme, ThemeInfo } from './types';
 
@@ -23,7 +24,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [year, setYear] = useState<Year>('2025');
-  const theme = themes[year];
+  const theme = getThemeForYear(year);
   const themeInfo = themesInfo[year];
 
   // Apply initial theme class
@@ -36,9 +37,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setYear(newYear);
     // Remove all theme classes
     document.documentElement.classList.remove(
-      'theme-2023',
-      'theme-2024',
-      'theme-2025',
+      ...SUPPORTED_YEARS.map((year) => `theme-${year}`),
     );
     // Add the new theme class
     document.documentElement.classList.add(`theme-${newYear}`);

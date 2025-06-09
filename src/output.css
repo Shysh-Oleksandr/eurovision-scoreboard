@@ -683,6 +683,10 @@ video {
   display: flex;
 }
 
+.table {
+  display: table;
+}
+
 .h-1 {
   height: 0.25rem;
 }
@@ -1152,6 +1156,285 @@ video {
   transition-duration: 500ms;
 }
 
+.theme-2013,[data-theme="2013"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2014,[data-theme="2014"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2015,[data-theme="2015"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2016,[data-theme="2016"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2017,[data-theme="2017"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2018,[data-theme="2018"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2019,[data-theme="2019"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2021,[data-theme="2021"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2022,[data-theme="2022"] {
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
 .theme-2023,[data-theme="2023"] {
   --twc-primary-800: 225.79999999999995 76.7% 42.2%;
   --twc-primary-900: 239 83.9% 29.2%;
@@ -1367,14 +1650,18 @@ h6 {
 }
 
 #main.theme-2023 {
-  background-image: url('/src/assets/bgImages/BlueBg2023.webp');
+  background-image: url('/src/assets/bgImages/BlueBg2023.webp') !important;
 }
 
 #main.theme-2024 {
-  background-image: url('/src/assets/bgImages/PurpleBg2024.webp');
+  background-image: url('/src/assets/bgImages/PurpleBg2024.webp') !important;
 }
 
 #main.theme-2025 {
+  background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
+}
+
+#main.theme-default {
   background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
 }
 

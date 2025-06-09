@@ -1,6 +1,9 @@
+import { Year } from '../config';
+
 import { ThemeRecord } from './types';
 
-export const themes: ThemeRecord = {
+// We only support 2023-2025 themes, with 2025 as fallback
+export const themes = {
   '2023': {
     colors: {
       primary: {
@@ -115,4 +118,13 @@ export const themes: ThemeRecord = {
       },
     },
   },
-};
+} as ThemeRecord;
+
+// Helper function to get theme for any year
+export function getThemeForYear(year: Year) {
+  if (year === '2023' || year === '2024' || year === '2025') {
+    return themes[year];
+  }
+
+  return themes['2025']; // Fallback to 2025 theme
+}

@@ -13,7 +13,7 @@ const MainContent = () => {
 
   return (
     <div
-      className={`w-full h-full theme-${year}`}
+      className={`w-full h-full theme-default theme-${year}`}
       id="main"
       style={{
         backgroundColor: theme.colors.appBgColor,
