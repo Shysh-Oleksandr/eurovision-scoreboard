@@ -40,10 +40,9 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '..', './src/index.html'),
-      // favicon: path.resolve(__dirname, '..', './public/img/favicon.png'),
     }),
     new FaviconsWebpackPlugin(
-      path.resolve(__dirname, '..', './public/img/favicon.png'),
+      path.resolve(__dirname, '..', './public/img/favicon-32x32.png'),
     ),
   ],
   stats: 'errors-only',
