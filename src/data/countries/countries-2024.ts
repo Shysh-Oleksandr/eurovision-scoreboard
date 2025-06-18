@@ -16,7 +16,7 @@ export const COUNTRIES_2024: BaseCountry[] = [
   { ...COMMON_COUNTRIES.Estonia, isQualified: true },
   { ...COMMON_COUNTRIES.Finland, isQualified: true },
   { ...COMMON_COUNTRIES.France, isQualified: true },
-  { ...COMMON_COUNTRIES.Georgia, isQualified: false },
+  { ...COMMON_COUNTRIES.Georgia, isQualified: true },
   { ...COMMON_COUNTRIES.Germany, isQualified: true },
   { ...COMMON_COUNTRIES.Greece, isQualified: true },
   { ...COMMON_COUNTRIES.Iceland, isQualified: false },
