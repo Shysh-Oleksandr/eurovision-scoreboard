@@ -60,7 +60,7 @@ export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
         className={`${
           year !== localYear
             ? 'animated-border'
-            : 'border-[3px] border-solid border-transparent'
+            : 'bg-none bg-primary-900 hover:bg-primary-950 border-[3px] border-solid border-transparent'
         }`}
       />
     </div>

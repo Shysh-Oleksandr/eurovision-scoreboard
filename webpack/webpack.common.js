@@ -42,7 +42,7 @@ module.exports = {
       template: path.resolve(__dirname, '..', './src/index.html'),
     }),
     new FaviconsWebpackPlugin(
-      path.resolve(__dirname, '..', './public/img/favicon-32x32.png'),
+      path.resolve(__dirname, '..', './public/img/favicon-128x128.png'),
     ),
   ],
   stats: 'errors-only',

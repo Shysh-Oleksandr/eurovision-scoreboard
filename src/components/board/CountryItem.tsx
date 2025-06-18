@@ -102,7 +102,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
             ? ''
             : 'cursor-pointer transition-colors duration-300 hover:!bg-countryItem-hoverBg'
         } ${isActive ? 'rounded-sm' : ''} ${
-          showPlaceAnimation ? 'ml-2' : ''
+          showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''
         } bg-countryItem-bg text-countryItem-text`,
       [isDisabled, isActive, showPlaceAnimation],
     );
@@ -112,11 +112,11 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         {showPlaceAnimation && (
           <animated.div
             style={springsPlaceContainer}
-            className="flex items-center justify-center h-10 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText"
+            className="flex items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText"
           >
             <animated.h4
               style={springsPlaceText}
-              className="font-semibold text-lg"
+              className="font-semibold md:text-lg text-base"
             >
               {index + 1 < 10 ? `0${index + 1}` : index + 1}
             </animated.h4>
@@ -145,11 +145,11 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
               className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-white self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
             />
             <h4
-              className={`uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] xs:pr-2 pr-0 ${
+              className={`uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] xs:pr-2 pr-0 ${
                 country.name.length > 10 && !isVotingOver
                   ? 'md:text-xs'
                   : 'md:text-sm'
-              } md:leading-4 text-base xs:break-normal break-all`}
+              } md:leading-4 xs:break-normal break-all`}
             >
               {country.name}
             </h4>

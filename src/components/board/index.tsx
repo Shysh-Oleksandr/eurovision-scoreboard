@@ -130,7 +130,22 @@ const Board = ({
         onClick={onClick}
       />
       <div className="container-wrapping-flip-move">
-        <FlipMove duration={500} delay={flipMoveDelay}>
+        <FlipMove
+          duration={500}
+          delay={flipMoveDelay}
+          appearAnimation={{
+            from: { opacity: '0', transform: 'translateY(10px)' },
+            to: { opacity: '1', transform: 'translateY(0)' },
+          }}
+          enterAnimation={{
+            from: { opacity: '0', transform: 'translateY(10px)' },
+            to: { opacity: '1', transform: 'translateY(0)' },
+          }}
+          leaveAnimation={{
+            from: { opacity: '1', transform: 'translateY(0)' },
+            to: { opacity: '0', transform: 'translateY(10px)' },
+          }}
+        >
           {sortedCountries.map(renderItem)}
         </FlipMove>
       </div>

@@ -26,7 +26,7 @@ const WinnerModal = ({ winnerCountry, dispatch }: Props) => {
       onClick={() => setShowModal(false)}
     >
       <div
-        className="bg-primary-950 lg:w-2/5 md:w-1/2 w-2/3 lg:py-16 md:py-12 sm:py-8 py-6 lg:px-10 md:px-8 px-4 text-white text-center rounded-md shadow-2xl"
+        className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 lg:w-2/5 md:w-1/2 w-3/4 lg:py-16 md:py-12 sm:py-8 py-6 lg:px-10 md:px-8 px-4 text-white text-center rounded-lg shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="lg:text-3xl sm:text-2xl text-xl font-semibold mb-4">

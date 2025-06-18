@@ -150,7 +150,7 @@ h6 {
   }
 }
 
-@media (min-width: 512px) {
+@media (min-width: 576px) {
   .container-wrapping-flip-move > div {
     columns: 2;
   }

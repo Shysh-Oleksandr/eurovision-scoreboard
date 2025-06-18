@@ -41,16 +41,20 @@ const ControlsPanel = ({
           {isJuryVoting ? 'Jury voting' : 'Televote'}
         </h3>
       </div>
-      {isJuryVoting && <CountryInfo votingCountryIndex={votingCountryIndex} />}
-      <VotingButtons
-        dispatch={dispatch}
-        countries={countries}
-        shouldShowLastPoints={shouldShowLastPoints}
-        countriesLeft={countriesLeft}
-        isJuryVoting={isJuryVoting}
-        votingCountryIndex={votingCountryIndex}
-        shouldClearPoints={shouldClearPoints}
-      />
+      <div className="bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md">
+        {isJuryVoting && (
+          <CountryInfo votingCountryIndex={votingCountryIndex} />
+        )}
+        <VotingButtons
+          dispatch={dispatch}
+          countries={countries}
+          shouldShowLastPoints={shouldShowLastPoints}
+          countriesLeft={countriesLeft}
+          isJuryVoting={isJuryVoting}
+          votingCountryIndex={votingCountryIndex}
+          shouldClearPoints={shouldClearPoints}
+        />
+      </div>
       {isJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
     </div>
   );

@@ -81,7 +81,7 @@ const BoardHeader = ({
 
   return (
     <div className="pb-2 flex flex-row w-full justify-between items-center">
-      <h3 className="lg:text-2xl text-xl text-white">
+      <h3 className="lg:text-2xl xs:text-xl text-lg text-white">
         {winnerCountry ? (
           <>
             <span className="font-semibold">{winnerCountry.name}</span> is the

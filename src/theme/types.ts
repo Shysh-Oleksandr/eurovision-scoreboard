@@ -2,6 +2,7 @@ import { Year } from '../config';
 
 export interface ThemeColors {
   primary: {
+    700: string;
     800: string;
     900: string;
     950: string;
