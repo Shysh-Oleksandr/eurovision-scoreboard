@@ -2,6 +2,7 @@ import React, { useReducer } from 'react';
 
 import Board from '../components/board';
 import ControlsPanel from '../components/controlsPanel';
+import FeedbackInfo from '../components/feedbackInfo';
 import { YearSelectBox } from '../components/SelectBox/YearSelectBox';
 import WinnerModal from '../components/WinnerModal';
 import scoreboardReducer, { initialState } from '../state/reducer';
@@ -58,6 +59,7 @@ export const Main = () => {
   return (
     <ThemeProvider>
       <MainContent />
+      <FeedbackInfo className="md:block hidden" />
     </ThemeProvider>
   );
 };
