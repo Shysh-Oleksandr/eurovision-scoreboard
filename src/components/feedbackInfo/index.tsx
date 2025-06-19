@@ -18,6 +18,13 @@ const FeedbackIcon = () => (
   </svg>
 );
 
+const UPCOMING_FEATURES = [
+  'Semi-finals',
+  'Custom countries selection',
+  'Contests before 2013',
+  'Custom themes for each contest',
+];
+
 const FeedbackModal = ({
   setShowModal,
 }: {
@@ -29,13 +36,13 @@ const FeedbackModal = ({
       onClick={() => setShowModal(false)}
     >
       <div
-        className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 lg:w-2/5 md:w-1/2 w-4/5 lg:pb-16 md:pb-12 sm:pb-8 pb-6 lg:pt-12 md:pt-10 sm:pt-8 pt-6 lg:px-10 md:px-8 xs:px-6 px-4 text-white rounded-lg shadow-2xl"
+        className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 lg:w-2/5 md:w-1/2 w-4/5 md:pb-12 sm:pb-8 pb-6 lg:pt-12 md:pt-10 sm:pt-8 pt-6 lg:px-10 md:px-8 xs:px-6 px-4 text-white rounded-xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="lg:text-3xl sm:text-2xl text-xl font-semibold mb-6 text-center">
+        <h3 className="lg:text-3xl sm:text-2xl text-xl font-semibold mb-3 sm:mb-4 md:mb-6 text-center">
           Feedback
         </h3>
-        <div className="lg:text-lg sm:text-base text-sm font-medium text-left">
+        <div className="lg:text-lg sm:text-base text-sm font-medium">
           <p className="mb-4">
             Have a bug to report, a feature to suggest, or just want to leave
             feedback?
@@ -60,6 +67,18 @@ const FeedbackModal = ({
           </p>
           <p>Thank you!</p>
         </div>
+        <div className="sm:mt-4 mt-3 lg:text-lg sm:text-base text-sm font-medium text-left sm:pt-4 pt-3 border-t border-solid border-primary-800">
+          <p className="text-center md:text-xl sm:text-lg text-base font-semibold mb-2 md:mb-4">
+            Upcoming features:
+          </p>
+          <ul>
+            {UPCOMING_FEATURES.map((item, index) => (
+              <li key={item}>
+                <p>{`${index + 1}. ${item}`}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
@@ -72,7 +91,7 @@ const FeedbackInfo = ({ className }: { className?: string }) => {
     <>
       <button
         onClick={() => setShowModal(true)}
-        className={`fixed bottom-5 right-5 text-white p-2 rounded-full shadow-lg focus:outline-none z-50 hover:scale-110 transition-transform duration-300 ${className}`}
+        className={`fixed bottom-5 right-5 text-white p-2 focus:outline-none z-50 hover:scale-110 transition-transform duration-300 ${className}`}
         aria-label="Open feedback modal"
         title="Open feedback modal"
       >
