@@ -1,29 +1,32 @@
 import React, { useCallback } from 'react';
 
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
-import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { useGetCountries } from '../../hooks/useGetCountries';
+import { Country } from '../../models';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 import { useTheme } from '../../theme/ThemeContext';
 import Button from '../Button';
 
 type Props = {
-  countries: Country[];
-  isJuryVoting: boolean;
-  votingPoints: number;
-  votingCountry: Country;
-  winnerCountry: Country | null;
   onClick: (countryCode: string) => void;
-  dispatch: React.Dispatch<ScoreboardAction>;
 };
 
-const BoardHeader = ({
-  countries,
-  isJuryVoting,
-  votingPoints,
-  votingCountry,
-  winnerCountry,
-  onClick,
-  dispatch,
-}: Props): JSX.Element => {
+const BoardHeader = ({ onClick }: Props): JSX.Element => {
+  const {
+    countries,
+    isJuryVoting,
+    votingPoints,
+    votingCountryIndex,
+    winnerCountry,
+    resetLastPoints,
+    giveTelevotePoints,
+  } = useScoreboardStore();
+
+  const allCountries = useGetCountries();
+  const votingCountry = isJuryVoting
+    ? (allCountries[votingCountryIndex] as Country)
+    : (countries[votingCountryIndex] as Country);
+
   const { year } = useTheme();
 
   const votingText = isJuryVoting ? (
@@ -45,9 +48,7 @@ const BoardHeader = ({
         countries.filter((country) => country.isVotingFinished).length === 0;
 
       if (isFirstTelevoteCountry) {
-        dispatch({
-          type: ScoreboardActionKind.RESET_LAST_POINTS,
-        });
+        resetLastPoints();
       }
 
       const votingCountryPlace =
@@ -56,13 +57,7 @@ const BoardHeader = ({
 
       const randomVotingPoints = getRandomTelevotePoints(votingCountryPlace);
 
-      dispatch({
-        type: ScoreboardActionKind.GIVE_TELEVOTE_POINTS,
-        payload: {
-          countryCode: votingCountry?.code,
-          votingPoints: randomVotingPoints,
-        },
-      });
+      giveTelevotePoints(votingCountry?.code, randomVotingPoints);
 
       return;
     }
@@ -77,7 +72,14 @@ const BoardHeader = ({
     const randomCountryCode = countriesWithoutPoints[randomCountryIndex].code;
 
     onClick(randomCountryCode);
-  }, [countries, votingCountry?.code, isJuryVoting, dispatch, onClick]);
+  }, [
+    countries,
+    votingCountry?.code,
+    isJuryVoting,
+    resetLastPoints,
+    giveTelevotePoints,
+    onClick,
+  ]);
 
   return (
     <div className="pb-2 flex flex-row w-full justify-between items-center">

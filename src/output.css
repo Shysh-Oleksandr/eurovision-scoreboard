@@ -667,6 +667,10 @@ video {
   margin-bottom: 0.5rem;
 }
 
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
 .mb-4 {
   margin-bottom: 1rem;
 }
@@ -701,10 +705,6 @@ video {
 
 .mt-3 {
   margin-top: 0.75rem;
-}
-
-.mb-3 {
-  margin-bottom: 0.75rem;
 }
 
 .block {
@@ -879,10 +879,6 @@ video {
   border-width: 3px;
 }
 
-.border-b {
-  border-bottom-width: 1px;
-}
-
 .border-b-2 {
   border-bottom-width: 2px;
 }
@@ -895,48 +891,13 @@ video {
   border-style: solid;
 }
 
-.border-transparent {
-  border-color: transparent;
-}
-
-.border-white {
-  --tw-border-opacity: 1;
-  border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
-}
-
-.border-red-600 {
-  --tw-border-opacity: 1;
-  border-color: rgb(220 38 38 / var(--tw-border-opacity, 1));
-}
-
-.border-slate-300 {
-  --tw-border-opacity: 1;
-  border-color: rgb(203 213 225 / var(--tw-border-opacity, 1));
-}
-
-.border-slate-500 {
-  --tw-border-opacity: 1;
-  border-color: rgb(100 116 139 / var(--tw-border-opacity, 1));
-}
-
-.border-slate-400 {
-  --tw-border-opacity: 1;
-  border-color: rgb(148 163 184 / var(--tw-border-opacity, 1));
-}
-
-.border-primary-950 {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--twc-primary-950) / var(--twc-primary-950-opacity, var(--tw-border-opacity)));
-}
-
-.border-primary-900 {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, var(--tw-border-opacity)));
-}
-
 .border-primary-800 {
   --tw-border-opacity: 1;
   border-color: hsl(var(--twc-primary-800) / var(--twc-primary-800-opacity, var(--tw-border-opacity)));
+}
+
+.border-transparent {
+  border-color: transparent;
 }
 
 .bg-black {
@@ -1121,10 +1082,6 @@ video {
 
 .pb-3 {
   padding-bottom: 0.75rem;
-}
-
-.pb-4 {
-  padding-bottom: 1rem;
 }
 
 .pb-6 {
@@ -2093,16 +2050,16 @@ h6 {
     right: 2rem;
   }
 
+  .sm\:mb-4 {
+    margin-bottom: 1rem;
+  }
+
   .sm\:ml-8 {
     margin-left: 2rem;
   }
 
   .sm\:mt-4 {
     margin-top: 1rem;
-  }
-
-  .sm\:mb-4 {
-    margin-bottom: 1rem;
   }
 
   .sm\:w-auto {
@@ -2268,10 +2225,6 @@ h6 {
 
   .md\:pt-6 {
     padding-top: 1.5rem;
-  }
-
-  .md\:pt-4 {
-    padding-top: 1rem;
   }
 
   .md\:text-base {

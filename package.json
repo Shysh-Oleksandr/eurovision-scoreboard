@@ -26,7 +26,8 @@
     "react-dom": "^18.2.0",
     "react-flip-move": "^3.0.5",
     "sharp": "^0.33.5",
-    "tw-colors": "^3.3.2"
+    "tw-colors": "^3.3.2",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.21.8",

@@ -2,30 +2,28 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { ANIMATION_DURATION } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
-import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
 
 import TelevoteInput from './TelevoteInput';
 
 type Props = {
-  countries: Country[];
-  shouldShowLastPoints: boolean;
-  isJuryVoting: boolean;
   countriesLeft: number;
-  votingCountryIndex: number;
-  shouldClearPoints: boolean;
-  dispatch: React.Dispatch<ScoreboardAction>;
 };
 
-const VotingButtons = ({
-  countries,
-  shouldShowLastPoints,
-  isJuryVoting,
-  countriesLeft,
-  votingCountryIndex,
-  shouldClearPoints,
-  dispatch,
-}: Props) => {
+const VotingButtons = ({ countriesLeft }: Props) => {
+  const {
+    countries,
+    shouldShowLastPoints,
+    isJuryVoting,
+    votingCountryIndex,
+    shouldClearPoints,
+    giveRandomJuryPoints,
+    hideLastReceivedPoints,
+    resetLastPoints,
+    giveTelevotePoints,
+  } = useScoreboardStore();
+
   const timerId = useRef<NodeJS.Timeout | null>(null);
 
   const isFirstTelevoteCountry = useMemo(
@@ -39,16 +37,13 @@ const VotingButtons = ({
       timerId.current = null;
     }
 
-    dispatch({ type: ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS });
-
-    dispatch({
-      type: ScoreboardActionKind.HIDE_LAST_RECEIVED_POINTS,
-    });
+    giveRandomJuryPoints();
+    hideLastReceivedPoints();
 
     timerId.current = setTimeout(() => {
-      dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
+      resetLastPoints();
     }, ANIMATION_DURATION);
-  }, [dispatch]);
+  }, [giveRandomJuryPoints, hideLastReceivedPoints, resetLastPoints]);
 
   const finishVoting = useCallback(() => {
     if (timerId.current) {
@@ -57,15 +52,12 @@ const VotingButtons = ({
     }
 
     if (isJuryVoting) {
-      new Array(countriesLeft).fill(0).map(() => {
-        dispatch({
-          type: ScoreboardActionKind.GIVE_RANDOM_JURY_POINTS,
-          payload: { isRandomFinishing: true },
-        });
+      new Array(countriesLeft).fill(0).forEach(() => {
+        giveRandomJuryPoints(true);
       });
 
       timerId.current = setTimeout(() => {
-        dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
+        resetLastPoints();
       }, ANIMATION_DURATION);
     } else {
       const filteredCountries = countries.filter(
@@ -75,7 +67,7 @@ const VotingButtons = ({
         (a, b) => b.points - a.points,
       );
 
-      sortedCountries.map((votingCountry) => {
+      sortedCountries.forEach((votingCountry) => {
         const votingCountryPlace =
           countries.findIndex(
             (country) => country.code === votingCountry.code,
@@ -83,16 +75,17 @@ const VotingButtons = ({
 
         const randomVotingPoints = getRandomTelevotePoints(votingCountryPlace);
 
-        dispatch({
-          type: ScoreboardActionKind.GIVE_TELEVOTE_POINTS,
-          payload: {
-            countryCode: votingCountry.code,
-            votingPoints: randomVotingPoints,
-          },
-        });
+        giveTelevotePoints(votingCountry.code, randomVotingPoints);
       });
     }
-  }, [countries, countriesLeft, dispatch, isJuryVoting]);
+  }, [
+    countries,
+    countriesLeft,
+    isJuryVoting,
+    giveRandomJuryPoints,
+    resetLastPoints,
+    giveTelevotePoints,
+  ]);
 
   useEffect(() => {
     if ((shouldShowLastPoints || shouldClearPoints) && timerId.current) {
@@ -111,8 +104,6 @@ const VotingButtons = ({
         <TelevoteInput
           votingCountryIndex={votingCountryIndex}
           isFirstTelevoteCountry={isFirstTelevoteCountry}
-          countries={countries}
-          dispatch={dispatch}
         />
       )}
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { Year } from '../../config';
 import { reinitializeCountriesData, SUPPORTED_YEARS } from '../../data/data';
-import { ScoreboardActionKind } from '../../models';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 import { useTheme } from '../../theme/ThemeContext';
 import Button from '../Button';
 import FeedbackInfo from '../feedbackInfo';
@@ -14,12 +14,9 @@ const options = SUPPORTED_YEARS.map((year) => ({
   label: year.toString(),
 }));
 
-interface Props {
-  dispatch: React.Dispatch<any>;
-}
-
-export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
+export const YearSelectBox: React.FC = () => {
   const { themeInfo, year, setYear } = useTheme();
+  const { startOver } = useScoreboardStore();
 
   const [localYear, setLocalYear] = useState(year);
 
@@ -27,7 +24,6 @@ export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
     const newYear = e.target.value as Year;
 
     setLocalYear(newYear);
-    dispatch({ type: 'SET_YEAR', payload: newYear });
   };
 
   const handleRestart = () => {
@@ -36,7 +32,7 @@ export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
       reinitializeCountriesData(localYear);
     }
 
-    dispatch({ type: ScoreboardActionKind.START_OVER });
+    startOver();
   };
 
   React.useEffect(() => {

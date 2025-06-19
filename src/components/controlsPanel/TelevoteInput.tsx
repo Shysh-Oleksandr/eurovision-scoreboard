@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 
 import { getMaxPossibleTelevotePoints } from '../../data/data';
-import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
 
 const NUMBER_REGEX = /^\d*$/;
@@ -9,16 +9,14 @@ const NUMBER_REGEX = /^\d*$/;
 type Props = {
   votingCountryIndex: number;
   isFirstTelevoteCountry: boolean;
-  countries: Country[];
-  dispatch: React.Dispatch<ScoreboardAction>;
 };
 
 const TelevoteInput = ({
   votingCountryIndex,
   isFirstTelevoteCountry,
-  countries,
-  dispatch,
 }: Props) => {
+  const { countries, resetLastPoints, giveTelevotePoints } =
+    useScoreboardStore();
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
@@ -57,15 +55,10 @@ const TelevoteInput = ({
     setEnteredPoints('');
 
     if (isFirstTelevoteCountry) {
-      dispatch({
-        type: ScoreboardActionKind.RESET_LAST_POINTS,
-      });
+      resetLastPoints();
     }
 
-    dispatch({
-      type: ScoreboardActionKind.GIVE_TELEVOTE_POINTS,
-      payload: { countryCode: votingCountryCode, votingPoints },
-    });
+    giveTelevotePoints(votingCountryCode, votingPoints);
   };
 
   return (

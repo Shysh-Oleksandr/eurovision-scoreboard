@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import { Country, ScoreboardAction } from '../models';
+import { useScoreboardStore } from '../state/scoreboardStore';
 
 import StartOverButton from './StartOverButton';
 
-type Props = {
-  winnerCountry: Country | null;
-  dispatch: React.Dispatch<ScoreboardAction>;
-};
-
-const WinnerModal = ({ winnerCountry, dispatch }: Props) => {
+const WinnerModal = () => {
+  const { winnerCountry } = useScoreboardStore();
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -36,10 +32,7 @@ const WinnerModal = ({ winnerCountry, dispatch }: Props) => {
           <span className="font-bold">{winnerCountry.name}</span> won with{' '}
           <span className="font-bold">{winnerCountry.points}</span> points!
         </h4>
-        <StartOverButton
-          dispatch={dispatch}
-          className="!py-3 sm:text-base text-xs sm:w-auto sm:!px-12 w-full"
-        />
+        <StartOverButton className="!py-3 sm:text-base text-xs sm:w-auto sm:!px-12 w-full" />
       </div>
     </div>
   );

@@ -3,36 +3,30 @@ import FlipMove from 'react-flip-move';
 
 import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data/data';
 import { useGetCountries } from '../../hooks/useGetCountries';
-import { Country, ScoreboardAction, ScoreboardActionKind } from '../../models';
+import { Country } from '../../models';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import BoardHeader from './BoardHeader';
 import CountryItem from './CountryItem';
 
 const MAX_COUNTRY_WITH_POINTS = POINTS_ARRAY.length;
 
-type Props = {
-  countries: Country[];
-  isJuryVoting: boolean;
-  winnerCountry: Country | null;
-  votingPoints: number;
-  votingCountryIndex: number;
-  shouldShowLastPoints: boolean;
-  isVotingOver: boolean;
-  dispatch: React.Dispatch<ScoreboardAction>;
-};
+const Board = (): JSX.Element => {
+  const {
+    countries,
+    isJuryVoting,
+    winnerCountry,
+    votingPoints,
+    votingCountryIndex,
+    shouldShowLastPoints,
+    resetLastPoints,
+    giveJuryPoints,
+  } = useScoreboardStore();
 
-const Board = ({
-  countries,
-  isJuryVoting,
-  winnerCountry,
-  votingPoints,
-  votingCountryIndex,
-  shouldShowLastPoints,
-  isVotingOver,
-  dispatch,
-}: Props): JSX.Element => {
   const timerId = useRef<NodeJS.Timeout | null>(null);
   const allCountries = useGetCountries();
+
+  const isVotingOver = !!winnerCountry;
 
   const sortedCountries = useMemo(
     () => [...countries].sort((a, b) => b.points - a.points),
@@ -67,8 +61,9 @@ const Board = ({
       clearTimeout(timerId.current);
       timerId.current = null;
     }
-    dispatch({ type: ScoreboardActionKind.RESET_LAST_POINTS });
-  }, [dispatch]);
+
+    resetLastPoints();
+  }, [resetLastPoints]);
 
   const onClick = useCallback(
     (countryCode: string) => {
@@ -80,12 +75,9 @@ const Board = ({
         timerId.current = setTimeout(handleResetPoints, ANIMATION_DURATION);
       }
 
-      dispatch({
-        type: ScoreboardActionKind.GIVE_JURY_POINTS,
-        payload: { countryCode },
-      });
+      giveJuryPoints(countryCode);
     },
-    [countriesWithPointsLength, dispatch, handleResetPoints],
+    [countriesWithPointsLength, giveJuryPoints, handleResetPoints],
   );
 
   const renderItem = useCallback(
@@ -120,15 +112,7 @@ const Board = ({
 
   return (
     <div className={`${winnerCountry ? '' : 'md:w-2/3'} w-full h-full`}>
-      <BoardHeader
-        isJuryVoting={isJuryVoting}
-        votingPoints={votingPoints}
-        countries={sortedCountries}
-        votingCountry={votingCountry}
-        winnerCountry={winnerCountry}
-        dispatch={dispatch}
-        onClick={onClick}
-      />
+      <BoardHeader onClick={onClick} />
       <div className="container-wrapping-flip-move">
         <FlipMove
           duration={500}
