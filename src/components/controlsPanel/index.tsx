@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getCountriesLength } from '../../data/data';
+import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import CountryInfo from './CountryInfo';
@@ -10,6 +10,7 @@ import VotingPointsInfo from './VotingPointsInfo';
 const ControlsPanel = (): JSX.Element | null => {
   const { votingCountryIndex, votingPoints, isJuryVoting, winnerCountry } =
     useScoreboardStore();
+  const { getCountriesLength } = useCountriesStore();
 
   const isVotingOver = !!winnerCountry;
   const countriesLeft = getCountriesLength() - votingCountryIndex;

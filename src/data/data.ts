@@ -20,7 +20,7 @@ export const SUPPORTED_YEARS = [
   2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023, 2024, 2025,
 ];
 
-export const getCountriesData = (year?: Year) => {
+export const getCountriesByYear = (year: Year): BaseCountry[] => {
   switch (year) {
     case '2013':
       return COUNTRIES_2013;
@@ -50,52 +50,6 @@ export const getCountriesData = (year?: Year) => {
   }
 };
 
-let cachedCountryData: BaseCountry[] = getCountriesData();
-
-export const getAllCountries = () => cachedCountryData;
-
-export const reinitializeCountriesData = (year: Year) => {
-  cachedCountryData = getCountriesData(year);
-};
-
-export const getCountriesLength = () => {
-  return cachedCountryData.length;
-};
-export const getInitialCountries = () => {
-  return getQualifiedCountries().map((country) => ({
-    ...country,
-    points: 0,
-    lastReceivedPoints: null,
-  }));
-};
-
-export const getQualifiedCountries = () => {
-  return cachedCountryData.filter(
-    (country: BaseCountry) => country.isQualified,
-  );
-};
-
-export const getTotalTelevotePoints = () => {
-  const countryVotingPoints = POINTS_ARRAY.reduce(
-    (prev, curr) => prev + curr,
-    0,
-  );
-
-  return countryVotingPoints * (getCountriesLength() - 1);
-};
-
-const MAX_POINTS_FOR_A_VOTE = 12;
-
-export const getMaxPossibleTelevotePoints = () => {
-  return MAX_POINTS_FOR_A_VOTE * (getCountriesLength() - 1);
-};
-
-export const getAverageVotingPoints = () => {
-  return Math.round(getTotalTelevotePoints() / getCountriesLength());
-};
-
-export const ANIMATION_DURATION = 3000;
-
 export const POINTS_ARRAY = new Array(10).fill(0).map((_, index) => {
   const points = index + 1;
 
@@ -105,3 +59,24 @@ export const POINTS_ARRAY = new Array(10).fill(0).map((_, index) => {
 
   return points;
 });
+
+const MAX_POINTS_FOR_A_VOTE = 12;
+
+export const getMaxPossibleTelevotePoints = (countriesLength: number) => {
+  return MAX_POINTS_FOR_A_VOTE * (countriesLength - 1);
+};
+
+const getTotalTelevotePoints = (countriesLength: number) => {
+  const countryVotingPoints = POINTS_ARRAY.reduce(
+    (prev, curr) => prev + curr,
+    0,
+  );
+
+  return countryVotingPoints * (countriesLength - 1);
+};
+
+export const getAverageVotingPoints = (countriesLength: number) => {
+  return Math.round(getTotalTelevotePoints(countriesLength) / countriesLength);
+};
+
+export const ANIMATION_DURATION = 3000;

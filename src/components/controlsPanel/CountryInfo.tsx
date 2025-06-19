@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
 import { getSequenceNumber } from '../../helpers/getSequenceNumber';
-import { useGetCountries } from '../../hooks/useGetCountries';
+import { useCountriesStore } from '../../state/countriesStore';
 
 type Props = { votingCountryIndex: number };
 
 const CountryInfo = ({ votingCountryIndex }: Props) => {
   const [shouldBlink, setShouldBlink] = useState(false);
 
-  const allCountries = useGetCountries();
+  const { allCountries } = useCountriesStore();
 
   const votingCountryData = allCountries[votingCountryIndex];
 

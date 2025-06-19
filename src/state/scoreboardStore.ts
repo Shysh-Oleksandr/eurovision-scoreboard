@@ -2,14 +2,11 @@ import { create } from 'zustand';
 
 import { devtools } from 'zustand/middleware';
 
-import {
-  getAllCountries,
-  getCountriesLength,
-  getInitialCountries,
-  POINTS_ARRAY,
-} from '../data/data';
+import { POINTS_ARRAY } from '../data/data';
 import { getNextVotingPoints } from '../helpers/getNextVotingPoints';
 import { Country, CountryWithPoints } from '../models';
+
+import { useCountriesStore } from './countriesStore';
 
 interface ScoreboardState {
   // State
@@ -60,7 +57,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
   devtools(
     (set, get) => ({
       // Initial state
-      countries: getInitialCountries(),
+      countries: useCountriesStore.getState().getInitialCountries(),
       isJuryVoting: true,
       votingCountryIndex: 0,
       votingPoints: 1,
@@ -71,6 +68,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
       // Actions
       giveJuryPoints: (countryCode: string) => {
         const state = get();
+        const countriesStore = useCountriesStore.getState();
 
         const countriesWithPoints = state.countries.filter(
           (country) => country.lastReceivedPoints !== null,
@@ -81,7 +79,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
         const nextVotingCountryIndex =
           state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
         const isJuryVotingOver =
-          nextVotingCountryIndex === getCountriesLength();
+          nextVotingCountryIndex === countriesStore.getCountriesLength();
 
         set({
           votingPoints: getNextVotingPoints(state.votingPoints),
@@ -151,11 +149,12 @@ export const useScoreboardStore = create<ScoreboardState>()(
 
       giveRandomJuryPoints: (isRandomFinishing = false) => {
         const state = get();
+        const countriesStore = useCountriesStore.getState();
 
         const isJuryVotingOver =
-          state.votingCountryIndex === getCountriesLength() - 1;
+          state.votingCountryIndex === countriesStore.getCountriesLength() - 1;
         const votingCountryCode =
-          getAllCountries()[state.votingCountryIndex].code;
+          countriesStore.allCountries[state.votingCountryIndex].code;
 
         const countriesWithPoints: CountryWithPoints[] = [];
 
@@ -233,7 +232,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
 
       startOver: () => {
         set({
-          countries: getInitialCountries(),
+          countries: useCountriesStore.getState().getInitialCountries(),
           isJuryVoting: true,
           votingCountryIndex: 0,
           votingPoints: 1,

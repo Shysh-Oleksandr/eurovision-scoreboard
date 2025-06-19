@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { ANIMATION_DURATION } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
+import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
 
@@ -23,6 +24,7 @@ const VotingButtons = ({ countriesLeft }: Props) => {
     resetLastPoints,
     giveTelevotePoints,
   } = useScoreboardStore();
+  const { getQualifiedCountries, getCountriesLength } = useCountriesStore();
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
 
@@ -73,7 +75,11 @@ const VotingButtons = ({ countriesLeft }: Props) => {
             (country) => country.code === votingCountry.code,
           ) + 1;
 
-        const randomVotingPoints = getRandomTelevotePoints(votingCountryPlace);
+        const randomVotingPoints = getRandomTelevotePoints(
+          votingCountryPlace,
+          getQualifiedCountries().length,
+          getCountriesLength(),
+        );
 
         giveTelevotePoints(votingCountry.code, randomVotingPoints);
       });
@@ -85,6 +91,8 @@ const VotingButtons = ({ countriesLeft }: Props) => {
     giveRandomJuryPoints,
     resetLastPoints,
     giveTelevotePoints,
+    getQualifiedCountries,
+    getCountriesLength,
   ]);
 
   useEffect(() => {

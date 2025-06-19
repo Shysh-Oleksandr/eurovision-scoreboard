@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Board from '../components/board';
 import ControlsPanel from '../components/controlsPanel';
 import FeedbackInfo from '../components/feedbackInfo';
 import { YearSelectBox } from '../components/SelectBox/YearSelectBox';
 import WinnerModal from '../components/WinnerModal';
-import { ThemeProvider, useTheme } from '../theme/ThemeContext';
+import { useCountriesStore } from '../state/countriesStore';
 
-const MainContent = () => {
-  const { theme, year } = useTheme();
+export const Main = () => {
+  const { year, theme } = useCountriesStore();
+
+  // Apply initial theme class on mount
+  useEffect(() => {
+    document.documentElement.classList.add(`theme-${year}`);
+  }, [year]);
 
   return (
     <div
@@ -26,17 +31,9 @@ const MainContent = () => {
             <ControlsPanel />
           </div>
           <WinnerModal />
+          <FeedbackInfo className="md:block hidden" />
         </div>
       </div>
     </div>
-  );
-};
-
-export const Main = () => {
-  return (
-    <ThemeProvider>
-      <MainContent />
-      <FeedbackInfo className="md:block hidden" />
-    </ThemeProvider>
   );
 };

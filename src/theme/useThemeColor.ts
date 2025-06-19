@@ -1,4 +1,5 @@
-import { useTheme } from './ThemeContext';
+import { useCountriesStore } from '../state/countriesStore';
+
 import type { ThemeColors } from './types';
 
 type DotPrefix<T extends string> = T extends '' ? '' : `.${T}`;
@@ -32,7 +33,7 @@ export function useThemeColor(paths: ColorPath[]): string[];
 export function useThemeColor(
   pathOrPaths: ColorPath | ColorPath[],
 ): string | string[] {
-  const { theme } = useTheme();
+  const { theme } = useCountriesStore();
 
   if (Array.isArray(pathOrPaths)) {
     return pathOrPaths.map((path) => getColorFromPath(theme, path));

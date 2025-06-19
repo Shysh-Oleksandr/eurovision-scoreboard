@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 
 import { getMaxPossibleTelevotePoints } from '../../data/data';
+import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
 
@@ -17,6 +18,7 @@ const TelevoteInput = ({
 }: Props) => {
   const { countries, resetLastPoints, giveTelevotePoints } =
     useScoreboardStore();
+  const { getCountriesLength } = useCountriesStore();
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
@@ -42,7 +44,9 @@ const TelevoteInput = ({
       return;
     }
 
-    const maxPossibleTelevotePoints = getMaxPossibleTelevotePoints();
+    const maxPossibleTelevotePoints = getMaxPossibleTelevotePoints(
+      getCountriesLength(),
+    );
 
     if (votingPoints > maxPossibleTelevotePoints) {
       setError(

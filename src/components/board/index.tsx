@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import FlipMove from 'react-flip-move';
 
 import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data/data';
-import { useGetCountries } from '../../hooks/useGetCountries';
 import { Country } from '../../models';
+import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import BoardHeader from './BoardHeader';
@@ -24,7 +24,7 @@ const Board = (): JSX.Element => {
   } = useScoreboardStore();
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
-  const allCountries = useGetCountries();
+  const { allCountries } = useCountriesStore();
 
   const isVotingOver = !!winnerCountry;
 

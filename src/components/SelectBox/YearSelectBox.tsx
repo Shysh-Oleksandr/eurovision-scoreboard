@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 import { Year } from '../../config';
-import { reinitializeCountriesData, SUPPORTED_YEARS } from '../../data/data';
+import { SUPPORTED_YEARS } from '../../data/data';
+import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import { useTheme } from '../../theme/ThemeContext';
 import Button from '../Button';
 import FeedbackInfo from '../feedbackInfo';
 
@@ -15,7 +15,7 @@ const options = SUPPORTED_YEARS.map((year) => ({
 }));
 
 export const YearSelectBox: React.FC = () => {
-  const { themeInfo, year, setYear } = useTheme();
+  const { year, themeInfo, setYear } = useCountriesStore();
   const { startOver } = useScoreboardStore();
 
   const [localYear, setLocalYear] = useState(year);
@@ -29,15 +29,10 @@ export const YearSelectBox: React.FC = () => {
   const handleRestart = () => {
     if (localYear !== year) {
       setYear(localYear);
-      reinitializeCountriesData(localYear);
     }
 
     startOver();
   };
-
-  React.useEffect(() => {
-    document.querySelector('html')?.setAttribute('data-theme', `theme${year}`);
-  }, [year]);
 
   return (
     <div className="flex justify-between items-center">
