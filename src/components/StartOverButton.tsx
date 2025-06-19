@@ -1,17 +1,18 @@
 import React from 'react';
 
-import { ScoreboardAction, ScoreboardActionKind } from '../models';
+import { useScoreboardStore } from '../state/scoreboardStore';
 
 import Button from './Button';
 
 type Props = {
   className?: string;
-  dispatch: React.Dispatch<ScoreboardAction>;
 };
 
-const StartOverButton = ({ className, dispatch }: Props) => {
+const StartOverButton = ({ className }: Props) => {
+  const { startOver } = useScoreboardStore();
+
   const handleStartOver = () => {
-    dispatch({ type: ScoreboardActionKind.START_OVER });
+    startOver();
   };
 
   return (

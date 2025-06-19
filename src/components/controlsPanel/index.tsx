@@ -1,33 +1,18 @@
 import React from 'react';
 
-import { getCountriesLength } from '../../data/data';
-import { Country, ScoreboardAction } from '../../models';
+import { useCountriesStore } from '../../state/countriesStore';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import CountryInfo from './CountryInfo';
 import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
-type Props = {
-  countries: Country[];
-  votingCountryIndex: number;
-  votingPoints: number;
-  isJuryVoting: boolean;
-  shouldShowLastPoints: boolean;
-  shouldClearPoints: boolean;
-  isVotingOver: boolean;
-  dispatch: React.Dispatch<ScoreboardAction>;
-};
+const ControlsPanel = (): JSX.Element | null => {
+  const { votingCountryIndex, votingPoints, isJuryVoting, winnerCountry } =
+    useScoreboardStore();
+  const { getCountriesLength } = useCountriesStore();
 
-const ControlsPanel = ({
-  countries,
-  votingCountryIndex,
-  votingPoints,
-  isJuryVoting,
-  shouldShowLastPoints,
-  shouldClearPoints,
-  isVotingOver,
-  dispatch,
-}: Props): JSX.Element | null => {
+  const isVotingOver = !!winnerCountry;
   const countriesLeft = getCountriesLength() - votingCountryIndex;
 
   if (isVotingOver) {
@@ -45,15 +30,7 @@ const ControlsPanel = ({
         {isJuryVoting && (
           <CountryInfo votingCountryIndex={votingCountryIndex} />
         )}
-        <VotingButtons
-          dispatch={dispatch}
-          countries={countries}
-          shouldShowLastPoints={shouldShowLastPoints}
-          countriesLeft={countriesLeft}
-          isJuryVoting={isJuryVoting}
-          votingCountryIndex={votingCountryIndex}
-          shouldClearPoints={shouldClearPoints}
-        />
+        <VotingButtons countriesLeft={countriesLeft} />
       </div>
       {isJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
     </div>

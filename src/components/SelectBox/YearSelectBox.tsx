@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 import { Year } from '../../config';
-import { reinitializeCountriesData, SUPPORTED_YEARS } from '../../data/data';
-import { ScoreboardActionKind } from '../../models';
-import { useTheme } from '../../theme/ThemeContext';
+import { SUPPORTED_YEARS } from '../../data/data';
+import { useCountriesStore } from '../../state/countriesStore';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
 import FeedbackInfo from '../feedbackInfo';
 
@@ -14,12 +14,9 @@ const options = SUPPORTED_YEARS.map((year) => ({
   label: year.toString(),
 }));
 
-interface Props {
-  dispatch: React.Dispatch<any>;
-}
-
-export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
-  const { themeInfo, year, setYear } = useTheme();
+export const YearSelectBox: React.FC = () => {
+  const { year, themeInfo, setYear } = useCountriesStore();
+  const { startOver } = useScoreboardStore();
 
   const [localYear, setLocalYear] = useState(year);
 
@@ -27,21 +24,15 @@ export const YearSelectBox: React.FC<Props> = ({ dispatch }) => {
     const newYear = e.target.value as Year;
 
     setLocalYear(newYear);
-    dispatch({ type: 'SET_YEAR', payload: newYear });
   };
 
   const handleRestart = () => {
     if (localYear !== year) {
       setYear(localYear);
-      reinitializeCountriesData(localYear);
     }
 
-    dispatch({ type: ScoreboardActionKind.START_OVER });
+    startOver();
   };
-
-  React.useEffect(() => {
-    document.querySelector('html')?.setAttribute('data-theme', `theme${year}`);
-  }, [year]);
 
   return (
     <div className="flex justify-between items-center">
