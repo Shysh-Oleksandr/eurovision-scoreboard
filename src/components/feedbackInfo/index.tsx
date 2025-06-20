@@ -21,8 +21,8 @@ const FeedbackIcon = () => (
 const UPCOMING_FEATURES = [
   'Semi-finals',
   'Custom countries selection',
-  'Contests before 2013',
   'Custom themes for each contest',
+  'Custom animations for each contest',
 ];
 
 const FeedbackModal = ({

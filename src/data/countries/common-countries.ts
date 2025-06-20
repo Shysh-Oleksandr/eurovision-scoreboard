@@ -5,6 +5,11 @@ export const COMMON_COUNTRIES = {
     code: 'AL',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66be049cf07bd10fefca7b53_al.svg',
   },
+  Andorra: {
+    name: 'Andorra',
+    code: 'AD',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66be049c8cd530e3bd4eb474_ad.svg',
+  },
   Armenia: {
     name: 'Armenia',
     code: 'AM',
@@ -140,15 +145,20 @@ export const COMMON_COUNTRIES = {
     code: 'MT',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437cde561af29d224ce0_mt.svg',
   },
-  Montenegro: {
-    name: 'Montenegro',
-    code: 'ME',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437a577b84668e260847_me.svg',
-  },
   Moldova: {
     name: 'Moldova',
     code: 'MD',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437a8c1cf7591b9a48c3_md.svg',
+  },
+  Monaco: {
+    name: 'Monaco',
+    code: 'MC',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437bfd208d55c8ac5bcb_mc.svg',
+  },
+  Montenegro: {
+    name: 'Montenegro',
+    code: 'ME',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437a577b84668e260847_me.svg',
   },
   Netherlands: {
     name: 'Netherlands',
@@ -195,6 +205,16 @@ export const COMMON_COUNTRIES = {
     code: 'RS',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4386ecc7703ef117562a_rs.svg',
   },
+  SerbiaMontenegro: {
+    name: 'Serbia & Montenegro',
+    code: 'CS',
+    flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flag_of_Serbia_and_Montenegro_%281992%E2%80%932006%29.svg/1200px-Flag_of_Serbia_and_Montenegro_%281992%E2%80%932006%29.svg.png',
+  },
+  Slovakia: {
+    name: 'Slovakia',
+    code: 'SK',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf43885b07a53217a12132_sk.svg',
+  },
   Slovenia: {
     name: 'Slovenia',
     code: 'SI',
@@ -214,6 +234,11 @@ export const COMMON_COUNTRIES = {
     name: 'Switzerland',
     code: 'CH',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1f351f0d5cf3a03db26a_ch.svg',
+  },
+  Turkey: {
+    name: 'Turkey',
+    code: 'TR',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438be043e403da7d1717_tr.svg',
   },
   Ukraine: {
     name: 'Ukraine',

@@ -1,3 +1,14 @@
+export { COMMON_COUNTRIES } from './common-countries';
+
+export { COUNTRIES_2004 } from './countries-2004';
+export { COUNTRIES_2005 } from './countries-2005';
+export { COUNTRIES_2006 } from './countries-2006';
+export { COUNTRIES_2007 } from './countries-2007';
+export { COUNTRIES_2008 } from './countries-2008';
+export { COUNTRIES_2009 } from './countries-2009';
+export { COUNTRIES_2010 } from './countries-2010';
+export { COUNTRIES_2011 } from './countries-2011';
+export { COUNTRIES_2012 } from './countries-2012';
 export { COUNTRIES_2013 } from './countries-2013';
 export { COUNTRIES_2014 } from './countries-2014';
 export { COUNTRIES_2015 } from './countries-2015';

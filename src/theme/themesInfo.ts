@@ -2,6 +2,33 @@ import { ThemeInfoRecord } from './types';
 
 // Got logo from https://commons.wikimedia.org/wiki/File:Eurovision_Song_Contest_heart_Switzerland_white.svg
 export const themesInfo: ThemeInfoRecord = {
+  '2004': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Turkey2004.svg'),
+  },
+  '2005': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Ukraine2023.svg'),
+  },
+  '2006': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Greece2006.svg'),
+  },
+  '2007': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Finland2007.svg'),
+  },
+  '2008': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Serbia2008.svg'),
+  },
+  '2009': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Russia2009.svg'),
+  },
+  '2010': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Norway2010.svg'),
+  },
+  '2011': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Germany2011.svg'),
+  },
+  '2012': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Azerbaijan2012.svg'),
+  },
   '2013': {
     hostingCountryLogo: require('../assets/hostingCountryLogos/Sweden2024.svg'),
   },

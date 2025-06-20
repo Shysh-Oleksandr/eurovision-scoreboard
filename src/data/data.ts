@@ -2,6 +2,15 @@ import { Year } from '../config';
 import { BaseCountry } from '../models';
 
 import {
+  COUNTRIES_2004,
+  COUNTRIES_2005,
+  COUNTRIES_2006,
+  COUNTRIES_2007,
+  COUNTRIES_2008,
+  COUNTRIES_2009,
+  COUNTRIES_2010,
+  COUNTRIES_2011,
+  COUNTRIES_2012,
   COUNTRIES_2013,
   COUNTRIES_2014,
   COUNTRIES_2015,
@@ -16,12 +25,31 @@ import {
   COUNTRIES_2025,
 } from './countries';
 
-export const SUPPORTED_YEARS = [
-  2013, 2014, 2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023, 2024, 2025,
-];
+export const SUPPORTED_YEARS = Array.from(
+  { length: 22 },
+  (_, i) => 2004 + i,
+).filter((year) => year !== 2020);
 
 export const getCountriesByYear = (year: Year): BaseCountry[] => {
   switch (year) {
+    case '2004':
+      return COUNTRIES_2004;
+    case '2005':
+      return COUNTRIES_2005;
+    case '2006':
+      return COUNTRIES_2006;
+    case '2007':
+      return COUNTRIES_2007;
+    case '2008':
+      return COUNTRIES_2008;
+    case '2009':
+      return COUNTRIES_2009;
+    case '2010':
+      return COUNTRIES_2010;
+    case '2011':
+      return COUNTRIES_2011;
+    case '2012':
+      return COUNTRIES_2012;
     case '2013':
       return COUNTRIES_2013;
     case '2014':

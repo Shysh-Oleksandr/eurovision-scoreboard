@@ -1285,6 +1285,294 @@ video {
   transition-duration: 500ms;
 }
 
+.theme-2004,[data-theme="2004"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2005,[data-theme="2005"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2006,[data-theme="2006"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2007,[data-theme="2007"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2008,[data-theme="2008"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2009,[data-theme="2009"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2010,[data-theme="2010"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2011,[data-theme="2011"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
+.theme-2012,[data-theme="2012"] {
+  --twc-primary-700: 270.9 86.8% 61.4%;
+  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
+  --twc-primary-900: 268.1 71.2% 25.9%;
+  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
+  --twc-appBgColor: 282.1 90.6% 16.7%;
+  --twc-countryItem-bg: 265 67.4% 43.3%;
+  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-text: 0 0% 99.6%;
+  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryPointsText: 270 100% 0.4%;
+  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televotePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
+  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
+  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
+  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
+  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
+  --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
+  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
+  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
+}
+
 .theme-2013,[data-theme="2013"] {
   --twc-primary-700: 270.9 86.8% 61.4%;
   --twc-primary-800: 268.29999999999995 70.6% 34.7%;
