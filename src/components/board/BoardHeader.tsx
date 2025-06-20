@@ -66,7 +66,9 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
     }
 
     const countriesWithoutPoints = countries.filter(
-      (country) => country.lastReceivedPoints === null,
+      (country) =>
+        country.lastReceivedPoints === null &&
+        country.code !== votingCountry?.code,
     );
 
     const randomCountryIndex = Math.floor(
