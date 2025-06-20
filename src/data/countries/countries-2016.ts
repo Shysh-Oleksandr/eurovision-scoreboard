@@ -36,8 +36,6 @@ export const COUNTRIES_2016: BaseCountry[] = [
   { ...COMMON_COUNTRIES.NorthMacedonia, isQualified: false },
   { ...COMMON_COUNTRIES.Norway, isQualified: false },
   { ...COMMON_COUNTRIES.Poland, isQualified: true },
-  { ...COMMON_COUNTRIES.Portugal, isQualified: false },
-  { ...COMMON_COUNTRIES.Romania, isQualified: false },
   { ...COMMON_COUNTRIES.Russia, isQualified: true },
   { ...COMMON_COUNTRIES.SanMarino, isQualified: false },
   { ...COMMON_COUNTRIES.Serbia, isQualified: true },
