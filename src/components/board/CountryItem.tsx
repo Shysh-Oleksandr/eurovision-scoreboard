@@ -2,8 +2,10 @@ import React, { forwardRef, useMemo, useState, useEffect } from 'react';
 
 import { animated } from '@react-spring/web';
 
+import { POINTS_ARRAY } from '../../data/data';
 import useAnimatePoints from '../../hooks/useAnimatePoints';
-import { Country } from '../../models';
+import { Country, EventPhase } from '../../models';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 import { useThemeColor } from '../../theme/useThemeColor';
 import RoundedTriangle from '../RoundedTriangle';
 
@@ -12,29 +14,21 @@ import { useDouzePointsAnimation, useVotingFinished } from './hooks';
 
 type Props = {
   country: Country;
-  isJuryVoting: boolean;
-  hasCountryFinishedVoting: boolean;
-  isActive: boolean;
-  isVotingCountry: boolean;
   index: number;
+  votingCountryCode?: string;
   onClick: (countryCode: string) => void;
-  isVotingOver: boolean;
 };
 
 const CountryItem = forwardRef<HTMLButtonElement, Props>(
-  (
-    {
-      country,
-      hasCountryFinishedVoting,
-      isActive,
+  ({ country, index, votingCountryCode, onClick }, ref) => {
+    const {
+      countries,
       isJuryVoting,
-      isVotingCountry,
-      index,
-      onClick,
-      isVotingOver,
-    },
-    ref,
-  ) => {
+      winnerCountry,
+      qualifiedCountries,
+      eventPhase,
+    } = useScoreboardStore();
+
     const [juryLastPointsBg, televoteLastPointsBg, televotePointsBg, pointsBg] =
       useThemeColor([
         'countryItem.juryLastPointsBg',
@@ -48,16 +42,28 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
 
     const [showPlaceAnimation, setShowPlaceAnimation] = useState(false);
 
-    useEffect(() => {
-      if (isVotingOver) {
-        const timer = setTimeout(() => {
-          setShowPlaceAnimation(true);
-        }, 3050);
+    const isVotingCountry = country.code === votingCountryCode && isJuryVoting;
+    const isActive = country.code === votingCountryCode && !isJuryVoting;
+    const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
-        return () => clearTimeout(timer);
-      }
-      setShowPlaceAnimation(false);
-    }, [isVotingOver]);
+    const hasCountryFinishedVoting = useMemo(
+      () =>
+        countries.filter((country) => country.lastReceivedPoints !== null)
+          .length === POINTS_ARRAY.length,
+      [countries],
+    );
+
+    const isSemiFinalPhase =
+      eventPhase === EventPhase.SEMI_FINAL_1 ||
+      eventPhase === EventPhase.SEMI_FINAL_2;
+
+    const isQualified = useMemo(
+      () => qualifiedCountries.some((c) => c.code === country.code),
+      [qualifiedCountries, country.code],
+    );
+
+    const isNonQualifiedInSemiFinal =
+      isVotingOver && isSemiFinalPhase && !isQualified;
 
     const {
       springsContainer,
@@ -90,11 +96,6 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       [isVoted, hasCountryFinishedVoting, isVotingCountry, isJuryVoting],
     );
 
-    const handleClick = useMemo(
-      () => () => onClick(country.code),
-      [onClick, country.code],
-    );
-
     const buttonClassName = useMemo(
       () =>
         `relative outline outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
@@ -103,22 +104,49 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
             : 'cursor-pointer transition-colors duration-300 hover:!bg-countryItem-hoverBg'
         } ${isActive ? 'rounded-sm' : ''} ${
           showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''
-        } bg-countryItem-bg text-countryItem-text`,
-      [isDisabled, isActive, showPlaceAnimation],
+        } ${
+          isNonQualifiedInSemiFinal
+            ? '!bg-primary-900 opacity-70'
+            : 'bg-countryItem-bg'
+        } 
+        ${isVotingCountry ? 'opacity-70' : ''}
+        text-countryItem-text`,
+      [
+        isDisabled,
+        isActive,
+        showPlaceAnimation,
+        isNonQualifiedInSemiFinal,
+        isVotingCountry,
+      ],
     );
+
+    const placeText = index + 1 < 10 ? `0${index + 1}` : index + 1;
+
+    useEffect(() => {
+      if (isVotingOver) {
+        const timer = setTimeout(() => {
+          setShowPlaceAnimation(true);
+        }, 3050);
+
+        return () => clearTimeout(timer);
+      }
+      setShowPlaceAnimation(false);
+    }, [isVotingOver]);
 
     return (
       <div className="flex relative">
         {showPlaceAnimation && (
           <animated.div
             style={springsPlaceContainer}
-            className="flex items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText"
+            className={`flex items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText ${
+              isNonQualifiedInSemiFinal ? 'bg-primary-900 opacity-70' : ''
+            }`}
           >
             <animated.h4
               style={springsPlaceText}
               className="font-semibold md:text-lg text-base"
             >
-              {index + 1 < 10 ? `0${index + 1}` : index + 1}
+              {placeText}
             </animated.h4>
           </animated.div>
         )}
@@ -128,7 +156,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
           style={springsActive}
           className={buttonClassName}
           disabled={isDisabled}
-          onClick={handleClick}
+          onClick={() => onClick(country.code)}
         >
           {isJuryVoting && showDouzePointsAnimation && (
             <DouzePointsAnimation

@@ -8,9 +8,10 @@ type Props = { votingCountryIndex: number };
 const CountryInfo = ({ votingCountryIndex }: Props) => {
   const [shouldBlink, setShouldBlink] = useState(false);
 
-  const { allCountries } = useCountriesStore();
+  const { getVotingCountries } = useCountriesStore();
 
-  const votingCountryData = allCountries[votingCountryIndex];
+  const votingCountries = getVotingCountries();
+  const votingCountryData = votingCountries[votingCountryIndex];
 
   useEffect(() => {
     if (votingCountryIndex === 0) return;
@@ -35,7 +36,8 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
         <span className="font-medium">
           {getSequenceNumber(votingCountryIndex + 1)}
         </span>{' '}
-        of <span className="font-medium">{allCountries.length}</span> countries
+        of <span className="font-medium">{votingCountries.length}</span>{' '}
+        countries
       </h5>
     </div>
   );

@@ -8,11 +8,7 @@ import Button from '../Button';
 
 import TelevoteInput from './TelevoteInput';
 
-type Props = {
-  countriesLeft: number;
-};
-
-const VotingButtons = ({ countriesLeft }: Props) => {
+const VotingButtons = () => {
   const {
     countries,
     shouldShowLastPoints,
@@ -25,6 +21,8 @@ const VotingButtons = ({ countriesLeft }: Props) => {
     giveTelevotePoints,
   } = useScoreboardStore();
   const { getQualifiedCountries, getCountriesLength } = useCountriesStore();
+
+  const countriesLeft = getCountriesLength() - votingCountryIndex;
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
 

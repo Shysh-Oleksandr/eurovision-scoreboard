@@ -19,8 +19,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@react-spring/web": "^9.7.1",
     "@vercel/analytics": "^1.5.0",
+    "gsap": "^3.13.0",
     "react": "^18.2.0",
     "react-animated-numbers": "^0.18.0",
     "react-dom": "^18.2.0",

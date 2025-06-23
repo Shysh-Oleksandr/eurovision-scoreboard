@@ -1,3 +1,5 @@
+import { BaseCountry } from '../../models';
+
 // Flags from https://geotargetly.com/free-flags
 export const COMMON_COUNTRIES = {
   Albania: {
@@ -251,3 +253,6 @@ export const COMMON_COUNTRIES = {
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a3d774008a7088f805_gb.svg',
   },
 };
+
+export const ALL_COUNTRIES: Omit<BaseCountry, 'isQualified'>[] =
+  Object.values(COMMON_COUNTRIES);

@@ -4,40 +4,59 @@ import { devtools } from 'zustand/middleware';
 
 import { Year } from '../config';
 import { getCountriesByYear, SUPPORTED_YEARS } from '../data/data';
-import { BaseCountry } from '../models';
+import { BaseCountry, SemiFinalGroup } from '../models';
 import { getThemeForYear } from '../theme/themes';
 import { themesInfo } from '../theme/themesInfo';
 import { Theme, ThemeInfo } from '../theme/types';
 
+const INITIAL_YEAR = '2025';
+
 interface CountriesState {
   // State
-  allCountries: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
+  allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
+  selectedCountries: BaseCountry[]; // Countries selected for the current event
+  eventSetupModalOpen: boolean;
   year: Year;
   theme: Theme;
   themeInfo: ThemeInfo;
 
   // Actions
   setYear: (year: Year) => void;
+  setEventSetupModalOpen: (open: boolean) => void;
   getQualifiedCountries: () => BaseCountry[];
+  getVotingCountries: () => BaseCountry[];
   getCountriesLength: () => number;
   getInitialCountries: () => {
     name: string;
     code: string;
     flag: string;
     isQualified: boolean;
+    semiFinalGroup?: SemiFinalGroup;
+    isAutoQualified?: boolean;
+    isSelected?: boolean;
+    isQualifiedFromSemi?: boolean;
     points: number;
     lastReceivedPoints: null;
   }[];
+  setSelectedCountries: (countries: BaseCountry[]) => void;
+  getAutoQualifiedCountries: () => BaseCountry[];
+  getQualifiedFromSemiCountries: () => BaseCountry[];
+  setQualifiedFromSemi: (
+    countryCodes: string[],
+    semiFinalGroup: SemiFinalGroup,
+  ) => void;
 }
 
 export const useCountriesStore = create<CountriesState>()(
   devtools(
     (set, get) => ({
       // Initial state
-      allCountries: getCountriesByYear('2025'),
-      year: '2025',
-      theme: getThemeForYear('2025'),
-      themeInfo: themesInfo['2025'],
+      allCountriesForYear: getCountriesByYear(INITIAL_YEAR),
+      selectedCountries: [],
+      eventSetupModalOpen: true,
+      year: INITIAL_YEAR,
+      theme: getThemeForYear(INITIAL_YEAR),
+      themeInfo: themesInfo[INITIAL_YEAR],
 
       // Actions
       setYear: (year: Year) => {
@@ -48,24 +67,54 @@ export const useCountriesStore = create<CountriesState>()(
         // Add the new theme class
         document.documentElement.classList.add(`theme-${year}`);
 
+        const countries = getCountriesByYear(year);
+
         set({
-          allCountries: getCountriesByYear(year),
+          allCountriesForYear: countries,
+          selectedCountries: [],
           year,
           theme: getThemeForYear(year),
           themeInfo: themesInfo[year],
         });
       },
 
-      getQualifiedCountries: () => {
-        const { allCountries } = get();
+      setEventSetupModalOpen: (open: boolean) => {
+        set({
+          eventSetupModalOpen: open,
+        });
+      },
 
-        return allCountries.filter((country) => country.isQualified);
+      getQualifiedCountries: () => {
+        const { selectedCountries, allCountriesForYear } = get();
+
+        // If we have selected countries, use those
+        if (selectedCountries.length > 0) {
+          return selectedCountries.filter(
+            (country) =>
+              country.isSelected ||
+              country.isAutoQualified ||
+              country.isQualifiedFromSemi,
+          );
+        }
+
+        // Otherwise fall back to the default qualified countries
+        return allCountriesForYear.filter((country) => country.isQualified);
+      },
+
+      getVotingCountries: () => {
+        const { selectedCountries, allCountriesForYear } = get();
+
+        // If we have selected countries, use those
+        if (selectedCountries.length > 0) {
+          return selectedCountries;
+        }
+
+        // Otherwise fall back to all countries for the year
+        return allCountriesForYear;
       },
 
       getCountriesLength: () => {
-        const { allCountries } = get();
-
-        return allCountries.length;
+        return get().getVotingCountries().length;
       },
 
       getInitialCountries: () => {
@@ -76,6 +125,57 @@ export const useCountriesStore = create<CountriesState>()(
           points: 0,
           lastReceivedPoints: null,
         }));
+      },
+
+      setSelectedCountries: (countries: BaseCountry[]) => {
+        set({
+          selectedCountries: countries,
+        });
+      },
+
+      getAutoQualifiedCountries: () => {
+        const { selectedCountries, allCountriesForYear } = get();
+
+        if (selectedCountries.length > 0) {
+          return selectedCountries.filter(
+            (country) => country.isAutoQualified && country.isSelected,
+          );
+        }
+
+        return allCountriesForYear.filter((country) => country.isAutoQualified);
+      },
+
+      getQualifiedFromSemiCountries: () => {
+        const { selectedCountries } = get();
+
+        return selectedCountries.filter(
+          (country) => country.isQualifiedFromSemi,
+        );
+      },
+
+      setQualifiedFromSemi: (
+        countryCodes: string[],
+        semiFinalGroup: SemiFinalGroup,
+      ) => {
+        const { selectedCountries } = get();
+
+        const updatedCountries = selectedCountries.map((country) => {
+          if (
+            country.semiFinalGroup === semiFinalGroup &&
+            countryCodes.includes(country.code)
+          ) {
+            return {
+              ...country,
+              isQualifiedFromSemi: true,
+            };
+          }
+
+          return country;
+        });
+
+        set({
+          selectedCountries: updatedCountries,
+        });
       },
     }),
     { name: 'countries-store' },

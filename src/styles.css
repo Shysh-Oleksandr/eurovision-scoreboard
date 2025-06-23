@@ -168,6 +168,34 @@ h6 {
   }
 }
 
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  @media (min-width: 1024px) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  ::-webkit-scrollbar-track {
+    background: theme('colors.primary-900');
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.primary-800');
+    border-radius: 100vh;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.primary-750');
+  }
+}
+
+/* TODO: Use theme colors */
 /* <select> styles */
 .select {
   /* Reset */
@@ -211,18 +239,18 @@ h6 {
   --border-angle: 0turn;
   --main-bg: conic-gradient(
     from var(--border-angle),
-    #0c0e89,
-    #02035e 5%,
-    #02035e 60%,
-    #0c0e89 95%
+    theme('colors.primary-900'),
+    theme('colors.primary-950') 5%,
+    theme('colors.primary-950') 60%,
+    theme('colors.primary-900') 95%
   );
 
   border: solid 3px transparent;
   --gradient-border: conic-gradient(
     from var(--border-angle),
     transparent 25%,
-    #08f,
-    #fd0184 99%,
+    theme('colors.primary-800') 65%,
+    theme('colors.countryItem-pointsBg') 99%,
     transparent
   );
 
@@ -240,15 +268,15 @@ h6 {
 
   transition: all;
 
-  animation: bg-spin 3s linear infinite;
+  animation: bg-spin 4s linear infinite;
 
   &:hover {
     --main-bg: conic-gradient(
       from var(--border-angle),
-      #0c0e9f,
-      #050775 5%,
-      #050775 60%,
-      #0c0e9f 95%
+      theme('colors.primary-800'),
+      theme('colors.primary-950') 5%,
+      theme('colors.primary-950') 60%,
+      theme('colors.primary-800') 95%
     );
   }
 }

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import Modal from '../Modal';
+
 const FeedbackIcon = () => (
   <svg
     width="24"
@@ -19,68 +21,70 @@ const FeedbackIcon = () => (
 );
 
 const UPCOMING_FEATURES = [
-  'Semi-finals',
-  'Custom countries selection',
+  'Semi-finals improvements',
   'Custom themes for each contest',
   'Custom animations for each contest',
+  'Custom settings',
+  'JESC support',
+  'Countries from all continents',
+  'Different voting rules support',
 ];
 
 const FeedbackModal = ({
+  showModal,
   setShowModal,
 }: {
+  showModal: boolean;
   setShowModal: (show: boolean) => void;
 }) => {
   return (
-    <div
-      className="w-full h-full absolute top-0 bottom-0 left-0 right-0 z-50 bg-black bg-opacity-60 flex justify-center items-center"
-      onClick={() => setShowModal(false)}
+    <Modal
+      isOpen={showModal}
+      onClose={() => setShowModal(false)}
+      containerClassName="lg:w-2/5 md:w-1/2 w-4/5"
+      contentClassName=" md:pb-12 sm:pb-8 pb-6 lg:pt-12 md:pt-10 sm:pt-8 pt-6 lg:px-10 md:px-8 xs:px-6 px-4 text-white"
     >
-      <div
-        className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 lg:w-2/5 md:w-1/2 w-4/5 md:pb-12 sm:pb-8 pb-6 lg:pt-12 md:pt-10 sm:pt-8 pt-6 lg:px-10 md:px-8 xs:px-6 px-4 text-white rounded-xl shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="lg:text-3xl sm:text-2xl text-xl font-semibold mb-3 sm:mb-4 md:mb-6 text-center">
-          Feedback
-        </h3>
-        <div className="lg:text-lg sm:text-base text-sm font-medium">
-          <p className="mb-4">
-            Have a bug to report, a feature to suggest, or just want to leave
-            feedback?
-          </p>
-          <p className="mb-2">
-            Feel free to create an issue on{' '}
-            <a
-              href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary-300 hover:text-primary-400 underline"
-            >
-              GitHub
-            </a>{' '}
-            or email me at{' '}
-            <a
-              href="mailto:sasha.shysh23@gmail.com"
-              className="text-primary-300 hover:text-primary-400 underline"
-            >
-              sasha.shysh23@gmail.com
-            </a>
-          </p>
-          <p>Thank you!</p>
-        </div>
-        <div className="sm:mt-4 mt-3 lg:text-lg sm:text-base text-sm font-medium text-left sm:pt-4 pt-3 border-t border-solid border-primary-800">
-          <p className="text-center md:text-xl sm:text-lg text-base font-semibold mb-2 md:mb-4">
-            Upcoming features:
-          </p>
-          <ul>
-            {UPCOMING_FEATURES.map((item, index) => (
-              <li key={item}>
-                <p>{`${index + 1}. ${item}`}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <h3 className="lg:text-3xl sm:text-2xl text-xl font-semibold mb-3 sm:mb-4 md:mb-6 text-center">
+        Feedback
+      </h3>
+      <div className="lg:text-lg sm:text-base text-base font-medium">
+        <p className="mb-4">
+          Have a bug to report, a feature to suggest, or just want to leave
+          feedback?
+        </p>
+        <p className="mb-2">
+          Feel free to create an issue on{' '}
+          <a
+            href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary-300 hover:text-primary-400 underline"
+          >
+            GitHub
+          </a>{' '}
+          or email me at{' '}
+          <a
+            href="mailto:sasha.shysh23@gmail.com"
+            className="text-primary-300 hover:text-primary-400 underline"
+          >
+            sasha.shysh23@gmail.com
+          </a>
+        </p>
+        <p>Thank you!</p>
       </div>
-    </div>
+      <div className="sm:mt-4 mt-3 lg:text-lg text-base font-medium text-left sm:pt-4 pt-3 border-t border-solid border-primary-800">
+        <p className="text-center md:text-xl sm:text-lg text-base font-semibold mb-2 md:mb-4">
+          Upcoming features:
+        </p>
+        <ul>
+          {UPCOMING_FEATURES.map((item, index) => (
+            <li key={item}>
+              <p>{`${index + 1}. ${item}`}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Modal>
   );
 };
 
@@ -89,6 +93,7 @@ const FeedbackInfo = ({ className }: { className?: string }) => {
 
   return (
     <>
+      {/* TODO: update styles to remove fixed position */}
       <button
         onClick={() => setShowModal(true)}
         className={`fixed bottom-5 right-5 text-white p-2 focus:outline-none z-50 hover:scale-110 transition-transform duration-300 ${className}`}
@@ -97,7 +102,7 @@ const FeedbackInfo = ({ className }: { className?: string }) => {
       >
         <FeedbackIcon />
       </button>
-      {showModal && <FeedbackModal setShowModal={setShowModal} />}
+      <FeedbackModal showModal={showModal} setShowModal={setShowModal} />
     </>
   );
 };
