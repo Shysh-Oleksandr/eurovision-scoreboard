@@ -16,17 +16,19 @@ const Board = (): JSX.Element => {
     countries,
     isJuryVoting,
     winnerCountry,
-    votingPoints,
     votingCountryIndex,
     shouldShowLastPoints,
+    qualifiedCountries,
     resetLastPoints,
     giveJuryPoints,
+    eventPhase,
+    restartCounter,
   } = useScoreboardStore();
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
-  const { allCountries } = useCountriesStore();
+  const { allCountriesForYear } = useCountriesStore();
 
-  const isVotingOver = !!winnerCountry;
+  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
   const sortedCountries = useMemo(
     () => [...countries].sort((a, b) => b.points - a.points),
@@ -38,12 +40,16 @@ const Board = (): JSX.Element => {
       countries.filter((country) => country.lastReceivedPoints !== null).length,
     [countries],
   );
+  const wasTheFirstPointsAwarded = useMemo(
+    () => countries.some((country) => country.points > 0),
+    [countries],
+  );
 
   const votingCountry = useMemo(() => {
-    if (isJuryVoting) return allCountries[votingCountryIndex] as Country;
+    if (isJuryVoting) return allCountriesForYear[votingCountryIndex] as Country;
 
     return countries[votingCountryIndex] as Country;
-  }, [allCountries, countries, isJuryVoting, votingCountryIndex]);
+  }, [allCountriesForYear, countries, isJuryVoting, votingCountryIndex]);
 
   const hasCountryFinishedVoting = useMemo(
     () => countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS,
@@ -51,10 +57,10 @@ const Board = (): JSX.Element => {
   );
 
   const flipMoveDelay = useMemo(() => {
-    if (votingCountryIndex === 0 && votingPoints === 1) return 0;
+    if (!wasTheFirstPointsAwarded) return 0;
 
     return hasCountryFinishedVoting ? 1000 : 500;
-  }, [hasCountryFinishedVoting, votingCountryIndex, votingPoints]);
+  }, [hasCountryFinishedVoting, wasTheFirstPointsAwarded]);
 
   const handleResetPoints = useCallback(() => {
     if (timerId.current) {
@@ -67,7 +73,7 @@ const Board = (): JSX.Element => {
 
   const onClick = useCallback(
     (countryCode: string) => {
-      if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS) {
+      if (countriesWithPointsLength >= MAX_COUNTRY_WITH_POINTS) {
         handleResetPoints();
       }
 
@@ -85,22 +91,12 @@ const Board = (): JSX.Element => {
       <CountryItem
         key={country.code}
         country={country}
-        isJuryVoting={isJuryVoting}
-        hasCountryFinishedVoting={hasCountryFinishedVoting}
-        isVotingCountry={country.code === votingCountry?.code && isJuryVoting}
-        isActive={country.code === votingCountry?.code && !isJuryVoting}
+        votingCountryCode={votingCountry?.code}
         onClick={onClick}
-        isVotingOver={isVotingOver}
         index={index}
       />
     ),
-    [
-      hasCountryFinishedVoting,
-      votingCountry,
-      isJuryVoting,
-      onClick,
-      isVotingOver,
-    ],
+    [votingCountry?.code, onClick],
   );
 
   useEffect(() => {
@@ -111,10 +107,11 @@ const Board = (): JSX.Element => {
   }, [shouldShowLastPoints]);
 
   return (
-    <div className={`${winnerCountry ? '' : 'md:w-2/3'} w-full h-full`}>
+    <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>
       <BoardHeader onClick={onClick} />
       <div className="container-wrapping-flip-move">
         <FlipMove
+          key={`${eventPhase}-${restartCounter}`}
           duration={500}
           delay={flipMoveDelay}
           appearAnimation={{

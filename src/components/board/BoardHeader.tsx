@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
+import { POINTS_ARRAY } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { Country } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
@@ -17,29 +18,44 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
     votingPoints,
     votingCountryIndex,
     winnerCountry,
+    qualifiedCountries,
     resetLastPoints,
     giveTelevotePoints,
   } = useScoreboardStore();
 
-  const { allCountries, year, getQualifiedCountries, getCountriesLength } =
-    useCountriesStore();
+  const {
+    allCountriesForYear,
+    year,
+    getQualifiedCountries,
+    getCountriesLength,
+  } = useCountriesStore();
+
+  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
   const votingCountry = isJuryVoting
-    ? (allCountries[votingCountryIndex] as Country)
+    ? (allCountriesForYear[votingCountryIndex] as Country)
     : (countries[votingCountryIndex] as Country);
 
-  const votingText = isJuryVoting ? (
-    <>
-      Choose a country to give{' '}
-      <span className="font-medium">{votingPoints}</span> point
-      {votingPoints === 1 ? '' : 's'}
-    </>
-  ) : (
-    <>
-      Enter televote points for{' '}
-      <span className="font-medium">{votingCountry?.name}</span>
-    </>
-  );
+  const votingText = useMemo(() => {
+    if (isVotingOver) return null;
+
+    if (isJuryVoting) {
+      return (
+        <>
+          Choose a country to give{' '}
+          <span className="font-medium">{votingPoints}</span> point
+          {votingPoints === 1 ? '' : 's'}
+        </>
+      );
+    }
+
+    return (
+      <>
+        Enter televote points for{' '}
+        <span className="font-medium">{votingCountry?.name}</span>
+      </>
+    );
+  }, [isVotingOver, isJuryVoting, votingPoints, votingCountry]);
 
   const chooseRandomly = useCallback(() => {
     if (!isJuryVoting) {
@@ -65,16 +81,25 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
       return;
     }
 
-    const countriesWithoutPoints = countries.filter(
+    const initialCountriesWithPointsLength = countries.filter(
+      (country) => country.lastReceivedPoints !== null,
+    ).length;
+
+    const availableCountries = countries.filter(
       (country) =>
-        country.lastReceivedPoints === null &&
-        country.code !== votingCountry?.code,
+        country.code !== votingCountry?.code &&
+        (country.lastReceivedPoints === null ||
+          initialCountriesWithPointsLength >= POINTS_ARRAY.length),
     );
 
+    if (availableCountries.length === 0) {
+      return;
+    }
+
     const randomCountryIndex = Math.floor(
-      Math.random() * countriesWithoutPoints.length,
+      Math.random() * availableCountries.length,
     );
-    const randomCountryCode = countriesWithoutPoints[randomCountryIndex].code;
+    const randomCountryCode = availableCountries[randomCountryIndex].code;
 
     onClick(randomCountryCode);
   }, [
@@ -100,7 +125,7 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
           votingText
         )}
       </h3>
-      {!winnerCountry && (
+      {!isVotingOver && (
         <Button label="Choose randomly" onClick={chooseRandomly} />
       )}
     </div>

@@ -8,7 +8,7 @@ export const App = () => {
   return (
     <>
       <Main />
-      <Analytics />
+      {!window.location.hostname.includes('localhost') && <Analytics />}
     </>
   );
 };

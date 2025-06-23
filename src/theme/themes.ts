@@ -8,7 +8,8 @@ export const themes = {
     colors: {
       primary: {
         700: '#314fdb',
-        800: '#1940be',
+        750: '#1c47d2',
+        800: '#173aad',
         900: '#0c0e89',
         950: '#02035e',
       },
@@ -47,6 +48,7 @@ export const themes = {
     colors: {
       primary: {
         700: '#8622e4',
+        750: '#621fae',
         800: '#4e2c7c',
         900: '#37185f',
         950: '#27064e',
@@ -86,6 +88,7 @@ export const themes = {
     colors: {
       primary: {
         700: '#9f47f2',
+        750: '#6720b9',
         800: '#551a97',
         900: '#3f1371',
         950: '#320d4e',

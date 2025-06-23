@@ -2,7 +2,39 @@ export type BaseCountry = {
   name: string;
   code: string;
   flag: string;
-  isQualified: boolean;
+  isQualified?: boolean;
+  semiFinalGroup?: SemiFinalGroup;
+  countryAssignmentGroup?: CountryAssignmentGroup;
+  isAutoQualified?: boolean;
+  isSelected?: boolean;
+  isQualifiedFromSemi?: boolean;
+};
+
+export type SemiFinalGroup = 'SF1' | 'SF2';
+
+export enum CountryAssignmentGroup {
+  SF1 = 'SF1',
+  SF2 = 'SF2',
+  AUTO_QUALIFIER = 'AUTO_QUALIFIER',
+  NOT_PARTICIPATING = 'NOT_PARTICIPATING',
+  GRAND_FINAL = 'GRAND_FINAL',
+  NOT_QUALIFIED = 'NOT_QUALIFIED',
+}
+
+export enum EventMode {
+  SEMI_FINALS_AND_GRAND_FINAL = 'SEMI_FINALS_AND_GRAND_FINAL',
+  GRAND_FINAL_ONLY = 'GRAND_FINAL_ONLY',
+}
+export enum EventPhase {
+  COUNTRY_SELECTION = 'COUNTRY_SELECTION',
+  SEMI_FINAL_1 = 'SEMI_FINAL_1',
+  SEMI_FINAL_2 = 'SEMI_FINAL_2',
+  GRAND_FINAL = 'GRAND_FINAL',
+}
+
+export type SemiFinalQualifiersAmount = {
+  SF1: number;
+  SF2: number;
 };
 
 export type Country = BaseCountry & {
