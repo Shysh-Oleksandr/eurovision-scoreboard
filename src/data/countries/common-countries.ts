@@ -32,15 +32,15 @@ export const COMMON_COUNTRIES = {
     code: 'AZ',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca1622ffbe99280f2d2_az.svg',
   },
-  Belgium: {
-    name: 'Belgium',
-    code: 'BE',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca15aa291bbcca0a86b_be.svg',
-  },
   Belarus: {
     name: 'Belarus',
     code: 'BY',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1f35dfe3396b5dd9880e_by.svg',
+  },
+  Belgium: {
+    name: 'Belgium',
+    code: 'BE',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca15aa291bbcca0a86b_be.svg',
   },
   BosniaHerzegovina: {
     name: 'Bosnia & Herzegovina',
@@ -127,10 +127,25 @@ export const COMMON_COUNTRIES = {
     code: 'IT',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a8e02b1117419105ba_it.svg',
   },
+  Kazakhstan: {
+    name: 'Kazakhstan',
+    code: 'KZ',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25aa87cddf5e21578de7_kz.svg',
+  },
+  Kosovo: {
+    name: 'Kosovo',
+    code: 'XK',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438e6a687f79f794a8b9_xk.svg',
+  },
   Latvia: {
     name: 'Latvia',
     code: 'LV',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4378f0869fbe66a78b9b_lv.svg',
+  },
+  Liechtenstein: {
+    name: 'Liechtenstein',
+    code: 'LI',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25aaa1598bdc7bc761c9_li.svg',
   },
   Lithuania: {
     name: 'Lithuania',
@@ -251,6 +266,11 @@ export const COMMON_COUNTRIES = {
     name: 'United Kingdom',
     code: 'GB',
     flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a3d774008a7088f805_gb.svg',
+  },
+  VaticanCity: {
+    name: 'Vatican City',
+    code: 'VA',
+    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438b2885860177ac1ec8_va.svg',
   },
 };
 
