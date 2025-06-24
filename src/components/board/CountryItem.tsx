@@ -27,6 +27,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       winnerCountry,
       qualifiedCountries,
       eventPhase,
+      showAllParticipants,
     } = useScoreboardStore();
 
     const [juryLastPointsBg, televoteLastPointsBg, televotePointsBg, pointsBg] =
@@ -65,6 +66,15 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
     const isNonQualifiedInSemiFinal =
       isVotingOver && isSemiFinalPhase && !isQualified;
 
+    const isNonQualifiedInAllParticipantsMode =
+      showAllParticipants &&
+      winnerCountry &&
+      !country.isQualifiedFromSemi &&
+      !country.isAutoQualified;
+
+    const shouldShowAsNonQualified =
+      isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode;
+
     const {
       springsContainer,
       springsText,
@@ -74,14 +84,15 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       springsActive,
       springsPlaceContainer,
       springsPlaceText,
-    } = useAnimatePoints(
-      country.lastReceivedPoints !== null && !isVotingFinished,
+    } = useAnimatePoints({
+      shouldShowLastPoints:
+        country.lastReceivedPoints !== null && !isVotingFinished,
       isDouzePoints,
       isActive,
       isJuryVoting,
-      !!country.isVotingFinished,
-      showPlaceAnimation,
-    );
+      isCountryVotingFinished: !!country.isVotingFinished,
+      isVotingOver,
+    });
 
     const isVoted = useMemo(
       () => country.lastReceivedPoints !== null || country.isVotingFinished,
@@ -105,8 +116,10 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         } ${isActive ? 'rounded-sm' : ''} ${
           showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''
         } ${
-          isNonQualifiedInSemiFinal
-            ? '!bg-primary-900 opacity-70'
+          shouldShowAsNonQualified
+            ? `!bg-primary-900 opacity-70 ${
+                showPlaceAnimation ? '!opacity-70' : ''
+              }`
             : 'bg-countryItem-bg'
         } 
         ${isVotingCountry ? 'opacity-70' : ''}
@@ -115,7 +128,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         isDisabled,
         isActive,
         showPlaceAnimation,
-        isNonQualifiedInSemiFinal,
+        shouldShowAsNonQualified,
         isVotingCountry,
       ],
     );
@@ -123,7 +136,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
     const placeText = index + 1 < 10 ? `0${index + 1}` : index + 1;
 
     useEffect(() => {
-      if (isVotingOver) {
+      if (isVotingOver || showAllParticipants) {
         const timer = setTimeout(() => {
           setShowPlaceAnimation(true);
         }, 3050);
@@ -131,15 +144,15 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         return () => clearTimeout(timer);
       }
       setShowPlaceAnimation(false);
-    }, [isVotingOver]);
+    }, [isVotingOver, showAllParticipants]);
 
     return (
       <div className="flex relative">
         {showPlaceAnimation && (
           <animated.div
             style={springsPlaceContainer}
-            className={`flex items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText ${
-              isNonQualifiedInSemiFinal ? 'bg-primary-900 opacity-70' : ''
+            className={`flex flex-none items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText ${
+              shouldShowAsNonQualified ? 'bg-primary-900 opacity-70' : ''
             }`}
           >
             <animated.h4
@@ -177,7 +190,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
                 country.name.length > 10 && !isVotingOver
                   ? 'md:text-xs'
                   : 'md:text-sm'
-              } md:leading-4 xs:break-normal break-all`}
+              } md:!leading-5 xs:break-normal break-all`}
             >
               {country.name}
             </h4>
@@ -218,7 +231,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
               <h6
                 className={`lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center text-countryItem-televotePointsText`}
               >
-                {country.points}
+                {country.points === -1 ? 'NQ' : country.points}
               </h6>
             </div>
           </div>

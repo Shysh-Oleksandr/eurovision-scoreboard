@@ -30,6 +30,8 @@ interface ScoreboardState {
   qualifiedCountries: Country[];
   semiFinalQualifiers: SemiFinalQualifiersAmount;
   restartCounter: number;
+  showAllParticipants: boolean;
+  isFinalAnimationFinished: boolean;
 
   // Actions
   giveJuryPoints: (countryCode: string) => void;
@@ -44,6 +46,8 @@ interface ScoreboardState {
   setSemiFinalQualifiers: (
     semiFinalQualifiers: SemiFinalQualifiersAmount,
   ) => void;
+  toggleShowAllParticipants: () => void;
+  setFinalAnimationFinished: (isFinished: boolean) => void;
 }
 
 const shouldResetLastPoints = (countriesWithPoints: CountryWithPoints[]) =>
@@ -89,6 +93,8 @@ export const useScoreboardStore = create<ScoreboardState>()(
       qualifiedCountries: [],
       semiFinalQualifiers: { SF1: 10, SF2: 10 },
       restartCounter: 0,
+      showAllParticipants: false,
+      isFinalAnimationFinished: false,
 
       // Actions
       giveJuryPoints: (countryCode: string) => {
@@ -348,6 +354,8 @@ export const useScoreboardStore = create<ScoreboardState>()(
           showQualificationResults: false,
           qualifiedCountries: [],
           restartCounter: get().restartCounter + 1,
+          showAllParticipants: false,
+          isFinalAnimationFinished: false,
         });
       },
 
@@ -358,6 +366,27 @@ export const useScoreboardStore = create<ScoreboardState>()(
       continueToNextPhase: () => {
         const state = get();
         const countriesStore = useCountriesStore.getState();
+
+        // Save semi-final results before moving to next phase
+        if (
+          state.eventPhase === EventPhase.SEMI_FINAL_1 ||
+          state.eventPhase === EventPhase.SEMI_FINAL_2
+        ) {
+          const currentSemiFinalResults = countriesStore.semiFinalResults;
+          const newSemiFinalResults: Record<string, number> = {};
+
+          state.countries.forEach((country) => {
+            newSemiFinalResults[country.code] = country.points;
+          });
+
+          // Merge with existing results
+          const mergedResults = {
+            ...currentSemiFinalResults,
+            ...newSemiFinalResults,
+          };
+
+          countriesStore.setSemiFinalResults(mergedResults);
+        }
 
         let nextPhase: EventPhase;
         let initialCountries: Country[];
@@ -409,12 +438,26 @@ export const useScoreboardStore = create<ScoreboardState>()(
           winnerCountry: null,
           showQualificationResults: false,
           qualifiedCountries: [],
+          showAllParticipants: false,
+          isFinalAnimationFinished: false,
         });
       },
 
       closeQualificationResults: () => {
         set({
           showQualificationResults: false,
+        });
+      },
+
+      toggleShowAllParticipants: () => {
+        set((state) => ({
+          showAllParticipants: !state.showAllParticipants,
+        }));
+      },
+
+      setFinalAnimationFinished: (isFinished: boolean) => {
+        set({
+          isFinalAnimationFinished: isFinished,
         });
       },
     }),

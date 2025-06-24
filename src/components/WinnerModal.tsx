@@ -22,25 +22,30 @@ const WinnerModal = () => {
   return (
     <Modal
       isOpen={showModal}
+      openDelay={3400}
       onClose={() => setShowModal(false)}
-      containerClassName="lg:w-2/5 md:w-1/2 w-3/4"
-      contentClassName="lg:py-16 md:py-12 sm:py-8 py-6 lg:px-10 md:px-8 px-4 text-white text-center"
+      containerClassName="lg:!w-2/5 md:!w-1/2 xs:!w-3/4 w-full"
+      contentClassName="md:pt-12 sm:pt-8 pt-6 lg:px-10 md:px-8 px-4 sm:!pb-8 !pb-4 text-white text-center"
+      bottomContent={
+        <div className="flex w-full xs:gap-4 gap-2 bg-primary-900 sm:p-4 p-2 z-30">
+          <Button
+            label="Start over"
+            onClick={() => {
+              setShowModal(false);
+              setEventSetupModalOpen(true);
+            }}
+            className="w-full"
+          />
+        </div>
+      }
     >
       <h3 className="lg:text-3xl sm:text-2xl text-xl font-semibold mb-4">
         We have a winner!
       </h3>
-      <h4 className="lg:text-2xl sm:text-xl text-base font-medium mb-4">
+      <h4 className="lg:text-2xl sm:text-xl text-base font-medium">
         <span className="font-bold">{winnerCountry.name}</span> won with{' '}
         <span className="font-bold">{winnerCountry.points}</span> points!
       </h4>
-      <Button
-        label="Start over"
-        onClick={() => {
-          setShowModal(false);
-          setEventSetupModalOpen(true);
-        }}
-        className={`py-3 sm:text-base text-xs sm:w-auto sm:!px-12 w-full`}
-      />
     </Modal>
   );
 };

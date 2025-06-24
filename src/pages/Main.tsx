@@ -7,20 +7,33 @@ import QualificationResultsModal from '../components/QualificationResultsModal';
 import EventSetupModal from '../components/setup/EventSetupModal';
 import WinnerModal from '../components/WinnerModal';
 import { useNextEventName } from '../hooks/useNextEventName';
-import { EventPhase } from '../models';
+import { EventMode, EventPhase } from '../models';
 import { useCountriesStore } from '../state/countriesStore';
 import { useScoreboardStore } from '../state/scoreboardStore';
 
 export const Main = () => {
   const { year, theme, themeInfo } = useCountriesStore();
-  const { eventPhase, continueToNextPhase, qualifiedCountries } =
-    useScoreboardStore();
+  const {
+    eventPhase,
+    eventMode,
+    continueToNextPhase,
+    qualifiedCountries,
+    winnerCountry,
+    showAllParticipants,
+    toggleShowAllParticipants,
+  } = useScoreboardStore();
 
   const { eventSetupModalOpen, setEventSetupModalOpen } = useCountriesStore();
 
   const { nextPhase, hasOneSemiFinal } = useNextEventName();
 
   const isVotingOver = qualifiedCountries.length > 0;
+  const hasWinner = !!winnerCountry;
+
+  const canShowAllParticipants =
+    eventPhase === EventPhase.GRAND_FINAL &&
+    hasWinner &&
+    eventMode === EventMode.SEMI_FINALS_AND_GRAND_FINAL;
 
   // Apply initial theme class on mount
   useEffect(() => {
@@ -82,6 +95,13 @@ export const Main = () => {
                   className="animated-border"
                 >
                   Continue to {nextPhase}
+                </Button>
+              )}
+              {canShowAllParticipants && (
+                <Button onClick={toggleShowAllParticipants} className="ml-2">
+                  {showAllParticipants
+                    ? 'Show grand finalists only'
+                    : 'Show all participants'}
                 </Button>
               )}
             </div>

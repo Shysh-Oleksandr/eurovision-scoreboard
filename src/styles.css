@@ -150,6 +150,12 @@ h6 {
   }
 }
 
+@media (min-width: 1440px) {
+  .container-wrapping-flip-move.show-all-participants > div {
+    columns: 3;
+  }
+}
+
 @media (min-width: 576px) {
   .container-wrapping-flip-move > div {
     columns: 2;

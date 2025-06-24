@@ -19,6 +19,7 @@ interface CountriesState {
   year: Year;
   theme: Theme;
   themeInfo: ThemeInfo;
+  semiFinalResults: Record<string, number>;
 
   // Actions
   setYear: (year: Year) => void;
@@ -46,6 +47,8 @@ interface CountriesState {
     countryCodes: string[],
     semiFinalGroup: SemiFinalGroup,
   ) => void;
+  setSemiFinalResults: (results: Record<string, number>) => void;
+  getSemiFinalPoints: (countryCode: string) => number;
 }
 
 export const useCountriesStore = create<CountriesState>()(
@@ -58,6 +61,7 @@ export const useCountriesStore = create<CountriesState>()(
       year: INITIAL_YEAR,
       theme: getThemeForYear(INITIAL_YEAR),
       themeInfo: themesInfo[INITIAL_YEAR],
+      semiFinalResults: {},
 
       // Actions
       setYear: (year: Year) => {
@@ -188,6 +192,16 @@ export const useCountriesStore = create<CountriesState>()(
         set({
           selectedCountries: updatedCountries,
         });
+      },
+
+      setSemiFinalResults: (results: Record<string, number>) => {
+        set({
+          semiFinalResults: results,
+        });
+      },
+
+      getSemiFinalPoints: (countryCode: string) => {
+        return get().semiFinalResults[countryCode] || 0;
       },
     }),
     { name: 'countries-store' },

@@ -21,17 +21,73 @@ const Board = (): JSX.Element => {
     giveJuryPoints,
     eventPhase,
     restartCounter,
+    showAllParticipants,
   } = useScoreboardStore();
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
-  const { getVotingCountry } = useCountriesStore();
+  const { getVotingCountry, selectedCountries, getSemiFinalPoints } =
+    useCountriesStore();
 
   const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
-  const sortedCountries = useMemo(
-    () => [...countries].sort((a, b) => b.points - a.points),
-    [countries],
-  );
+  // Get all countries to display when showAllParticipants is true
+  // TODO: move outside
+  const allCountriesToDisplay = useMemo(() => {
+    if (!showAllParticipants || !winnerCountry) {
+      return countries;
+    }
+
+    const allEventParticipants = selectedCountries.map((country) => {
+      // Find if this country already has points from the current voting
+      const existingCountry = countries.find((c) => c.code === country.code);
+
+      return {
+        ...country,
+        points: existingCountry?.points ?? -1,
+        lastReceivedPoints: existingCountry?.lastReceivedPoints ?? 0,
+        isVotingFinished: existingCountry?.isVotingFinished ?? true,
+      };
+    });
+
+    return allEventParticipants;
+  }, [countries, showAllParticipants, winnerCountry, selectedCountries]);
+
+  const sortedCountries = useMemo(() => {
+    const countriesToSort = [...allCountriesToDisplay];
+
+    if (showAllParticipants && winnerCountry) {
+      // When showing all participants, sort grand-finalists by grand final points
+      // and non-qualifiers by their semi-final points
+      return countriesToSort.sort((a, b) => {
+        // If both countries have grand final points, sort by grand final points
+        if (a.points >= 0 && b.points >= 0) {
+          return b.points - a.points;
+        }
+
+        // If one has grand final points and the other doesn't, grand finalist comes first
+        if (a.points >= 0 && b.points === -1) {
+          return -1;
+        }
+        if (a.points === -1 && b.points >= 0) {
+          return 1;
+        }
+
+        // If both are non-qualifiers, sort by semi-final points
+        const aSemiPoints = getSemiFinalPoints(a.code);
+        const bSemiPoints = getSemiFinalPoints(b.code);
+
+        return bSemiPoints - aSemiPoints;
+      });
+    }
+
+    // Default sorting by points
+    return countriesToSort.sort((a, b) => b.points - a.points);
+  }, [
+    allCountriesToDisplay,
+    showAllParticipants,
+    winnerCountry,
+    getSemiFinalPoints,
+  ]);
 
   const countriesWithPointsLength = useMemo(
     () =>
@@ -102,9 +158,13 @@ const Board = (): JSX.Element => {
   return (
     <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>
       <BoardHeader onClick={onClick} />
-      <div className="container-wrapping-flip-move">
+      <div
+        className={`container-wrapping-flip-move ${
+          showAllParticipants ? 'show-all-participants' : ''
+        }`}
+      >
         <FlipMove
-          key={`${eventPhase}-${restartCounter}`}
+          key={`${eventPhase}-${restartCounter}-${showAllParticipants}`}
           duration={500}
           delay={flipMoveDelay}
           appearAnimation={{

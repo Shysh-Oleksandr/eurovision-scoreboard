@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { SpringValue, easings, useSpring } from '@react-spring/web';
 
+import { useScoreboardStore } from '../state/scoreboardStore';
 import { useThemeColor } from '../theme/useThemeColor';
 
 type ReturnType = {
@@ -36,14 +37,23 @@ type ReturnType = {
   };
 };
 
-const useAnimatePoints = (
-  shouldShowLastPoints: boolean,
-  isDouzePoints: boolean,
-  isActive: boolean,
-  isJuryVoting: boolean,
-  isCountryVotingFinished: boolean,
-  isVotingOver: boolean,
-): ReturnType => {
+const useAnimatePoints = ({
+  shouldShowLastPoints,
+  isDouzePoints,
+  isActive,
+  isJuryVoting,
+  isCountryVotingFinished,
+  isVotingOver,
+}: {
+  shouldShowLastPoints: boolean;
+  isDouzePoints: boolean;
+  isActive: boolean;
+  isJuryVoting: boolean;
+  isCountryVotingFinished: boolean;
+  isVotingOver: boolean;
+}): ReturnType => {
+  const { isFinalAnimationFinished, setFinalAnimationFinished, winnerCountry } =
+    useScoreboardStore((state) => state);
   const [
     DEFAULT_BG_COLOR,
     UNFINISHED_TELEVOTE_TEXT_COLOR,
@@ -172,7 +182,13 @@ const useAnimatePoints = (
         },
         config: { duration: 400 },
       });
-    } else {
+    } else if (!isFinalAnimationFinished) {
+      if (winnerCountry) {
+        setTimeout(() => {
+          setFinalAnimationFinished(true);
+        }, 1000);
+      }
+
       apiContainer.start({
         from: {
           x: 0,
@@ -197,7 +213,7 @@ const useAnimatePoints = (
     if (isVotingOver) {
       apiPlaceContainer.start({
         from: { width: 0 },
-        to: { width: 40 }, // 40px = w-10 (2.5rem)
+        to: { width: window.innerWidth > 576 ? 40 : 32 }, // 40px = w-10 (2.5rem)
         config: { duration: 300, easing: easings.easeInOutCubic },
       });
 
@@ -219,6 +235,8 @@ const useAnimatePoints = (
         config: { duration: 300, easing: easings.easeInOutCubic },
       });
     }
+    // Deliberately not including winnerCountry and isFinalAnimationFinished in the dependency array to avoid animation issues
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     apiContainer,
     apiDouzeContainer,
@@ -231,6 +249,7 @@ const useAnimatePoints = (
     shouldShowLastPoints,
     isVotingOver,
     parallelogramsAnimation,
+    setFinalAnimationFinished,
   ]);
 
   useEffect(() => {
