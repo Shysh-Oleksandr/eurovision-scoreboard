@@ -25,7 +25,8 @@ interface CountriesState {
   setEventSetupModalOpen: (open: boolean) => void;
   getQualifiedCountries: () => BaseCountry[];
   getVotingCountries: () => BaseCountry[];
-  getCountriesLength: () => number;
+  getVotingCountry: () => BaseCountry;
+  getVotingCountriesLength: () => number;
   getInitialCountries: () => {
     name: string;
     code: string;
@@ -113,7 +114,18 @@ export const useCountriesStore = create<CountriesState>()(
         return allCountriesForYear;
       },
 
-      getCountriesLength: () => {
+      getVotingCountry: () => {
+        const { getVotingCountries } = get();
+
+        const { votingCountryIndex, isJuryVoting, countries } =
+          require('./scoreboardStore').useScoreboardStore.getState();
+
+        return isJuryVoting
+          ? getVotingCountries()[votingCountryIndex]
+          : countries[votingCountryIndex];
+      },
+
+      getVotingCountriesLength: () => {
         return get().getVotingCountries().length;
       },
 

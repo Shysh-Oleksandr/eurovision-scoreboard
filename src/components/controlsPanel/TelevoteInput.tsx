@@ -1,28 +1,23 @@
 import React, { ChangeEvent, useState } from 'react';
 
 // import { getMaxPossibleTelevotePoints } from '../../data/data';
-// import { useCountriesStore } from '../../state/countriesStore';
+import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
 
 const NUMBER_REGEX = /^\d*$/;
 
 type Props = {
-  votingCountryIndex: number;
   isFirstTelevoteCountry: boolean;
 };
 
-const TelevoteInput = ({
-  votingCountryIndex,
-  isFirstTelevoteCountry,
-}: Props) => {
-  const { countries, resetLastPoints, giveTelevotePoints } =
-    useScoreboardStore();
-  // const { getCountriesLength } = useCountriesStore();
+const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
+  const { resetLastPoints, giveTelevotePoints } = useScoreboardStore();
+  const { getVotingCountry } = useCountriesStore();
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
-  const votingCountryCode = countries[votingCountryIndex]?.code || '';
+  const votingCountryCode = getVotingCountry().code;
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -46,7 +41,7 @@ const TelevoteInput = ({
 
     // Commented out for now, but in future we should add a setting to enable this check
     // const maxPossibleTelevotePoints = getMaxPossibleTelevotePoints(
-    //   getCountriesLength(),
+    //   getVotingCountriesLength(),
     // );
 
     // if (votingPoints > maxPossibleTelevotePoints) {

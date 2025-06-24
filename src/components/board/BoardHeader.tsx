@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react';
 
 import { POINTS_ARRAY } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
-import { Country } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
@@ -16,7 +15,6 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
     countries,
     isJuryVoting,
     votingPoints,
-    votingCountryIndex,
     winnerCountry,
     qualifiedCountries,
     resetLastPoints,
@@ -24,17 +22,15 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
   } = useScoreboardStore();
 
   const {
-    allCountriesForYear,
     year,
     getQualifiedCountries,
-    getCountriesLength,
+    getVotingCountriesLength,
+    getVotingCountry,
   } = useCountriesStore();
 
   const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
-  const votingCountry = isJuryVoting
-    ? (allCountriesForYear[votingCountryIndex] as Country)
-    : (countries[votingCountryIndex] as Country);
+  const votingCountry = getVotingCountry();
 
   const votingText = useMemo(() => {
     if (isVotingOver) return null;
@@ -73,7 +69,7 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
       const randomVotingPoints = getRandomTelevotePoints(
         votingCountryPlace,
         getQualifiedCountries().length,
-        getCountriesLength(),
+        getVotingCountriesLength(),
       );
 
       giveTelevotePoints(votingCountry?.code, randomVotingPoints);
@@ -110,7 +106,7 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
     giveTelevotePoints,
     onClick,
     getQualifiedCountries,
-    getCountriesLength,
+    getVotingCountriesLength,
   ]);
 
   return (

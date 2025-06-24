@@ -104,7 +104,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
         const nextVotingCountryIndex =
           state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
         const isJuryVotingOver =
-          nextVotingCountryIndex === countriesStore.getCountriesLength();
+          nextVotingCountryIndex === countriesStore.getVotingCountriesLength();
 
         set({
           votingPoints: getNextVotingPoints(state.votingPoints),

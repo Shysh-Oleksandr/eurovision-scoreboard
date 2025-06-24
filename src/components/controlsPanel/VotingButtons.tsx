@@ -20,9 +20,10 @@ const VotingButtons = () => {
     resetLastPoints,
     giveTelevotePoints,
   } = useScoreboardStore();
-  const { getQualifiedCountries, getCountriesLength } = useCountriesStore();
+  const { getQualifiedCountries, getVotingCountriesLength } =
+    useCountriesStore();
 
-  const countriesLeft = getCountriesLength() - votingCountryIndex;
+  const countriesLeft = getVotingCountriesLength() - votingCountryIndex;
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
 
@@ -76,7 +77,7 @@ const VotingButtons = () => {
         const randomVotingPoints = getRandomTelevotePoints(
           votingCountryPlace,
           getQualifiedCountries().length,
-          getCountriesLength(),
+          getVotingCountriesLength(),
         );
 
         giveTelevotePoints(votingCountry.code, randomVotingPoints);
@@ -90,7 +91,7 @@ const VotingButtons = () => {
     resetLastPoints,
     giveTelevotePoints,
     getQualifiedCountries,
-    getCountriesLength,
+    getVotingCountriesLength,
   ]);
 
   useEffect(() => {
@@ -107,10 +108,7 @@ const VotingButtons = () => {
           <Button label="Vote randomly" onClick={voteRandomly} />
         </div>
       ) : (
-        <TelevoteInput
-          votingCountryIndex={votingCountryIndex}
-          isFirstTelevoteCountry={isFirstTelevoteCountry}
-        />
+        <TelevoteInput isFirstTelevoteCountry={isFirstTelevoteCountry} />
       )}
 
       <div className="w-full bg-slate-600 h-[1px] lg:my-4 my-3"></div>

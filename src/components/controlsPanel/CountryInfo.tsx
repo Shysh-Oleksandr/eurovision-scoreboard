@@ -8,10 +8,10 @@ type Props = { votingCountryIndex: number };
 const CountryInfo = ({ votingCountryIndex }: Props) => {
   const [shouldBlink, setShouldBlink] = useState(false);
 
-  const { getVotingCountries } = useCountriesStore();
+  const { getVotingCountry, getVotingCountriesLength } = useCountriesStore();
 
-  const votingCountries = getVotingCountries();
-  const votingCountryData = votingCountries[votingCountryIndex];
+  const votingCountry = getVotingCountry();
+  const votingCountriesLength = getVotingCountriesLength();
 
   useEffect(() => {
     if (votingCountryIndex === 0) return;
@@ -30,13 +30,13 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
           shouldBlink ? 'blinker' : ''
         }`}
       >
-        {votingCountryData?.name || ''}
+        {votingCountry?.name || ''}
       </h4>
       <h5 className="uppercase text-slate-400 lg:text-sm text-xs lg:mt-4 mt-2">
         <span className="font-medium">
           {getSequenceNumber(votingCountryIndex + 1)}
         </span>{' '}
-        of <span className="font-medium">{votingCountries.length}</span>{' '}
+        of <span className="font-medium">{votingCountriesLength}</span>{' '}
         countries
       </h5>
     </div>

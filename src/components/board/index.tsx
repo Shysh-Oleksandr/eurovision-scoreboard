@@ -14,9 +14,7 @@ const MAX_COUNTRY_WITH_POINTS = POINTS_ARRAY.length;
 const Board = (): JSX.Element => {
   const {
     countries,
-    isJuryVoting,
     winnerCountry,
-    votingCountryIndex,
     shouldShowLastPoints,
     qualifiedCountries,
     resetLastPoints,
@@ -26,7 +24,7 @@ const Board = (): JSX.Element => {
   } = useScoreboardStore();
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
-  const { allCountriesForYear } = useCountriesStore();
+  const { getVotingCountry } = useCountriesStore();
 
   const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
@@ -45,12 +43,7 @@ const Board = (): JSX.Element => {
     [countries],
   );
 
-  const votingCountry = useMemo(() => {
-    if (isJuryVoting) return allCountriesForYear[votingCountryIndex] as Country;
-
-    return countries[votingCountryIndex] as Country;
-  }, [allCountriesForYear, countries, isJuryVoting, votingCountryIndex]);
-
+  const votingCountry = getVotingCountry();
   const hasCountryFinishedVoting = useMemo(
     () => countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS,
     [countriesWithPointsLength],
