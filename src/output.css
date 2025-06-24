@@ -1095,11 +1095,6 @@ video {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
 
-.\!bg-countryItem-televotePointsBg {
-  --tw-bg-opacity: 1 !important;
-  background-color: hsl(var(--twc-countryItem-televotePointsBg) / var(--twc-countryItem-televotePointsBg-opacity, var(--tw-bg-opacity))) !important;
-}
-
 .bg-opacity-60 {
   --tw-bg-opacity: 0.6;
 }
@@ -2223,6 +2218,11 @@ video {
   }
 }
 
+.select::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
 ::-webkit-scrollbar-track {
   background: hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, 1));
 }
@@ -2419,8 +2419,6 @@ h6 {
   }
 }
 
-/* TODO: Use theme colors */
-
 /* <select> styles */
 
 .select {
@@ -2436,10 +2434,10 @@ h6 {
       no-repeat right 0.8em center / 1.4em,
     linear-gradient(
       to left,
-      rgba(255, 255, 255, 0.3) 3em,
-      rgba(255, 255, 255, 0.2) 3em
+      hsl(var(--twc-primary-800) / var(--twc-primary-800-opacity, 1)) 3em,
+      hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, 1)) 3em
     );
-  color: white;
+  color: #fff;
   border-radius: 0.25em;
   box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
@@ -2451,10 +2449,10 @@ h6 {
   &:focus {
     outline: none;
   }
-  /* <option> colors */
+  /* <option> colors - Fixed for Windows compatibility */
   option {
-    color: inherit;
-    background-color: white;
+    color: #fff !important;
+    background-color: hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, 1)) !important;
   }
 }
 

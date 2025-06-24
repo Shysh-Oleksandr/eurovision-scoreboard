@@ -61,7 +61,8 @@ export const CountrySelectionListItem: React.FC<
           <select
             value={countryGroupAssignment}
             onChange={handleAssignmentChange}
-            className="absolute inset-0 opacity-0 cursor-pointer"
+            className="select absolute inset-0 opacity-0 cursor-pointer"
+            id={`country-assignment-${country.code}`}
           >
             {availableGroups.map((group) => (
               <option key={group} value={group}>

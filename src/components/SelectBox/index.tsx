@@ -5,6 +5,7 @@ type SelectBoxProps = {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   className?: string;
+  id?: string;
 };
 
 /**
@@ -20,9 +21,11 @@ const SelectBox: React.FC<SelectBoxProps> = ({
   value,
   onChange,
   className,
+  id,
 }) => {
   return (
     <select
+      id={id}
       value={value}
       onChange={onChange}
       className={`select lg:text-base md:text-sm text-xs lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] w-[120px] ${className}`}

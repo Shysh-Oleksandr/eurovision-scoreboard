@@ -181,6 +181,11 @@ h6 {
     }
   }
 
+  .select::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
   ::-webkit-scrollbar-track {
     background: theme('colors.primary-900');
   }
@@ -195,7 +200,6 @@ h6 {
   }
 }
 
-/* TODO: Use theme colors */
 /* <select> styles */
 .select {
   /* Reset */
@@ -208,13 +212,14 @@ h6 {
       no-repeat right 0.8em center / 1.4em,
     linear-gradient(
       to left,
-      rgba(255, 255, 255, 0.3) 3em,
-      rgba(255, 255, 255, 0.2) 3em
+      theme('colors.primary-800') 3em,
+      theme('colors.primary-900') 3em
     );
-  color: white;
+  color: #fff;
   border-radius: 0.25em;
   box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
+  
   /* Remove IE arrow */
   &::-ms-expand {
     display: none;
@@ -223,10 +228,10 @@ h6 {
   &:focus {
     outline: none;
   }
-  /* <option> colors */
+  /* <option> colors - Fixed for Windows compatibility */
   option {
-    color: inherit;
-    background-color: white;
+    color: #fff !important;
+    background-color: theme('colors.primary-900') !important;
   }
 }
 

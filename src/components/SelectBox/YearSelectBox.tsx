@@ -45,7 +45,12 @@ export const YearSelectBox: React.FC = () => {
           alt="Hosting country logo"
           className="w-10 h-10"
         />
-        <SelectBox options={options} value={year} onChange={handleYearChange} />
+        <SelectBox
+          options={options}
+          value={year}
+          onChange={handleYearChange}
+          id="year-select-box"
+        />
       </div>
       <FeedbackInfo className="md:hiddfen block relative bottom-auto !right-0" />
     </div>
