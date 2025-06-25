@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useState, useEffect } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 
 import { animated } from '@react-spring/web';
 
@@ -9,6 +9,7 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import { useThemeColor } from '../../theme/useThemeColor';
 import RoundedTriangle from '../RoundedTriangle';
 
+import CountryPlaceNumber from './CountryPlaceNumber';
 import DouzePointsAnimation from './DouzePointsAnimation';
 import { useDouzePointsAnimation, useVotingFinished } from './hooks';
 
@@ -17,10 +18,21 @@ type Props = {
   index: number;
   votingCountryCode?: string;
   onClick: (countryCode: string) => void;
+  showPlaceAnimation: boolean;
 };
 
 const CountryItem = forwardRef<HTMLButtonElement, Props>(
-  ({ country, index, votingCountryCode, onClick }, ref) => {
+  (
+    {
+      country,
+      index,
+      votingCountryCode,
+      onClick,
+      showPlaceAnimation,
+      ...props
+    },
+    ref,
+  ) => {
     const {
       countries,
       isJuryVoting,
@@ -39,9 +51,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       ]);
     const isVotingFinished = useVotingFinished(!!country.isVotingFinished);
     const isDouzePoints = country.lastReceivedPoints === 12;
-    const showDouzePointsAnimation = useDouzePointsAnimation(isDouzePoints);
-
-    const [showPlaceAnimation, setShowPlaceAnimation] = useState(false);
+    const showDouzePointsAnimationHook = useDouzePointsAnimation(isDouzePoints);
 
     const isVotingCountry = country.code === votingCountryCode && isJuryVoting;
     const isActive = country.code === votingCountryCode && !isJuryVoting;
@@ -72,8 +82,9 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       !country.isQualifiedFromSemi &&
       !country.isAutoQualified;
 
-    const shouldShowAsNonQualified =
-      isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode;
+    const shouldShowAsNonQualified = Boolean(
+      isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode,
+    );
 
     const {
       springsContainer,
@@ -82,8 +93,6 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       springsDouzeParallelogramYellow,
       springsDouzeContainer,
       springsActive,
-      springsPlaceContainer,
-      springsPlaceText,
     } = useAnimatePoints({
       shouldShowLastPoints:
         country.lastReceivedPoints !== null && !isVotingFinished,
@@ -133,36 +142,13 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       ],
     );
 
-    const placeText = index + 1 < 10 ? `0${index + 1}` : index + 1;
-
-    useEffect(() => {
-      if (isVotingOver || showAllParticipants) {
-        const timer = setTimeout(() => {
-          setShowPlaceAnimation(true);
-        }, 3050);
-
-        return () => clearTimeout(timer);
-      }
-      setShowPlaceAnimation(false);
-    }, [isVotingOver, showAllParticipants]);
-
     return (
-      <div className="flex relative">
-        {showPlaceAnimation && (
-          <animated.div
-            style={springsPlaceContainer}
-            className={`flex flex-none items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText ${
-              shouldShowAsNonQualified ? 'bg-primary-900 opacity-70' : ''
-            }`}
-          >
-            <animated.h4
-              style={springsPlaceText}
-              className="font-semibold md:text-lg text-base"
-            >
-              {placeText}
-            </animated.h4>
-          </animated.div>
-        )}
+      <div className="flex relative" {...props}>
+        <CountryPlaceNumber
+          shouldShowAsNonQualified={shouldShowAsNonQualified}
+          index={index}
+          showPlaceAnimation={showPlaceAnimation}
+        />
 
         <animated.button
           ref={ref}
@@ -171,7 +157,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
           disabled={isDisabled}
           onClick={() => onClick(country.code)}
         >
-          {isJuryVoting && showDouzePointsAnimation && (
+          {isJuryVoting && showDouzePointsAnimationHook && (
             <DouzePointsAnimation
               springsDouzeContainer={springsDouzeContainer}
               springsDouzeParallelogramBlue={springsDouzeParallelogramBlue}

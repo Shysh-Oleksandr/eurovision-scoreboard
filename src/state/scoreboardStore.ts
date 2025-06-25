@@ -32,6 +32,7 @@ interface ScoreboardState {
   restartCounter: number;
   showAllParticipants: boolean;
   isFinalAnimationFinished: boolean;
+  canDisplayPlaceAnimation: boolean;
 
   // Actions
   giveJuryPoints: (countryCode: string) => void;
@@ -48,6 +49,7 @@ interface ScoreboardState {
   ) => void;
   toggleShowAllParticipants: () => void;
   setFinalAnimationFinished: (isFinished: boolean) => void;
+  setCanDisplayPlaceAnimation: (canDisplay: boolean) => void;
 }
 
 const shouldResetLastPoints = (countriesWithPoints: CountryWithPoints[]) =>
@@ -63,9 +65,13 @@ const getRemainingCountries = (
 
 const getLastCountryCodeByPoints = (remainingCountries: Country[]) =>
   remainingCountries.length
-    ? remainingCountries.slice().sort((a, b) => b.points - a.points)[
-        remainingCountries.length - 1
-      ].code
+    ? remainingCountries.slice().sort((a, b) => {
+        const pointsComparison = b.points - a.points;
+
+        return pointsComparison !== 0
+          ? pointsComparison
+          : a.name.localeCompare(b.name);
+      })[remainingCountries.length - 1].code
     : '';
 
 const getLastCountryIndexByPoints = (
@@ -95,6 +101,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
       restartCounter: 0,
       showAllParticipants: false,
       isFinalAnimationFinished: false,
+      canDisplayPlaceAnimation: true,
 
       // Actions
       giveJuryPoints: (countryCode: string) => {
@@ -180,9 +187,13 @@ export const useScoreboardStore = create<ScoreboardState>()(
           const countriesStore = useCountriesStore.getState();
 
           // Sort countries by points to get qualifiers
-          const sortedCountries = [...updatedCountries].sort(
-            (a, b) => b.points - a.points,
-          );
+          const sortedCountries = [...updatedCountries].sort((a, b) => {
+            const pointsComparison = b.points - a.points;
+
+            return pointsComparison !== 0
+              ? pointsComparison
+              : a.name.localeCompare(b.name);
+          });
           const newQualifiedCountries = sortedCountries.slice(
             0,
             state.semiFinalQualifiers[
@@ -356,6 +367,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           restartCounter: get().restartCounter + 1,
           showAllParticipants: false,
           isFinalAnimationFinished: false,
+          canDisplayPlaceAnimation: true,
         });
       },
 
@@ -458,6 +470,12 @@ export const useScoreboardStore = create<ScoreboardState>()(
       setFinalAnimationFinished: (isFinished: boolean) => {
         set({
           isFinalAnimationFinished: isFinished,
+        });
+      },
+
+      setCanDisplayPlaceAnimation: (canDisplay: boolean) => {
+        set({
+          canDisplayPlaceAnimation: canDisplay,
         });
       },
     }),

@@ -248,6 +248,7 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={canClose ? onClose : undefined}
+      overlayClassName="z-[10000]"
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
           {canClose && (

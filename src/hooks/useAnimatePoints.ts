@@ -5,6 +5,28 @@ import { SpringValue, easings, useSpring } from '@react-spring/web';
 import { useScoreboardStore } from '../state/scoreboardStore';
 import { useThemeColor } from '../theme/useThemeColor';
 
+// Consistent animation configs for better cross-platform performance
+const containerConfig = { duration: 300, easing: easings.easeInOutCubic };
+const textConfig = { duration: 400, easing: easings.easeInOutCubic };
+const douzeConfig = { duration: 400, easing: easings.easeInOutCubic };
+const parallelogramConfig = {
+  duration: 1000,
+  easing: easings.easeInOutCubic,
+};
+const activeConfig = { duration: 500, easing: easings.easeInOutCubic };
+
+const parallelogramsAnimation = {
+  from: {
+    left: '-20%',
+    transform: 'translate3d(0, 0, 0) skewX(45deg)',
+  },
+  to: {
+    left: '120%',
+    transform: 'translate3d(0, 0, 0) skewX(-45deg)',
+  },
+  config: parallelogramConfig,
+};
+
 type ReturnType = {
   springsContainer: {
     x: SpringValue<number>;
@@ -28,12 +50,6 @@ type ReturnType = {
     outlineWidth: SpringValue<number>;
     backgroundColor: SpringValue<string>;
     color: SpringValue<string>;
-  };
-  springsPlaceContainer: {
-    width: SpringValue<number>;
-  };
-  springsPlaceText: {
-    opacity: SpringValue<number>;
   };
 };
 
@@ -70,54 +86,67 @@ const useAnimatePoints = ({
 
   const isFirstRender = useRef(true);
 
-  const [springsActive, apiActive] = useSpring(() => ({
-    from: {
+  const [springsActive, apiActive] = useSpring(() => {
+    if (isJuryVoting) {
+      return {
+        outlineWidth: 0,
+        backgroundColor: DEFAULT_BG_COLOR,
+        color: UNFINISHED_TELEVOTE_TEXT_COLOR,
+        transform: 'translate3d(0, 0, 0)',
+      };
+    }
+    if (isCountryVotingFinished) {
+      return {
+        outlineWidth: 0,
+        backgroundColor: FINISHED_VOTING_COLOR,
+        color: TELEVOTE_COUNTRY_TEXT_COLOR,
+        transform: 'translate3d(0, 0, 0)',
+      };
+    }
+    if (isActive) {
+      return {
+        outlineWidth: 2,
+        backgroundColor: ACTIVE_VOTING_COLOR,
+        color: TELEVOTE_COUNTRY_TEXT_COLOR,
+        transform: 'translate3d(0, 0, 0)',
+      };
+    }
+
+    return {
       outlineWidth: 0,
       backgroundColor: DEFAULT_BG_COLOR,
       color: UNFINISHED_TELEVOTE_TEXT_COLOR,
-    },
-  }));
+      transform: 'translate3d(0, 0, 0)',
+    };
+  });
+
   const [springsContainer, apiContainer] = useSpring(() => ({
-    from: { x: 36, opacity: 0 },
+    from: { x: 36, opacity: 0, transform: 'translate3d(0, 0, 0)' },
+    config: containerConfig,
   }));
+
   const [springsText, apiText] = useSpring(() => ({
-    from: { x: 15, opacity: 0 },
+    from: { x: 15, opacity: 0, transform: 'translate3d(0, 0, 0)' },
+    config: textConfig,
   }));
+
   const [springsDouzeContainer, apiDouzeContainer] = useSpring(() => ({
-    from: { opacity: 0 },
+    from: { opacity: 0, transform: 'translate3d(0, 0, 0)' },
+    config: douzeConfig,
   }));
+
   const [springsDouzeParallelogramBlue, apiDouzeParallelogramBlue] = useSpring(
     () => ({
-      from: { left: '-20%', transform: 'skewX(45deg)' },
+      from: { left: '-20%', transform: 'translate3d(0, 0, 0) skewX(45deg)' },
+      config: parallelogramConfig,
     }),
   );
+
   const [springsDouzeParallelogramYellow, apiDouzeParallelogramYellow] =
     useSpring(() => ({
-      from: { left: '-50%', transform: 'skewX(45deg)' },
+      from: { left: '-50%', transform: 'translate3d(0, 0, 0) skewX(45deg)' },
+      config: parallelogramConfig,
     }));
-
-  const [springsPlaceContainer, apiPlaceContainer] = useSpring(() => ({
-    from: { width: 0 },
-  }));
-
-  const [springsPlaceText, apiPlaceText] = useSpring(() => ({
-    from: { opacity: 0 },
-  }));
-
-  const parallelogramsAnimation = useMemo(
-    () => ({
-      from: {
-        left: '-20%',
-        transform: 'skewX(45deg)',
-      },
-      to: {
-        left: '120%',
-        transform: 'skewX(-45deg)',
-      },
-      config: { duration: 1000, easing: easings.easeInOutCubic },
-    }),
-    [],
-  );
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -126,113 +155,82 @@ const useAnimatePoints = ({
       return;
     }
 
+    const immediate = isFinalAnimationFinished;
+
+    // Douze points animation
     if (isDouzePoints) {
       apiDouzeContainer.start({
-        from: { opacity: 0 },
-        to: { opacity: 1 },
+        to: { opacity: 1, transform: 'translate3d(0, 0, 0)' },
         delay: 200,
-        config: { duration: 400, easing: easings.easeInOutCubic },
+        config: douzeConfig,
+        immediate,
       });
 
-      apiDouzeParallelogramBlue.start(parallelogramsAnimation);
+      apiDouzeParallelogramBlue.start({
+        ...parallelogramsAnimation,
+        immediate,
+      });
+
       apiDouzeParallelogramYellow.start({
         ...parallelogramsAnimation,
         from: {
           left: '-50%',
-          transform: 'skewX(45deg)',
+          transform: 'translate3d(0, 0, 0) skewX(45deg)',
         },
+        immediate,
       });
     } else {
       apiDouzeContainer.start({
-        from: { opacity: 1 },
-        to: { opacity: 0 },
+        to: { opacity: 0, transform: 'translate3d(0, 0, 0)' },
         delay: 400,
-        config: { duration: 400, easing: easings.easeInOutCubic },
+        config: douzeConfig,
+        immediate,
       });
+
       apiDouzeParallelogramBlue.start({
-        from: parallelogramsAnimation.to,
         to: parallelogramsAnimation.from,
+        immediate,
       });
+
       apiDouzeParallelogramYellow.start({
         to: {
           left: '-50%',
-          transform: 'skewX(45deg)',
+          transform: 'translate3d(0, 0, 0) skewX(45deg)',
         },
-        from: parallelogramsAnimation.to,
+        immediate,
       });
     }
 
+    // Last points animation
     if (shouldShowLastPoints) {
       apiContainer.start({
-        from: {
-          x: 36,
-          opacity: 0,
-        },
-        to: {
-          x: 0,
-          opacity: 1,
-        },
-        config: { duration: 300, easing: easings.easeInOutCubic },
+        to: { x: 0, opacity: 1, transform: 'translate3d(0, 0, 0)' },
+        config: containerConfig,
+        immediate,
       });
+
       apiText.start({
-        from: { x: 15, opacity: 0 },
-        to: {
-          x: 0,
-          opacity: 1,
-        },
-        config: { duration: 400 },
+        to: { x: 0, opacity: 1, transform: 'translate3d(0, 0, 0)' },
+        config: textConfig,
+        immediate,
       });
     } else if (!isFinalAnimationFinished) {
       if (winnerCountry) {
         setTimeout(() => {
           setFinalAnimationFinished(true);
-        }, 1000);
+        }, 4000);
       }
 
       apiContainer.start({
-        from: {
-          x: 0,
-          opacity: 1,
-        },
-        to: {
-          x: 36,
-          opacity: 0,
-        },
-        config: { duration: 300, easing: easings.easeInOutCubic },
+        to: { x: 36, opacity: 0, transform: 'translate3d(0, 0, 0)' },
+        config: containerConfig,
+        immediate,
       });
+
       apiText.start({
-        from: { x: 0, opacity: 1 },
-        to: {
-          x: 15,
-          opacity: 0,
-        },
+        to: { x: 15, opacity: 0, transform: 'translate3d(0, 0, 0)' },
         config: { duration: 0 },
-      });
-    }
-
-    if (isVotingOver) {
-      apiPlaceContainer.start({
-        from: { width: 0 },
-        to: { width: window.innerWidth > 576 ? 40 : 32 }, // 40px = w-10 (2.5rem)
-        config: { duration: 300, easing: easings.easeInOutCubic },
-      });
-
-      apiPlaceText.start({
-        from: { opacity: 0 },
-        to: { opacity: 1 },
-        config: { duration: 300, easing: easings.easeInOutCubic },
-      });
-    } else {
-      apiPlaceContainer.start({
-        from: { width: 40 },
-        to: { width: 0 },
-        config: { duration: 300, easing: easings.easeInOutCubic },
-      });
-
-      apiPlaceText.start({
-        from: { opacity: 1 },
-        to: { opacity: 0 },
-        config: { duration: 300, easing: easings.easeInOutCubic },
+        immediate,
       });
     }
     // Deliberately not including winnerCountry and isFinalAnimationFinished in the dependency array to avoid animation issues
@@ -243,8 +241,6 @@ const useAnimatePoints = ({
     apiDouzeParallelogramBlue,
     apiDouzeParallelogramYellow,
     apiText,
-    apiPlaceContainer,
-    apiPlaceText,
     isDouzePoints,
     shouldShowLastPoints,
     isVotingOver,
@@ -253,14 +249,18 @@ const useAnimatePoints = ({
   ]);
 
   useEffect(() => {
+    const immediate = isFinalAnimationFinished;
+
     if (isJuryVoting) {
       apiActive.start({
         to: {
           outlineWidth: 0,
           backgroundColor: DEFAULT_BG_COLOR,
           color: UNFINISHED_TELEVOTE_TEXT_COLOR,
+          transform: 'translate3d(0, 0, 0)',
         },
-        config: { duration: 500, easing: easings.easeInOutCubic },
+        config: activeConfig,
+        immediate,
       });
 
       return;
@@ -268,31 +268,36 @@ const useAnimatePoints = ({
 
     if (isActive) {
       apiActive.start({
-        from: {
-          outlineWidth: 0,
-          backgroundColor: DEFAULT_BG_COLOR,
-          color: UNFINISHED_TELEVOTE_TEXT_COLOR,
-        },
         to: {
           outlineWidth: 2,
           backgroundColor: ACTIVE_VOTING_COLOR,
           color: TELEVOTE_COUNTRY_TEXT_COLOR,
+          transform: 'translate3d(0, 0, 0)',
         },
-        config: { duration: 500, easing: easings.easeInOutCubic },
+        config: activeConfig,
+        immediate,
       });
     } else if (isCountryVotingFinished) {
       apiActive.start({
-        from: {
-          outlineWidth: 2,
-          backgroundColor: ACTIVE_VOTING_COLOR,
-          color: TELEVOTE_COUNTRY_TEXT_COLOR,
-        },
         to: {
           outlineWidth: 0,
           backgroundColor: FINISHED_VOTING_COLOR,
           color: TELEVOTE_COUNTRY_TEXT_COLOR,
+          transform: 'translate3d(0, 0, 0)',
         },
-        config: { duration: 500, easing: easings.easeInOutCubic },
+        config: activeConfig,
+        immediate,
+      });
+    } else {
+      apiActive.start({
+        to: {
+          outlineWidth: 0,
+          backgroundColor: DEFAULT_BG_COLOR,
+          color: UNFINISHED_TELEVOTE_TEXT_COLOR,
+          transform: 'translate3d(0, 0, 0)',
+        },
+        config: activeConfig,
+        immediate,
       });
     }
   }, [
@@ -305,6 +310,7 @@ const useAnimatePoints = ({
     isCountryVotingFinished,
     isJuryVoting,
     UNFINISHED_TELEVOTE_TEXT_COLOR,
+    isFinalAnimationFinished,
   ]);
 
   return useMemo(
@@ -315,8 +321,6 @@ const useAnimatePoints = ({
       springsDouzeParallelogramYellow,
       springsDouzeContainer,
       springsActive,
-      springsPlaceContainer,
-      springsPlaceText,
     }),
     [
       springsActive,
@@ -325,8 +329,6 @@ const useAnimatePoints = ({
       springsDouzeParallelogramBlue,
       springsDouzeParallelogramYellow,
       springsText,
-      springsPlaceContainer,
-      springsPlaceText,
     ],
   );
 };
