@@ -1,5 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import FlipMove from 'react-flip-move';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Flipper, Flipped } from 'react-flip-toolkit';
+
+import { animated, useSpring } from '@react-spring/web';
 
 import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data/data';
 import { Country } from '../../models';
@@ -22,13 +30,15 @@ const Board = (): JSX.Element => {
     eventPhase,
     restartCounter,
     showAllParticipants,
+    setCanDisplayPlaceAnimation,
   } = useScoreboardStore();
+
+  const [showPlace, setShowPlace] = useState(false);
+  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
   const { getVotingCountry, selectedCountries, getSemiFinalPoints } =
     useCountriesStore();
-
-  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
   // Get all countries to display when showAllParticipants is true
   // TODO: move outside
@@ -81,13 +91,33 @@ const Board = (): JSX.Element => {
     }
 
     // Default sorting by points
-    return countriesToSort.sort((a, b) => b.points - a.points);
+    return countriesToSort.sort((a, b) => {
+      const pointsComparison = b.points - a.points;
+
+      return pointsComparison !== 0
+        ? pointsComparison
+        : a.name.localeCompare(b.name);
+    });
   }, [
     allCountriesToDisplay,
     showAllParticipants,
     winnerCountry,
     getSemiFinalPoints,
   ]);
+
+  const [displayOrder, setDisplayOrder] = useState<string[]>(
+    sortedCountries.map((c) => c.code),
+  );
+  const timeoutRef = useRef<NodeJS.Timeout>();
+
+  const countriesToRender = useMemo(() => {
+    // Preserve the display order while mapping to the latest country data
+    const countryMap = new Map(allCountriesToDisplay.map((c) => [c.code, c]));
+
+    return displayOrder
+      .map((code) => countryMap.get(code))
+      .filter((c): c is Country => !!c);
+  }, [displayOrder, allCountriesToDisplay]);
 
   const countriesWithPointsLength = useMemo(
     () =>
@@ -106,10 +136,10 @@ const Board = (): JSX.Element => {
   );
 
   const flipMoveDelay = useMemo(() => {
-    if (!wasTheFirstPointsAwarded) return 0;
+    if (!wasTheFirstPointsAwarded || isVotingOver) return 0;
 
     return hasCountryFinishedVoting ? 1000 : 500;
-  }, [hasCountryFinishedVoting, wasTheFirstPointsAwarded]);
+  }, [hasCountryFinishedVoting, wasTheFirstPointsAwarded, isVotingOver]);
 
   const handleResetPoints = useCallback(() => {
     if (timerId.current) {
@@ -137,15 +167,20 @@ const Board = (): JSX.Element => {
 
   const renderItem = useCallback(
     (country: Country, index: number) => (
-      <CountryItem
-        key={country.code}
-        country={country}
-        votingCountryCode={votingCountry?.code}
-        onClick={onClick}
-        index={index}
-      />
+      <Flipped key={country.code} flipId={country.code}>
+        {(props) => (
+          <CountryItem
+            country={country}
+            votingCountryCode={votingCountry?.code}
+            onClick={onClick}
+            index={index}
+            {...props}
+            showPlaceAnimation={showPlace}
+          />
+        )}
+      </Flipped>
     ),
-    [votingCountry?.code, onClick],
+    [votingCountry?.code, onClick, showPlace],
   );
 
   useEffect(() => {
@@ -155,34 +190,72 @@ const Board = (): JSX.Element => {
     }
   }, [shouldShowLastPoints]);
 
+  const flipKey = useMemo(
+    () => `${countriesToRender.map((c) => c.code).join(',')}-${isVotingOver}`,
+    [countriesToRender, isVotingOver],
+  );
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      setDisplayOrder(sortedCountries.map((c) => c.code));
+    }, flipMoveDelay);
+
+    return () => {
+      clearTimeout(timeoutRef.current);
+    };
+  }, [sortedCountries, flipMoveDelay]);
+
+  useEffect(() => {
+    if (isVotingOver) {
+      const timer = setTimeout(() => {
+        setShowPlace(true);
+      }, 3050);
+
+      return () => clearTimeout(timer);
+    }
+    if (!winnerCountry) {
+      setShowPlace(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVotingOver]);
+
+  useEffect(() => {
+    if (winnerCountry) {
+      setTimeout(() => {
+        setCanDisplayPlaceAnimation(false);
+      }, 4050);
+    }
+  }, [setCanDisplayPlaceAnimation, winnerCountry]);
+
+  const [containerAnimation, api] = useSpring(() => ({
+    from: { opacity: 0, transform: 'translateY(15px)' },
+    config: { duration: 350 },
+  }));
+
+  useEffect(() => {
+    api.start({
+      to: { opacity: 1, transform: 'translateY(0px)' },
+      from: { opacity: 0, transform: 'translateY(15px)' },
+    });
+  }, [api, eventPhase, restartCounter, showAllParticipants]);
+
   return (
     <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>
       <BoardHeader onClick={onClick} />
-      <div
+      <animated.div
+        style={containerAnimation}
         className={`container-wrapping-flip-move ${
           showAllParticipants ? 'show-all-participants' : ''
         }`}
       >
-        <FlipMove
+        <Flipper
           key={`${eventPhase}-${restartCounter}-${showAllParticipants}`}
-          duration={500}
-          delay={flipMoveDelay}
-          appearAnimation={{
-            from: { opacity: '0', transform: 'translateY(10px)' },
-            to: { opacity: '1', transform: 'translateY(0)' },
-          }}
-          enterAnimation={{
-            from: { opacity: '0', transform: 'translateY(10px)' },
-            to: { opacity: '1', transform: 'translateY(0)' },
-          }}
-          leaveAnimation={{
-            from: { opacity: '1', transform: 'translateY(0)' },
-            to: { opacity: '0', transform: 'translateY(10px)' },
-          }}
+          flipKey={flipKey}
+          spring={{ damping: 5, stiffness: 25, overshootClamping: true }}
         >
-          {sortedCountries.map(renderItem)}
-        </FlipMove>
-      </div>
+          {countriesToRender.map(renderItem)}
+        </Flipper>
+      </animated.div>
     </div>
   );
 };

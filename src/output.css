@@ -682,6 +682,10 @@ video {
   z-index: 100;
 }
 
+.z-\[10000\] {
+  z-index: 10000;
+}
+
 .mx-4 {
   margin-left: 1rem;
   margin-right: 1rem;
@@ -695,6 +699,11 @@ video {
 .my-3 {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.my-4 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .mb-1 {
@@ -791,6 +800,30 @@ video {
 
 .max-h-\[80vh\] {
   max-height: 80vh;
+}
+
+.\!max-h-\[80vh\] {
+  max-height: 80vh !important;
+}
+
+.max-h-\[60vh\] {
+  max-height: 60vh;
+}
+
+.max-h-\[40vh\] {
+  max-height: 40vh;
+}
+
+.max-h-\[50vh\] {
+  max-height: 50vh;
+}
+
+.max-h-\[90vh\] {
+  max-height: 90vh;
+}
+
+.max-h-\[70vh\] {
+  max-height: 70vh;
 }
 
 .w-10 {
@@ -1513,6 +1546,14 @@ video {
 
 .transition-transform {
   transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
@@ -2891,14 +2932,6 @@ h6 {
   .md\:text-xs {
     font-size: 0.75rem;
     line-height: 1rem;
-  }
-
-  .md\:leading-4 {
-    line-height: 1rem;
-  }
-
-  .md\:\!leading-4 {
-    line-height: 1rem !important;
   }
 
   .md\:\!leading-5 {
