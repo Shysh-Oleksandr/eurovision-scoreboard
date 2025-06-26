@@ -2550,13 +2550,6 @@ h6 {
   background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
 }
 
-.container-wrapping-flip-move > div {
-  -moz-columns: 1;
-       columns: 1;
-  -moz-column-gap: 0.75rem;
-       column-gap: 0.75rem;
-}
-
 .triangle {
   width: 1rem;
   position: absolute;
@@ -2575,29 +2568,36 @@ h6 {
   }
 }
 
-@media (min-width: 1440px) {
-  .container-wrapping-flip-move.show-all-participants > div {
-    -moz-columns: 3;
-         columns: 3;
-  }
+.container-wrapping-flipper > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  -moz-column-gap: 0.75rem;
+       column-gap: 0.75rem;
 }
 
+/* 3 columns cause reordering issues */
+
+/* @media (min-width: 1440px) {
+  .container-wrapping-flipper.show-all-participants > div {
+    grid-template-columns: repeat(3, 1fr);
+  }
+} */
+
 @media (min-width: 576px) {
-  .container-wrapping-flip-move > div {
-    -moz-columns: 2;
-         columns: 2;
+  .container-wrapping-flipper > div {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 768px) {
-  .container-wrapping-flip-move > div {
+  .container-wrapping-flipper > div {
     -moz-column-gap: 1rem;
          column-gap: 1rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .container-wrapping-flip-move > div {
+  .container-wrapping-flipper > div {
     -moz-column-gap: 1.5rem;
          column-gap: 1.5rem;
   }
@@ -2888,6 +2888,10 @@ h6 {
   .sm\:text-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
+  }
+
+  .sm\:text-\[0\.85rem\] {
+    font-size: 0.85rem;
   }
 
   .sm\:text-base {

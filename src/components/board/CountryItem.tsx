@@ -215,7 +215,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
                 color={country.isVotingFinished ? televotePointsBg : pointsBg}
               />
               <h6
-                className={`lg:text-lg sm:text-base xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center text-countryItem-televotePointsText`}
+                className={`lg:text-lg sm:text-[0.85rem] xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center text-countryItem-televotePointsText`}
               >
                 {country.points === -1 ? 'NQ' : country.points}
               </h6>
