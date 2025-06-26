@@ -114,6 +114,10 @@ h6 {
   overflow-x: hidden;
 }
 
+/* TODO: move the bg image logic outside */
+#main.theme-2022 {
+  background-image: url('/src/assets/bgImages/DarkRedBg2022.webp') !important;
+}
 #main.theme-2023 {
   background-image: url('/src/assets/bgImages/BlueBg2023.webp') !important;
 }
@@ -262,7 +266,7 @@ h6 {
     from var(--border-angle),
     transparent 25%,
     theme('colors.primary-800') 65%,
-    theme('colors.countryItem-pointsBg') 99%,
+    theme('colors.animatedBorder') 99%,
     transparent
   );
 

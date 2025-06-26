@@ -8,7 +8,13 @@ export interface ThemeColors {
     900: string;
     950: string;
   };
+  gray: {
+    500: string;
+    600: string;
+    900: string;
+  };
   appBgColor: string;
+  animatedBorder: string;
   countryItem: {
     bg: string;
     hoverBg: string;
@@ -36,6 +42,7 @@ export interface ThemeColors {
     activeBg: string;
     activeText: string;
     inactiveText: string;
+    inactiveBg: string;
   };
 }
 

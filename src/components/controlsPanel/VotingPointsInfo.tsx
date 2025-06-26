@@ -34,7 +34,7 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
           <div
             key={points}
             className={`lg:w-8 w-7 lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${
-              isActive ? 'bg-panelInfo-activeBg' : 'bg-primary-950'
+              isActive ? 'bg-panelInfo-activeBg' : 'bg-panelInfo-inactiveBg'
             }`}
           >
             <h6

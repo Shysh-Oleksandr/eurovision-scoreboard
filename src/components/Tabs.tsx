@@ -79,7 +79,7 @@ const Tabs: React.FC<TabsProps> = ({
             width: isSmallScreen
               ? 'calc(100% - 14px)'
               : tabWidths[activeTabIndex] || 0,
-            left: isSmallScreen ? '2px' : `${activeTabLeft}px`,
+            left: isSmallScreen ? '6px' : `${activeTabLeft}px`,
             transform: isSmallScreen
               ? `translateY(${activeTabIndex * 100 + activeTabIndex * 10}%)`
               : 'none',
