@@ -257,7 +257,7 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
               className="md:text-base text-sm"
               onClick={onClose}
             >
-              Cancel
+              Close
             </Button>
           )}
           <Button className="w-full !text-base" onClick={handleStartEvent}>

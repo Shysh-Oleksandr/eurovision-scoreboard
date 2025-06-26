@@ -4,6 +4,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose?: () => void;
   children: React.ReactNode;
+  topContent?: React.ReactNode;
   bottomContent?: React.ReactNode;
   containerClassName?: string;
   contentClassName?: string;
@@ -15,10 +16,11 @@ const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   children,
+  topContent,
   bottomContent,
-  containerClassName,
-  contentClassName,
-  overlayClassName,
+  containerClassName = '',
+  contentClassName = '',
+  overlayClassName = '',
   openDelay,
 }) => {
   const [shouldShow, setShouldShow] = useState(false);
@@ -61,8 +63,9 @@ const Modal: React.FC<ModalProps> = ({
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
+        {topContent}
         <div
-          className={`max-h-[80vh] overflow-y-auto scrollbar md:p-6 xs:p-5 p-3 py-5 ${contentClassName}`}
+          className={`max-h-[80vh] overflow-y-auto md:p-6 xs:p-5 p-3 py-5 ${contentClassName}`}
         >
           {children}
         </div>

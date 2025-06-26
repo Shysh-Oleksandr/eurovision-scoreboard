@@ -187,7 +187,8 @@ h6 {
     }
   }
 
-  .select::-webkit-scrollbar {
+  .select::-webkit-scrollbar,
+  .narrow-scrollbar::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }

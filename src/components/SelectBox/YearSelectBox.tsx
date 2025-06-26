@@ -5,7 +5,7 @@ import { SUPPORTED_YEARS } from '../../data/data';
 import { EventPhase } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import FeedbackInfo from '../feedbackInfo';
+import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
 import SelectBox from '.';
 
@@ -52,7 +52,7 @@ export const YearSelectBox: React.FC = () => {
           id="year-select-box"
         />
       </div>
-      <FeedbackInfo className="md:hiddfen block relative bottom-auto !right-0" />
+      <FeedbackInfoButton />
     </div>
   );
 };
