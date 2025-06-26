@@ -1,7 +1,8 @@
 export const WHATS_NEW = [
   {
     date: '2025-06-26',
-    title: 'Improved the feedback and updates modal',
+    title:
+      'Improved the feedback and updates modal. Added 2022 theme. Fixed the layout issue on iPad',
   },
   {
     date: '2025-06-25',

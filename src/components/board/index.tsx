@@ -5,11 +5,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Flipper, Flipped } from 'react-flip-toolkit';
+import { Flipped, Flipper } from 'react-flip-toolkit';
 
 import { animated, useSpring } from '@react-spring/web';
 
 import { ANIMATION_DURATION, POINTS_ARRAY } from '../../data/data';
+import { useReorderCountries } from '../../hooks/useReorderCountries';
 import { Country } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -119,6 +120,8 @@ const Board = (): JSX.Element => {
       .filter((c): c is Country => !!c);
   }, [displayOrder, allCountriesToDisplay]);
 
+  const reorderedCountries = useReorderCountries(countriesToRender);
+
   const countriesWithPointsLength = useMemo(
     () =>
       countries.filter((country) => country.lastReceivedPoints !== null).length,
@@ -166,21 +169,21 @@ const Board = (): JSX.Element => {
   );
 
   const renderItem = useCallback(
-    (country: Country, index: number) => (
+    (country: Country) => (
       <Flipped key={country.code} flipId={country.code}>
         {(props) => (
           <CountryItem
             country={country}
             votingCountryCode={votingCountry?.code}
             onClick={onClick}
-            index={index}
+            index={sortedCountries.findIndex((c) => c.code === country.code)}
             {...props}
             showPlaceAnimation={showPlace}
           />
         )}
       </Flipped>
     ),
-    [votingCountry?.code, onClick, showPlace],
+    [votingCountry?.code, onClick, showPlace, sortedCountries],
   );
 
   useEffect(() => {
@@ -190,20 +193,33 @@ const Board = (): JSX.Element => {
     }
   }, [shouldShowLastPoints]);
 
+  const [finalCountries, setFinalCountries] = useState<Country[]>([]);
+
   const flipKey = useMemo(
-    () => `${countriesToRender.map((c) => c.code).join(',')}-${isVotingOver}`,
-    [countriesToRender, isVotingOver],
+    () => `${finalCountries.map((c) => c.code).join(',')}-${isVotingOver}`,
+    [finalCountries, isVotingOver],
   );
 
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
-      setDisplayOrder(sortedCountries.map((c) => c.code));
+      const newOrder = sortedCountries.map((c) => c.code);
+
+      if (
+        newOrder.length !== displayOrder.length ||
+        newOrder.some((code, i) => code !== displayOrder[i])
+      ) {
+        setDisplayOrder(newOrder);
+      }
     }, flipMoveDelay);
 
     return () => {
       clearTimeout(timeoutRef.current);
     };
-  }, [sortedCountries, flipMoveDelay]);
+  }, [sortedCountries, flipMoveDelay, displayOrder]);
+
+  useEffect(() => {
+    setFinalCountries(reorderedCountries);
+  }, [reorderedCountries]);
 
   useEffect(() => {
     if (isVotingOver) {
@@ -244,7 +260,7 @@ const Board = (): JSX.Element => {
       <BoardHeader onClick={onClick} />
       <animated.div
         style={containerAnimation}
-        className={`container-wrapping-flip-move ${
+        className={`container-wrapping-flipper ${
           showAllParticipants ? 'show-all-participants' : ''
         }`}
       >
@@ -253,7 +269,7 @@ const Board = (): JSX.Element => {
           flipKey={flipKey}
           spring={{ damping: 5, stiffness: 25, overshootClamping: true }}
         >
-          {countriesToRender.map(renderItem)}
+          {finalCountries.map(renderItem)}
         </Flipper>
       </animated.div>
     </div>
