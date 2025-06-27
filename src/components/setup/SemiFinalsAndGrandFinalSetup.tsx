@@ -79,7 +79,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
                 onChange={(e) => {
                   semiFinal.setQualifiers(parseInt(e.target.value));
                 }}
-                className="bg-primary-900 text-white px-3 py-1 rounded w-18"
+                className="bg-primary-900 text-white px-3 py-1 rounded w-18 transition-colors duration-400 hover:bg-primary-950 focus:bg-primary-950"
                 min={1}
                 max={semiFinal.countries.length}
               />

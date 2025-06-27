@@ -16,25 +16,37 @@ export interface ThemeColors {
   appBgColor: string;
   animatedBorder: string;
   countryItem: {
-    bg: string;
-    hoverBg: string;
-    text: string;
-    pointsBg: string;
+    juryBg: string;
+    juryHoverBg: string;
+    juryCountryText: string;
+    juryPointsBg: string;
     juryPointsText: string;
-    televotePointsBg: string;
-    televoteActiveBg: string;
-    televotePointsText: string;
-    televoteCountryText: string;
-    televoteUnfinishedText: string;
-    televoteFinishedBg: string;
-    televoteOutline: string;
     juryLastPointsBg: string;
+    juryLastPointsText: string;
+
+    televoteUnfinishedBg: string;
+    televoteUnfinishedText: string;
+    televoteUnfinishedPointsBg: string;
+    televoteUnfinishedPointsText: string;
+    televoteActiveBg: string;
+    televoteActiveText: string;
+    televoteActivePointsBg: string;
+    televoteActivePointsText: string;
+    televoteOutline: string;
+    televoteFinishedBg: string;
+    televoteFinishedText: string;
+    televoteFinishedPointsBg: string;
+    televoteFinishedPointsText: string;
     televoteLastPointsBg: string;
-    lastPointsText: string;
+    televoteLastPointsText: string;
+    unqualifiedBg: string;
+    unqualifiedText: string;
+
     douzePointsBg: string;
     douzePointsText: string;
     douzePointsBlock1: string;
     douzePointsBlock2: string;
+
     placeContainerBg: string;
     placeText: string;
   };

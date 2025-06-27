@@ -6,12 +6,13 @@ import { POINTS_ARRAY } from '../../data/data';
 import useAnimatePoints from '../../hooks/useAnimatePoints';
 import { Country, EventPhase } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import { useThemeColor } from '../../theme/useThemeColor';
 import RoundedTriangle from '../RoundedTriangle';
 
 import CountryPlaceNumber from './CountryPlaceNumber';
 import DouzePointsAnimation from './DouzePointsAnimation';
-import { useDouzePointsAnimation, useVotingFinished } from './hooks';
+import { useCountryItemColors } from './hooks/useCountryItemColors';
+import useDouzePointsAnimation from './hooks/useDouzePointsAnimation';
+import useVotingFinished from './hooks/useVotingFinished';
 
 type Props = {
   country: Country;
@@ -42,13 +43,6 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
       showAllParticipants,
     } = useScoreboardStore();
 
-    const [juryLastPointsBg, televoteLastPointsBg, televotePointsBg, pointsBg] =
-      useThemeColor([
-        'countryItem.juryLastPointsBg',
-        'countryItem.televoteLastPointsBg',
-        'countryItem.televotePointsBg',
-        'countryItem.pointsBg',
-      ]);
     const isVotingFinished = useVotingFinished(!!country.isVotingFinished);
     const isDouzePoints = country.lastReceivedPoints === 12;
     const showDouzePointsAnimationHook = useDouzePointsAnimation(isDouzePoints);
@@ -56,6 +50,17 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
     const isVotingCountry = country.code === votingCountryCode && isJuryVoting;
     const isActive = country.code === votingCountryCode && !isJuryVoting;
     const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
+
+    const {
+      pointsBgColor,
+      pointsTextColor,
+      lastPointsBgColor,
+      lastPointsTextColor,
+    } = useCountryItemColors({
+      isJuryVoting,
+      isCountryVotingFinished: !!country.isVotingFinished,
+      isActive,
+    });
 
     const hasCountryFinishedVoting = useMemo(
       () =>
@@ -87,12 +92,12 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
     );
 
     const {
-      springsContainer,
-      springsText,
+      springsLastPointsContainer,
+      springsLastPointsText,
       springsDouzeParallelogramBlue,
       springsDouzeParallelogramYellow,
       springsDouzeContainer,
-      springsActive,
+      springsPoints,
     } = useAnimatePoints({
       shouldShowLastPoints:
         country.lastReceivedPoints !== null && !isVotingFinished,
@@ -121,18 +126,18 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         `relative outline outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
           isDisabled
             ? ''
-            : 'cursor-pointer transition-colors duration-300 hover:!bg-countryItem-hoverBg'
+            : 'cursor-pointer transition-colors duration-300 hover:!bg-countryItem-juryHoverBg'
         } ${isActive ? 'rounded-sm' : ''} ${
           showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''
         } ${
           shouldShowAsNonQualified
-            ? `!bg-primary-900 opacity-70 ${
+            ? `!bg-countryItem-unqualifiedBg opacity-70 ${
                 showPlaceAnimation ? '!opacity-70' : ''
               }`
-            : 'bg-countryItem-bg'
+            : ''
         } 
         ${isVotingCountry ? 'opacity-70' : ''}
-        text-countryItem-text`,
+        `,
       [
         isDisabled,
         isActive,
@@ -152,7 +157,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
 
         <animated.button
           ref={ref}
-          style={springsActive}
+          style={springsPoints}
           className={buttonClassName}
           disabled={isDisabled}
           onClick={() => onClick(country.code)}
@@ -169,7 +174,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
             <img
               src={country.flag}
               alt={`${country.name} flag`}
-              className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-countryItem-bg self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
+              className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-countryItem-juryBg self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
             />
             <h4
               className={`uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] xs:pr-2 pr-0 ${
@@ -182,40 +187,39 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
             </h4>
           </div>
           <div className="flex h-full">
+            {/* Last points */}
             <animated.div
-              style={springsContainer}
-              className={`relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8 ${
-                country.isVotingFinished
-                  ? `bg-countryItem-televoteLastPointsBg`
-                  : `bg-countryItem-juryLastPointsBg`
-              }`}
+              style={{
+                ...springsLastPointsContainer,
+                backgroundColor: lastPointsBgColor,
+              }}
+              className={`relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8`}
             >
-              <RoundedTriangle
-                color={
-                  country.isVotingFinished
-                    ? televoteLastPointsBg
-                    : juryLastPointsBg
-                }
-              />
+              <RoundedTriangle color={lastPointsBgColor} />
               <animated.h6
-                style={springsText}
-                className="lg:text-lg md:text-sm text-xs font-semibold h-full items-center flex justify-center text-countryItem-lastPointsText"
+                style={{
+                  ...springsLastPointsText,
+                  color: lastPointsTextColor,
+                }}
+                className="lg:text-lg md:text-sm text-xs font-semibold h-full items-center flex justify-center"
               >
                 {country.lastReceivedPoints}
               </animated.h6>
             </animated.div>
+
+            {/* Points */}
             <div
-              className={`relative h-full z-20 lg:w-[2.57rem] pr-1 md:w-9 w-8 ${
-                country.isVotingFinished
-                  ? 'bg-countryItem-televotePointsBg'
-                  : 'bg-countryItem-pointsBg'
-              }`}
+              className={`relative h-full z-20 lg:w-[2.57rem] pr-1 md:w-9 w-8`}
+              style={{
+                backgroundColor: pointsBgColor,
+              }}
             >
-              <RoundedTriangle
-                color={country.isVotingFinished ? televotePointsBg : pointsBg}
-              />
+              <RoundedTriangle color={pointsBgColor} />
               <h6
-                className={`lg:text-lg sm:text-[0.85rem] xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center text-countryItem-televotePointsText`}
+                className={`lg:text-lg sm:text-[0.85rem] xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center`}
+                style={{
+                  color: pointsTextColor,
+                }}
               >
                 {country.points === -1 ? 'NQ' : country.points}
               </h6>

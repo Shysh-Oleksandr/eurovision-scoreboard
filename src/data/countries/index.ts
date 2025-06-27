@@ -16,6 +16,7 @@ export { COUNTRIES_2016 } from './countries-2016';
 export { COUNTRIES_2017 } from './countries-2017';
 export { COUNTRIES_2018 } from './countries-2018';
 export { COUNTRIES_2019 } from './countries-2019';
+export { COUNTRIES_2020 } from './countries-2020';
 export { COUNTRIES_2021 } from './countries-2021';
 export { COUNTRIES_2022 } from './countries-2022';
 export { COUNTRIES_2023 } from './countries-2023';

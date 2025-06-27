@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-06-27',
+    title: 'Added 2021 theme and 2020 countries',
+  },
+  {
     date: '2025-06-26',
     title:
       'Improved the feedback and updates modal. Added 2022 theme. Fixed the layout issue on iPad',

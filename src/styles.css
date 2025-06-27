@@ -115,6 +115,12 @@ h6 {
 }
 
 /* TODO: move the bg image logic outside */
+#main.theme-2020 {
+  background-image: url('/src/assets/bgImages/BlueBg2020.webp') !important;
+}
+#main.theme-2021 {
+  background-image: url('/src/assets/bgImages/BlueBg2021.webp') !important;
+}
 #main.theme-2022 {
   background-image: url('/src/assets/bgImages/DarkRedBg2022.webp') !important;
 }

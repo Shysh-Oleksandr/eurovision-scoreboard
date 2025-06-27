@@ -50,6 +50,9 @@ export const themesInfo: ThemeInfoRecord = {
   '2019': {
     hostingCountryLogo: require('../assets/hostingCountryLogos/Israel2019.svg'),
   },
+  '2020': {
+    hostingCountryLogo: require('../assets/hostingCountryLogos/Netherlands2021.svg'),
+  },
   '2021': {
     hostingCountryLogo: require('../assets/hostingCountryLogos/Netherlands2021.svg'),
   },

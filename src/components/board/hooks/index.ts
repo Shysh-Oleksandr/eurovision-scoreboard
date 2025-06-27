@@ -1,2 +1,3 @@
-export { default as useDouzePointsAnimation } from './useDouzePointsAnimation';
-export { default as useVotingFinished } from './useVotingFinished';
+export * from './useDouzePointsAnimation';
+export * from './useVotingFinished';
+export * from './useCountryItemColors';

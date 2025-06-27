@@ -28,11 +28,11 @@ const parallelogramsAnimation = {
 };
 
 type ReturnType = {
-  springsContainer: {
+  springsLastPointsContainer: {
     x: SpringValue<number>;
     opacity: SpringValue<number>;
   };
-  springsText: {
+  springsLastPointsText: {
     x: SpringValue<number>;
   };
   springsDouzeParallelogramBlue: {
@@ -46,7 +46,7 @@ type ReturnType = {
   springsDouzeContainer: {
     opacity: SpringValue<number>;
   };
-  springsActive: {
+  springsPoints: {
     outlineWidth: SpringValue<number>;
     backgroundColor: SpringValue<string>;
     color: SpringValue<string>;
@@ -71,61 +71,69 @@ const useAnimatePoints = ({
   const { isFinalAnimationFinished, setFinalAnimationFinished, winnerCountry } =
     useScoreboardStore((state) => state);
   const [
-    DEFAULT_BG_COLOR,
-    UNFINISHED_TELEVOTE_TEXT_COLOR,
-    TELEVOTE_COUNTRY_TEXT_COLOR,
-    FINISHED_VOTING_COLOR,
-    ACTIVE_VOTING_COLOR,
+    JURY_BG_COLOR,
+    JURY_TEXT_COLOR,
+    TELEVOTE_UNFINISHED_BG_COLOR,
+    TELEVOTE_UNFINISHED_TEXT_COLOR,
+    TELEVOTE_ACTIVE_BG_COLOR,
+    TELEVOTE_ACTIVE_TEXT_COLOR,
+    TELEVOTE_FINISHED_BG_COLOR,
+    TELEVOTE_FINISHED_TEXT_COLOR,
   ] = useThemeColor([
-    'countryItem.bg',
+    'countryItem.juryBg',
+    'countryItem.juryCountryText',
+    'countryItem.televoteUnfinishedBg',
     'countryItem.televoteUnfinishedText',
-    'countryItem.televoteCountryText',
-    'countryItem.televoteFinishedBg',
     'countryItem.televoteActiveBg',
+    'countryItem.televoteActiveText',
+    'countryItem.televoteFinishedBg',
+    'countryItem.televoteFinishedText',
   ]);
 
   const isFirstRender = useRef(true);
 
-  const [springsActive, apiActive] = useSpring(() => {
+  const [springsPoints, pointsApiContainer] = useSpring(() => {
     if (isJuryVoting) {
       return {
         outlineWidth: 0,
-        backgroundColor: DEFAULT_BG_COLOR,
-        color: UNFINISHED_TELEVOTE_TEXT_COLOR,
+        backgroundColor: JURY_BG_COLOR,
+        color: JURY_TEXT_COLOR,
         transform: 'translate3d(0, 0, 0)',
       };
     }
     if (isCountryVotingFinished) {
       return {
         outlineWidth: 0,
-        backgroundColor: FINISHED_VOTING_COLOR,
-        color: TELEVOTE_COUNTRY_TEXT_COLOR,
+        backgroundColor: TELEVOTE_FINISHED_BG_COLOR,
+        color: TELEVOTE_FINISHED_TEXT_COLOR,
         transform: 'translate3d(0, 0, 0)',
       };
     }
     if (isActive) {
       return {
         outlineWidth: 2,
-        backgroundColor: ACTIVE_VOTING_COLOR,
-        color: TELEVOTE_COUNTRY_TEXT_COLOR,
+        backgroundColor: TELEVOTE_ACTIVE_BG_COLOR,
+        color: TELEVOTE_ACTIVE_TEXT_COLOR,
         transform: 'translate3d(0, 0, 0)',
       };
     }
 
     return {
       outlineWidth: 0,
-      backgroundColor: DEFAULT_BG_COLOR,
-      color: UNFINISHED_TELEVOTE_TEXT_COLOR,
+      backgroundColor: TELEVOTE_UNFINISHED_BG_COLOR,
+      color: TELEVOTE_UNFINISHED_TEXT_COLOR,
       transform: 'translate3d(0, 0, 0)',
     };
   });
 
-  const [springsContainer, apiContainer] = useSpring(() => ({
-    from: { x: 36, opacity: 0, transform: 'translate3d(0, 0, 0)' },
-    config: containerConfig,
-  }));
+  const [springsLastPointsContainer, lastPointsApiContainer] = useSpring(
+    () => ({
+      from: { x: 36, opacity: 0, transform: 'translate3d(0, 0, 0)' },
+      config: containerConfig,
+    }),
+  );
 
-  const [springsText, apiText] = useSpring(() => ({
+  const [springsLastPointsText, lastPointsApiText] = useSpring(() => ({
     from: { x: 15, opacity: 0, transform: 'translate3d(0, 0, 0)' },
     config: textConfig,
   }));
@@ -203,13 +211,13 @@ const useAnimatePoints = ({
 
     // Last points animation
     if (shouldShowLastPoints) {
-      apiContainer.start({
+      lastPointsApiContainer.start({
         to: { x: 0, opacity: 1, transform: 'translate3d(0, 0, 0)' },
         config: containerConfig,
         immediate,
       });
 
-      apiText.start({
+      lastPointsApiText.start({
         to: { x: 0, opacity: 1, transform: 'translate3d(0, 0, 0)' },
         config: textConfig,
         immediate,
@@ -221,13 +229,13 @@ const useAnimatePoints = ({
         }, 4000);
       }
 
-      apiContainer.start({
+      lastPointsApiContainer.start({
         to: { x: 36, opacity: 0, transform: 'translate3d(0, 0, 0)' },
         config: containerConfig,
         immediate,
       });
 
-      apiText.start({
+      lastPointsApiText.start({
         to: { x: 15, opacity: 0, transform: 'translate3d(0, 0, 0)' },
         config: { duration: 0 },
         immediate,
@@ -236,11 +244,11 @@ const useAnimatePoints = ({
     // Deliberately not including winnerCountry and isFinalAnimationFinished in the dependency array to avoid animation issues
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    apiContainer,
+    lastPointsApiContainer,
     apiDouzeContainer,
     apiDouzeParallelogramBlue,
     apiDouzeParallelogramYellow,
-    apiText,
+    lastPointsApiText,
     isDouzePoints,
     shouldShowLastPoints,
     isVotingOver,
@@ -252,11 +260,11 @@ const useAnimatePoints = ({
     const immediate = isFinalAnimationFinished;
 
     if (isJuryVoting) {
-      apiActive.start({
+      pointsApiContainer.start({
         to: {
           outlineWidth: 0,
-          backgroundColor: DEFAULT_BG_COLOR,
-          color: UNFINISHED_TELEVOTE_TEXT_COLOR,
+          backgroundColor: JURY_BG_COLOR,
+          color: JURY_TEXT_COLOR,
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
@@ -267,33 +275,33 @@ const useAnimatePoints = ({
     }
 
     if (isActive) {
-      apiActive.start({
+      pointsApiContainer.start({
         to: {
           outlineWidth: 2,
-          backgroundColor: ACTIVE_VOTING_COLOR,
-          color: TELEVOTE_COUNTRY_TEXT_COLOR,
+          backgroundColor: TELEVOTE_ACTIVE_BG_COLOR,
+          color: TELEVOTE_ACTIVE_TEXT_COLOR,
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
         immediate,
       });
     } else if (isCountryVotingFinished) {
-      apiActive.start({
+      pointsApiContainer.start({
         to: {
           outlineWidth: 0,
-          backgroundColor: FINISHED_VOTING_COLOR,
-          color: TELEVOTE_COUNTRY_TEXT_COLOR,
+          backgroundColor: TELEVOTE_FINISHED_BG_COLOR,
+          color: TELEVOTE_FINISHED_TEXT_COLOR,
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
         immediate,
       });
     } else {
-      apiActive.start({
+      pointsApiContainer.start({
         to: {
           outlineWidth: 0,
-          backgroundColor: DEFAULT_BG_COLOR,
-          color: UNFINISHED_TELEVOTE_TEXT_COLOR,
+          backgroundColor: TELEVOTE_UNFINISHED_BG_COLOR,
+          color: TELEVOTE_UNFINISHED_TEXT_COLOR,
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
@@ -301,34 +309,37 @@ const useAnimatePoints = ({
       });
     }
   }, [
-    ACTIVE_VOTING_COLOR,
-    DEFAULT_BG_COLOR,
-    TELEVOTE_COUNTRY_TEXT_COLOR,
-    FINISHED_VOTING_COLOR,
-    apiActive,
+    JURY_BG_COLOR,
+    JURY_TEXT_COLOR,
+    TELEVOTE_UNFINISHED_BG_COLOR,
+    TELEVOTE_UNFINISHED_TEXT_COLOR,
+    TELEVOTE_ACTIVE_BG_COLOR,
+    TELEVOTE_ACTIVE_TEXT_COLOR,
+    TELEVOTE_FINISHED_BG_COLOR,
+    TELEVOTE_FINISHED_TEXT_COLOR,
+    pointsApiContainer,
     isActive,
     isCountryVotingFinished,
     isJuryVoting,
-    UNFINISHED_TELEVOTE_TEXT_COLOR,
     isFinalAnimationFinished,
   ]);
 
   return useMemo(
     () => ({
-      springsContainer,
-      springsText,
+      springsLastPointsContainer,
+      springsLastPointsText,
       springsDouzeParallelogramBlue,
       springsDouzeParallelogramYellow,
       springsDouzeContainer,
-      springsActive,
+      springsPoints,
     }),
     [
-      springsActive,
-      springsContainer,
+      springsPoints,
+      springsLastPointsContainer,
       springsDouzeContainer,
       springsDouzeParallelogramBlue,
       springsDouzeParallelogramYellow,
-      springsText,
+      springsLastPointsText,
     ],
   );
 };
