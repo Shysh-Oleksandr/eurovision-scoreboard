@@ -18,6 +18,7 @@ import {
   COUNTRIES_2017,
   COUNTRIES_2018,
   COUNTRIES_2019,
+  COUNTRIES_2020,
   COUNTRIES_2021,
   COUNTRIES_2022,
   COUNTRIES_2023,
@@ -25,10 +26,7 @@ import {
   COUNTRIES_2025,
 } from './countries';
 
-export const SUPPORTED_YEARS = Array.from(
-  { length: 22 },
-  (_, i) => 2004 + i,
-).filter((year) => year !== 2020);
+export const SUPPORTED_YEARS = Array.from({ length: 22 }, (_, i) => 2004 + i);
 
 export const getCountriesByYear = (year: Year): BaseCountry[] => {
   switch (year) {
@@ -64,6 +62,8 @@ export const getCountriesByYear = (year: Year): BaseCountry[] => {
       return COUNTRIES_2018;
     case '2019':
       return COUNTRIES_2019;
+    case '2020':
+      return COUNTRIES_2020;
     case '2021':
       return COUNTRIES_2021;
     case '2022':

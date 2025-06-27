@@ -48,7 +48,7 @@ export const themes = {
         douzePointsBlock1: '#f3f3fe',
         douzePointsBlock2: '#084fc3',
         placeContainerBg: '#b75a9a',
-        placeText: '#cbc4ca',
+        placeText: '#fff',
         unqualifiedBg: '#102c89',
         unqualifiedText: '#f3f3fe',
       },
@@ -290,6 +290,10 @@ const yearsWithThemes = Object.keys(themes);
 export function getThemeForYear(year: Year) {
   if (yearsWithThemes.includes(year)) {
     return themes[year];
+  }
+
+  if (year === '2020') {
+    return themes['2021'];
   }
 
   return themes['2025']; // Fallback to 2025 theme
