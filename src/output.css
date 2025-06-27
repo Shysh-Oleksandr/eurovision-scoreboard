@@ -674,8 +674,8 @@ video {
   z-index: 50;
 }
 
-.z-\[10000\] {
-  z-index: 10000;
+.z-\[1000\] {
+  z-index: 1000;
 }
 
 .z-\[100\] {
@@ -1040,19 +1040,14 @@ video {
   border-color: rgb(255 255 255 / var(--tw-border-opacity, 1));
 }
 
-.\!bg-primary-900 {
+.\!bg-countryItem-unqualifiedBg {
   --tw-bg-opacity: 1 !important;
-  background-color: hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, var(--tw-bg-opacity))) !important;
+  background-color: hsl(var(--twc-countryItem-unqualifiedBg) / var(--twc-countryItem-unqualifiedBg-opacity, var(--tw-bg-opacity))) !important;
 }
 
 .bg-black {
   --tw-bg-opacity: 1;
   background-color: rgb(0 0 0 / var(--tw-bg-opacity, 1));
-}
-
-.bg-countryItem-bg {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--twc-countryItem-bg) / var(--twc-countryItem-bg-opacity, var(--tw-bg-opacity)));
 }
 
 .bg-countryItem-douzePointsBg {
@@ -1070,29 +1065,14 @@ video {
   background-color: hsl(var(--twc-countryItem-douzePointsBlock2) / var(--twc-countryItem-douzePointsBlock2-opacity, var(--tw-bg-opacity)));
 }
 
-.bg-countryItem-juryLastPointsBg {
+.bg-countryItem-juryBg {
   --tw-bg-opacity: 1;
-  background-color: hsl(var(--twc-countryItem-juryLastPointsBg) / var(--twc-countryItem-juryLastPointsBg-opacity, var(--tw-bg-opacity)));
+  background-color: hsl(var(--twc-countryItem-juryBg) / var(--twc-countryItem-juryBg-opacity, var(--tw-bg-opacity)));
 }
 
 .bg-countryItem-placeContainerBg {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--twc-countryItem-placeContainerBg) / var(--twc-countryItem-placeContainerBg-opacity, var(--tw-bg-opacity)));
-}
-
-.bg-countryItem-pointsBg {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--twc-countryItem-pointsBg) / var(--twc-countryItem-pointsBg-opacity, var(--tw-bg-opacity)));
-}
-
-.bg-countryItem-televoteLastPointsBg {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--twc-countryItem-televoteLastPointsBg) / var(--twc-countryItem-televoteLastPointsBg-opacity, var(--tw-bg-opacity)));
-}
-
-.bg-countryItem-televotePointsBg {
-  --tw-bg-opacity: 1;
-  background-color: hsl(var(--twc-countryItem-televotePointsBg) / var(--twc-countryItem-televotePointsBg-opacity, var(--tw-bg-opacity)));
 }
 
 .bg-gray-600 {
@@ -1433,24 +1413,9 @@ video {
   color: hsl(var(--twc-countryItem-douzePointsText) / var(--twc-countryItem-douzePointsText-opacity, var(--tw-text-opacity)));
 }
 
-.text-countryItem-lastPointsText {
-  --tw-text-opacity: 1;
-  color: hsl(var(--twc-countryItem-lastPointsText) / var(--twc-countryItem-lastPointsText-opacity, var(--tw-text-opacity)));
-}
-
 .text-countryItem-placeText {
   --tw-text-opacity: 1;
   color: hsl(var(--twc-countryItem-placeText) / var(--twc-countryItem-placeText-opacity, var(--tw-text-opacity)));
-}
-
-.text-countryItem-televotePointsText {
-  --tw-text-opacity: 1;
-  color: hsl(var(--twc-countryItem-televotePointsText) / var(--twc-countryItem-televotePointsText-opacity, var(--tw-text-opacity)));
-}
-
-.text-countryItem-text {
-  --tw-text-opacity: 1;
-  color: hsl(var(--twc-countryItem-text) / var(--twc-countryItem-text-opacity, var(--tw-text-opacity)));
 }
 
 .text-gray-400 {
@@ -1589,21 +1554,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1627,21 +1599,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1665,21 +1644,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1703,21 +1689,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1741,21 +1734,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1779,21 +1779,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1817,21 +1824,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1855,21 +1869,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1893,21 +1914,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1931,21 +1959,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -1969,21 +2004,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -2007,21 +2049,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -2045,21 +2094,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -2083,21 +2139,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -2121,21 +2184,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -2159,21 +2229,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -2187,41 +2264,50 @@ video {
 }
 
 .theme-2021,[data-theme="2021"] {
-  --twc-primary-700: 270.9 86.8% 61.4%;
-  --twc-primary-750: 267.79999999999995 70.5% 42.5%;
-  --twc-primary-800: 268.29999999999995 70.6% 34.7%;
-  --twc-primary-900: 268.1 71.2% 25.9%;
-  --twc-primary-950: 274.20000000000005 71.4% 17.8%;
-  --twc-gray-500: 282.4 31.8% 58%;
-  --twc-gray-600: 282.20000000000005 25.2% 42%;
-  --twc-gray-900: 278.79999999999995 34.8% 27.1%;
-  --twc-appBgColor: 282.1 90.6% 16.7%;
-  --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
-  --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
-  --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
-  --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
-  --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
-  --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
-  --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
-  --twc-countryItem-placeContainerBg: 279.5 74.5% 38.4%;
-  --twc-countryItem-placeText: 330 100% 99.2%;
-  --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
-  --twc-panelInfo-activeText: 296.70000000000005 94.3% 41.4%;
-  --twc-panelInfo-inactiveText: 268.4 63.3% 40.6%;
-  --twc-panelInfo-inactiveBg: 274.20000000000005 71.4% 17.8%;
+  --twc-primary-700: 228.89999999999998 70.2% 50%;
+  --twc-primary-750: 225.79999999999995 77% 41%;
+  --twc-primary-800: 226.10000000000002 79.1% 30%;
+  --twc-primary-900: 239.39999999999998 85.7% 22%;
+  --twc-primary-950: 239.20000000000005 95.1% 16.1%;
+  --twc-gray-500: 233.29999999999995 38.8% 59%;
+  --twc-gray-600: 233.39999999999998 34% 42.2%;
+  --twc-gray-900: 231.10000000000002 35.3% 26.1%;
+  --twc-appBgColor: 236.5 50% 20.4%;
+  --twc-animatedBorder: 318.70000000000005 39.2% 53.5%;
+  --twc-countryItem-juryBg: 240 84.6% 97.5%;
+  --twc-countryItem-juryHoverBg: 240 33.3% 88.8%;
+  --twc-countryItem-juryCountryText: 246.70000000000005 47.4% 3.7%;
+  --twc-countryItem-juryPointsBg: 240 84.6% 97.5%;
+  --twc-countryItem-juryPointsText: 246.70000000000005 47.4% 3.7%;
+  --twc-countryItem-juryLastPointsBg: 317.79999999999995 78.7% 70.6%;
+  --twc-countryItem-juryLastPointsText: 240 84.6% 97.5%;
+  --twc-countryItem-televoteUnfinishedBg: 240 84.6% 97.5%;
+  --twc-countryItem-televoteUnfinishedText: 246.70000000000005 47.4% 3.7%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 224.60000000000002 100% 49.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 240 84.6% 97.5%;
+  --twc-countryItem-televoteActiveBg: 224.70000000000005 98.2% 42.9%;
+  --twc-countryItem-televoteActiveText: 240 84.6% 97.5%;
+  --twc-countryItem-televoteActivePointsBg: 224.60000000000002 100% 49.6%;
+  --twc-countryItem-televoteActivePointsText: 240 84.6% 97.5%;
+  --twc-countryItem-televoteOutline: 217.20000000000005 91.2% 59.8%;
+  --twc-countryItem-televoteFinishedBg: 227.60000000000002 15.2% 37.5%;
+  --twc-countryItem-televoteFinishedText: 240 84.6% 97.5%;
+  --twc-countryItem-televoteFinishedPointsBg: 227.60000000000002 15.2% 37.5%;
+  --twc-countryItem-televoteFinishedPointsText: 240 84.6% 97.5%;
+  --twc-countryItem-televoteLastPointsBg: 317.79999999999995 78.7% 70.6%;
+  --twc-countryItem-televoteLastPointsText: 240 84.6% 97.5%;
+  --twc-countryItem-douzePointsBg: 318.70000000000005 39.2% 53.5%;
+  --twc-countryItem-douzePointsText: 240 84.6% 97.5%;
+  --twc-countryItem-douzePointsBlock1: 240 84.6% 97.5%;
+  --twc-countryItem-douzePointsBlock2: 217.20000000000005 92.1% 39.8%;
+  --twc-countryItem-placeContainerBg: 318.70000000000005 39.2% 53.5%;
+  --twc-countryItem-placeText: 308.6 6.3% 78.2%;
+  --twc-countryItem-unqualifiedBg: 226.10000000000002 79.1% 30%;
+  --twc-countryItem-unqualifiedText: 240 84.6% 97.5%;
+  --twc-panelInfo-activeBg: 318.70000000000005 39.2% 53.5%;
+  --twc-panelInfo-activeText: 308.6 6.3% 78.2%;
+  --twc-panelInfo-inactiveText: 296.5 21.7% 46.1%;
+  --twc-panelInfo-inactiveBg: 296.4 84.8% 15.5%;
 }
 
 .theme-2022,[data-theme="2022"] {
@@ -2233,29 +2319,38 @@ video {
   --twc-gray-500: 327.5 11.2% 58%;
   --twc-gray-600: 320.6 16.7% 41%;
   --twc-gray-900: 319.4 24.6% 27.1%;
-  --twc-appBgColor: 319.29999999999995 36.8% 14.9%;
+  --twc-appBgColor: 358 44.1% 13.3%;
   --twc-animatedBorder: 20.69999999999999 94.6% 36.1%;
-  --twc-countryItem-bg: 308.79999999999995 52.2% 18%;
-  --twc-countryItem-hoverBg: 307.29999999999995 42.3% 19%;
-  --twc-countryItem-text: 272.29999999999995 86.7% 97.1%;
-  --twc-countryItem-pointsBg: 308.79999999999995 52.2% 18%;
+  --twc-countryItem-juryBg: 308.79999999999995 52.2% 18%;
+  --twc-countryItem-juryHoverBg: 307.29999999999995 42.3% 19%;
+  --twc-countryItem-juryCountryText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-juryPointsBg: 308.79999999999995 52.2% 18%;
   --twc-countryItem-juryPointsText: 272.29999999999995 86.7% 97.1%;
   --twc-countryItem-juryLastPointsBg: 163.5 20.2% 38.8%;
-  --twc-countryItem-lastPointsText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-juryLastPointsText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-televoteUnfinishedBg: 308.79999999999995 52.2% 18%;
   --twc-countryItem-televoteUnfinishedText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 20.69999999999999 94.6% 36.1%;
+  --twc-countryItem-televoteUnfinishedPointsText: 272.29999999999995 86.7% 97.1%;
   --twc-countryItem-televoteActiveBg: 319.5 38.1% 38%;
+  --twc-countryItem-televoteActiveText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-televoteActivePointsBg: 20.69999999999999 94.6% 36.1%;
+  --twc-countryItem-televoteActivePointsText: 272.29999999999995 86.7% 97.1%;
   --twc-countryItem-televoteOutline: 318.29999999999995 49.2% 47.1%;
   --twc-countryItem-televoteFinishedBg: 20.69999999999999 94.6% 36.1%;
-  --twc-countryItem-televotePointsBg: 20.69999999999999 94.6% 36.1%;
-  --twc-countryItem-televotePointsText: 272.29999999999995 86.7% 97.1%;
-  --twc-countryItem-televoteCountryText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-televoteFinishedText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-televoteFinishedPointsBg: 20.69999999999999 94.6% 36.1%;
+  --twc-countryItem-televoteFinishedPointsText: 272.29999999999995 86.7% 97.1%;
   --twc-countryItem-televoteLastPointsBg: 163.5 20.2% 38.8%;
+  --twc-countryItem-televoteLastPointsText: 272.29999999999995 86.7% 97.1%;
   --twc-countryItem-douzePointsBg: 20.69999999999999 94.6% 36.1%;
   --twc-countryItem-douzePointsText: 272.29999999999995 86.7% 97.1%;
   --twc-countryItem-douzePointsBlock1: 318.9 42.9% 26.1%;
   --twc-countryItem-douzePointsBlock2: 163.5 20.2% 38.8%;
-  --twc-countryItem-placeContainerBg: 20.69999999999999 94.6% 36.1%;
+  --twc-countryItem-placeContainerBg: 318.9 42.9% 26.1%;
   --twc-countryItem-placeText: 272.29999999999995 86.7% 97.1%;
+  --twc-countryItem-unqualifiedBg: 318.9 42.9% 26.1%;
+  --twc-countryItem-unqualifiedText: 272.29999999999995 86.7% 97.1%;
   --twc-panelInfo-activeBg: 163.5 20.2% 38.8%;
   --twc-panelInfo-activeText: 162 62.5% 93.7%;
   --twc-panelInfo-inactiveText: 162 62.5% 93.7%;
@@ -2273,27 +2368,36 @@ video {
   --twc-gray-900: 231.79999999999995 31.9% 27.1%;
   --twc-appBgColor: 229.39999999999998 65.7% 35.5%;
   --twc-animatedBorder: 328.79999999999995 99.2% 49.8%;
-  --twc-countryItem-bg: 0 0% 100%;
-  --twc-countryItem-hoverBg: 204 93.8% 93.7%;
-  --twc-countryItem-text: 240 1.8% 10.8%;
-  --twc-countryItem-pointsBg: 328.79999999999995 99.2% 49.8%;
-  --twc-countryItem-juryPointsText: 224.60000000000002 100% 49.6%;
-  --twc-countryItem-televotePointsBg: 224.60000000000002 100% 49.6%;
-  --twc-countryItem-televoteActiveBg: 224.70000000000005 98.2% 42.9%;
-  --twc-countryItem-televotePointsText: 0 0% 100%;
-  --twc-countryItem-televoteCountryText: 0 0% 100%;
-  --twc-countryItem-televoteUnfinishedText: 240 1.8% 10.8%;
-  --twc-countryItem-televoteFinishedBg: 239.39999999999998 66.7% 31.8%;
-  --twc-countryItem-televoteOutline: 217.20000000000005 91.2% 59.8%;
+  --twc-countryItem-juryBg: 0 0% 100%;
+  --twc-countryItem-juryHoverBg: 204 93.8% 93.7%;
+  --twc-countryItem-juryCountryText: 240 1.8% 10.8%;
+  --twc-countryItem-juryPointsBg: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-juryPointsText: 0 0% 100%;
   --twc-countryItem-juryLastPointsBg: 58.30000000000001 100% 49.8%;
+  --twc-countryItem-juryLastPointsText: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-televoteUnfinishedBg: 0 0% 100%;
+  --twc-countryItem-televoteUnfinishedText: 240 1.8% 10.8%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-televoteUnfinishedPointsText: 0 0% 100%;
+  --twc-countryItem-televoteActiveBg: 224.70000000000005 98.2% 42.9%;
+  --twc-countryItem-televoteActiveText: 0 0% 100%;
+  --twc-countryItem-televoteActivePointsBg: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-televoteActivePointsText: 0 0% 100%;
+  --twc-countryItem-televoteOutline: 217.20000000000005 91.2% 59.8%;
+  --twc-countryItem-televoteFinishedBg: 239.39999999999998 66.7% 31.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 100%;
+  --twc-countryItem-televoteFinishedPointsBg: 224.60000000000002 100% 49.6%;
+  --twc-countryItem-televoteFinishedPointsText: 0 0% 100%;
   --twc-countryItem-televoteLastPointsBg: 58.30000000000001 100% 49.8%;
-  --twc-countryItem-lastPointsText: 328.79999999999995 99.2% 49.8%;
+  --twc-countryItem-televoteLastPointsText: 328.79999999999995 99.2% 49.8%;
   --twc-countryItem-douzePointsBg: 58.30000000000001 100% 49.8%;
   --twc-countryItem-douzePointsText: 328.79999999999995 99.2% 49.8%;
   --twc-countryItem-douzePointsBlock1: 224.20000000000005 100% 49.8%;
   --twc-countryItem-douzePointsBlock2: 328.79999999999995 99.2% 49.8%;
   --twc-countryItem-placeContainerBg: 328.79999999999995 99.2% 49.8%;
   --twc-countryItem-placeText: 0 0% 100%;
+  --twc-countryItem-unqualifiedBg: 226 76.5% 38.4%;
+  --twc-countryItem-unqualifiedText: 0 0% 100%;
   --twc-panelInfo-activeBg: 58.30000000000001 100% 49.8%;
   --twc-panelInfo-activeText: 328.79999999999995 99.2% 49.8%;
   --twc-panelInfo-inactiveText: 225.79999999999995 76.7% 42.2%;
@@ -2311,27 +2415,36 @@ video {
   --twc-gray-900: 278 30.8% 26.1%;
   --twc-appBgColor: 265.5 47.6% 32.9%;
   --twc-animatedBorder: 304.70000000000005 56.3% 51.6%;
-  --twc-countryItem-bg: 271.1 58.3% 37.6%;
-  --twc-countryItem-hoverBg: 270.6 60.8% 31%;
-  --twc-countryItem-text: 330 100% 99.2%;
-  --twc-countryItem-pointsBg: 304.70000000000005 56.3% 51.6%;
-  --twc-countryItem-juryPointsText: 267.20000000000005 54.1% 61.6%;
-  --twc-countryItem-televotePointsBg: 267.20000000000005 54.1% 61.6%;
-  --twc-countryItem-televoteActiveBg: 267.20000000000005 54.1% 61.6%;
-  --twc-countryItem-televotePointsText: 330 100% 99.2%;
-  --twc-countryItem-televoteCountryText: 330 100% 99.2%;
-  --twc-countryItem-televoteUnfinishedText: 330 100% 99.2%;
-  --twc-countryItem-televoteFinishedBg: 271.1 70.4% 22.5%;
-  --twc-countryItem-televoteOutline: 290.5 77% 72.7%;
+  --twc-countryItem-juryBg: 271.1 58.3% 37.6%;
+  --twc-countryItem-juryHoverBg: 270.6 60.8% 31%;
+  --twc-countryItem-juryCountryText: 330 100% 99.2%;
+  --twc-countryItem-juryPointsBg: 304.70000000000005 56.3% 51.6%;
+  --twc-countryItem-juryPointsText: 330 100% 99.2%;
   --twc-countryItem-juryLastPointsBg: 194.10000000000002 66.2% 44.1%;
+  --twc-countryItem-juryLastPointsText: 330 100% 99.2%;
+  --twc-countryItem-televoteUnfinishedBg: 271.1 58.3% 37.6%;
+  --twc-countryItem-televoteUnfinishedText: 330 100% 99.2%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 304.70000000000005 56.3% 51.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 330 100% 99.2%;
+  --twc-countryItem-televoteActiveBg: 267.20000000000005 54.1% 61.6%;
+  --twc-countryItem-televoteActiveText: 330 100% 99.2%;
+  --twc-countryItem-televoteActivePointsBg: 304.70000000000005 56.3% 51.6%;
+  --twc-countryItem-televoteActivePointsText: 330 100% 99.2%;
+  --twc-countryItem-televoteOutline: 290.5 77% 72.7%;
+  --twc-countryItem-televoteFinishedBg: 271.1 70.4% 22.5%;
+  --twc-countryItem-televoteFinishedText: 330 100% 99.2%;
+  --twc-countryItem-televoteFinishedPointsBg: 267.20000000000005 54.1% 61.6%;
+  --twc-countryItem-televoteFinishedPointsText: 330 100% 99.2%;
   --twc-countryItem-televoteLastPointsBg: 194.10000000000002 66.2% 44.1%;
-  --twc-countryItem-lastPointsText: 330 100% 99.2%;
+  --twc-countryItem-televoteLastPointsText: 330 100% 99.2%;
   --twc-countryItem-douzePointsBg: 305 68.6% 58.8%;
   --twc-countryItem-douzePointsText: 265 88.8% 28%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
   --twc-countryItem-douzePointsBlock2: 194.10000000000002 66.2% 44.1%;
   --twc-countryItem-placeContainerBg: 271.1 58.3% 37.6%;
   --twc-countryItem-placeText: 330 100% 99.2%;
+  --twc-countryItem-unqualifiedBg: 265.5 47.6% 32.9%;
+  --twc-countryItem-unqualifiedText: 330 100% 99.2%;
   --twc-panelInfo-activeBg: 270.9 86.4% 31.8%;
   --twc-panelInfo-activeText: 194.20000000000005 65.5% 44.3%;
   --twc-panelInfo-inactiveText: 265.5 47.6% 32.9%;
@@ -2349,21 +2462,28 @@ video {
   --twc-gray-900: 278.79999999999995 34.8% 27.1%;
   --twc-appBgColor: 282.1 90.6% 16.7%;
   --twc-animatedBorder: 0 0% 99.6%;
-  --twc-countryItem-bg: 265 67.4% 43.3%;
-  --twc-countryItem-hoverBg: 265.1 70.5% 35.9%;
-  --twc-countryItem-text: 0 0% 99.6%;
-  --twc-countryItem-pointsBg: 0 0% 99.6%;
+  --twc-countryItem-juryBg: 265 67.4% 43.3%;
+  --twc-countryItem-juryHoverBg: 265.1 70.5% 35.9%;
+  --twc-countryItem-juryCountryText: 0 0% 99.6%;
+  --twc-countryItem-juryPointsBg: 0 0% 99.6%;
   --twc-countryItem-juryPointsText: 270 100% 0.4%;
-  --twc-countryItem-televotePointsBg: 0 0% 99.6%;
-  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
-  --twc-countryItem-televotePointsText: 270 100% 0.4%;
-  --twc-countryItem-televoteCountryText: 0 0% 99.6%;
-  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
-  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
-  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
   --twc-countryItem-juryLastPointsBg: 296.9 99% 38.8%;
+  --twc-countryItem-juryLastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedBg: 265 67.4% 43.3%;
+  --twc-countryItem-televoteUnfinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteUnfinishedPointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteActiveBg: 265 78.5% 56.3%;
+  --twc-countryItem-televoteActiveText: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteActivePointsText: 270 100% 0.4%;
+  --twc-countryItem-televoteOutline: 264.79999999999995 32.2% 64.7%;
+  --twc-countryItem-televoteFinishedBg: 296.9 99% 38.8%;
+  --twc-countryItem-televoteFinishedText: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 0 0% 99.6%;
+  --twc-countryItem-televoteFinishedPointsText: 270 100% 0.4%;
   --twc-countryItem-televoteLastPointsBg: 279.70000000000005 74.1% 50%;
-  --twc-countryItem-lastPointsText: 0 0% 99.6%;
+  --twc-countryItem-televoteLastPointsText: 0 0% 99.6%;
   --twc-countryItem-douzePointsBg: 180 95.5% 43.5%;
   --twc-countryItem-douzePointsText: 226.5 81.1% 29%;
   --twc-countryItem-douzePointsBlock1: 275.79999999999995 88.6% 37.8%;
@@ -2529,6 +2649,10 @@ h6 {
 }
 
 /* TODO: move the bg image logic outside */
+
+#main.theme-2021 {
+  background-image: url('/src/assets/bgImages/BlueBg2021.webp') !important;
+}
 
 #main.theme-2022 {
   background-image: url('/src/assets/bgImages/DarkRedBg2022.webp') !important;
@@ -2714,9 +2838,9 @@ h6 {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.hover\:\!bg-countryItem-hoverBg:hover {
+.hover\:\!bg-countryItem-juryHoverBg:hover {
   --tw-bg-opacity: 1 !important;
-  background-color: hsl(var(--twc-countryItem-hoverBg) / var(--twc-countryItem-hoverBg-opacity, var(--tw-bg-opacity))) !important;
+  background-color: hsl(var(--twc-countryItem-juryHoverBg) / var(--twc-countryItem-juryHoverBg-opacity, var(--tw-bg-opacity))) !important;
 }
 
 .hover\:\!bg-primary-700:hover {
@@ -2739,6 +2863,11 @@ h6 {
   background-color: hsl(var(--twc-primary-800) / var(--twc-primary-800-opacity, var(--tw-bg-opacity)));
 }
 
+.hover\:bg-primary-950:hover {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--twc-primary-950) / var(--twc-primary-950-opacity, var(--tw-bg-opacity)));
+}
+
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
@@ -2752,6 +2881,11 @@ h6 {
 .focus\:bg-primary-800:focus {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--twc-primary-800) / var(--twc-primary-800-opacity, var(--tw-bg-opacity)));
+}
+
+.focus\:bg-primary-950:focus {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--twc-primary-950) / var(--twc-primary-950-opacity, var(--tw-bg-opacity)));
 }
 
 .focus\:outline-none:focus {
