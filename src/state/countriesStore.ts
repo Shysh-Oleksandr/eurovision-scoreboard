@@ -9,7 +9,7 @@ import { getThemeForYear } from '../theme/themes';
 import { themesInfo } from '../theme/themesInfo';
 import { Theme, ThemeInfo } from '../theme/types';
 
-const INITIAL_YEAR = '2021';
+const INITIAL_YEAR = '2025';
 
 interface CountriesState {
   // State
