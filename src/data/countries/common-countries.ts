@@ -1,278 +1,1029 @@
 import { BaseCountry } from '../../models';
 
-// Flags from https://geotargetly.com/free-flags
-export const COMMON_COUNTRIES = {
+type CommonCountry = Pick<
+  BaseCountry,
+  'name' | 'code' | 'category' | 'isEurovisionCountry'
+>;
+export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
+  // Eurovision countries
   Albania: {
     name: 'Albania',
     code: 'AL',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66be049cf07bd10fefca7b53_al.svg',
+    category: 'Eurovision Participants',
   },
   Andorra: {
     name: 'Andorra',
     code: 'AD',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66be049c8cd530e3bd4eb474_ad.svg',
+    category: 'Eurovision Participants',
   },
   Armenia: {
     name: 'Armenia',
     code: 'AM',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66be049c18580316e57fd94b_am.svg',
+    category: 'Eurovision Participants',
   },
   Australia: {
     name: 'Australia',
     code: 'AU',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca1a9040d4ad6005302_au.svg',
+    category: 'Eurovision Participants',
   },
   Austria: {
     name: 'Austria',
     code: 'AT',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66be0b937d9508ec39cdb04a_at.svg',
+    category: 'Eurovision Participants',
   },
   Azerbaijan: {
     name: 'Azerbaijan',
     code: 'AZ',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca1622ffbe99280f2d2_az.svg',
+    category: 'Eurovision Participants',
   },
   Belarus: {
     name: 'Belarus',
     code: 'BY',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1f35dfe3396b5dd9880e_by.svg',
+    category: 'Eurovision Participants',
   },
   Belgium: {
     name: 'Belgium',
     code: 'BE',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca15aa291bbcca0a86b_be.svg',
+    category: 'Eurovision Participants',
   },
   BosniaHerzegovina: {
     name: 'Bosnia & Herzegovina',
     code: 'BA',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca15eba5d4654214c13_ba.svg',
+    category: 'Eurovision Participants',
   },
   Bulgaria: {
     name: 'Bulgaria',
     code: 'BG',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1ca1e0e5dccc20382df3_bg.svg',
+    category: 'Eurovision Participants',
   },
   Croatia: {
     name: 'Croatia',
     code: 'HR',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a6c2e1936cd3a84d70_hr.svg',
+    category: 'Eurovision Participants',
   },
   Cyprus: {
     name: 'Cyprus',
     code: 'CY',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a1bc05c830d8b956a4_cy.svg',
+    category: 'Eurovision Participants',
   },
   Czechia: {
     name: 'Czechia',
     code: 'CZ',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a1bcf606ad88f87e7e_cz.svg',
+    category: 'Eurovision Participants',
   },
   Denmark: {
     name: 'Denmark',
     code: 'DK',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a1c671b1a7680bf756_dk.svg',
+    category: 'Eurovision Participants',
   },
   Estonia: {
     name: 'Estonia',
     code: 'EE',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a13cfe7fd4f257cd6f_ee.svg',
+    category: 'Eurovision Participants',
   },
   Finland: {
     name: 'Finland',
     code: 'FI',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a2105c325ee744520d_fi.svg',
+    category: 'Eurovision Participants',
   },
   France: {
     name: 'France',
     code: 'FR',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a3cbeffadf364a88e3_fr.svg',
+    category: 'Eurovision Participants',
   },
   Georgia: {
     name: 'Georgia',
     code: 'GE',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a3622ffbe9928955a6_ge.svg',
+    category: 'Eurovision Participants',
   },
   Germany: {
     name: 'Germany',
     code: 'DE',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a1cdd4f45da9d4eb38_de.svg',
+    category: 'Eurovision Participants',
   },
   Greece: {
     name: 'Greece',
     code: 'GR',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a5aba7827ebf258495_gr.svg',
+    category: 'Eurovision Participants',
   },
   Hungary: {
     name: 'Hungary',
     code: 'HU',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a7c671b1a7680bfc12_hu.svg',
+    category: 'Eurovision Participants',
   },
   Iceland: {
     name: 'Iceland',
     code: 'IS',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a8115be590e9bd1462_is.svg',
+    category: 'Eurovision Participants',
   },
   Ireland: {
     name: 'Ireland',
     code: 'IE',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a78ee7dfc71806b3cc_ie.svg',
+    category: 'Eurovision Participants',
   },
   Israel: {
     name: 'Israel',
     code: 'IL',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a7fda0ce5d675ef41b_il.svg',
+    category: 'Eurovision Participants',
   },
   Italy: {
     name: 'Italy',
     code: 'IT',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a8e02b1117419105ba_it.svg',
-  },
-  Kazakhstan: {
-    name: 'Kazakhstan',
-    code: 'KZ',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25aa87cddf5e21578de7_kz.svg',
-  },
-  Kosovo: {
-    name: 'Kosovo',
-    code: 'XK',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438e6a687f79f794a8b9_xk.svg',
+    category: 'Eurovision Participants',
   },
   Latvia: {
     name: 'Latvia',
     code: 'LV',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4378f0869fbe66a78b9b_lv.svg',
-  },
-  Liechtenstein: {
-    name: 'Liechtenstein',
-    code: 'LI',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25aaa1598bdc7bc761c9_li.svg',
+    category: 'Eurovision Participants',
   },
   Lithuania: {
     name: 'Lithuania',
     code: 'LT',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437bac957ca74af9dfe1_lt.svg',
+    category: 'Eurovision Participants',
   },
   Luxembourg: {
     name: 'Luxembourg',
     code: 'LU',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437811e45df915df8222_lu.svg',
+    category: 'Eurovision Participants',
   },
   Malta: {
     name: 'Malta',
     code: 'MT',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437cde561af29d224ce0_mt.svg',
+    category: 'Eurovision Participants',
   },
   Moldova: {
     name: 'Moldova',
     code: 'MD',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437a8c1cf7591b9a48c3_md.svg',
+    category: 'Eurovision Participants',
   },
   Monaco: {
     name: 'Monaco',
     code: 'MC',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437bfd208d55c8ac5bcb_mc.svg',
+    category: 'Eurovision Participants',
   },
   Montenegro: {
     name: 'Montenegro',
     code: 'ME',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437a577b84668e260847_me.svg',
+    category: 'Eurovision Participants',
+  },
+  Morocco: {
+    name: 'Morocco',
+    code: 'MA',
+    category: 'Eurovision Participants',
   },
   Netherlands: {
     name: 'Netherlands',
     code: 'NL',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4384aaebf8633cc754a0_nl.svg',
+    category: 'Eurovision Participants',
   },
   NorthMacedonia: {
     name: 'North Macedonia',
     code: 'MK',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf437bfd208d55c8ac5c07_mk.svg',
+    category: 'Eurovision Participants',
   },
   Norway: {
     name: 'Norway',
     code: 'NO',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1f353a1353fba261110f_bv.svg',
+    category: 'Eurovision Participants',
   },
   Poland: {
     name: 'Poland',
     code: 'PL',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf43851cec61ee4c3e53ab_pl.svg',
+    category: 'Eurovision Participants',
   },
   Portugal: {
     name: 'Portugal',
     code: 'PT',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4385cc482afeb9d7a1b3_pt.svg',
+    category: 'Eurovision Participants',
   },
   Romania: {
     name: 'Romania',
     code: 'RO',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438655e2bbac5000efa6_ro.svg',
+    category: 'Eurovision Participants',
   },
   Russia: {
     name: 'Russia',
     code: 'RU',
-    flag: 'https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg',
+    category: 'Eurovision Participants',
   },
   SanMarino: {
     name: 'San Marino',
     code: 'SM',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf43889c24820a55ffddfc_sm.svg',
+    category: 'Eurovision Participants',
   },
   Serbia: {
     name: 'Serbia',
     code: 'RS',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4386ecc7703ef117562a_rs.svg',
+    category: 'Eurovision Participants',
   },
   SerbiaMontenegro: {
     name: 'Serbia & Montenegro',
     code: 'CS',
-    flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flag_of_Serbia_and_Montenegro_%281992%E2%80%932006%29.svg/1200px-Flag_of_Serbia_and_Montenegro_%281992%E2%80%932006%29.svg.png',
+    category: 'Eurovision Participants',
   },
   Slovakia: {
     name: 'Slovakia',
     code: 'SK',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf43885b07a53217a12132_sk.svg',
+    category: 'Eurovision Participants',
   },
   Slovenia: {
     name: 'Slovenia',
     code: 'SI',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438822b571db555ba767_si.svg',
+    category: 'Eurovision Participants',
   },
   Spain: {
     name: 'Spain',
     code: 'ES',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a1a87268259b6202ac_es.svg',
+    category: 'Eurovision Participants',
   },
   Sweden: {
     name: 'Sweden',
     code: 'SE',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf4388d00ff1711f3be415_se.svg',
+    category: 'Eurovision Participants',
   },
   Switzerland: {
     name: 'Switzerland',
     code: 'CH',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf1f351f0d5cf3a03db26a_ch.svg',
+    category: 'Eurovision Participants',
   },
   Turkey: {
     name: 'Turkey',
     code: 'TR',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438be043e403da7d1717_tr.svg',
+    category: 'Eurovision Participants',
   },
   Ukraine: {
     name: 'Ukraine',
     code: 'UA',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438b9759cc2db4055158_ua.svg',
+    category: 'Eurovision Participants',
   },
   UnitedKingdom: {
     name: 'United Kingdom',
     code: 'GB',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf25a3d774008a7088f805_gb.svg',
+    category: 'Eurovision Participants',
+  },
+  Yugoslavia: {
+    name: 'Yugoslavia',
+    code: 'YU',
+    category: 'Eurovision Participants',
+  },
+
+  // Not Eurovision countries by category
+  // Asia
+  Afghanistan: {
+    name: 'Afghanistan',
+    code: 'AF',
+    category: 'Asia',
+  },
+  Bahrain: {
+    name: 'Bahrain',
+    code: 'BH',
+    category: 'Asia',
+  },
+  Bangladesh: {
+    name: 'Bangladesh',
+    code: 'BD',
+    category: 'Asia',
+  },
+  Bhutan: {
+    name: 'Bhutan',
+    code: 'BT',
+    category: 'Asia',
+  },
+  Brunei: {
+    name: 'Brunei',
+    code: 'BN',
+    category: 'Asia',
+  },
+  Cambodia: {
+    name: 'Cambodia',
+    code: 'KH',
+    category: 'Asia',
+  },
+  China: {
+    name: 'China',
+    code: 'CN',
+    category: 'Asia',
+  },
+  EastTimor: {
+    name: 'East Timor',
+    code: 'TL',
+    category: 'Asia',
+  },
+  HongKong: {
+    name: 'Hong Kong',
+    code: 'HK',
+    category: 'Asia',
+  },
+  India: {
+    name: 'India',
+    code: 'IN',
+    category: 'Asia',
+  },
+  Indonesia: {
+    name: 'Indonesia',
+    code: 'ID',
+    category: 'Asia',
+  },
+  Iran: {
+    name: 'Iran',
+    code: 'IR',
+    category: 'Asia',
+  },
+  Iraq: {
+    name: 'Iraq',
+    code: 'IQ',
+    category: 'Asia',
+  },
+  Japan: {
+    name: 'Japan',
+    code: 'JP',
+    category: 'Asia',
+  },
+  Jordan: {
+    name: 'Jordan',
+    code: 'JO',
+    category: 'Asia',
+  },
+  Kazakhstan: {
+    name: 'Kazakhstan',
+    code: 'KZ',
+    category: 'Asia',
+  },
+  Kuwait: {
+    name: 'Kuwait',
+    code: 'KW',
+    category: 'Asia',
+  },
+  Kyrgyzstan: {
+    name: 'Kyrgyzstan',
+    code: 'KG',
+    category: 'Asia',
+  },
+  Laos: {
+    name: 'Laos',
+    code: 'LA',
+    category: 'Asia',
+  },
+  Lebanon: {
+    name: 'Lebanon',
+    code: 'LB',
+    category: 'Asia',
+  },
+  Macao: {
+    name: 'Macao',
+    code: 'MO',
+    category: 'Asia',
+  },
+  Malaysia: {
+    name: 'Malaysia',
+    code: 'MY',
+    category: 'Asia',
+  },
+  Maldives: {
+    name: 'Maldives',
+    code: 'MV',
+    category: 'Asia',
+  },
+  Mongolia: {
+    name: 'Mongolia',
+    code: 'MN',
+    category: 'Asia',
+  },
+  Myanmar: {
+    name: 'Myanmar',
+    code: 'MM',
+    category: 'Asia',
+  },
+  Nepal: {
+    name: 'Nepal',
+    code: 'NP',
+    category: 'Asia',
+  },
+  NorthKorea: {
+    name: 'North Korea',
+    code: 'KP',
+    category: 'Asia',
+  },
+  Oman: {
+    name: 'Oman',
+    code: 'OM',
+    category: 'Asia',
+  },
+  Pakistan: {
+    name: 'Pakistan',
+    code: 'PK',
+    category: 'Asia',
+  },
+  Palestine: {
+    name: 'Palestine',
+    code: 'PS',
+    category: 'Asia',
+  },
+  Philippines: {
+    name: 'Philippines',
+    code: 'PH',
+    category: 'Asia',
+  },
+  Qatar: {
+    name: 'Qatar',
+    code: 'QA',
+    category: 'Asia',
+  },
+  SaudiArabia: {
+    name: 'Saudi Arabia',
+    code: 'SA',
+    category: 'Asia',
+  },
+  Singapore: {
+    name: 'Singapore',
+    code: 'SG',
+    category: 'Asia',
+  },
+  SouthKorea: {
+    name: 'South Korea',
+    code: 'KR',
+    category: 'Asia',
+  },
+  SriLanka: {
+    name: 'Sri Lanka',
+    code: 'LK',
+    category: 'Asia',
+  },
+  Syria: {
+    name: 'Syria',
+    code: 'SY',
+    category: 'Asia',
+  },
+  Tajikistan: {
+    name: 'Tajikistan',
+    code: 'TJ',
+    category: 'Asia',
+  },
+  Thailand: {
+    name: 'Thailand',
+    code: 'TH',
+    category: 'Asia',
+  },
+  Turkmenistan: {
+    name: 'Turkmenistan',
+    code: 'TM',
+    category: 'Asia',
+  },
+  UnitedArabEmirates: {
+    name: 'United Arab Emirates',
+    code: 'AE',
+    category: 'Asia',
+  },
+  Uzbekistan: {
+    name: 'Uzbekistan',
+    code: 'UZ',
+    category: 'Asia',
+  },
+  Vietnam: {
+    name: 'Vietnam',
+    code: 'VN',
+    category: 'Asia',
+  },
+  Yemen: {
+    name: 'Yemen',
+    code: 'YE',
+    category: 'Asia',
+  },
+
+  // Africa
+  Algeria: {
+    name: 'Algeria',
+    code: 'DZ',
+    category: 'Africa',
+  },
+  Angola: {
+    name: 'Angola',
+    code: 'AO',
+    category: 'Africa',
+  },
+  Benin: {
+    name: 'Benin',
+    code: 'BJ',
+    category: 'Africa',
+  },
+  Botswana: {
+    name: 'Botswana',
+    code: 'BW',
+    category: 'Africa',
+  },
+  BurkinaFaso: {
+    name: 'Burkina Faso',
+    code: 'BF',
+    category: 'Africa',
+  },
+  Burundi: {
+    name: 'Burundi',
+    code: 'BI',
+    category: 'Africa',
+  },
+  Cameroon: {
+    name: 'Cameroon',
+    code: 'CM',
+    category: 'Africa',
+  },
+  CapeVerde: {
+    name: 'Cape Verde',
+    code: 'CV',
+    category: 'Africa',
+  },
+  CentralAfricanRepublic: {
+    name: 'Central African Republic',
+    code: 'CF',
+    category: 'Africa',
+  },
+  Chad: {
+    name: 'Chad',
+    code: 'TD',
+    category: 'Africa',
+  },
+  Comoros: {
+    name: 'Comoros',
+    code: 'KM',
+    category: 'Africa',
+  },
+  Congo: {
+    name: 'Congo',
+    code: 'CG',
+    category: 'Africa',
+  },
+  DemocraticRepublicOfCongo: {
+    name: 'The Democratic Republic of Congo',
+    code: 'CD',
+    category: 'Africa',
+  },
+  Djibouti: {
+    name: 'Djibouti',
+    code: 'DJ',
+    category: 'Africa',
+  },
+  Egypt: {
+    name: 'Egypt',
+    code: 'EG',
+    category: 'Africa',
+  },
+  EquatorialGuinea: {
+    name: 'Equatorial Guinea',
+    code: 'GQ',
+    category: 'Africa',
+  },
+  Eritrea: {
+    name: 'Eritrea',
+    code: 'ER',
+    category: 'Africa',
+  },
+  Eswatini: {
+    name: 'Eswatini',
+    code: 'SZ',
+    category: 'Africa',
+  },
+  Ethiopia: {
+    name: 'Ethiopia',
+    code: 'ET',
+    category: 'Africa',
+  },
+  Gabon: {
+    name: 'Gabon',
+    code: 'GA',
+    category: 'Africa',
+  },
+  Gambia: {
+    name: 'Gambia',
+    code: 'GM',
+    category: 'Africa',
+  },
+  Ghana: {
+    name: 'Ghana',
+    code: 'GH',
+    category: 'Africa',
+  },
+  Guinea: {
+    name: 'Guinea',
+    code: 'GN',
+    category: 'Africa',
+  },
+  GuineaBissau: {
+    name: 'Guinea-Bissau',
+    code: 'GW',
+    category: 'Africa',
+  },
+  IvoryCoast: {
+    name: 'Ivory Coast',
+    code: 'CI',
+    category: 'Africa',
+  },
+  Kenya: {
+    name: 'Kenya',
+    code: 'KE',
+    category: 'Africa',
+  },
+  Lesotho: {
+    name: 'Lesotho',
+    code: 'LS',
+    category: 'Africa',
+  },
+  Liberia: {
+    name: 'Liberia',
+    code: 'LR',
+    category: 'Africa',
+  },
+  Libya: {
+    name: 'Libya',
+    code: 'LY',
+    category: 'Africa',
+  },
+  Madagascar: {
+    name: 'Madagascar',
+    code: 'MG',
+    category: 'Africa',
+  },
+  Malawi: {
+    name: 'Malawi',
+    code: 'MW',
+    category: 'Africa',
+  },
+  Mali: {
+    name: 'Mali',
+    code: 'ML',
+    category: 'Africa',
+  },
+  Mauritania: {
+    name: 'Mauritania',
+    code: 'MR',
+    category: 'Africa',
+  },
+  Mauritius: {
+    name: 'Mauritius',
+    code: 'MU',
+    category: 'Africa',
+  },
+  Mozambique: {
+    name: 'Mozambique',
+    code: 'MZ',
+    category: 'Africa',
+  },
+  Namibia: {
+    name: 'Namibia',
+    code: 'NA',
+    category: 'Africa',
+  },
+  Niger: {
+    name: 'Niger',
+    code: 'NE',
+    category: 'Africa',
+  },
+  Nigeria: {
+    name: 'Nigeria',
+    code: 'NG',
+    category: 'Africa',
+  },
+  Rwanda: {
+    name: 'Rwanda',
+    code: 'RW',
+    category: 'Africa',
+  },
+  SaoTomeAndPrincipe: {
+    name: 'Sao Tome and Principe',
+    code: 'ST',
+    category: 'Africa',
+  },
+  Senegal: {
+    name: 'Senegal',
+    code: 'SN',
+    category: 'Africa',
+  },
+  Seychelles: {
+    name: 'Seychelles',
+    code: 'SC',
+    category: 'Africa',
+  },
+  SierraLeone: {
+    name: 'Sierra Leone',
+    code: 'SL',
+    category: 'Africa',
+  },
+  Somalia: {
+    name: 'Somalia',
+    code: 'SO',
+    category: 'Africa',
+  },
+  SouthAfrica: {
+    name: 'South Africa',
+    code: 'ZA',
+    category: 'Africa',
+  },
+  SouthSudan: {
+    name: 'South Sudan',
+    code: 'SS',
+    category: 'Africa',
+  },
+  Sudan: {
+    name: 'Sudan',
+    code: 'SD',
+    category: 'Africa',
+  },
+  Tanzania: {
+    name: 'Tanzania',
+    code: 'TZ',
+    category: 'Africa',
+  },
+  Togo: {
+    name: 'Togo',
+    code: 'TG',
+    category: 'Africa',
+  },
+  Tunisia: {
+    name: 'Tunisia',
+    code: 'TN',
+    category: 'Africa',
+  },
+  Uganda: {
+    name: 'Uganda',
+    code: 'UG',
+    category: 'Africa',
+  },
+  Zambia: {
+    name: 'Zambia',
+    code: 'ZM',
+    category: 'Africa',
+  },
+  Zimbabwe: {
+    name: 'Zimbabwe',
+    code: 'ZW',
+    category: 'Africa',
+  },
+
+  // North America
+  AntiguaAndBarbuda: {
+    name: 'Antigua and Barbuda',
+    code: 'AG',
+    category: 'North America',
+  },
+  Bahamas: {
+    name: 'Bahamas',
+    code: 'BS',
+    category: 'North America',
+  },
+  Barbados: {
+    name: 'Barbados',
+    code: 'BB',
+    category: 'North America',
+  },
+  Belize: {
+    name: 'Belize',
+    code: 'BZ',
+    category: 'North America',
+  },
+  Canada: {
+    name: 'Canada',
+    code: 'CA',
+    category: 'North America',
+  },
+  CostaRica: {
+    name: 'Costa Rica',
+    code: 'CR',
+    category: 'North America',
+  },
+  Cuba: {
+    name: 'Cuba',
+    code: 'CU',
+    category: 'North America',
+  },
+  Dominica: {
+    name: 'Dominica',
+    code: 'DM',
+    category: 'North America',
+  },
+  DominicanRepublic: {
+    name: 'Dominican Republic',
+    code: 'DO',
+    category: 'North America',
+  },
+  ElSalvador: {
+    name: 'El Salvador',
+    code: 'SV',
+    category: 'North America',
+  },
+  Grenada: {
+    name: 'Grenada',
+    code: 'GD',
+    category: 'North America',
+  },
+  Guadeloupe: {
+    name: 'Guadeloupe',
+    code: 'GP',
+    category: 'North America',
+  },
+  Guatemala: {
+    name: 'Guatemala',
+    code: 'GT',
+    category: 'North America',
+  },
+  Haiti: {
+    name: 'Haiti',
+    code: 'HT',
+    category: 'North America',
+  },
+  Honduras: {
+    name: 'Honduras',
+    code: 'HN',
+    category: 'North America',
+  },
+  Jamaica: {
+    name: 'Jamaica',
+    code: 'JM',
+    category: 'North America',
+  },
+  Mexico: {
+    name: 'Mexico',
+    code: 'MX',
+    category: 'North America',
+  },
+  Nicaragua: {
+    name: 'Nicaragua',
+    code: 'NI',
+    category: 'North America',
+  },
+  Panama: {
+    name: 'Panama',
+    code: 'PA',
+    category: 'North America',
+  },
+  TrinidadAndTobago: {
+    name: 'Trinidad and Tobago',
+    code: 'TT',
+    category: 'North America',
+  },
+  UnitedStates: {
+    name: 'United States',
+    code: 'US',
+    category: 'North America',
+  },
+
+  // South America
+  Argentina: {
+    name: 'Argentina',
+    code: 'AR',
+    category: 'South America',
+  },
+  Bolivia: {
+    name: 'Bolivia',
+    code: 'BO',
+    category: 'South America',
+  },
+  Brazil: {
+    name: 'Brazil',
+    code: 'BR',
+    category: 'South America',
+  },
+  Chile: {
+    name: 'Chile',
+    code: 'CL',
+    category: 'South America',
+  },
+  Colombia: {
+    name: 'Colombia',
+    code: 'CO',
+    category: 'South America',
+  },
+  Ecuador: {
+    name: 'Ecuador',
+    code: 'EC',
+    category: 'South America',
+  },
+  Guyana: {
+    name: 'Guyana',
+    code: 'GY',
+    category: 'South America',
+  },
+  Paraguay: {
+    name: 'Paraguay',
+    code: 'PY',
+    category: 'South America',
+  },
+  Peru: {
+    name: 'Peru',
+    code: 'PE',
+    category: 'South America',
+  },
+  Suriname: {
+    name: 'Suriname',
+    code: 'SR',
+    category: 'South America',
+  },
+  Uruguay: {
+    name: 'Uruguay',
+    code: 'UY',
+    category: 'South America',
+  },
+  Venezuela: {
+    name: 'Venezuela',
+    code: 'VE',
+    category: 'South America',
+  },
+
+  // Oceania
+  FijiIslands: {
+    name: 'Fiji Islands',
+    code: 'FJ',
+    category: 'Oceania',
+  },
+  FrenchPolynesia: {
+    name: 'French Polynesia',
+    code: 'PF',
+    category: 'Oceania',
+  },
+  Kiribati: {
+    name: 'Kiribati',
+    code: 'KI',
+    category: 'Oceania',
+  },
+  NewZealand: {
+    name: 'New Zealand',
+    code: 'NZ',
+    category: 'Oceania',
+  },
+  Palau: {
+    name: 'Palau',
+    code: 'PW',
+    category: 'Oceania',
+  },
+  PapuaNewGuinea: {
+    name: 'Papua New Guinea',
+    code: 'PG',
+    category: 'Oceania',
+  },
+  Samoa: {
+    name: 'Samoa',
+    code: 'WS',
+    category: 'Oceania',
+  },
+  SolomonIslands: {
+    name: 'Solomon Islands',
+    code: 'SB',
+    category: 'Oceania',
+  },
+  Tonga: {
+    name: 'Tonga',
+    code: 'TO',
+    category: 'Oceania',
+  },
+  Tuvalu: {
+    name: 'Tuvalu',
+    code: 'TV',
+    category: 'Oceania',
+  },
+
+  // Additional European countries
+  Kosovo: {
+    name: 'Kosovo',
+    code: 'XK',
+    category: 'Rest of Europe',
+  },
+  Liechtenstein: {
+    name: 'Liechtenstein',
+    code: 'LI',
+    category: 'Rest of Europe',
   },
   VaticanCity: {
     name: 'Vatican City',
     code: 'VA',
-    flag: 'https://cdn.prod.website-files.com/5e6988439312b5bbb3f95631/66bf438b2885860177ac1ec8_va.svg',
+    category: 'Rest of Europe',
+  },
+  FaroeIslands: {
+    name: 'Faroe Islands',
+    code: 'FO',
+    category: 'Rest of Europe',
+  },
+  England: {
+    name: 'England',
+    code: 'GB-ENG',
+    category: 'Rest of Europe',
+  },
+  NorthernIreland: {
+    name: 'Northern Ireland',
+    code: 'GB-NIR',
+    category: 'Rest of Europe',
+  },
+  Scotland: {
+    name: 'Scotland',
+    code: 'GB-SCT',
+    category: 'Rest of Europe',
+  },
+  Wales: {
+    name: 'Wales',
+    code: 'GB-WLS',
+    category: 'Rest of Europe',
+  },
+  RestOfWorld: {
+    name: 'Rest of the World',
+    code: 'WW',
+    category: 'Rest of Europe',
   },
 };
 
-export const ALL_COUNTRIES: Omit<BaseCountry, 'isQualified'>[] =
-  Object.values(COMMON_COUNTRIES);
+export const ALL_COUNTRIES: CommonCountry[] = Object.values(COMMON_COUNTRIES);

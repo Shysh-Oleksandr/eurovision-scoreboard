@@ -1,13 +1,14 @@
 export type BaseCountry = {
   name: string;
   code: string;
-  flag: string;
+  category?: string;
   isQualified?: boolean;
   semiFinalGroup?: SemiFinalGroup;
   countryAssignmentGroup?: CountryAssignmentGroup;
   isAutoQualified?: boolean;
   isSelected?: boolean;
   isQualifiedFromSemi?: boolean;
+  isEurovisionCountry?: boolean;
 };
 
 export type SemiFinalGroup = 'SF1' | 'SF2';

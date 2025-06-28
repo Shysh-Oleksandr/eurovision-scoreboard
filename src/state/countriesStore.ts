@@ -24,7 +24,6 @@ interface CountriesState {
   getInitialCountries: () => {
     name: string;
     code: string;
-    flag: string;
     isQualified: boolean;
     semiFinalGroup?: SemiFinalGroup;
     isAutoQualified?: boolean;
