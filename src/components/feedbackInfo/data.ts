@@ -1,7 +1,8 @@
 export const WHATS_NEW = [
   {
     date: '2025-06-28',
-    title: 'Decoupled the theme from the year',
+    title:
+      'Decoupled the theme from the year. Added all countries in the world for selection',
   },
   {
     date: '2025-06-27',
@@ -29,15 +30,11 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-06-27', end: '2025-06-29' },
+    approximateDates: { start: '2025-06-27', end: '2025-07-01' },
     title: 'More custom themes',
   },
   {
     approximateDates: { start: '2025-06-29', end: '2025-06-30' },
-    title: 'All countries in the world support',
-  },
-  {
-    approximateDates: { start: '2025-06-30', end: '2025-07-02' },
     title: 'Custom country creation',
   },
   {

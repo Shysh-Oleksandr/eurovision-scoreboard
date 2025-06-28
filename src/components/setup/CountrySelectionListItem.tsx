@@ -45,6 +45,7 @@ export const CountrySelectionListItem: React.FC<
       }`}
     >
       <img
+        loading="lazy"
         src={getFlagPath(country.code)}
         alt={`${country.name} flag`}
         className="w-8 h-6 object-cover flex-none rounded-sm"

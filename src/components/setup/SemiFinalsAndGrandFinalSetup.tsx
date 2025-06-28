@@ -68,6 +68,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
             key={semiFinal.group}
             title={semiFinal.title}
             countriesCount={semiFinal.countries.length}
+            defaultExpanded
           >
             <div className="mb-2 flex items-center gap-2">
               <label className="block text-sm text-white">
@@ -79,7 +80,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
                 onChange={(e) => {
                   semiFinal.setQualifiers(parseInt(e.target.value));
                 }}
-                className="bg-primary-900 text-white px-3 py-1 rounded w-18 transition-colors duration-400 hover:bg-primary-950 focus:bg-primary-950"
+                className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm text-white px-3 py-1 rounded w-18 transition-colors duration-300 hover:bg-primary-950 focus:bg-primary-950"
                 min={1}
                 max={semiFinal.countries.length}
               />
@@ -96,6 +97,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
       <SectionWrapper
         title="Auto-Qualifiers"
         countriesCount={autoQualifiers.length}
+        defaultExpanded
       >
         <CountrySelectionList
           countries={autoQualifiers}

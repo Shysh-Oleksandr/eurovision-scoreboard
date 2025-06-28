@@ -8,11 +8,11 @@ interface UpdateListProps {
 
 const UpdateList: React.FC<UpdateListProps> = ({ items }) => {
   return (
-    <ul className="sm:space-y-3 space-y-2">
+    <ul className="space-y-2">
       {items.map((item) => (
         <li
           key={item.date ? `${item.date}-${item.title}` : item.title}
-          className="border-l-2 rounded border-solid border-white sm:pl-4 pl-3"
+          className="border-l-2 rounded border-solid border-white sm:pl-4 pl-3 bg-gradient-to-r from-primary-800/30 to-primary-900/30 shadow-sm rounded-r-lg sm:w-fit w-full sm:p-1 p-0.5 pr-2"
         >
           <p className="text-white/70 text-sm font-medium">
             {getDateLabel(item)}
