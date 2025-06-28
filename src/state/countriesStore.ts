@@ -3,26 +3,19 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 import { Year } from '../config';
-import { getCountriesByYear, SUPPORTED_YEARS } from '../data/data';
+import { getCountriesByYear } from '../data/data';
 import { BaseCountry, SemiFinalGroup } from '../models';
-import { getThemeForYear } from '../theme/themes';
-import { themesInfo } from '../theme/themesInfo';
-import { Theme, ThemeInfo } from '../theme/types';
 
-const INITIAL_YEAR = '2025';
+import { INITIAL_YEAR } from './generalStore';
 
 interface CountriesState {
   // State
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
   selectedCountries: BaseCountry[]; // Countries selected for the current event
   eventSetupModalOpen: boolean;
-  year: Year;
-  theme: Theme;
-  themeInfo: ThemeInfo;
   semiFinalResults: Record<string, number>;
 
   // Actions
-  setYear: (year: Year) => void;
   setEventSetupModalOpen: (open: boolean) => void;
   getQualifiedCountries: () => BaseCountry[];
   getVotingCountries: () => BaseCountry[];
@@ -49,6 +42,7 @@ interface CountriesState {
   ) => void;
   setSemiFinalResults: (results: Record<string, number>) => void;
   getSemiFinalPoints: (countryCode: string) => number;
+  updateCountriesForYear: (year: Year) => void;
 }
 
 export const useCountriesStore = create<CountriesState>()(
@@ -58,31 +52,9 @@ export const useCountriesStore = create<CountriesState>()(
       allCountriesForYear: getCountriesByYear(INITIAL_YEAR),
       selectedCountries: [],
       eventSetupModalOpen: true,
-      year: INITIAL_YEAR,
-      theme: getThemeForYear(INITIAL_YEAR),
-      themeInfo: themesInfo[INITIAL_YEAR],
       semiFinalResults: {},
 
       // Actions
-      setYear: (year: Year) => {
-        // Remove all theme classes
-        document.documentElement.classList.remove(
-          ...SUPPORTED_YEARS.map((year) => `theme-${year}`),
-        );
-        // Add the new theme class
-        document.documentElement.classList.add(`theme-${year}`);
-
-        const countries = getCountriesByYear(year);
-
-        set({
-          allCountriesForYear: countries,
-          selectedCountries: [],
-          year,
-          theme: getThemeForYear(year),
-          themeInfo: themesInfo[year],
-        });
-      },
-
       setEventSetupModalOpen: (open: boolean) => {
         set({
           eventSetupModalOpen: open,
@@ -202,6 +174,15 @@ export const useCountriesStore = create<CountriesState>()(
 
       getSemiFinalPoints: (countryCode: string) => {
         return get().semiFinalResults[countryCode] || 0;
+      },
+
+      updateCountriesForYear: (year: Year) => {
+        const countries = getCountriesByYear(year);
+
+        set({
+          allCountriesForYear: countries,
+          selectedCountries: [],
+        });
       },
     }),
     { name: 'countries-store' },

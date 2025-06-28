@@ -9,10 +9,11 @@ import WinnerModal from '../components/WinnerModal';
 import { useNextEventName } from '../hooks/useNextEventName';
 import { EventMode, EventPhase } from '../models';
 import { useCountriesStore } from '../state/countriesStore';
+import { useGeneralStore } from '../state/generalStore';
 import { useScoreboardStore } from '../state/scoreboardStore';
 
 export const Main = () => {
-  const { year, theme, themeInfo } = useCountriesStore();
+  const { year, themeYear, theme, themeInfo } = useGeneralStore();
   const {
     eventPhase,
     eventMode,
@@ -37,8 +38,12 @@ export const Main = () => {
 
   // Apply initial theme class on mount
   useEffect(() => {
-    document.documentElement.classList.add(`theme-${year}`);
-  }, [year]);
+    document.documentElement.classList.add(`theme-${themeYear}`);
+
+    return () => {
+      document.documentElement.classList.remove(`theme-${themeYear}`);
+    };
+  }, [themeYear]);
 
   const phaseTitle = useMemo(() => {
     switch (eventPhase) {
@@ -56,7 +61,7 @@ export const Main = () => {
   // TODO: decompose
   return (
     <div
-      className={`w-full h-full theme-default theme-${year}`}
+      className={`w-full h-full theme-default theme-${themeYear}`}
       id="main"
       style={{
         backgroundColor: theme.colors.appBgColor,

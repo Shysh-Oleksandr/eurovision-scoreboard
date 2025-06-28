@@ -3,6 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { POINTS_ARRAY } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { useCountriesStore } from '../../state/countriesStore';
+import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
 
@@ -21,12 +22,10 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
     giveTelevotePoints,
   } = useScoreboardStore();
 
-  const {
-    year,
-    getQualifiedCountries,
-    getVotingCountriesLength,
-    getVotingCountry,
-  } = useCountriesStore();
+  const { getQualifiedCountries, getVotingCountriesLength, getVotingCountry } =
+    useCountriesStore();
+
+  const { year } = useGeneralStore();
 
   const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 

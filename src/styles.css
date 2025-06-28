@@ -227,7 +227,7 @@ h6 {
   border: 0;
   outline: 0;
   font: inherit;
-  /* Personalize */
+
   background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
       no-repeat right 0.8em center / 1.4em,
     linear-gradient(
@@ -252,6 +252,18 @@ h6 {
   option {
     color: #fff !important;
     background-color: theme('colors.primary-900') !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .select {
+    background: url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)
+      no-repeat right 0.65em center / 1.2em,
+    linear-gradient(
+      to left,
+      theme('colors.primary-800') 2.5em,
+      theme('colors.primary-900') 2.5em
+    );
   }
 }
 

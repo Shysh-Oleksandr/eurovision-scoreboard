@@ -7,7 +7,7 @@ export const themes = {
   '2021': {
     colors: {
       primary: {
-        700: '#2647d9',
+        700: '#203cbc',
         750: '#183eb9',
         800: '#102c89',
         900: '#080968',
@@ -286,11 +286,11 @@ export const themes = {
   },
 } as ThemeRecord;
 
-const yearsWithThemes = Object.keys(themes);
+export const YEARS_WITH_THEME = Object.keys(themes);
 
 // Helper function to get theme for any year
 export function getThemeForYear(year: Year) {
-  if (yearsWithThemes.includes(year)) {
+  if (YEARS_WITH_THEME.includes(year)) {
     return themes[year];
   }
 

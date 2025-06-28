@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-06-28',
+    title: 'Decoupled the theme from the year',
+  },
+  {
     date: '2025-06-27',
     title: 'Added 2021 theme and 2020 countries',
   },

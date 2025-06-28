@@ -1,4 +1,4 @@
-import { useCountriesStore } from '../state/countriesStore';
+import { useGeneralStore } from '../state/generalStore';
 
 import type { ThemeColors } from './types';
 
@@ -33,7 +33,7 @@ export function useThemeColor(paths: ColorPath[]): string[];
 export function useThemeColor(
   pathOrPaths: ColorPath | ColorPath[],
 ): string | string[] {
-  const { theme } = useCountriesStore();
+  const { theme } = useGeneralStore();
 
   if (Array.isArray(pathOrPaths)) {
     return pathOrPaths.map((path) => getColorFromPath(theme, path));
