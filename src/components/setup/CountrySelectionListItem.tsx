@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { getFlagPath } from '../../helpers/getFlagPath';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
 
 const ASSIGNMENT_GROUP_LABELS: Record<CountryAssignmentGroup, string> = {
@@ -39,19 +40,21 @@ export const CountrySelectionListItem: React.FC<
 
   return (
     <div
-      className={`flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 gap-2 p-2 rounded-md transition-colors duration-300 relative ${
+      className={`flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 p-2 rounded-md transition-colors duration-300 relative ${
         countryGroupAssignment ? '' : 'pointer-events-none'
       }`}
     >
-      <div>
-        <img
-          src={country.flag}
-          alt={`${country.name} flag`}
-          className="w-8 h-6 object-cover flex-none rounded-sm"
-        />
-      </div>
+      <img
+        loading="lazy"
+        src={getFlagPath(country.code)}
+        alt={`${country.name} flag`}
+        className="w-8 h-6 object-cover flex-none rounded-sm"
+      />
 
-      <span className="text-sm text-white flex-1 truncate" title={country.name}>
+      <span
+        className="text-sm text-white flex-1 truncate ml-2"
+        title={country.name}
+      >
         {country.name}
       </span>
 

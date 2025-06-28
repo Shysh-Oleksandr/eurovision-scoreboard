@@ -1,5 +1,6 @@
 const path = require('path');
 
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -28,7 +29,16 @@ module.exports = {
         type: 'asset/resource',
       },
       {
-        test: /\.(woff(2)?|eot|ttf|otf|svg|)$/,
+        test: /\.svg$/,
+        include: path.resolve(__dirname, '..', './src/assets/flags'),
+        type: 'asset/resource',
+        generator: {
+          filename: 'flags/[name][ext]',
+        },
+      },
+      {
+        test: /\.(woff(2)?|eot|ttf|otf|svg)$/,
+        exclude: path.resolve(__dirname, '..', './src/assets/flags'),
         type: 'asset/inline',
       },
     ],
@@ -44,6 +54,14 @@ module.exports = {
     new FaviconsWebpackPlugin(
       path.resolve(__dirname, '..', './public/img/favicon-128x128.png'),
     ),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, '..', 'src/assets/flags'),
+          to: 'flags',
+        },
+      ],
+    }),
   ],
   stats: 'errors-only',
 };

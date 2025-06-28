@@ -32,6 +32,7 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
       <SectionWrapper
         title="Grand Final"
         countriesCount={grandFinalQualifiers.length}
+        defaultExpanded
       >
         <CountrySelectionList
           countries={grandFinalQualifiers}
@@ -43,6 +44,7 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
       <SectionWrapper
         title="Not Qualified"
         countriesCount={notQualifiedCountries.length}
+        defaultExpanded
       >
         <CountrySelectionList
           countries={notQualifiedCountries}

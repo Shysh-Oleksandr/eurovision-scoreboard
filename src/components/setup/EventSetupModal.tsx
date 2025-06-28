@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ALL_COUNTRIES } from '../../data/countries/common-countries';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   BaseCountry,
   CountryAssignmentGroup,
@@ -16,6 +17,7 @@ import Tabs from '../Tabs';
 
 import { CountrySelectionList } from './CountrySelectionList';
 import GrandFinalOnlySetup from './GrandFinalOnlySetup';
+import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
 import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
 
@@ -28,6 +30,16 @@ const TABS = [
     label: 'Grand Final Only',
     value: EventMode.GRAND_FINAL_ONLY,
   },
+];
+
+const categoryOrder = [
+  'All-Time Participants',
+  'Europe',
+  'Asia',
+  'Africa',
+  'North America',
+  'South America',
+  'Oceania',
 ];
 
 const SEMI_FINALS_GROUPS = [
@@ -61,6 +73,15 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
   );
   const [sf1Qualifiers, setSf1Qualifiers] = useState(10);
   const [sf2Qualifiers, setSf2Qualifiers] = useState(10);
+  const [countriesSearch, setCountriesSearch] = useState('');
+
+  const debouncedSearch = useDebounce(countriesSearch, 300);
+
+  const [expandedCategories, setExpandedCategories] = useState<
+    Record<string, boolean>
+  >({});
+
+  const prevDebouncedSearchRef = useRef<string>();
 
   const [countryAssignments, setCountryAssignments] = useState<
     Record<EventMode, Record<string, CountryAssignmentGroup>>
@@ -118,6 +139,17 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
       [EventMode.GRAND_FINAL_ONLY]: grandFinalOnlyInitialAssignments,
     });
   }, [allCountriesForYear]);
+
+  const handleToggleCategory = (category: string) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  };
+
+  const handleCountriesSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCountriesSearch(e.target.value);
+  };
 
   const handleCountryAssignment = (
     countryCode: string,
@@ -240,6 +272,60 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
     };
   }, [countryAssignments, activeTab]);
 
+  const { groups: groupedNotParticipatingCountries, sortedCategories } =
+    useMemo((): {
+      groups: Record<string, BaseCountry[]>;
+      sortedCategories: string[];
+    } => {
+      const groups: Record<string, BaseCountry[]> = {};
+
+      const filteredNotParticipatingCountries =
+        notParticipatingCountries.filter((country) =>
+          country.name
+            .toLowerCase()
+            .includes(debouncedSearch.trim().toLowerCase()),
+        );
+
+      filteredNotParticipatingCountries.forEach((country) => {
+        const category = country.category || 'Other';
+
+        if (!groups[category]) {
+          groups[category] = [];
+        }
+        groups[category].push(country);
+      });
+
+      const sortedCategories = Object.keys(groups).sort((a, b) => {
+        const aIndex = categoryOrder.indexOf(a);
+        const bIndex = categoryOrder.indexOf(b);
+
+        if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+        if (aIndex === -1) return 1;
+        if (bIndex === -1) return -1;
+
+        return aIndex - bIndex;
+      });
+
+      return { groups, sortedCategories };
+    }, [notParticipatingCountries, debouncedSearch]);
+
+  useEffect(() => {
+    if (debouncedSearch !== prevDebouncedSearchRef.current) {
+      if (debouncedSearch.trim()) {
+        const newExpanded: Record<string, boolean> = {};
+
+        sortedCategories.forEach((category) => {
+          newExpanded[category] = true;
+        });
+        setExpandedCategories(newExpanded);
+      } else {
+        setExpandedCategories({});
+      }
+    }
+
+    prevDebouncedSearchRef.current = debouncedSearch;
+  }, [debouncedSearch, sortedCategories]);
+
   if (!isOpen || Object.keys(countryAssignments[activeTab]).length === 0) {
     return null;
   }
@@ -300,19 +386,47 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
 
         <div className="h-px bg-primary-800 w-full my-1" />
 
-        <SectionWrapper
-          title="Not Participating"
-          countriesCount={notParticipatingCountries.length}
-        >
-          <CountrySelectionList
-            countries={notParticipatingCountries}
-            onAssignCountryAssignment={handleCountryAssignment}
-            getCountryGroupAssignment={getCountryGroupAssignment}
-            availableGroups={
-              isGrandFinalOnly ? GRAND_FINAL_GROUPS : SEMI_FINALS_GROUPS
-            }
-          />
-        </SectionWrapper>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-white text-base md:text-lg font-semibold">
+            Not Participating
+          </p>
+          <div className="relative">
+            <input
+              className="sm:max-w-[200px] w-full py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
+              name="countriesSearch"
+              id="countriesSearch"
+              placeholder="Search countries..."
+              value={countriesSearch}
+              onChange={handleCountriesSearch}
+            />
+            <SearchInputIcon
+              showClearIcon={countriesSearch.length > 0}
+              onClick={() =>
+                countriesSearch.length > 0 && setCountriesSearch('')
+              }
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          {sortedCategories.map((category) => (
+            <SectionWrapper
+              key={category}
+              title={category}
+              countriesCount={groupedNotParticipatingCountries[category].length}
+              isExpanded={!!expandedCategories[category]}
+              onToggle={() => handleToggleCategory(category)}
+            >
+              <CountrySelectionList
+                countries={groupedNotParticipatingCountries[category]}
+                onAssignCountryAssignment={handleCountryAssignment}
+                getCountryGroupAssignment={getCountryGroupAssignment}
+                availableGroups={
+                  isGrandFinalOnly ? GRAND_FINAL_GROUPS : SEMI_FINALS_GROUPS
+                }
+              />
+            </SectionWrapper>
+          ))}
+        </div>
       </div>
     </Modal>
   );
