@@ -171,7 +171,14 @@ export const useScoreboardStore = create<ScoreboardState>()(
 
         const winnerCountry = isVotingFinished
           ? updatedCountries.reduce((prev, current) =>
-              prev.points > current.points ? prev : current,
+              (() => {
+                if (prev.points > current.points) return prev;
+                if (prev.points < current.points) return current;
+
+                return prev.name.localeCompare(current.name) <= 0
+                  ? prev
+                  : current;
+              })(),
             )
           : null;
 

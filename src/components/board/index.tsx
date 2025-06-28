@@ -87,7 +87,11 @@ const Board = (): JSX.Element => {
         const aSemiPoints = getSemiFinalPoints(a.code);
         const bSemiPoints = getSemiFinalPoints(b.code);
 
-        return bSemiPoints - aSemiPoints;
+        const pointsComparison = bSemiPoints - aSemiPoints;
+
+        return pointsComparison !== 0
+          ? pointsComparison
+          : a.name.localeCompare(b.name);
       });
     }
 

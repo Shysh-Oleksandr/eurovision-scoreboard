@@ -273,6 +273,8 @@ export const themes = {
         douzePointsBlock2: '#2698bb',
         placeContainerBg: '#7919ab',
         placeText: '#fffbfd',
+        unqualifiedBg: '#551a97',
+        unqualifiedText: '#fefefe',
       },
       panelInfo: {
         activeBg: '#530b97',
