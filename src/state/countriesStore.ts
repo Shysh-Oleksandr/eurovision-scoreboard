@@ -65,16 +65,20 @@ export const useCountriesStore = create<CountriesState>()(
 
         // If we have selected countries, use those
         if (selectedCountries.length > 0) {
-          return selectedCountries.filter(
-            (country) =>
-              country.isSelected ||
-              country.isAutoQualified ||
-              country.isQualifiedFromSemi,
-          );
+          return selectedCountries
+            .filter(
+              (country) =>
+                country.isSelected ||
+                country.isAutoQualified ||
+                country.isQualifiedFromSemi,
+            )
+            .sort((a, b) => a.name.localeCompare(b.name));
         }
 
         // Otherwise fall back to the default qualified countries
-        return allCountriesForYear.filter((country) => country.isQualified);
+        return allCountriesForYear
+          .filter((country) => country.isQualified)
+          .sort((a, b) => a.name.localeCompare(b.name));
       },
 
       getVotingCountries: () => {
@@ -82,11 +86,11 @@ export const useCountriesStore = create<CountriesState>()(
 
         // If we have selected countries, use those
         if (selectedCountries.length > 0) {
-          return selectedCountries;
+          return selectedCountries.sort((a, b) => a.name.localeCompare(b.name));
         }
 
         // Otherwise fall back to all countries for the year
-        return allCountriesForYear;
+        return allCountriesForYear.sort((a, b) => a.name.localeCompare(b.name));
       },
 
       getVotingCountry: () => {
@@ -107,11 +111,13 @@ export const useCountriesStore = create<CountriesState>()(
       getInitialCountries: () => {
         const qualifiedCountries = get().getQualifiedCountries();
 
-        return qualifiedCountries.map((country) => ({
-          ...country,
-          points: 0,
-          lastReceivedPoints: null,
-        }));
+        return qualifiedCountries
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((country) => ({
+            ...country,
+            points: 0,
+            lastReceivedPoints: null,
+          }));
       },
 
       setSelectedCountries: (countries: BaseCountry[]) => {
@@ -124,20 +130,22 @@ export const useCountriesStore = create<CountriesState>()(
         const { selectedCountries, allCountriesForYear } = get();
 
         if (selectedCountries.length > 0) {
-          return selectedCountries.filter(
-            (country) => country.isAutoQualified && country.isSelected,
-          );
+          return selectedCountries
+            .filter((country) => country.isAutoQualified && country.isSelected)
+            .sort((a, b) => a.name.localeCompare(b.name));
         }
 
-        return allCountriesForYear.filter((country) => country.isAutoQualified);
+        return allCountriesForYear
+          .filter((country) => country.isAutoQualified)
+          .sort((a, b) => a.name.localeCompare(b.name));
       },
 
       getQualifiedFromSemiCountries: () => {
         const { selectedCountries } = get();
 
-        return selectedCountries.filter(
-          (country) => country.isQualifiedFromSemi,
-        );
+        return selectedCountries
+          .filter((country) => country.isQualifiedFromSemi)
+          .sort((a, b) => a.name.localeCompare(b.name));
       },
 
       setQualifiedFromSemi: (

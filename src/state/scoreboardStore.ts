@@ -349,6 +349,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           nextPhase === EventPhase.SEMI_FINAL_1
             ? selectedCountries
                 .filter((c) => c.semiFinalGroup === 'SF1' && c.isSelected)
+                .sort((a, b) => a.name.localeCompare(b.name))
                 .map((country) => ({
                   ...country,
                   points: 0,
@@ -420,11 +421,13 @@ export const useScoreboardStore = create<ScoreboardState>()(
         ) {
           nextPhase = EventPhase.SEMI_FINAL_2;
 
-          initialCountries = sf2Countries.map((country) => ({
-            ...country,
-            points: 0,
-            lastReceivedPoints: null,
-          }));
+          initialCountries = sf2Countries
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((country) => ({
+              ...country,
+              points: 0,
+              lastReceivedPoints: null,
+            }));
         } else {
           nextPhase = EventPhase.GRAND_FINAL;
 
@@ -436,11 +439,13 @@ export const useScoreboardStore = create<ScoreboardState>()(
             ...countriesStore.getQualifiedFromSemiCountries(),
           ];
 
-          initialCountries = qualifiedCountries.map((country) => ({
-            ...country,
-            points: 0,
-            lastReceivedPoints: null,
-          }));
+          initialCountries = qualifiedCountries
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((country) => ({
+              ...country,
+              points: 0,
+              lastReceivedPoints: null,
+            }));
         }
 
         set({

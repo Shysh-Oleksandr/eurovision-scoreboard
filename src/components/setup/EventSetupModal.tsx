@@ -240,27 +240,29 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
     const autoQualifiers = ALL_COUNTRIES.filter(
       (c) =>
         currentAssignments[c.code] === CountryAssignmentGroup.AUTO_QUALIFIER,
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
+
     const grandFinalQualifiers = ALL_COUNTRIES.filter(
       (c) => currentAssignments[c.code] === CountryAssignmentGroup.GRAND_FINAL,
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
+
     const sf1Countries = ALL_COUNTRIES.filter(
       (c) => currentAssignments[c.code] === CountryAssignmentGroup.SF1,
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     const sf2Countries = ALL_COUNTRIES.filter(
       (c) => currentAssignments[c.code] === CountryAssignmentGroup.SF2,
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     const notQualifiedCountries = ALL_COUNTRIES.filter(
       (c) =>
         currentAssignments[c.code] === CountryAssignmentGroup.NOT_QUALIFIED,
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     const notParticipatingCountries = ALL_COUNTRIES.filter(
       (c) =>
         currentAssignments[c.code] === CountryAssignmentGroup.NOT_PARTICIPATING,
-    );
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
     return {
       autoQualifiers,
@@ -293,6 +295,11 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
           groups[category] = [];
         }
         groups[category].push(country);
+      });
+
+      // Sort countries within each category alphabetically
+      Object.keys(groups).forEach((category) => {
+        groups[category].sort((a, b) => a.name.localeCompare(b.name));
       });
 
       const sortedCategories = Object.keys(groups).sort((a, b) => {
