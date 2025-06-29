@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
+import { ArrowIcon } from '../../assets/icons/ArrowIcon';
 import { Year } from '../../config';
 import { themes } from '../../theme/themes';
 
@@ -49,6 +50,9 @@ const SelectDisplay: React.FC<{
         )}
         {selectedOption?.label}
       </div>
+      <ArrowIcon
+        className={`text-white w-7 h-7 rotate-90 absolute lg:right-2.5 md:right-2 right-1`}
+      />
     </div>
   );
 };

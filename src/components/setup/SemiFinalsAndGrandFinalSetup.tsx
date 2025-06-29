@@ -18,6 +18,10 @@ interface SemiFinalsAndGrandFinalSetupProps {
     group: CountryAssignmentGroup,
   ) => void;
   getCountryGroupAssignment: (country: BaseCountry) => CountryAssignmentGroup;
+  onBulkAssign: (
+    countries: BaseCountry[],
+    group: CountryAssignmentGroup,
+  ) => void;
 }
 
 const SEMI_FINALS_GROUPS = [
@@ -39,6 +43,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
   sf2Countries,
   onAssignCountryAssignment,
   getCountryGroupAssignment,
+  onBulkAssign,
 }) => {
   const hasOneSemiFinal = sf2Countries.length === 0;
 
@@ -69,6 +74,9 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
             title={semiFinal.title}
             countriesCount={semiFinal.countries.length}
             defaultExpanded
+            onBulkAssign={(group) => onBulkAssign(semiFinal.countries, group)}
+            availableGroups={SEMI_FINALS_GROUPS}
+            currentGroup={semiFinal.group as CountryAssignmentGroup}
           >
             <div className="mb-2 flex items-center gap-2">
               <label className="block text-sm text-white">
@@ -98,6 +106,9 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
         title="Auto-Qualifiers"
         countriesCount={autoQualifiers.length}
         defaultExpanded
+        onBulkAssign={(group) => onBulkAssign(autoQualifiers, group)}
+        availableGroups={SEMI_FINALS_GROUPS}
+        currentGroup={CountryAssignmentGroup.AUTO_QUALIFIER}
       >
         <CountrySelectionList
           countries={autoQualifiers}

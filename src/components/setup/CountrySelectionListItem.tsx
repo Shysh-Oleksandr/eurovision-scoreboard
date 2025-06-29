@@ -1,9 +1,10 @@
 import React from 'react';
 
+import { ArrowIcon } from '../../assets/icons/ArrowIcon';
 import { getFlagPath } from '../../helpers/getFlagPath';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
 
-const ASSIGNMENT_GROUP_LABELS: Record<CountryAssignmentGroup, string> = {
+export const ASSIGNMENT_GROUP_LABELS: Record<CountryAssignmentGroup, string> = {
   [CountryAssignmentGroup.SF1]: 'Semi-Final 1',
   [CountryAssignmentGroup.SF2]: 'Semi-Final 2',
   [CountryAssignmentGroup.AUTO_QUALIFIER]: 'Auto-Qualifier',
@@ -60,11 +61,11 @@ export const CountrySelectionListItem: React.FC<
 
       {countryGroupAssignment && onAssignCountryAssignment && (
         <>
-          <div className="w-6 h-6 bg-[url(https://upload.wikimedia.org/wikipedia/commons/9/9d/Caret_down_font_awesome_whitevariation.svg)] bg-no-repeat bg-center bg-[length:18px_18px]"></div>
+          <ArrowIcon className="text-white w-6 h-6 rotate-90" />
           <select
             value={countryGroupAssignment}
             onChange={handleAssignmentChange}
-            className="select absolute inset-0 opacity-0 cursor-pointer"
+            className="absolute inset-0 opacity-0 cursor-pointer"
             id={`country-assignment-${country.code}`}
           >
             {availableGroups.map((group) => (

@@ -13,6 +13,10 @@ interface GrandFinalOnlySetupProps {
     group: CountryAssignmentGroup,
   ) => void;
   getCountryGroupAssignment: (country: BaseCountry) => CountryAssignmentGroup;
+  onBulkAssign: (
+    countries: BaseCountry[],
+    group: CountryAssignmentGroup,
+  ) => void;
 }
 
 const GRAND_FINAL_GROUPS = [
@@ -26,6 +30,7 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
   notQualifiedCountries,
   onAssignCountryAssignment,
   getCountryGroupAssignment,
+  onBulkAssign,
 }) => {
   return (
     <div className="flex flex-col gap-3">
@@ -33,6 +38,9 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
         title="Grand Final"
         countriesCount={grandFinalQualifiers.length}
         defaultExpanded
+        onBulkAssign={(group) => onBulkAssign(grandFinalQualifiers, group)}
+        availableGroups={GRAND_FINAL_GROUPS}
+        currentGroup={CountryAssignmentGroup.GRAND_FINAL}
       >
         <CountrySelectionList
           countries={grandFinalQualifiers}
@@ -45,6 +53,9 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
         title="Not Qualified"
         countriesCount={notQualifiedCountries.length}
         defaultExpanded
+        onBulkAssign={(group) => onBulkAssign(notQualifiedCountries, group)}
+        availableGroups={GRAND_FINAL_GROUPS}
+        currentGroup={CountryAssignmentGroup.NOT_QUALIFIED}
       >
         <CountrySelectionList
           countries={notQualifiedCountries}

@@ -164,15 +164,61 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
     }));
   };
 
+  const handleBulkCountryAssignment = (
+    countries: BaseCountry[],
+    group: CountryAssignmentGroup,
+  ) => {
+    const countryCodes = countries.map((c) => c.code);
+
+    setCountryAssignments((prev) => {
+      const newAssignments = { ...prev[activeTab] };
+
+      countryCodes.forEach((code) => {
+        newAssignments[code] = group;
+      });
+
+      return {
+        ...prev,
+        [activeTab]: newAssignments,
+      };
+    });
+  };
+
   const handleStartEvent = () => {
     if (activeTab === EventMode.SEMI_FINALS_AND_GRAND_FINAL) {
       const sf2QualifiersCount = sf2Countries.length > 0 ? sf2Qualifiers : 0;
       const totalQualifiers =
         sf1Qualifiers + sf2QualifiersCount + autoQualifiers.length;
 
+      if (
+        sf1Qualifiers <= 0 ||
+        (sf2Qualifiers <= 0 && sf2Countries.length > 0)
+      ) {
+        alert('The number of the Semi-Final qualifiers must be at least 1.');
+
+        return;
+      }
+
       if (totalQualifiers < 11) {
         alert(
           'The total number of qualifiers for the Grand Final must be at least 11.',
+        );
+
+        return;
+      }
+
+      if (sf1Countries.length === 0) {
+        alert('There are no countries in the Semi-Final 1.');
+
+        return;
+      }
+
+      if (
+        sf1Qualifiers >= sf1Countries.length ||
+        (sf2Qualifiers >= sf2Countries.length && sf2Countries.length > 0)
+      ) {
+        alert(
+          'The number of the Semi-Final qualifiers must be less than the number of participants.',
         );
 
         return;
@@ -341,7 +387,7 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={canClose ? onClose : undefined}
-      overlayClassName="z-[1000]"
+      overlayClassName="!z-[1000]"
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
           {canClose && (
@@ -379,6 +425,7 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
             sf2Countries={sf2Countries}
             onAssignCountryAssignment={handleCountryAssignment}
             getCountryGroupAssignment={getCountryGroupAssignment}
+            onBulkAssign={handleBulkCountryAssignment}
           />
         )}
 
@@ -388,6 +435,7 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
             notQualifiedCountries={notQualifiedCountries}
             onAssignCountryAssignment={handleCountryAssignment}
             getCountryGroupAssignment={getCountryGroupAssignment}
+            onBulkAssign={handleBulkCountryAssignment}
           />
         )}
 
@@ -422,6 +470,16 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
               countriesCount={groupedNotParticipatingCountries[category].length}
               isExpanded={!!expandedCategories[category]}
               onToggle={() => handleToggleCategory(category)}
+              onBulkAssign={(group) =>
+                handleBulkCountryAssignment(
+                  groupedNotParticipatingCountries[category],
+                  group,
+                )
+              }
+              availableGroups={
+                isGrandFinalOnly ? GRAND_FINAL_GROUPS : SEMI_FINALS_GROUPS
+              }
+              currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
             >
               <CountrySelectionList
                 countries={groupedNotParticipatingCountries[category]}
