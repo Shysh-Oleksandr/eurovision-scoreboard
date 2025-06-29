@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-06-29',
+    title: 'Added custom entry creation and bulk assignment',
+  },
+  {
     date: '2025-06-28',
     title:
       'Decoupled the theme from the year. Added all countries in the world for selection',
@@ -30,12 +34,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-06-27', end: '2025-07-01' },
+    approximateDates: { start: '2025-06-27', end: '2025-07-03' },
     title: 'More custom themes',
-  },
-  {
-    approximateDates: { start: '2025-06-29', end: '2025-06-30' },
-    title: 'Custom country creation',
   },
   {
     approximateDates: { start: '2025-07-01', end: '2025-07-06' },
@@ -46,12 +46,12 @@ export const UPCOMING_FEATURES = [
     title: 'JESC support',
   },
   {
-    // approximateDates: { start: '2025-12-01', end: '2025-12-07' },
-    title: 'Custom animations for each contest',
-  },
-  {
     // approximateDates: { start: '2026-01-01', end: '2026-01-07' },
     title: 'Different voting rules support',
+  },
+  {
+    // approximateDates: { start: '2025-12-01', end: '2025-12-07' },
+    title: 'Custom animations for each contest',
   },
 ];
 

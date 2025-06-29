@@ -12,6 +12,8 @@ interface CountrySelectionListProps {
   ) => void;
   getCountryGroupAssignment: (country: BaseCountry) => CountryAssignmentGroup;
   availableGroups?: CountryAssignmentGroup[];
+  extraContent?: React.ReactNode;
+  onEdit?: (country: BaseCountry) => void;
 }
 
 export const CountrySelectionList: React.FC<CountrySelectionListProps> = ({
@@ -19,6 +21,8 @@ export const CountrySelectionList: React.FC<CountrySelectionListProps> = ({
   onAssignCountryAssignment,
   getCountryGroupAssignment,
   availableGroups,
+  extraContent,
+  onEdit,
 }) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
@@ -29,8 +33,10 @@ export const CountrySelectionList: React.FC<CountrySelectionListProps> = ({
           countryGroupAssignment={getCountryGroupAssignment(country)}
           onAssignCountryAssignment={onAssignCountryAssignment}
           availableGroups={availableGroups}
+          onEdit={onEdit}
         />
       ))}
+      {extraContent}
     </div>
   );
 };

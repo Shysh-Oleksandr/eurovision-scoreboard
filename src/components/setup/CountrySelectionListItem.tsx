@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ArrowIcon } from '../../assets/icons/ArrowIcon';
+import { PencilIcon } from '../../assets/icons/PencilIcon';
 import { getFlagPath } from '../../helpers/getFlagPath';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
 
@@ -21,6 +22,7 @@ interface CountrySelectionListItemProps {
   ) => void;
   countryGroupAssignment?: CountryAssignmentGroup;
   availableGroups?: CountryAssignmentGroup[];
+  onEdit?: (country: BaseCountry) => void;
 }
 
 export const CountrySelectionListItem: React.FC<
@@ -30,6 +32,7 @@ export const CountrySelectionListItem: React.FC<
   onAssignCountryAssignment,
   countryGroupAssignment,
   availableGroups = Object.values(CountryAssignmentGroup),
+  onEdit,
 }) => {
   const handleAssignmentChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -47,17 +50,33 @@ export const CountrySelectionListItem: React.FC<
     >
       <img
         loading="lazy"
-        src={getFlagPath(country.code)}
+        src={country.flag || getFlagPath(country.code)}
+        onError={(e) => {
+          e.currentTarget.src = getFlagPath('ww');
+        }}
         alt={`${country.name} flag`}
         className="w-8 h-6 object-cover flex-none rounded-sm"
       />
-
       <span
         className="text-sm text-white flex-1 truncate ml-2"
         title={country.name}
       >
         {country.name}
       </span>
+
+      {country.category === 'Custom' && onEdit && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onEdit(country);
+          }}
+          className="ml-2 z-10 relative p-1 rounded-full hover:bg-white/20 double-clickable-area"
+          aria-label={`Edit ${country.name}`}
+        >
+          <PencilIcon className="w-4 h-4 text-white" />
+        </button>
+      )}
 
       {countryGroupAssignment && onAssignCountryAssignment && (
         <>
