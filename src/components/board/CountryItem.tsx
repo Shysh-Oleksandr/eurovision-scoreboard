@@ -173,9 +173,12 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
 
           <div className="flex items-center">
             <img
-              src={getFlagPath(country.code)}
-              alt={`${country.name} flag`}
               loading="lazy"
+              src={country.flag || getFlagPath(country.code)}
+              onError={(e) => {
+                e.currentTarget.src = getFlagPath('ww');
+              }}
+              alt={`${country.name} flag`}
               className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-countryItem-juryBg self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
             />
             <h4

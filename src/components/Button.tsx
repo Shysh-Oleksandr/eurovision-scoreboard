@@ -4,7 +4,7 @@ type Props = {
   label?: string;
   className?: string;
   onClick: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'destructive';
   children?: ReactNode;
 };
 
@@ -23,6 +23,8 @@ const Button = ({
       'bg-primary-900 from-primary-900 to-primary-800/70 text-white hover:bg-primary-700',
     secondary:
       'bg-gray-600 from-gray-600 to-gray-900/70 text-white hover:bg-gray-500',
+    destructive:
+      'bg-red-900 from-red-900 to-red-600/40 text-white hover:bg-red-700',
   };
 
   return (

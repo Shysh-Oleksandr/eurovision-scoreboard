@@ -14,6 +14,7 @@ interface SectionWrapperProps {
   onBulkAssign?: (group: CountryAssignmentGroup) => void;
   availableGroups?: CountryAssignmentGroup[];
   currentGroup?: CountryAssignmentGroup;
+  getLabel?: (itemsCount: number) => string;
 }
 
 const SectionWrapper: React.FC<SectionWrapperProps> = ({
@@ -26,12 +27,24 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
   onBulkAssign,
   availableGroups,
   currentGroup,
+  getLabel,
 }) => {
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
   const [hasBeenOpened, setHasBeenOpened] = useState(defaultExpanded);
 
   const isControlled = controlledIsExpanded !== undefined;
   const isExpanded = isControlled ? controlledIsExpanded! : internalIsExpanded;
+
+  const getAmountLabel = (itemsCount: number) => {
+    if (getLabel) {
+      return getLabel(itemsCount);
+    }
+    if (itemsCount === 1) {
+      return 'country';
+    }
+
+    return 'countries';
+  };
 
   useEffect(() => {
     // Needed for lazy loading of children
@@ -74,15 +87,15 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
         <div className="flex items-center gap-2">
           {onBulkAssign && availableGroups && currentGroup ? (
             <div
-              className="relative"
+              className="relative min-w-[120px]"
               onClick={(e) => {
                 e.stopPropagation();
               }}
             >
-              <div className="flex items-center gap-2 cursor-pointer px-2 py-1 flex-none rounded-md bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/30 shadow transition-colors duration-300">
+              <div className="flex items-center gap-1 justify-between cursor-pointer pr-2 pl-3 py-1 flex-none rounded-md bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/30 shadow transition-colors duration-300">
                 {countriesCount !== undefined && (
                   <span className="text-white text-sm whitespace-nowrap">
-                    {countriesCount} countries
+                    {countriesCount} {getAmountLabel(countriesCount)}
                   </span>
                 )}
                 <ArrowIcon className="text-white w-6 h-6 rotate-90 mb-0.5" />

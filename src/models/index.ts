@@ -2,6 +2,7 @@ export type BaseCountry = {
   name: string;
   code: string;
   category?: string;
+  flag?: string;
   isQualified?: boolean;
   semiFinalGroup?: SemiFinalGroup;
   countryAssignmentGroup?: CountryAssignmentGroup;
