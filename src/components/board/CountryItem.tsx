@@ -174,7 +174,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
           <div className="flex items-center">
             <img
               loading="lazy"
-              src={country.flag || getFlagPath(country.code)}
+              src={getFlagPath(country)}
               onError={(e) => {
                 e.currentTarget.src = getFlagPath('ww');
               }}

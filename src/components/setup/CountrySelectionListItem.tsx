@@ -50,7 +50,7 @@ export const CountrySelectionListItem: React.FC<
     >
       <img
         loading="lazy"
-        src={country.flag || getFlagPath(country.code)}
+        src={country.flag || getFlagPath(country)}
         onError={(e) => {
           e.currentTarget.src = getFlagPath('ww');
         }}

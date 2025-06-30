@@ -226,7 +226,9 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
               <img
                 src={flag}
                 alt="Selected flag"
-                className="w-24 h-18 rounded-md object-cover"
+                className="rounded-md object-cover"
+                width={96}
+                height={72}
               />
             </div>
           )}
