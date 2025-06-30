@@ -9,7 +9,6 @@ export type BaseCountry = {
   isAutoQualified?: boolean;
   isSelected?: boolean;
   isQualifiedFromSemi?: boolean;
-  isEurovisionCountry?: boolean;
 };
 
 export type SemiFinalGroup = 'SF1' | 'SF2';

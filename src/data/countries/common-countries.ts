@@ -1,9 +1,6 @@
 import { BaseCountry } from '../../models';
 
-type CommonCountry = Pick<
-  BaseCountry,
-  'name' | 'code' | 'category' | 'isEurovisionCountry'
->;
+type CommonCountry = Pick<BaseCountry, 'name' | 'code' | 'category'>;
 export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
   // Eurovision countries
   Albania: {

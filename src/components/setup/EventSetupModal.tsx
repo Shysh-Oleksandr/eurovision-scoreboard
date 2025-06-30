@@ -271,7 +271,9 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
 
         const isAutoQualifier = group === CountryAssignmentGroup.AUTO_QUALIFIER;
         const isGrandFinalist = group === CountryAssignmentGroup.GRAND_FINAL;
-        const isSemiFinalist = group === 'SF1' || group === 'SF2';
+        const isSemiFinalist =
+          group === CountryAssignmentGroup.SF1 ||
+          group === CountryAssignmentGroup.SF2;
 
         const isCompetitor =
           isAutoQualifier || isGrandFinalist || isSemiFinalist;
