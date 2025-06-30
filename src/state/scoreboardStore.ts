@@ -33,6 +33,7 @@ interface ScoreboardState {
   showAllParticipants: boolean;
   isFinalAnimationFinished: boolean;
   canDisplayPlaceAnimation: boolean;
+  televotingProgress: number;
 
   // Actions
   giveJuryPoints: (countryCode: string) => void;
@@ -102,6 +103,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
       showAllParticipants: false,
       isFinalAnimationFinished: false,
       canDisplayPlaceAnimation: true,
+      televotingProgress: 0,
 
       // Actions
       giveJuryPoints: (countryCode: string) => {
@@ -229,6 +231,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           countries: updatedCountries,
           showQualificationResults,
           qualifiedCountries,
+          televotingProgress: state.televotingProgress + 1,
         });
       },
 
@@ -376,6 +379,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           showAllParticipants: false,
           isFinalAnimationFinished: false,
           canDisplayPlaceAnimation: true,
+          televotingProgress: 0,
         });
       },
 
@@ -464,6 +468,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           qualifiedCountries: [],
           showAllParticipants: false,
           isFinalAnimationFinished: false,
+          televotingProgress: 0,
         });
       },
 

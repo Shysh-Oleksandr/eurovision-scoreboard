@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 
 // import { getMaxPossibleTelevotePoints } from '../../data/data';
+import { getSequenceNumber } from '../../helpers/getSequenceNumber';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
@@ -12,8 +13,10 @@ type Props = {
 };
 
 const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
-  const { resetLastPoints, giveTelevotePoints } = useScoreboardStore();
+  const { resetLastPoints, giveTelevotePoints, countries, televotingProgress } =
+    useScoreboardStore();
   const { getVotingCountry } = useCountriesStore();
+
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');
 
@@ -62,10 +65,20 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
   };
 
   return (
-    <div className="lg:px-4 px-3 mt-1">
-      <label className="lg:text-xl text-lg text-white" htmlFor="televoteInput">
+    <div className="w-full pb-1 lg:pt-3 pt-2 lg:px-4 px-3 rounded-md rounded-b-none">
+      <label
+        className="lg:text-[1.35rem] text-lg text-white"
+        htmlFor="televoteInput"
+      >
         Enter televote points
       </label>
+
+      <h5 className="uppercase text-slate-400 lg:text-sm text-xs mt-2 mb-1">
+        <span className="font-medium">
+          {getSequenceNumber(televotingProgress + 1)}
+        </span>{' '}
+        of <span className="font-medium">{countries.length}</span> countries
+      </h5>
       <div className="flex">
         <input
           className="w-full lg:pt-3 md:pt-2 pt-1 lg:pb-2 md:pb-1 pb-[2px] px-2 mt-2 rounded-md bg-primary-900 transition-colors duration-300 placeholder:text-gray-400 text-white lg:text-base text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "

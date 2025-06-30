@@ -120,9 +120,7 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
           votingText
         )}
       </h3>
-      {!isVotingOver && (
-        <Button label="Choose randomly" onClick={chooseRandomly} />
-      )}
+      {!isVotingOver && <Button label="Random" onClick={chooseRandomly} />}
     </div>
   );
 };

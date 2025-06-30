@@ -127,7 +127,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
         `relative outline outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full ${
           isDisabled
             ? ''
-            : 'cursor-pointer transition-colors duration-300 hover:!bg-countryItem-juryHoverBg'
+            : 'cursor-pointer transition-colors duration-[400ms] hover:!bg-countryItem-juryHoverBg'
         } ${isActive ? 'rounded-sm' : ''} ${
           showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''
         } ${

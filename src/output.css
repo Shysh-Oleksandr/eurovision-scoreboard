@@ -773,6 +773,10 @@ video {
   margin-top: 1rem;
 }
 
+.mt-0 {
+  margin-top: 0px;
+}
+
 .block {
   display: block;
 }
@@ -885,6 +889,10 @@ video {
   width: 25%;
 }
 
+.w-\[56px\] {
+  width: 56px;
+}
+
 .w-\[min\(100\%\2c 600px\)\] {
   width: min(100%,600px);
 }
@@ -896,34 +904,6 @@ video {
 
 .w-full {
   width: 100%;
-}
-
-.w-20 {
-  width: 5rem;
-}
-
-.w-\[72px\] {
-  width: 72px;
-}
-
-.w-\[40px\] {
-  width: 40px;
-}
-
-.w-\[60px\] {
-  width: 60px;
-}
-
-.w-\[66px\] {
-  width: 66px;
-}
-
-.w-\[50px\] {
-  width: 50px;
-}
-
-.w-\[56px\] {
-  width: 56px;
 }
 
 .min-w-\[110px\] {
@@ -1794,6 +1774,53 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.theme-2018,[data-theme="2018"] {
+  --twc-primary-700: 212.89999999999998 73.2% 41%;
+  --twc-primary-750: 216.10000000000002 77% 41%;
+  --twc-primary-800: 212.60000000000002 100% 26.7%;
+  --twc-primary-900: 218.10000000000002 85.7% 22%;
+  --twc-primary-950: 218.5 95.1% 16.1%;
+  --twc-gray-500: 216.29999999999995 38.8% 59%;
+  --twc-gray-600: 215.29999999999995 34% 42.2%;
+  --twc-gray-900: 219.60000000000002 35.3% 26.1%;
+  --twc-appBgColor: 224.70000000000005 76.6% 15.1%;
+  --twc-animatedBorder: 168.79999999999995 79% 72%;
+  --twc-countryItem-juryBg: 212.60000000000002 100% 26.7%;
+  --twc-countryItem-juryHoverBg: 212.89999999999998 98.8% 32.9%;
+  --twc-countryItem-juryCountryText: 207.5 100% 90.6%;
+  --twc-countryItem-juryPointsBg: 212.60000000000002 100% 26.7%;
+  --twc-countryItem-juryPointsText: 207.5 100% 90.6%;
+  --twc-countryItem-juryLastPointsBg: 168.79999999999995 79% 72%;
+  --twc-countryItem-juryLastPointsText: 211.70000000000005 100% 27.1%;
+  --twc-countryItem-televoteUnfinishedBg: 212.60000000000002 100% 26.7%;
+  --twc-countryItem-televoteUnfinishedText: 207.5 100% 90.6%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 212.60000000000002 100% 26.7%;
+  --twc-countryItem-televoteUnfinishedPointsText: 207.5 100% 90.6%;
+  --twc-countryItem-televoteActiveBg: 222.39999999999998 74.4% 26.1%;
+  --twc-countryItem-televoteActiveText: 207.5 100% 90.6%;
+  --twc-countryItem-televoteActivePointsBg: 222.39999999999998 74.4% 26.1%;
+  --twc-countryItem-televoteActivePointsText: 207.5 100% 90.6%;
+  --twc-countryItem-televoteOutline: 212.10000000000002 77.9% 39%;
+  --twc-countryItem-televoteFinishedBg: 209.60000000000002 83% 48.4%;
+  --twc-countryItem-televoteFinishedText: 207.5 100% 90.6%;
+  --twc-countryItem-televoteFinishedPointsBg: 209.60000000000002 83% 48.4%;
+  --twc-countryItem-televoteFinishedPointsText: 207.5 100% 90.6%;
+  --twc-countryItem-televoteLastPointsBg: 168.79999999999995 79% 72%;
+  --twc-countryItem-televoteLastPointsText: 211.70000000000005 100% 27.1%;
+  --twc-countryItem-douzePointsBg: 54.89999999999998 76.1% 63.9%;
+  --twc-countryItem-douzePointsText: 217.10000000000002 76.4% 28.2%;
+  --twc-countryItem-douzePointsBlock1: 168.79999999999995 79% 72%;
+  --twc-countryItem-douzePointsBlock2: 209.60000000000002 83% 48.4%;
+  --twc-countryItem-placeContainerBg: 212.60000000000002 100% 26.7%;
+  --twc-countryItem-placeText: 207.5 100% 90.6%;
+  --twc-countryItem-unqualifiedBg: 218.29999999999995 67.1% 27.5%;
+  --twc-countryItem-unqualifiedText: 207.5 100% 90.6%;
+  --twc-panelInfo-activeBg: 54.89999999999998 42.4% 49%;
+  --twc-panelInfo-activeText: 217.10000000000002 76.4% 28.2%;
+  --twc-panelInfo-inactiveText: 215 15.8% 70.2%;
+  --twc-panelInfo-inactiveBg: 213.5 96.2% 20.8%;
+}
+
 .theme-2019,[data-theme="2019"] {
   --twc-primary-700: 207.79999999999995 73.2% 41%;
   --twc-primary-750: 210.89999999999998 77% 41%;
@@ -2229,6 +2256,10 @@ h6 {
 }
 
 /* TODO: move the bg image logic outside */
+
+#main.theme-2018 {
+  background-image: url('/src/assets/bgImages/BlueBg2018.webp') !important;
+}
 
 #main.theme-2019 {
   background-image: url('/src/assets/bgImages/BlueBg2019.webp') !important;
@@ -2897,6 +2928,22 @@ h6 {
     margin-top: 1.5rem;
   }
 
+  .lg\:mt-3 {
+    margin-top: 0.75rem;
+  }
+
+  .lg\:mt-2 {
+    margin-top: 0.5rem;
+  }
+
+  .lg\:mt-1 {
+    margin-top: 0.25rem;
+  }
+
+  .lg\:mt-0 {
+    margin-top: 0px;
+  }
+
   .lg\:h-10 {
     height: 2.5rem;
   }
@@ -3052,6 +3099,10 @@ h6 {
   .lg\:text-xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
+  }
+
+  .lg\:text-\[1\.35rem\] {
+    font-size: 1.35rem;
   }
 
   .lg\:leading-5 {

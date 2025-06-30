@@ -32,7 +32,7 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
       >
         {votingCountry?.name || ''}
       </h4>
-      <h5 className="uppercase text-slate-400 lg:text-sm text-xs lg:mt-4 mt-2">
+      <h5 className="uppercase text-slate-400 lg:text-sm text-xs lg:mt-3 mt-2">
         <span className="font-medium">
           {getSequenceNumber(votingCountryIndex + 1)}
         </span>{' '}
