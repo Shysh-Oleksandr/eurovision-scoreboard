@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-06-30',
+    title: 'Added 2019 and 2018 themes. Added confetti for the winner 🎉',
+  },
+  {
     date: '2025-06-29',
     title: 'Added custom entry creation and bulk assignment',
   },

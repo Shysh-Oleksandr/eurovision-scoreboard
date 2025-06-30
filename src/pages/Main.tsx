@@ -5,6 +5,7 @@ import Button from '../components/Button';
 import ControlsPanel from '../components/controlsPanel';
 import QualificationResultsModal from '../components/QualificationResultsModal';
 import EventSetupModal from '../components/setup/EventSetupModal';
+import WinnerConfetti from '../components/WinnerConfetti';
 import WinnerModal from '../components/WinnerModal';
 import { useNextEventName } from '../hooks/useNextEventName';
 import { EventMode, EventPhase } from '../models';
@@ -67,6 +68,7 @@ export const Main = () => {
         backgroundColor: theme.colors.appBgColor,
       }}
     >
+      <WinnerConfetti />
       <EventSetupModal
         isOpen={eventSetupModalOpen}
         onClose={() => setEventSetupModalOpen(false)}

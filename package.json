@@ -23,6 +23,7 @@
     "@react-spring/web": "^9.7.1",
     "gsap": "^3.13.0",
     "react": "^18.2.0",
+    "react-confetti": "^6.4.0",
     "react-dom": "^18.2.0",
     "react-flip-toolkit": "^7.2.4",
     "sharp": "^0.33.5",
