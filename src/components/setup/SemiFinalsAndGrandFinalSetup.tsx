@@ -88,7 +88,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
                 onChange={(e) => {
                   semiFinal.setQualifiers(parseInt(e.target.value));
                 }}
-                className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm text-white px-3 py-1 rounded w-18 transition-colors duration-300 hover:bg-primary-950 focus:bg-primary-950"
+                className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm text-white px-3 py-1 rounded transition-colors duration-300 hover:bg-primary-950 focus:bg-primary-950 w-[56px]"
                 min={1}
                 max={semiFinal.countries.length}
               />

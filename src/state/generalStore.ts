@@ -84,6 +84,21 @@ export const useGeneralStore = create<GeneralState>()(
     }),
     {
       name: 'general-storage',
+      merge: (persistedState, currentState) => {
+        const state = persistedState as Partial<GeneralState>;
+
+        const year = state.year ?? INITIAL_YEAR;
+        const themeYear = state.themeYear ?? INITIAL_YEAR;
+
+        return {
+          ...currentState,
+          ...state,
+          year,
+          themeYear,
+          theme: getThemeForYear(themeYear),
+          themeInfo: themesInfo[year],
+        };
+      },
     },
   ),
 );
