@@ -115,6 +115,9 @@ h6 {
 }
 
 /* TODO: move the bg image logic outside */
+#main.theme-2017 {
+  background-image: url('/src/assets/bgImages/BlueBg2017.webp') !important;
+}
 #main.theme-2018 {
   background-image: url('/src/assets/bgImages/BlueBg2018.webp') !important;
 }
