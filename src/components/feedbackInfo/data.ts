@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-02',
+    title:
+      'Migrated from Vercel to Cloudflare. Set up the new domain - douzepoints.app',
+  },
+  {
     date: '2025-06-30',
     title: 'Added 2019 and 2018 themes. Added confetti for the winner 🎉',
   },
@@ -38,20 +43,20 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-06-27', end: '2025-07-03' },
+    approximateDates: { start: '2025-07-03', end: '2025-07-06' },
+    title: 'Different voting rules support',
+  },
+  {
+    approximateDates: { start: '2025-07-03', end: '2025-07-09' },
     title: 'More custom themes',
   },
   {
-    approximateDates: { start: '2025-07-01', end: '2025-07-06' },
+    approximateDates: { start: '2025-07-06', end: '2025-07-10' },
     title: 'Odds-based random voting',
   },
   {
-    approximateDates: { start: '2025-07-06', end: '2025-07-07' },
+    approximateDates: { start: '2025-07-07', end: '2025-07-11' },
     title: 'JESC support',
-  },
-  {
-    // approximateDates: { start: '2026-01-01', end: '2026-01-07' },
-    title: 'Different voting rules support',
   },
   {
     // approximateDates: { start: '2025-12-01', end: '2025-12-07' },

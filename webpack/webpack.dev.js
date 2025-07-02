@@ -20,7 +20,7 @@ module.exports = {
   plugins: [
     new ReactRefreshWebpackPlugin(),
     new webpack.DefinePlugin({
-      'process.env.name': JSON.stringify('Euroviron Scoreboard'),
+      'process.env.name': JSON.stringify('DouzePoints'),
     }),
   ],
 };
