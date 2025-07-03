@@ -1,6 +1,6 @@
 export const WHATS_NEW = [
   {
-    date: '2025-07-04',
+    date: '2025-07-03',
     title: 'Added 2016 theme. Improved assets loading for better performance',
   },
   {
