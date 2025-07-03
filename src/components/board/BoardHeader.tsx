@@ -56,7 +56,58 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
             );
           }
 
-          // For lower-points phase
+          // For individual mode, always show specific point announcement
+          if (presenterSettings.pointGrouping === 'individual') {
+            let points = presenterSettings.currentAnnouncingPoints;
+
+            // If no current points, look ahead to determine the first point for this country
+            if (!points) {
+              const presetVote =
+                presenterSettings.presetJuryVotes[
+                  presenterSettings.currentMessageCountryIndex
+                ];
+
+              if (presetVote) {
+                // Get the first point (lowest) that will be announced
+                const sortedPoints = Object.entries(presetVote.points)
+                  .filter(([, pointValue]) => pointValue > 0)
+                  .sort(
+                    (a, b) =>
+                      parseInt(a[1].toString()) - parseInt(b[1].toString()),
+                  );
+
+                if (sortedPoints.length > 0) {
+                  points = parseInt(sortedPoints[0][1].toString());
+                }
+              }
+            }
+
+            if (points) {
+              return (
+                <>
+                  Hi, <span className="font-medium">{messageCountry.name}</span>{' '}
+                  calling.
+                  <br />
+                  <span className="font-medium">
+                    {points} point{points === 1 ? '' : 's'}
+                  </span>{' '}
+                  go{points === 1 ? 'es' : ''} to...
+                </>
+              );
+            }
+
+            // Fallback if no points are configured
+            return (
+              <>
+                Hi, <span className="font-medium">{messageCountry.name}</span>{' '}
+                calling.
+                <br />
+                Preparing points...
+              </>
+            );
+          }
+
+          // For grouped mode, show the generic lower points message
           return (
             <>
               Hi, <span className="font-medium">{messageCountry.name}</span>{' '}

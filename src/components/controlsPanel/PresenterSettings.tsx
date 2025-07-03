@@ -68,19 +68,26 @@ const PresenterSettings = () => {
         {/* Point Grouping - Only show for jury voting */}
         {isJuryVoting && (
           <div className="mb-4">
-            <h5 className="text-white lg:text-base text-sm font-medium mb-2">
+            <h5 className="text-white lg:text-base text-sm font-medium mb-3">
               Point Grouping
+              {!hasPresetVotes && (
+                <span className="text-gray-400 text-xs ml-2">
+                  (Configure points first)
+                </span>
+              )}
             </h5>
-            <div className="flex space-x-4">
+            <div className="grid grid-cols-2 gap-3">
               <RadioButton
                 label="Individual"
                 checked={presenterSettings.pointGrouping === 'individual'}
                 onChange={() => setPointGrouping('individual')}
+                disabled={!hasPresetVotes}
               />
               <RadioButton
                 label="Grouped"
                 checked={presenterSettings.pointGrouping === 'grouped'}
                 onChange={() => setPointGrouping('grouped')}
+                disabled={!hasPresetVotes}
               />
             </div>
           </div>
@@ -107,15 +114,7 @@ const PresenterSettings = () => {
           </div>
         </div>
 
-        {/* Status indicator */}
-        {hasPresetVotes && (
-          <div className="mt-3 text-sm text-green-400">
-            ✓ Points configured for{' '}
-            {isJuryVoting
-              ? `${presenterSettings.presetJuryVotes.length} countries`
-              : `${presenterSettings.presetTelevoteVotes.length} countries`}
-          </div>
-        )}
+        {/* Status indicator removed */}
       </div>
 
       {/* Edit Points Modal */}

@@ -90,4 +90,5 @@ export interface PresenterSettings {
   isAutoPlaying: boolean;
   currentPhase: PresenterPhase;
   currentMessageCountryIndex: number; // Separate index for message display
+  currentAnnouncingPoints: number | null; // Track current point value being announced in individual mode
 }

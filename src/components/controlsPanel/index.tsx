@@ -16,6 +16,7 @@ const ControlsPanel = (): JSX.Element | null => {
     winnerCountry,
     eventPhase,
     qualifiedCountries,
+    presenterSettings,
   } = useScoreboardStore();
 
   const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
@@ -25,6 +26,10 @@ const ControlsPanel = (): JSX.Element | null => {
 
   // In semi-finals, we only have televote (no jury voting)
   const showJuryVoting = !isSemiFinal && isJuryVoting;
+
+  // Show voting points info during jury voting or during presenter mode jury phase
+  const showVotingPointsInfo =
+    showJuryVoting || (presenterSettings.isAutoPlaying && isJuryVoting);
 
   if (isVotingOver) {
     return null;
@@ -43,7 +48,7 @@ const ControlsPanel = (): JSX.Element | null => {
         )}
         <VotingButtons />
       </div>
-      {showJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
+      {showVotingPointsInfo && <VotingPointsInfo votingPoints={votingPoints} />}
       <PresenterSettings />
     </div>
   );

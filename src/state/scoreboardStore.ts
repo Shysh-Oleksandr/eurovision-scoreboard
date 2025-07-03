@@ -131,6 +131,8 @@ export const useScoreboardStore = create<ScoreboardState>()(
         currentPlayingCountryIndex: 0,
         isAutoPlaying: false,
         currentPhase: 'lower-points',
+        currentMessageCountryIndex: 0,
+        currentAnnouncingPoints: null,
       },
 
       // Actions
@@ -431,6 +433,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
             isAutoPlaying: false,
             currentPhase: 'lower-points',
             currentMessageCountryIndex: 0,
+            currentAnnouncingPoints: null,
           },
         });
       },
@@ -702,7 +705,12 @@ export const useScoreboardStore = create<ScoreboardState>()(
               )
             : nextVotingCountryIndex,
           isJuryVoting: !isJuryVotingOver,
-          votingPoints: 1, // Always reset to 1 after giving points
+          // Don't reset votingPoints during presenter mode individual announcements
+          votingPoints:
+            state.presenterSettings.isAutoPlaying &&
+            state.presenterSettings.pointGrouping === 'individual'
+              ? state.votingPoints // Keep current votingPoints during presenter mode
+              : 1, // Reset to 1 only for manual voting
           presenterSettings: isJuryVotingOver
             ? {
                 ...state.presenterSettings,
@@ -780,6 +788,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
                 presenterSettings: {
                   ...state.presenterSettings,
                   currentPhase: 'lower-points',
+                  currentAnnouncingPoints: null, // Reset for grouped mode
                 },
               }));
               get().resetLastPoints();
@@ -832,21 +841,55 @@ export const useScoreboardStore = create<ScoreboardState>()(
                 douzePointsCountry ? 4500 : 4000,
               );
             } else {
-              // Play individual points one by one, but give ALL points for this country
+              // Individual mode: Play points one by one sequentially (1, 2, 3, 4, 5, 6, 7, 8, 10, 12)
+              // Sort points by value to ensure sequential order
+              const sortedPoints = Object.entries(presetVote.points).sort(
+                ([, a], [, b]) => a - b,
+              );
+
+              // Set the first point value immediately to avoid flash of generic message
               set((state) => ({
                 presenterSettings: {
                   ...state.presenterSettings,
                   currentPhase: 'lower-points',
+                  currentAnnouncingPoints: sortedPoints[0]
+                    ? parseInt(sortedPoints[0][1].toString())
+                    : null,
                 },
+                votingPoints: sortedPoints[0]
+                  ? parseInt(sortedPoints[0][1].toString())
+                  : 1, // Update votingPoints to match the first point
               }));
+
               get().resetLastPoints();
 
-              // Give all points at once but with individual timing for visual effect
-              setTimeout(() => {
-                get().giveMultipleJuryPoints(presetVote.points);
-              }, 500);
+              // Give points one by one with delays
+              sortedPoints.forEach(([countryCode, points], index) => {
+                setTimeout(() => {
+                  // Update the announcing points for message display
+                  set((state) => ({
+                    presenterSettings: {
+                      ...state.presenterSettings,
+                      currentAnnouncingPoints: points,
+                      currentPhase:
+                        points === 12 ? 'twelve-points' : 'lower-points',
+                    },
+                    votingPoints: points, // Update votingPoints to match the current point
+                  }));
 
-              // Move to next country after animations
+                  // Give the points
+                  if (points === 12) {
+                    get().givePresenterDouzePoints(countryCode);
+                  } else {
+                    // Give individual point using giveMultipleJuryPoints with single point
+                    get().giveMultipleJuryPoints({ [countryCode]: points });
+                  }
+                }, 500 + index * 1500); // 1.5 seconds between each point
+              });
+
+              // Move to next country after all points are given
+              const totalDelay = 500 + sortedPoints.length * 1500 + 1500; // Extra 1.5s at the end
+
               setTimeout(() => {
                 // Clear all animations
                 get().resetLastPoints();
@@ -859,6 +902,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
                       currentPlayingCountryIndex: currentCountryIndex + 1,
                       currentPhase: 'lower-points',
                       currentMessageCountryIndex: currentCountryIndex + 1,
+                      currentAnnouncingPoints: null, // Reset for next country
                     },
                     votingCountryIndex: currentCountryIndex + 1,
                   }));
@@ -868,7 +912,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
                     get().playNextPresenterVotes();
                   }, 100);
                 }, 2000);
-              }, 4000);
+              }, totalDelay);
             }
           }
         } else {
