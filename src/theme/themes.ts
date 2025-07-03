@@ -4,6 +4,62 @@ import { ThemeRecord } from './types';
 
 // We only support several themes, with 2025 as fallback
 export const themes = {
+  '2016': {
+    colors: {
+      primary: {
+        700: '#2970b3',
+        750: '#2768a5',
+        800: '#183c63',
+        900: '#133353',
+        950: '#0a2743',
+      },
+      gray: {
+        500: '#6e98bf',
+        600: '#476c90',
+        900: '#2b435a',
+      },
+      appBgColor: '#183c63',
+      animatedBorder: '#a1078b',
+      countryItem: {
+        juryBg: '#0e1f35',
+        juryHoverBg: '#142d4d',
+        juryCountryText: '#f4ffff',
+        juryPointsBg: '#0e1f35',
+        juryPointsText: '#f4ffff',
+        juryLastPointsBg: '#51ccc9',
+        juryLastPointsText: '#f4ffff',
+        televoteUnfinishedBg: '#0e1f35',
+        televoteUnfinishedText: '#f4ffff',
+        televoteUnfinishedPointsBg: '#0e1f35',
+        televoteUnfinishedPointsText: '#f4ffff',
+        televoteActiveBg: '#1d3e5d',
+        televoteActiveText: '#f4ffff',
+        televoteActivePointsBg: '#1d3e5d',
+        televoteActivePointsText: '#f4ffff',
+        televoteOutline: '#2366a4',
+        televoteFinishedBg: '#2a6b84',
+        televoteFinishedText: '#f4ffff',
+        televoteFinishedPointsBg: '#3f5e94',
+        televoteFinishedPointsText: '#f4ffff',
+        televoteLastPointsBg: '#a1078b',
+        televoteLastPointsText: '#f4ffff',
+        douzePointsBg: '#870089',
+        douzePointsText: '#f4ffff',
+        douzePointsBlock1: '#297a8c',
+        douzePointsBlock2: '#d603bc',
+        placeContainerBg: '#183c63',
+        placeText: '#f4ffff',
+        unqualifiedBg: '#183c63',
+        unqualifiedText: '#f4ffff',
+      },
+      panelInfo: {
+        activeBg: '#a1078b',
+        activeText: '#c4c0c3',
+        inactiveText: '#6f96a3',
+        inactiveBg: '#275865',
+      },
+    },
+  },
   '2017': {
     colors: {
       primary: {

@@ -1766,6 +1766,53 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.theme-2016,[data-theme="2016"] {
+  --twc-primary-700: 209.10000000000002 62.7% 43.1%;
+  --twc-primary-750: 209 61.8% 40%;
+  --twc-primary-800: 211.20000000000005 61% 24.1%;
+  --twc-primary-900: 210 62.7% 20%;
+  --twc-primary-950: 209.5 74% 15.1%;
+  --twc-gray-500: 208.89999999999998 38.8% 59%;
+  --twc-gray-600: 209.60000000000002 34% 42.2%;
+  --twc-gray-900: 209.39999999999998 35.3% 26.1%;
+  --twc-appBgColor: 211.20000000000005 61% 24.1%;
+  --twc-animatedBorder: 308.6 91.7% 32.9%;
+  --twc-countryItem-juryBg: 213.79999999999995 58.2% 13.1%;
+  --twc-countryItem-juryHoverBg: 213.70000000000005 58.8% 19%;
+  --twc-countryItem-juryCountryText: 180 100% 97.8%;
+  --twc-countryItem-juryPointsBg: 213.79999999999995 58.2% 13.1%;
+  --twc-countryItem-juryPointsText: 180 100% 97.8%;
+  --twc-countryItem-juryLastPointsBg: 178.5 54.7% 55.9%;
+  --twc-countryItem-juryLastPointsText: 180 100% 97.8%;
+  --twc-countryItem-televoteUnfinishedBg: 213.79999999999995 58.2% 13.1%;
+  --twc-countryItem-televoteUnfinishedText: 180 100% 97.8%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 213.79999999999995 58.2% 13.1%;
+  --twc-countryItem-televoteUnfinishedPointsText: 180 100% 97.8%;
+  --twc-countryItem-televoteActiveBg: 209.10000000000002 52.5% 23.9%;
+  --twc-countryItem-televoteActiveText: 180 100% 97.8%;
+  --twc-countryItem-televoteActivePointsBg: 209.10000000000002 52.5% 23.9%;
+  --twc-countryItem-televoteActivePointsText: 180 100% 97.8%;
+  --twc-countryItem-televoteOutline: 208.79999999999995 64.8% 39%;
+  --twc-countryItem-televoteFinishedBg: 196.70000000000005 51.7% 34.1%;
+  --twc-countryItem-televoteFinishedText: 180 100% 97.8%;
+  --twc-countryItem-televoteFinishedPointsBg: 218.10000000000002 40.3% 41.4%;
+  --twc-countryItem-televoteFinishedPointsText: 180 100% 97.8%;
+  --twc-countryItem-televoteLastPointsBg: 308.6 91.7% 32.9%;
+  --twc-countryItem-televoteLastPointsText: 180 100% 97.8%;
+  --twc-countryItem-douzePointsBg: 299.1 100% 26.9%;
+  --twc-countryItem-douzePointsText: 180 100% 97.8%;
+  --twc-countryItem-douzePointsBlock1: 190.89999999999998 54.7% 35.5%;
+  --twc-countryItem-douzePointsBlock2: 307.4 97.2% 42.5%;
+  --twc-countryItem-placeContainerBg: 211.20000000000005 61% 24.1%;
+  --twc-countryItem-placeText: 180 100% 97.8%;
+  --twc-countryItem-unqualifiedBg: 211.20000000000005 61% 24.1%;
+  --twc-countryItem-unqualifiedText: 180 100% 97.8%;
+  --twc-panelInfo-activeBg: 308.6 91.7% 32.9%;
+  --twc-panelInfo-activeText: 315 3.3% 76.1%;
+  --twc-panelInfo-inactiveText: 195 22% 53.7%;
+  --twc-panelInfo-inactiveBg: 192.60000000000002 44.3% 27.5%;
+}
+
 .theme-2017,[data-theme="2017"] {
   --twc-primary-700: 229 73.2% 41%;
   --twc-primary-750: 228.79999999999995 77% 41%;
@@ -2295,6 +2342,10 @@ h6 {
 }
 
 /* TODO: move the bg image logic outside */
+
+#main.theme-2016 {
+  background-image: url('/src/assets/bgImages/GalaxyBg2016.webp') !important;
+}
 
 #main.theme-2017 {
   background-image: url('/src/assets/bgImages/BlueBg2017.webp') !important;
