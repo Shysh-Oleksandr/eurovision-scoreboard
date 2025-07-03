@@ -59,6 +59,7 @@ export const themes = {
         inactiveBg: '#275865',
       },
     },
+    backgroundImage: '/bgImages/GalaxyBg2016.webp',
   },
   '2017': {
     colors: {
@@ -115,6 +116,7 @@ export const themes = {
         inactiveBg: '#081967',
       },
     },
+    backgroundImage: '/bgImages/BlueBg2017.webp',
   },
   '2018': {
     colors: {
@@ -171,6 +173,7 @@ export const themes = {
         inactiveBg: '#022f68',
       },
     },
+    backgroundImage: '/bgImages/BlueBg2018.webp',
   },
   '2019': {
     colors: {
@@ -227,6 +230,64 @@ export const themes = {
         inactiveBg: '#0e315b',
       },
     },
+    backgroundImage: '/bgImages/BlueBg2019.webp',
+  },
+  '2020': {
+    colors: {
+      primary: {
+        700: '#203cbc',
+        750: '#183eb9',
+        800: '#102c89',
+        900: '#080968',
+        950: '#020350',
+      },
+      gray: {
+        500: '#6e77bf',
+        600: '#474f90',
+        900: '#2b325a',
+      },
+      appBgColor: '#1a1d4e',
+      animatedBorder: '#b75a9a',
+      countryItem: {
+        juryBg: '#f3f3fe',
+        juryHoverBg: '#d9d9ec',
+        juryCountryText: '#06050e',
+        juryPointsBg: '#f3f3fe',
+        juryPointsText: '#06050e',
+        juryLastPointsBg: '#ef79cc',
+        juryLastPointsText: '#f3f3fe',
+        televoteUnfinishedBg: '#f3f3fe',
+        televoteUnfinishedText: '#06050e',
+        televoteUnfinishedPointsBg: '#f3f3fe',
+        televoteUnfinishedPointsText: '#06050e',
+        televoteActiveBg: '#0239d9',
+        televoteActiveText: '#f3f3fe',
+        televoteActivePointsBg: '#f3f3fe',
+        televoteActivePointsText: '#06050e',
+        televoteOutline: '#3b82f6',
+        televoteFinishedBg: '#51576e',
+        televoteFinishedText: '#f3f3fe',
+        televoteFinishedPointsBg: '#51576e',
+        televoteFinishedPointsText: '#f3f3fe',
+        televoteLastPointsBg: '#ef79cc',
+        televoteLastPointsText: '#f3f3fe',
+        douzePointsBg: '#b75a9a',
+        douzePointsText: '#f3f3fe',
+        douzePointsBlock1: '#f3f3fe',
+        douzePointsBlock2: '#084fc3',
+        placeContainerBg: '#b75a9a',
+        placeText: '#fff',
+        unqualifiedBg: '#102c89',
+        unqualifiedText: '#f3f3fe',
+      },
+      panelInfo: {
+        activeBg: '#b75a9a',
+        activeText: '#e3d8e1',
+        inactiveText: '#8c5c8f',
+        inactiveBg: '#2d0647',
+      },
+    },
+    backgroundImage: '/bgImages/BlueBg2020.webp',
   },
   '2021': {
     colors: {
@@ -283,6 +344,7 @@ export const themes = {
         inactiveBg: '#2d0647',
       },
     },
+    backgroundImage: '/bgImages/BlueBg2021.webp',
   },
   '2022': {
     colors: {
@@ -339,6 +401,7 @@ export const themes = {
         inactiveBg: '#2d4844',
       },
     },
+    backgroundImage: '/bgImages/DarkRedBg2022.webp',
   },
   '2023': {
     colors: {
@@ -395,6 +458,7 @@ export const themes = {
         inactiveBg: '#02035e',
       },
     },
+    backgroundImage: '/bgImages/BlueBg2023.webp',
   },
   '2024': {
     colors: {
@@ -451,6 +515,7 @@ export const themes = {
         inactiveBg: '#27064e',
       },
     },
+    backgroundImage: '/bgImages/PurpleBg2024.webp',
   },
   '2025': {
     colors: {
@@ -507,6 +572,7 @@ export const themes = {
         inactiveBg: '#320d4e',
       },
     },
+    backgroundImage: '/bgImages/PurpleBg2025.webp',
   },
 } as ThemeRecord;
 
@@ -518,9 +584,36 @@ export function getThemeForYear(year: Year) {
     return themes[year];
   }
 
-  if (year === '2020') {
-    return themes['2021'];
-  }
-
   return themes['2025']; // Fallback to 2025 theme
+}
+
+// Hosting country logos for all years (2004-2025)
+const hostingCountryLogos: Record<Year, string> = {
+  '2004': '/hostingCountryLogos/Turkey2004.svg',
+  '2005': '/hostingCountryLogos/Ukraine2023.svg',
+  '2006': '/hostingCountryLogos/Greece2006.svg',
+  '2007': '/hostingCountryLogos/Finland2007.svg',
+  '2008': '/hostingCountryLogos/Serbia2008.svg',
+  '2009': '/hostingCountryLogos/Russia2009.svg',
+  '2010': '/hostingCountryLogos/Norway2010.svg',
+  '2011': '/hostingCountryLogos/Germany2011.svg',
+  '2012': '/hostingCountryLogos/Azerbaijan2012.svg',
+  '2013': '/hostingCountryLogos/Sweden2024.svg',
+  '2014': '/hostingCountryLogos/Denmark2014.svg',
+  '2015': '/hostingCountryLogos/Austria2015.svg',
+  '2016': '/hostingCountryLogos/Sweden2024.svg',
+  '2017': '/hostingCountryLogos/Ukraine2023.svg',
+  '2018': '/hostingCountryLogos/Portugal2018.svg',
+  '2019': '/hostingCountryLogos/Israel2019.svg',
+  '2020': '/hostingCountryLogos/Netherlands2021.svg',
+  '2021': '/hostingCountryLogos/Netherlands2021.svg',
+  '2022': '/hostingCountryLogos/Italy2022.svg',
+  '2023': '/hostingCountryLogos/Ukraine2023.svg',
+  '2024': '/hostingCountryLogos/Sweden2024.svg',
+  '2025': '/hostingCountryLogos/Switzerland2025.svg',
+};
+
+// Helper function to get hosting country logo for any year
+export function getHostingCountryLogoForYear(year: Year): string {
+  return hostingCountryLogos[year] || hostingCountryLogos['2025']; // Fallback to 2025
 }

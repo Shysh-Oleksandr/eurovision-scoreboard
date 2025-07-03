@@ -8,6 +8,7 @@ import { getCountriesByYear } from '../data/data';
 import { BaseCountry, SemiFinalGroup } from '../models';
 
 import { INITIAL_YEAR } from './generalStore';
+import { useScoreboardStore } from './scoreboardStore';
 
 interface CountriesState {
   // State
@@ -109,7 +110,7 @@ export const useCountriesStore = create<CountriesState>()(
           const { getVotingCountries } = get();
 
           const { votingCountryIndex, isJuryVoting, countries } =
-            require('./scoreboardStore').useScoreboardStore.getState();
+            useScoreboardStore.getState();
 
           return isJuryVoting
             ? getVotingCountries()[votingCountryIndex]

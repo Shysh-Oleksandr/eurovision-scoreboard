@@ -60,11 +60,7 @@ export interface ThemeColors {
 
 export interface Theme {
   colors: ThemeColors;
-}
-
-export interface ThemeInfo {
-  hostingCountryLogo: string;
+  backgroundImage: string;
 }
 
 export type ThemeRecord = Record<Year, Theme>;
-export type ThemeInfoRecord = Record<Year, ThemeInfo>;

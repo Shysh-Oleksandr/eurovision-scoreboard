@@ -1,98 +1,105 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* To start tailwind: npx tailwindcss -i ./src/styles.css -o ./src/output.css --watch */
 
 /*Zero styles*/
 * {
-  padding: 0;
-  margin: 0;
-  border: 0;
+	padding: 0;
+	margin: 0;
+	border: 0;
 }
+
 *,
 *:before,
 *:after {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
+
 :focus,
 :active {
-  outline: none;
+	outline: none;
 }
+
 a:focus,
 a:active {
-  outline: none;
+	outline: none;
 }
 
 nav,
 footer,
 header,
 aside {
-  display: block;
+	display: block;
 }
 
 html,
 body,
 #root {
-  font-family: 'Montserrat', sans-serif;
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
-  font-size: 100%;
-  line-height: 1;
-  font-size: 14px;
-  -ms-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
+	font-family: 'Montserrat', sans-serif;
+	height: 100%;
+	width: 100%;
+	overflow-x: hidden;
+	font-size: 100%;
+	line-height: 1;
+	font-size: 14px;
+	-ms-text-size-adjust: 100%;
+	-moz-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
 }
 
 input,
 button,
 textarea {
-  font-family: inherit;
+	font-family: inherit;
 }
 
 input::-ms-clear {
-  display: none;
+	display: none;
 }
+
 button {
-  cursor: pointer;
+	cursor: pointer;
 }
+
 button::-moz-focus-inner {
-  padding: 0;
-  border: 0;
+	padding: 0;
+	border: 0;
 }
+
 a,
 a:visited {
-  text-decoration: none;
+	text-decoration: none;
 }
+
 a:hover {
-  text-decoration: none;
+	text-decoration: none;
 }
+
 .note__preview ul,
 .note__preview li {
-  list-style: inside !important;
+	list-style: inside !important;
 }
 
 .note__preview ol li {
-  list-style: numbers inside !important;
+	list-style: numbers inside !important;
 }
 
 .note__preview a {
-  text-decoration: underline;
+	text-decoration: underline;
 }
 
 .note__preview a:hover {
-  text-decoration: none;
+	text-decoration: none;
 }
 
 .note__preview p {
-  min-height: 1rem;
+	min-height: 1rem;
 }
 
 img {
-  vertical-align: top;
+	vertical-align: top;
 }
 
 h1,
@@ -101,113 +108,83 @@ h3,
 h4,
 h5,
 h6 {
-  font-size: inherit;
-  font-weight: 400;
+	font-size: inherit;
+	font-weight: 400;
 }
 
 /* Fonts */
 
 /* montserrat-regular - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../public/fonts/Montserrat-Regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+	font-display: swap;
+	/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-family: 'Montserrat';
+	font-style: normal;
+	font-weight: 400;
+	src: url('/fonts/Montserrat-Regular.woff2') format('woff2');
+	/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
+
 /* montserrat-500 - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 500;
-  src: url('../public/fonts/Montserrat-Medium.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+	font-display: swap;
+	/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-family: 'Montserrat';
+	font-style: normal;
+	font-weight: 500;
+	src: url('/fonts/Montserrat-Medium.woff2') format('woff2');
+	/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
+
 /* montserrat-600 - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 600;
-  src: url('../public/fonts/Montserrat-SemiBold.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+	font-display: swap;
+	/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-family: 'Montserrat';
+	font-style: normal;
+	font-weight: 600;
+	src: url('/fonts/Montserrat-SemiBold.woff2') format('woff2');
+	/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
+
 /* montserrat-700 - latin */
 @font-face {
-  font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
-  font-style: normal;
-  font-weight: 700;
-  src: url('../public/fonts/Montserrat-Bold.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+	font-display: swap;
+	/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-family: 'Montserrat';
+	font-style: normal;
+	font-weight: 700;
+	src: url('/fonts/Montserrat-Bold.woff2') format('woff2');
+	/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
-
-/* ---------------------------------------------------- */
 
 #main {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  overflow-y: auto;
-  overflow-x: hidden;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
-
-/* TODO: move the bg image logic outside */
-#main.theme-2016 {
-  background-image: url('/src/assets/bgImages/GalaxyBg2016.webp') !important;
-}
-#main.theme-2017 {
-  background-image: url('/src/assets/bgImages/BlueBg2017.webp') !important;
-}
-#main.theme-2018 {
-  background-image: url('/src/assets/bgImages/BlueBg2018.webp') !important;
-}
-#main.theme-2019 {
-  background-image: url('/src/assets/bgImages/BlueBg2019.webp') !important;
-}
-#main.theme-2020 {
-  background-image: url('/src/assets/bgImages/BlueBg2020.webp') !important;
-}
-#main.theme-2021 {
-  background-image: url('/src/assets/bgImages/BlueBg2021.webp') !important;
-}
-#main.theme-2022 {
-  background-image: url('/src/assets/bgImages/DarkRedBg2022.webp') !important;
-}
-#main.theme-2023 {
-  background-image: url('/src/assets/bgImages/BlueBg2023.webp') !important;
-}
-#main.theme-2024 {
-  background-image: url('/src/assets/bgImages/PurpleBg2024.webp') !important;
-}
-#main.theme-2025 {
-  background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
-}
-#main.theme-default {
-  background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
-}
-
 
 .triangle {
-  width: 1rem;
-  position: absolute;
-  left: calc(-1rem + 1px);
-  z-index: 25;
-  height: 100%;
+	width: 1rem;
+	position: absolute;
+	left: calc(-1rem + 1px);
+	z-index: 25;
+	height: 100%;
 }
 
 .blinker {
-  animation: blinker 0.8s ease-out;
+	animation: blinker 0.8s ease-out;
 }
 
 @keyframes blinker {
-  50% {
-    opacity: 0;
-  }
+	50% {
+		opacity: 0;
+	}
 }
 
-.container-wrapping-flipper > div {
-  display: grid;
-  grid-template-columns: 1fr;
-  column-gap: 0.75rem;
+.container-wrapping-flipper>div {
+	display: grid;
+	grid-template-columns: 1fr;
+	column-gap: 0.75rem;
 }
 
 /* 3 columns cause reordering issues */
@@ -218,180 +195,170 @@ h6 {
 } */
 
 @media (min-width: 576px) {
-  .container-wrapping-flipper > div {
-    grid-template-columns: repeat(2, 1fr);
-  }
+	.container-wrapping-flipper>div {
+		grid-template-columns: repeat(2, 1fr);
+	}
 }
 
 @media (min-width: 768px) {
-  .container-wrapping-flipper > div {
-    column-gap: 1rem;
-  }
+	.container-wrapping-flipper>div {
+		column-gap: 1rem;
+	}
 }
 
 @media (min-width: 1024px) {
-  .container-wrapping-flipper > div {
-    column-gap: 1.5rem;
-  }
+	.container-wrapping-flipper>div {
+		column-gap: 1.5rem;
+	}
 }
 
 @layer utilities {
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
+	::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
 
-  @media (min-width: 1024px) {
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-    }
-  }
+	@media (min-width: 1024px) {
+		::-webkit-scrollbar {
+			width: 10px;
+			height: 10px;
+		}
+	}
 
-  .select::-webkit-scrollbar,
-  .narrow-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
+	.select::-webkit-scrollbar,
+	.narrow-scrollbar::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
 
-  ::-webkit-scrollbar-track {
-    background: theme('colors.primary-900');
-  }
+	::-webkit-scrollbar-track {
+		background: theme('colors.primary-900');
+	}
 
-  ::-webkit-scrollbar-thumb {
-    background: theme('colors.primary-800');
-    border-radius: 100vh;
-  }
+	::-webkit-scrollbar-thumb {
+		background: theme('colors.primary-800');
+		border-radius: 100vh;
+	}
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: theme('colors.primary-750');
-  }
+	::-webkit-scrollbar-thumb:hover {
+		background: theme('colors.primary-750');
+	}
 }
 
 /* <select> styles */
 .select {
-  /* Reset */
-  appearance: none;
-  border: 0;
-  outline: 0;
-  font: inherit;
+	/* Reset */
+	appearance: none;
+	border: 0;
+	outline: 0;
+	font: inherit;
 
-  background: linear-gradient(
-      to left,
-      theme('colors.primary-800') 3em,
-      theme('colors.primary-900') 3em
-    );
-  color: #fff;
-  border-radius: 0.25em;
-  box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  
-  /* Remove IE arrow */
-  &::-ms-expand {
-    display: none;
-  }
-  /* Remove focus outline */
-  &:focus {
-    outline: none;
-  }
-  /* <option> colors - Fixed for Windows compatibility */
-  option {
-    color: #fff !important;
-    background-color: theme('colors.primary-900') !important;
-  }
+	background: linear-gradient(to left,
+			theme('colors.primary-800') 3em,
+			theme('colors.primary-900') 3em);
+	color: #fff;
+	border-radius: 0.25em;
+	box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+
+	/* Remove IE arrow */
+	&::-ms-expand {
+		display: none;
+	}
+
+	/* Remove focus outline */
+	&:focus {
+		outline: none;
+	}
+
+	/* <option> colors - Fixed for Windows compatibility */
+	option {
+		color: #fff !important;
+		background-color: theme('colors.primary-900') !important;
+	}
 }
 
 @media (max-width: 768px) {
-  .select {
-    background: linear-gradient(
-      to left,
-      theme('colors.primary-800') 2.5em,
-      theme('colors.primary-900') 2.5em
-    );
-  }
+	.select {
+		background: linear-gradient(to left,
+				theme('colors.primary-800') 2.5em,
+				theme('colors.primary-900') 2.5em);
+	}
 }
 
 .animated-border {
-  display: grid;
-  place-content: center;
-  color: white;
-  text-shadow: 0 1px 0 #000;
+	display: grid;
+	place-content: center;
+	color: white;
+	text-shadow: 0 1px 0 #000;
 
-  --border-angle: 0turn;
-  --main-bg: conic-gradient(
-    from var(--border-angle),
-    theme('colors.primary-900'),
-    theme('colors.primary-950') 5%,
-    theme('colors.primary-950') 60%,
-    theme('colors.primary-900') 95%
-  );
+	--border-angle: 0turn;
+	--main-bg: conic-gradient(from var(--border-angle),
+			theme('colors.primary-900'),
+			theme('colors.primary-950') 5%,
+			theme('colors.primary-950') 60%,
+			theme('colors.primary-900') 95%);
 
-  border: solid 3px transparent;
-  --gradient-border: conic-gradient(
-    from var(--border-angle),
-    transparent 25%,
-    theme('colors.primary-800') 65%,
-    theme('colors.animatedBorder') 99%,
-    transparent
-  );
+	border: solid 3px transparent;
+	--gradient-border: conic-gradient(from var(--border-angle),
+			transparent 25%,
+			theme('colors.primary-800') 65%,
+			theme('colors.animatedBorder') 99%,
+			transparent);
 
-  background: 
-    /* padding-box clip this background in to the overall element except the border. */ var(
-        --main-bg
-      )
-      padding-box,
-    /* border-box extends this background to the border space */
-      var(--gradient-border) border-box,
-    /* Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background. */
-      var(--main-bg) border-box;
+	background:
+		/* padding-box clip this background in to the overall element except the border. */
+		var(--main-bg) padding-box,
+		/* border-box extends this background to the border space */
+		var(--gradient-border) border-box,
+		/* Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background. */
+		var(--main-bg) border-box;
 
-  background-position: center center;
+	background-position: center center;
 
-  transition: all;
+	transition: all;
 
-  animation: bg-spin 4s linear infinite;
+	animation: bg-spin 4s linear infinite;
 
-  &:hover {
-    --main-bg: conic-gradient(
-      from var(--border-angle),
-      theme('colors.primary-800'),
-      theme('colors.primary-950') 5%,
-      theme('colors.primary-950') 60%,
-      theme('colors.primary-800') 95%
-    );
-  }
+	&:hover {
+		--main-bg: conic-gradient(from var(--border-angle),
+				theme('colors.primary-800'),
+				theme('colors.primary-950') 5%,
+				theme('colors.primary-950') 60%,
+				theme('colors.primary-800') 95%);
+	}
 }
 
 @property --border-angle {
-  syntax: '<angle>';
-  inherits: true;
-  initial-value: 0turn;
+	syntax: '<angle>';
+	inherits: true;
+	initial-value: 0turn;
 }
 
 @keyframes bg-spin {
-  to {
-    --border-angle: 1turn;
-  }
+	to {
+		--border-angle: 1turn;
+	}
 }
 
 .double-clickable-area {
-  position: relative;
-  cursor: pointer;
-  pointer-events: auto;
+	position: relative;
+	cursor: pointer;
+	pointer-events: auto;
 }
 
 .double-clickable-area::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
 }
 
 @media (min-width: 768px) {
-  .double-clickable-area::after {
-    width: 150%;
-    height: 150%;
-  }
+	.double-clickable-area::after {
+		width: 150%;
+		height: 150%;
+	}
 }

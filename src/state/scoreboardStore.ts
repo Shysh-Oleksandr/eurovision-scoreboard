@@ -36,6 +36,7 @@ interface ScoreboardState {
   televotingProgress: number;
 
   // Actions
+  initializeCountries: () => void;
   giveJuryPoints: (countryCode: string) => void;
   giveTelevotePoints: (countryCode: string, votingPoints: number) => void;
   giveRandomJuryPoints: (isRandomFinishing?: boolean) => void;
@@ -87,7 +88,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
   devtools(
     (set, get) => ({
       // Initial state
-      countries: useCountriesStore.getState().getInitialCountries(),
+      countries: [],
       isJuryVoting: true,
       votingCountryIndex: 0,
       votingPoints: 1,

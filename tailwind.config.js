@@ -1,9 +1,9 @@
-const { createThemes } = require('tw-colors');
+import { createThemes } from 'tw-colors';
 
-const { getThemeForYear, YEARS_WITH_THEME } = require('./src/theme/themes');
+import { getThemeForYear, YEARS_WITH_THEME } from './src/theme/themes';
 
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ['./src/**/*.{html,js,ts,jsx,tsx}'],
   theme: {
     extend: {

@@ -6,8 +6,7 @@ import { WHATS_NEW } from '../components/feedbackInfo/data';
 import { Year } from '../config';
 import { SUPPORTED_YEARS } from '../data/data';
 import { getThemeForYear } from '../theme/themes';
-import { themesInfo } from '../theme/themesInfo';
-import { Theme, ThemeInfo } from '../theme/types';
+import { Theme } from '../theme/types';
 
 import { useCountriesStore } from './countriesStore';
 
@@ -19,7 +18,6 @@ interface GeneralState {
   year: Year;
   themeYear: Year;
   theme: Theme;
-  themeInfo: ThemeInfo;
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
@@ -45,7 +43,6 @@ export const useGeneralStore = create<GeneralState>()(
       year: INITIAL_YEAR,
       themeYear: INITIAL_YEAR,
       theme: getThemeForYear(INITIAL_YEAR),
-      themeInfo: themesInfo[INITIAL_YEAR],
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
       },
@@ -63,7 +60,6 @@ export const useGeneralStore = create<GeneralState>()(
       setYear: (year: Year) => {
         set({
           year: year,
-          themeInfo: themesInfo[year],
         });
 
         useCountriesStore.getState().updateCountriesForYear(year);
@@ -96,7 +92,6 @@ export const useGeneralStore = create<GeneralState>()(
           year,
           themeYear,
           theme: getThemeForYear(themeYear),
-          themeInfo: themesInfo[year],
         };
       },
     },

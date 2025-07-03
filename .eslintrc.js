@@ -36,6 +36,10 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { varsIgnorePattern: '^React$' },
+    ],
     // '@typescript-eslint/no-magic-numbers': [
     //   'warn',
     //   {
