@@ -39,6 +39,8 @@ const SelectDisplay: React.FC<{
             src={selectedOption.imageUrl}
             alt={selectedOption.label}
             className="w-6 h-6 mr-2"
+            width={24}
+            height={24}
           />
         ) : (
           <span
@@ -164,6 +166,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                       src={option.imageUrl}
                       alt={option.label}
                       className="w-5 h-5 mr-3"
+                      width={20}
+                      height={20}
                     />
                   ) : (
                     <span

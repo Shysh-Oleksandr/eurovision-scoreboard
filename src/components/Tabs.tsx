@@ -19,9 +19,9 @@ const Tabs: React.FC<TabsProps> = ({
   tabs,
   activeTab,
   setActiveTab,
-  containerClassName,
-  buttonClassName,
-  overlayClassName,
+  containerClassName = '',
+  buttonClassName = '',
+  overlayClassName = '',
 }) => {
   const isSmallScreen =
     useMediaQuery('(max-width: 479px)') || window.innerWidth < 480;
@@ -70,6 +70,7 @@ const Tabs: React.FC<TabsProps> = ({
 
   return (
     <nav
+      role="tablist"
       className={`flex xs:flex-row flex-col overflow-x-auto items-center p-1 px-2 gap-1 md:text-lg text-base text-gray-700 bg-primary-900 rounded-xl w-full relative ${containerClassName}`}
     >
       {isInitialized && (

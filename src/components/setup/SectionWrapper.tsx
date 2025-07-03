@@ -104,6 +104,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
                   onChange={handleBulkAssign}
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   id={`country-assignment-${title}`}
+                  aria-label={`Bulk assign all countries in ${title} to a group`}
                 >
                   {availableGroups.map((group) => (
                     <option key={group} value={group}>

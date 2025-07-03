@@ -79,10 +79,14 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
             currentGroup={semiFinal.group as CountryAssignmentGroup}
           >
             <div className="mb-2 flex items-center gap-2">
-              <label className="block text-sm text-white">
+              <label
+                htmlFor={`qualifiers-${semiFinal.group}`}
+                className="block text-sm text-white"
+              >
                 Number of qualifiers:
               </label>
               <input
+                id={`qualifiers-${semiFinal.group}`}
                 type="number"
                 value={semiFinal.qualifiers || ''}
                 onChange={(e) => {
@@ -91,6 +95,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
                 className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm text-white px-3 py-1 rounded transition-colors duration-300 hover:bg-primary-950 focus:bg-primary-950 w-[56px]"
                 min={1}
                 max={semiFinal.countries.length}
+                aria-label={`Number of qualifiers for ${semiFinal.title}`}
               />
             </div>
             <CountrySelectionList

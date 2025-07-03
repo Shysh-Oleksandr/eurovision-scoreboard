@@ -39,7 +39,10 @@ module.exports = {
       {
         test: /\.(woff(2)?|eot|ttf|otf|svg)$/,
         exclude: path.resolve(__dirname, '..', './src/assets/flags'),
-        type: 'asset/inline',
+        type: 'asset/resource',
+        generator: {
+          filename: 'fonts/[name][ext]',
+        },
       },
     ],
   },
@@ -59,6 +62,10 @@ module.exports = {
         {
           from: path.resolve(__dirname, '..', 'src/assets/flags'),
           to: 'flags',
+        },
+        {
+          from: path.resolve(__dirname, '..', 'public/fonts'),
+          to: 'fonts',
         },
       ],
     }),

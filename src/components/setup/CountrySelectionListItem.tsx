@@ -34,6 +34,9 @@ export const CountrySelectionListItem: React.FC<
   availableGroups = Object.values(CountryAssignmentGroup),
   onEdit,
 }) => {
+  const shouldLazyLoad =
+    countryGroupAssignment === CountryAssignmentGroup.NOT_PARTICIPATING;
+
   const handleAssignmentChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
@@ -49,13 +52,15 @@ export const CountrySelectionListItem: React.FC<
       }`}
     >
       <img
-        loading="lazy"
+        loading={shouldLazyLoad ? 'lazy' : 'eager'}
         src={country.flag || getFlagPath(country)}
         onError={(e) => {
           e.currentTarget.src = getFlagPath('ww');
         }}
         alt={`${country.name} flag`}
         className="w-8 h-6 object-cover flex-none rounded-sm"
+        width={32}
+        height={24}
       />
       <span
         className="text-sm text-white flex-1 truncate ml-2"
@@ -86,6 +91,7 @@ export const CountrySelectionListItem: React.FC<
             onChange={handleAssignmentChange}
             className="absolute inset-0 opacity-0 cursor-pointer"
             id={`country-assignment-${country.code}`}
+            aria-label={`Assign ${country.name} to a group`}
           >
             {availableGroups.map((group) => (
               <option key={group} value={group}>

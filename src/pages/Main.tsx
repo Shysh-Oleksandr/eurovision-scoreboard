@@ -82,6 +82,8 @@ export const Main = () => {
                   src={themeInfo.hostingCountryLogo}
                   alt="Hosting country logo"
                   className="w-10 h-10"
+                  width={40}
+                  height={40}
                 />
                 <h2 className="sm:text-xl text-lg font-bold text-white">
                   {phaseTitle}
