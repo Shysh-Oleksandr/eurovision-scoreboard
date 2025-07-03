@@ -12,9 +12,10 @@ import { EventMode, EventPhase } from '../models';
 import { useCountriesStore } from '../state/countriesStore';
 import { useGeneralStore } from '../state/generalStore';
 import { useScoreboardStore } from '../state/scoreboardStore';
+import { getHostingCountryLogoForYear } from '../theme/themes';
 
 export const Main = () => {
-  const { year, themeYear, theme, themeInfo } = useGeneralStore();
+  const { year, themeYear, theme } = useGeneralStore();
   const {
     eventPhase,
     eventMode,
@@ -66,6 +67,10 @@ export const Main = () => {
       id="main"
       style={{
         backgroundColor: theme.colors.appBgColor,
+        backgroundImage: `url(${theme.backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
       }}
     >
       <WinnerConfetti />
@@ -79,7 +84,7 @@ export const Main = () => {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-2">
                 <img
-                  src={themeInfo.hostingCountryLogo}
+                  src={getHostingCountryLogoForYear(year)}
                   alt="Hosting country logo"
                   className="w-10 h-10"
                   width={40}

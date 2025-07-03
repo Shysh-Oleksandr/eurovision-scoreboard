@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-04',
+    title: 'Added 2016 theme. Improved assets loading for better performance',
+  },
+  {
     date: '2025-07-02',
     title:
       'Migrated from Vercel to Cloudflare. Set up the new domain - douzepoints.app. Added 2017 theme',
