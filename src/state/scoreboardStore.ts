@@ -130,6 +130,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
         presetTelevoteVotes: [],
         currentPlayingCountryIndex: 0,
         isAutoPlaying: false,
+        currentPhase: 'lower-points',
       },
 
       // Actions
@@ -428,6 +429,8 @@ export const useScoreboardStore = create<ScoreboardState>()(
             presetTelevoteVotes: [],
             currentPlayingCountryIndex: 0,
             isAutoPlaying: false,
+            currentPhase: 'lower-points',
+            currentMessageCountryIndex: 0,
           },
         });
       },
@@ -637,13 +640,14 @@ export const useScoreboardStore = create<ScoreboardState>()(
             ...state.presenterSettings,
             isAutoPlaying: true,
             currentPlayingCountryIndex: 0,
+            currentPhase: 'lower-points',
+            currentMessageCountryIndex: 0,
           },
+          votingCountryIndex: 0,
         }));
 
-        // Start playing the first country's votes
-        setTimeout(() => {
-          get().playNextPresenterVotes();
-        }, 1000);
+        // Start playing the first country's votes immediately
+        get().playNextPresenterVotes();
       },
 
       stopPresenterMode: () => {
@@ -651,6 +655,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           presenterSettings: {
             ...state.presenterSettings,
             isAutoPlaying: false,
+            currentPhase: 'lower-points',
           },
         }));
       },
@@ -770,7 +775,13 @@ export const useScoreboardStore = create<ScoreboardState>()(
                 },
               );
 
-              // Clear any existing animations first
+              // Set phase to lower points and clear any existing animations
+              set((state) => ({
+                presenterSettings: {
+                  ...state.presenterSettings,
+                  currentPhase: 'lower-points',
+                },
+              }));
               get().resetLastPoints();
 
               // Play all points except 12 simultaneously
@@ -783,6 +794,13 @@ export const useScoreboardStore = create<ScoreboardState>()(
               // Then play 12 points after a delay (but keep 1-10 visible)
               if (douzePointsCountry) {
                 setTimeout(() => {
+                  // Change to twelve points phase and message
+                  set((state) => ({
+                    presenterSettings: {
+                      ...state.presenterSettings,
+                      currentPhase: 'twelve-points',
+                    },
+                  }));
                   get().givePresenterDouzePoints(douzePointsCountry!);
                 }, 3000);
               }
@@ -790,27 +808,37 @@ export const useScoreboardStore = create<ScoreboardState>()(
               // Clear all animations together and move to next country
               setTimeout(
                 () => {
-                  // Clear all animations
+                  // Clear all animations but keep the message
                   get().resetLastPoints();
 
-                  // Wait 1 second with clear screen before next country
+                  // Wait longer (2 seconds) with clear screen before next country
                   setTimeout(() => {
                     set((state) => ({
                       presenterSettings: {
                         ...state.presenterSettings,
                         currentPlayingCountryIndex: currentCountryIndex + 1,
+                        currentPhase: 'lower-points',
+                        currentMessageCountryIndex: currentCountryIndex + 1,
                       },
-                      votingPoints: 1, // Reset voting points for next country
+                      votingCountryIndex: currentCountryIndex + 1,
                     }));
 
-                    // Play next country
-                    get().playNextPresenterVotes();
-                  }, 1000);
+                    // Play next country immediately after the state update
+                    setTimeout(() => {
+                      get().playNextPresenterVotes();
+                    }, 100);
+                  }, 2000);
                 },
-                douzePointsCountry ? 6000 : 4000,
+                douzePointsCountry ? 4500 : 4000,
               );
             } else {
               // Play individual points one by one, but give ALL points for this country
+              set((state) => ({
+                presenterSettings: {
+                  ...state.presenterSettings,
+                  currentPhase: 'lower-points',
+                },
+              }));
               get().resetLastPoints();
 
               // Give all points at once but with individual timing for visual effect
@@ -823,19 +851,23 @@ export const useScoreboardStore = create<ScoreboardState>()(
                 // Clear all animations
                 get().resetLastPoints();
 
-                // Wait 1 second with clear screen before next country
+                // Wait longer (2 seconds) with clear screen before next country
                 setTimeout(() => {
                   set((state) => ({
                     presenterSettings: {
                       ...state.presenterSettings,
                       currentPlayingCountryIndex: currentCountryIndex + 1,
+                      currentPhase: 'lower-points',
+                      currentMessageCountryIndex: currentCountryIndex + 1,
                     },
-                    votingPoints: 1, // Reset voting points for next country
+                    votingCountryIndex: currentCountryIndex + 1,
                   }));
 
-                  // Play next country
-                  get().playNextPresenterVotes();
-                }, 1000);
+                  // Play next country immediately after the state update
+                  setTimeout(() => {
+                    get().playNextPresenterVotes();
+                  }, 100);
+                }, 2000);
               }, 4000);
             }
           }

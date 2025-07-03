@@ -67,7 +67,9 @@ export interface CountryWithPoints {
   points: number;
 }
 
-export type PresenterPointGrouping = 'individual' | 'grouped';
+export type PresenterPointGrouping = 'grouped' | 'individual';
+
+export type PresenterPhase = 'lower-points' | 'twelve-points' | 'transitioning';
 
 export interface PresetJuryVote {
   votingCountryCode: string;
@@ -86,4 +88,6 @@ export interface PresenterSettings {
   presetTelevoteVotes: PresetTelevoteVote[];
   currentPlayingCountryIndex: number;
   isAutoPlaying: boolean;
+  currentPhase: PresenterPhase;
+  currentMessageCountryIndex: number; // Separate index for message display
 }

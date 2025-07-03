@@ -38,14 +38,17 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
     // Check if presenter mode is active
     if (presenterSettings.isAutoPlaying) {
       if (isJuryVoting) {
-        const currentVotingCountry = votingCountry;
+        const countriesStore = useCountriesStore.getState();
+        const votingCountries = countriesStore.getVotingCountries();
+        const messageCountry =
+          votingCountries[presenterSettings.currentMessageCountryIndex];
 
-        if (currentVotingCountry) {
-          if (votingPoints === 12) {
+        if (messageCountry) {
+          // Use the presenter phase to determine the message
+          if (presenterSettings.currentPhase === 'twelve-points') {
             return (
               <>
-                Hi,{' '}
-                <span className="font-medium">{currentVotingCountry.name}</span>{' '}
+                Hi, <span className="font-medium">{messageCountry.name}</span>{' '}
                 calling.
                 <br />
                 <span className="font-medium">12 points</span> go to...
@@ -53,10 +56,10 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
             );
           }
 
+          // For lower-points phase
           return (
             <>
-              Hi,{' '}
-              <span className="font-medium">{currentVotingCountry.name}</span>{' '}
+              Hi, <span className="font-medium">{messageCountry.name}</span>{' '}
               calling.
               <br />
               Here are the lower points:

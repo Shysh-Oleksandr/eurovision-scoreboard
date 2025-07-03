@@ -108,12 +108,46 @@ export const useCountriesStore = create<CountriesState>()(
         getVotingCountry: () => {
           const { getVotingCountries } = get();
 
-          const { votingCountryIndex, isJuryVoting, countries } =
-            require('./scoreboardStore').useScoreboardStore.getState();
+          const {
+            votingCountryIndex,
+            isJuryVoting,
+            countries,
+            presenterSettings,
+          } = require('./scoreboardStore').useScoreboardStore.getState(); // In presenter mode, use currentMessageCountryIndex to keep top-right display in sync
+          const effectiveIndex = presenterSettings.isAutoPlaying
+            ? presenterSettings.currentMessageCountryIndex
+            : votingCountryIndex;
 
-          return isJuryVoting
-            ? getVotingCountries()[votingCountryIndex]
-            : countries[votingCountryIndex];
+          const votingCountries = getVotingCountries();
+
+          // In presenter mode, always use voting countries for consistency
+          if (presenterSettings.isAutoPlaying) {
+            if (
+              effectiveIndex >= 0 &&
+              effectiveIndex < votingCountries.length
+            ) {
+              return votingCountries[effectiveIndex];
+            }
+
+            return votingCountries[0] || null;
+          }
+
+          // Normal mode: use voting countries for jury, regular countries for televote
+          if (isJuryVoting) {
+            if (
+              effectiveIndex >= 0 &&
+              effectiveIndex < votingCountries.length
+            ) {
+              return votingCountries[effectiveIndex];
+            }
+
+            return votingCountries[0] || null;
+          }
+          if (effectiveIndex >= 0 && effectiveIndex < countries.length) {
+            return countries[effectiveIndex];
+          }
+
+          return countries[0] || null;
         },
 
         getVotingCountriesLength: () => {
