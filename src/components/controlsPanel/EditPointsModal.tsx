@@ -5,7 +5,6 @@ import { PresetJuryVote, PresetTelevoteVote } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../Button';
-import CountryDropdown from '../CountryDropdown';
 
 type Props = {
   onClose: () => void;
@@ -185,60 +184,63 @@ const EditPointsModal = ({ onClose }: Props) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-y-auto">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-white lg:text-xl text-lg font-medium">
-              Edit Points
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors duration-200"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+      {/* Modal - floating popup without backdrop */}
+      <div className="relative bg-gradient-to-tr from-primary-950 to-primary-900 border border-gray-600 rounded-lg shadow-2xl w-full max-w-[60%] max-h-[80vh] overflow-hidden pointer-events-auto">
+        {/* Header */}
+        <div className="bg-primary-800/50 px-4 py-3 border-b border-gray-600 flex justify-between items-center">
+          <h3 className="text-white text-lg font-medium">
+            {isJuryVoting
+              ? 'Configure Jury Points'
+              : 'Configure Televote Points'}
+          </h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-700 rounded"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
 
+        {/* Content */}
+        <div className="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
           {isJuryVoting ? (
             <>
-              {/* Voting Country Selection */}
-              <div className="mb-6">
-                <h4 className="text-white lg:text-base text-sm font-medium mb-2">
-                  Who's voting?
-                </h4>
-                <CountryDropdown
-                  countries={votingCountries}
-                  selectedCountryCode={selectedVotingCountryCode}
-                  onSelect={setSelectedVotingCountryCode}
-                  placeholder="Select voting country"
-                />
+              {/* Country Selection */}
+              <div className="mb-4">
+                <label className="block text-white text-sm font-medium mb-2">
+                  Voting Country
+                </label>
+                <select
+                  value={selectedVotingCountryCode}
+                  onChange={(e) => setSelectedVotingCountryCode(e.target.value)}
+                  className="w-full py-2 px-3 bg-white border border-gray-600 rounded text-black text-sm focus:border-primary-400 focus:outline-none"
+                >
+                  <option value="">Select country</option>
+                  {votingCountries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Random Points Button */}
-              <div className="mb-6">
+              {/* Random Button */}
+              <div className="mb-4">
                 <Button
-                  label="Random Points"
+                  label="Generate Random Points"
                   onClick={handleRandomPointsForCurrentCountry}
                   variant="secondary"
                   className="w-full"
@@ -247,7 +249,10 @@ const EditPointsModal = ({ onClose }: Props) => {
 
               {/* Points Assignment */}
               {currentJuryVote && (
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3">
+                  <label className="block text-white text-sm font-medium">
+                    Point Distribution
+                  </label>
                   {POINTS_ARRAY.map((pointValue) => {
                     const selectedCountryCode =
                       getSelectedCountryForPoints(pointValue);
@@ -260,18 +265,23 @@ const EditPointsModal = ({ onClose }: Props) => {
                         key={pointValue}
                         className="flex items-center space-x-3"
                       >
-                        <div className="w-8 text-white font-medium">
+                        <div className="bg-primary-600 text-white font-medium text-sm px-2 py-1 rounded min-w-[30px] text-center">
                           {pointValue}
                         </div>
-                        <CountryDropdown
-                          countries={availableCountries}
-                          selectedCountryCode={selectedCountryCode}
-                          onSelect={(countryCode) =>
-                            handleJuryPointSelection(pointValue, countryCode)
+                        <select
+                          value={selectedCountryCode || ''}
+                          onChange={(e) =>
+                            handleJuryPointSelection(pointValue, e.target.value)
                           }
-                          placeholder="Select country"
-                          className="flex-1"
-                        />
+                          className="flex-1 py-2 px-3 bg-white border border-gray-600 rounded text-black text-sm focus:border-primary-400 focus:outline-none"
+                        >
+                          <option value="">Select country</option>
+                          {availableCountries.map((country) => (
+                            <option key={country.code} value={country.code}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     );
                   })}
@@ -280,10 +290,10 @@ const EditPointsModal = ({ onClose }: Props) => {
             </>
           ) : (
             /* Televote Points */
-            <div className="space-y-4 mb-6">
-              <h4 className="text-white lg:text-base text-sm font-medium mb-4">
-                Enter televote points for each country
-              </h4>
+            <div className="space-y-3">
+              <label className="block text-white text-sm font-medium">
+                Televote Points
+              </label>
               {currentTelevoteVotes.map((vote) => {
                 const country = countries.find(
                   (c) => c.code === vote.countryCode,
@@ -294,9 +304,9 @@ const EditPointsModal = ({ onClose }: Props) => {
                 return (
                   <div
                     key={vote.countryCode}
-                    className="flex items-center space-x-3"
+                    className="flex items-center justify-between"
                   >
-                    <div className="flex-1 text-white">{country.name}</div>
+                    <span className="text-white text-sm">{country.name}</span>
                     <input
                       type="number"
                       value={vote.points}
@@ -306,7 +316,7 @@ const EditPointsModal = ({ onClose }: Props) => {
                           parseInt(e.target.value) || 0,
                         )
                       }
-                      className="w-24 lg:py-2 py-[6px] px-3 bg-primary-800 border border-gray-600 rounded-md text-white lg:text-base text-sm"
+                      className="w-20 py-1 px-2 bg-gray-700 border border-gray-600 rounded text-white text-sm text-center focus:border-primary-400 focus:outline-none"
                       min="0"
                     />
                   </div>
@@ -314,22 +324,22 @@ const EditPointsModal = ({ onClose }: Props) => {
               })}
             </div>
           )}
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex space-x-3">
-            <Button
-              label="Save"
-              onClick={handleSave}
-              variant="primary"
-              className="flex-1"
-            />
-            <Button
-              label="Clear"
-              onClick={handleClear}
-              variant="destructive"
-              className="flex-1"
-            />
-          </div>
+        {/* Footer */}
+        <div className="bg-primary-800/30 px-4 py-3 border-t border-gray-600 flex space-x-3">
+          <Button
+            label="Save"
+            onClick={handleSave}
+            variant="primary"
+            className="flex-1"
+          />
+          <Button
+            label="Clear"
+            onClick={handleClear}
+            variant="destructive"
+            className="flex-1"
+          />
         </div>
       </div>
     </div>
