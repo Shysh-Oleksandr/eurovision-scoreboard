@@ -780,30 +780,32 @@ export const useScoreboardStore = create<ScoreboardState>()(
                 }
               }, 500);
 
-              // Then play 12 points after a delay
+              // Then play 12 points after a delay (but keep 1-10 visible)
               if (douzePointsCountry) {
                 setTimeout(() => {
-                  get().resetLastPoints();
                   get().givePresenterDouzePoints(douzePointsCountry!);
                 }, 3000);
               }
 
-              // Move to next country after all animations
+              // Clear all animations together and move to next country
               setTimeout(
                 () => {
+                  // Clear all animations
                   get().resetLastPoints();
-                  set((state) => ({
-                    presenterSettings: {
-                      ...state.presenterSettings,
-                      currentPlayingCountryIndex: currentCountryIndex + 1,
-                    },
-                    votingPoints: 1, // Reset voting points for next country
-                  }));
 
-                  // Play next country after a pause
+                  // Wait 1 second with clear screen before next country
                   setTimeout(() => {
+                    set((state) => ({
+                      presenterSettings: {
+                        ...state.presenterSettings,
+                        currentPlayingCountryIndex: currentCountryIndex + 1,
+                      },
+                      votingPoints: 1, // Reset voting points for next country
+                    }));
+
+                    // Play next country
                     get().playNextPresenterVotes();
-                  }, 1500);
+                  }, 1000);
                 },
                 douzePointsCountry ? 6000 : 4000,
               );
@@ -818,19 +820,22 @@ export const useScoreboardStore = create<ScoreboardState>()(
 
               // Move to next country after animations
               setTimeout(() => {
+                // Clear all animations
                 get().resetLastPoints();
-                set((state) => ({
-                  presenterSettings: {
-                    ...state.presenterSettings,
-                    currentPlayingCountryIndex: currentCountryIndex + 1,
-                  },
-                  votingPoints: 1, // Reset voting points for next country
-                }));
 
-                // Play next country after a pause
+                // Wait 1 second with clear screen before next country
                 setTimeout(() => {
+                  set((state) => ({
+                    presenterSettings: {
+                      ...state.presenterSettings,
+                      currentPlayingCountryIndex: currentCountryIndex + 1,
+                    },
+                    votingPoints: 1, // Reset voting points for next country
+                  }));
+
+                  // Play next country
                   get().playNextPresenterVotes();
-                }, 1500);
+                }, 1000);
               }, 4000);
             }
           }
@@ -844,16 +849,22 @@ export const useScoreboardStore = create<ScoreboardState>()(
           if (presetVote) {
             get().giveTelevotePoints(presetVote.countryCode, presetVote.points);
 
-            set((state) => ({
-              presenterSettings: {
-                ...state.presenterSettings,
-                currentPlayingCountryIndex: currentCountryIndex + 1,
-              },
-            }));
-
-            // Play next country after a pause
+            // Clear animations and move to next country with 1-second gap
             setTimeout(() => {
-              get().playNextPresenterVotes();
+              get().resetLastPoints();
+
+              // Wait 1 second with clear screen before next country
+              setTimeout(() => {
+                set((state) => ({
+                  presenterSettings: {
+                    ...state.presenterSettings,
+                    currentPlayingCountryIndex: currentCountryIndex + 1,
+                  },
+                }));
+
+                // Play next country
+                get().playNextPresenterVotes();
+              }, 1000);
             }, 2000);
           } else {
             // All televote votes completed
