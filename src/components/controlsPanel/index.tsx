@@ -4,6 +4,7 @@ import { EventPhase } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import CountryInfo from './CountryInfo';
+import PresenterSettings from './PresenterSettings';
 import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
@@ -43,6 +44,7 @@ const ControlsPanel = (): JSX.Element | null => {
         <VotingButtons />
       </div>
       {showJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
+      <PresenterSettings />
     </div>
   );
 };

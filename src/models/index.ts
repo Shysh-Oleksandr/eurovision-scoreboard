@@ -66,3 +66,24 @@ export interface CountryWithPoints {
   code: string;
   points: number;
 }
+
+export type PresenterPointGrouping = 'individual' | 'grouped';
+
+export interface PresetJuryVote {
+  votingCountryCode: string;
+  points: { [receivingCountryCode: string]: number };
+}
+
+export interface PresetTelevoteVote {
+  countryCode: string;
+  points: number;
+}
+
+export interface PresenterSettings {
+  isPresenterMode: boolean;
+  pointGrouping: PresenterPointGrouping;
+  presetJuryVotes: PresetJuryVote[];
+  presetTelevoteVotes: PresetTelevoteVote[];
+  currentPlayingCountryIndex: number;
+  isAutoPlaying: boolean;
+}

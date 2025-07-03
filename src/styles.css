@@ -146,7 +146,6 @@ h6 {
   background-image: url('/src/assets/bgImages/PurpleBg2025.webp');
 }
 
-
 .triangle {
   width: 1rem;
   position: absolute;
@@ -238,15 +237,15 @@ h6 {
   font: inherit;
 
   background: linear-gradient(
-      to left,
-      theme('colors.primary-800') 3em,
-      theme('colors.primary-900') 3em
-    );
+    to left,
+    theme('colors.primary-800') 3em,
+    theme('colors.primary-900') 3em
+  );
   color: #fff;
   border-radius: 0.25em;
   box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  
+
   /* Remove IE arrow */
   &::-ms-expand {
     display: none;

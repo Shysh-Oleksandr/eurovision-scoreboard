@@ -20,6 +20,7 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
     qualifiedCountries,
     resetLastPoints,
     giveTelevotePoints,
+    presenterSettings,
   } = useScoreboardStore();
 
   const { getQualifiedCountries, getVotingCountriesLength, getVotingCountry } =
@@ -33,6 +34,40 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
 
   const votingText = useMemo(() => {
     if (isVotingOver) return null;
+
+    // Check if presenter mode is active
+    if (presenterSettings.isAutoPlaying) {
+      if (isJuryVoting) {
+        const currentVotingCountry = votingCountry;
+
+        if (currentVotingCountry) {
+          if (votingPoints === 12) {
+            return (
+              <>
+                Hi,{' '}
+                <span className="font-medium">{currentVotingCountry.name}</span>{' '}
+                calling.
+                <br />
+                <span className="font-medium">12 points</span> go to...
+              </>
+            );
+          }
+
+          return (
+            <>
+              Hi,{' '}
+              <span className="font-medium">{currentVotingCountry.name}</span>{' '}
+              calling.
+              <br />
+              Here are the lower points:
+            </>
+          );
+        }
+      } else {
+        // Televote presenter mode
+        return <>Televote results are being presented automatically.</>;
+      }
+    }
 
     if (isJuryVoting) {
       return (
@@ -50,7 +85,13 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
         <span className="font-medium">{votingCountry?.name}</span>
       </>
     );
-  }, [isVotingOver, isJuryVoting, votingPoints, votingCountry]);
+  }, [
+    isVotingOver,
+    isJuryVoting,
+    votingPoints,
+    votingCountry,
+    presenterSettings,
+  ]);
 
   const chooseRandomly = useCallback(() => {
     if (!isJuryVoting) {

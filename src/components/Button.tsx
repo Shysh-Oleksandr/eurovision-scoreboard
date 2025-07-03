@@ -6,6 +6,7 @@ type Props = {
   onClick: () => void;
   variant?: 'primary' | 'secondary' | 'destructive';
   children?: ReactNode;
+  disabled?: boolean;
 };
 
 const Button = ({
@@ -14,6 +15,7 @@ const Button = ({
   onClick,
   variant = 'primary',
   children,
+  disabled = false,
 }: Props) => {
   const baseClasses =
     'lg:text-base md:text-base text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] font-medium uppercase rounded-md shadow-lg transition-colors lg:leading-5 duration-300 bg-gradient-to-tr from-[20%]';
@@ -27,10 +29,13 @@ const Button = ({
       'bg-red-900 from-red-900 to-red-600/40 text-white hover:bg-red-700',
   };
 
+  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
+
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
-      onClick={onClick}
+      className={`${baseClasses} ${variantClasses[variant]} ${disabledClasses} ${className}`}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
     >
       {children || label}
     </button>

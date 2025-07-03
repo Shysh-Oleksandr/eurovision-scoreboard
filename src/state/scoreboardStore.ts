@@ -11,6 +11,10 @@ import {
   EventMode,
   EventPhase,
   SemiFinalQualifiersAmount,
+  PresenterSettings,
+  PresetJuryVote,
+  PresetTelevoteVote,
+  PresenterPointGrouping,
 } from '../models';
 
 import { useCountriesStore } from './countriesStore';
@@ -34,6 +38,7 @@ interface ScoreboardState {
   isFinalAnimationFinished: boolean;
   canDisplayPlaceAnimation: boolean;
   televotingProgress: number;
+  presenterSettings: PresenterSettings;
 
   // Actions
   giveJuryPoints: (countryCode: string) => void;
@@ -51,6 +56,20 @@ interface ScoreboardState {
   toggleShowAllParticipants: () => void;
   setFinalAnimationFinished: (isFinished: boolean) => void;
   setCanDisplayPlaceAnimation: (canDisplay: boolean) => void;
+
+  // Presenter actions
+  togglePresenterMode: () => void;
+  setPointGrouping: (grouping: PresenterPointGrouping) => void;
+  setPresetJuryVotes: (votes: PresetJuryVote[]) => void;
+  setPresetTelevoteVotes: (votes: PresetTelevoteVote[]) => void;
+  generateRandomPresetVotes: () => void;
+  startPresenterMode: () => void;
+  stopPresenterMode: () => void;
+  playNextPresenterVotes: () => void;
+  giveMultipleJuryPoints: (pointsMap: {
+    [countryCode: string]: number;
+  }) => void;
+  givePresenterDouzePoints: (countryCode: string) => void;
 }
 
 const shouldResetLastPoints = (countriesWithPoints: CountryWithPoints[]) =>
@@ -104,6 +123,14 @@ export const useScoreboardStore = create<ScoreboardState>()(
       isFinalAnimationFinished: false,
       canDisplayPlaceAnimation: true,
       televotingProgress: 0,
+      presenterSettings: {
+        isPresenterMode: false,
+        pointGrouping: 'individual',
+        presetJuryVotes: [],
+        presetTelevoteVotes: [],
+        currentPlayingCountryIndex: 0,
+        isAutoPlaying: false,
+      },
 
       // Actions
       giveJuryPoints: (countryCode: string) => {
@@ -133,6 +160,13 @@ export const useScoreboardStore = create<ScoreboardState>()(
             : nextVotingCountryIndex,
           isJuryVoting: !isJuryVotingOver,
           shouldShowLastPoints: !shouldReset,
+          presenterSettings: isJuryVotingOver
+            ? {
+                ...state.presenterSettings,
+                isAutoPlaying: false,
+                currentPlayingCountryIndex: 0,
+              }
+            : state.presenterSettings,
           countries: state.countries.map((country) => {
             if (country.code === countryCode) {
               return {
@@ -307,6 +341,13 @@ export const useScoreboardStore = create<ScoreboardState>()(
             : state.votingCountryIndex + 1,
           isJuryVoting: !isJuryVotingOver,
           shouldShowLastPoints: !isRandomFinishing,
+          presenterSettings: isJuryVotingOver
+            ? {
+                ...state.presenterSettings,
+                isAutoPlaying: false,
+                currentPlayingCountryIndex: 0,
+              }
+            : state.presenterSettings,
           countries: updatedCountries,
         });
       },
@@ -380,6 +421,14 @@ export const useScoreboardStore = create<ScoreboardState>()(
           isFinalAnimationFinished: false,
           canDisplayPlaceAnimation: true,
           televotingProgress: 0,
+          presenterSettings: {
+            isPresenterMode: false,
+            pointGrouping: 'individual',
+            presetJuryVotes: [],
+            presetTelevoteVotes: [],
+            currentPlayingCountryIndex: 0,
+            isAutoPlaying: false,
+          },
         });
       },
 
@@ -494,6 +543,323 @@ export const useScoreboardStore = create<ScoreboardState>()(
         set({
           canDisplayPlaceAnimation: canDisplay,
         });
+      },
+
+      // Presenter mode actions
+      togglePresenterMode: () => {
+        set((state) => ({
+          presenterSettings: {
+            ...state.presenterSettings,
+            isPresenterMode: !state.presenterSettings.isPresenterMode,
+          },
+        }));
+      },
+
+      setPointGrouping: (grouping: PresenterPointGrouping) => {
+        set((state) => ({
+          presenterSettings: {
+            ...state.presenterSettings,
+            pointGrouping: grouping,
+          },
+        }));
+      },
+
+      setPresetJuryVotes: (votes: PresetJuryVote[]) => {
+        set((state) => ({
+          presenterSettings: {
+            ...state.presenterSettings,
+            presetJuryVotes: votes,
+          },
+        }));
+      },
+
+      setPresetTelevoteVotes: (votes: PresetTelevoteVote[]) => {
+        set((state) => ({
+          presenterSettings: {
+            ...state.presenterSettings,
+            presetTelevoteVotes: votes,
+          },
+        }));
+      },
+
+      generateRandomPresetVotes: () => {
+        const state = get();
+        const countriesStore = useCountriesStore.getState();
+        const votingCountries = countriesStore.getVotingCountries();
+        const receivingCountries = state.countries;
+
+        if (state.isJuryVoting) {
+          // Generate random jury votes for all voting countries
+          const randomJuryVotes: PresetJuryVote[] = votingCountries.map(
+            (votingCountry) => {
+              const availableCountries = receivingCountries.filter(
+                (country) => country.code !== votingCountry.code,
+              );
+
+              const pointsToDistribute = [...POINTS_ARRAY];
+              const points: { [receivingCountryCode: string]: number } = {};
+
+              pointsToDistribute.forEach((pointValue) => {
+                const randomIndex = Math.floor(
+                  Math.random() * availableCountries.length,
+                );
+                const randomCountry = availableCountries[randomIndex];
+
+                points[randomCountry.code] = pointValue;
+
+                // Remove the country to avoid duplicates
+                availableCountries.splice(randomIndex, 1);
+              });
+
+              return {
+                votingCountryCode: votingCountry.code,
+                points,
+              };
+            },
+          );
+
+          get().setPresetJuryVotes(randomJuryVotes);
+        } else {
+          // Generate random televote points for all countries
+          const randomTelevoteVotes: PresetTelevoteVote[] =
+            receivingCountries.map((country) => ({
+              countryCode: country.code,
+              points: Math.floor(Math.random() * 300) + 50, // Random points between 50-350
+            }));
+
+          get().setPresetTelevoteVotes(randomTelevoteVotes);
+        }
+      },
+
+      startPresenterMode: () => {
+        set((state) => ({
+          presenterSettings: {
+            ...state.presenterSettings,
+            isAutoPlaying: true,
+            currentPlayingCountryIndex: 0,
+          },
+        }));
+
+        // Start playing the first country's votes
+        setTimeout(() => {
+          get().playNextPresenterVotes();
+        }, 1000);
+      },
+
+      stopPresenterMode: () => {
+        set((state) => ({
+          presenterSettings: {
+            ...state.presenterSettings,
+            isAutoPlaying: false,
+          },
+        }));
+      },
+
+      giveMultipleJuryPoints: (pointsMap: {
+        [countryCode: string]: number;
+      }) => {
+        const state = get();
+        const countriesStore = useCountriesStore.getState();
+
+        // For presenter mode, we give all points for the current voting country at once
+        // and then advance to the next voting country
+        const nextVotingCountryIndex = state.votingCountryIndex + 1;
+        const isJuryVotingOver =
+          nextVotingCountryIndex >= countriesStore.getVotingCountriesLength();
+
+        // Update all countries at once with their respective points
+        const updatedCountries = state.countries.map((country) => {
+          const pointsReceived = pointsMap[country.code];
+
+          if (pointsReceived) {
+            return {
+              ...country,
+              points: country.points + pointsReceived,
+              lastReceivedPoints: pointsReceived,
+            };
+          }
+
+          return country;
+        });
+
+        set({
+          countries: updatedCountries,
+          shouldShowLastPoints: true,
+          votingCountryIndex: isJuryVotingOver
+            ? getLastCountryIndexByPoints(
+                updatedCountries,
+                getLastCountryCodeByPoints(
+                  getRemainingCountries(
+                    updatedCountries,
+                    Object.keys(pointsMap)[0],
+                  ),
+                ),
+              )
+            : nextVotingCountryIndex,
+          isJuryVoting: !isJuryVotingOver,
+          votingPoints: 1, // Always reset to 1 after giving points
+          presenterSettings: isJuryVotingOver
+            ? {
+                ...state.presenterSettings,
+                isAutoPlaying: false,
+                currentPlayingCountryIndex: 0,
+              }
+            : state.presenterSettings,
+        });
+      },
+
+      givePresenterDouzePoints: (countryCode: string) => {
+        const state = get();
+
+        // Just give 12 points without advancing voting progression
+        const updatedCountries = state.countries.map((country) => {
+          if (country.code === countryCode) {
+            return {
+              ...country,
+              points: country.points + 12,
+              lastReceivedPoints: 12,
+            };
+          }
+
+          return country;
+        });
+
+        set({
+          countries: updatedCountries,
+          shouldShowLastPoints: true,
+          votingPoints: 12, // Set to 12 for the display
+        });
+      },
+
+      playNextPresenterVotes: () => {
+        const state = get();
+        const countriesStore = useCountriesStore.getState();
+
+        if (!state.presenterSettings.isAutoPlaying) return;
+
+        if (state.isJuryVoting) {
+          const votingCountries = countriesStore.getVotingCountries();
+          const currentCountryIndex =
+            state.presenterSettings.currentPlayingCountryIndex;
+
+          if (currentCountryIndex >= votingCountries.length) {
+            // All jury votes completed
+            get().stopPresenterMode();
+
+            return;
+          }
+
+          const currentVotingCountry = votingCountries[currentCountryIndex];
+          const presetVote = state.presenterSettings.presetJuryVotes.find(
+            (vote) => vote.votingCountryCode === currentVotingCountry.code,
+          );
+
+          if (presetVote) {
+            if (state.presenterSettings.pointGrouping === 'grouped') {
+              // Play 1-10 points together, then 12 separately
+              const pointsExcept12: { [countryCode: string]: number } = {};
+              let douzePointsCountry: string | null = null;
+
+              Object.entries(presetVote.points).forEach(
+                ([countryCode, points]) => {
+                  if (points === 12) {
+                    douzePointsCountry = countryCode;
+                  } else {
+                    pointsExcept12[countryCode] = points;
+                  }
+                },
+              );
+
+              // Clear any existing animations first
+              get().resetLastPoints();
+
+              // Play all points except 12 simultaneously
+              setTimeout(() => {
+                if (Object.keys(pointsExcept12).length > 0) {
+                  get().giveMultipleJuryPoints(pointsExcept12);
+                }
+              }, 500);
+
+              // Then play 12 points after a delay
+              if (douzePointsCountry) {
+                setTimeout(() => {
+                  get().resetLastPoints();
+                  get().givePresenterDouzePoints(douzePointsCountry!);
+                }, 3000);
+              }
+
+              // Move to next country after all animations
+              setTimeout(
+                () => {
+                  get().resetLastPoints();
+                  set((state) => ({
+                    presenterSettings: {
+                      ...state.presenterSettings,
+                      currentPlayingCountryIndex: currentCountryIndex + 1,
+                    },
+                    votingPoints: 1, // Reset voting points for next country
+                  }));
+
+                  // Play next country after a pause
+                  setTimeout(() => {
+                    get().playNextPresenterVotes();
+                  }, 1500);
+                },
+                douzePointsCountry ? 6000 : 4000,
+              );
+            } else {
+              // Play individual points one by one, but give ALL points for this country
+              get().resetLastPoints();
+
+              // Give all points at once but with individual timing for visual effect
+              setTimeout(() => {
+                get().giveMultipleJuryPoints(presetVote.points);
+              }, 500);
+
+              // Move to next country after animations
+              setTimeout(() => {
+                get().resetLastPoints();
+                set((state) => ({
+                  presenterSettings: {
+                    ...state.presenterSettings,
+                    currentPlayingCountryIndex: currentCountryIndex + 1,
+                  },
+                  votingPoints: 1, // Reset voting points for next country
+                }));
+
+                // Play next country after a pause
+                setTimeout(() => {
+                  get().playNextPresenterVotes();
+                }, 1500);
+              }, 4000);
+            }
+          }
+        } else {
+          // Televote mode
+          const currentCountryIndex =
+            state.presenterSettings.currentPlayingCountryIndex;
+          const presetVote =
+            state.presenterSettings.presetTelevoteVotes[currentCountryIndex];
+
+          if (presetVote) {
+            get().giveTelevotePoints(presetVote.countryCode, presetVote.points);
+
+            set((state) => ({
+              presenterSettings: {
+                ...state.presenterSettings,
+                currentPlayingCountryIndex: currentCountryIndex + 1,
+              },
+            }));
+
+            // Play next country after a pause
+            setTimeout(() => {
+              get().playNextPresenterVotes();
+            }, 2000);
+          } else {
+            // All televote votes completed
+            get().stopPresenterMode();
+          }
+        }
       },
     }),
     { name: 'scoreboard-store' },
