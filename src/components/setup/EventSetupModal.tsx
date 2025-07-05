@@ -8,10 +8,10 @@ import {
 } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../Button';
-import Modal from '../Modal';
+import Button from '../common/Button';
+import Modal from '../common/Modal';
+import Tabs from '../common/Tabs';
 import { YearSelectBox } from '../SelectBox/YearSelectBox';
-import Tabs from '../Tabs';
 
 import { TABS } from './constants';
 import CustomCountryModal from './CustomCountryModal';

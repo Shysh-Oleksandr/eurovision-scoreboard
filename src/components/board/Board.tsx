@@ -5,9 +5,9 @@ import { animated } from '@react-spring/web';
 
 import { Country } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
+import CountryItem from '../countryItem/CountryItem';
 
 import BoardHeader from './BoardHeader';
-import CountryItem from './CountryItem';
 import { useBoardAnimations } from './hooks/useBoardAnimations';
 import { useCountryDisplay } from './hooks/useCountryDisplay';
 import { useCountrySorter } from './hooks/useCountrySorter';
@@ -47,11 +47,18 @@ const Board = (): JSX.Element => {
             index={sortedCountries.findIndex((c) => c.code === country.code)}
             {...props}
             showPlaceAnimation={showPlace}
+            hasCountryFinishedVoting={hasCountryFinishedVoting}
           />
         )}
       </Flipped>
     ),
-    [votingCountry?.code, onClick, showPlace, sortedCountries],
+    [
+      votingCountry?.code,
+      onClick,
+      showPlace,
+      sortedCountries,
+      hasCountryFinishedVoting,
+    ],
   );
 
   const { showAllParticipants } = useScoreboardStore();

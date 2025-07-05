@@ -35,7 +35,8 @@ export const CountrySelectionListItem: React.FC<
   onEdit,
 }) => {
   const shouldLazyLoad =
-    countryGroupAssignment === CountryAssignmentGroup.NOT_PARTICIPATING;
+    countryGroupAssignment !== CountryAssignmentGroup.SF1 &&
+    countryGroupAssignment !== CountryAssignmentGroup.SF2;
 
   const handleAssignmentChange = (
     event: React.ChangeEvent<HTMLSelectElement>,

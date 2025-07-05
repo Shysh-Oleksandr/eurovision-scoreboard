@@ -3,7 +3,7 @@ import React from 'react';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
 import { getHostingCountryLogoForYear } from '../../theme/themes';
-import Button from '../Button';
+import Button from '../common/Button';
 
 interface SimulationHeaderProps {
   phaseTitle: string;

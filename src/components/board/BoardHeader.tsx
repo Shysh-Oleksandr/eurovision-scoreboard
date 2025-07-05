@@ -5,7 +5,7 @@ import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../Button';
+import Button from '../common/Button';
 
 type Props = {
   onClick: (countryCode: string) => void;

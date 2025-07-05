@@ -3,7 +3,7 @@ import React from 'react';
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { EventMode, EventPhase } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../Button';
+import Button from '../common/Button';
 
 export const PhaseActions = () => {
   const {

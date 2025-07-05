@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
-import Button from '../Button';
-import Modal from '../Modal';
+import Button from '../common/Button';
+import Modal from '../common/Modal';
 
 interface CustomCountryModalProps {
   isOpen: boolean;

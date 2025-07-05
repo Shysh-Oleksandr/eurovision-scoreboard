@@ -2,7 +2,7 @@ import React from 'react';
 
 import { PlusIcon } from '../../assets/icons/PlusIcon';
 import { BaseCountry, CountryAssignmentGroup, EventMode } from '../../models';
-import Button from '../Button';
+import Button from '../common/Button';
 
 import { GRAND_FINAL_GROUPS, SEMI_FINALS_GROUPS } from './constants';
 import { CountrySelectionList } from './CountrySelectionList';

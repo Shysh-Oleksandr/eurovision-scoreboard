@@ -9,7 +9,7 @@ import {
   YEARS_WITH_THEME,
   getHostingCountryLogoForYear,
 } from '../../theme/themes';
-import Button from '../Button';
+import Button from '../common/Button';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
 import CustomSelect from './CustomSelect';

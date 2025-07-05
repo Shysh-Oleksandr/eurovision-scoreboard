@@ -6,8 +6,8 @@ import { useGSAP } from '@gsap/react';
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { EventPhase } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../Button';
-import Modal from '../Modal';
+import Button from '../common/Button';
+import Modal from '../common/Modal';
 import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
 const QualificationResultsModal = () => {
