@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
-import Button from '../Button';
-import Modal from '../Modal';
-import Tabs from '../Tabs';
+import Button from '../common/Button';
+import Modal from '../common/Modal';
+import Tabs from '../common/Tabs';
 
 import { getTabs, WHATS_NEW, UPCOMING_FEATURES } from './data';
 import UpdateList from './UpdateList';

@@ -4,7 +4,7 @@ import { ANIMATION_DURATION } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../Button';
+import Button from '../common/Button';
 
 import TelevoteInput from './TelevoteInput';
 

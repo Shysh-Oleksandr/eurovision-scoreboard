@@ -7,7 +7,6 @@ import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import { getCountriesByYear } from '../data/data';
 import { BaseCountry, SemiFinalGroup } from '../models';
 
-import { INITIAL_YEAR } from './generalStore';
 import { useScoreboardStore } from './scoreboardStore';
 
 interface CountriesState {
@@ -45,6 +44,7 @@ interface CountriesState {
   setSemiFinalResults: (results: Record<string, number>) => void;
   getSemiFinalPoints: (countryCode: string) => number;
   updateCountriesForYear: (year: Year) => void;
+  setInitialCountriesForYear: (year: Year) => void;
   addCustomCountry: (country: Omit<BaseCountry, 'code' | 'category'>) => void;
   updateCustomCountry: (country: BaseCountry) => void;
   deleteCustomCountry: (countryCode: string) => void;
@@ -56,7 +56,7 @@ export const useCountriesStore = create<CountriesState>()(
     persist(
       (set, get) => ({
         // Initial state
-        allCountriesForYear: getCountriesByYear(INITIAL_YEAR),
+        allCountriesForYear: [],
         selectedCountries: [],
         eventSetupModalOpen: true,
         semiFinalResults: {},
@@ -204,6 +204,16 @@ export const useCountriesStore = create<CountriesState>()(
           set({
             allCountriesForYear: countries,
             selectedCountries: [],
+          });
+        },
+
+        setInitialCountriesForYear: (year: Year) => {
+          if (get().allCountriesForYear.length > 0) return;
+
+          const countries = getCountriesByYear(year);
+
+          set({
+            allCountriesForYear: countries,
           });
         },
 

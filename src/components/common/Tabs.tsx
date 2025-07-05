@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
-import { useMediaQuery } from '../hooks/useMediaQuery';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 interface TabsProps {
   tabs: {

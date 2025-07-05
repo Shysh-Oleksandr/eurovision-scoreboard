@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
-import Button from '../Button';
-import Modal from '../Modal';
+import Button from '../common/Button';
+import Modal from '../common/Modal';
 
 interface CustomCountryModalProps {
   isOpen: boolean;
@@ -142,7 +142,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
         </div>
       }
     >
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-4 sm:p-4 p-2">
         <h2 className="text-xl font-bold text-white">
           {isEditMode ? 'Edit' : 'Create'} Custom Entry
         </h2>

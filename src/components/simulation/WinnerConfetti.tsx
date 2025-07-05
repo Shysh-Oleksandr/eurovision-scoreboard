@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Confetti from 'react-confetti';
 
-import { useScoreboardStore } from '../state/scoreboardStore';
+import { useScoreboardStore } from '../../state/scoreboardStore';
 
 const CONFETTI_TIMEOUT = 10 * 1000;
 

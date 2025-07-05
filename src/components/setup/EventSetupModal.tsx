@@ -1,7 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { PlusIcon } from '../../assets/icons/PlusIcon';
-import { useDebounce } from '../../hooks/useDebounce';
 import {
   BaseCountry,
   CountryAssignmentGroup,
@@ -10,64 +8,25 @@ import {
 } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../Button';
-import Modal from '../Modal';
-import { YearSelectBox } from '../SelectBox/YearSelectBox';
-import Tabs from '../Tabs';
+import Button from '../common/Button';
+import Modal from '../common/Modal';
+import Tabs from '../common/Tabs';
 
-import { CountrySelectionList } from './CountrySelectionList';
+import { TABS } from './constants';
 import CustomCountryModal from './CustomCountryModal';
 import GrandFinalOnlySetup from './GrandFinalOnlySetup';
-import SearchInputIcon from './SearchInputIcon';
-import SectionWrapper from './SectionWrapper';
+import { useCountryAssignments } from './hooks/useCountryAssignments';
+import { useCustomCountryModal } from './hooks/useCustomCountryModal';
+import NotParticipatingSection from './NotParticipatingSection';
 import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
+import { SetupHeader } from './SetupHeader';
+import { validateEventSetup } from './utils/eventValidation';
 
-const TABS = [
-  {
-    label: 'Semi-Finals + Grand Final',
-    value: EventMode.SEMI_FINALS_AND_GRAND_FINAL,
-  },
-  {
-    label: 'Grand Final Only',
-    value: EventMode.GRAND_FINAL_ONLY,
-  },
-];
+import { useDebounce } from '@/hooks/useDebounce';
 
-const categoryOrder = [
-  'Custom',
-  'All-Time Participants',
-  'Europe',
-  'Asia',
-  'Africa',
-  'North America',
-  'South America',
-  'Oceania',
-];
-
-const SEMI_FINALS_GROUPS = [
-  CountryAssignmentGroup.SF1,
-  CountryAssignmentGroup.SF2,
-  CountryAssignmentGroup.AUTO_QUALIFIER,
-  CountryAssignmentGroup.NOT_PARTICIPATING,
-];
-
-const GRAND_FINAL_GROUPS = [
-  CountryAssignmentGroup.GRAND_FINAL,
-  CountryAssignmentGroup.NOT_QUALIFIED,
-  CountryAssignmentGroup.NOT_PARTICIPATING,
-];
-
-interface EventSetupModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const EventSetupModal: React.FC<EventSetupModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
-  const { allCountriesForYear, getAllCountries, customCountries } =
-    useCountriesStore();
+const EventSetupModal = () => {
+  const { eventSetupModalOpen, setEventSetupModalOpen } = useCountriesStore();
+  const { allCountriesForYear, getAllCountries } = useCountriesStore();
   const { startEvent, setSemiFinalQualifiers, eventPhase } =
     useScoreboardStore();
 
@@ -76,192 +35,58 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
   );
   const [sf1Qualifiers, setSf1Qualifiers] = useState(10);
   const [sf2Qualifiers, setSf2Qualifiers] = useState(10);
-  const [countriesSearch, setCountriesSearch] = useState('');
-  const [isCustomCountryModalOpen, setIsCustomCountryModalOpen] =
-    useState(false);
-  const [countryToEdit, setCountryToEdit] = useState<BaseCountry | undefined>(
-    undefined,
-  );
-
-  const debouncedSearch = useDebounce(countriesSearch, 300);
-
-  const [expandedCategories, setExpandedCategories] = useState<
-    Record<string, boolean>
-  >({});
-
-  const prevDebouncedSearchRef = useRef<string>();
-
-  const [countryAssignments, setCountryAssignments] = useState<
-    Record<EventMode, Record<string, CountryAssignmentGroup>>
-  >({
-    [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: {},
-    [EventMode.GRAND_FINAL_ONLY]: {},
-  });
 
   const isGrandFinalOnly = activeTab === EventMode.GRAND_FINAL_ONLY;
   const canClose = eventPhase !== EventPhase.COUNTRY_SELECTION;
 
-  const handleOpenCreateModal = () => {
-    setCountryToEdit(undefined);
-    setIsCustomCountryModalOpen(true);
-  };
+  const debouncedCanClose = useDebounce(canClose, 300);
 
-  const handleOpenEditModal = (country: BaseCountry) => {
-    setCountryToEdit(country);
-    setIsCustomCountryModalOpen(true);
-  };
+  const {
+    countryGroups: {
+      autoQualifiers,
+      grandFinalQualifiers,
+      sf1Countries,
+      sf2Countries,
+      notParticipatingCountries,
+      notQualifiedCountries,
+      assignments,
+    },
+    handleCountryAssignment,
+    handleBulkCountryAssignment,
+    getCountryGroupAssignment,
+    areAssignmentsLoaded,
+  } = useCountryAssignments(activeTab);
 
-  const handleCloseModal = () => {
-    setIsCustomCountryModalOpen(false);
-    setCountryToEdit(undefined);
-  };
+  const {
+    isCustomCountryModalOpen,
+    countryToEdit,
+    handleOpenCreateModal,
+    handleOpenEditModal,
+    handleCloseModal,
+  } = useCustomCountryModal();
 
-  // Initialize selected countries based on the current year's data
-  useEffect(() => {
-    const semiFinalsInitialAssignments: Record<string, CountryAssignmentGroup> =
-      {};
-    const grandFinalOnlyInitialAssignments: Record<
-      string,
-      CountryAssignmentGroup
-    > = {};
+  const onClose = useCallback(() => {
+    setEventSetupModalOpen(false);
+  }, [setEventSetupModalOpen]);
 
-    const allCountries = getAllCountries();
-
-    allCountries.forEach((country) => {
-      const countryData = allCountriesForYear.find(
-        (c) => c.code === country.code,
-      );
-
-      // SEMI_FINALS_AND_GRAND_FINAL initialization
-      if (countryData?.isAutoQualified) {
-        semiFinalsInitialAssignments[country.code] =
-          CountryAssignmentGroup.AUTO_QUALIFIER;
-      } else if (countryData?.semiFinalGroup) {
-        semiFinalsInitialAssignments[country.code] =
-          countryData.semiFinalGroup as CountryAssignmentGroup;
-      } else {
-        semiFinalsInitialAssignments[country.code] =
-          CountryAssignmentGroup.NOT_PARTICIPATING;
-      }
-
-      // GRAND_FINAL_ONLY initialization
-      if (countryData) {
-        if (countryData.isQualified) {
-          grandFinalOnlyInitialAssignments[country.code] =
-            CountryAssignmentGroup.GRAND_FINAL;
-        } else {
-          grandFinalOnlyInitialAssignments[country.code] =
-            CountryAssignmentGroup.NOT_QUALIFIED;
-        }
-      } else {
-        grandFinalOnlyInitialAssignments[country.code] =
-          CountryAssignmentGroup.NOT_PARTICIPATING;
-      }
+  const handleStartEvent = useCallback(() => {
+    const validationError = validateEventSetup(isGrandFinalOnly, {
+      sf1Qualifiers,
+      sf2Qualifiers,
+      sf1CountriesCount: sf1Countries.length,
+      sf2CountriesCount: sf2Countries.length,
+      autoQualifiersCount: autoQualifiers.length,
+      grandFinalQualifiersCount: grandFinalQualifiers.length,
     });
 
-    setCountryAssignments({
-      [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: semiFinalsInitialAssignments,
-      [EventMode.GRAND_FINAL_ONLY]: grandFinalOnlyInitialAssignments,
-    });
-  }, [allCountriesForYear, getAllCountries, customCountries]);
+    if (validationError) {
+      alert(validationError);
 
-  const handleToggleCategory = (category: string) => {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
-  };
-
-  const handleCountriesSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCountriesSearch(e.target.value);
-  };
-
-  const handleCountryAssignment = (
-    countryCode: string,
-    group: CountryAssignmentGroup,
-  ) => {
-    setCountryAssignments((prev) => ({
-      ...prev,
-      [activeTab]: {
-        ...prev[activeTab],
-        [countryCode]: group,
-      },
-    }));
-  };
-
-  const handleBulkCountryAssignment = (
-    countries: BaseCountry[],
-    group: CountryAssignmentGroup,
-  ) => {
-    const countryCodes = countries.map((c) => c.code);
-
-    setCountryAssignments((prev) => {
-      const newAssignments = { ...prev[activeTab] };
-
-      countryCodes.forEach((code) => {
-        newAssignments[code] = group;
-      });
-
-      return {
-        ...prev,
-        [activeTab]: newAssignments,
-      };
-    });
-  };
-
-  const handleStartEvent = () => {
-    if (activeTab === EventMode.SEMI_FINALS_AND_GRAND_FINAL) {
-      const sf2QualifiersCount = sf2Countries.length > 0 ? sf2Qualifiers : 0;
-      const totalQualifiers =
-        sf1Qualifiers + sf2QualifiersCount + autoQualifiers.length;
-
-      if (
-        sf1Qualifiers <= 0 ||
-        (sf2Qualifiers <= 0 && sf2Countries.length > 0)
-      ) {
-        alert('The number of the Semi-Final qualifiers must be at least 1.');
-
-        return;
-      }
-
-      if (totalQualifiers < 11) {
-        alert(
-          'The total number of qualifiers for the Grand Final must be at least 11.',
-        );
-
-        return;
-      }
-
-      if (sf1Countries.length === 0) {
-        alert('There are no countries in the Semi-Final 1.');
-
-        return;
-      }
-
-      if (
-        sf1Qualifiers >= sf1Countries.length ||
-        (sf2Qualifiers >= sf2Countries.length && sf2Countries.length > 0)
-      ) {
-        alert(
-          'The number of the Semi-Final qualifiers must be less than the number of participants.',
-        );
-
-        return;
-      }
-    } else if (activeTab === EventMode.GRAND_FINAL_ONLY) {
-      if (grandFinalQualifiers.length < 11) {
-        alert(
-          'The number of the Grand Final participants must be at least 11.',
-        );
-
-        return;
-      }
+      return;
     }
 
     const allCountries = getAllCountries();
-    const allSelectedCountries: BaseCountry[] = Object.entries(
-      countryAssignments[activeTab],
-    )
+    const allSelectedCountries: BaseCountry[] = Object.entries(assignments)
       .filter(([, group]) => group !== CountryAssignmentGroup.NOT_PARTICIPATING)
       .map(([countryCode, group]) => {
         const country = allCountries.find((c) => c.code === countryCode)!;
@@ -293,148 +118,37 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
       SF2: sf2Qualifiers,
     });
     startEvent(activeTab, allSelectedCountries);
+  }, [
+    isGrandFinalOnly,
+    sf1Qualifiers,
+    sf2Qualifiers,
+    sf1Countries.length,
+    sf2Countries.length,
+    autoQualifiers.length,
+    grandFinalQualifiers.length,
+    getAllCountries,
+    assignments,
+    setSemiFinalQualifiers,
+    startEvent,
+    activeTab,
+    allCountriesForYear,
+  ]);
+
+  const onStart = () => {
     onClose();
+    setTimeout(() => {
+      handleStartEvent();
+    }, 200);
   };
-
-  const getCountryGroupAssignment = (country: BaseCountry) => {
-    return countryAssignments[activeTab]?.[country.code];
-  };
-
-  // Group countries by their status
-  const {
-    autoQualifiers,
-    grandFinalQualifiers,
-    sf1Countries,
-    sf2Countries,
-    notParticipatingCountries,
-    notQualifiedCountries,
-  } = useMemo(() => {
-    const currentAssignments = countryAssignments[activeTab] || {};
-    const allCountries = getAllCountries();
-
-    const autoQualifiers = allCountries
-      .filter(
-        (c) =>
-          currentAssignments[c.code] === CountryAssignmentGroup.AUTO_QUALIFIER,
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const grandFinalQualifiers = allCountries
-      .filter(
-        (c) =>
-          currentAssignments[c.code] === CountryAssignmentGroup.GRAND_FINAL,
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const sf1Countries = allCountries
-      .filter((c) => currentAssignments[c.code] === CountryAssignmentGroup.SF1)
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const sf2Countries = allCountries
-      .filter((c) => currentAssignments[c.code] === CountryAssignmentGroup.SF2)
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const notQualifiedCountries = allCountries
-      .filter(
-        (c) =>
-          currentAssignments[c.code] === CountryAssignmentGroup.NOT_QUALIFIED,
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    const notParticipatingCountries = allCountries
-      .filter(
-        (c) =>
-          currentAssignments[c.code] ===
-          CountryAssignmentGroup.NOT_PARTICIPATING,
-      )
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    return {
-      autoQualifiers,
-      grandFinalQualifiers,
-      sf1Countries,
-      sf2Countries,
-      notParticipatingCountries,
-      notQualifiedCountries,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countryAssignments, activeTab, customCountries, getAllCountries]);
-
-  const { groups: groupedNotParticipatingCountries, sortedCategories } =
-    useMemo((): {
-      groups: Record<string, BaseCountry[]>;
-      sortedCategories: string[];
-    } => {
-      const groups: Record<string, BaseCountry[]> = {};
-
-      const filteredNotParticipatingCountries =
-        notParticipatingCountries.filter((country) =>
-          country.name
-            .toLowerCase()
-            .includes(debouncedSearch.trim().toLowerCase()),
-        );
-
-      filteredNotParticipatingCountries.forEach((country) => {
-        const category = country.category || 'Other';
-
-        if (!groups[category]) {
-          groups[category] = [];
-        }
-        groups[category].push(country);
-      });
-
-      if (!groups['Custom']) {
-        groups['Custom'] = [];
-      }
-
-      // Sort countries within each category alphabetically
-      Object.keys(groups).forEach((category) => {
-        groups[category].sort((a, b) => a.name.localeCompare(b.name));
-      });
-
-      const sortedCategories = Object.keys(groups).sort((a, b) => {
-        const aIndex = categoryOrder.indexOf(a);
-        const bIndex = categoryOrder.indexOf(b);
-
-        if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
-        if (aIndex === -1) return 1;
-        if (bIndex === -1) return -1;
-
-        return aIndex - bIndex;
-      });
-
-      return { groups, sortedCategories };
-    }, [notParticipatingCountries, debouncedSearch]);
-
-  useEffect(() => {
-    if (debouncedSearch !== prevDebouncedSearchRef.current) {
-      if (debouncedSearch.trim()) {
-        const newExpanded: Record<string, boolean> = {};
-
-        sortedCategories.forEach((category) => {
-          newExpanded[category] = true;
-        });
-        setExpandedCategories(newExpanded);
-      } else {
-        setExpandedCategories({});
-      }
-    }
-
-    prevDebouncedSearchRef.current = debouncedSearch;
-  }, [debouncedSearch, sortedCategories]);
-
-  if (!isOpen || Object.keys(countryAssignments[activeTab]).length === 0) {
-    return null;
-  }
 
   return (
     <Modal
-      isOpen={isOpen}
-      onClose={canClose ? onClose : undefined}
+      isOpen={eventSetupModalOpen && areAssignmentsLoaded}
+      onClose={debouncedCanClose ? onClose : undefined}
       overlayClassName="!z-[1000]"
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
-          {canClose && (
+          {debouncedCanClose && (
             <Button
               variant="secondary"
               className="md:text-base text-sm"
@@ -443,13 +157,13 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
               Close
             </Button>
           )}
-          <Button className="w-full !text-base" onClick={handleStartEvent}>
+          <Button className="w-full !text-base" onClick={onStart}>
             Start
           </Button>
         </div>
       }
     >
-      <YearSelectBox />
+      <SetupHeader />
       <CustomCountryModal
         isOpen={isCustomCountryModalOpen}
         onClose={handleCloseModal}
@@ -490,73 +204,15 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
 
         <div className="h-px bg-primary-800 w-full my-1" />
 
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-white text-base md:text-lg font-semibold">
-            Not Participating
-          </p>
-          <div className="relative">
-            <input
-              className="sm:max-w-[200px] w-full py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
-              name="countriesSearch"
-              id="countriesSearch"
-              placeholder="Search countries..."
-              value={countriesSearch}
-              onChange={handleCountriesSearch}
-            />
-            <SearchInputIcon
-              showClearIcon={countriesSearch.length > 0}
-              onClick={() =>
-                countriesSearch.length > 0 && setCountriesSearch('')
-              }
-            />
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          {sortedCategories.map((category) => (
-            <SectionWrapper
-              key={category}
-              title={category}
-              countriesCount={groupedNotParticipatingCountries[category].length}
-              isExpanded={!!expandedCategories[category]}
-              onToggle={() => handleToggleCategory(category)}
-              onBulkAssign={(group) =>
-                handleBulkCountryAssignment(
-                  groupedNotParticipatingCountries[category],
-                  group,
-                )
-              }
-              availableGroups={
-                isGrandFinalOnly ? GRAND_FINAL_GROUPS : SEMI_FINALS_GROUPS
-              }
-              currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
-              getLabel={
-                category === 'Custom'
-                  ? (itemsCount) => (itemsCount === 1 ? 'entry' : 'entries')
-                  : undefined
-              }
-            >
-              <CountrySelectionList
-                countries={groupedNotParticipatingCountries[category]}
-                onAssignCountryAssignment={handleCountryAssignment}
-                getCountryGroupAssignment={getCountryGroupAssignment}
-                availableGroups={
-                  isGrandFinalOnly ? GRAND_FINAL_GROUPS : SEMI_FINALS_GROUPS
-                }
-                onEdit={handleOpenEditModal}
-                extraContent={
-                  category === 'Custom' && (
-                    <Button
-                      onClick={handleOpenCreateModal}
-                      className="normal-case sm:!text-base !text-sm mr-1 !py-2 w-fit"
-                    >
-                      <PlusIcon className="w-6 h-6" />
-                    </Button>
-                  )
-                }
-              />
-            </SectionWrapper>
-          ))}
-        </div>
+        <NotParticipatingSection
+          handleOpenEditModal={handleOpenEditModal}
+          handleOpenCreateModal={handleOpenCreateModal}
+          notParticipatingCountries={notParticipatingCountries}
+          activeTab={activeTab}
+          handleBulkCountryAssignment={handleBulkCountryAssignment}
+          handleCountryAssignment={handleCountryAssignment}
+          getCountryGroupAssignment={getCountryGroupAssignment}
+        />
       </div>
     </Modal>
   );

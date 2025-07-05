@@ -4,7 +4,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { getSequenceNumber } from '../../helpers/getSequenceNumber';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../Button';
+import Button from '../common/Button';
 
 const NUMBER_REGEX = /^\d*$/;
 
