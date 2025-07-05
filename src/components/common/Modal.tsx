@@ -59,7 +59,8 @@ const Modal: React.FC<ModalProps> = ({
       className={`fixed inset-0 flex items-center justify-center z-[100] transition-all duration-[200ms] ${
         isActive ? 'bg-black bg-opacity-60' : 'bg-opacity-0'
       } ${overlayClassName}`}
-      onClick={onClose}
+      onClick={isActive ? onClose : undefined}
+      style={{ pointerEvents: isActive ? 'auto' : 'none' }}
     >
       <div
         className={`bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 overflow-hidden rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-4 w-full transition-all duration-[200ms] ${
