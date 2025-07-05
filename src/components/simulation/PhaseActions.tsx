@@ -31,7 +31,7 @@ export const PhaseActions = () => {
   }
 
   return (
-    <div className="flex justify-end h-10 mb-2">
+    <div className="flex justify-end mb-2">
       {isVotingOver && (
         <Button onClick={continueToNextPhase} className="animated-border">
           Continue to {nextPhase}
