@@ -86,6 +86,8 @@ export const useGeneralStore = create<GeneralState>()(
         const year = state.year ?? INITIAL_YEAR;
         const themeYear = state.themeYear ?? INITIAL_YEAR;
 
+        useCountriesStore.getState().setInitialCountriesForYear(year);
+
         return {
           ...currentState,
           ...state,
@@ -97,3 +99,5 @@ export const useGeneralStore = create<GeneralState>()(
     },
   ),
 );
+
+useCountriesStore.getState().setInitialCountriesForYear(INITIAL_YEAR);
