@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { BaseCountry } from '../../../models';
 
@@ -9,19 +9,33 @@ export const useCustomCountryModal = () => {
     undefined,
   );
 
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleOpenCreateModal = () => {
     setCountryToEdit(undefined);
     setIsCustomCountryModalOpen(true);
   };
 
   const handleOpenEditModal = (country: BaseCountry) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     setCountryToEdit(country);
     setIsCustomCountryModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsCustomCountryModalOpen(false);
-    setCountryToEdit(undefined);
+    timeoutRef.current = setTimeout(() => {
+      setCountryToEdit(undefined);
+    }, 400);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   };
 
   return {

@@ -22,6 +22,8 @@ import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
 import { SetupHeader } from './SetupHeader';
 import { validateEventSetup } from './utils/eventValidation';
 
+import { useDebounce } from '@/hooks/useDebounce';
+
 const EventSetupModal = () => {
   const { eventSetupModalOpen, setEventSetupModalOpen } = useCountriesStore();
   const { allCountriesForYear, getAllCountries } = useCountriesStore();
@@ -36,6 +38,8 @@ const EventSetupModal = () => {
 
   const isGrandFinalOnly = activeTab === EventMode.GRAND_FINAL_ONLY;
   const canClose = eventPhase !== EventPhase.COUNTRY_SELECTION;
+
+  const debouncedCanClose = useDebounce(canClose, 300);
 
   const {
     countryGroups: {
@@ -114,7 +118,6 @@ const EventSetupModal = () => {
       SF2: sf2Qualifiers,
     });
     startEvent(activeTab, allSelectedCountries);
-    onClose();
   }, [
     isGrandFinalOnly,
     sf1Qualifiers,
@@ -128,22 +131,24 @@ const EventSetupModal = () => {
     setSemiFinalQualifiers,
     startEvent,
     activeTab,
-    onClose,
     allCountriesForYear,
   ]);
 
-  if (!eventSetupModalOpen || !areAssignmentsLoaded) {
-    return null;
-  }
+  const onStart = () => {
+    onClose();
+    setTimeout(() => {
+      handleStartEvent();
+    }, 200);
+  };
 
   return (
     <Modal
-      isOpen={eventSetupModalOpen}
-      onClose={canClose ? onClose : undefined}
+      isOpen={eventSetupModalOpen && areAssignmentsLoaded}
+      onClose={debouncedCanClose ? onClose : undefined}
       overlayClassName="!z-[1000]"
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
-          {canClose && (
+          {debouncedCanClose && (
             <Button
               variant="secondary"
               className="md:text-base text-sm"
@@ -152,7 +157,7 @@ const EventSetupModal = () => {
               Close
             </Button>
           )}
-          <Button className="w-full !text-base" onClick={handleStartEvent}>
+          <Button className="w-full !text-base" onClick={onStart}>
             Start
           </Button>
         </div>

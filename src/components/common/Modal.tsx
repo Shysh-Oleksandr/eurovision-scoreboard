@@ -23,49 +23,53 @@ const Modal: React.FC<ModalProps> = ({
   overlayClassName = '',
   openDelay,
 }) => {
-  const [shouldShow, setShouldShow] = useState(false);
-  // TODO: fix animation
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      if (openDelay) {
-        // If delay is specified, wait before showing
-        const timer = setTimeout(() => {
-          setShouldShow(true);
-          setIsAnimating(true);
-        }, openDelay);
+    let openTimeoutId: number;
+    let closeTimeoutId: number;
 
-        return () => clearTimeout(timer);
-      }
-      // No delay, show immediately
-      setShouldShow(true);
-      setIsAnimating(true);
+    if (isOpen) {
+      setIsMounted(true);
+      const timeout = openDelay ?? 10;
+
+      openTimeoutId = window.setTimeout(() => {
+        setIsActive(true);
+      }, timeout);
     } else {
-      // Hide immediately when isOpen becomes false
-      setShouldShow(false);
-      setIsAnimating(false);
+      setIsActive(false);
+      closeTimeoutId = window.setTimeout(() => {
+        setIsMounted(false);
+      }, 200); // Animation duration
     }
+
+    return () => {
+      window.clearTimeout(openTimeoutId);
+      window.clearTimeout(closeTimeoutId);
+    };
   }, [isOpen, openDelay]);
 
-  if (!shouldShow) return null;
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center z-[100] transition-opacity duration-300 ${
-        isAnimating ? 'bg-black bg-opacity-60' : 'bg-black bg-opacity-0'
+      className={`fixed inset-0 flex items-center justify-center z-[100] transition-all duration-[200ms] ${
+        isActive ? 'bg-black bg-opacity-60' : 'bg-opacity-0'
       } ${overlayClassName}`}
       onClick={onClose}
     >
       <div
-        className={`bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 overflow-hidden rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-4 w-full transition-transform duration-300 ${
-          isAnimating ? 'scale-100' : 'scale-95'
+        className={`bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 overflow-hidden rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-4 w-full transition-all duration-[200ms] ${
+          isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
         {topContent}
         <div
-          className={`max-h-[80vh] overflow-y-auto md:p-6 xs:p-5 p-3 py-5 ${contentClassName}`}
+          className={`overflow-y-auto sm:max-h-[calc(90vh-70px)] max-h-[calc(95vh-70px)] md:p-6 xs:p-5 p-3 py-5 ${contentClassName}`}
         >
           {children}
         </div>

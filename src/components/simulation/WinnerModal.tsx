@@ -16,11 +16,9 @@ const WinnerModal = () => {
     }
   }, [winnerCountry]);
 
-  if (!showModal || !winnerCountry) return null;
-
   return (
     <Modal
-      isOpen={showModal}
+      isOpen={showModal && !!winnerCountry}
       openDelay={3400}
       onClose={() => setShowModal(false)}
       containerClassName="lg:!w-2/5 md:!w-1/2 xs:!w-3/4 w-full"
@@ -42,8 +40,8 @@ const WinnerModal = () => {
         We have a winner!
       </h3>
       <h4 className="lg:text-2xl sm:text-xl text-base font-medium">
-        <span className="font-bold">{winnerCountry.name}</span> won with{' '}
-        <span className="font-bold">{winnerCountry.points}</span> points!
+        <span className="font-bold">{winnerCountry?.name ?? ''}</span> won with{' '}
+        <span className="font-bold">{winnerCountry?.points ?? ''}</span> points!
       </h4>
     </Modal>
   );
