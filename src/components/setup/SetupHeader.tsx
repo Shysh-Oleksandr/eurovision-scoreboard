@@ -1,5 +1,6 @@
 import React from 'react';
 
+import SyncIcon from '../../assets/icons/SyncIcon';
 import { Year } from '../../config';
 import { SUPPORTED_YEARS } from '../../data/data';
 import { EventPhase } from '../../models';
@@ -10,10 +11,8 @@ import {
   getHostingCountryLogoForYear,
 } from '../../theme/themes';
 import Button from '../common/Button';
+import CustomSelect from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
-
-import CustomSelect from './CustomSelect';
-import SyncIcon from './SyncIcon';
 
 const isSmallScreen = window.innerWidth < 370;
 
@@ -28,7 +27,7 @@ const themeOptions = YEARS_WITH_THEME.map((year) => ({
   label: year.toString(),
 }));
 
-export const YearSelectBox: React.FC = () => {
+export const SetupHeader: React.FC = () => {
   const { year, themeYear, setYear, setTheme } = useGeneralStore();
   const { eventPhase, setEventPhase } = useScoreboardStore();
 

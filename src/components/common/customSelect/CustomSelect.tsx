@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-import { ArrowIcon } from '../../assets/icons/ArrowIcon';
-import { Year } from '../../config';
-import { themes } from '../../theme/themes';
+import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
+import { Year } from '../../../config';
+import { themes } from '../../../theme/themes';
 
 type Option = {
   label: string;
@@ -75,13 +75,9 @@ const SelectLabel: React.FC<{ label?: string; id?: string }> = ({
 const SelectContainer: React.FC<{
   children: React.ReactNode;
   className?: string;
-  id?: string;
-}> = ({ children, className = '', id }) => {
+}> = ({ children, className = '' }) => {
   return (
-    <div
-      className={`relative sm:min-w-[130px] min-w-[110px] ${className}`}
-      id={id}
-    >
+    <div className={`relative sm:min-w-[130px] min-w-[110px] ${className}`}>
       {children}
     </div>
   );
@@ -126,12 +122,14 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   const renderTouchSelect = () => (
-    <SelectContainer className={className} id={id}>
+    <SelectContainer className={className}>
       <SelectDisplay value={value} options={options} />
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="absolute top-0 left-0 w-full h-full opacity-0"
+        aria-label={label}
+        id={id}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -143,7 +141,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   );
 
   const renderDesktopSelect = () => (
-    <SelectContainer className={`z-30 ${className}`} id={id}>
+    <SelectContainer className={`z-30 ${className}`}>
       <div
         ref={selectRef}
         onClick={() => setIsOpen(!isOpen)}

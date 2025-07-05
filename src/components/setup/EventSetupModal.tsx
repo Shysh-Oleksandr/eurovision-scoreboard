@@ -11,7 +11,6 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
 import Tabs from '../common/Tabs';
-import { YearSelectBox } from '../SelectBox/YearSelectBox';
 
 import { TABS } from './constants';
 import CustomCountryModal from './CustomCountryModal';
@@ -20,6 +19,7 @@ import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
 import NotParticipatingSection from './NotParticipatingSection';
 import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
+import { SetupHeader } from './SetupHeader';
 import { validateEventSetup } from './utils/eventValidation';
 
 const EventSetupModal = () => {
@@ -158,7 +158,7 @@ const EventSetupModal = () => {
         </div>
       }
     >
-      <YearSelectBox />
+      <SetupHeader />
       <CustomCountryModal
         isOpen={isCustomCountryModalOpen}
         onClose={handleCloseModal}
