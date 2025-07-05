@@ -57,15 +57,9 @@ const GRAND_FINAL_GROUPS = [
   CountryAssignmentGroup.NOT_PARTICIPATING,
 ];
 
-interface EventSetupModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+const EventSetupModal = () => {
+  const { eventSetupModalOpen, setEventSetupModalOpen } = useCountriesStore();
 
-const EventSetupModal: React.FC<EventSetupModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
   const { allCountriesForYear, getAllCountries, customCountries } =
     useCountriesStore();
   const { startEvent, setSemiFinalQualifiers, eventPhase } =
@@ -100,6 +94,10 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
 
   const isGrandFinalOnly = activeTab === EventMode.GRAND_FINAL_ONLY;
   const canClose = eventPhase !== EventPhase.COUNTRY_SELECTION;
+
+  const onClose = () => {
+    setEventSetupModalOpen(false);
+  };
 
   const handleOpenCreateModal = () => {
     setCountryToEdit(undefined);
@@ -423,13 +421,16 @@ const EventSetupModal: React.FC<EventSetupModalProps> = ({
     prevDebouncedSearchRef.current = debouncedSearch;
   }, [debouncedSearch, sortedCategories]);
 
-  if (!isOpen || Object.keys(countryAssignments[activeTab]).length === 0) {
+  if (
+    !eventSetupModalOpen ||
+    Object.keys(countryAssignments[activeTab]).length === 0
+  ) {
     return null;
   }
 
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={eventSetupModalOpen}
       onClose={canClose ? onClose : undefined}
       overlayClassName="!z-[1000]"
       bottomContent={

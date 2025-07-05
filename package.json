@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "npm run build:css && vite build",
     "build:css": "tailwindcss -i ./src/styles.css -o ./src/output.css --minify",
-    "build:css:watch": "tailwindcss -i ./src/styles.css -o ./src/output.css --watch",
+    "tailwind": "tailwindcss -i ./src/styles.css -o ./src/output.css --watch",
     "preview": "vite preview",
     "preview:worker": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
