@@ -3,13 +3,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
-import { useNextEventName } from '../hooks/useNextEventName';
-import { EventPhase } from '../models';
-import { useScoreboardStore } from '../state/scoreboardStore';
-
-import Button from './Button';
-import Modal from './Modal';
-import { CountrySelectionListItem } from './setup/CountrySelectionListItem';
+import { useNextEventName } from '../../hooks/useNextEventName';
+import { EventPhase } from '../../models';
+import { useScoreboardStore } from '../../state/scoreboardStore';
+import Button from '../Button';
+import Modal from '../Modal';
+import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
 const QualificationResultsModal = () => {
   const {

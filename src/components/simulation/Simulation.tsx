@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
-import Board from '../board';
+import Board from '../board/Board';
 import ControlsPanel from '../controlsPanel';
-import QualificationResultsModal from '../QualificationResultsModal';
 import WinnerModal from '../WinnerModal';
 
 import { PhaseActions } from './PhaseActions';
+import QualificationResultsModal from './QualificationResultsModal';
 import { SimulationHeader } from './SimulationHeader';
 import WinnerConfetti from './WinnerConfetti';
 
