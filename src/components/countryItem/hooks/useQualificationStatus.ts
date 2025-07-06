@@ -1,41 +1,47 @@
 import { useMemo } from 'react';
 
-import { Country, EventPhase } from '../../../models';
+import { Country, StageId } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 export const useQualificationStatus = (
   country: Country,
   isVotingOver: boolean,
 ) => {
-  const { qualifiedCountries, eventPhase, showAllParticipants, winnerCountry } =
-    useScoreboardStore();
+  const {
+    getCurrentStage,
+    getCountryInSemiFinal,
+    showAllParticipants,
+    winnerCountry,
+  } = useScoreboardStore();
 
   const shouldShowAsNonQualified = useMemo(() => {
-    const isSemiFinalPhase =
-      eventPhase === EventPhase.SEMI_FINAL_1 ||
-      eventPhase === EventPhase.SEMI_FINAL_2;
+    const { id: currentStageId } = getCurrentStage();
+    const isSemiFinalPhase = currentStageId !== StageId.GF;
 
-    const isQualified = qualifiedCountries.some((c) => c.code === country.code);
+    const countryInSemiFinal = getCountryInSemiFinal(country.code);
 
     const isNonQualifiedInSemiFinal =
-      isVotingOver && isSemiFinalPhase && !isQualified;
+      isVotingOver &&
+      isSemiFinalPhase &&
+      !countryInSemiFinal?.isQualifiedFromSemi;
 
     const isNonQualifiedInAllParticipantsMode =
       showAllParticipants &&
       winnerCountry &&
-      !country.isQualifiedFromSemi &&
-      !country.isAutoQualified;
+      !countryInSemiFinal?.isQualifiedFromSemi &&
+      !country?.isAutoQualified;
 
     return Boolean(
       isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode,
     );
   }, [
-    eventPhase,
-    qualifiedCountries,
+    getCurrentStage,
+    getCountryInSemiFinal,
+    country.code,
+    country?.isAutoQualified,
     isVotingOver,
     showAllParticipants,
     winnerCountry,
-    country,
   ]);
 
   return shouldShowAsNonQualified;

@@ -5,7 +5,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { Year } from '../config';
 import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import { getCountriesByYear } from '../data/data';
-import { BaseCountry, SemiFinalGroup } from '../models';
+import { BaseCountry, Country } from '../models';
 
 import { useScoreboardStore } from './scoreboardStore';
 
@@ -14,7 +14,6 @@ interface CountriesState {
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
   selectedCountries: BaseCountry[]; // Countries selected for the current event
   eventSetupModalOpen: boolean;
-  semiFinalResults: Record<string, number>;
   customCountries: BaseCountry[];
 
   // Actions
@@ -23,26 +22,9 @@ interface CountriesState {
   getVotingCountries: () => BaseCountry[];
   getVotingCountry: () => BaseCountry;
   getVotingCountriesLength: () => number;
-  getInitialCountries: () => {
-    name: string;
-    code: string;
-    isQualified?: boolean;
-    semiFinalGroup?: SemiFinalGroup;
-    isAutoQualified?: boolean;
-    isSelected?: boolean;
-    isQualifiedFromSemi?: boolean;
-    points: number;
-    lastReceivedPoints: null;
-  }[];
+  getInitialCountries: () => Country[];
   setSelectedCountries: (countries: BaseCountry[]) => void;
   getAutoQualifiedCountries: () => BaseCountry[];
-  getQualifiedFromSemiCountries: () => BaseCountry[];
-  setQualifiedFromSemi: (
-    countryCodes: string[],
-    semiFinalGroup: SemiFinalGroup,
-  ) => void;
-  setSemiFinalResults: (results: Record<string, number>) => void;
-  getSemiFinalPoints: (countryCode: string) => number;
   updateCountriesForYear: (year: Year) => void;
   setInitialCountriesForYear: (year: Year) => void;
   addCustomCountry: (country: Omit<BaseCountry, 'code' | 'category'>) => void;
@@ -59,7 +41,6 @@ export const useCountriesStore = create<CountriesState>()(
         allCountriesForYear: [],
         selectedCountries: [],
         eventSetupModalOpen: true,
-        semiFinalResults: {},
         customCountries: [],
 
         // Actions
@@ -77,9 +58,9 @@ export const useCountriesStore = create<CountriesState>()(
             return selectedCountries
               .filter(
                 (country) =>
-                  country.isSelected ||
                   country.isAutoQualified ||
-                  country.isQualifiedFromSemi,
+                  country.isQualifiedFromSemi ||
+                  country.isQualified,
               )
               .sort((a, b) => a.name.localeCompare(b.name));
           }
@@ -109,12 +90,14 @@ export const useCountriesStore = create<CountriesState>()(
         getVotingCountry: () => {
           const { getVotingCountries } = get();
 
-          const { votingCountryIndex, isJuryVoting, countries } =
+          const { votingCountryIndex, getCurrentStage } =
             useScoreboardStore.getState();
 
-          return isJuryVoting
+          const currentStage = getCurrentStage();
+
+          return currentStage.isJuryVoting
             ? getVotingCountries()[votingCountryIndex]
-            : countries[votingCountryIndex];
+            : currentStage.countries[votingCountryIndex];
         },
 
         getVotingCountriesLength: () => {
@@ -124,13 +107,16 @@ export const useCountriesStore = create<CountriesState>()(
         getInitialCountries: () => {
           const qualifiedCountries = get().getQualifiedCountries();
 
-          return qualifiedCountries
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((country) => ({
-              ...country,
-              points: 0,
-              lastReceivedPoints: null,
-            }));
+          return qualifiedCountries.map(
+            (country) =>
+              ({
+                ...country,
+                juryPoints: 0,
+                televotePoints: 0,
+                points: 0,
+                lastReceivedPoints: null,
+              } as Country),
+          );
         },
 
         setSelectedCountries: (countries: BaseCountry[]) => {
@@ -144,58 +130,13 @@ export const useCountriesStore = create<CountriesState>()(
 
           if (selectedCountries.length > 0) {
             return selectedCountries
-              .filter(
-                (country) => country.isAutoQualified && country.isSelected,
-              )
+              .filter((country) => country.isAutoQualified)
               .sort((a, b) => a.name.localeCompare(b.name));
           }
 
           return allCountriesForYear
             .filter((country) => country.isAutoQualified)
             .sort((a, b) => a.name.localeCompare(b.name));
-        },
-
-        getQualifiedFromSemiCountries: () => {
-          const { selectedCountries } = get();
-
-          return selectedCountries
-            .filter((country) => country.isQualifiedFromSemi)
-            .sort((a, b) => a.name.localeCompare(b.name));
-        },
-
-        setQualifiedFromSemi: (
-          countryCodes: string[],
-          semiFinalGroup: SemiFinalGroup,
-        ) => {
-          const { selectedCountries } = get();
-
-          const updatedCountries = selectedCountries.map((country) => {
-            if (
-              country.semiFinalGroup === semiFinalGroup &&
-              countryCodes.includes(country.code)
-            ) {
-              return {
-                ...country,
-                isQualifiedFromSemi: true,
-              };
-            }
-
-            return country;
-          });
-
-          set({
-            selectedCountries: updatedCountries,
-          });
-        },
-
-        setSemiFinalResults: (results: Record<string, number>) => {
-          set({
-            semiFinalResults: results,
-          });
-        },
-
-        getSemiFinalPoints: (countryCode: string) => {
-          return get().semiFinalResults[countryCode] || 0;
         },
 
         updateCountriesForYear: (year: Year) => {

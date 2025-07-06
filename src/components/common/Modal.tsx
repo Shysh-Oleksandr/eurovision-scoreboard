@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ModalProps {
   isOpen: boolean;
@@ -54,7 +55,7 @@ const Modal: React.FC<ModalProps> = ({
     return null;
   }
 
-  return (
+  const modalContent = (
     <div
       className={`fixed inset-0 flex items-center justify-center z-[100] transition-all duration-[200ms] ${
         isActive ? 'bg-black bg-opacity-60' : 'bg-opacity-0'
@@ -78,6 +79,9 @@ const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
+
+  // Use portal to render modal at document body level to avoid nesting issues
+  return createPortal(modalContent, document.body);
 };
 
 export default Modal;

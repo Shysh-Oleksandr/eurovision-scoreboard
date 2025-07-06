@@ -38,14 +38,13 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
     },
     ref,
   ) => {
-    const { isJuryVoting, winnerCountry, qualifiedCountries } =
-      useScoreboardStore();
+    const { getCurrentStage } = useScoreboardStore();
+
+    const { isJuryVoting, isOver: isVotingOver } = getCurrentStage();
 
     const isVotingFinished = useVotingFinished(!!country.isVotingFinished);
     const isDouzePoints = country.lastReceivedPoints === 12;
     const showDouzePointsAnimationHook = useDouzePointsAnimation(isDouzePoints);
-
-    const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
 
     const shouldShowAsNonQualified = useQualificationStatus(
       country,

@@ -14,10 +14,9 @@ import { useCountrySorter } from './hooks/useCountrySorter';
 import { useVoting } from './hooks/useVoting';
 
 const Board = (): JSX.Element => {
-  const { winnerCountry, qualifiedCountries, eventPhase, restartCounter } =
-    useScoreboardStore();
+  const { getCurrentStage, restartCounter } = useScoreboardStore();
 
-  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
+  const { isOver: isVotingOver, id: currentStageId } = getCurrentStage();
 
   const allCountriesToDisplay = useCountryDisplay();
   const sortedCountries = useCountrySorter(allCountriesToDisplay);
@@ -73,7 +72,7 @@ const Board = (): JSX.Element => {
         }`}
       >
         <Flipper
-          key={`${eventPhase}-${restartCounter}-${showAllParticipants}`}
+          key={`${currentStageId}-${restartCounter}-${showAllParticipants}`}
           flipKey={flipKey}
           spring={{ damping: 5, stiffness: 25, overshootClamping: true }}
         >

@@ -116,7 +116,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      overlayClassName="z-[1001]"
+      overlayClassName="!z-[1001]"
       containerClassName="w-[min(100%,600px)]"
       bottomContent={
         <div className="flex justify-between items-center xs:gap-4 gap-2 bg-primary-900 p-4 z-30">

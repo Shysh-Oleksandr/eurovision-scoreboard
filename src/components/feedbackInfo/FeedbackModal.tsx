@@ -40,6 +40,7 @@ const FeedbackModal = ({
       onClose={() => setShowModal(false)}
       containerClassName="lg:w-3/4 md:w-2/3 w-4/5"
       contentClassName="pb-2 xs:!pt-6 !pt-4 sm:!px-12 xs:!px-8 !px-6 text-white h-[50vh] narrow-scrollbar"
+      overlayClassName="!z-[1001]"
       topContent={
         <Tabs
           tabs={tabs}

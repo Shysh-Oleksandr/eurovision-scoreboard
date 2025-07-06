@@ -1,15 +1,13 @@
-export type BaseCountry = {
+export interface BaseCountry {
   name: string;
   code: string;
   category?: string;
   flag?: string;
   isQualified?: boolean;
   semiFinalGroup?: SemiFinalGroup;
-  countryAssignmentGroup?: CountryAssignmentGroup;
   isAutoQualified?: boolean;
-  isSelected?: boolean;
   isQualifiedFromSemi?: boolean;
-};
+}
 
 export type SemiFinalGroup = 'SF1' | 'SF2';
 
@@ -23,43 +21,48 @@ export enum CountryAssignmentGroup {
 }
 
 export enum EventMode {
-  SEMI_FINALS_AND_GRAND_FINAL = 'SEMI_FINALS_AND_GRAND_FINAL',
   GRAND_FINAL_ONLY = 'GRAND_FINAL_ONLY',
-}
-export enum EventPhase {
-  COUNTRY_SELECTION = 'COUNTRY_SELECTION',
-  SEMI_FINAL_1 = 'SEMI_FINAL_1',
-  SEMI_FINAL_2 = 'SEMI_FINAL_2',
-  GRAND_FINAL = 'GRAND_FINAL',
+  SEMI_FINALS_AND_GRAND_FINAL = 'SEMI_FINALS_AND_GRAND_FINAL',
 }
 
-export type SemiFinalQualifiersAmount = {
+export interface SemiFinalQualifiersAmount {
   SF1: number;
   SF2: number;
-};
+}
 
-export type Country = BaseCountry & {
+export enum StageVotingMode {
+  TELEVOTE_ONLY = 'TELEVOTE_ONLY',
+  JURY_ONLY = 'JURY_ONLY',
+  TELEVOTE_AND_JURY = 'TELEVOTE_AND_JURY',
+}
+
+export enum StageVotingType {
+  JURY = 'JURY',
+  TELEVOTE = 'TELEVOTE',
+}
+
+export interface EventStage {
+  id: string;
+  name: string;
+  votingMode: StageVotingMode;
+  countries: Country[];
+  isOver: boolean;
+  isJuryVoting: boolean;
+  isLastStage?: boolean;
+}
+
+export enum StageId {
+  SF1 = 'sf1',
+  SF2 = 'sf2',
+  GF = 'gf',
+}
+
+export interface Country extends BaseCountry {
+  juryPoints: number;
+  televotePoints: number;
   points: number;
   lastReceivedPoints: number | null;
   isVotingFinished?: boolean;
-};
-
-export enum ScoreboardActionKind {
-  GIVE_JURY_POINTS = 'GIVE_JURY_POINTS',
-  GIVE_TELEVOTE_POINTS = 'GIVE_TELEVOTE_POINTS',
-  GIVE_RANDOM_JURY_POINTS = 'GIVE_RANDOM_JURY_POINTS',
-  RESET_LAST_POINTS = 'RESET_LAST_POINTS',
-  HIDE_LAST_RECEIVED_POINTS = 'HIDE_LAST_RECEIVED_POINTS',
-  START_OVER = 'START_OVER',
-}
-
-export interface ScoreboardAction {
-  type: ScoreboardActionKind;
-  payload?: {
-    countryCode?: string;
-    votingPoints?: number;
-    isRandomFinishing?: boolean;
-  };
 }
 
 export interface CountryWithPoints {

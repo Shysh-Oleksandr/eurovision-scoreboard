@@ -1,11 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import {
-  BaseCountry,
-  CountryAssignmentGroup,
-  EventMode,
-  EventPhase,
-} from '../../models';
+import { BaseCountry, CountryAssignmentGroup, EventMode } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
@@ -27,7 +22,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 const EventSetupModal = () => {
   const { eventSetupModalOpen, setEventSetupModalOpen } = useCountriesStore();
   const { allCountriesForYear, getAllCountries } = useCountriesStore();
-  const { startEvent, setSemiFinalQualifiers, eventPhase } =
+  const { startEvent, setSemiFinalQualifiers, eventStages } =
     useScoreboardStore();
 
   const [activeTab, setActiveTab] = useState<EventMode>(
@@ -37,7 +32,7 @@ const EventSetupModal = () => {
   const [sf2Qualifiers, setSf2Qualifiers] = useState(10);
 
   const isGrandFinalOnly = activeTab === EventMode.GRAND_FINAL_ONLY;
-  const canClose = eventPhase !== EventPhase.COUNTRY_SELECTION;
+  const canClose = eventStages.length > 0;
 
   const debouncedCanClose = useDebounce(canClose, 300);
 
@@ -100,13 +95,9 @@ const EventSetupModal = () => {
           group === CountryAssignmentGroup.SF1 ||
           group === CountryAssignmentGroup.SF2;
 
-        const isCompetitor =
-          isAutoQualifier || isGrandFinalist || isSemiFinalist;
-
         return {
           ...country,
           ...(countryDataForYear ?? {}),
-          isSelected: isCompetitor,
           semiFinalGroup: isSemiFinalist ? group : undefined,
           isAutoQualified: isAutoQualifier,
           isQualified: isAutoQualifier || isGrandFinalist,

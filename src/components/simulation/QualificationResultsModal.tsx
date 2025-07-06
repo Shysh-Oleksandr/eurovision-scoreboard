@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
-import { EventPhase } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal';
@@ -12,27 +11,25 @@ import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
 const QualificationResultsModal = () => {
   const {
-    eventPhase,
     showQualificationResults,
-    qualifiedCountries,
+    getCurrentStage,
     continueToNextPhase,
     closeQualificationResults,
   } = useScoreboardStore();
 
-  const { nextPhase, hasOneSemiFinal } = useNextEventName();
-  const isSemiFinal1 = eventPhase === EventPhase.SEMI_FINAL_1;
+  const { name: currentStageName, countries } = getCurrentStage();
+  const { nextPhase } = useNextEventName();
+
+  const qualifiedCountries = useMemo(
+    () =>
+      countries
+        .filter((country) => country.isQualifiedFromSemi)
+        .sort((a, b) => b.points - a.points),
+    [countries],
+  );
 
   const countriesContainerRef = useRef<HTMLDivElement>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const title = useMemo(() => {
-    if (hasOneSemiFinal) return 'Semi-Final';
-    if (isSemiFinal1) {
-      return 'Semi-Final 1';
-    }
-
-    return 'Semi-Final 2';
-  }, [hasOneSemiFinal, isSemiFinal1]);
 
   const handleClose = () => {
     closeQualificationResults();
@@ -93,7 +90,7 @@ const QualificationResultsModal = () => {
       }
     >
       <h2 className="md:text-2xl text-xl font-bold mb-4 text-white">
-        {title} Qualifiers
+        {currentStageName} Qualifiers
       </h2>
 
       <div

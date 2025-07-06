@@ -7,9 +7,15 @@ import { useScoreboardStore } from '../../../state/scoreboardStore';
 const MAX_COUNTRY_WITH_POINTS = POINTS_ARRAY.length;
 
 export const useVoting = () => {
-  const { countries, giveJuryPoints, resetLastPoints, shouldShowLastPoints } =
-    useScoreboardStore();
+  const {
+    getCurrentStage,
+    giveJuryPoints,
+    resetLastPoints,
+    shouldShowLastPoints,
+  } = useScoreboardStore();
   const { getVotingCountry } = useCountriesStore();
+
+  const { countries } = getCurrentStage();
 
   const timerId = useRef<NodeJS.Timeout | null>(null);
 

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { EventPhase } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import CountryInfo from './CountryInfo';
@@ -8,19 +7,12 @@ import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
 const ControlsPanel = (): JSX.Element | null => {
-  const {
-    votingCountryIndex,
-    votingPoints,
-    isJuryVoting,
-    winnerCountry,
-    eventPhase,
-    qualifiedCountries,
-  } = useScoreboardStore();
+  const { votingCountryIndex, votingPoints, getCurrentStage } =
+    useScoreboardStore();
 
-  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
-  const isSemiFinal =
-    eventPhase === EventPhase.SEMI_FINAL_1 ||
-    eventPhase === EventPhase.SEMI_FINAL_2;
+  const { isJuryVoting, isOver: isVotingOver, id } = getCurrentStage();
+
+  const isSemiFinal = id !== 'gf';
 
   // In semi-finals, we only have televote (no jury voting)
   const showJuryVoting = !isSemiFinal && isJuryVoting;
@@ -29,7 +21,7 @@ const ControlsPanel = (): JSX.Element | null => {
     return null;
   }
 
-  const votingTitle = !isSemiFinal && isJuryVoting ? 'Jury voting' : 'Televote';
+  const votingTitle = isJuryVoting ? 'Jury voting' : 'Televote';
 
   return (
     <div className="flex-1 mb-[6px] md:pt-1 pt-4">

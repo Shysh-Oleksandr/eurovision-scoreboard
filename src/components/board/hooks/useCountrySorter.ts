@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 
 import { Country } from '../../../models';
-import { useCountriesStore } from '../../../state/countriesStore';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 export const useCountrySorter = (countriesToDisplay: Country[]) => {
-  const { winnerCountry, showAllParticipants } = useScoreboardStore();
-  const { getSemiFinalPoints } = useCountriesStore();
+  const { winnerCountry, showAllParticipants, getCountryInSemiFinal } =
+    useScoreboardStore();
 
   const sortedCountries = useMemo(() => {
     const countriesToSort = [...countriesToDisplay];
@@ -23,8 +22,8 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
           return 1;
         }
 
-        const aSemiPoints = getSemiFinalPoints(a.code);
-        const bSemiPoints = getSemiFinalPoints(b.code);
+        const aSemiPoints = getCountryInSemiFinal(a.code)?.points ?? 0;
+        const bSemiPoints = getCountryInSemiFinal(b.code)?.points ?? 0;
         const pointsComparison = bSemiPoints - aSemiPoints;
 
         return pointsComparison !== 0
@@ -44,7 +43,7 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
     countriesToDisplay,
     showAllParticipants,
     winnerCountry,
-    getSemiFinalPoints,
+    getCountryInSemiFinal,
   ]);
 
   return sortedCountries;

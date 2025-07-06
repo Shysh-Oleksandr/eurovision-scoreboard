@@ -10,11 +10,10 @@ import TelevoteInput from './TelevoteInput';
 
 const VotingButtons = () => {
   const {
-    countries,
     shouldShowLastPoints,
-    isJuryVoting,
     votingCountryIndex,
     shouldClearPoints,
+    getCurrentStage,
     giveRandomJuryPoints,
     hideLastReceivedPoints,
     resetLastPoints,
@@ -22,6 +21,8 @@ const VotingButtons = () => {
   } = useScoreboardStore();
   const { getQualifiedCountries, getVotingCountriesLength } =
     useCountriesStore();
+
+  const { countries, isJuryVoting } = getCurrentStage();
 
   const countriesLeft = getVotingCountriesLength() - votingCountryIndex;
 

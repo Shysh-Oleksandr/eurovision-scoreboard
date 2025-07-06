@@ -3,7 +3,7 @@ import React from 'react';
 import SyncIcon from '../../assets/icons/SyncIcon';
 import { Year } from '../../config';
 import { SUPPORTED_YEARS } from '../../data/data';
-import { EventPhase } from '../../models';
+import { StageId } from '../../models';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import {
@@ -29,19 +29,22 @@ const themeOptions = YEARS_WITH_THEME.map((year) => ({
 
 export const SetupHeader: React.FC = () => {
   const { year, themeYear, setYear, setTheme } = useGeneralStore();
-  const { eventPhase, setEventPhase } = useScoreboardStore();
+  const { eventStages, getCurrentStage, setEventStages } = useScoreboardStore();
 
   const handleYearChange = (newYear: string) => {
-    if (eventPhase !== EventPhase.COUNTRY_SELECTION) {
+    if (eventStages.length > 0) {
+      const { id: currentStageId } = getCurrentStage();
+      const isGrandFinal = currentStageId === StageId.GF;
+
       if (
         window.confirm(
           `A ${
-            eventPhase === EventPhase.GRAND_FINAL ? 'Grand Final' : 'semi-final'
+            isGrandFinal ? 'Grand Final' : 'semi-final'
           } is in progress. Changing the year will reset the current scoreboard and start a new setup. Are you sure?`,
         )
       ) {
         setYear(newYear as Year);
-        setEventPhase(EventPhase.COUNTRY_SELECTION);
+        setEventStages([]);
       }
     } else {
       setYear(newYear as Year);

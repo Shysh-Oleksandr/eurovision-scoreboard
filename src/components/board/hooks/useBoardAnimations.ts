@@ -15,7 +15,7 @@ export const useBoardAnimations = (
   const {
     winnerCountry,
     setCanDisplayPlaceAnimation,
-    eventPhase,
+    getCurrentStage,
     restartCounter,
     showAllParticipants,
   } = useScoreboardStore();
@@ -26,6 +26,8 @@ export const useBoardAnimations = (
   );
   const [finalCountries, setFinalCountries] = useState<Country[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout>();
+
+  const { id: currentStageId } = getCurrentStage();
 
   const countriesToRender = useMemo(() => {
     const countryMap = new Map(sortedCountries.map((c) => [c.code, c]));
@@ -101,7 +103,7 @@ export const useBoardAnimations = (
       to: { opacity: 1, transform: 'translateY(0px)' },
       from: { opacity: 0, transform: 'translateY(15px)' },
     });
-  }, [api, eventPhase, restartCounter, showAllParticipants]);
+  }, [api, currentStageId, restartCounter, showAllParticipants]);
 
   return {
     finalCountries,
