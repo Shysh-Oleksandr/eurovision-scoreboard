@@ -5,7 +5,13 @@ import { devtools, persist } from 'zustand/middleware';
 import { Year } from '../config';
 import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import { getCountriesByYear } from '../data/data';
-import { BaseCountry, Country } from '../models';
+import {
+  BaseCountry,
+  Country,
+  EventMode,
+  EventStage,
+  StageId,
+} from '../models';
 
 import { useScoreboardStore } from './scoreboardStore';
 
@@ -15,6 +21,8 @@ interface CountriesState {
   selectedCountries: BaseCountry[]; // Countries selected for the current event
   eventSetupModalOpen: boolean;
   customCountries: BaseCountry[];
+  eventAssignments: Record<EventMode, Record<string, string>>;
+  configuredEventStages: EventStage[];
 
   // Actions
   setEventSetupModalOpen: (open: boolean) => void;
@@ -31,6 +39,10 @@ interface CountriesState {
   updateCustomCountry: (country: BaseCountry) => void;
   deleteCustomCountry: (countryCode: string) => void;
   getAllCountries: () => BaseCountry[];
+  setEventAssignments: (
+    assignments: Record<EventMode, Record<string, string>>,
+  ) => void;
+  setConfiguredEventStages: (stages: EventStage[]) => void;
 }
 
 export const useCountriesStore = create<CountriesState>()(
@@ -42,6 +54,11 @@ export const useCountriesStore = create<CountriesState>()(
         selectedCountries: [],
         eventSetupModalOpen: true,
         customCountries: [],
+        eventAssignments: {
+          [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: {},
+          [EventMode.GRAND_FINAL_ONLY]: {},
+        },
+        configuredEventStages: [],
 
         // Actions
         setEventSetupModalOpen: (open: boolean) => {
@@ -73,15 +90,24 @@ export const useCountriesStore = create<CountriesState>()(
 
         getVotingCountries: () => {
           const { selectedCountries, allCountriesForYear } = get();
+          const { getCurrentStage } = useScoreboardStore.getState();
+          const currentStage = getCurrentStage();
 
-          // If we have selected countries, use those
+          // In a semi-final, only participating countries are voting.
+          if (currentStage && currentStage.id !== StageId.GF) {
+            return currentStage.countries.sort((a, b) =>
+              a.name.localeCompare(b.name),
+            );
+          }
+
+          // In the Grand Final, all selected countries for the event can vote.
           if (selectedCountries.length > 0) {
             return selectedCountries.sort((a, b) =>
               a.name.localeCompare(b.name),
             );
           }
 
-          // Otherwise fall back to all countries for the year
+          // Otherwise, fall back to all countries for the year.
           return allCountriesForYear.sort((a, b) =>
             a.name.localeCompare(b.name),
           );
@@ -145,6 +171,11 @@ export const useCountriesStore = create<CountriesState>()(
           set({
             allCountriesForYear: countries,
             selectedCountries: [],
+            eventAssignments: {
+              [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: {},
+              [EventMode.GRAND_FINAL_ONLY]: {},
+            },
+            configuredEventStages: [],
           });
         },
 
@@ -192,6 +223,14 @@ export const useCountriesStore = create<CountriesState>()(
           const { customCountries } = get();
 
           return [...ALL_COUNTRIES, ...customCountries];
+        },
+
+        setEventAssignments: (assignments) => {
+          set({ eventAssignments: assignments });
+        },
+
+        setConfiguredEventStages: (stages) => {
+          set({ configuredEventStages: stages });
         },
       }),
       {

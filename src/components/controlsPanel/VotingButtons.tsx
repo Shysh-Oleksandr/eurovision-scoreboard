@@ -26,7 +26,7 @@ const VotingButtons = () => {
 
   const countriesLeft = getVotingCountriesLength() - votingCountryIndex;
 
-  const timerId = useRef<NodeJS.Timeout | null>(null);
+  const timerId = useRef<number | null>(null);
 
   const isFirstTelevoteCountry = useMemo(
     () => countries.filter((country) => country.isVotingFinished).length === 0,

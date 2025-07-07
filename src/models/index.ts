@@ -4,7 +4,7 @@ export interface BaseCountry {
   category?: string;
   flag?: string;
   isQualified?: boolean;
-  semiFinalGroup?: SemiFinalGroup;
+  semiFinalGroup?: string;
   isAutoQualified?: boolean;
   isQualifiedFromSemi?: boolean;
 }
@@ -12,12 +12,11 @@ export interface BaseCountry {
 export type SemiFinalGroup = 'SF1' | 'SF2';
 
 export enum CountryAssignmentGroup {
+  AUTO_QUALIFIER = 'AUTO_QUALIFIER',
   SF1 = 'SF1',
   SF2 = 'SF2',
-  AUTO_QUALIFIER = 'AUTO_QUALIFIER',
-  NOT_PARTICIPATING = 'NOT_PARTICIPATING',
-  GRAND_FINAL = 'GRAND_FINAL',
   NOT_QUALIFIED = 'NOT_QUALIFIED',
+  NOT_PARTICIPATING = 'NOT_PARTICIPATING',
 }
 
 export enum EventMode {
@@ -31,9 +30,10 @@ export interface SemiFinalQualifiersAmount {
 }
 
 export enum StageVotingMode {
+  JURY_AND_TELEVOTE = 'JURY_AND_TELEVOTE',
   TELEVOTE_ONLY = 'TELEVOTE_ONLY',
   JURY_ONLY = 'JURY_ONLY',
-  TELEVOTE_AND_JURY = 'TELEVOTE_AND_JURY',
+  COMBINED = 'COMBINED',
 }
 
 export enum StageVotingType {
@@ -49,6 +49,7 @@ export interface EventStage {
   isOver: boolean;
   isJuryVoting: boolean;
   isLastStage?: boolean;
+  qualifiersAmount?: number;
 }
 
 export enum StageId {

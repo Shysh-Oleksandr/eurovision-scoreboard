@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
-import Modal from '../common/Modal';
+import Modal from '../common/Modal/Modal';
 
 const WinnerModal = () => {
   const { winnerCountry } = useScoreboardStore();

@@ -30,7 +30,7 @@ export const useCountryDisplay = () => {
         juryPoints: existingCountry?.juryPoints ?? 0,
         televotePoints: existingCountry?.televotePoints ?? 0,
         points: existingCountry?.points ?? -1,
-        lastReceivedPoints: existingCountry?.lastReceivedPoints ?? 0,
+        lastReceivedPoints: existingCountry?.lastReceivedPoints ?? -1,
         isVotingFinished: existingCountry?.isVotingFinished ?? true,
       };
     });

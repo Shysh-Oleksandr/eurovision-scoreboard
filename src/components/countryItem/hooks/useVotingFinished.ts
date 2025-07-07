@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ANIMATION_DURATION } from '../../../data/data';
 
 const useVotingFinished = (isVotingFinished: boolean) => {
-  const timerId = useRef<NodeJS.Timeout | null>(null);
+  const timerId = useRef<number | null>(null);
   const [isFinished, setIsFinished] = useState(false);
 
   const clearTimer = useCallback(() => {

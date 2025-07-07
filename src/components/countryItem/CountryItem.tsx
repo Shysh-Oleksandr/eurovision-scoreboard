@@ -43,6 +43,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
     const { isJuryVoting, isOver: isVotingOver } = getCurrentStage();
 
     const isVotingFinished = useVotingFinished(!!country.isVotingFinished);
+
     const isDouzePoints = country.lastReceivedPoints === 12;
     const showDouzePointsAnimationHook = useDouzePointsAnimation(isDouzePoints);
 
@@ -138,6 +139,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
               style={{
                 ...springsLastPointsContainer,
                 backgroundColor: lastPointsBgColor,
+                display: country.lastReceivedPoints === -1 ? 'none' : 'block',
               }}
               className={`relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8`}
             >

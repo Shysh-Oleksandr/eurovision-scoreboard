@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { SpringValue, easings, useSpring } from '@react-spring/web';
 
-import { useScoreboardStore } from '../state/scoreboardStore';
 import { useThemeColor } from '../theme/useThemeColor';
 
 // Consistent animation configs for better cross-platform performance
@@ -68,8 +67,6 @@ const useAnimatePoints = ({
   isCountryVotingFinished: boolean;
   isVotingOver: boolean;
 }): ReturnType => {
-  const { isFinalAnimationFinished, setFinalAnimationFinished, winnerCountry } =
-    useScoreboardStore((state) => state);
   const [
     JURY_BG_COLOR,
     JURY_TEXT_COLOR,
@@ -163,20 +160,16 @@ const useAnimatePoints = ({
       return;
     }
 
-    const immediate = isFinalAnimationFinished;
-
     // Douze points animation
     if (isDouzePoints) {
       apiDouzeContainer.start({
         to: { opacity: 1, transform: 'translate3d(0, 0, 0)' },
         delay: 200,
         config: douzeConfig,
-        immediate,
       });
 
       apiDouzeParallelogramBlue.start({
         ...parallelogramsAnimation,
-        immediate,
       });
 
       apiDouzeParallelogramYellow.start({
@@ -185,19 +178,16 @@ const useAnimatePoints = ({
           left: '-50%',
           transform: 'translate3d(0, 0, 0) skewX(45deg)',
         },
-        immediate,
       });
     } else {
       apiDouzeContainer.start({
         to: { opacity: 0, transform: 'translate3d(0, 0, 0)' },
         delay: 400,
         config: douzeConfig,
-        immediate,
       });
 
       apiDouzeParallelogramBlue.start({
         to: parallelogramsAnimation.from,
-        immediate,
       });
 
       apiDouzeParallelogramYellow.start({
@@ -205,7 +195,6 @@ const useAnimatePoints = ({
           left: '-50%',
           transform: 'translate3d(0, 0, 0) skewX(45deg)',
         },
-        immediate,
       });
     }
 
@@ -214,35 +203,23 @@ const useAnimatePoints = ({
       lastPointsApiContainer.start({
         to: { x: 0, opacity: 1, transform: 'translate3d(0, 0, 0)' },
         config: containerConfig,
-        immediate,
       });
 
       lastPointsApiText.start({
         to: { x: 0, opacity: 1, transform: 'translate3d(0, 0, 0)' },
         config: textConfig,
-        immediate,
       });
-    } else if (!isFinalAnimationFinished) {
-      if (winnerCountry) {
-        setTimeout(() => {
-          setFinalAnimationFinished(true);
-        }, 4000);
-      }
-
+    } else {
       lastPointsApiContainer.start({
         to: { x: 36, opacity: 0, transform: 'translate3d(0, 0, 0)' },
         config: containerConfig,
-        immediate,
       });
 
       lastPointsApiText.start({
         to: { x: 15, opacity: 0, transform: 'translate3d(0, 0, 0)' },
         config: { duration: 0 },
-        immediate,
       });
     }
-    // Deliberately not including winnerCountry and isFinalAnimationFinished in the dependency array to avoid animation issues
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     lastPointsApiContainer,
     apiDouzeContainer,
@@ -252,13 +229,9 @@ const useAnimatePoints = ({
     isDouzePoints,
     shouldShowLastPoints,
     isVotingOver,
-    parallelogramsAnimation,
-    setFinalAnimationFinished,
   ]);
 
   useEffect(() => {
-    const immediate = isFinalAnimationFinished;
-
     if (isJuryVoting) {
       pointsApiContainer.start({
         to: {
@@ -268,7 +241,6 @@ const useAnimatePoints = ({
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
-        immediate,
       });
 
       return;
@@ -283,7 +255,6 @@ const useAnimatePoints = ({
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
-        immediate,
       });
     } else if (isCountryVotingFinished) {
       pointsApiContainer.start({
@@ -294,7 +265,6 @@ const useAnimatePoints = ({
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
-        immediate,
       });
     } else {
       pointsApiContainer.start({
@@ -305,7 +275,6 @@ const useAnimatePoints = ({
           transform: 'translate3d(0, 0, 0)',
         },
         config: activeConfig,
-        immediate,
       });
     }
   }, [
@@ -321,7 +290,6 @@ const useAnimatePoints = ({
     isActive,
     isCountryVotingFinished,
     isJuryVoting,
-    isFinalAnimationFinished,
   ]);
 
   return useMemo(

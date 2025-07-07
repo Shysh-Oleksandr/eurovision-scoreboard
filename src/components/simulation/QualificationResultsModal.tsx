@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react';
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
-import Modal from '../common/Modal';
+import Modal, { ANIMATION_DURATION } from '../common/Modal/Modal';
 import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
 const QualificationResultsModal = () => {
@@ -30,9 +30,20 @@ const QualificationResultsModal = () => {
 
   const countriesContainerRef = useRef<HTMLDivElement>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [shouldClose, setShouldClose] = useState(false);
+
+  useEffect(() => {
+    if (showQualificationResults) {
+      setShouldClose(false);
+    }
+  }, [showQualificationResults]);
 
   const handleClose = () => {
     closeQualificationResults();
+  };
+
+  const handleTriggerClose = () => {
+    setShouldClose(true);
   };
 
   // Track when modal becomes visible (after delay)
@@ -68,19 +79,22 @@ const QualificationResultsModal = () => {
 
   return (
     <Modal
-      isOpen={showQualificationResults}
-      onClose={handleClose}
+      isOpen={showQualificationResults && !shouldClose}
+      onClose={handleTriggerClose}
+      onClosed={handleClose}
       openDelay={3400}
-      containerClassName="lg:w-2/5 md:w-1/2 w-4/5"
+      containerClassName="!w-[min(100%,500px)]"
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleTriggerClose}>
             Close
           </Button>
           <Button
             onClick={() => {
-              handleClose();
-              continueToNextPhase();
+              handleTriggerClose();
+              setTimeout(() => {
+                continueToNextPhase();
+              }, ANIMATION_DURATION / 2);
             }}
             className="animated-border !text-sm md:!text-base w-full"
           >

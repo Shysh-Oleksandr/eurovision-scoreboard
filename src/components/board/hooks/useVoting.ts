@@ -17,7 +17,7 @@ export const useVoting = () => {
 
   const { countries } = getCurrentStage();
 
-  const timerId = useRef<NodeJS.Timeout | null>(null);
+  const timerId = useRef<number | null>(null);
 
   const { countriesWithPointsLength, wasTheFirstPointsAwarded } =
     useMemo(() => {
