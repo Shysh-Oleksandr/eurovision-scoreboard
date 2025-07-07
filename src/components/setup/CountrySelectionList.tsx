@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { BaseCountry, CountryAssignmentGroup } from '../../models';
+import { BaseCountry } from '../../models';
 
-import { CountrySelectionListItem } from './CountrySelectionListItem';
+import {
+  AvailableGroup,
+  CountrySelectionListItem,
+} from './CountrySelectionListItem';
 
 interface CountrySelectionListProps {
   countries: BaseCountry[];
-  onAssignCountryAssignment: (
-    countryCode: string,
-    group: CountryAssignmentGroup,
-  ) => void;
-  getCountryGroupAssignment: (country: BaseCountry) => CountryAssignmentGroup;
-  availableGroups?: CountryAssignmentGroup[];
+  onAssignCountryAssignment: (countryCode: string, group: string) => void;
+  getCountryGroupAssignment: (country: BaseCountry) => string;
+  availableGroups?: AvailableGroup[];
   extraContent?: React.ReactNode;
   onEdit?: (country: BaseCountry) => void;
 }

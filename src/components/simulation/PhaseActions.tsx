@@ -1,28 +1,29 @@
 import React from 'react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
-import { EventMode, EventPhase } from '../../models';
+import { EventMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 
 export const PhaseActions = () => {
   const {
-    eventPhase,
     eventMode,
     continueToNextPhase,
-    qualifiedCountries,
     winnerCountry,
     showAllParticipants,
+    getCurrentStage,
     toggleShowAllParticipants,
   } = useScoreboardStore();
 
   const { nextPhase } = useNextEventName();
 
-  const isVotingOver = qualifiedCountries.length > 0;
+  const { isOver: isVotingOver, isLastStage } = getCurrentStage();
+
   const hasWinner = !!winnerCountry;
 
   const canShowAllParticipants =
-    eventPhase === EventPhase.GRAND_FINAL &&
+    isVotingOver &&
+    isLastStage &&
     hasWinner &&
     eventMode === EventMode.SEMI_FINALS_AND_GRAND_FINAL;
 
@@ -32,7 +33,7 @@ export const PhaseActions = () => {
 
   return (
     <div className="flex justify-end mb-2">
-      {isVotingOver && (
+      {isVotingOver && !isLastStage && (
         <Button onClick={continueToNextPhase} className="animated-border">
           Continue to {nextPhase}
         </Button>

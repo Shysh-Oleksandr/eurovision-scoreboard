@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import { ArrowIcon } from '../../assets/icons/ArrowIcon';
-import { CountryAssignmentGroup } from '../../models';
-import { ASSIGNMENT_GROUP_LABELS } from '../setup/CountrySelectionListItem';
+import {
+  ASSIGNMENT_GROUP_LABELS,
+  AvailableGroup,
+  isStageGroup,
+} from '../setup/CountrySelectionListItem';
 
 interface SectionWrapperProps {
   title: string;
@@ -11,10 +14,11 @@ interface SectionWrapperProps {
   isExpanded?: boolean;
   onToggle?: () => void;
   defaultExpanded?: boolean;
-  onBulkAssign?: (group: CountryAssignmentGroup) => void;
-  availableGroups?: CountryAssignmentGroup[];
-  currentGroup?: CountryAssignmentGroup;
+  onBulkAssign?: (group: string) => void;
+  availableGroups?: AvailableGroup[];
+  currentGroup?: string;
   getLabel?: (itemsCount: number) => string;
+  extraContent?: React.ReactNode;
 }
 
 const SectionWrapper: React.FC<SectionWrapperProps> = ({
@@ -28,6 +32,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
   availableGroups,
   currentGroup,
   getLabel,
+  extraContent,
 }) => {
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
   const [hasBeenOpened, setHasBeenOpened] = useState(defaultExpanded);
@@ -63,13 +68,13 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
 
   const handleBulkAssign = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
-    onBulkAssign?.(e.target.value as CountryAssignmentGroup);
+    onBulkAssign?.(e.target.value);
   };
 
   return (
     <div className="bg-primary-800 bg-gradient-to-tl from-primary-900 to-primary-800 rounded-lg">
       <div
-        className="flex justify-between items-center cursor-pointer sm:p-4 p-3 sm:pl-3 pl-2 gap-1"
+        className="flex flex-wrap justify-between items-center cursor-pointer sm:p-4 p-3 sm:pl-3 pl-2 gap-1"
         onClick={handleToggle}
       >
         <div className="flex items-center sm:gap-2.5 gap-1.5">
@@ -84,7 +89,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
             {title}
           </h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
           {onBulkAssign && availableGroups && currentGroup ? (
             <div
               className="relative min-w-[120px]"
@@ -102,25 +107,36 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
                 <select
                   value={currentGroup}
                   onChange={handleBulkAssign}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  className="absolute inset-0 opacity-0 cursor-pointer select"
                   id={`country-assignment-${title}`}
                   aria-label={`Bulk assign all countries in ${title} to a group`}
                 >
-                  {availableGroups.map((group) => (
-                    <option key={group} value={group}>
-                      {ASSIGNMENT_GROUP_LABELS[group]}
-                    </option>
-                  ))}
+                  {availableGroups.map((group) => {
+                    if (isStageGroup(group)) {
+                      return (
+                        <option key={group.id} value={group.id}>
+                          {group.name}
+                        </option>
+                      );
+                    }
+
+                    return (
+                      <option key={group} value={group}>
+                        {ASSIGNMENT_GROUP_LABELS[group]}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             </div>
           ) : (
             countriesCount !== undefined && (
               <span className="bg-primary-800 flex-none text-white px-2 py-1 rounded-md shadow text-sm">
-                {countriesCount} countries
+                {countriesCount} {getAmountLabel(countriesCount)}
               </span>
             )
           )}
+          {extraContent}
         </div>
       </div>
 

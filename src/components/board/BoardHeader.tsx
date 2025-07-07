@@ -13,11 +13,9 @@ type Props = {
 
 const BoardHeader = ({ onClick }: Props): JSX.Element => {
   const {
-    countries,
-    isJuryVoting,
+    getCurrentStage,
     votingPoints,
     winnerCountry,
-    qualifiedCountries,
     resetLastPoints,
     giveTelevotePoints,
   } = useScoreboardStore();
@@ -27,7 +25,7 @@ const BoardHeader = ({ onClick }: Props): JSX.Element => {
 
   const { year } = useGeneralStore();
 
-  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
+  const { isJuryVoting, countries, isOver: isVotingOver } = getCurrentStage();
 
   const votingCountry = getVotingCountry();
 

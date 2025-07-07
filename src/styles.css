@@ -277,6 +277,7 @@ h6 {
   option {
     color: #fff !important;
     background-color: theme('colors.primary-900') !important;
+    font-weight: 500;
   }
 }
 

@@ -4,38 +4,46 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
-import { EventPhase } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
-import Modal from '../common/Modal';
+import Modal, { ANIMATION_DURATION } from '../common/Modal/Modal';
 import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
 const QualificationResultsModal = () => {
   const {
-    eventPhase,
     showQualificationResults,
-    qualifiedCountries,
+    getCurrentStage,
     continueToNextPhase,
     closeQualificationResults,
   } = useScoreboardStore();
 
-  const { nextPhase, hasOneSemiFinal } = useNextEventName();
-  const isSemiFinal1 = eventPhase === EventPhase.SEMI_FINAL_1;
+  const { name: currentStageName, countries } = getCurrentStage();
+  const { nextPhase } = useNextEventName();
+
+  const qualifiedCountries = useMemo(
+    () =>
+      countries
+        .filter((country) => country.isQualifiedFromSemi)
+        .sort((a, b) => b.points - a.points),
+    [countries],
+  );
 
   const countriesContainerRef = useRef<HTMLDivElement>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [shouldClose, setShouldClose] = useState(false);
 
-  const title = useMemo(() => {
-    if (hasOneSemiFinal) return 'Semi-Final';
-    if (isSemiFinal1) {
-      return 'Semi-Final 1';
+  useEffect(() => {
+    if (showQualificationResults) {
+      setShouldClose(false);
     }
-
-    return 'Semi-Final 2';
-  }, [hasOneSemiFinal, isSemiFinal1]);
+  }, [showQualificationResults]);
 
   const handleClose = () => {
     closeQualificationResults();
+  };
+
+  const handleTriggerClose = () => {
+    setShouldClose(true);
   };
 
   // Track when modal becomes visible (after delay)
@@ -71,19 +79,22 @@ const QualificationResultsModal = () => {
 
   return (
     <Modal
-      isOpen={showQualificationResults}
-      onClose={handleClose}
+      isOpen={showQualificationResults && !shouldClose}
+      onClose={handleTriggerClose}
+      onClosed={handleClose}
       openDelay={3400}
-      containerClassName="lg:w-2/5 md:w-1/2 w-4/5"
+      containerClassName="!w-[min(100%,500px)]"
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleTriggerClose}>
             Close
           </Button>
           <Button
             onClick={() => {
-              handleClose();
-              continueToNextPhase();
+              handleTriggerClose();
+              setTimeout(() => {
+                continueToNextPhase();
+              }, ANIMATION_DURATION / 2);
             }}
             className="animated-border !text-sm md:!text-base w-full"
           >
@@ -93,7 +104,7 @@ const QualificationResultsModal = () => {
       }
     >
       <h2 className="md:text-2xl text-xl font-bold mb-4 text-white">
-        {title} Qualifiers
+        {currentStageName} Qualifiers
       </h2>
 
       <div

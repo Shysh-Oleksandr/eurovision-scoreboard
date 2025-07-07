@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { EventPhase } from '../../models';
+import { StageVotingMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import CountryInfo from './CountryInfo';
@@ -8,28 +8,22 @@ import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
 const ControlsPanel = (): JSX.Element | null => {
-  const {
-    votingCountryIndex,
-    votingPoints,
-    isJuryVoting,
-    winnerCountry,
-    eventPhase,
-    qualifiedCountries,
-  } = useScoreboardStore();
+  const { votingCountryIndex, votingPoints, getCurrentStage } =
+    useScoreboardStore();
 
-  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
-  const isSemiFinal =
-    eventPhase === EventPhase.SEMI_FINAL_1 ||
-    eventPhase === EventPhase.SEMI_FINAL_2;
-
-  // In semi-finals, we only have televote (no jury voting)
-  const showJuryVoting = !isSemiFinal && isJuryVoting;
+  const { isJuryVoting, isOver: isVotingOver, votingMode } = getCurrentStage();
 
   if (isVotingOver) {
     return null;
   }
 
-  const votingTitle = !isSemiFinal && isJuryVoting ? 'Jury voting' : 'Televote';
+  let votingTitle = 'Televote';
+
+  if (votingMode === StageVotingMode.COMBINED) {
+    votingTitle = 'Voting';
+  } else if (isJuryVoting) {
+    votingTitle = 'Jury voting';
+  }
 
   return (
     <div className="flex-1 mb-[6px] md:pt-1 pt-4">
@@ -37,12 +31,12 @@ const ControlsPanel = (): JSX.Element | null => {
         <h3 className="lg:text-2xl text-xl text-white">{votingTitle}</h3>
       </div>
       <div className="bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md">
-        {showJuryVoting && (
+        {isJuryVoting && (
           <CountryInfo votingCountryIndex={votingCountryIndex} />
         )}
         <VotingButtons />
       </div>
-      {showJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
+      {isJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
     </div>
   );
 };

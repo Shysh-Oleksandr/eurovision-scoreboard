@@ -1,128 +1,98 @@
 import React from 'react';
 
-import { BaseCountry, CountryAssignmentGroup } from '../../models';
+import {
+  BaseCountry,
+  CountryAssignmentGroup,
+  EventStage,
+  StageId,
+} from '../../models';
+import Button from '../common/Button';
 
+import AddEventStageButton from './AddEventStageButton';
 import { CountrySelectionList } from './CountrySelectionList';
+import { AvailableGroup } from './CountrySelectionListItem';
 import SectionWrapper from './SectionWrapper';
 
-interface SemiFinalsAndGrandFinalSetupProps {
-  sf1Qualifiers: number;
-  sf2Qualifiers: number;
-  setSf1Qualifiers: (value: number) => void;
-  setSf2Qualifiers: (value: number) => void;
-  autoQualifiers: BaseCountry[];
-  sf1Countries: BaseCountry[];
-  sf2Countries: BaseCountry[];
-  onAssignCountryAssignment: (
-    countryCode: string,
-    group: CountryAssignmentGroup,
-  ) => void;
-  getCountryGroupAssignment: (country: BaseCountry) => CountryAssignmentGroup;
-  onBulkAssign: (
-    countries: BaseCountry[],
-    group: CountryAssignmentGroup,
-  ) => void;
-}
+import { PencilIcon } from '@/assets/icons/PencilIcon';
 
-const SEMI_FINALS_GROUPS = [
-  CountryAssignmentGroup.SF1,
-  CountryAssignmentGroup.SF2,
-  CountryAssignmentGroup.AUTO_QUALIFIER,
-  CountryAssignmentGroup.NOT_PARTICIPATING,
-];
+type SetupEventStage = Omit<EventStage, 'countries'> & {
+  countries: BaseCountry[];
+};
+
+interface SemiFinalsAndGrandFinalSetupProps {
+  eventStages: SetupEventStage[];
+  autoQualifiers: BaseCountry[];
+  onAssignCountryAssignment: (countryCode: string, group: string) => void;
+  getCountryGroupAssignment: (country: BaseCountry) => string;
+  onBulkAssign: (countries: BaseCountry[], group: string) => void;
+  onEditStage: (stage: EventStage) => void;
+  onCreateStage: () => void;
+  availableGroups: AvailableGroup[];
+}
 
 const SemiFinalsAndGrandFinalSetup: React.FC<
   SemiFinalsAndGrandFinalSetupProps
 > = ({
-  sf1Qualifiers,
-  sf2Qualifiers,
-  setSf1Qualifiers,
-  setSf2Qualifiers,
+  eventStages,
   autoQualifiers,
-  sf1Countries,
-  sf2Countries,
   onAssignCountryAssignment,
   getCountryGroupAssignment,
   onBulkAssign,
+  onEditStage,
+  onCreateStage,
+  availableGroups,
 }) => {
-  const hasOneSemiFinal = sf2Countries.length === 0;
-
-  const semiFinals = [
-    {
-      group: 'SF1',
-      title: hasOneSemiFinal ? 'Semi-Final' : 'Semi-Final 1',
-      countries: sf1Countries,
-      qualifiers: sf1Qualifiers,
-      setQualifiers: setSf1Qualifiers,
-    },
-    {
-      group: 'SF2',
-      title: 'Semi-Final 2',
-      countries: sf2Countries,
-      qualifiers: sf2Qualifiers,
-      setQualifiers: setSf2Qualifiers,
-      // TODO: add a note that this year had only one semi-final
-    },
-  ];
-
   return (
-    <>
-      <div className="flex flex-col gap-3">
-        {semiFinals.map((semiFinal) => (
-          <SectionWrapper
-            key={semiFinal.group}
-            title={semiFinal.title}
-            countriesCount={semiFinal.countries.length}
-            defaultExpanded
-            onBulkAssign={(group) => onBulkAssign(semiFinal.countries, group)}
-            availableGroups={SEMI_FINALS_GROUPS}
-            currentGroup={semiFinal.group as CountryAssignmentGroup}
-          >
-            <div className="mb-2 flex items-center gap-2">
-              <label
-                htmlFor={`qualifiers-${semiFinal.group}`}
-                className="block text-sm text-white"
-              >
-                Number of qualifiers:
-              </label>
-              <input
-                id={`qualifiers-${semiFinal.group}`}
-                type="number"
-                value={semiFinal.qualifiers || ''}
-                onChange={(e) => {
-                  semiFinal.setQualifiers(parseInt(e.target.value));
-                }}
-                className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm text-white px-3 py-1 rounded transition-colors duration-300 hover:bg-primary-950 focus:bg-primary-950 w-[56px]"
-                min={1}
-                max={semiFinal.countries.length}
-                aria-label={`Number of qualifiers for ${semiFinal.title}`}
-              />
-            </div>
-            <CountrySelectionList
-              countries={semiFinal.countries}
-              onAssignCountryAssignment={onAssignCountryAssignment}
-              getCountryGroupAssignment={getCountryGroupAssignment}
-              availableGroups={SEMI_FINALS_GROUPS}
-            />
-          </SectionWrapper>
-        ))}
-      </div>
+    <div className="flex flex-col gap-3">
       <SectionWrapper
         title="Auto-Qualifiers"
         countriesCount={autoQualifiers.length}
         defaultExpanded
         onBulkAssign={(group) => onBulkAssign(autoQualifiers, group)}
-        availableGroups={SEMI_FINALS_GROUPS}
+        availableGroups={availableGroups}
         currentGroup={CountryAssignmentGroup.AUTO_QUALIFIER}
       >
         <CountrySelectionList
           countries={autoQualifiers}
           onAssignCountryAssignment={onAssignCountryAssignment}
           getCountryGroupAssignment={getCountryGroupAssignment}
-          availableGroups={SEMI_FINALS_GROUPS}
+          availableGroups={availableGroups}
         />
       </SectionWrapper>
-    </>
+      {eventStages
+        .filter((stage) => stage.id !== StageId.GF)
+        .map((stage) => (
+          <SectionWrapper
+            key={stage.id}
+            title={stage.name}
+            countriesCount={stage.countries.length}
+            defaultExpanded
+            onBulkAssign={(group) => onBulkAssign(stage.countries, group)}
+            availableGroups={availableGroups}
+            currentGroup={stage.id}
+            extraContent={
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditStage(stage as EventStage);
+                }}
+                className="!p-2"
+                aria-label={`Edit ${stage.name}`}
+              >
+                <PencilIcon className="w-5 h-5" />
+              </Button>
+            }
+          >
+            <CountrySelectionList
+              countries={stage.countries}
+              onAssignCountryAssignment={onAssignCountryAssignment}
+              getCountryGroupAssignment={getCountryGroupAssignment}
+              availableGroups={availableGroups}
+            />
+          </SectionWrapper>
+        ))}
+      <AddEventStageButton onClick={onCreateStage} />
+    </div>
   );
 };
 

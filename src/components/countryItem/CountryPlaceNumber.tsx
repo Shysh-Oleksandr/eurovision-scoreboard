@@ -17,9 +17,9 @@ const CountryPlaceNumber = ({
   index,
   showPlaceAnimation,
 }: Props) => {
-  const { winnerCountry, qualifiedCountries, canDisplayPlaceAnimation } =
-    useScoreboardStore();
-  const isVotingOver = !!winnerCountry || qualifiedCountries.length > 0;
+  const { getCurrentStage, canDisplayPlaceAnimation } = useScoreboardStore();
+
+  const { isOver: isVotingOver } = getCurrentStage();
 
   // Calculate width dynamically to handle different screen sizes
   const width = useMemo(() => {

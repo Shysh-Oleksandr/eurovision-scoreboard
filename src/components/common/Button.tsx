@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 type Props = {
   label?: string;
   className?: string;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   variant?: 'primary' | 'secondary' | 'destructive';
   children?: ReactNode;
 };

@@ -1,39 +1,36 @@
 import React from 'react';
 
 import { PlusIcon } from '../../assets/icons/PlusIcon';
-import { BaseCountry, CountryAssignmentGroup, EventMode } from '../../models';
+import { BaseCountry, CountryAssignmentGroup } from '../../models';
 import Button from '../common/Button';
 
-import { GRAND_FINAL_GROUPS, SEMI_FINALS_GROUPS } from './constants';
 import { CountrySelectionList } from './CountrySelectionList';
+import { AvailableGroup } from './CountrySelectionListItem';
 import { useCountrySearch } from './hooks/useCountrySearch';
 import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
 
 interface NotParticipatingSectionProps {
   notParticipatingCountries: BaseCountry[];
-  activeTab: EventMode;
   handleBulkCountryAssignment: (
     countries: BaseCountry[],
-    group: CountryAssignmentGroup,
+    group: string,
   ) => void;
-  handleCountryAssignment: (
-    countryCode: string,
-    group: CountryAssignmentGroup,
-  ) => void;
-  getCountryGroupAssignment: (country: BaseCountry) => CountryAssignmentGroup;
+  handleCountryAssignment: (countryCode: string, group: string) => void;
+  getCountryGroupAssignment: (country: BaseCountry) => string;
   handleOpenEditModal: (country: BaseCountry) => void;
   handleOpenCreateModal: () => void;
+  availableGroups: AvailableGroup[];
 }
 
 const NotParticipatingSection = ({
   notParticipatingCountries,
-  activeTab,
   handleBulkCountryAssignment,
   handleCountryAssignment,
   getCountryGroupAssignment,
   handleOpenEditModal,
   handleOpenCreateModal,
+  availableGroups,
 }: NotParticipatingSectionProps) => {
   const {
     countriesSearch,
@@ -44,11 +41,6 @@ const NotParticipatingSection = ({
     groupedNotParticipatingCountries,
     sortedCategories,
   } = useCountrySearch(notParticipatingCountries);
-
-  const availableGroups =
-    activeTab === EventMode.GRAND_FINAL_ONLY
-      ? GRAND_FINAL_GROUPS
-      : SEMI_FINALS_GROUPS;
 
   return (
     <>
@@ -103,7 +95,7 @@ const NotParticipatingSection = ({
                 category === 'Custom' && (
                   <Button
                     onClick={handleOpenCreateModal}
-                    className="normal-case sm:!text-base !text-sm mr-1 !py-2 w-fit"
+                    className="mr-1 !py-2 w-fit"
                   >
                     <PlusIcon className="w-6 h-6" />
                   </Button>

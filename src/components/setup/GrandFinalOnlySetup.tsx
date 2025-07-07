@@ -1,52 +1,68 @@
 import React from 'react';
 
-import { BaseCountry, CountryAssignmentGroup } from '../../models';
+import { PencilIcon } from '../../assets/icons/PencilIcon';
+import {
+  BaseCountry,
+  CountryAssignmentGroup,
+  EventStage,
+  StageId,
+} from '../../models';
+import Button from '../common/Button';
 
 import { CountrySelectionList } from './CountrySelectionList';
+import { AvailableGroup } from './CountrySelectionListItem';
 import SectionWrapper from './SectionWrapper';
 
 interface GrandFinalOnlySetupProps {
-  grandFinalQualifiers: BaseCountry[];
+  grandFinalStage?: EventStage;
   notQualifiedCountries: BaseCountry[];
-  onAssignCountryAssignment: (
-    countryCode: string,
-    group: CountryAssignmentGroup,
-  ) => void;
-  getCountryGroupAssignment: (country: BaseCountry) => CountryAssignmentGroup;
-  onBulkAssign: (
-    countries: BaseCountry[],
-    group: CountryAssignmentGroup,
-  ) => void;
+  onAssignCountryAssignment: (countryCode: string, group: string) => void;
+  getCountryGroupAssignment: (country: BaseCountry) => string;
+  onBulkAssign: (countries: BaseCountry[], group: string) => void;
+  onEditStage: (stage: EventStage) => void;
+  availableGroups: AvailableGroup[];
 }
 
-const GRAND_FINAL_GROUPS = [
-  CountryAssignmentGroup.GRAND_FINAL,
-  CountryAssignmentGroup.NOT_QUALIFIED,
-  CountryAssignmentGroup.NOT_PARTICIPATING,
-];
-
 const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
-  grandFinalQualifiers,
+  grandFinalStage,
   notQualifiedCountries,
   onAssignCountryAssignment,
   getCountryGroupAssignment,
   onBulkAssign,
+  onEditStage,
+  availableGroups,
 }) => {
+  if (!grandFinalStage) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <SectionWrapper
-        title="Grand Final"
-        countriesCount={grandFinalQualifiers.length}
+        title={grandFinalStage.name}
+        countriesCount={grandFinalStage.countries.length}
         defaultExpanded
-        onBulkAssign={(group) => onBulkAssign(grandFinalQualifiers, group)}
-        availableGroups={GRAND_FINAL_GROUPS}
-        currentGroup={CountryAssignmentGroup.GRAND_FINAL}
+        onBulkAssign={(group) => onBulkAssign(grandFinalStage.countries, group)}
+        availableGroups={availableGroups}
+        currentGroup={StageId.GF}
+        extraContent={
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditStage(grandFinalStage);
+            }}
+            className="!p-2"
+            aria-label={`Edit ${grandFinalStage.name}`}
+          >
+            <PencilIcon className="w-5 h-5" />
+          </Button>
+        }
       >
         <CountrySelectionList
-          countries={grandFinalQualifiers}
+          countries={grandFinalStage.countries}
           onAssignCountryAssignment={onAssignCountryAssignment}
           getCountryGroupAssignment={getCountryGroupAssignment}
-          availableGroups={GRAND_FINAL_GROUPS}
+          availableGroups={availableGroups}
         />
       </SectionWrapper>
       <SectionWrapper
@@ -54,14 +70,14 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
         countriesCount={notQualifiedCountries.length}
         defaultExpanded
         onBulkAssign={(group) => onBulkAssign(notQualifiedCountries, group)}
-        availableGroups={GRAND_FINAL_GROUPS}
+        availableGroups={availableGroups}
         currentGroup={CountryAssignmentGroup.NOT_QUALIFIED}
       >
         <CountrySelectionList
           countries={notQualifiedCountries}
           onAssignCountryAssignment={onAssignCountryAssignment}
           getCountryGroupAssignment={getCountryGroupAssignment}
-          availableGroups={GRAND_FINAL_GROUPS}
+          availableGroups={availableGroups}
         />
       </SectionWrapper>
     </div>

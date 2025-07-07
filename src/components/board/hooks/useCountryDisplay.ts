@@ -5,9 +5,13 @@ import { useCountriesStore } from '../../../state/countriesStore';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 export const useCountryDisplay = () => {
-  const { countries, winnerCountry, showAllParticipants } =
-    useScoreboardStore();
+  const { winnerCountry, showAllParticipants } = useScoreboardStore();
+
   const { selectedCountries } = useCountriesStore();
+
+  const { getCurrentStage } = useScoreboardStore();
+
+  const { countries } = getCurrentStage();
 
   const allCountriesToDisplay = useMemo(() => {
     if (!showAllParticipants || !winnerCountry) {
@@ -23,8 +27,10 @@ export const useCountryDisplay = () => {
 
       return {
         ...country,
+        juryPoints: existingCountry?.juryPoints ?? 0,
+        televotePoints: existingCountry?.televotePoints ?? 0,
         points: existingCountry?.points ?? -1,
-        lastReceivedPoints: existingCountry?.lastReceivedPoints ?? 0,
+        lastReceivedPoints: existingCountry?.lastReceivedPoints ?? -1,
         isVotingFinished: existingCountry?.isVotingFinished ?? true,
       };
     });

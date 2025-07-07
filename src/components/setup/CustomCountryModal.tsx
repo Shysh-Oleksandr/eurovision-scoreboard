@@ -4,7 +4,8 @@ import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import Button from '../common/Button';
-import Modal from '../common/Modal';
+import Modal from '../common/Modal/Modal';
+import ModalBottomContent from '../common/Modal/ModalBottomContent';
 
 interface CustomCountryModalProps {
   isOpen: boolean;
@@ -47,7 +48,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
   const handleSave = () => {
     if (name.trim() === '') {
-      alert('Country name is required.');
+      alert('Entry name is required.');
 
       return;
     }
@@ -116,33 +117,17 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      overlayClassName="z-[1001]"
-      containerClassName="w-[min(100%,600px)]"
+      overlayClassName="!z-[1001]"
+      containerClassName="!w-[min(100%,500px)]"
       bottomContent={
-        <div className="flex justify-between items-center xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
-          <div>
-            {isEditMode && (
-              <Button variant="destructive" onClick={handleDelete}>
-                Delete
-              </Button>
-            )}
-          </div>
-          <div className="flex justify-end xs:gap-4 gap-2">
-            <Button
-              variant="secondary"
-              className="md:text-base text-sm"
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-            <Button className="w-full !text-base" onClick={handleSave}>
-              Save
-            </Button>
-          </div>
-        </div>
+        <ModalBottomContent
+          onClose={onClose}
+          onSave={handleSave}
+          onDelete={handleDelete}
+        />
       }
     >
-      <div className="flex flex-col gap-4 sm:p-4 p-2">
+      <div className="flex flex-col gap-4 p-2">
         <h2 className="text-xl font-bold text-white">
           {isEditMode ? 'Edit' : 'Create'} Custom Entry
         </h2>

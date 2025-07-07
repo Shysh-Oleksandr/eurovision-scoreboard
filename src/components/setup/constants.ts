@@ -23,14 +23,8 @@ export const CATEGORY_ORDER = [
 ];
 
 export const SEMI_FINALS_GROUPS = [
+  CountryAssignmentGroup.AUTO_QUALIFIER,
   CountryAssignmentGroup.SF1,
   CountryAssignmentGroup.SF2,
-  CountryAssignmentGroup.AUTO_QUALIFIER,
-  CountryAssignmentGroup.NOT_PARTICIPATING,
-];
-
-export const GRAND_FINAL_GROUPS = [
-  CountryAssignmentGroup.GRAND_FINAL,
-  CountryAssignmentGroup.NOT_QUALIFIED,
   CountryAssignmentGroup.NOT_PARTICIPATING,
 ];

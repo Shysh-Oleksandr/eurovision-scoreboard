@@ -5,23 +5,29 @@ import { PencilIcon } from '../../assets/icons/PencilIcon';
 import { getFlagPath } from '../../helpers/getFlagPath';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
 
-export const ASSIGNMENT_GROUP_LABELS: Record<CountryAssignmentGroup, string> = {
+export const ASSIGNMENT_GROUP_LABELS: Record<string, string> = {
+  [CountryAssignmentGroup.AUTO_QUALIFIER]: 'Auto-Qualifier',
   [CountryAssignmentGroup.SF1]: 'Semi-Final 1',
   [CountryAssignmentGroup.SF2]: 'Semi-Final 2',
-  [CountryAssignmentGroup.AUTO_QUALIFIER]: 'Auto-Qualifier',
   [CountryAssignmentGroup.NOT_PARTICIPATING]: 'Not Participating',
-  [CountryAssignmentGroup.GRAND_FINAL]: 'Grand Final',
   [CountryAssignmentGroup.NOT_QUALIFIED]: 'Not Qualified',
+};
+
+export type AvailableGroup =
+  | { id: string; name: string }
+  | CountryAssignmentGroup;
+
+export const isStageGroup = (
+  group: AvailableGroup,
+): group is { id: string; name: string } => {
+  return (group as { id: string; name: string }).id !== undefined;
 };
 
 interface CountrySelectionListItemProps {
   country: BaseCountry;
-  onAssignCountryAssignment?: (
-    countryCode: string,
-    group: CountryAssignmentGroup,
-  ) => void;
-  countryGroupAssignment?: CountryAssignmentGroup;
-  availableGroups?: CountryAssignmentGroup[];
+  onAssignCountryAssignment?: (countryCode: string, group: string) => void;
+  countryGroupAssignment?: string;
+  availableGroups?: AvailableGroup[];
   onEdit?: (country: BaseCountry) => void;
 }
 
@@ -41,7 +47,7 @@ export const CountrySelectionListItem: React.FC<
   const handleAssignmentChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    const newAssignment = event.target.value as CountryAssignmentGroup;
+    const newAssignment = event.target.value;
 
     onAssignCountryAssignment?.(country.code, newAssignment);
   };
@@ -90,15 +96,22 @@ export const CountrySelectionListItem: React.FC<
           <select
             value={countryGroupAssignment}
             onChange={handleAssignmentChange}
-            className="absolute inset-0 opacity-0 cursor-pointer"
+            className="absolute inset-0 opacity-0 cursor-pointer select"
             id={`country-assignment-${country.code}`}
             aria-label={`Assign ${country.name} to a group`}
           >
-            {availableGroups.map((group) => (
-              <option key={group} value={group}>
-                {ASSIGNMENT_GROUP_LABELS[group]}
-              </option>
-            ))}
+            {availableGroups.map((group) => {
+              const value = isStageGroup(group) ? group.id : group;
+              const label = isStageGroup(group)
+                ? group.name
+                : ASSIGNMENT_GROUP_LABELS[group];
+
+              return (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              );
+            })}
           </select>
         </>
       )}

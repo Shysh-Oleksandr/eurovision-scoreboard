@@ -13,9 +13,15 @@ type Props = {
 };
 
 const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
-  const { resetLastPoints, giveTelevotePoints, countries, televotingProgress } =
-    useScoreboardStore();
+  const {
+    resetLastPoints,
+    giveTelevotePoints,
+    getCurrentStage,
+    televotingProgress,
+  } = useScoreboardStore();
   const { getVotingCountry } = useCountriesStore();
+
+  const { countries } = getCurrentStage();
 
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');

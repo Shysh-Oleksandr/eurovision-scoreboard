@@ -10,15 +10,14 @@ import { SimulationHeader } from './SimulationHeader';
 import WinnerConfetti from './WinnerConfetti';
 import WinnerModal from './WinnerModal';
 
-import { EventPhase } from '@/models';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 export const Simulation = () => {
-  const { eventPhase } = useScoreboardStore();
+  const { eventStages } = useScoreboardStore();
 
   const phaseTitle = usePhaseTitle();
 
-  if (eventPhase === EventPhase.COUNTRY_SELECTION) {
+  if (eventStages.length === 0) {
     return null;
   }
 

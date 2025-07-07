@@ -5,7 +5,13 @@ import { devtools, persist } from 'zustand/middleware';
 import { Year } from '../config';
 import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import { getCountriesByYear } from '../data/data';
-import { BaseCountry, SemiFinalGroup } from '../models';
+import {
+  BaseCountry,
+  Country,
+  EventMode,
+  EventStage,
+  StageId,
+} from '../models';
 
 import { useScoreboardStore } from './scoreboardStore';
 
@@ -14,8 +20,9 @@ interface CountriesState {
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
   selectedCountries: BaseCountry[]; // Countries selected for the current event
   eventSetupModalOpen: boolean;
-  semiFinalResults: Record<string, number>;
   customCountries: BaseCountry[];
+  eventAssignments: Record<EventMode, Record<string, string>>;
+  configuredEventStages: EventStage[];
 
   // Actions
   setEventSetupModalOpen: (open: boolean) => void;
@@ -23,32 +30,19 @@ interface CountriesState {
   getVotingCountries: () => BaseCountry[];
   getVotingCountry: () => BaseCountry;
   getVotingCountriesLength: () => number;
-  getInitialCountries: () => {
-    name: string;
-    code: string;
-    isQualified?: boolean;
-    semiFinalGroup?: SemiFinalGroup;
-    isAutoQualified?: boolean;
-    isSelected?: boolean;
-    isQualifiedFromSemi?: boolean;
-    points: number;
-    lastReceivedPoints: null;
-  }[];
+  getInitialCountries: () => Country[];
   setSelectedCountries: (countries: BaseCountry[]) => void;
   getAutoQualifiedCountries: () => BaseCountry[];
-  getQualifiedFromSemiCountries: () => BaseCountry[];
-  setQualifiedFromSemi: (
-    countryCodes: string[],
-    semiFinalGroup: SemiFinalGroup,
-  ) => void;
-  setSemiFinalResults: (results: Record<string, number>) => void;
-  getSemiFinalPoints: (countryCode: string) => number;
   updateCountriesForYear: (year: Year) => void;
   setInitialCountriesForYear: (year: Year) => void;
   addCustomCountry: (country: Omit<BaseCountry, 'code' | 'category'>) => void;
   updateCustomCountry: (country: BaseCountry) => void;
   deleteCustomCountry: (countryCode: string) => void;
   getAllCountries: () => BaseCountry[];
+  setEventAssignments: (
+    assignments: Record<EventMode, Record<string, string>>,
+  ) => void;
+  setConfiguredEventStages: (stages: EventStage[]) => void;
 }
 
 export const useCountriesStore = create<CountriesState>()(
@@ -59,8 +53,12 @@ export const useCountriesStore = create<CountriesState>()(
         allCountriesForYear: [],
         selectedCountries: [],
         eventSetupModalOpen: true,
-        semiFinalResults: {},
         customCountries: [],
+        eventAssignments: {
+          [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: {},
+          [EventMode.GRAND_FINAL_ONLY]: {},
+        },
+        configuredEventStages: [],
 
         // Actions
         setEventSetupModalOpen: (open: boolean) => {
@@ -77,9 +75,9 @@ export const useCountriesStore = create<CountriesState>()(
             return selectedCountries
               .filter(
                 (country) =>
-                  country.isSelected ||
                   country.isAutoQualified ||
-                  country.isQualifiedFromSemi,
+                  country.isQualifiedFromSemi ||
+                  country.isQualified,
               )
               .sort((a, b) => a.name.localeCompare(b.name));
           }
@@ -92,15 +90,24 @@ export const useCountriesStore = create<CountriesState>()(
 
         getVotingCountries: () => {
           const { selectedCountries, allCountriesForYear } = get();
+          const { getCurrentStage } = useScoreboardStore.getState();
+          const currentStage = getCurrentStage();
 
-          // If we have selected countries, use those
+          // In a semi-final, only participating countries are voting.
+          if (currentStage && currentStage.id !== StageId.GF) {
+            return currentStage.countries.sort((a, b) =>
+              a.name.localeCompare(b.name),
+            );
+          }
+
+          // In the Grand Final, all selected countries for the event can vote.
           if (selectedCountries.length > 0) {
             return selectedCountries.sort((a, b) =>
               a.name.localeCompare(b.name),
             );
           }
 
-          // Otherwise fall back to all countries for the year
+          // Otherwise, fall back to all countries for the year.
           return allCountriesForYear.sort((a, b) =>
             a.name.localeCompare(b.name),
           );
@@ -109,12 +116,14 @@ export const useCountriesStore = create<CountriesState>()(
         getVotingCountry: () => {
           const { getVotingCountries } = get();
 
-          const { votingCountryIndex, isJuryVoting, countries } =
+          const { votingCountryIndex, getCurrentStage } =
             useScoreboardStore.getState();
 
-          return isJuryVoting
+          const currentStage = getCurrentStage();
+
+          return currentStage.isJuryVoting
             ? getVotingCountries()[votingCountryIndex]
-            : countries[votingCountryIndex];
+            : currentStage.countries[votingCountryIndex];
         },
 
         getVotingCountriesLength: () => {
@@ -124,13 +133,16 @@ export const useCountriesStore = create<CountriesState>()(
         getInitialCountries: () => {
           const qualifiedCountries = get().getQualifiedCountries();
 
-          return qualifiedCountries
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((country) => ({
-              ...country,
-              points: 0,
-              lastReceivedPoints: null,
-            }));
+          return qualifiedCountries.map(
+            (country) =>
+              ({
+                ...country,
+                juryPoints: 0,
+                televotePoints: 0,
+                points: 0,
+                lastReceivedPoints: null,
+              } as Country),
+          );
         },
 
         setSelectedCountries: (countries: BaseCountry[]) => {
@@ -144,9 +156,7 @@ export const useCountriesStore = create<CountriesState>()(
 
           if (selectedCountries.length > 0) {
             return selectedCountries
-              .filter(
-                (country) => country.isAutoQualified && country.isSelected,
-              )
+              .filter((country) => country.isAutoQualified)
               .sort((a, b) => a.name.localeCompare(b.name));
           }
 
@@ -155,55 +165,17 @@ export const useCountriesStore = create<CountriesState>()(
             .sort((a, b) => a.name.localeCompare(b.name));
         },
 
-        getQualifiedFromSemiCountries: () => {
-          const { selectedCountries } = get();
-
-          return selectedCountries
-            .filter((country) => country.isQualifiedFromSemi)
-            .sort((a, b) => a.name.localeCompare(b.name));
-        },
-
-        setQualifiedFromSemi: (
-          countryCodes: string[],
-          semiFinalGroup: SemiFinalGroup,
-        ) => {
-          const { selectedCountries } = get();
-
-          const updatedCountries = selectedCountries.map((country) => {
-            if (
-              country.semiFinalGroup === semiFinalGroup &&
-              countryCodes.includes(country.code)
-            ) {
-              return {
-                ...country,
-                isQualifiedFromSemi: true,
-              };
-            }
-
-            return country;
-          });
-
-          set({
-            selectedCountries: updatedCountries,
-          });
-        },
-
-        setSemiFinalResults: (results: Record<string, number>) => {
-          set({
-            semiFinalResults: results,
-          });
-        },
-
-        getSemiFinalPoints: (countryCode: string) => {
-          return get().semiFinalResults[countryCode] || 0;
-        },
-
         updateCountriesForYear: (year: Year) => {
           const countries = getCountriesByYear(year);
 
           set({
             allCountriesForYear: countries,
             selectedCountries: [],
+            eventAssignments: {
+              [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: {},
+              [EventMode.GRAND_FINAL_ONLY]: {},
+            },
+            configuredEventStages: [],
           });
         },
 
@@ -251,6 +223,14 @@ export const useCountriesStore = create<CountriesState>()(
           const { customCountries } = get();
 
           return [...ALL_COUNTRIES, ...customCountries];
+        },
+
+        setEventAssignments: (assignments) => {
+          set({ eventAssignments: assignments });
+        },
+
+        setConfiguredEventStages: (stages) => {
+          set({ configuredEventStages: stages });
         },
       }),
       {

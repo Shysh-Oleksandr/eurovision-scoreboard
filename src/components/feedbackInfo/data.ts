@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-07',
+    title:
+      'Added semi-finals creation and editing. Allowed to select voting mode for each stage',
+  },
+  {
     date: '2025-07-03',
     title: 'Added 2016 theme. Improved assets loading for better performance',
   },
@@ -47,23 +52,19 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-07-06', end: '2025-07-07' },
-    title: 'Different voting rules support',
-  },
-  {
-    approximateDates: { start: '2025-07-07', end: '2025-07-10' },
-    title: 'Detailed voting breakdown',
-  },
-  {
-    approximateDates: { start: '2025-07-09', end: '2025-07-12' },
-    title: 'Odds-based random voting',
-  },
-  {
-    approximateDates: { start: '2025-07-11', end: '2025-07-12' },
-    title: 'JESC support with custom themes',
+    approximateDates: { start: '2025-07-08', end: '2025-07-09' },
+    title: 'Semi-finals voting by selection (without awarding points)',
   },
   {
     approximateDates: { start: '2025-07-12', end: '2025-07-13' },
+    title: 'Odds-based random voting. Detailed voting breakdown',
+  },
+  {
+    approximateDates: { start: '2025-07-13', end: '2025-07-14' },
+    title: 'JESC support with custom themes',
+  },
+  {
+    approximateDates: { start: '2025-07-14', end: '2025-07-15' },
     title: 'Presentation mode',
   },
   {
