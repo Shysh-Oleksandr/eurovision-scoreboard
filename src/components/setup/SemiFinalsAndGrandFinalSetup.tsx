@@ -21,6 +21,7 @@ type SetupEventStage = Omit<EventStage, 'countries'> & {
 
 interface SemiFinalsAndGrandFinalSetupProps {
   eventStages: SetupEventStage[];
+  grandFinalStage?: SetupEventStage;
   autoQualifiers: BaseCountry[];
   onAssignCountryAssignment: (countryCode: string, group: string) => void;
   getCountryGroupAssignment: (country: BaseCountry) => string;
@@ -35,6 +36,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
 > = ({
   eventStages,
   autoQualifiers,
+  grandFinalStage,
   onAssignCountryAssignment,
   getCountryGroupAssignment,
   onBulkAssign,
@@ -91,6 +93,25 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
             />
           </SectionWrapper>
         ))}
+      {grandFinalStage && (
+        <SectionWrapper
+          title={grandFinalStage.name}
+          defaultExpanded
+          isCollapsible={false}
+          extraContent={
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditStage(grandFinalStage as EventStage);
+              }}
+              className="!p-2"
+              aria-label={`Edit ${grandFinalStage.name}`}
+            >
+              <PencilIcon className="w-5 h-5" />
+            </Button>
+          }
+        />
+      )}
       <AddEventStageButton onClick={onCreateStage} />
     </div>
   );

@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-08',
+    title:
+      'Added the Grand Final editing. Increased the custom entries storage capacity',
+  },
+  {
     date: '2025-07-07',
     title:
       'Added semi-finals creation and editing. Allowed to select voting mode for each stage',

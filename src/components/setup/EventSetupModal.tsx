@@ -315,7 +315,6 @@ const EventSetupModal = () => {
         onClose={handleCloseEventStageModal}
         eventStageToEdit={eventStageToEdit}
         localEventStagesLength={configuredEventStages.length}
-        isGrandFinalOnly={isGrandFinalOnly}
         onSave={handleSaveStage}
         onDelete={handleDeleteStage}
       />
@@ -332,6 +331,9 @@ const EventSetupModal = () => {
             autoQualifiers={autoQualifiers}
             eventStages={eventStagesWithCountries.filter(
               (s) => s.id !== StageId.GF,
+            )}
+            grandFinalStage={eventStagesWithCountries.find(
+              (s) => s.id === StageId.GF,
             )}
             onAssignCountryAssignment={handleCountryAssignment}
             getCountryGroupAssignment={getCountryGroupAssignment}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { ArrowIcon } from '../../assets/icons/ArrowIcon';
-import { EventStage, StageVotingMode } from '../../models';
+import { EventStage, StageId, StageVotingMode } from '../../models';
 import Modal from '../common/Modal/Modal';
 import ModalBottomContent from '../common/Modal/ModalBottomContent';
 
@@ -28,7 +28,6 @@ interface EventStageModalProps {
   onDelete: (stageId: string) => void;
   eventStageToEdit?: EventStage;
   localEventStagesLength: number;
-  isGrandFinalOnly: boolean;
 }
 
 const EventStageModal: React.FC<EventStageModalProps> = ({
@@ -38,10 +37,10 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   onDelete,
   eventStageToEdit,
   localEventStagesLength,
-  isGrandFinalOnly,
 }) => {
   const isEditMode = !!eventStageToEdit;
   const [shouldClose, setShouldClose] = useState(false);
+  const isGrandFinalStage = eventStageToEdit?.id === StageId.GF;
 
   const [name, setName] = useState('');
   const [qualifiersAmount, setQualifiersAmount] = useState<number>(10);
@@ -112,14 +111,14 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
         <ModalBottomContent
           onClose={handleTriggerClose}
           onSave={handleSave}
-          onDelete={isGrandFinalOnly ? undefined : handleDelete}
+          onDelete={isGrandFinalStage ? undefined : handleDelete}
         />
       }
     >
       <div className="flex flex-col gap-4 p-2">
         <h2 className="text-xl font-bold text-white">
           {isEditMode ? 'Edit' : 'Add'}{' '}
-          {isGrandFinalOnly ? 'Grand Final' : 'Semi-Final'}
+          {isGrandFinalStage ? 'Grand Final' : 'Semi-Final'}
         </h2>
         <div className="flex flex-col gap-2">
           <label htmlFor="stageName" className="text-white">
@@ -160,7 +159,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
             </div>
           </div>
         </div>
-        {!isGrandFinalOnly && (
+        {!isGrandFinalStage && (
           <div className="mb-2 flex items-center gap-2">
             <label
               htmlFor={`qualifiers-${eventStageToEdit?.id}`}
