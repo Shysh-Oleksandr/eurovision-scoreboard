@@ -80,6 +80,14 @@ export const useGeneralStore = create<GeneralState>()(
     }),
     {
       name: 'general-storage',
+      partialize(state) {
+        return {
+          year: state.year,
+          themeYear: state.themeYear,
+          lastSeenUpdate: state.lastSeenUpdate,
+          shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
+        };
+      },
       merge: (persistedState, currentState) => {
         const state = persistedState as Partial<GeneralState>;
 

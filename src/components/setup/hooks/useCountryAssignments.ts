@@ -81,7 +81,6 @@ export const useCountryAssignments = (
       [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: semiFinalsInitialAssignments,
       [EventMode.GRAND_FINAL_ONLY]: grandFinalOnlyInitialAssignments,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     allCountriesForYear,
     getAllCountries,
@@ -121,11 +120,15 @@ export const useCountryAssignments = (
   };
 
   const getCountryGroupAssignment = (country: BaseCountry) => {
-    return eventAssignments[activeTab]?.[country.code];
+    return (
+      eventAssignments[activeTab]?.[country.code] ||
+      CountryAssignmentGroup.NOT_PARTICIPATING
+    );
   };
 
   const countryGroups = useMemo(() => {
     const currentAssignments = eventAssignments[activeTab] || {};
+
     const allCountries = getAllCountries();
 
     const initialGroups: Record<string, Country[]> = {
@@ -154,7 +157,7 @@ export const useCountryAssignments = (
 
       if (group && initialGroups[group]) {
         initialGroups[group].push(countryWithPoints);
-      } else if (group) {
+      } else {
         // Country assigned to a group that doesn't exist (e.g. deleted stage)
         initialGroups[CountryAssignmentGroup.NOT_PARTICIPATING].push(
           countryWithPoints,

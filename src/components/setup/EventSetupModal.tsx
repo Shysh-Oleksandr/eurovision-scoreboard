@@ -29,7 +29,8 @@ import { validateEventSetup } from './utils/eventValidation';
 import { useDebounce } from '@/hooks/useDebounce';
 
 const EventSetupModal = () => {
-  const { eventSetupModalOpen, setEventSetupModalOpen } = useCountriesStore();
+  const { eventSetupModalOpen, setEventSetupModalOpen, loadCustomCountries } =
+    useCountriesStore();
   const {
     allCountriesForYear,
     getAllCountries,
@@ -56,6 +57,10 @@ const EventSetupModal = () => {
     setAssignments,
     allAssignments,
   } = useCountryAssignments(activeTab, configuredEventStages);
+
+  useEffect(() => {
+    loadCustomCountries();
+  }, [loadCustomCountries]);
 
   useEffect(() => {
     if (!eventSetupModalOpen) return;

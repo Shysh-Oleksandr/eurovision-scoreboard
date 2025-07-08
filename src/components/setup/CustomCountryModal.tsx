@@ -46,7 +46,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     }
   }, [countryToEdit, isOpen]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (name.trim() === '') {
       alert('Entry name is required.');
 
@@ -54,20 +54,20 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     }
 
     if (isEditMode) {
-      updateCustomCountry({ ...countryToEdit, name, flag });
+      await updateCustomCountry({ ...countryToEdit, name, flag });
     } else {
-      addCustomCountry({ name, flag });
+      await addCustomCountry({ name, flag });
     }
     onClose();
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!countryToEdit) return;
 
     if (
       window.confirm(`Are you sure you want to delete ${countryToEdit.name}?`)
     ) {
-      deleteCustomCountry(countryToEdit.code);
+      await deleteCustomCountry(countryToEdit.code);
       onClose();
     }
   };

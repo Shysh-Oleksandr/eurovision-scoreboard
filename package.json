@@ -25,6 +25,7 @@
     "@gsap/react": "^2.1.2",
     "@react-spring/web": "^9.7.1",
     "gsap": "^3.13.0",
+    "idb": "^8.0.3",
     "react": "^18.2.0",
     "react-confetti": "^6.4.0",
     "react-dom": "^18.2.0",
