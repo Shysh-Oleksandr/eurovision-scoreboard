@@ -6,6 +6,13 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 
 const config = { duration: 300, easing: easings.easeInOutCubic };
 
+const AnimatedDiv = animated.div as React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+>;
+const AnimatedH4 = animated.h4 as React.FC<
+  React.HTMLAttributes<HTMLHeadingElement>
+>;
+
 type Props = {
   shouldShowAsNonQualified: boolean;
   index: number;
@@ -82,19 +89,19 @@ const CountryPlaceNumber = ({
   }
 
   return (
-    <animated.div
-      style={springsPlaceContainer}
+    <AnimatedDiv
+      style={springsPlaceContainer as any}
       className={`flex flex-none items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText ${
         shouldShowAsNonQualified ? 'bg-primary-900 opacity-70' : ''
       }`}
     >
-      <animated.h4
-        style={springsPlaceText}
+      <AnimatedH4
+        style={springsPlaceText as any}
         className="font-semibold md:text-lg text-base"
       >
         {placeText}
-      </animated.h4>
-    </animated.div>
+      </AnimatedH4>
+    </AnimatedDiv>
   );
 };
 

@@ -26,16 +26,15 @@
     "@react-spring/web": "^9.7.1",
     "gsap": "^3.13.0",
     "idb": "^8.0.3",
-    "react": "^18.2.0",
+    "react": "19.1.0",
     "react-confetti": "^6.4.0",
-    "react-dom": "^18.2.0",
+    "react-dom": "19.1.0",
     "react-flip-toolkit": "^7.2.4",
-    "tw-colors": "^3.3.2",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@types/react": "^18.2.6",
-    "@types/react-dom": "^18.2.4",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
     "@typescript-eslint/parser": "^5.59.5",
     "@vitejs/plugin-react": "^4.2.1",
@@ -54,6 +53,7 @@
     "stylelint-config-standard": "^38.0.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss": "^3.4.4",
+    "tw-colors": "^3.3.2",
     "typescript": "^5.0.4",
     "vite": "^5.0.12"
   },

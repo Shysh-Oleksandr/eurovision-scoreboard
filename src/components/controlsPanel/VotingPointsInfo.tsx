@@ -4,6 +4,10 @@ import { easings, useSpring, animated } from '@react-spring/web';
 
 import { POINTS_ARRAY } from '../../data/data';
 
+const AnimatedDiv = animated.div as React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+>;
+
 type Props = { votingPoints: number };
 
 const VotingPointsInfo = ({ votingPoints }: Props) => {
@@ -46,8 +50,8 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
             >
               {points}
             </h6>
-            <animated.div
-              style={springsActive}
+            <AnimatedDiv
+              style={springsActive as any}
               className={`block w-full lg:h-[5px] h-1 ${
                 isActive ? 'bg-panelInfo-activeText' : 'bg-transparent'
               } absolute bottom-0 z-20`}

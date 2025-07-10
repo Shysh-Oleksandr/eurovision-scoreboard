@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 
 import { StageVotingMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';

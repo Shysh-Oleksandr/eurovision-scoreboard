@@ -10,7 +10,7 @@ export const useCountrySearch = (notParticipatingCountries: BaseCountry[]) => {
     Record<string, boolean>
   >({});
   const debouncedSearch = useDebounce(countriesSearch, 300);
-  const prevDebouncedSearchRef = useRef<string>();
+  const prevDebouncedSearchRef = useRef<string>(undefined);
 
   const handleCountriesSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCountriesSearch(e.target.value);

@@ -16,6 +16,23 @@ import { useItemState } from './hooks/useItemState';
 import { useQualificationStatus } from './hooks/useQualificationStatus';
 import useVotingFinished from './hooks/useVotingFinished';
 
+const AnimatedButton = animated(
+  // eslint-disable-next-line react/display-name
+  forwardRef<
+    HTMLButtonElement,
+    React.ButtonHTMLAttributes<HTMLButtonElement> & { style?: any }
+  >((props, ref) => <button {...props} ref={ref} />),
+);
+
+AnimatedButton.displayName = 'AnimatedButton';
+
+const AnimatedDiv = animated.div as React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+>;
+const AnimatedH6 = animated.h6 as React.FC<
+  React.HTMLAttributes<HTMLHeadingElement>
+>;
+
 type Props = {
   country: Country;
   index: number;
@@ -97,7 +114,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
           showPlaceAnimation={showPlaceAnimation}
         />
 
-        <animated.button
+        <AnimatedButton
           ref={ref}
           style={springsPoints}
           className={buttonClassName}
@@ -136,25 +153,29 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
           </div>
           <div className="flex h-full">
             {/* Last points */}
-            <animated.div
-              style={{
-                ...springsLastPointsContainer,
-                backgroundColor: lastPointsBgColor,
-                display: country.lastReceivedPoints === -1 ? 'none' : 'block',
-              }}
+            <AnimatedDiv
+              style={
+                {
+                  ...springsLastPointsContainer,
+                  backgroundColor: lastPointsBgColor,
+                  display: country.lastReceivedPoints === -1 ? 'none' : 'block',
+                } as any
+              }
               className={`relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8`}
             >
               <RoundedTriangle color={lastPointsBgColor} />
-              <animated.h6
-                style={{
-                  ...springsLastPointsText,
-                  color: lastPointsTextColor,
-                }}
+              <AnimatedH6
+                style={
+                  {
+                    ...springsLastPointsText,
+                    color: lastPointsTextColor,
+                  } as any
+                }
                 className="lg:text-lg md:text-sm text-xs font-semibold h-full items-center flex justify-center"
               >
                 {country.lastReceivedPoints}
-              </animated.h6>
-            </animated.div>
+              </AnimatedH6>
+            </AnimatedDiv>
 
             {/* Points */}
             <div
@@ -174,7 +195,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
               </h6>
             </div>
           </div>
-        </animated.button>
+        </AnimatedButton>
       </div>
     );
   },

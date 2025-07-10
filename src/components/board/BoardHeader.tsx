@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type JSX } from 'react';
 
 import { POINTS_ARRAY } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';

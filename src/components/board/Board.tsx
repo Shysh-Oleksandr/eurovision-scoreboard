@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, type JSX } from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
 
-import { animated } from '@react-spring/web';
+import { animated, type AnimatedProps } from '@react-spring/web';
 
 import { Country } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -12,6 +12,12 @@ import { useBoardAnimations } from './hooks/useBoardAnimations';
 import { useCountryDisplay } from './hooks/useCountryDisplay';
 import { useCountrySorter } from './hooks/useCountrySorter';
 import { useVoting } from './hooks/useVoting';
+
+const AnimatedDiv = animated.div as React.FC<
+  AnimatedProps<
+    { style?: React.CSSProperties } & React.HTMLAttributes<HTMLDivElement>
+  >
+>;
 
 const Board = (): JSX.Element => {
   const { getCurrentStage, restartCounter } = useScoreboardStore();
@@ -65,7 +71,7 @@ const Board = (): JSX.Element => {
   return (
     <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>
       <BoardHeader onClick={onClick} />
-      <animated.div
+      <AnimatedDiv
         style={containerAnimation}
         className={`container-wrapping-flipper ${
           showAllParticipants ? 'show-all-participants' : ''
@@ -78,7 +84,7 @@ const Board = (): JSX.Element => {
         >
           {finalCountries.map(renderItem)}
         </Flipper>
-      </animated.div>
+      </AnimatedDiv>
     </div>
   );
 };
