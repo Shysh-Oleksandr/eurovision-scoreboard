@@ -6,8 +6,10 @@ import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 
 const WinnerModal = () => {
-  const { winnerCountry } = useScoreboardStore();
-  const { setEventSetupModalOpen } = useCountriesStore();
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const setEventSetupModalOpen = useCountriesStore(
+    (state) => state.setEventSetupModalOpen,
+  );
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {

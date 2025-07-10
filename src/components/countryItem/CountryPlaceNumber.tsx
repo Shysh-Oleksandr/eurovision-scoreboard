@@ -24,7 +24,10 @@ const CountryPlaceNumber = ({
   index,
   showPlaceAnimation,
 }: Props) => {
-  const { getCurrentStage, canDisplayPlaceAnimation } = useScoreboardStore();
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const canDisplayPlaceAnimation = useScoreboardStore(
+    (state) => state.canDisplayPlaceAnimation,
+  );
 
   const { isOver: isVotingOver } = getCurrentStage();
 

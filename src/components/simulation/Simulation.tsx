@@ -13,7 +13,7 @@ import WinnerModal from './WinnerModal';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 export const Simulation = () => {
-  const { eventStages } = useScoreboardStore();
+  const eventStages = useScoreboardStore((state) => state.eventStages);
 
   const phaseTitle = usePhaseTitle();
 

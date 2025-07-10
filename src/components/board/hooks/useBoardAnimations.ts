@@ -12,13 +12,15 @@ export const useBoardAnimations = (
   wasTheFirstPointsAwarded: boolean,
   hasCountryFinishedVoting: boolean,
 ) => {
-  const {
-    winnerCountry,
-    setCanDisplayPlaceAnimation,
-    getCurrentStage,
-    restartCounter,
-    showAllParticipants,
-  } = useScoreboardStore();
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const setCanDisplayPlaceAnimation = useScoreboardStore(
+    (state) => state.setCanDisplayPlaceAnimation,
+  );
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const restartCounter = useScoreboardStore((state) => state.restartCounter);
+  const showAllParticipants = useScoreboardStore(
+    (state) => state.showAllParticipants,
+  );
 
   const [showPlace, setShowPlace] = useState(false);
   const [displayOrder, setDisplayOrder] = useState<string[]>(

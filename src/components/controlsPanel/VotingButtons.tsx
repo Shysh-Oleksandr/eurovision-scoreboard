@@ -7,16 +7,26 @@ import Button from '../common/Button';
 import TelevoteInput from './TelevoteInput';
 
 const VotingButtons = () => {
-  const {
-    giveRandomJuryPoints,
-    resetLastPoints,
-    hideLastReceivedPoints,
-    finishJuryVotingRandomly,
-    finishTelevoteVotingRandomly,
-    getCurrentStage,
-    shouldShowLastPoints,
-    shouldClearPoints,
-  } = useScoreboardStore();
+  const hideLastReceivedPoints = useScoreboardStore(
+    (state) => state.hideLastReceivedPoints,
+  );
+  const finishJuryVotingRandomly = useScoreboardStore(
+    (state) => state.finishJuryVotingRandomly,
+  );
+  const finishTelevoteVotingRandomly = useScoreboardStore(
+    (state) => state.finishTelevoteVotingRandomly,
+  );
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const giveRandomJuryPoints = useScoreboardStore(
+    (state) => state.giveRandomJuryPoints,
+  );
+  const resetLastPoints = useScoreboardStore((state) => state.resetLastPoints);
+  const shouldShowLastPoints = useScoreboardStore(
+    (state) => state.shouldShowLastPoints,
+  );
+  const shouldClearPoints = useScoreboardStore(
+    (state) => state.shouldClearPoints,
+  );
   const { countries, isJuryVoting } = getCurrentStage();
   const timerId = useRef<number | null>(null);
 

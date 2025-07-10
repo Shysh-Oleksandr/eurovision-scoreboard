@@ -6,14 +6,18 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 
 export const PhaseActions = () => {
-  const {
-    eventMode,
-    continueToNextPhase,
-    winnerCountry,
-    showAllParticipants,
-    getCurrentStage,
-    toggleShowAllParticipants,
-  } = useScoreboardStore();
+  const eventMode = useScoreboardStore((state) => state.eventMode);
+  const continueToNextPhase = useScoreboardStore(
+    (state) => state.continueToNextPhase,
+  );
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const showAllParticipants = useScoreboardStore(
+    (state) => state.showAllParticipants,
+  );
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const toggleShowAllParticipants = useScoreboardStore(
+    (state) => state.toggleShowAllParticipants,
+  );
 
   const { nextPhase } = useNextEventName();
 

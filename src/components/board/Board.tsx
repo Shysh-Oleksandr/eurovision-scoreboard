@@ -20,7 +20,14 @@ const AnimatedDiv = animated.div as React.FC<
 >;
 
 const Board = (): JSX.Element => {
-  const { getCurrentStage, restartCounter } = useScoreboardStore();
+  // This is needed to trigger a re-render of the board when the event stages change(usually when giving points)
+  useScoreboardStore((state) => state.eventStages);
+
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const restartCounter = useScoreboardStore((state) => state.restartCounter);
+  const showAllParticipants = useScoreboardStore(
+    (state) => state.showAllParticipants,
+  );
 
   const { isOver: isVotingOver, id: currentStageId } = getCurrentStage();
 
@@ -65,8 +72,6 @@ const Board = (): JSX.Element => {
       hasCountryFinishedVoting,
     ],
   );
-
-  const { showAllParticipants } = useScoreboardStore();
 
   return (
     <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>

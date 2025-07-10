@@ -28,8 +28,13 @@ const themeOptions = YEARS_WITH_THEME.map((year) => ({
 }));
 
 export const SetupHeader: React.FC = () => {
-  const { year, themeYear, setYear, setTheme } = useGeneralStore();
-  const { eventStages, getCurrentStage, setEventStages } = useScoreboardStore();
+  const year = useGeneralStore((state) => state.year);
+  const themeYear = useGeneralStore((state) => state.themeYear);
+  const setYear = useGeneralStore((state) => state.setYear);
+  const setTheme = useGeneralStore((state) => state.setTheme);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const setEventStages = useScoreboardStore((state) => state.setEventStages);
 
   const handleYearChange = (newYear: string) => {
     if (eventStages.length > 0) {

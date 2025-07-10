@@ -33,7 +33,7 @@ export function useThemeColor(paths: ColorPath[]): string[];
 export function useThemeColor(
   pathOrPaths: ColorPath | ColorPath[],
 ): string | string[] {
-  const { theme } = useGeneralStore();
+  const theme = useGeneralStore((state) => state.theme);
 
   if (Array.isArray(pathOrPaths)) {
     return pathOrPaths.map((path) => getColorFromPath(theme, path));

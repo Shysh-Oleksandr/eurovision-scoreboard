@@ -10,8 +10,10 @@ interface SimulationHeaderProps {
 }
 
 export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
-  const { year } = useGeneralStore();
-  const { setEventSetupModalOpen } = useCountriesStore();
+  const year = useGeneralStore((state) => state.year);
+  const setEventSetupModalOpen = useCountriesStore(
+    (state) => state.setEventSetupModalOpen,
+  );
 
   return (
     <div className="flex justify-between items-center mb-4">

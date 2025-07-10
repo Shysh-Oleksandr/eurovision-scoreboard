@@ -8,8 +8,11 @@ import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
 const ControlsPanel = (): JSX.Element | null => {
-  const { votingCountryIndex, votingPoints, getCurrentStage } =
-    useScoreboardStore();
+  const votingCountryIndex = useScoreboardStore(
+    (state) => state.votingCountryIndex,
+  );
+  const votingPoints = useScoreboardStore((state) => state.votingPoints);
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
   const { isJuryVoting, isOver: isVotingOver, votingMode } = getCurrentStage();
 

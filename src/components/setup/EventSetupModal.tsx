@@ -29,15 +29,29 @@ import { validateEventSetup } from './utils/eventValidation';
 import { useDebounce } from '@/hooks/useDebounce';
 
 const EventSetupModal = () => {
-  const { eventSetupModalOpen, setEventSetupModalOpen, loadCustomCountries } =
-    useCountriesStore();
-  const {
-    allCountriesForYear,
-    getAllCountries,
-    configuredEventStages,
-    setConfiguredEventStages,
-  } = useCountriesStore();
-  const { currentStageId, startEvent } = useScoreboardStore();
+  const eventSetupModalOpen = useCountriesStore(
+    (state) => state.eventSetupModalOpen,
+  );
+  const setEventSetupModalOpen = useCountriesStore(
+    (state) => state.setEventSetupModalOpen,
+  );
+  const loadCustomCountries = useCountriesStore(
+    (state) => state.loadCustomCountries,
+  );
+  const allCountriesForYear = useCountriesStore(
+    (state) => state.allCountriesForYear,
+  );
+  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  const configuredEventStages = useCountriesStore(
+    (state) => state.configuredEventStages,
+  );
+  const setConfiguredEventStages = useCountriesStore(
+    (state) => state.setConfiguredEventStages,
+  );
+
+  const currentStageId = useScoreboardStore((state) => state.currentStageId);
+  const startEvent = useScoreboardStore((state) => state.startEvent);
+  const setEventStages = useScoreboardStore((state) => state.setEventStages);
 
   const [activeTab, setActiveTab] = useState<EventMode>(
     EventMode.SEMI_FINALS_AND_GRAND_FINAL,
@@ -240,7 +254,7 @@ const EventSetupModal = () => {
     }
 
     onClose();
-    useScoreboardStore.getState().setEventStages(eventStagesWithCountries);
+    setEventStages(eventStagesWithCountries);
 
     const allCountries = getAllCountries();
     const allSelectedCountries: BaseCountry[] = Object.entries(
@@ -275,10 +289,11 @@ const EventSetupModal = () => {
     autoQualifiers.length,
     grandFinalQualifiers.length,
     onClose,
+    setEventStages,
     getAllCountries,
     allAssignments,
-    startEvent,
     activeTab,
+    startEvent,
     allCountriesForYear,
   ]);
 

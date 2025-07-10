@@ -10,12 +10,16 @@ import Modal, { ANIMATION_DURATION } from '../common/Modal/Modal';
 import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
 const QualificationResultsModal = () => {
-  const {
-    showQualificationResults,
-    getCurrentStage,
-    continueToNextPhase,
-    closeQualificationResults,
-  } = useScoreboardStore();
+  const showQualificationResults = useScoreboardStore(
+    (state) => state.showQualificationResults,
+  );
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const continueToNextPhase = useScoreboardStore(
+    (state) => state.continueToNextPhase,
+  );
+  const closeQualificationResults = useScoreboardStore(
+    (state) => state.closeQualificationResults,
+  );
 
   const { name: currentStageName, countries } = getCurrentStage();
   const { nextPhase } = useNextEventName();

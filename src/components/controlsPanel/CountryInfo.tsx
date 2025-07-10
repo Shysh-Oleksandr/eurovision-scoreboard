@@ -8,7 +8,10 @@ type Props = { votingCountryIndex: number };
 const CountryInfo = ({ votingCountryIndex }: Props) => {
   const [shouldBlink, setShouldBlink] = useState(false);
 
-  const { getVotingCountry, getVotingCountriesLength } = useCountriesStore();
+  const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
+  const getVotingCountriesLength = useCountriesStore(
+    (state) => state.getVotingCountriesLength,
+  );
 
   const votingCountry = getVotingCountry();
   const votingCountriesLength = getVotingCountriesLength();

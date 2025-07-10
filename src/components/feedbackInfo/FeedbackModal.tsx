@@ -16,11 +16,13 @@ const FeedbackModal = ({
   setShowModal: (show: boolean) => void;
 }) => {
   const [activeTab, setActiveTab] = useState('feedback');
-  const {
-    setLastSeenUpdate,
-    setShouldShowNewChangesIndicator,
-    shouldShowNewChangesIndicator,
-  } = useGeneralStore();
+  const setLastSeenUpdate = useGeneralStore((state) => state.setLastSeenUpdate);
+  const setShouldShowNewChangesIndicator = useGeneralStore(
+    (state) => state.setShouldShowNewChangesIndicator,
+  );
+  const shouldShowNewChangesIndicator = useGeneralStore(
+    (state) => state.shouldShowNewChangesIndicator,
+  );
 
   // Handle "What's New" tab activation
   useEffect(() => {
