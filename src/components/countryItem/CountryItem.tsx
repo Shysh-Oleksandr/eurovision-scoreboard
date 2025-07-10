@@ -44,7 +44,8 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
 
     const isVotingFinished = useVotingFinished(!!country.isVotingFinished);
 
-    const isDouzePoints = country.lastReceivedPoints === 12;
+    const isDouzePoints =
+      !country.televotePoints && country.lastReceivedPoints === 12;
     const showDouzePointsAnimationHook = useDouzePointsAnimation(isDouzePoints);
 
     const shouldShowAsNonQualified = useQualificationStatus(
@@ -103,7 +104,7 @@ const CountryItem = forwardRef<HTMLButtonElement, Props>(
           disabled={isDisabled}
           onClick={() => onClick(country.code)}
         >
-          {isJuryVoting && showDouzePointsAnimationHook && (
+          {showDouzePointsAnimationHook && (
             <DouzePointsAnimation
               springsDouzeContainer={springsDouzeContainer}
               springsDouzeParallelogramBlue={springsDouzeParallelogramBlue}

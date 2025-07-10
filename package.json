@@ -13,7 +13,7 @@
     "deploy": "npm run build && wrangler deploy",
     "lint": "yarn lint:js && yarn lint:css && yarn lint:types-cli && yarn lint:last-commit",
     "lint:js": "eslint --ext .ts --ext .tsx .",
-    "lint:css": "stylelint \"./src/**/*.{ts,tsx}\"",
+    "lint:css": "stylelint \"./src/styles.css\"",
     "lint:types-cli": "yarn tsc -p tsconfig.production.json",
     "lint:last-commit": "echo \"Info: no previous commits\"",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
@@ -50,6 +50,8 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.39",
     "prettier": "^2.8.8",
+    "stylelint": "^16.21.1",
+    "stylelint-config-standard": "^38.0.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.0.4",

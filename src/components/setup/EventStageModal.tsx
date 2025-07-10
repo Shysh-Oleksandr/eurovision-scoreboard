@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { ArrowIcon } from '../../assets/icons/ArrowIcon';
 import { EventStage, StageId, StageVotingMode } from '../../models';
@@ -13,6 +13,8 @@ const getVotingModeLabel = (votingMode: StageVotingMode) => {
       return 'Jury Only';
     case StageVotingMode.COMBINED:
       return 'Combined';
+    case StageVotingMode.PICK_QUALIFIERS:
+      return 'Pick Qualifiers';
     case StageVotingMode.JURY_AND_TELEVOTE:
     default:
       return 'Jury and Televote';
@@ -47,6 +49,18 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   const [votingMode, setVotingMode] = useState<StageVotingMode>(
     StageVotingMode.TELEVOTE_ONLY,
   );
+
+  const votingModeOptions = useMemo(() => {
+    return Object.values(StageVotingMode)
+      .filter(
+        (mode) =>
+          !isGrandFinalStage || mode !== StageVotingMode.PICK_QUALIFIERS,
+      )
+      .map((mode) => ({
+        label: getVotingModeLabel(mode),
+        value: mode,
+      }));
+  }, [isGrandFinalStage]);
 
   useEffect(() => {
     if (isOpen) {
@@ -150,9 +164,9 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer select"
                 aria-label="Select voting mode"
               >
-                {Object.values(StageVotingMode).map((mode) => (
-                  <option key={mode} value={mode}>
-                    {getVotingModeLabel(mode)}
+                {votingModeOptions.map((mode) => (
+                  <option key={mode.value} value={mode.value}>
+                    {mode.label}
                   </option>
                 ))}
               </select>
