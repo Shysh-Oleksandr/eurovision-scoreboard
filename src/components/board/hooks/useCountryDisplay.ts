@@ -5,11 +5,16 @@ import { useCountriesStore } from '../../../state/countriesStore';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 export const useCountryDisplay = () => {
-  const { winnerCountry, showAllParticipants } = useScoreboardStore();
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const showAllParticipants = useScoreboardStore(
+    (state) => state.showAllParticipants,
+  );
 
-  const { selectedCountries } = useCountriesStore();
+  const selectedCountries = useCountriesStore(
+    (state) => state.selectedCountries,
+  );
 
-  const { getCurrentStage } = useScoreboardStore();
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
   const { countries } = getCurrentStage();
 

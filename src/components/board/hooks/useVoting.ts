@@ -7,13 +7,13 @@ import { useScoreboardStore } from '../../../state/scoreboardStore';
 const MAX_COUNTRY_WITH_POINTS = POINTS_ARRAY.length;
 
 export const useVoting = () => {
-  const {
-    getCurrentStage,
-    giveJuryPoints,
-    resetLastPoints,
-    shouldShowLastPoints,
-  } = useScoreboardStore();
-  const { getVotingCountry } = useCountriesStore();
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const giveJuryPoints = useScoreboardStore((state) => state.giveJuryPoints);
+  const resetLastPoints = useScoreboardStore((state) => state.resetLastPoints);
+  const shouldShowLastPoints = useScoreboardStore(
+    (state) => state.shouldShowLastPoints,
+  );
+  const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
 
   const { countries } = getCurrentStage();
 

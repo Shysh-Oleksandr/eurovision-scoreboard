@@ -7,12 +7,14 @@ export const useQualificationStatus = (
   country: Country,
   isVotingOver: boolean,
 ) => {
-  const {
-    getCurrentStage,
-    getCountryInSemiFinal,
-    showAllParticipants,
-    winnerCountry,
-  } = useScoreboardStore();
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const getCountryInSemiFinal = useScoreboardStore(
+    (state) => state.getCountryInSemiFinal,
+  );
+  const showAllParticipants = useScoreboardStore(
+    (state) => state.showAllParticipants,
+  );
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
 
   const shouldShowAsNonQualified = useMemo(() => {
     const { id: currentStageId } = getCurrentStage();

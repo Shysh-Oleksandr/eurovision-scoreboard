@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/*Zero styles*/
+/* Zero styles */
 * {
   padding: 0;
   margin: 0;
@@ -10,10 +10,10 @@
 }
 
 *,
-*:before,
-*:after {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
+*::before,
+*::after {
+  box-sizing: border-box;
+  box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -37,16 +37,15 @@ aside {
 html,
 body,
 #root {
-  font-family: 'Montserrat', sans-serif;
+  font-family: Montserrat, sans-serif;
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  font-size: 100%;
   line-height: 1;
   font-size: 14px;
-  -ms-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 input,
@@ -117,50 +116,57 @@ h6 {
 /* montserrat-regular - latin */
 @font-face {
   font-display: swap;
+
   /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
+  font-family: Montserrat;
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/Montserrat-Regular.woff2') format('woff2');
+
   /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
 /* montserrat-500 - latin */
 @font-face {
   font-display: swap;
+
   /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
+  font-family: Montserrat;
   font-style: normal;
   font-weight: 500;
   src: url('/fonts/Montserrat-Medium.woff2') format('woff2');
+
   /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
 /* montserrat-600 - latin */
 @font-face {
   font-display: swap;
+
   /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
+  font-family: Montserrat;
   font-style: normal;
   font-weight: 600;
   src: url('/fonts/Montserrat-SemiBold.woff2') format('woff2');
+
   /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
 /* montserrat-700 - latin */
 @font-face {
   font-display: swap;
+
   /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-  font-family: 'Montserrat';
+  font-family: Montserrat;
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/Montserrat-Bold.woff2') format('woff2');
+
   /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 
 #main {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
 }
 
 .triangle {
@@ -188,25 +194,26 @@ h6 {
 }
 
 /* 3 columns cause reordering issues */
+
 /* @media (min-width: 1440px) {
   .container-wrapping-flipper.show-all-participants > div {
     grid-template-columns: repeat(3, 1fr);
   }
 } */
 
-@media (min-width: 576px) {
+@media (width >= 576px) {
   .container-wrapping-flipper > div {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .container-wrapping-flipper > div {
     column-gap: 1rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   .container-wrapping-flipper > div {
     column-gap: 1.5rem;
   }
@@ -218,7 +225,7 @@ h6 {
     height: 6px;
   }
 
-  @media (min-width: 1024px) {
+  @media (width >= 1024px) {
     ::-webkit-scrollbar {
       width: 10px;
       height: 10px;
@@ -252,7 +259,6 @@ h6 {
   border: 0;
   outline: 0;
   font: inherit;
-
   background: linear-gradient(
     to left,
     theme('colors.primary-800') 3em,
@@ -260,7 +266,7 @@ h6 {
   );
   color: #fff;
   border-radius: 0.25em;
-  box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 1em 0 rgb(0 0 0 / 20%);
   cursor: pointer;
 
   /* Remove IE arrow */
@@ -281,7 +287,7 @@ h6 {
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .select {
     background: linear-gradient(
       to left,
@@ -307,6 +313,7 @@ h6 {
   );
 
   border: solid 3px transparent;
+
   --gradient-border: conic-gradient(
     from var(--border-angle),
     transparent 25%,
@@ -324,11 +331,8 @@ h6 {
       var(--gradient-border) border-box,
     /* Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background. */
       var(--main-bg) border-box;
-
   background-position: center center;
-
   transition: all;
-
   animation: bg-spin 4s linear infinite;
 
   &:hover {
@@ -369,7 +373,7 @@ h6 {
   height: 200%;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .double-clickable-area::after {
     width: 150%;
     height: 150%;

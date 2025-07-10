@@ -9,7 +9,8 @@ interface PageWrapperProps {
 
 export const PageWrapper = ({ children }: PageWrapperProps) => {
   useThemeSetup();
-  const { themeYear, theme } = useGeneralStore();
+  const themeYear = useGeneralStore((state) => state.themeYear);
+  const theme = useGeneralStore((state) => state.theme);
 
   return (
     <div

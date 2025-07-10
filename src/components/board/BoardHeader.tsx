@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type JSX } from 'react';
 
 import { POINTS_ARRAY } from '../../data/data';
 import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
@@ -12,18 +12,23 @@ type Props = {
 };
 
 const BoardHeader = ({ onClick }: Props): JSX.Element => {
-  const {
-    getCurrentStage,
-    votingPoints,
-    winnerCountry,
-    resetLastPoints,
-    giveTelevotePoints,
-  } = useScoreboardStore();
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const votingPoints = useScoreboardStore((state) => state.votingPoints);
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const resetLastPoints = useScoreboardStore((state) => state.resetLastPoints);
+  const giveTelevotePoints = useScoreboardStore(
+    (state) => state.giveTelevotePoints,
+  );
 
-  const { getQualifiedCountries, getVotingCountriesLength, getVotingCountry } =
-    useCountriesStore();
+  const getQualifiedCountries = useCountriesStore(
+    (state) => state.getQualifiedCountries,
+  );
+  const getVotingCountriesLength = useCountriesStore(
+    (state) => state.getVotingCountriesLength,
+  );
+  const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
 
-  const { year } = useGeneralStore();
+  const year = useGeneralStore((state) => state.year);
 
   const { isJuryVoting, countries, isOver: isVotingOver } = getCurrentStage();
 

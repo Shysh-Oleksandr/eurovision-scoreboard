@@ -4,8 +4,13 @@ import { Country } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 export const useCountrySorter = (countriesToDisplay: Country[]) => {
-  const { winnerCountry, showAllParticipants, getCountryInSemiFinal } =
-    useScoreboardStore();
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const showAllParticipants = useScoreboardStore(
+    (state) => state.showAllParticipants,
+  );
+  const getCountryInSemiFinal = useScoreboardStore(
+    (state) => state.getCountryInSemiFinal,
+  );
 
   const sortedCountries = useMemo(() => {
     const countriesToSort = [...countriesToDisplay];

@@ -7,8 +7,12 @@ import FeedbackModal from './FeedbackModal';
 
 const FeedbackInfoButton = ({ className }: { className?: string }) => {
   const [showModal, setShowModal] = useState(false);
-  const { shouldShowNewChangesIndicator, checkForNewUpdates } =
-    useGeneralStore();
+  const shouldShowNewChangesIndicator = useGeneralStore(
+    (state) => state.shouldShowNewChangesIndicator,
+  );
+  const checkForNewUpdates = useGeneralStore(
+    (state) => state.checkForNewUpdates,
+  );
 
   useEffect(() => {
     checkForNewUpdates();

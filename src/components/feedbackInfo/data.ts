@@ -57,19 +57,19 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-07-08', end: '2025-07-09' },
+    approximateDates: { start: '2025-07-12', end: '2025-07-13' },
     title: 'Semi-finals voting by selection (without awarding points)',
   },
   {
-    approximateDates: { start: '2025-07-12', end: '2025-07-13' },
+    approximateDates: { start: '2025-07-15', end: '2025-07-20' },
     title: 'Odds-based random voting. Detailed voting breakdown',
   },
   {
-    approximateDates: { start: '2025-07-13', end: '2025-07-14' },
+    // approximateDates: { start: '2025-07-13', end: '2025-07-14' },
     title: 'JESC support with custom themes',
   },
   {
-    approximateDates: { start: '2025-07-14', end: '2025-07-15' },
+    // approximateDates: { start: '2025-07-14', end: '2025-07-15' },
     title: 'Presentation mode',
   },
   {

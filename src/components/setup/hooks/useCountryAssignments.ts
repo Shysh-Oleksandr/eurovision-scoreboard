@@ -14,13 +14,15 @@ export const useCountryAssignments = (
   activeTab: EventMode,
   eventStages: EventStage[],
 ) => {
-  const {
-    allCountriesForYear,
-    getAllCountries,
-    customCountries,
-    eventAssignments,
-    setEventAssignments,
-  } = useCountriesStore();
+  const customCountries = useCountriesStore((state) => state.customCountries);
+  const allCountriesForYear = useCountriesStore(
+    (state) => state.allCountriesForYear,
+  );
+  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  const eventAssignments = useCountriesStore((state) => state.eventAssignments);
+  const setEventAssignments = useCountriesStore(
+    (state) => state.setEventAssignments,
+  );
 
   const stageIds = eventStages.map((s) => s.id).join(',');
 

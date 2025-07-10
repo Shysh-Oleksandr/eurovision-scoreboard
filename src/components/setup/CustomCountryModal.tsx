@@ -31,8 +31,13 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
   const [name, setName] = useState('');
   const [flag, setFlag] = useState('');
-  const { addCustomCountry, updateCustomCountry, deleteCustomCountry } =
-    useCountriesStore();
+  const addCustomCountry = useCountriesStore((state) => state.addCustomCountry);
+  const updateCustomCountry = useCountriesStore(
+    (state) => state.updateCustomCountry,
+  );
+  const deleteCustomCountry = useCountriesStore(
+    (state) => state.deleteCustomCountry,
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 

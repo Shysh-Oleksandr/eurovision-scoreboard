@@ -1,31 +1,33 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { ANIMATION_DURATION } from '../../data/data';
-import { getRandomTelevotePoints } from '../../helpers/getRandomTelevotePoints';
-import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 
 import TelevoteInput from './TelevoteInput';
 
 const VotingButtons = () => {
-  const {
-    shouldShowLastPoints,
-    votingCountryIndex,
-    shouldClearPoints,
-    getCurrentStage,
-    giveRandomJuryPoints,
-    hideLastReceivedPoints,
-    resetLastPoints,
-    giveTelevotePoints,
-  } = useScoreboardStore();
-  const { getQualifiedCountries, getVotingCountriesLength } =
-    useCountriesStore();
-
+  const hideLastReceivedPoints = useScoreboardStore(
+    (state) => state.hideLastReceivedPoints,
+  );
+  const finishJuryVotingRandomly = useScoreboardStore(
+    (state) => state.finishJuryVotingRandomly,
+  );
+  const finishTelevoteVotingRandomly = useScoreboardStore(
+    (state) => state.finishTelevoteVotingRandomly,
+  );
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const giveRandomJuryPoints = useScoreboardStore(
+    (state) => state.giveRandomJuryPoints,
+  );
+  const resetLastPoints = useScoreboardStore((state) => state.resetLastPoints);
+  const shouldShowLastPoints = useScoreboardStore(
+    (state) => state.shouldShowLastPoints,
+  );
+  const shouldClearPoints = useScoreboardStore(
+    (state) => state.shouldClearPoints,
+  );
   const { countries, isJuryVoting } = getCurrentStage();
-
-  const countriesLeft = getVotingCountriesLength() - votingCountryIndex;
-
   const timerId = useRef<number | null>(null);
 
   const isFirstTelevoteCountry = useMemo(
@@ -33,7 +35,7 @@ const VotingButtons = () => {
     [countries],
   );
 
-  const voteRandomly = useCallback(() => {
+  const voteRandomlyJury = useCallback(() => {
     if (timerId.current) {
       clearTimeout(timerId.current);
       timerId.current = null;
@@ -47,53 +49,23 @@ const VotingButtons = () => {
     }, ANIMATION_DURATION);
   }, [giveRandomJuryPoints, hideLastReceivedPoints, resetLastPoints]);
 
-  const finishVoting = useCallback(() => {
+  const finishRandomly = () => {
     if (timerId.current) {
       clearTimeout(timerId.current);
       timerId.current = null;
     }
-
     if (isJuryVoting) {
-      new Array(countriesLeft).fill(0).forEach(() => {
-        giveRandomJuryPoints(true);
-      });
+      finishJuryVotingRandomly();
 
       timerId.current = setTimeout(() => {
         resetLastPoints();
       }, ANIMATION_DURATION);
-    } else {
-      const filteredCountries = countries.filter(
-        (country) => !country.isVotingFinished,
-      );
-      const sortedCountries = [...filteredCountries].sort(
-        (a, b) => b.points - a.points,
-      );
 
-      sortedCountries.forEach((votingCountry) => {
-        const votingCountryPlace =
-          countries.findIndex(
-            (country) => country.code === votingCountry.code,
-          ) + 1;
-
-        const randomVotingPoints = getRandomTelevotePoints(
-          votingCountryPlace,
-          getQualifiedCountries().length,
-          getVotingCountriesLength(),
-        );
-
-        giveTelevotePoints(votingCountry.code, randomVotingPoints);
-      });
+      return;
     }
-  }, [
-    countries,
-    countriesLeft,
-    isJuryVoting,
-    giveRandomJuryPoints,
-    resetLastPoints,
-    giveTelevotePoints,
-    getQualifiedCountries,
-    getVotingCountriesLength,
-  ]);
+
+    finishTelevoteVotingRandomly();
+  };
 
   useEffect(() => {
     if ((shouldShowLastPoints || shouldClearPoints) && timerId.current) {
@@ -106,7 +78,7 @@ const VotingButtons = () => {
     <div className="w-full pt-1 lg:pb-4 pb-3 rounded-md rounded-t-none">
       {isJuryVoting ? (
         <div className="lg:px-4 px-3">
-          <Button label="Vote randomly" onClick={voteRandomly} />
+          <Button label="Vote randomly" onClick={voteRandomlyJury} />
         </div>
       ) : (
         <TelevoteInput isFirstTelevoteCountry={isFirstTelevoteCountry} />
@@ -116,7 +88,7 @@ const VotingButtons = () => {
       <div className="lg:px-4 px-3">
         <Button
           label="Finish randomly"
-          onClick={finishVoting}
+          onClick={finishRandomly}
           className="w-full"
         />
       </div>

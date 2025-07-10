@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useGeneralStore } from '../state/generalStore';
 
 export const useThemeSetup = () => {
-  const { themeYear } = useGeneralStore();
+  const themeYear = useGeneralStore((state) => state.themeYear);
 
   useEffect(() => {
     const themeClass = `theme-${themeYear}`;

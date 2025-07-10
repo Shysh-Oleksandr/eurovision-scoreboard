@@ -87,11 +87,12 @@ const Tabs: React.FC<TabsProps> = ({
           }}
         />
       )}
-
       {tabs.map((tab, index) => (
         <button
           key={tab.value}
-          ref={(el) => (tabRefs.current[index] = el)}
+          ref={(el) => {
+            tabRefs.current[index] = el;
+          }}
           role="tab"
           type="button"
           className={`flex whitespace-nowrap items-center justify-center md:h-12 h-10 px-3 w-full font-medium rounded-lg outline-none transition-colors duration-300 relative z-10 ${

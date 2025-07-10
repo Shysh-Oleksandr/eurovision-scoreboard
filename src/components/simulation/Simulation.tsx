@@ -2,7 +2,7 @@ import React from 'react';
 
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
 import Board from '../board/Board';
-import ControlsPanel from '../controlsPanel';
+import ControlsPanel from '../controlsPanel/ControlsPanel';
 
 import { PhaseActions } from './PhaseActions';
 import QualificationResultsModal from './QualificationResultsModal';
@@ -13,7 +13,7 @@ import WinnerModal from './WinnerModal';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 export const Simulation = () => {
-  const { eventStages } = useScoreboardStore();
+  const eventStages = useScoreboardStore((state) => state.eventStages);
 
   const phaseTitle = usePhaseTitle();
 
