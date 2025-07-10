@@ -2,7 +2,7 @@ import React from 'react';
 
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
 import Board from '../board/Board';
-import ControlsPanel from '../controlsPanel';
+import ControlsPanel from '../controlsPanel/ControlsPanel';
 
 import { PhaseActions } from './PhaseActions';
 import QualificationResultsModal from './QualificationResultsModal';

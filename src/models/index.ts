@@ -34,7 +34,7 @@ export enum StageVotingMode {
   TELEVOTE_ONLY = 'TELEVOTE_ONLY',
   JURY_ONLY = 'JURY_ONLY',
   COMBINED = 'COMBINED',
-  PICK_QUALIFIERS = 'PICK_QUALIFIERS',
+  // PICK_QUALIFIERS = 'PICK_QUALIFIERS',
 }
 
 export enum StageVotingType {

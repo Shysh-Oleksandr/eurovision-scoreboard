@@ -13,8 +13,8 @@ const getVotingModeLabel = (votingMode: StageVotingMode) => {
       return 'Jury Only';
     case StageVotingMode.COMBINED:
       return 'Combined';
-    case StageVotingMode.PICK_QUALIFIERS:
-      return 'Pick Qualifiers';
+    // case StageVotingMode.PICK_QUALIFIERS:
+    //   return 'Pick Qualifiers';
     case StageVotingMode.JURY_AND_TELEVOTE:
     default:
       return 'Jury and Televote';
@@ -53,8 +53,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   const votingModeOptions = useMemo(() => {
     return Object.values(StageVotingMode)
       .filter(
-        (mode) =>
-          !isGrandFinalStage || mode !== StageVotingMode.PICK_QUALIFIERS,
+        () => !isGrandFinalStage, //|| mode !== StageVotingMode.PICK_QUALIFIERS,
       )
       .map((mode) => ({
         label: getVotingModeLabel(mode),
