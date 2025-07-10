@@ -51,15 +51,17 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   );
 
   const votingModeOptions = useMemo(() => {
-    return Object.values(StageVotingMode)
-      .filter(
-        () => !isGrandFinalStage, //|| mode !== StageVotingMode.PICK_QUALIFIERS,
-      )
-      .map((mode) => ({
-        label: getVotingModeLabel(mode),
-        value: mode,
-      }));
-  }, [isGrandFinalStage]);
+    return (
+      Object.values(StageVotingMode)
+        // .filter(
+        //   () => !isGrandFinalStage, //|| mode !== StageVotingMode.PICK_QUALIFIERS,
+        // )
+        .map((mode) => ({
+          label: getVotingModeLabel(mode),
+          value: mode,
+        }))
+    );
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
