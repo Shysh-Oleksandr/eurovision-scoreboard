@@ -25,7 +25,6 @@ export const useScoreboardStore = create<ScoreboardState>()(
       showQualificationResults: false,
       restartCounter: 0,
       showAllParticipants: false,
-      canDisplayPlaceAnimation: true,
       televotingProgress: 0,
 
       // Actions

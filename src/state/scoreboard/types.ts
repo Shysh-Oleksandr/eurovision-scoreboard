@@ -13,7 +13,6 @@ export interface ScoreboardState {
   showQualificationResults: boolean;
   restartCounter: number;
   showAllParticipants: boolean;
-  canDisplayPlaceAnimation: boolean;
   televotingProgress: number;
 
   // Actions
@@ -33,5 +32,4 @@ export interface ScoreboardState {
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;
-  setCanDisplayPlaceAnimation: (canDisplay: boolean) => void;
 }

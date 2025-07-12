@@ -111,7 +111,6 @@ export const createEventActions: StateCreator<
       showQualificationResults: false,
       restartCounter: get().restartCounter + 1,
       showAllParticipants: false,
-      canDisplayPlaceAnimation: true,
       televotingProgress: 0,
     });
   },

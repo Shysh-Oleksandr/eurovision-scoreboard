@@ -10,6 +10,10 @@ export default {
       screens: {
         xs: '480px',
       },
+      willChange: {
+        opacity: 'opacity',
+        all: 'transform, opacity',
+      },
     },
   },
   plugins: [

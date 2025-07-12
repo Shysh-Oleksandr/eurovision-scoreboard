@@ -6,7 +6,6 @@ type MiscActions = {
   resetLastPoints: () => void;
   hideLastReceivedPoints: () => void;
   toggleShowAllParticipants: () => void;
-  setCanDisplayPlaceAnimation: (canDisplay: boolean) => void;
 };
 
 export const createMiscActions: StateCreator<
@@ -50,11 +49,5 @@ export const createMiscActions: StateCreator<
     set((state) => ({
       showAllParticipants: !state.showAllParticipants,
     }));
-  },
-
-  setCanDisplayPlaceAnimation: (canDisplay: boolean) => {
-    set({
-      canDisplayPlaceAnimation: canDisplay,
-    });
   },
 });
