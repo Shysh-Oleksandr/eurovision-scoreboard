@@ -1,6 +1,7 @@
+import gsap from 'gsap';
 import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 
-import { useSpring } from '@react-spring/web';
+import { useGSAP } from '@gsap/react';
 
 import { useReorderCountries } from '../../../hooks/useReorderCountries';
 import { Country } from '../../../models';
@@ -13,9 +14,6 @@ export const useBoardAnimations = (
   hasCountryFinishedVoting: boolean,
 ) => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
-  const setCanDisplayPlaceAnimation = useScoreboardStore(
-    (state) => state.setCanDisplayPlaceAnimation,
-  );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const restartCounter = useScoreboardStore((state) => state.restartCounter);
   const showAllParticipants = useScoreboardStore(
@@ -84,36 +82,40 @@ export const useBoardAnimations = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVotingOver]);
 
-  useEffect(() => {
-    if (winnerCountry) {
-      setTimeout(() => {
-        setCanDisplayPlaceAnimation(false);
-      }, 4050);
-    }
-  }, [setCanDisplayPlaceAnimation, winnerCountry]);
-
   const flipKey = useMemo(
     () => `${finalCountries.map((c) => c.code).join(',')}-${isVotingOver}`,
     [finalCountries, isVotingOver],
   );
 
-  const [containerAnimation, api] = useSpring(() => ({
-    from: { opacity: 0, transform: 'translateY(15px)' },
-    config: { duration: 350 },
-  }));
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    api.start({
-      to: { opacity: 1, transform: 'translateY(0px)' },
-      from: { opacity: 0, transform: 'translateY(15px)' },
-    });
-  }, [api, currentStageId, restartCounter, showAllParticipants]);
+  useGSAP(
+    () => {
+      gsap.fromTo(
+        containerRef.current,
+        {
+          opacity: 0,
+          y: 20,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.in',
+        },
+      );
+    },
+    {
+      dependencies: [currentStageId, restartCounter, showAllParticipants],
+      scope: containerRef,
+    },
+  );
 
   return {
     finalCountries,
     showPlace,
     flipKey,
-    containerAnimation,
+    containerRef,
     renderItem: (
       renderFn: (country: Country, index: number, props: any) => JSX.Element,
     ) => {

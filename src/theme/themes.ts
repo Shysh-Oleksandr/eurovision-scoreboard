@@ -364,7 +364,7 @@ export const themes = {
       animatedBorder: '#b34105',
       countryItem: {
         juryBg: '#46163f',
-        juryHoverBg: '#451c40',
+        juryHoverBg: '#572351',
         juryCountryText: '#f8f1fe',
         juryPointsBg: '#46163f',
         juryPointsText: '#f8f1fe',
@@ -408,7 +408,7 @@ export const themes = {
       primary: {
         700: '#314fdb',
         750: '#1c47d2',
-        800: '#173aad',
+        800: '#1536a2',
         900: '#0c0e89',
         950: '#02035e',
       },

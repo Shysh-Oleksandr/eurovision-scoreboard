@@ -1,8 +1,6 @@
 import React, { useCallback, type JSX } from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
 
-import { animated, type AnimatedProps } from '@react-spring/web';
-
 import { Country } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import CountryItem from '../countryItem/CountryItem';
@@ -13,11 +11,7 @@ import { useCountryDisplay } from './hooks/useCountryDisplay';
 import { useCountrySorter } from './hooks/useCountrySorter';
 import { useVoting } from './hooks/useVoting';
 
-const AnimatedDiv = animated.div as React.FC<
-  AnimatedProps<
-    { style?: React.CSSProperties } & React.HTMLAttributes<HTMLDivElement>
-  >
->;
+const FLIP_SPRING = { damping: 5, stiffness: 25, overshootClamping: true };
 
 const Board = (): JSX.Element => {
   // This is needed to trigger a re-render of the board when the event stages change(usually when giving points)
@@ -40,7 +34,7 @@ const Board = (): JSX.Element => {
     onClick,
   } = useVoting();
 
-  const { finalCountries, showPlace, flipKey, containerAnimation } =
+  const { finalCountries, showPlace, flipKey, containerRef } =
     useBoardAnimations(
       sortedCountries,
       isVotingOver,
@@ -76,20 +70,20 @@ const Board = (): JSX.Element => {
   return (
     <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>
       <BoardHeader onClick={onClick} />
-      <AnimatedDiv
-        style={containerAnimation}
-        className={`container-wrapping-flipper ${
+      <div
+        ref={containerRef}
+        className={`container-wrapping-flipper will-change-all ${
           showAllParticipants ? 'show-all-participants' : ''
         }`}
       >
         <Flipper
           key={`${currentStageId}-${restartCounter}-${showAllParticipants}`}
           flipKey={flipKey}
-          spring={{ damping: 5, stiffness: 25, overshootClamping: true }}
+          spring={FLIP_SPRING}
         >
           {finalCountries.map(renderItem)}
         </Flipper>
-      </AnimatedDiv>
+      </div>
     </div>
   );
 };

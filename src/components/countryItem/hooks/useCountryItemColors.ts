@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 
-import { useThemeColor } from '../../../theme/useThemeColor';
-
 type Props = {
   isJuryVoting: boolean;
   isCountryVotingFinished: boolean;
@@ -13,83 +11,39 @@ export const useCountryItemColors = ({
   isCountryVotingFinished,
   isActive,
 }: Props) => {
-  const [
-    JURY_LAST_POINTS_BG,
-    JURY_LAST_POINTS_TEXT,
-    JURY_POINTS_BG,
-    JURY_POINTS_TEXT,
-    TELEVOTE_LAST_POINTS_BG,
-    TELEVOTE_LAST_POINTS_TEXT,
-    TELEVOTE_UNFINISHED_POINTS_BG,
-    TELEVOTE_UNFINISHED_POINTS_TEXT,
-    TELEVOTE_ACTIVE_POINTS_BG,
-    TELEVOTE_ACTIVE_POINTS_TEXT,
-    TELEVOTE_FINISHED_POINTS_BG,
-    TELEVOTE_FINISHED_POINTS_TEXT,
-  ] = useThemeColor([
-    'countryItem.juryLastPointsBg',
-    'countryItem.juryLastPointsText',
-    'countryItem.juryPointsBg',
-    'countryItem.juryPointsText',
-    'countryItem.televoteLastPointsBg',
-    'countryItem.televoteLastPointsText',
-    'countryItem.televoteUnfinishedPointsBg',
-    'countryItem.televoteUnfinishedPointsText',
-    'countryItem.televoteActivePointsBg',
-    'countryItem.televoteActivePointsText',
-    'countryItem.televoteFinishedPointsBg',
-    'countryItem.televoteFinishedPointsText',
-  ]);
+  const pointsBgClass = useMemo(() => {
+    if (isJuryVoting)
+      return 'bg-countryItem-juryPointsBg text-countryItem-juryPointsBg';
+    if (isCountryVotingFinished)
+      return 'bg-countryItem-televoteFinishedPointsBg text-countryItem-televoteFinishedPointsBg';
+    if (isActive)
+      return 'bg-countryItem-televoteActivePointsBg text-countryItem-televoteActivePointsBg';
 
-  const colors = useMemo(() => {
-    const pointsBgColor = (() => {
-      if (isJuryVoting) return JURY_POINTS_BG;
-      if (isCountryVotingFinished) return TELEVOTE_FINISHED_POINTS_BG;
-      if (isActive) return TELEVOTE_ACTIVE_POINTS_BG;
+    return 'bg-countryItem-televoteUnfinishedPointsBg text-countryItem-televoteUnfinishedPointsBg';
+  }, [isJuryVoting, isCountryVotingFinished, isActive]);
 
-      return TELEVOTE_UNFINISHED_POINTS_BG;
-    })();
+  const pointsTextClass = useMemo(() => {
+    if (isJuryVoting) return 'text-countryItem-juryPointsText';
+    if (isCountryVotingFinished)
+      return 'text-countryItem-televoteFinishedPointsText';
+    if (isActive) return 'text-countryItem-televoteActivePointsText';
 
-    const pointsTextColor = (() => {
-      if (isJuryVoting) return JURY_POINTS_TEXT;
-      if (isCountryVotingFinished) return TELEVOTE_FINISHED_POINTS_TEXT;
-      if (isActive) return TELEVOTE_ACTIVE_POINTS_TEXT;
+    return 'text-countryItem-televoteUnfinishedPointsText';
+  }, [isJuryVoting, isCountryVotingFinished, isActive]);
 
-      return TELEVOTE_UNFINISHED_POINTS_TEXT;
-    })();
+  const lastPointsBgClass = isCountryVotingFinished
+    ? 'bg-countryItem-televoteLastPointsBg text-countryItem-televoteLastPointsBg'
+    : 'bg-countryItem-juryLastPointsBg text-countryItem-juryLastPointsBg';
 
-    const lastPointsBgColor = isCountryVotingFinished
-      ? TELEVOTE_LAST_POINTS_BG
-      : JURY_LAST_POINTS_BG;
+  const lastPointsTextClass =
+    isJuryVoting || !isCountryVotingFinished
+      ? 'text-countryItem-juryLastPointsText'
+      : 'text-countryItem-televoteLastPointsText';
 
-    const lastPointsTextColor =
-      isJuryVoting || !isCountryVotingFinished
-        ? JURY_LAST_POINTS_TEXT
-        : TELEVOTE_LAST_POINTS_TEXT;
-
-    return {
-      pointsBgColor,
-      pointsTextColor,
-      lastPointsBgColor,
-      lastPointsTextColor,
-    };
-  }, [
-    isJuryVoting,
-    isCountryVotingFinished,
-    isActive,
-    JURY_LAST_POINTS_BG,
-    JURY_LAST_POINTS_TEXT,
-    JURY_POINTS_BG,
-    JURY_POINTS_TEXT,
-    TELEVOTE_LAST_POINTS_BG,
-    TELEVOTE_LAST_POINTS_TEXT,
-    TELEVOTE_UNFINISHED_POINTS_BG,
-    TELEVOTE_UNFINISHED_POINTS_TEXT,
-    TELEVOTE_ACTIVE_POINTS_BG,
-    TELEVOTE_ACTIVE_POINTS_TEXT,
-    TELEVOTE_FINISHED_POINTS_BG,
-    TELEVOTE_FINISHED_POINTS_TEXT,
-  ]);
-
-  return colors;
+  return {
+    pointsBgClass,
+    pointsTextClass,
+    lastPointsBgClass,
+    lastPointsTextClass,
+  };
 };

@@ -1,36 +1,42 @@
-import React, { useEffect } from 'react';
+import gsap from 'gsap';
+import React, { useRef } from 'react';
 
-import { easings, useSpring, animated } from '@react-spring/web';
+import { useGSAP } from '@gsap/react';
 
 import { POINTS_ARRAY } from '../../data/data';
-
-const AnimatedDiv = animated.div as React.FC<
-  React.HTMLAttributes<HTMLDivElement>
->;
 
 type Props = { votingPoints: number };
 
 const VotingPointsInfo = ({ votingPoints }: Props) => {
-  const [springsActive, apiActive] = useSpring(() => ({
-    from: {
-      x: -30,
-    },
-  }));
+  const containerRef = useRef<HTMLDivElement>(null);
+  const underlinesRef = useRef<Record<number, HTMLDivElement | null>>({});
 
-  useEffect(() => {
-    apiActive.start({
-      from: {
-        x: -30,
-      },
-      to: {
-        x: 0,
-      },
-      config: { duration: 300, easing: easings.linear },
-    });
-  }, [apiActive, votingPoints]);
+  useGSAP(
+    () => {
+      const activeUnderline = underlinesRef.current[votingPoints];
+
+      if (activeUnderline) {
+        gsap.fromTo(
+          activeUnderline,
+          {
+            x: -30,
+          },
+          {
+            x: 0,
+            duration: 0.3,
+            ease: 'none', // linear
+          },
+        );
+      }
+    },
+    { dependencies: [votingPoints], scope: containerRef },
+  );
 
   return (
-    <div className="flex justify-between w-full lg:mt-6 md:mt-4 mt-3 overflow-hidden rounded-sm">
+    <div
+      ref={containerRef}
+      className="flex justify-between w-full lg:mt-6 md:mt-4 mt-3 overflow-hidden rounded-sm"
+    >
       {POINTS_ARRAY.map((points) => {
         const isActive = points === votingPoints;
 
@@ -50,8 +56,10 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
             >
               {points}
             </h6>
-            <AnimatedDiv
-              style={springsActive as any}
+            <div
+              ref={(el) => {
+                underlinesRef.current[points] = el;
+              }}
               className={`block w-full lg:h-[5px] h-1 ${
                 isActive ? 'bg-panelInfo-activeText' : 'bg-transparent'
               } absolute bottom-0 z-20`}
