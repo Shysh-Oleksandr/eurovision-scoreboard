@@ -1,5 +1,14 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-14',
+    title:
+      'Remade the random voting logic. Added configurable odds with presets for each year based on the actual results. Added detailed voting breakdown for each stage and voting mode',
+  },
+  {
+    date: '2025-07-11',
+    title: 'Improved the animation performance',
+  },
+  {
     date: '2025-07-08',
     title:
       'Added the Grand Final editing. Increased the custom entries storage capacity',

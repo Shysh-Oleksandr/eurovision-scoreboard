@@ -12,7 +12,7 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 const LABELS = [
   {
     label: 'Jury',
-    color: 'bg-primary-700',
+    color: 'bg-primary-700/80',
   },
 
   {

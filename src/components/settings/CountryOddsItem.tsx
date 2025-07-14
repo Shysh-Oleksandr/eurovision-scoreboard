@@ -85,7 +85,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
   };
 
   return (
-    <div className="bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/50 rounded-lg p-3 text-white">
+    <div className="bg-primary-800 bg-gradient-to-tr from-[10%] from-primary-900/80 to-primary-700/50 rounded-lg p-3 text-white">
       <div className="flex items-center gap-3">
         <img
           src={country.flag || getFlagPath(country)}
@@ -100,7 +100,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
       <div className="grid grid-cols-2 gap-2 mt-2">
         <input
           type="number"
-          className="bg-primary-700/60 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400"
+          className="bg-primary-700/40 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400"
           placeholder="Jury"
           min={0}
           max={MAX_ODDS}
@@ -110,7 +110,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
         />
         <input
           type="number"
-          className="bg-primary-800 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400"
+          className="bg-primary-900/50 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400"
           placeholder="Tele"
           min={0}
           max={MAX_ODDS}

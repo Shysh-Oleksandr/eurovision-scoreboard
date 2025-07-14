@@ -37,7 +37,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%, 850px)]"
-      contentClassName="!py-0 !px-2 text-white h-[75vh] narrow-scrollbar"
+      contentClassName="!py-0 !px-2 text-white h-[70vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       topContent={
         <Tabs
