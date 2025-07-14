@@ -32,7 +32,7 @@ const SelectDisplay: React.FC<{
   const selectedOption = options.find((option) => option.value === value);
 
   return (
-    <div className="select md:h-12 h-10 lg:!text-base !text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer">
+    <div className="select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer">
       <div className="flex items-center">
         {selectedOption?.imageUrl ? (
           <img
@@ -53,7 +53,7 @@ const SelectDisplay: React.FC<{
         {selectedOption?.label}
       </div>
       <ArrowIcon
-        className={`text-white w-7 h-7 rotate-90 absolute lg:right-2.5 md:right-2 right-1`}
+        className={`text-white w-7 h-7 rotate-90 absolute lg:right-2.5 sm:right-2 right-1`}
       />
     </div>
   );
@@ -149,7 +149,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       >
         <SelectDisplay value={value} options={options} />
         {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-primary-900 rounded-md shadow-lg md:max-h-[300px] max-h-[200px] overflow-y-auto">
+          <div className="absolute z-10 w-full mt-1 bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto">
             <ul className="py-1">
               {options.map((option) => (
                 <li

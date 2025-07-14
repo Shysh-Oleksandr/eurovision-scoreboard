@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { EventMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
+
+import FinalStatsModal from './FinalStatsModal';
 
 export const PhaseActions = () => {
   const eventMode = useScoreboardStore((state) => state.eventMode);
@@ -18,6 +20,8 @@ export const PhaseActions = () => {
   const toggleShowAllParticipants = useScoreboardStore(
     (state) => state.toggleShowAllParticipants,
   );
+
+  const [showFinalStatsModal, setShowFinalStatsModal] = useState(false);
 
   const { nextPhase } = useNextEventName();
 
@@ -36,19 +40,32 @@ export const PhaseActions = () => {
   }
 
   return (
-    <div className="flex justify-end mb-2">
-      {isVotingOver && !isLastStage && (
-        <Button onClick={continueToNextPhase} className="animated-border">
-          Continue to {nextPhase}
-        </Button>
-      )}
-      {canShowAllParticipants && (
-        <Button onClick={toggleShowAllParticipants} className="ml-2">
-          {showAllParticipants
-            ? 'Show grand finalists only'
-            : 'Show all participants'}
-        </Button>
-      )}
-    </div>
+    <>
+      <FinalStatsModal
+        isOpen={showFinalStatsModal}
+        onClose={() => setShowFinalStatsModal(false)}
+      />
+
+      <div className="flex justify-end mb-2 gap-2">
+        {isVotingOver && (
+          <Button
+            variant="tertiary"
+            onClick={() => setShowFinalStatsModal(true)}
+          >
+            View Stats
+          </Button>
+        )}
+        {canShowAllParticipants && (
+          <Button onClick={toggleShowAllParticipants}>
+            {showAllParticipants ? 'Grand finalists only' : 'All participants'}
+          </Button>
+        )}
+        {isVotingOver && !isLastStage && (
+          <Button onClick={continueToNextPhase} className="animated-border">
+            Continue to {nextPhase}
+          </Button>
+        )}
+      </div>
+    </>
   );
 };

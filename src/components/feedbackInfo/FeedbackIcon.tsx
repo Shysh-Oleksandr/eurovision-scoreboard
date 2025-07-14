@@ -6,7 +6,7 @@ const FeedbackIcon = () => (
     height="24"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
-    className="md:scale-150 scale-125"
+    className="scale-150"
   >
     <g>
       <path fill="none" d="M0 0h24v24H0z" />

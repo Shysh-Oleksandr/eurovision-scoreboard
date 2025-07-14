@@ -1,5 +1,14 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-14',
+    title:
+      'Remade the random voting logic. Added configurable odds with presets for each year based on the actual results. Added detailed voting breakdown for each stage and voting mode',
+  },
+  {
+    date: '2025-07-11',
+    title: 'Improved the animation performance',
+  },
+  {
     date: '2025-07-08',
     title:
       'Added the Grand Final editing. Increased the custom entries storage capacity',
@@ -57,12 +66,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-07-12', end: '2025-07-13' },
+    approximateDates: { start: '2025-07-16', end: '2025-07-17' },
     title: 'Semi-finals voting by selection (without awarding points)',
-  },
-  {
-    approximateDates: { start: '2025-07-15', end: '2025-07-20' },
-    title: 'Odds-based random voting. Detailed voting breakdown',
   },
   {
     // approximateDates: { start: '2025-07-13', end: '2025-07-14' },

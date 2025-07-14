@@ -1,23 +1,39 @@
 import { BaseCountry, Country, EventMode, EventStage } from '../../models';
 
-export interface ScoreboardState {
+export type Vote = {
+  countryCode: string;
+  points: number;
+};
+
+export type StageVotes = {
+  jury?: Record<string, Vote[]>; // voting country code -> votes
+  televote?: Record<string, Vote[]>; // voting country code -> votes
+  combined?: Record<string, Vote[]>;
+};
+
+export type ScoreboardState = {
   // State
   eventStages: EventStage[];
   currentStageId: string | null;
+  eventMode: EventMode;
   votingCountryIndex: number;
   votingPoints: number;
   shouldShowLastPoints: boolean;
   shouldClearPoints: boolean;
   winnerCountry: Country | null;
-  eventMode: EventMode;
   showQualificationResults: boolean;
   restartCounter: number;
   showAllParticipants: boolean;
   televotingProgress: number;
+  predefinedVotes: Record<string, Partial<StageVotes>>;
+  hasShownManualTelevoteWarning: boolean;
+  randomnessLevel: number;
 
-  // Actions
+  // Getters
   getCurrentStage: () => EventStage;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
+
+  // Actions
   setEventStages: (
     stages: (Omit<EventStage, 'countries'> & { countries: BaseCountry[] })[],
   ) => void;
@@ -26,10 +42,18 @@ export interface ScoreboardState {
   giveRandomJuryPoints: (isRandomFinishing?: boolean) => void;
   finishJuryVotingRandomly: () => void;
   finishTelevoteVotingRandomly: () => void;
+  givePredefinedJuryPoint: () => void;
+  givePredefinedTelevotePoints: () => void;
   resetLastPoints: () => void;
   hideLastReceivedPoints: () => void;
   startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;
-}
+  setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
+  setRandomnessLevel: (level: number) => void;
+  predefineVotesForStage: (
+    stage: EventStage,
+    resetOtherStages?: boolean,
+  ) => void;
+};

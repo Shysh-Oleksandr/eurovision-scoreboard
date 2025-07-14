@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import SyncIcon from '../../assets/icons/SyncIcon';
 import { Year } from '../../config';
@@ -14,6 +14,8 @@ import Button from '../common/Button';
 import CustomSelect from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
+import { SettingsIcon } from '@/assets/icons/SettingsIcon';
+
 const isSmallScreen = window.innerWidth < 370;
 
 const yearOptions = SUPPORTED_YEARS.map((year) => ({
@@ -27,7 +29,13 @@ const themeOptions = YEARS_WITH_THEME.map((year) => ({
   label: year.toString(),
 }));
 
-export const SetupHeader: React.FC = () => {
+type SetupHeaderProps = {
+  openSettingsModal: () => void;
+};
+
+export const SetupHeader: React.FC<SetupHeaderProps> = ({
+  openSettingsModal,
+}) => {
   const year = useGeneralStore((state) => state.year);
   const themeYear = useGeneralStore((state) => state.themeYear);
   const setYear = useGeneralStore((state) => state.setYear);
@@ -35,6 +43,12 @@ export const SetupHeader: React.FC = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
+
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   const handleYearChange = (newYear: string) => {
     if (eventStages.length > 0) {
@@ -70,8 +84,12 @@ export const SetupHeader: React.FC = () => {
     !isSmallScreen;
 
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex items-end sm:space-x-4 space-x-2">
+    <div
+      className={`flex justify-between items-end w-full ${
+        isTouchDevice ? 'overflow-x-auto' : 'overflow-x-visible'
+      } space-x-3 pb-2`}
+    >
+      <div className="flex items-end sm:space-x-4 space-x-3">
         <CustomSelect
           options={yearOptions}
           value={year}
@@ -89,12 +107,24 @@ export const SetupHeader: React.FC = () => {
         />
 
         {shouldShowSyncButton && (
-          <Button onClick={handleSyncTheme}>
-            <SyncIcon />
+          <Button onClick={handleSyncTheme} className="!p-3 group">
+            <SyncIcon className="group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
           </Button>
         )}
       </div>
-      <FeedbackInfoButton className="sm:mt-1.5 mt-3" />
+      <div className="flex items-end md:gap-4 gap-3">
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            openSettingsModal();
+          }}
+          className="!p-3 group"
+          aria-label="Settings"
+        >
+          <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
+        </Button>
+        <FeedbackInfoButton />
+      </div>
     </div>
   );
 };

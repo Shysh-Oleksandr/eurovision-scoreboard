@@ -23,49 +23,47 @@ const Tabs: React.FC<TabsProps> = ({
   buttonClassName = '',
   overlayClassName = '',
 }) => {
-  const isSmallScreen =
-    useMediaQuery('(max-width: 479px)') || window.innerWidth < 480;
+  const isSmallScreen = useMediaQuery('(max-width: 479px)');
 
-  const [tabWidths, setTabWidths] = useState<number[]>([]);
-  const [activeTabLeft, setActiveTabLeft] = useState(0);
+  const [tabDimensions, setTabDimensions] = useState<
+    { width: number; left: number }[]
+  >([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const activeTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
+  const { width: activeTabWidth, left: activeTabLeft } = tabDimensions[
+    activeTabIndex
+  ] || { width: 0, left: 0 };
 
   const measureTabs = useCallback(() => {
-    const widths: number[] = [];
-    let leftPosition = 0;
+    const dimensions = tabRefs.current.map((ref) => {
+      if (!ref) return { width: 0, left: 0 };
 
-    tabRefs.current.forEach((ref, index) => {
-      if (ref) {
-        const width = ref.offsetWidth;
-
-        widths.push(width);
-
-        if (index === activeTabIndex) {
-          leftPosition = ref.offsetLeft;
-        }
-      }
+      return { width: ref.offsetWidth, left: ref.offsetLeft };
     });
 
-    setTabWidths(widths);
-    setActiveTabLeft(leftPosition);
-  }, [activeTabIndex]);
+    setTabDimensions(dimensions);
+    setIsInitialized(true);
+  }, []);
 
   useEffect(() => {
     measureTabs();
-    setIsInitialized(true);
   }, [tabs, measureTabs]);
 
   useEffect(() => {
+    let timeoutId: number;
     const handleResize = () => {
-      measureTabs();
+      clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(() => measureTabs(), 150);
     };
 
     window.addEventListener('resize', handleResize);
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [measureTabs]);
 
   return (
@@ -77,9 +75,7 @@ const Tabs: React.FC<TabsProps> = ({
         <div
           className={`absolute top-1 md:h-12 h-10 bg-gradient-to-tr from-[20%] from-primary-800 to-primary-700/70 rounded-lg shadow transition-all duration-[400ms] ease-in-out ${overlayClassName}`}
           style={{
-            width: isSmallScreen
-              ? 'calc(100% - 14px)'
-              : tabWidths[activeTabIndex] || 0,
+            width: isSmallScreen ? 'calc(100% - 14px)' : activeTabWidth || 0,
             left: isSmallScreen ? '6px' : `${activeTabLeft}px`,
             transform: isSmallScreen
               ? `translateY(${activeTabIndex * 100 + activeTabIndex * 10}%)`

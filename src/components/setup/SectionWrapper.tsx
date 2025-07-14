@@ -107,7 +107,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
                 e.stopPropagation();
               }}
             >
-              <div className="flex items-center gap-1 justify-between cursor-pointer pr-2 pl-3 py-1 flex-none rounded-md bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/30 shadow transition-colors duration-300">
+              <div className="flex items-center gap-1 justify-between cursor-pointer pr-2 pl-3 py-1 flex-none rounded-md bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/40 shadow transition-colors duration-300">
                 {countriesCount !== undefined && (
                   <span className="text-white text-sm whitespace-nowrap">
                     {countriesCount} {getAmountLabel(countriesCount)}

@@ -7,6 +7,8 @@ export interface BaseCountry {
   semiFinalGroup?: string;
   isAutoQualified?: boolean;
   isQualifiedFromSemi?: boolean;
+  juryOdds?: number;
+  televoteOdds?: number;
 }
 
 export type SemiFinalGroup = 'SF1' | 'SF2';

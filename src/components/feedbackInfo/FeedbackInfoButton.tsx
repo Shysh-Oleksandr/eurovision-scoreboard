@@ -22,7 +22,7 @@ const FeedbackInfoButton = ({ className }: { className?: string }) => {
     <>
       <button
         onClick={() => setShowModal(true)}
-        className={`text-white p-2 relative focus:outline-none z-50 hover:scale-110 transition-transform duration-300 ${className}`}
+        className={`text-white p-2 mb-1 relative focus:outline-none z-50 hover:scale-110 transition-transform duration-300 ${className}`}
         aria-label="Open feedback modal"
         title="Open feedback modal"
       >

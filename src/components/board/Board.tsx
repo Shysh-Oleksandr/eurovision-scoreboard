@@ -32,6 +32,7 @@ const Board = (): JSX.Element => {
     wasTheFirstPointsAwarded,
     hasCountryFinishedVoting,
     onClick,
+    resetPoints,
   } = useVoting();
 
   const { finalCountries, showPlace, flipKey, containerRef } =
@@ -69,7 +70,7 @@ const Board = (): JSX.Element => {
 
   return (
     <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>
-      <BoardHeader onClick={onClick} />
+      <BoardHeader resetPoints={resetPoints} />
       <div
         ref={containerRef}
         className={`container-wrapping-flipper will-change-all ${

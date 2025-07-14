@@ -95,8 +95,11 @@ export const createEventActions: StateCreator<
 
     let firstVotingCountryIndex = 0;
 
-    if (firstStage && firstStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
-      firstVotingCountryIndex = firstStage.countries.length - 1;
+    if (firstStage) {
+      get().predefineVotesForStage(firstStage, true);
+      if (firstStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
+        firstVotingCountryIndex = firstStage.countries.length - 1;
+      }
     }
 
     set({
@@ -112,6 +115,7 @@ export const createEventActions: StateCreator<
       restartCounter: get().restartCounter + 1,
       showAllParticipants: false,
       televotingProgress: 0,
+      hasShownManualTelevoteWarning: false,
     });
   },
 
@@ -165,6 +169,8 @@ export const createEventActions: StateCreator<
         countries: nextStageCountries,
       };
     }
+
+    get().predefineVotesForStage(updatedEventStages[currentStageIndex + 1]);
 
     set({
       eventStages: updatedEventStages,

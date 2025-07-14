@@ -107,5 +107,3 @@ export const useGeneralStore = create<GeneralState>()(
     },
   ),
 );
-
-useCountriesStore.getState().setInitialCountriesForYear(INITIAL_YEAR);
