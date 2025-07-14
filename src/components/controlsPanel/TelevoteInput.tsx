@@ -21,6 +21,12 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
   const televotingProgress = useScoreboardStore(
     (state) => state.televotingProgress,
   );
+  const hasShownManualTelevoteWarning = useScoreboardStore(
+    (state) => state.hasShownManualTelevoteWarning,
+  );
+  const setHasShownManualTelevoteWarning = useScoreboardStore(
+    (state) => state.setHasShownManualTelevoteWarning,
+  );
 
   const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
 
@@ -64,13 +70,30 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
     //   return;
     // }
 
-    setEnteredPoints('');
+    const vote = () => {
+      setEnteredPoints('');
 
-    if (isFirstTelevoteCountry) {
-      resetLastPoints();
+      if (isFirstTelevoteCountry) {
+        resetLastPoints();
+      }
+
+      giveTelevotePoints(votingCountryCode, votingPoints);
+    };
+
+    if (hasShownManualTelevoteWarning) {
+      vote();
+
+      return;
     }
 
-    giveTelevotePoints(votingCountryCode, votingPoints);
+    const confirmation = window.confirm(
+      'Note: Manually assigning televote points won’t be reflected in the detailed stats. Are you sure you want to continue?',
+    );
+
+    if (confirmation) {
+      setHasShownManualTelevoteWarning(true);
+      vote();
+    }
   };
 
   return (

@@ -128,7 +128,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
         <ModalBottomContent
           onClose={onClose}
           onSave={handleSave}
-          onDelete={handleDelete}
+          onDelete={countryToEdit ? handleDelete : undefined}
         />
       }
     >

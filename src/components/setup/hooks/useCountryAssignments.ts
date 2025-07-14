@@ -26,6 +26,7 @@ export const useCountryAssignments = (
 
   const stageIds = eventStages.map((s) => s.id).join(',');
 
+  // This is used to initialize the country assignments for the event
   useEffect(() => {
     if (
       Object.keys(eventAssignments[EventMode.SEMI_FINALS_AND_GRAND_FINAL])

@@ -52,17 +52,21 @@ export const useVoting = () => {
     resetLastPoints();
   }, [resetLastPoints]);
 
+  const resetPoints = useCallback(() => {
+    if (countriesWithPointsLength >= MAX_COUNTRY_WITH_POINTS) {
+      handleResetPoints();
+    }
+    if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
+      timerId.current = setTimeout(handleResetPoints, ANIMATION_DURATION);
+    }
+  }, [countriesWithPointsLength, handleResetPoints]);
+
   const onClick = useCallback(
     (countryCode: string) => {
-      if (countriesWithPointsLength >= MAX_COUNTRY_WITH_POINTS) {
-        handleResetPoints();
-      }
-      if (countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS - 1) {
-        timerId.current = setTimeout(handleResetPoints, ANIMATION_DURATION);
-      }
+      resetPoints();
       giveJuryPoints(countryCode);
     },
-    [countriesWithPointsLength, giveJuryPoints, handleResetPoints],
+    [resetPoints, giveJuryPoints],
   );
 
   useEffect(() => {
@@ -77,5 +81,6 @@ export const useVoting = () => {
     wasTheFirstPointsAwarded,
     hasCountryFinishedVoting,
     onClick,
+    resetPoints,
   };
 };

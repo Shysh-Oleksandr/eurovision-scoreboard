@@ -10,15 +10,14 @@ import {
   getCustomCountries,
   saveCustomCountry,
 } from '../helpers/indexedDB';
-import {
-  BaseCountry,
-  Country,
-  EventMode,
-  EventStage,
-  StageId,
-} from '../models';
+import { BaseCountry, EventMode, EventStage, StageId } from '../models';
 
 import { useScoreboardStore } from './scoreboardStore';
+
+export type CountryOdds = Record<
+  string,
+  { juryOdds?: number; televoteOdds?: number }
+>;
 
 interface CountriesState {
   // State
@@ -28,6 +27,7 @@ interface CountriesState {
   customCountries: BaseCountry[];
   eventAssignments: Record<EventMode, Record<string, string>>;
   configuredEventStages: EventStage[];
+  countryOdds: CountryOdds;
 
   // Actions
   setEventSetupModalOpen: (open: boolean) => void;
@@ -35,7 +35,6 @@ interface CountriesState {
   getVotingCountries: () => BaseCountry[];
   getVotingCountry: () => BaseCountry;
   getVotingCountriesLength: () => number;
-  getInitialCountries: () => Country[];
   setSelectedCountries: (countries: BaseCountry[]) => void;
   getAutoQualifiedCountries: () => BaseCountry[];
   updateCountriesForYear: (year: Year) => void;
@@ -51,6 +50,14 @@ interface CountriesState {
   ) => void;
   setConfiguredEventStages: (stages: EventStage[]) => void;
   loadCustomCountries: () => Promise<void>;
+  updateCountryOdds: (
+    countryCode: string,
+    odds: { juryOdds?: number; televoteOdds?: number },
+  ) => void;
+  setBulkCountryOdds: (
+    odds: Record<string, { juryOdds?: number; televoteOdds?: number }>,
+  ) => void;
+  loadYearOdds: (countries: BaseCountry[]) => void;
 }
 
 export const useCountriesStore = create<CountriesState>()(
@@ -66,6 +73,7 @@ export const useCountriesStore = create<CountriesState>()(
         [EventMode.GRAND_FINAL_ONLY]: {},
       },
       configuredEventStages: [],
+      countryOdds: {},
 
       // Actions
       setEventSetupModalOpen: (open: boolean) => {
@@ -124,28 +132,13 @@ export const useCountriesStore = create<CountriesState>()(
 
         const currentStage = getCurrentStage();
 
-        return currentStage.isJuryVoting
+        return currentStage?.isJuryVoting
           ? getVotingCountries()[votingCountryIndex]
-          : currentStage.countries[votingCountryIndex];
+          : currentStage?.countries[votingCountryIndex];
       },
 
       getVotingCountriesLength: () => {
         return get().getVotingCountries().length;
-      },
-
-      getInitialCountries: () => {
-        const qualifiedCountries = get().getQualifiedCountries();
-
-        return qualifiedCountries.map(
-          (country) =>
-            ({
-              ...country,
-              juryPoints: 0,
-              televotePoints: 0,
-              points: 0,
-              lastReceivedPoints: null,
-            } as Country),
-        );
       },
 
       setSelectedCountries: (countries: BaseCountry[]) => {
@@ -171,15 +164,54 @@ export const useCountriesStore = create<CountriesState>()(
       updateCountriesForYear: (year: Year) => {
         const countries = getCountriesByYear(year);
 
+        const initialOdds: Record<
+          string,
+          { juryOdds?: number; televoteOdds?: number }
+        > = {};
+
+        countries.forEach((country) => {
+          initialOdds[country.code] = {
+            juryOdds: country.juryOdds ?? 50,
+            televoteOdds: country.televoteOdds ?? 50,
+          };
+        });
+
         set({
           allCountriesForYear: countries,
           selectedCountries: [],
+          configuredEventStages: [],
           eventAssignments: {
             [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: {},
             [EventMode.GRAND_FINAL_ONLY]: {},
           },
-          configuredEventStages: [],
+          countryOdds: initialOdds,
         });
+      },
+
+      loadYearOdds: (countries: BaseCountry[]) => {
+        const { allCountriesForYear } = get();
+        const yearOdds: Record<
+          string,
+          { juryOdds?: number; televoteOdds?: number }
+        > = {};
+
+        countries.forEach((country) => {
+          const yearCountryData = allCountriesForYear.find(
+            (c) => c.code === country.code,
+          );
+
+          yearOdds[country.code] = {
+            juryOdds: yearCountryData?.juryOdds ?? 50,
+            televoteOdds: yearCountryData?.televoteOdds ?? 50,
+          };
+        });
+
+        set((state) => ({
+          countryOdds: {
+            ...state.countryOdds,
+            ...yearOdds,
+          },
+        }));
       },
 
       setInitialCountriesForYear: (year: Year) => {
@@ -187,8 +219,21 @@ export const useCountriesStore = create<CountriesState>()(
 
         const countries = getCountriesByYear(year);
 
+        const initialOdds: Record<
+          string,
+          { juryOdds?: number; televoteOdds?: number }
+        > = {};
+
+        countries.forEach((country) => {
+          initialOdds[country.code] = {
+            juryOdds: country.juryOdds ?? 50,
+            televoteOdds: country.televoteOdds ?? 50,
+          };
+        });
+
         set({
           allCountriesForYear: countries,
+          countryOdds: initialOdds,
         });
       },
 
@@ -246,6 +291,27 @@ export const useCountriesStore = create<CountriesState>()(
         const customCountries = await getCustomCountries();
 
         set({ customCountries });
+      },
+
+      updateCountryOdds: (countryCode, odds) => {
+        set((state) => ({
+          countryOdds: {
+            ...state.countryOdds,
+            [countryCode]: {
+              ...state.countryOdds[countryCode],
+              ...odds,
+            },
+          },
+        }));
+      },
+
+      setBulkCountryOdds: (odds) => {
+        set((state) => ({
+          countryOdds: {
+            ...state.countryOdds,
+            ...odds,
+          },
+        }));
       },
     }),
     { name: 'countries-store' },

@@ -6,6 +6,7 @@ type MiscActions = {
   resetLastPoints: () => void;
   hideLastReceivedPoints: () => void;
   toggleShowAllParticipants: () => void;
+  setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
 };
 
 export const createMiscActions: StateCreator<
@@ -49,5 +50,11 @@ export const createMiscActions: StateCreator<
     set((state) => ({
       showAllParticipants: !state.showAllParticipants,
     }));
+  },
+
+  setHasShownManualTelevoteWarning: (hasShown: boolean) => {
+    set({
+      hasShownManualTelevoteWarning: hasShown,
+    });
   },
 });

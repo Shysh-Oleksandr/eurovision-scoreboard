@@ -30,3 +30,40 @@ Array.from(document.querySelectorAll(".v_table tbody tr")).map(tr => {
   return tr.querySelectorAll("td")[1]?.querySelector("a")?.textContent.trim();
 }).filter(Boolean);
 */
+
+/* 
+Script for getting GF odds from the table:
+Array.from(document.querySelectorAll('.v_table tbody tr'))
+  .map((tr) => {
+    const tds = tr.querySelectorAll('td');
+    const name = tds[1]?.querySelector('a')?.textContent?.trim();
+    const televoteText = tds[4]?.querySelector('div')?.textContent?.trim();
+    const juryText = tds[5]?.textContent?.trim();
+    
+    const juryPoints = juryText ? parseInt(juryText, 10) : null;
+    const televotePoints = televoteText ? parseInt(televoteText, 10) : null;
+
+    return name && juryPoints !== null && televotePoints !== null
+      ? { name, juryPoints, televotePoints }
+      : null;
+  })
+  .filter(Boolean);
+
+  ------------------------------------------------------------
+  
+Script for getting SF odds from the table:
+
+Array.from(document.querySelectorAll('.v_table.v_table_out tbody tr'))
+.map((tr) => {
+  const tds = tr.querySelectorAll('td');
+  const name = tds[1]?.querySelector('a')?.textContent?.trim();
+  const pointsText = tds[3]?.textContent?.trim();
+  
+  const points = pointsText ? parseInt(pointsText, 10) : null;
+
+  return name && points !== null
+    ? { name, points }
+    : null;
+})
+.filter(Boolean);
+*/

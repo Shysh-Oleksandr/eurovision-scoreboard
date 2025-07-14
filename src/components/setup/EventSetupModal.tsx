@@ -13,6 +13,7 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 import Tabs from '../common/Tabs';
+import { SettingsModal } from '../settings';
 
 import { TABS } from './constants';
 import { AvailableGroup } from './CountrySelectionListItem';
@@ -56,6 +57,7 @@ const EventSetupModal = () => {
   const [activeTab, setActiveTab] = useState<EventMode>(
     EventMode.SEMI_FINALS_AND_GRAND_FINAL,
   );
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const {
     countryGroups: {
@@ -71,6 +73,11 @@ const EventSetupModal = () => {
     setAssignments,
     allAssignments,
   } = useCountryAssignments(activeTab, configuredEventStages);
+
+  const participatingCountries = [
+    ...autoQualifiers,
+    ...eventStagesWithCountries.flatMap((stage) => stage.countries),
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   useEffect(() => {
     loadCustomCountries();
@@ -236,7 +243,7 @@ const EventSetupModal = () => {
       ? grandFinalAvailableGroups
       : semiFinalsAvailableGroups;
 
-  const handleStartEvent = useCallback(() => {
+  const handleStartEvent = () => {
     const validationError = validateEventSetup(isGrandFinalOnly, {
       stages: eventStagesWithCountries.map((s) => ({
         id: s.id,
@@ -257,15 +264,16 @@ const EventSetupModal = () => {
     setEventStages(eventStagesWithCountries);
 
     const allCountries = getAllCountries();
+    // TODO: update
+    const { countryOdds } = useCountriesStore.getState();
+
     const allSelectedCountries: BaseCountry[] = Object.entries(
       allAssignments[activeTab],
     )
       .filter(([, group]) => group !== CountryAssignmentGroup.NOT_PARTICIPATING)
       .map(([countryCode, group]) => {
         const country = allCountries.find((c) => c.code === countryCode)!;
-        const countryDataForYear = allCountriesForYear.find(
-          (c) => c.code === countryCode,
-        );
+        const odds = countryOdds[countryCode];
 
         const isAutoQualifier = group === CountryAssignmentGroup.AUTO_QUALIFIER;
         const isGrandFinalist = group === StageId.GF;
@@ -275,7 +283,8 @@ const EventSetupModal = () => {
 
         return {
           ...country,
-          ...(countryDataForYear ?? {}),
+          juryOdds: odds?.juryOdds,
+          televoteOdds: odds?.televoteOdds,
           semiFinalGroup: isSemiFinalist ? group : undefined,
           isAutoQualified: isAutoQualifier,
           isQualified: isAutoQualifier || isGrandFinalist,
@@ -283,19 +292,7 @@ const EventSetupModal = () => {
       });
 
     startEvent(activeTab, allSelectedCountries);
-  }, [
-    isGrandFinalOnly,
-    eventStagesWithCountries,
-    autoQualifiers.length,
-    grandFinalQualifiers.length,
-    onClose,
-    setEventStages,
-    getAllCountries,
-    allAssignments,
-    activeTab,
-    startEvent,
-    allCountriesForYear,
-  ]);
+  };
 
   return (
     <Modal
@@ -319,7 +316,12 @@ const EventSetupModal = () => {
         </div>
       }
     >
-      <SetupHeader />
+      <SetupHeader openSettingsModal={() => setIsSettingsModalOpen(true)} />
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        participatingCountries={participatingCountries}
+      />
       <CustomCountryModal
         isOpen={isCustomCountryModalOpen}
         onClose={handleCloseModal}
@@ -334,7 +336,7 @@ const EventSetupModal = () => {
         onDelete={handleDeleteStage}
       />
 
-      <div className="mt-4 flex flex-col gap-3">
+      <div className="mt-2 flex flex-col gap-3">
         <Tabs
           tabs={TABS}
           activeTab={activeTab}
