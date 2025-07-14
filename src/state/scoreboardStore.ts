@@ -39,6 +39,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
         [StageId.GF]: {},
       },
       hasShownManualTelevoteWarning: false,
+      randomnessLevel: 50,
     }),
     { name: 'scoreboard-store' },
   ),

@@ -379,3 +379,64 @@ h6 {
     height: 150%;
   }
 }
+
+.range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  border-radius: 15px;
+  height: 7px;
+  background: linear-gradient(
+    to right,
+    theme('colors.primary-700') var(--progress, 0%),
+    theme('colors.primary-800') var(--progress, 0%)
+  );
+}
+
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  background-color: theme('colors.primary-700');
+  border-radius: 50%;
+  border: none;
+  transition: 0.2s ease-in-out;
+}
+
+.range-slider::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  background-color: theme('colors.primary-700');
+  border-radius: 50%;
+  border: none;
+  transition: 0.2s ease-in-out;
+}
+
+/* TODO: Add hover and focus styles */
+/* 
+.range-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 10px theme('colors.primary-700');
+}
+
+.range-slider:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px theme('colors.primary-700');
+}
+
+.range-slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 13px theme('colors.primary-700');
+}
+
+.range-slider::-moz-range-thumb:hover {
+  box-shadow: 0 0 0 10px theme('colors.primary-700');
+}
+
+.range-slider:active::-moz-range-thumb {
+  box-shadow: 0 0 0 13px theme('colors.primary-700');
+}
+
+.range-slider:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 13px theme('colors.primary-700');
+} */

@@ -226,10 +226,10 @@ function roundToHalf(n: number) {
 }
 
 const main = () => {
-  const TARGET_MIN_ODDS = 0.5;
+  const TARGET_MIN_ODDS = 1;
   const TARGET_MAX_ODDS = 99;
-  const NON_FINALIST_MAX_ODDS = 10;
-  const FINALIST_MIN_ODDS = 10;
+  const NON_FINALIST_MAX_ODDS = 20;
+  const FINALIST_MIN_ODDS = 20;
 
   const normalize = (
     value: number,

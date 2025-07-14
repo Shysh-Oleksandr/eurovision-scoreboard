@@ -7,7 +7,10 @@ import { ScoreboardState } from './types';
 import { predefineStageVotes } from './votesPredefinition';
 
 type PredefinitionActions = {
-  predefineVotesForStage: (stage: EventStage) => void;
+  predefineVotesForStage: (
+    stage: EventStage,
+    resetOtherStages?: boolean,
+  ) => void;
 };
 
 export const createPredefinitionActions: StateCreator<
@@ -15,9 +18,10 @@ export const createPredefinitionActions: StateCreator<
   [['zustand/devtools', never]],
   [],
   PredefinitionActions
-> = (set) => ({
+> = (set, get) => ({
   predefineVotesForStage: (stage: EventStage, resetOtherStages = false) => {
     const { selectedCountries, countryOdds } = useCountriesStore.getState();
+    const { randomnessLevel } = get();
 
     const votingCountries =
       stage.id === StageId.GF ? selectedCountries : stage.countries;
@@ -27,6 +31,7 @@ export const createPredefinitionActions: StateCreator<
       votingCountries,
       stage.votingMode,
       countryOdds,
+      randomnessLevel,
     );
 
     set((state) => ({

@@ -1,11 +1,13 @@
 import React from 'react';
 
 import Button from '../common/Button';
+import { RangeSlider } from '../common/RangeSlider';
 
 import { CountryOddsItem } from './CountryOddsItem';
 
 import { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const LABELS = [
   {
@@ -32,6 +34,10 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
     (state) => state.setBulkCountryOdds,
   );
   const loadYearOdds = useCountriesStore((state) => state.loadYearOdds);
+  const randomnessLevel = useScoreboardStore((state) => state.randomnessLevel);
+  const setRandomnessLevel = useScoreboardStore(
+    (state) => state.setRandomnessLevel,
+  );
 
   const handleOddsChange = (
     countryCode: string,
@@ -65,10 +71,17 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
 
     countries.forEach((country) => {
       const juryOdds = Math.floor(Math.random() * 101);
-      let televoteOdds = Math.floor(Math.random() * 101);
+      const minTelevote = Math.max(1, juryOdds - 50);
+      const maxTelevote = Math.min(99, juryOdds + 50);
+
+      let televoteOdds =
+        Math.floor(Math.random() * (maxTelevote - minTelevote + 1)) +
+        minTelevote;
 
       while (televoteOdds === juryOdds) {
-        televoteOdds = Math.floor(Math.random() * 101);
+        televoteOdds =
+          Math.floor(Math.random() * (maxTelevote - minTelevote + 1)) +
+          minTelevote;
       }
       newOdds[country.code] = { juryOdds, televoteOdds };
     });
@@ -106,7 +119,19 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
   }
 
   return (
-    <div>
+    <>
+      <div className="mb-4">
+        <RangeSlider
+          id="randomness"
+          label="Randomness Level"
+          min={0}
+          max={100}
+          value={randomnessLevel}
+          onChange={setRandomnessLevel}
+          minLabel="Predictable"
+          maxLabel="Chaotic"
+        />
+      </div>
       <div className="flex sm:items-end items-start gap-4 mb-4 justify-between flex-wrap sm:flex-row flex-col-reverse">
         <div className="flex items-center gap-2 flex-wrap">
           <Button className="md:text-base text-sm" onClick={handleRandomize}>
@@ -156,6 +181,6 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
           );
         })}
       </div>
-    </div>
+    </>
   );
 };

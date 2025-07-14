@@ -18,17 +18,35 @@ type CountryWithRank = {
   combinedRank: number;
 };
 
+const getWeightFactor = (randomnessLevel: number) => {
+  if (randomnessLevel > 50) {
+    // For randomness > 50, smoothly decrease weight factor from 0.9 at 51 to 0.1 at 100
+    return 0.1 + ((100 - randomnessLevel) / 49) * 0.7;
+  }
+
+  if (randomnessLevel === 50) {
+    return 0.8;
+  }
+
+  // For randomness < 50, smoothly increase weight factor from 1 at 49 to 2.2 at 0
+  return 1 + ((50 - randomnessLevel) / 50) * 1.2;
+};
+
 const generateFullRanking = (
   votingCountry: BaseCountry,
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
   oddsType: 'juryOdds' | 'televoteOdds',
+  randomnessLevel: number,
 ): { code: string; rank: number }[] => {
+  const weightFactor = getWeightFactor(randomnessLevel);
+  const temperature = (randomnessLevel / 100) * 70; // 0-70
+
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
     .map((c) => ({
       id: c.code,
-      weight: countryOdds[c.code]?.[oddsType] ?? 50,
+      weight: Math.pow(countryOdds[c.code]?.[oddsType] ?? 50, weightFactor),
     }));
 
   const rankedWinners: { code: string; rank: number }[] = [];
@@ -36,7 +54,7 @@ const generateFullRanking = (
   let rank = 1;
 
   while (remainingChoices.length > 0) {
-    const winnerId = rw(remainingChoices);
+    const winnerId = rw(remainingChoices, temperature);
 
     rankedWinners.push({ code: winnerId, rank });
     remainingChoices = remainingChoices.filter((c) => c.id !== winnerId);
@@ -50,12 +68,14 @@ const generateCombinedVotes = (
   votingCountry: BaseCountry,
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
+  randomnessLevel: number,
 ): Vote[] => {
   const juryRanking = generateFullRanking(
     votingCountry,
     stageCountries,
     countryOdds,
     'juryOdds',
+    randomnessLevel,
   );
 
   const televoteRanking = generateFullRanking(
@@ -63,6 +83,7 @@ const generateCombinedVotes = (
     stageCountries,
     countryOdds,
     'televoteOdds',
+    randomnessLevel,
   );
 
   const combinedRanking: CountryWithRank[] = juryRanking
@@ -104,12 +125,16 @@ const generateVotesForSource = (
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
   oddsType: 'juryOdds' | 'televoteOdds',
+  randomnessLevel: number,
 ): Vote[] => {
+  const weightFactor = getWeightFactor(randomnessLevel);
+  const temperature = 35 + (randomnessLevel / 100) * 25; // 35-60
+
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
     .map((c) => ({
       id: c.code,
-      weight: countryOdds[c.code]?.[oddsType] ?? 50,
+      weight: Math.pow(countryOdds[c.code]?.[oddsType] ?? 50, weightFactor),
     }));
 
   if (choices.length === 0) {
@@ -125,7 +150,7 @@ const generateVotesForSource = (
   }
 
   while (winners.length < numPointsToAward && remainingChoices.length > 0) {
-    const winnerId = rw(remainingChoices);
+    const winnerId = rw(remainingChoices, temperature);
 
     winners.push(winnerId);
     remainingChoices = remainingChoices.filter((c) => c.id !== winnerId);
@@ -144,6 +169,7 @@ export const predefineStageVotes = (
   votingCountries: BaseCountry[],
   votingMode: StageVotingMode,
   countryOdds: CountryOdds,
+  randomnessLevel: number,
 ): Partial<StageVotes> => {
   const stageVotes: Partial<StageVotes> = {};
 
@@ -167,6 +193,7 @@ export const predefineStageVotes = (
         stageCountries,
         countryOdds,
         'juryOdds',
+        randomnessLevel,
       );
     }
   }
@@ -178,6 +205,7 @@ export const predefineStageVotes = (
         votingCountry,
         stageCountries,
         countryOdds,
+        randomnessLevel,
       );
     }
   }
@@ -190,6 +218,7 @@ export const predefineStageVotes = (
         stageCountries,
         countryOdds,
         'televoteOdds',
+        randomnessLevel,
       );
     }
   }

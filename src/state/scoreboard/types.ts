@@ -27,6 +27,7 @@ export type ScoreboardState = {
   televotingProgress: number;
   predefinedVotes: Record<string, Partial<StageVotes>>;
   hasShownManualTelevoteWarning: boolean;
+  randomnessLevel: number;
 
   // Getters
   getCurrentStage: () => EventStage;
@@ -50,6 +51,7 @@ export type ScoreboardState = {
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
+  setRandomnessLevel: (level: number) => void;
   predefineVotesForStage: (
     stage: EventStage,
     resetOtherStages?: boolean,
