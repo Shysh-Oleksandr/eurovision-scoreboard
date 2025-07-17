@@ -4,6 +4,8 @@ import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
 import { Year } from '../../../config';
 import { themes } from '../../../theme/themes';
 
+import { useTouchDevice } from '@/hooks/useTouchDevice';
+
 type Option = {
   label: string;
   value: string;
@@ -92,12 +94,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   label,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-  }, []);
+  const isTouchDevice = useTouchDevice();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

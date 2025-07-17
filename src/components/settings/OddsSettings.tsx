@@ -2,9 +2,11 @@ import React from 'react';
 
 import Button from '../common/Button';
 import { RangeSlider } from '../common/RangeSlider';
+import { Tooltip } from '../common/Tooltip';
 
 import { CountryOddsItem } from './CountryOddsItem';
 
+import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -120,7 +122,35 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
 
   return (
     <>
-      <div className="mb-4">
+      <div className="mb-4 relative">
+        <div className="absolute top-0 right-0">
+          <Tooltip
+            content={
+              <div className="space-y-2 font-medium">
+                <p>
+                  Each country has separate jury and televote odds (0–100).
+                  <br />
+                  <span className="font-bold">Higher number =</span> better
+                  chance of getting more points.
+                  <br />
+                  Initial values are based on countries' real Eurovision results
+                  for the selected year.
+                </p>
+                <p>
+                  The Randomness Level slider controls predictability:
+                  <br />
+                  <span className="font-bold">Low =</span> more realistic,
+                  following odds closely.
+                  <br />
+                  <span className="font-bold">High =</span> more chaotic,
+                  unpredictable.
+                </p>
+              </div>
+            }
+          >
+            <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
+          </Tooltip>
+        </div>
         <RangeSlider
           id="randomness"
           label="Randomness Level"
