@@ -122,11 +122,8 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
 
   return (
     <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <label htmlFor="randomness" className="block text-white text-sm">
-            Randomness Level
-          </label>
+      <div className="mb-4 relative">
+        <div className="absolute top-0 right-0">
           <Tooltip
             content={
               <div className="space-y-2 font-medium">
@@ -156,6 +153,7 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
         </div>
         <RangeSlider
           id="randomness"
+          label="Randomness Level"
           min={0}
           max={100}
           value={randomnessLevel}
