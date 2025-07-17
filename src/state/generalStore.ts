@@ -88,13 +88,16 @@ export const useGeneralStore = create<GeneralState>()(
           shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
         };
       },
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          useCountriesStore.getState().setInitialCountriesForYear(state.year);
+        }
+      },
       merge: (persistedState, currentState) => {
         const state = persistedState as Partial<GeneralState>;
 
         const year = state.year ?? INITIAL_YEAR;
         const themeYear = state.themeYear ?? INITIAL_YEAR;
-
-        useCountriesStore.getState().setInitialCountriesForYear(year);
 
         return {
           ...currentState,
@@ -107,3 +110,5 @@ export const useGeneralStore = create<GeneralState>()(
     },
   ),
 );
+
+useCountriesStore.getState().setInitialCountriesForYear(INITIAL_YEAR);
