@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import SyncIcon from '../../assets/icons/SyncIcon';
 import { Year } from '../../config';
@@ -15,6 +15,7 @@ import CustomSelect from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
+import { useTouchDevice } from '@/hooks/useTouchDevice';
 
 const isSmallScreen = window.innerWidth < 370;
 
@@ -44,11 +45,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
 
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-  }, []);
+  const isTouchDevice = useTouchDevice();
 
   const handleYearChange = (newYear: string) => {
     if (eventStages.length > 0) {

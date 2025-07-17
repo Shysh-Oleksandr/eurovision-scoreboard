@@ -42,8 +42,8 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
     // We must cancel the pending debounce, or it will overwrite the prop change.
     cancelJury();
     cancelTelevote();
-    setJuryOdds(country.juryOdds ?? 50);
-    setTelevoteOdds(country.televoteOdds ?? 50);
+    setJuryOdds(country.juryOdds);
+    setTelevoteOdds(country.televoteOdds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [country.juryOdds, country.televoteOdds]);
 
@@ -100,7 +100,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
       <div className="grid grid-cols-2 gap-2 mt-2">
         <input
           type="number"
-          className="bg-primary-700/40 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400"
+          className="bg-primary-700/40 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400 focus:bg-primary-700/60 hover:bg-primary-700/60 transition-colors duration-300"
           placeholder="Jury"
           min={0}
           max={MAX_ODDS}
@@ -110,7 +110,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
         />
         <input
           type="number"
-          className="bg-primary-900/50 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400"
+          className="bg-primary-900/50 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400 focus:bg-primary-900/80 hover:bg-primary-900/80 transition-colors duration-300"
           placeholder="Tele"
           min={0}
           max={MAX_ODDS}
