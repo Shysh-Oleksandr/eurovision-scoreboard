@@ -18,18 +18,21 @@ type CountryWithRank = {
   combinedRank: number;
 };
 
-const getWeightFactor = (randomnessLevel: number) => {
-  if (randomnessLevel > 50) {
-    // For randomness > 50, smoothly decrease weight factor from 0.9 at 51 to 0.1 at 100
-    return 0.1 + ((100 - randomnessLevel) / 49) * 0.7;
-  }
+const calculateTemperature = (randomnessLevel: number): number => {
+  // Interpolate temperature from 45 to 50 for randomness levels 0-40.
+  // Beyond 40, it stays at 50.
+  const clampedRandomness = Math.max(0, Math.min(randomnessLevel, 40));
+  const temperature = 45 + (clampedRandomness / 40) * 5;
 
-  if (randomnessLevel === 50) {
-    return 0.8;
-  }
+  return temperature;
+};
 
-  // For randomness < 50, smoothly increase weight factor from 1 at 49 to 2.2 at 0
-  return 1 + ((50 - randomnessLevel) / 50) * 1.2;
+const calculateWeightFromOdds = (odds: number): number => {
+  // A higher exponent creates a more "spiky" distribution of points,
+  // making the difference between winners and losers more pronounced.
+  const DISTRIBUTION_EXPONENT = 2.5;
+
+  return Math.pow(Math.max(1, odds), DISTRIBUTION_EXPONENT);
 };
 
 const generateFullRanking = (
@@ -37,16 +40,13 @@ const generateFullRanking = (
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
   oddsType: 'juryOdds' | 'televoteOdds',
-  randomnessLevel: number,
+  temperature: number,
 ): { code: string; rank: number }[] => {
-  const weightFactor = getWeightFactor(randomnessLevel);
-  const temperature = (randomnessLevel / 100) * 70; // 0-70
-
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
     .map((c) => ({
       id: c.code,
-      weight: Math.pow(countryOdds[c.code]?.[oddsType] ?? 50, weightFactor),
+      weight: calculateWeightFromOdds(countryOdds[c.code]?.[oddsType] ?? 50),
     }));
 
   const rankedWinners: { code: string; rank: number }[] = [];
@@ -68,14 +68,14 @@ const generateCombinedVotes = (
   votingCountry: BaseCountry,
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
-  randomnessLevel: number,
+  temperature: number,
 ): Vote[] => {
   const juryRanking = generateFullRanking(
     votingCountry,
     stageCountries,
     countryOdds,
     'juryOdds',
-    randomnessLevel,
+    temperature,
   );
 
   const televoteRanking = generateFullRanking(
@@ -83,7 +83,7 @@ const generateCombinedVotes = (
     stageCountries,
     countryOdds,
     'televoteOdds',
-    randomnessLevel,
+    temperature,
   );
 
   const combinedRanking: CountryWithRank[] = juryRanking
@@ -125,16 +125,13 @@ const generateVotesForSource = (
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
   oddsType: 'juryOdds' | 'televoteOdds',
-  randomnessLevel: number,
+  temperature: number,
 ): Vote[] => {
-  const weightFactor = getWeightFactor(randomnessLevel);
-  const temperature = 35 + (randomnessLevel / 100) * 25; // 35-60
-
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
     .map((c) => ({
       id: c.code,
-      weight: Math.pow(countryOdds[c.code]?.[oddsType] ?? 50, weightFactor),
+      weight: calculateWeightFromOdds(countryOdds[c.code]?.[oddsType] ?? 50),
     }));
 
   if (choices.length === 0) {
@@ -171,6 +168,45 @@ export const predefineStageVotes = (
   countryOdds: CountryOdds,
   randomnessLevel: number,
 ): Partial<StageVotes> => {
+  // Create a new set of odds with randomness "baked in" for this simulation.
+  // This ensures that a country's "luck" is consistent across all voters.
+  const perturbedOdds: CountryOdds = {};
+  const randomnessFactor = randomnessLevel / 100;
+  const temperature = calculateTemperature(randomnessLevel);
+
+  for (const country of stageCountries) {
+    const originalJuryOdds = countryOdds[country.code]?.juryOdds ?? 50;
+    const originalTelevoteOdds = countryOdds[country.code]?.televoteOdds ?? 50;
+
+    const luckFactor = Math.random() * 1.5 + 1.5; // 1.5-3
+    // Generate a "luck" factor for this country for this simulation run
+    // from a power-law distribution. This ensures "spiky" random results
+    // where some countries get high values and most get lower values.
+    // We set a minimum baseline (e.g., 15) to prevent too many countries
+    // from getting near-zero odds at high randomness levels.
+    const randomBaseline = Math.random() * 20; // 0-20
+
+    const juryRandomValue =
+      randomBaseline +
+      (100 - randomBaseline) * Math.pow(Math.random(), luckFactor);
+    const televoteRandomValue =
+      randomBaseline +
+      (100 - randomBaseline) * Math.pow(Math.random(), luckFactor);
+
+    // Interpolate between the real odds and the random value.
+    const perturbedJuryOdds =
+      (1 - randomnessFactor) * originalJuryOdds +
+      randomnessFactor * juryRandomValue;
+    const perturbedTelevoteOdds =
+      (1 - randomnessFactor) * originalTelevoteOdds +
+      randomnessFactor * televoteRandomValue;
+
+    perturbedOdds[country.code] = {
+      juryOdds: perturbedJuryOdds,
+      televoteOdds: perturbedTelevoteOdds,
+    };
+  }
+
   const stageVotes: Partial<StageVotes> = {};
 
   const shouldGenerateJury =
@@ -191,9 +227,9 @@ export const predefineStageVotes = (
       stageVotes.jury[votingCountry.code] = generateVotesForSource(
         votingCountry,
         stageCountries,
-        countryOdds,
+        perturbedOdds,
         'juryOdds',
-        randomnessLevel,
+        temperature,
       );
     }
   }
@@ -204,8 +240,8 @@ export const predefineStageVotes = (
       stageVotes.combined[votingCountry.code] = generateCombinedVotes(
         votingCountry,
         stageCountries,
-        countryOdds,
-        randomnessLevel,
+        perturbedOdds,
+        temperature,
       );
     }
   }
@@ -216,9 +252,9 @@ export const predefineStageVotes = (
       stageVotes.televote[votingCountry.code] = generateVotesForSource(
         votingCountry,
         stageCountries,
-        countryOdds,
+        perturbedOdds,
         'televoteOdds',
-        randomnessLevel,
+        temperature,
       );
     }
   }

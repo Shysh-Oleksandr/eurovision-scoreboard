@@ -22,7 +22,8 @@ export type ScoreboardState = {
   shouldClearPoints: boolean;
   winnerCountry: Country | null;
   showQualificationResults: boolean;
-  restartCounter: number;
+  restartCounter: number; // It's needed to trigger restart event when clicking "Restart" button
+  startCounter: number; // It's needed for board initial animation when clicking "Start" button
   showAllParticipants: boolean;
   televotingProgress: number;
   predefinedVotes: Record<string, Partial<StageVotes>>;
@@ -47,6 +48,7 @@ export type ScoreboardState = {
   resetLastPoints: () => void;
   hideLastReceivedPoints: () => void;
   startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
+  triggerRestartEvent: () => void;
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;

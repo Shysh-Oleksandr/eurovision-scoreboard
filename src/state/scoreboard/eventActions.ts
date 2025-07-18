@@ -19,6 +19,7 @@ type EventActions = {
   startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
+  triggerRestartEvent: () => void;
 };
 
 export const createEventActions: StateCreator<
@@ -112,7 +113,7 @@ export const createEventActions: StateCreator<
       shouldClearPoints: false,
       winnerCountry: null,
       showQualificationResults: false,
-      restartCounter: get().restartCounter + 1,
+      startCounter: get().startCounter + 1,
       showAllParticipants: false,
       televotingProgress: 0,
       hasShownManualTelevoteWarning: false,
@@ -188,6 +189,12 @@ export const createEventActions: StateCreator<
   closeQualificationResults: () => {
     set({
       showQualificationResults: false,
+    });
+  },
+
+  triggerRestartEvent: () => {
+    set({
+      restartCounter: get().restartCounter + 1,
     });
   },
 });

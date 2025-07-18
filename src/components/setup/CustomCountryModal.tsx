@@ -177,7 +177,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
               OR
             </span>
             <Button
-              variant="secondary"
+              variant="tertiary"
               className="w-fit pointer-events-auto"
               onClick={handleBrowseClick}
             >

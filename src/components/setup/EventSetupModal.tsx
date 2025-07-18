@@ -49,10 +49,11 @@ const EventSetupModal = () => {
   const setConfiguredEventStages = useCountriesStore(
     (state) => state.setConfiguredEventStages,
   );
-
+  const countryOdds = useCountriesStore((state) => state.countryOdds);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const startEvent = useScoreboardStore((state) => state.startEvent);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
+  const restartCounter = useScoreboardStore((state) => state.restartCounter);
 
   const [activeTab, setActiveTab] = useState<EventMode>(
     EventMode.SEMI_FINALS_AND_GRAND_FINAL,
@@ -264,8 +265,6 @@ const EventSetupModal = () => {
     setEventStages(eventStagesWithCountries);
 
     const allCountries = getAllCountries();
-    // TODO: update
-    const { countryOdds } = useCountriesStore.getState();
 
     const allSelectedCountries: BaseCountry[] = Object.entries(
       allAssignments[activeTab],
@@ -293,6 +292,13 @@ const EventSetupModal = () => {
 
     startEvent(activeTab, allSelectedCountries);
   };
+
+  useEffect(() => {
+    if (restartCounter > 0) {
+      handleStartEvent();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restartCounter]);
 
   return (
     <Modal

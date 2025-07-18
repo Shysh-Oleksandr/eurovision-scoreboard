@@ -18,7 +18,6 @@ const Board = (): JSX.Element => {
   useScoreboardStore((state) => state.eventStages);
 
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const restartCounter = useScoreboardStore((state) => state.restartCounter);
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
   );
@@ -78,7 +77,7 @@ const Board = (): JSX.Element => {
         }`}
       >
         <Flipper
-          key={`${currentStageId}-${restartCounter}-${showAllParticipants}`}
+          key={`${currentStageId}-${showAllParticipants}`}
           flipKey={flipKey}
           spring={FLIP_SPRING}
         >

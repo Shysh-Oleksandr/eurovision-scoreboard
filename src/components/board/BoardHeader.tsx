@@ -70,7 +70,9 @@ const BoardHeader = ({ resetPoints }: Props): JSX.Element => {
           votingText
         )}
       </h3>
-      {!isVotingOver && <Button label="Random" onClick={chooseRandomly} />}
+      {!isVotingOver && (
+        <Button variant="tertiary" label="Random" onClick={chooseRandomly} />
+      )}
     </div>
   );
 };

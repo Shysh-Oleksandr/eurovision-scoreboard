@@ -5,6 +5,9 @@ import { useGeneralStore } from '../../state/generalStore';
 import { getHostingCountryLogoForYear } from '../../theme/themes';
 import Button from '../common/Button';
 
+import { RestartIcon } from '@/assets/icons/RestartIcon';
+import { useScoreboardStore } from '@/state/scoreboardStore';
+
 interface SimulationHeaderProps {
   phaseTitle: string;
 }
@@ -13,6 +16,10 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const year = useGeneralStore((state) => state.year);
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,
+  );
+
+  const triggerRestartEvent = useScoreboardStore(
+    (state) => state.triggerRestartEvent,
   );
 
   return (
@@ -31,10 +38,10 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
       </div>
 
       <div className="flex gap-2">
-        <Button
-          label="Start over"
-          onClick={() => setEventSetupModalOpen(true)}
-        />
+        <Button onClick={() => triggerRestartEvent()} className="!p-3">
+          <RestartIcon className="w-6 h-6" />
+        </Button>
+        <Button label="Setup" onClick={() => setEventSetupModalOpen(true)} />
       </div>
     </div>
   );

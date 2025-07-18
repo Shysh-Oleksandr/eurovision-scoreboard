@@ -1,7 +1,10 @@
 import React from 'react';
 
-import { EventStage, StageVotingType } from '../../../models';
+import { EventStage, StageVotingMode, StageVotingType } from '../../../models';
 import Badge from '../../common/Badge';
+
+import { InfoIcon } from '@/assets/icons/InfoIcon';
+import { Tooltip } from '@/components/common/Tooltip';
 
 interface StatsHeaderProps {
   finishedStages: EventStage[];
@@ -22,8 +25,38 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   voteTypeOptions,
   totalBadgeLabel,
 }) => {
+  const isCombinedVoting = finishedStages.some(
+    (stage) =>
+      stage.id === selectedStageId &&
+      stage.votingMode === StageVotingMode.COMBINED,
+  );
+
   return (
-    <div className="flex flex-col gap-3 px-2">
+    <div className="flex flex-col gap-3 px-2 relative">
+      {isCombinedVoting && (
+        <div className="absolute top-1 right-1">
+          <Tooltip
+            content={
+              <div className="space-y-2 font-medium">
+                <p>
+                  In Combined voting, each country gets jury and televote
+                  rankings separately.
+                  <br />
+                  These rankings are merged 50/50 — converted into points,
+                  summed, and re-ranked — to decide the final points given.
+                  <br />
+                  <br />
+                  This means a country’s combined total may differ from the sum
+                  of separate jury and televote points, since only rankings —
+                  not raw points — are used.
+                </p>
+              </div>
+            }
+          >
+            <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
+          </Tooltip>
+        </div>
+      )}
       <div className="flex justify-center sm:gap-3 gap-2 flex-wrap">
         {finishedStages.map((stage) => (
           <Badge
@@ -37,7 +70,6 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
           />
         ))}
       </div>
-
       <div className="flex justify-center sm:gap-3 gap-2">
         <Badge
           label={totalBadgeLabel}

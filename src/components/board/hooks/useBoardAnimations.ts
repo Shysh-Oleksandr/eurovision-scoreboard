@@ -15,7 +15,7 @@ export const useBoardAnimations = (
 ) => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const restartCounter = useScoreboardStore((state) => state.restartCounter);
+  const startCounter = useScoreboardStore((state) => state.startCounter);
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
   );
@@ -106,7 +106,7 @@ export const useBoardAnimations = (
       );
     },
     {
-      dependencies: [currentStageId, restartCounter, showAllParticipants],
+      dependencies: [currentStageId, startCounter, showAllParticipants],
       scope: containerRef,
     },
   );

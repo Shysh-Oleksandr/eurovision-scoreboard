@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-18',
+    title:
+      'Improved the randomness logic. Added a restart button during simulation. Small improvements',
+  },
+  {
     date: '2025-07-17',
     title: 'Small bug fixes',
   },
