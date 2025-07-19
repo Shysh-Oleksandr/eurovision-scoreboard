@@ -29,8 +29,8 @@ const ControlsPanel = (): JSX.Element | null => {
   }
 
   return (
-    <div className="flex-1 mb-[6px] md:pt-1 pt-4">
-      <div className="md:pb-3 pb-1">
+    <div className="mb-[6px] md:min-w-[180px] w-full">
+      <div className="md:pb-2 pb-1 md:h-12 flex items-center">
         <h3 className="lg:text-2xl text-xl text-white">{votingTitle}</h3>
       </div>
       <div className="bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md">

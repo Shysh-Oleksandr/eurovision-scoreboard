@@ -68,7 +68,7 @@ const Board = (): JSX.Element => {
   );
 
   return (
-    <div className={`${isVotingOver ? '' : 'md:w-2/3'} w-full h-full`}>
+    <div className="w-full h-full">
       <BoardHeader resetPoints={resetPoints} />
       <div
         ref={containerRef}
