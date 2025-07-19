@@ -21,9 +21,11 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
 
     setShouldBlink(true);
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setShouldBlink(false);
     }, 1000);
+
+    return () => clearTimeout(timer);
   }, [votingCountryIndex]);
 
   return (

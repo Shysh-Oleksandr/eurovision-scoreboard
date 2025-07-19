@@ -34,13 +34,18 @@ const Board = (): JSX.Element => {
     resetPoints,
   } = useVoting();
 
-  const { finalCountries, showPlace, flipKey, containerRef } =
-    useBoardAnimations(
-      sortedCountries,
-      isVotingOver,
-      wasTheFirstPointsAwarded,
-      hasCountryFinishedVoting,
-    );
+  const {
+    delayedSortedCountries,
+    finalCountries,
+    showPlace,
+    flipKey,
+    containerRef,
+  } = useBoardAnimations(
+    sortedCountries,
+    isVotingOver,
+    wasTheFirstPointsAwarded,
+    hasCountryFinishedVoting,
+  );
 
   const renderItem = useCallback(
     (country: Country) => (
@@ -50,7 +55,9 @@ const Board = (): JSX.Element => {
             country={country}
             votingCountryCode={votingCountry?.code}
             onClick={onClick}
-            index={sortedCountries.findIndex((c) => c.code === country.code)}
+            index={delayedSortedCountries.findIndex(
+              (c) => c.code === country.code,
+            )}
             {...props}
             showPlaceAnimation={showPlace}
             hasCountryFinishedVoting={hasCountryFinishedVoting}
@@ -62,7 +69,7 @@ const Board = (): JSX.Element => {
       votingCountry?.code,
       onClick,
       showPlace,
-      sortedCountries,
+      delayedSortedCountries,
       hasCountryFinishedVoting,
     ],
   );

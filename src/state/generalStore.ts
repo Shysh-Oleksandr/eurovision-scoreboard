@@ -45,7 +45,7 @@ export const useGeneralStore = create<GeneralState>()(
       year: INITIAL_YEAR,
       themeYear: INITIAL_YEAR,
       theme: getThemeForYear(INITIAL_YEAR),
-      alwaysShowRankings: false,
+      alwaysShowRankings: true,
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
       },

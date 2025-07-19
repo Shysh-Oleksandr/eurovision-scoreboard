@@ -178,11 +178,11 @@ h6 {
 }
 
 .blinker {
-  animation: blinker 0.8s ease-out;
+  animation: blinker 1s ease-in-out;
 }
 
 @keyframes blinker {
-  50% {
+  0% {
     opacity: 0;
   }
 }
