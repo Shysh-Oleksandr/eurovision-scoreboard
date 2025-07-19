@@ -11,6 +11,7 @@ interface CollapsibleSectionProps {
   extraContent?: React.ReactNode;
   headerClassName?: string;
   titleClassName?: string;
+  contentClassName?: string;
 }
 
 export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
@@ -20,8 +21,9 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   onToggle,
   defaultExpanded = false,
   extraContent,
-  headerClassName,
-  titleClassName,
+  headerClassName = '',
+  titleClassName = '',
+  contentClassName = '',
 }) => {
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
   const [hasBeenOpened, setHasBeenOpened] = useState(defaultExpanded);
@@ -80,7 +82,9 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
         }`}
       >
         <div className="overflow-hidden">
-          <div className="p-4 pt-3 border-t border-primary-800 border-solid">
+          <div
+            className={`p-4 pt-3 border-t border-primary-800 border-solid ${contentClassName}`}
+          >
             {hasBeenOpened && children}
           </div>
         </div>

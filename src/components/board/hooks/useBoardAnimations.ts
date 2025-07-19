@@ -121,9 +121,10 @@ export const useBoardAnimations = (
 
   useEffect(() => {
     if (alwaysShowRankings && wasTheFirstPointsAwarded) {
+      const delay = flipMoveDelay === 0 ? 0 : flipMoveDelay + 200;
       const timer = setTimeout(() => {
         setDelayedSortedCountries(sortedCountries);
-      }, flipMoveDelay);
+      }, delay);
 
       return () => clearTimeout(timer);
     }

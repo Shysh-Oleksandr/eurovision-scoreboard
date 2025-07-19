@@ -3,6 +3,8 @@ import Confetti from 'react-confetti';
 
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 const CONFETTI_TIMEOUT = 10 * 1000;
 
 const CONFETTI_COLORS = [
@@ -18,6 +20,9 @@ const CONFETTI_COLORS = [
 
 const WinnerConfetti: React.FC = () => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const showWinnerConfetti = useGeneralStore(
+    (state) => state.showWinnerConfetti,
+  );
   const [showConfetti, setShowConfetti] = useState(false);
   const [shouldRecycle, setShouldRecycle] = useState(false);
   const [windowDimensions, setWindowDimensions] = useState({
@@ -53,7 +58,7 @@ const WinnerConfetti: React.FC = () => {
     setShouldRecycle(false);
   }, [winnerCountry]);
 
-  if (!showConfetti) return null;
+  if (!showConfetti || !showWinnerConfetti) return null;
 
   return (
     <Confetti

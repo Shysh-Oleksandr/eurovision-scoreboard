@@ -57,7 +57,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
       }
     >
-      <div className="p-4">
+      <div className="py-4 px-2">
         {activeTab === SettingsTab.GENERAL && <GeneralSettings />}
         {activeTab === SettingsTab.ODDS && (
           <OddsSettings countries={participatingCountries} />

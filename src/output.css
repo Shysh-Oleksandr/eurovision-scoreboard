@@ -1091,6 +1091,41 @@ video {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
+.scale-y-\[1\.05\] {
+  --tw-scale-y: 1.05;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-y-\[1\.45\] {
+  --tw-scale-y: 1.45;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-y-\[1\.5\] {
+  --tw-scale-y: 1.5;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-y-\[1\] {
+  --tw-scale-y: 1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-y-\[1\.1\] {
+  --tw-scale-y: 1.1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-y-\[1\.2\] {
+  --tw-scale-y: 1.2;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.scale-y-\[1\.01\] {
+  --tw-scale-y: 1.01;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
@@ -1751,6 +1786,11 @@ video {
   padding-bottom: 10px;
 }
 
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .\!pb-4 {
   padding-bottom: 1rem !important;
 }
@@ -2038,6 +2078,11 @@ video {
 
 .text-white\/90 {
   color: rgb(255 255 255 / 0.9);
+}
+
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity, 1));
 }
 
 .underline {
@@ -3106,7 +3151,8 @@ h6 {
   border-radius: 6px;
   overflow: hidden;
   transition: all 0.2s ease;
-  display: inline-block;
+  display: flex;
+  align-items: center;
 }
 
 .checkbox-wrapper .cbx:not(:last-child) {
@@ -3118,9 +3164,9 @@ h6 {
 }
 
 .checkbox-wrapper .cbx span {
-  float: left;
-  vertical-align: middle;
-  transform: translate3d(0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .checkbox-wrapper .cbx span:first-child {
@@ -3132,6 +3178,7 @@ h6 {
   border: 1px solid #cccfdb;
   transition: all 0.2s ease;
   box-shadow: 0 1px 1px rgba(0, 16, 75, 0.05);
+  flex: none;
 }
 
 .checkbox-wrapper .cbx span:first-child svg {
@@ -3187,7 +3234,8 @@ h6 {
 @media screen and (max-width: 640px) {
   .checkbox-wrapper .cbx {
     width: 100%;
-    display: inline-block;
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -3444,6 +3492,10 @@ h6 {
     max-width: 9rem;
   }
 
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .sm\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -3682,6 +3734,10 @@ h6 {
 
   .md\:\~md\/xl\:\~w-\[14\.5rem\]\/\[26rem\] {
     width: clamp(14.5rem,-2.75rem + 35.94vw,26rem)/* fluid from 14.5rem at 48rem to 26rem at 80rem */;
+  }
+
+  .md\:\~md\/xl\:\~w-\[14rem\]\/\[26rem\] {
+    width: clamp(14rem,-4rem + 37.5vw,26rem)/* fluid from 14rem at 48rem to 26rem at 80rem */;
   }
 }
 

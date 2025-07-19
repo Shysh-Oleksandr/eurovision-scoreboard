@@ -453,7 +453,8 @@ h6 {
   border-radius: 6px;
   overflow: hidden;
   transition: all 0.2s ease;
-  display: inline-block;
+  display: flex;
+  align-items: center;
 }
 
 .checkbox-wrapper .cbx:not(:last-child) {
@@ -465,9 +466,9 @@ h6 {
 }
 
 .checkbox-wrapper .cbx span {
-  float: left;
-  vertical-align: middle;
-  transform: translate3d(0, 0, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .checkbox-wrapper .cbx span:first-child {
@@ -479,6 +480,7 @@ h6 {
   border: 1px solid #cccfdb;
   transition: all 0.2s ease;
   box-shadow: 0 1px 1px rgba(0, 16, 75, 0.05);
+  flex: none;
 }
 
 .checkbox-wrapper .cbx span:first-child svg {
@@ -532,7 +534,8 @@ h6 {
 @media screen and (max-width: 640px) {
   .checkbox-wrapper .cbx {
     width: 100%;
-    display: inline-block;
+    display: flex;
+    align-items: center;
   }
 }
 

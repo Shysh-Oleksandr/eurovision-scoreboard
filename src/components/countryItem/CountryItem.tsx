@@ -99,7 +99,7 @@ const CountryItem = ({
   return (
     <div
       className={`flex relative ${
-        isVotingOver ? '' : 'md:~md/xl:~w-[14.5rem]/[26rem]'
+        isVotingOver ? '' : 'md:~md/xl:~w-[14rem]/[26rem]'
       }`}
       {...props}
     >
@@ -110,7 +110,7 @@ const CountryItem = ({
       />
 
       <button
-        className={`${buttonClassName} flex-1 min-w-0`}
+        className={`${buttonClassName} flex-1 min-w-0 overflow-hidden`}
         disabled={isDisabled}
         onClick={() => onClick(country.code)}
       >

@@ -9,9 +9,13 @@ import Button from '../common/Button';
 import Modal, { ANIMATION_DURATION } from '../common/Modal/Modal';
 import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
+import { useGeneralStore } from '@/state/generalStore';
 import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
 
 const QualificationResultsModal = () => {
+  const showQualificationModal = useGeneralStore(
+    (state) => state.showQualificationModal,
+  );
   const showQualificationResults = useScoreboardStore(
     (state) => state.showQualificationResults,
   );
@@ -22,6 +26,9 @@ const QualificationResultsModal = () => {
   const closeQualificationResults = useScoreboardStore(
     (state) => state.closeQualificationResults,
   );
+
+  const shouldShowQualificationModal =
+    showQualificationModal && showQualificationResults;
 
   const { name: currentStageName, countries } = getCurrentStage();
   const { nextPhase } = useNextEventName();
@@ -39,10 +46,10 @@ const QualificationResultsModal = () => {
   const [shouldClose, setShouldClose] = useState(false);
 
   useEffect(() => {
-    if (showQualificationResults) {
+    if (shouldShowQualificationModal) {
       setShouldClose(false);
     }
-  }, [showQualificationResults]);
+  }, [shouldShowQualificationModal]);
 
   const handleClose = () => {
     closeQualificationResults();
@@ -54,7 +61,7 @@ const QualificationResultsModal = () => {
 
   // Track when modal becomes visible (after delay)
   useEffect(() => {
-    if (showQualificationResults) {
+    if (shouldShowQualificationModal) {
       const timer = setTimeout(() => {
         setIsModalVisible(true);
       }, 3400); // Same delay as openDelay prop
@@ -65,7 +72,7 @@ const QualificationResultsModal = () => {
       };
     }
     setIsModalVisible(false);
-  }, [showQualificationResults]);
+  }, [shouldShowQualificationModal]);
 
   useGSAP(
     () => {
@@ -85,7 +92,7 @@ const QualificationResultsModal = () => {
 
   return (
     <Modal
-      isOpen={showQualificationResults && !shouldClose}
+      isOpen={shouldShowQualificationModal && !shouldClose}
       onClose={handleTriggerClose}
       onClosed={handleClose}
       openDelay={3400}
