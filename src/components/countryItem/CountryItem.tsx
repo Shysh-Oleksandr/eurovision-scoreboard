@@ -14,6 +14,8 @@ import { useItemState } from './hooks/useItemState';
 import { useQualificationStatus } from './hooks/useQualificationStatus';
 import useVotingFinished from './hooks/useVotingFinished';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 type Props = {
   country: Country;
   index: number;
@@ -33,6 +35,11 @@ const CountryItem = ({
   ...props
 }: Props) => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const alwaysShowRankings = useGeneralStore(
+    (state) => state.alwaysShowRankings,
+  );
+
+  const shouldShowPlaceNumber = alwaysShowRankings || showPlaceAnimation;
 
   const { isJuryVoting, isOver: isVotingOver } = getCurrentStage();
 
@@ -65,7 +72,7 @@ const CountryItem = ({
     country,
     votingCountryCode,
     isJuryVoting,
-    showPlaceAnimation,
+    showPlaceAnimation: shouldShowPlaceNumber,
     shouldShowAsNonQualified,
     hasCountryFinishedVoting,
     isCountryVotingFinished: !!country.isVotingFinished,
@@ -94,7 +101,7 @@ const CountryItem = ({
       <CountryPlaceNumber
         shouldShowAsNonQualified={shouldShowAsNonQualified}
         index={index}
-        showPlaceAnimation={showPlaceAnimation}
+        showPlaceAnimation={shouldShowPlaceNumber}
       />
 
       <button

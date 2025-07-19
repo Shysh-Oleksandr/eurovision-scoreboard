@@ -14,6 +14,11 @@ enum SettingsTab {
   ODDS = 'Odds',
 }
 
+const tabs = [
+  { value: SettingsTab.GENERAL, label: 'General' },
+  { value: SettingsTab.ODDS, label: 'Odds' },
+];
+
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -25,12 +30,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   participatingCountries,
 }) => {
-  const [activeTab, setActiveTab] = useState(SettingsTab.ODDS);
-
-  const tabs = [
-    // { value: SettingsTab.GENERAL, label: 'General' },
-    { value: SettingsTab.ODDS, label: 'Odds' },
-  ];
+  const [activeTab, setActiveTab] = useState(SettingsTab.GENERAL);
 
   return (
     <Modal

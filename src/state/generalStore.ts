@@ -18,11 +18,13 @@ interface GeneralState {
   year: Year;
   themeYear: Year;
   theme: Theme;
+  alwaysShowRankings: boolean;
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
   setYear: (year: Year) => void;
   setTheme: (year: Year) => void;
+  setAlwaysShowRankings: (show: boolean) => void;
 }
 
 const getLatestUpdate = () => {
@@ -43,6 +45,7 @@ export const useGeneralStore = create<GeneralState>()(
       year: INITIAL_YEAR,
       themeYear: INITIAL_YEAR,
       theme: getThemeForYear(INITIAL_YEAR),
+      alwaysShowRankings: false,
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
       },
@@ -77,6 +80,9 @@ export const useGeneralStore = create<GeneralState>()(
           theme: getThemeForYear(year),
         });
       },
+      setAlwaysShowRankings: (show: boolean) => {
+        set({ alwaysShowRankings: show });
+      },
     }),
     {
       name: 'general-storage',
@@ -86,6 +92,7 @@ export const useGeneralStore = create<GeneralState>()(
           themeYear: state.themeYear,
           lastSeenUpdate: state.lastSeenUpdate,
           shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
+          alwaysShowRankings: state.alwaysShowRankings,
         };
       },
       onRehydrateStorage: () => (state) => {
