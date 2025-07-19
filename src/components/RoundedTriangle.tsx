@@ -11,7 +11,7 @@ const RoundedTriangle = ({ className, withTransition = true }: Props) => (
     viewBox="86.921 205.97 75.066 144.831"
     width="100%"
     height="100%"
-    className={`triangle ${className} !bg-transparent ${
+    className={`triangle ${className} !bg-transparent scale-y-[1.05] ${
       withTransition ? '!transition-colors !duration-500' : ''
     }`}
     preserveAspectRatio="none"

@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
@@ -17,6 +17,8 @@ const CountryPlaceNumber = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
 
+  const [shouldBlink, setShouldBlink] = useState(false);
+
   // Calculate width dynamically to handle different screen sizes
   const width = useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -25,6 +27,16 @@ const CountryPlaceNumber = ({
 
     return 40; // fallback
   }, []);
+
+  useEffect(() => {
+    setShouldBlink(true);
+
+    const timer = setTimeout(() => {
+      setShouldBlink(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [index]);
 
   useGSAP(
     () => {
@@ -71,7 +83,12 @@ const CountryPlaceNumber = ({
         shouldShowAsNonQualified ? 'bg-primary-900 opacity-70' : ''
       }`}
     >
-      <h4 ref={textRef} className="font-semibold md:text-lg text-base">
+      <h4
+        ref={textRef}
+        className={`font-semibold md:text-lg text-base ${
+          shouldBlink ? 'blinker' : ''
+        }`}
+      >
         {placeText}
       </h4>
     </div>

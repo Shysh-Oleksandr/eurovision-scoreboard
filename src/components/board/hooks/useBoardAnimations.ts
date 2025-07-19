@@ -7,6 +7,8 @@ import { useReorderCountries } from '../../../hooks/useReorderCountries';
 import { Country } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 export const useBoardAnimations = (
   sortedCountries: Country[],
   isVotingOver: boolean,
@@ -18,6 +20,9 @@ export const useBoardAnimations = (
   const startCounter = useScoreboardStore((state) => state.startCounter);
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
+  );
+  const alwaysShowRankings = useGeneralStore(
+    (state) => state.alwaysShowRankings,
   );
 
   const [showPlace, setShowPlace] = useState(false);
@@ -111,7 +116,28 @@ export const useBoardAnimations = (
     },
   );
 
+  const [delayedSortedCountries, setDelayedSortedCountries] =
+    useState(sortedCountries);
+
+  useEffect(() => {
+    if (alwaysShowRankings && wasTheFirstPointsAwarded) {
+      const delay = flipMoveDelay === 0 ? 0 : flipMoveDelay + 200;
+      const timer = setTimeout(() => {
+        setDelayedSortedCountries(sortedCountries);
+      }, delay);
+
+      return () => clearTimeout(timer);
+    }
+    setDelayedSortedCountries(sortedCountries);
+  }, [
+    sortedCountries,
+    alwaysShowRankings,
+    wasTheFirstPointsAwarded,
+    flipMoveDelay,
+  ]);
+
   return {
+    delayedSortedCountries,
     finalCountries,
     showPlace,
     flipKey,

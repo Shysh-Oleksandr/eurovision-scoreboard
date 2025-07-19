@@ -1,8 +1,8 @@
 export const WHATS_NEW = [
   {
-    date: '2025-07-18',
+    date: '2025-07-19',
     title:
-      'Improved the randomness logic. Added a restart button during simulation. Small improvements',
+      'Added UI Preferences settings. Added the ability to always display the rankings. Small improvements',
   },
   {
     date: '2025-07-17',
@@ -75,16 +75,16 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-07-19', end: '2025-07-20' },
-    title: 'Semi-finals voting by selection (without awarding points)',
-  },
-  {
-    approximateDates: { start: '2025-07-19', end: '2025-07-20' },
-    title: 'Voting countries selection',
+    approximateDates: { start: '2025-07-20', end: '2025-07-21' },
+    title: 'Configurable points system (not only "1-8, 10, 12")',
   },
   {
     approximateDates: { start: '2025-07-20', end: '2025-07-21' },
-    title: 'Configurable points system (not only "1-8, 10, 12")',
+    title: 'Voting countries selection',
+  },
+  {
+    approximateDates: { start: '2025-07-21', end: '2025-07-22' },
+    title: 'Semi-finals voting by selection (without awarding points)',
   },
   {
     // approximateDates: { start: '2025-07-13', end: '2025-07-14' },

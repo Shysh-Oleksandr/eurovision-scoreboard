@@ -38,7 +38,12 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
       </div>
 
       <div className="flex gap-2">
-        <Button onClick={() => triggerRestartEvent()} className="!p-3">
+        <Button
+          onClick={() => triggerRestartEvent()}
+          className="!p-3"
+          aria-label="Restart"
+          title="Restart"
+        >
           <RestartIcon className="w-6 h-6" />
         </Button>
         <Button label="Setup" onClick={() => setEventSetupModalOpen(true)} />

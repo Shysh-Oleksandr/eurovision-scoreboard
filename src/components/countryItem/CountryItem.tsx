@@ -14,6 +14,8 @@ import { useItemState } from './hooks/useItemState';
 import { useQualificationStatus } from './hooks/useQualificationStatus';
 import useVotingFinished from './hooks/useVotingFinished';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 type Props = {
   country: Country;
   index: number;
@@ -33,6 +35,11 @@ const CountryItem = ({
   ...props
 }: Props) => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const alwaysShowRankings = useGeneralStore(
+    (state) => state.alwaysShowRankings,
+  );
+
+  const shouldShowPlaceNumber = alwaysShowRankings || showPlaceAnimation;
 
   const { isJuryVoting, isOver: isVotingOver } = getCurrentStage();
 
@@ -65,7 +72,7 @@ const CountryItem = ({
     country,
     votingCountryCode,
     isJuryVoting,
-    showPlaceAnimation,
+    showPlaceAnimation: shouldShowPlaceNumber,
     shouldShowAsNonQualified,
     hasCountryFinishedVoting,
     isCountryVotingFinished: !!country.isVotingFinished,
@@ -90,15 +97,20 @@ const CountryItem = ({
   });
 
   return (
-    <div className="flex relative" {...props}>
+    <div
+      className={`flex relative ${
+        isVotingOver ? '' : 'md:~md/xl:~w-[14rem]/[26rem]'
+      }`}
+      {...props}
+    >
       <CountryPlaceNumber
         shouldShowAsNonQualified={shouldShowAsNonQualified}
         index={index}
-        showPlaceAnimation={showPlaceAnimation}
+        showPlaceAnimation={shouldShowPlaceNumber}
       />
 
       <button
-        className={buttonClassName}
+        className={`${buttonClassName} flex-1 min-w-0 overflow-hidden`}
         disabled={isDisabled}
         onClick={() => onClick(country.code)}
       >
@@ -112,7 +124,7 @@ const CountryItem = ({
           />
         )}
 
-        <div className="flex items-center">
+        <div className="flex items-center overflow-hidden flex-1">
           <img
             loading="lazy"
             src={getFlagPath(country)}
@@ -125,23 +137,19 @@ const CountryItem = ({
             className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-countryItem-juryBg self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
           />
           <h4
-            className={`uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] xs:pr-2 pr-0 ${
-              country.name.length > 10 && !isVotingOver
-                ? 'md:text-xs'
-                : 'md:text-sm'
-            } md:!leading-5 xs:break-normal break-all`}
+            className={`uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] truncate flex-1 min-w-[7rem] sm:min-w-[9rem] md:min-w-0 2cols:max-w-[11rem] sm:max-w-[9rem] xs:max-w-[20rem] 2xs:max-w-[14.7rem] max-w-[11rem] md:max-w-full`}
           >
             {country.name}
           </h4>
         </div>
-        <div className="flex h-full">
+        <div className="flex h-full flex-shrink-0">
           {/* Last points */}
           <div
             ref={lastPointsContainerRef}
             style={{
               display: country.lastReceivedPoints === -1 ? 'none' : 'block',
             }}
-            className={`relative z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8 will-change-all ${lastPointsBgClass}`}
+            className={`absolute lg:right-10 md:right-9 right-8 z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8 will-change-all ${lastPointsBgClass}`}
           >
             <RoundedTriangle
               className={lastPointsBgClass}

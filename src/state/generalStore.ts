@@ -18,11 +18,19 @@ interface GeneralState {
   year: Year;
   themeYear: Year;
   theme: Theme;
+  alwaysShowRankings: boolean;
+  showQualificationModal: boolean;
+  showWinnerModal: boolean;
+  showWinnerConfetti: boolean;
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
   setYear: (year: Year) => void;
   setTheme: (year: Year) => void;
+  setAlwaysShowRankings: (show: boolean) => void;
+  setShowQualificationModal: (show: boolean) => void;
+  setShowWinnerModal: (show: boolean) => void;
+  setShowWinnerConfetti: (show: boolean) => void;
 }
 
 const getLatestUpdate = () => {
@@ -43,6 +51,11 @@ export const useGeneralStore = create<GeneralState>()(
       year: INITIAL_YEAR,
       themeYear: INITIAL_YEAR,
       theme: getThemeForYear(INITIAL_YEAR),
+      alwaysShowRankings: true,
+      showQualificationModal: true,
+      showWinnerModal: true,
+      showWinnerConfetti: true,
+
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
       },
@@ -77,6 +90,18 @@ export const useGeneralStore = create<GeneralState>()(
           theme: getThemeForYear(year),
         });
       },
+      setAlwaysShowRankings: (show: boolean) => {
+        set({ alwaysShowRankings: show });
+      },
+      setShowQualificationModal: (show: boolean) => {
+        set({ showQualificationModal: show });
+      },
+      setShowWinnerModal: (show: boolean) => {
+        set({ showWinnerModal: show });
+      },
+      setShowWinnerConfetti: (show: boolean) => {
+        set({ showWinnerConfetti: show });
+      },
     }),
     {
       name: 'general-storage',
@@ -86,6 +111,10 @@ export const useGeneralStore = create<GeneralState>()(
           themeYear: state.themeYear,
           lastSeenUpdate: state.lastSeenUpdate,
           shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
+          alwaysShowRankings: state.alwaysShowRankings,
+          showQualificationModal: state.showQualificationModal,
+          showWinnerModal: state.showWinnerModal,
+          showWinnerConfetti: state.showWinnerConfetti,
         };
       },
       onRehydrateStorage: () => (state) => {

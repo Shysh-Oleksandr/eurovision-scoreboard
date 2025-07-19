@@ -5,12 +5,17 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 const WinnerModal = () => {
+  const showWinnerModal = useGeneralStore((state) => state.showWinnerModal);
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,
   );
   const [showModal, setShowModal] = useState(false);
+
+  const shouldShowWinnerModal = showWinnerModal && showModal && !!winnerCountry;
 
   useEffect(() => {
     if (winnerCountry) {
@@ -20,7 +25,7 @@ const WinnerModal = () => {
 
   return (
     <Modal
-      isOpen={showModal && !!winnerCountry}
+      isOpen={shouldShowWinnerModal}
       openDelay={3400}
       onClose={() => setShowModal(false)}
       containerClassName="lg:!w-2/5 md:!w-1/2 xs:!w-3/4 w-full"
