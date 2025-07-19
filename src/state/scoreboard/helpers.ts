@@ -1,5 +1,21 @@
 import { Country, EventStage } from '../../models';
 
+export const compareCountriesByPoints = (a: Country, b: Country) => {
+  const pointsComparison = b.points - a.points;
+
+  if (pointsComparison === 0) {
+    const televoteComparison = b.televotePoints - a.televotePoints;
+
+    if (televoteComparison === 0) {
+      return a.name.localeCompare(b.name);
+    }
+
+    return televoteComparison;
+  }
+
+  return pointsComparison;
+};
+
 export const getRemainingCountries = (
   countries: Country[],
   countryCode: string | undefined,
@@ -10,13 +26,9 @@ export const getRemainingCountries = (
 
 export const getLastCountryCodeByPoints = (remainingCountries: Country[]) =>
   remainingCountries.length
-    ? remainingCountries.slice().sort((a, b) => {
-        const pointsComparison = b.points - a.points;
-
-        return pointsComparison !== 0
-          ? pointsComparison
-          : a.name.localeCompare(b.name);
-      })[remainingCountries.length - 1].code
+    ? remainingCountries.slice().sort(compareCountriesByPoints)[
+        remainingCountries.length - 1
+      ].code
     : '';
 
 export const getLastCountryIndexByPoints = (
@@ -47,25 +59,29 @@ export const handleStageEnd = (
       isVotingFinished: true,
     }));
     winnerCountry = updatedCountries.reduce((prev, current) => {
-      if (prev.points > current.points) {
-        return prev;
-      }
       if (current.points > prev.points) {
         return current;
       }
+      if (current.points < prev.points) {
+        return prev;
+      }
+      // points are equal, check televotePoints
+      if (current.televotePoints > prev.televotePoints) {
+        return current;
+      }
+      if (current.televotePoints < prev.televotePoints) {
+        return prev;
+      }
 
-      return prev.name.localeCompare(current.name) < 0 ? prev : current;
+      // televotePoints are also equal, use alphabetical order (A-Z wins)
+      return current.name.localeCompare(prev.name) < 0 ? current : prev;
     });
   }
 
   if (showQualificationResults) {
-    const sortedCountries = [...updatedCountries].sort((a, b) => {
-      const pointsComparison = b.points - a.points;
-
-      return pointsComparison !== 0
-        ? pointsComparison
-        : a.name.localeCompare(b.name);
-    });
+    const sortedCountries = [...updatedCountries].sort(
+      compareCountriesByPoints,
+    );
     const qualifiersAmount = currentStage.qualifiersAmount || 0;
     const qualifiedCountries = sortedCountries.slice(0, qualifiersAmount);
 

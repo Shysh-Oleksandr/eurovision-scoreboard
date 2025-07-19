@@ -9,6 +9,8 @@ import Button from '../common/Button';
 import Modal, { ANIMATION_DURATION } from '../common/Modal/Modal';
 import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
 
+import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
+
 const QualificationResultsModal = () => {
   const showQualificationResults = useScoreboardStore(
     (state) => state.showQualificationResults,
@@ -28,7 +30,7 @@ const QualificationResultsModal = () => {
     () =>
       countries
         .filter((country) => country.isQualifiedFromSemi)
-        .sort((a, b) => b.points - a.points),
+        .sort(compareCountriesByPoints),
     [countries],
   );
 

@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { Country } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
+import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
+
 export const useCountrySorter = (countriesToDisplay: Country[]) => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const showAllParticipants = useScoreboardStore(
@@ -31,19 +33,21 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
         const bSemiPoints = getCountryInSemiFinal(b.code)?.points ?? 0;
         const pointsComparison = bSemiPoints - aSemiPoints;
 
-        return pointsComparison !== 0
-          ? pointsComparison
-          : a.name.localeCompare(b.name);
+        if (pointsComparison === 0) {
+          const televoteComparison = b.televotePoints - a.televotePoints;
+
+          if (televoteComparison === 0) {
+            return a.name.localeCompare(b.name);
+          }
+
+          return televoteComparison;
+        }
+
+        return pointsComparison;
       });
     }
 
-    return countriesToSort.sort((a, b) => {
-      const pointsComparison = b.points - a.points;
-
-      return pointsComparison !== 0
-        ? pointsComparison
-        : a.name.localeCompare(b.name);
-    });
+    return countriesToSort.sort(compareCountriesByPoints);
   }, [
     countriesToDisplay,
     showAllParticipants,

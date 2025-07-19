@@ -162,7 +162,21 @@ export const useFinalStats = () => {
   };
 
   const rankedCountries = [...participatingCountries]
-    .sort((a, b) => getPoints(b) - getPoints(a) || a.name.localeCompare(b.name))
+    .sort((a, b) => {
+      const pointsComparison = getPoints(b) - getPoints(a);
+
+      if (pointsComparison === 0) {
+        const televoteComparison = b.televotePoints - a.televotePoints;
+
+        if (televoteComparison === 0) {
+          return a.name.localeCompare(b.name);
+        }
+
+        return televoteComparison;
+      }
+
+      return pointsComparison;
+    })
     .map((country, index) => ({ ...country, rank: index + 1 }));
 
   const getPointsFromVoter = (
