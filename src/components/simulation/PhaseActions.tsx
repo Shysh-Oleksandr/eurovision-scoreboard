@@ -99,7 +99,7 @@ export const PhaseActions = () => {
               value: stage.id,
               label: stage.name,
             }))}
-            className="py-2.5 px-4 min-w-[150px] font-medium bg-primary-800 bg-gradient-to-bl from-[20%] from-primary-900 to-primary-800/60 lg:text-base text-sm hover:bg-primary-700"
+            className="py-2.5 sm:px-4 px-3 sm:min-w-[150px] font-medium bg-primary-800 bg-gradient-to-bl from-[20%] from-primary-900 to-primary-800/60 lg:text-base text-sm hover:bg-primary-700"
             selectClassName="select"
             arrowClassName="!w-6 !h-6"
           >

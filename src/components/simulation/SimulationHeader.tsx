@@ -32,7 +32,7 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const canUndo =
     pastStates.length > 0 &&
     !!pastStates[pastStates.length - 1].currentStageId &&
-    viewedStageId === currentStageId;
+    (!viewedStageId || viewedStageId === currentStageId);
 
   return (
     <div className="flex justify-between items-center mb-4">
