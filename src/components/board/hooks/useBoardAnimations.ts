@@ -21,6 +21,7 @@ export const useBoardAnimations = (
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
   );
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const alwaysShowRankings = useGeneralStore(
     (state) => state.alwaysShowRankings,
   );
@@ -111,7 +112,12 @@ export const useBoardAnimations = (
       );
     },
     {
-      dependencies: [currentStageId, startCounter, showAllParticipants],
+      dependencies: [
+        currentStageId,
+        startCounter,
+        showAllParticipants,
+        viewedStageId,
+      ],
       scope: containerRef,
     },
   );

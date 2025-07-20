@@ -117,6 +117,7 @@ export const createEventActions: StateCreator<
       showAllParticipants: false,
       televotingProgress: 0,
       hasShownManualTelevoteWarning: false,
+      viewedStageId: null,
     });
   },
 

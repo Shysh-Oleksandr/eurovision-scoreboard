@@ -5,6 +5,7 @@ import { EventMode, StageId } from '@/models';
 export const initialScoreboardState: Partial<ScoreboardState> = {
   eventStages: [],
   currentStageId: null,
+  viewedStageId: null,
   eventMode: EventMode.GRAND_FINAL_ONLY,
   votingCountryIndex: 0,
   votingPoints: 1,

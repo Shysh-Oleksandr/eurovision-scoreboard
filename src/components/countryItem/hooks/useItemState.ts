@@ -46,7 +46,9 @@ export const useItemState = ({
 
     if (isJuryVoting) {
       return `bg-countryItem-juryBg text-countryItem-juryCountryText ${
-        isDisabled ? '' : 'hover:bg-countryItem-juryHoverBg cursor-pointer '
+        isDisabled
+          ? 'cursor-not-allowed'
+          : 'hover:bg-countryItem-juryHoverBg cursor-pointer '
       }`;
     }
 

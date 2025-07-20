@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { ArrowIcon } from '../../assets/icons/ArrowIcon';
 import { CollapsibleSection } from '../common/CollapsibleSection';
+import Select from '../common/Select';
 import {
   ASSIGNMENT_GROUP_LABELS,
   AvailableGroup,
@@ -75,37 +75,31 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
             e.stopPropagation();
           }}
         >
-          <div className="flex items-center gap-1 justify-between cursor-pointer pr-2 pl-3 py-1 flex-none rounded-md bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/40 shadow transition-colors duration-300">
+          <Select
+            value={currentGroup}
+            onChange={handleBulkAssign}
+            id={`country-assignment-${title}`}
+            aria-label={`Bulk assign all countries in ${title} to a group`}
+            options={availableGroups.map((group) => {
+              if (isStageGroup(group)) {
+                return { value: group.id, label: group.name };
+              }
+
+              return {
+                value: group,
+                label: ASSIGNMENT_GROUP_LABELS[group],
+              };
+            })}
+            className="gap-1 justify-between pr-2 pl-3 py-1 bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/40 shadow"
+            selectClassName="select"
+            arrowClassName="!w-6 !h-6 mb-0.5"
+          >
             {countriesCount !== undefined && (
               <span className="text-white text-sm whitespace-nowrap">
                 {countriesCount} {getAmountLabel(countriesCount)}
               </span>
             )}
-            <ArrowIcon className="text-white w-6 h-6 rotate-90 mb-0.5" />
-            <select
-              value={currentGroup}
-              onChange={handleBulkAssign}
-              className="absolute inset-0 opacity-0 cursor-pointer select"
-              id={`country-assignment-${title}`}
-              aria-label={`Bulk assign all countries in ${title} to a group`}
-            >
-              {availableGroups.map((group) => {
-                if (isStageGroup(group)) {
-                  return (
-                    <option key={group.id} value={group.id}>
-                      {group.name}
-                    </option>
-                  );
-                }
-
-                return (
-                  <option key={group} value={group}>
-                    {ASSIGNMENT_GROUP_LABELS[group]}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+          </Select>
         </div>
       ) : (
         countriesCount !== undefined && (

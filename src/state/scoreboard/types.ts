@@ -15,6 +15,7 @@ export type ScoreboardState = {
   // State
   eventStages: EventStage[];
   currentStageId: string | null;
+  viewedStageId: string | null;
   eventMode: EventMode;
   votingCountryIndex: number;
   votingPoints: number;
@@ -52,6 +53,7 @@ export type ScoreboardState = {
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;
+  setViewedStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   setRandomnessLevel: (level: number) => void;
   predefineVotesForStage: (

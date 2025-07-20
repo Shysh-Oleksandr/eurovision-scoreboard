@@ -5,6 +5,8 @@ import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 
+import { getWinnerCountry } from '@/state/scoreboard/helpers';
+
 type Props = {
   resetPoints: () => void;
 };
@@ -19,14 +21,25 @@ const BoardHeader = ({ resetPoints }: Props): JSX.Element => {
   const givePredefinedTelevotePoints = useScoreboardStore(
     (state) => state.givePredefinedTelevotePoints,
   );
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
+
+  const viewedStage = eventStages.find((s) => s.id === viewedStageId);
+  const winnerCountryFromStage = getWinnerCountry(viewedStage?.countries ?? []);
 
   const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
 
   const year = useGeneralStore((state) => state.year);
 
-  const { isJuryVoting, isOver: isVotingOver } = getCurrentStage();
+  const {
+    isJuryVoting,
+    isOver: isVotingOver,
+    id: currentStageId,
+  } = getCurrentStage();
 
   const votingCountry = getVotingCountry();
+
+  const isAnotherStageDisplayed = currentStageId !== viewedStageId;
 
   const votingText = useMemo(() => {
     if (isVotingOver) return null;
@@ -49,6 +62,33 @@ const BoardHeader = ({ resetPoints }: Props): JSX.Element => {
     );
   }, [isVotingOver, isJuryVoting, votingPoints, votingCountry]);
 
+  const winnerText = useMemo(() => {
+    if (!winnerCountry) return null;
+
+    if (isAnotherStageDisplayed && winnerCountryFromStage) {
+      return (
+        <>
+          <span className="font-semibold">{winnerCountryFromStage.name}</span>{' '}
+          is the winner of{' '}
+          <span className="font-medium">{viewedStage?.name}</span>!
+        </>
+      );
+    }
+
+    return (
+      <>
+        <span className="font-semibold">{winnerCountry.name}</span> is the
+        winner of <span className="font-medium">Eurovision {year}</span>!
+      </>
+    );
+  }, [
+    winnerCountry,
+    isAnotherStageDisplayed,
+    winnerCountryFromStage,
+    year,
+    viewedStage?.name,
+  ]);
+
   const chooseRandomly = () => {
     if (isJuryVoting) {
       resetPoints();
@@ -67,14 +107,7 @@ const BoardHeader = ({ resetPoints }: Props): JSX.Element => {
       }`}
     >
       <h3 className="lg:text-2xl xs:text-xl text-lg text-white">
-        {winnerCountry ? (
-          <>
-            <span className="font-semibold">{winnerCountry.name}</span> is the
-            winner of Eurovision {year}!
-          </>
-        ) : (
-          votingText
-        )}
+        {winnerText || votingText}
       </h3>
       {!isVotingOver && (
         <Button variant="tertiary" label="Random" onClick={chooseRandomly} />

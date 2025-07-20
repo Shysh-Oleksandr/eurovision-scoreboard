@@ -910,6 +910,10 @@ video {
   height: 1px;
 }
 
+.\!h-6 {
+  height: 1.5rem !important;
+}
+
 .\!max-h-\[calc\(80vh-140px\)\] {
   max-height: calc(80vh - 140px) !important;
 }
@@ -1007,6 +1011,18 @@ video {
   width: 100%;
 }
 
+.\!w-6 {
+  width: 1.5rem !important;
+}
+
+.w-\[200px\] {
+  width: 200px;
+}
+
+.w-\[150px\] {
+  width: 150px;
+}
+
 .min-w-0 {
   min-width: 0px;
 }
@@ -1035,6 +1051,10 @@ video {
   min-width: 7rem;
 }
 
+.min-w-\[150px\] {
+  min-width: 150px;
+}
+
 .max-w-\[11rem\] {
   max-width: 11rem;
 }
@@ -1048,6 +1068,10 @@ video {
 }
 
 .flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+.shrink-0 {
   flex-shrink: 0;
 }
 
@@ -1520,6 +1544,26 @@ video {
   background-color: transparent;
 }
 
+.bg-primary-700\/60 {
+  background-color: hsl(var(--twc-primary-700) / 0.6);
+}
+
+.bg-primary-800\/60 {
+  background-color: hsl(var(--twc-primary-800) / 0.6);
+}
+
+.bg-primary-800\/30 {
+  background-color: hsl(var(--twc-primary-800) / 0.3);
+}
+
+.bg-primary-700\/70 {
+  background-color: hsl(var(--twc-primary-700) / 0.7);
+}
+
+.bg-primary-800\/70 {
+  background-color: hsl(var(--twc-primary-800) / 0.7);
+}
+
 .bg-opacity-0 {
   --tw-bg-opacity: 0;
 }
@@ -1592,6 +1636,30 @@ video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-primary-900\/60 {
+  --tw-gradient-from: hsl(var(--twc-primary-900) / 0.6) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--twc-primary-900) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-primary-800\/80 {
+  --tw-gradient-from: hsl(var(--twc-primary-800) / 0.8) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--twc-primary-800) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-primary-900\/70 {
+  --tw-gradient-from: hsl(var(--twc-primary-900) / 0.7) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--twc-primary-900) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-primary-900\/90 {
+  --tw-gradient-from: hsl(var(--twc-primary-900) / 0.9) var(--tw-gradient-from-position);
+  --tw-gradient-to: hsl(var(--twc-primary-900) / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .from-\[10\%\] {
   --tw-gradient-from-position: 10%;
 }
@@ -1602,6 +1670,10 @@ video {
 
 .from-\[30\%\] {
   --tw-gradient-from-position: 30%;
+}
+
+.from-\[15\%\] {
+  --tw-gradient-from-position: 15%;
 }
 
 .to-gray-600\/70 {
@@ -1650,6 +1722,34 @@ video {
 
 .to-red-600\/40 {
   --tw-gradient-to: rgb(220 38 38 / 0.4) var(--tw-gradient-to-position);
+}
+
+.to-primary-800\/80 {
+  --tw-gradient-to: hsl(var(--twc-primary-800) / 0.8) var(--tw-gradient-to-position);
+}
+
+.to-primary-800\/90 {
+  --tw-gradient-to: hsl(var(--twc-primary-800) / 0.9) var(--tw-gradient-to-position);
+}
+
+.to-primary-800\/50 {
+  --tw-gradient-to: hsl(var(--twc-primary-800) / 0.5) var(--tw-gradient-to-position);
+}
+
+.to-primary-800\/20 {
+  --tw-gradient-to: hsl(var(--twc-primary-800) / 0.2) var(--tw-gradient-to-position);
+}
+
+.to-primary-800\/30 {
+  --tw-gradient-to: hsl(var(--twc-primary-800) / 0.3) var(--tw-gradient-to-position);
+}
+
+.to-primary-800\/10 {
+  --tw-gradient-to: hsl(var(--twc-primary-800) / 0.1) var(--tw-gradient-to-position);
+}
+
+.to-primary-700\/30 {
+  --tw-gradient-to: hsl(var(--twc-primary-700) / 0.3) var(--tw-gradient-to-position);
 }
 
 .object-cover {
@@ -3319,6 +3419,15 @@ h6 {
   background-color: rgb(255 255 255 / 0.2);
 }
 
+.hover\:bg-primary-900:hover {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, var(--tw-bg-opacity)));
+}
+
+.hover\:bg-primary-800\/70:hover {
+  background-color: hsl(var(--twc-primary-800) / 0.7);
+}
+
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
@@ -3350,6 +3459,10 @@ h6 {
 .focus\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+
+.focus\:outline-2:focus {
+  outline-width: 2px;
 }
 
 .group:hover .group-hover\:rotate-90 {

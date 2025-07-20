@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-20',
+    title:
+      'Added the Undo button, full screen mode option, and confirmation before leaving the page during simulation. Allowed to view the scoreboard for semi-finals after the final results. Small UI improvements',
+  },
+  {
     date: '2025-07-19',
     title:
       'Added UI Preferences settings. Added the ability to always display the rankings. Small improvements',
@@ -75,15 +80,15 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-07-20', end: '2025-07-21' },
+    approximateDates: { start: '2025-07-22', end: '2025-07-23' },
     title: 'Configurable points system (not only "1-8, 10, 12")',
   },
   {
-    approximateDates: { start: '2025-07-20', end: '2025-07-21' },
+    approximateDates: { start: '2025-07-23', end: '2025-07-24' },
     title: 'Voting countries selection',
   },
   {
-    approximateDates: { start: '2025-07-21', end: '2025-07-22' },
+    approximateDates: { start: '2025-07-24', end: '2025-07-25' },
     title: 'Semi-finals voting by selection (without awarding points)',
   },
   {

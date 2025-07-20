@@ -69,7 +69,7 @@ export const GeneralSettings: React.FC = () => {
         <Checkbox
           id="show-winner-confetti"
           labelClassName="w-full"
-          label="Show confetti for winner"
+          label="Show winner confetti"
           checked={showWinnerConfetti}
           onChange={(e) => setShowWinnerConfetti(e.target.checked)}
         />

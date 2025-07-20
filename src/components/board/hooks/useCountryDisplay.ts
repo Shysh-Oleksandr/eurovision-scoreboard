@@ -9,6 +9,8 @@ export const useCountryDisplay = () => {
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
   );
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
 
   const selectedCountries = useCountriesStore(
     (state) => state.selectedCountries,
@@ -16,7 +18,8 @@ export const useCountryDisplay = () => {
 
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
-  const { countries } = getCurrentStage();
+  const { countries } =
+    eventStages.find((s) => s.id === viewedStageId) || getCurrentStage();
 
   const allCountriesToDisplay = useMemo(() => {
     if (!showAllParticipants || !winnerCountry) {
