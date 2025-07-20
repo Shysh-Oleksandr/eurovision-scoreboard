@@ -107,6 +107,8 @@ const CountryItem = ({
         shouldShowAsNonQualified={shouldShowAsNonQualified}
         index={index}
         showPlaceAnimation={shouldShowPlaceNumber}
+        points={country.points}
+        isJuryVoting={isJuryVoting}
       />
 
       <button

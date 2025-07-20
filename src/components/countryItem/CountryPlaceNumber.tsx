@@ -3,21 +3,31 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { ArrowIcon } from '@/assets/icons/ArrowIcon';
+import usePrevious from '@/hooks/usePrevious';
+
 type Props = {
   shouldShowAsNonQualified: boolean;
   index: number;
   showPlaceAnimation: boolean;
+  points: number;
+  isJuryVoting: boolean;
 };
 
 const CountryPlaceNumber = ({
   shouldShowAsNonQualified,
   index,
   showPlaceAnimation,
+  points,
+  isJuryVoting,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
 
-  const [shouldBlink, setShouldBlink] = useState(false);
+  const [displayArrow, setDisplayArrow] = useState(false);
+
+  const previousIndex = usePrevious(index);
+  const previousDisplayArrow = usePrevious(displayArrow);
 
   // Calculate width dynamically to handle different screen sizes
   const width = useMemo(() => {
@@ -29,14 +39,24 @@ const CountryPlaceNumber = ({
   }, []);
 
   useEffect(() => {
-    setShouldBlink(true);
+    if (points === 0 || !isJuryVoting) {
+      setDisplayArrow(false);
 
-    const timer = setTimeout(() => {
-      setShouldBlink(false);
-    }, 1000);
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [index]);
+    if (
+      previousIndex !== undefined &&
+      previousIndex !== null &&
+      index < previousIndex
+    ) {
+      setDisplayArrow(true);
+
+      setTimeout(() => {
+        setDisplayArrow(false);
+      }, 1800);
+    }
+  }, [index, isJuryVoting, points, previousIndex]);
 
   useGSAP(
     () => {
@@ -79,15 +99,21 @@ const CountryPlaceNumber = ({
   return (
     <div
       ref={containerRef}
-      className={`flex flex-none items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText ${
+      className={`flex flex-none items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText relative ${
         shouldShowAsNonQualified ? 'bg-primary-900 opacity-70' : ''
       }`}
     >
+      <ArrowIcon
+        className={`text-white w-8 h-8 -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 ${
+          displayArrow ? 'blinker' : 'opacity-0'
+        }`}
+      />
+
       <h4
         ref={textRef}
         className={`font-semibold md:text-lg text-base ${
-          shouldBlink ? 'blinker' : ''
-        }`}
+          displayArrow ? '!opacity-0' : ''
+        } ${previousDisplayArrow && !displayArrow ? 'blinker' : ''}`}
       >
         {placeText}
       </h4>

@@ -58,8 +58,14 @@ const BoardHeader = ({ resetPoints }: Props): JSX.Element => {
     }
   };
 
+  const hasContent = winnerCountry || !isVotingOver;
+
   return (
-    <div className="pb-2 flex flex-row w-full justify-between items-center md:h-12">
+    <div
+      className={`pb-2 flex flex-row w-full justify-between items-center ${
+        hasContent ? 'md:h-12' : ''
+      }`}
+    >
       <h3 className="lg:text-2xl xs:text-xl text-lg text-white">
         {winnerCountry ? (
           <>
