@@ -125,6 +125,7 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
           label="Vote"
           onClick={handleVoting}
           className="mt-2 ml-2 md:px-4 !px-6"
+          disabled={enteredPoints === '' || error !== ''}
         />
       </div>
       {error !== '' && (

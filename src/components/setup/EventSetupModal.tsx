@@ -54,6 +54,7 @@ const EventSetupModal = () => {
   const startEvent = useScoreboardStore((state) => state.startEvent);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const restartCounter = useScoreboardStore((state) => state.restartCounter);
+  const { clear } = useScoreboardStore.temporal.getState();
 
   const [activeTab, setActiveTab] = useState<EventMode>(
     EventMode.SEMI_FINALS_AND_GRAND_FINAL,
@@ -291,6 +292,8 @@ const EventSetupModal = () => {
       });
 
     startEvent(activeTab, allSelectedCountries);
+
+    clear();
   };
 
   useEffect(() => {
