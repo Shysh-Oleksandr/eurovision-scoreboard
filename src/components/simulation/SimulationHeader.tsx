@@ -15,6 +15,9 @@ interface SimulationHeaderProps {
 
 export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const year = useGeneralStore((state) => state.year);
+  const shouldShowResetWarning = useGeneralStore(
+    (state) => state.shouldShowResetWarning,
+  );
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,
   );
@@ -22,10 +25,14 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const triggerRestartEvent = useScoreboardStore(
     (state) => state.triggerRestartEvent,
   );
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const { undo, pastStates } = useScoreboardStore.temporal.getState();
 
   const canUndo =
-    pastStates.length > 0 && !!pastStates[pastStates.length - 1].currentStageId;
+    pastStates.length > 0 &&
+    !!pastStates[pastStates.length - 1].currentStageId &&
+    viewedStageId === currentStageId;
 
   return (
     <div className="flex justify-between items-center mb-4">
@@ -54,7 +61,13 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
         </Button>
         <Button
           onClick={() => {
-            triggerRestartEvent();
+            if (shouldShowResetWarning) {
+              if (confirm('Are you sure you want to restart?')) {
+                triggerRestartEvent();
+              }
+            } else {
+              triggerRestartEvent();
+            }
           }}
           className="!p-3"
           aria-label="Restart"

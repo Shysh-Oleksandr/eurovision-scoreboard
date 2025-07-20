@@ -37,6 +37,12 @@ export const GeneralSettings: React.FC = () => {
   const setShouldShowBeforeUnloadWarning = useGeneralStore(
     (state) => state.setShouldShowBeforeUnloadWarning,
   );
+  const shouldShowResetWarning = useGeneralStore(
+    (state) => state.shouldShowResetWarning,
+  );
+  const setShouldShowResetWarning = useGeneralStore(
+    (state) => state.setShouldShowResetWarning,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -86,6 +92,13 @@ export const GeneralSettings: React.FC = () => {
           label="Confirm Before Leaving"
           checked={shouldShowBeforeUnloadWarning}
           onChange={(e) => setShouldShowBeforeUnloadWarning(e.target.checked)}
+        />
+        <Checkbox
+          id="show-reset-warning"
+          labelClassName="w-full"
+          label="Confirm Before Restarting"
+          checked={shouldShowResetWarning}
+          onChange={(e) => setShouldShowResetWarning(e.target.checked)}
         />
       </CollapsibleSection>
     </div>

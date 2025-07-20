@@ -24,6 +24,7 @@ interface GeneralState {
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
   shouldShowBeforeUnloadWarning: boolean;
+  shouldShowResetWarning: boolean;
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
@@ -35,6 +36,7 @@ interface GeneralState {
   setShowWinnerConfetti: (show: boolean) => void;
   setEnableFullscreen: (enable: boolean) => void;
   setShouldShowBeforeUnloadWarning: (show: boolean) => void;
+  setShouldShowResetWarning: (show: boolean) => void;
 }
 
 const getLatestUpdate = () => {
@@ -61,6 +63,7 @@ export const useGeneralStore = create<GeneralState>()(
       showWinnerConfetti: true,
       enableFullscreen: false,
       shouldShowBeforeUnloadWarning: true,
+      shouldShowResetWarning: true,
 
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
@@ -114,6 +117,9 @@ export const useGeneralStore = create<GeneralState>()(
       setShouldShowBeforeUnloadWarning: (show: boolean) => {
         set({ shouldShowBeforeUnloadWarning: show });
       },
+      setShouldShowResetWarning: (show: boolean) => {
+        set({ shouldShowResetWarning: show });
+      },
     }),
     {
       name: 'general-storage',
@@ -128,6 +134,7 @@ export const useGeneralStore = create<GeneralState>()(
           showWinnerModal: state.showWinnerModal,
           showWinnerConfetti: state.showWinnerConfetti,
           shouldShowBeforeUnloadWarning: state.shouldShowBeforeUnloadWarning,
+          shouldShowResetWarning: state.shouldShowResetWarning,
         };
       },
       onRehydrateStorage: () => (state) => {
