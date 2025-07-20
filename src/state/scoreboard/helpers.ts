@@ -39,6 +39,31 @@ export const getLastCountryIndexByPoints = (
 export const isVotingOver = (lastCountryIndexByPoints: number) =>
   lastCountryIndexByPoints === -1;
 
+export const getWinnerCountry = (countries: Country[]) => {
+  if (countries.length === 0) {
+    return null;
+  }
+
+  return countries.reduce((prev, current) => {
+    if (current.points > prev.points) {
+      return current;
+    }
+    if (current.points < prev.points) {
+      return prev;
+    }
+    // points are equal, check televotePoints
+    if (current.televotePoints > prev.televotePoints) {
+      return current;
+    }
+    if (current.televotePoints < prev.televotePoints) {
+      return prev;
+    }
+
+    // televotePoints are also equal, use alphabetical order (A-Z wins)
+    return current.name.localeCompare(prev.name) < 0 ? current : prev;
+  });
+};
+
 export const handleStageEnd = (
   countries: Country[],
   currentStage: EventStage,
@@ -58,24 +83,7 @@ export const handleStageEnd = (
       ...country,
       isVotingFinished: true,
     }));
-    winnerCountry = updatedCountries.reduce((prev, current) => {
-      if (current.points > prev.points) {
-        return current;
-      }
-      if (current.points < prev.points) {
-        return prev;
-      }
-      // points are equal, check televotePoints
-      if (current.televotePoints > prev.televotePoints) {
-        return current;
-      }
-      if (current.televotePoints < prev.televotePoints) {
-        return prev;
-      }
-
-      // televotePoints are also equal, use alphabetical order (A-Z wins)
-      return current.name.localeCompare(prev.name) < 0 ? current : prev;
-    });
+    winnerCountry = getWinnerCountry(updatedCountries);
   }
 
   if (showQualificationResults) {

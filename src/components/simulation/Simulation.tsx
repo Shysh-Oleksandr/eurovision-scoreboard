@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { useBeforeUnload } from '../../hooks/useBeforeUnload';
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
 import Board from '../board/Board';
 import ControlsPanel from '../controlsPanel/ControlsPanel';
@@ -16,6 +17,8 @@ export const Simulation = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
 
   const phaseTitle = usePhaseTitle();
+
+  useBeforeUnload();
 
   if (eventStages.length === 0) {
     return null;

@@ -1,10 +1,10 @@
 import React from 'react';
 
-interface RestartIconProps {
+interface UndoIconProps {
   className?: string;
 }
 
-export const RestartIcon: React.FC<RestartIconProps> = ({ className }) => (
+export const UndoIcon: React.FC<UndoIconProps> = ({ className }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="currentColor"
@@ -13,8 +13,6 @@ export const RestartIcon: React.FC<RestartIconProps> = ({ className }) => (
     viewBox="0 0 16 16"
     className={className}
   >
-    <g>
-      <path d="M15,6V1.76l-1.7,1.7A7,7,0,1,0,14.92,9H13.51a5.63,5.63,0,1,1-1.2-4.55L10.76,6Z" />
-    </g>
+    <path d="M6,3.6V0L0,6l6,6V8c6-.27,7.53,3.76,7.88,5.77a.27.27,0,0,0,.53,0C17.08,2.86,6,3.6,6,3.6Z" />
   </svg>
 );

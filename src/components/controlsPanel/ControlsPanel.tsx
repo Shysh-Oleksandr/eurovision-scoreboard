@@ -29,7 +29,7 @@ const ControlsPanel = (): JSX.Element | null => {
   }
 
   return (
-    <div className="mb-[6px] md:min-w-[180px] w-full">
+    <div className="mb-[6px] md:min-w-[180px] w-full md:max-w-[240px] lg:max-w-[258px] xl:max-w-[335px]">
       <div className="md:pb-2 pb-1 md:h-12 flex items-center">
         <h3 className="lg:text-2xl text-xl text-white">{votingTitle}</h3>
       </div>

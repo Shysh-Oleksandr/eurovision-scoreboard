@@ -19,7 +19,7 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
 
     if (showAllParticipants && winnerCountry) {
       return countriesToSort.sort((a, b) => {
-        if (a.points === b.points) {
+        if (a.points === b.points && a.points !== -1) {
           const televoteComparison = b.televotePoints - a.televotePoints;
 
           if (televoteComparison === 0) {

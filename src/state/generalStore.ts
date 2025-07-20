@@ -22,6 +22,9 @@ interface GeneralState {
   showQualificationModal: boolean;
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
+  enableFullscreen: boolean;
+  shouldShowBeforeUnloadWarning: boolean;
+  shouldShowResetWarning: boolean;
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
@@ -31,6 +34,9 @@ interface GeneralState {
   setShowQualificationModal: (show: boolean) => void;
   setShowWinnerModal: (show: boolean) => void;
   setShowWinnerConfetti: (show: boolean) => void;
+  setEnableFullscreen: (enable: boolean) => void;
+  setShouldShowBeforeUnloadWarning: (show: boolean) => void;
+  setShouldShowResetWarning: (show: boolean) => void;
 }
 
 const getLatestUpdate = () => {
@@ -55,6 +61,9 @@ export const useGeneralStore = create<GeneralState>()(
       showQualificationModal: true,
       showWinnerModal: true,
       showWinnerConfetti: true,
+      enableFullscreen: false,
+      shouldShowBeforeUnloadWarning: true,
+      shouldShowResetWarning: true,
 
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
@@ -102,6 +111,15 @@ export const useGeneralStore = create<GeneralState>()(
       setShowWinnerConfetti: (show: boolean) => {
         set({ showWinnerConfetti: show });
       },
+      setEnableFullscreen: (enable: boolean) => {
+        set({ enableFullscreen: enable });
+      },
+      setShouldShowBeforeUnloadWarning: (show: boolean) => {
+        set({ shouldShowBeforeUnloadWarning: show });
+      },
+      setShouldShowResetWarning: (show: boolean) => {
+        set({ shouldShowResetWarning: show });
+      },
     }),
     {
       name: 'general-storage',
@@ -115,6 +133,8 @@ export const useGeneralStore = create<GeneralState>()(
           showQualificationModal: state.showQualificationModal,
           showWinnerModal: state.showWinnerModal,
           showWinnerConfetti: state.showWinnerConfetti,
+          shouldShowBeforeUnloadWarning: state.shouldShowBeforeUnloadWarning,
+          shouldShowResetWarning: state.shouldShowResetWarning,
         };
       },
       onRehydrateStorage: () => (state) => {

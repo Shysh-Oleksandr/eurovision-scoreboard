@@ -227,22 +227,22 @@ export const useFinalStats = () => {
 
     if (
       (points === 12 && !isTotalVoteType) ||
-      (points >= 22 && isTotalVoteType)
+      (points >= 20 && isTotalVoteType)
     ) {
-      return 'font-bold bg-primary-800';
+      return 'font-bold bg-primary-700/50';
     }
 
     if (
       (points === 10 && !isTotalVoteType) ||
-      (points >= 18 && isTotalVoteType)
+      (points >= 17 && isTotalVoteType)
     ) {
-      return 'font-semibold bg-primary-900';
+      return 'font-semibold bg-primary-800/60';
     }
     if (
       (points === 8 && !isTotalVoteType) ||
-      (points >= 16 && isTotalVoteType)
+      (points >= 15 && isTotalVoteType)
     ) {
-      return 'font-semibold bg-primary-900/60';
+      return 'font-semibold bg-primary-800/30';
     }
 
     return 'font-medium';

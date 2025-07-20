@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { ArrowIcon } from '../../assets/icons/ArrowIcon';
 import { EventStage, StageId, StageVotingMode } from '../../models';
 import Modal from '../common/Modal/Modal';
 import ModalBottomContent from '../common/Modal/ModalBottomContent';
+import Select from '../common/Select';
 
 const getVotingModeLabel = (votingMode: StageVotingMode) => {
   switch (votingMode) {
@@ -144,7 +144,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
+            className="w-full h-12 py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
             placeholder="Enter name..."
           />
         </div>
@@ -152,27 +152,18 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
           <label htmlFor="votingMode" className="text-white">
             Voting Mode
           </label>
-          <div className="relative">
-            <div className="flex items-center w-full py-2.5 pl-3 pr-4 cursor-pointer rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800">
-              <span className="flex-1">{getVotingModeLabel(votingMode)}</span>
-              <ArrowIcon className="w-6 h-6 text-white rotate-90" />
-              <select
-                id="votingMode"
-                value={votingMode}
-                onChange={(e) =>
-                  setVotingMode(e.target.value as StageVotingMode)
-                }
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer select"
-                aria-label="Select voting mode"
-              >
-                {votingModeOptions.map((mode) => (
-                  <option key={mode.value} value={mode.value}>
-                    {mode.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <Select
+            id="votingMode"
+            value={votingMode}
+            onChange={(e) => setVotingMode(e.target.value as StageVotingMode)}
+            aria-label="Select voting mode"
+            options={votingModeOptions}
+            className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
+            selectClassName="select"
+            arrowClassName="!w-6 !h-6"
+          >
+            <span className="flex-1">{getVotingModeLabel(votingMode)}</span>
+          </Select>
         </div>
         {!isGrandFinalStage && (
           <div className="mb-2 flex items-center gap-2">

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { EventMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
+import Select from '../common/Select';
 
 import FinalStatsModal from './FinalStatsModal';
 
@@ -20,22 +21,42 @@ export const PhaseActions = () => {
   const toggleShowAllParticipants = useScoreboardStore(
     (state) => state.toggleShowAllParticipants,
   );
+  const eventStages = useScoreboardStore((state) => state.eventStages);
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const setViewedStageId = useScoreboardStore(
+    (state) => state.setViewedStageId,
+  );
 
   const [showFinalStatsModal, setShowFinalStatsModal] = useState(false);
 
   const { nextPhase } = useNextEventName();
 
-  const { isOver: isVotingOver, isLastStage } = getCurrentStage();
+  const {
+    isOver: isVotingOver,
+    isLastStage,
+    id: currentStageId,
+  } = getCurrentStage();
+
+  const viewedStage =
+    eventStages.find((s) => s.id === viewedStageId) || getCurrentStage();
+
+  const isAnotherStageDisplayed = viewedStageId !== currentStageId;
 
   const hasWinner = !!winnerCountry;
 
-  const canShowAllParticipants =
+  const isSFAndGFEventOver =
     isVotingOver &&
     isLastStage &&
     hasWinner &&
     eventMode === EventMode.SEMI_FINALS_AND_GRAND_FINAL;
 
-  if (!isVotingOver && !canShowAllParticipants) {
+  useEffect(() => {
+    if (isSFAndGFEventOver && !viewedStageId) {
+      setViewedStageId(getCurrentStage().id);
+    }
+  }, [isSFAndGFEventOver, getCurrentStage, setViewedStageId, viewedStageId]);
+
+  if (!isVotingOver && !isSFAndGFEventOver) {
     return null;
   }
 
@@ -46,7 +67,7 @@ export const PhaseActions = () => {
         onClose={() => setShowFinalStatsModal(false)}
       />
 
-      <div className="flex justify-end mb-2 gap-2">
+      <div className="flex justify-end mb-2 gap-2 min-h-12">
         {isVotingOver && (
           <Button
             variant="tertiary"
@@ -55,10 +76,35 @@ export const PhaseActions = () => {
             View Stats
           </Button>
         )}
-        {canShowAllParticipants && (
+
+        {isSFAndGFEventOver && !isAnotherStageDisplayed && (
           <Button onClick={toggleShowAllParticipants}>
             {showAllParticipants ? 'Grand finalists only' : 'All participants'}
           </Button>
+        )}
+        {isSFAndGFEventOver && (
+          <Select
+            id="eventStage"
+            value={viewedStage.id}
+            onChange={(e) => {
+              if (showAllParticipants) {
+                toggleShowAllParticipants();
+              }
+              setViewedStageId(
+                eventStages.find((stage) => stage.id === e.target.value)!.id,
+              );
+            }}
+            aria-label="Select event stage"
+            options={eventStages.map((stage) => ({
+              value: stage.id,
+              label: stage.name,
+            }))}
+            className="py-2.5 sm:px-4 px-3 sm:min-w-[150px] font-medium bg-primary-800 bg-gradient-to-bl from-[20%] from-primary-900 to-primary-800/60 lg:text-base text-sm hover:bg-primary-700"
+            selectClassName="select"
+            arrowClassName="!w-6 !h-6"
+          >
+            <span className="flex-1">{viewedStage.name}</span>
+          </Select>
         )}
         {isVotingOver && !isLastStage && (
           <Button onClick={continueToNextPhase} className="animated-border">

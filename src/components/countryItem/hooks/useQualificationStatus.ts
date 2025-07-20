@@ -15,9 +15,10 @@ export const useQualificationStatus = (
     (state) => state.showAllParticipants,
   );
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
 
   const shouldShowAsNonQualified = useMemo(() => {
-    const { id: currentStageId } = getCurrentStage();
+    const currentStageId = viewedStageId || getCurrentStage().id;
     const isSemiFinalPhase = currentStageId !== StageId.GF;
 
     const countryInSemiFinal = getCountryInSemiFinal(country.code);
@@ -37,6 +38,7 @@ export const useQualificationStatus = (
       isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode,
     );
   }, [
+    viewedStageId,
     getCurrentStage,
     getCountryInSemiFinal,
     country.code,
