@@ -31,6 +31,12 @@ export const GeneralSettings: React.FC = () => {
   const setEnableFullscreen = useGeneralStore(
     (state) => state.setEnableFullscreen,
   );
+  const shouldShowBeforeUnloadWarning = useGeneralStore(
+    (state) => state.shouldShowBeforeUnloadWarning,
+  );
+  const setShouldShowBeforeUnloadWarning = useGeneralStore(
+    (state) => state.setShouldShowBeforeUnloadWarning,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -73,6 +79,13 @@ export const GeneralSettings: React.FC = () => {
           label="Enable fullscreen mode"
           checked={enableFullscreen}
           onChange={(e) => setEnableFullscreen(e.target.checked)}
+        />
+        <Checkbox
+          id="show-before-unload-warning"
+          labelClassName="w-full"
+          label="Confirm Before Leaving"
+          checked={shouldShowBeforeUnloadWarning}
+          onChange={(e) => setShouldShowBeforeUnloadWarning(e.target.checked)}
         />
       </CollapsibleSection>
     </div>
