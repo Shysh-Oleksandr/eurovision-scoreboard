@@ -22,6 +22,7 @@ interface GeneralState {
   showQualificationModal: boolean;
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
+  enableFullscreen: boolean;
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
@@ -31,6 +32,7 @@ interface GeneralState {
   setShowQualificationModal: (show: boolean) => void;
   setShowWinnerModal: (show: boolean) => void;
   setShowWinnerConfetti: (show: boolean) => void;
+  setEnableFullscreen: (enable: boolean) => void;
 }
 
 const getLatestUpdate = () => {
@@ -55,6 +57,7 @@ export const useGeneralStore = create<GeneralState>()(
       showQualificationModal: true,
       showWinnerModal: true,
       showWinnerConfetti: true,
+      enableFullscreen: false,
 
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
@@ -101,6 +104,9 @@ export const useGeneralStore = create<GeneralState>()(
       },
       setShowWinnerConfetti: (show: boolean) => {
         set({ showWinnerConfetti: show });
+      },
+      setEnableFullscreen: (enable: boolean) => {
+        set({ enableFullscreen: enable });
       },
     }),
     {

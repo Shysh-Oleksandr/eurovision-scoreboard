@@ -27,6 +27,10 @@ export const GeneralSettings: React.FC = () => {
   const setShowWinnerConfetti = useGeneralStore(
     (state) => state.setShowWinnerConfetti,
   );
+  const enableFullscreen = useGeneralStore((state) => state.enableFullscreen);
+  const setEnableFullscreen = useGeneralStore(
+    (state) => state.setEnableFullscreen,
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -62,6 +66,13 @@ export const GeneralSettings: React.FC = () => {
           label="Show confetti for winner"
           checked={showWinnerConfetti}
           onChange={(e) => setShowWinnerConfetti(e.target.checked)}
+        />
+        <Checkbox
+          id="enable-fullscreen"
+          labelClassName="w-full"
+          label="Enable fullscreen mode"
+          checked={enableFullscreen}
+          onChange={(e) => setEnableFullscreen(e.target.checked)}
         />
       </CollapsibleSection>
     </div>
