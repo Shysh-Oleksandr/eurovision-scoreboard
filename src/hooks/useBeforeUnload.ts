@@ -7,7 +7,7 @@ export const useBeforeUnload = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const shouldShowBeforeUnloadWarning = useGeneralStore(
-    (state) => state.shouldShowBeforeUnloadWarning,
+    (state) => state.settings.shouldShowBeforeUnloadWarning,
   );
 
   useEffect(() => {

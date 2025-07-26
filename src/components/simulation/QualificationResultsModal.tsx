@@ -14,7 +14,7 @@ import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
 
 const QualificationResultsModal = () => {
   const showQualificationModal = useGeneralStore(
-    (state) => state.showQualificationModal,
+    (state) => state.settings.showQualificationModal,
   );
   const showQualificationResults = useScoreboardStore(
     (state) => state.showQualificationResults,

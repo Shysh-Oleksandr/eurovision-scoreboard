@@ -16,7 +16,7 @@ interface SimulationHeaderProps {
 export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const year = useGeneralStore((state) => state.year);
   const shouldShowResetWarning = useGeneralStore(
-    (state) => state.shouldShowResetWarning,
+    (state) => state.settings.shouldShowResetWarning,
   );
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,

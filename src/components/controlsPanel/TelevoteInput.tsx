@@ -6,6 +6,8 @@ import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 const NUMBER_REGEX = /^\d*$/;
 
 type Props = {
@@ -21,6 +23,10 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
   const televotingProgress = useScoreboardStore(
     (state) => state.televotingProgress,
   );
+  const shouldShowManualTelevoteWarning = useGeneralStore(
+    (state) => state.settings.shouldShowManualTelevoteWarning,
+  );
+
   const hasShownManualTelevoteWarning = useScoreboardStore(
     (state) => state.hasShownManualTelevoteWarning,
   );
@@ -80,7 +86,7 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
       giveTelevotePoints(votingCountryCode, votingPoints);
     };
 
-    if (hasShownManualTelevoteWarning) {
+    if (hasShownManualTelevoteWarning || !shouldShowManualTelevoteWarning) {
       vote();
 
       return;

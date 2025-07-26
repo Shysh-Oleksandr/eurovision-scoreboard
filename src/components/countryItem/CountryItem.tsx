@@ -36,7 +36,7 @@ const CountryItem = ({
 }: Props) => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const alwaysShowRankings = useGeneralStore(
-    (state) => state.alwaysShowRankings,
+    (state) => state.settings.alwaysShowRankings,
   );
 
   const shouldShowPlaceNumber = alwaysShowRankings || showPlaceAnimation;

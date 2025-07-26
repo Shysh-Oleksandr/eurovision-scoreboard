@@ -23,7 +23,7 @@ export const useBoardAnimations = (
   );
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const alwaysShowRankings = useGeneralStore(
-    (state) => state.alwaysShowRankings,
+    (state) => state.settings.alwaysShowRankings,
   );
 
   const [showPlace, setShowPlace] = useState(false);

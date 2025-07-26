@@ -120,7 +120,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
         >
           <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
         </Button>
-        <FeedbackInfoButton />
+        <FeedbackInfoButton className={`${isTouchDevice ? 'mr-1' : ''}`} />
       </div>
     </div>
   );

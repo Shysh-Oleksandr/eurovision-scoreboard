@@ -12,31 +12,31 @@ import { useCountriesStore } from './countriesStore';
 
 export const INITIAL_YEAR = '2025' as Year;
 
-interface GeneralState {
-  lastSeenUpdate: string | null;
-  shouldShowNewChangesIndicator: boolean;
-  year: Year;
-  themeYear: Year;
-  theme: Theme;
+interface Settings {
   alwaysShowRankings: boolean;
+  showRankChangeIndicator: boolean;
   showQualificationModal: boolean;
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
   shouldShowBeforeUnloadWarning: boolean;
   shouldShowResetWarning: boolean;
+  shouldShowManualTelevoteWarning: boolean;
+}
+
+interface GeneralState {
+  lastSeenUpdate: string | null;
+  shouldShowNewChangesIndicator: boolean;
+  year: Year;
+  themeYear: Year;
+  theme: Theme;
+  settings: Settings;
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
   setYear: (year: Year) => void;
   setTheme: (year: Year) => void;
-  setAlwaysShowRankings: (show: boolean) => void;
-  setShowQualificationModal: (show: boolean) => void;
-  setShowWinnerModal: (show: boolean) => void;
-  setShowWinnerConfetti: (show: boolean) => void;
-  setEnableFullscreen: (enable: boolean) => void;
-  setShouldShowBeforeUnloadWarning: (show: boolean) => void;
-  setShouldShowResetWarning: (show: boolean) => void;
+  setSettings: (settings: Partial<Settings>) => void;
 }
 
 const getLatestUpdate = () => {
@@ -57,13 +57,17 @@ export const useGeneralStore = create<GeneralState>()(
       year: INITIAL_YEAR,
       themeYear: INITIAL_YEAR,
       theme: getThemeForYear(INITIAL_YEAR),
-      alwaysShowRankings: true,
-      showQualificationModal: true,
-      showWinnerModal: true,
-      showWinnerConfetti: true,
-      enableFullscreen: false,
-      shouldShowBeforeUnloadWarning: true,
-      shouldShowResetWarning: true,
+      settings: {
+        alwaysShowRankings: true,
+        showRankChangeIndicator: true,
+        showQualificationModal: true,
+        showWinnerModal: true,
+        showWinnerConfetti: true,
+        enableFullscreen: false,
+        shouldShowBeforeUnloadWarning: true,
+        shouldShowResetWarning: true,
+        shouldShowManualTelevoteWarning: true,
+      },
 
       setLastSeenUpdate: (update: string) => {
         set({ lastSeenUpdate: update });
@@ -99,26 +103,10 @@ export const useGeneralStore = create<GeneralState>()(
           theme: getThemeForYear(year),
         });
       },
-      setAlwaysShowRankings: (show: boolean) => {
-        set({ alwaysShowRankings: show });
-      },
-      setShowQualificationModal: (show: boolean) => {
-        set({ showQualificationModal: show });
-      },
-      setShowWinnerModal: (show: boolean) => {
-        set({ showWinnerModal: show });
-      },
-      setShowWinnerConfetti: (show: boolean) => {
-        set({ showWinnerConfetti: show });
-      },
-      setEnableFullscreen: (enable: boolean) => {
-        set({ enableFullscreen: enable });
-      },
-      setShouldShowBeforeUnloadWarning: (show: boolean) => {
-        set({ shouldShowBeforeUnloadWarning: show });
-      },
-      setShouldShowResetWarning: (show: boolean) => {
-        set({ shouldShowResetWarning: show });
+      setSettings: (settings: Partial<Settings>) => {
+        set((state) => ({
+          settings: { ...state.settings, ...settings },
+        }));
       },
     }),
     {
@@ -129,12 +117,7 @@ export const useGeneralStore = create<GeneralState>()(
           themeYear: state.themeYear,
           lastSeenUpdate: state.lastSeenUpdate,
           shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
-          alwaysShowRankings: state.alwaysShowRankings,
-          showQualificationModal: state.showQualificationModal,
-          showWinnerModal: state.showWinnerModal,
-          showWinnerConfetti: state.showWinnerConfetti,
-          shouldShowBeforeUnloadWarning: state.shouldShowBeforeUnloadWarning,
-          shouldShowResetWarning: state.shouldShowResetWarning,
+          settings: state.settings,
         };
       },
       onRehydrateStorage: () => (state) => {
