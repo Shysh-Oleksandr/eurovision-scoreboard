@@ -8,6 +8,8 @@ import Tabs from '../common/Tabs';
 import { getTabs, WHATS_NEW, UPCOMING_FEATURES } from './data';
 import UpdateList from './UpdateList';
 
+import GitHubIcon from '@/assets/icons/GitHubIcon';
+
 const FeedbackModal = ({
   showModal,
   setShowModal,
@@ -41,7 +43,7 @@ const FeedbackModal = ({
       isOpen={showModal}
       onClose={() => setShowModal(false)}
       containerClassName="!w-[min(100%,650px)]"
-      contentClassName="pb-2 xs:!pt-6 !pt-4 sm:!px-12 xs:!px-8 !px-6 text-white h-[50vh] narrow-scrollbar"
+      contentClassName="pb-2 xs:!pt-6 !pt-4 sm:!px-12 xs:!px-8 !px-6 text-white sm:h-[50vh] h-[55vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       topContent={
         <Tabs
@@ -51,6 +53,7 @@ const FeedbackModal = ({
           containerClassName="!rounded-none"
           buttonClassName="sm:h-14 h-10"
           overlayClassName="sm:h-14 h-10"
+          alwaysHorizontal
         />
       }
       bottomContent={
@@ -78,6 +81,7 @@ const FeedbackModal = ({
                 rel="noopener noreferrer"
                 className="text-primary-300 hover:text-primary-400 underline font-semibold"
               >
+                <GitHubIcon className="w-5 h-5 inline-block mr-1 mb-1" />
                 GitHub
               </a>{' '}
               or email me at{' '}
@@ -88,11 +92,16 @@ const FeedbackModal = ({
                 sasha.shysh23@gmail.com
               </a>
             </p>
-            <p className="mb-4">
-              If you're reporting a bug, please mention your device (mobile or
-              PC), operating system (Android, iOS, Windows, macOS), and include
-              any helpful details, screenshots, or videos.
-            </p>
+            <div className="mb-4">
+              If you're reporting a bug, please include your:
+              <br />
+              <ul className="list-disc list-inside">
+                <li>device (mobile, tablet, or PC)</li>
+                <li>OS (Android, iOS, Windows, macOS)</li>
+                <li>browser (Chrome, Safari, etc.)</li>
+                <li>and any helpful details like screenshots or videos</li>
+              </ul>
+            </div>
             <p>Thank you!</p>
           </div>
         )}

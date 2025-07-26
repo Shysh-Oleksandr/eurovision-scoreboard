@@ -109,10 +109,10 @@ export const getTabs = (shouldShowNewChangesIndicator: boolean) => {
   return [
     { label: 'Feedback', value: 'feedback' },
     {
-      label: "What's New",
+      label: 'Updates',
       value: 'whats-new',
       showIndicator: shouldShowNewChangesIndicator,
     },
-    { label: 'Upcoming Features', value: 'upcoming' },
+    { label: 'Upcoming', value: 'upcoming' },
   ];
 };

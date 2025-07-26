@@ -47,6 +47,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           containerClassName="!rounded-none"
           buttonClassName="sm:h-14 h-10"
           overlayClassName="sm:h-14 h-10"
+          alwaysHorizontal
         />
       }
       bottomContent={

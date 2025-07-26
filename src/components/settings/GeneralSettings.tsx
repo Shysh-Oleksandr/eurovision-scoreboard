@@ -44,6 +44,9 @@ export const GeneralSettings: React.FC = () => {
     (state) => state.setShouldShowResetWarning,
   );
 
+  const isFullScreenSupported = document.fullscreenEnabled;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
   return (
     <div className="flex flex-col gap-4">
       <CollapsibleSection
@@ -79,24 +82,29 @@ export const GeneralSettings: React.FC = () => {
           checked={showWinnerConfetti}
           onChange={(e) => setShowWinnerConfetti(e.target.checked)}
         />
-        <Checkbox
-          id="enable-fullscreen"
-          labelClassName="w-full"
-          label="Enable fullscreen mode"
-          checked={enableFullscreen}
-          onChange={(e) => setEnableFullscreen(e.target.checked)}
-        />
-        <Checkbox
-          id="show-before-unload-warning"
-          labelClassName="w-full"
-          label="Confirm Before Leaving"
-          checked={shouldShowBeforeUnloadWarning}
-          onChange={(e) => setShouldShowBeforeUnloadWarning(e.target.checked)}
-        />
+        {isFullScreenSupported && (
+          <Checkbox
+            id="enable-fullscreen"
+            labelClassName="w-full"
+            label="Enable fullscreen mode"
+            checked={enableFullscreen}
+            onChange={(e) => setEnableFullscreen(e.target.checked)}
+          />
+        )}
+        {/* iOS doesn't support beforeunload event */}
+        {!isIOS && (
+          <Checkbox
+            id="show-before-unload-warning"
+            labelClassName="w-full"
+            label="Confirm before leaving"
+            checked={shouldShowBeforeUnloadWarning}
+            onChange={(e) => setShouldShowBeforeUnloadWarning(e.target.checked)}
+          />
+        )}
         <Checkbox
           id="show-reset-warning"
           labelClassName="w-full"
-          label="Confirm Before Restarting"
+          label="Confirm before restarting"
           checked={shouldShowResetWarning}
           onChange={(e) => setShouldShowResetWarning(e.target.checked)}
         />

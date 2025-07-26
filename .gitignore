@@ -12,3 +12,5 @@ coverage-ts
 
 .DS_Store
 .wrangler/
+
+.cursor/

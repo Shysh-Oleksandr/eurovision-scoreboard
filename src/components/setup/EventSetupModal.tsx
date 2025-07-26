@@ -350,6 +350,7 @@ const EventSetupModal = () => {
           tabs={TABS}
           activeTab={activeTab}
           setActiveTab={(tab) => setActiveTab(tab as EventMode)}
+          alwaysHorizontal
         />
 
         {activeTab === EventMode.SEMI_FINALS_AND_GRAND_FINAL && (

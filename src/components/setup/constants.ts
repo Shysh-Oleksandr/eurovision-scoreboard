@@ -2,7 +2,7 @@ import { CountryAssignmentGroup, EventMode } from '../../models';
 
 export const TABS = [
   {
-    label: 'Semi-Finals + Grand Final',
+    label: 'All Shows',
     value: EventMode.SEMI_FINALS_AND_GRAND_FINAL,
   },
   {
