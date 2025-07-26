@@ -5,6 +5,7 @@ import { getSequenceNumber } from '../../helpers/getSequenceNumber';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
+import { Input } from '../Input';
 
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -118,8 +119,8 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
         of <span className="font-medium">{countries.length}</span> countries
       </h5>
       <div className="flex">
-        <input
-          className="w-full lg:pt-3 md:pt-2 pt-1 lg:pb-2 md:pb-1 pb-[2px] px-2 mt-2 rounded-md bg-primary-900 transition-colors duration-300 placeholder:text-gray-400 text-white lg:text-base text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
+        <Input
+          className="w-full lg:!pt-3 md:!pt-2 !pt-1 lg:!pb-2 md:!pb-1 !pb-[2px] !px-2 !mt-2 lg:text-base text-sm"
           name="televoteInput"
           id="televoteInput"
           type="number"

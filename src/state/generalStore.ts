@@ -14,13 +14,13 @@ export const INITIAL_YEAR = '2025' as Year;
 
 interface Settings {
   alwaysShowRankings: boolean;
-  showRankChangeIndicator: boolean;
   showQualificationModal: boolean;
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
   shouldShowBeforeUnloadWarning: boolean;
   shouldShowResetWarning: boolean;
+  showRankChangeIndicator: boolean;
   shouldShowManualTelevoteWarning: boolean;
 }
 
@@ -59,13 +59,13 @@ export const useGeneralStore = create<GeneralState>()(
       theme: getThemeForYear(INITIAL_YEAR),
       settings: {
         alwaysShowRankings: true,
-        showRankChangeIndicator: true,
         showQualificationModal: true,
         showWinnerModal: true,
         showWinnerConfetti: true,
         enableFullscreen: false,
         shouldShowBeforeUnloadWarning: true,
         shouldShowResetWarning: true,
+        showRankChangeIndicator: true,
         shouldShowManualTelevoteWarning: true,
       },
 

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { getFlagPath } from '@/helpers/getFlagPath';
-import { useDebounceWithCancel } from '@/hooks/useDebounceWithCancel';
-import { BaseCountry } from '@/models';
+import { getFlagPath } from '../../helpers/getFlagPath';
+import { useDebounceWithCancel } from '../../hooks/useDebounceWithCancel';
+import { BaseCountry } from '../../models';
+import { Input } from '../Input';
 
 const MAX_ODDS = 1000;
 const DEBOUNCE_TIME = 400;
@@ -98,9 +99,9 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
         <span className="font-semibold truncate">{country.name}</span>
       </div>
       <div className="grid grid-cols-2 gap-2 mt-2">
-        <input
+        <Input
           type="number"
-          className="bg-primary-700/40 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400 focus:bg-primary-700/60 hover:bg-primary-700/60 transition-colors duration-300 border-solid border-transparent border-b-2 focus:border-white"
+          className="!bg-primary-700/40 !px-1 !py-1.5 text-center placeholder:!text-gray-400 focus:!bg-primary-700/60 hover:!bg-primary-700/60 bg-none"
           placeholder="Jury"
           min={0}
           max={MAX_ODDS}
@@ -108,9 +109,9 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
           value={juryOdds ?? ''}
           onChange={(e) => handleInputChange(e, setJuryOdds, isJuryUserInput)}
         />
-        <input
+        <Input
           type="number"
-          className="bg-primary-900/50 w-full px-1 py-1.5 rounded-md text-center placeholder:text-gray-400 focus:bg-primary-900/80 hover:bg-primary-900/80 transition-colors duration-300 border-solid border-transparent border-b-2 focus:border-white"
+          className="!bg-primary-900/50 !px-1 !py-1.5 text-center placeholder:!text-gray-400 focus:!bg-primary-900/80 hover:!bg-primary-900/80 bg-none"
           placeholder="Tele"
           min={0}
           max={MAX_ODDS}

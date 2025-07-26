@@ -69,7 +69,7 @@ const FeedbackModal = ({
     >
       <div className="lg:text-lg sm:text-base text-base font-medium">
         {activeTab === 'feedback' && (
-          <div className="lg:pt-4">
+          <div className="lg:pt-2">
             <p className="mb-2 font-semibold">
               Found a bug, have a feature idea, or just want to share feedback?
             </p>

@@ -6,6 +6,7 @@ import { useCountriesStore } from '../../state/countriesStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 import ModalBottomContent from '../common/Modal/ModalBottomContent';
+import { Input } from '../Input';
 
 interface CustomCountryModalProps {
   isOpen: boolean;
@@ -140,13 +141,13 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           <label htmlFor="countryName" className="text-white">
             Name
           </label>
-          <input
+          <Input
             id="countryName"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
             placeholder="Enter name..."
+            className="lg:text-[0.95rem] text-sm"
           />
         </div>
         <div className="flex flex-col gap-4">
@@ -185,12 +186,16 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             </Button>
           </div>
 
-          <input
+          <Input
             id="flagUrl"
             type="text"
-            value={flag.startsWith('data:image') ? '' : flag}
+            value={
+              flag.startsWith('data:image') || flag.startsWith('/flags/')
+                ? ''
+                : flag
+            }
             onChange={(e) => setFlag(e.target.value)}
-            className="w-full py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
+            className="lg:text-[0.95rem] text-sm"
             placeholder="Or paste an image URL"
           />
 
