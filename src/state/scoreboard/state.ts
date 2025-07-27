@@ -8,7 +8,7 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   viewedStageId: null,
   eventMode: EventMode.GRAND_FINAL_ONLY,
   votingCountryIndex: 0,
-  votingPoints: 1,
+  votingPointsIndex: 0,
   shouldShowLastPoints: true,
   shouldClearPoints: false,
   winnerCountry: null,
@@ -24,4 +24,5 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   },
   hasShownManualTelevoteWarning: false,
   randomnessLevel: 50,
+  lastPointsResetTimerId: null,
 };

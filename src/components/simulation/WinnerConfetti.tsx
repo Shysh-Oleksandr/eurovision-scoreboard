@@ -21,7 +21,7 @@ const CONFETTI_COLORS = [
 const WinnerConfetti: React.FC = () => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const showWinnerConfetti = useGeneralStore(
-    (state) => state.showWinnerConfetti,
+    (state) => state.settings.showWinnerConfetti,
   );
   const [showConfetti, setShowConfetti] = useState(false);
   const [shouldRecycle, setShouldRecycle] = useState(false);

@@ -1,6 +1,5 @@
 import rw from 'random-weighted-choice';
 
-import { POINTS_ARRAY } from '../../data/data';
 import { BaseCountry, Country, StageVotingMode } from '../../models';
 import { CountryOdds } from '../countriesStore';
 
@@ -69,6 +68,7 @@ const generateCombinedVotes = (
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
   temperature: number,
+  pointsSystem: number[],
 ): Vote[] => {
   const juryRanking = generateFullRanking(
     votingCountry,
@@ -108,11 +108,11 @@ const generateCombinedVotes = (
     });
 
   const numPointsToAward = Math.min(
-    POINTS_ARRAY.length,
+    pointsSystem.length,
     combinedRanking.length,
   );
   const winners = combinedRanking.slice(0, numPointsToAward);
-  const sortedPoints = [...POINTS_ARRAY].sort((a, b) => b - a);
+  const sortedPoints = [...pointsSystem].sort((a, b) => b - a);
 
   return winners.map((winner, index) => ({
     countryCode: winner.code,
@@ -126,6 +126,7 @@ const generateVotesForSource = (
   countryOdds: CountryOdds,
   oddsType: 'juryOdds' | 'televoteOdds',
   temperature: number,
+  pointsSystem: number[],
 ): Vote[] => {
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
@@ -138,7 +139,7 @@ const generateVotesForSource = (
     return [];
   }
 
-  const numPointsToAward = Math.min(POINTS_ARRAY.length, choices.length);
+  const numPointsToAward = Math.min(pointsSystem.length, choices.length);
   const winners: string[] = [];
   let remainingChoices = [...choices];
 
@@ -153,7 +154,7 @@ const generateVotesForSource = (
     remainingChoices = remainingChoices.filter((c) => c.id !== winnerId);
   }
 
-  const sortedPoints = [...POINTS_ARRAY].sort((a, b) => b - a);
+  const sortedPoints = [...pointsSystem].sort((a, b) => b - a);
 
   return winners.map((winnerCode, index) => ({
     countryCode: winnerCode,
@@ -167,6 +168,7 @@ export const predefineStageVotes = (
   votingMode: StageVotingMode,
   countryOdds: CountryOdds,
   randomnessLevel: number,
+  pointsSystem: number[],
 ): Partial<StageVotes> => {
   // Create a new set of odds with randomness "baked in" for this simulation.
   // This ensures that a country's "luck" is consistent across all voters.
@@ -230,6 +232,7 @@ export const predefineStageVotes = (
         perturbedOdds,
         'juryOdds',
         temperature,
+        pointsSystem,
       );
     }
   }
@@ -242,6 +245,7 @@ export const predefineStageVotes = (
         stageCountries,
         perturbedOdds,
         temperature,
+        pointsSystem,
       );
     }
   }
@@ -255,6 +259,7 @@ export const predefineStageVotes = (
         perturbedOdds,
         'televoteOdds',
         temperature,
+        pointsSystem,
       );
     }
   }

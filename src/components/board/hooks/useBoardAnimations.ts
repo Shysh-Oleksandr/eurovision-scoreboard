@@ -13,7 +13,7 @@ export const useBoardAnimations = (
   sortedCountries: Country[],
   isVotingOver: boolean,
   wasTheFirstPointsAwarded: boolean,
-  hasCountryFinishedVoting: boolean,
+  isDouzePointsAwarded: boolean,
 ) => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
@@ -23,7 +23,7 @@ export const useBoardAnimations = (
   );
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const alwaysShowRankings = useGeneralStore(
-    (state) => state.alwaysShowRankings,
+    (state) => state.settings.alwaysShowRankings,
   );
 
   const [showPlace, setShowPlace] = useState(false);
@@ -48,8 +48,8 @@ export const useBoardAnimations = (
   const flipMoveDelay = useMemo(() => {
     if (!wasTheFirstPointsAwarded || isVotingOver) return 0;
 
-    return hasCountryFinishedVoting ? 1000 : 500;
-  }, [hasCountryFinishedVoting, wasTheFirstPointsAwarded, isVotingOver]);
+    return isDouzePointsAwarded ? 1000 : 500;
+  }, [isDouzePointsAwarded, wasTheFirstPointsAwarded, isVotingOver]);
 
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {

@@ -11,7 +11,6 @@ const ControlsPanel = (): JSX.Element | null => {
   const votingCountryIndex = useScoreboardStore(
     (state) => state.votingCountryIndex,
   );
-  const votingPoints = useScoreboardStore((state) => state.votingPoints);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
   const { isJuryVoting, isOver: isVotingOver, votingMode } = getCurrentStage();
@@ -39,7 +38,7 @@ const ControlsPanel = (): JSX.Element | null => {
         )}
         <VotingButtons />
       </div>
-      {isJuryVoting && <VotingPointsInfo votingPoints={votingPoints} />}
+      {isJuryVoting && <VotingPointsInfo />}
     </div>
   );
 };

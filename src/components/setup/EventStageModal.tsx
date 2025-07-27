@@ -4,6 +4,7 @@ import { EventStage, StageId, StageVotingMode } from '../../models';
 import Modal from '../common/Modal/Modal';
 import ModalBottomContent from '../common/Modal/ModalBottomContent';
 import Select from '../common/Select';
+import { Input } from '../Input';
 
 const getVotingModeLabel = (votingMode: StageVotingMode) => {
   switch (votingMode) {
@@ -139,12 +140,12 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
           <label htmlFor="stageName" className="text-white">
             Name
           </label>
-          <input
+          <Input
             id="stageName"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full h-12 py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
+            className="h-12 lg:text-[0.95rem] text-sm"
             placeholder="Enter name..."
           />
         </div>
@@ -173,14 +174,14 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
             >
               Number of qualifiers:
             </label>
-            <input
+            <Input
               id={`qualifiers-${eventStageToEdit?.id}`}
               type="number"
               value={qualifiersAmount || ''}
               onChange={(e) => {
                 setQualifiersAmount(parseInt(e.target.value, 10));
               }}
-              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm text-white px-3 py-1 rounded transition-colors duration-300 hover:bg-primary-950 focus:bg-primary-950 w-[56px]"
+              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-[56px]"
               min={0}
               max={eventStageToEdit?.countries.length}
               aria-label={`Number of qualifiers for ${eventStageToEdit?.name}`}

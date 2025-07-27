@@ -8,7 +8,9 @@ import Modal from '../common/Modal/Modal';
 import { useGeneralStore } from '@/state/generalStore';
 
 const WinnerModal = () => {
-  const showWinnerModal = useGeneralStore((state) => state.showWinnerModal);
+  const showWinnerModal = useGeneralStore(
+    (state) => state.settings.showWinnerModal,
+  );
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,

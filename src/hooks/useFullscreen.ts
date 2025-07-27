@@ -44,16 +44,16 @@ const exitFullscreen = () => {
 };
 
 export const useFullscreen = () => {
-  const enableFullscreen = useGeneralStore((state) => state.enableFullscreen);
-  const setEnableFullscreen = useGeneralStore(
-    (state) => state.setEnableFullscreen,
+  const enableFullscreen = useGeneralStore(
+    (state) => state.settings.enableFullscreen,
   );
+  const setSettings = useGeneralStore((state) => state.setSettings);
 
   const handleFullscreenChange = useCallback(() => {
     if (!getFullscreenElement()) {
-      setEnableFullscreen(false);
+      setSettings({ enableFullscreen: false });
     }
-  }, [setEnableFullscreen]);
+  }, [setSettings]);
 
   useEffect(() => {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -82,11 +82,11 @@ export const useFullscreen = () => {
     if (enableFullscreen) {
       if (!getFullscreenElement()) {
         requestFullscreen(document.documentElement).catch(() => {
-          setEnableFullscreen(false);
+          setSettings({ enableFullscreen: false });
         });
       }
     } else if (getFullscreenElement()) {
       exitFullscreen();
     }
-  }, [enableFullscreen, setEnableFullscreen]);
+  }, [enableFullscreen, setSettings]);
 };

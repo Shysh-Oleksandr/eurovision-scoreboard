@@ -13,6 +13,7 @@ interface TabsProps {
   containerClassName?: string;
   buttonClassName?: string;
   overlayClassName?: string;
+  alwaysHorizontal?: boolean;
 }
 
 const Tabs: React.FC<TabsProps> = ({
@@ -22,8 +23,10 @@ const Tabs: React.FC<TabsProps> = ({
   containerClassName = '',
   buttonClassName = '',
   overlayClassName = '',
+  alwaysHorizontal = false,
 }) => {
-  const isSmallScreen = useMediaQuery('(max-width: 479px)');
+  const isSmallScreen =
+    useMediaQuery('(max-width: 479px)') && !alwaysHorizontal;
 
   const [tabDimensions, setTabDimensions] = useState<
     { width: number; left: number }[]
@@ -69,7 +72,9 @@ const Tabs: React.FC<TabsProps> = ({
   return (
     <nav
       role="tablist"
-      className={`flex xs:flex-row flex-col overflow-x-auto items-center p-1 px-2 gap-1 md:text-lg text-base text-gray-700 bg-primary-900 rounded-xl w-full relative ${containerClassName}`}
+      className={`flex ${
+        alwaysHorizontal ? 'flex-row' : 'xs:flex-row flex-col'
+      } overflow-x-auto items-center p-1 px-2 gap-1 md:text-lg text-base text-gray-700 bg-primary-900 rounded-xl w-full relative ${containerClassName}`}
     >
       {isInitialized && (
         <div

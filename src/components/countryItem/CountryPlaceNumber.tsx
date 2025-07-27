@@ -5,6 +5,7 @@ import { useGSAP } from '@gsap/react';
 
 import { ArrowIcon } from '@/assets/icons/ArrowIcon';
 import usePrevious from '@/hooks/usePrevious';
+import { useGeneralStore } from '@/state/generalStore';
 
 type Props = {
   shouldShowAsNonQualified: boolean;
@@ -21,6 +22,10 @@ const CountryPlaceNumber = ({
   points,
   isJuryVoting,
 }: Props) => {
+  const showRankChangeIndicator = useGeneralStore(
+    (state) => state.settings.showRankChangeIndicator,
+  );
+
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
 
@@ -39,7 +44,7 @@ const CountryPlaceNumber = ({
   }, []);
 
   useEffect(() => {
-    if (points === 0 || !isJuryVoting) {
+    if (points === 0 || !isJuryVoting || !showRankChangeIndicator) {
       setDisplayArrow(false);
 
       return;
@@ -56,7 +61,7 @@ const CountryPlaceNumber = ({
         setDisplayArrow(false);
       }, 1800);
     }
-  }, [index, isJuryVoting, points, previousIndex]);
+  }, [index, isJuryVoting, points, previousIndex, showRankChangeIndicator]);
 
   useGSAP(
     () => {

@@ -1,23 +1,43 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-const useDouzePointsAnimation = (isDouzePoints: boolean) => {
-  const [showAnimation, setShowAnimation] = useState(isDouzePoints);
+import { ANIMATION_DURATION } from '@/data/data';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
-  const hideAnimation = useCallback(() => {
-    setShowAnimation(false);
-  }, []);
+const useDouzePointsAnimation = (
+  isDouzePoints: boolean,
+  countryCode: string,
+) => {
+  const hideDouzePointsAnimation = useScoreboardStore(
+    (state) => state.hideDouzePointsAnimation,
+  );
+
+  const [shouldRender, setShouldRender] = useState(false);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (isDouzePoints) {
-      setShowAnimation(true);
-    } else {
-      const timer = setTimeout(hideAnimation, 1000);
-
-      return () => clearTimeout(timer);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
     }
-  }, [isDouzePoints, hideAnimation]);
 
-  return showAnimation;
+    if (isDouzePoints) {
+      setShouldRender(true);
+      timerRef.current = setTimeout(() => {
+        hideDouzePointsAnimation(countryCode);
+      }, ANIMATION_DURATION);
+    } else if (shouldRender) {
+      timerRef.current = setTimeout(() => {
+        setShouldRender(false);
+      }, ANIMATION_DURATION / 2);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [isDouzePoints, shouldRender, hideDouzePointsAnimation, countryCode]);
+
+  return shouldRender;
 };
 
 export default useDouzePointsAnimation;

@@ -3,6 +3,7 @@ import React from 'react';
 import { PlusIcon } from '../../assets/icons/PlusIcon';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
 import Button from '../common/Button';
+import { Input } from '../Input';
 
 import { CountrySelectionList } from './CountrySelectionList';
 import { AvailableGroup } from './CountrySelectionListItem';
@@ -49,8 +50,8 @@ const NotParticipatingSection = ({
           Not Participating
         </p>
         <div className="relative">
-          <input
-            className="sm:max-w-[200px] w-full py-3 pl-3 pr-10 rounded-md bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 transition-colors duration-300 placeholder:text-white/55 text-white lg:text-[0.95rem] text-sm border-solid border-transparent border-b-2 hover:bg-primary-800 focus:bg-primary-800 focus:border-white "
+          <Input
+            className="sm:w-[200px] lg:text-[0.95rem] text-sm"
             name="countriesSearch"
             id="countriesSearch"
             placeholder="Search countries..."
@@ -95,9 +96,9 @@ const NotParticipatingSection = ({
                 category === 'Custom' && (
                   <Button
                     onClick={handleOpenCreateModal}
-                    className="mr-1 !py-2 w-fit"
+                    className="mr-1 !py-1 w-fit"
                   >
-                    <PlusIcon className="w-6 h-6" />
+                    <PlusIcon className="w-7 h-7" />
                   </Button>
                 )
               }
