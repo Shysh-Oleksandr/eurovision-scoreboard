@@ -1,4 +1,4 @@
-import React, { useCallback, type JSX } from 'react';
+import React, { useCallback, useMemo, type JSX } from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
 
 import { Country } from '../../models';
@@ -31,8 +31,11 @@ const Board = (): JSX.Element => {
     wasTheFirstPointsAwarded,
     hasCountryFinishedVoting,
     onClick,
-    resetPoints,
   } = useVoting();
+
+  const isDouzePointsAwarded = useMemo(() => {
+    return sortedCountries.some((country) => country.showDouzePointsAnimation);
+  }, [sortedCountries]);
 
   const {
     delayedSortedCountries,
@@ -44,7 +47,7 @@ const Board = (): JSX.Element => {
     sortedCountries,
     isVotingOver,
     wasTheFirstPointsAwarded,
-    hasCountryFinishedVoting,
+    isDouzePointsAwarded,
   );
 
   const renderItem = useCallback(
@@ -76,7 +79,7 @@ const Board = (): JSX.Element => {
 
   return (
     <div className="w-full h-full">
-      <BoardHeader resetPoints={resetPoints} />
+      <BoardHeader />
       <div
         ref={containerRef}
         className={`container-wrapping-flipper will-change-all ${

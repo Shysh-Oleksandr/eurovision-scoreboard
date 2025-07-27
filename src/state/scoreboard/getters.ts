@@ -1,6 +1,7 @@
 import { StateCreator } from 'zustand';
 
 import { Country, EventStage, StageId } from '../../models';
+import { useGeneralStore } from '../generalStore';
 
 import { ScoreboardState } from './types';
 
@@ -27,6 +28,13 @@ export const createGetters: StateCreator<
   [],
   Getters
 > = (_set, get) => ({
+  getVotingPoints: () => {
+    const { votingPointsIndex } = get();
+    const { pointsSystem } = useGeneralStore.getState();
+
+    return pointsSystem[votingPointsIndex];
+  },
+
   getCurrentStage: () => {
     const { eventStages, currentStageId } = get();
 

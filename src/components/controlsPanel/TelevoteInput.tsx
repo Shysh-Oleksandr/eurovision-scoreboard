@@ -11,12 +11,7 @@ import { useGeneralStore } from '@/state/generalStore';
 
 const NUMBER_REGEX = /^\d*$/;
 
-type Props = {
-  isFirstTelevoteCountry: boolean;
-};
-
-const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
-  const resetLastPoints = useScoreboardStore((state) => state.resetLastPoints);
+const TelevoteInput = () => {
   const giveTelevotePoints = useScoreboardStore(
     (state) => state.giveTelevotePoints,
   );
@@ -79,10 +74,6 @@ const TelevoteInput = ({ isFirstTelevoteCountry }: Props) => {
 
     const vote = () => {
       setEnteredPoints('');
-
-      if (isFirstTelevoteCountry) {
-        resetLastPoints();
-      }
 
       giveTelevotePoints(votingCountryCode, votingPoints);
     };

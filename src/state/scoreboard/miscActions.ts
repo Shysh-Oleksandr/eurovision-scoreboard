@@ -9,6 +9,7 @@ type MiscActions = {
   setViewedStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   setRandomnessLevel: (level: number) => void;
+  hideDouzePointsAnimation: (countryCode: string) => void;
 };
 
 export const createMiscActions: StateCreator<
@@ -33,6 +34,7 @@ export const createMiscActions: StateCreator<
             countries: stage.countries.map((country) => ({
               ...country,
               lastReceivedPoints: null,
+              showDouzePointsAnimation: false,
             })),
           };
         }
@@ -67,5 +69,28 @@ export const createMiscActions: StateCreator<
   },
   setRandomnessLevel: (level: number) => {
     set({ randomnessLevel: level });
+  },
+  hideDouzePointsAnimation: (countryCode: string) => {
+    const state = get();
+    const currentStage = state.getCurrentStage();
+
+    if (!currentStage) return;
+
+    set({
+      eventStages: state.eventStages.map((stage) => {
+        if (stage.id === state.currentStageId) {
+          return {
+            ...stage,
+            countries: stage.countries.map((country) =>
+              country.code === countryCode
+                ? { ...country, showDouzePointsAnimation: false }
+                : country,
+            ),
+          };
+        }
+
+        return stage;
+      }),
+    });
   },
 });

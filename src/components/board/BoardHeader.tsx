@@ -7,13 +7,9 @@ import Button from '../common/Button';
 
 import { getWinnerCountry } from '@/state/scoreboard/helpers';
 
-type Props = {
-  resetPoints: () => void;
-};
-
-const BoardHeader = ({ resetPoints }: Props): JSX.Element => {
+const BoardHeader = (): JSX.Element => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const votingPoints = useScoreboardStore((state) => state.votingPoints);
+  const votingPoints = useScoreboardStore((state) => state.getVotingPoints());
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const givePredefinedJuryPoint = useScoreboardStore(
     (state) => state.givePredefinedJuryPoint,
@@ -91,7 +87,7 @@ const BoardHeader = ({ resetPoints }: Props): JSX.Element => {
 
   const chooseRandomly = () => {
     if (isJuryVoting) {
-      resetPoints();
+      // resetPoints();
       givePredefinedJuryPoint();
     } else {
       givePredefinedTelevotePoints();

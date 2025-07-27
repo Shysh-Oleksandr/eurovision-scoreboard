@@ -3,17 +3,21 @@ import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
-import { POINTS_ARRAY } from '../../data/data';
+import { useGeneralStore } from '@/state/generalStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
-type Props = { votingPoints: number };
-
-const VotingPointsInfo = ({ votingPoints }: Props) => {
+const VotingPointsInfo = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const underlinesRef = useRef<Record<number, HTMLDivElement | null>>({});
 
+  const pointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const votingPointsIndex = useScoreboardStore(
+    (state) => state.votingPointsIndex,
+  );
+
   useGSAP(
     () => {
-      const activeUnderline = underlinesRef.current[votingPoints];
+      const activeUnderline = underlinesRef.current[votingPointsIndex];
 
       if (activeUnderline) {
         gsap.fromTo(
@@ -29,21 +33,28 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
         );
       }
     },
-    { dependencies: [votingPoints], scope: containerRef },
+    { dependencies: [votingPointsIndex], scope: containerRef },
   );
 
   return (
     <div
       ref={containerRef}
-      className="flex justify-between w-full md:mt-4 mt-3 overflow-hidden rounded-sm"
+      className="grid w-full gap-y-1 sm:mt-3 mt-2 overflow-hidden rounded-sm"
+      style={{
+        gridTemplateColumns: `repeat(${Math.min(
+          pointsSystem.length,
+          10,
+        )}, minmax(0, 1fr))`,
+      }}
     >
-      {POINTS_ARRAY.map((points) => {
-        const isActive = points === votingPoints;
+      {pointsSystem.map((points, index) => {
+        const isActive = index === votingPointsIndex;
 
         return (
           <div
-            key={points}
-            className={`lg:w-8 w-7 lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${
+            // eslint-disable-next-line react/no-array-index-key
+            key={`${points}-${index}`}
+            className={`lg:min-w-8 min-w-7 lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${
               isActive ? 'bg-panelInfo-activeBg' : 'bg-panelInfo-inactiveBg'
             }`}
           >
@@ -58,7 +69,7 @@ const VotingPointsInfo = ({ votingPoints }: Props) => {
             </h6>
             <div
               ref={(el) => {
-                underlinesRef.current[points] = el;
+                underlinesRef.current[index] = el;
               }}
               className={`block w-full lg:h-[5px] h-1 ${
                 isActive ? 'bg-panelInfo-activeText' : 'bg-transparent'

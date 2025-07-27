@@ -4,6 +4,8 @@ import { useGeneralStore } from '../../state/generalStore';
 import { Checkbox } from '../common/Checkbox';
 import { CollapsibleSection } from '../common/CollapsibleSection';
 
+import { PointsSystemSelection } from './PointsSystemSelection';
+
 export const GeneralSettings: React.FC = () => {
   const settings = useGeneralStore((state) => state.settings);
   const setSettings = useGeneralStore((state) => state.setSettings);
@@ -102,6 +104,9 @@ export const GeneralSettings: React.FC = () => {
             setSettings({ shouldShowManualTelevoteWarning: e.target.checked })
           }
         />
+      </CollapsibleSection>
+      <CollapsibleSection title="Voting" defaultExpanded>
+        <PointsSystemSelection />
       </CollapsibleSection>
     </div>
   );

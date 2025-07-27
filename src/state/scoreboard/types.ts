@@ -18,7 +18,7 @@ export type ScoreboardState = {
   viewedStageId: string | null;
   eventMode: EventMode;
   votingCountryIndex: number;
-  votingPoints: number;
+  votingPointsIndex: number;
   shouldShowLastPoints: boolean;
   shouldClearPoints: boolean;
   winnerCountry: Country | null;
@@ -30,18 +30,19 @@ export type ScoreboardState = {
   predefinedVotes: Record<string, Partial<StageVotes>>;
   hasShownManualTelevoteWarning: boolean;
   randomnessLevel: number;
+  lastPointsResetTimerId: number | null;
 
   // Getters
   getCurrentStage: () => EventStage;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
-
+  getVotingPoints: () => number;
   // Actions
   setEventStages: (
     stages: (Omit<EventStage, 'countries'> & { countries: BaseCountry[] })[],
   ) => void;
   giveJuryPoints: (countryCode: string) => void;
   giveTelevotePoints: (countryCode: string, votingPoints: number) => void;
-  giveRandomJuryPoints: (isRandomFinishing?: boolean) => void;
+  giveRandomJuryPoints: () => void;
   finishJuryVotingRandomly: () => void;
   finishTelevoteVotingRandomly: () => void;
   givePredefinedJuryPoint: () => void;
@@ -56,6 +57,7 @@ export type ScoreboardState = {
   setViewedStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   setRandomnessLevel: (level: number) => void;
+  hideDouzePointsAnimation: (countryCode: string) => void;
   predefineVotesForStage: (
     stage: EventStage,
     resetOtherStages?: boolean,

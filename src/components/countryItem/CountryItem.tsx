@@ -48,9 +48,10 @@ const CountryItem = ({
     isVotingOver,
   );
 
-  const isDouzePoints =
-    !country.televotePoints && country.lastReceivedPoints === 12;
-  const showDouzePointsAnimationHook = useDouzePointsAnimation(isDouzePoints);
+  const showDouzePointsAnimationHook = useDouzePointsAnimation(
+    !!country.showDouzePointsAnimation,
+    country.code,
+  );
 
   const douzePointsContainerRef = useRef<HTMLDivElement>(null);
   const douzePointsParallelogramBlueRef = useRef<HTMLDivElement>(null);
@@ -92,7 +93,7 @@ const CountryItem = ({
   const { lastPointsContainerRef, lastPointsTextRef } = useAnimatePoints({
     shouldShowLastPoints:
       country.lastReceivedPoints !== null && !isVotingFinished,
-    isDouzePoints,
+    isDouzePoints: !!country.showDouzePointsAnimation,
     douzePointsRefs,
   });
 

@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-27',
+    title: 'Added the points system configuration. Small UI improvements/fixes',
+  },
+  {
     date: '2025-07-20',
     title:
       'Added the Undo button, full screen mode option, and confirmation before leaving the page during simulation. Allowed to view the scoreboard for semi-finals after the final results. Small UI improvements',
@@ -80,19 +84,22 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-07-22', end: '2025-07-23' },
-    title: 'Configurable points system (not only "1-8, 10, 12")',
-  },
-  {
-    approximateDates: { start: '2025-07-23', end: '2025-07-24' },
+    approximateDates: { start: '2025-08-02', end: '2025-08-03' },
     title: 'Voting countries selection',
   },
   {
-    approximateDates: { start: '2025-07-24', end: '2025-07-25' },
+    // approximateDates: { start: '2025-08-02', end: '2025-08-03' },
     title: 'Semi-finals voting by selection (without awarding points)',
   },
   {
-    // approximateDates: { start: '2025-07-13', end: '2025-07-14' },
+    // approximateDates: { start: '2025-08-02', end: '2025-08-03' },
+    title:
+      'The 2016-18 televote announcement order (from lowest points to highest)',
+  },
+  {
+    title: 'Settings for the contest year and host country',
+  },
+  {
     title: 'JESC support with custom themes',
   },
   {

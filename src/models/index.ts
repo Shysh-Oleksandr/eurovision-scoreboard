@@ -67,6 +67,7 @@ export interface Country extends BaseCountry {
   points: number;
   lastReceivedPoints: number | null;
   isVotingFinished?: boolean;
+  showDouzePointsAnimation?: boolean;
 }
 
 export interface CountryWithPoints {

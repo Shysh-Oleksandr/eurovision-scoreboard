@@ -94,17 +94,4 @@ export const getMaxPossibleTelevotePoints = (countriesLength: number) => {
   return MAX_POINTS_FOR_A_VOTE * (countriesLength - 1);
 };
 
-const getTotalTelevotePoints = (countriesLength: number) => {
-  const countryVotingPoints = POINTS_ARRAY.reduce(
-    (prev, curr) => prev + curr,
-    0,
-  );
-
-  return countryVotingPoints * (countriesLength - 1);
-};
-
-export const getAverageVotingPoints = (countriesLength: number) => {
-  return Math.round(getTotalTelevotePoints(countriesLength) / countriesLength);
-};
-
 export const ANIMATION_DURATION = 3000;

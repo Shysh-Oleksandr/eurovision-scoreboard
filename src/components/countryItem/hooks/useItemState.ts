@@ -46,9 +46,7 @@ export const useItemState = ({
 
     if (isJuryVoting) {
       return `bg-countryItem-juryBg text-countryItem-juryCountryText ${
-        isDisabled
-          ? 'cursor-not-allowed'
-          : 'hover:bg-countryItem-juryHoverBg cursor-pointer '
+        isDisabled ? '' : 'hover:bg-countryItem-juryHoverBg cursor-pointer '
       }`;
     }
 
@@ -75,7 +73,7 @@ export const useItemState = ({
       `relative will-change-colors outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full transition-all !duration-500 ${
         isActive ? 'rounded-sm' : ''
       } ${showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''}
-      ${isVotingCountry ? 'opacity-70' : ''}
+      ${isVotingCountry ? 'opacity-70 cursor-not-allowed' : ''}
       ${buttonColors}
       `,
     [isActive, showPlaceAnimation, isVotingCountry, buttonColors],

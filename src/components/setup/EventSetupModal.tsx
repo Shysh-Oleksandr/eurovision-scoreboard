@@ -28,6 +28,7 @@ import { SetupHeader } from './SetupHeader';
 import { validateEventSetup } from './utils/eventValidation';
 
 import { useDebounce } from '@/hooks/useDebounce';
+import { INITIAL_YEAR } from '@/state/generalStore';
 
 const EventSetupModal = () => {
   const eventSetupModalOpen = useCountriesStore(
@@ -41,6 +42,9 @@ const EventSetupModal = () => {
   );
   const allCountriesForYear = useCountriesStore(
     (state) => state.allCountriesForYear,
+  );
+  const setInitialCountriesForYear = useCountriesStore(
+    (state) => state.setInitialCountriesForYear,
   );
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const configuredEventStages = useCountriesStore(
@@ -84,6 +88,13 @@ const EventSetupModal = () => {
   useEffect(() => {
     loadCustomCountries();
   }, [loadCustomCountries]);
+
+  // useEffect(() => {
+  //   console.log('allCountriesForYear', allCountriesForYear);
+  //   if (allCountriesForYear.length === 0) {
+  //     setInitialCountriesForYear(INITIAL_YEAR);
+  //   }
+  // }, [allCountriesForYear.length, setInitialCountriesForYear]);
 
   useEffect(() => {
     if (!eventSetupModalOpen) return;
