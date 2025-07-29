@@ -2,6 +2,7 @@ import rw from 'random-weighted-choice';
 
 import { BaseCountry, Country, StageVotingMode } from '../../models';
 import { CountryOdds } from '../countriesStore';
+import { PointsItem } from '../generalStore';
 
 import { StageVotes, Vote } from './types';
 
@@ -68,7 +69,7 @@ const generateCombinedVotes = (
   stageCountries: BaseCountry[],
   countryOdds: CountryOdds,
   temperature: number,
-  pointsSystem: number[],
+  pointsSystem: PointsItem[],
 ): Vote[] => {
   const juryRanking = generateFullRanking(
     votingCountry,
@@ -112,11 +113,11 @@ const generateCombinedVotes = (
     combinedRanking.length,
   );
   const winners = combinedRanking.slice(0, numPointsToAward);
-  const sortedPoints = [...pointsSystem].sort((a, b) => b - a);
+  const sortedPoints = [...pointsSystem].sort((a, b) => b.value - a.value);
 
   return winners.map((winner, index) => ({
     countryCode: winner.code,
-    points: sortedPoints[index],
+    points: sortedPoints[index].value,
   }));
 };
 
@@ -126,7 +127,7 @@ const generateVotesForSource = (
   countryOdds: CountryOdds,
   oddsType: 'juryOdds' | 'televoteOdds',
   temperature: number,
-  pointsSystem: number[],
+  pointsSystem: PointsItem[],
 ): Vote[] => {
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
@@ -154,11 +155,11 @@ const generateVotesForSource = (
     remainingChoices = remainingChoices.filter((c) => c.id !== winnerId);
   }
 
-  const sortedPoints = [...pointsSystem].sort((a, b) => b - a);
+  const sortedPoints = [...pointsSystem].sort((a, b) => b.value - a.value);
 
   return winners.map((winnerCode, index) => ({
     countryCode: winnerCode,
-    points: sortedPoints[index],
+    points: sortedPoints[index].value,
   }));
 };
 
@@ -168,7 +169,7 @@ export const predefineStageVotes = (
   votingMode: StageVotingMode,
   countryOdds: CountryOdds,
   randomnessLevel: number,
-  pointsSystem: number[],
+  pointsSystem: PointsItem[],
 ): Partial<StageVotes> => {
   // Create a new set of odds with randomness "baked in" for this simulation.
   // This ensures that a country's "luck" is consistent across all voters.

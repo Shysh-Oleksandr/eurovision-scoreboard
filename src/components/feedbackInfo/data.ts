@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-07-29',
+    title:
+      'Added the ability to assign the DouzePoints animation for specific points. Small bug fixes',
+  },
+  {
     date: '2025-07-27',
     title: 'Added the points system configuration. Small UI improvements/fixes',
   },

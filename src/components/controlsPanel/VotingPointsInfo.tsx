@@ -47,13 +47,12 @@ const VotingPointsInfo = () => {
         )}, minmax(0, 1fr))`,
       }}
     >
-      {pointsSystem.map((points, index) => {
+      {pointsSystem.map((pointsItem, index) => {
         const isActive = index === votingPointsIndex;
 
         return (
           <div
-            // eslint-disable-next-line react/no-array-index-key
-            key={`${points}-${index}`}
+            key={pointsItem.id}
             className={`lg:min-w-8 min-w-7 lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${
               isActive ? 'bg-panelInfo-activeBg' : 'bg-panelInfo-inactiveBg'
             }`}
@@ -65,7 +64,7 @@ const VotingPointsInfo = () => {
                   : 'text-panelInfo-inactiveText font-semibold'
               }`}
             >
-              {points}
+              {pointsItem.value}
             </h6>
             <div
               ref={(el) => {

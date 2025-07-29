@@ -32,7 +32,7 @@ export const createGetters: StateCreator<
     const { votingPointsIndex } = get();
     const { pointsSystem } = useGeneralStore.getState();
 
-    return pointsSystem[votingPointsIndex];
+    return pointsSystem[votingPointsIndex].value;
   },
 
   getCurrentStage: () => {

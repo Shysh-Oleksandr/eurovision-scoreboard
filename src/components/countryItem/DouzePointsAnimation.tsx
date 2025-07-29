@@ -6,17 +6,19 @@ type DouzePointsAnimationProps = {
     parallelogramBlueRef: React.RefObject<HTMLDivElement | null>;
     parallelogramYellowRef: React.RefObject<HTMLDivElement | null>;
   };
+  pointsAmount?: number;
 };
 
 const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   refs,
+  pointsAmount = 12,
 }) => (
   <div
     ref={refs.containerRef}
     className="absolute overflow-hidden left-0 right-0 top-0 bottom-0 z-40 bg-countryItem-douzePointsBg flex justify-center items-center opacity-0"
   >
-    <h4 className="text-countryItem-douzePointsText lg:text-xl md:text-lg xs:text-base text-sm font-bold">
-      12 POINTS
+    <h4 className="text-countryItem-douzePointsText lg:text-xl md:text-lg xs:text-base text-sm font-bold uppercase">
+      {pointsAmount} {pointsAmount === 1 ? 'point' : 'points'}
     </h4>
     <div
       ref={refs.parallelogramBlueRef}

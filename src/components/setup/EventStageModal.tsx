@@ -127,7 +127,9 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
         <ModalBottomContent
           onClose={handleTriggerClose}
           onSave={handleSave}
-          onDelete={isGrandFinalStage ? undefined : handleDelete}
+          onDelete={
+            isGrandFinalStage || !eventStageToEdit ? undefined : handleDelete
+          }
         />
       }
     >

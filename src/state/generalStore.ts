@@ -24,6 +24,12 @@ interface Settings {
   shouldShowManualTelevoteWarning: boolean;
 }
 
+export interface PointsItem {
+  value: number;
+  showDouzePoints: boolean;
+  id: number;
+}
+
 interface GeneralState {
   lastSeenUpdate: string | null;
   shouldShowNewChangesIndicator: boolean;
@@ -31,14 +37,14 @@ interface GeneralState {
   themeYear: Year;
   theme: Theme;
   settings: Settings;
-  pointsSystem: number[];
+  pointsSystem: PointsItem[];
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
   setYear: (year: Year) => void;
   setTheme: (year: Year) => void;
   setSettings: (settings: Partial<Settings>) => void;
-  setPointsSystem: (points: number[]) => void;
+  setPointsSystem: (points: PointsItem[]) => void;
 }
 
 const getLatestUpdate = () => {
@@ -51,6 +57,12 @@ const getLatestUpdate = () => {
   return null;
 };
 
+const initialPointsSystem = POINTS_ARRAY.map((value, index) => ({
+  value,
+  showDouzePoints: value === 12,
+  id: index,
+}));
+
 export const useGeneralStore = create<GeneralState>()(
   devtools(
     persist(
@@ -60,7 +72,7 @@ export const useGeneralStore = create<GeneralState>()(
         year: INITIAL_YEAR,
         themeYear: INITIAL_YEAR,
         theme: getThemeForYear(INITIAL_YEAR),
-        pointsSystem: POINTS_ARRAY,
+        pointsSystem: initialPointsSystem,
         settings: {
           alwaysShowRankings: true,
           showQualificationModal: true,
@@ -112,7 +124,7 @@ export const useGeneralStore = create<GeneralState>()(
             settings: { ...state.settings, ...settings },
           }));
         },
-        setPointsSystem: (points: number[]) => {
+        setPointsSystem: (points: PointsItem[]) => {
           set({ pointsSystem: points });
         },
       }),
@@ -139,13 +151,35 @@ export const useGeneralStore = create<GeneralState>()(
           const year = state.year ?? INITIAL_YEAR;
           const themeYear = state.themeYear ?? INITIAL_YEAR;
 
+          // Convert old points system format to new format if needed
+          let pointsSystem: PointsItem[] | undefined;
+
+          if (state.pointsSystem) {
+            if (
+              Array.isArray(state.pointsSystem) &&
+              typeof state.pointsSystem[0] === 'number'
+            ) {
+              pointsSystem = (state.pointsSystem as unknown as number[]).map(
+                (value, index) => ({
+                  value,
+                  showDouzePoints: value === 12,
+                  id: index,
+                }),
+              );
+            } else {
+              pointsSystem = state.pointsSystem as PointsItem[];
+            }
+          } else {
+            pointsSystem = initialPointsSystem;
+          }
+
           return {
             ...currentState,
             ...state,
             year,
             themeYear,
             theme: getThemeForYear(themeYear),
-            pointsSystem: state.pointsSystem ?? POINTS_ARRAY,
+            pointsSystem,
           };
         },
       },
