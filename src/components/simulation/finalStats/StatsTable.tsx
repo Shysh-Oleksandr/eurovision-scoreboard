@@ -38,6 +38,7 @@ const StatsTable: React.FC<StatsTableProps> = ({
                   loading="lazy"
                   width={32}
                   height={24}
+                  title={country.name}
                 />
               </th>
             ))}
