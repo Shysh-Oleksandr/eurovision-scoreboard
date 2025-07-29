@@ -339,6 +339,20 @@ export const createVotingActions: StateCreator<
           ? Math.max(...pointsForThisCountry.map((p) => p.points))
           : null;
 
+      // If this country is not receiving new points, preserve its existing lastReceivedPoints
+      if (pointsForThisCountry.length === 0) {
+        return {
+          ...country,
+          // Only reset lastReceivedPoints if we're starting a new set of points
+          lastReceivedPoints:
+            state.votingPointsIndex === 0 ? null : country.lastReceivedPoints,
+          showDouzePointsAnimation:
+            state.votingPointsIndex === 0
+              ? false
+              : country.showDouzePointsAnimation,
+        };
+      }
+
       return {
         ...country,
         juryPoints: country.juryPoints + totalReceivedPoints,
