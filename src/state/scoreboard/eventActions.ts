@@ -140,6 +140,17 @@ export const createEventActions: StateCreator<
     if (!nextStage) return;
 
     const updatedEventStages = [...state.eventStages];
+
+    // Reset animations for current stage
+    updatedEventStages[currentStageIndex] = {
+      ...currentStage,
+      countries: currentStage.countries.map((country) => ({
+        ...country,
+        lastReceivedPoints: null,
+        showDouzePointsAnimation: false,
+      })),
+    };
+
     let nextStageCountries = nextStage.countries;
 
     let nextVotingCountryIndex = 0;
