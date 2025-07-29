@@ -1,39 +1,40 @@
 import { arrayMoveImmutable } from 'array-move';
 import React, { useEffect, useState } from 'react';
 
-import { useGeneralStore } from '../../../state/generalStore';
+import { PointsItem, useGeneralStore } from '../../../state/generalStore';
 
-import { PointsSystemHeader, PointsList, PREDEFINED_SYSTEMS_MAP } from '.';
+import { PointsList } from './PointsList';
+import { PointsSystemHeader } from './PointsSystemHeader';
+
+import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 
 export const PointsSystemSelection = () => {
   const pointsSystem = useGeneralStore((state) => state.pointsSystem);
   const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
 
-  const [internalPoints, setInternalPoints] = useState(() =>
-    pointsSystem.map((p) => ({ id: Math.random(), value: String(p) })),
+  const [internalPoints, setInternalPoints] = useState<PointsItem[]>(
+    () => pointsSystem,
   );
 
   useEffect(() => {
-    setInternalPoints(
-      pointsSystem.map((p) => ({ id: Math.random(), value: String(p) })),
-    );
+    setInternalPoints(pointsSystem);
   }, [pointsSystem]);
 
   const currentSystem = Object.entries(PREDEFINED_SYSTEMS_MAP).find(
     ([, value]) =>
       value.length === pointsSystem.length &&
-      value.every((v, i) => v === pointsSystem[i]),
+      value.every(
+        (v, i) =>
+          v.value === pointsSystem[i].value &&
+          v.showDouzePoints === pointsSystem[i].showDouzePoints,
+      ),
   )?.[0];
 
   const onSortEnd = (oldIndex: number, newIndex: number) => {
     const moved = arrayMoveImmutable(internalPoints, oldIndex, newIndex);
 
     setInternalPoints(moved);
-    setPointsSystem(
-      moved
-        .map((p) => Number(p.value))
-        .filter((p) => !Number.isNaN(p) && p !== 0),
-    );
+    setPointsSystem(moved);
   };
 
   const handleRemovePoint = (index: number) => {
@@ -43,25 +44,24 @@ export const PointsSystemSelection = () => {
   const handlePointChange = (index: number, value: string) => {
     const newPoints = [...internalPoints];
 
-    newPoints[index] = { ...newPoints[index], value };
+    newPoints[index] = { ...newPoints[index], value: Number(value) };
     setInternalPoints(newPoints);
   };
 
   const handlePointBlur = (index: number) => {
     const pointValue = internalPoints[index].value;
 
-    if (String(pointValue).trim() === '' || Number(pointValue) < 1) {
+    if (pointValue < 1) {
       handleRemovePoint(index);
     } else {
       const newPoints = [...internalPoints];
 
       newPoints[index] = {
         ...newPoints[index],
-        value: String(Number(pointValue)),
+        value: pointValue,
       };
       setInternalPoints(newPoints);
-
-      setPointsSystem(newPoints.map((p) => Number(p.value)));
+      setPointsSystem(newPoints);
     }
   };
 
@@ -74,13 +74,27 @@ export const PointsSystemSelection = () => {
       return;
     }
 
-    setPointsSystem(
-      PREDEFINED_SYSTEMS_MAP[value as keyof typeof PREDEFINED_SYSTEMS_MAP],
-    );
+    setPointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
   };
 
   const handleAddPoint = (value: string) => {
-    setPointsSystem([...pointsSystem, Number(value)]);
+    const newPoint = {
+      value: Number(value),
+      showDouzePoints: false,
+      id: Math.random(),
+    };
+
+    setPointsSystem([...pointsSystem, newPoint]);
+  };
+
+  const handleDouzePointsToggle = (index: number) => {
+    const newPoints = [...pointsSystem];
+
+    newPoints[index] = {
+      ...newPoints[index],
+      showDouzePoints: !newPoints[index].showDouzePoints,
+    };
+    setPointsSystem(newPoints);
   };
 
   return (
@@ -97,6 +111,7 @@ export const PointsSystemSelection = () => {
         onPointBlur={handlePointBlur}
         onPointRemove={handleRemovePoint}
         onPointAdd={handleAddPoint}
+        onDouzePointsToggle={handleDouzePointsToggle}
       />
     </div>
   );

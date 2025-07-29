@@ -41,7 +41,8 @@ export const createVotingActions: StateCreator<
     const countriesStore = useCountriesStore.getState();
     const { pointsSystem } = useGeneralStore.getState();
     const currentStage = state.getCurrentStage();
-    const votingPoints = pointsSystem[state.votingPointsIndex];
+    const votingPointsItem = pointsSystem[state.votingPointsIndex];
+    const votingPoints = votingPointsItem.value;
 
     if (!currentStage) return;
 
@@ -61,10 +62,10 @@ export const createVotingActions: StateCreator<
       if (votesForCountry) {
         const occurrences = pointsSystem
           .slice(0, state.votingPointsIndex)
-          .filter((p) => p === votingPoints).length;
+          .filter((p) => p.value === votingPoints).length;
 
         const allMatchingVotes = votesForCountry.filter(
-          (v) => v.points === votingPoints,
+          (v) => v.points === votingPointsItem.value,
         );
 
         const voteToUpdate = allMatchingVotes[occurrences];
@@ -135,7 +136,7 @@ export const createVotingActions: StateCreator<
           juryPoints: baseCountry.juryPoints + votingPoints,
           points: baseCountry.points + votingPoints,
           lastReceivedPoints: votingPoints,
-          showDouzePointsAnimation: votingPoints === 12,
+          showDouzePointsAnimation: votingPointsItem.showDouzePoints,
         };
       }
 
@@ -311,7 +312,7 @@ export const createVotingActions: StateCreator<
         .filter((p) => p === currentPoints).length;
 
       const allMatchingVotes = predefinedJuryVotes.filter(
-        (v) => v.points === currentPoints,
+        (v) => v.points === currentPoints.value,
       );
 
       const vote = allMatchingVotes[occurrences];
@@ -353,12 +354,16 @@ export const createVotingActions: StateCreator<
         };
       }
 
+      const pointsItem = maxPoints
+        ? pointsSystem.find((p) => p.value === maxPoints)
+        : null;
+
       return {
         ...country,
         juryPoints: country.juryPoints + totalReceivedPoints,
         points: country.points + totalReceivedPoints,
         lastReceivedPoints: maxPoints,
-        showDouzePointsAnimation: maxPoints === 12,
+        showDouzePointsAnimation: pointsItem?.showDouzePoints ?? false,
       };
     });
 
@@ -482,7 +487,7 @@ export const createVotingActions: StateCreator<
           .filter((p) => p === currentPoints).length;
 
         const allMatchingVotes = votesForCountry.filter(
-          (v) => v.points === currentPoints,
+          (v) => v.points === currentPoints.value,
         );
 
         const vote = allMatchingVotes[occurrences];
@@ -513,12 +518,14 @@ export const createVotingActions: StateCreator<
           ...pointsForThisCountry.map((p) => p.points),
         );
 
+        const pointsItem = pointsSystem.find((p) => p.value === maxPoints);
+
         return {
           ...country,
           juryPoints: country.juryPoints + totalReceivedPoints,
           points: country.points + totalReceivedPoints,
           lastReceivedPoints: maxPoints,
-          showDouzePointsAnimation: maxPoints === 12,
+          showDouzePointsAnimation: pointsItem?.showDouzePoints ?? false,
         };
       });
 
@@ -688,7 +695,7 @@ export const createVotingActions: StateCreator<
       .filter((p) => p === currentPoints).length;
 
     const allMatchingVotes = votesForCountry.filter(
-      (v) => v.points === currentPoints,
+      (v) => v.points === currentPoints.value,
     );
     const vote = allMatchingVotes[occurrences];
 

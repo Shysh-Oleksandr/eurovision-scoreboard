@@ -1,15 +1,11 @@
 import React from 'react';
 
+import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
+import { SparklesIcon } from '@/assets/icons/SparklesIcon';
 import Button from '@/components/common/Button';
 import Select from '@/components/common/Select';
-import { POINTS_ARRAY } from '@/data/data';
-
-export const PREDEFINED_SYSTEMS_MAP = {
-  default: POINTS_ARRAY,
-  reversed: [...POINTS_ARRAY].reverse(),
-  old: Array(10).fill(1),
-};
+import { Tooltip } from '@/components/common/Tooltip';
 
 const predefinedSystemsOptions = [
   { value: 'default', label: 'Eurovision Standard (1-8, 10, 12)' },
@@ -37,7 +33,24 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
   return (
     <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
       <div>
-        <h4 className="text-base sm:text-lg font-semibold">Points System</h4>
+        <div className="flex items-center gap-2">
+          <h4 className="text-base sm:text-lg font-semibold">Points System</h4>
+          <Tooltip
+            content={
+              <div className="space-y-2 font-medium">
+                <p>
+                  The{' '}
+                  <SparklesIcon className="w-4 h-4 mb-1 inline-block text-yellow-300" />{' '}
+                  icon indicates that the points will be animated when the
+                  country receives them. Click to toggle.
+                </p>
+              </div>
+            }
+            position="right"
+          >
+            <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
+          </Tooltip>
+        </div>
         <p className="text-sm text-white/50">Drag and drop to reorder</p>
       </div>
       <div className="flex items-center gap-2 ml-auto">

@@ -26,6 +26,8 @@ import {
   COUNTRIES_2025,
 } from './countries';
 
+import { PointsItem } from '@/state/generalStore';
+
 export const SUPPORTED_YEARS = Array.from({ length: 22 }, (_, i) => 2004 + i);
 
 export const getCountriesByYear = (year: Year): BaseCountry[] => {
@@ -95,3 +97,23 @@ export const getMaxPossibleTelevotePoints = (countriesLength: number) => {
 };
 
 export const ANIMATION_DURATION = 3000;
+
+export const PREDEFINED_SYSTEMS_MAP: Record<string, PointsItem[]> = {
+  default: POINTS_ARRAY.map((value, index) => ({
+    value,
+    showDouzePoints: value === 12,
+    id: index,
+  })),
+  reversed: [...POINTS_ARRAY].reverse().map((value, index) => ({
+    value,
+    showDouzePoints: value === 12,
+    id: index,
+  })),
+  old: Array(10)
+    .fill(1)
+    .map((value, index) => ({
+      value,
+      showDouzePoints: false,
+      id: index,
+    })),
+};

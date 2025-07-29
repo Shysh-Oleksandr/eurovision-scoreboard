@@ -4,18 +4,16 @@ import SortableList from 'react-easy-sort';
 import { AddPointButton } from './AddPointButton';
 import { PointItem } from './PointItem';
 
-interface Point {
-  id: number;
-  value: string;
-}
+import { PointsItem } from '@/state/generalStore';
 
 interface PointsListProps {
-  points: Point[];
+  points: PointsItem[];
   onSortEnd: (oldIndex: number, newIndex: number) => void;
   onPointChange: (index: number, value: string) => void;
   onPointBlur: (index: number) => void;
   onPointRemove: (index: number) => void;
   onPointAdd: (value: string) => void;
+  onDouzePointsToggle: (index: number) => void;
 }
 
 export const PointsList: React.FC<PointsListProps> = ({
@@ -25,6 +23,7 @@ export const PointsList: React.FC<PointsListProps> = ({
   onPointBlur,
   onPointRemove,
   onPointAdd,
+  onDouzePointsToggle,
 }) => {
   return (
     <SortableList
@@ -36,10 +35,12 @@ export const PointsList: React.FC<PointsListProps> = ({
         <PointItem
           key={item.id}
           id={item.id}
-          value={item.value}
+          value={String(item.value)}
+          showDouzePoints={item.showDouzePoints}
           onChange={(value) => onPointChange(index, value)}
           onBlur={() => onPointBlur(index)}
           onRemove={() => onPointRemove(index)}
+          onDouzePointsToggle={() => onDouzePointsToggle(index)}
         />
       ))}
       <AddPointButton onAdd={onPointAdd} />

@@ -48,10 +48,12 @@ const CountryItem = ({
     isVotingOver,
   );
 
-  const showDouzePointsAnimationHook = useDouzePointsAnimation(
-    !!country.showDouzePointsAnimation,
-    country.code,
-  );
+  const { shouldRender: showDouzePointsAnimationHook, points: douzePoints } =
+    useDouzePointsAnimation(
+      !!country.showDouzePointsAnimation,
+      country.code,
+      country.lastReceivedPoints,
+    );
 
   const douzePointsContainerRef = useRef<HTMLDivElement>(null);
   const douzePointsParallelogramBlueRef = useRef<HTMLDivElement>(null);
@@ -124,6 +126,7 @@ const CountryItem = ({
               parallelogramBlueRef: douzePointsParallelogramBlueRef,
               parallelogramYellowRef: douzePointsParallelogramYellowRef,
             }}
+            pointsAmount={douzePoints ?? 0}
           />
         )}
 
