@@ -3954,6 +3954,14 @@ h6 {
     min-width: 50px;
   }
 
+  .lg\:min-w-7 {
+    min-width: 1.75rem;
+  }
+
+  .lg\:min-w-6 {
+    min-width: 1.5rem;
+  }
+
   .lg\:max-w-5xl {
     max-width: 64rem;
   }
@@ -4094,6 +4102,11 @@ h6 {
 
   .xl\:text-lg {
     font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  .xl\:text-xl {
+    font-size: 1.25rem;
     line-height: 1.75rem;
   }
 }

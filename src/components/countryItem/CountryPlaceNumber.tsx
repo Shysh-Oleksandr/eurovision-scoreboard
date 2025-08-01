@@ -37,7 +37,9 @@ const CountryPlaceNumber = ({
   // Calculate width dynamically to handle different screen sizes
   const width = useMemo(() => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth > 576 ? 40 : 32;
+      const mobileWidth = window.innerWidth > 480 ? 32 : 28;
+
+      return window.innerWidth > 576 ? 40 : mobileWidth;
     }
 
     return 40; // fallback
@@ -109,14 +111,14 @@ const CountryPlaceNumber = ({
       }`}
     >
       <ArrowIcon
-        className={`text-white w-8 h-8 -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 ${
+        className={`text-white 2cols:w-8 w-7 2cols:h-8 h-7 -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 ${
           displayArrow ? 'blinker' : 'opacity-0'
         }`}
       />
 
       <h4
         ref={textRef}
-        className={`font-semibold md:text-lg text-base ${
+        className={`font-semibold md:text-lg xs:text-base text-sm ${
           displayArrow ? '!opacity-0' : ''
         } ${previousDisplayArrow && !displayArrow ? 'blinker' : ''}`}
       >
