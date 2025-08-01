@@ -118,6 +118,8 @@ const generateCombinedVotes = (
   return winners.map((winner, index) => ({
     countryCode: winner.code,
     points: sortedPoints[index].value,
+    pointsId: sortedPoints[index].id,
+    showDouzePointsAnimation: sortedPoints[index].showDouzePoints,
   }));
 };
 
@@ -160,6 +162,8 @@ const generateVotesForSource = (
   return winners.map((winnerCode, index) => ({
     countryCode: winnerCode,
     points: sortedPoints[index].value,
+    pointsId: sortedPoints[index].id,
+    showDouzePointsAnimation: sortedPoints[index].showDouzePoints,
   }));
 };
 

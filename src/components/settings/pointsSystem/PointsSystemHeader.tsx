@@ -11,6 +11,10 @@ const predefinedSystemsOptions = [
   { value: 'default', label: 'Eurovision Standard (1-8, 10, 12)' },
   { value: 'reversed', label: 'Reversed (12-8, 10, 1)' },
   { value: 'old', label: 'Eurovision Pre-1975 (1x10)' },
+  {
+    value: 'melodifestivalen',
+    label: 'Melodifestivalen (1, 2, 4, 6, 8, 10, 12)',
+  },
 ];
 
 interface PointsSystemHeaderProps {
@@ -47,6 +51,7 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
               </div>
             }
             position="right"
+            className="sm:w-[min(300px,80vw)] w-[250px] sm:-left-32 left-1/2 sm:translate-x-0 -translate-x-1/2"
           >
             <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
           </Tooltip>

@@ -53,12 +53,12 @@ const VotingPointsInfo = () => {
         return (
           <div
             key={pointsItem.id}
-            className={`lg:min-w-8 min-w-7 lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${
+            className={`lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${
               isActive ? 'bg-panelInfo-activeBg' : 'bg-panelInfo-inactiveBg'
             }`}
           >
             <h6
-              className={`lg:text-xl text-lg transition-colors duration-500 ${
+              className={`xl:text-xl text-lg md:text-base lg:text-lg transition-colors duration-500 ${
                 isActive
                   ? 'text-panelInfo-activeText font-bold'
                   : 'text-panelInfo-inactiveText font-semibold'

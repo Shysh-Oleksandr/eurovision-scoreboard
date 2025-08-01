@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-01',
+    title: 'Small bug fixes',
+  },
+  {
     date: '2025-07-29',
     title:
       'Added the ability to assign the DouzePoints animation for specific points. Small bug fixes',

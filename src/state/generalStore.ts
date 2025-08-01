@@ -37,7 +37,8 @@ interface GeneralState {
   themeYear: Year;
   theme: Theme;
   settings: Settings;
-  pointsSystem: PointsItem[];
+  pointsSystem: PointsItem[]; // used during simulation
+  settingsPointsSystem: PointsItem[]; // used locally in settings
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
@@ -45,6 +46,7 @@ interface GeneralState {
   setTheme: (year: Year) => void;
   setSettings: (settings: Partial<Settings>) => void;
   setPointsSystem: (points: PointsItem[]) => void;
+  setSettingsPointsSystem: (points: PointsItem[]) => void;
 }
 
 const getLatestUpdate = () => {
@@ -73,6 +75,7 @@ export const useGeneralStore = create<GeneralState>()(
         themeYear: INITIAL_YEAR,
         theme: getThemeForYear(INITIAL_YEAR),
         pointsSystem: initialPointsSystem,
+        settingsPointsSystem: initialPointsSystem,
         settings: {
           alwaysShowRankings: true,
           showQualificationModal: true,
@@ -127,6 +130,9 @@ export const useGeneralStore = create<GeneralState>()(
         setPointsSystem: (points: PointsItem[]) => {
           set({ pointsSystem: points });
         },
+        setSettingsPointsSystem: (points: PointsItem[]) => {
+          set({ settingsPointsSystem: points });
+        },
       }),
       {
         name: 'general-storage',
@@ -137,7 +143,7 @@ export const useGeneralStore = create<GeneralState>()(
             lastSeenUpdate: state.lastSeenUpdate,
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
             settings: state.settings,
-            pointsSystem: state.pointsSystem,
+            settingsPointsSystem: state.settingsPointsSystem,
           };
         },
         onRehydrateStorage: () => (state) => {
@@ -152,25 +158,24 @@ export const useGeneralStore = create<GeneralState>()(
           const themeYear = state.themeYear ?? INITIAL_YEAR;
 
           // Convert old points system format to new format if needed
-          let pointsSystem: PointsItem[] | undefined;
+          let settingsPointsSystem: PointsItem[] =
+            state.pointsSystem || initialPointsSystem; // keep old points system for backwards compatibility
 
-          if (state.pointsSystem) {
+          if (state.settingsPointsSystem) {
             if (
-              Array.isArray(state.pointsSystem) &&
-              typeof state.pointsSystem[0] === 'number'
+              Array.isArray(state.settingsPointsSystem) &&
+              typeof state.settingsPointsSystem[0] === 'number'
             ) {
-              pointsSystem = (state.pointsSystem as unknown as number[]).map(
-                (value, index) => ({
-                  value,
-                  showDouzePoints: value === 12,
-                  id: index,
-                }),
-              );
+              settingsPointsSystem = (
+                state.settingsPointsSystem as unknown as number[]
+              ).map((value, index) => ({
+                value,
+                showDouzePoints: value === 12,
+                id: index,
+              }));
             } else {
-              pointsSystem = state.pointsSystem as PointsItem[];
+              settingsPointsSystem = state.settingsPointsSystem as PointsItem[];
             }
-          } else {
-            pointsSystem = initialPointsSystem;
           }
 
           return {
@@ -179,7 +184,7 @@ export const useGeneralStore = create<GeneralState>()(
             year,
             themeYear,
             theme: getThemeForYear(themeYear),
-            pointsSystem,
+            settingsPointsSystem,
           };
         },
       },

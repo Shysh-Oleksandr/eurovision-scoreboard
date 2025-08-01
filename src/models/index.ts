@@ -73,4 +73,5 @@ export interface Country extends BaseCountry {
 export interface CountryWithPoints {
   code: string;
   points: number;
+  showDouzePointsAnimation: boolean;
 }

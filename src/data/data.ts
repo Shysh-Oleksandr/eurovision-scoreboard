@@ -116,4 +116,9 @@ export const PREDEFINED_SYSTEMS_MAP: Record<string, PointsItem[]> = {
       showDouzePoints: false,
       id: index,
     })),
+  melodifestivalen: [1, 2, 4, 6, 8, 10, 12].map((value, index) => ({
+    value,
+    showDouzePoints: value === 12,
+    id: index,
+  })),
 };

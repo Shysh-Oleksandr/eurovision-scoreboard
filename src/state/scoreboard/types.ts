@@ -3,6 +3,8 @@ import { BaseCountry, Country, EventMode, EventStage } from '../../models';
 export type Vote = {
   countryCode: string;
   points: number;
+  pointsId: number;
+  showDouzePointsAnimation: boolean;
 };
 
 export type StageVotes = {
