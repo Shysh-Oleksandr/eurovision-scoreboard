@@ -1046,6 +1046,26 @@ video {
   width: 100%;
 }
 
+.\!w-auto {
+  width: auto !important;
+}
+
+.w-\[min\(200px\2c 80vw\)\] {
+  width: min(200px,80vw);
+}
+
+.w-\[160px\] {
+  width: 160px;
+}
+
+.w-\[200px\] {
+  width: 200px;
+}
+
+.w-\[250px\] {
+  width: 250px;
+}
+
 .min-w-0 {
   min-width: 0px;
 }
@@ -3504,6 +3524,10 @@ h6 {
 }
 
 @media (min-width: 30rem) {
+  .xs\:left-0 {
+    left: 0px;
+  }
+
   .xs\:mx-6 {
     margin-left: 1.5rem;
     margin-right: 1.5rem;
@@ -3521,12 +3545,25 @@ h6 {
     width: 2.5rem;
   }
 
+  .xs\:w-\[200px\] {
+    width: 200px;
+  }
+
+  .xs\:w-\[250px\] {
+    width: 250px;
+  }
+
   .xs\:min-w-\[40px\] {
     min-width: 40px;
   }
 
   .xs\:max-w-\[20rem\] {
     max-width: 20rem;
+  }
+
+  .xs\:translate-x-0 {
+    --tw-translate-x: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 
   .xs\:grid-cols-2 {
@@ -3584,6 +3621,14 @@ h6 {
 }
 
 @media (min-width: 36rem) {
+  .\32 cols\:h-8 {
+    height: 2rem;
+  }
+
+  .\32 cols\:w-8 {
+    width: 2rem;
+  }
+
   .\32 cols\:max-w-\[11rem\] {
     max-width: 11rem;
   }
@@ -3592,6 +3637,22 @@ h6 {
 @media (min-width: 40rem) {
   .sm\:right-2 {
     right: 0.5rem;
+  }
+
+  .sm\:left-0 {
+    left: 0px;
+  }
+
+  .sm\:-left-8 {
+    left: -2rem;
+  }
+
+  .sm\:-left-16 {
+    left: -4rem;
+  }
+
+  .sm\:-left-32 {
+    left: -8rem;
   }
 
   .sm\:mt-3 {
@@ -3623,6 +3684,10 @@ h6 {
     width: fit-content;
   }
 
+  .sm\:w-\[min\(300px\2c 80vw\)\] {
+    width: min(300px,80vw);
+  }
+
   .sm\:min-w-\[130px\] {
     min-width: 130px;
   }
@@ -3637,6 +3702,11 @@ h6 {
 
   .sm\:max-w-\[9rem\] {
     max-width: 9rem;
+  }
+
+  .sm\:translate-x-0 {
+    --tw-translate-x: 0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 
   .sm\:grid-cols-2 {

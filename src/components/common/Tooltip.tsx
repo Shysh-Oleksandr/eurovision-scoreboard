@@ -7,7 +7,7 @@ interface TooltipProps {
   content: React.ReactNode;
   children: React.ReactElement;
   className?: string;
-  position?: 'left' | 'right';
+  position?: 'left' | 'right' | 'center';
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({
@@ -40,6 +40,12 @@ export const Tooltip: React.FC<TooltipProps> = ({
     }
   };
 
+  const positionClasses = {
+    left: 'right-0',
+    right: 'left-0',
+    center: 'left-1/2 -translate-x-1/2',
+  };
+
   return (
     <div
       ref={tooltipRef}
@@ -51,9 +57,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       {children}
       {isOpen && (
         <div
-          className={`absolute top-full ${
-            position === 'left' ? 'right-0' : 'left-0'
-          } mt-2 bg-primary-900 bg-gradient-to-tl from-primary-900 to-primary-800/70 text-white text-sm rounded-md px-3 py-2 z-50 w-[min(300px,80vw)] shadow-xl ${className}`}
+          className={`absolute top-full ${positionClasses[position]} mt-2 bg-primary-900 bg-gradient-to-tl from-primary-900 to-primary-800/70 text-white text-sm rounded-md px-3 py-2 z-50 w-[min(300px,80vw)] shadow-xl ${className}`}
         >
           {content}
         </div>
