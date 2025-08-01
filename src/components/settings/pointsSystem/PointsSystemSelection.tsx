@@ -9,24 +9,28 @@ import { PointsSystemHeader } from './PointsSystemHeader';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 
 export const PointsSystemSelection = () => {
-  const pointsSystem = useGeneralStore((state) => state.pointsSystem);
-  const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
+  const settingsPointsSystem = useGeneralStore(
+    (state) => state.settingsPointsSystem,
+  );
+  const setSettingsPointsSystem = useGeneralStore(
+    (state) => state.setSettingsPointsSystem,
+  );
 
   const [internalPoints, setInternalPoints] = useState<PointsItem[]>(
-    () => pointsSystem,
+    () => settingsPointsSystem,
   );
 
   useEffect(() => {
-    setInternalPoints(pointsSystem);
-  }, [pointsSystem]);
+    setInternalPoints(settingsPointsSystem);
+  }, [settingsPointsSystem]);
 
   const currentSystem = Object.entries(PREDEFINED_SYSTEMS_MAP).find(
     ([, value]) =>
-      value.length === pointsSystem.length &&
+      value.length === settingsPointsSystem.length &&
       value.every(
         (v, i) =>
-          v.value === pointsSystem[i].value &&
-          v.showDouzePoints === pointsSystem[i].showDouzePoints,
+          v.value === settingsPointsSystem[i].value &&
+          v.showDouzePoints === settingsPointsSystem[i].showDouzePoints,
       ),
   )?.[0];
 
@@ -34,11 +38,11 @@ export const PointsSystemSelection = () => {
     const moved = arrayMoveImmutable(internalPoints, oldIndex, newIndex);
 
     setInternalPoints(moved);
-    setPointsSystem(moved);
+    setSettingsPointsSystem(moved);
   };
 
   const handleRemovePoint = (index: number) => {
-    setPointsSystem(pointsSystem.filter((_, i) => i !== index));
+    setSettingsPointsSystem(settingsPointsSystem.filter((_, i) => i !== index));
   };
 
   const handlePointChange = (index: number, value: string) => {
@@ -61,7 +65,7 @@ export const PointsSystemSelection = () => {
         value: pointValue,
       };
       setInternalPoints(newPoints);
-      setPointsSystem(newPoints);
+      setSettingsPointsSystem(newPoints);
     }
   };
 
@@ -74,7 +78,7 @@ export const PointsSystemSelection = () => {
       return;
     }
 
-    setPointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
+    setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
   };
 
   const handleAddPoint = (value: string) => {
@@ -84,17 +88,17 @@ export const PointsSystemSelection = () => {
       id: Math.random(),
     };
 
-    setPointsSystem([...pointsSystem, newPoint]);
+    setSettingsPointsSystem([...settingsPointsSystem, newPoint]);
   };
 
   const handleDouzePointsToggle = (index: number) => {
-    const newPoints = [...pointsSystem];
+    const newPoints = [...settingsPointsSystem];
 
     newPoints[index] = {
       ...newPoints[index],
       showDouzePoints: !newPoints[index].showDouzePoints,
     };
-    setPointsSystem(newPoints);
+    setSettingsPointsSystem(newPoints);
   };
 
   return (
@@ -102,7 +106,7 @@ export const PointsSystemSelection = () => {
       <PointsSystemHeader
         currentSystem={currentSystem || 'custom'}
         onSystemChange={handlePredefinedSystemChange}
-        onReset={() => setPointsSystem(PREDEFINED_SYSTEMS_MAP.default)}
+        onReset={() => setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP.default)}
       />
       <PointsList
         points={internalPoints}

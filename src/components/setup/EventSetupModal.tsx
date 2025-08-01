@@ -27,8 +27,9 @@ import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
 import { SetupHeader } from './SetupHeader';
 import { validateEventSetup } from './utils/eventValidation';
 
+import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useDebounce } from '@/hooks/useDebounce';
-import { INITIAL_YEAR } from '@/state/generalStore';
+import { useGeneralStore } from '@/state/generalStore';
 
 const EventSetupModal = () => {
   const eventSetupModalOpen = useCountriesStore(
@@ -43,9 +44,6 @@ const EventSetupModal = () => {
   const allCountriesForYear = useCountriesStore(
     (state) => state.allCountriesForYear,
   );
-  const setInitialCountriesForYear = useCountriesStore(
-    (state) => state.setInitialCountriesForYear,
-  );
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const configuredEventStages = useCountriesStore(
     (state) => state.configuredEventStages,
@@ -58,6 +56,10 @@ const EventSetupModal = () => {
   const startEvent = useScoreboardStore((state) => state.startEvent);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const restartCounter = useScoreboardStore((state) => state.restartCounter);
+  const settingsPointsSystem = useGeneralStore(
+    (state) => state.settingsPointsSystem,
+  );
+  const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
   const { clear } = useScoreboardStore.temporal.getState();
 
   const [activeTab, setActiveTab] = useState<EventMode>(
@@ -88,13 +90,6 @@ const EventSetupModal = () => {
   useEffect(() => {
     loadCustomCountries();
   }, [loadCustomCountries]);
-
-  // useEffect(() => {
-  //   console.log('allCountriesForYear', allCountriesForYear);
-  //   if (allCountriesForYear.length === 0) {
-  //     setInitialCountriesForYear(INITIAL_YEAR);
-  //   }
-  // }, [allCountriesForYear.length, setInitialCountriesForYear]);
 
   useEffect(() => {
     if (!eventSetupModalOpen) return;
@@ -272,6 +267,12 @@ const EventSetupModal = () => {
 
       return;
     }
+
+    setPointsSystem(
+      settingsPointsSystem.length > 0
+        ? settingsPointsSystem
+        : PREDEFINED_SYSTEMS_MAP['default'],
+    );
 
     onClose();
     setEventStages(eventStagesWithCountries);

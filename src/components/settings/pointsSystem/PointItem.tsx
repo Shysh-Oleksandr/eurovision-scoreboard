@@ -30,7 +30,7 @@ export const PointItem: React.FC<PointItemProps> = ({
       <div className="flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 py-1 rounded-md z-10 cursor-grab relative overflow-visible">
         <button
           onClick={onDouzePointsToggle}
-          className="absolute -left-3 -top-3 p-2"
+          className="absolute -left-3 -top-3 p-2 hover:scale-125 transition-transform duration-300"
           title={
             showDouzePoints
               ? 'Disable DouzePoints animation'
