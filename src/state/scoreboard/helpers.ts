@@ -1,4 +1,4 @@
-import { Country, EventStage } from '../../models';
+import { Country, EventStage, StageVotingMode } from '../../models';
 
 export const compareCountriesByPoints = (a: Country, b: Country) => {
   const pointsComparison = b.points - a.points;
@@ -82,6 +82,11 @@ export const handleStageEnd = (
     updatedCountries = updatedCountries.map((country) => ({
       ...country,
       isVotingFinished: true,
+      showDouzePointsAnimation:
+        currentStage.votingMode === StageVotingMode.TELEVOTE_ONLY ||
+        currentStage.votingMode === StageVotingMode.JURY_AND_TELEVOTE
+          ? false
+          : country.showDouzePointsAnimation,
     }));
     winnerCountry = getWinnerCountry(updatedCountries);
   }

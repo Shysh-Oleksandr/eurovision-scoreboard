@@ -280,6 +280,85 @@ export const createVotingActions: StateCreator<
     });
   },
 
+  givePredefinedJuryPoint: () => {
+    const state = get();
+    const currentStage = state.getCurrentStage();
+    const { pointsSystem } = useGeneralStore.getState();
+
+    if (!currentStage) return;
+
+    const votingCountry = useCountriesStore.getState().getVotingCountry();
+
+    if (!votingCountry) return;
+
+    const predefinedVotesForStage = state.predefinedVotes[currentStage.id];
+
+    if (!predefinedVotesForStage) return;
+
+    const votes =
+      currentStage.votingMode === StageVotingMode.COMBINED
+        ? predefinedVotesForStage.combined
+        : predefinedVotesForStage.jury;
+
+    const votesFromCountry = votes?.[votingCountry.code];
+
+    if (!votesFromCountry) return;
+
+    const currentPoints = pointsSystem[state.votingPointsIndex];
+
+    const vote = votesFromCountry.find((v) => v.pointsId === currentPoints.id);
+
+    if (!vote) return;
+
+    get().giveJuryPoints(vote.countryCode);
+  },
+
+  givePredefinedTelevotePoints: () => {
+    const state = get();
+    const currentStage = state.getCurrentStage();
+
+    if (!currentStage) return;
+
+    const votingCountry = useCountriesStore.getState().getVotingCountry(); // This is the country receiving points
+
+    if (!votingCountry) return;
+
+    const predefinedTelevoteVotes =
+      state.predefinedVotes[currentStage.id]?.televote;
+
+    if (!predefinedTelevoteVotes) return;
+
+    const votingCountries = useCountriesStore.getState().getVotingCountries();
+    let totalPoints = 0;
+
+    for (const vc of votingCountries) {
+      const votesFromVoter = predefinedTelevoteVotes[vc.code];
+
+      if (votesFromVoter) {
+        const voteForCountry = votesFromVoter.find(
+          (v) => v.countryCode === votingCountry.code,
+        );
+
+        if (voteForCountry) {
+          totalPoints += voteForCountry.points;
+        }
+      }
+    }
+
+    const isFirstTelevoteCountry =
+      currentStage.countries.filter((country) => country.isVotingFinished)
+        .length === 0;
+
+    if (isFirstTelevoteCountry) {
+      if (state.lastPointsResetTimerId) {
+        clearTimeout(state.lastPointsResetTimerId);
+      }
+      get().resetLastPoints();
+    }
+
+    get().giveTelevotePoints(votingCountry.code, totalPoints);
+  },
+
   giveRandomJuryPoints: () => {
     const state = get();
     const countriesStore = useCountriesStore.getState();
@@ -646,84 +725,5 @@ export const createVotingActions: StateCreator<
       showQualificationResults,
       televotingProgress: state.televotingProgress + countriesToVote.length,
     });
-  },
-
-  givePredefinedJuryPoint: () => {
-    const state = get();
-    const currentStage = state.getCurrentStage();
-    const { pointsSystem } = useGeneralStore.getState();
-
-    if (!currentStage) return;
-
-    const votingCountry = useCountriesStore.getState().getVotingCountry();
-
-    if (!votingCountry) return;
-
-    const predefinedVotesForStage = state.predefinedVotes[currentStage.id];
-
-    if (!predefinedVotesForStage) return;
-
-    const votes =
-      currentStage.votingMode === StageVotingMode.COMBINED
-        ? predefinedVotesForStage.combined
-        : predefinedVotesForStage.jury;
-
-    const votesFromCountry = votes?.[votingCountry.code];
-
-    if (!votesFromCountry) return;
-
-    const currentPoints = pointsSystem[state.votingPointsIndex];
-
-    const vote = votesFromCountry.find((v) => v.pointsId === currentPoints.id);
-
-    if (!vote) return;
-
-    get().giveJuryPoints(vote.countryCode);
-  },
-
-  givePredefinedTelevotePoints: () => {
-    const state = get();
-    const currentStage = state.getCurrentStage();
-
-    if (!currentStage) return;
-
-    const votingCountry = useCountriesStore.getState().getVotingCountry(); // This is the country receiving points
-
-    if (!votingCountry) return;
-
-    const predefinedTelevoteVotes =
-      state.predefinedVotes[currentStage.id]?.televote;
-
-    if (!predefinedTelevoteVotes) return;
-
-    const votingCountries = useCountriesStore.getState().getVotingCountries();
-    let totalPoints = 0;
-
-    for (const vc of votingCountries) {
-      const votesFromVoter = predefinedTelevoteVotes[vc.code];
-
-      if (votesFromVoter) {
-        const voteForCountry = votesFromVoter.find(
-          (v) => v.countryCode === votingCountry.code,
-        );
-
-        if (voteForCountry) {
-          totalPoints += voteForCountry.points;
-        }
-      }
-    }
-
-    const isFirstTelevoteCountry =
-      currentStage.countries.filter((country) => country.isVotingFinished)
-        .length === 0;
-
-    if (isFirstTelevoteCountry) {
-      if (state.lastPointsResetTimerId) {
-        clearTimeout(state.lastPointsResetTimerId);
-      }
-      get().resetLastPoints();
-    }
-
-    get().giveTelevotePoints(votingCountry.code, totalPoints);
   },
 });
