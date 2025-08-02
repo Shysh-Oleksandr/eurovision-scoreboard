@@ -14,7 +14,7 @@ const useDouzePointsAnimation = (
 
   const [shouldRender, setShouldRender] = useState(false);
   const [animationPoints, setAnimationPoints] = useState<number | null>(null);
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (timerRef.current) {

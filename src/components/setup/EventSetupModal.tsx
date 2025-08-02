@@ -18,7 +18,7 @@ import { SettingsModal } from '../settings';
 import { TABS } from './constants';
 import { AvailableGroup } from './CountrySelectionListItem';
 import CustomCountryModal from './CustomCountryModal';
-import EventStageModal from './EventStageModal';
+import EventStageModal from './event-stage/EventStageModal';
 import GrandFinalOnlySetup from './GrandFinalOnlySetup';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';

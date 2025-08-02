@@ -51,7 +51,7 @@ export const PointItem: React.FC<PointItemProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
-          className="!w-12 h-8 bg-transparent bg-none"
+          className="w-full text-center h-8 !px-0 bg-transparent bg-none"
           min={1}
           step={1}
         />
