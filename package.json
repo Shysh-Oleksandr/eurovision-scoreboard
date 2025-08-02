@@ -17,7 +17,8 @@
     "lint:types-cli": "yarn tsc -p tsconfig.production.json",
     "lint:last-commit": "echo \"Info: no previous commits\"",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "calculate-odds": "npx ts-node scripts/calculateCountriesOdds.ts"
+    "calculate-odds": "npx ts-node -P tsconfig.scripts.json scripts/calculateCountriesOdds.ts",
+    "add-spokesperson-order": "npx ts-node -P tsconfig.scripts.json scripts/addSpokespersonOrder.ts"
   },
   "keywords": [],
   "author": "",
@@ -38,6 +39,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@types/node": "^24.1.0",
     "@types/react": "19.1.8",
     "@types/react-dom": "^19.1.6",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
