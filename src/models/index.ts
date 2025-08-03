@@ -5,10 +5,12 @@ export interface BaseCountry {
   flag?: string;
   isQualified?: boolean;
   semiFinalGroup?: string;
+  aqSemiFinalGroup?: string;
   isAutoQualified?: boolean;
   isQualifiedFromSemi?: boolean;
   juryOdds?: number;
   televoteOdds?: number;
+  spokespersonOrder?: number;
 }
 
 export type SemiFinalGroup = 'SF1' | 'SF2';
@@ -49,6 +51,7 @@ export interface EventStage {
   name: string;
   votingMode: StageVotingMode;
   countries: Country[];
+  votingCountries?: BaseCountry[];
   isOver: boolean;
   isJuryVoting: boolean;
   isLastStage?: boolean;

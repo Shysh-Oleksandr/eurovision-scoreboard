@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
@@ -6,6 +6,8 @@ import Modal from '../common/Modal/Modal';
 import StatsHeader from './finalStats/StatsHeader';
 import StatsTable from './finalStats/StatsTable';
 import { useFinalStats } from './finalStats/useFinalStats';
+
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 interface FinalStatsModalProps {
   isOpen: boolean;
@@ -16,6 +18,8 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+
   const {
     finishedStages,
     selectedStage,
@@ -25,12 +29,17 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     setSelectedVoteType,
     voteTypeOptions,
     totalBadgeLabel,
-    votingCountries,
     rankedCountries,
     getPoints,
     getCellPoints,
     getCellClassName,
   } = useFinalStats();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    setSelectedStageId(viewedStageId);
+  }, [isOpen, viewedStageId, setSelectedStageId]);
 
   return (
     <Modal
@@ -60,10 +69,11 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       {selectedStage ? (
         <StatsTable
           rankedCountries={rankedCountries}
-          votingCountries={votingCountries}
           getCellPoints={getCellPoints}
           getCellClassName={getCellClassName}
           getPoints={getPoints}
+          selectedStageId={selectedStageId}
+          selectedVoteType={selectedVoteType}
         />
       ) : (
         <div className="text-center p-8 text-gray-400">

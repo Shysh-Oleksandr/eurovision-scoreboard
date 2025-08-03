@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand';
 
-import { EventStage, StageId } from '../../models';
+import { EventStage } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
@@ -21,13 +21,13 @@ export const createPredefinitionActions: StateCreator<
   PredefinitionActions
 > = (set, get) => ({
   predefineVotesForStage: (stage: EventStage, resetOtherStages = false) => {
-    const { selectedCountries, countryOdds } = useCountriesStore.getState();
+    const { countryOdds, getStageVotingCountries } =
+      useCountriesStore.getState();
     const { pointsSystem } = useGeneralStore.getState();
 
     const { randomnessLevel } = get();
 
-    const votingCountries =
-      stage.id === StageId.GF ? selectedCountries : stage.countries;
+    const votingCountries = getStageVotingCountries(stage.id);
 
     const predefinedVotes = predefineStageVotes(
       stage.countries,

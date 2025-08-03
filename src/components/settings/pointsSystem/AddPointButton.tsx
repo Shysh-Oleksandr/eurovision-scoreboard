@@ -32,7 +32,7 @@ export const AddPointButton: React.FC<AddPointButtonProps> = ({ onAdd }) => {
   };
 
   return (
-    <div className="flex items-center justify-end">
+    <div>
       {isAdding ? (
         <div className="flex items-center">
           <Input
@@ -41,13 +41,13 @@ export const AddPointButton: React.FC<AddPointButtonProps> = ({ onAdd }) => {
             onChange={(e) => setNewPoint(e.target.value)}
             onBlur={handleAddPoint}
             autoFocus
-            className="lg:!w-[60px] !w-[52px] !h-[35px] text-center !px-0"
+            className="w-full !h-[35px] text-center !px-0"
           />
         </div>
       ) : (
         <Button
           onClick={() => setIsAdding(true)}
-          className="h-full !py-1 !px-4 lg:!px-5 w-fit"
+          className="h-full !py-1 !px-4 lg:!px-5 w-full flex justify-center"
         >
           <PlusIcon className="w-7 h-7" />
         </Button>

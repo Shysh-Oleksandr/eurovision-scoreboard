@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
-import Tabs from '../common/Tabs';
+import Tabs from '../common/tabs/Tabs';
 
 import { GeneralSettings } from './GeneralSettings';
 import { OddsSettings } from './OddsSettings';
@@ -45,9 +45,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           activeTab={activeTab}
           setActiveTab={(tab) => setActiveTab(tab as SettingsTab)}
           containerClassName="!rounded-none"
-          buttonClassName="sm:h-14 h-10"
-          overlayClassName="sm:h-14 h-10"
-          alwaysHorizontal
         />
       }
       bottomContent={

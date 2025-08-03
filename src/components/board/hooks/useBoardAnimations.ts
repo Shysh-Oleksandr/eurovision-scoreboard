@@ -31,7 +31,7 @@ export const useBoardAnimations = (
     sortedCountries.map((c) => c.code),
   );
   const [finalCountries, setFinalCountries] = useState<Country[]>([]);
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { id: currentStageId } = getCurrentStage();
 

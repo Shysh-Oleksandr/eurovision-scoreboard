@@ -32,7 +32,7 @@ export type ScoreboardState = {
   predefinedVotes: Record<string, Partial<StageVotes>>;
   hasShownManualTelevoteWarning: boolean;
   randomnessLevel: number;
-  lastPointsResetTimerId: number | null;
+  lastPointsResetTimerId: NodeJS.Timeout | null;
 
   // Getters
   getCurrentStage: () => EventStage;

@@ -231,6 +231,10 @@ export const predefineStageVotes = (
   if (shouldGenerateJury) {
     stageVotes.jury = {};
     for (const votingCountry of votingCountries) {
+      if (votingCountry.code === 'WW') {
+        continue;
+      }
+
       stageVotes.jury[votingCountry.code] = generateVotesForSource(
         votingCountry,
         stageCountries,

@@ -6,7 +6,7 @@ const useVotingFinished = (
   isVotingFinished: boolean,
   isVotingOver: boolean,
 ) => {
-  const timerId = useRef<number | null>(null);
+  const timerId = useRef<NodeJS.Timeout | null>(null);
   const [isFinished, setIsFinished] = useState(isVotingOver);
 
   const clearTimer = useCallback(() => {

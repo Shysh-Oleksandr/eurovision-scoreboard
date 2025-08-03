@@ -1,13 +1,22 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  ReactNode,
+} from 'react';
 
-import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
+
+interface TabItem {
+  label: string;
+  value: string;
+  showIndicator?: boolean;
+  content?: ReactNode;
+}
 
 interface TabsProps {
-  tabs: {
-    label: string;
-    value: string;
-    showIndicator?: boolean;
-  }[];
+  tabs: TabItem[];
   activeTab: string;
   setActiveTab: (tab: string) => void;
   containerClassName?: string;
@@ -16,6 +25,39 @@ interface TabsProps {
   alwaysHorizontal?: boolean;
 }
 
+interface TabContentProps {
+  tabs: TabItem[];
+  activeTab: string;
+  preserveContent?: boolean;
+}
+
+const TabContent: React.FC<TabContentProps> = ({
+  tabs,
+  activeTab,
+  preserveContent = false,
+}) => {
+  if (!preserveContent) {
+    // Return only the active tab content
+    const activeTabItem = tabs.find((tab) => tab.value === activeTab);
+
+    return activeTabItem?.content || null;
+  }
+
+  // Preserve all tab content, only hide inactive ones
+  return (
+    <>
+      {tabs.map((tab) => (
+        <div
+          key={tab.value}
+          className={`${tab.value === activeTab ? 'block' : 'hidden'}`}
+        >
+          {tab.content}
+        </div>
+      ))}
+    </>
+  );
+};
+
 const Tabs: React.FC<TabsProps> = ({
   tabs,
   activeTab,
@@ -23,7 +65,7 @@ const Tabs: React.FC<TabsProps> = ({
   containerClassName = '',
   buttonClassName = '',
   overlayClassName = '',
-  alwaysHorizontal = false,
+  alwaysHorizontal = true,
 }) => {
   const isSmallScreen =
     useMediaQuery('(max-width: 479px)') && !alwaysHorizontal;
@@ -116,4 +158,5 @@ const Tabs: React.FC<TabsProps> = ({
   );
 };
 
+export { TabContent };
 export default Tabs;

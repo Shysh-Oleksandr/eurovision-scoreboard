@@ -28,7 +28,7 @@ export const PointsList: React.FC<PointsListProps> = ({
   return (
     <SortableList
       onSortEnd={onSortEnd}
-      className="flex flex-wrap gap-2"
+      className="grid lg:grid-cols-9 md:grid-cols-7 sm:grid-cols-6 xs:grid-cols-4 2xs:grid-cols-3 grid-cols-2 gap-2"
       draggedItemClassName="dragged"
     >
       {points.map((item, index) => (

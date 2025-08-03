@@ -5,24 +5,15 @@ import {
   BaseCountry,
   Country,
   EventStage,
-  StageId,
   StageVotingMode,
   StageVotingType,
 } from '../../../models';
-import { useCountriesStore } from '../../../state/countriesStore';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 export const useFinalStats = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const predefinedVotes = useScoreboardStore((state) => state.predefinedVotes);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
-
-  const allEventCountries = useCountriesStore(
-    (state) => state.selectedCountries,
-  );
-  const allCountriesForYear = useCountriesStore(
-    (state) => state.allCountriesForYear,
-  );
 
   const finishedStages = eventStages.filter((stage) => stage.isOver);
 
@@ -102,24 +93,6 @@ export const useFinalStats = () => {
     () => (selectedStage ? selectedStage.countries : []),
     [selectedStage],
   );
-
-  const votingCountries: BaseCountry[] = useMemo(() => {
-    if (!selectedStage) return [];
-    if (selectedStage.id !== StageId.GF) {
-      return participatingCountries.sort((a, b) =>
-        a.name.localeCompare(b.name),
-      );
-    }
-
-    return allEventCountries.length > 0
-      ? allEventCountries
-      : allCountriesForYear;
-  }, [
-    selectedStage,
-    participatingCountries,
-    allEventCountries,
-    allCountriesForYear,
-  ]);
 
   const votesForStage = selectedStageId
     ? predefinedVotes[selectedStageId]
@@ -257,7 +230,6 @@ export const useFinalStats = () => {
     setSelectedVoteType,
     voteTypeOptions,
     totalBadgeLabel,
-    votingCountries,
     rankedCountries,
     getPoints,
     getCellPoints,

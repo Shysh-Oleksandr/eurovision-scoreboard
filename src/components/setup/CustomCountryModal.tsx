@@ -211,6 +211,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                   flag === preset ? 'border-white' : 'border-transparent'
                 }`}
                 onClick={() => setFlag(preset)}
+                loading="lazy"
               />
             ))}
           </div>

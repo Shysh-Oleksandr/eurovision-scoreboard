@@ -67,3 +67,16 @@ Array.from(document.querySelectorAll('.v_table.v_table_out tbody tr'))
 })
 .filter(Boolean);
 */
+
+/*
+From https://en.wikipedia.org/wiki/Eurovision_Song_Contest_2025#Spokespersons
+Script for getting spokesperson order from the list:
+Array.from(document.querySelectorAll(".div-col ol li")).map((item, index) => {
+  const text = item.textContent.trim();
+  const name = text.split("–")[0].trim(); // get the part before the en dash
+  return {
+    name,
+    order: index
+  };
+});
+*/

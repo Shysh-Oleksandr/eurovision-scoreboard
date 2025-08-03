@@ -9,7 +9,7 @@ export const useCustomCountryModal = () => {
     undefined,
   );
 
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleOpenCreateModal = () => {
     setCountryToEdit(undefined);
