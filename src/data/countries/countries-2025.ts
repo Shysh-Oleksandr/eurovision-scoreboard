@@ -106,6 +106,7 @@ export const COUNTRIES_2025: BaseCountry[] = [
     juryOdds: 75,
     televoteOdds: 33.5,
     spokespersonOrder: 11,
+    aqSemiFinalGroup: 'SF2',
   },
   {
     ...COMMON_COUNTRIES.Georgia,
@@ -122,6 +123,7 @@ export const COUNTRIES_2025: BaseCountry[] = [
     juryOdds: 43.5,
     televoteOdds: 39.5,
     spokespersonOrder: 27,
+    aqSemiFinalGroup: 'SF2',
   },
   {
     ...COMMON_COUNTRIES.Greece,
@@ -162,6 +164,7 @@ export const COUNTRIES_2025: BaseCountry[] = [
     juryOdds: 68.5,
     televoteOdds: 46,
     spokespersonOrder: 12,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Latvia,
@@ -266,6 +269,7 @@ export const COUNTRIES_2025: BaseCountry[] = [
     juryOdds: 28.5,
     televoteOdds: 22.5,
     spokespersonOrder: 24,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Sweden,
@@ -282,6 +286,7 @@ export const COUNTRIES_2025: BaseCountry[] = [
     juryOdds: 85.5,
     televoteOdds: 20,
     spokespersonOrder: 36,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Ukraine,
@@ -298,5 +303,6 @@ export const COUNTRIES_2025: BaseCountry[] = [
     juryOdds: 47,
     televoteOdds: 20,
     spokespersonOrder: 23,
+    aqSemiFinalGroup: 'SF2',
   },
 ];

@@ -3,15 +3,25 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 import { Year } from '../config';
-import { ALL_COUNTRIES } from '../data/countries/common-countries';
+import {
+  ALL_COUNTRIES,
+  COMMON_COUNTRIES,
+} from '../data/countries/common-countries';
 import { getCountriesByYear } from '../data/data';
 import {
   deleteCustomCountryFromDB,
   getCustomCountries,
   saveCustomCountry,
 } from '../helpers/indexedDB';
-import { BaseCountry, EventMode, EventStage, StageId } from '../models';
+import {
+  BaseCountry,
+  EventMode,
+  EventStage,
+  StageId,
+  StageVotingMode,
+} from '../models';
 
+import { useGeneralStore } from './generalStore';
 import { useScoreboardStore } from './scoreboardStore';
 
 export type CountryOdds = Record<
@@ -32,7 +42,8 @@ interface CountriesState {
   // Actions
   setEventSetupModalOpen: (open: boolean) => void;
   getQualifiedCountries: () => BaseCountry[];
-  getVotingCountries: () => BaseCountry[];
+  getInitialVotingCountries: (stageId?: string) => BaseCountry[];
+  getStageVotingCountries: (stageId?: string) => BaseCountry[];
   getVotingCountry: () => BaseCountry;
   getVotingCountriesLength: () => number;
   setSelectedCountries: (countries: BaseCountry[]) => void;
@@ -103,29 +114,74 @@ export const useCountriesStore = create<CountriesState>()(
           .sort((a, b) => a.name.localeCompare(b.name));
       },
 
-      getVotingCountries: () => {
-        const { selectedCountries, allCountriesForYear } = get();
-        const { getCurrentStage } = useScoreboardStore.getState();
-        const currentStage = getCurrentStage();
+      getInitialVotingCountries: (stageId: StageId) => {
+        const { allCountriesForYear } = get();
+        const { year } = useGeneralStore.getState();
 
-        // In a semi-final, only participating countries are voting.
-        if (currentStage && currentStage.id !== StageId.GF) {
-          return currentStage.countries.sort((a, b) =>
-            a.name.localeCompare(b.name),
+        const allCountriesForYearCopy = [...allCountriesForYear];
+
+        let baseVotingCountries: BaseCountry[] = [];
+
+        if (stageId !== StageId.GF) {
+          // In a semi-final, only participating countries and a few AQs are voting.
+          baseVotingCountries = allCountriesForYearCopy.filter(
+            (c) =>
+              c.semiFinalGroup?.toLowerCase() === stageId.toLowerCase() ||
+              c.aqSemiFinalGroup?.toLowerCase() === stageId.toLowerCase(),
+          );
+        } else {
+          // In the Grand Final, all selected countries for the event can vote.
+          baseVotingCountries = allCountriesForYearCopy.sort(
+            (a, b) => (a.spokespersonOrder ?? 0) - (b.spokespersonOrder ?? 0),
           );
         }
 
-        // In the Grand Final, all selected countries for the event can vote.
-        if (selectedCountries.length > 0) {
-          return selectedCountries.sort((a, b) => a.name.localeCompare(b.name));
+        const restOfWorld = COMMON_COUNTRIES['RestOfWorld'];
+        const shouldAddRestOfWorld = Number(year) >= 2023;
+
+        if (
+          restOfWorld &&
+          shouldAddRestOfWorld &&
+          !baseVotingCountries.some((c) => c.code === 'WW')
+        ) {
+          baseVotingCountries.push(restOfWorld);
         }
 
-        // Otherwise, fall back to all countries for the year.
-        return allCountriesForYear.sort((a, b) => a.name.localeCompare(b.name));
+        return baseVotingCountries;
+      },
+
+      getStageVotingCountries: (stageId?: string) => {
+        const { configuredEventStages } = get();
+        const { eventStages, currentStageId, predefinedVotes } =
+          useScoreboardStore.getState();
+
+        const relevantStageId = stageId ?? currentStageId;
+        const relevantStage = eventStages.find(
+          (stage) => stage.id === relevantStageId,
+        );
+
+        if (!relevantStage) {
+          return [];
+        }
+
+        const isRestOfWorldVoting =
+          relevantStage?.votingMode === StageVotingMode.TELEVOTE_ONLY ||
+          (relevantStage?.votingMode === StageVotingMode.JURY_AND_TELEVOTE &&
+            (!relevantStage.isJuryVoting ||
+              !predefinedVotes[relevantStageId!]?.televote));
+
+        const votingCountries =
+          configuredEventStages
+            .find((stage) => stage.id === relevantStageId)
+            ?.votingCountries?.filter(
+              (country) => country.code !== 'WW' || isRestOfWorldVoting,
+            ) || [];
+
+        return votingCountries;
       },
 
       getVotingCountry: () => {
-        const { getVotingCountries } = get();
+        const { getStageVotingCountries } = get();
 
         const { votingCountryIndex, getCurrentStage } =
           useScoreboardStore.getState();
@@ -133,12 +189,12 @@ export const useCountriesStore = create<CountriesState>()(
         const currentStage = getCurrentStage();
 
         return currentStage?.isJuryVoting
-          ? getVotingCountries()[votingCountryIndex]
+          ? getStageVotingCountries()[votingCountryIndex]
           : currentStage?.countries[votingCountryIndex];
       },
 
       getVotingCountriesLength: () => {
-        return get().getVotingCountries().length;
+        return get().getStageVotingCountries().length;
       },
 
       setSelectedCountries: (countries: BaseCountry[]) => {

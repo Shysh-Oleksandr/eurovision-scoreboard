@@ -54,6 +54,10 @@ export const createEventActions: StateCreator<
 
     countriesStore.setSelectedCountries(selectedCountries);
 
+    set({
+      predefinedVotes: {},
+    });
+
     const allStagesFromSetup = get().eventStages;
     let newEventStages: EventStage[];
 

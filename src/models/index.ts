@@ -5,6 +5,7 @@ export interface BaseCountry {
   flag?: string;
   isQualified?: boolean;
   semiFinalGroup?: string;
+  aqSemiFinalGroup?: string;
   isAutoQualified?: boolean;
   isQualifiedFromSemi?: boolean;
   juryOdds?: number;
@@ -50,6 +51,7 @@ export interface EventStage {
   name: string;
   votingMode: StageVotingMode;
   countries: Country[];
+  votingCountries?: BaseCountry[];
   isOver: boolean;
   isJuryVoting: boolean;
   isLastStage?: boolean;

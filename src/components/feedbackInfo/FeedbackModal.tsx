@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useGeneralStore } from '../../state/generalStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
-import Tabs from '../common/Tabs';
+import Tabs from '../common/tabs/Tabs';
 
 import { getTabs, WHATS_NEW, UPCOMING_FEATURES } from './data';
 import UpdateList from './UpdateList';
@@ -51,9 +51,6 @@ const FeedbackModal = ({
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           containerClassName="!rounded-none"
-          buttonClassName="sm:h-14 h-10"
-          overlayClassName="sm:h-14 h-10"
-          alwaysHorizontal
         />
       }
       bottomContent={

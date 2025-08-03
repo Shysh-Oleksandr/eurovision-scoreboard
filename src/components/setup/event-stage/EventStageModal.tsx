@@ -4,7 +4,7 @@ import { FormProvider } from 'react-hook-form';
 import { EventStage, StageVotingMode } from '../../../models';
 import Modal from '../../common/Modal/Modal';
 import ModalBottomContent from '../../common/Modal/ModalBottomContent';
-import Tabs from '../../common/Tabs';
+import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
 import EventStageSettings from './EventStageSettings';
 import EventStageVoters from './EventStageVoters';
@@ -69,10 +69,17 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
     form.handleSubmit((data) => {
       const result = onSubmit(data);
 
+      if (result.votingCountries.length === 0) {
+        alert('Please select at least one voting country');
+
+        return;
+      }
+
       if (result) {
         onSave({
           ...result,
           votingMode: result.votingMode as StageVotingMode,
+          votingCountries: result.votingCountries || [],
         });
         handleTriggerClose();
       }
@@ -94,31 +101,41 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
 
   const renderContent = () => {
     if (isEditMode) {
-      // Edit mode - show tabs
-      switch (activeTab) {
-        case EventStageModalTab.SETTINGS:
-          return (
+      // Edit mode - use TabContent for state preservation
+      const tabsWithContent = [
+        {
+          ...tabs[0],
+          content: (
             <EventStageSettings
               eventStageToEdit={eventStageToEdit}
               isEditMode={isEditModeFromHook}
               isGrandFinalStage={isGrandFinalStage}
             />
-          );
-        case EventStageModalTab.VOTERS:
-          return <EventStageVoters />;
-        default:
-          return null;
-      }
-    } else {
-      // Add mode - show only settings
+          ),
+        },
+        {
+          ...tabs[1],
+          content: <EventStageVoters stageId={eventStageToEdit?.id} />,
+        },
+      ];
+
       return (
-        <EventStageSettings
-          eventStageToEdit={eventStageToEdit}
-          isEditMode={isEditModeFromHook}
-          isGrandFinalStage={isGrandFinalStage}
+        <TabContent
+          tabs={tabsWithContent}
+          activeTab={activeTab}
+          preserveContent={true}
         />
       );
     }
+
+    // Add mode - show only settings
+    return (
+      <EventStageSettings
+        eventStageToEdit={eventStageToEdit}
+        isEditMode={isEditModeFromHook}
+        isGrandFinalStage={isGrandFinalStage}
+      />
+    );
   };
 
   return (
@@ -138,9 +155,6 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
             activeTab={activeTab}
             setActiveTab={(tab) => setActiveTab(tab as EventStageModalTab)}
             containerClassName="!rounded-none"
-            buttonClassName="sm:h-14 h-10"
-            overlayClassName="sm:h-14 h-10"
-            alwaysHorizontal
           />
         ) : null
       }

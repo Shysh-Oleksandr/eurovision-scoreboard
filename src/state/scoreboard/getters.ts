@@ -6,6 +6,7 @@ import { useGeneralStore } from '../generalStore';
 import { ScoreboardState } from './types';
 
 type Getters = {
+  getVotingPoints: () => number;
   getCurrentStage: () => EventStage | undefined;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
 };

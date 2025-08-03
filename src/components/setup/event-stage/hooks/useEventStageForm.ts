@@ -10,6 +10,14 @@ import { EventStage, StageId, StageVotingMode } from '../../../../models';
 const baseSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   votingMode: z.enum(Object.values(StageVotingMode) as [string, ...string[]]),
+  votingCountries: z
+    .array(
+      z.object({
+        code: z.string(),
+        name: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 // Schema for Grand Final (no qualifiersAmount)
@@ -49,6 +57,7 @@ export const useEventStageForm = ({
       name: '',
       qualifiersAmount: undefined,
       votingMode: StageVotingMode.TELEVOTE_ONLY,
+      votingCountries: [],
     },
   });
 
@@ -58,6 +67,7 @@ export const useEventStageForm = ({
       name: '',
       qualifiersAmount: 10,
       votingMode: StageVotingMode.TELEVOTE_ONLY,
+      votingCountries: [],
     },
   });
 
@@ -73,12 +83,14 @@ export const useEventStageForm = ({
             eventStageToEdit.qualifiersAmount ||
             (isGrandFinalStage ? undefined : 0),
           votingMode: eventStageToEdit.votingMode,
+          votingCountries: eventStageToEdit.votingCountries || [],
         });
       } else {
         form.reset({
           name: `Semi-Final ${localEventStagesLength}`,
           qualifiersAmount: isGrandFinalStage ? undefined : 10,
           votingMode: StageVotingMode.TELEVOTE_ONLY,
+          votingCountries: [],
         });
       }
     }
@@ -96,6 +108,7 @@ export const useEventStageForm = ({
       name: data.name,
       qualifiersAmount: data.qualifiersAmount,
       votingMode: data.votingMode,
+      votingCountries: data.votingCountries || [],
     };
   };
 

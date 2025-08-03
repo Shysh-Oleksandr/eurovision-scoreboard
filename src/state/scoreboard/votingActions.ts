@@ -328,7 +328,9 @@ export const createVotingActions: StateCreator<
 
     if (!predefinedTelevoteVotes) return;
 
-    const votingCountries = useCountriesStore.getState().getVotingCountries();
+    const votingCountries = useCountriesStore
+      .getState()
+      .getStageVotingCountries();
     let totalPoints = 0;
 
     for (const vc of votingCountries) {
@@ -366,7 +368,7 @@ export const createVotingActions: StateCreator<
     const { pointsSystem } = useGeneralStore.getState();
 
     if (!currentStage) return;
-    const votingCountries = countriesStore.getVotingCountries();
+    const votingCountries = countriesStore.getStageVotingCountries();
 
     const isJuryVotingOver =
       state.votingCountryIndex === votingCountries.length - 1;
@@ -526,7 +528,7 @@ export const createVotingActions: StateCreator<
 
     if (!predefinedJuryVotes) return;
 
-    const votingCountries = countriesStore.getVotingCountries();
+    const votingCountries = countriesStore.getStageVotingCountries();
     let countriesLeft = votingCountries.length - state.votingCountryIndex;
 
     let updatedCountries = [...currentStage.countries];
@@ -675,7 +677,9 @@ export const createVotingActions: StateCreator<
     );
 
     const televoteTotals: Record<string, number> = {};
-    const votingCountries = useCountriesStore.getState().getVotingCountries();
+    const votingCountries = useCountriesStore
+      .getState()
+      .getStageVotingCountries();
 
     for (const votingCountry of votingCountries) {
       const votes = predefinedTelevoteVotes[votingCountry.code];

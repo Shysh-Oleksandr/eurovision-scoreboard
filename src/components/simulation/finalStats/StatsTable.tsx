@@ -1,28 +1,44 @@
 import React from 'react';
 
-import { BaseCountry, Country } from '../../../models';
+import { Country, StageVotingType } from '../../../models';
 
 import CountryStatsRow from './CountryStatsRow';
 import { getCountryFlag } from './useFinalStats';
 
+import { useCountriesStore } from '@/state/countriesStore';
+
 interface StatsTableProps {
   rankedCountries: (Country & { rank: number })[];
-  votingCountries: BaseCountry[];
+  selectedStageId: string | null;
   getCellPoints: (
     participantCode: string,
     voterCode: string,
   ) => string | number;
   getCellClassName: (points: number) => string;
   getPoints: (country: Country) => number;
+  selectedVoteType: StageVotingType | 'Total';
 }
 
 const StatsTable: React.FC<StatsTableProps> = ({
   rankedCountries,
-  votingCountries,
   getCellPoints,
   getCellClassName,
   getPoints,
+  selectedStageId,
+  selectedVoteType,
 }) => {
+  const getStageVotingCountries = useCountriesStore(
+    (state) => state.getStageVotingCountries,
+  );
+
+  const isRestOfWorldVoting =
+    selectedVoteType === StageVotingType.TELEVOTE ||
+    selectedVoteType === 'Total';
+
+  const votingCountries = getStageVotingCountries(
+    selectedStageId ?? undefined,
+  ).filter((country) => country.code !== 'WW' || isRestOfWorldVoting);
+
   return (
     <div className="overflow-auto narrow-scrollbar mt-4">
       <table className="text-left border-collapse">
