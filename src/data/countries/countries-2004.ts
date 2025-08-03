@@ -10,6 +10,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 49.5,
     televoteOdds: 49.5,
+    spokespersonOrder: 1,
   },
   {
     ...COMMON_COUNTRIES.Andorra,
@@ -18,6 +19,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 5,
     televoteOdds: 5,
+    spokespersonOrder: 0,
   },
   {
     ...COMMON_COUNTRIES.Austria,
@@ -25,6 +27,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 21.5,
     televoteOdds: 21.5,
+    spokespersonOrder: 2,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Belarus,
@@ -33,6 +37,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 4.5,
     televoteOdds: 4.5,
+    spokespersonOrder: 5,
   },
   {
     ...COMMON_COUNTRIES.Belgium,
@@ -40,6 +45,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 21,
     televoteOdds: 21,
+    spokespersonOrder: 4,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.BosniaHerzegovina,
@@ -48,6 +55,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 45,
     televoteOdds: 45,
+    spokespersonOrder: 3,
   },
   {
     ...COMMON_COUNTRIES.Croatia,
@@ -56,6 +64,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 33.5,
     televoteOdds: 33.5,
+    spokespersonOrder: 17,
   },
   {
     ...COMMON_COUNTRIES.Cyprus,
@@ -64,6 +73,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 67.5,
     televoteOdds: 67.5,
+    spokespersonOrder: 8,
   },
   {
     ...COMMON_COUNTRIES.Denmark,
@@ -72,6 +82,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 19.5,
     televoteOdds: 19.5,
+    spokespersonOrder: 10,
   },
   {
     ...COMMON_COUNTRIES.Estonia,
@@ -80,6 +91,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 20,
     televoteOdds: 20,
+    spokespersonOrder: 11,
   },
   {
     ...COMMON_COUNTRIES.Finland,
@@ -88,6 +100,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 18,
     televoteOdds: 18,
+    spokespersonOrder: 13,
   },
   {
     ...COMMON_COUNTRIES.France,
@@ -95,6 +108,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 30.5,
     televoteOdds: 30.5,
+    spokespersonOrder: 14,
   },
   {
     ...COMMON_COUNTRIES.Germany,
@@ -102,6 +116,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 45.5,
     televoteOdds: 45.5,
+    spokespersonOrder: 9,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Greece,
@@ -110,6 +126,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 91,
     televoteOdds: 91,
+    spokespersonOrder: 16,
   },
   {
     ...COMMON_COUNTRIES.Iceland,
@@ -117,6 +134,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 23.5,
     televoteOdds: 23.5,
+    spokespersonOrder: 20,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Ireland,
@@ -124,6 +143,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 21,
     televoteOdds: 21,
+    spokespersonOrder: 18,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Israel,
@@ -132,6 +153,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 20,
     televoteOdds: 20,
+    spokespersonOrder: 19,
   },
   {
     ...COMMON_COUNTRIES.Latvia,
@@ -140,6 +162,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 8.5,
     televoteOdds: 8.5,
+    spokespersonOrder: 22,
   },
   {
     ...COMMON_COUNTRIES.Lithuania,
@@ -148,6 +171,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 9.5,
     televoteOdds: 9.5,
+    spokespersonOrder: 21,
   },
   {
     ...COMMON_COUNTRIES.Malta,
@@ -156,6 +180,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 33.5,
     televoteOdds: 33.5,
+    spokespersonOrder: 25,
   },
   {
     ...COMMON_COUNTRIES.Monaco,
@@ -164,6 +189,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 4.5,
     televoteOdds: 4.5,
+    spokespersonOrder: 23,
   },
   {
     ...COMMON_COUNTRIES.Netherlands,
@@ -172,6 +198,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 22.5,
     televoteOdds: 22.5,
+    spokespersonOrder: 26,
   },
   {
     ...COMMON_COUNTRIES.NorthMacedonia,
@@ -180,6 +207,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 32.5,
     televoteOdds: 32.5,
+    spokespersonOrder: 24,
   },
   {
     ...COMMON_COUNTRIES.Norway,
@@ -187,6 +215,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 20,
     televoteOdds: 20,
+    spokespersonOrder: 27,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Poland,
@@ -194,6 +224,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 27,
     televoteOdds: 27,
+    spokespersonOrder: 28,
   },
   {
     ...COMMON_COUNTRIES.Portugal,
@@ -202,6 +233,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 13.5,
     televoteOdds: 13.5,
+    spokespersonOrder: 29,
   },
   {
     ...COMMON_COUNTRIES.Romania,
@@ -209,6 +241,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 24.5,
     televoteOdds: 24.5,
+    spokespersonOrder: 30,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Russia,
@@ -216,6 +250,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 38.5,
     televoteOdds: 38.5,
+    spokespersonOrder: 31,
   },
   {
     ...COMMON_COUNTRIES.SerbiaMontenegro,
@@ -224,6 +259,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 94,
     televoteOdds: 94,
+    spokespersonOrder: 7,
   },
   {
     ...COMMON_COUNTRIES.Slovenia,
@@ -232,6 +268,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 2.5,
     televoteOdds: 2.5,
+    spokespersonOrder: 33,
   },
   {
     ...COMMON_COUNTRIES.Spain,
@@ -239,6 +276,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 44,
     televoteOdds: 44,
+    spokespersonOrder: 12,
   },
   {
     ...COMMON_COUNTRIES.Sweden,
@@ -246,6 +284,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 67.5,
     televoteOdds: 67.5,
+    spokespersonOrder: 32,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Switzerland,
@@ -254,6 +294,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: false,
     juryOdds: 1,
     televoteOdds: 1,
+    spokespersonOrder: 6,
   },
   {
     ...COMMON_COUNTRIES.Turkey,
@@ -261,6 +302,8 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 75,
     televoteOdds: 75,
+    spokespersonOrder: 34,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Ukraine,
@@ -269,6 +312,7 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 99,
     televoteOdds: 99,
+    spokespersonOrder: 35,
   },
   {
     ...COMMON_COUNTRIES.UnitedKingdom,
@@ -276,5 +320,6 @@ export const COUNTRIES_2004: BaseCountry[] = [
     isQualified: true,
     juryOdds: 27.5,
     televoteOdds: 27.5,
+    spokespersonOrder: 15,
   },
 ];

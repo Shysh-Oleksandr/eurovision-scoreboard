@@ -9,6 +9,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 6,
     televoteOdds: 6,
+    spokespersonOrder: 33,
   },
   {
     ...COMMON_COUNTRIES.Armenia,
@@ -16,6 +17,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 48,
     televoteOdds: 49.5,
+    spokespersonOrder: 15,
   },
   {
     ...COMMON_COUNTRIES.Australia,
@@ -23,6 +25,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 99,
     televoteOdds: 62,
+    spokespersonOrder: 25,
   },
   {
     ...COMMON_COUNTRIES.Austria,
@@ -30,6 +33,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 27.5,
     televoteOdds: 46.5,
+    spokespersonOrder: 0,
   },
   {
     ...COMMON_COUNTRIES.Azerbaijan,
@@ -37,6 +41,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 30.5,
     televoteOdds: 36,
+    spokespersonOrder: 2,
   },
   {
     ...COMMON_COUNTRIES.Belarus,
@@ -44,6 +49,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 15.5,
     televoteOdds: 15.5,
+    spokespersonOrder: 21,
   },
   {
     ...COMMON_COUNTRIES.Belgium,
@@ -51,6 +57,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 52,
     televoteOdds: 31,
+    spokespersonOrder: 26,
   },
   {
     ...COMMON_COUNTRIES.BosniaHerzegovina,
@@ -58,6 +65,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 20,
     televoteOdds: 20,
+    spokespersonOrder: 7,
   },
   {
     ...COMMON_COUNTRIES.Bulgaria,
@@ -65,6 +73,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 51,
     televoteOdds: 59.5,
+    spokespersonOrder: 17,
   },
   {
     ...COMMON_COUNTRIES.Croatia,
@@ -72,6 +81,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 29.5,
     televoteOdds: 27,
+    spokespersonOrder: 28,
   },
   {
     ...COMMON_COUNTRIES.Cyprus,
@@ -79,6 +89,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 30.5,
     televoteOdds: 31.5,
+    spokespersonOrder: 16,
   },
   {
     ...COMMON_COUNTRIES.Czechia,
@@ -86,6 +97,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 30,
     televoteOdds: 20,
+    spokespersonOrder: 4,
   },
   {
     ...COMMON_COUNTRIES.Denmark,
@@ -93,6 +105,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 3.5,
     televoteOdds: 3.5,
+    spokespersonOrder: 12,
   },
   {
     ...COMMON_COUNTRIES.Estonia,
@@ -100,6 +113,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 1,
     televoteOdds: 1,
+    spokespersonOrder: 34,
   },
   {
     ...COMMON_COUNTRIES.Finland,
@@ -107,6 +121,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 7.5,
     televoteOdds: 7.5,
+    spokespersonOrder: 10,
   },
   {
     ...COMMON_COUNTRIES.France,
@@ -114,6 +129,8 @@ export const COUNTRIES_2016: BaseCountry[] = [
     isAutoQualified: true,
     juryOdds: 56.5,
     televoteOdds: 44,
+    spokespersonOrder: 13,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Georgia,
@@ -121,6 +138,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 39.5,
     televoteOdds: 25.5,
+    spokespersonOrder: 6,
   },
   {
     ...COMMON_COUNTRIES.Germany,
@@ -128,6 +146,8 @@ export const COUNTRIES_2016: BaseCountry[] = [
     isAutoQualified: true,
     juryOdds: 20,
     televoteOdds: 22,
+    spokespersonOrder: 22,
+    aqSemiFinalGroup: 'SF2',
   },
   {
     ...COMMON_COUNTRIES.Greece,
@@ -135,6 +155,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 6,
     televoteOdds: 6,
+    spokespersonOrder: 29,
   },
   {
     ...COMMON_COUNTRIES.Hungary,
@@ -142,6 +163,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 32.5,
     televoteOdds: 32.5,
+    spokespersonOrder: 39,
   },
   {
     ...COMMON_COUNTRIES.Iceland,
@@ -149,6 +171,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 7.5,
     televoteOdds: 7.5,
+    spokespersonOrder: 1,
   },
   {
     ...COMMON_COUNTRIES.Ireland,
@@ -156,6 +179,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 6,
     televoteOdds: 6,
+    spokespersonOrder: 5,
   },
   {
     ...COMMON_COUNTRIES.Israel,
@@ -163,6 +187,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 50.5,
     televoteOdds: 22.5,
+    spokespersonOrder: 20,
   },
   {
     ...COMMON_COUNTRIES.Italy,
@@ -170,6 +195,8 @@ export const COUNTRIES_2016: BaseCountry[] = [
     isAutoQualified: true,
     juryOdds: 42,
     televoteOdds: 27.5,
+    spokespersonOrder: 36,
+    aqSemiFinalGroup: 'SF2',
   },
   {
     ...COMMON_COUNTRIES.Latvia,
@@ -177,6 +204,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 37,
     televoteOdds: 34,
+    spokespersonOrder: 19,
   },
   {
     ...COMMON_COUNTRIES.Lithuania,
@@ -184,6 +212,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 45.5,
     televoteOdds: 41,
+    spokespersonOrder: 30,
   },
   {
     ...COMMON_COUNTRIES.Malta,
@@ -191,6 +220,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 53.5,
     televoteOdds: 23.5,
+    spokespersonOrder: 8,
   },
   {
     ...COMMON_COUNTRIES.Moldova,
@@ -198,6 +228,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 3,
     televoteOdds: 3,
+    spokespersonOrder: 14,
   },
   {
     ...COMMON_COUNTRIES.Montenegro,
@@ -205,6 +236,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 9.5,
     televoteOdds: 9.5,
+    spokespersonOrder: 40,
   },
   {
     ...COMMON_COUNTRIES.Netherlands,
@@ -212,6 +244,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 48,
     televoteOdds: 28.5,
+    spokespersonOrder: 18,
   },
   {
     ...COMMON_COUNTRIES.NorthMacedonia,
@@ -219,6 +252,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 16,
     televoteOdds: 16,
+    spokespersonOrder: 32,
   },
   {
     ...COMMON_COUNTRIES.Norway,
@@ -226,6 +260,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 10.5,
     televoteOdds: 10.5,
+    spokespersonOrder: 24,
   },
   {
     ...COMMON_COUNTRIES.Poland,
@@ -233,6 +268,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 21.5,
     televoteOdds: 68.5,
+    spokespersonOrder: 37,
   },
   {
     ...COMMON_COUNTRIES.Russia,
@@ -240,6 +276,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 52,
     televoteOdds: 99,
+    spokespersonOrder: 23,
   },
   {
     ...COMMON_COUNTRIES.SanMarino,
@@ -247,6 +284,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF1',
     juryOdds: 11.5,
     televoteOdds: 11.5,
+    spokespersonOrder: 3,
   },
   {
     ...COMMON_COUNTRIES.Serbia,
@@ -254,6 +292,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 28.5,
     televoteOdds: 37.5,
+    spokespersonOrder: 31,
   },
   {
     ...COMMON_COUNTRIES.Slovenia,
@@ -261,6 +300,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 9,
     televoteOdds: 9,
+    spokespersonOrder: 38,
   },
   {
     ...COMMON_COUNTRIES.Spain,
@@ -268,6 +308,8 @@ export const COUNTRIES_2016: BaseCountry[] = [
     isAutoQualified: true,
     juryOdds: 36.5,
     televoteOdds: 22,
+    spokespersonOrder: 9,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Sweden,
@@ -275,6 +317,8 @@ export const COUNTRIES_2016: BaseCountry[] = [
     isAutoQualified: true,
     juryOdds: 50,
     televoteOdds: 50.5,
+    spokespersonOrder: 41,
+    aqSemiFinalGroup: 'SF1',
   },
   {
     ...COMMON_COUNTRIES.Switzerland,
@@ -282,6 +326,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 2,
     televoteOdds: 2,
+    spokespersonOrder: 11,
   },
   {
     ...COMMON_COUNTRIES.Ukraine,
@@ -289,6 +334,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     semiFinalGroup: 'SF2',
     juryOdds: 72,
     televoteOdds: 90.5,
+    spokespersonOrder: 35,
   },
   {
     ...COMMON_COUNTRIES.UnitedKingdom,
@@ -296,5 +342,7 @@ export const COUNTRIES_2016: BaseCountry[] = [
     isAutoQualified: true,
     juryOdds: 33,
     televoteOdds: 22,
+    spokespersonOrder: 27,
+    aqSemiFinalGroup: 'SF2',
   },
 ];

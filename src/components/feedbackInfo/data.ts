@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-03',
+    title:
+      'Added voting countries selection, reordering, correct initial order for all years, Rest of the World voting, and auto-qualifier voting in semi-finals',
+  },
+  {
     date: '2025-08-01',
     title: 'Small bug fixes',
   },
@@ -93,8 +98,12 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-08-02', end: '2025-08-03' },
-    title: 'Voting countries selection',
+    approximateDates: { start: '2025-08-09', end: '2025-08-10' },
+    title: 'Settings for the contest year and host country',
+  },
+  {
+    approximateDates: { start: '2025-08-10', end: '2025-08-11' },
+    title: 'JESC support with custom themes',
   },
   {
     // approximateDates: { start: '2025-08-02', end: '2025-08-03' },
@@ -105,12 +114,7 @@ export const UPCOMING_FEATURES = [
     title:
       'The 2016-18 televote announcement order (from lowest points to highest)',
   },
-  {
-    title: 'Settings for the contest year and host country',
-  },
-  {
-    title: 'JESC support with custom themes',
-  },
+
   {
     // approximateDates: { start: '2025-07-14', end: '2025-07-15' },
     title: 'Presentation mode',
