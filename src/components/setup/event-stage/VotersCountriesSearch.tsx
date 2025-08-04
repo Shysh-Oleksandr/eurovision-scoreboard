@@ -65,9 +65,9 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
       <div className="flex items-center justify-between gap-2 mb-2">
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-white">
-            Non-voting Countries
+            Non-Voting Countries
           </h3>
-          <p className="text-sm text-white/50">Click to add</p>
+          <p className="text-sm text-white/50">Search and click to add</p>
         </div>
         <div className="relative">
           <Input

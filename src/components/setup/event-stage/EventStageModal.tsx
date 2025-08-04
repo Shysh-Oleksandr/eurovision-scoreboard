@@ -69,7 +69,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
     form.handleSubmit((data) => {
       const result = onSubmit(data);
 
-      if (result.votingCountries.length === 0) {
+      if (result.votingCountries.length === 0 && eventStageToEdit) {
         alert('Please select at least one voting country');
 
         return;
