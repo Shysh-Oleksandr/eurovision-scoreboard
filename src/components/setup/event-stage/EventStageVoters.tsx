@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 
+import { EventStageFormData } from './hooks';
 import VotersCountriesSearch from './VotersCountriesSearch';
 import VotersList from './VotersList';
 import VotersSelectionHeader from './VotersSelectionHeader';
@@ -14,14 +15,22 @@ interface EventStageVotersProps {
 }
 
 const EventStageVoters: React.FC<EventStageVotersProps> = ({ stageId }) => {
-  const { watch, setValue } = useFormContext();
-  const votingCountries = useMemo(
-    () => watch('votingCountries') || [],
-    [watch],
-  );
+  const { control, setValue } = useFormContext<EventStageFormData>();
+  const votingCountries = useWatch({
+    control,
+    name: 'votingCountries',
+    defaultValue: [],
+  }) as BaseCountry[];
 
-  const [localVotingCountries, setLocalVotingCountries] =
-    useState<BaseCountry[]>(votingCountries);
+  const syncVotersWithParticipants = !!useWatch({
+    control,
+    name: 'syncVotersWithParticipants',
+    defaultValue: true,
+  });
+
+  const [localVotingCountries, setLocalVotingCountries] = useState<
+    BaseCountry[]
+  >(votingCountries || []);
 
   const getInitialVotingCountries = useCountriesStore(
     (state) => state.getInitialVotingCountries,
@@ -37,29 +46,43 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({ stageId }) => {
 
       if (existingVotingCountries.length > 0) {
         setLocalVotingCountries(existingVotingCountries);
-        setValue('votingCountries', existingVotingCountries);
+        setValue('votingCountries', existingVotingCountries as any);
       }
     }
   }, [stageId, getStageVotingCountries, setValue]);
 
   // Update local state when form value changes
   useEffect(() => {
-    setLocalVotingCountries(votingCountries);
+    setLocalVotingCountries(votingCountries || []);
   }, [votingCountries]);
 
-  // Update form value when local state changes
-  useEffect(() => {
-    setValue('votingCountries', localVotingCountries);
-  }, [localVotingCountries, setValue]);
+  // Helper to update both local state and form value without causing loops
+  const setLocalVotingCountriesAndForm: React.Dispatch<
+    React.SetStateAction<BaseCountry[]>
+  > = (updater) => {
+    setLocalVotingCountries((prev) => {
+      const next =
+        typeof updater === 'function'
+          ? (updater as (prev: BaseCountry[]) => BaseCountry[])(prev)
+          : updater;
+
+      // Keep form value in sync when local changes
+      setValue('votingCountries', next as any, { shouldDirty: true });
+
+      return next;
+    });
+  };
 
   const handleAddVoter = (country: BaseCountry) => {
     if (!localVotingCountries.find((c) => c.code === country.code)) {
-      setLocalVotingCountries((prev) => [...prev, country]);
+      setLocalVotingCountriesAndForm((prev) => [...prev, country]);
     }
   };
 
   const handleReset = () => {
-    setLocalVotingCountries(getInitialVotingCountries(stageId));
+    setLocalVotingCountriesAndForm(
+      getInitialVotingCountries(stageId).initialVotingCountries,
+    );
   };
 
   const handleSort = (sort: 'az' | 'za' | 'shuffle') => {
@@ -77,17 +100,27 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({ stageId }) => {
       sortedCountries = localVotingCountries.sort(() => Math.random() - 0.5);
     }
 
-    setLocalVotingCountries([...sortedCountries]);
+    setLocalVotingCountriesAndForm([...sortedCountries]);
+  };
+
+  const handleSyncVotersChange = (sync: boolean) => {
+    setValue('syncVotersWithParticipants', sync, { shouldDirty: true });
   };
 
   return (
     <div className="flex flex-col gap-4 p-2">
       <div>
         <div>
-          <VotersSelectionHeader onReset={handleReset} onSort={handleSort} />
+          <VotersSelectionHeader
+            onReset={handleReset}
+            onSort={handleSort}
+            syncVotersWithParticipants={syncVotersWithParticipants}
+            onSyncVotersChange={handleSyncVotersChange}
+            votersAmount={localVotingCountries.length}
+          />
           <VotersList
             localVotingCountries={localVotingCountries}
-            setLocalVotingCountries={setLocalVotingCountries}
+            setLocalVotingCountries={setLocalVotingCountriesAndForm}
           />
         </div>
         <div className="h-px bg-primary-800 w-full sm:my-6 my-4" />

@@ -9,7 +9,6 @@ import {
 import { useCountriesStore } from '@/state/countriesStore';
 
 interface UseStageModalActionsProps {
-  activeTab: EventMode;
   allAssignments: Record<EventMode, Record<string, string>>;
   setAssignments: (
     assignments: Record<EventMode, Record<string, string>>,
@@ -17,7 +16,6 @@ interface UseStageModalActionsProps {
 }
 
 export const useStageModalActions = ({
-  activeTab,
   allAssignments,
   setAssignments,
 }: UseStageModalActionsProps) => {
@@ -32,6 +30,7 @@ export const useStageModalActions = ({
   const setConfiguredEventStages = useCountriesStore(
     (state) => state.setConfiguredEventStages,
   );
+  const activeTab = useCountriesStore((state) => state.activeMode);
 
   const handleOpenCreateEventStageModal = () => {
     setEventStageToEdit(undefined);
@@ -64,6 +63,7 @@ export const useStageModalActions = ({
         countries: [],
         isOver: false,
         isJuryVoting: false,
+        syncVotersWithParticipants: true, // Default to true
       };
       const grandFinalStage = configuredEventStages.find(
         (s) => s.id === StageId.GF,

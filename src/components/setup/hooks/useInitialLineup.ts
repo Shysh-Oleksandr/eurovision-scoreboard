@@ -44,7 +44,9 @@ export const useInitialLineup = () => {
         countries: [],
         isOver: false,
         isJuryVoting: false,
-        votingCountries: getInitialVotingCountries(StageId.SF1),
+        votingCountries: getInitialVotingCountries(StageId.SF1)
+          .initialVotingCountries,
+        syncVotersWithParticipants: true,
       });
     }
     if (hasSf2) {
@@ -56,7 +58,9 @@ export const useInitialLineup = () => {
         countries: [],
         isOver: false,
         isJuryVoting: false,
-        votingCountries: getInitialVotingCountries(StageId.SF2),
+        votingCountries: getInitialVotingCountries(StageId.SF2)
+          .initialVotingCountries,
+        syncVotersWithParticipants: true,
       });
     }
     initialStages.push({
@@ -66,7 +70,9 @@ export const useInitialLineup = () => {
       countries: [],
       isOver: false,
       isJuryVoting: false,
-      votingCountries: getInitialVotingCountries(StageId.GF),
+      votingCountries: getInitialVotingCountries(StageId.GF)
+        .initialVotingCountries,
+      syncVotersWithParticipants: true,
     });
     setConfiguredEventStages(initialStages);
   }, [

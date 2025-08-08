@@ -10,10 +10,7 @@ import {
 } from '../../../models';
 import { useCountriesStore } from '../../../state/countriesStore';
 
-export const useCountryAssignments = (
-  activeTab: EventMode,
-  eventStages: EventStage[],
-) => {
+export const useCountryAssignments = (eventStages: EventStage[]) => {
   const customCountries = useCountriesStore((state) => state.customCountries);
   const allCountriesForYear = useCountriesStore(
     (state) => state.allCountriesForYear,
@@ -23,6 +20,7 @@ export const useCountryAssignments = (
   const setEventAssignments = useCountriesStore(
     (state) => state.setEventAssignments,
   );
+  const activeTab = useCountriesStore((state) => state.activeMode);
 
   const stageIds = eventStages.map((s) => s.id).join(',');
 

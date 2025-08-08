@@ -43,6 +43,8 @@ const EventSetupModal = () => {
   const configuredEventStages = useCountriesStore(
     (state) => state.configuredEventStages,
   );
+  const activeTab = useCountriesStore((state) => state.activeMode);
+  const setActiveTab = useCountriesStore((state) => state.setActiveMode);
   const countryOdds = useCountriesStore((state) => state.countryOdds);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const startEvent = useScoreboardStore((state) => state.startEvent);
@@ -54,9 +56,6 @@ const EventSetupModal = () => {
   const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
   const { clear } = useScoreboardStore.temporal.getState();
 
-  const [activeTab, setActiveTab] = useState<EventMode>(
-    EventMode.SEMI_FINALS_AND_GRAND_FINAL,
-  );
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const {
@@ -72,7 +71,7 @@ const EventSetupModal = () => {
     getCountryGroupAssignment,
     setAssignments,
     allAssignments,
-  } = useCountryAssignments(activeTab, configuredEventStages);
+  } = useCountryAssignments(configuredEventStages);
 
   const {
     isEventStageModalOpen,
@@ -82,7 +81,7 @@ const EventSetupModal = () => {
     handleCloseEventStageModal,
     handleSaveStage,
     handleDeleteStage,
-  } = useStageModalActions({ activeTab, allAssignments, setAssignments });
+  } = useStageModalActions({ allAssignments, setAssignments });
 
   const {
     isCustomCountryModalOpen,
@@ -133,15 +132,22 @@ const EventSetupModal = () => {
       : semiFinalsAvailableGroups;
 
   const handleStartEvent = () => {
-    const validationError = validateEventSetup(isGrandFinalOnly, {
-      stages: eventStagesWithCountries.map((s) => ({
-        id: s.id,
-        qualifiersAmount: s.qualifiersAmount || 0,
-        countriesCount: s.countries.length,
-      })),
-      autoQualifiersCount: autoQualifiers.length,
-      grandFinalQualifiersCount: grandFinalQualifiers.length,
-    });
+    const validationError = validateEventSetup(
+      isGrandFinalOnly,
+      settingsPointsSystem.length,
+      {
+        stages: eventStagesWithCountries.map((s) => ({
+          id: s.id,
+          qualifiersAmount: s.qualifiersAmount || 0,
+          countriesCount: s.countries.length,
+          votingCountries: s.votingCountries || [],
+          name: s.name,
+          votingMode: s.votingMode,
+        })),
+        autoQualifiersCount: autoQualifiers.length,
+        grandFinalQualifiersCount: grandFinalQualifiers.length,
+      },
+    );
 
     if (validationError) {
       alert(validationError);

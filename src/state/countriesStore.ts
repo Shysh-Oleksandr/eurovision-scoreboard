@@ -15,6 +15,7 @@ import {
 } from '../helpers/indexedDB';
 import {
   BaseCountry,
+  CountryAssignmentGroup,
   EventMode,
   EventStage,
   StageId,
@@ -38,11 +39,15 @@ interface CountriesState {
   eventAssignments: Record<EventMode, Record<string, string>>;
   configuredEventStages: EventStage[];
   countryOdds: CountryOdds;
+  activeMode: EventMode;
 
   // Actions
   setEventSetupModalOpen: (open: boolean) => void;
   getQualifiedCountries: () => BaseCountry[];
-  getInitialVotingCountries: (stageId?: string) => BaseCountry[];
+  getInitialVotingCountries: (stageId?: string) => {
+    initialVotingCountries: BaseCountry[];
+    extraVotingCountries: BaseCountry[];
+  };
   getStageVotingCountries: (stageId?: string) => BaseCountry[];
   getVotingCountry: () => BaseCountry;
   getVotingCountriesLength: () => number;
@@ -69,6 +74,11 @@ interface CountriesState {
     odds: Record<string, { juryOdds?: number; televoteOdds?: number }>,
   ) => void;
   loadYearOdds: (countries: BaseCountry[]) => void;
+  syncVotersWithParticipants: (
+    assignments: Record<EventMode, Record<string, string>>,
+    newActiveMode?: EventMode,
+  ) => void;
+  setActiveMode: (mode: EventMode) => void;
 }
 
 export const useCountriesStore = create<CountriesState>()(
@@ -85,7 +95,7 @@ export const useCountriesStore = create<CountriesState>()(
       },
       configuredEventStages: [],
       countryOdds: {},
-
+      activeMode: EventMode.SEMI_FINALS_AND_GRAND_FINAL,
       // Actions
       setEventSetupModalOpen: (open: boolean) => {
         set({
@@ -120,18 +130,29 @@ export const useCountriesStore = create<CountriesState>()(
 
         const allCountriesForYearCopy = [...allCountriesForYear];
 
-        let baseVotingCountries: BaseCountry[] = [];
+        let initialVotingCountries: BaseCountry[] = [];
+        const extraVotingCountries: BaseCountry[] = [];
 
         if (stageId !== StageId.GF) {
           // In a semi-final, only participating countries and a few AQs are voting.
-          baseVotingCountries = allCountriesForYearCopy.filter(
-            (c) =>
-              c.semiFinalGroup?.toLowerCase() === stageId.toLowerCase() ||
-              c.aqSemiFinalGroup?.toLowerCase() === stageId.toLowerCase(),
-          );
+          allCountriesForYearCopy.forEach((c) => {
+            const isSemiFinalGroup =
+              c.semiFinalGroup?.toLowerCase() === stageId.toLowerCase();
+
+            const isAQSemiFinalGroup =
+              c.aqSemiFinalGroup?.toLowerCase() === stageId.toLowerCase();
+
+            if (isAQSemiFinalGroup) {
+              extraVotingCountries.push(c);
+            }
+
+            if (isSemiFinalGroup || isAQSemiFinalGroup) {
+              initialVotingCountries.push(c);
+            }
+          });
         } else {
           // In the Grand Final, all selected countries for the event can vote.
-          baseVotingCountries = allCountriesForYearCopy.sort(
+          initialVotingCountries = allCountriesForYearCopy.sort(
             (a, b) => (a.spokespersonOrder ?? 0) - (b.spokespersonOrder ?? 0),
           );
         }
@@ -142,12 +163,13 @@ export const useCountriesStore = create<CountriesState>()(
         if (
           restOfWorld &&
           shouldAddRestOfWorld &&
-          !baseVotingCountries.some((c) => c.code === 'WW')
+          !initialVotingCountries.some((c) => c.code === 'WW')
         ) {
-          baseVotingCountries.push(restOfWorld);
+          initialVotingCountries.push(restOfWorld);
+          extraVotingCountries.push(restOfWorld);
         }
 
-        return baseVotingCountries;
+        return { initialVotingCountries, extraVotingCountries };
       },
 
       getStageVotingCountries: (stageId?: string) => {
@@ -336,6 +358,10 @@ export const useCountriesStore = create<CountriesState>()(
       },
 
       setEventAssignments: (assignments) => {
+        const { syncVotersWithParticipants } = get();
+
+        syncVotersWithParticipants(assignments);
+
         set({ eventAssignments: assignments });
       },
 
@@ -368,6 +394,181 @@ export const useCountriesStore = create<CountriesState>()(
             ...odds,
           },
         }));
+      },
+
+      syncVotersWithParticipants: (
+        assignments: Record<EventMode, Record<string, string>>,
+        newActiveMode?: EventMode,
+      ) => {
+        const {
+          configuredEventStages,
+          activeMode,
+          getAllCountries,
+          getInitialVotingCountries,
+        } = get();
+
+        const currentActiveMode = newActiveMode ?? activeMode;
+
+        const currentAssignments = assignments[currentActiveMode] || {};
+        const previousAssignments = get().eventAssignments?.[currentActiveMode] || {};
+
+        // Build a quick lookup for BaseCountry by code
+        const allCountries = getAllCountries();
+        const codeToCountry = new Map<string, BaseCountry>();
+        allCountries.forEach((c) => codeToCountry.set(c.code, c));
+
+        const updatedConfiguredEventStages = configuredEventStages.map((stage) => {
+          // Respect stage-level toggle
+          if (!stage.syncVotersWithParticipants) {
+            return stage;
+          }
+
+          const { extraVotingCountries } =
+            getInitialVotingCountries(stage.id as StageId) ||
+            ({ extraVotingCountries: [] } as {
+              extraVotingCountries: BaseCountry[];
+            });
+
+          const extrasCodes = new Set(
+            (extraVotingCountries || []).map((c) => c.code),
+          );
+
+          // Resolve participants for this stage depending on active mode and stage type
+          const participantCodesNow = new Set<string>();
+          const participantCodesBefore = new Set<string>();
+
+          if (currentActiveMode === EventMode.SEMI_FINALS_AND_GRAND_FINAL) {
+            if (stage.id === StageId.GF) {
+              // In All Shows, GF voters are all participants from ANY semi-final stage + AQs
+              const semiStageIds = new Set(
+                configuredEventStages
+                  .filter((s) => s.id !== StageId.GF)
+                  .map((s) => s.id),
+              );
+
+              Object.entries(currentAssignments).forEach(
+                ([countryCode, group]) => {
+                  if (
+                    semiStageIds.has(group) ||
+                    group === CountryAssignmentGroup.AUTO_QUALIFIER
+                  ) {
+                    participantCodesNow.add(countryCode);
+                  }
+                },
+              );
+              Object.entries(previousAssignments).forEach(
+                ([countryCode, group]) => {
+                  if (
+                    semiStageIds.has(group) ||
+                    group === CountryAssignmentGroup.AUTO_QUALIFIER
+                  ) {
+                    participantCodesBefore.add(countryCode);
+                  }
+                },
+              );
+            } else {
+              // Semi-finals: only participants assigned to this stage id
+              Object.entries(currentAssignments).forEach(
+                ([countryCode, group]) => {
+                  if (group === stage.id) participantCodesNow.add(countryCode);
+                },
+              );
+              Object.entries(previousAssignments).forEach(
+                ([countryCode, group]) => {
+                  if (group === stage.id)
+                    participantCodesBefore.add(countryCode);
+                },
+              );
+            }
+          } else if (currentActiveMode === EventMode.GRAND_FINAL_ONLY) {
+            // In GF-only mode, GF voters are GF participants + NOT_QUALIFIED
+            // (other stages shouldn't exist, but we still guard by stage.id)
+            if (stage.id === StageId.GF) {
+              Object.entries(currentAssignments).forEach(
+                ([countryCode, group]) => {
+                  if (
+                    group === StageId.GF ||
+                    group === CountryAssignmentGroup.NOT_QUALIFIED
+                  ) {
+                    participantCodesNow.add(countryCode);
+                  }
+                },
+              );
+              Object.entries(previousAssignments).forEach(
+                ([countryCode, group]) => {
+                  if (
+                    group === StageId.GF ||
+                    group === CountryAssignmentGroup.NOT_QUALIFIED
+                  ) {
+                    participantCodesBefore.add(countryCode);
+                  }
+                },
+              );
+            }
+          }
+
+          const currentList: BaseCountry[] = stage.votingCountries || [];
+
+          // 1) Keep items from current list in their existing order when:
+          //    - still participants now, OR
+          //    - are extras (AQs / Rest of World), OR
+          //    - were NOT previously participants of this stage (manual additions)
+          const kept: BaseCountry[] = [];
+          const keptCodes = new Set<string>();
+
+          for (const country of currentList) {
+            const code = country.code;
+            const isParticipantNow = participantCodesNow.has(code);
+            const isExtra = extrasCodes.has(code);
+            const wasParticipantBefore = participantCodesBefore.has(code);
+
+            if (isParticipantNow || isExtra || !wasParticipantBefore) {
+              if (!keptCodes.has(code)) {
+                kept.push(country);
+                keptCodes.add(code);
+              }
+            }
+            // Else: it was previously a participant in this stage but is no longer
+            // assigned here → remove it from the voting list.
+          }
+
+          // 2) Append any NEW participants (now assigned to this stage) that are not yet kept
+          for (const code of participantCodesNow) {
+            if (!keptCodes.has(code)) {
+              const country = codeToCountry.get(code);
+              if (country) {
+                kept.push(country);
+                keptCodes.add(code);
+              }
+            }
+          }
+
+          // 3) Extras handling
+          // For semi-finals, always ensure extras are present (AQs + RoW)
+          // For GF, only keep extras that were already present (e.g. Rest of World if the user kept it)
+          const shouldAppendExtras = stage.id !== StageId.GF;
+          if (shouldAppendExtras) {
+            for (const extra of extraVotingCountries || []) {
+              if (!keptCodes.has(extra.code)) {
+                kept.push(extra);
+                keptCodes.add(extra.code);
+              }
+            }
+          }
+
+          return {
+            ...stage,
+            votingCountries: kept,
+          };
+        });
+
+        set({ configuredEventStages: updatedConfiguredEventStages });
+      },
+
+      setActiveMode: (mode: EventMode) => {
+        set({ activeMode: mode });
+
+        get().syncVotersWithParticipants(get().eventAssignments, mode);
       },
     }),
     { name: 'countries-store' },

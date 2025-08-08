@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -12,12 +12,14 @@ const baseSchema = z.object({
   votingMode: z.enum(Object.values(StageVotingMode) as [string, ...string[]]),
   votingCountries: z
     .array(
-      z.object({
-        code: z.string(),
-        name: z.string(),
-      }),
+      z
+        .looseObject({
+          code: z.string(),
+          name: z.string(),
+        })
     )
     .optional(),
+  syncVotersWithParticipants: z.boolean().optional(),
 });
 
 // Schema for Grand Final (no qualifiersAmount)
@@ -58,6 +60,7 @@ export const useEventStageForm = ({
       qualifiersAmount: undefined,
       votingMode: StageVotingMode.TELEVOTE_ONLY,
       votingCountries: [],
+      syncVotersWithParticipants: true,
     },
   });
 
@@ -68,39 +71,38 @@ export const useEventStageForm = ({
       qualifiersAmount: 10,
       votingMode: StageVotingMode.TELEVOTE_ONLY,
       votingCountries: [],
+      syncVotersWithParticipants: true,
     },
   });
 
+  // Always refer to the correct form based on whether the edited stage is GF
   const form = isGrandFinalStage ? grandFinalForm : semiFinalForm;
 
   // Reset form when modal opens or eventStageToEdit changes
-  React.useEffect(() => {
-    if (isOpen) {
-      if (eventStageToEdit) {
-        form.reset({
-          name: eventStageToEdit.name,
-          qualifiersAmount:
-            eventStageToEdit.qualifiersAmount ||
-            (isGrandFinalStage ? undefined : 0),
-          votingMode: eventStageToEdit.votingMode,
-          votingCountries: eventStageToEdit.votingCountries || [],
-        });
-      } else {
-        form.reset({
-          name: `Semi-Final ${localEventStagesLength}`,
-          qualifiersAmount: isGrandFinalStage ? undefined : 10,
-          votingMode: StageVotingMode.TELEVOTE_ONLY,
-          votingCountries: [],
-        });
-      }
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (eventStageToEdit) {
+      form.reset({
+        name: eventStageToEdit.name,
+        qualifiersAmount:
+          eventStageToEdit.qualifiersAmount ||
+          (isGrandFinalStage ? undefined : 0),
+        votingMode: eventStageToEdit.votingMode,
+        votingCountries: (eventStageToEdit.votingCountries as any) || [],
+        syncVotersWithParticipants:
+          eventStageToEdit.syncVotersWithParticipants ?? true,
+      }, { keepDefaultValues: false });
+    } else {
+      form.reset({
+        name: `Semi-Final ${localEventStagesLength}`,
+        qualifiersAmount: isGrandFinalStage ? undefined : 10,
+        votingMode: StageVotingMode.TELEVOTE_ONLY,
+        votingCountries: [] as any,
+        syncVotersWithParticipants: true,
+      }, { keepDefaultValues: false });
     }
-  }, [
-    eventStageToEdit,
-    isOpen,
-    localEventStagesLength,
-    form,
-    isGrandFinalStage,
-  ]);
+  }, [eventStageToEdit, isOpen, localEventStagesLength, form, isGrandFinalStage]);
 
   const onSubmit = (data: EventStageFormData) => {
     return {
@@ -109,6 +111,7 @@ export const useEventStageForm = ({
       qualifiersAmount: data.qualifiersAmount,
       votingMode: data.votingMode,
       votingCountries: data.votingCountries || [],
+      syncVotersWithParticipants: data.syncVotersWithParticipants ?? true,
     };
   };
 

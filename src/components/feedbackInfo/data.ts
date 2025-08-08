@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-08',
+    title:
+      'Added the ability to sync voters with participants (enabled by default)',
+  },  
+  {
     date: '2025-08-03',
     title:
       'Added voting countries selection, reordering, correct initial order for all years, Rest of the World voting, and auto-qualifier voting in semi-finals',

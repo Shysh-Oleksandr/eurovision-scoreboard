@@ -5,7 +5,7 @@ export function useDebounceWithCancel<T>(
   delay: number,
 ): [T, () => void] {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   const cancel = () => {
     if (timerRef.current) {

@@ -52,6 +52,7 @@ export interface EventStage {
   votingMode: StageVotingMode;
   countries: Country[];
   votingCountries?: BaseCountry[];
+  syncVotersWithParticipants?: boolean;
   isOver: boolean;
   isJuryVoting: boolean;
   isLastStage?: boolean;

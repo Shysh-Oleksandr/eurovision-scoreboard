@@ -76,10 +76,11 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
       }
 
       if (result) {
+        // Ensure we keep full country objects (not just {code, name}) on save
         onSave({
           ...result,
           votingMode: result.votingMode as StageVotingMode,
-          votingCountries: result.votingCountries || [],
+          votingCountries: (result.votingCountries || []) as any,
         });
         handleTriggerClose();
       }

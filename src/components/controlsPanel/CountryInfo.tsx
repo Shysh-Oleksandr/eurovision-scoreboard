@@ -31,7 +31,7 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
   return (
     <div className="w-full pb-2 lg:pt-4 pt-3 lg:px-4 px-3 rounded-md rounded-b-none">
       <h4
-        className={`text-white uppercase lg:text-2xl text-xl ${
+        className={`text-white uppercase break-words lg:text-2xl text-xl ${
           shouldBlink ? 'blinker' : ''
         }`}
       >
