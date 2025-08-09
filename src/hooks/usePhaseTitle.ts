@@ -2,12 +2,12 @@ import { useGeneralStore } from '../state/generalStore';
 import { useScoreboardStore } from '../state/scoreboardStore';
 
 export const usePhaseTitle = () => {
-  const year = useGeneralStore((state) => state.year);
+  const contestYear = useGeneralStore((state) => state.settings.contestYear);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
   const { name: stageName } = getCurrentStage() || {};
 
-  const phaseTitle = `${stageName} - ${year}`;
+  const phaseTitle = contestYear ? `${stageName} - ${contestYear}` : stageName;
 
   return phaseTitle;
 };

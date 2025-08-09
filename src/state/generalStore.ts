@@ -5,10 +5,12 @@ import { devtools, persist } from 'zustand/middleware';
 import { WHATS_NEW } from '../components/feedbackInfo/data';
 import { Year } from '../config';
 import { POINTS_ARRAY, SUPPORTED_YEARS } from '../data/data';
-import { getThemeForYear } from '../theme/themes';
+import { getHostingCountryByYear, getThemeForYear } from '../theme/themes';
 import { Theme } from '../theme/types';
 
 import { useCountriesStore } from './countriesStore';
+import { BaseCountry } from '@/models';
+import { useScoreboardStore } from './scoreboardStore';
 
 export const INITIAL_YEAR = '2025' as Year;
 
@@ -22,6 +24,10 @@ interface Settings {
   shouldShowResetWarning: boolean;
   showRankChangeIndicator: boolean;
   shouldShowManualTelevoteWarning: boolean;
+  showHostingCountryLogo: boolean;
+  hostingCountryCode: string;
+  contestName: string;
+  contestYear: string;
 }
 
 export interface PointsItem {
@@ -39,6 +45,11 @@ interface GeneralState {
   settings: Settings;
   pointsSystem: PointsItem[]; // used during simulation
   settingsPointsSystem: PointsItem[]; // used locally in settings
+  generalSettingsExpansion: {
+    contest: boolean;
+    voting: boolean;
+    uiPreferences: boolean;
+  };
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
@@ -47,6 +58,10 @@ interface GeneralState {
   setSettings: (settings: Partial<Settings>) => void;
   setPointsSystem: (points: PointsItem[]) => void;
   setSettingsPointsSystem: (points: PointsItem[]) => void;
+  setGeneralSettingsExpansion: (
+    expansion: Partial<GeneralState['generalSettingsExpansion']>,
+  ) => void;
+  getHostingCountry: () => BaseCountry;
 }
 
 const getLatestUpdate = () => {
@@ -76,6 +91,11 @@ export const useGeneralStore = create<GeneralState>()(
         theme: getThemeForYear(INITIAL_YEAR),
         pointsSystem: initialPointsSystem,
         settingsPointsSystem: initialPointsSystem,
+        generalSettingsExpansion: {
+          contest: true,
+          voting: true,
+          uiPreferences: true,
+        },
         settings: {
           alwaysShowRankings: true,
           showQualificationModal: true,
@@ -86,6 +106,10 @@ export const useGeneralStore = create<GeneralState>()(
           shouldShowResetWarning: true,
           showRankChangeIndicator: true,
           shouldShowManualTelevoteWarning: true,
+          showHostingCountryLogo: true,
+          hostingCountryCode: 'CH', // Switzerland for 2025
+          contestName: 'Eurovision',
+          contestYear: INITIAL_YEAR,
         },
 
         setLastSeenUpdate: (update: string) => {
@@ -105,9 +129,15 @@ export const useGeneralStore = create<GeneralState>()(
         setYear: (year: Year) => {
           set({
             year: year,
+            settings: {
+              ...get().settings,
+              hostingCountryCode: getHostingCountryByYear(year).code,
+              contestYear: year,
+            },
           });
 
           useCountriesStore.getState().updateCountriesForYear(year);
+          useScoreboardStore.getState().setCurrentStageId(null);
         },
         setTheme: (year: Year) => {
           // Remove all theme classes
@@ -133,6 +163,21 @@ export const useGeneralStore = create<GeneralState>()(
         setSettingsPointsSystem: (points: PointsItem[]) => {
           set({ settingsPointsSystem: points });
         },
+        setGeneralSettingsExpansion: (expansion) => {
+          set((state) => ({
+            generalSettingsExpansion: {
+              ...state.generalSettingsExpansion,
+              ...expansion,
+            },
+          }));
+        },
+        getHostingCountry: () => {
+          const countries = useCountriesStore.getState().getAllCountries();
+
+          const hostingCountryCode = get().settings.hostingCountryCode || 'CH';
+
+          return countries.find((country) => country.code === hostingCountryCode) as BaseCountry;
+        },
       }),
       {
         name: 'general-storage',
@@ -144,6 +189,7 @@ export const useGeneralStore = create<GeneralState>()(
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
             settings: state.settings,
             settingsPointsSystem: state.settingsPointsSystem,
+            generalSettingsExpansion: state.generalSettingsExpansion,
           };
         },
         onRehydrateStorage: () => (state) => {
@@ -157,26 +203,14 @@ export const useGeneralStore = create<GeneralState>()(
           const year = state.year ?? INITIAL_YEAR;
           const themeYear = state.themeYear ?? INITIAL_YEAR;
 
-          // Convert old points system format to new format if needed
-          let settingsPointsSystem: PointsItem[] =
-            state.pointsSystem || initialPointsSystem; // keep old points system for backwards compatibility
+          const settingsPointsSystem: PointsItem[] =
+            state.settingsPointsSystem || initialPointsSystem;
 
-          if (state.settingsPointsSystem) {
-            if (
-              Array.isArray(state.settingsPointsSystem) &&
-              typeof state.settingsPointsSystem[0] === 'number'
-            ) {
-              settingsPointsSystem = (
-                state.settingsPointsSystem as unknown as number[]
-              ).map((value, index) => ({
-                value,
-                showDouzePoints: value === 12,
-                id: index,
-              }));
-            } else {
-              settingsPointsSystem = state.settingsPointsSystem as PointsItem[];
-            }
-          }
+
+          const settings = {
+            ...currentState.settings,
+            ...state.settings,
+          };
 
           return {
             ...currentState,
@@ -185,6 +219,7 @@ export const useGeneralStore = create<GeneralState>()(
             themeYear,
             theme: getThemeForYear(themeYear),
             settingsPointsSystem,
+            settings,
           };
         },
       },

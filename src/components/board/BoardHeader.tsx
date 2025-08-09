@@ -19,13 +19,13 @@ const BoardHeader = (): JSX.Element => {
   );
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const eventStages = useScoreboardStore((state) => state.eventStages);
+  const contestYear = useGeneralStore((state) => state.settings.contestYear);
+  const contestName = useGeneralStore((state) => state.settings.contestName);
 
   const viewedStage = eventStages.find((s) => s.id === viewedStageId);
   const winnerCountryFromStage = getWinnerCountry(viewedStage?.countries ?? []);
 
   const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
-
-  const year = useGeneralStore((state) => state.year);
 
   const {
     isJuryVoting,
@@ -74,14 +74,19 @@ const BoardHeader = (): JSX.Element => {
     return (
       <>
         <span className="font-semibold">{winnerCountry.name}</span> is the
-        winner of <span className="font-medium">Eurovision {year}</span>!
+        winner of{' '}
+        <span className="font-medium">
+          {contestName || 'Eurovision'} {contestYear || ''}
+        </span>
+        !
       </>
     );
   }, [
     winnerCountry,
     isAnotherStageDisplayed,
     winnerCountryFromStage,
-    year,
+    contestYear,
+    contestName,
     viewedStage?.name,
   ]);
 

@@ -7,6 +7,7 @@ type MiscActions = {
   hideLastReceivedPoints: () => void;
   toggleShowAllParticipants: () => void;
   setViewedStageId: (stageId: string | null) => void;
+  setCurrentStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   setRandomnessLevel: (level: number) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
@@ -59,6 +60,12 @@ export const createMiscActions: StateCreator<
   setViewedStageId: (stageId: string | null) => {
     set({
       viewedStageId: stageId,
+    });
+  },
+
+  setCurrentStageId: (stageId: string | null) => {
+    set({
+      currentStageId: stageId,
     });
   },
 

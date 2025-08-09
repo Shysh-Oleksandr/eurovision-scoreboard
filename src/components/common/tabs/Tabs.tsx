@@ -6,8 +6,6 @@ import React, {
   ReactNode,
 } from 'react';
 
-import { useMediaQuery } from '../../../hooks/useMediaQuery';
-
 interface TabItem {
   label: string;
   value: string;
@@ -67,8 +65,9 @@ const Tabs: React.FC<TabsProps> = ({
   overlayClassName = '',
   alwaysHorizontal = true,
 }) => {
-  const isSmallScreen =
-    useMediaQuery('(max-width: 479px)') && !alwaysHorizontal;
+  const isSmallScreen = false;
+  // Commented out because we don't use vertical tabs anymore
+  // useMediaQuery('(max-width: 479px)') && !alwaysHorizontal;
 
   const [tabDimensions, setTabDimensions] = useState<
     { width: number; left: number }[]

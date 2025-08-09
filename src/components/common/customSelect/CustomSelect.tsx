@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
 import { Year } from '../../../config';
@@ -19,6 +20,7 @@ type CustomSelectProps = {
   className?: string;
   id?: string;
   label?: string;
+  imageClassName?: string;
 };
 
 const getThemeColor = (year: string) => {
@@ -30,7 +32,8 @@ const getThemeColor = (year: string) => {
 const SelectDisplay: React.FC<{
   value: string;
   options: Option[];
-}> = ({ value, options }) => {
+  imageClassName?: string;
+}> = ({ value, options, imageClassName }) => {
   const selectedOption = options.find((option) => option.value === value);
 
   return (
@@ -40,7 +43,7 @@ const SelectDisplay: React.FC<{
           <img
             src={selectedOption.imageUrl}
             alt={selectedOption.label}
-            className="w-6 h-6 mr-2"
+            className={`w-6 h-6 mr-2 object-cover ${imageClassName ?? ''}`}
             width={24}
             height={24}
           />
@@ -48,7 +51,7 @@ const SelectDisplay: React.FC<{
           <span
             className="w-4 h-4 rounded-full mr-2.5 mb-0.5"
             style={{
-              backgroundColor: getThemeColor(selectedOption!.value),
+              backgroundColor: getThemeColor(selectedOption?.value ?? ''),
             }}
           ></span>
         )}
@@ -92,27 +95,62 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   className = '',
   id,
   label,
+  imageClassName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const isTouchDevice = useTouchDevice();
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        selectRef.current &&
-        !selectRef.current.contains(event.target as Node)
-      ) {
+    const handlePointerDownOutside = (event: PointerEvent) => {
+      const targetNode = event.target as Node;
+      const clickedInsideSelect = !!(
+        selectRef.current && selectRef.current.contains(targetNode)
+      );
+      const clickedInsideDropdown = !!(
+        dropdownRef.current && dropdownRef.current.contains(targetNode)
+      );
+
+      if (!clickedInsideSelect && !clickedInsideDropdown) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handlePointerDownOutside);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('pointerdown', handlePointerDownOutside);
     };
   }, []);
+
+  // Position the dropdown using a portal so it is not clipped by parent overflow
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const updatePosition = () => {
+      if (!selectRef.current) return;
+      const rect = selectRef.current.getBoundingClientRect();
+
+      setDropdownStyle({
+        position: 'fixed',
+        top: rect.bottom + 4, // mt-1 spacing
+        left: rect.left,
+        width: rect.width,
+        zIndex: 10000,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [isOpen]);
 
   const handleOptionClick = (optionValue: string) => {
     onChange(optionValue);
@@ -121,7 +159,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   const renderTouchSelect = () => (
     <SelectContainer className={className}>
-      <SelectDisplay value={value} options={options} />
+      <SelectDisplay
+        value={value}
+        options={options}
+        imageClassName={imageClassName}
+      />
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -142,41 +184,68 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     <SelectContainer className={`z-30 ${className}`}>
       <div
         ref={selectRef}
-        onClick={() => setIsOpen(!isOpen)}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          setIsOpen((prev) => !prev);
+        }}
         className="relative"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen((prev) => !prev);
+          }
+        }}
       >
-        <SelectDisplay value={value} options={options} />
-        {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto">
-            <ul className="py-1">
-              {options.map((option) => (
-                <li
-                  key={option.value}
-                  className={`px-3 py-2 text-base text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
-                    option.value === value ? 'bg-primary-800' : ''
-                  }`}
-                  onClick={() => handleOptionClick(option.value)}
-                >
-                  {option.imageUrl ? (
-                    <img
-                      src={option.imageUrl}
-                      alt={option.label}
-                      className="w-5 h-5 mr-3"
-                      width={20}
-                      height={20}
-                    />
-                  ) : (
-                    <span
-                      className="w-4 h-4 rounded-full mr-3"
-                      style={{ backgroundColor: getThemeColor(option.value) }}
-                    ></span>
-                  )}
-                  {option.label}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <SelectDisplay
+          value={value}
+          options={options}
+          imageClassName={imageClassName}
+        />
+        {isOpen &&
+          createPortal(
+            <div
+              ref={dropdownRef}
+              style={dropdownStyle}
+              className="bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <ul className="py-1">
+                {options.map((option) => (
+                  <li
+                    key={option.value}
+                    className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
+                      option.value === value ? 'bg-primary-800' : ''
+                    }`}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      handleOptionClick(option.value);
+                    }}
+                  >
+                    {option.imageUrl ? (
+                      <img
+                        src={option.imageUrl}
+                        alt={option.label}
+                        className={`w-5 h-5 mr-3 object-cover ${
+                          imageClassName ?? ''
+                        }`}
+                        width={20}
+                        height={20}
+                      />
+                    ) : (
+                      <span
+                        className="w-4 h-4 rounded-full mr-3"
+                        style={{ backgroundColor: getThemeColor(option.value) }}
+                      ></span>
+                    )}
+                    {option.label}
+                  </li>
+                ))}
+              </ul>
+            </div>,
+            document.body,
+          )}
       </div>
     </SelectContainer>
   );

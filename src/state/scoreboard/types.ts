@@ -57,6 +57,7 @@ export type ScoreboardState = {
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;
   setViewedStageId: (stageId: string | null) => void;
+  setCurrentStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   setRandomnessLevel: (level: number) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;

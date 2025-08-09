@@ -1,5 +1,6 @@
 import { Year } from '../config';
 
+import { BaseCountry } from '@/models';
 import { ThemeRecord } from './types';
 
 // We only support several themes, with 2025 as fallback
@@ -587,33 +588,61 @@ export function getThemeForYear(year: Year) {
   return themes['2025']; // Fallback to 2025 theme
 }
 
+type HostingCountryData = {
+  code: string;
+  logo: string;
+};
+
 // Hosting country logos for all years (2004-2025)
-const hostingCountryLogos: Record<Year, string> = {
-  '2004': '/hostingCountryLogos/Turkey2004.svg',
-  '2005': '/hostingCountryLogos/Ukraine2023.svg',
-  '2006': '/hostingCountryLogos/Greece2006.svg',
-  '2007': '/hostingCountryLogos/Finland2007.svg',
-  '2008': '/hostingCountryLogos/Serbia2008.svg',
-  '2009': '/hostingCountryLogos/Russia2009.svg',
-  '2010': '/hostingCountryLogos/Norway2010.svg',
-  '2011': '/hostingCountryLogos/Germany2011.svg',
-  '2012': '/hostingCountryLogos/Azerbaijan2012.svg',
-  '2013': '/hostingCountryLogos/Sweden2024.svg',
-  '2014': '/hostingCountryLogos/Denmark2014.svg',
-  '2015': '/hostingCountryLogos/Austria2015.svg',
-  '2016': '/hostingCountryLogos/Sweden2024.svg',
-  '2017': '/hostingCountryLogos/Ukraine2023.svg',
-  '2018': '/hostingCountryLogos/Portugal2018.svg',
-  '2019': '/hostingCountryLogos/Israel2019.svg',
-  '2020': '/hostingCountryLogos/Netherlands2021.svg',
-  '2021': '/hostingCountryLogos/Netherlands2021.svg',
-  '2022': '/hostingCountryLogos/Italy2022.svg',
-  '2023': '/hostingCountryLogos/Ukraine2023.svg',
-  '2024': '/hostingCountryLogos/Sweden2024.svg',
-  '2025': '/hostingCountryLogos/Switzerland2025.svg',
+const hostingCountryLogos: Record<Year, HostingCountryData> = {
+  '2004': { code: 'TR', logo: '/hostingCountryLogos/Turkey2004.svg' },
+  '2005': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
+  '2006': { code: 'GR', logo: '/hostingCountryLogos/Greece2006.svg' },
+  '2007': { code: 'FI', logo: '/hostingCountryLogos/Finland2007.svg' },
+  '2008': { code: 'RS', logo: '/hostingCountryLogos/Serbia2008.svg' },
+  '2009': { code: 'RU', logo: '/hostingCountryLogos/Russia2009.svg' },
+  '2010': { code: 'NO', logo: '/hostingCountryLogos/Norway2010.svg' },
+  '2011': { code: 'DE', logo: '/hostingCountryLogos/Germany2011.svg' },
+  '2012': { code: 'AZ', logo: '/hostingCountryLogos/Azerbaijan2012.svg' },
+  '2013': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
+  '2014': { code: 'DK', logo: '/hostingCountryLogos/Denmark2014.svg' },
+  '2015': { code: 'AT', logo: '/hostingCountryLogos/Austria2015.svg' },
+  '2016': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
+  '2017': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
+  '2018': { code: 'PT', logo: '/hostingCountryLogos/Portugal2018.svg' },
+  '2019': { code: 'IL', logo: '/hostingCountryLogos/Israel2019.svg' },
+  '2020': { code: 'NL', logo: '/hostingCountryLogos/Netherlands2021.svg' },
+  '2021': { code: 'NL', logo: '/hostingCountryLogos/Netherlands2021.svg' },
+  '2022': { code: 'IT', logo: '/hostingCountryLogos/Italy2022.svg' },
+  '2023': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
+  '2024': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
+  '2025': { code: 'CH', logo: '/hostingCountryLogos/Switzerland2025.svg' },
 };
 
 // Helper function to get hosting country logo for any year
-export function getHostingCountryLogoForYear(year: Year): string {
+export function getHostingCountryByYear(year: Year): HostingCountryData {
   return hostingCountryLogos[year] || hostingCountryLogos['2025']; // Fallback to 2025
 }
+
+export function getHostingCountryLogo(country: BaseCountry): {logo: string, isExisting: boolean} {
+  const existingCountryLogo = Object.values(hostingCountryLogos).find(
+    (hostingCountry) => hostingCountry.code === country.code,
+  )?.logo;
+
+  if (existingCountryLogo) return {logo: existingCountryLogo, isExisting: true}; 
+
+  return {logo: getFlagPath(country), isExisting: false};
+}
+
+
+const getFlagPath = (country: BaseCountry | string): string => {
+  if (typeof country === 'string') {
+    return `/flags/${country.toLowerCase()}.svg`;
+  }
+
+  if (country.flag) return country.flag;
+
+  if (country.code.startsWith('custom')) return 'ww';
+
+  return `/flags/${country.code.toLowerCase()}.svg`;
+};

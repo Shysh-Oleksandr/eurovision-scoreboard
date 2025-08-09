@@ -4,11 +4,16 @@ import { useGeneralStore } from '../../state/generalStore';
 import { Checkbox } from '../common/Checkbox';
 import { CollapsibleSection } from '../common/CollapsibleSection';
 
+import { ContestSettings } from './ContestSettings';
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
 
 export const GeneralSettings: React.FC = () => {
   const settings = useGeneralStore((state) => state.settings);
   const setSettings = useGeneralStore((state) => state.setSettings);
+  const expansion = useGeneralStore((state) => state.generalSettingsExpansion);
+  const setExpansion = useGeneralStore(
+    (state) => state.setGeneralSettingsExpansion,
+  );
 
   const isFullScreenSupported = document.fullscreenEnabled;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -16,8 +21,27 @@ export const GeneralSettings: React.FC = () => {
   return (
     <div className="flex flex-col gap-4">
       <CollapsibleSection
+        title="Contest"
+        isExpanded={expansion.contest}
+        onToggle={() => setExpansion({ contest: !expansion.contest })}
+        contentClassName="grid sm:grid-cols-2 grid-cols-1 gap-2 items-center"
+      >
+        <ContestSettings />
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        title="Voting"
+        isExpanded={expansion.voting}
+        onToggle={() => setExpansion({ voting: !expansion.voting })}
+      >
+        <PointsSystemSelection />
+      </CollapsibleSection>
+      <CollapsibleSection
         title="UI Preferences"
-        defaultExpanded
+        isExpanded={expansion.uiPreferences}
+        onToggle={() =>
+          setExpansion({ uiPreferences: !expansion.uiPreferences })
+        }
         contentClassName="grid sm:grid-cols-2 grid-cols-1 gap-1"
       >
         <Checkbox
@@ -104,9 +128,6 @@ export const GeneralSettings: React.FC = () => {
             setSettings({ shouldShowManualTelevoteWarning: e.target.checked })
           }
         />
-      </CollapsibleSection>
-      <CollapsibleSection title="Voting" defaultExpanded>
-        <PointsSystemSelection />
       </CollapsibleSection>
     </div>
   );

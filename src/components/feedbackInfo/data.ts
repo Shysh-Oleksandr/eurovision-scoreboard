@@ -1,9 +1,9 @@
 export const WHATS_NEW = [
   {
-    date: '2025-08-08',
+    date: '2025-08-09',
     title:
-      'Added the ability to sync voters with participants (enabled by default)',
-  },  
+      'Added the settings for the contest name, year, and host country',
+  },   
   {
     date: '2025-08-03',
     title:
@@ -103,11 +103,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-08-09', end: '2025-08-10' },
-    title: 'Settings for the contest year and host country',
-  },
-  {
-    approximateDates: { start: '2025-08-10', end: '2025-08-11' },
+    approximateDates: { start: '2025-08-10', end: '2025-08-15' },
     title: 'JESC support with custom themes',
   },
   {

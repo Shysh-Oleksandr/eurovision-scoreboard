@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
-import { getHostingCountryLogoForYear } from '../../theme/themes';
+import { getHostingCountryLogo } from '../../theme/themes';
 import Button from '../common/Button';
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
@@ -14,7 +14,10 @@ interface SimulationHeaderProps {
 }
 
 export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
-  const year = useGeneralStore((state) => state.year);
+  const showHostingCountryLogo = useGeneralStore(
+    (state) => state.settings.showHostingCountryLogo,
+  );
+  const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
   const shouldShowResetWarning = useGeneralStore(
     (state) => state.settings.shouldShowResetWarning,
   );
@@ -34,16 +37,24 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
     !!pastStates[pastStates.length - 1].currentStageId &&
     (!viewedStageId || viewedStageId === currentStageId);
 
+  const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
+
   return (
     <div className="flex justify-between items-center mb-4">
       <div className="flex items-center gap-2">
-        <img
-          src={getHostingCountryLogoForYear(year)}
-          alt="Hosting country logo"
-          className="w-10 h-10"
-          width={40}
-          height={40}
-        />
+        {showHostingCountryLogo && (
+          <img
+            src={logo}
+            alt="Hosting country logo"
+            className={`flex-none rounded-sm ${
+              isExisting
+                ? 'w-10 h-10 overflow-visible'
+                : 'w-9 h-7 object-cover mr-1'
+            }`}
+            width={36}
+            height={28}
+          />
+        )}
         <h2 className="sm:text-xl text-lg font-bold text-white">
           {phaseTitle}
         </h2>

@@ -67,10 +67,11 @@ export const PhaseActions = () => {
         onClose={() => setShowFinalStatsModal(false)}
       />
 
-      <div className="flex justify-end mb-2 gap-2 min-h-12">
+      <div className="flex pb-2 gap-2 min-h-12 whitespace-nowrap w-full overflow-x-auto">
         {isVotingOver && (
           <Button
             variant="tertiary"
+            className="ml-auto"
             onClick={() => setShowFinalStatsModal(true)}
           >
             View Stats

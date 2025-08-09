@@ -12,6 +12,7 @@ interface CollapsibleSectionProps {
   headerClassName?: string;
   titleClassName?: string;
   contentClassName?: string;
+  overflowClassName?: string;
 }
 
 export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
@@ -24,6 +25,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   headerClassName = '',
   titleClassName = '',
   contentClassName = '',
+  overflowClassName = '',
 }) => {
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
   const [hasBeenOpened, setHasBeenOpened] = useState(defaultExpanded);
@@ -81,7 +83,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
             : 'grid-rows-[0fr] opacity-0'
         }`}
       >
-        <div className="overflow-hidden">
+        <div className={`overflow-hidden ${overflowClassName ?? ''}`}>
           <div
             className={`p-4 pt-3 border-t border-primary-800 border-solid ${contentClassName}`}
           >

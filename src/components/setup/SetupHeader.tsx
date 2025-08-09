@@ -6,10 +6,7 @@ import { SUPPORTED_YEARS } from '../../data/data';
 import { StageId } from '../../models';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import {
-  YEARS_WITH_THEME,
-  getHostingCountryLogoForYear,
-} from '../../theme/themes';
+import { YEARS_WITH_THEME, getHostingCountryByYear } from '../../theme/themes';
 import Button from '../common/Button';
 import CustomSelect from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
@@ -22,7 +19,7 @@ const isSmallScreen = window.innerWidth < 370;
 const yearOptions = SUPPORTED_YEARS.map((year) => ({
   value: year.toString(),
   label: year.toString(),
-  imageUrl: getHostingCountryLogoForYear(year.toString() as Year),
+  imageUrl: getHostingCountryByYear(year.toString() as Year).logo,
 }));
 
 const themeOptions = YEARS_WITH_THEME.map((year) => ({
