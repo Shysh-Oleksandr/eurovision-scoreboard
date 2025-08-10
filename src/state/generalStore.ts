@@ -5,7 +5,8 @@ import { devtools, persist } from 'zustand/middleware';
 import { WHATS_NEW } from '../components/feedbackInfo/data';
 import { Year } from '../config';
 import { POINTS_ARRAY, SUPPORTED_YEARS } from '../data/data';
-import { getHostingCountryByYear, getThemeForYear } from '../theme/themes';
+import { getThemeForYear } from '../theme/themes';
+import { getHostingCountryByYear } from '../theme/hosting';
 import { Theme } from '../theme/types';
 
 import { useCountriesStore } from './countriesStore';
@@ -24,6 +25,7 @@ interface Settings {
   shouldShowResetWarning: boolean;
   showRankChangeIndicator: boolean;
   shouldShowManualTelevoteWarning: boolean;
+  shouldShowHeartFlagIcon: boolean;
   showHostingCountryLogo: boolean;
   hostingCountryCode: string;
   contestName: string;
@@ -107,6 +109,7 @@ export const useGeneralStore = create<GeneralState>()(
           showRankChangeIndicator: true,
           shouldShowManualTelevoteWarning: true,
           showHostingCountryLogo: true,
+          shouldShowHeartFlagIcon: false,
           hostingCountryCode: 'CH', // Switzerland for 2025
           contestName: 'Eurovision',
           contestYear: INITIAL_YEAR,

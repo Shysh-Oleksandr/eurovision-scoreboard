@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { getFlagPath } from '../../helpers/getFlagPath';
 import { useDebounceWithCancel } from '../../hooks/useDebounceWithCancel';
 import { BaseCountry } from '../../models';
 import { Input } from '../Input';
+
+import { useGeneralStore } from '@/state/generalStore';
+import { getHostingCountryLogo } from '@/theme/hosting';
 
 const MAX_ODDS = 1000;
 const DEBOUNCE_TIME = 400;
@@ -17,6 +19,10 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
   country,
   onOddsChange,
 }) => {
+  const shouldShowHeartFlagIcon = useGeneralStore(
+    (state) => state.settings.shouldShowHeartFlagIcon,
+  );
+
   const [juryOdds, setJuryOdds] = useState<number | undefined>(
     country.juryOdds ?? 50,
   );
@@ -85,16 +91,23 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
     }
   };
 
+  const { logo, isExisting } = getHostingCountryLogo(
+    country,
+    shouldShowHeartFlagIcon,
+  );
+
   return (
     <div className="bg-primary-800 bg-gradient-to-tr from-[10%] from-primary-900/80 to-primary-700/50 rounded-lg p-3 text-white">
       <div className="flex items-center gap-3">
         <img
-          src={country.flag || getFlagPath(country)}
+          src={logo}
           alt={country.name}
-          className="w-8 h-6 object-cover flex-none rounded-sm"
+          className={`flex-none rounded-sm ${
+            isExisting ? 'w-8 h-8' : 'w-8 h-6 object-cover'
+          }`}
           loading="lazy"
           width={32}
-          height={24}
+          height={28}
         />
         <span className="font-semibold truncate">{country.name}</span>
       </div>

@@ -10,6 +10,9 @@ import SearchInputIcon from '../SearchInputIcon';
 
 import { useVotersCountriesSearch } from './hooks/useVotersCountriesSearch';
 
+import { useGeneralStore } from '@/state/generalStore';
+import { getHostingCountryLogo } from '@/theme/hosting';
+
 const getAmountLabel = (itemsCount: number) => {
   if (itemsCount === 1) {
     return 'country';
@@ -27,6 +30,10 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
   localVotingCountries,
   onAddVoter,
 }) => {
+  const shouldShowHeartFlagIcon = useGeneralStore(
+    (state) => state.settings.shouldShowHeartFlagIcon,
+  );
+
   const [availableCountries, setAvailableCountries] = useState<BaseCountry[]>(
     [],
   );
@@ -107,32 +114,41 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
             }
           >
             <div className="grid lg:grid-cols-5 sm:grid-cols-4 2cols:grid-cols-3 grid-cols-2 gap-2">
-              {groupedAvailableCountries[category].map((country) => (
-                <button
-                  key={country.code}
-                  onClick={() => onAddVoter(country)}
-                  className="flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 p-2 rounded-md transition-colors duration-300 relative"
-                >
-                  <img
-                    src={country.flag || getFlagPath(country)}
-                    onError={(e) => {
-                      e.currentTarget.src = getFlagPath('ww');
-                    }}
-                    alt={`${country.name} flag`}
-                    className="w-8 h-6 object-cover flex-none rounded-sm"
-                    width={32}
-                    height={24}
-                    loading="lazy"
-                  />
-                  <span
-                    className="text-sm text-white flex-1 truncate ml-2"
-                    title={country.name}
+              {groupedAvailableCountries[category].map((country) => {
+                const { logo, isExisting } = getHostingCountryLogo(
+                  country,
+                  shouldShowHeartFlagIcon,
+                );
+
+                return (
+                  <button
+                    key={country.code}
+                    onClick={() => onAddVoter(country)}
+                    className="flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 p-2 rounded-md transition-colors duration-300 relative"
                   >
-                    {country.name}
-                  </span>
-                  <PlusIcon className="w-6 h-6 text-white xs:ml-2" />
-                </button>
-              ))}
+                    <img
+                      src={logo}
+                      onError={(e) => {
+                        e.currentTarget.src = getFlagPath('ww');
+                      }}
+                      alt={`${country.name} flag`}
+                      className={`flex-none rounded-sm ${
+                        isExisting ? 'w-7 h-7' : 'w-7 h-5 object-cover'
+                      }`}
+                      width={32}
+                      height={28}
+                      loading="lazy"
+                    />
+                    <span
+                      className="text-sm text-white flex-1 truncate ml-2"
+                      title={country.name}
+                    >
+                      {country.name}
+                    </span>
+                    <PlusIcon className="w-6 h-6 text-white xs:ml-2" />
+                  </button>
+                );
+              })}
             </div>
           </CollapsibleSection>
         ))}

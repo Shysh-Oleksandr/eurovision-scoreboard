@@ -3,9 +3,9 @@ import React, { useMemo } from 'react';
 import { Checkbox } from '../common/Checkbox';
 import CustomSelect from '../common/customSelect/CustomSelect';
 
-import { getFlagPath } from '@/helpers/getFlagPath';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
+import { getHostingCountryLogo } from '@/theme/hosting';
 
 export const HostingCountrySelect: React.FC = () => {
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
@@ -13,11 +13,16 @@ export const HostingCountrySelect: React.FC = () => {
   const setSettings = useGeneralStore((state) => state.setSettings);
 
   const options = useMemo(() => {
-    return getAllCountries().map((country) => ({
-      label: country.name,
-      value: country.code,
-      imageUrl: getFlagPath(country),
-    }));
+    return getAllCountries().map((country) => {
+      const { logo, isExisting } = getHostingCountryLogo(country);
+
+      return {
+        label: country.name,
+        value: country.code,
+        imageUrl: logo,
+        isExisting,
+      };
+    });
   }, [getAllCountries]);
 
   return (
@@ -39,7 +44,9 @@ export const HostingCountrySelect: React.FC = () => {
           onChange={(value) => setSettings({ hostingCountryCode: value })}
           id="hosting-country-select-box"
           className="ml-1"
-          imageClassName="w-8 h-6"
+          getImageClassName={(option) =>
+            option.isExisting ? 'w-8 h-8 !object-contain' : 'w-8 h-6'
+          }
         />
       )}
     </>

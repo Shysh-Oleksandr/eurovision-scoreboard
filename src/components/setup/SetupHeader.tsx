@@ -6,7 +6,8 @@ import { SUPPORTED_YEARS } from '../../data/data';
 import { StageId } from '../../models';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import { YEARS_WITH_THEME, getHostingCountryByYear } from '../../theme/themes';
+import { getHostingCountryByYear } from '../../theme/hosting';
+import { YEARS_WITH_THEME } from '../../theme/themes';
 import Button from '../common/Button';
 import CustomSelect from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
@@ -90,6 +91,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           onChange={handleYearChange}
           id="year-select-box"
           label="Year"
+          className="sm:w-[130px] w-[110px]"
         />
 
         <CustomSelect
@@ -98,6 +100,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           onChange={handleThemeChange}
           id="theme-select-box"
           label="Theme"
+          className="sm:w-[130px] w-[110px]"
         />
 
         {shouldShowSyncButton && (

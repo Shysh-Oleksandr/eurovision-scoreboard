@@ -1,9 +1,19 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-10',
+    title:
+      'Added the heart flag icons for all Eurovision countries. Added the search for hosting countries',
+  },   
+  {
     date: '2025-08-09',
     title:
       'Added the settings for the contest name, year, and host country',
   },   
+  {
+    date: '2025-08-08',
+    title:
+      'Added the ability to sync voters with participants (enabled by default)',
+  },  
   {
     date: '2025-08-03',
     title:

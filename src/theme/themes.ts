@@ -1,6 +1,5 @@
 import { Year } from '../config';
 
-import { BaseCountry } from '@/models';
 import { ThemeRecord } from './types';
 
 // We only support several themes, with 2025 as fallback
@@ -10,7 +9,7 @@ export const themes = {
       primary: {
         700: '#2970b3',
         750: '#2768a5',
-        800: '#183c63',
+        800: '#1d4577',
         900: '#133353',
         950: '#0a2743',
       },
@@ -65,11 +64,11 @@ export const themes = {
   '2017': {
     colors: {
       primary: {
-        700: '#1c38b5',
-        750: '#1836b9',
-        800: '#0a2184',
+        700: '#173ad3',
+        750: '#1537cb',
+        800: '#0c27a1',
         900: '#081a68',
-        950: '#021050',
+        950: '#02125a',
       },
       gray: {
         500: '#6e7dbf',
@@ -181,7 +180,7 @@ export const themes = {
       primary: {
         700: '#1c6eb5',
         750: '#1866b9',
-        800: '#104a89',
+        800: '#0e4177',
         900: '#082e68',
         950: '#021c50',
       },
@@ -350,10 +349,10 @@ export const themes = {
   '2022': {
     colors: {
       primary: {
-        700: '#963678',
+        700: '#7a2961',
         750: '#7e3065',
-        800: '#5f264d',
-        900: '#34182b',
+        800: '#5f1c4a',
+        900: '#311227',
         950: '#2b1323',
       },
       gray: {
@@ -588,61 +587,4 @@ export function getThemeForYear(year: Year) {
   return themes['2025']; // Fallback to 2025 theme
 }
 
-type HostingCountryData = {
-  code: string;
-  logo: string;
-};
-
-// Hosting country logos for all years (2004-2025)
-const hostingCountryLogos: Record<Year, HostingCountryData> = {
-  '2004': { code: 'TR', logo: '/hostingCountryLogos/Turkey2004.svg' },
-  '2005': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
-  '2006': { code: 'GR', logo: '/hostingCountryLogos/Greece2006.svg' },
-  '2007': { code: 'FI', logo: '/hostingCountryLogos/Finland2007.svg' },
-  '2008': { code: 'RS', logo: '/hostingCountryLogos/Serbia2008.svg' },
-  '2009': { code: 'RU', logo: '/hostingCountryLogos/Russia2009.svg' },
-  '2010': { code: 'NO', logo: '/hostingCountryLogos/Norway2010.svg' },
-  '2011': { code: 'DE', logo: '/hostingCountryLogos/Germany2011.svg' },
-  '2012': { code: 'AZ', logo: '/hostingCountryLogos/Azerbaijan2012.svg' },
-  '2013': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
-  '2014': { code: 'DK', logo: '/hostingCountryLogos/Denmark2014.svg' },
-  '2015': { code: 'AT', logo: '/hostingCountryLogos/Austria2015.svg' },
-  '2016': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
-  '2017': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
-  '2018': { code: 'PT', logo: '/hostingCountryLogos/Portugal2018.svg' },
-  '2019': { code: 'IL', logo: '/hostingCountryLogos/Israel2019.svg' },
-  '2020': { code: 'NL', logo: '/hostingCountryLogos/Netherlands2021.svg' },
-  '2021': { code: 'NL', logo: '/hostingCountryLogos/Netherlands2021.svg' },
-  '2022': { code: 'IT', logo: '/hostingCountryLogos/Italy2022.svg' },
-  '2023': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
-  '2024': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
-  '2025': { code: 'CH', logo: '/hostingCountryLogos/Switzerland2025.svg' },
-};
-
-// Helper function to get hosting country logo for any year
-export function getHostingCountryByYear(year: Year): HostingCountryData {
-  return hostingCountryLogos[year] || hostingCountryLogos['2025']; // Fallback to 2025
-}
-
-export function getHostingCountryLogo(country: BaseCountry): {logo: string, isExisting: boolean} {
-  const existingCountryLogo = Object.values(hostingCountryLogos).find(
-    (hostingCountry) => hostingCountry.code === country.code,
-  )?.logo;
-
-  if (existingCountryLogo) return {logo: existingCountryLogo, isExisting: true}; 
-
-  return {logo: getFlagPath(country), isExisting: false};
-}
-
-
-const getFlagPath = (country: BaseCountry | string): string => {
-  if (typeof country === 'string') {
-    return `/flags/${country.toLowerCase()}.svg`;
-  }
-
-  if (country.flag) return country.flag;
-
-  if (country.code.startsWith('custom')) return 'ww';
-
-  return `/flags/${country.code.toLowerCase()}.svg`;
-};
+ 

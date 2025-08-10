@@ -2,7 +2,8 @@ import React from 'react';
 
 import { BaseCountry, Country } from '../../../models';
 
-import { getCountryFlag } from './useFinalStats';
+import { useGeneralStore } from '@/state/generalStore';
+import { getHostingCountryLogo } from '@/theme/hosting';
 
 interface CountryStatsRowProps {
   country: Country & { rank: number };
@@ -22,6 +23,14 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
   getCellClassName,
   getPoints,
 }) => {
+  const shouldShowHeartFlagIcon = useGeneralStore(
+    (state) => state.settings.shouldShowHeartFlagIcon,
+  );
+  const { logo, isExisting } = getHostingCountryLogo(
+    country,
+    shouldShowHeartFlagIcon,
+  );
+
   return (
     <tr className="border-b border-solid border-primary-900 hover:bg-primary-800/50">
       <td className="p-2">
@@ -30,12 +39,14 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
             {country.rank}
           </span>
           <img
-            src={country.flag || getCountryFlag(country)}
+            src={logo}
             alt={country.name}
-            className="w-8 h-6 object-cover rounded-sm"
+            className={`${
+              isExisting ? 'w-8 h-8' : 'w-8 h-6 object-cover rounded-sm'
+            }`}
             loading="lazy"
             width={32}
-            height={24}
+            height={32}
           />
           <span className="font-medium truncate flex-1">{country.name}</span>
           <span className="font-bold text-lg">{getPoints(country)}</span>

@@ -45,6 +45,15 @@ export const GeneralSettings: React.FC = () => {
         contentClassName="grid sm:grid-cols-2 grid-cols-1 gap-1"
       >
         <Checkbox
+          id="show-heart-flag-icon"
+          labelClassName="w-full"
+          label="Use heart icons for flags"
+          checked={settings.shouldShowHeartFlagIcon}
+          onChange={(e) =>
+            setSettings({ shouldShowHeartFlagIcon: e.target.checked })
+          }
+        />
+        <Checkbox
           id="show-place-number"
           labelClassName="w-full"
           label="Always show rankings"

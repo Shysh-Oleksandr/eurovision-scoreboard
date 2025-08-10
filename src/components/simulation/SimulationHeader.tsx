@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
-import { getHostingCountryLogo } from '../../theme/themes';
+import { getHostingCountryLogo } from '../../theme/hosting';
 import Button from '../common/Button';
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';

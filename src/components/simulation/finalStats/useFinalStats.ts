@@ -236,7 +236,3 @@ export const useFinalStats = () => {
     getCellClassName,
   };
 };
-
-export const getCountryFlag = (country: BaseCountry) => {
-  return country.flag || getFlagPath(country);
-};

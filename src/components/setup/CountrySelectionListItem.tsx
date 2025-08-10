@@ -5,6 +5,9 @@ import { PencilIcon } from '../../assets/icons/PencilIcon';
 import { getFlagPath } from '../../helpers/getFlagPath';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
 
+import { useGeneralStore } from '@/state/generalStore';
+import { getHostingCountryLogo } from '@/theme/hosting';
+
 export const ASSIGNMENT_GROUP_LABELS: Record<string, string> = {
   [CountryAssignmentGroup.AUTO_QUALIFIER]: 'Auto-Qualifier',
   [CountryAssignmentGroup.SF1]: 'Semi-Final 1',
@@ -40,6 +43,9 @@ export const CountrySelectionListItem: React.FC<
   availableGroups = Object.values(CountryAssignmentGroup),
   onEdit,
 }) => {
+  const shouldShowHeartFlagIcon = useGeneralStore(
+    (state) => state.settings.shouldShowHeartFlagIcon,
+  );
   const shouldLazyLoad =
     countryGroupAssignment !== CountryAssignmentGroup.SF1 &&
     countryGroupAssignment !== CountryAssignmentGroup.SF2;
@@ -52,6 +58,11 @@ export const CountrySelectionListItem: React.FC<
     onAssignCountryAssignment?.(country.code, newAssignment);
   };
 
+  const { logo, isExisting } = getHostingCountryLogo(
+    country,
+    shouldShowHeartFlagIcon,
+  );
+
   return (
     <div
       className={`flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 p-2 rounded-md transition-colors duration-300 relative ${
@@ -60,14 +71,16 @@ export const CountrySelectionListItem: React.FC<
     >
       <img
         loading={shouldLazyLoad ? 'lazy' : 'eager'}
-        src={country.flag || getFlagPath(country)}
+        src={logo}
         onError={(e) => {
           e.currentTarget.src = getFlagPath('ww');
         }}
         alt={`${country.name} flag`}
-        className="w-8 h-6 object-cover flex-none rounded-sm"
+        className={`flex-none rounded-sm ${
+          isExisting ? 'w-8 h-7' : 'w-8 h-6 object-cover'
+        }`}
         width={32}
-        height={24}
+        height={28}
       />
       <span
         className="text-sm text-white flex-1 truncate ml-2"

@@ -3,9 +3,10 @@ import React from 'react';
 import { Country, StageVotingType } from '../../../models';
 
 import CountryStatsRow from './CountryStatsRow';
-import { getCountryFlag } from './useFinalStats';
 
 import { useCountriesStore } from '@/state/countriesStore';
+import { useGeneralStore } from '@/state/generalStore';
+import { getHostingCountryLogo } from '@/theme/hosting';
 
 interface StatsTableProps {
   rankedCountries: (Country & { rank: number })[];
@@ -27,6 +28,10 @@ const StatsTable: React.FC<StatsTableProps> = ({
   selectedStageId,
   selectedVoteType,
 }) => {
+  const shouldShowHeartFlagIcon = useGeneralStore(
+    (state) => state.settings.shouldShowHeartFlagIcon,
+  );
+
   const getStageVotingCountries = useCountriesStore(
     (state) => state.getStageVotingCountries,
   );
@@ -45,19 +50,28 @@ const StatsTable: React.FC<StatsTableProps> = ({
         <thead className="sticky top-0 z-10">
           <tr>
             <th className="p-2 min-w-[220px] w-[220px] h-auto"></th>
-            {votingCountries.map((country) => (
-              <th key={country.code} className="p-1 min-w-12 w-12">
-                <img
-                  src={getCountryFlag(country)}
-                  alt={country.name}
-                  className="w-8 h-6 object-cover rounded-sm mx-auto"
-                  loading="lazy"
-                  width={32}
-                  height={24}
-                  title={country.name}
-                />
-              </th>
-            ))}
+            {votingCountries.map((country) => {
+              const { logo, isExisting } = getHostingCountryLogo(
+                country,
+                shouldShowHeartFlagIcon,
+              );
+
+              return (
+                <th key={country.code} className="p-1 min-w-12 w-12">
+                  <img
+                    src={logo}
+                    alt={country.name}
+                    className={`${
+                      isExisting ? 'w-8 h-8' : 'w-8 h-6 object-cover rounded-sm'
+                    } mx-auto`}
+                    loading="lazy"
+                    width={32}
+                    height={24}
+                    title={country.name}
+                  />
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>

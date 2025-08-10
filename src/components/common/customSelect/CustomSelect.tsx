@@ -1,16 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
 import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
 import { Year } from '../../../config';
 import { themes } from '../../../theme/themes';
 
+import { useDebounce } from '@/hooks/useDebounce';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 
 type Option = {
   label: string;
   value: string;
   imageUrl?: string;
+  isExisting?: boolean;
 };
 
 type CustomSelectProps = {
@@ -20,7 +22,7 @@ type CustomSelectProps = {
   className?: string;
   id?: string;
   label?: string;
-  imageClassName?: string;
+  getImageClassName?: (option: Option) => string;
 };
 
 const getThemeColor = (year: string) => {
@@ -32,8 +34,8 @@ const getThemeColor = (year: string) => {
 const SelectDisplay: React.FC<{
   value: string;
   options: Option[];
-  imageClassName?: string;
-}> = ({ value, options, imageClassName }) => {
+  getImageClassName?: (option: Option) => string;
+}> = ({ value, options, getImageClassName }) => {
   const selectedOption = options.find((option) => option.value === value);
 
   return (
@@ -43,7 +45,9 @@ const SelectDisplay: React.FC<{
           <img
             src={selectedOption.imageUrl}
             alt={selectedOption.label}
-            className={`w-6 h-6 mr-2 object-cover ${imageClassName ?? ''}`}
+            className={`w-6 h-6 mr-2 object-cover ${
+              getImageClassName?.(selectedOption) ?? ''
+            }`}
             width={24}
             height={24}
           />
@@ -95,13 +99,18 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   className = '',
   id,
   label,
-  imageClassName,
+  getImageClassName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const isTouchDevice = useTouchDevice();
+  const [searchText, setSearchText] = useState('');
+  const debouncedSearch = useDebounce(searchText, 200);
+  const initialSelectedLabelRef = useRef<string>('');
+  const selectionChangedRef = useRef<boolean>(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handlePointerDownOutside = (event: PointerEvent) => {
@@ -152,17 +161,46 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     };
   }, [isOpen]);
 
+  // Initialize search and focus input when opening
+  useEffect(() => {
+    if (isOpen) {
+      const selectedOption = options.find((option) => option.value === value);
+      const label = selectedOption?.label ?? '';
+
+      initialSelectedLabelRef.current = label;
+      selectionChangedRef.current = false;
+      setSearchText('');
+
+      // Focus the input on open
+      requestAnimationFrame(() => {
+        searchInputRef.current?.focus();
+      });
+    } else {
+      setSearchText('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   const handleOptionClick = (optionValue: string) => {
     onChange(optionValue);
+    selectionChangedRef.current = true;
     setIsOpen(false);
   };
+
+  const filteredOptions = useMemo(() => {
+    const q = debouncedSearch.trim().toLowerCase();
+
+    if (!q) return options;
+
+    return options.filter((o) => o.label.toLowerCase().includes(q));
+  }, [options, debouncedSearch]);
 
   const renderTouchSelect = () => (
     <SelectContainer className={className}>
       <SelectDisplay
         value={value}
         options={options}
-        imageClassName={imageClassName}
+        getImageClassName={getImageClassName}
       />
       <select
         value={value}
@@ -186,6 +224,12 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         ref={selectRef}
         onMouseDown={(e) => {
           e.stopPropagation();
+
+          const target = e.target as HTMLElement;
+
+          if (isOpen && (target.tagName === 'INPUT' || target.closest('input')))
+            return;
+
           setIsOpen((prev) => !prev);
         }}
         className="relative"
@@ -198,11 +242,35 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           }
         }}
       >
-        <SelectDisplay
-          value={value}
-          options={options}
-          imageClassName={imageClassName}
-        />
+        {isOpen ? (
+          // While open, show an input in place of the display so users can search immediately.
+          <div className="select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between">
+            <div className="flex items-center w-full">
+              <input
+                ref={searchInputRef}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onBlur={() => {
+                  // If no selection was made, restore the previous label
+                  if (!selectionChangedRef.current) {
+                    setSearchText(initialSelectedLabelRef.current);
+                  }
+                }}
+                placeholder="Search..."
+                className="w-full bg-transparent outline-none text-white placeholder:text-white/70"
+              />
+            </div>
+            <ArrowIcon
+              className={`text-white w-7 h-7 rotate-90 absolute lg:right-2.5 sm:right-2 right-1`}
+            />
+          </div>
+        ) : (
+          <SelectDisplay
+            value={value}
+            options={options}
+            getImageClassName={getImageClassName}
+          />
+        )}
         {isOpen &&
           createPortal(
             <div
@@ -212,7 +280,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               onMouseDown={(e) => e.stopPropagation()}
             >
               <ul className="py-1">
-                {options.map((option) => (
+                {filteredOptions.map((option) => (
                   <li
                     key={option.value}
                     className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
@@ -228,10 +296,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                         src={option.imageUrl}
                         alt={option.label}
                         className={`w-5 h-5 mr-3 object-cover ${
-                          imageClassName ?? ''
+                          getImageClassName?.(option) ?? ''
                         }`}
                         width={20}
                         height={20}
+                        loading="lazy"
                       />
                     ) : (
                       <span
