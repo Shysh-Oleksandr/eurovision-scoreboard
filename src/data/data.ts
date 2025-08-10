@@ -90,10 +90,27 @@ export const POINTS_ARRAY = new Array(10).fill(0).map((_, index) => {
   return points;
 });
 
-const MAX_POINTS_FOR_A_VOTE = 12;
+export const getMaxPossibleTelevotePoints = (
+  votingCountries: BaseCountry[],
+  votingCountryCode: string,
+  pointsSystem: PointsItem[]
+) => {
+  const maxPointsInSystem = pointsSystem.reduce((sum, item) => Math.max(sum, item.value), 0);
+  
+  const votingCountriesLength = votingCountries.filter(country => country.code !== votingCountryCode).length;
+  return maxPointsInSystem * votingCountriesLength;
+};
 
-export const getMaxPossibleTelevotePoints = (countriesLength: number) => {
-  return MAX_POINTS_FOR_A_VOTE * (countriesLength - 1);
+export const getTotalTelevotePoints = (
+  votingCountriesLength: number,
+  pointsSystem: PointsItem[]
+) => {
+  // Calculate total points available in the points system
+  const totalPointsInSystem = pointsSystem.reduce((sum, item) => sum + item.value, 0);
+  
+  // Each voting country can give totalPointsInSystem points total
+  // The total available points for the stage is the sum of all points in the system * number of voting countries
+  return totalPointsInSystem * votingCountriesLength;
 };
 
 export const ANIMATION_DURATION = 3000;

@@ -30,6 +30,7 @@ interface Settings {
   hostingCountryCode: string;
   contestName: string;
   contestYear: string;
+  shouldLimitManualTelevotePoints: boolean;
 }
 
 export interface PointsItem {
@@ -113,6 +114,7 @@ export const useGeneralStore = create<GeneralState>()(
           hostingCountryCode: 'CH', // Switzerland for 2025
           contestName: 'Eurovision',
           contestYear: INITIAL_YEAR,
+          shouldLimitManualTelevotePoints: true,
         },
 
         setLastSeenUpdate: (update: string) => {

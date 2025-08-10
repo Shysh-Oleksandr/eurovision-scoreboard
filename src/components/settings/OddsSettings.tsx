@@ -125,6 +125,7 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
       <div className="mb-4 relative">
         <div className="absolute top-0 right-0">
           <Tooltip
+            position="right"
             content={
               <div className="space-y-2 font-medium">
                 <p>

@@ -40,7 +40,7 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
               </p>
             </div>
           }
-          position="right"
+          position="left"
         >
           <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
         </Tooltip>
@@ -49,7 +49,7 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
           onChange={(e) => onSyncVotersChange(e.target.checked)}
           id="sync-voters-checkbox"
           label="Sync voters with participant countries"
-          labelClassName="text-white !px-0 !pt-1 !pb-3"
+          labelClassName="text-white !px-0 !pt-1 !pb-3 !items-start"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">

@@ -50,8 +50,7 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
                 </p>
               </div>
             }
-            position="right"
-            className="sm:w-[min(300px,80vw)] w-[250px] sm:-left-32 left-1/2 sm:translate-x-0 -translate-x-1/2"
+            position="center"
           >
             <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
           </Tooltip>

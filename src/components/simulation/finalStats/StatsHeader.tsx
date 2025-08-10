@@ -36,6 +36,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
       {isCombinedVoting && (
         <div className="absolute top-1 right-1">
           <Tooltip
+            position="right"
             content={
               <div className="space-y-2 font-medium">
                 <p>

@@ -3,9 +3,12 @@ import React from 'react';
 import { useGeneralStore } from '../../state/generalStore';
 import { Checkbox } from '../common/Checkbox';
 import { CollapsibleSection } from '../common/CollapsibleSection';
+import { Tooltip } from '../common/Tooltip';
 
 import { ContestSettings } from './ContestSettings';
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
+
+import { InfoIcon } from '@/assets/icons/InfoIcon';
 
 export const GeneralSettings: React.FC = () => {
   const settings = useGeneralStore((state) => state.settings);
@@ -35,6 +38,30 @@ export const GeneralSettings: React.FC = () => {
         onToggle={() => setExpansion({ voting: !expansion.voting })}
       >
         <PointsSystemSelection />
+        <div className="h-px bg-primary-800 w-full my-4" />
+
+        <div className="flex items-start gap-2">
+          <Tooltip
+            content={
+              <div className="font-medium">
+                When enabled, limits the total televote points you can award
+                (when manually entering points) and shows how many remain.
+              </div>
+            }
+            position="left"
+          >
+            <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+          </Tooltip>
+          <Checkbox
+            id="limit-manual-televote-points"
+            labelClassName="w-full !px-0 !pt-1 !items-start"
+            label="Limit Manual Televote Points"
+            checked={settings.shouldLimitManualTelevotePoints}
+            onChange={(e) =>
+              setSettings({ shouldLimitManualTelevotePoints: e.target.checked })
+            }
+          />
+        </div>
       </CollapsibleSection>
       <CollapsibleSection
         title="UI Preferences"

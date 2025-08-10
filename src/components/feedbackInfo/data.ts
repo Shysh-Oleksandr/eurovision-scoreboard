@@ -2,7 +2,7 @@ export const WHATS_NEW = [
   {
     date: '2025-08-10',
     title:
-      'Added the heart flag icons for all Eurovision countries. Added the search for hosting countries',
+      'Added the heart flag icons for all Eurovision countries, the search for hosting countries, the televote progress bar, and settings for limiting manual televote points',
   },   
   {
     date: '2025-08-09',
