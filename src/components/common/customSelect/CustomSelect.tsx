@@ -15,14 +15,21 @@ type Option = {
   isExisting?: boolean;
 };
 
+type OptionGroup = {
+  label: string;
+  options: Option[];
+};
+
 type CustomSelectProps = {
   options: Option[];
+  groups?: { label: string; options: Option[] }[]; // optional grouped options
   value: string;
   onChange: (value: string) => void;
   className?: string;
   id?: string;
   label?: string;
   getImageClassName?: (option: Option) => string;
+  selectClassName?: string;
 };
 
 const getThemeColor = (year: string) => {
@@ -35,11 +42,14 @@ const SelectDisplay: React.FC<{
   value: string;
   options: Option[];
   getImageClassName?: (option: Option) => string;
-}> = ({ value, options, getImageClassName }) => {
+  selectClassName?: string;
+}> = ({ value, options, getImageClassName, selectClassName }) => {
   const selectedOption = options.find((option) => option.value === value);
 
   return (
-    <div className="select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer">
+    <div
+      className={`select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer ${selectClassName}`}
+    >
       <div className="flex items-center">
         {selectedOption?.imageUrl ? (
           <img
@@ -94,12 +104,14 @@ const SelectContainer: React.FC<{
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
+  groups,
   value,
   onChange,
   className = '',
   id,
   label,
   getImageClassName,
+  selectClassName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -190,17 +202,29 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const filteredOptions = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
 
+    if (groups && groups.length > 0) {
+      const mapped: OptionGroup[] = groups.map((g) => ({
+        label: g.label,
+        options: q
+          ? g.options.filter((o) => o.label.toLowerCase().includes(q))
+          : g.options,
+      }));
+
+      return mapped;
+    }
+
     if (!q) return options;
 
-    return options.filter((o) => o.label.toLowerCase().includes(q));
-  }, [options, debouncedSearch]);
+    return (options || []).filter((o) => o.label.toLowerCase().includes(q));
+  }, [options, groups, debouncedSearch]);
 
   const renderTouchSelect = () => (
     <SelectContainer className={className}>
       <SelectDisplay
         value={value}
-        options={options}
+        options={groups ? groups.flatMap((g) => g.options) : options}
         getImageClassName={getImageClassName}
+        selectClassName={selectClassName}
       />
       <select
         value={value}
@@ -209,11 +233,21 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         aria-label={label}
         id={id}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        {groups
+          ? groups.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+          : options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
       </select>
     </SelectContainer>
   );
@@ -267,8 +301,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         ) : (
           <SelectDisplay
             value={value}
-            options={options}
+            options={groups ? groups.flatMap((g) => g.options) : options}
             getImageClassName={getImageClassName}
+            selectClassName={selectClassName}
           />
         )}
         {isOpen &&
@@ -279,39 +314,117 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               className="bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto"
               onMouseDown={(e) => e.stopPropagation()}
             >
-              <ul className="py-1">
-                {filteredOptions.map((option) => (
-                  <li
-                    key={option.value}
-                    className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
-                      option.value === value ? 'bg-primary-800' : ''
-                    }`}
-                    onMouseDown={(e) => {
-                      e.stopPropagation();
-                      handleOptionClick(option.value);
-                    }}
-                  >
-                    {option.imageUrl ? (
-                      <img
-                        src={option.imageUrl}
-                        alt={option.label}
-                        className={`w-5 h-5 mr-3 object-cover ${
-                          getImageClassName?.(option) ?? ''
+              {(() => {
+                const hasGroups = !!(groups && groups.length > 0);
+
+                if (hasGroups) {
+                  const grouped = filteredOptions as OptionGroup[];
+                  const nonEmptyGroups = grouped.filter(
+                    (g) => g.options.length > 0,
+                  );
+
+                  if (nonEmptyGroups.length === 0) {
+                    return (
+                      <div className="px-3 py-2 text-white/70">No options</div>
+                    );
+                  }
+
+                  return (
+                    <div className="py-1">
+                      {nonEmptyGroups.map((group) => (
+                        <div key={group.label}>
+                          <div className="px-3 py-1 text-xs uppercase tracking-wider text-white/70">
+                            {group.label}
+                          </div>
+                          <ul>
+                            {group.options.map((option) => (
+                              <li
+                                key={option.value}
+                                className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
+                                  option.value === value ? 'bg-primary-800' : ''
+                                }`}
+                                onMouseDown={(e) => {
+                                  e.stopPropagation();
+                                  handleOptionClick(option.value);
+                                }}
+                              >
+                                {option.imageUrl ? (
+                                  <img
+                                    src={option.imageUrl}
+                                    alt={option.label}
+                                    className={`w-5 h-5 mr-3 object-cover ${
+                                      getImageClassName?.(option) ?? ''
+                                    }`}
+                                    width={20}
+                                    height={20}
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <span
+                                    className="w-4 h-4 rounded-full mr-3"
+                                    style={{
+                                      backgroundColor: getThemeColor(
+                                        option.value,
+                                      ),
+                                    }}
+                                  ></span>
+                                )}
+                                {option.label}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+
+                const flat = filteredOptions as Option[];
+
+                if (flat.length === 0) {
+                  return (
+                    <div className="px-3 py-2 text-white/70">No options</div>
+                  );
+                }
+
+                return (
+                  <ul className="py-1">
+                    {flat.map((option) => (
+                      <li
+                        key={option.value}
+                        className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
+                          option.value === value ? 'bg-primary-800' : ''
                         }`}
-                        width={20}
-                        height={20}
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span
-                        className="w-4 h-4 rounded-full mr-3"
-                        style={{ backgroundColor: getThemeColor(option.value) }}
-                      ></span>
-                    )}
-                    {option.label}
-                  </li>
-                ))}
-              </ul>
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          handleOptionClick(option.value);
+                        }}
+                      >
+                        {option.imageUrl ? (
+                          <img
+                            src={option.imageUrl}
+                            alt={option.label}
+                            className={`w-5 h-5 mr-3 object-cover ${
+                              getImageClassName?.(option) ?? ''
+                            }`}
+                            width={20}
+                            height={20}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <span
+                            className="w-4 h-4 rounded-full mr-3"
+                            style={{
+                              backgroundColor: getThemeColor(option.value),
+                            }}
+                          ></span>
+                        )}
+                        {option.label}
+                      </li>
+                    ))}
+                  </ul>
+                );
+              })()}
             </div>,
             document.body,
           )}

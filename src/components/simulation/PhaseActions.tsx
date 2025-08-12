@@ -45,6 +45,7 @@ export const PhaseActions = () => {
   const hasWinner = !!winnerCountry;
 
   const isSFAndGFEventOver =
+    eventStages.length > 1 &&
     isVotingOver &&
     isLastStage &&
     hasWinner &&
@@ -67,7 +68,7 @@ export const PhaseActions = () => {
         onClose={() => setShowFinalStatsModal(false)}
       />
 
-      <div className="flex pb-2 gap-2 min-h-12 whitespace-nowrap w-full overflow-x-auto">
+      <div className="flex pb-2 gap-2 min-h-12 whitespace-nowrap w-full overflow-x-auto sm:overflow-x-visible">
         {isVotingOver && (
           <Button
             variant="tertiary"

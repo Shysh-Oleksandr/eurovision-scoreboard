@@ -34,6 +34,11 @@ const hostingLogosByYear: Record<Year, HostingCountryData> = {
   '2025': { code: 'CH', logo: '/hostingCountryLogos/Switzerland2025.svg' },
 };
 
+const juniorHostingLogosByYear: Record<string, HostingCountryData> = {
+  '2023': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
+  '2024': { code: 'ES', logo: '/hostingCountryLogos/EuroSpain.svg' },
+};
+
 // Optional per-country overrides for a default hosting logo not tied to a specific year
 // Extend this with entries like: 'SE': '/hostingCountryLogos/SwedenDefault.svg'
 const countryDefaultHostingLogos: Partial<Record<string, string>> = {
@@ -78,7 +83,11 @@ const countryDefaultHostingLogos: Partial<Record<string, string>> = {
 // Helper: latest-first list of years
 const yearsDesc: Year[] = [...years].reverse() as Year[];
 
-export function getHostingCountryByYear(year: Year): HostingCountryData {
+export function getHostingCountryByYear(year: Year, isJunior = false): HostingCountryData {
+  if (isJunior) {
+    return juniorHostingLogosByYear[year] || juniorHostingLogosByYear['2024'];
+  }
+
   return hostingLogosByYear[year] || hostingLogosByYear['2025'];
 }
 

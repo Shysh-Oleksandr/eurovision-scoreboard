@@ -51,7 +51,29 @@ Array.from(document.querySelectorAll('.v_table.v_table_out tbody tr'))
     : null;
 })
 .filter(Boolean);
+
+------------------------------------------------------------
+Script for getting Junior countries odds from the table(https://eurovisionworld.com/junior-eurovision/2024):
+
+Array.from(document.querySelectorAll('.national_table tbody tr'))
+  .map((tr) => {
+    const tds = tr.querySelectorAll('td');
+    const name = tds[1]?.querySelector('a')?.textContent?.trim();
+    const televoteText = tds[4]?.querySelector('a')?.textContent?.trim();
+    const juryText = tds[5]?.querySelector('a')?.textContent?.trim();
+    
+    const juryPoints = juryText ? parseInt(juryText, 10) : null;
+    const televotePoints = televoteText ? parseInt(televoteText, 10) : null;
+
+    return name && juryPoints !== null && televotePoints !== null
+      ? { name, juryPoints, televotePoints }
+      : null;
+  })
+  .filter(Boolean);
+
 */
+
+const IS_JESC = true;
 
 const finalists: (
   | {
@@ -65,104 +87,88 @@ const finalists: (
     }
 )[] = [
   {
-    name: 'Ukraine',
-    points: 280,
+      "name": "France",
+      "juryPoints": 136,
+      "televotePoints": 92
   },
   {
-    name: 'Serbia & Montenegro',
-    points: 263,
+      "name": "Spain",
+      "juryPoints": 115,
+      "televotePoints": 86
   },
   {
-    name: 'Greece',
-    points: 252,
+      "name": "Armenia",
+      "juryPoints": 116,
+      "televotePoints": 64
   },
   {
-    name: 'Turkey',
-    points: 195,
+      "name": "United KingdomUK",
+      "juryPoints": 102,
+      "televotePoints": 58
   },
   {
-    name: 'Cyprus',
-    points: 170,
+      "name": "Ukraine",
+      "juryPoints": 45,
+      "televotePoints": 83
   },
   {
-    name: 'Sweden',
-    points: 170,
+      "name": "Poland",
+      "juryPoints": 69,
+      "televotePoints": 55
   },
   {
-    name: 'Albania',
-    points: 106,
+      "name": "Netherlands",
+      "juryPoints": 52,
+      "televotePoints": 70
   },
   {
-    name: 'Germany',
-    points: 93,
+      "name": "Albania",
+      "juryPoints": 70,
+      "televotePoints": 45
   },
   {
-    name: 'Bosnia & Herzegovina.',
-    points: 91,
+      "name": "Germany",
+      "juryPoints": 33,
+      "televotePoints": 74
   },
   {
-    name: 'Spain',
-    points: 87,
+      "name": "Malta",
+      "juryPoints": 51,
+      "televotePoints": 43
   },
   {
-    name: 'Russia',
-    points: 67,
+      "name": "Italy",
+      "juryPoints": 37,
+      "televotePoints": 44
   },
   {
-    name: 'Malta',
-    points: 50,
+      "name": "North MacedoniaN.Macedonia",
+      "juryPoints": 37,
+      "televotePoints": 39
   },
   {
-    name: 'Croatia',
-    points: 50,
+      "name": "Portugal",
+      "juryPoints": 30,
+      "televotePoints": 45
   },
   {
-    name: 'North MacedoniaN.Macedonia',
-    points: 47,
+      "name": "Georgia",
+      "juryPoints": 21,
+      "televotePoints": 53
   },
   {
-    name: 'France',
-    points: 40,
+      "name": "Estonia",
+      "juryPoints": 6,
+      "televotePoints": 43
   },
   {
-    name: 'United KingdomUK',
-    points: 29,
-  },
-  {
-    name: 'Poland',
-    points: 27,
-  },
-  {
-    name: 'Romania',
-    points: 18,
-  },
-  {
-    name: 'Iceland',
-    points: 16,
-  },
-  {
-    name: 'Netherlands',
-    points: 11,
-  },
-  {
-    name: 'Austria',
-    points: 9,
-  },
-  {
-    name: 'Belgium',
-    points: 7,
-  },
-  {
-    name: 'Ireland',
-    points: 7,
-  },
-  {
-    name: 'Norway',
-    points: 3,
-  },
-];
+      "name": "Ireland",
+      "juryPoints": 8,
+      "televotePoints": 34
+  }
+]
 
-const nonFinalists: { name: string; points: number }[] = [
+const nonFinalists: { name: string; points: number }[] = IS_JESC ? [] : [
   {
     name: 'Estonia',
     points: 57,
@@ -221,7 +227,7 @@ const main = () => {
   const TARGET_MIN_ODDS = 1;
   const TARGET_MAX_ODDS = 99;
   const NON_FINALIST_MAX_ODDS = 20;
-  const FINALIST_MIN_ODDS = 20;
+  const FINALIST_MIN_ODDS = IS_JESC ? 5 : 20;
 
   const normalize = (
     value: number,

@@ -42,7 +42,7 @@ const VotingButtons = () => {
         <TelevoteInput />
       )}
 
-      <div className="w-full bg-slate-600 h-[1px] lg:my-4 my-3"></div>
+      <div className="w-full bg-white/15 h-[1px] lg:my-4 my-3"></div>
       <div className="lg:px-4 px-3">
         <Button
           label="Finish randomly"

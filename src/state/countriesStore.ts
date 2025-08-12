@@ -7,7 +7,7 @@ import {
   ALL_COUNTRIES,
   COMMON_COUNTRIES,
 } from '../data/countries/common-countries';
-import { getCountriesByYear } from '../data/data';
+import { getCountriesByPreset } from '../data/data';
 import {
   deleteCustomCountryFromDB,
   getCustomCountries,
@@ -54,7 +54,10 @@ interface CountriesState {
   setSelectedCountries: (countries: BaseCountry[]) => void;
   getAutoQualifiedCountries: () => BaseCountry[];
   updateCountriesForYear: (year: Year) => void;
-  setInitialCountriesForYear: (year: Year) => void;
+  setInitialCountriesForYear: (
+    year: Year,
+    options?: { force?: boolean; isJuniorContest?: boolean },
+  ) => void;
   addCustomCountry: (
     country: Omit<BaseCountry, 'code' | 'category'>,
   ) => Promise<void>;
@@ -126,7 +129,7 @@ export const useCountriesStore = create<CountriesState>()(
 
       getInitialVotingCountries: (stageId: StageId) => {
         const { allCountriesForYear } = get();
-        const { year } = useGeneralStore.getState();
+        const { year, settings: {isJuniorContest} } = useGeneralStore.getState();
 
         const allCountriesForYearCopy = [...allCountriesForYear];
 
@@ -157,8 +160,9 @@ export const useCountriesStore = create<CountriesState>()(
           );
         }
 
+
         const restOfWorld = COMMON_COUNTRIES['RestOfWorld'];
-        const shouldAddRestOfWorld = Number(year) >= 2023;
+        const shouldAddRestOfWorld =!isJuniorContest && Number(year) >= 2023;
 
         if (
           restOfWorld &&
@@ -240,7 +244,8 @@ export const useCountriesStore = create<CountriesState>()(
       },
 
       updateCountriesForYear: (year: Year) => {
-        const countries = getCountriesByYear(year);
+        const { settings } = useGeneralStore.getState();
+        const countries = getCountriesByPreset(year, settings.isJuniorContest);
 
         const initialOdds: Record<
           string,
@@ -292,10 +297,18 @@ export const useCountriesStore = create<CountriesState>()(
         }));
       },
 
-      setInitialCountriesForYear: (year: Year) => {
-        if (get().allCountriesForYear.length > 0) return;
+      setInitialCountriesForYear: (year: Year, options?: { force?: boolean; isJuniorContest?: boolean }) => {
+        const { force = false, isJuniorContest } = options || {};
 
-        const countries = getCountriesByYear(year);
+        if (!force && get().allCountriesForYear.length > 0) return;
+
+        const { settings } = useGeneralStore.getState();
+        const effectiveIsJunior =
+          typeof isJuniorContest === 'boolean'
+            ? isJuniorContest
+            : settings.isJuniorContest;
+
+        const countries = getCountriesByPreset(year, effectiveIsJunior);
 
         const initialOdds: Record<
           string,

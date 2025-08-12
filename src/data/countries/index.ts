@@ -23,6 +23,10 @@ export { COUNTRIES_2023 } from './countries-2023';
 export { COUNTRIES_2024 } from './countries-2024';
 export { COUNTRIES_2025 } from './countries-2025';
 
+// JESC
+export { JUNIOR_COUNTRIES_2023 } from './junior-countries-2023';
+export { JUNIOR_COUNTRIES_2024 } from './junior-countries-2024';
+
 /*
 From https://eurovisionworld.com/eurovision/2022
 Script for getting countries from the table:

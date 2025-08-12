@@ -47,6 +47,7 @@ export const HostingCountrySelect: React.FC = () => {
           getImageClassName={(option) =>
             option.isExisting ? 'w-8 h-8 !object-contain' : 'w-8 h-6'
           }
+          selectClassName="!shadow-none"
         />
       )}
     </>
