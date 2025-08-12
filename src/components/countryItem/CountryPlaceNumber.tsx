@@ -111,7 +111,7 @@ const CountryPlaceNumber = ({
       }`}
     >
       <ArrowIcon
-        className={`text-white 2cols:w-8 w-7 2cols:h-8 h-7 -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 ${
+        className={`text-countryItem-placeText 2cols:w-8 w-7 2cols:h-8 h-7 -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 ${
           displayArrow ? 'blinker' : 'opacity-0'
         }`}
       />

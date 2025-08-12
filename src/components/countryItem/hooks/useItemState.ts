@@ -39,7 +39,7 @@ export const useItemState = ({
 
   const buttonColors = useMemo(() => {
     if (shouldShowAsNonQualified) {
-      return `bg-countryItem-unqualifiedBg text-countryItem-televoteFinishedText opacity-70 ${
+      return `bg-countryItem-unqualifiedBg text-countryItem-unqualifiedText opacity-70 ${
         showPlaceAnimation ? '!opacity-70' : ''
       }`;
     }

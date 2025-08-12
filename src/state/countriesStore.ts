@@ -129,7 +129,7 @@ export const useCountriesStore = create<CountriesState>()(
 
       getInitialVotingCountries: (stageId: StageId) => {
         const { allCountriesForYear } = get();
-        const { year } = useGeneralStore.getState();
+        const { year, settings: {isJuniorContest} } = useGeneralStore.getState();
 
         const allCountriesForYearCopy = [...allCountriesForYear];
 
@@ -160,8 +160,9 @@ export const useCountriesStore = create<CountriesState>()(
           );
         }
 
+
         const restOfWorld = COMMON_COUNTRIES['RestOfWorld'];
-        const shouldAddRestOfWorld = Number(year) >= 2023;
+        const shouldAddRestOfWorld =!isJuniorContest && Number(year) >= 2023;
 
         if (
           restOfWorld &&

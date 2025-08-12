@@ -87,89 +87,84 @@ const finalists: (
     }
 )[] = [
   {
-    "name": "Georgia",
-    "juryPoints": 180,
-    "televotePoints": 59
+      "name": "France",
+      "juryPoints": 136,
+      "televotePoints": 92
   },
   {
-    "name": "Portugal",
-    "juryPoints": 96,
-    "televotePoints": 117
+      "name": "Spain",
+      "juryPoints": 115,
+      "televotePoints": 86
   },
   {
-    "name": "Ukraine",
-    "juryPoints": 122,
-    "televotePoints": 81
+      "name": "Armenia",
+      "juryPoints": 116,
+      "televotePoints": 64
   },
   {
-    "name": "France",
-    "juryPoints": 103,
-    "televotePoints": 74
+      "name": "United KingdomUK",
+      "juryPoints": 102,
+      "televotePoints": 58
   },
   {
-    "name": "Malta",
-    "juryPoints": 74,
-    "televotePoints": 79
+      "name": "Ukraine",
+      "juryPoints": 45,
+      "televotePoints": 83
   },
   {
-    "name": "Spain",
-    "juryPoints": 80,
-    "televotePoints": 64
+      "name": "Poland",
+      "juryPoints": 69,
+      "televotePoints": 55
   },
   {
-    "name": "Albania",
-    "juryPoints": 82,
-    "televotePoints": 44
+      "name": "Netherlands",
+      "juryPoints": 52,
+      "televotePoints": 70
   },
   {
-    "name": "Armenia",
-    "juryPoints": 76,
-    "televotePoints": 49
+      "name": "Albania",
+      "juryPoints": 70,
+      "televotePoints": 45
   },
   {
-    "name": "Italy",
-    "juryPoints": 52,
-    "televotePoints": 46
+      "name": "Germany",
+      "juryPoints": 33,
+      "televotePoints": 74
   },
   {
-    "name": "Netherlands",
-    "juryPoints": 34,
-    "televotePoints": 57
+      "name": "Malta",
+      "juryPoints": 51,
+      "televotePoints": 43
   },
   {
-    "name": "Germany",
-    "juryPoints": 14,
-    "televotePoints": 57
+      "name": "Italy",
+      "juryPoints": 37,
+      "televotePoints": 44
   },
   {
-    "name": "Poland",
-    "juryPoints": 13,
-    "televotePoints": 48
+      "name": "North MacedoniaN.Macedonia",
+      "juryPoints": 37,
+      "televotePoints": 39
   },
   {
-    "name": "Cyprus",
-    "juryPoints": 10,
-    "televotePoints": 50
+      "name": "Portugal",
+      "juryPoints": 30,
+      "televotePoints": 45
   },
   {
-    "name": "Estonia",
-    "juryPoints": 14,
-    "televotePoints": 41
+      "name": "Georgia",
+      "juryPoints": 21,
+      "televotePoints": 53
   },
   {
-    "name": "Ireland",
-    "juryPoints": 15,
-    "televotePoints": 40
+      "name": "Estonia",
+      "juryPoints": 6,
+      "televotePoints": 43
   },
   {
-    "name": "North MacedoniaN.Macedonia",
-    "juryPoints": 20,
-    "televotePoints": 34
-  },
-  {
-    "name": "San Marino",
-    "juryPoints": 1,
-    "televotePoints": 46
+      "name": "Ireland",
+      "juryPoints": 8,
+      "televotePoints": 34
   }
 ]
 

@@ -29,6 +29,7 @@ type CustomSelectProps = {
   id?: string;
   label?: string;
   getImageClassName?: (option: Option) => string;
+  selectClassName?: string;
 };
 
 const getThemeColor = (year: string) => {
@@ -41,11 +42,14 @@ const SelectDisplay: React.FC<{
   value: string;
   options: Option[];
   getImageClassName?: (option: Option) => string;
-}> = ({ value, options, getImageClassName }) => {
+  selectClassName?: string;
+}> = ({ value, options, getImageClassName, selectClassName }) => {
   const selectedOption = options.find((option) => option.value === value);
 
   return (
-    <div className="select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer">
+    <div
+      className={`select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer ${selectClassName}`}
+    >
       <div className="flex items-center">
         {selectedOption?.imageUrl ? (
           <img
@@ -107,6 +111,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   id,
   label,
   getImageClassName,
+  selectClassName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -219,6 +224,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         value={value}
         options={groups ? groups.flatMap((g) => g.options) : options}
         getImageClassName={getImageClassName}
+        selectClassName={selectClassName}
       />
       <select
         value={value}
@@ -297,6 +303,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             value={value}
             options={groups ? groups.flatMap((g) => g.options) : options}
             getImageClassName={getImageClassName}
+            selectClassName={selectClassName}
           />
         )}
         {isOpen &&

@@ -45,6 +45,7 @@ export const PhaseActions = () => {
   const hasWinner = !!winnerCountry;
 
   const isSFAndGFEventOver =
+    eventStages.length > 1 &&
     isVotingOver &&
     isLastStage &&
     hasWinner &&
