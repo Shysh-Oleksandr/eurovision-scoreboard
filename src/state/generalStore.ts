@@ -4,7 +4,7 @@ import { devtools, persist } from 'zustand/middleware';
 
 import { WHATS_NEW } from '../components/feedbackInfo/data';
 import { Year } from '../config';
-import { POINTS_ARRAY, SUPPORTED_YEARS } from '../data/data';
+import { ALL_THEMES, POINTS_ARRAY } from '../data/data';
 import { getThemeForYear } from '../theme/themes';
 import { getHostingCountryByYear } from '../theme/hosting';
 import { Theme } from '../theme/types';
@@ -28,7 +28,8 @@ interface Settings {
   shouldShowHeartFlagIcon: boolean;
   showHostingCountryLogo: boolean;
   hostingCountryCode: string;
-  contestName: string;
+  contestName: string; // 'Eurovision' | 'Junior Eurovision'
+  isJuniorContest: boolean;
   contestYear: string;
   shouldLimitManualTelevotePoints: boolean;
 }
@@ -43,7 +44,7 @@ interface GeneralState {
   lastSeenUpdate: string | null;
   shouldShowNewChangesIndicator: boolean;
   year: Year;
-  themeYear: Year;
+  themeYear: string;
   theme: Theme;
   settings: Settings;
   pointsSystem: PointsItem[]; // used during simulation
@@ -57,7 +58,7 @@ interface GeneralState {
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
   setYear: (year: Year) => void;
-  setTheme: (year: Year) => void;
+  setTheme: (year: string, isJuniorTheme?: boolean) => void;
   setSettings: (settings: Partial<Settings>) => void;
   setPointsSystem: (points: PointsItem[]) => void;
   setSettingsPointsSystem: (points: PointsItem[]) => void;
@@ -113,6 +114,7 @@ export const useGeneralStore = create<GeneralState>()(
           shouldShowHeartFlagIcon: false,
           hostingCountryCode: 'CH', // Switzerland for 2025
           contestName: 'Eurovision',
+          isJuniorContest: false,
           contestYear: INITIAL_YEAR,
           shouldLimitManualTelevotePoints: true,
         },
@@ -132,11 +134,13 @@ export const useGeneralStore = create<GeneralState>()(
           }
         },
         setYear: (year: Year) => {
+          const isJunior = get().settings.isJuniorContest;
+
           set({
             year: year,
             settings: {
               ...get().settings,
-              hostingCountryCode: getHostingCountryByYear(year).code,
+              hostingCountryCode: getHostingCountryByYear(year, isJunior).code,
               contestYear: year,
             },
           });
@@ -144,10 +148,10 @@ export const useGeneralStore = create<GeneralState>()(
           useCountriesStore.getState().updateCountriesForYear(year);
           useScoreboardStore.getState().setCurrentStageId(null);
         },
-        setTheme: (year: Year) => {
+        setTheme: (year: string) => {
           // Remove all theme classes
           document.documentElement.classList.remove(
-            ...SUPPORTED_YEARS.map((y) => `theme-${y}`),
+            ...ALL_THEMES.map((y) => `theme-${y}`),
           );
           // Add the new theme class
           document.documentElement.classList.add(`theme-${year}`);
@@ -199,7 +203,17 @@ export const useGeneralStore = create<GeneralState>()(
         },
         onRehydrateStorage: () => (state) => {
           if (state) {
-            useCountriesStore.getState().setInitialCountriesForYear(state.year);
+            const isJunior = state.settings?.isJuniorContest ?? false;
+            useCountriesStore
+              .getState()
+              .setInitialCountriesForYear(state.year, {
+                force: true,
+                isJuniorContest: isJunior,
+              });
+
+            // Ensure theme is consistent; fallback to standard theme for the year
+            const theme = getThemeForYear(state.themeYear ?? state.year);
+            useGeneralStore.setState({ theme });
           }
         },
         merge: (persistedState, currentState) => {
@@ -212,9 +226,16 @@ export const useGeneralStore = create<GeneralState>()(
             state.settingsPointsSystem || initialPointsSystem;
 
 
-          const settings = {
+          const persistedSettings = {
             ...currentState.settings,
             ...state.settings,
+          };
+
+          const isJunior = persistedSettings.isJuniorContest ?? false;
+          const settings = {
+            ...persistedSettings,
+            isJuniorContest: isJunior,
+            contestYear: year,
           };
 
           return {
@@ -233,4 +254,12 @@ export const useGeneralStore = create<GeneralState>()(
   ),
 );
 
-useCountriesStore.getState().setInitialCountriesForYear(INITIAL_YEAR);
+// Initialize once at app startup using current settings.
+// We must pass the correct contest type to avoid defaulting to ESC.
+(() => {
+  const { settings, year } = useGeneralStore.getState();
+  useCountriesStore.getState().setInitialCountriesForYear(year, {
+    force: true,
+    isJuniorContest: settings.isJuniorContest,
+  });
+})();

@@ -33,9 +33,8 @@ export const useCountryAssignments = (eventStages: EventStage[]) => {
       return;
     }
 
-    const hasSemiFinals = eventStages.some((s) => s.id !== StageId.GF);
-
-    if (eventStages.length === 0 || !hasSemiFinals) {
+    // Initialize assignments even if there are no semi-finals (e.g. JESC)
+    if (eventStages.length === 0) {
       return;
     }
 
@@ -66,7 +65,7 @@ export const useCountryAssignments = (eventStages: EventStage[]) => {
 
       // GRAND_FINAL_ONLY initialization
       if (countryData) {
-        if (countryData.isQualified) {
+        if (countryData.isQualified || countryData.isAutoQualified) {
           grandFinalOnlyInitialAssignments[country.code] = StageId.GF;
         } else {
           grandFinalOnlyInitialAssignments[country.code] =

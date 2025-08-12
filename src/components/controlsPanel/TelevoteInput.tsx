@@ -183,7 +183,7 @@ const TelevoteInput = () => {
         Enter televote points
       </label>
 
-      <h5 className="uppercase text-slate-400 lg:text-sm text-xs mt-2 mb-1">
+      <h5 className="uppercase text-white/50 lg:text-sm text-xs mt-2 mb-1">
         <span className="font-medium">
           {getSequenceNumber(televotingProgress + 1)}
         </span>{' '}

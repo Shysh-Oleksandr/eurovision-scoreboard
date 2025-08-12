@@ -63,4 +63,4 @@ export interface Theme {
   backgroundImage: string;
 }
 
-export type ThemeRecord = Record<Year, Theme>;
+export type ThemeRecord = Record<string, Theme>;
