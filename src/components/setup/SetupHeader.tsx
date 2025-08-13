@@ -11,7 +11,11 @@ import { StageId } from '../../models';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import { getHostingCountryByYear } from '../../theme/hosting';
-import { ESC_YEARS_WITH_THEME, YEARS_WITH_THEME } from '../../theme/themes';
+import {
+  ESC_YEARS_WITH_THEME,
+  JUNIOR_YEARS_WITH_THEME,
+  YEARS_WITH_THEME,
+} from '../../theme/themes';
 import Button from '../common/Button';
 import CustomSelect from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
@@ -38,10 +42,14 @@ const themeOptions = ESC_YEARS_WITH_THEME.map((year) => ({
   label: year.toString(),
 }));
 
-const jescThemeOptions = JUNIOR_SUPPORTED_YEARS.map((year) => ({
-  value: `${JUNIOR_THEME_PREFIX}${year}`,
-  label: year.toString(),
-}));
+const jescThemeOptions = JUNIOR_YEARS_WITH_THEME.map((year) => {
+  const yearNumber = parseInt(year.replace(JUNIOR_THEME_PREFIX, ''));
+
+  return {
+    value: `${JUNIOR_THEME_PREFIX}${yearNumber}`,
+    label: yearNumber.toString(),
+  };
+});
 
 type SetupHeaderProps = {
   openSettingsModal: () => void;

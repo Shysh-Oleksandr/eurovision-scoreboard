@@ -24,6 +24,13 @@ export { COUNTRIES_2024 } from './countries-2024';
 export { COUNTRIES_2025 } from './countries-2025';
 
 // JESC
+export { JUNIOR_COUNTRIES_2016 } from './junior-countries-2016';
+export { JUNIOR_COUNTRIES_2017 } from './junior-countries-2017';
+export { JUNIOR_COUNTRIES_2018 } from './junior-countries-2018';
+export { JUNIOR_COUNTRIES_2019 } from './junior-countries-2019';
+export { JUNIOR_COUNTRIES_2020 } from './junior-countries-2020';
+export { JUNIOR_COUNTRIES_2021 } from './junior-countries-2021';
+export { JUNIOR_COUNTRIES_2022 } from './junior-countries-2022';
 export { JUNIOR_COUNTRIES_2023 } from './junior-countries-2023';
 export { JUNIOR_COUNTRIES_2024 } from './junior-countries-2024';
 

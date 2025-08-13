@@ -35,6 +35,13 @@ const hostingLogosByYear: Record<Year, HostingCountryData> = {
 };
 
 const juniorHostingLogosByYear: Record<string, HostingCountryData> = {
+  '2016': { code: 'MT', logo: '/hostingCountryLogos/EuroMalta.svg' },
+  '2017': { code: 'GE', logo: '/hostingCountryLogos/EuroGeorgia.svg' },
+  '2018': { code: 'BY', logo: '/hostingCountryLogos/EuroBielorrusia.svg' },
+  '2019': { code: 'PL', logo: '/hostingCountryLogos/EuroPolonia.svg' },
+  '2020': { code: 'PL', logo: '/hostingCountryLogos/EuroPolonia.svg' },
+  '2021': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
+  '2022': { code: 'AM', logo: '/hostingCountryLogos/EuroArmenia.svg' },
   '2023': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
   '2024': { code: 'ES', logo: '/hostingCountryLogos/EuroSpain.svg' },
 };

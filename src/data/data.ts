@@ -24,6 +24,13 @@ import {
   COUNTRIES_2023,
   COUNTRIES_2024,
   COUNTRIES_2025,
+  JUNIOR_COUNTRIES_2016,
+  JUNIOR_COUNTRIES_2017,
+  JUNIOR_COUNTRIES_2018,
+  JUNIOR_COUNTRIES_2019,
+  JUNIOR_COUNTRIES_2020,
+  JUNIOR_COUNTRIES_2021,
+  JUNIOR_COUNTRIES_2022,
   JUNIOR_COUNTRIES_2023,
   JUNIOR_COUNTRIES_2024,
 } from './countries';
@@ -33,7 +40,7 @@ import { PointsItem } from '@/state/generalStore';
 export const SUPPORTED_YEARS = Array.from({ length: 22 }, (_, i) => 2004 + i);
 
 // Junior Eurovision years supported in the app
-export const JUNIOR_SUPPORTED_YEARS: Year[] = ['2023', '2024'];
+export const JUNIOR_SUPPORTED_YEARS = Array.from({ length: 9 }, (_, i) => 2016 + i);
 
 export const JUNIOR_THEME_PREFIX = 'JESC-';
 
@@ -95,6 +102,20 @@ export const getCountriesByPreset = (
 ): BaseCountry[] => {
   if (isJuniorContest) {
     switch (year) {
+      case '2016':
+        return JUNIOR_COUNTRIES_2016;
+      case '2017':
+        return JUNIOR_COUNTRIES_2017;
+      case '2018':
+        return JUNIOR_COUNTRIES_2018;
+      case '2019':
+        return JUNIOR_COUNTRIES_2019;
+      case '2020':
+        return JUNIOR_COUNTRIES_2020;
+      case '2021':
+        return JUNIOR_COUNTRIES_2021;
+      case '2022':
+        return JUNIOR_COUNTRIES_2022;
       case '2023':
         return JUNIOR_COUNTRIES_2023;
       case '2024':

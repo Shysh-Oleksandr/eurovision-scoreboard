@@ -87,84 +87,89 @@ const finalists: (
     }
 )[] = [
   {
-      "name": "France",
-      "juryPoints": 136,
-      "televotePoints": 92
+    "name": "Georgia",
+    "juryPoints": 144,
+    "televotePoints": 83
   },
   {
-      "name": "Spain",
-      "juryPoints": 115,
-      "televotePoints": 86
+    "name": "Armenia",
+    "juryPoints": 99,
+    "televotePoints": 110
   },
   {
-      "name": "Armenia",
-      "juryPoints": 116,
-      "televotePoints": 64
+    "name": "Italy",
+    "juryPoints": 84,
+    "televotePoints": 103
   },
   {
-      "name": "United KingdomUK",
-      "juryPoints": 102,
-      "televotePoints": 58
+    "name": "Russia",
+    "juryPoints": 68,
+    "televotePoints": 105
   },
   {
-      "name": "Ukraine",
-      "juryPoints": 45,
-      "televotePoints": 83
+    "name": "Australia",
+    "juryPoints": 86,
+    "televotePoints": 99
   },
   {
-      "name": "Poland",
-      "juryPoints": 69,
-      "televotePoints": 55
+    "name": "Malta",
+    "juryPoints": 80,
+    "televotePoints": 105
   },
   {
-      "name": "Netherlands",
-      "juryPoints": 52,
-      "televotePoints": 70
+    "name": "Belarus",
+    "juryPoints": 92,
+    "televotePoints": 65
   },
   {
-      "name": "Albania",
-      "juryPoints": 70,
-      "televotePoints": 45
+    "name": "Netherlands",
+    "juryPoints": 94,
+    "televotePoints": 65
   },
   {
-      "name": "Germany",
-      "juryPoints": 33,
-      "televotePoints": 74
+    "name": "Bulgaria",
+    "juryPoints": 78,
+    "televotePoints": 68
   },
   {
-      "name": "Malta",
-      "juryPoints": 51,
-      "televotePoints": 43
+    "name": "Ireland",
+    "juryPoints": 56,
+    "televotePoints": 57
   },
   {
-      "name": "Italy",
-      "juryPoints": 37,
-      "televotePoints": 44
+    "name": "Poland",
+    "juryPoints": 21,
+    "televotePoints": 36
   },
   {
-      "name": "North MacedoniaN.Macedonia",
-      "juryPoints": 37,
-      "televotePoints": 39
+    "name": "North MacedoniaN.Macedonia",
+    "juryPoints": 17,
+    "televotePoints": 24
   },
   {
-      "name": "Portugal",
-      "juryPoints": 30,
-      "televotePoints": 45
+    "name": "Albania",
+    "juryPoints": 23,
+    "televotePoints": 13
   },
   {
-      "name": "Georgia",
-      "juryPoints": 21,
-      "televotePoints": 53
+    "name": "Ukraine",
+    "juryPoints": 18,
+    "televotePoints": 12
   },
   {
-      "name": "Estonia",
-      "juryPoints": 6,
-      "televotePoints": 43
+    "name": "Israel",
+    "juryPoints": 6,
+    "televotePoints": 20
   },
   {
-      "name": "Ireland",
-      "juryPoints": 8,
-      "televotePoints": 34
+    "name": "Cyprus",
+    "juryPoints": 15,
+    "televotePoints": 12
+  },
+  {
+    "name": "Serbia",
+    "juryPoints": 5,
+    "televotePoints": 9
   }
 ]
 

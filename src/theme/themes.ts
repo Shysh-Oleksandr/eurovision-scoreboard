@@ -700,6 +700,7 @@ export const themes = {
 
 export const YEARS_WITH_THEME = Object.keys(themes);
 export const ESC_YEARS_WITH_THEME = Object.keys(escThemes);
+export const JUNIOR_YEARS_WITH_THEME = Object.keys(juniorThemes);
 
 // Helper function to get theme for any year
 export function getThemeForYear(year: string) {

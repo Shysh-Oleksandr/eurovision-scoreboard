@@ -1,0 +1,102 @@
+import { BaseCountry } from '../../models';
+
+import { COMMON_COUNTRIES } from './common-countries';
+
+export const JUNIOR_COUNTRIES_2020: BaseCountry[] = [
+  {
+    ...COMMON_COUNTRIES.France,
+    juryOdds: 99,
+    televoteOdds: 99,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 11,
+  },
+  {
+    ...COMMON_COUNTRIES.Kazakhstan,
+    juryOdds: 91.5,
+    televoteOdds: 43.5,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 1,
+  },
+  {
+    ...COMMON_COUNTRIES.Spain,
+    juryOdds: 56,
+    televoteOdds: 49,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 9,
+  },
+  {
+    ...COMMON_COUNTRIES.Netherlands,
+    juryOdds: 68,
+    televoteOdds: 37,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 2,
+  },
+  {
+    ...COMMON_COUNTRIES.Belarus,
+    juryOdds: 76,
+    televoteOdds: 28,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 4,
+  },
+  {
+    ...COMMON_COUNTRIES.Georgia,
+    juryOdds: 69.5,
+    televoteOdds: 9,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 6,
+  },
+  {
+    ...COMMON_COUNTRIES.Ukraine,
+    juryOdds: 43.5,
+    televoteOdds: 24.5,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 10,
+  },
+  {
+    ...COMMON_COUNTRIES.Malta,
+    juryOdds: 42,
+    televoteOdds: 18,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 7,
+  },
+  {
+    ...COMMON_COUNTRIES.Poland,
+    juryOdds: 34.5,
+    televoteOdds: 11.5,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 5,
+  },
+  {
+    ...COMMON_COUNTRIES.Russia,
+    juryOdds: 31,
+    televoteOdds: 11.5,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 8,
+  },
+  {
+    ...COMMON_COUNTRIES.Serbia,
+    juryOdds: 17.5,
+    televoteOdds: 19,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 3,
+  },
+  {
+    ...COMMON_COUNTRIES.Germany,
+    juryOdds: 5,
+    televoteOdds: 5,
+    isQualified: true,
+    isAutoQualified: true,
+    spokespersonOrder: 0,
+  }
+]
