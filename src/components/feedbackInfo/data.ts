@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-13',
+    title:
+      'Added the 2016-2022 JESC presets and 2021-2022 themes',
+  },    
+  {
     date: '2025-08-12',
     title:
       'Added the Junior Eurovision support with custom themes for 2023 and 2024',
@@ -117,10 +122,6 @@ export const WHATS_NEW = [
 ];
 
 export const UPCOMING_FEATURES = [
-  {
-    approximateDates: { start: '2025-08-13', end: '2025-08-15' },
-    title: 'More JESC years. A few more themes',
-  }, 
   {
     approximateDates: { start: '2025-08-15', end: '2025-08-17' },
     title: 'Save and load contest presets',

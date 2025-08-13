@@ -49,6 +49,7 @@ export interface ThemeColors {
 
     placeContainerBg: string;
     placeText: string;
+    unqualifiedPlaceText: string;
   };
   panelInfo: {
     activeBg: string;

@@ -107,7 +107,9 @@ const CountryPlaceNumber = ({
     <div
       ref={containerRef}
       className={`flex flex-none items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText relative ${
-        shouldShowAsNonQualified ? 'bg-primary-900 opacity-70' : ''
+        shouldShowAsNonQualified
+          ? 'bg-primary-900 opacity-70 text-countryItem-unqualifiedPlaceText'
+          : ''
       }`}
     >
       <ArrowIcon

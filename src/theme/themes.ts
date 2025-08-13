@@ -3,6 +3,64 @@ import { ThemeRecord } from './types';
 
 // Junior Eurovision specific themes for select years (merged under keys like JESC-<year>)
 const juniorThemes: Partial<ThemeRecord> = {
+  'JESC-2021': {
+    colors: {
+      primary: {
+        700: 'hsl(35, 86%, 47%)',
+        750: 'hsl(35, 62%, 38%)',
+        800: 'hsl(35, 61%, 28%)',
+        900: 'hsl(35, 64%, 21%)',
+        950: 'hsl(35, 67%, 12%)',
+      },
+      gray: {
+        500: 'hsl(35, 42%, 68%)',
+        600: 'hsl(35, 29%, 51%)',
+        900: 'hsl(35, 35%, 35%)',
+      },
+      appBgColor: '#13076e',
+      animatedBorder: 'hsl(35, 98%, 79%)',
+      countryItem: {
+        juryBg: 'hsl(228, 88%, 35%)',
+        juryHoverBg: 'hsl(228, 88%, 30%)',
+        juryCountryText: '#dff9ff',
+        juryPointsBg: '#3767cb',
+        juryPointsText: '#dff9ff',
+        juryLastPointsBg: '#bcb077',
+        juryLastPointsText: '#5f3e06',
+        televoteUnfinishedBg: 'hsl(228, 88%, 35%)',
+        televoteUnfinishedText: '#dff9ff',
+        televoteUnfinishedPointsBg: '#3767cb',
+        televoteUnfinishedPointsText: '#dff9ff',
+        televoteActiveBg: 'hsl(228, 86%, 59%)',
+        televoteActiveText: '#dff9ff',
+        televoteActivePointsBg: '#3767cb',
+        televoteActivePointsText: '#dff9ff',
+        televoteOutline: 'hsl(205, 98%, 62%)',
+        televoteFinishedBg: '#bcb077',
+        televoteFinishedText: '#5f3e06',
+        televoteFinishedPointsBg: '#b8a64c',
+        televoteFinishedPointsText: '#5f3e06',
+        televoteLastPointsBg: '#3767cb',
+        televoteLastPointsText: '#dff9ff',
+        douzePointsBg: '#bea676',
+        douzePointsText: '#5f3e06',
+        douzePointsBlock1: 'hsl(35, 61%, 28%)',
+        douzePointsBlock2: '#3767cb',
+        placeContainerBg: '#bcb077',
+        placeText: '#5f3e06',
+        unqualifiedBg: 'hsl(228, 61%, 36%)',
+        unqualifiedText: '#dff9ff',
+        unqualifiedPlaceText: "#dff9ff",
+      },
+      panelInfo: {
+        activeBg: '#bcb077',
+        activeText: '#5f3e06',
+        inactiveText: '#5c7bc1',
+        inactiveBg: '#112a90',
+      },
+    },
+    backgroundImage: '/bgImages/TowerJescBg2021.webp',
+  },   
   'JESC-2022': {
     colors: {
       primary: {
@@ -50,6 +108,7 @@ const juniorThemes: Partial<ThemeRecord> = {
         placeText: '#ffdead',
         unqualifiedBg: 'hsl(214, 61%, 36%)',
         unqualifiedText: '#dff9ff',
+        unqualifiedPlaceText: "#dff9ff",
       },
       panelInfo: {
         activeBg: 'hsl(335, 86%, 32%)',
@@ -107,6 +166,7 @@ const juniorThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(188, 100%, 93%)',
         unqualifiedBg: 'hsl(205, 61%, 36%)',
         unqualifiedText: 'hsl(188, 100%, 93%)',
+        unqualifiedPlaceText: "hsl(188, 100%, 93%)",
       },
       panelInfo: {
         activeBg: 'hsl(205, 86%, 32%)',
@@ -164,6 +224,7 @@ const juniorThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(310, 100%, 98%)',
         unqualifiedBg: 'hsl(310, 51%, 30%)',
         unqualifiedText: 'hsl(310, 100%, 98%)',
+        unqualifiedPlaceText: "hsl(310, 100%, 98%)",
       },
       panelInfo: {
         activeBg: 'hsl(310, 86%, 32%)',
@@ -224,6 +285,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(180, 100%, 98%)',
         unqualifiedBg: 'hsl(211, 61%, 24%)',
         unqualifiedText: 'hsl(180, 100%, 98%)',
+        unqualifiedPlaceText: "hsl(180, 100%, 98%)",
       },
       panelInfo: {
         activeBg: 'hsl(309, 92%, 33%)',
@@ -281,6 +343,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(180, 10%, 90%)',
         unqualifiedBg: 'hsl(229, 86%, 22%)',
         unqualifiedText: 'hsl(180, 10%, 90%)',
+        unqualifiedPlaceText: "hsl(180, 10%, 90%)",
       },
       panelInfo: {
         activeBg: 'hsl(350, 69%, 41%)',
@@ -338,6 +401,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(208, 100%, 91%)',
         unqualifiedBg: 'hsl(218, 67%, 27%)',
         unqualifiedText: 'hsl(208, 100%, 91%)',
+        unqualifiedPlaceText: "hsl(208, 100%, 91%)",
       },
       panelInfo: {
         activeBg: 'hsl(55, 42%, 49%)',
@@ -395,6 +459,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(180, 100%, 97%)',
         unqualifiedBg: 'hsl(213, 79%, 30%)',
         unqualifiedText: 'hsl(180, 100%, 97%)',
+        unqualifiedPlaceText: "hsl(180, 100%, 97%)",
       },
       panelInfo: {
         activeBg: 'hsl(56, 10%, 72%)',
@@ -452,6 +517,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(0, 0%, 100%)',
         unqualifiedBg: 'hsl(226, 79%, 30%)',
         unqualifiedText: 'hsl(240, 85%, 97%)',
+        unqualifiedPlaceText: "hsl(240, 85%, 97%)",
       },
       panelInfo: {
         activeBg: 'hsl(319, 39%, 54%)',
@@ -509,6 +575,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(0, 0%, 100%)',
         unqualifiedBg: 'hsl(226, 79%, 30%)',
         unqualifiedText: 'hsl(240, 85%, 97%)',
+        unqualifiedPlaceText: "hsl(240, 85%, 97%)",
       },
       panelInfo: {
         activeBg: 'hsl(319, 39%, 54%)',
@@ -566,6 +633,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(272, 87%, 97%)',
         unqualifiedBg: 'hsl(319, 43%, 26%)',
         unqualifiedText: 'hsl(272, 87%, 97%)',
+        unqualifiedPlaceText: "hsl(272, 87%, 97%)",
       },
       panelInfo: {
         activeBg: 'hsl(163, 20%, 39%)',
@@ -623,6 +691,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(0, 0%, 100%)',
         unqualifiedBg: 'hsl(226, 77%, 38%)',
         unqualifiedText: 'hsl(0, 0%, 100%)',
+        unqualifiedPlaceText: "hsl(0, 0%, 100%)",
       },
       panelInfo: {
         activeBg: 'hsl(58, 100%, 50%)',
@@ -680,6 +749,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(330, 100%, 99%)',
         unqualifiedBg: 'hsl(266, 48%, 33%)',
         unqualifiedText: 'hsl(330, 100%, 99%)',
+        unqualifiedPlaceText: "hsl(330, 100%, 99%)",
       },
       panelInfo: {
         activeBg: 'hsl(271, 86%, 32%)',
@@ -737,6 +807,7 @@ export const escThemes: Partial<ThemeRecord> = {
         placeText: 'hsl(330, 100%, 99%)',
         unqualifiedBg: 'hsl(268, 71%, 35%)',
         unqualifiedText: 'hsl(0, 0%, 100%)',
+        unqualifiedPlaceText: "hsl(0, 0%, 100%)",
       },
       panelInfo: {
         activeBg: 'hsl(271, 86%, 32%)',
