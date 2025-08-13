@@ -2901,6 +2901,53 @@ video {
   --twc-panelInfo-inactiveBg: 274 71% 18%;
 }
 
+.theme-JESC-2022,[data-theme="JESC-2022"] {
+  --twc-primary-700: 335 86% 54%;
+  --twc-primary-750: 335 62% 41%;
+  --twc-primary-800: 335 61% 31%;
+  --twc-primary-900: 335 64% 21%;
+  --twc-primary-950: 335 67% 14%;
+  --twc-gray-500: 335 42% 68%;
+  --twc-gray-600: 335 29% 51%;
+  --twc-gray-900: 335 35% 35%;
+  --twc-appBgColor: 250 93.3% 17.6%;
+  --twc-animatedBorder: 45 98% 79%;
+  --twc-countryItem-juryBg: 214 88% 35%;
+  --twc-countryItem-juryHoverBg: 214 88% 30%;
+  --twc-countryItem-juryCountryText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-juryPointsBg: 214 88% 50%;
+  --twc-countryItem-juryPointsText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-juryLastPointsBg: 335 86% 42%;
+  --twc-countryItem-juryLastPointsText: 35.89999999999998 100% 83.9%;
+  --twc-countryItem-televoteUnfinishedBg: 214 88% 35%;
+  --twc-countryItem-televoteUnfinishedText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-televoteUnfinishedPointsBg: 214 88% 50%;
+  --twc-countryItem-televoteUnfinishedPointsText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-televoteActiveBg: 214 86% 59%;
+  --twc-countryItem-televoteActiveText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-televoteActivePointsBg: 214 88% 50%;
+  --twc-countryItem-televoteActivePointsText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-televoteOutline: 205 98% 62%;
+  --twc-countryItem-televoteFinishedBg: 335 86% 42%;
+  --twc-countryItem-televoteFinishedText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-televoteFinishedPointsBg: 335 86% 48%;
+  --twc-countryItem-televoteFinishedPointsText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-televoteLastPointsBg: 214 88% 50%;
+  --twc-countryItem-televoteLastPointsText: 191.29999999999995 100% 93.7%;
+  --twc-countryItem-douzePointsBg: 40 35.6% 60.4%;
+  --twc-countryItem-douzePointsText: 0 0% 0%;
+  --twc-countryItem-douzePointsBlock1: 335 86% 32%;
+  --twc-countryItem-douzePointsBlock2: 214 88% 50%;
+  --twc-countryItem-placeContainerBg: 335 86% 32%;
+  --twc-countryItem-placeText: 35.89999999999998 100% 83.9%;
+  --twc-countryItem-unqualifiedBg: 214 61% 36%;
+  --twc-countryItem-unqualifiedText: 191.29999999999995 100% 93.7%;
+  --twc-panelInfo-activeBg: 335 86% 32%;
+  --twc-panelInfo-activeText: 45.39999999999998 39% 58.8%;
+  --twc-panelInfo-inactiveText: 220 54.3% 58.8%;
+  --twc-panelInfo-inactiveBg: 239.39999999999998 87.2% 21.4%;
+}
+
 .theme-JESC-2023,[data-theme="JESC-2023"] {
   --twc-primary-700: 205 86% 59%;
   --twc-primary-750: 205 62% 46%;
@@ -2995,6 +3042,8 @@ video {
   --twc-panelInfo-inactiveBg: 310 68% 19%;
 }
 
+/* Webkit browsers */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -3024,6 +3073,26 @@ video {
 
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--twc-primary-750) / var(--twc-primary-750-opacity, 1));
+}
+
+/* Firefox */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--twc-primary-800) / var(--twc-primary-800-opacity, 1)) hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, 1));
+}
+
+@media (min-width: 1024px) {
+  * {
+    scrollbar-width: auto;
+    /* Let browser pick, as "thin" is not size-configurable */
+  }
+}
+
+.select,
+  .narrow-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--twc-primary-800) / var(--twc-primary-800-opacity, 1)) hsl(var(--twc-primary-900) / var(--twc-primary-900-opacity, 1));
 }
 
 /* Zero styles */

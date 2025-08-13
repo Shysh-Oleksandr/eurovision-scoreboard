@@ -220,6 +220,7 @@ h6 {
 }
 
 @layer utilities {
+  /* Webkit browsers */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -249,6 +250,24 @@ h6 {
 
   ::-webkit-scrollbar-thumb:hover {
     background: theme('colors.primary-750');
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.primary-800') theme('colors.primary-900');
+  }
+
+  @media (min-width: 1024px) {
+    * {
+      scrollbar-width: auto; /* Let browser pick, as "thin" is not size-configurable */
+    }
+  }
+
+  .select,
+  .narrow-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.primary-800') theme('colors.primary-900');
   }
 }
 

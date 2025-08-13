@@ -3,6 +3,63 @@ import { ThemeRecord } from './types';
 
 // Junior Eurovision specific themes for select years (merged under keys like JESC-<year>)
 const juniorThemes: Partial<ThemeRecord> = {
+  'JESC-2022': {
+    colors: {
+      primary: {
+        700: 'hsl(335, 86%, 54%)',
+        750: 'hsl(335, 62%, 41%)',
+        800: 'hsl(335, 61%, 31%)',
+        900: 'hsl(335, 64%, 21%)',
+        950: 'hsl(335, 67%, 14%)',
+      },
+      gray: {
+        500: 'hsl(335, 42%, 68%)',
+        600: 'hsl(335, 29%, 51%)',
+        900: 'hsl(335, 35%, 35%)',
+      },
+      appBgColor: '#110357',
+      animatedBorder: 'hsl(45, 98%, 79%)',
+      countryItem: {
+        juryBg: 'hsl(214, 88%, 35%)',
+        juryHoverBg: 'hsl(214, 88%, 30%)',
+        juryCountryText: '#dff9ff',
+        juryPointsBg: 'hsl(214, 88%, 50%)',
+        juryPointsText: '#dff9ff',
+        juryLastPointsBg: 'hsl(335, 86%, 42%)',
+        juryLastPointsText: '#ffdead',
+        televoteUnfinishedBg: 'hsl(214, 88%, 35%)',
+        televoteUnfinishedText: '#dff9ff',
+        televoteUnfinishedPointsBg: 'hsl(214, 88%, 50%)',
+        televoteUnfinishedPointsText: '#dff9ff',
+        televoteActiveBg: 'hsl(214, 86%, 59%)',
+        televoteActiveText: '#dff9ff',
+        televoteActivePointsBg: 'hsl(214, 88%, 50%)',
+        televoteActivePointsText: '#dff9ff',
+        televoteOutline: 'hsl(205, 98%, 62%)',
+        televoteFinishedBg: 'hsl(335, 86%, 42%)',
+        televoteFinishedText: '#dff9ff',
+        televoteFinishedPointsBg: 'hsl(335, 86%, 48%)',
+        televoteFinishedPointsText: '#dff9ff',
+        televoteLastPointsBg: 'hsl(214, 88%, 50%)',
+        televoteLastPointsText: '#dff9ff',
+        douzePointsBg: '#bea676',
+        douzePointsText: '#000000',
+        douzePointsBlock1: 'hsl(335, 86%, 32%)',
+        douzePointsBlock2: 'hsl(214, 88%, 50%)',
+        placeContainerBg: 'hsl(335, 86%, 32%)',
+        placeText: '#ffdead',
+        unqualifiedBg: 'hsl(214, 61%, 36%)',
+        unqualifiedText: '#dff9ff',
+      },
+      panelInfo: {
+        activeBg: 'hsl(335, 86%, 32%)',
+        activeText: '#bfab6d',
+        inactiveText: '#5d83cf',
+        inactiveBg: '#070866',
+      },
+    },
+    backgroundImage: '/bgImages/SpinJescBg2022.webp',
+  },  
   'JESC-2023': {
     colors: {
       primary: {
