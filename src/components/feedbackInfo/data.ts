@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-14',
+    title:
+      'Added the ability to use custom background images',
+  },    
+  {
     date: '2025-08-13',
     title:
       'Added the 2016-2022 JESC presets and 2021-2022 themes',
