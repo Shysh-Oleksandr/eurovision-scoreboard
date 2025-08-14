@@ -1,10 +1,12 @@
 import React from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
+import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
 import { CollapsibleSection } from '../common/CollapsibleSection';
 import { Tooltip } from '../common/Tooltip';
 
+import { BgImageSelect } from './BgImageSelect';
 import { ContestSettings } from './ContestSettings';
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
 
@@ -13,6 +15,7 @@ import { InfoIcon } from '@/assets/icons/InfoIcon';
 export const GeneralSettings: React.FC = () => {
   const settings = useGeneralStore((state) => state.settings);
   const setSettings = useGeneralStore((state) => state.setSettings);
+  const resetAllSettings = useGeneralStore((state) => state.resetAllSettings);
   const expansion = useGeneralStore((state) => state.generalSettingsExpansion);
   const setExpansion = useGeneralStore(
     (state) => state.setGeneralSettingsExpansion,
@@ -164,7 +167,20 @@ export const GeneralSettings: React.FC = () => {
             setSettings({ shouldShowManualTelevoteWarning: e.target.checked })
           }
         />
+        <BgImageSelect />
       </CollapsibleSection>
+
+      <Button
+        variant="tertiary"
+        className="w-full"
+        onClick={() => {
+          if (confirm('Are you sure you want to reset all settings?')) {
+            resetAllSettings();
+          }
+        }}
+      >
+        Reset All Settings
+      </Button>
     </div>
   );
 };

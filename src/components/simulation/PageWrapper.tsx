@@ -11,6 +11,12 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
   useThemeSetup();
   const themeYear = useGeneralStore((state) => state.themeYear);
   const theme = useGeneralStore((state) => state.theme);
+  const shouldUseCustomBgImage = useGeneralStore(
+    (state) => state.settings.shouldUseCustomBgImage,
+  );
+  const customBgImage = useGeneralStore(
+    (state) => state.settings.customBgImage,
+  );
 
   return (
     <div
@@ -18,7 +24,11 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
       id="main"
       style={{
         backgroundColor: theme.colors.appBgColor,
-        backgroundImage: `url(${theme.backgroundImage})`,
+        backgroundImage: `url(${
+          shouldUseCustomBgImage && customBgImage
+            ? customBgImage
+            : theme.backgroundImage
+        })`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

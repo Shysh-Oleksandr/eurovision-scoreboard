@@ -12,8 +12,30 @@ import { Theme } from '../theme/types';
 import { useCountriesStore } from './countriesStore';
 import { BaseCountry } from '@/models';
 import { useScoreboardStore } from './scoreboardStore';
+import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
 
 export const INITIAL_YEAR = '2025' as Year;
+
+export const DEFAULT_SETTINGS: Settings = {
+  alwaysShowRankings: true,
+  showQualificationModal: true,
+  showWinnerModal: true,
+  showWinnerConfetti: true,
+  enableFullscreen: false,
+  shouldShowBeforeUnloadWarning: true,
+  shouldShowResetWarning: true,
+  showRankChangeIndicator: true,
+  shouldShowManualTelevoteWarning: true,
+  showHostingCountryLogo: true,
+  shouldShowHeartFlagIcon: false,
+  shouldUseCustomBgImage: false,
+  customBgImage: null,
+  hostingCountryCode: 'CH', // Switzerland for 2025
+  contestName: 'Eurovision',
+  isJuniorContest: false,
+  contestYear: INITIAL_YEAR,
+  shouldLimitManualTelevotePoints: true,
+}
 
 interface Settings {
   alwaysShowRankings: boolean;
@@ -27,7 +49,9 @@ interface Settings {
   shouldShowManualTelevoteWarning: boolean;
   shouldShowHeartFlagIcon: boolean;
   showHostingCountryLogo: boolean;
-  hostingCountryCode: string;
+  hostingCountryCode: string;  
+  shouldUseCustomBgImage: boolean;
+  customBgImage: string | null;
   contestName: string; // 'Eurovision' | 'Junior Eurovision'
   isJuniorContest: boolean;
   contestYear: string;
@@ -66,6 +90,8 @@ interface GeneralState {
     expansion: Partial<GeneralState['generalSettingsExpansion']>,
   ) => void;
   getHostingCountry: () => BaseCountry;
+  resetAllSettings: () => void;
+
 }
 
 const getLatestUpdate = () => {
@@ -100,24 +126,7 @@ export const useGeneralStore = create<GeneralState>()(
           voting: true,
           uiPreferences: true,
         },
-        settings: {
-          alwaysShowRankings: true,
-          showQualificationModal: true,
-          showWinnerModal: true,
-          showWinnerConfetti: true,
-          enableFullscreen: false,
-          shouldShowBeforeUnloadWarning: true,
-          shouldShowResetWarning: true,
-          showRankChangeIndicator: true,
-          shouldShowManualTelevoteWarning: true,
-          showHostingCountryLogo: true,
-          shouldShowHeartFlagIcon: false,
-          hostingCountryCode: 'CH', // Switzerland for 2025
-          contestName: 'Eurovision',
-          isJuniorContest: false,
-          contestYear: INITIAL_YEAR,
-          shouldLimitManualTelevotePoints: true,
-        },
+        settings: DEFAULT_SETTINGS,
 
         setLastSeenUpdate: (update: string) => {
           set({ lastSeenUpdate: update });
@@ -187,16 +196,22 @@ export const useGeneralStore = create<GeneralState>()(
 
           return countries.find((country) => country.code === hostingCountryCode) as BaseCountry;
         },
+        resetAllSettings: () => {
+          set({ settings: DEFAULT_SETTINGS, pointsSystem: initialPointsSystem, settingsPointsSystem: initialPointsSystem });
+        },
       }),
       {
         name: 'general-storage',
         partialize(state) {
+          const { customBgImage: _ignore, ...restSettings } = state.settings;
+
           return {
             year: state.year,
             themeYear: state.themeYear,
             lastSeenUpdate: state.lastSeenUpdate,
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
-            settings: state.settings,
+            // Do not persist large image data URLs in localStorage to avoid quota issues
+            settings: { ...restSettings, customBgImage: null },
             settingsPointsSystem: state.settingsPointsSystem,
             generalSettingsExpansion: state.generalSettingsExpansion,
           };
@@ -214,6 +229,17 @@ export const useGeneralStore = create<GeneralState>()(
             // Ensure theme is consistent; fallback to standard theme for the year
             const theme = getThemeForYear(state.themeYear ?? state.year);
             useGeneralStore.setState({ theme });
+
+            // Load custom background image from IndexedDB after rehydration
+            (async () => {
+              const image = await getCustomBgImageFromDB();
+              if (image) {
+                const current = useGeneralStore.getState().settings;
+                useGeneralStore.setState({
+                  settings: { ...current, customBgImage: image },
+                });
+              }
+            })();
           }
         },
         merge: (persistedState, currentState) => {
@@ -262,4 +288,14 @@ export const useGeneralStore = create<GeneralState>()(
     force: true,
     isJuniorContest: settings.isJuniorContest,
   });
+})();
+
+(async () => {
+  const image = await getCustomBgImageFromDB();
+  if (image) {
+    const current = useGeneralStore.getState().settings;
+    useGeneralStore.setState({
+      settings: { ...current, customBgImage: image },
+    });
+  }
 })();
