@@ -124,7 +124,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
         <TabContent
           tabs={tabsWithContent}
           activeTab={activeTab}
-          preserveContent={true}
+          preserveContent
         />
       );
     }

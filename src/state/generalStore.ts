@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
   isJuniorContest: false,
   contestYear: INITIAL_YEAR,
   shouldLimitManualTelevotePoints: true,
+  randomnessLevel: 50, // 0-100
 }
 
 interface Settings {
@@ -56,6 +57,7 @@ interface Settings {
   isJuniorContest: boolean;
   contestYear: string;
   shouldLimitManualTelevotePoints: boolean;
+  randomnessLevel: number;
 }
 
 export interface PointsItem {
@@ -64,7 +66,7 @@ export interface PointsItem {
   id: number;
 }
 
-interface GeneralState {
+export interface GeneralState {
   lastSeenUpdate: string | null;
   shouldShowNewChangesIndicator: boolean;
   year: Year;
@@ -74,6 +76,7 @@ interface GeneralState {
   pointsSystem: PointsItem[]; // used during simulation
   settingsPointsSystem: PointsItem[]; // used locally in settings
   generalSettingsExpansion: {
+    presets: boolean;
     contest: boolean;
     voting: boolean;
     uiPreferences: boolean;
@@ -122,6 +125,7 @@ export const useGeneralStore = create<GeneralState>()(
         pointsSystem: initialPointsSystem,
         settingsPointsSystem: initialPointsSystem,
         generalSettingsExpansion: {
+          presets: true,
           contest: true,
           voting: true,
           uiPreferences: true,

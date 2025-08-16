@@ -69,10 +69,10 @@ const Modal: React.FC<ModalProps> = ({
     if (isMobileInLandscape) {
       if (topContent) return '!max-h-[calc(80vh-140px)]';
 
-      return '!max-h-[calc(80vh-80px)]';
+      return '!max-h-[calc(80vh-100px)]';
     }
 
-    return 'sm:!max-h-[calc(90vh-70px)] max-h-[calc(90vh-90px)]';
+    return 'sm:!max-h-[calc(90vh-70px)] max-h-[calc(90vh-110px)]';
   }, [isMobileInLandscape, topContent]);
 
   if (!isMounted) {

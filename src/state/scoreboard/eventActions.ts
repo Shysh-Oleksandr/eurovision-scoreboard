@@ -110,7 +110,6 @@ export const createEventActions: StateCreator<
     set({
       eventStages: finalEventStages,
       currentStageId: firstStage?.id ?? null,
-      eventMode: mode,
       votingCountryIndex: firstVotingCountryIndex,
       votingPointsIndex: 0,
       shouldShowLastPoints: true,

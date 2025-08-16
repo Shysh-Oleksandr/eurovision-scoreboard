@@ -6,7 +6,6 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   eventStages: [],
   currentStageId: null,
   viewedStageId: null,
-  eventMode: EventMode.GRAND_FINAL_ONLY,
   votingCountryIndex: 0,
   votingPointsIndex: 0,
   shouldShowLastPoints: true,
@@ -23,6 +22,5 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
     [StageId.GF]: {},
   },
   hasShownManualTelevoteWarning: false,
-  randomnessLevel: 50,
   lastPointsResetTimerId: null,
 };

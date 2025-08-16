@@ -19,13 +19,11 @@ export const createPredefinitionActions: StateCreator<
   [['zustand/devtools', never]],
   [],
   PredefinitionActions
-> = (set, get) => ({
+> = (set) => ({
   predefineVotesForStage: (stage: EventStage, resetOtherStages = false) => {
     const { countryOdds, getStageVotingCountries } =
       useCountriesStore.getState();
-    const { pointsSystem } = useGeneralStore.getState();
-
-    const { randomnessLevel } = get();
+    const { pointsSystem, settings: {randomnessLevel} } = useGeneralStore.getState();
 
     const votingCountries = getStageVotingCountries(stage.id);
 

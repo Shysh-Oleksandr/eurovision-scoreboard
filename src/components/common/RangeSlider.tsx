@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { useDebounce } from '@/hooks/useDebounce';
+import usePrevious from '@/hooks/usePrevious';
 
 interface RangeSliderProps {
   id?: string;
@@ -27,10 +28,13 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
 }) => {
   const [internalValue, setInternalValue] = useState(value);
   const debouncedValue = useDebounce(internalValue, delay);
+  const prevDebouncedValue = usePrevious(debouncedValue);
 
   useEffect(() => {
-    onChange(debouncedValue);
-  }, [debouncedValue, onChange]);
+    if (debouncedValue !== prevDebouncedValue) {
+      onChange(debouncedValue);
+    }
+  }, [debouncedValue, onChange, prevDebouncedValue]);
 
   useEffect(() => {
     setInternalValue(value);

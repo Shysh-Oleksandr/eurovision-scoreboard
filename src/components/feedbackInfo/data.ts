@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-16',
+    title:
+      'Added the ability to save and load custom presets',
+  }, 
+  {
     date: '2025-08-14',
     title:
       'Added the ability to use custom background images',
@@ -128,15 +133,11 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-08-15', end: '2025-08-17' },
-    title: 'Save and load contest presets',
-  },
-  {
-    // approximateDates: { start: '2025-08-02', end: '2025-08-03' },
+    approximateDates: { start: '2025-08-20', end: '2025-08-24' },
     title: 'Semi-finals voting by selection (without awarding points)',
   },
   {
-    // approximateDates: { start: '2025-08-02', end: '2025-08-03' },
+    approximateDates: { start: '2025-08-21', end: '2025-08-25' },
     title:
       'The 2016-18 televote announcement order (from lowest points to highest)',
   },

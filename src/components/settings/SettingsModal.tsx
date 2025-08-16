@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
-import Tabs from '../common/tabs/Tabs';
+import Tabs, { TabContent } from '../common/tabs/Tabs';
 
 import { GeneralSettings } from './GeneralSettings';
 import { OddsSettings } from './OddsSettings';
@@ -32,6 +32,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState(SettingsTab.GENERAL);
 
+  const tabsWithContent = useMemo(
+    () => [
+      {
+        ...tabs[0],
+        content: <GeneralSettings />,
+      },
+      {
+        ...tabs[1],
+        content: <OddsSettings countries={participatingCountries} />,
+      },
+    ],
+    [participatingCountries],
+  );
+
   return (
     <Modal
       isOpen={isOpen}
@@ -56,10 +70,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       }
     >
       <div className="py-4 px-2">
-        {activeTab === SettingsTab.GENERAL && <GeneralSettings />}
-        {activeTab === SettingsTab.ODDS && (
-          <OddsSettings countries={participatingCountries} />
-        )}
+        <TabContent
+          tabs={tabsWithContent}
+          activeTab={activeTab}
+          preserveContent
+        />
       </div>
     </Modal>
   );

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
-import { EventMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Select from '../common/Select';
@@ -9,7 +8,6 @@ import Select from '../common/Select';
 import FinalStatsModal from './FinalStatsModal';
 
 export const PhaseActions = () => {
-  const eventMode = useScoreboardStore((state) => state.eventMode);
   const continueToNextPhase = useScoreboardStore(
     (state) => state.continueToNextPhase,
   );
@@ -45,11 +43,7 @@ export const PhaseActions = () => {
   const hasWinner = !!winnerCountry;
 
   const isSFAndGFEventOver =
-    eventStages.length > 1 &&
-    isVotingOver &&
-    isLastStage &&
-    hasWinner &&
-    eventMode === EventMode.SEMI_FINALS_AND_GRAND_FINAL;
+    eventStages.length > 1 && isVotingOver && isLastStage && hasWinner;
 
   useEffect(() => {
     if (isSFAndGFEventOver && !viewedStageId) {

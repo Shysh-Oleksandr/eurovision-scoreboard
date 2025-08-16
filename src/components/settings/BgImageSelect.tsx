@@ -14,6 +14,8 @@ import { useGeneralStore } from '@/state/generalStore';
 const screenAspectRatio = window.innerWidth / window.innerHeight;
 const imageSize = 100;
 
+const MAX_IMAGE_SIZE = 1024 * 1024 * 4; // 4MB
+
 export const BgImageSelect: React.FC = () => {
   const shouldUseCustomBgImage = useGeneralStore(
     (state) => state.settings.shouldUseCustomBgImage,
@@ -32,6 +34,16 @@ export const BgImageSelect: React.FC = () => {
       alert('Please select a valid image file.');
 
       return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      const shouldContinue = confirm(
+        `Image size is pretty large (${
+          Math.round((file.size / 1024 / 1024) * 100) / 100
+        }MB). This can slow down the simulation, so you might want to compress it or use a smaller image. Do you want to continue with this image?`,
+      );
+
+      if (!shouldContinue) return;
     }
 
     const reader = new FileReader();

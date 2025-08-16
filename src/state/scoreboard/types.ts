@@ -18,7 +18,6 @@ export type ScoreboardState = {
   eventStages: EventStage[];
   currentStageId: string | null;
   viewedStageId: string | null;
-  eventMode: EventMode;
   votingCountryIndex: number;
   votingPointsIndex: number;
   shouldShowLastPoints: boolean;
@@ -31,7 +30,6 @@ export type ScoreboardState = {
   televotingProgress: number;
   predefinedVotes: Record<string, Partial<StageVotes>>;
   hasShownManualTelevoteWarning: boolean;
-  randomnessLevel: number;
   lastPointsResetTimerId: NodeJS.Timeout | null;
 
   // Getters
@@ -59,7 +57,6 @@ export type ScoreboardState = {
   setViewedStageId: (stageId: string | null) => void;
   setCurrentStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
-  setRandomnessLevel: (level: number) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
   predefineVotesForStage: (
     stage: EventStage,

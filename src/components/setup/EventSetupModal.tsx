@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, useMemo } from 'react';
 
 import {
   BaseCountry,
@@ -10,7 +10,7 @@ import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
-import Tabs from '../common/tabs/Tabs';
+import Tabs, { TabContent } from '../common/tabs/Tabs';
 import { SettingsModal } from '../settings';
 
 import { TABS } from './constants';
@@ -195,6 +195,58 @@ const EventSetupModal = () => {
     clear();
   };
 
+  const tabsWithContent = useMemo(
+    () => [
+      {
+        ...TABS[0],
+        content: (
+          <SemiFinalsAndGrandFinalSetup
+            autoQualifiers={autoQualifiers}
+            eventStages={eventStagesWithCountries.filter(
+              (s) => s.id !== StageId.GF,
+            )}
+            grandFinalStage={eventStagesWithCountries.find(
+              (s) => s.id === StageId.GF,
+            )}
+            onAssignCountryAssignment={handleCountryAssignment}
+            getCountryGroupAssignment={getCountryGroupAssignment}
+            onBulkAssign={handleBulkCountryAssignment}
+            onEditStage={handleOpenEditEventStageModal}
+            onCreateStage={handleOpenCreateEventStageModal}
+            availableGroups={availableGroups}
+          />
+        ),
+      },
+      {
+        ...TABS[1],
+        content: (
+          <GrandFinalOnlySetup
+            grandFinalStage={eventStagesWithCountries.find(
+              (s) => s.id === StageId.GF,
+            )}
+            notQualifiedCountries={notQualifiedCountries}
+            onAssignCountryAssignment={handleCountryAssignment}
+            getCountryGroupAssignment={getCountryGroupAssignment}
+            onBulkAssign={handleBulkCountryAssignment}
+            onEditStage={handleOpenEditEventStageModal}
+            availableGroups={availableGroups}
+          />
+        ),
+      },
+    ],
+    [
+      autoQualifiers,
+      availableGroups,
+      eventStagesWithCountries,
+      getCountryGroupAssignment,
+      handleBulkCountryAssignment,
+      handleCountryAssignment,
+      handleOpenCreateEventStageModal,
+      handleOpenEditEventStageModal,
+      notQualifiedCountries,
+    ],
+  );
+
   useEffect(() => {
     if (restartCounter > 0) {
       handleStartEvent();
@@ -251,37 +303,11 @@ const EventSetupModal = () => {
           setActiveTab={(tab) => setActiveTab(tab as EventMode)}
         />
 
-        {activeTab === EventMode.SEMI_FINALS_AND_GRAND_FINAL && (
-          <SemiFinalsAndGrandFinalSetup
-            autoQualifiers={autoQualifiers}
-            eventStages={eventStagesWithCountries.filter(
-              (s) => s.id !== StageId.GF,
-            )}
-            grandFinalStage={eventStagesWithCountries.find(
-              (s) => s.id === StageId.GF,
-            )}
-            onAssignCountryAssignment={handleCountryAssignment}
-            getCountryGroupAssignment={getCountryGroupAssignment}
-            onBulkAssign={handleBulkCountryAssignment}
-            onEditStage={handleOpenEditEventStageModal}
-            onCreateStage={handleOpenCreateEventStageModal}
-            availableGroups={availableGroups}
-          />
-        )}
-
-        {isGrandFinalOnly && (
-          <GrandFinalOnlySetup
-            grandFinalStage={eventStagesWithCountries.find(
-              (s) => s.id === StageId.GF,
-            )}
-            notQualifiedCountries={notQualifiedCountries}
-            onAssignCountryAssignment={handleCountryAssignment}
-            getCountryGroupAssignment={getCountryGroupAssignment}
-            onBulkAssign={handleBulkCountryAssignment}
-            onEditStage={handleOpenEditEventStageModal}
-            availableGroups={availableGroups}
-          />
-        )}
+        <TabContent
+          tabs={tabsWithContent}
+          activeTab={activeTab}
+          preserveContent
+        />
 
         <div className="h-px bg-primary-800 w-full my-1" />
 

@@ -30,7 +30,7 @@ export type CountryOdds = Record<
   { juryOdds?: number; televoteOdds?: number }
 >;
 
-interface CountriesState {
+export interface CountriesState {
   // State
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
   selectedCountries: BaseCountry[]; // Countries selected for the current event

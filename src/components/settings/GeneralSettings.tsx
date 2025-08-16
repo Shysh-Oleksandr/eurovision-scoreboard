@@ -9,6 +9,7 @@ import { Tooltip } from '../common/Tooltip';
 import { BgImageSelect } from './BgImageSelect';
 import { ContestSettings } from './ContestSettings';
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
+import { PresetsSettings } from './presets/PresetsSettings';
 
 import { InfoIcon } from '@/assets/icons/InfoIcon';
 
@@ -26,6 +27,14 @@ export const GeneralSettings: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      <CollapsibleSection
+        title="Presets"
+        isExpanded={expansion.presets}
+        onToggle={() => setExpansion({ presets: !expansion.presets })}
+      >
+        <PresetsSettings />
+      </CollapsibleSection>
+
       <CollapsibleSection
         title="Contest"
         isExpanded={expansion.contest}
@@ -174,7 +183,11 @@ export const GeneralSettings: React.FC = () => {
         variant="tertiary"
         className="w-full"
         onClick={() => {
-          if (confirm('Are you sure you want to reset all settings?')) {
+          if (
+            confirm(
+              "Are you sure you want to reset all settings? This won't affect your presets.",
+            )
+          ) {
             resetAllSettings();
           }
         }}

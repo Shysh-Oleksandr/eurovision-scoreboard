@@ -9,7 +9,7 @@ import { CountryOddsItem } from './CountryOddsItem';
 import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
-import { useScoreboardStore } from '@/state/scoreboardStore';
+import { useGeneralStore } from '@/state/generalStore';
 
 const LABELS = [
   {
@@ -36,10 +36,10 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
     (state) => state.setBulkCountryOdds,
   );
   const loadYearOdds = useCountriesStore((state) => state.loadYearOdds);
-  const randomnessLevel = useScoreboardStore((state) => state.randomnessLevel);
-  const setRandomnessLevel = useScoreboardStore(
-    (state) => state.setRandomnessLevel,
+  const randomnessLevel = useGeneralStore(
+    (state) => state.settings.randomnessLevel,
   );
+  const setSettings = useGeneralStore((state) => state.setSettings);
 
   const handleOddsChange = (
     countryCode: string,
@@ -158,7 +158,7 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
           min={0}
           max={100}
           value={randomnessLevel}
-          onChange={setRandomnessLevel}
+          onChange={(value) => setSettings({ randomnessLevel: value })}
           minLabel="Predictable"
           maxLabel="Chaotic"
         />
