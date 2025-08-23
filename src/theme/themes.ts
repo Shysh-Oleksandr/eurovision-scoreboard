@@ -838,3 +838,21 @@ export function getThemeForYear(year: string) {
 
   return themes['2025']; // Fallback to 2025 theme
 }
+
+// Helper function to get background image for a specific year
+export function getThemeBackground(themeYear: string): string {
+  if (themeYear.includes('JESC')) {
+    const juniorKey = themeYear;
+    if (juniorThemes[juniorKey]?.backgroundImage) {
+      return juniorThemes[juniorKey]!.backgroundImage;
+    }
+    // Fallback to latest junior theme
+    return juniorThemes['JESC-2024']?.backgroundImage || '/bgImages/FlowerJescBg2024.webp';
+  }
+
+  const bg = escThemes[themeYear]?.backgroundImage
+    ?? escThemes['2025']?.backgroundImage
+    ?? '/bgImages/PurpleBg2025.webp';
+
+  return bg;
+}

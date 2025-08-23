@@ -16,6 +16,7 @@ interface ModalProps {
   contentClassName?: string;
   overlayClassName?: string;
   openDelay?: number; // Delay in milliseconds before opening the modal
+  ref?: React.RefObject<HTMLDivElement | null>;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -29,6 +30,7 @@ const Modal: React.FC<ModalProps> = ({
   contentClassName = '',
   overlayClassName = '',
   openDelay,
+  ref,
 }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -92,6 +94,7 @@ const Modal: React.FC<ModalProps> = ({
           isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}
+        ref={ref}
       >
         {topContent}
         <div

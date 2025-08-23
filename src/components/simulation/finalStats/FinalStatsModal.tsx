@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 
-import Button from '../common/Button';
-import Modal from '../common/Modal/Modal';
+import Button from '../../common/Button';
+import Modal from '../../common/Modal/Modal';
 
-import StatsHeader from './finalStats/StatsHeader';
-import StatsTable from './finalStats/StatsTable';
-import { useFinalStats } from './finalStats/useFinalStats';
+import StatsHeader from './StatsHeader';
+import StatsTable from './StatsTable';
+import { useFinalStats } from './useFinalStats';
 
 import { useScoreboardStore } from '@/state/scoreboardStore';
 

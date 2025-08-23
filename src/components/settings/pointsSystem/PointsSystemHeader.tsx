@@ -73,7 +73,7 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
           onChange={onSystemChange}
           value={currentSystemOption?.value}
           options={predefinedSystemsOptions}
-          className="bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 p-2 !rounded-md min-w-[150px]"
+          className="bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 p-2 !rounded-md min-w-[150px] hover:bg-primary-700/60"
         >
           <span className="text-sm line-clamp-2">
             {currentSystemOption?.label}

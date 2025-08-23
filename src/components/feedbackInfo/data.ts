@@ -1,39 +1,40 @@
 export const WHATS_NEW = [
   {
-    date: '2025-08-16',
+    date: '2025-08-23',
     title:
-      'Added the ability to save and load custom presets',
-  }, 
+      'Added the ability to generate, customize, and download a screenshot of the final scoreboard results for sharing',
+  },
+  {
+    date: '2025-08-16',
+    title: 'Added the ability to save and load custom presets',
+  },
   {
     date: '2025-08-14',
-    title:
-      'Added the ability to use custom background images',
-  },    
+    title: 'Added the ability to use custom background images',
+  },
   {
     date: '2025-08-13',
-    title:
-      'Added the 2016-2022 JESC presets and 2021-2022 themes',
-  },    
+    title: 'Added the 2016-2022 JESC presets and 2021-2022 themes',
+  },
   {
     date: '2025-08-12',
     title:
       'Added the Junior Eurovision support with custom themes for 2023 and 2024',
-  },    
+  },
   {
     date: '2025-08-10',
     title:
       'Added the heart flag icons for all Eurovision countries, the search for hosting countries, the televote progress bar, and settings for limiting manual televote points',
-  },   
+  },
   {
     date: '2025-08-09',
-    title:
-      'Added the settings for the contest name, year, and host country',
-  },   
+    title: 'Added the settings for the contest name, year, and host country',
+  },
   {
     date: '2025-08-08',
     title:
       'Added the ability to sync voters with participants (enabled by default)',
-  },  
+  },
   {
     date: '2025-08-03',
     title:
@@ -133,13 +134,17 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-08-20', end: '2025-08-24' },
+    approximateDates: { start: '2025-08-24', end: '2025-08-26' },
     title: 'Semi-finals voting by selection (without awarding points)',
   },
   {
-    approximateDates: { start: '2025-08-21', end: '2025-08-25' },
+    approximateDates: { start: '2025-08-25', end: '2025-08-30' },
     title:
       'The 2016-18 televote announcement order (from lowest points to highest)',
+  },
+  {
+    // approximateDates: { start: '2025-08-25', end: '2025-08-30' },
+    title: 'The stats screenshot generation',
   },
 
   {

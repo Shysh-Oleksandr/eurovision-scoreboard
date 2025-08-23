@@ -14,6 +14,12 @@ import { BaseCountry } from '@/models';
 import { useScoreboardStore } from './scoreboardStore';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
 
+export enum ShareImageAspectRatio {
+  LANDSCAPE = '1200x630',
+  SQUARE = '800x800',
+  PORTRAIT = '750x1000',
+}
+
 export const INITIAL_YEAR = '2025' as Year;
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -38,6 +44,40 @@ export const DEFAULT_SETTINGS: Settings = {
   randomnessLevel: 50, // 0-100
 }
 
+// Function to determine initial aspect ratio based on device width
+const getInitialAspectRatio = (): ShareImageAspectRatio => {
+  if (typeof window !== 'undefined' && window.innerWidth < 576) {
+    return ShareImageAspectRatio.SQUARE;
+  }
+  return ShareImageAspectRatio.LANDSCAPE;
+};
+
+export const DEFAULT_IMAGE_CUSTOMIZATION: ImageCustomizationSettings = {
+  isCustomizationExpanded: false,
+  title: '', // empty means use default (contestName + contestYear)
+  subtitle: '', // empty means use default (stage name)
+  layout: 2, // number of columns, default is 2
+  maxCountries: 0, // 0 means show all
+  showRankings: true,
+  showPoints: true,
+  shortCountryNames: false,
+  aspectRatio: getInitialAspectRatio(),
+  itemSize: 'lg' as 'sm' | 'md' | 'lg' | 'xl' | '2xl',
+  titleFontSize: 36, // font size in px for title
+  subtitleFontSize: 24, // font size in px for subtitle
+  brandingFontSize: 20, // font size in px for branding text
+  verticalPadding: 64, // vertical padding in px
+  horizontalPadding: 80, // horizontal padding in px
+  highQuality: true,
+}
+
+// Predefined aspect ratio presets for image customization
+export const ASPECT_RATIO_PRESETS = {
+  '1200x630': { width: 1200, height: 630, label: 'Landscape (16:9)' },
+  '800x800': { width: 800, height: 800, label: 'Square (1:1)' },
+  '750x1000': { width: 750, height: 1000, label: 'Portrait (3:4)' },
+} as const;
+
 interface Settings {
   alwaysShowRankings: boolean;
   showQualificationModal: boolean;
@@ -60,6 +100,25 @@ interface Settings {
   randomnessLevel: number;
 }
 
+export interface ImageCustomizationSettings {
+  isCustomizationExpanded: boolean;
+  title: string;
+  subtitle: string;
+  layout: number;
+  maxCountries: number;
+  showRankings: boolean;
+  showPoints: boolean;
+  shortCountryNames: boolean;
+  aspectRatio: ShareImageAspectRatio;
+  itemSize: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  titleFontSize: number; // font size in px for title
+  subtitleFontSize: number; // font size in px for subtitle
+  brandingFontSize: number; // font size in px for branding text
+  verticalPadding: number; // vertical padding in px
+  horizontalPadding: number; // horizontal padding in px
+  highQuality: boolean;
+}
+
 export interface PointsItem {
   value: number;
   showDouzePoints: boolean;
@@ -73,6 +132,7 @@ export interface GeneralState {
   themeYear: string;
   theme: Theme;
   settings: Settings;
+  imageCustomization: ImageCustomizationSettings;
   pointsSystem: PointsItem[]; // used during simulation
   settingsPointsSystem: PointsItem[]; // used locally in settings
   generalSettingsExpansion: {
@@ -87,6 +147,7 @@ export interface GeneralState {
   setYear: (year: Year) => void;
   setTheme: (year: string, isJuniorTheme?: boolean) => void;
   setSettings: (settings: Partial<Settings>) => void;
+  setImageCustomization: (customization: Partial<ImageCustomizationSettings>) => void;
   setPointsSystem: (points: PointsItem[]) => void;
   setSettingsPointsSystem: (points: PointsItem[]) => void;
   setGeneralSettingsExpansion: (
@@ -131,6 +192,7 @@ export const useGeneralStore = create<GeneralState>()(
           uiPreferences: true,
         },
         settings: DEFAULT_SETTINGS,
+        imageCustomization: DEFAULT_IMAGE_CUSTOMIZATION,
 
         setLastSeenUpdate: (update: string) => {
           set({ lastSeenUpdate: update });
@@ -179,6 +241,11 @@ export const useGeneralStore = create<GeneralState>()(
             settings: { ...state.settings, ...settings },
           }));
         },
+        setImageCustomization: (customization: Partial<ImageCustomizationSettings>) => {
+          set((state) => ({
+            imageCustomization: { ...state.imageCustomization, ...customization },
+          }));
+        },
         setPointsSystem: (points: PointsItem[]) => {
           set({ pointsSystem: points });
         },
@@ -216,6 +283,8 @@ export const useGeneralStore = create<GeneralState>()(
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
             // Do not persist large image data URLs in localStorage to avoid quota issues
             settings: { ...restSettings, customBgImage: null },
+            // Only persist aspectRatio and isCustomizationExpanded from imageCustomization
+            imageCustomization: { aspectRatio: state.imageCustomization.aspectRatio, isCustomizationExpanded: state.imageCustomization.isCustomizationExpanded },
             settingsPointsSystem: state.settingsPointsSystem,
             generalSettingsExpansion: state.generalSettingsExpansion,
           };
@@ -255,7 +324,6 @@ export const useGeneralStore = create<GeneralState>()(
           const settingsPointsSystem: PointsItem[] =
             state.settingsPointsSystem || initialPointsSystem;
 
-
           const persistedSettings = {
             ...currentState.settings,
             ...state.settings,
@@ -265,7 +333,12 @@ export const useGeneralStore = create<GeneralState>()(
           const settings = {
             ...persistedSettings,
             isJuniorContest: isJunior,
-            contestYear: year,
+          };
+
+          // Merge imageCustomization, keeping only aspectRatio from persistence
+          const imageCustomization = {
+            ...currentState.imageCustomization,
+            ...(state.imageCustomization && { aspectRatio: state.imageCustomization.aspectRatio, isCustomizationExpanded: state.imageCustomization.isCustomizationExpanded }),
           };
 
           return {
@@ -276,6 +349,7 @@ export const useGeneralStore = create<GeneralState>()(
             theme: getThemeForYear(themeYear),
             settingsPointsSystem,
             settings,
+            imageCustomization,
           };
         },
       },

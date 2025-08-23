@@ -1,45 +1,54 @@
 import { useMemo } from 'react';
-
 import { Country } from '../models';
-
 import { useMediaQuery } from './useMediaQuery';
 
-export const useReorderCountries = (countries: Country[]) => {
+export const useReorderCountries = (
+  countries: Country[],
+  customColumnCount?: number,
+) => {
   const isTablet = useMediaQuery('(min-width: 576px)');
 
   const reorderedCountries = useMemo(() => {
     let columnCount = 1;
 
-    if (isTablet) {
-      columnCount = 2;
+    if (customColumnCount) {
+      columnCount = customColumnCount;
+    } else {
+      if (isTablet) {
+        columnCount = 2;
+      }
     }
 
     if (columnCount <= 1) {
       return countries;
     }
 
+    const total = countries.length;
+    const baseRowCount = Math.floor(total / columnCount);
+    const extra = total % columnCount;
+
+    const columns: Country[][] = [];
+    let start = 0;
+
+    for (let col = 0; col < columnCount; col++) {
+      const size = baseRowCount + (col < extra ? 1 : 0);
+      columns[col] = countries.slice(start, start + size);
+      start += size;
+    }
+
     const reordered: Country[] = [];
-    const rowCount = Math.ceil(countries.length / columnCount);
-    const columns: Country[][] = Array.from({ length: columnCount }, () => []);
+    const maxRows = Math.max(...columns.map(c => c.length));
 
-    countries.forEach((country, i) => {
-      const columnIndex = Math.floor(i / rowCount);
-
-      if (columns[columnIndex]) {
-        columns[columnIndex].push(country);
-      }
-    });
-
-    Array.from({ length: rowCount }).forEach((_, i) => {
-      Array.from({ length: columnCount }).forEach((__, j) => {
-        if (columns[j]?.[i]) {
-          reordered.push(columns[j][i]);
+    for (let row = 0; row < maxRows; row++) {
+      for (let col = 0; col < columnCount; col++) {
+        if (columns[col][row]) {
+          reordered.push(columns[col][row]);
         }
-      });
-    });
+      }
+    }
 
     return reordered;
-  }, [countries, isTablet]);
+  }, [countries, isTablet, customColumnCount]);
 
   return reorderedCountries;
 };

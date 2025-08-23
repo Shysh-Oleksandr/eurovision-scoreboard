@@ -5,7 +5,10 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Select from '../common/Select';
 
-import FinalStatsModal from './FinalStatsModal';
+import FinalStatsModal from './finalStats/FinalStatsModal';
+import ShareResultsModal from './share/ShareResultsModal';
+
+import { ShareIcon } from '@/assets/icons/ShareIcon';
 
 export const PhaseActions = () => {
   const continueToNextPhase = useScoreboardStore(
@@ -26,6 +29,7 @@ export const PhaseActions = () => {
   );
 
   const [showFinalStatsModal, setShowFinalStatsModal] = useState(false);
+  const [showShareResultsModal, setShowShareResultsModal] = useState(false);
 
   const { nextPhase } = useNextEventName();
 
@@ -57,6 +61,10 @@ export const PhaseActions = () => {
 
   return (
     <>
+      <ShareResultsModal
+        isOpen={showShareResultsModal}
+        onClose={() => setShowShareResultsModal(false)}
+      />
       <FinalStatsModal
         isOpen={showFinalStatsModal}
         onClose={() => setShowFinalStatsModal(false)}
@@ -66,7 +74,16 @@ export const PhaseActions = () => {
         {isVotingOver && (
           <Button
             variant="tertiary"
-            className="ml-auto"
+            className="ml-auto !px-4"
+            onClick={() => setShowShareResultsModal(true)}
+            Icon={<ShareIcon className="w-[20px] h-[20px]" />}
+          >
+            Share
+          </Button>
+        )}
+        {isVotingOver && (
+          <Button
+            variant="tertiary"
             onClick={() => setShowFinalStatsModal(true)}
           >
             View Stats

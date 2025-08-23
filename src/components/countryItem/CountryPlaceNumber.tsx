@@ -13,6 +13,7 @@ type Props = {
   showPlaceAnimation: boolean;
   points: number;
   isJuryVoting: boolean;
+  size?: 'scoreboard' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 };
 
 const CountryPlaceNumber = ({
@@ -21,6 +22,7 @@ const CountryPlaceNumber = ({
   showPlaceAnimation,
   points,
   isJuryVoting,
+  size = 'scoreboard',
 }: Props) => {
   const showRankChangeIndicator = useGeneralStore(
     (state) => state.settings.showRankChangeIndicator,
@@ -33,6 +35,38 @@ const CountryPlaceNumber = ({
 
   const previousIndex = usePrevious(index);
   const previousDisplayArrow = usePrevious(displayArrow);
+
+  const isScoreboard = size === 'scoreboard';
+
+  // Size-based styles
+  const sizeStyles = {
+    scoreboard: {
+      container: 'lg:h-10 md:h-9 xs:h-8 h-7',
+      text: 'md:text-lg xs:text-base text-sm',
+    },
+    sm: {
+      container: 'h-7 w-9 mr-1',
+      text: 'text-sm',
+    },
+    md: {
+      container: 'h-8 w-10 mr-1',
+      text: 'text-sm',
+    },
+    lg: {
+      container: 'h-10 w-12 mr-[6px]',
+      text: 'text-lg',
+    },
+    xl: {
+      container: 'h-12 w-[48px] mr-[6px]',
+      text: 'text-xl',
+    },
+    '2xl': {
+      container: 'h-14 w-16 mr-2',
+      text: 'text-2xl',
+    },
+  };
+
+  const currentSize = sizeStyles[size];
 
   // Calculate width dynamically to handle different screen sizes
   const width = useMemo(() => {
@@ -67,7 +101,7 @@ const CountryPlaceNumber = ({
 
   useGSAP(
     () => {
-      if (showPlaceAnimation) {
+      if (showPlaceAnimation && isScoreboard) {
         gsap.fromTo(
           containerRef.current,
           {
@@ -106,21 +140,23 @@ const CountryPlaceNumber = ({
   return (
     <div
       ref={containerRef}
-      className={`flex flex-none items-center justify-center lg:h-10 md:h-9 xs:h-8 h-7 rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText relative ${
+      className={`flex flex-none items-center justify-center rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText relative ${
+        currentSize.container
+      } ${
         shouldShowAsNonQualified
           ? 'bg-primary-900 opacity-70 text-countryItem-unqualifiedPlaceText'
           : ''
       }`}
     >
       <ArrowIcon
-        className={`text-countryItem-placeText 2cols:w-8 w-7 2cols:h-8 h-7 -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 ${
+        className={`text-countryItem-placeText -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 2cols:w-8 w-7 2cols:h-8 h-7 ${
           displayArrow ? 'blinker' : 'opacity-0'
         }`}
       />
 
       <h4
         ref={textRef}
-        className={`font-semibold md:text-lg xs:text-base text-sm ${
+        className={`font-semibold ${currentSize.text} ${
           displayArrow ? '!opacity-0' : ''
         } ${previousDisplayArrow && !displayArrow ? 'blinker' : ''}`}
       >
