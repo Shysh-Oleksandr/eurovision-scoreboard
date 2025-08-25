@@ -56,6 +56,8 @@ export const createEventActions: StateCreator<
 
     set({
       predefinedVotes: {},
+      countryPoints: {},
+      qualificationOrder: {},
     });
 
     const allStagesFromSetup = get().eventStages;

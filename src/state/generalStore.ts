@@ -42,10 +42,11 @@ export const DEFAULT_SETTINGS: Settings = {
   contestYear: INITIAL_YEAR,
   shouldLimitManualTelevotePoints: true,
   randomnessLevel: 50, // 0-100
+  isPickQualifiersMode: false,
 }
 
 // Function to determine initial aspect ratio based on device width
-const getInitialAspectRatio = (): ShareImageAspectRatio => {
+export const getInitialAspectRatio = (): ShareImageAspectRatio => {
   if (typeof window !== 'undefined' && window.innerWidth < 576) {
     return ShareImageAspectRatio.SQUARE;
   }
@@ -98,6 +99,7 @@ interface Settings {
   contestYear: string;
   shouldLimitManualTelevotePoints: boolean;
   randomnessLevel: number;
+  isPickQualifiersMode: boolean;
 }
 
 export interface ImageCustomizationSettings {

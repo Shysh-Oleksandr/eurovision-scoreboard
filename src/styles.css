@@ -193,14 +193,6 @@ h6 {
   column-gap: 0.75rem;
 }
 
-/* 3 columns cause reordering issues */
-
-/* @media (min-width: 1440px) {
-  .container-wrapping-flipper.show-all-participants > div {
-    grid-template-columns: repeat(3, 1fr);
-  }
-} */
-
 @media (min-width: 576px) {
   .container-wrapping-flipper > div {
     grid-template-columns: repeat(2, 1fr);
@@ -216,6 +208,12 @@ h6 {
 @media (min-width: 1024px) {
   .container-wrapping-flipper > div {
     column-gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container-wrapping-flipper.is-over > div {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 

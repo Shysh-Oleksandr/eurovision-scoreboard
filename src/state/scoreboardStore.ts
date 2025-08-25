@@ -40,6 +40,8 @@ export const useScoreboardStore = create<ScoreboardState>()(
           winnerCountry,
           showQualificationResults,
           predefinedVotes,
+          countryPoints,
+          qualificationOrder,
         } = state;
 
         return {
@@ -51,6 +53,8 @@ export const useScoreboardStore = create<ScoreboardState>()(
           winnerCountry,
           showQualificationResults,
           predefinedVotes,
+          countryPoints,
+          qualificationOrder,
         };
       },
     },

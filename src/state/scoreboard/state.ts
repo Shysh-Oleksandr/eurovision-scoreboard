@@ -21,6 +21,16 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
     [StageId.SF2]: {},
     [StageId.GF]: {},
   },
+  countryPoints: {
+    [StageId.SF1]: {},
+    [StageId.SF2]: {},
+    [StageId.GF]: {},
+  },
+  qualificationOrder: {
+    [StageId.SF1]: {},
+    [StageId.SF2]: {},
+    [StageId.GF]: {},
+  },
   hasShownManualTelevoteWarning: false,
   lastPointsResetTimerId: null,
 };

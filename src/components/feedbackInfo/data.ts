@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-25',
+    title:
+      'Added the ability to pick qualifiers for semi-finals by selection (without awarding points)',
+  }, 
+  {
     date: '2025-08-23',
     title:
       'Added the ability to generate, customize, and download a screenshot of the final scoreboard results for sharing',
@@ -133,10 +138,6 @@ export const WHATS_NEW = [
 ];
 
 export const UPCOMING_FEATURES = [
-  {
-    approximateDates: { start: '2025-08-24', end: '2025-08-26' },
-    title: 'Semi-finals voting by selection (without awarding points)',
-  },
   {
     approximateDates: { start: '2025-08-25', end: '2025-08-30' },
     title:

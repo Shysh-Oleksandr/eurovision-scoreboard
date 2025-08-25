@@ -7,6 +7,14 @@ export type Vote = {
   showDouzePointsAnimation: boolean;
 };
 
+export type CountryPoints = {
+  juryPoints: number;
+  televotePoints: number;
+  combinedPoints: number;
+};
+
+export type QualificationOrder = Record<string, Record<string, number>>; // stageId -> countryCode -> qualificationOrder
+
 export type StageVotes = {
   jury?: Record<string, Vote[]>; // voting country code -> votes
   televote?: Record<string, Vote[]>; // voting country code -> votes
@@ -29,8 +37,10 @@ export type ScoreboardState = {
   showAllParticipants: boolean;
   televotingProgress: number;
   predefinedVotes: Record<string, Partial<StageVotes>>;
+  countryPoints: Record<string, Record<string, CountryPoints>>; // stageId -> countryCode -> CountryPoints
   hasShownManualTelevoteWarning: boolean;
   lastPointsResetTimerId: NodeJS.Timeout | null;
+  qualificationOrder: QualificationOrder;
 
   // Getters
   getCurrentStage: () => EventStage;
@@ -62,4 +72,6 @@ export type ScoreboardState = {
     stage: EventStage,
     resetOtherStages?: boolean,
   ) => void;
+  pickQualifier: (countryCode: string) => void;
+  pickQualifierRandomly: () => void;
 };

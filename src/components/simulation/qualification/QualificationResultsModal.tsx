@@ -3,11 +3,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
-import { useNextEventName } from '../../hooks/useNextEventName';
-import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../common/Button';
-import Modal, { ANIMATION_DURATION } from '../common/Modal/Modal';
-import { CountrySelectionListItem } from '../setup/CountrySelectionListItem';
+import { useNextEventName } from '../../../hooks/useNextEventName';
+import { useScoreboardStore } from '../../../state/scoreboardStore';
+import Button from '../../common/Button';
+import Modal, { ANIMATION_DURATION } from '../../common/Modal/Modal';
+
+import { CountryQualificationItem } from './CountryQualificationItem';
 
 import { useGeneralStore } from '@/state/generalStore';
 import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
@@ -26,11 +27,14 @@ const QualificationResultsModal = () => {
   const closeQualificationResults = useScoreboardStore(
     (state) => state.closeQualificationResults,
   );
+  const qualificationOrder = useScoreboardStore(
+    (state) => state.qualificationOrder,
+  );
 
   const shouldShowQualificationModal =
     showQualificationModal && showQualificationResults;
 
-  const { name: currentStageName, countries } = getCurrentStage();
+  const { name: currentStageName, countries, id: stageId } = getCurrentStage();
   const { nextPhase } = useNextEventName();
 
   const qualifiedCountries = useMemo(
@@ -44,6 +48,17 @@ const QualificationResultsModal = () => {
   const countriesContainerRef = useRef<HTMLDivElement>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [shouldClose, setShouldClose] = useState(false);
+
+  const sortedQualifiedCountries = useMemo(() => {
+    const stageQualificationOrder = qualificationOrder[stageId] || {};
+
+    return [...qualifiedCountries].sort((a, b) => {
+      const orderA = stageQualificationOrder[a.code] || 0;
+      const orderB = stageQualificationOrder[b.code] || 0;
+
+      return orderA - orderB;
+    });
+  }, [qualifiedCountries, qualificationOrder, stageId]);
 
   useEffect(() => {
     if (shouldShowQualificationModal) {
@@ -77,14 +92,21 @@ const QualificationResultsModal = () => {
   useGSAP(
     () => {
       if (isModalVisible) {
-        gsap.from(countriesContainerRef.current?.children ?? [], {
-          opacity: 0,
-          x: -160,
-          duration: 0.6,
-          ease: 'power3.out',
-          stagger: 0.6,
-          delay: 0.2,
-        });
+        gsap.fromTo(
+          countriesContainerRef.current?.children ?? [],
+          {
+            opacity: 0,
+            x: -160,
+          },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.6,
+            ease: 'none',
+            stagger: 0.6,
+            delay: 0.2,
+          },
+        );
       }
     },
     { scope: countriesContainerRef, dependencies: [isModalVisible] },
@@ -122,10 +144,15 @@ const QualificationResultsModal = () => {
 
       <div
         ref={countriesContainerRef}
-        className="grid grid-cols-1 xs:grid-cols-2 gap-3"
+        className="grid grid-cols-2 gap-x-3 md:gap-y-3 xs:gap-y-2 gap-y-1.5"
       >
-        {qualifiedCountries.map((country) => (
-          <CountrySelectionListItem key={country.code} country={country} />
+        {sortedQualifiedCountries.map((country) => (
+          <CountryQualificationItem
+            key={country.code}
+            country={country}
+            shouldAnimate={false}
+            isModal
+          />
         ))}
       </div>
     </Modal>

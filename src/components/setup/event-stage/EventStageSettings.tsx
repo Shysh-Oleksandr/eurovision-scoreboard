@@ -13,8 +13,6 @@ const getVotingModeLabel = (votingMode: StageVotingMode) => {
       return 'Jury Only';
     case StageVotingMode.COMBINED:
       return 'Combined';
-    // case StageVotingMode.PICK_QUALIFIERS:
-    //   return 'Pick Qualifiers';
     case StageVotingMode.JURY_AND_TELEVOTE:
     default:
       return 'Jury and Televote';
@@ -41,16 +39,10 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
   const votingMode = watch('votingMode');
 
   const votingModeOptions = useMemo(() => {
-    return (
-      Object.values(StageVotingMode)
-        // .filter(
-        //   () => !isGrandFinalStage, //|| mode !== StageVotingMode.PICK_QUALIFIERS,
-        // )
-        .map((mode) => ({
-          label: getVotingModeLabel(mode),
-          value: mode,
-        }))
-    );
+    return Object.values(StageVotingMode).map((mode) => ({
+      label: getVotingModeLabel(mode),
+      value: mode,
+    }));
   }, []);
 
   return (
@@ -100,7 +92,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
           <div className="flex items-center gap-2">
             <label
               htmlFor={`qualifiers-${eventStageToEdit?.id}`}
-              className="block text-sm text-white"
+              className="block text-base text-white"
             >
               Number of qualifiers:
             </label>
@@ -108,14 +100,14 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
               id={`qualifiers-${eventStageToEdit?.id}`}
               type="number"
               {...register('qualifiersAmount', { valueAsNumber: true })}
-              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-[56px]"
+              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-[64px]"
               min={0}
               max={eventStageToEdit?.countries.length}
               aria-label={`Number of qualifiers for ${eventStageToEdit?.name}`}
             />
           </div>
           {errors.qualifiersAmount && (
-            <span className="text-red-400 text-sm pt-1">
+            <span className="text-red-400 text-sm block pt-1">
               {errors.qualifiersAmount.message as string}
             </span>
           )}

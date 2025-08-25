@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 
 import {
   ASPECT_RATIO_PRESETS,
+  getInitialAspectRatio,
   ShareImageAspectRatio,
   useGeneralStore,
 } from '../../../state/generalStore';
@@ -522,7 +523,11 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                     onBlur={(e) => {
                       const { value } = e.target;
 
-                      if (value === '' || isNaN(parseInt(value))) {
+                      if (
+                        value === '' ||
+                        isNaN(parseInt(value)) ||
+                        parseInt(value) < 14
+                      ) {
                         updateImageSetting('brandingFontSize', 20);
                       }
                     }}
@@ -657,7 +662,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                     ...auto,
                     title: defaultTitle,
                     subtitle: defaultSubtitle,
-                    aspectRatio: ShareImageAspectRatio.LANDSCAPE,
+                    aspectRatio: getInitialAspectRatio(),
                     maxCountries: 0,
                     showRankings: true,
                     showPoints: true,

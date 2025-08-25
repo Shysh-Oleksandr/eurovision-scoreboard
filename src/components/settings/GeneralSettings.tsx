@@ -52,27 +52,59 @@ export const GeneralSettings: React.FC = () => {
         <PointsSystemSelection />
         <div className="h-px bg-primary-800 w-full my-4" />
 
-        <div className="flex items-start gap-2">
-          <Tooltip
-            content={
-              <div className="font-medium">
-                When enabled, limits the total televote points you can award
-                (when manually entering points) and shows how many remain.
-              </div>
-            }
-            position="left"
-          >
-            <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-          </Tooltip>
-          <Checkbox
-            id="limit-manual-televote-points"
-            labelClassName="w-full !px-0 !pt-1 !items-start"
-            label="Limit Manual Televote Points"
-            checked={settings.shouldLimitManualTelevotePoints}
-            onChange={(e) =>
-              setSettings({ shouldLimitManualTelevotePoints: e.target.checked })
-            }
-          />
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
+          <div className="flex items-start gap-2">
+            <Tooltip
+              content={
+                <div className="font-medium">
+                  When enabled, limits the total televote points you can award
+                  (when manually entering points) and shows how many remain.
+                </div>
+              }
+              position="left"
+            >
+              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            </Tooltip>
+            <Checkbox
+              id="limit-manual-televote-points"
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              label="Limit Manual Televote Points"
+              checked={settings.shouldLimitManualTelevotePoints}
+              onChange={(e) =>
+                setSettings({
+                  shouldLimitManualTelevotePoints: e.target.checked,
+                })
+              }
+            />
+          </div>
+
+          <div className="flex items-start gap-2 text-white">
+            <Tooltip
+              content={
+                <div className="font-medium">
+                  <p>
+                    Click countries (or choose randomly) to qualify them without
+                    awarding points.
+                    <br />
+                    The Semi-Finals voting mode still affects random qualifiers
+                    and points distribution.
+                  </p>
+                </div>
+              }
+              position="left"
+            >
+              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            </Tooltip>
+            <Checkbox
+              id="isPickQualifiersMode"
+              label="Pick qualifiers without awarding points"
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              checked={settings.isPickQualifiersMode}
+              onChange={(e) => {
+                setSettings({ isPickQualifiersMode: e.target.checked });
+              }}
+            />
+          </div>
         </div>
       </CollapsibleSection>
       <CollapsibleSection
@@ -170,7 +202,7 @@ export const GeneralSettings: React.FC = () => {
         <Checkbox
           id="show-manual-televote-warning"
           labelClassName="w-full"
-          label="Show warning before manually assigning televote points"
+          label="Warn before manually assigning televote points"
           checked={settings.shouldShowManualTelevoteWarning}
           onChange={(e) =>
             setSettings({ shouldShowManualTelevoteWarning: e.target.checked })

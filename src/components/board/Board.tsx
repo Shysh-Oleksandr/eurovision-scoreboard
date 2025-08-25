@@ -83,7 +83,7 @@ const Board = (): JSX.Element => {
       <div
         ref={containerRef}
         className={`container-wrapping-flipper will-change-all ${
-          showAllParticipants ? 'show-all-participants' : ''
+          isVotingOver ? 'is-over' : ''
         }`}
       >
         <Flipper

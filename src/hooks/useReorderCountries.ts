@@ -7,6 +7,7 @@ export const useReorderCountries = (
   customColumnCount?: number,
 ) => {
   const isTablet = useMediaQuery('(min-width: 576px)');
+  const isDesktop = useMediaQuery('(min-width: 1280px)');
 
   const reorderedCountries = useMemo(() => {
     let columnCount = 1;
@@ -16,6 +17,10 @@ export const useReorderCountries = (
     } else {
       if (isTablet) {
         columnCount = 2;
+      }
+
+      if (isDesktop) {
+        columnCount = 3;
       }
     }
 
@@ -48,7 +53,7 @@ export const useReorderCountries = (
     }
 
     return reordered;
-  }, [countries, isTablet, customColumnCount]);
+  }, [countries, isTablet, isDesktop, customColumnCount]);
 
   return reorderedCountries;
 };
