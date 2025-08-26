@@ -40,7 +40,7 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
 
   return (
-    <div className="flex justify-between items-center mb-4">
+    <div className="flex justify-between items-center gap-2 mb-4">
       <div className="flex items-center gap-2">
         {showHostingCountryLogo && (
           <img

@@ -32,7 +32,7 @@ export const CountryQualificationItem: React.FC<
           x: 0,
           opacity: 1,
           duration: 0.2,
-          ease: 'power3.out',
+          ease: 'power1.in',
         });
       }
     },
@@ -60,7 +60,6 @@ export const CountryQualificationItem: React.FC<
       onClick={onClick}
     >
       <img
-        loading="lazy"
         src={getFlagPath(country)}
         onError={(e) => {
           e.currentTarget.src = getFlagPath('ww');

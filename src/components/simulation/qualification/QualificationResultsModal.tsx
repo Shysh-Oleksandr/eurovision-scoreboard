@@ -102,7 +102,7 @@ const QualificationResultsModal = () => {
             opacity: 1,
             x: 0,
             duration: 0.6,
-            ease: 'none',
+            ease: 'power1.in',
             stagger: 0.6,
             delay: 0.2,
           },

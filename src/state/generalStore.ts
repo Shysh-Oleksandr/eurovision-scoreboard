@@ -41,6 +41,7 @@ export const DEFAULT_SETTINGS: Settings = {
   isJuniorContest: false,
   contestYear: INITIAL_YEAR,
   shouldLimitManualTelevotePoints: true,
+  shouldShowJuryVotingProgress: true,
   randomnessLevel: 50, // 0-100
   isPickQualifiersMode: false,
 }
@@ -98,6 +99,7 @@ interface Settings {
   isJuniorContest: boolean;
   contestYear: string;
   shouldLimitManualTelevotePoints: boolean;
+  shouldShowJuryVotingProgress: boolean;
   randomnessLevel: number;
   isPickQualifiersMode: boolean;
 }

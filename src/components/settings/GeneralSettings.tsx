@@ -208,6 +208,17 @@ export const GeneralSettings: React.FC = () => {
             setSettings({ shouldShowManualTelevoteWarning: e.target.checked })
           }
         />
+        <Checkbox
+          id="show-jury-voting-progress"
+          labelClassName="w-full"
+          label="Show jury voting progress bar"
+          checked={settings.shouldShowJuryVotingProgress}
+          onChange={(e) =>
+            setSettings({
+              shouldShowJuryVotingProgress: e.target.checked,
+            })
+          }
+        />
         <BgImageSelect />
       </CollapsibleSection>
 
