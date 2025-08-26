@@ -11,7 +11,6 @@ import { useGeneralStore } from '@/state/generalStore';
 
 export const useBoardAnimations = (
   sortedCountries: Country[],
-  isVotingOver: boolean,
   wasTheFirstPointsAwarded: boolean,
   isDouzePointsAwarded: boolean,
 ) => {
@@ -33,7 +32,7 @@ export const useBoardAnimations = (
   const [finalCountries, setFinalCountries] = useState<Country[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { id: currentStageId } = getCurrentStage();
+  const { id: currentStageId, isOver: isVotingOver } = getCurrentStage();
 
   const countriesToRender = useMemo(() => {
     const countryMap = new Map(sortedCountries.map((c) => [c.code, c]));
@@ -43,7 +42,7 @@ export const useBoardAnimations = (
       .filter((c): c is Country => !!c);
   }, [displayOrder, sortedCountries]);
 
-  const reorderedCountries = useReorderCountries(countriesToRender);
+  const reorderedCountries = useReorderCountries(countriesToRender, undefined, isVotingOver);
 
   const flipMoveDelay = useMemo(() => {
     if (!wasTheFirstPointsAwarded || isVotingOver) return 0;

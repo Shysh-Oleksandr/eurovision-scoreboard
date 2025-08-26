@@ -45,7 +45,6 @@ const Board = (): JSX.Element => {
     containerRef,
   } = useBoardAnimations(
     sortedCountries,
-    isVotingOver,
     wasTheFirstPointsAwarded,
     isDouzePointsAwarded,
   );

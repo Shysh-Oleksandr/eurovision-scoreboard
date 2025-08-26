@@ -5,9 +5,10 @@ import { useMediaQuery } from './useMediaQuery';
 export const useReorderCountries = (
   countries: Country[],
   customColumnCount?: number,
+  isVotingOver?: boolean,
 ) => {
   const isTablet = useMediaQuery('(min-width: 576px)');
-  const isDesktop = useMediaQuery('(min-width: 1280px)');
+  const isDesktop = useMediaQuery('(min-width: 1280px)') ;
 
   const reorderedCountries = useMemo(() => {
     let columnCount = 1;
@@ -19,7 +20,7 @@ export const useReorderCountries = (
         columnCount = 2;
       }
 
-      if (isDesktop) {
+      if (isDesktop && isVotingOver) {
         columnCount = 3;
       }
     }
@@ -53,7 +54,7 @@ export const useReorderCountries = (
     }
 
     return reordered;
-  }, [countries, isTablet, isDesktop, customColumnCount]);
+  }, [countries, isTablet, isDesktop, customColumnCount, isVotingOver]);
 
   return reorderedCountries;
 };

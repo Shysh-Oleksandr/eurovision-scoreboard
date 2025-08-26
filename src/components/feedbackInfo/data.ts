@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-26',
+    title:
+      'Fixed the board reordering issue on desktop',
+  },   
+  {
     date: '2025-08-25',
     title:
       'Added the ability to pick qualifiers for semi-finals by selection (without awarding points)',
