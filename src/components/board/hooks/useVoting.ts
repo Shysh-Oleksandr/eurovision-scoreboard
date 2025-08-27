@@ -40,8 +40,8 @@ export const useVoting = () => {
     }, [countries]);
 
   const hasCountryFinishedVoting = useMemo(
-    () => countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS,
-    [MAX_COUNTRY_WITH_POINTS, countriesWithPointsLength],
+    () => countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS && isJuryVoting,
+    [MAX_COUNTRY_WITH_POINTS, countriesWithPointsLength, isJuryVoting],
   );
 
   const onClick = useCallback(
