@@ -33,7 +33,7 @@ export const PickQualifiersSimulation = () => {
 
       <div
         className={`flex md:gap-6 xs:gap-4 gap-3 ${
-          currentStage.isOver ? 'mt-4' : ''
+          currentStage.isOver ? 'pt-2' : 'sm:pt-[0.9rem] pt-0'
         }`}
         key={startCounter}
       >

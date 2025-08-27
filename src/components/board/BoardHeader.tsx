@@ -21,6 +21,12 @@ const BoardHeader = (): JSX.Element => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
   const contestName = useGeneralStore((state) => state.settings.contestName);
+  const revealTelevoteLowestToHighest = useGeneralStore(
+    (state) => state.settings.revealTelevoteLowestToHighest,
+  );
+  const currentRevealTelevotePoints = useScoreboardStore(
+    (state) => state.currentRevealTelevotePoints,
+  );
 
   const viewedStage = eventStages.find((s) => s.id === viewedStageId);
   const winnerCountryFromStage = getWinnerCountry(viewedStage?.countries ?? []);
@@ -40,6 +46,16 @@ const BoardHeader = (): JSX.Element => {
   const votingText = useMemo(() => {
     if (isVotingOver) return null;
 
+    if (revealTelevoteLowestToHighest && !isJuryVoting) {
+      const pointsToShow = currentRevealTelevotePoints;
+
+      return (
+        <>
+          {pointsToShow} point{pointsToShow === 1 ? '' : 's'} go to...
+        </>
+      );
+    }
+
     if (isJuryVoting) {
       return (
         <>
@@ -56,7 +72,14 @@ const BoardHeader = (): JSX.Element => {
         <span className="font-medium">{votingCountry?.name}</span>
       </>
     );
-  }, [isVotingOver, isJuryVoting, votingPoints, votingCountry]);
+  }, [
+    isVotingOver,
+    revealTelevoteLowestToHighest,
+    isJuryVoting,
+    votingCountry?.name,
+    votingPoints,
+    currentRevealTelevotePoints,
+  ]);
 
   const winnerText = useMemo(() => {
     if (!winnerCountry) return null;

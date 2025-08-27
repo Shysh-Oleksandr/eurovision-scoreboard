@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-08-27',
+    title:
+      'The 2016-18 televote reveal order (from lowest points to highest). Small improvements',
+  },   
+  {
     date: '2025-08-26',
     title:
       'Fixed the board reordering issue on desktop',
@@ -144,15 +149,10 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-08-25', end: '2025-08-30' },
+    approximateDates: { start: '2025-08-28', end: '2025-08-31' },
     title:
-      'The 2016-18 televote announcement order (from lowest points to highest)',
+      'The stats screenshot generation',
   },
-  {
-    // approximateDates: { start: '2025-08-25', end: '2025-08-30' },
-    title: 'The stats screenshot generation',
-  },
-
   {
     // approximateDates: { start: '2025-07-14', end: '2025-07-15' },
     title: 'Presentation mode',

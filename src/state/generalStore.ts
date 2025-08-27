@@ -44,6 +44,7 @@ export const DEFAULT_SETTINGS: Settings = {
   shouldShowJuryVotingProgress: true,
   randomnessLevel: 50, // 0-100
   isPickQualifiersMode: false,
+  revealTelevoteLowestToHighest: false,
 }
 
 // Function to determine initial aspect ratio based on device width
@@ -102,6 +103,7 @@ interface Settings {
   shouldShowJuryVotingProgress: boolean;
   randomnessLevel: number;
   isPickQualifiersMode: boolean;
+  revealTelevoteLowestToHighest: boolean;
 }
 
 export interface ImageCustomizationSettings {

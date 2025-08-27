@@ -10,6 +10,7 @@ type MiscActions = {
   setCurrentStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
+  setCurrentRevealTelevotePoints: (points: number) => void;
 };
 
 export const createMiscActions: StateCreator<
@@ -94,6 +95,12 @@ export const createMiscActions: StateCreator<
 
         return stage;
       }),
+    });
+  },
+
+  setCurrentRevealTelevotePoints: (points: number) => {
+    set({
+      currentRevealTelevotePoints: points,
     });
   },
 });

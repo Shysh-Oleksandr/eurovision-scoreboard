@@ -103,7 +103,7 @@ const FeedbackModal = ({
           </div>
         )}
 
-        {activeTab === 'whats-new' && <UpdateList items={WHATS_NEW} />}
+        {activeTab === 'whats-new' && <UpdateList items={WHATS_NEW} compact />}
 
         {activeTab === 'upcoming' && (
           <div>
