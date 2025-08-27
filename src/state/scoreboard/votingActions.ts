@@ -20,6 +20,91 @@ import { ScoreboardState, Vote } from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
 
+// Reusable function to swap predefined votes between two countries (jury, televote, combined)
+const swapVotesBetweenCountries = (
+  predefinedVotes: any,
+  countryCodeA: string,
+  countryCodeB: string,
+) => {
+  const updated: any = { ...predefinedVotes };
+
+  if (predefinedVotes.jury) {
+    updated.jury = { ...predefinedVotes.jury };
+    Object.keys(predefinedVotes.jury).forEach((voter) => {
+      const votes = predefinedVotes.jury![voter];
+      if (!votes) return;
+      updated.jury![voter] = votes.map((vote: any) => {
+        if (vote.countryCode === countryCodeA) return { ...vote, countryCode: countryCodeB };
+        if (vote.countryCode === countryCodeB) return { ...vote, countryCode: countryCodeA };
+        return vote;
+      });
+    });
+  }
+
+  if (predefinedVotes.televote) {
+    updated.televote = { ...predefinedVotes.televote };
+    Object.keys(predefinedVotes.televote).forEach((voter) => {
+      const votes = predefinedVotes.televote![voter];
+      if (!votes) return;
+      updated.televote![voter] = votes.map((vote: any) => {
+        if (vote.countryCode === countryCodeA) return { ...vote, countryCode: countryCodeB };
+        if (vote.countryCode === countryCodeB) return { ...vote, countryCode: countryCodeA };
+        return vote;
+      });
+    });
+  }
+
+  if (predefinedVotes.combined) {
+    updated.combined = { ...predefinedVotes.combined };
+    Object.keys(predefinedVotes.combined).forEach((voter) => {
+      const votes = predefinedVotes.combined![voter];
+      if (!votes) return;
+      updated.combined![voter] = votes.map((vote: any) => {
+        if (vote.countryCode === countryCodeA) return { ...vote, countryCode: countryCodeB };
+        if (vote.countryCode === countryCodeB) return { ...vote, countryCode: countryCodeA };
+        return vote;
+      });
+    });
+  }
+
+  return updated;
+};
+
+// Recalculate stage countryPoints (jury, televote, combined) from predefinedVotes
+const recalculateCountryPoints = (currentStage: EventStage, predefinedVotes: any) => {
+  const pointsByCountry: Record<string, { juryPoints: number; televotePoints: number; combinedPoints: number }> = {};
+
+  currentStage.countries.forEach((c) => {
+    pointsByCountry[c.code] = { juryPoints: 0, televotePoints: 0, combinedPoints: 0 };
+  });
+
+  if (predefinedVotes.jury) {
+    Object.values(predefinedVotes.jury).forEach((votes: any) => {
+      votes?.forEach((v: any) => {
+        if (pointsByCountry[v.countryCode]) pointsByCountry[v.countryCode].juryPoints += v.points;
+      });
+    });
+  }
+
+  if (predefinedVotes.televote) {
+    Object.values(predefinedVotes.televote).forEach((votes: any) => {
+      votes?.forEach((v: any) => {
+        if (pointsByCountry[v.countryCode]) pointsByCountry[v.countryCode].televotePoints += v.points;
+      });
+    });
+  }
+
+  if (predefinedVotes.combined) {
+    Object.values(predefinedVotes.combined).forEach((votes: any) => {
+      votes?.forEach((v: any) => {
+        if (pointsByCountry[v.countryCode]) pointsByCountry[v.countryCode].combinedPoints += v.points;
+      });
+    });
+  }
+
+  return pointsByCountry;
+};
+
 type VotingActions = {
   giveJuryPoints: (countryCode: string) => void;
   giveTelevotePoints: (countryCode: string, votingPoints: number) => void;
@@ -28,6 +113,7 @@ type VotingActions = {
   finishTelevoteVotingRandomly: () => void;
   givePredefinedJuryPoint: () => void;
   givePredefinedTelevotePoints: () => void;
+  giveManualTelevotePointsInRevealMode: (countryCode: string) => void;
   pickQualifier: (countryCode: string) => void;
   pickQualifierRandomly: () => void;
 };
@@ -318,9 +404,21 @@ export const createVotingActions: StateCreator<
   givePredefinedTelevotePoints: () => {
     const state = get();
     const currentStage = state.getCurrentStage();
+    const revealTelevoteLowestToHighest = useGeneralStore.getState().settings.revealTelevoteLowestToHighest;
 
     if (!currentStage) return;
 
+    if (revealTelevoteLowestToHighest) {
+      // In reveal mode, give points to the country with the lowest points
+      const nextLowestCountry = state.getNextLowestTelevoteCountry();
+      
+      if (!nextLowestCountry || !nextLowestCountry.country) return;
+
+      get().giveTelevotePoints(nextLowestCountry.country.code,  state.currentRevealTelevotePoints);
+      return;
+    }
+
+    // Original logic for normal mode
     const votingCountry = useCountriesStore.getState().getVotingCountry(); // This is the country receiving points
 
     if (!votingCountry) return;
@@ -361,6 +459,53 @@ export const createVotingActions: StateCreator<
     }
 
     get().giveTelevotePoints(votingCountry.code, totalPoints);
+  },
+
+  giveManualTelevotePointsInRevealMode: (countryCode: string) => {
+    const state = get();
+    const currentStage = state.getCurrentStage();
+
+    if (!currentStage) return;
+    
+    // Get the current reveal points and the next lowest country
+    const currentRevealPoints = state.currentRevealTelevotePoints;
+    const nextLowestCountry = state.getNextLowestTelevoteCountry();
+    
+    if (!nextLowestCountry || !nextLowestCountry.country) return;
+    
+    // If the clicked country is not the next lowest country, we need to swap votes
+    if (countryCode !== nextLowestCountry.country?.code) {
+      const predefinedVotes = state.predefinedVotes[currentStage.id];
+      if (predefinedVotes) {
+        // Swap votes between the clicked country and the next lowest country
+        const updatedPredefinedVotes = swapVotesBetweenCountries(
+          predefinedVotes,
+          countryCode,
+          nextLowestCountry.country.code
+        );
+        
+        // Recalculate country points after the swap
+        const recalculatedCountryPoints = recalculateCountryPoints(
+          currentStage,
+          updatedPredefinedVotes
+        );
+        
+        // Update the store with swapped votes and recalculated points
+        set((s) => ({
+          countryPoints: {
+            ...s.countryPoints,
+            [currentStage.id]: recalculatedCountryPoints,
+          },
+          predefinedVotes: {
+            ...s.predefinedVotes,
+            [currentStage.id]: updatedPredefinedVotes,
+          },
+        }));
+      }
+    }
+    
+    // Give the televote points to the clicked country
+    get().giveTelevotePoints(countryCode, currentRevealPoints);
   },
 
   giveRandomJuryPoints: () => {
@@ -795,116 +940,18 @@ export const createVotingActions: StateCreator<
       const lowestQualifyingCountry = topCountries[topCountries.length - 1];
       
       if (lowestQualifyingCountry) {
-        // Swap jury votes if they exist
-        if (predefinedVotes.jury) {
-          updatedPredefinedVotes.jury = { ...predefinedVotes.jury };
-          Object.keys(predefinedVotes.jury).forEach(votingCountryCode => {
-            const votes = [...predefinedVotes.jury![votingCountryCode]];
-            
-            // Create a new array with swapped votes
-            const swappedVotes = votes.map(vote => {
-              if (vote.countryCode === countryCode) {
-                // Replace selected country votes with lowest country votes
-                return { ...vote, countryCode: lowestQualifyingCountry.code };
-              } else if (vote.countryCode === lowestQualifyingCountry.code) {
-                // Replace lowest country votes with selected country votes
-                return { ...vote, countryCode: countryCode };
-              }
-              return vote;
-            });
-            
-            updatedPredefinedVotes.jury![votingCountryCode] = swappedVotes;
-          });
-        }
-        
-        // Swap televote votes if they exist
-        if (predefinedVotes.televote) {
-          updatedPredefinedVotes.televote = { ...predefinedVotes.televote };
-          Object.keys(predefinedVotes.televote).forEach(votingCountryCode => {
-            const votes = [...predefinedVotes.televote![votingCountryCode]];
-            
-            // Create a new array with swapped votes
-            const swappedVotes = votes.map(vote => {
-              if (vote.countryCode === countryCode) {
-                // Replace selected country votes with lowest country votes
-                return { ...vote, countryCode: lowestQualifyingCountry.code };
-              } else if (vote.countryCode === lowestQualifyingCountry.code) {
-                // Replace lowest country votes with selected country votes
-                return { ...vote, countryCode: countryCode };
-              }
-              return vote;
-            });
-            
-            updatedPredefinedVotes.televote![votingCountryCode] = swappedVotes;
-          });
-        }
-        
-        // Swap combined votes if they exist
-        if (predefinedVotes.combined) {
-          updatedPredefinedVotes.combined = { ...predefinedVotes.combined };
-          Object.keys(predefinedVotes.combined).forEach(votingCountryCode => {
-            const votes = [...predefinedVotes.combined![votingCountryCode]];
-            
-            // Create a new array with swapped votes
-            const swappedVotes = votes.map(vote => {
-              if (vote.countryCode === countryCode) {
-                // Replace selected country votes with lowest country votes
-                return { ...vote, countryCode: lowestQualifyingCountry.code };
-              } else if (vote.countryCode === lowestQualifyingCountry.code) {
-                // Replace lowest country votes with selected country votes
-                return { ...vote, countryCode: countryCode };
-              }
-              return vote;
-            });
-            
-            updatedPredefinedVotes.combined![votingCountryCode] = swappedVotes;
-          });
-        }
-        
+        // Use reusable helper to swap predefined votes
+        updatedPredefinedVotes = swapVotesBetweenCountries(
+          predefinedVotes,
+          countryCode,
+          lowestQualifyingCountry.code,
+        );
+
         // Recalculate country points after the swap
-        const recalculatedCountryPoints: Record<string, any> = {};
-        
-        // Initialize all countries with 0 points
-        currentStage.countries.forEach(country => {
-          recalculatedCountryPoints[country.code] = {
-            juryPoints: 0,
-            televotePoints: 0,
-            combinedPoints: 0,
-          };
-        });
-
-        // Recalculate jury points
-        if (updatedPredefinedVotes.jury) {
-          Object.values(updatedPredefinedVotes.jury).forEach((votes: any) => {
-            votes.forEach((vote: any) => {
-              if (recalculatedCountryPoints[vote.countryCode]) {
-                recalculatedCountryPoints[vote.countryCode].juryPoints += vote.points;
-              }
-            });
-          });
-        }
-
-        // Recalculate televote points
-        if (updatedPredefinedVotes.televote) {
-          Object.values(updatedPredefinedVotes.televote).forEach((votes: any) => {
-            votes.forEach((vote: any) => {
-              if (recalculatedCountryPoints[vote.countryCode]) {
-                recalculatedCountryPoints[vote.countryCode].televotePoints += vote.points;
-              }
-            });
-          });
-        }
-
-        // Recalculate combined points
-        if (updatedPredefinedVotes.combined) {
-          Object.values(updatedPredefinedVotes.combined).forEach((votes: any) => {
-            votes.forEach((vote: any) => {
-              if (recalculatedCountryPoints[vote.countryCode]) {
-                recalculatedCountryPoints[vote.countryCode].combinedPoints += vote.points;
-              }
-            });
-          });
-        }
+        const recalculatedCountryPoints = recalculateCountryPoints(
+          currentStage,
+          updatedPredefinedVotes,
+        );
 
         // Update the countryPoints in the store
         set((s) => ({
@@ -917,7 +964,7 @@ export const createVotingActions: StateCreator<
             [currentStage.id]: updatedPredefinedVotes,
           },
         }));
-        
+
         // Update the local variable for use in the rest of the function
         Object.assign(stageCountryPoints, recalculatedCountryPoints);
       }

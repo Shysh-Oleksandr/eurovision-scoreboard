@@ -33,4 +33,5 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   },
   hasShownManualTelevoteWarning: false,
   lastPointsResetTimerId: null,
+  currentRevealTelevotePoints: undefined,
 };

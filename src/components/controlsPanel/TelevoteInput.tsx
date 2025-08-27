@@ -29,6 +29,9 @@ const TelevoteInput = () => {
   const shouldLimitManualTelevotePoints = useGeneralStore(
     (state) => state.settings.shouldLimitManualTelevotePoints,
   );
+  const revealTelevoteLowestToHighest = useGeneralStore(
+    (state) => state.settings.revealTelevoteLowestToHighest,
+  );
   const pointsSystem = useGeneralStore((state) => state.pointsSystem);
 
   const hasShownManualTelevoteWarning = useScoreboardStore(
@@ -36,6 +39,15 @@ const TelevoteInput = () => {
   );
   const setHasShownManualTelevoteWarning = useScoreboardStore(
     (state) => state.setHasShownManualTelevoteWarning,
+  );
+  const currentRevealTelevotePoints = useScoreboardStore(
+    (state) => state.currentRevealTelevotePoints,
+  );
+  const setCurrentRevealTelevotePoints = useScoreboardStore(
+    (state) => state.setCurrentRevealTelevotePoints,
+  );
+  const getNextLowestTelevoteCountry = useScoreboardStore(
+    (state) => state.getNextLowestTelevoteCountry,
   );
 
   const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
@@ -122,7 +134,9 @@ const TelevoteInput = () => {
       // Check if the current voting country would exceed their individual limit
       if (votingPoints > televoteProgress.maxPointsPerVotingCountry) {
         setError(
-          `The maximum number of points for this country is ${televoteProgress.maxPointsPerVotingCountry}`,
+          revealTelevoteLowestToHighest
+            ? `The maximum possible number of points is ${televoteProgress.maxPointsPerVotingCountry}`
+            : `The maximum number of points for this country is ${televoteProgress.maxPointsPerVotingCountry}`,
         );
 
         return;
@@ -139,6 +153,26 @@ const TelevoteInput = () => {
 
         return;
       }
+    }
+
+    // In reveal mode, update the current reveal points as the user types
+    if (revealTelevoteLowestToHighest) {
+      if (hasShownManualTelevoteWarning || !shouldShowManualTelevoteWarning) {
+        setCurrentRevealTelevotePoints(votingPoints);
+
+        return;
+      }
+
+      const confirmation = window.confirm(
+        "Note: Manually adjusting televote points won't be reflected in the detailed stats. Are you sure you want to continue?",
+      );
+
+      if (confirmation) {
+        setHasShownManualTelevoteWarning(true);
+        setCurrentRevealTelevotePoints(votingPoints);
+      }
+
+      return;
     }
 
     const vote = () => {
@@ -173,6 +207,22 @@ const TelevoteInput = () => {
       setEnteredPoints('');
     }
   }, [televotingProgress]);
+
+  useEffect(() => {
+    if (revealTelevoteLowestToHighest) {
+      const nextCountry = getNextLowestTelevoteCountry();
+
+      if (nextCountry) {
+        setCurrentRevealTelevotePoints(nextCountry.points);
+        setEnteredPoints(nextCountry.points.toString());
+      }
+    }
+  }, [
+    revealTelevoteLowestToHighest,
+    getNextLowestTelevoteCountry,
+    setCurrentRevealTelevotePoints,
+    televotingProgress,
+  ]);
 
   return (
     <div className="w-full pb-1 lg:pt-3 pt-2 lg:px-4 px-3 rounded-md rounded-b-none">
@@ -230,12 +280,14 @@ const TelevoteInput = () => {
           onChange={handleInputChange}
         />
         <Button
-          label="Vote"
+          label={revealTelevoteLowestToHighest ? 'Save' : 'Vote'}
           onClick={handleVoting}
           className="mt-2 ml-2 md:px-4 !px-6"
           disabled={
             enteredPoints === '' ||
-            (error !== '' && !disableLimit && !disableLimitForShow)
+            (error !== '' && !disableLimit && !disableLimitForShow) ||
+            (revealTelevoteLowestToHighest &&
+              enteredPoints === currentRevealTelevotePoints?.toString())
           }
         />
       </div>

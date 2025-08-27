@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { Country } from '../../../models';
+import { useGeneralStore } from '@/state/generalStore';
 
 type useItemStateProps = {
   country: Country;
@@ -21,8 +22,12 @@ export const useItemState = ({
   hasCountryFinishedVoting,
   isCountryVotingFinished,
 }: useItemStateProps) => {
+  const revealTelevoteLowestToHighest = useGeneralStore(
+    (state) => state.settings.revealTelevoteLowestToHighest,
+  );
+
   const isVotingCountry = country.code === votingCountryCode && isJuryVoting;
-  const isActive = country.code === votingCountryCode && !isJuryVoting;
+  const isActive = country.code === votingCountryCode && !isJuryVoting && !revealTelevoteLowestToHighest;
 
   const isVoted = useMemo(
     () => country.lastReceivedPoints !== null || country.isVotingFinished,
@@ -33,7 +38,7 @@ export const useItemState = ({
     () =>
       (isVoted && !hasCountryFinishedVoting) ||
       isVotingCountry ||
-      !isJuryVoting,
+      (!isJuryVoting && !revealTelevoteLowestToHighest),
     [isVoted, hasCountryFinishedVoting, isVotingCountry, isJuryVoting],
   );
 
@@ -46,7 +51,7 @@ export const useItemState = ({
 
     if (isJuryVoting) {
       return `bg-countryItem-juryBg text-countryItem-juryCountryText ${
-        isDisabled ? '' : 'hover:bg-countryItem-juryHoverBg cursor-pointer '
+        isDisabled ? '' : 'hover:bg-countryItem-juryHoverBg cursor-pointer'
       }`;
     }
 
@@ -58,7 +63,7 @@ export const useItemState = ({
       return 'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
     }
 
-    return 'bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText';
+    return `bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText ${revealTelevoteLowestToHighest ? 'hover:bg-countryItem-juryHoverBg cursor-pointer' : ''}`;
   }, [
     shouldShowAsNonQualified,
     isJuryVoting,

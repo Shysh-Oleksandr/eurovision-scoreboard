@@ -11,6 +11,8 @@ import { useCountryDisplay } from './hooks/useCountryDisplay';
 import { useCountrySorter } from './hooks/useCountrySorter';
 import { useVoting } from './hooks/useVoting';
 
+import { MIN_COUNTRIES_FOR_3_COLUMNS } from '@/hooks/useReorderCountries';
+
 const FLIP_SPRING = { damping: 5, stiffness: 25, overshootClamping: true };
 
 const Board = (): JSX.Element => {
@@ -82,7 +84,9 @@ const Board = (): JSX.Element => {
       <div
         ref={containerRef}
         className={`container-wrapping-flipper will-change-all ${
-          isVotingOver ? 'is-over' : ''
+          isVotingOver && finalCountries.length >= MIN_COUNTRIES_FOR_3_COLUMNS
+            ? 'is-over'
+            : ''
         }`}
       >
         <Flipper

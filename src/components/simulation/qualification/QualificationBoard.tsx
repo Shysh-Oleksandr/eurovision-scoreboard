@@ -1,4 +1,7 @@
-import React from 'react';
+import gsap from 'gsap';
+import React, { useRef } from 'react';
+
+import { useGSAP } from '@gsap/react';
 
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
@@ -8,12 +11,36 @@ import Button from '@/components/common/Button';
 
 const QualificationBoard = () => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const pickQualifier = useScoreboardStore((state) => state.pickQualifier);
   const pickQualifierRandomly = useScoreboardStore(
     (state) => state.pickQualifierRandomly,
   );
 
   const { countries, isOver } = getCurrentStage();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      gsap.fromTo(
+        containerRef.current,
+        {
+          opacity: 0,
+          y: 20,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.in',
+        },
+      );
+    },
+    {
+      dependencies: [currentStageId],
+      scope: containerRef,
+    },
+  );
 
   return (
     <div className="flex-1 rounded-sm">
@@ -30,7 +57,10 @@ const QualificationBoard = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 2cols:grid-cols-2 gap-x-3 gap-y-1.5">
+      <div
+        ref={containerRef}
+        className="grid grid-cols-1 2cols:grid-cols-2 gap-x-3 gap-y-1.5"
+      >
         {countries.map((country) => (
           <CountryQualificationItem
             key={country.code}

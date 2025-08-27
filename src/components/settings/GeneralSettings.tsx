@@ -53,31 +53,6 @@ export const GeneralSettings: React.FC = () => {
         <div className="h-px bg-primary-800 w-full my-4" />
 
         <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
-          <div className="flex items-start gap-2">
-            <Tooltip
-              content={
-                <div className="font-medium">
-                  When enabled, limits the total televote points you can award
-                  (when manually entering points) and shows how many remain.
-                </div>
-              }
-              position="left"
-            >
-              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-            </Tooltip>
-            <Checkbox
-              id="limit-manual-televote-points"
-              labelClassName="w-full !px-0 !pt-1 !items-start"
-              label="Limit Manual Televote Points"
-              checked={settings.shouldLimitManualTelevotePoints}
-              onChange={(e) =>
-                setSettings({
-                  shouldLimitManualTelevotePoints: e.target.checked,
-                })
-              }
-            />
-          </div>
-
           <div className="flex items-start gap-2 text-white">
             <Tooltip
               content={
@@ -103,6 +78,57 @@ export const GeneralSettings: React.FC = () => {
               onChange={(e) => {
                 setSettings({ isPickQualifiersMode: e.target.checked });
               }}
+            />
+          </div>
+          <div className="flex items-start gap-2 text-white">
+            <Tooltip
+              content={
+                <div className="font-medium">
+                  <p>
+                    When enabled, the televote points will be announced from
+                    lowest to highest (ESC 2016–2018 system). Otherwise, order
+                    follows jury points.
+                  </p>
+                </div>
+              }
+              position="left"
+            >
+              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            </Tooltip>
+            <Checkbox
+              id="announce-televote-from-lowest-to-highest"
+              label="Televote reveal order: lowest to highest"
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              checked={settings.revealTelevoteLowestToHighest}
+              onChange={(e) => {
+                setSettings({
+                  revealTelevoteLowestToHighest: e.target.checked,
+                });
+              }}
+            />
+          </div>
+          <div className="flex items-start gap-2">
+            <Tooltip
+              content={
+                <div className="font-medium">
+                  When enabled, limits the total televote points you can award
+                  (when manually entering points) and shows how many remain.
+                </div>
+              }
+              position="left"
+            >
+              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            </Tooltip>
+            <Checkbox
+              id="limit-manual-televote-points"
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              label="Limit manual televote points"
+              checked={settings.shouldLimitManualTelevotePoints}
+              onChange={(e) =>
+                setSettings({
+                  shouldLimitManualTelevotePoints: e.target.checked,
+                })
+              }
             />
           </div>
         </div>
@@ -206,6 +232,17 @@ export const GeneralSettings: React.FC = () => {
           checked={settings.shouldShowManualTelevoteWarning}
           onChange={(e) =>
             setSettings({ shouldShowManualTelevoteWarning: e.target.checked })
+          }
+        />
+        <Checkbox
+          id="show-jury-voting-progress"
+          labelClassName="w-full"
+          label="Show jury voting progress bar"
+          checked={settings.shouldShowJuryVotingProgress}
+          onChange={(e) =>
+            setSettings({
+              shouldShowJuryVotingProgress: e.target.checked,
+            })
           }
         />
         <BgImageSelect />

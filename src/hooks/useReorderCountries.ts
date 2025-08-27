@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { Country } from '../models';
 import { useMediaQuery } from './useMediaQuery';
 
+export const MIN_COUNTRIES_FOR_3_COLUMNS = 24;
+
 export const useReorderCountries = (
   countries: Country[],
   customColumnCount?: number,
@@ -20,7 +22,7 @@ export const useReorderCountries = (
         columnCount = 2;
       }
 
-      if (isDesktop && isVotingOver) {
+      if (isDesktop && isVotingOver && countries.length >= MIN_COUNTRIES_FOR_3_COLUMNS) {
         columnCount = 3;
       }
     }

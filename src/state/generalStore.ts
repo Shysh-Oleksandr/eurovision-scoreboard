@@ -41,8 +41,10 @@ export const DEFAULT_SETTINGS: Settings = {
   isJuniorContest: false,
   contestYear: INITIAL_YEAR,
   shouldLimitManualTelevotePoints: true,
+  shouldShowJuryVotingProgress: true,
   randomnessLevel: 50, // 0-100
   isPickQualifiersMode: false,
+  revealTelevoteLowestToHighest: false,
 }
 
 // Function to determine initial aspect ratio based on device width
@@ -98,8 +100,10 @@ interface Settings {
   isJuniorContest: boolean;
   contestYear: string;
   shouldLimitManualTelevotePoints: boolean;
+  shouldShowJuryVotingProgress: boolean;
   randomnessLevel: number;
   isPickQualifiersMode: boolean;
+  revealTelevoteLowestToHighest: boolean;
 }
 
 export interface ImageCustomizationSettings {

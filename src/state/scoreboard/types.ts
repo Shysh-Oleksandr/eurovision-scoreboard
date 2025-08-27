@@ -41,11 +41,13 @@ export type ScoreboardState = {
   hasShownManualTelevoteWarning: boolean;
   lastPointsResetTimerId: NodeJS.Timeout | null;
   qualificationOrder: QualificationOrder;
+  currentRevealTelevotePoints: number; // Current points to give in reveal mode
 
   // Getters
   getCurrentStage: () => EventStage;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
   getVotingPoints: () => number;
+  getNextLowestTelevoteCountry: () => {country: Country | null, points: number} | null; // Get next country to receive points in reveal mode
   // Actions
   setEventStages: (
     stages: (Omit<EventStage, 'countries'> & { countries: BaseCountry[] })[],
@@ -57,6 +59,7 @@ export type ScoreboardState = {
   finishTelevoteVotingRandomly: () => void;
   givePredefinedJuryPoint: () => void;
   givePredefinedTelevotePoints: () => void;
+  giveManualTelevotePointsInRevealMode: (countryCode: string) => void;
   resetLastPoints: () => void;
   hideLastReceivedPoints: () => void;
   startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
@@ -68,6 +71,7 @@ export type ScoreboardState = {
   setCurrentStageId: (stageId: string | null) => void;
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
+  setCurrentRevealTelevotePoints: (points: number) => void; // Set current points to give in reveal mode
   predefineVotesForStage: (
     stage: EventStage,
     resetOtherStages?: boolean,
