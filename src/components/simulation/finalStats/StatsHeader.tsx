@@ -14,6 +14,7 @@ interface StatsHeaderProps {
   setSelectedVoteType: (type: 'Total' | StageVotingType) => void;
   voteTypeOptions: StageVotingType[];
   totalBadgeLabel: string;
+  hideVoteTypeOptions?: boolean;
 }
 
 const StatsHeader: React.FC<StatsHeaderProps> = ({
@@ -24,6 +25,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   setSelectedVoteType,
   voteTypeOptions,
   totalBadgeLabel,
+  hideVoteTypeOptions = false,
 }) => {
   const isCombinedVoting = finishedStages.some(
     (stage) =>
@@ -32,7 +34,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   );
 
   return (
-    <div className="flex flex-col gap-3 px-2 relative">
+    <div className="flex flex-col sm:gap-2.5 gap-2 px-2 relative">
       {isCombinedVoting && (
         <div className="absolute top-1 right-1">
           <Tooltip
@@ -71,21 +73,23 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
           />
         ))}
       </div>
-      <div className="flex justify-center sm:gap-3 gap-2">
-        <Badge
-          label={totalBadgeLabel}
-          onClick={() => setSelectedVoteType('Total')}
-          isActive={selectedVoteType === 'Total'}
-        />
-        {voteTypeOptions.map((type) => (
+      {!hideVoteTypeOptions && (
+        <div className="flex justify-center sm:gap-3 gap-2">
           <Badge
-            key={type}
-            label={type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
-            onClick={() => setSelectedVoteType(type)}
-            isActive={selectedVoteType === type}
+            label={totalBadgeLabel}
+            onClick={() => setSelectedVoteType('Total')}
+            isActive={selectedVoteType === 'Total'}
           />
-        ))}
-      </div>
+          {voteTypeOptions.map((type) => (
+            <Badge
+              key={type}
+              label={type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
+              onClick={() => setSelectedVoteType(type)}
+              isActive={selectedVoteType === type}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

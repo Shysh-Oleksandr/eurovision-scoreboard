@@ -111,20 +111,21 @@ export const useFinalStats = () => {
     }, 0);
   };
 
-  const getPoints = (country: Country) => {
-    if (selectedVoteType === StageVotingType.JURY) {
-      if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
-        return getTotalPointsForCountry(country.code, 'jury');
-      }
-
-      return country.juryPoints;
-    }
-    if (selectedVoteType === StageVotingType.TELEVOTE) {
+  const getPoints = (country: Country, type?: 'jury' | 'televote' | 'combined') => {
+    if ((selectedVoteType === StageVotingType.TELEVOTE && !type) || type === 'televote') {
       if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
         return getTotalPointsForCountry(country.code, 'televote');
       }
 
       return country.televotePoints;
+    }
+
+    if ((selectedVoteType === StageVotingType.JURY && !type) || type === 'jury') {
+      if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
+        return getTotalPointsForCountry(country.code, 'jury');
+      }
+
+      return country.juryPoints;
     }
 
     if (selectedStage?.votingMode === StageVotingMode.COMBINED) {

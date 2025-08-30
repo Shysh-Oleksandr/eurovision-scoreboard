@@ -1,13 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import Button from '../../common/Button';
 import Modal from '../../common/Modal/Modal';
+import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
+import SplitStats from './SplitStats';
 import StatsHeader from './StatsHeader';
 import StatsTable from './StatsTable';
+import SummaryStats from './SummaryStats';
 import { useFinalStats } from './useFinalStats';
 
 import { useScoreboardStore } from '@/state/scoreboardStore';
+
+enum FinalStatsTab {
+  BREAKDOWN = 'Breakdown',
+  SPLIT = 'Split',
+  SUMMARY = 'Summary',
+}
+
+const tabs = [
+  { value: FinalStatsTab.BREAKDOWN, label: 'Breakdown' },
+  { value: FinalStatsTab.SPLIT, label: 'Split' },
+  { value: FinalStatsTab.SUMMARY, label: 'Summary' },
+];
 
 interface FinalStatsModalProps {
   isOpen: boolean;
@@ -19,6 +34,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   onClose,
 }) => {
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const [activeTab, setActiveTab] = useState(FinalStatsTab.BREAKDOWN);
 
   const {
     finishedStages,
@@ -35,6 +51,53 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     getCellClassName,
   } = useFinalStats();
 
+  const tabsWithContent = useMemo(
+    () => [
+      {
+        ...tabs[0],
+        content: (
+          <StatsTable
+            rankedCountries={rankedCountries}
+            getCellPoints={getCellPoints}
+            getCellClassName={getCellClassName}
+            getPoints={getPoints}
+            selectedStageId={selectedStageId}
+            selectedVoteType={selectedVoteType}
+          />
+        ),
+      },
+      {
+        ...tabs[1],
+        content: (
+          <SplitStats
+            rankedCountries={rankedCountries}
+            selectedStage={selectedStage}
+            getPoints={getPoints}
+          />
+        ),
+      },
+      {
+        ...tabs[2],
+        content: (
+          <SummaryStats
+            rankedCountries={rankedCountries}
+            selectedStage={selectedStage}
+            getPoints={getPoints}
+          />
+        ),
+      },
+    ],
+    [
+      selectedStageId,
+      selectedVoteType,
+      selectedStage,
+      rankedCountries,
+      getCellPoints,
+      getCellClassName,
+      getPoints,
+    ],
+  );
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -46,8 +109,16 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,_95vw)]"
-      contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
+      contentClassName="!py-4 !px-2 text-white h-[75vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
+      topContent={
+        <Tabs
+          tabs={tabs}
+          activeTab={activeTab}
+          setActiveTab={(tab) => setActiveTab(tab as FinalStatsTab)}
+          containerClassName="!rounded-none"
+        />
+      }
       bottomContent={
         <div className="bg-primary-900 p-4 z-30">
           <Button className="md:text-base text-sm w-full" onClick={onClose}>
@@ -64,16 +135,14 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
         setSelectedVoteType={setSelectedVoteType}
         voteTypeOptions={voteTypeOptions}
         totalBadgeLabel={totalBadgeLabel}
+        hideVoteTypeOptions={activeTab !== FinalStatsTab.BREAKDOWN}
       />
 
       {selectedStage ? (
-        <StatsTable
-          rankedCountries={rankedCountries}
-          getCellPoints={getCellPoints}
-          getCellClassName={getCellClassName}
-          getPoints={getPoints}
-          selectedStageId={selectedStageId}
-          selectedVoteType={selectedVoteType}
+        <TabContent
+          tabs={tabsWithContent}
+          activeTab={activeTab}
+          preserveContent
         />
       ) : (
         <div className="text-center p-8 text-gray-400">
