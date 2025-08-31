@@ -103,7 +103,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
   }, [rankedCountries, shouldShowJuryAndTelevote, getPoints]);
 
   return (
-    <div className="overflow-auto narrow-scrollbar mt-4">
+    <div className="overflow-auto narrow-scrollbar">
       <table className="text-left border-collapse w-full">
         <thead className="sticky top-0 z-10">
           <tr className={tableStyles.headerRow}>
@@ -127,84 +127,93 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
           </tr>
         </thead>
         <tbody>
-          {rankedCountries.map((country) => (
-            <tr key={country.code} className={tableStyles.bodyRow}>
-              {/* Rank Column */}
-              <td className={tableStyles.rankCell}>
-                <span className={tableStyles.rankText}>{country.rank}</span>
-              </td>
+          {rankedCountries.map((country, index, array) => {
+            const isLastRow = index === array.length - 1;
 
-              {/* Country Column */}
-              <td className={tableStyles.countryCell}>
-                <div className={tableStyles.countryContent}>
-                  {(() => {
-                    const { logo, isExisting } = getHostingCountryLogo(
-                      country,
-                      shouldShowHeartFlagIcon,
-                    );
+            return (
+              <tr
+                key={country.code}
+                className={`${tableStyles.bodyRow} ${
+                  isLastRow ? 'border-b-0' : ''
+                }`}
+              >
+                {/* Rank Column */}
+                <td className={tableStyles.rankCell}>
+                  <span className={tableStyles.rankText}>{country.rank}</span>
+                </td>
 
-                    return (
-                      <img
-                        src={logo}
-                        alt={country.name}
-                        className={`${
-                          isExisting
-                            ? 'w-8 h-8'
-                            : 'w-8 h-6 object-cover rounded-sm'
-                        }`}
-                        loading="lazy"
-                        width={32}
-                        height={32}
-                      />
-                    );
-                  })()}
-                  <span className={tableStyles.countryName}>
-                    {country.name}
+                {/* Country Column */}
+                <td className={tableStyles.countryCell}>
+                  <div className={tableStyles.countryContent}>
+                    {(() => {
+                      const { logo, isExisting } = getHostingCountryLogo(
+                        country,
+                        shouldShowHeartFlagIcon,
+                      );
+
+                      return (
+                        <img
+                          src={logo}
+                          alt={country.name}
+                          className={`${
+                            isExisting
+                              ? 'w-8 h-8'
+                              : 'w-8 h-6 object-cover rounded-sm'
+                          }`}
+                          loading="lazy"
+                          width={32}
+                          height={32}
+                        />
+                      );
+                    })()}
+                    <span className={tableStyles.countryName}>
+                      {country.name}
+                    </span>
+                  </div>
+                </td>
+
+                {/* Total Points Column */}
+                <td className={tableStyles.pointsCell}>
+                  <span className={tableStyles.pointsText}>
+                    {getPoints(country, 'combined')}
                   </span>
-                </div>
-              </td>
+                </td>
 
-              {/* Total Points Column */}
-              <td className={tableStyles.pointsCell}>
-                <span className={tableStyles.pointsText}>
-                  {getPoints(country, 'combined')}
-                </span>
-              </td>
+                {/* Jury and Televote Columns - only show if shouldShowJuryAndTelevote */}
+                {shouldShowJuryAndTelevote && (
+                  <>
+                    {/* Jury Points */}
+                    <td className={tableStyles.pointsCell}>
+                      <span className={tableStyles.pointsText}>
+                        {getPoints(country, 'jury')}
+                      </span>
+                    </td>
 
-              {/* Jury and Televote Columns - only show if shouldShowJuryAndTelevote */}
-              {shouldShowJuryAndTelevote && (
-                <>
-                  {/* Jury Points */}
-                  <td className={tableStyles.pointsCell}>
-                    <span className={tableStyles.pointsText}>
-                      {getPoints(country, 'jury')}
-                    </span>
-                  </td>
+                    {/* Tele Points */}
+                    <td className={tableStyles.pointsCell}>
+                      <span className={tableStyles.pointsText}>
+                        {getPoints(country, 'televote')}
+                      </span>
+                    </td>
 
-                  {/* Tele Points */}
-                  <td className={tableStyles.pointsCell}>
-                    <span className={tableStyles.pointsText}>
-                      {getPoints(country, 'televote')}
-                    </span>
-                  </td>
+                    {/* Jury Placement */}
+                    <td className={tableStyles.pointsCell}>
+                      <span className={tableStyles.pointsText}>
+                        {juryPlacements.get(country.code)}
+                      </span>
+                    </td>
 
-                  {/* Jury Placement */}
-                  <td className={tableStyles.pointsCell}>
-                    <span className={tableStyles.pointsText}>
-                      {juryPlacements.get(country.code)}
-                    </span>
-                  </td>
-
-                  {/* Tele Placement */}
-                  <td className={tableStyles.lastCell}>
-                    <span className={tableStyles.pointsText}>
-                      {televotePlacements.get(country.code)}
-                    </span>
-                  </td>
-                </>
-              )}
-            </tr>
-          ))}
+                    {/* Tele Placement */}
+                    <td className={tableStyles.lastCell}>
+                      <span className={tableStyles.pointsText}>
+                        {televotePlacements.get(country.code)}
+                      </span>
+                    </td>
+                  </>
+                )}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

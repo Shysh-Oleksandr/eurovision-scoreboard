@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Button from '../../common/Button';
 import Modal from '../../common/Modal/Modal';
 import Tabs, { TabContent } from '../../common/tabs/Tabs';
+import ShareStatsModal from '../share/ShareStatsModal';
 
 import SplitStats from './SplitStats';
 import StatsHeader from './StatsHeader';
@@ -10,6 +11,7 @@ import StatsTable from './StatsTable';
 import SummaryStats from './SummaryStats';
 import { useFinalStats } from './useFinalStats';
 
+import { StatsTableType } from '@/models';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 enum FinalStatsTab {
@@ -24,6 +26,20 @@ const tabs = [
   { value: FinalStatsTab.SUMMARY, label: 'Summary' },
 ];
 
+// Map FinalStatsTab to StatsTableType
+const getStatsTableType = (tab: FinalStatsTab): StatsTableType => {
+  switch (tab) {
+    case FinalStatsTab.BREAKDOWN:
+      return StatsTableType.BREAKDOWN;
+    case FinalStatsTab.SPLIT:
+      return StatsTableType.SPLIT;
+    case FinalStatsTab.SUMMARY:
+      return StatsTableType.SUMMARY;
+    default:
+      return StatsTableType.BREAKDOWN;
+  }
+};
+
 interface FinalStatsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -35,6 +51,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
 }) => {
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const [activeTab, setActiveTab] = useState(FinalStatsTab.BREAKDOWN);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const {
     finishedStages,
@@ -50,6 +67,9 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     getCellPoints,
     getCellClassName,
   } = useFinalStats();
+
+  // Image generation hook
+  const statsTableType = getStatsTableType(activeTab);
 
   const tabsWithContent = useMemo(
     () => [
@@ -98,6 +118,10 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     ],
   );
 
+  const handleShareClick = () => {
+    setIsShareModalOpen(true);
+  };
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -109,7 +133,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,_95vw)]"
-      contentClassName="!py-4 !px-2 text-white h-[75vh] narrow-scrollbar"
+      contentClassName="!py-4 !px-2 text-white sm:h-[75vh] h-[70vh] narrow-scrollbar relative"
       overlayClassName="!z-[1001]"
       topContent={
         <Tabs
@@ -136,6 +160,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
         voteTypeOptions={voteTypeOptions}
         totalBadgeLabel={totalBadgeLabel}
         hideVoteTypeOptions={activeTab !== FinalStatsTab.BREAKDOWN}
+        handleShareClick={handleShareClick}
       />
 
       {selectedStage ? (
@@ -149,6 +174,20 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
           No finished stages to display stats for.
         </div>
       )}
+
+      {/* Share Stats Modal */}
+      <ShareStatsModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        activeTab={statsTableType}
+        rankedCountries={rankedCountries}
+        selectedStageId={selectedStageId}
+        selectedVoteType={selectedVoteType}
+        getCellPoints={getCellPoints}
+        getCellClassName={getCellClassName}
+        getPoints={getPoints}
+        selectedStage={selectedStage}
+      />
     </Modal>
   );
 };

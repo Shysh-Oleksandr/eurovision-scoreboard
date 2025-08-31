@@ -36,12 +36,16 @@ const SplitStats: React.FC<SplitStatsProps> = ({
       'p-2 min-w-[60px] w-[60px] h-auto text-center border-r border-solid border-primary-900',
     totalHeader:
       'p-2 min-w-[200px] w-[200px] h-auto text-center border-r border-solid border-primary-900',
+    totalPointsHeader:
+      'p-2 min-w-[100px] w-[100px] h-auto text-center border-r border-solid border-primary-900',
     juryHeader:
       'p-2 min-w-[200px] w-[200px] h-auto text-center border-r border-solid border-primary-900',
     televoteHeader: 'p-2 min-w-[200px] w-[200px] h-auto text-center',
     subHeader: 'p-2 min-w-[80px] w-[80px] h-auto',
     countrySubHeader:
       'p-2 min-w-[140px] w-[140px] h-auto text-center border-x border-solid border-primary-900',
+    countryHeader:
+      'p-2 min-w-[200px] w-[200px] h-auto text-center border-r border-solid border-primary-900',
     pointsSubHeader:
       'p-2 min-w-[60px] w-[60px] h-auto text-center border-r border-solid border-primary-900',
     jurySubHeader:
@@ -92,47 +96,55 @@ const SplitStats: React.FC<SplitStatsProps> = ({
   });
 
   return (
-    <div className="overflow-auto narrow-scrollbar mt-4">
+    <div className="overflow-auto narrow-scrollbar">
       <table className="text-left border-collapse w-full">
         <thead className="sticky top-0 z-10">
-          <tr className={tableStyles.headerRow}>
-            <th className={tableStyles.rankHeader}>Rank</th>
-            <th className={tableStyles.totalHeader} colSpan={2}>
-              Total
-            </th>
-            {shouldShowJuryAndTelevote && (
-              <>
+          {shouldShowJuryAndTelevote ? (
+            <>
+              <tr className={tableStyles.headerRow}>
+                <th className={tableStyles.rankHeader}>Rank</th>
+                <th className={tableStyles.totalHeader} colSpan={2}>
+                  Total
+                </th>
                 <th className={tableStyles.juryHeader} colSpan={2}>
                   Jury
                 </th>
                 <th className={tableStyles.televoteHeader} colSpan={2}>
                   Televote
                 </th>
-              </>
-            )}
-          </tr>
-          <tr className={tableStyles.headerRow}>
-            <th className={tableStyles.subHeader}></th>
-            <th className={tableStyles.countrySubHeader}>Country</th>
-            <th className={tableStyles.pointsSubHeader}>Points</th>
-            {shouldShowJuryAndTelevote && (
-              <>
+              </tr>
+              <tr className={tableStyles.headerRow}>
+                <th className={tableStyles.subHeader}></th>
+                <th className={tableStyles.countrySubHeader}>Country</th>
+                <th className={tableStyles.pointsSubHeader}>Points</th>
                 <th className={tableStyles.jurySubHeader}>Country</th>
                 <th className={tableStyles.pointsSubHeader}>Points</th>
                 <th className={tableStyles.televoteSubHeader}>Country</th>
                 <th className={tableStyles.pointsSubHeader}>Points</th>
-              </>
-            )}
-          </tr>
+              </tr>
+            </>
+          ) : (
+            <tr className={tableStyles.headerRow}>
+              <th className={tableStyles.rankHeader}>Rank</th>
+              <th className={tableStyles.countryHeader}>Country</th>
+              <th className={tableStyles.totalPointsHeader}>Points</th>
+            </tr>
+          )}
         </thead>
         <tbody>
-          {rankedCountries.map((_, index) => {
+          {rankedCountries.map((_, index, array) => {
+            const isLastRow = index === array.length - 1;
             const totalCountry = countriesByTotal[index];
             const juryCountry = countriesByJury[index];
             const televoteCountry = countriesByTelevote[index];
 
             return (
-              <tr key={totalCountry.code} className={tableStyles.bodyRow}>
+              <tr
+                key={totalCountry.code}
+                className={`${tableStyles.bodyRow} ${
+                  isLastRow ? 'border-b-0' : ''
+                }`}
+              >
                 <td className={tableStyles.rankCell}>
                   <span className={tableStyles.rankText}>{index + 1}</span>
                 </td>

@@ -6,10 +6,10 @@ import {
   ShareImageAspectRatio,
   useGeneralStore,
 } from '../../../state/generalStore';
-import { getThemeBackground } from '../../../theme/themes';
 import Button from '../../common/Button';
 
 import ShareCountryItem from './ShareCountryItem';
+import { useShareBgImage } from './useShareBgImage';
 
 import { GenerateImageIcon } from '@/assets/icons/GenerateImageIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
@@ -30,11 +30,9 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const settings = useGeneralStore((state) => state.settings);
   const imageCustomization = useGeneralStore(
     (state) => state.imageCustomization,
   );
-  const themeYear = useGeneralStore((state) => state.themeYear);
 
   const isTouchDevice = useTouchDevice();
 
@@ -192,13 +190,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
     }
   };
 
-  const getBackgroundImage = () => {
-    if (settings.shouldUseCustomBgImage && settings.customBgImage) {
-      return settings.customBgImage;
-    }
-
-    return getThemeBackground(themeYear);
-  };
+  const backgroundImage = useShareBgImage();
 
   const allCountriesToDisplay = useCountryDisplay();
   const sortedCountries = useCountrySorter(allCountriesToDisplay);
@@ -226,12 +218,6 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
           const modalWidth = modalRef.current.offsetWidth;
 
           const modalContentWidth = modalWidth - 14;
-
-          // if (modalContentWidth > currentPreset.width) {
-          //   setScale(1);
-
-          //   return;
-          // }
 
           setScale(modalContentWidth / currentPreset.width); // scale based on base width
         }
@@ -278,7 +264,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
             <div
               className="absolute inset-0"
               style={{
-                backgroundImage: `url(${getBackgroundImage()})`,
+                backgroundImage: `url(${backgroundImage})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}

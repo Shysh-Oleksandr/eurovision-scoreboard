@@ -78,3 +78,9 @@ export interface CountryWithPoints {
   points: number;
   showDouzePointsAnimation: boolean;
 }
+
+export enum StatsTableType {
+  BREAKDOWN = 'Breakdown',
+  SPLIT = 'Split',
+  SUMMARY = 'Summary',
+}

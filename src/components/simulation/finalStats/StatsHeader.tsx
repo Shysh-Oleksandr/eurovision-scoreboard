@@ -4,6 +4,8 @@ import { EventStage, StageVotingMode, StageVotingType } from '../../../models';
 import Badge from '../../common/Badge';
 
 import { InfoIcon } from '@/assets/icons/InfoIcon';
+import { ShareIcon } from '@/assets/icons/ShareIcon';
+import Button from '@/components/common/Button';
 import { Tooltip } from '@/components/common/Tooltip';
 
 interface StatsHeaderProps {
@@ -15,6 +17,7 @@ interface StatsHeaderProps {
   voteTypeOptions: StageVotingType[];
   totalBadgeLabel: string;
   hideVoteTypeOptions?: boolean;
+  handleShareClick: () => void;
 }
 
 const StatsHeader: React.FC<StatsHeaderProps> = ({
@@ -26,6 +29,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   voteTypeOptions,
   totalBadgeLabel,
   hideVoteTypeOptions = false,
+  handleShareClick,
 }) => {
   const isCombinedVoting = finishedStages.some(
     (stage) =>
@@ -34,7 +38,16 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   );
 
   return (
-    <div className="flex flex-col sm:gap-2.5 gap-2 px-2 relative">
+    <div className="flex sm:flex-row items-center flex-col justify-between sm:gap-2.5 gap-2 px-2 relative sm:mb-4 mb-2">
+      <Button
+        variant="tertiary"
+        className="!px-4 z-20 h-fit sm:w-fit w-full justify-center"
+        onClick={handleShareClick}
+        Icon={<ShareIcon className="w-[20px] h-[20px]" />}
+      >
+        Share
+      </Button>
+
       {isCombinedVoting && (
         <div className="absolute top-1 right-1">
           <Tooltip
@@ -60,36 +73,49 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
           </Tooltip>
         </div>
       )}
-      <div className="flex justify-center sm:gap-3 gap-2 flex-wrap">
-        {finishedStages.map((stage) => (
-          <Badge
-            key={stage.id}
-            label={stage.name}
-            onClick={() => {
-              setSelectedStageId(stage.id);
-              setSelectedVoteType('Total');
-            }}
-            isActive={selectedStageId === stage.id}
-          />
-        ))}
-      </div>
-      {!hideVoteTypeOptions && (
-        <div className="flex justify-center sm:gap-3 gap-2">
-          <Badge
-            label={totalBadgeLabel}
-            onClick={() => setSelectedVoteType('Total')}
-            isActive={selectedVoteType === 'Total'}
-          />
-          {voteTypeOptions.map((type) => (
+      <div className="flex flex-col sm:gap-2.5 gap-2">
+        <div className="flex justify-center sm:gap-3 gap-2 flex-wrap">
+          {finishedStages.map((stage) => (
             <Badge
-              key={type}
-              label={type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}
-              onClick={() => setSelectedVoteType(type)}
-              isActive={selectedVoteType === type}
+              key={stage.id}
+              label={stage.name}
+              onClick={() => {
+                setSelectedStageId(stage.id);
+                setSelectedVoteType('Total');
+              }}
+              isActive={selectedStageId === stage.id}
             />
           ))}
         </div>
-      )}
+        {!hideVoteTypeOptions && (
+          <div className="flex justify-center sm:gap-3 gap-2">
+            <Badge
+              label={totalBadgeLabel}
+              onClick={() => setSelectedVoteType('Total')}
+              isActive={selectedVoteType === 'Total'}
+            />
+            {voteTypeOptions.map((type) => (
+              <Badge
+                key={type}
+                label={
+                  type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()
+                }
+                onClick={() => setSelectedVoteType(type)}
+                isActive={selectedVoteType === type}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Button
+        variant="tertiary"
+        className="!px-4 z-20 h-fit sm:block hidden invisible"
+        onClick={() => {}}
+        Icon={<ShareIcon className="w-[20px] h-[20px]" />}
+      >
+        Share
+      </Button>
     </div>
   );
 };

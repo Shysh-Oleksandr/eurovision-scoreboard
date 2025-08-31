@@ -45,7 +45,7 @@ const StatsTable: React.FC<StatsTableProps> = ({
   ).filter((country) => country.code !== 'WW' || isRestOfWorldVoting);
 
   return (
-    <div className="overflow-auto narrow-scrollbar mt-4">
+    <div className="overflow-auto narrow-scrollbar">
       <table className="text-left border-collapse">
         <thead className="sticky top-0 z-10">
           <tr>
