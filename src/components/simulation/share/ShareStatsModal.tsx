@@ -177,14 +177,14 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
                   }
                 />
 
-                <Checkbox
+                {/* <Checkbox
                   id="generateOnOpen"
                   label="Generate Image Automatically on Open"
                   checked={settings.generateOnOpen}
                   onChange={(e) =>
                     updateSetting('generateOnOpen', e.target.checked)
                   }
-                />
+                /> */}
               </div>
             </div>
           </CollapsibleSection>

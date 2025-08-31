@@ -275,18 +275,18 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
     }
   }, [generateImage, onImageGenerated, modalRef]);
 
-  useEffect(() => {
-    if (!isGenerating && !generatedImageUrl && settings.generateOnOpen) {
-      setTimeout(() => {
-        handleGenerateImage();
-      }, 300);
-    }
-  }, [
-    isGenerating,
-    generatedImageUrl,
-    handleGenerateImage,
-    settings.generateOnOpen,
-  ]);
+  // useEffect(() => {
+  //   if (!isGenerating && !generatedImageUrl && settings.generateOnOpen) {
+  //     setTimeout(() => {
+  //       handleGenerateImage();
+  //     }, 300);
+  //   }
+  // }, [
+  //   isGenerating,
+  //   generatedImageUrl,
+  //   handleGenerateImage,
+  //   settings.generateOnOpen,
+  // ]);
 
   return (
     <div>
