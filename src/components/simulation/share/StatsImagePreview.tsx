@@ -279,7 +279,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
     if (!isGenerating && !generatedImageUrl && settings.generateOnOpen) {
       setTimeout(() => {
         handleGenerateImage();
-      }, 100);
+      }, 300);
     }
   }, [
     isGenerating,
