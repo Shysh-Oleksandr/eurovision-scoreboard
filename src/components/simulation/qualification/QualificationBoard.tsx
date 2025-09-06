@@ -46,7 +46,10 @@ const QualificationBoard = () => {
     <div className="flex-1 rounded-sm">
       {!isOver && (
         <div className="2cols:flex hidden justify-between items-center flex-wrap gap-2 mb-2">
-          <h2 className="lg:text-2xl xs:text-xl text-lg font-medium text-white">
+          <h2
+            className="lg:text-2xl xs:text-xl text-lg font-medium text-white"
+            style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
+          >
             Choose a country to qualify
           </h2>
           <Button

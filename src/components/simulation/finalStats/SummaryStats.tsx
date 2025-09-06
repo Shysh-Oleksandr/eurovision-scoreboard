@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Country, EventStage, StageVotingMode } from '../../../models';
 
+import { useBorderOpacity } from './useBorderOpacity';
+
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
@@ -12,16 +14,20 @@ interface SummaryStatsProps {
     country: Country,
     type?: 'jury' | 'televote' | 'combined',
   ) => number;
+  enableHover?: boolean;
 }
 
 const SummaryStats: React.FC<SummaryStatsProps> = ({
   rankedCountries,
   selectedStage,
   getPoints,
+  enableHover = true,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+
+  const cssVars = useBorderOpacity(!enableHover);
 
   // Check if we should show jury and televote columns
   const shouldShowJuryAndTelevote =
@@ -45,13 +51,15 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
     juryPlacementHeader:
       'p-2 min-w-[100px] w-[100px] h-auto text-center border-r border-solid border-primary-900',
     telePlacementHeader: 'p-2 min-w-[100px] w-[100px] h-auto text-center',
-    bodyRow: 'border-b border-solid border-primary-900 hover:bg-primary-800/50',
+    bodyRow: `border-b border-solid border-primary-900 ${
+      enableHover ? 'hover:bg-primary-800/50' : ''
+    }`,
     rankCell: 'p-2 text-center border-r border-solid border-primary-900',
     countryCell: 'p-2 border-r border-solid border-primary-900',
     pointsCell: 'p-2 text-center border-r border-solid border-primary-900',
     lastCell: 'p-2 text-center',
     countryContent: 'flex items-center gap-3 pl-1',
-    countryName: 'font-medium truncate flex-1',
+    countryName: 'font-medium truncate flex-1 leading-normal',
     pointsText: 'font-semibold text-lg',
     rankText: 'text-lg font-semibold',
   };
@@ -103,7 +111,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
   }, [rankedCountries, shouldShowJuryAndTelevote, getPoints]);
 
   return (
-    <div className="overflow-auto narrow-scrollbar">
+    <div className="overflow-auto narrow-scrollbar" style={cssVars}>
       <table className="text-left border-collapse w-full">
         <thead className="sticky top-0 z-10">
           <tr className={tableStyles.headerRow}>

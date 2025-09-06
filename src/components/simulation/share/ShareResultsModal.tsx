@@ -255,7 +255,13 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
         <div className="sm:mx-3 mx-2">
           <CollapsibleSection
             title="Customization"
-            defaultExpanded={imageCustomization.isCustomizationExpanded}
+            isExpanded={imageCustomization.isCustomizationExpanded}
+            onToggle={() => {
+              setImageCustomization({
+                isCustomizationExpanded:
+                  !imageCustomization.isCustomizationExpanded,
+              });
+            }}
             contentClassName="lg:px-6 sm:px-4 px-3"
             extraContent={
               <Button

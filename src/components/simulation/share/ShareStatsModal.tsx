@@ -48,6 +48,8 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
     null,
   );
+  const [lastGeneratedImageType, setLastGeneratedImageType] =
+    useState<StatsTableType | null>(null);
 
   const { settings, setSettings, resetSettings } = useStatsCustomizationStore();
   const contestName = useGeneralStore((state) => state.settings.contestName);
@@ -64,14 +66,18 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       ? 'Split'
       : 'Summary';
 
-  const handleImageGenerated = useCallback((dataUrl: string) => {
-    setGeneratedImageUrl(dataUrl);
-  }, []);
+  const handleImageGenerated = useCallback(
+    (dataUrl: string) => {
+      setGeneratedImageUrl(dataUrl);
+      setLastGeneratedImageType(activeTab);
+    },
+    [activeTab],
+  );
 
   const handleDownload = () => {
     if (!generatedImageUrl) return;
 
-    const filename = `${defaultTitle} - ${stageName} - ${tableTypeText} - ${voteTypeText} - DouzePoints.app - ${Date.now()}.png`;
+    const filename = `${defaultTitle} - ${tableTypeText} - ${voteTypeText} - DouzePoints.app - ${Date.now()}.png`;
 
     const link = document.createElement('a');
 
@@ -90,10 +96,22 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
         title: defaultTitle,
       });
     }
-    if (isOpen && settings.generateOnOpen) {
+    if (
+      isOpen &&
+      settings.generateOnOpen &&
+      (!generatedImageUrl || lastGeneratedImageType !== activeTab)
+    ) {
       setGeneratedImageUrl(null);
     }
-  }, [isOpen, defaultTitle, setSettings, settings.generateOnOpen]);
+  }, [
+    isOpen,
+    defaultTitle,
+    setSettings,
+    settings.generateOnOpen,
+    generatedImageUrl,
+    lastGeneratedImageType,
+    activeTab,
+  ]);
 
   return (
     <Modal
@@ -115,7 +133,12 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
         <div className="sm:mx-3 mx-2">
           <CollapsibleSection
             title="Customization"
-            defaultExpanded={settings.isCustomizationExpanded}
+            isExpanded={settings.isCustomizationExpanded}
+            onToggle={() => {
+              setSettings({
+                isCustomizationExpanded: !settings.isCustomizationExpanded,
+              });
+            }}
             contentClassName="lg:px-6 sm:px-4 px-3"
             extraContent={
               <Button
@@ -130,8 +153,8 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
               </Button>
             }
           >
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="sm:space-y-4 space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 gap-2 items-center">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Title
@@ -142,32 +165,31 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
                     value={settings.title}
                     onChange={(e) => updateSetting('title', e.target.value)}
                     placeholder="Enter title"
+                    maxLength={100}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Background Opacity
+                    Border Opacity
                   </label>
                   <Input
                     type="number"
                     className="pr-3"
-                    value={settings.backgroundOpacity}
+                    value={settings.borderOpacity}
                     onChange={(e) =>
                       updateSetting(
-                        'backgroundOpacity',
-                        parseFloat(e.target.value) || 0.3,
+                        'borderOpacity',
+                        parseFloat(e.target.value) ?? 1,
                       )
                     }
                     min="0"
                     max="1"
                     step="0.1"
-                    placeholder="0.3"
+                    placeholder="1"
                   />
                 </div>
-              </div>
 
-              <div className="flex flex-wrap gap-1">
                 <Checkbox
                   id="showBackgroundImage"
                   label="Show Background Image"
@@ -177,14 +199,48 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
                   }
                 />
 
-                {/* <Checkbox
+                {settings.showBackgroundImage && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Background Image Opacity
+                    </label>
+                    <Input
+                      type="number"
+                      className="pr-3"
+                      value={settings.backgroundOpacity}
+                      onChange={(e) =>
+                        updateSetting(
+                          'backgroundOpacity',
+                          parseFloat(e.target.value) || 0.3,
+                        )
+                      }
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      placeholder="0.3"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-1">
+                <Checkbox
+                  id="showVotingCountriesNames"
+                  label="Show Voting Countries Names"
+                  checked={settings.showVotingCountriesNames}
+                  onChange={(e) =>
+                    updateSetting('showVotingCountriesNames', e.target.checked)
+                  }
+                />
+
+                <Checkbox
                   id="generateOnOpen"
                   label="Generate Image Automatically on Open"
                   checked={settings.generateOnOpen}
                   onChange={(e) =>
                     updateSetting('generateOnOpen', e.target.checked)
                   }
-                /> */}
+                />
               </div>
             </div>
           </CollapsibleSection>

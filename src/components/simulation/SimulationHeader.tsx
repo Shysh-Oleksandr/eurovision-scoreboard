@@ -55,7 +55,10 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
             height={28}
           />
         )}
-        <h2 className="sm:text-xl text-lg font-bold text-white">
+        <h2
+          className="sm:text-xl text-lg font-bold text-white"
+          style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
+        >
           {phaseTitle}
         </h2>
       </div>

@@ -48,7 +48,10 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
           style: { transform: 'none' }, // ignore preview scaling
         });
         i += 1;
-        dataUrl = canvas.toDataURL(options.format === 'jpeg' ? 'image/jpeg' : 'image/png', 0.9);
+        dataUrl = canvas.toDataURL(
+          options.format === 'jpeg' ? 'image/jpeg' : 'image/png',
+          0.9,
+        );
         cycle[i] = dataUrl.length;
 
         if (dataUrl.length > cycle[i - 1]) {
@@ -65,7 +68,10 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
               height: options.height,
               style: { transform: 'none' }, // ignore preview scaling
             });
-            dataUrl = canvas.toDataURL(options.format === 'jpeg' ? 'image/jpeg' : 'image/png', 0.9);
+            dataUrl = canvas.toDataURL(
+              options.format === 'jpeg' ? 'image/jpeg' : 'image/png',
+              0.9,
+            );
           }
         }
       }
@@ -77,9 +83,15 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
     } finally {
       setIsGenerating(false);
     }
-  }, [options, settings, themeYear]);
+  }, [
+    options.quality,
+    options.format,
+    options.width,
+    options.height,
+    // Remove settings and themeYear from dependencies as they're not used in the function
+  ]);
 
-  const getBackgroundImage = () => {
+  const getBackgroundImage = useCallback(() => {
     if (options.backgroundImage) {
       return options.backgroundImage;
     }
@@ -87,14 +99,19 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
       return settings.customBgImage;
     }
     return getThemeBackground(themeYear);
-  };
+  }, [
+    options.backgroundImage,
+    settings.shouldUseCustomBgImage,
+    settings.customBgImage,
+    themeYear,
+  ]);
 
-  const downloadImage = (dataUrl: string, filename: string) => {
+  const downloadImage = useCallback((dataUrl: string, filename: string) => {
     const link = document.createElement('a');
     link.download = filename;
     link.href = dataUrl;
     link.click();
-  };
+  }, []);
 
   return {
     containerRef,

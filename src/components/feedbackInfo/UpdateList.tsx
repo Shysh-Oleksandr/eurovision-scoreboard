@@ -37,7 +37,7 @@ const UpdateList = ({
             <p className="text-white/70 text-sm font-medium">
               {getDateLabel(item)}
             </p>
-            <p className="mt-1">{item.title}</p>
+            <p className="mt-0.5 leading-normal">{item.title}</p>
           </li>
         ))}
       </ul>

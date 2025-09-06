@@ -130,7 +130,10 @@ const BoardHeader = (): JSX.Element => {
         hasContent ? 'md:h-12' : ''
       }`}
     >
-      <h3 className="lg:text-2xl xs:text-xl text-lg text-white">
+      <h3
+        className="lg:text-2xl xs:text-xl text-lg text-white"
+        style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
+      >
         {winnerText || votingText}
       </h3>
       {!isVotingOver && (

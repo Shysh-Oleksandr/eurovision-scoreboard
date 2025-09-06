@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Country, EventStage, StageVotingMode } from '../../../models';
 
+import { useBorderOpacity } from './useBorderOpacity';
+
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
@@ -12,16 +14,20 @@ interface SplitStatsProps {
     country: Country,
     type?: 'jury' | 'televote' | 'combined',
   ) => number;
+  enableHover?: boolean;
 }
 
 const SplitStats: React.FC<SplitStatsProps> = ({
   rankedCountries,
   selectedStage,
   getPoints,
+  enableHover = true,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+
+  const cssVars = useBorderOpacity(!enableHover);
 
   // Check if we should show jury and televote columns
   const shouldShowJuryAndTelevote =
@@ -52,13 +58,15 @@ const SplitStats: React.FC<SplitStatsProps> = ({
       'p-2 min-w-[140px] w-[140px] h-auto text-center border-r border-solid border-primary-900',
     televoteSubHeader:
       'p-2 min-w-[140px] w-[140px] h-auto text-center border-r border-solid border-primary-900',
-    bodyRow: 'border-b border-solid border-primary-900 hover:bg-primary-800/50',
+    bodyRow: `border-b border-solid border-primary-900 ${
+      enableHover ? 'hover:bg-primary-800/50' : ''
+    }`,
     rankCell: 'p-2 text-center border-r border-solid border-primary-900',
     countryCell: 'p-2 border-r border-solid border-primary-900',
     pointsCell: 'p-2 text-center border-r border-solid border-primary-900',
     lastPointsCell: 'p-2 text-center',
     countryContent: 'flex items-center gap-3 pl-1',
-    countryName: 'font-medium truncate flex-1',
+    countryName: 'font-medium truncate flex-1 leading-normal',
     pointsText: 'font-semibold text-lg',
     rankText: 'text-lg font-semibold',
   };
@@ -96,7 +104,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
   });
 
   return (
-    <div className="overflow-auto narrow-scrollbar">
+    <div className="overflow-auto narrow-scrollbar" style={cssVars}>
       <table className="text-left border-collapse w-full">
         <thead className="sticky top-0 z-10">
           {shouldShowJuryAndTelevote ? (
@@ -120,7 +128,9 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                 <th className={tableStyles.jurySubHeader}>Country</th>
                 <th className={tableStyles.pointsSubHeader}>Points</th>
                 <th className={tableStyles.televoteSubHeader}>Country</th>
-                <th className={tableStyles.pointsSubHeader}>Points</th>
+                <th className={tableStyles.pointsSubHeader + ' border-r-0'}>
+                  Points
+                </th>
               </tr>
             </>
           ) : (

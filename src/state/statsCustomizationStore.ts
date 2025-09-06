@@ -5,8 +5,10 @@ export interface StatsCustomizationSettings {
   title: string;
   showBackgroundImage: boolean;
   backgroundOpacity: number;
+  borderOpacity: number;
   generateOnOpen: boolean;
   isCustomizationExpanded: boolean;
+  showVotingCountriesNames: boolean;
 }
 
 export interface StatsCustomizationState {
@@ -19,8 +21,10 @@ const DEFAULT_STATS_CUSTOMIZATION: StatsCustomizationSettings = {
   title: '',
   showBackgroundImage: true,
   backgroundOpacity: 0.3,
+  borderOpacity: 1,
   generateOnOpen: true,
   isCustomizationExpanded: false,
+  showVotingCountriesNames: false,
 };
 
 export const useStatsCustomizationStore = create<StatsCustomizationState>()(

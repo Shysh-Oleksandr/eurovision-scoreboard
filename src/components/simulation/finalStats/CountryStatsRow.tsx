@@ -14,6 +14,7 @@ interface CountryStatsRowProps {
   ) => string | number;
   getCellClassName: (points: number) => string;
   getPoints: (country: Country) => number;
+  enableHover?: boolean;
 }
 
 const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
@@ -22,6 +23,7 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
   getCellPoints,
   getCellClassName,
   getPoints,
+  enableHover = true,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
@@ -32,7 +34,11 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
   );
 
   return (
-    <tr className="border-b border-solid border-primary-900 hover:bg-primary-800/50">
+    <tr
+      className={`border-b border-solid border-primary-900 ${
+        enableHover ? 'hover:bg-primary-800/50' : ''
+      }`}
+    >
       <td className="p-2">
         <div className="flex items-center gap-3">
           <span className="text-lg font-bold w-6 text-center">
@@ -48,7 +54,9 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
             width={32}
             height={32}
           />
-          <span className="font-medium truncate flex-1">{country.name}</span>
+          <span className="font-medium truncate flex-1 leading-normal">
+            {country.name}
+          </span>
           <span className="font-bold text-lg">{getPoints(country)}</span>
         </div>
       </td>

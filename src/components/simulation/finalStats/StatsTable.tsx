@@ -3,9 +3,11 @@ import React from 'react';
 import { Country, StageVotingType } from '../../../models';
 
 import CountryStatsRow from './CountryStatsRow';
+import { useBorderOpacity } from './useBorderOpacity';
 
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
+import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 interface StatsTableProps {
@@ -18,6 +20,7 @@ interface StatsTableProps {
   getCellClassName: (points: number) => string;
   getPoints: (country: Country) => number;
   selectedVoteType: StageVotingType | 'Total';
+  enableHover?: boolean;
 }
 
 const StatsTable: React.FC<StatsTableProps> = ({
@@ -27,14 +30,21 @@ const StatsTable: React.FC<StatsTableProps> = ({
   getPoints,
   selectedStageId,
   selectedVoteType,
+  enableHover = true,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const showVotingCountriesNames =
+    useStatsCustomizationStore(
+      (state) => state.settings.showVotingCountriesNames,
+    ) && !enableHover;
 
   const getStageVotingCountries = useCountriesStore(
     (state) => state.getStageVotingCountries,
   );
+
+  const cssVars = useBorderOpacity(!enableHover);
 
   const isRestOfWorldVoting =
     selectedVoteType === StageVotingType.TELEVOTE ||
@@ -45,7 +55,10 @@ const StatsTable: React.FC<StatsTableProps> = ({
   ).filter((country) => country.code !== 'WW' || isRestOfWorldVoting);
 
   return (
-    <div className="overflow-auto narrow-scrollbar">
+    <div
+      className={`narrow-scrollbar ${enableHover ? 'overflow-auto' : ''}`}
+      style={cssVars}
+    >
       <table className="text-left border-collapse">
         <thead className="sticky top-0 z-10">
           <tr>
@@ -58,17 +71,41 @@ const StatsTable: React.FC<StatsTableProps> = ({
 
               return (
                 <th key={country.code} className="p-1 min-w-12 w-12">
-                  <img
-                    src={logo}
-                    alt={country.name}
-                    className={`${
-                      isExisting ? 'w-8 h-8' : 'w-8 h-6 object-cover rounded-sm'
-                    } mx-auto`}
-                    loading="lazy"
-                    width={32}
-                    height={24}
-                    title={country.name}
-                  />
+                  <div
+                    className={`flex flex-col items-center justify-end gap-1.5 ${
+                      showVotingCountriesNames ? 'h-[100px]' : ''
+                    }`}
+                  >
+                    {showVotingCountriesNames && (
+                      <h5
+                        className="text-white text-sm font-medium truncate"
+                        style={{
+                          writingMode: 'sideways-rl',
+                          whiteSpace: 'nowrap',
+                          lineHeight: 'normal',
+                          letterSpacing: '0.05em',
+                          overflow: 'hidden',
+                          display: 'inline-block',
+                          transform: 'rotate(180deg)',
+                        }}
+                      >
+                        {country.code === 'WW' ? 'ROTW' : country.name}
+                      </h5>
+                    )}
+                    <img
+                      src={logo}
+                      alt={country.name}
+                      className={`${
+                        isExisting
+                          ? 'w-8 h-8'
+                          : 'w-8 h-6 object-cover rounded-sm'
+                      } mx-auto flex-shrink-0`}
+                      loading="lazy"
+                      width={32}
+                      height={24}
+                      title={country.name}
+                    />
+                  </div>
                 </th>
               );
             })}
@@ -83,6 +120,7 @@ const StatsTable: React.FC<StatsTableProps> = ({
               getCellPoints={getCellPoints}
               getCellClassName={getCellClassName}
               getPoints={getPoints}
+              enableHover={enableHover}
             />
           ))}
         </tbody>

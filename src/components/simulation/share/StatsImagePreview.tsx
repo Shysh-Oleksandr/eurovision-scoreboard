@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from 'react';
 
 import { Country, StageVotingType } from '../../../models';
 import { useStatsCustomizationStore } from '../../../state/statsCustomizationStore';
@@ -50,14 +56,24 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
   generatedImageUrl,
 }) => {
   const [scale, setScale] = useState(1);
-  const settings = useStatsCustomizationStore((state) => state.settings);
+  // Only select the specific settings we need to prevent unnecessary re-renders
+  const backgroundOpacity = useStatsCustomizationStore(
+    (state) => state.settings.backgroundOpacity,
+  );
+  const generateOnOpen = useStatsCustomizationStore(
+    (state) => state.settings.generateOnOpen,
+  );
+  const showBackgroundImage = useStatsCustomizationStore(
+    (state) => state.settings.showBackgroundImage,
+  );
+  const title = useStatsCustomizationStore((state) => state.settings.title);
 
   // Let the preview render at natural width, we'll scale it to fit modal
   const [previewWidth, setPreviewWidth] = useState(MIN_WIDTH);
   const [previewHeight, setPreviewHeight] = useState(MIN_HEIGHT);
 
   // Use refs to track previous values and prevent unnecessary updates
-  const prevDimensionsRef = useRef({ width: MIN_WIDTH, height: MIN_HEIGHT });
+  const prevDimensionsRef = useRef({ width: MIN_WIDTH, height: MIN_WIDTH });
 
   // Store current dimensions for image generation
   const currentDimensionsRef = useRef({ width: MIN_WIDTH, height: MIN_HEIGHT });
@@ -66,31 +82,36 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
     width: currentDimensionsRef.current.width,
     height: currentDimensionsRef.current.height,
     backgroundImage: null, // We'll handle this in the component
-    backgroundOpacity: settings.backgroundOpacity,
   });
 
   // Calculate responsive font sizes based on preview width
-  const getTitleFontSize = (width?: number) => {
-    const minSize = 22;
-    const maxSize = 42;
-    const baseWidth = width || previewWidth;
-    const baseSize = Math.max(minSize, Math.min(maxSize, baseWidth * 0.04));
+  const getTitleFontSize = useCallback(
+    (width?: number) => {
+      const minSize = 22;
+      const maxSize = 42;
+      const baseWidth = width || previewWidth;
+      const baseSize = Math.max(minSize, Math.min(maxSize, baseWidth * 0.04));
 
-    return Math.round(baseSize);
-  };
+      return Math.round(baseSize);
+    },
+    [previewWidth],
+  );
 
-  const getBrandingFontSize = (width?: number) => {
-    const minSize = 16;
-    const maxSize = 22;
-    const baseWidth = width || previewWidth;
-    const baseSize = Math.max(minSize, Math.min(maxSize, baseWidth * 0.025));
+  const getBrandingFontSize = useCallback(
+    (width?: number) => {
+      const minSize = 16;
+      const maxSize = 22;
+      const baseWidth = width || previewWidth;
+      const baseSize = Math.max(minSize, Math.min(maxSize, baseWidth * 0.025));
 
-    return Math.round(baseSize);
-  };
+      return Math.round(baseSize);
+    },
+    [previewWidth],
+  );
 
   const backgroundImage = useShareBgImage();
 
-  const renderContent = () => {
+  const renderContent = useMemo(() => {
     switch (activeTab) {
       case StatsTableType.BREAKDOWN:
         return (
@@ -101,6 +122,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
             getPoints={getPoints}
             selectedStageId={selectedStageId}
             selectedVoteType={selectedVoteType}
+            enableHover={false}
           />
         );
       case StatsTableType.SPLIT:
@@ -109,6 +131,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
             rankedCountries={rankedCountries}
             selectedStage={selectedStage}
             getPoints={getPoints}
+            enableHover={false}
           />
         );
       case StatsTableType.SUMMARY:
@@ -117,12 +140,22 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
             rankedCountries={rankedCountries}
             selectedStage={selectedStage}
             getPoints={getPoints}
+            enableHover={false}
           />
         );
       default:
         return null;
     }
-  };
+  }, [
+    activeTab,
+    rankedCountries,
+    getCellPoints,
+    getCellClassName,
+    getPoints,
+    selectedStageId,
+    selectedVoteType,
+    selectedStage,
+  ]);
 
   useEffect(() => {
     const resize = () => {
@@ -166,7 +199,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
           // Calculate title height if title exists
           let titleHeight = 0;
 
-          if (settings.title) {
+          if (title) {
             // Calculate title height based on text content and font size
             const titleFontSize = getTitleFontSize();
             const lineHeight = 1.2; // Approximate line height
@@ -178,7 +211,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
               availableWidth / avgCharWidth,
             );
             const estimatedLines = Math.ceil(
-              settings.title.length / estimatedCharsPerLine,
+              title.length / estimatedCharsPerLine,
             );
 
             titleHeight = Math.max(
@@ -198,16 +231,6 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
             Math.abs(newHeight - prevDimensionsRef.current.height) > 10 ||
             Math.abs(newWidth - prevDimensionsRef.current.width) > 10
           ) {
-            // console.log(
-            //   'Content dimensions:',
-            //   contentWidth,
-            //   'x',
-            //   contentHeight,
-            //   'New dimensions:',
-            //   newWidth,
-            //   'x',
-            //   newHeight,
-            // );
             setPreviewHeight(newHeight);
             setPreviewWidth(newWidth);
             prevDimensionsRef.current = { width: newWidth, height: newHeight };
@@ -255,38 +278,81 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rankedCountries, activeTab, containerRef]);
 
+  // Debounce image generation to prevent multiple rapid calls
+  const generateImageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleGenerateImage = useCallback(async () => {
-    const dataUrl = await generateImage();
-
-    if (dataUrl && onImageGenerated) {
-      onImageGenerated(dataUrl);
-
-      // Scroll down within the modal to show the generated image
-      setTimeout(() => {
-        if (modalRef.current) {
-          const modalContent = modalRef.current.childNodes[0] as HTMLDivElement;
-
-          modalContent.scrollTo({
-            top: modalContent.scrollHeight,
-            behavior: 'smooth',
-          });
-        }
-      }, 100);
+    // Prevent multiple simultaneous generations
+    if (isGenerating) {
+      return;
     }
-  }, [generateImage, onImageGenerated, modalRef]);
 
-  // useEffect(() => {
-  //   if (!isGenerating && !generatedImageUrl && settings.generateOnOpen) {
-  //     setTimeout(() => {
-  //       handleGenerateImage();
-  //     }, 300);
-  //   }
-  // }, [
-  //   isGenerating,
-  //   generatedImageUrl,
-  //   handleGenerateImage,
-  //   settings.generateOnOpen,
-  // ]);
+    // Clear any pending generation
+    if (generateImageTimeoutRef.current) {
+      clearTimeout(generateImageTimeoutRef.current);
+    }
+
+    // Debounce the generation
+    generateImageTimeoutRef.current = setTimeout(async () => {
+      const dataUrl = await generateImage();
+
+      if (dataUrl && onImageGenerated) {
+        onImageGenerated(dataUrl);
+
+        // Scroll down within the modal to show the generated image
+        setTimeout(() => {
+          if (modalRef.current) {
+            const modalContent = modalRef.current
+              .childNodes[0] as HTMLDivElement;
+
+            modalContent.scrollTo({
+              top: modalContent.scrollHeight,
+              behavior: 'smooth',
+            });
+          }
+        }, 100);
+      }
+    }, 100); // 100ms debounce
+  }, [generateImage, onImageGenerated, modalRef, isGenerating]);
+
+  // Use a ref to track if we've already auto-generated
+  const hasAutoGeneratedRef = useRef(false);
+
+  // Auto-generate image when modal opens, but only once
+  useEffect(() => {
+    // Only run this effect once when the component mounts and conditions are met
+    if (
+      !isGenerating &&
+      !generatedImageUrl &&
+      generateOnOpen &&
+      !hasAutoGeneratedRef.current
+    ) {
+      hasAutoGeneratedRef.current = true;
+      const timer = setTimeout(() => {
+        // Check if component is still mounted and not generating before calling handleGenerateImage
+        if (!hasAutoGeneratedRef.current || isGenerating) {
+          return;
+        }
+        handleGenerateImage();
+      }, 300);
+
+      // Cleanup timer if component unmounts
+      return () => {
+        clearTimeout(timer);
+        hasAutoGeneratedRef.current = false;
+      };
+    }
+  }, [isGenerating, generatedImageUrl, generateOnOpen, handleGenerateImage]); // Include handleGenerateImage to satisfy ESLint
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (generateImageTimeoutRef.current) {
+        clearTimeout(generateImageTimeoutRef.current);
+      }
+      hasAutoGeneratedRef.current = false;
+    };
+  }, []);
 
   return (
     <div>
@@ -309,14 +375,14 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
         >
           <div className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 relative flex flex-col items-center justify-center h-full px-5 pt-10 pb-10">
             {/* Background Image */}
-            {settings.showBackgroundImage && (
+            {showBackgroundImage && (
               <div
                 className="absolute inset-0"
                 style={{
                   backgroundImage: `url(${backgroundImage})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  opacity: settings.backgroundOpacity,
+                  opacity: backgroundOpacity,
                 }}
               />
             )}
@@ -324,14 +390,14 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
             {/* Title */}
             <div className="text-center relative z-10 flex-shrink-0">
               <h1
-                className="font-bold text-white leading-tight truncate"
+                className="font-bold text-white"
                 style={{
                   fontSize: `${getTitleFontSize()}px`,
                   textShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
                   maxWidth: `${previewWidth - 40}px`,
                 }}
               >
-                {settings.title}
+                {title}
               </h1>
             </div>
 
@@ -341,7 +407,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
                 previewWidth > MIN_WIDTH * 2 ? 'my-4' : 'my-6'
               }`}
             >
-              {renderContent()}
+              {renderContent}
             </div>
 
             {/* Branding */}

@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-09-06',
+    title:
+      'Share stats improvements',
+  },
+  {
     date: '2025-08-31',
     title:
       'Added split stats and summary stats. Added the ability to generate the stats image',
@@ -153,7 +158,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-09-06', end: '2025-09-07' },
+    approximateDates: { start: '2025-09-07', end: '2025-09-08' },
     title: 'Presentation mode',
   },
   {
