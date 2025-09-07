@@ -224,14 +224,19 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
               </div>
 
               <div className="flex flex-wrap gap-1">
-                <Checkbox
-                  id="showVotingCountriesNames"
-                  label="Show Voting Countries Names"
-                  checked={settings.showVotingCountriesNames}
-                  onChange={(e) =>
-                    updateSetting('showVotingCountriesNames', e.target.checked)
-                  }
-                />
+                {activeTab === StatsTableType.BREAKDOWN && (
+                  <Checkbox
+                    id="showVotingCountriesNames"
+                    label="Show Voting Countries Names"
+                    checked={settings.showVotingCountriesNames}
+                    onChange={(e) =>
+                      updateSetting(
+                        'showVotingCountriesNames',
+                        e.target.checked,
+                      )
+                    }
+                  />
+                )}
 
                 <Checkbox
                   id="generateOnOpen"

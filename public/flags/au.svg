@@ -1,1 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="640" viewBox="0 0 10080 5040"><defs><clipPath id="a"><path d="M0 0h6v3H0z"/></clipPath><clipPath id="b"><path d="M0 0v1.5h6V3zm6 0H3v3H0z"/></clipPath><path id="c" d="m0-360 69.421 215.845 212.038-80.301L155.99-35.603l194.985 115.71-225.881 19.651 31.105 224.59L0 160l-156.198 164.349 31.105-224.59-225.881-19.651 194.986-115.711-125.471-188.853 212.038 80.301z"/><path id="d" d="M0-210 54.86-75.508l144.862 10.614L88.765 28.842l34.67 141.052L0 93.334l-123.435 76.56 34.67-141.052-110.957-93.736L-54.86-75.508z"/></defs><path fill="#012169" d="M0 0h10080v5040H0z"/><path d="m0 0 6 3m0-3L0 3" stroke="#fff" stroke-width=".6" clip-path="url(#a)" transform="scale(840)"/><path d="m0 0 6 3m0-3L0 3" stroke="#e4002b" stroke-width=".4" clip-path="url(#b)" transform="scale(840)"/><path d="M2520 0v2520M0 1260h5040" stroke="#fff" stroke-width="840"/><path d="M2520 0v2520M0 1260h5040" stroke="#e4002b" stroke-width="504"/><g fill="#fff"><use xlink:href="#c" transform="matrix(2.1 0 0 2.1 2520 3780)"/><use xlink:href="#c" x="7560" y="4200"/><use xlink:href="#c" x="6300" y="2205"/><use xlink:href="#c" x="7560" y="840"/><use xlink:href="#c" x="8680" y="1869"/><use xlink:href="#d" x="8064" y="2730"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" width="960" height="640" version="1.1" viewBox="0 0 22680 15120"><script xmlns="" id="eppiocemhmnlbhjplcgkofciiegomcon"/><script xmlns=""/><script xmlns=""/>
+<metadata>
+<rdf:RDF>
+<cc:Work rdf:about="">
+<dc:format>image/svg+xml</dc:format>
+<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+<dc:title/>
+</cc:Work>
+</rdf:RDF>
+</metadata>
+<defs>
+<polygon id="a" points="3.905 8.109 0 4 -3.905 8.109 -3.127 2.494 -8.774 2.003 -3.9 -.89 -7.036 -5.611 -1.736 -3.604 0 -9 0 -9 1.736 -3.604 7.036 -5.611 3.9 -.89 8.774 2.003 3.127 2.494"/>
+<polygon id="g" points="-5.29 7.281 -3.804 1.236 -8.56 -2.781 -2.351 -3.236 0 -9 0 -9 2.351 -3.236 8.56 -2.781 3.804 1.236 5.29 7.281 0 4"/>
+</defs>
+<path d="m0 0h22680v15120h-22680v-15120z" fill="#00008b"/>
+<use transform="matrix(252 0 0 252 5670 11340)" width="30240" height="15120" fill="#fff" xlink:href="#a"/>
+<use transform="matrix(120 0 0 120 17010 12600)" width="30240" height="15120" fill="#fff" xlink:href="#a"/>
+<use transform="matrix(120 0 0 120 13230 6615)" width="30240" height="15120" fill="#fff" xlink:href="#a"/>
+<use transform="matrix(120 0 0 120 17010 2520)" width="30240" height="15120" fill="#fff" xlink:href="#a"/>
+<use transform="matrix(120 0 0 120 20370 5607)" width="30240" height="15120" fill="#fff" xlink:href="#a"/>
+<use transform="matrix(70 0 0 70 18522 8190)" width="30240" height="15120" fill="#fff" xlink:href="#g"/>
+<g transform="scale(30.24)">
+<path d="m0 .00029052v30.046l142.43 94.954-142.43 94.954v30.046l45.068 6e-5 142.43-94.954 142.43 94.954 45.068 6e-5-.00029-30.046-142.43-94.954 142.43-94.954v-30.046h-45.068l-142.43 94.954-142.43-94.954z" style="fill-rule:evenodd;fill:#ffffff"/>
+<path d="m0 250 125-83.334h27.951l-130.42 83.334zm0-250 125 83.333h-27.951l-97.049-64.699zm222.05 83.333 125-83.333h27.951l-125 83.333zm152.95 166.67-125-83.333h27.951l97.05 64.699z" style="fill:#ff0000"/>
+<path d="m187.5.00029052v250m-187.5-125h375" style="stroke-width:83.333;stroke:#ffffff"/>
+<path d="m187.5.00029052v250m-187.5-125h375" style="stroke-width:50;stroke:#ff0000"/>
+</g>
+<script xmlns="" id="vsc-settings-data">{"audioBoolean":false,"blacklist":"vine.co\nimgur.com\nteams.microsoft.com\n","controllerButtonSize":14,"controllerOpacity":0.3,"defaultLogLevel":4,"displayKeyCode":86,"enabled":true,"forceLastSavedSpeed":false,"keyBindings":[{"action":"display","force":"false","key":86,"predefined":true,"value":0},{"action":"slower","force":"false","key":83,"predefined":true,"value":0.1},{"action":"faster","force":"false","key":68,"predefined":true,"value":0.1},{"action":"rewind","force":"false","key":90,"predefined":true,"value":10},{"action":"advance","force":"false","key":88,"predefined":true,"value":10},{"action":"reset","force":"false","key":82,"predefined":true,"value":1.3},{"action":"fast","force":"false","key":71,"predefined":true,"value":1.8}],"lastSpeed":1,"logLevel":3,"rememberSpeed":false,"speeds":{"blob:https://music.youtube.com/7bc41bc2-ca47-4f02-87e9-f66c0494e777":1},"startHidden":false,"version":"0.5.3"}</script><script xmlns=""/></svg>

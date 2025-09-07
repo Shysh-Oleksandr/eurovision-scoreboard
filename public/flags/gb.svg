@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" width="1200" height="600"><clipPath id="a"><path d="M0 0v30h60V0z"/></clipPath><clipPath id="b"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath><g clip-path="url(#a)"><path d="M0 0v30h60V0z" fill="#012169"/><path d="m0 0 60 30m0-30L0 30" stroke="#fff" stroke-width="6"/><path d="m0 0 60 30m0-30L0 30" clip-path="url(#b)" stroke="#C8102E" stroke-width="4"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30" width="1000" height="600"><script xmlns="" id="eppiocemhmnlbhjplcgkofciiegomcon"/><script xmlns=""/><script xmlns=""/>
+	<clipPath id="t">
+		<path d="M25,15h25v15zv15h-25zh-25v-15zv-15h25z"/>
+	</clipPath>
+	<path d="M0,0v30h50v-30z" fill="#012169"/>
+	<path d="M0,0 50,30M50,0 0,30" stroke="#fff" stroke-width="6"/>
+	<path d="M0,0 50,30M50,0 0,30" clip-path="url(#t)" stroke="#C8102E" stroke-width="4"/>
+	<path d="M-1 11h22v-12h8v12h22v8h-22v12h-8v-12h-22z" fill="#C8102E" stroke="#FFF" stroke-width="2"/>
+<script xmlns="" id="vsc-settings-data">{"audioBoolean":false,"blacklist":"vine.co\nimgur.com\nteams.microsoft.com\n","controllerButtonSize":14,"controllerOpacity":0.3,"defaultLogLevel":4,"displayKeyCode":86,"enabled":true,"forceLastSavedSpeed":false,"keyBindings":[{"action":"display","force":"false","key":86,"predefined":true,"value":0},{"action":"slower","force":"false","key":83,"predefined":true,"value":0.1},{"action":"faster","force":"false","key":68,"predefined":true,"value":0.1},{"action":"rewind","force":"false","key":90,"predefined":true,"value":10},{"action":"advance","force":"false","key":88,"predefined":true,"value":10},{"action":"reset","force":"false","key":82,"predefined":true,"value":1.3},{"action":"fast","force":"false","key":71,"predefined":true,"value":1.8}],"lastSpeed":1,"logLevel":3,"rememberSpeed":false,"speeds":{"blob:https://music.youtube.com/7bc41bc2-ca47-4f02-87e9-f66c0494e777":1},"startHidden":false,"version":"0.5.3"}</script><script xmlns=""/></svg>
