@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
-import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
+import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 import Tabs from '../common/tabs/Tabs';
 
 import { getTabs, WHATS_NEW, UPCOMING_FEATURES } from './data';
@@ -54,14 +54,7 @@ const FeedbackModal = ({
         />
       }
       bottomContent={
-        <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 sm:p-4 p-2 z-30">
-          <Button
-            className="md:text-base text-sm w-full"
-            onClick={() => setShowModal(false)}
-          >
-            Close
-          </Button>
-        </div>
+        <ModalBottomCloseButton onClose={() => setShowModal(false)} />
       }
     >
       <div className="lg:text-lg sm:text-base text-base font-medium">

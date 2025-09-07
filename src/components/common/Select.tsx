@@ -40,7 +40,7 @@ const Select = ({
         }`}
       />
       <select
-        className={`absolute inset-0 h-full w-full cursor-pointer opacity-0 ${
+        className={`absolute inset-0 h-full w-full cursor-pointer opacity-0 select ${
           selectClassName || ''
         }`}
         {...props}

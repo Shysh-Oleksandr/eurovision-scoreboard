@@ -9,6 +9,7 @@ import { Input } from '../../Input';
 import StatsImagePreview from './StatsImagePreview';
 
 import { DownloadIcon } from '@/assets/icons/DownloadIcon';
+import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { Country, StageVotingType, StatsTableType } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
@@ -121,13 +122,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       containerClassName="!w-[min(100%,_95vw)]"
       contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
-      bottomContent={
-        <div className="bg-primary-900 p-4 z-30">
-          <Button className="md:text-base text-sm w-full" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      }
+      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <div className="sm:space-y-6 space-y-4 sm:py-2 py-1">
         <div className="sm:mx-3 mx-2">

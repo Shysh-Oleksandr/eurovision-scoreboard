@@ -10,7 +10,7 @@ import { Tooltip } from '@/components/common/Tooltip';
 const predefinedSystemsOptions = [
   { value: 'default', label: 'Eurovision Standard (1-8, 10, 12)' },
   { value: 'reversed', label: 'Reversed (12-8, 10, 1)' },
-  { value: 'old', label: 'Eurovision Pre-1975 (1x10)' },
+  // { value: 'old', label: 'Eurovision Pre-1975 (1x10)' },
   {
     value: 'melodifestivalen',
     label: 'Melodifestivalen (1, 2, 4, 6, 8, 10, 12)',

@@ -111,7 +111,10 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
   }, [rankedCountries, shouldShowJuryAndTelevote, getPoints]);
 
   return (
-    <div className="overflow-auto narrow-scrollbar" style={cssVars}>
+    <div
+      className={`${enableHover ? 'overflow-auto' : ''} narrow-scrollbar`}
+      style={cssVars}
+    >
       <table className="text-left border-collapse w-full">
         <thead className="sticky top-0 z-10">
           <tr className={tableStyles.headerRow}>

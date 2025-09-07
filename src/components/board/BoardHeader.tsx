@@ -7,7 +7,7 @@ import Button from '../common/Button';
 
 import { getWinnerCountry } from '@/state/scoreboard/helpers';
 
-const BoardHeader = (): JSX.Element => {
+const BoardHeader = (): JSX.Element | null => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const votingPoints = useScoreboardStore((state) => state.getVotingPoints());
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
@@ -126,8 +126,8 @@ const BoardHeader = (): JSX.Element => {
 
   return (
     <div
-      className={`pb-2 flex flex-row w-full justify-between items-center ${
-        hasContent ? 'md:h-12' : ''
+      className={`flex flex-row w-full justify-between items-center ${
+        hasContent ? 'md:h-12 pb-2' : ''
       }`}
     >
       <h3

@@ -260,7 +260,7 @@ const EventSetupModal = () => {
       onClose={debouncedCanClose ? onClose : undefined}
       overlayClassName="!z-[1000]"
       bottomContent={
-        <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
+        <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
           {debouncedCanClose && (
             <Button
               variant="secondary"

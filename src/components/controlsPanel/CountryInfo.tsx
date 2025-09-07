@@ -55,7 +55,7 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
             className={`h-2 rounded-full transition-all duration-300 bg-primary-700 bg-gradient-to-r from-primary-800 to-primary-700`}
             style={{
               width: `${Math.min(
-                ((votingCountryIndex + 1) / votingCountriesLength) * 100,
+                (votingCountryIndex / votingCountriesLength) * 100,
                 100,
               )}%`,
             }}

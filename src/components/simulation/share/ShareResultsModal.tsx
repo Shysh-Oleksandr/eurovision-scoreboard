@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   ASPECT_RATIO_PRESETS,
@@ -18,8 +18,10 @@ import ImageGenerator from './ImageGenerator';
 
 import { DownloadIcon } from '@/assets/icons/DownloadIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
+import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
-import { StageId } from '@/models';
+import { StageId, StageVotingMode } from '@/models';
+import { useCountriesStore } from '@/state/countriesStore';
 
 interface ShareResultsModalProps {
   isOpen: boolean;
@@ -34,6 +36,9 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
     null,
   );
+  const [lastGeneratedStageId, setLastGeneratedStageId] = useState<
+    string | null
+  >(null);
 
   const imageCustomization = useGeneralStore(
     (state) => state.imageCustomization,
@@ -47,13 +52,63 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   const currentStageId = useScoreboardStore(
     (state) => state.viewedStageId || state.currentStageId,
   );
+  const votingCountryIndex = useScoreboardStore(
+    (state) => state.votingCountryIndex,
+  );
+  const televotingProgress = useScoreboardStore(
+    (state) => state.televotingProgress,
+  );
+
+  const getVotingCountriesLength = useCountriesStore(
+    (state) => state.getVotingCountriesLength,
+  );
   const currentStage = eventStages.find((stage) => stage.id === currentStageId);
 
   const isTouchDevice = useTouchDevice();
 
-  const { id, name } = currentStage || {};
-  const defaultTitle = `${contestName} ${contestYear}`;
-  const defaultSubtitle = id === StageId.GF ? `Final Results - ${name}` : name;
+  const { id, name, isOver, isJuryVoting, votingMode, countries } =
+    currentStage || {};
+
+  const { title: defaultTitle, subtitle: defaultSubtitle } = useMemo(() => {
+    const isGf = id === StageId.GF;
+
+    let title = `${contestName} ${contestYear}`;
+    let subtitle = isGf ? `Final Results - ${name}` : name;
+
+    if (!isOver) {
+      title = `${contestName} ${contestYear} - ${name}`;
+
+      if (isJuryVoting) {
+        if (votingCountryIndex === 0) {
+          subtitle = name;
+        }
+
+        subtitle = `${votingCountryIndex} of ${getVotingCountriesLength()} countries voted`;
+      } else if (
+        (votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+          votingMode === StageVotingMode.COMBINED) &&
+        televotingProgress === 0
+      ) {
+        subtitle = 'Jury results';
+      } else {
+        subtitle = `${televotingProgress} of ${countries?.length} televotes revealed`;
+      }
+    }
+
+    return { title, subtitle };
+  }, [
+    id,
+    contestName,
+    contestYear,
+    name,
+    isOver,
+    isJuryVoting,
+    votingMode,
+    televotingProgress,
+    votingCountryIndex,
+    getVotingCountriesLength,
+    countries?.length,
+  ]);
 
   const allCountriesToDisplay = useCountryDisplay();
   const sortedCountries = useCountrySorter(allCountriesToDisplay);
@@ -243,13 +298,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       containerClassName="!w-[min(100%,_95vw)]"
       contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
-      bottomContent={
-        <div className="bg-primary-900 p-4 z-30">
-          <Button className="md:text-base text-sm w-full" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      }
+      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <div className="sm:space-y-6 space-y-4 sm:py-2 py-1">
         <div className="sm:mx-3 mx-2">
@@ -326,7 +375,6 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                       }),
                     )}
                     className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
-                    selectClassName="select"
                     arrowClassName="!w-6 !h-6"
                   >
                     <span className="flex-1">
@@ -346,7 +394,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                     }}
                     options={[
                       { value: 1, label: '1 Column' },
-                      { value: 2, label: '2 Columns (Default)' },
+                      { value: 2, label: '2 Columns' },
                       { value: 3, label: '3 Columns' },
                       { value: 4, label: '4 Columns' },
                       { value: 5, label: '5 Columns' },
@@ -355,12 +403,11 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                       { value: 8, label: '8 Columns' },
                     ]}
                     className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
-                    selectClassName="select"
                     arrowClassName="!w-6 !h-6"
                   >
                     <span className="flex-1">
                       {imageCustomization.layout === 1 && '1 Column'}
-                      {imageCustomization.layout === 2 && '2 Columns (Default)'}
+                      {imageCustomization.layout === 2 && '2 Columns'}
                       {imageCustomization.layout === 3 && '3 Columns'}
                       {imageCustomization.layout === 4 && '4 Columns'}
                       {imageCustomization.layout === 5 && '5 Columns'}
@@ -388,7 +435,6 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                       { value: '2xl', label: '2X Large' },
                     ]}
                     className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
-                    selectClassName="select"
                     arrowClassName="!w-6 !h-6"
                   >
                     <span className="flex-1">
@@ -684,6 +730,8 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
         <ImageGenerator
           onImageGenerated={handleImageGenerated}
           generatedImageUrl={generatedImageUrl}
+          lastGeneratedStageId={lastGeneratedStageId}
+          setLastGeneratedStageId={setLastGeneratedStageId}
           modalRef={modalRef}
         />
 

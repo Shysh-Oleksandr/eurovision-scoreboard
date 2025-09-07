@@ -120,7 +120,7 @@ const QualificationResultsModal = () => {
       openDelay={3400}
       containerClassName="!w-[min(100%,500px)]"
       bottomContent={
-        <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 p-4 z-30">
+        <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 sm:p-4 p-2 z-30">
           <Button variant="secondary" onClick={handleTriggerClose}>
             Close
           </Button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
 import { useQualificationStatus } from '@/components/countryItem/hooks/useQualificationStatus';
@@ -13,6 +13,7 @@ type Props = {
   showPoints?: boolean;
   showRankings?: boolean;
   shortCountryNames?: boolean;
+  isVotingOver?: boolean;
 };
 
 const ShareCountryItem: React.FC<Props> = ({
@@ -22,12 +23,24 @@ const ShareCountryItem: React.FC<Props> = ({
   showPoints = true,
   showRankings = true,
   shortCountryNames = false,
+  isVotingOver = false,
 }) => {
-  const shouldShowAsNonQualified = useQualificationStatus(country, true);
+  const shouldShowAsNonQualified = useQualificationStatus(
+    country,
+    isVotingOver,
+  );
 
-  const buttonColors = shouldShowAsNonQualified
-    ? 'bg-countryItem-unqualifiedBg text-countryItem-unqualifiedText opacity-70'
-    : 'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText hover:bg-countryItem-televoteFinishedHoverBg';
+  const buttonColors = useMemo(() => {
+    if (shouldShowAsNonQualified) {
+      return 'bg-countryItem-unqualifiedBg text-countryItem-unqualifiedText opacity-70';
+    }
+
+    if (country.isVotingFinished) {
+      return 'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
+    }
+
+    return 'bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText';
+  }, [shouldShowAsNonQualified, country.isVotingFinished]);
 
   // Size-based styles
   const sizeStyles = {

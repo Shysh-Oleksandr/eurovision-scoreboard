@@ -1,8 +1,11 @@
 export const WHATS_NEW = [
   {
+    date: '2025-09-07',
+    title: 'Added the ability to share simulation results during voting. Small layout improvements',
+  },
+  {
     date: '2025-09-06',
-    title:
-      'Share stats improvements',
+    title: 'Share stats improvements',
   },
   {
     date: '2025-08-31',
@@ -158,11 +161,19 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-09-07', end: '2025-09-08' },
-    title: 'Presentation mode',
+    approximateDates: { start: '2025-09-13', end: '2025-09-14' },
+    title: 'Presentation mode and the ability to predefine voting',
   },
   {
-    // approximateDates: { start: '2025-12-01', end: '2025-12-07' },
+    title: 'Save simulation progress',
+  },
+  {
+    title: 'Separate points system for jury and televote',
+  },
+  {
+    title: 'Pre-1975 points system support',
+  },
+  {
     title: 'Custom animations for each contest',
   },
 ];

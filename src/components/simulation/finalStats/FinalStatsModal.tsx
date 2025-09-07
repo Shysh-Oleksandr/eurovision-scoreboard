@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import Button from '../../common/Button';
 import Modal from '../../common/Modal/Modal';
 import Tabs, { TabContent } from '../../common/tabs/Tabs';
 import ShareStatsModal from '../share/ShareStatsModal';
@@ -11,6 +10,7 @@ import StatsTable from './StatsTable';
 import SummaryStats from './SummaryStats';
 import { useFinalStats } from './useFinalStats';
 
+import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { StatsTableType } from '@/models';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -143,13 +143,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
           containerClassName="!rounded-none"
         />
       }
-      bottomContent={
-        <div className="bg-primary-900 p-4 z-30">
-          <Button className="md:text-base text-sm w-full" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      }
+      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <StatsHeader
         finishedStages={finishedStages}

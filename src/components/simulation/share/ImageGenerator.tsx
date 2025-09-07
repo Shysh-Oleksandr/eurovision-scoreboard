@@ -15,16 +15,21 @@ import { GenerateImageIcon } from '@/assets/icons/GenerateImageIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
 import { useReorderCountries } from '@/hooks/useReorderCountries';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 interface ImageGeneratorProps {
   onImageGenerated: (dataUrl: string) => void;
   generatedImageUrl: string | null;
+  lastGeneratedStageId: string | null;
+  setLastGeneratedStageId: (stageId: string | null) => void;
   modalRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   onImageGenerated,
   generatedImageUrl,
+  lastGeneratedStageId,
+  setLastGeneratedStageId,
   modalRef,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,6 +38,9 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   const imageCustomization = useGeneralStore(
     (state) => state.imageCustomization,
   );
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+
+  const { isOver: isVotingOver, id: currentStageId } = getCurrentStage();
 
   const isTouchDevice = useTouchDevice();
 
@@ -205,11 +213,15 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   );
 
   useEffect(() => {
-    if (!generatedImageUrl && !isGenerating) {
+    if (
+      !isGenerating &&
+      (!generatedImageUrl || currentStageId !== lastGeneratedStageId)
+    ) {
       generateImage();
+      setLastGeneratedStageId(currentStageId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [generatedImageUrl, isGenerating]);
+  }, [generatedImageUrl, isGenerating, currentStageId, lastGeneratedStageId]);
 
   useEffect(() => {
     const resize = () => {
@@ -326,6 +338,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                   showRankings={imageCustomization.showRankings}
                   size={imageCustomization.itemSize}
                   shortCountryNames={imageCustomization.shortCountryNames}
+                  isVotingOver={isVotingOver}
                 />
               ))}
             </div>

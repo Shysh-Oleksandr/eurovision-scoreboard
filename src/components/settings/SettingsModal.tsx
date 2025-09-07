@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 
-import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
+import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '../common/tabs/Tabs';
 
 import { GeneralSettings } from './GeneralSettings';
@@ -61,13 +61,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           containerClassName="!rounded-none"
         />
       }
-      bottomContent={
-        <div className="bg-primary-900 p-4 z-30">
-          <Button className="md:text-base text-sm w-full" onClick={onClose}>
-            Close
-          </Button>
-        </div>
-      }
+      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <div className="py-4 px-2">
         <TabContent

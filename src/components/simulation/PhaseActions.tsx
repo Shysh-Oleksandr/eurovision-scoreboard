@@ -8,8 +8,6 @@ import Select from '../common/Select';
 import FinalStatsModal from './finalStats/FinalStatsModal';
 import ShareResultsModal from './share/ShareResultsModal';
 
-import { ShareIcon } from '@/assets/icons/ShareIcon';
-
 export const PhaseActions = () => {
   const continueToNextPhase = useScoreboardStore(
     (state) => state.continueToNextPhase,
@@ -70,21 +68,12 @@ export const PhaseActions = () => {
         onClose={() => setShowFinalStatsModal(false)}
       />
 
-      <div className="flex pb-2 gap-2 min-h-12 whitespace-nowrap w-full overflow-x-auto sm:overflow-x-visible">
-        {isVotingOver && (
-          <Button
-            variant="tertiary"
-            className="ml-auto !px-4"
-            onClick={() => setShowShareResultsModal(true)}
-            Icon={<ShareIcon className="w-[20px] h-[20px]" />}
-          >
-            Share
-          </Button>
-        )}
+      <div className="flex gap-2 lg:mb-3 md:mb-2 pt-1 sm:pt-0 md:mt-0 min-h-12 whitespace-nowrap w-full overflow-x-auto sm:overflow-x-visible">
         {isVotingOver && (
           <Button
             variant="tertiary"
             onClick={() => setShowFinalStatsModal(true)}
+            className="ml-auto xs:!px-4"
           >
             View Stats
           </Button>
@@ -113,7 +102,6 @@ export const PhaseActions = () => {
               label: stage.name,
             }))}
             className="py-2.5 sm:px-4 px-3 sm:min-w-[150px] font-medium bg-primary-800 bg-gradient-to-bl from-[20%] from-primary-900 to-primary-800/60 lg:text-base text-sm hover:bg-primary-700"
-            selectClassName="select"
             arrowClassName="!w-6 !h-6"
           >
             <span className="flex-1">{viewedStage.name}</span>

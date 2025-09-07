@@ -19,7 +19,7 @@ export const PickQualifiersSimulation = () => {
   return (
     <>
       {!isOver && (
-        <div className="flex 2cols:hidden justify-between items-center gap-2 mb-2">
+        <div className="flex 2cols:hidden justify-between items-center gap-2 xs:mb-1 mb-2 mt-2">
           <h2
             className="lg:text-2xl xs:text-xl text-lg font-medium text-white"
             style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
@@ -36,7 +36,7 @@ export const PickQualifiersSimulation = () => {
 
       <div
         className={`flex md:gap-6 xs:gap-4 gap-3 ${
-          currentStage.isOver ? 'pt-2' : 'sm:pt-[0.9rem] pt-0'
+          currentStage.isOver ? 'pt-2' : 'xs:pt-2 pt-0'
         }`}
         key={startCounter}
       >

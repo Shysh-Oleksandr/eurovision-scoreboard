@@ -91,7 +91,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
               };
             })}
             className="gap-1 justify-between pr-2 pl-3 py-1 bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/40 shadow"
-            selectClassName="select"
+            
             arrowClassName="!w-6 !h-6 mb-0.5"
           >
             {countriesCount !== undefined && (
