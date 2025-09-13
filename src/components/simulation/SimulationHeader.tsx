@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
 import { getHostingCountryLogo } from '../../theme/hosting';
 import Button from '../common/Button';
 
-import ShareResultsModal from './share/ShareResultsModal';
+const ShareResultsModal = React.lazy(() => import('./share/ShareResultsModal'));
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { ShareIcon } from '@/assets/icons/ShareIcon';
@@ -50,10 +50,12 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
 
   return (
     <>
-      <ShareResultsModal
-        isOpen={showShareResultsModal}
-        onClose={() => setShowShareResultsModal(false)}
-      />
+      <Suspense fallback={null}>
+        <ShareResultsModal
+          isOpen={showShareResultsModal}
+          onClose={() => setShowShareResultsModal(false)}
+        />
+      </Suspense>
 
       <div className="flex flex-col xs:flex-row justify-between xs:gap-1.5 gap-2 xs:items-center mb-1 sm:mb-2 md:mb-3">
         <div className="flex items-center gap-2">

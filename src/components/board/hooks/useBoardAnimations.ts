@@ -1,3 +1,4 @@
+import gsap from 'gsap';
 import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -95,22 +96,19 @@ export const useBoardAnimations = (
 
   useGSAP(
     () => {
-      (async () => {
-        const { default: gsap } = await import('gsap');
-        gsap.fromTo(
-          containerRef.current,
-          {
-            opacity: 0,
-            y: 20,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: 'power3.in',
-          },
-        );
-      })();
+      gsap.fromTo(
+        containerRef.current,
+        {
+          opacity: 0,
+          y: 20,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.in',
+        },
+      );
     },
     {
       dependencies: [

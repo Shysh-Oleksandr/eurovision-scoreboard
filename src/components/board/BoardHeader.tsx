@@ -1,5 +1,7 @@
 import React, { useMemo, type JSX } from 'react';
 
+import { useShallow } from 'zustand/shallow';
+
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -8,24 +10,31 @@ import Button from '../common/Button';
 import { getWinnerCountry } from '@/state/scoreboard/helpers';
 
 const BoardHeader = (): JSX.Element | null => {
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const votingPoints = useScoreboardStore((state) => state.getVotingPoints());
-  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
-  const givePredefinedJuryPoint = useScoreboardStore(
-    (state) => state.givePredefinedJuryPoint,
+  const {
+    getCurrentStage,
+    winnerCountry,
+    viewedStageId,
+    eventStages,
+    currentRevealTelevotePoints,
+    votingPoints,
+    givePredefinedJuryPoint,
+    givePredefinedTelevotePoints,
+  } = useScoreboardStore(
+    useShallow((state) => ({
+      getCurrentStage: state.getCurrentStage,
+      winnerCountry: state.winnerCountry,
+      viewedStageId: state.viewedStageId,
+      eventStages: state.eventStages,
+      currentRevealTelevotePoints: state.currentRevealTelevotePoints,
+      votingPoints: state.getVotingPoints(),
+      givePredefinedJuryPoint: state.givePredefinedJuryPoint,
+      givePredefinedTelevotePoints: state.givePredefinedTelevotePoints,
+    })),
   );
-  const givePredefinedTelevotePoints = useScoreboardStore(
-    (state) => state.givePredefinedTelevotePoints,
-  );
-  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
-  const eventStages = useScoreboardStore((state) => state.eventStages);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
   const contestName = useGeneralStore((state) => state.settings.contestName);
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
-  );
-  const currentRevealTelevotePoints = useScoreboardStore(
-    (state) => state.currentRevealTelevotePoints,
   );
 
   const viewedStage = eventStages.find((s) => s.id === viewedStageId);

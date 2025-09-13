@@ -325,15 +325,18 @@ export const useGeneralStore = create<GeneralState>()(
             const theme = getThemeForYear(state.themeYear ?? state.year);
             useGeneralStore.setState({ theme });
 
-            // Load custom background image from IndexedDB after rehydration
             (async () => {
-              const image = await getCustomBgImageFromDB();
-              if (image) {
-                const current = useGeneralStore.getState().settings;
-                useGeneralStore.setState({
-                  settings: { ...current, customBgImage: image },
-                });
-              }
+              const currentSettings = useGeneralStore.getState().settings;
+              if (!currentSettings.shouldUseCustomBgImage) return;
+            
+              requestIdleCallback(async () => {
+                const image = await getCustomBgImageFromDB();
+                if (image) {
+                  useGeneralStore.setState({
+                    settings: { ...currentSettings, customBgImage: image },
+                  });
+                }
+              });
             })();
           }
         },

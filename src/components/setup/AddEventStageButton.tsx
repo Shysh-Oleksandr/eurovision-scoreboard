@@ -18,6 +18,8 @@ const AddEventStageButton: React.FC<AddEventStageButtonProps> = ({
         onClick();
       }}
       className="justify-center flex items-center !p-2"
+      title="Add Event Stage"
+      aria-label="Add Event Stage"
     >
       <PlusIcon className="w-8 h-8" />
     </Button>

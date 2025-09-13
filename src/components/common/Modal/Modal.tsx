@@ -83,7 +83,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
-      className={`fixed inset-0 flex items-center justify-center z-[100] transition-all duration-[200ms] ${
+      className={`fixed inset-0 flex items-center justify-center z-[100] transition-colors duration-[200ms] ${
         isActive ? 'bg-black bg-opacity-60' : 'bg-opacity-0'
       } ${overlayClassName}`}
       onClick={isActive ? onClose : undefined}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import { useBeforeUnload } from '../../hooks/useBeforeUnload';
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
@@ -7,7 +7,6 @@ import ControlsPanel from '../controlsPanel/ControlsPanel';
 
 import { PhaseActions } from './PhaseActions';
 import { PickQualifiersSimulation } from './qualification/PickQualifiersSimulation';
-import QualificationResultsModal from './qualification/QualificationResultsModal';
 import { SimulationHeader } from './SimulationHeader';
 import WinnerConfetti from './WinnerConfetti';
 import WinnerModal from './WinnerModal';
@@ -16,7 +15,15 @@ import { StageId } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
+const QualificationResultsModal = React.lazy(
+  () => import('./qualification/QualificationResultsModal'),
+);
+
 export const Simulation = () => {
+  const showQualificationModal = useGeneralStore(
+    (state) => state.settings.showQualificationModal,
+  );
+
   const isPickQualifiersMode = useGeneralStore(
     (state) => state.settings.isPickQualifiersMode,
   );
@@ -52,7 +59,12 @@ export const Simulation = () => {
           )}
 
           <WinnerModal />
-          <QualificationResultsModal />
+
+          {showQualificationModal && (
+            <Suspense fallback={null}>
+              <QualificationResultsModal />
+            </Suspense>
+          )}
         </div>
       </div>
 

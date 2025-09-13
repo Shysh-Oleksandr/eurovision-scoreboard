@@ -1,3 +1,4 @@
+import gsap from 'gsap';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -101,34 +102,30 @@ const CountryPlaceNumber = ({
   useGSAP(
     () => {
       if (showPlaceAnimation && isScoreboard) {
-        (async () => {
-          const { default: gsap } = await import('gsap');
-
-          gsap.fromTo(
-            containerRef.current,
-            {
-              width: 0,
-            },
-            {
-              width,
-              duration: 0.3,
-              delay: 0.08,
-              ease: 'power3.inOut',
-            },
-          );
-          gsap.fromTo(
-            textRef.current,
-            {
-              opacity: 0,
-            },
-            {
-              opacity: 1,
-              duration: 0.3,
-              delay: 0.08,
-              ease: 'power3.inOut',
-            },
-          );
-        })();
+        gsap.fromTo(
+          containerRef.current,
+          {
+            width: 0,
+          },
+          {
+            width,
+            duration: 0.3,
+            delay: 0.08,
+            ease: 'power3.inOut',
+          },
+        );
+        gsap.fromTo(
+          textRef.current,
+          {
+            opacity: 0,
+          },
+          {
+            opacity: 1,
+            duration: 0.3,
+            delay: 0.08,
+            ease: 'power3.inOut',
+          },
+        );
       }
     },
     { dependencies: [showPlaceAnimation, width], scope: containerRef },

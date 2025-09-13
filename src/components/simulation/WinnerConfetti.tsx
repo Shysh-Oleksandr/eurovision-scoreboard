@@ -1,9 +1,10 @@
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
-const LazyConfetti = React.lazy(() => import('react-confetti'));
 
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import { useGeneralStore } from '@/state/generalStore';
+
+const LazyConfetti = React.lazy(() => import('react-confetti'));
 
 const CONFETTI_TIMEOUT = 10 * 1000;
 
