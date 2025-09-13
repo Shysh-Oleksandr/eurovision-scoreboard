@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import Button from '../common/Button';
 import { RangeSlider } from '../common/RangeSlider';
@@ -25,9 +25,10 @@ const LABELS = [
 
 interface OddsSettingsProps {
   countries: BaseCountry[];
+  onLoaded?: () => void;
 }
 
-const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
+const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
   const countryOdds = useCountriesStore((state) => state.countryOdds);
   const updateCountryOdds = useCountriesStore(
     (state) => state.updateCountryOdds,
@@ -105,6 +106,10 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
     });
     setBulkCountryOdds(newOdds);
   };
+
+  useEffect(() => {
+    onLoaded?.();
+  }, [onLoaded]);
 
   if (countries.length === 0) {
     return (

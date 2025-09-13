@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-09-13',
+    title: 'Performance improvements',
+  }, 
+  {
     date: '2025-09-07',
     title: 'Added the ability to share simulation results during voting. Small layout improvements',
   },

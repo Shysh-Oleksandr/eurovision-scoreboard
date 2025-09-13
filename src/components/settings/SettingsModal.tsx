@@ -35,6 +35,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState(SettingsTab.GENERAL);
 
+  const [isOddsLoaded, setIsOddsLoaded] = useState(false);
+
   const tabsWithContent = useMemo(
     () => [
       {
@@ -51,14 +53,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             }
           >
-            {activeTab === SettingsTab.ODDS && (
-              <OddsSettings countries={participatingCountries} />
+            {(activeTab === SettingsTab.ODDS || isOddsLoaded) && (
+              <OddsSettings
+                countries={participatingCountries}
+                onLoaded={() => setIsOddsLoaded(true)}
+              />
             )}
           </Suspense>
         ),
       },
     ],
-    [participatingCountries, activeTab],
+    [activeTab, isOddsLoaded, participatingCountries],
   );
 
   useEffect(() => {

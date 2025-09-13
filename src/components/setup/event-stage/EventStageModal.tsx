@@ -44,6 +44,8 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   const [shouldClose, setShouldClose] = useState(false);
   const [activeTab, setActiveTab] = useState(EventStageModalTab.SETTINGS);
 
+  const [isVotersLoaded, setIsVotersLoaded] = useState(false);
+
   const {
     form,
     onSubmit,
@@ -127,8 +129,11 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
                 </div>
               }
             >
-              {activeTab === EventStageModalTab.VOTERS && (
-                <EventStageVoters stageId={eventStageToEdit?.id} />
+              {(activeTab === EventStageModalTab.VOTERS || isVotersLoaded) && (
+                <EventStageVoters
+                  stageId={eventStageToEdit?.id}
+                  onLoaded={() => setIsVotersLoaded(true)}
+                />
               )}
             </Suspense>
           ),

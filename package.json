@@ -17,6 +17,7 @@
     "lint:types-cli": "yarn tsc -p tsconfig.production.json",
     "lint:last-commit": "echo \"Info: no previous commits\"",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "generate-countries-json": "npx ts-node -P tsconfig.scripts.json scripts/generateCountriesJson.ts",
     "calculate-odds": "npx ts-node -P tsconfig.scripts.json scripts/calculateCountriesOdds.ts",
     "add-spokesperson-order": "npx ts-node -P tsconfig.scripts.json scripts/addSpokespersonOrder.ts",
     "convert-hex-to-hsl": "npx ts-node -P tsconfig.scripts.json scripts/convertHexToHsl.ts --write"

@@ -7,7 +7,6 @@ import {
   ALL_COUNTRIES,
   COMMON_COUNTRIES,
 } from '../data/countries/common-countries';
-import { getCountriesByPreset } from '../data/data';
 import {
   deleteCustomCountryFromDB,
   getCustomCountries,
@@ -24,6 +23,7 @@ import {
 
 import { useGeneralStore } from './generalStore';
 import { useScoreboardStore } from './scoreboardStore';
+import { RestOfWorld } from '@/data/countries';
 
 export type CountryOdds = Record<
   string,
@@ -53,11 +53,11 @@ export interface CountriesState {
   getVotingCountriesLength: () => number;
   setSelectedCountries: (countries: BaseCountry[]) => void;
   getAutoQualifiedCountries: () => BaseCountry[];
-  updateCountriesForYear: (year: Year) => void;
+  updateCountriesForYear: (year: Year) => Promise<void>;
   setInitialCountriesForYear: (
     year: Year,
     options?: { force?: boolean; isJuniorContest?: boolean },
-  ) => void;
+  ) => Promise<void>;
   addCustomCountry: (
     country: Omit<BaseCountry, 'code' | 'category'>,
   ) => Promise<void>;
@@ -86,7 +86,32 @@ export interface CountriesState {
 
 export const useCountriesStore = create<CountriesState>()(
   devtools(
-    (set, get) => ({
+    (set, get) => {
+      // Helpers (internal to store factory)
+      const buildCountriesUrl = (year: Year, isJunior: boolean) =>
+        isJunior
+          ? `/data/countries/junior-countries-${year}.json`
+          : `/data/countries/countries-${year}.json`;
+
+      const loadCountriesByPreset = async (year: Year, isJunior: boolean) => {
+        const url = buildCountriesUrl(year, isJunior);
+
+        const res = await fetch(url, { cache: 'force-cache' });
+        if (res.ok) return (await res.json()) as BaseCountry[];
+
+        if (isJunior && res.status === 404) {
+          const escRes = await fetch(buildCountriesUrl(year, false), {
+            cache: 'force-cache',
+          });
+          if (escRes.ok) return (await escRes.json()) as BaseCountry[];
+        }
+
+        throw new Error(
+          `Failed to load countries JSON for ${year} (${isJunior ? 'JESC' : 'ESC'})`,
+        );
+      };
+
+      return {
       // Initial state
       allCountriesForYear: [],
       selectedCountries: [],
@@ -161,16 +186,15 @@ export const useCountriesStore = create<CountriesState>()(
         }
 
 
-        const restOfWorld = COMMON_COUNTRIES['RestOfWorld'];
         const shouldAddRestOfWorld =!isJuniorContest && Number(year) >= 2023;
 
         if (
-          restOfWorld &&
+          RestOfWorld &&
           shouldAddRestOfWorld &&
           !initialVotingCountries.some((c) => c.code === 'WW')
         ) {
-          initialVotingCountries.push(restOfWorld);
-          extraVotingCountries.push(restOfWorld);
+          initialVotingCountries.push(RestOfWorld);
+          extraVotingCountries.push(RestOfWorld);
         }
 
         return { initialVotingCountries, extraVotingCountries };
@@ -243,9 +267,12 @@ export const useCountriesStore = create<CountriesState>()(
           .sort((a, b) => a.name.localeCompare(b.name));
       },
 
-      updateCountriesForYear: (year: Year) => {
+      updateCountriesForYear: async (year: Year) => {
         const { settings } = useGeneralStore.getState();
-        const countries = getCountriesByPreset(year, settings.isJuniorContest);
+        const countries = await loadCountriesByPreset(
+          year,
+          settings.isJuniorContest,
+        );
 
         const initialOdds: Record<
           string,
@@ -297,18 +324,21 @@ export const useCountriesStore = create<CountriesState>()(
         }));
       },
 
-      setInitialCountriesForYear: (year: Year, options?: { force?: boolean; isJuniorContest?: boolean }) => {
+      setInitialCountriesForYear: async (
+        year: Year,
+        options?: { force?: boolean; isJuniorContest?: boolean },
+      ) => {
         const { force = false, isJuniorContest } = options || {};
 
         if (!force && get().allCountriesForYear.length > 0) return;
 
-        const { settings } = useGeneralStore.getState();
         const effectiveIsJunior =
-          typeof isJuniorContest === 'boolean'
-            ? isJuniorContest
-            : settings.isJuniorContest;
+          typeof isJuniorContest === 'boolean' ? isJuniorContest : false;
 
-        const countries = getCountriesByPreset(year, effectiveIsJunior);
+        const countries = await loadCountriesByPreset(
+          year,
+          effectiveIsJunior,
+        );
 
         const initialOdds: Record<
           string,
@@ -583,7 +613,8 @@ export const useCountriesStore = create<CountriesState>()(
 
         get().syncVotersWithParticipants(get().eventAssignments, mode);
       },
-    }),
+    };
+    },
     { name: 'countries-store', enabled: process.env.NODE_ENV === 'development' },
   ),
 );

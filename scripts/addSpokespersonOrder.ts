@@ -11,7 +11,7 @@ Array.from(document.querySelectorAll(".div-col ol li")).map((item, index) => {
   };
 });
 */
-
+// !Deprecated
 const { COUNTRIES_2024 } = require('../src/data/countries/countries-2024');
 
 const spokespersons: { name: string; order: number }[] = [

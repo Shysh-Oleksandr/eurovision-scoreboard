@@ -1,0 +1,162 @@
+[
+  {
+    "name": "France",
+    "code": "FR",
+    "category": "All-Time Participants",
+    "juryOdds": 99,
+    "televoteOdds": 81,
+    "spokespersonOrder": 5,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Armenia",
+    "code": "AM",
+    "category": "All-Time Participants",
+    "juryOdds": 82.5,
+    "televoteOdds": 79,
+    "spokespersonOrder": 14,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Georgia",
+    "code": "GE",
+    "category": "All-Time Participants",
+    "juryOdds": 85.5,
+    "televoteOdds": 33,
+    "spokespersonOrder": 7,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Ireland",
+    "code": "IE",
+    "category": "All-Time Participants",
+    "juryOdds": 66.5,
+    "televoteOdds": 63,
+    "spokespersonOrder": 8,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "United Kingdom",
+    "code": "GB",
+    "category": "All-Time Participants",
+    "juryOdds": 50,
+    "televoteOdds": 99,
+    "spokespersonOrder": 11,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Spain",
+    "code": "ES",
+    "category": "All-Time Participants",
+    "juryOdds": 45,
+    "televoteOdds": 95,
+    "spokespersonOrder": 10,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Netherlands",
+    "code": "NL",
+    "category": "All-Time Participants",
+    "juryOdds": 44,
+    "televoteOdds": 79,
+    "spokespersonOrder": 0,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Portugal",
+    "code": "PT",
+    "category": "All-Time Participants",
+    "juryOdds": 39,
+    "televoteOdds": 79,
+    "spokespersonOrder": 12,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Ukraine",
+    "code": "UA",
+    "category": "All-Time Participants",
+    "juryOdds": 36,
+    "televoteOdds": 67,
+    "spokespersonOrder": 15,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Poland",
+    "code": "PL",
+    "category": "All-Time Participants",
+    "juryOdds": 32.5,
+    "televoteOdds": 45,
+    "spokespersonOrder": 1,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Italy",
+    "code": "IT",
+    "category": "All-Time Participants",
+    "juryOdds": 32.5,
+    "televoteOdds": 45,
+    "spokespersonOrder": 4,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Albania",
+    "code": "AL",
+    "category": "All-Time Participants",
+    "juryOdds": 39,
+    "televoteOdds": 25,
+    "spokespersonOrder": 6,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Serbia",
+    "code": "RS",
+    "category": "All-Time Participants",
+    "juryOdds": 31.5,
+    "televoteOdds": 41,
+    "spokespersonOrder": 13,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "North Macedonia",
+    "code": "MK",
+    "category": "All-Time Participants",
+    "juryOdds": 10,
+    "televoteOdds": 23,
+    "spokespersonOrder": 9,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Kazakhstan",
+    "code": "KZ",
+    "category": "Asia",
+    "juryOdds": 5,
+    "televoteOdds": 23,
+    "spokespersonOrder": 2,
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Malta",
+    "code": "MT",
+    "category": "All-Time Participants",
+    "juryOdds": 8.5,
+    "televoteOdds": 5,
+    "spokespersonOrder": 3,
+    "isQualified": true,
+    "isAutoQualified": true
+  }
+]
