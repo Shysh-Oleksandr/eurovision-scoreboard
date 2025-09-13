@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 
 import { EventStage, StageVotingMode } from '../../../models';
@@ -7,8 +7,9 @@ import ModalBottomContent from '../../common/Modal/ModalBottomContent';
 import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
 import EventStageSettings from './EventStageSettings';
-import EventStageVoters from './EventStageVoters';
 import { useEventStageForm } from './hooks';
+
+const EventStageVoters = React.lazy(() => import('./EventStageVoters'));
 
 enum EventStageModalTab {
   SETTINGS = 'Settings',
@@ -118,7 +119,19 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
         },
         {
           ...tabs[1],
-          content: <EventStageVoters stageId={eventStageToEdit?.id} />,
+          content: (
+            <Suspense
+              fallback={
+                <div className="text-white text-center py-2 font-medium">
+                  Loading...
+                </div>
+              }
+            >
+              {activeTab === EventStageModalTab.VOTERS && (
+                <EventStageVoters stageId={eventStageToEdit?.id} />
+              )}
+            </Suspense>
+          ),
         },
       ];
 

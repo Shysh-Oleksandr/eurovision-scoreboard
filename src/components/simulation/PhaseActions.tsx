@@ -8,7 +8,6 @@ import Select from '../common/Select';
 const FinalStatsModal = React.lazy(
   () => import('./finalStats/FinalStatsModal'),
 );
-const ShareResultsModal = React.lazy(() => import('./share/ShareResultsModal'));
 
 export const PhaseActions = () => {
   const continueToNextPhase = useScoreboardStore(
@@ -29,7 +28,7 @@ export const PhaseActions = () => {
   );
 
   const [showFinalStatsModal, setShowFinalStatsModal] = useState(false);
-  const [showShareResultsModal, setShowShareResultsModal] = useState(false);
+  const [isFinalStatsModalLoaded, setIsFinalStatsModalLoaded] = useState(false);
 
   const { nextPhase } = useNextEventName();
 
@@ -62,16 +61,13 @@ export const PhaseActions = () => {
   return (
     <>
       <Suspense fallback={null}>
-        <ShareResultsModal
-          isOpen={showShareResultsModal}
-          onClose={() => setShowShareResultsModal(false)}
-        />
-      </Suspense>
-      <Suspense fallback={null}>
-        <FinalStatsModal
-          isOpen={showFinalStatsModal}
-          onClose={() => setShowFinalStatsModal(false)}
-        />
+        {(showFinalStatsModal || isFinalStatsModalLoaded) && (
+          <FinalStatsModal
+            isOpen={showFinalStatsModal}
+            onClose={() => setShowFinalStatsModal(false)}
+            onLoaded={() => setIsFinalStatsModalLoaded(true)}
+          />
+        )}
       </Suspense>
 
       <div className="flex gap-2 lg:mb-3 md:mb-2 pt-1 sm:pt-0 md:mt-0 min-h-12 whitespace-nowrap w-full overflow-x-auto sm:overflow-x-visible">

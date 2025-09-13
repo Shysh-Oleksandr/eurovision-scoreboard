@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 
 import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
@@ -308,124 +308,130 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         )}
         {isOpen &&
           createPortal(
-            <div
-              ref={dropdownRef}
-              style={dropdownStyle}
-              className="bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto"
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              {(() => {
-                const hasGroups = !!(groups && groups.length > 0);
+            <Suspense fallback={null}>
+              <div
+                ref={dropdownRef}
+                style={dropdownStyle}
+                className="bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto"
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                {(() => {
+                  const hasGroups = !!(groups && groups.length > 0);
 
-                if (hasGroups) {
-                  const grouped = filteredOptions as OptionGroup[];
-                  const nonEmptyGroups = grouped.filter(
-                    (g) => g.options.length > 0,
-                  );
+                  if (hasGroups) {
+                    const grouped = filteredOptions as OptionGroup[];
+                    const nonEmptyGroups = grouped.filter(
+                      (g) => g.options.length > 0,
+                    );
 
-                  if (nonEmptyGroups.length === 0) {
+                    if (nonEmptyGroups.length === 0) {
+                      return (
+                        <div className="px-3 py-2 text-white/70">
+                          No options
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="py-1">
+                        {nonEmptyGroups.map((group) => (
+                          <div key={group.label}>
+                            <div className="px-3 py-1 text-xs uppercase tracking-wider text-white/70">
+                              {group.label}
+                            </div>
+                            <ul>
+                              {group.options.map((option) => (
+                                <li
+                                  key={option.value}
+                                  className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
+                                    option.value === value
+                                      ? 'bg-primary-800'
+                                      : ''
+                                  }`}
+                                  onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                    handleOptionClick(option.value);
+                                  }}
+                                >
+                                  {option.imageUrl ? (
+                                    <img
+                                      src={option.imageUrl}
+                                      alt={option.label}
+                                      className={`w-5 h-5 mr-3 object-cover ${
+                                        getImageClassName?.(option) ?? ''
+                                      }`}
+                                      width={20}
+                                      height={20}
+                                      loading="lazy"
+                                    />
+                                  ) : (
+                                    <span
+                                      className="w-4 h-4 rounded-full mr-3"
+                                      style={{
+                                        backgroundColor: getThemeColor(
+                                          option.value,
+                                        ),
+                                      }}
+                                    ></span>
+                                  )}
+                                  {option.label}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+
+                  const flat = filteredOptions as Option[];
+
+                  if (flat.length === 0) {
                     return (
                       <div className="px-3 py-2 text-white/70">No options</div>
                     );
                   }
 
                   return (
-                    <div className="py-1">
-                      {nonEmptyGroups.map((group) => (
-                        <div key={group.label}>
-                          <div className="px-3 py-1 text-xs uppercase tracking-wider text-white/70">
-                            {group.label}
-                          </div>
-                          <ul>
-                            {group.options.map((option) => (
-                              <li
-                                key={option.value}
-                                className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
-                                  option.value === value ? 'bg-primary-800' : ''
-                                }`}
-                                onMouseDown={(e) => {
-                                  e.stopPropagation();
-                                  handleOptionClick(option.value);
-                                }}
-                              >
-                                {option.imageUrl ? (
-                                  <img
-                                    src={option.imageUrl}
-                                    alt={option.label}
-                                    className={`w-5 h-5 mr-3 object-cover ${
-                                      getImageClassName?.(option) ?? ''
-                                    }`}
-                                    width={20}
-                                    height={20}
-                                    loading="lazy"
-                                  />
-                                ) : (
-                                  <span
-                                    className="w-4 h-4 rounded-full mr-3"
-                                    style={{
-                                      backgroundColor: getThemeColor(
-                                        option.value,
-                                      ),
-                                    }}
-                                  ></span>
-                                )}
-                                {option.label}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                    <ul className="py-1">
+                      {flat.map((option) => (
+                        <li
+                          key={option.value}
+                          className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
+                            option.value === value ? 'bg-primary-800' : ''
+                          }`}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            handleOptionClick(option.value);
+                          }}
+                        >
+                          {option.imageUrl ? (
+                            <img
+                              src={option.imageUrl}
+                              alt={option.label}
+                              className={`w-5 h-5 mr-3 object-cover ${
+                                getImageClassName?.(option) ?? ''
+                              }`}
+                              width={20}
+                              height={20}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <span
+                              className="w-4 h-4 rounded-full mr-3"
+                              style={{
+                                backgroundColor: getThemeColor(option.value),
+                              }}
+                            ></span>
+                          )}
+                          {option.label}
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   );
-                }
-
-                const flat = filteredOptions as Option[];
-
-                if (flat.length === 0) {
-                  return (
-                    <div className="px-3 py-2 text-white/70">No options</div>
-                  );
-                }
-
-                return (
-                  <ul className="py-1">
-                    {flat.map((option) => (
-                      <li
-                        key={option.value}
-                        className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
-                          option.value === value ? 'bg-primary-800' : ''
-                        }`}
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                          handleOptionClick(option.value);
-                        }}
-                      >
-                        {option.imageUrl ? (
-                          <img
-                            src={option.imageUrl}
-                            alt={option.label}
-                            className={`w-5 h-5 mr-3 object-cover ${
-                              getImageClassName?.(option) ?? ''
-                            }`}
-                            width={20}
-                            height={20}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span
-                            className="w-4 h-4 rounded-full mr-3"
-                            style={{
-                              backgroundColor: getThemeColor(option.value),
-                            }}
-                          ></span>
-                        )}
-                        {option.label}
-                      </li>
-                    ))}
-                  </ul>
-                );
-              })()}
-            </div>,
+                })()}
+              </div>
+            </Suspense>,
             document.body,
           )}
       </div>

@@ -27,7 +27,7 @@ interface OddsSettingsProps {
   countries: BaseCountry[];
 }
 
-export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
+const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
   const countryOdds = useCountriesStore((state) => state.countryOdds);
   const updateCountryOdds = useCountriesStore(
     (state) => state.updateCountryOdds,
@@ -215,3 +215,5 @@ export const OddsSettings: React.FC<OddsSettingsProps> = ({ countries }) => {
     </>
   );
 };
+
+export default OddsSettings;

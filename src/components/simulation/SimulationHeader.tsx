@@ -5,13 +5,13 @@ import { useGeneralStore } from '../../state/generalStore';
 import { getHostingCountryLogo } from '../../theme/hosting';
 import Button from '../common/Button';
 
-const ShareResultsModal = React.lazy(() => import('./share/ShareResultsModal'));
-
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { ShareIcon } from '@/assets/icons/ShareIcon';
 import { SlidersIcon } from '@/assets/icons/SlidersIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+
+const ShareResultsModal = React.lazy(() => import('./share/ShareResultsModal'));
 
 interface SimulationHeaderProps {
   phaseTitle: string;
@@ -44,6 +44,8 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
 
   const [showShareResultsModal, setShowShareResultsModal] = useState(false);
+  const [isShareResultsModalLoaded, setIsShareResultsModalLoaded] =
+    useState(false);
 
   const buttonClassName =
     'xs:!p-3 !py-2 !flex-1 justify-center items-center flex xs:!flex-none';
@@ -51,10 +53,13 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   return (
     <>
       <Suspense fallback={null}>
-        <ShareResultsModal
-          isOpen={showShareResultsModal}
-          onClose={() => setShowShareResultsModal(false)}
-        />
+        {(showShareResultsModal || isShareResultsModalLoaded) && (
+          <ShareResultsModal
+            isOpen={showShareResultsModal}
+            onClose={() => setShowShareResultsModal(false)}
+            onLoaded={() => setIsShareResultsModalLoaded(true)}
+          />
+        )}
       </Suspense>
 
       <div className="flex flex-col xs:flex-row justify-between xs:gap-1.5 gap-2 xs:items-center mb-1 sm:mb-2 md:mb-3">

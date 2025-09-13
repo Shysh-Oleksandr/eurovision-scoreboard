@@ -1,13 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 
 import Modal from '../common/Modal/Modal';
 import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '../common/tabs/Tabs';
 
 import { GeneralSettings } from './GeneralSettings';
-import { OddsSettings } from './OddsSettings';
 
 import { BaseCountry } from '@/models';
+
+const OddsSettings = React.lazy(() => import('./OddsSettings'));
 
 enum SettingsTab {
   GENERAL = 'General',
@@ -23,12 +24,14 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   participatingCountries: BaseCountry[];
+  onLoaded: () => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   participatingCountries,
+  onLoaded,
 }) => {
   const [activeTab, setActiveTab] = useState(SettingsTab.GENERAL);
 
@@ -40,11 +43,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       },
       {
         ...tabs[1],
-        content: <OddsSettings countries={participatingCountries} />,
+        content: (
+          <Suspense
+            fallback={
+              <div className="text-white text-center py-2 font-medium">
+                Loading...
+              </div>
+            }
+          >
+            {activeTab === SettingsTab.ODDS && (
+              <OddsSettings countries={participatingCountries} />
+            )}
+          </Suspense>
+        ),
       },
     ],
-    [participatingCountries],
+    [participatingCountries, activeTab],
   );
+
+  useEffect(() => {
+    onLoaded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Modal

@@ -77,7 +77,7 @@ export const CountrySelectionListItem: React.FC<
         }}
         alt={`${country.name} flag`}
         className={`flex-none rounded-sm ${
-          isExisting ? 'w-8 h-7' : 'w-8 h-6 object-cover'
+          isExisting ? 'w-7 h-7' : 'w-8 h-6 object-cover'
         }`}
         width={32}
         height={28}
