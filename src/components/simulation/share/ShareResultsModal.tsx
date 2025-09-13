@@ -26,16 +26,19 @@ import { useCountriesStore } from '@/state/countriesStore';
 interface ShareResultsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLoaded: () => void;
 }
 
 const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   isOpen,
   onClose,
+  onLoaded,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
     null,
   );
+
   const [lastGeneratedStageId, setLastGeneratedStageId] = useState<
     string | null
   >(null);
@@ -286,6 +289,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       });
 
       applyAutoSettings();
+      onLoaded();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);

@@ -48,6 +48,8 @@ export const AddPointButton: React.FC<AddPointButtonProps> = ({ onAdd }) => {
         <Button
           onClick={() => setIsAdding(true)}
           className="h-full !py-1 !px-4 lg:!px-5 w-full flex justify-center"
+          title="Add Point"
+          aria-label="Add Point"
         >
           <PlusIcon className="w-7 h-7" />
         </Button>

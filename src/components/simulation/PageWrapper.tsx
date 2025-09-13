@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useThemeSetup } from '../../hooks/useThemeSetup';
 import { useGeneralStore } from '../../state/generalStore';
@@ -18,17 +18,21 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
     (state) => state.settings.customBgImage,
   );
 
+  const backgroundImage = useMemo(() => {
+    if (shouldUseCustomBgImage && customBgImage) {
+      return customBgImage;
+    }
+
+    return theme.backgroundImage;
+  }, [shouldUseCustomBgImage, customBgImage, theme.backgroundImage]);
+
   return (
     <div
       className={`w-full h-full theme-default theme-${themeYear}`}
       id="main"
       style={{
         backgroundColor: theme.colors.appBgColor,
-        backgroundImage: `url(${
-          shouldUseCustomBgImage && customBgImage
-            ? customBgImage
-            : theme.backgroundImage
-        })`,
+        backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

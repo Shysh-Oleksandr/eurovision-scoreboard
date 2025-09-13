@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Select from '../common/Select';
 
-import FinalStatsModal from './finalStats/FinalStatsModal';
-import ShareResultsModal from './share/ShareResultsModal';
+const FinalStatsModal = React.lazy(
+  () => import('./finalStats/FinalStatsModal'),
+);
 
 export const PhaseActions = () => {
   const continueToNextPhase = useScoreboardStore(
@@ -27,7 +28,7 @@ export const PhaseActions = () => {
   );
 
   const [showFinalStatsModal, setShowFinalStatsModal] = useState(false);
-  const [showShareResultsModal, setShowShareResultsModal] = useState(false);
+  const [isFinalStatsModalLoaded, setIsFinalStatsModalLoaded] = useState(false);
 
   const { nextPhase } = useNextEventName();
 
@@ -59,14 +60,15 @@ export const PhaseActions = () => {
 
   return (
     <>
-      <ShareResultsModal
-        isOpen={showShareResultsModal}
-        onClose={() => setShowShareResultsModal(false)}
-      />
-      <FinalStatsModal
-        isOpen={showFinalStatsModal}
-        onClose={() => setShowFinalStatsModal(false)}
-      />
+      <Suspense fallback={null}>
+        {(showFinalStatsModal || isFinalStatsModalLoaded) && (
+          <FinalStatsModal
+            isOpen={showFinalStatsModal}
+            onClose={() => setShowFinalStatsModal(false)}
+            onLoaded={() => setIsFinalStatsModalLoaded(true)}
+          />
+        )}
+      </Suspense>
 
       <div className="flex gap-2 lg:mb-3 md:mb-2 pt-1 sm:pt-0 md:mt-0 min-h-12 whitespace-nowrap w-full overflow-x-auto sm:overflow-x-visible">
         {isVotingOver && (

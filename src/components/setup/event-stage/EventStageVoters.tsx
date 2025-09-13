@@ -12,9 +12,13 @@ import { useCountriesStore } from '@/state/countriesStore';
 interface EventStageVotersProps {
   className?: string;
   stageId?: string;
+  onLoaded?: () => void;
 }
 
-const EventStageVoters: React.FC<EventStageVotersProps> = ({ stageId }) => {
+const EventStageVoters: React.FC<EventStageVotersProps> = ({
+  stageId,
+  onLoaded,
+}) => {
   const { control, setValue } = useFormContext<EventStageFormData>();
   const votingCountries = useWatch({
     control,
@@ -48,8 +52,10 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({ stageId }) => {
         setLocalVotingCountries(existingVotingCountries);
         setValue('votingCountries', existingVotingCountries as any);
       }
+
+      onLoaded?.();
     }
-  }, [stageId, getStageVotingCountries, setValue]);
+  }, [stageId, getStageVotingCountries, setValue, onLoaded]);
 
   // Update local state when form value changes
   useEffect(() => {

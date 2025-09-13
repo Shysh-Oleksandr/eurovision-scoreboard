@@ -4,6 +4,7 @@ import React, {
   useState,
   useCallback,
   ReactNode,
+  useMemo,
 } from 'react';
 
 interface TabItem {
@@ -75,10 +76,19 @@ const Tabs: React.FC<TabsProps> = ({
   const [isInitialized, setIsInitialized] = useState(false);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const activeTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
-  const { width: activeTabWidth, left: activeTabLeft } = tabDimensions[
-    activeTabIndex
-  ] || { width: 0, left: 0 };
+  const activeTabStyle = useMemo(() => {
+    const activeTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
+
+    const { width: activeTabWidth, left: activeTabLeft } = tabDimensions[
+      activeTabIndex
+    ] || { width: 0, left: 0 };
+
+    return {
+      width: isSmallScreen ? 'calc(100% - 14px)' : activeTabWidth || 0,
+      left: isSmallScreen ? '6px' : `${activeTabLeft}px`,
+      transform: isSmallScreen ? `translateY(${activeTabLeft}px)` : 'none',
+    };
+  }, [tabs, tabDimensions, isSmallScreen, activeTab]);
 
   const measureTabs = useCallback(() => {
     const dimensions = tabRefs.current.map((ref) => {
@@ -120,13 +130,7 @@ const Tabs: React.FC<TabsProps> = ({
       {isInitialized && (
         <div
           className={`absolute top-1 md:h-12 h-10 bg-gradient-to-tr from-[20%] from-primary-800 to-primary-700/70 rounded-lg shadow transition-all duration-[400ms] ease-in-out ${overlayClassName}`}
-          style={{
-            width: isSmallScreen ? 'calc(100% - 14px)' : activeTabWidth || 0,
-            left: isSmallScreen ? '6px' : `${activeTabLeft}px`,
-            transform: isSmallScreen
-              ? `translateY(${activeTabIndex * 100 + activeTabIndex * 10}%)`
-              : 'none',
-          }}
+          style={activeTabStyle}
         />
       )}
       {tabs.map((tab, index) => (

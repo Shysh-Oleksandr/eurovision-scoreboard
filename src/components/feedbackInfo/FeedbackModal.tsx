@@ -13,9 +13,11 @@ import GitHubIcon from '@/assets/icons/GitHubIcon';
 const FeedbackModal = ({
   showModal,
   setShowModal,
+  onLoaded,
 }: {
   showModal: boolean;
   setShowModal: (show: boolean) => void;
+  onLoaded: () => void;
 }) => {
   const [activeTab, setActiveTab] = useState('feedback');
   const setLastSeenUpdate = useGeneralStore((state) => state.setLastSeenUpdate);
@@ -34,6 +36,9 @@ const FeedbackModal = ({
       setLastSeenUpdate(latestUpdate);
       setShouldShowNewChangesIndicator(false);
     }
+
+    onLoaded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, setLastSeenUpdate, setShouldShowNewChangesIndicator]);
 
   const tabs = getTabs(shouldShowNewChangesIndicator);

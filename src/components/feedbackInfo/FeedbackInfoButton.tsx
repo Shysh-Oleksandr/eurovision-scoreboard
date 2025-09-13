@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
 
 import FeedbackIcon from './FeedbackIcon';
-import FeedbackModal from './FeedbackModal';
+
+const FeedbackModal = React.lazy(() => import('./FeedbackModal'));
 
 const FeedbackInfoButton = ({ className }: { className?: string }) => {
   const [showModal, setShowModal] = useState(false);
+  const [isFeedbackModalLoaded, setIsFeedbackModalLoaded] = useState(false);
   const shouldShowNewChangesIndicator = useGeneralStore(
     (state) => state.shouldShowNewChangesIndicator,
   );
@@ -31,7 +33,15 @@ const FeedbackInfoButton = ({ className }: { className?: string }) => {
           <div className="absolute -top-[0.1rem] -right-[0.2rem] w-3.5 h-3.5 bg-primary-700 rounded-full animate-pulse" />
         )}
       </button>
-      <FeedbackModal showModal={showModal} setShowModal={setShowModal} />
+      <Suspense fallback={null}>
+        {(showModal || isFeedbackModalLoaded) && (
+          <FeedbackModal
+            showModal={showModal}
+            setShowModal={setShowModal}
+            onLoaded={() => setIsFeedbackModalLoaded(true)}
+          />
+        )}
+      </Suspense>
     </>
   );
 };

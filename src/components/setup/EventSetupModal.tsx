@@ -1,4 +1,10 @@
-import React, { useCallback, useState, useEffect, useMemo } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useEffect,
+  useMemo,
+  Suspense,
+} from 'react';
 
 import {
   BaseCountry,
@@ -11,13 +17,9 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 import Tabs, { TabContent } from '../common/tabs/Tabs';
-import { SettingsModal } from '../settings';
 
 import { TABS } from './constants';
 import { AvailableGroup } from './CountrySelectionListItem';
-import CustomCountryModal from './CustomCountryModal';
-import EventStageModal from './event-stage/EventStageModal';
-import GrandFinalOnlySetup from './GrandFinalOnlySetup';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
 import { useInitialLineup } from './hooks/useInitialLineup';
@@ -30,6 +32,13 @@ import { validateEventSetup } from './utils/eventValidation';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
+
+const EventStageModal = React.lazy(
+  () => import('./event-stage/EventStageModal'),
+);
+const CustomCountryModal = React.lazy(() => import('./CustomCountryModal'));
+const SettingsModal = React.lazy(() => import('../settings/SettingsModal'));
+const GrandFinalOnlySetup = React.lazy(() => import('./GrandFinalOnlySetup'));
 
 const EventSetupModal = () => {
   const eventSetupModalOpen = useCountriesStore(
@@ -57,6 +66,7 @@ const EventSetupModal = () => {
   const { clear } = useScoreboardStore.temporal.getState();
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isSettingsModalLoaded, setIsSettingsModalLoaded] = useState(false);
 
   const {
     countryGroups: {
@@ -220,21 +230,32 @@ const EventSetupModal = () => {
       {
         ...TABS[1],
         content: (
-          <GrandFinalOnlySetup
-            grandFinalStage={eventStagesWithCountries.find(
-              (s) => s.id === StageId.GF,
+          <Suspense
+            fallback={
+              <div className="text-white text-center py-2 font-medium">
+                Loading...
+              </div>
+            }
+          >
+            {activeTab === EventMode.GRAND_FINAL_ONLY && (
+              <GrandFinalOnlySetup
+                grandFinalStage={eventStagesWithCountries.find(
+                  (s) => s.id === StageId.GF,
+                )}
+                notQualifiedCountries={notQualifiedCountries}
+                onAssignCountryAssignment={handleCountryAssignment}
+                getCountryGroupAssignment={getCountryGroupAssignment}
+                onBulkAssign={handleBulkCountryAssignment}
+                onEditStage={handleOpenEditEventStageModal}
+                availableGroups={availableGroups}
+              />
             )}
-            notQualifiedCountries={notQualifiedCountries}
-            onAssignCountryAssignment={handleCountryAssignment}
-            getCountryGroupAssignment={getCountryGroupAssignment}
-            onBulkAssign={handleBulkCountryAssignment}
-            onEditStage={handleOpenEditEventStageModal}
-            availableGroups={availableGroups}
-          />
+          </Suspense>
         ),
       },
     ],
     [
+      activeTab,
       autoQualifiers,
       availableGroups,
       eventStagesWithCountries,
@@ -277,24 +298,40 @@ const EventSetupModal = () => {
       }
     >
       <SetupHeader openSettingsModal={() => setIsSettingsModalOpen(true)} />
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
-        participatingCountries={participatingCountries}
-      />
-      <CustomCountryModal
-        isOpen={isCustomCountryModalOpen}
-        onClose={handleCloseModal}
-        countryToEdit={countryToEdit}
-      />
-      <EventStageModal
-        isOpen={isEventStageModalOpen}
-        onClose={handleCloseEventStageModal}
-        eventStageToEdit={eventStageToEdit}
-        localEventStagesLength={configuredEventStages.length}
-        onSave={handleSaveStage}
-        onDelete={handleDeleteStage}
-      />
+
+      <Suspense fallback={null}>
+        {(isSettingsModalOpen || isSettingsModalLoaded) && (
+          <SettingsModal
+            isOpen={isSettingsModalOpen}
+            onClose={() => setIsSettingsModalOpen(false)}
+            participatingCountries={participatingCountries}
+            onLoaded={() => setIsSettingsModalLoaded(true)}
+          />
+        )}
+      </Suspense>
+
+      {isCustomCountryModalOpen && (
+        <Suspense fallback={null}>
+          <CustomCountryModal
+            isOpen={isCustomCountryModalOpen}
+            onClose={handleCloseModal}
+            countryToEdit={countryToEdit}
+          />
+        </Suspense>
+      )}
+
+      {isEventStageModalOpen && (
+        <Suspense fallback={null}>
+          <EventStageModal
+            isOpen={isEventStageModalOpen}
+            onClose={handleCloseEventStageModal}
+            eventStageToEdit={eventStageToEdit}
+            localEventStagesLength={configuredEventStages.length}
+            onSave={handleSaveStage}
+            onDelete={handleDeleteStage}
+          />
+        </Suspense>
+      )}
 
       <div className="mt-2 flex flex-col gap-3">
         <Tabs

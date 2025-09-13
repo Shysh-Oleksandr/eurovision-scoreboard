@@ -53,6 +53,7 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
             }}
             className="!p-2"
             aria-label={`Edit ${grandFinalStage.name}`}
+            title={`Edit ${grandFinalStage.name}`}
           >
             <PencilIcon className="w-5 h-5" />
           </Button>

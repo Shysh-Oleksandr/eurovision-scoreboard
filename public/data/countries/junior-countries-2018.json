@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Poland",
+    "code": "PL",
+    "category": "All-Time Participants",
+    "juryOdds": 55,
+    "televoteOdds": 99,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 19
+  },
+  {
+    "name": "France",
+    "code": "FR",
+    "category": "All-Time Participants",
+    "juryOdds": 59.5,
+    "televoteOdds": 82.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 14
+  },
+  {
+    "name": "Australia",
+    "code": "AU",
+    "category": "All-Time Participants",
+    "juryOdds": 99,
+    "televoteOdds": 27,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 11
+  },
+  {
+    "name": "Ukraine",
+    "code": "UA",
+    "category": "All-Time Participants",
+    "juryOdds": 71,
+    "televoteOdds": 48.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 0
+  },
+  {
+    "name": "Kazakhstan",
+    "code": "KZ",
+    "category": "Asia",
+    "juryOdds": 48,
+    "televoteOdds": 70.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 2
+  },
+  {
+    "name": "Malta",
+    "code": "MT",
+    "category": "All-Time Participants",
+    "juryOdds": 92.5,
+    "televoteOdds": 18,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 18
+  },
+  {
+    "name": "Italy",
+    "code": "IT",
+    "category": "All-Time Participants",
+    "juryOdds": 64.5,
+    "televoteOdds": 30,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 10
+  },
+  {
+    "name": "Georgia",
+    "code": "GE",
+    "category": "All-Time Participants",
+    "juryOdds": 71.5,
+    "televoteOdds": 14.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 12
+  },
+  {
+    "name": "Armenia",
+    "code": "AM",
+    "category": "All-Time Participants",
+    "juryOdds": 40,
+    "televoteOdds": 41.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 16
+  },
+  {
+    "name": "Russia",
+    "code": "RU",
+    "category": "All-Time Participants",
+    "juryOdds": 43,
+    "televoteOdds": 34.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 4
+  },
+  {
+    "name": "Belarus",
+    "code": "BY",
+    "category": "All-Time Participants",
+    "juryOdds": 43.5,
+    "televoteOdds": 27,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 7
+  },
+  {
+    "name": "Netherlands",
+    "code": "NL",
+    "category": "All-Time Participants",
+    "juryOdds": 19.5,
+    "televoteOdds": 40,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 5
+  },
+  {
+    "name": "North Macedonia",
+    "code": "MK",
+    "category": "All-Time Participants",
+    "juryOdds": 45.5,
+    "televoteOdds": 11,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 15
+  },
+  {
+    "name": "Israel",
+    "code": "IL",
+    "category": "All-Time Participants",
+    "juryOdds": 26.5,
+    "televoteOdds": 21.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 13
+  },
+  {
+    "name": "Ireland",
+    "code": "IE",
+    "category": "All-Time Participants",
+    "juryOdds": 12.5,
+    "televoteOdds": 12,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 8
+  },
+  {
+    "name": "Azerbaijan",
+    "code": "AZ",
+    "category": "All-Time Participants",
+    "juryOdds": 16,
+    "televoteOdds": 6.5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 6
+  },
+  {
+    "name": "Portugal",
+    "code": "PT",
+    "category": "All-Time Participants",
+    "juryOdds": 5,
+    "televoteOdds": 17,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 1
+  },
+  {
+    "name": "Albania",
+    "code": "AL",
+    "category": "All-Time Participants",
+    "juryOdds": 11.5,
+    "televoteOdds": 10,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 3
+  },
+  {
+    "name": "Serbia",
+    "code": "RS",
+    "category": "All-Time Participants",
+    "juryOdds": 6.5,
+    "televoteOdds": 5,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 9
+  },
+  {
+    "name": "Wales",
+    "code": "GB-WLS",
+    "category": "Rest of Europe",
+    "juryOdds": 5,
+    "televoteOdds": 6,
+    "isQualified": true,
+    "isAutoQualified": true,
+    "spokespersonOrder": 17
+  }
+]

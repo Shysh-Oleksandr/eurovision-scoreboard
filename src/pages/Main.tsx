@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import EventSetupModal from '../components/setup/EventSetupModal';
 import { PageWrapper } from '../components/simulation/PageWrapper';
 
-import { Simulation } from '@/components/simulation/Simulation';
+import { useScoreboardStore } from '@/state/scoreboardStore';
+
+const Simulation = React.lazy(
+  () => import('../components/simulation/Simulation'),
+);
 
 export const Main = () => {
+  const eventStages = useScoreboardStore((state) => state.eventStages);
+
   return (
     <PageWrapper>
       <EventSetupModal />
-      <Simulation />
+      {eventStages.length > 0 && (
+        <Suspense fallback={null}>
+          <Simulation />
+        </Suspense>
+      )}
     </PageWrapper>
   );
 };

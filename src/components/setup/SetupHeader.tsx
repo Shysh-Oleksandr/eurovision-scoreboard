@@ -158,7 +158,12 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
         />
 
         {shouldShowSyncButton && (
-          <Button onClick={handleSyncTheme} className="!p-3 group">
+          <Button
+            onClick={handleSyncTheme}
+            className="!p-3 group"
+            title="Sync Theme"
+            aria-label="Sync Theme"
+          >
             <SyncIcon className="group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
           </Button>
         )}
@@ -171,6 +176,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           }}
           className="!p-3 group"
           aria-label="Settings"
+          title="Settings"
         >
           <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
         </Button>

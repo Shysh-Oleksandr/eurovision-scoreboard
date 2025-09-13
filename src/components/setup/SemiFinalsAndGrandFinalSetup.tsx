@@ -80,6 +80,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
                 }}
                 className="!p-2"
                 aria-label={`Edit ${stage.name}`}
+                title={`Edit ${stage.name}`}
               >
                 <PencilIcon className="w-5 h-5" />
               </Button>
@@ -106,6 +107,7 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
               }}
               className="!p-2"
               aria-label={`Edit ${grandFinalStage.name}`}
+              title={`Edit ${grandFinalStage.name}`}
             >
               <PencilIcon className="w-5 h-5" />
             </Button>

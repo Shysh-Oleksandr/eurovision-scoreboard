@@ -6,7 +6,7 @@ import QualifiedCountriesList from './QualifiedCountriesList';
 import Button from '@/components/common/Button';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-export const PickQualifiersSimulation = () => {
+const PickQualifiersSimulation = () => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const pickQualifierRandomly = useScoreboardStore(
     (state) => state.pickQualifierRandomly,
@@ -46,3 +46,5 @@ export const PickQualifiersSimulation = () => {
     </>
   );
 };
+
+export default PickQualifiersSimulation;

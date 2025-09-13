@@ -10,7 +10,7 @@ import StatsImagePreview from './StatsImagePreview';
 
 import { DownloadIcon } from '@/assets/icons/DownloadIcon';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
-import { Country, StageVotingType, StatsTableType } from '@/models';
+import { Country, EventStage, StageVotingType, StatsTableType } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
 
@@ -30,7 +30,8 @@ interface ShareStatsModalProps {
     country: Country,
     type?: 'jury' | 'televote' | 'combined',
   ) => number;
-  selectedStage: any; // EventStage type
+  selectedStage?: EventStage; // EventStage type
+  onLoaded: () => void;
 }
 
 const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
@@ -44,6 +45,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
   getCellClassName,
   getPoints,
   selectedStage,
+  onLoaded,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
@@ -96,6 +98,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       setSettings({
         title: defaultTitle,
       });
+      onLoaded();
     }
     if (
       isOpen &&
@@ -104,6 +107,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
     ) {
       setGeneratedImageUrl(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isOpen,
     defaultTitle,

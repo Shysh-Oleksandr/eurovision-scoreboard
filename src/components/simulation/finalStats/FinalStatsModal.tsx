@@ -1,18 +1,19 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 
 import Modal from '../../common/Modal/Modal';
 import Tabs, { TabContent } from '../../common/tabs/Tabs';
-import ShareStatsModal from '../share/ShareStatsModal';
 
-import SplitStats from './SplitStats';
 import StatsHeader from './StatsHeader';
 import StatsTable from './StatsTable';
-import SummaryStats from './SummaryStats';
 import { useFinalStats } from './useFinalStats';
 
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { StatsTableType } from '@/models';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+
+const ShareStatsModal = React.lazy(() => import('../share/ShareStatsModal'));
+const SplitStats = React.lazy(() => import('./SplitStats'));
+const SummaryStats = React.lazy(() => import('./SummaryStats'));
 
 enum FinalStatsTab {
   BREAKDOWN = 'Breakdown',
@@ -43,15 +44,18 @@ const getStatsTableType = (tab: FinalStatsTab): StatsTableType => {
 interface FinalStatsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLoaded: () => void;
 }
 
 const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   isOpen,
   onClose,
+  onLoaded,
 }) => {
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const [activeTab, setActiveTab] = useState(FinalStatsTab.BREAKDOWN);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isShareModalLoaded, setIsShareModalLoaded] = useState(false);
 
   const {
     finishedStages,
@@ -89,32 +93,53 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       {
         ...tabs[1],
         content: (
-          <SplitStats
-            rankedCountries={rankedCountries}
-            selectedStage={selectedStage}
-            getPoints={getPoints}
-          />
+          <Suspense
+            fallback={
+              <div className="text-white text-center py-2 font-medium">
+                Loading...
+              </div>
+            }
+          >
+            {activeTab === FinalStatsTab.SPLIT && (
+              <SplitStats
+                rankedCountries={rankedCountries}
+                selectedStage={selectedStage}
+                getPoints={getPoints}
+              />
+            )}
+          </Suspense>
         ),
       },
       {
         ...tabs[2],
         content: (
-          <SummaryStats
-            rankedCountries={rankedCountries}
-            selectedStage={selectedStage}
-            getPoints={getPoints}
-          />
+          <Suspense
+            fallback={
+              <div className="text-white text-center py-2 font-medium">
+                Loading...
+              </div>
+            }
+          >
+            {activeTab === FinalStatsTab.SUMMARY && (
+              <SummaryStats
+                rankedCountries={rankedCountries}
+                selectedStage={selectedStage}
+                getPoints={getPoints}
+              />
+            )}
+          </Suspense>
         ),
       },
     ],
     [
-      selectedStageId,
-      selectedVoteType,
-      selectedStage,
       rankedCountries,
       getCellPoints,
       getCellClassName,
       getPoints,
+      selectedStageId,
+      selectedVoteType,
+      activeTab,
+      selectedStage,
     ],
   );
 
@@ -126,6 +151,8 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     if (!isOpen) return;
 
     setSelectedStageId(viewedStageId);
+    onLoaded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, viewedStageId, setSelectedStageId]);
 
   return (
@@ -170,18 +197,23 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       )}
 
       {/* Share Stats Modal */}
-      <ShareStatsModal
-        isOpen={isShareModalOpen}
-        onClose={() => setIsShareModalOpen(false)}
-        activeTab={statsTableType}
-        rankedCountries={rankedCountries}
-        selectedStageId={selectedStageId}
-        selectedVoteType={selectedVoteType}
-        getCellPoints={getCellPoints}
-        getCellClassName={getCellClassName}
-        getPoints={getPoints}
-        selectedStage={selectedStage}
-      />
+      {(isShareModalOpen || isShareModalLoaded) && (
+        <Suspense fallback={null}>
+          <ShareStatsModal
+            isOpen={isShareModalOpen}
+            onClose={() => setIsShareModalOpen(false)}
+            onLoaded={() => setIsShareModalLoaded(true)}
+            activeTab={statsTableType}
+            rankedCountries={rankedCountries}
+            selectedStageId={selectedStageId}
+            selectedVoteType={selectedVoteType}
+            getCellPoints={getCellPoints}
+            getCellClassName={getCellClassName}
+            getPoints={getPoints}
+            selectedStage={selectedStage}
+          />
+        </Suspense>
+      )}
     </Modal>
   );
 };

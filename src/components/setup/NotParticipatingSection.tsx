@@ -97,6 +97,8 @@ const NotParticipatingSection = ({
                   <Button
                     onClick={handleOpenCreateModal}
                     className="mr-1 !py-1 w-fit"
+                    title="Add Custom Country"
+                    aria-label="Add Custom Country"
                   >
                     <PlusIcon className="w-7 h-7" />
                   </Button>
