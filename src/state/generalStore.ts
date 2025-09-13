@@ -360,7 +360,7 @@ export const useGeneralStore = create<GeneralState>()(
         },
       },
     ),
-    { name: 'general-store' },
+    { name: 'general-store', enabled: process.env.NODE_ENV === 'development', },
   ),
 );
 

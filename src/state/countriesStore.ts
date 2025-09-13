@@ -584,6 +584,6 @@ export const useCountriesStore = create<CountriesState>()(
         get().syncVotersWithParticipants(get().eventAssignments, mode);
       },
     }),
-    { name: 'countries-store' },
+    { name: 'countries-store', enabled: process.env.NODE_ENV === 'development' },
   ),
 );
