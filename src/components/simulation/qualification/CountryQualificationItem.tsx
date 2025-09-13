@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -28,12 +27,16 @@ export const CountryQualificationItem: React.FC<
   useGSAP(
     () => {
       if (shouldAnimate && itemRef.current) {
-        gsap.to(itemRef.current, {
-          x: 0,
-          opacity: 1,
-          duration: 0.2,
-          ease: 'power1.in',
-        });
+        (async () => {
+          const { default: gsap } = await import('gsap');
+
+          gsap.to(itemRef.current, {
+            x: 0,
+            opacity: 1,
+            duration: 0.2,
+            ease: 'power1.in',
+          });
+        })();
       }
     },
     { dependencies: [shouldAnimate], scope: itemRef },

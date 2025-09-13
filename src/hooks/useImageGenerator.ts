@@ -1,4 +1,3 @@
-import * as htmlToImage from 'html-to-image';
 import { useCallback, useRef, useState } from 'react';
 
 import { useGeneralStore } from '../state/generalStore';
@@ -25,6 +24,8 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
 
     setIsGenerating(true);
     try {
+      const htmlToImageModule = await import('html-to-image');
+      const toCanvas = (htmlToImageModule as any).toCanvas ?? htmlToImageModule.default?.toCanvas;
       const isSafariOrChrome =
         /safari|chrome/i.test(navigator.userAgent) &&
         !/android/i.test(navigator.userAgent);
@@ -37,7 +38,7 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
       let repeat = true;
 
       while (repeat && i < maxAttempts) {
-        canvas = await htmlToImage.toCanvas(containerRef.current, {
+        canvas = await toCanvas(containerRef.current, {
           fetchRequestInit: {
             cache: 'no-cache',
           },
@@ -58,7 +59,7 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
           repeat = false;
           // For Safari/Chrome, generate one more time to ensure background image is properly rendered
           if (isSafariOrChrome) {
-            canvas = await htmlToImage.toCanvas(containerRef.current, {
+            canvas = await toCanvas(containerRef.current, {
               fetchRequestInit: {
                 cache: 'no-cache',
               },

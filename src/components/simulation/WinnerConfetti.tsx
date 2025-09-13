@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import Confetti from 'react-confetti';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
+const LazyConfetti = React.lazy(() => import('react-confetti'));
 
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
@@ -58,17 +58,22 @@ const WinnerConfetti: React.FC = () => {
     setShouldRecycle(false);
   }, [winnerCountry]);
 
-  if (!showConfetti || !showWinnerConfetti) return null;
+  const shouldRender = showConfetti && showWinnerConfetti;
+  const pieces = useMemo(() => 300, []);
+
+  if (!shouldRender) return null;
 
   return (
-    <Confetti
-      width={windowDimensions.width}
-      height={windowDimensions.height}
-      recycle={shouldRecycle}
-      numberOfPieces={300}
-      gravity={0.1}
-      colors={CONFETTI_COLORS}
-    />
+    <Suspense fallback={null}>
+      <LazyConfetti
+        width={windowDimensions.width}
+        height={windowDimensions.height}
+        recycle={shouldRecycle}
+        numberOfPieces={pieces}
+        gravity={0.1}
+        colors={CONFETTI_COLORS}
+      />
+    </Suspense>
   );
 };
 

@@ -1,4 +1,3 @@
-import gsap from 'gsap';
 import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -22,19 +21,23 @@ const QualificationBoard = () => {
 
   useGSAP(
     () => {
-      gsap.fromTo(
-        containerRef.current,
-        {
-          opacity: 0,
-          y: 20,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power3.in',
-        },
-      );
+      (async () => {
+        const { default: gsap } = await import('gsap');
+
+        gsap.fromTo(
+          containerRef.current,
+          {
+            opacity: 0,
+            y: 20,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'power3.in',
+          },
+        );
+      })();
     },
     {
       dependencies: [currentStageId],

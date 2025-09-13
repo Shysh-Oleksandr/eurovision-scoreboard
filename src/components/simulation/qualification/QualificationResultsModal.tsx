@@ -1,4 +1,3 @@
-import { gsap } from 'gsap';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -92,21 +91,25 @@ const QualificationResultsModal = () => {
   useGSAP(
     () => {
       if (isModalVisible) {
-        gsap.fromTo(
-          countriesContainerRef.current?.children ?? [],
-          {
-            opacity: 0,
-            x: -160,
-          },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.6,
-            ease: 'power1.in',
-            stagger: 0.6,
-            delay: 0.2,
-          },
-        );
+        (async () => {
+          const { default: gsap } = await import('gsap');
+
+          gsap.fromTo(
+            countriesContainerRef.current?.children ?? [],
+            {
+              opacity: 0,
+              x: -160,
+            },
+            {
+              opacity: 1,
+              x: 0,
+              duration: 0.6,
+              ease: 'power1.in',
+              stagger: 0.6,
+              delay: 0.2,
+            },
+          );
+        })();
       }
     },
     { scope: countriesContainerRef, dependencies: [isModalVisible] },

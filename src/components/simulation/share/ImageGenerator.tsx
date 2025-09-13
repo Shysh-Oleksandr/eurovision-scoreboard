@@ -1,5 +1,6 @@
-import * as htmlToImage from 'html-to-image';
-import React, { useEffect, useRef, useState } from 'react';
+// html-to-image is heavy; load it only when generating
+// Note: dynamic import inside generateImage keeps it out of the initial bundle
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   ASPECT_RATIO_PRESETS,
@@ -52,11 +53,16 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
     ];
   const aspectRatio = currentPreset.width / currentPreset.height;
 
-  const generateImage = async () => {
+  const generateImage = useCallback(async () => {
     if (!containerRef.current) return;
 
     setIsGenerating(true);
     try {
+      const htmlToImageModule = await import('html-to-image');
+      const toCanvas =
+        (htmlToImageModule as any).toCanvas ??
+        htmlToImageModule.default?.toCanvas;
+
       const qualityFactor =
         imageCustomization.highQuality && !isTouchDevice ? 2 : 1;
 
@@ -78,7 +84,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
       let repeat = true;
 
       while (repeat && i < maxAttempts) {
-        canvas = await htmlToImage.toCanvas(containerRef.current, {
+        canvas = await toCanvas(containerRef.current, {
           fetchRequestInit: {
             cache: 'no-cache',
           },
@@ -98,7 +104,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
           repeat = false;
           // For Safari/Chrome, generate one more time to ensure background image is properly rendered
           if (isSafariOrChrome) {
-            canvas = await htmlToImage.toCanvas(containerRef.current, {
+            canvas = await toCanvas(containerRef.current, {
               fetchRequestInit: {
                 cache: 'no-cache',
               },
@@ -133,7 +139,14 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [
+    containerRef,
+    modalRef,
+    imageCustomization,
+    isTouchDevice,
+    onImageGenerated,
+    currentPreset,
+  ]);
 
   const getTitle = () => {
     return imageCustomization.title;

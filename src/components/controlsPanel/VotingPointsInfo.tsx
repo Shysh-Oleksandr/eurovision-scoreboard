@@ -1,4 +1,3 @@
-import gsap from 'gsap';
 import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -20,17 +19,21 @@ const VotingPointsInfo = () => {
       const activeUnderline = underlinesRef.current[votingPointsIndex];
 
       if (activeUnderline) {
-        gsap.fromTo(
-          activeUnderline,
-          {
-            x: -30,
-          },
-          {
-            x: 0,
-            duration: 0.3,
-            ease: 'none', // linear
-          },
-        );
+        (async () => {
+          const { default: gsap } = await import('gsap');
+
+          gsap.fromTo(
+            activeUnderline,
+            {
+              x: -30,
+            },
+            {
+              x: 0,
+              duration: 0.3,
+              ease: 'none', // linear
+            },
+          );
+        })();
       }
     },
     { dependencies: [votingPointsIndex], scope: containerRef },
