@@ -45,7 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   randomnessLevel: 50, // 0-100
   isPickQualifiersMode: false,
   revealTelevoteLowestToHighest: false,
-}
+};
 
 // Function to determine initial aspect ratio based on device width
 export const getInitialAspectRatio = (): ShareImageAspectRatio => {
@@ -72,7 +72,7 @@ export const DEFAULT_IMAGE_CUSTOMIZATION: ImageCustomizationSettings = {
   verticalPadding: 64, // vertical padding in px
   horizontalPadding: 80, // horizontal padding in px
   highQuality: true,
-}
+};
 
 // Predefined aspect ratio presets for image customization
 export const ASPECT_RATIO_PRESETS = {
@@ -93,7 +93,7 @@ interface Settings {
   shouldShowManualTelevoteWarning: boolean;
   shouldShowHeartFlagIcon: boolean;
   showHostingCountryLogo: boolean;
-  hostingCountryCode: string;  
+  hostingCountryCode: string;
   shouldUseCustomBgImage: boolean;
   customBgImage: string | null;
   contestName: string; // 'Eurovision' | 'Junior Eurovision'
@@ -153,7 +153,9 @@ export interface GeneralState {
   setYear: (year: Year) => void;
   setTheme: (year: string, isJuniorTheme?: boolean) => void;
   setSettings: (settings: Partial<Settings>) => void;
-  setImageCustomization: (customization: Partial<ImageCustomizationSettings>) => void;
+  setImageCustomization: (
+    customization: Partial<ImageCustomizationSettings>,
+  ) => void;
   setPointsSystem: (points: PointsItem[]) => void;
   setSettingsPointsSystem: (points: PointsItem[]) => void;
   setGeneralSettingsExpansion: (
@@ -161,7 +163,6 @@ export interface GeneralState {
   ) => void;
   getHostingCountry: () => BaseCountry;
   resetAllSettings: () => void;
-
 }
 
 const getLatestUpdate = () => {
@@ -247,9 +248,14 @@ export const useGeneralStore = create<GeneralState>()(
             settings: { ...state.settings, ...settings },
           }));
         },
-        setImageCustomization: (customization: Partial<ImageCustomizationSettings>) => {
+        setImageCustomization: (
+          customization: Partial<ImageCustomizationSettings>,
+        ) => {
           set((state) => ({
-            imageCustomization: { ...state.imageCustomization, ...customization },
+            imageCustomization: {
+              ...state.imageCustomization,
+              ...customization,
+            },
           }));
         },
         setPointsSystem: (points: PointsItem[]) => {
@@ -271,10 +277,16 @@ export const useGeneralStore = create<GeneralState>()(
 
           const hostingCountryCode = get().settings.hostingCountryCode || 'CH';
 
-          return countries.find((country) => country.code === hostingCountryCode) as BaseCountry;
+          return countries.find(
+            (country) => country.code === hostingCountryCode,
+          ) as BaseCountry;
         },
         resetAllSettings: () => {
-          set({ settings: DEFAULT_SETTINGS, pointsSystem: initialPointsSystem, settingsPointsSystem: initialPointsSystem });
+          set({
+            settings: DEFAULT_SETTINGS,
+            pointsSystem: initialPointsSystem,
+            settingsPointsSystem: initialPointsSystem,
+          });
         },
       }),
       {
@@ -290,7 +302,11 @@ export const useGeneralStore = create<GeneralState>()(
             // Do not persist large image data URLs in localStorage to avoid quota issues
             settings: { ...restSettings, customBgImage: null },
             // Only persist aspectRatio and isCustomizationExpanded from imageCustomization
-            imageCustomization: { aspectRatio: state.imageCustomization.aspectRatio, isCustomizationExpanded: state.imageCustomization.isCustomizationExpanded },
+            imageCustomization: {
+              aspectRatio: state.imageCustomization.aspectRatio,
+              isCustomizationExpanded:
+                state.imageCustomization.isCustomizationExpanded,
+            },
             settingsPointsSystem: state.settingsPointsSystem,
             generalSettingsExpansion: state.generalSettingsExpansion,
           };
@@ -344,7 +360,11 @@ export const useGeneralStore = create<GeneralState>()(
           // Merge imageCustomization, keeping only aspectRatio from persistence
           const imageCustomization = {
             ...currentState.imageCustomization,
-            ...(state.imageCustomization && { aspectRatio: state.imageCustomization.aspectRatio, isCustomizationExpanded: state.imageCustomization.isCustomizationExpanded }),
+            ...(state.imageCustomization && {
+              aspectRatio: state.imageCustomization.aspectRatio,
+              isCustomizationExpanded:
+                state.imageCustomization.isCustomizationExpanded,
+            }),
           };
 
           return {
@@ -360,7 +380,7 @@ export const useGeneralStore = create<GeneralState>()(
         },
       },
     ),
-    { name: 'general-store', enabled: process.env.NODE_ENV === 'development', },
+    { name: 'general-store', enabled: process.env.NODE_ENV === 'development' },
   ),
 );
 
@@ -375,11 +395,15 @@ export const useGeneralStore = create<GeneralState>()(
 })();
 
 (async () => {
-  const image = await getCustomBgImageFromDB();
-  if (image) {
-    const current = useGeneralStore.getState().settings;
-    useGeneralStore.setState({
-      settings: { ...current, customBgImage: image },
-    });
-  }
+  const currentSettings = useGeneralStore.getState().settings;
+  if (!currentSettings.shouldUseCustomBgImage) return;
+
+  requestIdleCallback(async () => {
+    const image = await getCustomBgImageFromDB();
+    if (image) {
+      useGeneralStore.setState({
+        settings: { ...currentSettings, customBgImage: image },
+      });
+    }
+  });
 })();
