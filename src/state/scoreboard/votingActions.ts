@@ -34,8 +34,10 @@ const swapVotesBetweenCountries = (
       const votes = predefinedVotes.jury![voter];
       if (!votes) return;
       updated.jury![voter] = votes.map((vote: any) => {
-        if (vote.countryCode === countryCodeA) return { ...vote, countryCode: countryCodeB };
-        if (vote.countryCode === countryCodeB) return { ...vote, countryCode: countryCodeA };
+        if (vote.countryCode === countryCodeA)
+          return { ...vote, countryCode: countryCodeB };
+        if (vote.countryCode === countryCodeB)
+          return { ...vote, countryCode: countryCodeA };
         return vote;
       });
     });
@@ -47,8 +49,10 @@ const swapVotesBetweenCountries = (
       const votes = predefinedVotes.televote![voter];
       if (!votes) return;
       updated.televote![voter] = votes.map((vote: any) => {
-        if (vote.countryCode === countryCodeA) return { ...vote, countryCode: countryCodeB };
-        if (vote.countryCode === countryCodeB) return { ...vote, countryCode: countryCodeA };
+        if (vote.countryCode === countryCodeA)
+          return { ...vote, countryCode: countryCodeB };
+        if (vote.countryCode === countryCodeB)
+          return { ...vote, countryCode: countryCodeA };
         return vote;
       });
     });
@@ -60,8 +64,10 @@ const swapVotesBetweenCountries = (
       const votes = predefinedVotes.combined![voter];
       if (!votes) return;
       updated.combined![voter] = votes.map((vote: any) => {
-        if (vote.countryCode === countryCodeA) return { ...vote, countryCode: countryCodeB };
-        if (vote.countryCode === countryCodeB) return { ...vote, countryCode: countryCodeA };
+        if (vote.countryCode === countryCodeA)
+          return { ...vote, countryCode: countryCodeB };
+        if (vote.countryCode === countryCodeB)
+          return { ...vote, countryCode: countryCodeA };
         return vote;
       });
     });
@@ -71,17 +77,28 @@ const swapVotesBetweenCountries = (
 };
 
 // Recalculate stage countryPoints (jury, televote, combined) from predefinedVotes
-const recalculateCountryPoints = (currentStage: EventStage, predefinedVotes: any) => {
-  const pointsByCountry: Record<string, { juryPoints: number; televotePoints: number; combinedPoints: number }> = {};
+const recalculateCountryPoints = (
+  currentStage: EventStage,
+  predefinedVotes: any,
+) => {
+  const pointsByCountry: Record<
+    string,
+    { juryPoints: number; televotePoints: number; combinedPoints: number }
+  > = {};
 
   currentStage.countries.forEach((c) => {
-    pointsByCountry[c.code] = { juryPoints: 0, televotePoints: 0, combinedPoints: 0 };
+    pointsByCountry[c.code] = {
+      juryPoints: 0,
+      televotePoints: 0,
+      combinedPoints: 0,
+    };
   });
 
   if (predefinedVotes.jury) {
     Object.values(predefinedVotes.jury).forEach((votes: any) => {
       votes?.forEach((v: any) => {
-        if (pointsByCountry[v.countryCode]) pointsByCountry[v.countryCode].juryPoints += v.points;
+        if (pointsByCountry[v.countryCode])
+          pointsByCountry[v.countryCode].juryPoints += v.points;
       });
     });
   }
@@ -89,7 +106,8 @@ const recalculateCountryPoints = (currentStage: EventStage, predefinedVotes: any
   if (predefinedVotes.televote) {
     Object.values(predefinedVotes.televote).forEach((votes: any) => {
       votes?.forEach((v: any) => {
-        if (pointsByCountry[v.countryCode]) pointsByCountry[v.countryCode].televotePoints += v.points;
+        if (pointsByCountry[v.countryCode])
+          pointsByCountry[v.countryCode].televotePoints += v.points;
       });
     });
   }
@@ -97,7 +115,8 @@ const recalculateCountryPoints = (currentStage: EventStage, predefinedVotes: any
   if (predefinedVotes.combined) {
     Object.values(predefinedVotes.combined).forEach((votes: any) => {
       votes?.forEach((v: any) => {
-        if (pointsByCountry[v.countryCode]) pointsByCountry[v.countryCode].combinedPoints += v.points;
+        if (pointsByCountry[v.countryCode])
+          pointsByCountry[v.countryCode].combinedPoints += v.points;
       });
     });
   }
@@ -112,6 +131,7 @@ type VotingActions = {
   finishJuryVotingRandomly: () => void;
   finishTelevoteVotingRandomly: () => void;
   givePredefinedJuryPoint: () => void;
+  givePredefinedJuryPointsGrouped: () => void;
   givePredefinedTelevotePoints: () => void;
   giveManualTelevotePointsInRevealMode: (countryCode: string) => void;
   pickQualifier: (countryCode: string) => void;
@@ -308,6 +328,180 @@ export const createVotingActions: StateCreator<
     }));
   },
 
+  givePredefinedJuryPointsGrouped: () => {
+    const state = get();
+    const countriesStore = useCountriesStore.getState();
+    const currentStage = state.getCurrentStage();
+    const { pointsSystem } = useGeneralStore.getState();
+
+    if (!currentStage) return;
+
+    const votingCountries = countriesStore.getStageVotingCountries();
+    const isJuryVotingOver =
+      state.votingCountryIndex === votingCountries.length - 1;
+    const votingCountryCode = votingCountries[state.votingCountryIndex]?.code;
+
+    if (!votingCountryCode) return;
+
+    const isCombinedVoting =
+      currentStage.votingMode === StageVotingMode.COMBINED;
+
+    const predefinedVotesForCountry =
+      state.predefinedVotes[currentStage.id]?.[
+        isCombinedVoting ? 'combined' : 'jury'
+      ]?.[votingCountryCode];
+
+    if (!predefinedVotesForCountry) return;
+
+    // Determine the group slice [startIndex, endIndex]
+    const startIndex = state.votingPointsIndex;
+    let endIndex = startIndex;
+
+    if (startIndex < pointsSystem.length) {
+      if (pointsSystem[startIndex].showDouzePoints) {
+        endIndex = startIndex; // animated point alone
+      } else {
+        // include all until (but excluding) the next animated point
+        let i = startIndex;
+        while (
+          i + 1 < pointsSystem.length &&
+          !pointsSystem[i + 1].showDouzePoints
+        ) {
+          i += 1;
+        }
+        // If the next item is animated, stop before it; otherwise include till the end
+        endIndex = i;
+      }
+    }
+
+    const pointsToGive = pointsSystem.slice(startIndex, endIndex + 1);
+
+    if (pointsToGive.length === 0) return;
+
+    const countriesWithRecentPoints: CountryWithPoints[] = [];
+
+    pointsToGive.forEach((currentPoints) => {
+      const vote = predefinedVotesForCountry.find(
+        (v) => v.pointsId === currentPoints.id,
+      );
+
+      if (vote) {
+        countriesWithRecentPoints.push({
+          code: vote.countryCode,
+          points: vote.points,
+          showDouzePointsAnimation: vote.showDouzePointsAnimation,
+        });
+      }
+    });
+
+    if (countriesWithRecentPoints.length === 0) return;
+
+    const updatedCountries = currentStage.countries.map((country) => {
+      const pointsForThisCountry = countriesWithRecentPoints.filter(
+        (c) => c.code === country.code,
+      );
+
+      if (pointsForThisCountry.length === 0) {
+        return {
+          ...country,
+          lastReceivedPoints:
+            state.votingPointsIndex === 0 ? null : country.lastReceivedPoints,
+          showDouzePointsAnimation:
+            state.votingPointsIndex === 0
+              ? false
+              : country.showDouzePointsAnimation,
+        } as Country;
+      }
+
+      const totalReceivedPoints = pointsForThisCountry.reduce(
+        (sum, v) => sum + v.points,
+        0,
+      );
+
+      const showDouzePointsAnimation = pointsForThisCountry.some(
+        (p) => p.showDouzePointsAnimation,
+      );
+
+      return {
+        ...country,
+        juryPoints: country.juryPoints + totalReceivedPoints,
+        points: country.points + totalReceivedPoints,
+        lastReceivedPoints: totalReceivedPoints,
+        showDouzePointsAnimation,
+      } as Country;
+    });
+
+    const isEndOfPointsSet = endIndex === pointsSystem.length - 1;
+
+    // Reset last points after animation duration
+    if (state.lastPointsResetTimerId && !isEndOfPointsSet) {
+      clearTimeout(state.lastPointsResetTimerId);
+    }
+
+    if (isEndOfPointsSet) {
+      const timerId = setTimeout(() => {
+        get().resetLastPoints();
+        set({ lastPointsResetTimerId: null });
+      }, ANIMATION_DURATION);
+
+      set({ lastPointsResetTimerId: timerId });
+    }
+
+    const nextVotingCountryIndex =
+      state.votingCountryIndex + (isEndOfPointsSet ? 1 : 0);
+
+    if (
+      isEndOfPointsSet &&
+      isJuryVotingOver &&
+      (currentStage.votingMode === StageVotingMode.JURY_ONLY ||
+        currentStage.votingMode === StageVotingMode.COMBINED)
+    ) {
+      const { winnerCountry, showQualificationResults, countries } =
+        handleStageEnd(updatedCountries, currentStage);
+
+      set({
+        votingPointsIndex: 0,
+        votingCountryIndex: nextVotingCountryIndex,
+        eventStages: state.eventStages.map((stage) =>
+          stage.id === state.currentStageId
+            ? { ...stage, countries, isOver: true, isJuryVoting: false }
+            : stage,
+        ),
+        shouldShowLastPoints: true,
+        winnerCountry,
+        showQualificationResults,
+      });
+
+      return;
+    }
+
+    const televoteCountryIndex = getLastCountryIndexByPoints(
+      updatedCountries,
+      getLastCountryCodeByPoints(
+        getRemainingCountries(updatedCountries, undefined),
+      ),
+    );
+
+    set({
+      votingPointsIndex: isEndOfPointsSet ? 0 : endIndex + 1,
+      votingCountryIndex: isEndOfPointsSet
+        ? isJuryVotingOver
+          ? televoteCountryIndex
+          : nextVotingCountryIndex
+        : state.votingCountryIndex,
+      eventStages: state.eventStages.map((stage) =>
+        stage.id === state.currentStageId
+          ? {
+              ...stage,
+              isJuryVoting: !(isEndOfPointsSet && isJuryVotingOver),
+              countries: updatedCountries,
+            }
+          : stage,
+      ),
+      shouldShowLastPoints: true,
+    });
+  },
+
   giveTelevotePoints: (countryCode: string, votingPoints: number) => {
     const state = get();
     const currentStage = state.getCurrentStage();
@@ -404,17 +598,21 @@ export const createVotingActions: StateCreator<
   givePredefinedTelevotePoints: () => {
     const state = get();
     const currentStage = state.getCurrentStage();
-    const revealTelevoteLowestToHighest = useGeneralStore.getState().settings.revealTelevoteLowestToHighest;
+    const revealTelevoteLowestToHighest =
+      useGeneralStore.getState().settings.revealTelevoteLowestToHighest;
 
     if (!currentStage) return;
 
     if (revealTelevoteLowestToHighest) {
       // In reveal mode, give points to the country with the lowest points
       const nextLowestCountry = state.getNextLowestTelevoteCountry();
-      
+
       if (!nextLowestCountry || !nextLowestCountry.country) return;
 
-      get().giveTelevotePoints(nextLowestCountry.country.code,  state.currentRevealTelevotePoints);
+      get().giveTelevotePoints(
+        nextLowestCountry.country.code,
+        state.currentRevealTelevotePoints,
+      );
       return;
     }
 
@@ -466,13 +664,13 @@ export const createVotingActions: StateCreator<
     const currentStage = state.getCurrentStage();
 
     if (!currentStage) return;
-    
+
     // Get the current reveal points and the next lowest country
     const currentRevealPoints = state.currentRevealTelevotePoints;
     const nextLowestCountry = state.getNextLowestTelevoteCountry();
-    
+
     if (!nextLowestCountry || !nextLowestCountry.country) return;
-    
+
     // If the clicked country is not the next lowest country, we need to swap votes
     if (countryCode !== nextLowestCountry.country?.code) {
       const predefinedVotes = state.predefinedVotes[currentStage.id];
@@ -481,15 +679,15 @@ export const createVotingActions: StateCreator<
         const updatedPredefinedVotes = swapVotesBetweenCountries(
           predefinedVotes,
           countryCode,
-          nextLowestCountry.country.code
+          nextLowestCountry.country.code,
         );
-        
+
         // Recalculate country points after the swap
         const recalculatedCountryPoints = recalculateCountryPoints(
           currentStage,
-          updatedPredefinedVotes
+          updatedPredefinedVotes,
         );
-        
+
         // Update the store with swapped votes and recalculated points
         set((s) => ({
           countryPoints: {
@@ -503,7 +701,7 @@ export const createVotingActions: StateCreator<
         }));
       }
     }
-    
+
     // Give the televote points to the clicked country
     get().giveTelevotePoints(countryCode, currentRevealPoints);
   },
@@ -883,7 +1081,7 @@ export const createVotingActions: StateCreator<
     const currentStage = state.getCurrentStage();
 
     if (!currentStage || currentStage.isOver) return;
-    
+
     const { qualifiersAmount = 0 } = currentStage;
     if (qualifiersAmount === 0) return;
 
@@ -896,19 +1094,23 @@ export const createVotingActions: StateCreator<
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
     // Check if there are enough countries to qualify
-    const availableCountries = currentStage.countries.filter(country => !country.isQualifiedFromSemi);
+    const availableCountries = currentStage.countries.filter(
+      (country) => !country.isQualifiedFromSemi,
+    );
     if (availableCountries.length === 0) return;
 
     // Check if the selected country is already qualified
-    const selectedCountry = currentStage.countries.find(country => country.code === countryCode);
+    const selectedCountry = currentStage.countries.find(
+      (country) => country.code === countryCode,
+    );
     if (!selectedCountry || selectedCountry.isQualifiedFromSemi) return;
 
     // Get the top N countries by points (excluding already qualified ones)
     const countriesWithPoints = currentStage.countries
-      .map(country => {
+      .map((country) => {
         const points = stageCountryPoints[country.code];
         let totalPoints = 0;
-        
+
         if (currentStage.votingMode === StageVotingMode.COMBINED) {
           totalPoints = points?.combinedPoints || 0;
         } else if (currentStage.votingMode === StageVotingMode.JURY_ONLY) {
@@ -917,9 +1119,10 @@ export const createVotingActions: StateCreator<
           totalPoints = points?.televotePoints || 0;
         } else {
           // JURY_AND_TELEVOTE mode - combine both
-          totalPoints = (points?.juryPoints || 0) + (points?.televotePoints || 0);
+          totalPoints =
+            (points?.juryPoints || 0) + (points?.televotePoints || 0);
         }
-        
+
         return {
           ...country,
           totalPoints,
@@ -927,18 +1130,22 @@ export const createVotingActions: StateCreator<
       })
       .sort((a, b) => b.totalPoints - a.totalPoints);
 
-    const topCountries = countriesWithPoints.slice(0, qualifiersAmount).filter(country => !country.isQualifiedFromSemi);
-    
+    const topCountries = countriesWithPoints
+      .slice(0, qualifiersAmount)
+      .filter((country) => !country.isQualifiedFromSemi);
+
     // Check if the selected country would have qualified by predefined votes
-    const wouldHaveQualified = topCountries.some(country => country.code === countryCode);
-    
+    const wouldHaveQualified = topCountries.some(
+      (country) => country.code === countryCode,
+    );
+
     let updatedPredefinedVotes = predefinedVotes;
-    
+
     // If the country wouldn't have qualified, we need to swap votes
     if (!wouldHaveQualified) {
       // Find the lowest qualifying country from the remaining top countries
       const lowestQualifyingCountry = topCountries[topCountries.length - 1];
-      
+
       if (lowestQualifyingCountry) {
         // Use reusable helper to swap predefined votes
         updatedPredefinedVotes = swapVotesBetweenCountries(
@@ -973,28 +1180,34 @@ export const createVotingActions: StateCreator<
     // Mark the selected country as qualified
     set((s) => {
       // Get the current qualification order for this stage
-      const currentStageQualificationOrder = s.qualificationOrder[currentStage.id] || {};
-      const nextOrderNumber = Object.keys(currentStageQualificationOrder).length + 1;
-      
-      const updatedEventStages = s.eventStages.map(stage => 
-        stage.id === currentStage.id 
+      const currentStageQualificationOrder =
+        s.qualificationOrder[currentStage.id] || {};
+      const nextOrderNumber =
+        Object.keys(currentStageQualificationOrder).length + 1;
+
+      const updatedEventStages = s.eventStages.map((stage) =>
+        stage.id === currentStage.id
           ? {
               ...stage,
-              countries: stage.countries.map(country =>
+              countries: stage.countries.map((country) =>
                 country.code === countryCode
-                  ? { 
-                      ...country, 
+                  ? {
+                      ...country,
                       isQualifiedFromSemi: true,
                     }
-                  : country
+                  : country,
               ),
             }
-          : stage
+          : stage,
       );
 
       // Check if all qualifiers have been selected
-      const updatedStage = updatedEventStages.find(stage => stage.id === currentStage.id);
-      const qualifiedCount = updatedStage?.countries.filter(country => country.isQualifiedFromSemi).length || 0;
+      const updatedStage = updatedEventStages.find(
+        (stage) => stage.id === currentStage.id,
+      );
+      const qualifiedCount =
+        updatedStage?.countries.filter((country) => country.isQualifiedFromSemi)
+          .length || 0;
       const isStageComplete = qualifiedCount >= qualifiersAmount;
 
       const newQualificationOrder = {
@@ -1003,30 +1216,34 @@ export const createVotingActions: StateCreator<
           ...currentStageQualificationOrder,
           [countryCode]: nextOrderNumber,
         },
-      }
+      };
 
       // If stage is complete, assign points to all countries and mark stage as over
       if (isStageComplete) {
         // Update all countries with their predefined points
-        const finalUpdatedEventStages = updatedEventStages.map(stage =>
+        const finalUpdatedEventStages = updatedEventStages.map((stage) =>
           stage.id === currentStage.id
             ? {
                 ...stage,
-                countries: stage.countries.map(country => {
+                countries: stage.countries.map((country) => {
                   const countryPoints = stageCountryPoints[country.code];
                   let juryPoints = 0;
                   let televotePoints = 0;
                   let totalPoints = 0;
-                  
+
                   if (currentStage.votingMode === StageVotingMode.COMBINED) {
                     totalPoints = countryPoints?.combinedPoints || 0;
                     juryPoints = 0;
                     televotePoints = 0;
-                  } else if (currentStage.votingMode === StageVotingMode.JURY_ONLY) {
+                  } else if (
+                    currentStage.votingMode === StageVotingMode.JURY_ONLY
+                  ) {
                     juryPoints = countryPoints?.juryPoints || 0;
                     televotePoints = 0;
                     totalPoints = juryPoints;
-                  } else if (currentStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
+                  } else if (
+                    currentStage.votingMode === StageVotingMode.TELEVOTE_ONLY
+                  ) {
                     televotePoints = countryPoints?.televotePoints || 0;
                     juryPoints = 0;
                     totalPoints = televotePoints;
@@ -1036,7 +1253,7 @@ export const createVotingActions: StateCreator<
                     televotePoints = countryPoints?.televotePoints || 0;
                     totalPoints = juryPoints + televotePoints;
                   }
-                  
+
                   return {
                     ...country,
                     juryPoints,
@@ -1046,7 +1263,7 @@ export const createVotingActions: StateCreator<
                 }),
                 isOver: true,
               }
-            : stage
+            : stage,
         );
 
         return {
@@ -1069,7 +1286,7 @@ export const createVotingActions: StateCreator<
     const currentStage = state.getCurrentStage();
 
     if (!currentStage || currentStage.isOver) return;
-    
+
     const { qualifiersAmount = 0 } = currentStage;
     if (qualifiersAmount === 0) return;
 
@@ -1082,14 +1299,16 @@ export const createVotingActions: StateCreator<
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
     // Check if there are enough countries to qualify
-    const availableCountries = currentStage.countries.filter(country => !country.isQualifiedFromSemi);
+    const availableCountries = currentStage.countries.filter(
+      (country) => !country.isQualifiedFromSemi,
+    );
     if (availableCountries.length === 0) return;
 
     const countriesWithPoints = currentStage.countries
-      .map(country => {
+      .map((country) => {
         const points = stageCountryPoints[country.code];
         let totalPoints = 0;
-        
+
         if (currentStage.votingMode === StageVotingMode.COMBINED) {
           totalPoints = points?.combinedPoints || 0;
         } else if (currentStage.votingMode === StageVotingMode.JURY_ONLY) {
@@ -1098,9 +1317,10 @@ export const createVotingActions: StateCreator<
           totalPoints = points?.televotePoints || 0;
         } else {
           // JURY_AND_TELEVOTE mode - combine both
-          totalPoints = (points?.juryPoints || 0) + (points?.televotePoints || 0);
+          totalPoints =
+            (points?.juryPoints || 0) + (points?.televotePoints || 0);
         }
-        
+
         return {
           ...country,
           totalPoints,
@@ -1108,8 +1328,10 @@ export const createVotingActions: StateCreator<
       })
       .sort((a, b) => b.totalPoints - a.totalPoints);
 
-    const topCountries = countriesWithPoints.slice(0, qualifiersAmount).filter(country => !country.isQualifiedFromSemi);
-    
+    const topCountries = countriesWithPoints
+      .slice(0, qualifiersAmount)
+      .filter((country) => !country.isQualifiedFromSemi);
+
     if (topCountries.length === 0) return;
 
     const randomIndex = Math.floor(Math.random() * topCountries.length);
@@ -1118,28 +1340,34 @@ export const createVotingActions: StateCreator<
     // Mark the selected country as qualified
     set((s) => {
       // Get the current qualification order for this stage
-      const currentStageQualificationOrder = s.qualificationOrder[currentStage.id] || {};
-      const nextOrderNumber = Object.keys(currentStageQualificationOrder).length + 1;
-      
-      const updatedEventStages = s.eventStages.map(stage => 
-        stage.id === currentStage.id 
+      const currentStageQualificationOrder =
+        s.qualificationOrder[currentStage.id] || {};
+      const nextOrderNumber =
+        Object.keys(currentStageQualificationOrder).length + 1;
+
+      const updatedEventStages = s.eventStages.map((stage) =>
+        stage.id === currentStage.id
           ? {
               ...stage,
-              countries: stage.countries.map(country =>
+              countries: stage.countries.map((country) =>
                 country.code === selectedCountry.code
-                  ? { 
-                      ...country, 
+                  ? {
+                      ...country,
                       isQualifiedFromSemi: true,
                     }
-                  : country
+                  : country,
               ),
             }
-          : stage
+          : stage,
       );
 
       // Check if all qualifiers have been selected
-      const updatedStage = updatedEventStages.find(stage => stage.id === currentStage.id);
-      const qualifiedCount = updatedStage?.countries.filter(country => country.isQualifiedFromSemi).length || 0;
+      const updatedStage = updatedEventStages.find(
+        (stage) => stage.id === currentStage.id,
+      );
+      const qualifiedCount =
+        updatedStage?.countries.filter((country) => country.isQualifiedFromSemi)
+          .length || 0;
       const isStageComplete = qualifiedCount >= qualifiersAmount;
 
       const newQualificationOrder = {
@@ -1148,30 +1376,34 @@ export const createVotingActions: StateCreator<
           ...currentStageQualificationOrder,
           [selectedCountry.code]: nextOrderNumber,
         },
-      }
+      };
 
       // If stage is complete, assign points to all countries and mark stage as over
       if (isStageComplete) {
         // Update all countries with their predefined points
-        const finalUpdatedEventStages = updatedEventStages.map(stage =>
+        const finalUpdatedEventStages = updatedEventStages.map((stage) =>
           stage.id === currentStage.id
             ? {
                 ...stage,
-                countries: stage.countries.map(country => {
+                countries: stage.countries.map((country) => {
                   const countryPoints = stageCountryPoints[country.code];
                   let juryPoints = 0;
                   let televotePoints = 0;
                   let totalPoints = 0;
-                  
+
                   if (currentStage.votingMode === StageVotingMode.COMBINED) {
                     totalPoints = countryPoints?.combinedPoints || 0;
                     juryPoints = 0;
                     televotePoints = 0;
-                  } else if (currentStage.votingMode === StageVotingMode.JURY_ONLY) {
+                  } else if (
+                    currentStage.votingMode === StageVotingMode.JURY_ONLY
+                  ) {
                     juryPoints = countryPoints?.juryPoints || 0;
                     televotePoints = 0;
                     totalPoints = juryPoints;
-                  } else if (currentStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
+                  } else if (
+                    currentStage.votingMode === StageVotingMode.TELEVOTE_ONLY
+                  ) {
                     televotePoints = countryPoints?.televotePoints || 0;
                     juryPoints = 0;
                     totalPoints = televotePoints;
@@ -1181,7 +1413,7 @@ export const createVotingActions: StateCreator<
                     televotePoints = countryPoints?.televotePoints || 0;
                     totalPoints = juryPoints + televotePoints;
                   }
-                  
+
                   return {
                     ...country,
                     juryPoints,
@@ -1191,7 +1423,7 @@ export const createVotingActions: StateCreator<
                 }),
                 isOver: true,
               }
-            : stage
+            : stage,
         );
 
         return {

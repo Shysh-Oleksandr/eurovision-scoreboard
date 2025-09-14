@@ -1,26 +1,48 @@
 import React, { useCallback } from 'react';
 
+import { useShallow } from 'zustand/shallow';
+
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 
 import TelevoteInput from './TelevoteInput';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 const VotingButtons = () => {
-  const finishJuryVotingRandomly = useScoreboardStore(
-    (state) => state.finishJuryVotingRandomly,
+  const useGroupedJuryPoints = useGeneralStore(
+    (state) => state.settings.useGroupedJuryPoints,
   );
-  const finishTelevoteVotingRandomly = useScoreboardStore(
-    (state) => state.finishTelevoteVotingRandomly,
+
+  const {
+    finishJuryVotingRandomly,
+    finishTelevoteVotingRandomly,
+    giveRandomJuryPoints,
+    getCurrentStage,
+    givePredefinedJuryPointsGrouped,
+  } = useScoreboardStore(
+    useShallow((state) => ({
+      finishJuryVotingRandomly: state.finishJuryVotingRandomly,
+      finishTelevoteVotingRandomly: state.finishTelevoteVotingRandomly,
+      giveRandomJuryPoints: state.giveRandomJuryPoints,
+      getCurrentStage: state.getCurrentStage,
+      givePredefinedJuryPointsGrouped: state.givePredefinedJuryPointsGrouped,
+    })),
   );
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const giveRandomJuryPoints = useScoreboardStore(
-    (state) => state.giveRandomJuryPoints,
-  );
+
   const { isJuryVoting } = getCurrentStage();
 
   const voteRandomlyJury = useCallback(() => {
-    giveRandomJuryPoints();
-  }, [giveRandomJuryPoints]);
+    if (useGroupedJuryPoints) {
+      givePredefinedJuryPointsGrouped();
+    } else {
+      giveRandomJuryPoints();
+    }
+  }, [
+    givePredefinedJuryPointsGrouped,
+    giveRandomJuryPoints,
+    useGroupedJuryPoints,
+  ]);
 
   const finishRandomly = () => {
     if (isJuryVoting) {

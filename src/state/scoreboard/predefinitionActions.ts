@@ -14,9 +14,9 @@ const calculateAndStoreCountryPoints = (
   set: any,
 ) => {
   const countryPoints: Record<string, any> = {};
-  
+
   // Initialize all countries with 0 points
-  stage.countries.forEach(country => {
+  stage.countries.forEach((country) => {
     countryPoints[country.code] = {
       juryPoints: 0,
       televotePoints: 0,
@@ -82,7 +82,10 @@ export const createPredefinitionActions: StateCreator<
   predefineVotesForStage: (stage: EventStage, resetOtherStages = false) => {
     const { countryOdds, getStageVotingCountries } =
       useCountriesStore.getState();
-    const { pointsSystem, settings: {randomnessLevel} } = useGeneralStore.getState();
+    const {
+      pointsSystem,
+      settings: { randomnessLevel },
+    } = useGeneralStore.getState();
 
     const votingCountries = getStageVotingCountries(stage.id);
 

@@ -90,7 +90,10 @@ const countryDefaultHostingLogos: Partial<Record<string, string>> = {
 // Helper: latest-first list of years
 const yearsDesc: Year[] = [...years].reverse() as Year[];
 
-export function getHostingCountryByYear(year: Year, isJunior = false): HostingCountryData {
+export function getHostingCountryByYear(
+  year: Year,
+  isJunior = false,
+): HostingCountryData {
   if (isJunior) {
     return juniorHostingLogosByYear[year] || juniorHostingLogosByYear['2024'];
   }
@@ -98,19 +101,23 @@ export function getHostingCountryByYear(year: Year, isJunior = false): HostingCo
   return hostingLogosByYear[year] || hostingLogosByYear['2025'];
 }
 
-export function getHostingLogoByCountryCode(countryCode: string): string | null {
+export function getHostingLogoByCountryCode(
+  countryCode: string,
+): string | null {
   // Check explicit default override first
   const override = countryDefaultHostingLogos[countryCode];
   if (override) return override;
 
   // Otherwise, find the most recent hosting logo for that country
-  const found = yearsDesc.find((y) => hostingLogosByYear[y]?.code === countryCode);
+  const found = yearsDesc.find(
+    (y) => hostingLogosByYear[y]?.code === countryCode,
+  );
   return found ? hostingLogosByYear[found].logo : null;
 }
 
 export function getHostingCountryLogo(
   country: BaseCountry,
-  shouldShowHeartFlagIcon = true
+  shouldShowHeartFlagIcon = true,
 ): { logo: string; isExisting: boolean } {
   if (!shouldShowHeartFlagIcon) {
     return { logo: getFlagPath(country), isExisting: false };

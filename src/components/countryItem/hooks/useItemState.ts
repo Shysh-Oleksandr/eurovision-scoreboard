@@ -27,7 +27,10 @@ export const useItemState = ({
   );
 
   const isVotingCountry = country.code === votingCountryCode && isJuryVoting;
-  const isActive = country.code === votingCountryCode && !isJuryVoting && !revealTelevoteLowestToHighest;
+  const isActive =
+    country.code === votingCountryCode &&
+    !isJuryVoting &&
+    !revealTelevoteLowestToHighest;
 
   const isVoted = useMemo(
     () => country.lastReceivedPoints !== null || country.isVotingFinished,
@@ -63,7 +66,11 @@ export const useItemState = ({
       return 'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
     }
 
-    return `bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText ${revealTelevoteLowestToHighest ? 'hover:bg-countryItem-juryHoverBg cursor-pointer' : ''}`;
+    return `bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText ${
+      revealTelevoteLowestToHighest
+        ? 'hover:bg-countryItem-juryHoverBg cursor-pointer'
+        : ''
+    }`;
   }, [
     shouldShowAsNonQualified,
     isJuryVoting,

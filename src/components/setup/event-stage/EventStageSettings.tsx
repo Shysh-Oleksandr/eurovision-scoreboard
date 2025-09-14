@@ -81,7 +81,6 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
           aria-label="Select voting mode"
           options={votingModeOptions}
           className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
-          
           arrowClassName="!w-6 !h-6"
         >
           <span className="flex-1">{getVotingModeLabel(votingMode)}</span>

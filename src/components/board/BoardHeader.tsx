@@ -60,7 +60,10 @@ const BoardHeader = (): JSX.Element | null => {
 
       return (
         <>
-          {pointsToShow} point{pointsToShow === 1 ? '' : 's'} go to...
+          <span className="font-medium">
+            {pointsToShow} point{pointsToShow === 1 ? '' : 's'}
+          </span>{' '}
+          go to...
         </>
       );
     }
@@ -124,7 +127,6 @@ const BoardHeader = (): JSX.Element | null => {
 
   const chooseRandomly = () => {
     if (isJuryVoting) {
-      // resetPoints();
       givePredefinedJuryPoint();
     } else {
       givePredefinedTelevotePoints();

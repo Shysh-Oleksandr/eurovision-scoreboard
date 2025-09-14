@@ -131,6 +131,80 @@ export const GeneralSettings: React.FC = () => {
               }
             />
           </div>
+          <div className="flex items-start gap-2">
+            <Tooltip
+              content={
+                <div className="font-medium">
+                  When enabled, clicking 'Vote randomly' will award one set of
+                  jury points, grouped as either (1–8, 10) or (12).
+                </div>
+              }
+              position="left"
+            >
+              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            </Tooltip>
+            <Checkbox
+              id="use-grouped-jury-points"
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              label="Group random jury voting"
+              checked={settings.useGroupedJuryPoints}
+              onChange={(e) =>
+                setSettings({
+                  useGroupedJuryPoints: e.target.checked,
+                })
+              }
+            />
+          </div>
+          <div className="flex items-start gap-2">
+            <Tooltip
+              content={
+                <div className="font-medium">
+                  When enabled, displays the presentation panel, which allows
+                  you to run voting automatically, without requiring any clicks.
+                </div>
+              }
+              position="left"
+            >
+              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            </Tooltip>
+            <Checkbox
+              id="presentation-mode-enabled"
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              label="Enable presentation mode"
+              checked={settings.presentationModeEnabled}
+              onChange={(e) =>
+                setSettings({
+                  presentationModeEnabled: e.target.checked,
+                })
+              }
+            />
+          </div>
+          {settings.presentationModeEnabled && (
+            <div className="flex items-start gap-2">
+              <Tooltip
+                content={
+                  <div className="font-medium">
+                    When enabled, the presentation will start automatically
+                    after the voting starts.
+                  </div>
+                }
+                position="left"
+              >
+                <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+              </Tooltip>
+              <Checkbox
+                id="auto-start-presentation"
+                labelClassName="w-full !px-0 !pt-1 !items-start"
+                label="Auto start presentation"
+                checked={settings.autoStartPresentation}
+                onChange={(e) =>
+                  setSettings({
+                    autoStartPresentation: e.target.checked,
+                  })
+                }
+              />
+            </div>
+          )}
         </div>
       </CollapsibleSection>
       <CollapsibleSection

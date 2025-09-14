@@ -60,4 +60,4 @@ export const RestOfWorld = {
   name: 'Rest of the World',
   code: 'WW',
   category: 'Rest of Europe',
-}
+};

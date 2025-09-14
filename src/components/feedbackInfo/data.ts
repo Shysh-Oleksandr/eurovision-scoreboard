@@ -1,11 +1,16 @@
 export const WHATS_NEW = [
   {
     date: '2025-09-13',
-    title: 'Performance improvements',
+    title: 'Presentation mode',
   }, 
   {
+    date: '2025-09-13',
+    title: 'Performance improvements',
+  },
+  {
     date: '2025-09-07',
-    title: 'Added the ability to share simulation results during voting. Small layout improvements',
+    title:
+      'Added the ability to share simulation results during voting. Small layout improvements',
   },
   {
     date: '2025-09-06',
@@ -165,8 +170,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-09-13', end: '2025-09-14' },
-    title: 'Presentation mode and the ability to predefine voting',
+    approximateDates: { start: '2025-09-20', end: '2025-09-21' },
+    title: 'The ability to predefine voting',
   },
   {
     title: 'Save simulation progress',

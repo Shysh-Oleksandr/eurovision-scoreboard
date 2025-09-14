@@ -8,12 +8,20 @@ import { useGeneralStore } from '@/state/generalStore';
 export const useVoting = () => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const giveJuryPoints = useScoreboardStore((state) => state.giveJuryPoints);
-  const giveTelevotePoints = useScoreboardStore((state) => state.giveTelevotePoints);
-  const giveManualTelevotePointsInRevealMode = useScoreboardStore((state) => state.giveManualTelevotePointsInRevealMode);
+  const giveTelevotePoints = useScoreboardStore(
+    (state) => state.giveTelevotePoints,
+  );
+  const giveManualTelevotePointsInRevealMode = useScoreboardStore(
+    (state) => state.giveManualTelevotePointsInRevealMode,
+  );
   const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
-  const currentRevealTelevotePoints = useScoreboardStore((state) => state.currentRevealTelevotePoints);
+  const currentRevealTelevotePoints = useScoreboardStore(
+    (state) => state.currentRevealTelevotePoints,
+  );
   const pointsSystem = useGeneralStore((state) => state.pointsSystem);
-  const revealTelevoteLowestToHighest = useGeneralStore((state) => state.settings.revealTelevoteLowestToHighest);
+  const revealTelevoteLowestToHighest = useGeneralStore(
+    (state) => state.settings.revealTelevoteLowestToHighest,
+  );
 
   const MAX_COUNTRY_WITH_POINTS = pointsSystem.length;
 
@@ -54,7 +62,14 @@ export const useVoting = () => {
         giveJuryPoints(countryCode);
       }
     },
-    [revealTelevoteLowestToHighest, isJuryVoting, currentRevealTelevotePoints, giveManualTelevotePointsInRevealMode, giveTelevotePoints, giveJuryPoints],
+    [
+      revealTelevoteLowestToHighest,
+      isJuryVoting,
+      currentRevealTelevotePoints,
+      giveManualTelevotePointsInRevealMode,
+      giveTelevotePoints,
+      giveJuryPoints,
+    ],
   );
 
   return {

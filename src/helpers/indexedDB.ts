@@ -80,7 +80,10 @@ export const deleteCustomBgImageFromDB = async () => {
     const db = await getDB();
     await db.delete(ASSETS_STORE_NAME, CUSTOM_BG_KEY);
   } catch (err) {
-    console.error('Failed to delete custom background image from IndexedDB', err);
+    console.error(
+      'Failed to delete custom background image from IndexedDB',
+      err,
+    );
   }
 };
 
@@ -91,8 +94,14 @@ export interface Preset {
   createdAt: number;
   updatedAt: number;
   // Keep only selected parts of the app state for portability
-  general: Pick<GeneralState, 'year' | 'themeYear' | 'settings' | 'settingsPointsSystem'>; 
-  countries: Pick<CountriesState, 'eventAssignments' | 'configuredEventStages' | 'countryOdds' | 'activeMode'>; 
+  general: Pick<
+    GeneralState,
+    'year' | 'themeYear' | 'settings' | 'settingsPointsSystem'
+  >;
+  countries: Pick<
+    CountriesState,
+    'eventAssignments' | 'configuredEventStages' | 'countryOdds' | 'activeMode'
+  >;
 }
 
 export const savePresetToDB = async (preset: Preset) => {

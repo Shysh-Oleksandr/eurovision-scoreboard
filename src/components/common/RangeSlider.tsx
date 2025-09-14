@@ -13,6 +13,8 @@ interface RangeSliderProps {
   onChange: (value: number) => void;
   value: number;
   delay?: number;
+  step?: number;
+  displayValue?: boolean;
 }
 
 export const RangeSlider: React.FC<RangeSliderProps> = ({
@@ -25,6 +27,8 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   maxLabel,
   id,
   delay = 400,
+  step,
+  displayValue = true,
 }) => {
   const [internalValue, setInternalValue] = useState(value);
   const debouncedValue = useDebounce(internalValue, delay);
@@ -53,10 +57,13 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
           htmlFor={id}
           className="block text-sm font-medium text-white/70 mb-1"
         >
-          {label}:{' '}
-          <span className="text-white/90 font-semibold text-base">
-            {internalValue}
-          </span>
+          {label}
+          {displayValue && ': '}
+          {displayValue && (
+            <span className="text-white/90 font-semibold text-base">
+              {internalValue}
+            </span>
+          )}
         </label>
       )}
       <div className="range-wrapper">
@@ -65,6 +72,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
           type="range"
           min={min}
           max={max}
+          step={step}
           value={internalValue}
           onChange={handleInputChange}
           className="range-slider"

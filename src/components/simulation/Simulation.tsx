@@ -17,6 +17,9 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 const QualificationResultsModal = React.lazy(
   () => import('./qualification/QualificationResultsModal'),
 );
+const PresentationPanel = React.lazy(
+  () => import('../presentationPanel/PresentationPanel'),
+);
 const PickQualifiersSimulation = React.lazy(
   () => import('./qualification/PickQualifiersSimulation'),
 );
@@ -29,12 +32,14 @@ const Simulation = () => {
     isPickQualifiersMode,
     showWinnerConfetti,
     showWinnerModal,
+    presentationModeEnabled,
   } = useGeneralStore(
     useShallow((state) => ({
       showQualificationModal: state.settings.showQualificationModal,
       isPickQualifiersMode: state.settings.isPickQualifiersMode,
       showWinnerConfetti: state.settings.showWinnerConfetti,
       showWinnerModal: state.settings.showWinnerModal,
+      presentationModeEnabled: state.settings.presentationModeEnabled,
     })),
   );
 
@@ -66,7 +71,14 @@ const Simulation = () => {
           ) : (
             <div className="pt-2 md:pt-1 lg:pt-0 w-full flex md:flex-row flex-col lg:gap-6 md:gap-4 gap-3">
               <Board />
-              <ControlsPanel />
+              {!currentStage.isOver && (
+                <div className="mb-[6px] md:min-w-[180px] w-full md:max-w-[240px] lg:max-w-[258px] xl:max-w-[335px] flex md:flex-col xs:flex-row flex-col gap-2">
+                  <ControlsPanel />
+                  <Suspense fallback={null}>
+                    {presentationModeEnabled && <PresentationPanel />}
+                  </Suspense>
+                </div>
+              )}
             </div>
           )}
 

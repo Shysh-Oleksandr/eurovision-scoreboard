@@ -111,8 +111,14 @@ export const useFinalStats = () => {
     }, 0);
   };
 
-  const getPoints = (country: Country, type?: 'jury' | 'televote' | 'combined') => {
-    if ((selectedVoteType === StageVotingType.TELEVOTE && !type) || type === 'televote') {
+  const getPoints = (
+    country: Country,
+    type?: 'jury' | 'televote' | 'combined',
+  ) => {
+    if (
+      (selectedVoteType === StageVotingType.TELEVOTE && !type) ||
+      type === 'televote'
+    ) {
       if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
         return getTotalPointsForCountry(country.code, 'televote');
       }
@@ -120,7 +126,10 @@ export const useFinalStats = () => {
       return country.televotePoints;
     }
 
-    if ((selectedVoteType === StageVotingType.JURY && !type) || type === 'jury') {
+    if (
+      (selectedVoteType === StageVotingType.JURY && !type) ||
+      type === 'jury'
+    ) {
       if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
         return getTotalPointsForCountry(country.code, 'jury');
       }

@@ -29,7 +29,7 @@ export const validateEventSetup = (
     for (const stage of semiFinalStages) {
       if (stage.countriesCount === 0) {
         return `There are no countries in ${stage.name}.`;
-      }   
+      }
       if (stage.votingCountries.length === 0) {
         return `There are no voting countries in ${stage.name}.`;
       }
@@ -39,7 +39,10 @@ export const validateEventSetup = (
       if (stage.qualifiersAmount >= stage.countriesCount) {
         return 'The number of qualifiers must be less than the number of participants.';
       }
-      if (stage.countriesCount < minStageParticipants && stage.votingMode !== StageVotingMode.TELEVOTE_ONLY) {
+      if (
+        stage.countriesCount < minStageParticipants &&
+        stage.votingMode !== StageVotingMode.TELEVOTE_ONLY
+      ) {
         return `The number of participants in ${stage.name} must be at least ${minStageParticipants}.`;
       }
     }

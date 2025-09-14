@@ -20,9 +20,14 @@ export enum ShareImageAspectRatio {
   PORTRAIT = '750x1000',
 }
 
+export enum PresentationPointsGrouping {
+  INDIVIDUAL = 'individual',
+  GROUPED = 'grouped',
+}
+
 export const INITIAL_YEAR = '2025' as Year;
 
-export const DEFAULT_SETTINGS: Settings = {
+const DEFAULT_SETTINGS: Settings = {
   alwaysShowRankings: true,
   showQualificationModal: true,
   showWinnerModal: true,
@@ -45,6 +50,17 @@ export const DEFAULT_SETTINGS: Settings = {
   randomnessLevel: 50, // 0-100
   isPickQualifiersMode: false,
   revealTelevoteLowestToHighest: false,
+  presentationModeEnabled: true,
+  useGroupedJuryPoints: false,
+  autoStartPresentation: false,
+
+};
+
+const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
+  isPresenting: false,
+  presentationSpeedSeconds: 5,
+  presentationJuryGrouping: PresentationPointsGrouping.INDIVIDUAL,
+  pauseAfterAnimatedPoints: true,
 };
 
 // Function to determine initial aspect ratio based on device width
@@ -104,6 +120,16 @@ interface Settings {
   randomnessLevel: number;
   isPickQualifiersMode: boolean;
   revealTelevoteLowestToHighest: boolean;
+  presentationModeEnabled: boolean;
+  useGroupedJuryPoints: boolean;
+  autoStartPresentation: boolean;
+}
+
+interface PresentationSettings {
+  isPresenting: boolean;
+  presentationSpeedSeconds: number; // delay between actions in seconds
+  presentationJuryGrouping: PresentationPointsGrouping;
+  pauseAfterAnimatedPoints: boolean;
 }
 
 export interface ImageCustomizationSettings {
@@ -138,6 +164,7 @@ export interface GeneralState {
   themeYear: string;
   theme: Theme;
   settings: Settings;
+  presentationSettings: PresentationSettings;
   imageCustomization: ImageCustomizationSettings;
   pointsSystem: PointsItem[]; // used during simulation
   settingsPointsSystem: PointsItem[]; // used locally in settings
@@ -163,6 +190,7 @@ export interface GeneralState {
   ) => void;
   getHostingCountry: () => BaseCountry;
   resetAllSettings: () => void;
+  setPresentationSettings: (settings: Partial<PresentationSettings>) => void;
 }
 
 const getLatestUpdate = () => {
@@ -199,6 +227,7 @@ export const useGeneralStore = create<GeneralState>()(
           uiPreferences: true,
         },
         settings: DEFAULT_SETTINGS,
+        presentationSettings: DEFAULT_PRESENTATION_SETTINGS,
         imageCustomization: DEFAULT_IMAGE_CUSTOMIZATION,
 
         setLastSeenUpdate: (update: string) => {
@@ -286,7 +315,13 @@ export const useGeneralStore = create<GeneralState>()(
             settings: DEFAULT_SETTINGS,
             pointsSystem: initialPointsSystem,
             settingsPointsSystem: initialPointsSystem,
+            presentationSettings: DEFAULT_PRESENTATION_SETTINGS,
           });
+        },
+        setPresentationSettings: (settings: Partial<PresentationSettings>) => {
+          set((state) => ({
+            presentationSettings: { ...state.presentationSettings, ...settings },
+          }));
         },
       }),
       {
@@ -309,6 +344,7 @@ export const useGeneralStore = create<GeneralState>()(
             },
             settingsPointsSystem: state.settingsPointsSystem,
             generalSettingsExpansion: state.generalSettingsExpansion,
+            presentationSettings: state.presentationSettings,
           };
         },
         onRehydrateStorage: () => (state) => {
@@ -328,7 +364,7 @@ export const useGeneralStore = create<GeneralState>()(
             (async () => {
               const currentSettings = useGeneralStore.getState().settings;
               if (!currentSettings.shouldUseCustomBgImage) return;
-            
+
               requestIdleCallback(async () => {
                 const image = await getCustomBgImageFromDB();
                 if (image) {
