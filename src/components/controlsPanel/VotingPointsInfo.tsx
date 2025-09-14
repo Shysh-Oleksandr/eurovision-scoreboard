@@ -39,7 +39,7 @@ const VotingPointsInfo = () => {
   return (
     <div
       ref={containerRef}
-      className="grid w-full gap-y-1 sm:mt-3 mt-2 overflow-hidden rounded-sm"
+      className="grid w-full gap-y-1 sm:mt-2 mt-1.5 overflow-hidden rounded-sm"
       style={{
         gridTemplateColumns: `repeat(${Math.min(
           pointsSystem.length,

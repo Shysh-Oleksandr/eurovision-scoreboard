@@ -29,7 +29,8 @@ export const useInitialLineup = () => {
 
   useEffect(() => {
     if (!eventSetupModalOpen) return;
-    if (configuredEventStages.length > 0 || allCountriesForYear.length === 0) return;
+    if (configuredEventStages.length > 0 || allCountriesForYear.length === 0)
+      return;
 
     const hasSf1 = allCountriesForYear.some((c) => c.semiFinalGroup === 'SF1');
     const hasSf2 = allCountriesForYear.some((c) => c.semiFinalGroup === 'SF2');

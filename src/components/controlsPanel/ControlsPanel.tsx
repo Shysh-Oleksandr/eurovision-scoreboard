@@ -28,8 +28,8 @@ const ControlsPanel = (): JSX.Element | null => {
   }
 
   return (
-    <div className="mb-[6px] md:min-w-[180px] w-full md:max-w-[240px] lg:max-w-[258px] xl:max-w-[335px]">
-      <div className="md:pb-2 pb-1 md:h-12 flex items-center">
+    <div className="w-full">
+      <div className="md:pb-2 pb-1 md:h-12 md:flex items-center hidden">
         <h3
           className="lg:text-2xl text-xl text-white"
           style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}

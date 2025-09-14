@@ -47,26 +47,37 @@ export const createGetters: StateCreator<
   getNextLowestTelevoteCountry: () => {
     const { getCurrentStage, countryPoints } = get();
     const currentStage = getCurrentStage();
-    
+
     if (!currentStage) return null;
 
-    const notFinishedCountries = Object.entries(countryPoints[currentStage.id]).filter(([code]) => !currentStage.countries.find((country) => country.code === code)?.isVotingFinished);
+    const notFinishedCountries = Object.entries(
+      countryPoints[currentStage.id],
+    ).filter(
+      ([code]) =>
+        !currentStage.countries.find((country) => country.code === code)
+          ?.isVotingFinished,
+    );
 
     if (notFinishedCountries.length === 0) return null;
 
-    const nextLowestTelevoteCountry = notFinishedCountries.reduce((prev, current) => {
-      if (current[1].televotePoints < prev[1].televotePoints) {
-        return current;
-      }
-      if (current[1].televotePoints > prev[1].televotePoints) {
+    const nextLowestTelevoteCountry = notFinishedCountries.reduce(
+      (prev, current) => {
+        if (current[1].televotePoints < prev[1].televotePoints) {
+          return current;
+        }
+        if (current[1].televotePoints > prev[1].televotePoints) {
+          return prev;
+        }
+
         return prev;
-      }
+      },
+    );
 
-      return prev;
-    });
+    const country =
+      currentStage.countries.find(
+        (country) => country.code === nextLowestTelevoteCountry[0],
+      ) ?? null;
 
-    const country = currentStage.countries.find((country) => country.code === nextLowestTelevoteCountry[0]) ?? null;
-
-    return {country, points: nextLowestTelevoteCountry[1].televotePoints};
+    return { country, points: nextLowestTelevoteCountry[1].televotePoints };
   },
 });

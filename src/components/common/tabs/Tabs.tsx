@@ -70,6 +70,7 @@ const Tabs: React.FC<TabsProps> = ({
   // Commented out because we don't use vertical tabs anymore
   // useMediaQuery('(max-width: 479px)') && !alwaysHorizontal;
 
+  const containerRef = useRef<HTMLElement | null>(null);
   const [tabDimensions, setTabDimensions] = useState<
     { width: number; left: number }[]
   >([]);
@@ -86,7 +87,7 @@ const Tabs: React.FC<TabsProps> = ({
     return {
       width: isSmallScreen ? 'calc(100% - 14px)' : activeTabWidth || 0,
       left: isSmallScreen ? '6px' : `${activeTabLeft}px`,
-      transform: isSmallScreen ? `translateY(${activeTabLeft}px)` : 'none',
+      // transform: isSmallScreen ? `translateY(${activeTabLeft}px)` : 'none',
     };
   }, [tabs, tabDimensions, isSmallScreen, activeTab]);
 
@@ -102,7 +103,23 @@ const Tabs: React.FC<TabsProps> = ({
   }, []);
 
   useEffect(() => {
+    // Measure immediately and again after fonts are ready (helps avoid width drift on custom font load)
     measureTabs();
+
+    let cancelled = false;
+
+    if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+      document.fonts.ready.then(() => {
+        if (!cancelled) {
+          // Next frame to ensure layout has settled after font swap
+          requestAnimationFrame(() => measureTabs());
+        }
+      });
+    }
+
+    return () => {
+      cancelled = true;
+    };
   }, [tabs, measureTabs]);
 
   useEffect(() => {
@@ -120,9 +137,26 @@ const Tabs: React.FC<TabsProps> = ({
     };
   }, [measureTabs]);
 
+  useEffect(() => {
+    // Observe container and tab size changes for more reliable measurements
+    const containerEl = containerRef.current;
+
+    if (!containerEl || typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(() => measureTabs());
+    });
+
+    observer.observe(containerEl);
+    tabRefs.current.forEach((ref) => ref && observer.observe(ref));
+
+    return () => observer.disconnect();
+  }, [measureTabs, tabs.length]);
+
   return (
     <nav
       role="tablist"
+      ref={containerRef}
       className={`flex ${
         alwaysHorizontal ? 'flex-row' : 'xs:flex-row flex-col'
       } overflow-x-auto items-center p-1 px-2 gap-1 md:text-lg text-base text-gray-700 bg-primary-900 rounded-xl w-full relative ${containerClassName}`}

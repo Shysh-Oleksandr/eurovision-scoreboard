@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 
 import QualificationBoard from './QualificationBoard';
 import QualifiedCountriesList from './QualifiedCountriesList';
 
 import Button from '@/components/common/Button';
+import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
+const PresentationPanel = React.lazy(
+  () => import('../../presentationPanel/PresentationPanel'),
+);
+
 const PickQualifiersSimulation = () => {
+  const presentationModeEnabled = useGeneralStore(
+    (state) => state.settings.presentationModeEnabled,
+  );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const pickQualifierRandomly = useScoreboardStore(
     (state) => state.pickQualifierRandomly,
@@ -41,7 +49,12 @@ const PickQualifiersSimulation = () => {
         key={startCounter}
       >
         <QualificationBoard />
-        <QualifiedCountriesList />
+        <div className="flex flex-col gap-2 xl:w-[350px] lg:w-[320px] 2cols:w-[calc(min(300px,35%))] w-[50%]">
+          <QualifiedCountriesList />
+          <Suspense fallback={null}>
+            {presentationModeEnabled && !isOver && <PresentationPanel />}
+          </Suspense>
+        </div>
       </div>
     </>
   );

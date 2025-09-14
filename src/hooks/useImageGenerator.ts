@@ -25,7 +25,9 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
     setIsGenerating(true);
     try {
       const htmlToImageModule = await import('html-to-image');
-      const toCanvas = (htmlToImageModule as any).toCanvas ?? htmlToImageModule.default?.toCanvas;
+      const toCanvas =
+        (htmlToImageModule as any).toCanvas ??
+        htmlToImageModule.default?.toCanvas;
       const isSafariOrChrome =
         /safari|chrome/i.test(navigator.userAgent) &&
         !/android/i.test(navigator.userAgent);

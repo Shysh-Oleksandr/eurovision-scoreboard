@@ -10,7 +10,7 @@ export const useReorderCountries = (
   isVotingOver?: boolean,
 ) => {
   const isTablet = useMediaQuery('(min-width: 576px)');
-  const isDesktop = useMediaQuery('(min-width: 1280px)') ;
+  const isDesktop = useMediaQuery('(min-width: 1280px)');
 
   const reorderedCountries = useMemo(() => {
     let columnCount = 1;
@@ -22,7 +22,11 @@ export const useReorderCountries = (
         columnCount = 2;
       }
 
-      if (isDesktop && isVotingOver && countries.length >= MIN_COUNTRIES_FOR_3_COLUMNS) {
+      if (
+        isDesktop &&
+        isVotingOver &&
+        countries.length >= MIN_COUNTRIES_FOR_3_COLUMNS
+      ) {
         columnCount = 3;
       }
     }
@@ -45,7 +49,7 @@ export const useReorderCountries = (
     }
 
     const reordered: Country[] = [];
-    const maxRows = Math.max(...columns.map(c => c.length));
+    const maxRows = Math.max(...columns.map((c) => c.length));
 
     for (let row = 0; row < maxRows; row++) {
       for (let col = 0; col < columnCount; col++) {

@@ -11,6 +11,7 @@ import {
 import { useCountriesStore } from '../countriesStore';
 
 import { ScoreboardState } from './types';
+import { useGeneralStore } from '../generalStore';
 
 type EventActions = {
   setEventStages: (
@@ -109,6 +110,11 @@ export const createEventActions: StateCreator<
       }
     }
 
+    const generalStore = useGeneralStore.getState();
+    generalStore.setPresentationSettings({
+      isPresenting: generalStore.settings.autoStartPresentation,
+    });
+
     set({
       eventStages: finalEventStages,
       currentStageId: firstStage?.id ?? null,
@@ -189,6 +195,11 @@ export const createEventActions: StateCreator<
     }
 
     get().predefineVotesForStage(updatedEventStages[currentStageIndex + 1]);
+
+    const generalStore = useGeneralStore.getState();
+    generalStore.setPresentationSettings({
+      isPresenting: generalStore.settings.autoStartPresentation,
+    });
 
     set({
       eventStages: updatedEventStages,

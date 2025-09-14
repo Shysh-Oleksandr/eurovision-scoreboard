@@ -47,7 +47,10 @@ export type ScoreboardState = {
   getCurrentStage: () => EventStage;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
   getVotingPoints: () => number;
-  getNextLowestTelevoteCountry: () => {country: Country | null, points: number} | null; // Get next country to receive points in reveal mode
+  getNextLowestTelevoteCountry: () => {
+    country: Country | null;
+    points: number;
+  } | null; // Get next country to receive points in reveal mode
   // Actions
   setEventStages: (
     stages: (Omit<EventStage, 'countries'> & { countries: BaseCountry[] })[],
@@ -58,6 +61,7 @@ export type ScoreboardState = {
   finishJuryVotingRandomly: () => void;
   finishTelevoteVotingRandomly: () => void;
   givePredefinedJuryPoint: () => void;
+  givePredefinedJuryPointsGrouped: () => void;
   givePredefinedTelevotePoints: () => void;
   giveManualTelevotePointsInRevealMode: (countryCode: string) => void;
   resetLastPoints: () => void;

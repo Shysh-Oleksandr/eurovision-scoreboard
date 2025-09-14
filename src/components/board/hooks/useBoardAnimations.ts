@@ -42,7 +42,11 @@ export const useBoardAnimations = (
       .filter((c): c is Country => !!c);
   }, [displayOrder, sortedCountries]);
 
-  const reorderedCountries = useReorderCountries(countriesToRender, undefined, isVotingOver);
+  const reorderedCountries = useReorderCountries(
+    countriesToRender,
+    undefined,
+    isVotingOver,
+  );
 
   const flipMoveDelay = useMemo(() => {
     if (!wasTheFirstPointsAwarded || isVotingOver) return 0;
