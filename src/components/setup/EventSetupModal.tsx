@@ -6,17 +6,21 @@ import React, {
   Suspense,
 } from 'react';
 
+import { useShallow } from 'zustand/shallow';
+
 import {
   BaseCountry,
   CountryAssignmentGroup,
   EventMode,
   StageId,
+  EventStage,
 } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 import Tabs, { TabContent } from '../common/tabs/Tabs';
+import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
 import { TABS } from './constants';
 import { AvailableGroup } from './CountrySelectionListItem';
@@ -32,6 +36,7 @@ import { validateEventSetup } from './utils/eventValidation';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
+import { StageVotes } from '@/state/scoreboard/types';
 
 const EventStageModal = React.lazy(
   () => import('./event-stage/EventStageModal'),
@@ -39,34 +44,64 @@ const EventStageModal = React.lazy(
 const CustomCountryModal = React.lazy(() => import('./CustomCountryModal'));
 const SettingsModal = React.lazy(() => import('../settings/SettingsModal'));
 const GrandFinalOnlySetup = React.lazy(() => import('./GrandFinalOnlySetup'));
+const VotingPredefinitionModal = React.lazy(
+  () => import('./voting-predefinition/VotingPredefinitionModal'),
+);
 
 const EventSetupModal = () => {
-  const eventSetupModalOpen = useCountriesStore(
-    (state) => state.eventSetupModalOpen,
-  );
-  const setEventSetupModalOpen = useCountriesStore(
-    (state) => state.setEventSetupModalOpen,
+  const {
+    eventSetupModalOpen,
+    predefModalOpen,
+    setEventSetupModalOpen,
+    setPredefModalOpen,
+    getAllCountries,
+    configuredEventStages,
+    activeTab,
+    setActiveTab,
+    countryOdds,
+    predefModalStageType,
+    setPredefModalStageType,
+  } = useCountriesStore(
+    useShallow((state) => ({
+      eventSetupModalOpen: state.eventSetupModalOpen,
+      predefModalOpen: state.predefModalOpen,
+      setEventSetupModalOpen: state.setEventSetupModalOpen,
+      setPredefModalOpen: state.setPredefModalOpen,
+      getAllCountries: state.getAllCountries,
+      configuredEventStages: state.configuredEventStages,
+      activeTab: state.activeMode,
+      setActiveTab: state.setActiveMode,
+      countryOdds: state.countryOdds,
+      predefModalStageType: state.predefModalStageType,
+      setPredefModalStageType: state.setPredefModalStageType,
+    })),
   );
 
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
-  const configuredEventStages = useCountriesStore(
-    (state) => state.configuredEventStages,
-  );
-  const activeTab = useCountriesStore((state) => state.activeMode);
-  const setActiveTab = useCountriesStore((state) => state.setActiveMode);
-  const countryOdds = useCountriesStore((state) => state.countryOdds);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const startEvent = useScoreboardStore((state) => state.startEvent);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const restartCounter = useScoreboardStore((state) => state.restartCounter);
+  const setPredefinedVotesForStage = useScoreboardStore(
+    (state) => state.setPredefinedVotesForStage,
+  );
   const settingsPointsSystem = useGeneralStore(
     (state) => state.settingsPointsSystem,
   );
   const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
+  const enablePredefined = useGeneralStore(
+    (state) => state.settings.enablePredefinedVotes,
+  );
   const { clear } = useScoreboardStore.temporal.getState();
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isSettingsModalLoaded, setIsSettingsModalLoaded] = useState(false);
+  const [isPredefModalLoaded, setIsPredefModalLoaded] = useState(false);
+  const [startPredefStage, setStartPredefStage] = useState<
+    | (Pick<EventStage, 'id' | 'name' | 'votingMode'> & {
+        countries: BaseCountry[];
+      })
+    | null
+  >(null);
 
   const {
     countryGroups: {
@@ -108,6 +143,11 @@ const EventSetupModal = () => {
 
   useInitialLineup();
 
+  const { onSaveContinue, nextStageForPredef } = useContinueToNextPhase();
+
+  const isInitialPredef = predefModalStageType === 'initial';
+  const predefStage = isInitialPredef ? startPredefStage : nextStageForPredef;
+
   const isGrandFinalOnly = activeTab === EventMode.GRAND_FINAL_ONLY;
   const canClose = !!currentStageId;
 
@@ -141,36 +181,7 @@ const EventSetupModal = () => {
       ? grandFinalAvailableGroups
       : semiFinalsAvailableGroups;
 
-  const handleStartEvent = () => {
-    const validationError = validateEventSetup(
-      isGrandFinalOnly,
-      settingsPointsSystem.length,
-      {
-        stages: eventStagesWithCountries.map((s) => ({
-          id: s.id,
-          qualifiersAmount: s.qualifiersAmount || 0,
-          countriesCount: s.countries.length,
-          votingCountries: s.votingCountries || [],
-          name: s.name,
-          votingMode: s.votingMode,
-        })),
-        autoQualifiersCount: autoQualifiers.length,
-        grandFinalQualifiersCount: grandFinalQualifiers.length,
-      },
-    );
-
-    if (validationError) {
-      alert(validationError);
-
-      return;
-    }
-
-    setPointsSystem(
-      settingsPointsSystem.length > 0
-        ? settingsPointsSystem
-        : PREDEFINED_SYSTEMS_MAP['default'],
-    );
-
+  const closeAndStartEvent = () => {
     onClose();
     setEventStages(eventStagesWithCountries);
 
@@ -203,6 +214,99 @@ const EventSetupModal = () => {
     startEvent(activeTab, allSelectedCountries);
 
     clear();
+  };
+
+  const handleStartEvent = () => {
+    const validationError = validateEventSetup(
+      isGrandFinalOnly,
+      settingsPointsSystem.length,
+      {
+        stages: eventStagesWithCountries.map((s) => ({
+          id: s.id,
+          qualifiersAmount: s.qualifiersAmount || 0,
+          countriesCount: s.countries.length,
+          votingCountries: s.votingCountries || [],
+          name: s.name,
+          votingMode: s.votingMode,
+        })),
+        autoQualifiersCount: autoQualifiers.length,
+        grandFinalQualifiersCount: grandFinalQualifiers.length,
+      },
+    );
+
+    if (validationError) {
+      alert(validationError);
+
+      return;
+    }
+
+    const resolvedPointsSystem =
+      settingsPointsSystem.length > 0
+        ? settingsPointsSystem
+        : PREDEFINED_SYSTEMS_MAP['default'];
+
+    setPointsSystem(resolvedPointsSystem);
+
+    // Compute first stage locally
+    const allStagesFromSetup = eventStagesWithCountries;
+    let stagesList: EventStage[] =
+      allStagesFromSetup as unknown as EventStage[];
+
+    if (activeTab === EventMode.GRAND_FINAL_ONLY) {
+      stagesList = allStagesFromSetup.filter((s) => s.id === StageId.GF) as any;
+    } else {
+      stagesList = allStagesFromSetup.filter(
+        (s) => s.id === StageId.GF || s.countries.length > 0,
+      ) as any;
+    }
+    const firstStage = stagesList[0] || null;
+
+    const isGFWithoutCountries =
+      firstStage.id === StageId.GF && firstStage?.countries.length === 0;
+
+    let firstStageCountries: BaseCountry[] = firstStage?.countries;
+
+    if (isGFWithoutCountries) {
+      const allCountries = getAllCountries();
+
+      firstStageCountries = Object.entries(allAssignments[activeTab])
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .filter(([_, group]) => group === CountryAssignmentGroup.AUTO_QUALIFIER)
+        .map(
+          ([countryCode]) => allCountries.find((c) => c.code === countryCode)!,
+        );
+    }
+
+    if (enablePredefined && firstStage) {
+      setStartPredefStage({
+        id: firstStage.id,
+        name: firstStage.name,
+        votingMode: firstStage.votingMode,
+        countries: firstStageCountries,
+      });
+      setPredefModalStageType('initial');
+      setPredefModalOpen(true);
+
+      return; // Wait for modal Save to proceed
+    }
+
+    closeAndStartEvent();
+  };
+
+  const onVotingPredefSaveStart = (votes: Partial<StageVotes>) => {
+    // Persist votes for first stage and start
+    const firstStageId = startPredefStage?.id;
+
+    setPredefinedVotesForStage(
+      {
+        ...(eventStagesWithCountries.find((s) => s.id === firstStageId) as any),
+      },
+      votes,
+      true,
+    );
+
+    closeAndStartEvent();
+    setPredefModalOpen(false);
   };
 
   const tabsWithContent = useMemo(
@@ -276,89 +380,103 @@ const EventSetupModal = () => {
   }, [restartCounter]);
 
   return (
-    <Modal
-      isOpen={eventSetupModalOpen}
-      onClose={debouncedCanClose ? onClose : undefined}
-      overlayClassName="!z-[1000]"
-      bottomContent={
-        <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
-          {debouncedCanClose && (
-            <Button
-              variant="secondary"
-              className="md:text-base text-sm"
-              onClick={onClose}
-            >
-              Close
-            </Button>
-          )}
-          <Button className="w-full !text-base" onClick={handleStartEvent}>
-            Start
-          </Button>
-        </div>
-      }
-    >
-      <SetupHeader openSettingsModal={() => setIsSettingsModalOpen(true)} />
-
+    <>
       <Suspense fallback={null}>
-        {(isSettingsModalOpen || isSettingsModalLoaded) && (
-          <SettingsModal
-            isOpen={isSettingsModalOpen}
-            onClose={() => setIsSettingsModalOpen(false)}
-            participatingCountries={participatingCountries}
-            onLoaded={() => setIsSettingsModalLoaded(true)}
+        {(predefModalOpen || isPredefModalLoaded) && predefStage && (
+          <VotingPredefinitionModal
+            isOpen={predefModalOpen}
+            onClose={() => setPredefModalOpen(false)}
+            stage={predefStage}
+            onSave={isInitialPredef ? onVotingPredefSaveStart : onSaveContinue}
+            onLoaded={() => setIsPredefModalLoaded(true)}
           />
         )}
       </Suspense>
 
-      {isCustomCountryModalOpen && (
+      <Modal
+        isOpen={eventSetupModalOpen}
+        onClose={debouncedCanClose ? onClose : undefined}
+        overlayClassName="!z-[1000]"
+        bottomContent={
+          <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
+            {debouncedCanClose && (
+              <Button
+                variant="secondary"
+                className="md:text-base text-sm"
+                onClick={onClose}
+              >
+                Close
+              </Button>
+            )}
+            <Button className="w-full !text-base" onClick={handleStartEvent}>
+              Start
+            </Button>
+          </div>
+        }
+      >
+        <SetupHeader openSettingsModal={() => setIsSettingsModalOpen(true)} />
+
         <Suspense fallback={null}>
-          <CustomCountryModal
-            isOpen={isCustomCountryModalOpen}
-            onClose={handleCloseModal}
-            countryToEdit={countryToEdit}
-          />
+          {(isSettingsModalOpen || isSettingsModalLoaded) && (
+            <SettingsModal
+              isOpen={isSettingsModalOpen}
+              onClose={() => setIsSettingsModalOpen(false)}
+              participatingCountries={participatingCountries}
+              onLoaded={() => setIsSettingsModalLoaded(true)}
+            />
+          )}
         </Suspense>
-      )}
 
-      {isEventStageModalOpen && (
-        <Suspense fallback={null}>
-          <EventStageModal
-            isOpen={isEventStageModalOpen}
-            onClose={handleCloseEventStageModal}
-            eventStageToEdit={eventStageToEdit}
-            localEventStagesLength={configuredEventStages.length}
-            onSave={handleSaveStage}
-            onDelete={handleDeleteStage}
+        {isCustomCountryModalOpen && (
+          <Suspense fallback={null}>
+            <CustomCountryModal
+              isOpen={isCustomCountryModalOpen}
+              onClose={handleCloseModal}
+              countryToEdit={countryToEdit}
+            />
+          </Suspense>
+        )}
+
+        {isEventStageModalOpen && (
+          <Suspense fallback={null}>
+            <EventStageModal
+              isOpen={isEventStageModalOpen}
+              onClose={handleCloseEventStageModal}
+              eventStageToEdit={eventStageToEdit}
+              localEventStagesLength={configuredEventStages.length}
+              onSave={handleSaveStage}
+              onDelete={handleDeleteStage}
+            />
+          </Suspense>
+        )}
+
+        <div className="mt-2 flex flex-col gap-3">
+          <Tabs
+            tabs={TABS}
+            activeTab={activeTab}
+            setActiveTab={(tab) => setActiveTab(tab as EventMode)}
           />
-        </Suspense>
-      )}
 
-      <div className="mt-2 flex flex-col gap-3">
-        <Tabs
-          tabs={TABS}
-          activeTab={activeTab}
-          setActiveTab={(tab) => setActiveTab(tab as EventMode)}
-        />
+          <TabContent
+            tabs={tabsWithContent}
+            activeTab={activeTab}
+            preserveContent
+          />
 
-        <TabContent
-          tabs={tabsWithContent}
-          activeTab={activeTab}
-          preserveContent
-        />
+          <div className="h-px bg-primary-800 w-full my-1" />
 
-        <div className="h-px bg-primary-800 w-full my-1" />
-
-        <NotParticipatingSection
-          handleOpenEditModal={handleOpenEditModal}
-          handleOpenCreateModal={handleOpenCreateModal}
-          notParticipatingCountries={notParticipatingCountries}
-          handleBulkCountryAssignment={handleBulkCountryAssignment}
-          handleCountryAssignment={handleCountryAssignment}
-          getCountryGroupAssignment={getCountryGroupAssignment}
-          availableGroups={availableGroups}
-        />
-      </div>
-    </Modal>
+          <NotParticipatingSection
+            handleOpenEditModal={handleOpenEditModal}
+            handleOpenCreateModal={handleOpenCreateModal}
+            notParticipatingCountries={notParticipatingCountries}
+            handleBulkCountryAssignment={handleBulkCountryAssignment}
+            handleCountryAssignment={handleCountryAssignment}
+            getCountryGroupAssignment={getCountryGroupAssignment}
+            availableGroups={availableGroups}
+          />
+        </div>
+      </Modal>
+    </>
   );
 };
 

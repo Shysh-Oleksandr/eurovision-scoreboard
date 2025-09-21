@@ -159,6 +159,30 @@ export const GeneralSettings: React.FC = () => {
             <Tooltip
               content={
                 <div className="font-medium">
+                  When enabled, you can set each country's votes before the
+                  voting begins.
+                </div>
+              }
+              position="left"
+            >
+              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            </Tooltip>
+            <Checkbox
+              id="enable-predefined-votes"
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              label="Enable predefined voting"
+              checked={settings.enablePredefinedVotes}
+              onChange={(e) =>
+                setSettings({
+                  enablePredefinedVotes: e.target.checked,
+                })
+              }
+            />
+          </div>
+          <div className="flex items-start gap-2">
+            <Tooltip
+              content={
+                <div className="font-medium">
                   When enabled, displays the presentation panel, which allows
                   you to run voting automatically, without requiring any clicks.
                 </div>

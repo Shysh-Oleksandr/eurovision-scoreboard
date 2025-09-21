@@ -79,6 +79,7 @@ const CountryItem = ({
     shouldShowAsNonQualified,
     hasCountryFinishedVoting,
     isCountryVotingFinished: !!country.isVotingFinished,
+    isVotingOver,
   });
 
   const {

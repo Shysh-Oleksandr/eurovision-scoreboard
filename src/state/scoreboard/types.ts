@@ -45,6 +45,7 @@ export type ScoreboardState = {
 
   // Getters
   getCurrentStage: () => EventStage;
+  getNextStage: () => EventStage | null;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
   getVotingPoints: () => number;
   getNextLowestTelevoteCountry: () => {
@@ -68,6 +69,11 @@ export type ScoreboardState = {
   hideLastReceivedPoints: () => void;
   startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
   triggerRestartEvent: () => void;
+  prepareForNextStage: (shouldUpdateStore?: boolean) => {
+    updatedEventStages: EventStage[];
+    nextStage: EventStage | null;
+    currentStageIndex: number;
+  };
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;
@@ -78,6 +84,11 @@ export type ScoreboardState = {
   setCurrentRevealTelevotePoints: (points: number) => void; // Set current points to give in reveal mode
   predefineVotesForStage: (
     stage: EventStage,
+    resetOtherStages?: boolean,
+  ) => void;
+  setPredefinedVotesForStage: (
+    stage: EventStage,
+    votes: Partial<StageVotes>,
     resetOtherStages?: boolean,
   ) => void;
   pickQualifier: (countryCode: string) => void;

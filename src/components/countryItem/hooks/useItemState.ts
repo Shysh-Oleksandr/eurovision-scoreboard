@@ -11,6 +11,7 @@ type useItemStateProps = {
   shouldShowAsNonQualified: boolean;
   hasCountryFinishedVoting: boolean;
   isCountryVotingFinished: boolean;
+  isVotingOver: boolean;
 };
 
 export const useItemState = ({
@@ -21,6 +22,7 @@ export const useItemState = ({
   shouldShowAsNonQualified,
   hasCountryFinishedVoting,
   isCountryVotingFinished,
+  isVotingOver,
 }: useItemStateProps) => {
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
@@ -41,8 +43,15 @@ export const useItemState = ({
     () =>
       (isVoted && !hasCountryFinishedVoting) ||
       isVotingCountry ||
-      (!isJuryVoting && !revealTelevoteLowestToHighest),
-    [isVoted, hasCountryFinishedVoting, isVotingCountry, isJuryVoting],
+      (!isJuryVoting && !revealTelevoteLowestToHighest) ||
+      isVotingOver,
+    [
+      isVoted,
+      hasCountryFinishedVoting,
+      isVotingCountry,
+      isJuryVoting,
+      isVotingOver,
+    ],
   );
 
   const buttonColors = useMemo(() => {
@@ -87,8 +96,9 @@ export const useItemState = ({
       } ${showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''}
       ${isVotingCountry ? 'opacity-70 cursor-not-allowed' : ''}
       ${buttonColors}
+      ${isVotingOver ? 'pointer-events-none' : ''}
       `,
-    [isActive, showPlaceAnimation, isVotingCountry, buttonColors],
+    [isActive, showPlaceAnimation, isVotingCountry, buttonColors, isVotingOver],
   );
 
   return { isDisabled, buttonClassName, isActive, isVotingCountry };
