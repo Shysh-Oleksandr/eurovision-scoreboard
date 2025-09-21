@@ -56,6 +56,7 @@ export interface EventStage {
   isJuryVoting: boolean;
   isLastStage?: boolean;
   qualifiersAmount?: number;
+  isReadyForPredef?: boolean; // is set to true when user opens predefinition modal; needed to call prepareForNextStage only once
 }
 
 export enum StageId {

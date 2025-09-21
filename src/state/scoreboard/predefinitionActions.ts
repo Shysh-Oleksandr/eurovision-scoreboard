@@ -71,6 +71,11 @@ type PredefinitionActions = {
     stage: EventStage,
     resetOtherStages?: boolean,
   ) => void;
+  setPredefinedVotesForStage: (
+    stage: EventStage,
+    votes: any,
+    resetOtherStages?: boolean,
+  ) => void;
 };
 
 export const createPredefinitionActions: StateCreator<
@@ -111,5 +116,24 @@ export const createPredefinitionActions: StateCreator<
 
     // Calculate and store country points for this stage
     calculateAndStoreCountryPoints(stage, predefinedVotes, set);
+  },
+
+  setPredefinedVotesForStage: (
+    stage: EventStage,
+    votes: any,
+    resetOtherStages = false,
+  ) => {
+    set((state) => ({
+      predefinedVotes: resetOtherStages
+        ? {
+            [stage.id]: votes,
+          }
+        : {
+            ...state.predefinedVotes,
+            [stage.id]: votes,
+          },
+    }));
+
+    calculateAndStoreCountryPoints(stage, votes, set);
   },
 });

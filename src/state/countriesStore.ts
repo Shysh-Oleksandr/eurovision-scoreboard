@@ -3,10 +3,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 import { Year } from '../config';
-import {
-  ALL_COUNTRIES,
-  COMMON_COUNTRIES,
-} from '../data/countries/common-countries';
+import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import {
   deleteCustomCountryFromDB,
   getCustomCountries,
@@ -35,6 +32,8 @@ export interface CountriesState {
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
   selectedCountries: BaseCountry[]; // Countries selected for the current event
   eventSetupModalOpen: boolean;
+  predefModalOpen: boolean;
+  predefModalStageType: 'initial' | 'next';
   customCountries: BaseCountry[];
   eventAssignments: Record<EventMode, Record<string, string>>;
   configuredEventStages: EventStage[];
@@ -43,12 +42,17 @@ export interface CountriesState {
 
   // Actions
   setEventSetupModalOpen: (open: boolean) => void;
+  setPredefModalOpen: (open: boolean) => void;
+  setPredefModalStageType: (type: 'initial' | 'next') => void;
   getQualifiedCountries: () => BaseCountry[];
   getInitialVotingCountries: (stageId?: string) => {
     initialVotingCountries: BaseCountry[];
     extraVotingCountries: BaseCountry[];
   };
-  getStageVotingCountries: (stageId?: string) => BaseCountry[];
+  getStageVotingCountries: (
+    stageId?: string,
+    allowROTW?: boolean,
+  ) => BaseCountry[];
   getVotingCountry: () => BaseCountry;
   getVotingCountriesLength: () => number;
   setSelectedCountries: (countries: BaseCountry[]) => void;
@@ -118,6 +122,7 @@ export const useCountriesStore = create<CountriesState>()(
         allCountriesForYear: [],
         selectedCountries: [],
         eventSetupModalOpen: true,
+        predefModalOpen: false,
         customCountries: [],
         eventAssignments: {
           [EventMode.SEMI_FINALS_AND_GRAND_FINAL]: {},
@@ -126,10 +131,21 @@ export const useCountriesStore = create<CountriesState>()(
         configuredEventStages: [],
         countryOdds: {},
         activeMode: EventMode.SEMI_FINALS_AND_GRAND_FINAL,
+        predefModalStageType: 'initial',
         // Actions
         setEventSetupModalOpen: (open: boolean) => {
           set({
             eventSetupModalOpen: open,
+          });
+        },
+        setPredefModalOpen: (open: boolean) => {
+          set({
+            predefModalOpen: open,
+          });
+        },
+        setPredefModalStageType: (type: 'initial' | 'next') => {
+          set({
+            predefModalStageType: type,
           });
         },
 
@@ -204,25 +220,27 @@ export const useCountriesStore = create<CountriesState>()(
           return { initialVotingCountries, extraVotingCountries };
         },
 
-        getStageVotingCountries: (stageId?: string) => {
+        getStageVotingCountries: (stageId?: string, allowROTW = true) => {
           const { configuredEventStages } = get();
           const { eventStages, currentStageId, predefinedVotes } =
             useScoreboardStore.getState();
 
           const relevantStageId = stageId ?? currentStageId;
-          const relevantStage = eventStages.find(
-            (stage) => stage.id === relevantStageId,
-          );
+          const relevantStage =
+            eventStages.find((stage) => stage.id === relevantStageId) ||
+            configuredEventStages.find((stage) => stage.id === relevantStageId);
 
           if (!relevantStage) {
             return [];
           }
 
           const isRestOfWorldVoting =
-            relevantStage?.votingMode === StageVotingMode.TELEVOTE_ONLY ||
-            (relevantStage?.votingMode === StageVotingMode.JURY_AND_TELEVOTE &&
-              (!relevantStage.isJuryVoting ||
-                !predefinedVotes[relevantStageId!]?.televote));
+            allowROTW &&
+            (relevantStage?.votingMode === StageVotingMode.TELEVOTE_ONLY ||
+              (relevantStage?.votingMode ===
+                StageVotingMode.JURY_AND_TELEVOTE &&
+                (!relevantStage.isJuryVoting ||
+                  !predefinedVotes[relevantStageId!]?.televote)));
 
           const votingCountries =
             configuredEventStages

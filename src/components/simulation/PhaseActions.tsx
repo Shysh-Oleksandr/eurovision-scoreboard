@@ -1,18 +1,17 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Select from '../common/Select';
 
+import { useContinueToNextPhase } from './hooks/useContinueToNextPhase';
+
 const FinalStatsModal = React.lazy(
   () => import('./finalStats/FinalStatsModal'),
 );
 
 export const PhaseActions = () => {
-  const continueToNextPhase = useScoreboardStore(
-    (state) => state.continueToNextPhase,
-  );
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
@@ -53,6 +52,8 @@ export const PhaseActions = () => {
       setViewedStageId(getCurrentStage().id);
     }
   }, [isSFAndGFEventOver, getCurrentStage, setViewedStageId, viewedStageId]);
+
+  const { handleContinue } = useContinueToNextPhase();
 
   if (!isVotingOver && !isSFAndGFEventOver) {
     return null;
@@ -110,7 +111,7 @@ export const PhaseActions = () => {
           </Select>
         )}
         {isVotingOver && !isLastStage && (
-          <Button onClick={continueToNextPhase} className="animated-border">
+          <Button onClick={handleContinue} className="animated-border">
             Continue to {nextPhase}
           </Button>
         )}

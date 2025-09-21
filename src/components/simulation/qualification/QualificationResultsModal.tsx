@@ -6,6 +6,7 @@ import { useNextEventName } from '../../../hooks/useNextEventName';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 import Button from '../../common/Button';
 import Modal, { ANIMATION_DURATION } from '../../common/Modal/Modal';
+import { useContinueToNextPhase } from '../hooks/useContinueToNextPhase';
 
 import { CountryQualificationItem } from './CountryQualificationItem';
 
@@ -20,9 +21,6 @@ const QualificationResultsModal = () => {
     (state) => state.showQualificationResults,
   );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const continueToNextPhase = useScoreboardStore(
-    (state) => state.continueToNextPhase,
-  );
   const closeQualificationResults = useScoreboardStore(
     (state) => state.closeQualificationResults,
   );
@@ -35,6 +33,8 @@ const QualificationResultsModal = () => {
 
   const { name: currentStageName, countries, id: stageId } = getCurrentStage();
   const { nextPhase } = useNextEventName();
+
+  const { handleContinue } = useContinueToNextPhase();
 
   const qualifiedCountries = useMemo(
     () =>
@@ -131,7 +131,7 @@ const QualificationResultsModal = () => {
             onClick={() => {
               handleTriggerClose();
               setTimeout(() => {
-                continueToNextPhase();
+                handleContinue();
               }, ANIMATION_DURATION / 2);
             }}
             className="animated-border !text-sm md:!text-base w-full"

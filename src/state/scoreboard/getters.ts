@@ -8,6 +8,7 @@ import { ScoreboardState } from './types';
 type Getters = {
   getVotingPoints: () => number;
   getCurrentStage: () => EventStage | undefined;
+  getNextStage: () => EventStage | null;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
 };
 
@@ -27,6 +28,19 @@ export const createGetters: StateCreator<
   getCurrentStage: () => {
     const { eventStages, currentStageId } = get();
     return eventStages.find((s) => s.id === currentStageId);
+  },
+
+  getNextStage: () => {
+    const { eventStages, currentStageId } = get();
+
+    const currentStageIndex = eventStages.findIndex(
+      (s: EventStage) => s.id === currentStageId,
+    );
+
+    const nextStage =
+      currentStageIndex !== -1 ? eventStages[currentStageIndex + 1] : null;
+
+    return nextStage;
   },
 
   getCountryInSemiFinal: (countryCode: string) => {

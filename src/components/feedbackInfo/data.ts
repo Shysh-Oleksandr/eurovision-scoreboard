@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-09-21',
+    title: 'The ability to predefine voting (enable in settings)',
+  },  
+  {
     date: '2025-09-13',
     title: 'Presentation mode',
   }, 
@@ -170,10 +174,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-09-20', end: '2025-09-21' },
-    title: 'The ability to predefine voting',
-  },
-  {
+    approximateDates: { start: '2025-09-27', end: '2025-09-28' },
     title: 'Save simulation progress',
   },
   {

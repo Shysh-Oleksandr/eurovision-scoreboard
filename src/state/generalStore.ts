@@ -53,6 +53,7 @@ const DEFAULT_SETTINGS: Settings = {
   presentationModeEnabled: true,
   useGroupedJuryPoints: false,
   autoStartPresentation: false,
+  enablePredefinedVotes: false,
 
 };
 
@@ -123,6 +124,7 @@ interface Settings {
   presentationModeEnabled: boolean;
   useGroupedJuryPoints: boolean;
   autoStartPresentation: boolean;
+  enablePredefinedVotes: boolean;
 }
 
 interface PresentationSettings {

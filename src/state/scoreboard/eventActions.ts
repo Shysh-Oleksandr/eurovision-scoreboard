@@ -18,6 +18,11 @@ type EventActions = {
     stages: (Omit<EventStage, 'countries'> & { countries: BaseCountry[] })[],
   ) => void;
   startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
+  prepareForNextStage: (shouldUpdateStore?: boolean) => {
+    updatedEventStages: EventStage[];
+    nextStage: EventStage | null;
+    currentStageIndex: number;
+  };
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
   triggerRestartEvent: () => void;
@@ -55,9 +60,17 @@ export const createEventActions: StateCreator<
 
     countriesStore.setSelectedCountries(selectedCountries);
 
+    const enablePredefined =
+      useGeneralStore.getState().settings.enablePredefinedVotes;
+
+    if (!enablePredefined) {
+      set({
+        predefinedVotes: {},
+        countryPoints: {},
+      });
+    }
+
     set({
-      predefinedVotes: {},
-      countryPoints: {},
       qualificationOrder: {},
     });
 
@@ -104,7 +117,9 @@ export const createEventActions: StateCreator<
     let firstVotingCountryIndex = 0;
 
     if (firstStage) {
-      get().predefineVotesForStage(firstStage, true);
+      if (!enablePredefined) {
+        get().predefineVotesForStage(firstStage, true);
+      }
       if (firstStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
         firstVotingCountryIndex = firstStage.countries.length - 1;
       }
@@ -132,23 +147,21 @@ export const createEventActions: StateCreator<
     });
   },
 
-  continueToNextPhase: () => {
+  // Needed to display correct countries for predefinition modal
+  prepareForNextStage: (shouldUpdateStore = true) => {
     const state = get();
-    const currentStage = state.eventStages.find(
-      (s: EventStage) => s.id === state.currentStageId,
-    );
+    const currentStage = state.getCurrentStage();
 
-    if (!currentStage) return;
+    if (!currentStage)
+      return { updatedEventStages: [], nextStage: null, currentStageIndex: -1 };
 
     const currentStageIndex = state.eventStages.findIndex(
       (s: EventStage) => s.id === state.currentStageId,
     );
-    const nextStage =
-      currentStageIndex !== -1
-        ? state.eventStages[currentStageIndex + 1]
-        : undefined;
+    const nextStage = state.getNextStage();
 
-    if (!nextStage) return;
+    if (!nextStage)
+      return { updatedEventStages: [], nextStage: null, currentStageIndex };
 
     const updatedEventStages = [...state.eventStages];
 
@@ -163,12 +176,6 @@ export const createEventActions: StateCreator<
     };
 
     let nextStageCountries = nextStage.countries;
-
-    let nextVotingCountryIndex = 0;
-
-    if (nextStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
-      nextVotingCountryIndex = nextStageCountries.length - 1;
-    }
 
     if (nextStage.id === StageId.GF) {
       const qualifiedFromSemiCountries = state.eventStages
@@ -188,13 +195,40 @@ export const createEventActions: StateCreator<
         ...nextStage.countries,
         ...qualifiedFromSemiCountries,
       ];
+
       updatedEventStages[currentStageIndex + 1] = {
         ...nextStage,
         countries: nextStageCountries,
+        isReadyForPredef: true,
       };
     }
 
-    get().predefineVotesForStage(updatedEventStages[currentStageIndex + 1]);
+    if (shouldUpdateStore) {
+      set({
+        eventStages: updatedEventStages,
+      });
+    }
+
+    return { updatedEventStages, nextStage, currentStageIndex };
+  },
+  continueToNextPhase: () => {
+    const { updatedEventStages, nextStage, currentStageIndex } =
+      get().prepareForNextStage(false);
+
+    if (!nextStage || currentStageIndex === -1) return;
+
+    let nextStageCountries = nextStage.countries;
+    let nextVotingCountryIndex = 0;
+
+    if (nextStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
+      nextVotingCountryIndex = nextStageCountries.length - 1;
+    }
+
+    const enablePredefined =
+      useGeneralStore.getState().settings.enablePredefinedVotes;
+    if (!enablePredefined) {
+      get().predefineVotesForStage(updatedEventStages[currentStageIndex + 1]);
+    }
 
     const generalStore = useGeneralStore.getState();
     generalStore.setPresentationSettings({
@@ -202,7 +236,7 @@ export const createEventActions: StateCreator<
     });
 
     set({
-      eventStages: updatedEventStages,
+      eventStages: enablePredefined ? [...get().eventStages] : updatedEventStages,
       currentStageId: nextStage.id,
       votingCountryIndex: nextVotingCountryIndex,
       votingPointsIndex: 0,
