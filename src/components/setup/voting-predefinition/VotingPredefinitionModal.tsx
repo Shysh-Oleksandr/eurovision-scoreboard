@@ -331,7 +331,7 @@ const VotingPredefinitionModal = ({
       return found || 0;
     }
 
-    const source = selectedType === StageVotingType.JURY ? 'jury' : 'televote';
+    const source = getActiveSource() || 'televote';
     const arr = votes?.[source]?.[voterCode] || [];
     const found = arr.find((v: any) => v.countryCode === participantCode);
 
@@ -543,7 +543,7 @@ const VotingPredefinitionModal = ({
                             getVoterValidity(country.code) === 'valid'
                               ? 'bg-green-500'
                               : getVoterValidity(country.code) === 'invalid'
-                              ? 'bg-red-500'
+                              ? 'bg-red-600'
                               : 'bg-yellow-500'
                           }`}
                           title={`$${country.name} - ${getVoterValidity(
