@@ -2,7 +2,8 @@ import isDeepEqual from 'fast-deep-equal';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
+import deepMerge from '@75lb/deep-merge';
 
 import { createEventActions } from './scoreboard/eventActions';
 import { createGetters } from './scoreboard/getters';
@@ -15,15 +16,37 @@ import { createVotingActions } from './scoreboard/votingActions';
 export const useScoreboardStore = create<ScoreboardState>()(
   temporal(
     devtools(
-      (set, get, store) => ({
-        ...createEventActions(set, get, store),
-        ...createMiscActions(set, get, store),
-        ...createVotingActions(set, get, store),
-        ...createGetters(set, get, store),
-        ...createPredefinitionActions(set, get, store),
+      persist(
+        (set, get, store) =>
+          ({
+            ...createEventActions(set, get, store),
+            ...createMiscActions(set, get, store),
+            ...createVotingActions(set, get, store),
+            ...createGetters(set, get, store),
+            ...createPredefinitionActions(set, get, store),
 
-        ...initialScoreboardState,
-      }),
+            ...initialScoreboardState,
+          } as ScoreboardState),
+        {
+          name: 'scoreboard-storage',
+          merge: (persistedState, currentState) =>
+            deepMerge(currentState, persistedState),
+          partialize: (state) => ({
+            eventStages: state.eventStages,
+            currentStageId: state.currentStageId,
+            votingCountryIndex: state.votingCountryIndex,
+            votingPointsIndex: state.votingPointsIndex,
+            viewedStageId: state.viewedStageId,
+            winnerCountry: state.winnerCountry,
+            showAllParticipants: state.showAllParticipants,
+            televotingProgress: state.televotingProgress,
+            predefinedVotes: state.predefinedVotes,
+            countryPoints: state.countryPoints,
+            qualificationOrder: state.qualificationOrder,
+            currentRevealTelevotePoints: state.currentRevealTelevotePoints,
+          }),
+        },
+      ),
       {
         name: 'scoreboard-store',
         enabled: process.env.NODE_ENV === 'development',

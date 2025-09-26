@@ -26,6 +26,7 @@ type EventActions = {
   continueToNextPhase: () => void;
   closeQualificationResults: () => void;
   triggerRestartEvent: () => void;
+  leaveEvent: () => void;
 };
 
 export const createEventActions: StateCreator<
@@ -236,7 +237,9 @@ export const createEventActions: StateCreator<
     });
 
     set({
-      eventStages: enablePredefined ? [...get().eventStages] : updatedEventStages,
+      eventStages: enablePredefined
+        ? [...get().eventStages]
+        : updatedEventStages,
       currentStageId: nextStage.id,
       votingCountryIndex: nextVotingCountryIndex,
       votingPointsIndex: 0,
@@ -257,6 +260,15 @@ export const createEventActions: StateCreator<
   triggerRestartEvent: () => {
     set({
       restartCounter: get().restartCounter + 1,
+    });
+  },
+
+  leaveEvent: () => {
+    useCountriesStore.getState().setEventSetupModalOpen(true);
+    
+    set({
+      eventStages: [],
+      currentStageId: null,
     });
   },
 });

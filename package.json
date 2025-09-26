@@ -26,6 +26,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@75lb/deep-merge": "^1.1.2",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.1",
     "array-move": "^4.0.0",

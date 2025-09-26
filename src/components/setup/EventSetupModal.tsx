@@ -78,6 +78,7 @@ const EventSetupModal = () => {
   );
 
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const startEvent = useScoreboardStore((state) => state.startEvent);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const restartCounter = useScoreboardStore((state) => state.restartCounter);
@@ -405,7 +406,7 @@ const EventSetupModal = () => {
                 className="md:text-base text-sm"
                 onClick={onClose}
               >
-                Close
+                {winnerCountry ? 'Close' : 'Continue'}
               </Button>
             )}
             <Button className="w-full !text-base" onClick={handleStartEvent}>

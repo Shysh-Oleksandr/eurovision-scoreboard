@@ -1,12 +1,16 @@
 export const WHATS_NEW = [
   {
+    date: '2025-09-26',
+    title: 'Persisted the setup and simulation progress',
+  },
+  {
     date: '2025-09-21',
     title: 'The ability to predefine voting (enable in settings)',
-  },  
+  },
   {
     date: '2025-09-13',
     title: 'Presentation mode',
-  }, 
+  },
   {
     date: '2025-09-13',
     title: 'Performance improvements',
@@ -175,7 +179,7 @@ export const WHATS_NEW = [
 export const UPCOMING_FEATURES = [
   {
     approximateDates: { start: '2025-09-27', end: '2025-09-28' },
-    title: 'Save simulation progress',
+    title: 'Bug fixing & small improvements',
   },
   {
     title: 'Separate points system for jury and televote',

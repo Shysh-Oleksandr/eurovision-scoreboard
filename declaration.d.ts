@@ -4,6 +4,7 @@ declare module '*.webp';
 declare module '*.svg';
 
 declare module 'random-weighted-choice';
+declare module '@75lb/deep-merge';
 
 interface Document {
   mozCancelFullScreen?: () => Promise<void>;
