@@ -69,7 +69,6 @@ export type ScoreboardState = {
   hideLastReceivedPoints: () => void;
   startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
   triggerRestartEvent: () => void;
-  leaveEvent: () => void;
   prepareForNextStage: (shouldUpdateStore?: boolean) => {
     updatedEventStages: EventStage[];
     nextStage: EventStage | null;

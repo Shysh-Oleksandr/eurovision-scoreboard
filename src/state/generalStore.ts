@@ -54,6 +54,7 @@ const DEFAULT_SETTINGS: Settings = {
   useGroupedJuryPoints: false,
   autoStartPresentation: false,
   enablePredefinedVotes: false,
+
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -258,7 +259,7 @@ export const useGeneralStore = create<GeneralState>()(
           });
 
           useCountriesStore.getState().updateCountriesForYear(year);
-          useScoreboardStore.getState().leaveEvent();
+          useScoreboardStore.getState().setCurrentStageId(null);
         },
         setTheme: (year: string) => {
           // Remove all theme classes
@@ -312,26 +313,16 @@ export const useGeneralStore = create<GeneralState>()(
           ) as BaseCountry;
         },
         resetAllSettings: () => {
-          get().setYear(INITIAL_YEAR);
-
           set({
-            themeYear: INITIAL_YEAR,
-            theme: getThemeForYear(INITIAL_YEAR),
             settings: DEFAULT_SETTINGS,
             pointsSystem: initialPointsSystem,
             settingsPointsSystem: initialPointsSystem,
             presentationSettings: DEFAULT_PRESENTATION_SETTINGS,
-            imageCustomization: DEFAULT_IMAGE_CUSTOMIZATION,
           });
-
-          localStorage.clear();
         },
         setPresentationSettings: (settings: Partial<PresentationSettings>) => {
           set((state) => ({
-            presentationSettings: {
-              ...state.presentationSettings,
-              ...settings,
-            },
+            presentationSettings: { ...state.presentationSettings, ...settings },
           }));
         },
       }),
@@ -339,10 +330,6 @@ export const useGeneralStore = create<GeneralState>()(
         name: 'general-storage',
         partialize(state) {
           const { customBgImage: _ignore, ...restSettings } = state.settings;
-          const {
-            isPresenting: _ignorePresenting,
-            ...restPresentationSettings
-          } = state.presentationSettings;
 
           return {
             year: state.year,
@@ -359,7 +346,7 @@ export const useGeneralStore = create<GeneralState>()(
             },
             settingsPointsSystem: state.settingsPointsSystem,
             generalSettingsExpansion: state.generalSettingsExpansion,
-            presentationSettings: restPresentationSettings,
+            presentationSettings: state.presentationSettings,
           };
         },
         onRehydrateStorage: () => (state) => {
