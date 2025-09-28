@@ -1,29 +1,46 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { BaseCountry, EventStage, StageVotingMode, StageVotingType } from '@/models';
+import {
+  BaseCountry,
+  EventStage,
+  StageVotingMode,
+  StageVotingType,
+} from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
 import { predefineStageVotes } from '@/state/scoreboard/votesPredefinition';
 
 type UseVotingPredefinitionArgs = {
-  stage: Pick<EventStage, 'id' | 'name' | 'votingMode'> & { countries: (BaseCountry | any)[] };
+  stage: Pick<EventStage, 'id' | 'name' | 'votingMode'> & {
+    countries: (BaseCountry | any)[];
+  };
 };
 
-export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) => {
+export const useVotingPredefinition = ({
+  stage,
+}: UseVotingPredefinitionArgs) => {
   const pointsSystem = useGeneralStore((s) => s.pointsSystem);
   const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
-  const getStageVotingCountries = useCountriesStore((s) => s.getStageVotingCountries);
+  const getStageVotingCountries = useCountriesStore(
+    (s) => s.getStageVotingCountries,
+  );
   const { countryOdds } = useCountriesStore();
 
-  const [selectedType, setSelectedType] = useState<'Total' | StageVotingType>('Total');
+  const [selectedType, setSelectedType] = useState<'Total' | StageVotingType>(
+    'Total',
+  );
   const [votes, setVotes] = useState<Partial<StageVotes> | null>(null);
   const [isSorting, setIsSorting] = useState(false);
 
   const [lastStageId, setLastStageId] = useState<string | null>(stage.id);
-  const [lastStageVotingMode, setLastStageVotingMode] = useState<StageVotingMode | null>(stage.votingMode);
+  const [lastStageVotingMode, setLastStageVotingMode] =
+    useState<StageVotingMode | null>(stage.votingMode);
 
-  const votingCountries = getStageVotingCountries(stage.id, selectedType !== StageVotingType.JURY);
+  const votingCountries = getStageVotingCountries(
+    stage.id,
+    selectedType !== StageVotingType.JURY,
+  );
 
   const isCombinedVoting = stage.votingMode === StageVotingMode.COMBINED;
 
@@ -36,21 +53,36 @@ export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) =>
     return 'Total';
   }, [stage]);
 
-  const isTotalVoteType = selectedType === 'Total' && totalBadgeLabel === 'Total';
-  const isTotalOrCombinedVoteType = selectedType === 'Total' && (totalBadgeLabel === 'Combined' || totalBadgeLabel === 'Total');
+  const isTotalVoteType =
+    selectedType === 'Total' && totalBadgeLabel === 'Total';
+  const isTotalOrCombinedVoteType =
+    selectedType === 'Total' &&
+    (totalBadgeLabel === 'Combined' || totalBadgeLabel === 'Total');
 
   const voteTypeOptions = useMemo(() => {
     if (!stage) return [] as StageVotingType[];
     const { votingMode } = stage;
-    if ([StageVotingMode.JURY_AND_TELEVOTE, StageVotingMode.COMBINED].includes(votingMode)) {
+    if (
+      [StageVotingMode.JURY_AND_TELEVOTE, StageVotingMode.COMBINED].includes(
+        votingMode,
+      )
+    ) {
       return [StageVotingType.JURY, StageVotingType.TELEVOTE];
     }
     return [] as StageVotingType[];
   }, [stage]);
 
   const getActiveSource = (): 'jury' | 'televote' | null => {
-    if (selectedType === StageVotingType.JURY || stage.votingMode === StageVotingMode.JURY_ONLY) return 'jury';
-    if (selectedType === StageVotingType.TELEVOTE || stage.votingMode === StageVotingMode.TELEVOTE_ONLY) return 'televote';
+    if (
+      selectedType === StageVotingType.JURY ||
+      stage.votingMode === StageVotingMode.JURY_ONLY
+    )
+      return 'jury';
+    if (
+      selectedType === StageVotingType.TELEVOTE ||
+      stage.votingMode === StageVotingMode.TELEVOTE_ONLY
+    )
+      return 'televote';
     return null;
   };
 
@@ -74,7 +106,11 @@ export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) =>
     setIsSorting(false);
   };
 
-  const applyInputValue = (participantCode: string, voterCode: string, rawValue: string) => {
+  const applyInputValue = (
+    participantCode: string,
+    voterCode: string,
+    rawValue: string,
+  ) => {
     const source = getActiveSource();
     if (!source) return; // Total tab is non-editable
 
@@ -91,23 +127,67 @@ export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) =>
           arr.splice(idx, 1);
         }
       } else {
-        const match = pointsSystem.find((p) => p.value === parsed);
-        if (!match) {
+        const matchingPoints = pointsSystem.filter((p) => p.value === parsed);
+        if (matchingPoints.length === 0) {
           if (idx !== -1) {
             arr.splice(idx, 1);
           }
         } else {
-          const entry = {
-            countryCode: participantCode,
-            points: match.value,
-            pointsId: match.id,
-            showDouzePointsAnimation: match.value === 12,
-          };
+          // Allowed ids for this points value (may contain duplicates like two 6's with distinct ids)
+          const allowedIds = matchingPoints.map((p) => p.id);
 
-          if (idx !== -1) {
-            arr[idx] = entry;
+          // Collect used ids by other assignments for this voter (exclude current participant if present)
+          const usedIds: number[] = arr
+            .filter((_, i) => i !== idx)
+            .map((item) => item.pointsId as number);
+          const usedSet = new Set(usedIds);
+
+          // Prefer keeping current id if value unchanged AND it's not used by someone else
+          const currentEntry = idx !== -1 ? (arr[idx] as any) : null;
+          const currentIdIfSameValue =
+            currentEntry &&
+            currentEntry.points === parsed &&
+            allowedIds.includes(currentEntry.pointsId)
+              ? (currentEntry.pointsId as number)
+              : undefined;
+
+          let chosenId: number | undefined;
+          if (
+            currentIdIfSameValue !== undefined &&
+            !usedSet.has(currentIdIfSameValue)
+          ) {
+            chosenId = currentIdIfSameValue;
           } else {
-            arr.push(entry);
+            chosenId = allowedIds.find((id) => !usedSet.has(id));
+          }
+
+          // If no available id for this value, transfer an existing id from another participant
+          if (chosenId === undefined) {
+            const donorIndex = arr.findIndex(
+              (other, i) =>
+                i !== idx && allowedIds.includes(other.pointsId as number),
+            );
+
+            if (donorIndex !== -1) {
+              chosenId = arr[donorIndex].pointsId as number;
+              // Remove donor assignment to free the id
+              arr.splice(donorIndex, 1);
+            }
+          }
+
+          if (chosenId !== undefined) {
+            const entry = {
+              countryCode: participantCode,
+              points: parsed,
+              pointsId: chosenId,
+              showDouzePointsAnimation: parsed === 12,
+            };
+
+            if (idx !== -1) {
+              arr[idx] = entry;
+            } else {
+              arr.push(entry);
+            }
           }
         }
       }
@@ -123,9 +203,12 @@ export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) =>
     const used = (votes as any)[source]?.[voterCode] || [];
     if (!used || used.length === 0) return 'incomplete';
     const expectedIds = pointsSystem.map((p) => p.id);
+
     const usedIds = used.map((v: any) => v.pointsId);
+
     const hasAll = expectedIds.every((id) => usedIds.includes(id));
     const noDuplicates = new Set(usedIds).size === usedIds.length;
+
     if (!noDuplicates) return 'invalid';
     if (hasAll && usedIds.length === expectedIds.length) return 'valid';
     return hasAll ? 'invalid' : 'incomplete';
@@ -201,27 +284,42 @@ export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) =>
 
       if (selectedType === 'Total') {
         if (isCombinedVoting) {
-          Object.values(votes.combined || {}).forEach((arr: any) => add(arr as any[]));
+          Object.values(votes.combined || {}).forEach((arr: any) =>
+            add(arr as any[]),
+          );
         } else {
-          Object.values(votes.jury || {}).forEach((arr: any) => add(arr as any[]));
-          Object.values(votes.televote || {}).forEach((arr: any) => add(arr as any[]));
+          Object.values(votes.jury || {}).forEach((arr: any) =>
+            add(arr as any[]),
+          );
+          Object.values(votes.televote || {}).forEach((arr: any) =>
+            add(arr as any[]),
+          );
         }
       } else if (selectedType === StageVotingType.JURY) {
-        Object.values(votes.jury || {}).forEach((arr: any) => add(arr as any[]));
+        Object.values(votes.jury || {}).forEach((arr: any) =>
+          add(arr as any[]),
+        );
       } else {
-        Object.values(votes.televote || {}).forEach((arr: any) => add(arr as any[]));
+        Object.values(votes.televote || {}).forEach((arr: any) =>
+          add(arr as any[]),
+        );
       }
     }
     const withRank = [...stage.countries]
       .sort((a, b) => (totals[b.code] || 0) - (totals[a.code] || 0))
       .map((c, i) => ({ ...c, rank: i + 1 }));
-    const finalCountries = isSorting ? withRank : withRank.sort((a, b) => a.name.localeCompare(b.name));
-    return finalCountries as Array<(BaseCountry & { rank: number })>;
+    const finalCountries = isSorting
+      ? withRank
+      : withRank.sort((a, b) => a.name.localeCompare(b.name));
+    return finalCountries as Array<BaseCountry & { rank: number }>;
   })();
 
   const validateAllBeforeSave = () => {
     const modesToValidate: Array<'jury' | 'televote'> = [];
-    if (stage.votingMode === StageVotingMode.JURY_AND_TELEVOTE || stage.votingMode === StageVotingMode.COMBINED) {
+    if (
+      stage.votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+      stage.votingMode === StageVotingMode.COMBINED
+    ) {
       modesToValidate.push('jury', 'televote');
     } else if (stage.votingMode === StageVotingMode.JURY_ONLY) {
       modesToValidate.push('jury');
@@ -239,18 +337,25 @@ export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) =>
         const usedIds: number[] = arr.map((v) => v.pointsId as number);
         const reasons: string[] = [];
 
-        const missingValues = expected.filter((p) => !usedIds.includes(p.id)).map((p) => p.value);
+        const missingValues = expected
+          .filter((p) => !usedIds.includes(p.id))
+          .map((p) => p.value);
         if (missingValues.length > 0) {
-          reasons.push(`not all points are used (missing: ${missingValues.join(', ')})`);
+          reasons.push(
+            `not all points are used (missing: ${missingValues.join(', ')})`,
+          );
         }
 
         const countsById = new Map<number, number>();
-        for (const id of usedIds) countsById.set(id, (countsById.get(id) || 0) + 1);
+        for (const id of usedIds)
+          countsById.set(id, (countsById.get(id) || 0) + 1);
         const duplicateIds: number[] = Array.from(countsById.entries())
           .filter(([, count]) => count > 1)
           .map(([id]) => id);
         if (duplicateIds.length > 0) {
-          const duplicateValues = expected.filter((p) => duplicateIds.includes(p.id)).map((p) => p.value);
+          const duplicateValues = expected
+            .filter((p) => duplicateIds.includes(p.id))
+            .map((p) => p.value);
           reasons.push(`duplicate points (${duplicateValues.join(', ')})`);
         }
 
@@ -314,4 +419,6 @@ export const useVotingPredefinition = ({ stage }: UseVotingPredefinitionArgs) =>
   };
 };
 
-export type UseVotingPredefinitionReturn = ReturnType<typeof useVotingPredefinition>;
+export type UseVotingPredefinitionReturn = ReturnType<
+  typeof useVotingPredefinition
+>;
