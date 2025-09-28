@@ -57,6 +57,8 @@ const VotingPredefinitionModal = ({
   const [editing, setEditing] = useState<Record<CellKey, string>>({});
 
   const [lastStageId, setLastStageId] = useState<string | null>(stage.id);
+  const [lastStageVotingMode, setLastStageVotingMode] =
+    useState<StageVotingMode | null>(stage.votingMode);
 
   const [isSorting, setIsSorting] = useState(false);
 
@@ -273,7 +275,7 @@ const VotingPredefinitionModal = ({
       return acc;
     };
 
-    if (selectedType === 'Total') {
+    if (isTotalOrCombinedVoteType) {
       if (isCombinedVoting) {
         let sum = 0;
 
@@ -296,19 +298,11 @@ const VotingPredefinitionModal = ({
       return sum;
     }
 
-    if (selectedType === StageVotingType.JURY) {
-      let sum = 0;
-
-      Object.values(votes.jury || {}).forEach((a: any) => {
-        sum = addFrom(a as any[], sum);
-      });
-
-      return sum;
-    }
+    const source = getActiveSource() || 'televote';
 
     let sum = 0;
 
-    Object.values(votes.televote || {}).forEach((a: any) => {
+    Object.values(votes[source] || {}).forEach((a: any) => {
       sum = addFrom(a as any[], sum);
     });
 
@@ -418,20 +412,30 @@ const VotingPredefinitionModal = ({
     onClose();
   };
 
-  useEffectOnce(onLoaded);
+  const resetVotes = () => {
+    setVotes(null);
+    setEditing({});
+    setSelectedType('Total');
+    setIsSorting(false);
+  };
 
-  // TODO: Add a progress bar
+  useEffectOnce(onLoaded);
 
   useEffect(() => {
     if (stage.id !== lastStageId) {
-      setVotes(null);
-      setEditing({});
-      setSelectedType('Total');
-      setIsSorting(false);
+      resetVotes();
     }
 
     setLastStageId(stage.id);
   }, [stage.id, lastStageId]);
+
+  useEffect(() => {
+    if (stage.votingMode !== lastStageVotingMode) {
+      resetVotes();
+    }
+
+    setLastStageVotingMode(stage.votingMode);
+  }, [stage.votingMode, lastStageVotingMode]);
 
   return (
     <Modal
