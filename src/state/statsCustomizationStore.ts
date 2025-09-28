@@ -21,7 +21,7 @@ const DEFAULT_STATS_CUSTOMIZATION: StatsCustomizationSettings = {
   title: '',
   showBackgroundImage: true,
   backgroundOpacity: 0.3,
-  borderOpacity: 1,
+  borderOpacity: 0.5,
   generateOnOpen: true,
   isCustomizationExpanded: false,
   showVotingCountriesNames: false,
