@@ -43,7 +43,7 @@ export const validateEventSetup = (
         stage.countriesCount < minStageParticipants &&
         stage.votingMode !== StageVotingMode.TELEVOTE_ONLY
       ) {
-        return `The number of participants in ${stage.name} must be at least ${minStageParticipants}.`;
+        return `The number of participants in ${stage.name} must be at least ${minStageParticipants} (depends on the number of items in the points system).`;
       }
     }
 

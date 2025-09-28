@@ -60,10 +60,9 @@ const VotingPredefinitionModal = ({
 
   const [isSorting, setIsSorting] = useState(false);
 
-  const votingCountries = useMemo(
-    () =>
-      getStageVotingCountries(stage.id, selectedType !== StageVotingType.JURY),
-    [getStageVotingCountries, selectedType, stage.id],
+  const votingCountries = getStageVotingCountries(
+    stage.id,
+    selectedType !== StageVotingType.JURY,
   );
 
   const randomizeAll = () => {
