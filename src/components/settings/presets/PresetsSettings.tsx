@@ -105,7 +105,7 @@ export const PresetsSettings: React.FC = () => {
       <h5 className="text-white/70 flex items-center">
         <InfoIcon className="w-4 h-4 inline-block mr-1" />
         The current presets implementation is not stable. It'll be updated in
-        October.
+        the future.
       </h5>
       <div className="flex items-center justify-between gap-2">
         <div className="text-base sm:text-lg font-semibold">
