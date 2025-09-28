@@ -2,11 +2,11 @@ export const WHATS_NEW = [
   {
     date: '2025-09-21',
     title: 'The ability to predefine voting (enable in settings)',
-  },  
+  },
   {
     date: '2025-09-13',
     title: 'Presentation mode',
-  }, 
+  },
   {
     date: '2025-09-13',
     title: 'Performance improvements',
@@ -174,17 +174,29 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-09-27', end: '2025-09-28' },
-    title: 'Save simulation progress',
+    approximateDates: { start: '2025-10-04', end: '2025-10-05' },
+    title: 'User authentication & Profiles',
+  },
+  {
+    title: 'Saving custom entries in your profile',
+  },
+  {
+    title: 'Custom theme builder. The ability to use public themes',
+  },
+  {
+    title: 'Saving scoreboards in your profile',
+  },
+  {
+    title: 'The ability to use public scoreboards',
+  },
+  {
+    title: 'Localization for different languages',
   },
   {
     title: 'Separate points system for jury and televote',
   },
   {
     title: 'Pre-1975 points system support',
-  },
-  {
-    title: 'Custom animations for each contest',
   },
 ];
 
