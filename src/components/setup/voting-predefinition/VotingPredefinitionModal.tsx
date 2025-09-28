@@ -353,7 +353,7 @@ const VotingPredefinitionModal = ({
     return [];
   }, [stage]);
 
-  const rankedCountries = useMemo(() => {
+  const rankedCountries = (() => {
     const totals: Record<string, number> = {};
 
     stage.countries.forEach((c) => {
@@ -389,7 +389,7 @@ const VotingPredefinitionModal = ({
         );
       }
     }
-    const withRank = stage.countries
+    const withRank = [...stage.countries]
       .sort((a, b) => (totals[b.code] || 0) - (totals[a.code] || 0))
       .map((c, i) => ({ ...c, rank: i + 1 }));
 
@@ -398,7 +398,7 @@ const VotingPredefinitionModal = ({
       : withRank.sort((a, b) => a.name.localeCompare(b.name));
 
     return finalCountries;
-  }, [stage.countries, votes, selectedType, isCombinedVoting, isSorting]);
+  })();
 
   const handleSave = () => {
     const { ok, errors } = validateAllBeforeSave();
@@ -438,7 +438,7 @@ const VotingPredefinitionModal = ({
       isOpen={isOpen}
       onClose={onClose}
       overlayClassName="!z-[1000]"
-      contentClassName="!px-2 text-white"
+      contentClassName="!px-2 text-white flex flex-col !overflow-hidden"
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
           <Button
@@ -520,11 +520,11 @@ const VotingPredefinitionModal = ({
       </div>
 
       {/* Table */}
-      <div className="narrow-scrollbar overflow-x-auto overflow-y-hidden">
+      <div className="narrow-scrollbar overflow-auto flex-1 min-h-0">
         <table className="text-left border-collapse">
-          <thead className="sticky top-0 z-10">
+          <thead className="sticky top-0 z-10 bg-primary-950 from-primary-950 to-primary-900 bg-gradient-to-bl">
             <tr>
-              <th className="p-2 min-w-[220px] w-[220px] h-auto"></th>
+              <th className="p-2 min-w-[220px] w-[220px] h-auto sm:bg-primary-900 sm:sticky sm:left-0 sm:z-[10] sm:rounded-tl-lg"></th>
               {votingCountries.map((country) => {
                 const { logo, isExisting } = getHostingCountryLogo(
                   country,
@@ -578,7 +578,7 @@ const VotingPredefinitionModal = ({
 
               return (
                 <tr key={country.code}>
-                  <td className="p-2">
+                  <td className="p-2 min-w-[220px] w-[220px] sm:sticky sm:left-0 sm:z-[10] sm:bg-primary-900">
                     <div className="flex items-center gap-3">
                       <span className="text-lg font-bold w-6 text-center">
                         {country.rank}
@@ -638,7 +638,10 @@ const VotingPredefinitionModal = ({
                           inputMode="numeric"
                           disabled={isTotalOrCombinedVoteType || isSameCountry}
                           onChange={(e) =>
-                            setEditing((s) => ({ ...s, [key]: e.target.value }))
+                            setEditing((s) => ({
+                              ...s,
+                              [key]: e.target.value,
+                            }))
                           }
                           onBlur={(e) => {
                             const parsed = Number(e.target.value);
