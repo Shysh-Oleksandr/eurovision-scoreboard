@@ -22,7 +22,7 @@ const ProfileWidget = () => {
         description={`Manage your profile and settings ${
           user ? `(${user.name})` : ''
         }`}
-        icon={<UserIcon className="w-6 h-6 flex-none" />}
+        icon={<UserIcon className="w-6 h-6 flex-none" />} // TODO: When authenticated, show the checkmark
       />
 
       {(isProfileModalOpen || isProfileModalLoaded) && (
