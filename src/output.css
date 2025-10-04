@@ -893,6 +893,10 @@ video {
   margin-top: 0.18rem;
 }
 
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -1000,6 +1004,10 @@ video {
   height: 24px;
 }
 
+.h-\[50vh\] {
+  height: 50vh;
+}
+
 .h-\[55vh\] {
   height: 55vh;
 }
@@ -1033,8 +1041,36 @@ video {
   height: 1px;
 }
 
-.h-\[50vh\] {
-  height: 50vh;
+.h-\[30vh\] {
+  height: 30vh;
+}
+
+.h-\[min\(30vh\2c 500px\)\] {
+  height: min(30vh,500px);
+}
+
+.\!h-\[min\(30vh\2c 500px\)\] {
+  height: min(30vh,500px) !important;
+}
+
+.\!h-\[max\(30vh\2c 500px\)\] {
+  height: max(30vh,500px) !important;
+}
+
+.\!h-\[max\(30vh\2c 300px\)\] {
+  height: max(30vh,300px) !important;
+}
+
+.\!h-\[max\(30vh\2c 200px\)\] {
+  height: max(30vh,200px) !important;
+}
+
+.\!h-\[max\(30vh\2c 400px\)\] {
+  height: max(30vh,400px) !important;
+}
+
+.\!h-\[max\(25vh\2c 200px\)\] {
+  height: max(25vh,200px) !important;
 }
 
 .\!max-h-\[calc\(80vh-100px\)\] {
@@ -1087,6 +1123,10 @@ video {
 
 .\!w-\[min\(100\%\2c 800px\)\] {
   width: min(100%,800px) !important;
+}
+
+.\!w-\[min\(100\%\2c 850px\)\] {
+  width: min(100%,850px) !important;
 }
 
 .\!w-\[min\(100\%\2c _95vw\)\] {
@@ -1238,8 +1278,12 @@ video {
   width: 100%;
 }
 
-.\!w-\[min\(100\%\2c 850px\)\] {
-  width: min(100%,850px) !important;
+.\!w-\[min\(100\%\2c 550px\)\] {
+  width: min(100%,550px) !important;
+}
+
+.\!w-\[min\(100\%\2c 600px\)\] {
+  width: min(100%,600px) !important;
 }
 
 .min-w-0 {
@@ -1778,11 +1822,6 @@ video {
 
 .border-none {
   border-style: none;
-}
-
-.border-primary-700 {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--twc-primary-700) / var(--twc-primary-700-opacity, var(--tw-border-opacity)));
 }
 
 .border-primary-800 {
@@ -4126,6 +4165,27 @@ h6 {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
 }
 
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e7dada;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .placeholder\:\!text-gray-400::-moz-placeholder {
   --tw-text-opacity: 1 !important;
   color: rgb(156 163 175 / var(--tw-text-opacity, 1)) !important;
@@ -5183,4 +5243,4 @@ h6 {
 .\[\&\>span\]\:\!text-sm>span {
   font-size: 0.875rem !important;
   line-height: 1.25rem !important;
-}
+} 

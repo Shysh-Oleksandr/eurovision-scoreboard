@@ -67,7 +67,7 @@ export interface CountriesState {
   ) => Promise<void>;
   updateCustomCountry: (country: BaseCountry) => Promise<void>;
   deleteCustomCountry: (countryCode: string) => Promise<void>;
-  getAllCountries: () => BaseCountry[];
+  getAllCountries: (includeCustomCountries?: boolean) => BaseCountry[];
   setEventAssignments: (
     assignments: Record<EventMode, Record<string, string>>,
   ) => void;
@@ -416,10 +416,12 @@ export const useCountriesStore = create<CountriesState>()(
           }));
         },
 
-        getAllCountries: () => {
+        getAllCountries: (includeCustomCountries = true) => {
           const { customCountries } = get();
 
-          return [...ALL_COUNTRIES, ...customCountries];
+          return includeCustomCountries
+            ? [...ALL_COUNTRIES, ...customCountries]
+            : ALL_COUNTRIES;
         },
 
         setEventAssignments: (assignments) => {

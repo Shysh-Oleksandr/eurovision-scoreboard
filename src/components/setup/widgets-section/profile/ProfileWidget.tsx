@@ -2,10 +2,13 @@ import React, { Suspense, useState } from 'react';
 
 import { UserIcon } from '@/assets/icons/UserIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
+import { useAuthStore } from '@/state/useAuthStore';
 
 const ProfileModal = React.lazy(() => import('./ProfileModal'));
 
 const ProfileWidget = () => {
+  const user = useAuthStore((state) => state.user);
+
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isProfileModalLoaded, setIsProfileModalLoaded] = useState(false);
 
@@ -16,7 +19,9 @@ const ProfileWidget = () => {
           setIsProfileModalOpen(true);
         }}
         title="Profile"
-        description="Manage your profile and settings"
+        description={`Manage your profile and settings ${
+          user ? `(${user.name})` : ''
+        }`}
         icon={<UserIcon className="w-6 h-6 flex-none" />}
       />
 

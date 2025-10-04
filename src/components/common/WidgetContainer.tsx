@@ -19,8 +19,10 @@ const WidgetContainer = ({
 }: WidgetContainerProps) => {
   return (
     <div
-      className={`bg-primary-900 rounded-lg p-3 text-white border border-primary-800 shadow-lg border-solid hover:bg-primary-800 transition-colors duration-300 cursor-pointer ${
-        disabled ? 'opacity-50 !cursor-not-allowed' : ''
+      className={`min-w-[200px] flex-1 bg-primary-900 rounded-lg p-3 text-white border border-primary-800 shadow-lg border-solid ${
+        disabled
+          ? 'opacity-50 !cursor-not-allowed'
+          : 'hover:bg-primary-800 transition-colors duration-300 cursor-pointer'
       }`}
       onClick={() => {
         if (disabled) return;

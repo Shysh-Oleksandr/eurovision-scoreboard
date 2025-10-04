@@ -17,6 +17,7 @@ interface CustomCountryModalProps {
 const PRESET_IMAGES = [
   '/flags/earth.svg',
   '/flags/world.svg',
+  '/flags/floptropica.svg',
   '/flags/neutral.svg',
   '/flags/lgbt.svg',
   '/flags/neutrois.svg',

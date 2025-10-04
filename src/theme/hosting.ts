@@ -116,14 +116,16 @@ export function getHostingLogoByCountryCode(
 }
 
 export function getHostingCountryLogo(
-  country: BaseCountry,
+  country: BaseCountry | string,
   shouldShowHeartFlagIcon = true,
 ): { logo: string; isExisting: boolean } {
   if (!shouldShowHeartFlagIcon) {
     return { logo: getFlagPath(country), isExisting: false };
   }
 
-  const existing = getHostingLogoByCountryCode(country.code);
+  const countryCode = typeof country === 'string' ? country : country.code;
+
+  const existing = getHostingLogoByCountryCode(countryCode);
   if (existing) {
     return { logo: existing, isExisting: true };
   }

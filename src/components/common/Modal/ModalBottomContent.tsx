@@ -6,12 +6,14 @@ interface ModalBottomContentProps {
   onClose: () => void;
   onSave: () => void;
   onDelete?: () => void;
+  isSaving?: boolean;
 }
 
 const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
   onClose,
   onSave,
   onDelete,
+  isSaving,
 }) => {
   return (
     <div
@@ -39,6 +41,8 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
         <Button
           className="w-full sm:!text-base text-sm px-6 font-semibold"
           onClick={onSave}
+          isLoading={isSaving}
+          disabled={isSaving}
         >
           Save
         </Button>

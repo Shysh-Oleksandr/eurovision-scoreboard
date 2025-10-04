@@ -9,6 +9,7 @@ type Props = {
   children?: ReactNode;
   disabled?: boolean;
   Icon?: React.ReactNode;
+  isLoading?: boolean;
 };
 
 const Button = ({
@@ -20,6 +21,7 @@ const Button = ({
   title,
   disabled,
   Icon,
+  isLoading,
 }: Props) => {
   const baseClasses =
     'lg:text-base md:text-base text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] font-medium uppercase rounded-md shadow-lg transition-colors lg:leading-5 duration-300 bg-gradient-to-tr from-[20%]';
@@ -39,13 +41,21 @@ const Button = ({
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${
         Icon ? 'flex items-center gap-2' : ''
-      } ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      } ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
+        isLoading ? 'flex' : ''
+      }`}
       onClick={onClick}
       title={title}
-      disabled={disabled}
+      disabled={disabled || isLoading}
     >
-      {Icon}
-      {children || label}
+      {isLoading ? (
+        <span className="loader" />
+      ) : (
+        <>
+          {Icon}
+          {children || label}
+        </>
+      )}
     </button>
   );
 };
