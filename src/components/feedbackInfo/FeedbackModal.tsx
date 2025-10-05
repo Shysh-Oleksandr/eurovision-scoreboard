@@ -62,60 +62,70 @@ const FeedbackModal = ({
         <ModalBottomCloseButton onClose={() => setShowModal(false)} />
       }
     >
-      <div className="lg:text-lg sm:text-base text-base font-medium">
+      <div className="lg:text-lg sm:text-base text-base font-medium h-full">
         {activeTab === 'feedback' && (
-          <div className="lg:pt-2">
-            <p className="mb-2 font-semibold">
-              Found a bug, have a feature idea, or just want to share feedback?
-            </p>
-            <div className="mb-2 sm:gap-3 gap-2 flex items-center">
-              <div className="text-primary-300 font-semibold tracking-wide bg-primary-800 px-2 py-1 rounded-md text-sm">
-                NEW
+          <div className="lg:pt-2 flex flex-col justify-between h-full">
+            <div>
+              <p className="mb-2 font-semibold">
+                Found a bug, have a feature idea, or just want to share
+                feedback?
+              </p>
+              <div className="mb-2 sm:gap-3 gap-2 flex items-center">
+                <div className="text-primary-300 font-semibold tracking-wide bg-primary-800 px-2 py-1 rounded-md text-sm">
+                  NEW
+                </div>
+                <p>
+                  You can now use{' '}
+                  <a
+                    href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/discussions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                  >
+                    GitHub Discussions
+                  </a>{' '}
+                  to share suggestions, ask questions, or even post your
+                  simulation results.
+                </p>
               </div>
-              <p>
-                You can now use{' '}
+              <p className="mb-4">
+                Alternatively, feel free to open an issue on{' '}
                 <a
-                  href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/discussions"
+                  href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/issues"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary-300 hover:text-primary-400 underline font-semibold"
                 >
-                  GitHub Discussions
+                  <GitHubIcon className="w-5 h-5 inline-block mr-1 mb-1" />
+                  GitHub
                 </a>{' '}
-                to share suggestions, ask questions, or even post your
-                simulation results.
+                or email me at{' '}
+                <a
+                  href="mailto:sasha.shysh23@gmail.com"
+                  className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                >
+                  sasha.shysh23@gmail.com
+                </a>
               </p>
+              <div className="mb-4">
+                If you're reporting a bug, please include your:
+                <br />
+                <ul className="list-disc list-inside">
+                  <li>device (mobile, tablet, or PC)</li>
+                  <li>OS (Android, iOS, Windows, macOS)</li>
+                  <li>browser (Chrome, Safari, etc.)</li>
+                  <li>and any helpful details like screenshots or videos</li>
+                </ul>
+              </div>
+              <p>Thank you!</p>
             </div>
-            <p className="mb-4">
-              Alternatively, feel free to open an issue on{' '}
-              <a
-                href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-300 hover:text-primary-400 underline font-semibold"
-              >
-                <GitHubIcon className="w-5 h-5 inline-block mr-1 mb-1" />
-                GitHub
-              </a>{' '}
-              or email me at{' '}
-              <a
-                href="mailto:sasha.shysh23@gmail.com"
-                className="text-primary-300 hover:text-primary-400 underline font-semibold"
-              >
-                sasha.shysh23@gmail.com
-              </a>
-            </p>
-            <div className="mb-4">
-              If you're reporting a bug, please include your:
-              <br />
-              <ul className="list-disc list-inside">
-                <li>device (mobile, tablet, or PC)</li>
-                <li>OS (Android, iOS, Windows, macOS)</li>
-                <li>browser (Chrome, Safari, etc.)</li>
-                <li>and any helpful details like screenshots or videos</li>
-              </ul>
-            </div>
-            <p>Thank you!</p>
+
+            <a
+              href="/privacy"
+              className="text-white text-right hover:text-white transition-colors duration-300 underline text-base font-semibold"
+            >
+              Privacy Policy
+            </a>
           </div>
         )}
 

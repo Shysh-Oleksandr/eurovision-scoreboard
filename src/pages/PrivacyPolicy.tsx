@@ -649,43 +649,6 @@ const PrivacyPolicy = () => {
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-white mb-4 border-b border-white/20 pb-2">
-              Links to Other Websites
-            </h2>
-            <p className="text-white/90 leading-relaxed mb-4">
-              Our Service may contain links to other websites that are not
-              operated by Us. If You click on a third party link, You will be
-              directed to that third party's site. We strongly advise You to
-              review the Privacy Policy of every site You visit.
-            </p>
-            <p className="text-white/90 leading-relaxed mb-6">
-              We have no control over and assume no responsibility for the
-              content, privacy policies or practices of any third party sites or
-              services.
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4 border-b border-white/20 pb-2">
-              Changes to this Privacy Policy
-            </h2>
-            <p className="text-white/90 leading-relaxed mb-4">
-              We may update Our Privacy Policy from time to time. We will notify
-              You of any changes by posting the new Privacy Policy on this page.
-            </p>
-            <p className="text-white/90 leading-relaxed mb-4">
-              We will let You know via email and/or a prominent notice on Our
-              Service, prior to the change becoming effective and update the
-              &quot;Last updated&quot; date at the top of this Privacy Policy.
-            </p>
-            <p className="text-white/90 leading-relaxed mb-6">
-              You are advised to review this Privacy Policy periodically for any
-              changes. Changes to this Privacy Policy are effective when they
-              are posted on this page.
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4 border-b border-white/20 pb-2">
               Contact Us
             </h2>
             <p className="text-white/90 leading-relaxed mb-4">
