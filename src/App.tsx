@@ -21,9 +21,13 @@ export const App = () => {
     if (url.searchParams.has('provider')) {
       window.history.replaceState({}, '', url.origin + url.pathname);
 
+      handlePostLogin(true);
+
       toast('Logged in successfully', {
         type: 'success',
       });
+
+      return;
     }
     // Initialize session: refresh -> me
     handlePostLogin();

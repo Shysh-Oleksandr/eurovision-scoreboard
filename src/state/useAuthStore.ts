@@ -12,7 +12,7 @@ export interface AuthState {
   accessToken: string | null;
   isBusy: boolean;
   login: () => void;
-  handlePostLogin: () => Promise<void>;
+  handlePostLogin: (force?: boolean) => Promise<void>;
   refresh: () => Promise<string | undefined>;
   fetchMe: () => Promise<void>;
   logout: () => Promise<void>;
@@ -29,7 +29,9 @@ export const useAuthStore = create<AuthState>()(
           (import.meta as any).env?.VITE_API_URL || 'http://localhost:8001';
         window.location.href = `${apiBase}/auth/google`;
       },
-      handlePostLogin: async () => {
+      handlePostLogin: async (force?: boolean) => {
+        if (!get().user && !force) return;
+
         attachRefreshInterceptor(get().refresh);
         setAccessTokenGetter(() => useAuthStore.getState().accessToken);
         try {
