@@ -583,3 +583,28 @@ h6 {
 .dragged {
   @apply !z-[9999999] !bg-primary-900 !shadow-lg !border-b-2 !border-solid !border-white;
 }
+
+.loader {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e7dada;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  }
+
+  @keyframes rotation {
+  0% {
+      transform: rotate(0deg);
+  }
+  100% {
+      transform: rotate(360deg);
+  }
+  } 
+
+  .Toastify__progress-bar--success,
+  .Toastify__progress-bar--info {
+    background: theme('colors.primary-700');
+  }

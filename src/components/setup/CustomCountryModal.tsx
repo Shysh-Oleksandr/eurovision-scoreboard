@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
@@ -17,6 +18,7 @@ interface CustomCountryModalProps {
 const PRESET_IMAGES = [
   '/flags/earth.svg',
   '/flags/world.svg',
+  '/flags/floptropica.svg',
   '/flags/neutral.svg',
   '/flags/lgbt.svg',
   '/flags/neutrois.svg',
@@ -54,7 +56,9 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
   const handleSave = async () => {
     if (name.trim() === '') {
-      alert('Entry name is required.');
+      toast('Entry name is required.', {
+        type: 'error',
+      });
 
       return;
     }

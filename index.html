@@ -49,7 +49,15 @@
     <link rel="icon" type="image/png" sizes="512x512" href="./img/favicon-512x512.png">
     
     <!-- Umami Analytics -->
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="785d8ef5-bd26-46a5-99c0-e3b52aa03c7c"></script>
+    <script>
+      if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        var s = document.createElement('script');
+        s.defer = true;
+        s.src = "https://cloud.umami.is/script.js";
+        s.setAttribute('data-website-id', '785d8ef5-bd26-46a5-99c0-e3b52aa03c7c');
+        document.head.appendChild(s);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

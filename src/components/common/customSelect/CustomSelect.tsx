@@ -30,6 +30,7 @@ type CustomSelectProps = {
   label?: string;
   getImageClassName?: (option: Option) => string;
   selectClassName?: string;
+  labelClassName?: string;
 };
 
 const getThemeColor = (year: string) => {
@@ -78,14 +79,15 @@ const SelectDisplay: React.FC<{
   );
 };
 
-const SelectLabel: React.FC<{ label?: string; id?: string }> = ({
-  label,
-  id,
-}) => {
+const SelectLabel: React.FC<{
+  label?: string;
+  id?: string;
+  className?: string;
+}> = ({ label, id, className }) => {
   if (!label) return null;
 
   return (
-    <label htmlFor={id} className="text-xs text-white">
+    <label htmlFor={id} className={`text-xs text-white ${className}`}>
       {label}
     </label>
   );
@@ -112,6 +114,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   label,
   getImageClassName,
   selectClassName,
+  labelClassName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -326,7 +329,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
                     if (nonEmptyGroups.length === 0) {
                       return (
-                        <div className="px-3 py-2 text-white/70">
+                        <div className="px-3 py-4 text-white/70">
                           No options
                         </div>
                       );
@@ -388,7 +391,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
                   if (flat.length === 0) {
                     return (
-                      <div className="px-3 py-2 text-white/70">No options</div>
+                      <div className="px-3 py-4 text-white/70">No options</div>
                     );
                   }
 
@@ -440,7 +443,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   return (
     <div className="flex flex-col">
-      <SelectLabel label={label} id={id} />
+      <SelectLabel label={label} id={id} className={labelClassName} />
       {isTouchDevice ? renderTouchSelect() : renderDesktopSelect()}
     </div>
   );

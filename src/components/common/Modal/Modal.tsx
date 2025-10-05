@@ -98,7 +98,7 @@ const Modal: React.FC<ModalProps> = ({
       >
         {topContent}
         <div
-          className={`overflow-y-auto md:p-6 xs:p-5 p-3 py-5 ${modalHeightStyle} ${contentClassName}`}
+          className={`overflow-y-auto md:p-6 xs:p-5 p-3 py-5 narrow-scrollbar ${modalHeightStyle} ${contentClassName}`}
         >
           {children}
         </div>

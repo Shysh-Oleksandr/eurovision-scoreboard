@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
@@ -31,7 +32,9 @@ export const BgImageSelect: React.FC = () => {
   const handleFileChange = async (file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      alert('Please select a valid image file.');
+      toast('Please select a valid image file.', {
+        type: 'error',
+      });
 
       return;
     }

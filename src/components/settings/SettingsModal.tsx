@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 
 import Modal from '../common/Modal/Modal';
 import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
@@ -6,6 +6,7 @@ import Tabs, { TabContent } from '../common/tabs/Tabs';
 
 import { GeneralSettings } from './GeneralSettings';
 
+import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { BaseCountry } from '@/models';
 
 const OddsSettings = React.lazy(() => import('./OddsSettings'));
@@ -66,16 +67,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     [activeTab, isOddsLoaded, participatingCountries],
   );
 
-  useEffect(() => {
-    onLoaded();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffectOnce(onLoaded);
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      containerClassName="!w-[min(100%, 850px)]"
+      containerClassName="!w-[min(100%,850px)]"
       contentClassName="!py-0 !px-2 text-white h-[70vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       topContent={

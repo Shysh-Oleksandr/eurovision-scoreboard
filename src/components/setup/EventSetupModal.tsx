@@ -1,10 +1,11 @@
 import React, {
+  Suspense,
   useCallback,
-  useState,
   useEffect,
   useMemo,
-  Suspense,
+  useState,
 } from 'react';
+import { toast } from 'react-toastify';
 
 import { useShallow } from 'zustand/shallow';
 
@@ -12,8 +13,8 @@ import {
   BaseCountry,
   CountryAssignmentGroup,
   EventMode,
-  StageId,
   EventStage,
+  StageId,
 } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -32,6 +33,7 @@ import NotParticipatingSection from './NotParticipatingSection';
 import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
 import { SetupHeader } from './SetupHeader';
 import { validateEventSetup } from './utils/eventValidation';
+// import WidgetsSection from './widgets-section/WidgetsSection';
 
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -235,7 +237,9 @@ const EventSetupModal = () => {
     );
 
     if (validationError) {
-      alert(validationError);
+      toast(validationError, {
+        type: 'error',
+      });
 
       return;
     }
@@ -450,6 +454,7 @@ const EventSetupModal = () => {
           </Suspense>
         )}
 
+        {/* <WidgetsSection /> */}
         <div className="mt-2 flex flex-col gap-3">
           <Tabs
             tabs={TABS}

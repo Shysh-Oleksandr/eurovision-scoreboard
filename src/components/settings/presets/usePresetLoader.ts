@@ -2,6 +2,7 @@ import { getPresetFromDB } from '@/helpers/indexedDB';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import { toast } from 'react-toastify';
 
 export const usePresetLoader = () => {
   const setConfiguredEventStages = useCountriesStore(
@@ -22,14 +23,18 @@ export const usePresetLoader = () => {
       const preset = await getPresetFromDB(id);
 
       if (!preset) {
-        alert('Failed to load preset: not found');
+        toast('Failed to load preset: not found', {
+          type: 'error',
+        });
         return;
       }
 
       const { general, countries } = preset;
 
       if (!general || !countries) {
-        alert('Preset is corrupted or incomplete');
+        toast('Preset is corrupted or incomplete', {
+          type: 'error',
+        });
         return;
       }
 
@@ -51,10 +56,14 @@ export const usePresetLoader = () => {
         if (countries.countryOdds) setBulkCountryOdds(countries.countryOdds);
       });
 
-      alert('Preset loaded successfully.');
+      toast('Preset loaded successfully.', {
+        type: 'success',
+      });
     } catch (e) {
       console.error(e);
-      alert('Failed to load preset. See console for details.');
+      toast('Failed to load preset. See console for details.', {
+        type: 'error',
+      });
     }
   };
 

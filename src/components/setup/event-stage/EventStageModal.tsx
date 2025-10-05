@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 import { EventStage, StageVotingMode } from '../../../models';
 import Modal from '../../common/Modal/Modal';
@@ -73,7 +74,9 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
       const result = onSubmit(data);
 
       if (result.votingCountries.length === 0 && eventStageToEdit) {
-        alert('Please select at least one voting country');
+        toast('Please select at least one voting country', {
+          type: 'error',
+        });
 
         return;
       }
