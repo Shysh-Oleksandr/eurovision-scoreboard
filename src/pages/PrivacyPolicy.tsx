@@ -1,11 +1,20 @@
 import React from 'react';
 
+import { ArrowIcon } from '@/assets/icons/ArrowIcon';
+
 const PrivacyPolicy = () => {
   return (
     <div className=" bg-black h-full overflow-y-auto">
       <div className=" mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 shadow-2xl">
           <header className="mb-8">
+            <a
+              href="/"
+              className="text-white/80 text-lg mb-4 block bg-black rounded-lg p-2 pr-4 w-fit transition-colors hover:bg-black/30"
+            >
+              <ArrowIcon className="w-6 h-6 rotate-180 inline-block mb-1" />
+              Back
+            </a>
             <h1 className="text-4xl font-bold text-white mb-4">
               Privacy Policy
             </h1>

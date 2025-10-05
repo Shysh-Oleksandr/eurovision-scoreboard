@@ -401,6 +401,7 @@ const EventSetupModal = () => {
         isOpen={eventSetupModalOpen}
         onClose={debouncedCanClose ? onClose : undefined}
         overlayClassName="!z-[1000]"
+        contentClassName="!pb-4"
         bottomContent={
           <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
             {debouncedCanClose && (
@@ -479,6 +480,19 @@ const EventSetupModal = () => {
             getCountryGroupAssignment={getCountryGroupAssignment}
             availableGroups={availableGroups}
           />
+
+          <div className="flex justify-center items-center sm:flex-row flex-col-reverse gap-2 text-white/90 mt-2 font-semibold xs:text-base text-sm text-center">
+            <span>
+              © Copyright {new Date().getFullYear()} DouzePoints.app | All
+              rights reserved
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="hidden sm:block">•</span>
+              <a href="/privacy" className="underline font-semibold">
+                Privacy Policy
+              </a>
+            </span>
+          </div>
         </div>
       </Modal>
     </>
