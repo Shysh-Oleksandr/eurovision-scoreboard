@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { toast, ToastContainer, Zoom } from 'react-toastify';
 
 import { CheckIcon } from './assets/icons/CheckIcon';
@@ -8,6 +9,8 @@ import { TriangleAlertIcon } from './assets/icons/TriangleAlertIcon';
 import { useFullscreen } from './hooks/useFullscreen';
 import { Main } from './pages/Main';
 import { useAuthStore } from './state/useAuthStore';
+
+const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
 
 export const App = () => {
   useFullscreen();
@@ -34,8 +37,13 @@ export const App = () => {
   }, [handlePostLogin]);
 
   return (
-    <>
-      <Main />
+    <BrowserRouter>
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+        </Routes>
+      </Suspense>
 
       <ToastContainer
         draggable
@@ -83,6 +91,6 @@ export const App = () => {
           return <InfoIcon className="w-6 h-6" />;
         }}
       />
-    </>
+    </BrowserRouter>
   );
 };
