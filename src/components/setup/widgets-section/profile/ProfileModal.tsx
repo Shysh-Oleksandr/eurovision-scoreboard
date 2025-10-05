@@ -51,31 +51,28 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      containerClassName="!w-[min(100%,600px)]"
-      contentClassName="text-white !h-[max(30vh,300px)]"
+      containerClassName="!w-[min(100%,500px)]"
+      contentClassName="text-white !h-[max(25vh,250px)]"
       overlayClassName="!z-[1001]"
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <h3 className="text-2xl font-bold mb-4">Profile</h3>
       {isAuthenticated ? (
-        <div className="text-base mb-4 flex justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            {user?.avatarUrl ? (
-              <img
-                src={user?.avatarUrl}
-                alt={user?.username || 'avatar'}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-            ) : null}
+        <div className="text-base mb-4 flex justify-between flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2.5">
+            <img
+              src={user?.avatarUrl || '/img/ProfileAvatarPlaceholder.png'}
+              alt={user?.username || 'avatar'}
+              className="w-14 h-14 rounded-full object-cover"
+            />
             <div>
-              <div className="font-semibold">{user?.name || 'Anonymous'}</div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-white/70">@{user?.username}</span>
+              <div className="flex items-center gap-1.5">
+                <div className="font-semibold">{user?.name || 'Anonymous'}</div>
                 {user?.country && (
                   <img
                     src={logo}
                     alt={`${user?.country} flag`}
-                    className={`flex-none rounded-sm pointer-events-none ${
+                    className={`flex-none rounded-sm mb-0.5 pointer-events-none ${
                       isExisting ? 'w-6 h-6' : 'w-7 h-5 object-cover'
                     }`}
                     width={28}
@@ -84,6 +81,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                   />
                 )}
               </div>
+              <span className="text-sm text-white/70">@{user?.username}</span>
             </div>
           </div>
 
@@ -95,8 +93,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           />
         </div>
       ) : (
-        <p className="text-base mb-4">
-          Authenticate to be create profile, save your settings and more.
+        <p className="text-base mb-4 text-white/80">
+          Authenticate to be able to create a profile, use custom countries, and
+          more.
         </p>
       )}
 

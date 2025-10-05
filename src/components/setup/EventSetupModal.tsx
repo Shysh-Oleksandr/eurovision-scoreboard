@@ -1,10 +1,11 @@
 import React, {
+  Suspense,
   useCallback,
-  useState,
   useEffect,
   useMemo,
-  Suspense,
+  useState,
 } from 'react';
+import { toast } from 'react-toastify';
 
 import { useShallow } from 'zustand/shallow';
 
@@ -12,8 +13,8 @@ import {
   BaseCountry,
   CountryAssignmentGroup,
   EventMode,
-  StageId,
   EventStage,
+  StageId,
 } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -236,7 +237,9 @@ const EventSetupModal = () => {
     );
 
     if (validationError) {
-      alert(validationError);
+      toast(validationError, {
+        type: 'error',
+      });
 
       return;
     }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,6 +10,7 @@ import {
   useUpdateProfileMutation,
   useUploadProfileAvatarMutation,
 } from '@/api/profiles';
+import Button from '@/components/common/Button';
 import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import { InputField } from '@/components/common/InputField';
 import Modal from '@/components/common/Modal/Modal';
@@ -17,6 +19,8 @@ import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
+
+const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -92,15 +96,35 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   }, [user?.avatarUrl, reset, setSelectedCountry, isOpen, user]);
 
   const onSave = handleSubmit(async (values) => {
-    await updateProfile({
-      ...values,
-      country: selectedCountry,
-    });
-    if (removeAvatar) {
-      await deleteAvatar();
-    } else if (selectedFile) {
-      await uploadAvatar(selectedFile);
+    const hasChanges =
+      values.username !== user?.username ||
+      values.name !== user?.name ||
+      selectedCountry !== user?.country;
+
+    try {
+      if (hasChanges) {
+        await updateProfile({
+          username: values.username.trim(),
+          name: values.name.trim(),
+          country: selectedCountry,
+        });
+      }
+      if (removeAvatar) {
+        await deleteAvatar();
+      } else if (selectedFile) {
+        await uploadAvatar(selectedFile);
+      }
+    } catch (error: any) {
+      toast(error?.response?.data?.message || 'Failed to update profile', {
+        type: 'error',
+      });
+
+      return;
     }
+
+    toast('Profile updated successfully!', {
+      type: 'success',
+    });
     onClose();
   });
 
@@ -111,12 +135,47 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     return user?.avatarUrl || '/img/ProfileAvatarPlaceholder.png';
   }, [selectedFile, removeAvatar, user?.avatarUrl]);
 
+  const onProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+
+    if (!file) {
+      return;
+    }
+
+    const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
+
+    if (!allowed.includes(file.type)) {
+      toast('Unsupported image type. Allowed: PNG, JPEG, WEBP, SVG', {
+        type: 'error',
+      });
+      e.currentTarget.value = '';
+
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast(
+        'Image is too large. Max size is 3MB. Please compress it or upload a smaller image.',
+        {
+          type: 'error',
+          autoClose: 5000,
+        },
+      );
+      e.currentTarget.value = '';
+
+      return;
+    }
+
+    setSelectedFile(file);
+    setRemoveAvatar(false);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,550px)]"
-      contentClassName="text-white narrow-scrollbar !h-[max(30vh,300px)]"
+      contentClassName="text-white narrow-scrollbar sm:!h-[max(30vh,320px)] !h-[max(30vh,390px)]"
       overlayClassName="!z-[1001]"
       bottomContent={
         <ModalBottomContent
@@ -128,12 +187,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     >
       <h3 className="text-2xl font-bold mb-4">Edit Profile</h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="sm:col-span-2 flex items-start gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 gap-3">
+        <div className="flex items-center gap-4 sm:col-span-2">
           <img
             src={displayAvatarUrl}
             alt="Avatar preview"
-            className="w-16 h-16 rounded-full object-cover"
+            className="w-20 h-20 rounded-full object-cover"
           />
           <div className="flex flex-wrap items-center gap-2">
             <input
@@ -141,56 +200,26 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               ref={fileInputRef}
               accept="image/png,image/jpeg,image/webp,image/svg+xml"
               className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null;
-
-                if (!file) {
-                  return;
-                }
-
-                const allowed = [
-                  'image/png',
-                  'image/jpeg',
-                  'image/webp',
-                  'image/svg+xml',
-                ];
-
-                if (!allowed.includes(file.type)) {
-                  alert('Unsupported file type. Allowed: PNG, JPEG, WEBP, SVG');
-                  e.currentTarget.value = '';
-
-                  return;
-                }
-
-                if (file.size > 3 * 1024 * 1024) {
-                  alert('File too large. Max size is 3MB.');
-                  e.currentTarget.value = '';
-
-                  return;
-                }
-
-                setSelectedFile(file);
-                setRemoveAvatar(false);
-              }}
+              onChange={onProfilePictureChange}
             />
-            <button
-              type="button"
-              className="px-3 py-1 rounded bg-zinc-700 hover:bg-zinc-600"
+            <Button
+              variant="tertiary"
+              className="!px-3 !py-3 !text-sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              Change Photo
-            </button>
+              Change Picture
+            </Button>
             {user?.avatarUrl || selectedFile ? (
-              <button
-                type="button"
-                className="px-3 py-1 rounded bg-red-600 hover:bg-red-500"
+              <Button
+                variant="destructive"
+                className="!px-3 !py-3 !text-sm"
                 onClick={() => {
                   setSelectedFile(null);
                   setRemoveAvatar(true);
                 }}
               >
-                Remove Photo
-              </button>
+                Delete Picture
+              </Button>
             ) : null}
           </div>
         </div>
@@ -217,6 +246,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           getImageClassName={(option) =>
             option.isExisting ? 'w-8 h-8 !object-contain' : 'w-8 h-6'
           }
+          label="Country"
+          labelClassName="!text-base font-medium mb-1"
           selectClassName="!shadow-none"
         />
       </div>

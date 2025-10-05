@@ -603,3 +603,8 @@ h6 {
       transform: rotate(360deg);
   }
   } 
+
+  .Toastify__progress-bar--success,
+  .Toastify__progress-bar--info {
+    background: theme('colors.primary-700');
+  }

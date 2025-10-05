@@ -893,10 +893,6 @@ video {
   margin-top: 0.18rem;
 }
 
-.mb-8 {
-  margin-bottom: 2rem;
-}
-
 .line-clamp-2 {
   overflow: hidden;
   display: -webkit-box;
@@ -936,6 +932,14 @@ video {
   height: 35px !important;
 }
 
+.\!h-\[max\(25vh\2c 250px\)\] {
+  height: max(25vh,250px) !important;
+}
+
+.\!h-\[max\(30vh\2c 390px\)\] {
+  height: max(30vh,390px) !important;
+}
+
 .h-1 {
   height: 0.25rem;
 }
@@ -958,6 +962,10 @@ video {
 
 .h-2\.5 {
   height: 0.625rem;
+}
+
+.h-20 {
+  height: 5rem;
 }
 
 .h-3 {
@@ -1004,10 +1012,6 @@ video {
   height: 24px;
 }
 
-.h-\[50vh\] {
-  height: 50vh;
-}
-
 .h-\[55vh\] {
   height: 55vh;
 }
@@ -1039,42 +1043,6 @@ video {
 
 .h-px {
   height: 1px;
-}
-
-.h-\[30vh\] {
-  height: 30vh;
-}
-
-.h-\[min\(30vh\2c 500px\)\] {
-  height: min(30vh,500px);
-}
-
-.\!h-\[min\(30vh\2c 500px\)\] {
-  height: min(30vh,500px) !important;
-}
-
-.\!h-\[max\(30vh\2c 500px\)\] {
-  height: max(30vh,500px) !important;
-}
-
-.\!h-\[max\(30vh\2c 300px\)\] {
-  height: max(30vh,300px) !important;
-}
-
-.\!h-\[max\(30vh\2c 200px\)\] {
-  height: max(30vh,200px) !important;
-}
-
-.\!h-\[max\(30vh\2c 400px\)\] {
-  height: max(30vh,400px) !important;
-}
-
-.\!h-\[max\(25vh\2c 200px\)\] {
-  height: max(25vh,200px) !important;
-}
-
-.h-16 {
-  height: 4rem;
 }
 
 .\!max-h-\[calc\(80vh-100px\)\] {
@@ -1121,6 +1089,10 @@ video {
   width: min(100%,500px) !important;
 }
 
+.\!w-\[min\(100\%\2c 550px\)\] {
+  width: min(100%,550px) !important;
+}
+
 .\!w-\[min\(100\%\2c 650px\)\] {
   width: min(100%,650px) !important;
 }
@@ -1149,6 +1121,10 @@ video {
   width: 3rem;
 }
 
+.w-14 {
+  width: 3.5rem;
+}
+
 .w-16 {
   width: 4rem;
 }
@@ -1159,6 +1135,10 @@ video {
 
 .w-2\.5 {
   width: 0.625rem;
+}
+
+.w-20 {
+  width: 5rem;
 }
 
 .w-3 {
@@ -1280,14 +1260,6 @@ video {
 
 .w-full {
   width: 100%;
-}
-
-.\!w-\[min\(100\%\2c 550px\)\] {
-  width: min(100%,550px) !important;
-}
-
-.\!w-\[min\(100\%\2c 600px\)\] {
-  width: min(100%,600px) !important;
 }
 
 .min-w-0 {
@@ -1614,6 +1586,10 @@ video {
 
 .gap-2 {
   gap: 0.5rem;
+}
+
+.gap-2\.5 {
+  gap: 0.625rem;
 }
 
 .gap-3 {
@@ -2013,6 +1989,11 @@ video {
   background-color: rgb(220 38 38 / var(--tw-bg-opacity, 1));
 }
 
+.bg-red-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(153 27 27 / var(--tw-bg-opacity, 1));
+}
+
 .bg-red-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(127 29 29 / var(--tw-bg-opacity, 1));
@@ -2031,9 +2012,9 @@ video {
   background-color: rgb(234 179 8 / var(--tw-bg-opacity, 1));
 }
 
-.bg-zinc-700 {
+.bg-yellow-800 {
   --tw-bg-opacity: 1;
-  background-color: rgb(63 63 70 / var(--tw-bg-opacity, 1));
+  background-color: rgb(133 77 14 / var(--tw-bg-opacity, 1));
 }
 
 .bg-opacity-0 {
@@ -2116,6 +2097,12 @@ video {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.from-red-800 {
+  --tw-gradient-from: #991b1b var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(153 27 27 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .from-red-900 {
   --tw-gradient-from: #7f1d1d var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(127 29 29 / 0) var(--tw-gradient-to-position);
@@ -2125,6 +2112,12 @@ video {
 .from-yellow-500 {
   --tw-gradient-from: #eab308 var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(234 179 8 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.from-yellow-900 {
+  --tw-gradient-from: #713f12 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(113 63 18 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
@@ -2196,8 +2189,24 @@ video {
   --tw-gradient-to: hsl(var(--twc-primary-900) / 0.5) var(--tw-gradient-to-position);
 }
 
+.to-red-600 {
+  --tw-gradient-to: #dc2626 var(--tw-gradient-to-position);
+}
+
 .to-red-600\/40 {
   --tw-gradient-to: rgb(220 38 38 / 0.4) var(--tw-gradient-to-position);
+}
+
+.to-red-800 {
+  --tw-gradient-to: #991b1b var(--tw-gradient-to-position);
+}
+
+.to-yellow-400 {
+  --tw-gradient-to: #facc15 var(--tw-gradient-to-position);
+}
+
+.to-yellow-800 {
+  --tw-gradient-to: #854d0e var(--tw-gradient-to-position);
 }
 
 .\!object-contain {
@@ -2302,6 +2311,11 @@ video {
 .\!py-2 {
   padding-top: 0.5rem !important;
   padding-bottom: 0.5rem !important;
+}
+
+.\!py-3 {
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
 }
 
 .\!py-4 {
@@ -2571,6 +2585,10 @@ video {
 
 .leading-normal {
   line-height: 1.5;
+}
+
+.leading-5 {
+  line-height: 1.25rem;
 }
 
 .tracking-wide {
@@ -2850,6 +2868,14 @@ video {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke !important;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
   transition-duration: 150ms !important;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
 
 .transition-all {
@@ -4195,6 +4221,11 @@ h6 {
   }
 }
 
+.Toastify__progress-bar--success,
+  .Toastify__progress-bar--info {
+  background: hsl(var(--twc-primary-700) / var(--twc-primary-700-opacity, 1));
+}
+
 .placeholder\:\!text-gray-400::-moz-placeholder {
   --tw-text-opacity: 1 !important;
   color: rgb(156 163 175 / var(--tw-text-opacity, 1)) !important;
@@ -4294,16 +4325,6 @@ h6 {
 
 .hover\:bg-white\/20:hover {
   background-color: rgb(255 255 255 / 0.2);
-}
-
-.hover\:bg-red-500:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--tw-bg-opacity, 1));
-}
-
-.hover\:bg-zinc-600:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(82 82 91 / var(--tw-bg-opacity, 1));
 }
 
 .hover\:text-white:hover {
@@ -4616,6 +4637,10 @@ h6 {
 
   .sm\:block {
     display: block;
+  }
+
+  .sm\:\!h-\[max\(30vh\2c 320px\)\] {
+    height: max(30vh,320px) !important;
   }
 
   .sm\:h-\[50vh\] {
@@ -5266,4 +5291,4 @@ h6 {
 .\[\&\>span\]\:\!text-sm>span {
   font-size: 0.875rem !important;
   line-height: 1.25rem !important;
-} 
+}

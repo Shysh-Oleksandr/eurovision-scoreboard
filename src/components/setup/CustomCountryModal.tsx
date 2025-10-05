@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
@@ -55,7 +56,9 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
   const handleSave = async () => {
     if (name.trim() === '') {
-      alert('Entry name is required.');
+      toast('Entry name is required.', {
+        type: 'error',
+      });
 
       return;
     }

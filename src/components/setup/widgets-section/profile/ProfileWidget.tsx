@@ -1,5 +1,6 @@
 import React, { Suspense, useState } from 'react';
 
+import { UserCheckIcon } from '@/assets/icons/UserCheckIcon';
 import { UserIcon } from '@/assets/icons/UserIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -19,10 +20,14 @@ const ProfileWidget = () => {
           setIsProfileModalOpen(true);
         }}
         title="Profile"
-        description={`Manage your profile and settings ${
-          user ? `(${user.name})` : ''
-        }`}
-        icon={<UserIcon className="w-6 h-6 flex-none" />} // TODO: When authenticated, show the checkmark
+        description={`Manage your profile and settings`}
+        icon={
+          user ? (
+            <UserCheckIcon className="w-6 h-6 flex-none" />
+          ) : (
+            <UserIcon className="w-6 h-6 flex-none" />
+          )
+        }
       />
 
       {(isProfileModalOpen || isProfileModalLoaded) && (
