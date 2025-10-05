@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-10-05',
+    title: 'Added user authentication, profile creation and editing',
+  },
+  {
     date: '2025-09-28',
     title: 'Bug fixes & small improvements',
   },
@@ -178,11 +182,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-10-04', end: '2025-10-05' },
-    title: 'User authentication & Profiles',
-  },
-  {
-    title: 'Saving custom entries in your profile',
+    approximateDates: { start: '2025-10-11', end: '2025-10-12' },
+    title: 'Saving custom entries in user profile. Persisting the setup and scoreboard progress.',
   },
   {
     title: 'Custom theme builder. The ability to use public themes',
