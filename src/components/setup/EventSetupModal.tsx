@@ -33,7 +33,7 @@ import NotParticipatingSection from './NotParticipatingSection';
 import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
 import { SetupHeader } from './SetupHeader';
 import { validateEventSetup } from './utils/eventValidation';
-// import WidgetsSection from './widgets-section/WidgetsSection';
+import WidgetsSection from './widgets-section/WidgetsSection';
 
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -455,7 +455,7 @@ const EventSetupModal = () => {
           </Suspense>
         )}
 
-        {/* <WidgetsSection /> */}
+        <WidgetsSection />
         <div className="mt-2 flex flex-col gap-3">
           <Tabs
             tabs={TABS}
@@ -486,12 +486,12 @@ const EventSetupModal = () => {
               © Copyright {new Date().getFullYear()} DouzePoints.app | All
               rights reserved
             </span>
-            <span className="flex items-center gap-2">
+            {/* <span className="flex items-center gap-2">
               <span className="hidden sm:block">•</span>
               <a href="/privacy" className="underline font-semibold">
                 Privacy Policy
               </a>
-            </span>
+            </span> */}
           </div>
         </div>
       </Modal>

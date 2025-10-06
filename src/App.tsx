@@ -1,6 +1,6 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ToastContainer, Zoom } from 'react-toastify';
+import { toast, ToastContainer, Zoom } from 'react-toastify';
 
 import { CheckIcon } from './assets/icons/CheckIcon';
 import { CircleXIcon } from './assets/icons/CircleXIcon';
@@ -8,6 +8,7 @@ import { InfoIcon } from './assets/icons/InfoIcon';
 import { TriangleAlertIcon } from './assets/icons/TriangleAlertIcon';
 import { useFullscreen } from './hooks/useFullscreen';
 import { Main } from './pages/Main';
+import { useAuthStore } from './state/useAuthStore';
 
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
 const About = React.lazy(() => import('./pages/About'));
@@ -15,26 +16,26 @@ const About = React.lazy(() => import('./pages/About'));
 export const App = () => {
   useFullscreen();
 
-  // const { handlePostLogin } = useAuthStore();
+  const { handlePostLogin } = useAuthStore();
 
-  // useEffect(() => {
-  //   // Immediately strip auth-related query params on app load
-  //   const url = new URL(window.location.href);
+  useEffect(() => {
+    // Immediately strip auth-related query params on app load
+    const url = new URL(window.location.href);
 
-  //   if (url.searchParams.has('provider')) {
-  //     window.history.replaceState({}, '', url.origin + url.pathname);
+    if (url.searchParams.has('provider')) {
+      window.history.replaceState({}, '', url.origin + url.pathname);
 
-  //     handlePostLogin(true);
+      handlePostLogin(true);
 
-  //     toast('Logged in successfully', {
-  //       type: 'success',
-  //     });
+      toast('Logged in successfully', {
+        type: 'success',
+      });
 
-  //     return;
-  //   }
-  //   // Initialize session: refresh -> me
-  //   handlePostLogin();
-  // }, [handlePostLogin]);
+      return;
+    }
+    // Initialize session: refresh -> me
+    handlePostLogin();
+  }, [handlePostLogin]);
 
   return (
     <BrowserRouter>
