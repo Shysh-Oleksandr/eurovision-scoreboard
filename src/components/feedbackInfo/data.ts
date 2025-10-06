@@ -1,8 +1,8 @@
 export const WHATS_NEW = [
-  // {
-  //   date: '2025-10-05',
-  //   title: 'Added user authentication, profile creation and editing',
-  // },
+  {
+    date: '2025-10-06',
+    title: 'Added user authentication, profile creation and editing',
+  },
   {
     date: '2025-09-28',
     title: 'Bug fixes & small improvements',
