@@ -10,6 +10,7 @@ import { useFullscreen } from './hooks/useFullscreen';
 import { Main } from './pages/Main';
 
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
+const About = React.lazy(() => import('./pages/About'));
 
 export const App = () => {
   useFullscreen();
@@ -41,6 +42,7 @@ export const App = () => {
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </Suspense>
 
