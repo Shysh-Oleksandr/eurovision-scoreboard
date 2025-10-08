@@ -486,12 +486,6 @@ const EventSetupModal = () => {
               © Copyright {new Date().getFullYear()} DouzePoints.app | All
               rights reserved
             </span>
-            {/* <span className="flex items-center gap-2">
-              <span className="hidden sm:block">•</span>
-              <a href="/privacy" className="underline font-semibold">
-                Privacy Policy
-              </a>
-            </span> */}
           </div>
         </div>
       </Modal>
