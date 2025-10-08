@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { toast, ToastContainer, Zoom } from 'react-toastify';
+import { ToastContainer, Zoom } from 'react-toastify';
 
 import { CheckIcon } from './assets/icons/CheckIcon';
 import { CircleXIcon } from './assets/icons/CircleXIcon';
@@ -26,10 +26,6 @@ export const App = () => {
       window.history.replaceState({}, '', url.origin + url.pathname);
 
       handlePostLogin(true);
-
-      toast('Logged in successfully', {
-        type: 'success',
-      });
 
       return;
     }

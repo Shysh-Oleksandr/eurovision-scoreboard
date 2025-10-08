@@ -6,6 +6,7 @@ import {
   attachRefreshInterceptor,
 } from '@/api/client';
 import type { Profile } from '@/types/profile';
+import { toast } from 'react-toastify';
 
 export interface AuthState {
   user: Profile | null;
@@ -38,10 +39,19 @@ export const useAuthStore = create<AuthState>()(
           const token = await get().refresh();
           if (token) {
             await get().fetchMe();
+
+            if (force) {
+              toast('Logged in successfully', {
+                type: 'success',
+              });
+            }
           }
         } catch (e) {
           // Refresh failed (e.g., expired/invalid refresh). Ensure we clear session state.
           set({ user: null, accessToken: null });
+          toast('Failed to login', {
+            type: 'error',
+          });
         }
         // Strip query params after handling redirect
         const url = new URL(window.location.href);

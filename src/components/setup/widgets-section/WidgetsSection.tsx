@@ -8,7 +8,7 @@ import WidgetContainer from '@/components/common/WidgetContainer';
 
 const WidgetsSection = () => {
   return (
-    <div className="flex gap-2 overflow-x-auto narrow-scrollbar w-full">
+    <div className="flex gap-2 overflow-x-auto narrow-scrollbar w-full mt-1">
       <ProfileWidget />
       <WidgetContainer
         onClick={() => {}}
