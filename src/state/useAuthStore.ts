@@ -7,6 +7,7 @@ import {
 } from '@/api/client';
 import type { Profile } from '@/types/profile';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '@/config';
 
 export interface AuthState {
   user: Profile | null;
@@ -26,9 +27,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isBusy: false,
       login: () => {
-        const apiBase =
-          (import.meta as any).env?.VITE_API_URL || 'http://localhost:8001';
-        window.location.href = `${apiBase}/auth/google`;
+        window.location.href = `${API_BASE_URL}/auth/google`;
       },
       handlePostLogin: async (force?: boolean) => {
         if (!get().user && !force) return;
