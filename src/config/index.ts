@@ -24,3 +24,6 @@ export const years = [
 ] as const;
 
 export type Year = (typeof years)[number];
+
+export const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:8001';
+// export const API_BASE_URL = 'https://api.douzepoints.app';

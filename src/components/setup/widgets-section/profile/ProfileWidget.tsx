@@ -16,12 +16,11 @@ const ProfileWidget = () => {
   return (
     <>
       <WidgetContainer
-        disabled
         onClick={() => {
           setIsProfileModalOpen(true);
         }}
         title="Profile"
-        description={`Manage your profile and settings`}
+        description="Manage your profile and settings"
         icon={
           user ? (
             <UserCheckIcon className="w-6 h-6 flex-none" />
