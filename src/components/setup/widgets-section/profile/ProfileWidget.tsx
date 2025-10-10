@@ -3,7 +3,6 @@ import React, { Suspense, useState } from 'react';
 import { UserCheckIcon } from '@/assets/icons/UserCheckIcon';
 import { UserIcon } from '@/assets/icons/UserIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
-import { API_BASE_URL } from '@/config';
 import { useAuthStore } from '@/state/useAuthStore';
 
 const ProfileModal = React.lazy(() => import('./ProfileModal'));
@@ -17,12 +16,11 @@ const ProfileWidget = () => {
   return (
     <>
       <WidgetContainer
-        disabled
         onClick={() => {
           setIsProfileModalOpen(true);
         }}
         title="Profile"
-        description={API_BASE_URL}
+        description="Manage your profile and settings"
         icon={
           user ? (
             <UserCheckIcon className="w-6 h-6 flex-none" />
