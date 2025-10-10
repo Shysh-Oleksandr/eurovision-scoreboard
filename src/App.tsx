@@ -16,22 +16,22 @@ const About = React.lazy(() => import('./pages/About'));
 export const App = () => {
   useFullscreen();
 
-  const { handlePostLogin } = useAuthStore();
+  // const { handlePostLogin } = useAuthStore();
 
-  useEffect(() => {
-    // Immediately strip auth-related query params on app load
-    const url = new URL(window.location.href);
+  // useEffect(() => {
+  //   // Immediately strip auth-related query params on app load
+  //   const url = new URL(window.location.href);
 
-    if (url.searchParams.has('provider')) {
-      window.history.replaceState({}, '', url.origin + url.pathname);
+  //   if (url.searchParams.has('provider')) {
+  //     window.history.replaceState({}, '', url.origin + url.pathname);
 
-      handlePostLogin(true);
+  //     handlePostLogin(true);
 
-      return;
-    }
-    // Initialize session: refresh -> me
-    handlePostLogin();
-  }, [handlePostLogin]);
+  //     return;
+  //   }
+  //   // Initialize session: refresh -> me
+  //   handlePostLogin();
+  // }, [handlePostLogin]);
 
   return (
     <BrowserRouter>

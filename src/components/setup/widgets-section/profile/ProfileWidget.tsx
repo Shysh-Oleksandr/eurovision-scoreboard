@@ -16,6 +16,7 @@ const ProfileWidget = () => {
   return (
     <>
       <WidgetContainer
+        disabled
         onClick={() => {
           setIsProfileModalOpen(true);
         }}
