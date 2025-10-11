@@ -50,11 +50,11 @@ export const usePresetLoader = () => {
       // Apply Countries store data (ensure stages before assignments for proper sync)
       if (countries.configuredEventStages)
         setConfiguredEventStages(countries.configuredEventStages);
-      requestIdleCallback(() => {
+      setTimeout(() => {
         if (countries.eventAssignments)
           setEventAssignments(countries.eventAssignments);
         if (countries.countryOdds) setBulkCountryOdds(countries.countryOdds);
-      });
+      }, 100);
 
       toast('Preset loaded successfully.', {
         type: 'success',

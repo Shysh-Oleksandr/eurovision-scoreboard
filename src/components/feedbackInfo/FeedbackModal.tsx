@@ -68,26 +68,9 @@ const FeedbackModal = ({
             <p className="mb-2 font-semibold">
               Found a bug, have a feature idea, or just want to share feedback?
             </p>
-            <div className="mb-2 sm:gap-3 gap-2 flex items-center">
-              <div className="text-primary-300 font-semibold tracking-wide bg-primary-800 px-2 py-1 rounded-md text-sm">
-                NEW
-              </div>
-              <p>
-                You can now use{' '}
-                <a
-                  href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/discussions"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-300 hover:text-primary-400 underline font-semibold"
-                >
-                  GitHub Discussions
-                </a>{' '}
-                to share suggestions, ask questions, or even post your
-                simulation results.
-              </p>
-            </div>
-            <p className="mb-4">
-              Alternatively, feel free to open an issue on{' '}
+
+            <p className="mb-3">
+              Feel free to open an issue on{' '}
               <a
                 href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/issues"
                 target="_blank"
@@ -105,6 +88,24 @@ const FeedbackModal = ({
                 sasha.shysh23@gmail.com
               </a>
             </p>
+            <div className="mb-3 sm:gap-3 gap-2 flex items-center">
+              {/* <div className="text-primary-300 font-semibold tracking-wide bg-primary-800 px-2 py-1 rounded-md text-sm">
+                NEW
+              </div> */}
+              <p>
+                Alternatively, you can use{' '}
+                <a
+                  href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/discussions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                >
+                  GitHub Discussions
+                </a>{' '}
+                to share suggestions, ask questions, or post your simulation
+                results.
+              </p>
+            </div>
             <div className="mb-4">
               If you're reporting a bug, please include your:
               <br />

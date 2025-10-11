@@ -3,11 +3,19 @@ import { toast } from 'react-toastify';
 
 import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
-import { useCountriesStore } from '../../state/countriesStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 import ModalBottomContent from '../common/Modal/ModalBottomContent';
 import { Input } from '../Input';
+
+import {
+  useCreateCustomEntryMutation,
+  useDeleteCustomEntryMutation,
+  useUpdateCustomEntryMutation,
+  useUploadCustomEntryFlagMutation,
+} from '@/api/customEntries';
+import { useImageUpload } from '@/hooks/useImageUpload';
+import { useAuthStore } from '@/state/useAuthStore';
 
 interface CustomCountryModalProps {
   isOpen: boolean;
@@ -15,6 +23,7 @@ interface CustomCountryModalProps {
   countryToEdit?: BaseCountry;
 }
 
+// These are stored in `https://cdn.douzepoints.app/custom-entries/presets/{name}`, e.g. `https://cdn.douzepoints.app/custom-entries/presets/earth.svg`
 const PRESET_IMAGES = [
   '/flags/earth.svg',
   '/flags/world.svg',
@@ -31,30 +40,54 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   countryToEdit,
 }) => {
   const isEditMode = !!countryToEdit;
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = !!user;
 
   const [name, setName] = useState('');
-  const [flag, setFlag] = useState('');
-  const addCustomCountry = useCountriesStore((state) => state.addCustomCountry);
-  const updateCustomCountry = useCountriesStore(
-    (state) => state.updateCustomCountry,
-  );
-  const deleteCustomCountry = useCountriesStore(
-    (state) => state.deleteCustomCountry,
-  );
+  const [flagUrl, setFlagUrl] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+
+  const { mutateAsync: createEntry, isPending: isCreating } =
+    useCreateCustomEntryMutation();
+  const { mutateAsync: updateEntry, isPending: isUpdating } =
+    useUpdateCustomEntryMutation();
+  const { mutateAsync: deleteEntry, isPending: isDeleting } =
+    useDeleteCustomEntryMutation();
+  const { mutateAsync: uploadFlag, isPending: isUploadingFlag } =
+    useUploadCustomEntryFlagMutation();
+
+  const imageUpload = useImageUpload({ maxSizeInMB: 1 });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
   useEffect(() => {
     if (countryToEdit) {
       setName(countryToEdit.name);
-      setFlag(countryToEdit.flag || '');
+      setFlagUrl(countryToEdit.flag || '');
+      setUploadedFile(null);
     } else {
       setName('');
-      setFlag('');
+      setFlagUrl('');
+      setUploadedFile(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryToEdit, isOpen]);
 
+  const getEntryId = (): string | null => {
+    if (!countryToEdit?.code.startsWith('custom-')) return null;
+
+    return countryToEdit.code.replace('custom-', '');
+  };
+
   const handleSave = async () => {
+    if (!isAuthenticated) {
+      toast('Please sign in to create custom entries.', {
+        type: 'error',
+      });
+
+      return;
+    }
+
     if (name.trim() === '') {
       toast('Entry name is required.', {
         type: 'error',
@@ -63,33 +96,97 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       return;
     }
 
-    if (isEditMode) {
-      await updateCustomCountry({ ...countryToEdit, name, flag });
-    } else {
-      await addCustomCountry({ name, flag });
+    try {
+      if (isEditMode) {
+        const entryId = getEntryId();
+
+        if (!entryId) {
+          toast('Invalid entry ID', { type: 'error' });
+
+          return;
+        }
+
+        // Update entry
+        await updateEntry({
+          id: entryId,
+          name,
+          flagUrl,
+        });
+
+        // Upload file if provided
+        if (uploadedFile) {
+          await uploadFlag({ id: entryId, file: uploadedFile });
+        }
+      } else {
+        // Create new entry
+        const newEntry = await createEntry({
+          name,
+          flagUrl: flagUrl || PRESET_IMAGES[1],
+        });
+
+        // Upload file if provided
+        if (uploadedFile) {
+          await uploadFlag({ id: newEntry._id, file: uploadedFile });
+        }
+      }
+
+      toast('Custom entry saved successfully!', { type: 'success' });
+
+      onClose();
+    } catch (error: any) {
+      toast(error?.response?.data?.message || 'Failed to save entry', {
+        type: 'error',
+      });
     }
-    onClose();
   };
 
   const handleDelete = async () => {
     if (!countryToEdit) return;
 
+    if (!isAuthenticated) {
+      toast('Please sign in to delete custom entries.', {
+        type: 'error',
+      });
+
+      return;
+    }
+
     if (
-      window.confirm(`Are you sure you want to delete ${countryToEdit.name}?`)
+      !window.confirm(`Are you sure you want to delete ${countryToEdit.name}?`)
     ) {
-      await deleteCustomCountry(countryToEdit.code);
+      return;
+    }
+
+    try {
+      const entryId = getEntryId();
+
+      if (!entryId) {
+        toast('Invalid entry ID', { type: 'error' });
+
+        return;
+      }
+
+      await deleteEntry(entryId);
+      toast('Entry deleted successfully!', { type: 'success' });
+
       onClose();
+    } catch (error: any) {
+      toast(error?.response?.data?.message || 'Failed to delete entry', {
+        type: 'error',
+      });
     }
   };
 
-  const handleFileChange = (file: File | null) => {
-    if (file) {
-      const reader = new FileReader();
+  const handleFileChange = async (file: File | null) => {
+    if (!file) return;
 
-      reader.onloadend = () => {
-        setFlag(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    const { isValid, error } = await imageUpload.validateAndSetFile(file);
+
+    if (isValid) {
+      setUploadedFile(file);
+      setFlagUrl(''); // Clear URL input when file is selected
+    } else if (error) {
+      toast(error, { type: 'error' });
     }
   };
 
@@ -123,6 +220,14 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     fileInputRef.current?.click();
   };
 
+  const isSaving = isCreating || isUpdating || isDeleting || isUploadingFlag;
+
+  const displayFlag = uploadedFile
+    ? imageUpload.base64
+    : flagUrl.startsWith('/flags/')
+    ? flagUrl
+    : flagUrl || '';
+
   return (
     <Modal
       isOpen={isOpen}
@@ -134,6 +239,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           onClose={onClose}
           onSave={handleSave}
           onDelete={countryToEdit ? handleDelete : undefined}
+          isSaving={isSaving}
         />
       }
     >
@@ -194,13 +300,16 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             id="flagUrl"
             type="text"
             value={
-              flag.startsWith('data:image') || flag.startsWith('/flags/')
-                ? ''
-                : flag
+              uploadedFile ? '' : flagUrl.startsWith('/flags/') ? '' : flagUrl
             }
-            onChange={(e) => setFlag(e.target.value)}
+            onChange={(e) => {
+              setFlagUrl(e.target.value);
+              setUploadedFile(null);
+              imageUpload.clear();
+            }}
             className="lg:text-[0.95rem] text-sm"
             placeholder="Or paste an image URL"
+            disabled={!!uploadedFile}
           />
 
           <div className="flex gap-2 flex-wrap">
@@ -212,19 +321,23 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                 height={37}
                 alt="Preset Flag"
                 className={`cursor-pointer object-cover rounded-md border-2 ${
-                  flag === preset ? 'border-white' : 'border-transparent'
+                  flagUrl === preset ? 'border-white' : 'border-transparent'
                 }`}
-                onClick={() => setFlag(preset)}
+                onClick={() => {
+                  setFlagUrl(preset);
+                  setUploadedFile(null);
+                  imageUpload.clear();
+                }}
                 loading="lazy"
               />
             ))}
           </div>
 
-          {flag && (
+          {displayFlag && (
             <div className="mt-2">
               <p className="text-white text-sm mb-1">Preview:</p>
               <img
-                src={flag}
+                src={displayFlag}
                 alt="Selected flag"
                 className="rounded-md object-cover"
                 width={96}

@@ -7,9 +7,12 @@ import { Input } from '../Input';
 
 import { CountrySelectionList } from './CountrySelectionList';
 import { AvailableGroup } from './CountrySelectionListItem';
+import { CustomEntriesMigration } from './CustomEntriesMigration';
 import { useCountrySearch } from './hooks/useCountrySearch';
 import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
+
+import { useAuthStore } from '@/state/useAuthStore';
 
 interface NotParticipatingSectionProps {
   notParticipatingCountries: BaseCountry[];
@@ -33,6 +36,7 @@ const NotParticipatingSection = ({
   handleOpenCreateModal,
   availableGroups,
 }: NotParticipatingSectionProps) => {
+  const { user } = useAuthStore();
   const {
     countriesSearch,
     handleCountriesSearch,
@@ -43,8 +47,36 @@ const NotParticipatingSection = ({
     sortedCategories,
   } = useCountrySearch(notParticipatingCountries);
 
+  const getExtraContent = (category: string) => {
+    if (category === 'Custom') {
+      if (!user) {
+        return (
+          <div className="flex items-center col-span-full">
+            <p className="text-white/80 text-sm">
+              You need to be logged in to create and use custom entries.
+            </p>
+          </div>
+        );
+      }
+
+      return (
+        <Button
+          onClick={handleOpenCreateModal}
+          className="mr-1 !py-1 w-fit"
+          title="Add Custom Country"
+          aria-label="Add Custom Country"
+        >
+          <PlusIcon className="w-7 h-7" />
+        </Button>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <>
+      <CustomEntriesMigration />
       <div className="flex items-center justify-between gap-2">
         <p className="text-white text-base md:text-lg font-semibold">
           Not Participating
@@ -92,18 +124,7 @@ const NotParticipatingSection = ({
               getCountryGroupAssignment={getCountryGroupAssignment}
               availableGroups={availableGroups}
               onEdit={handleOpenEditModal}
-              extraContent={
-                category === 'Custom' && (
-                  <Button
-                    onClick={handleOpenCreateModal}
-                    className="mr-1 !py-1 w-fit"
-                    title="Add Custom Country"
-                    aria-label="Add Custom Country"
-                  >
-                    <PlusIcon className="w-7 h-7" />
-                  </Button>
-                )
-              }
+              extraContent={getExtraContent(category)}
             />
           </SectionWrapper>
         ))}

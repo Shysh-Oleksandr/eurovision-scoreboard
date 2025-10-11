@@ -34,10 +34,10 @@ export const validateEventSetup = (
         return `There are no voting countries in ${stage.name}.`;
       }
       if (stage.qualifiersAmount <= 0) {
-        return 'The number of qualifiers must be at least 1.';
+        return `The number of qualifiers in ${stage.name} must be at least 1.`;
       }
       if (stage.qualifiersAmount >= stage.countriesCount) {
-        return 'The number of qualifiers must be less than the number of participants.';
+        return `The number of qualifiers in ${stage.name} must be less than the number of participants.`;
       }
       if (
         stage.countriesCount < minStageParticipants &&
