@@ -29,14 +29,11 @@ export const useCountryAssignments = (eventStages: EventStage[]) => {
     if (
       Object.keys(eventAssignments[EventMode.SEMI_FINALS_AND_GRAND_FINAL])
         .length > 0
-    ) {
+    )
       return;
-    }
 
     // Initialize assignments even if there are no semi-finals (e.g. JESC)
-    if (eventStages.length === 0) {
-      return;
-    }
+    if (eventStages.length === 0) return;
 
     const semiFinalsInitialAssignments: Record<string, string> = {};
     const grandFinalOnlyInitialAssignments: Record<string, string> = {};

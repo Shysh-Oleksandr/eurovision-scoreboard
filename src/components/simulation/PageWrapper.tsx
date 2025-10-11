@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 
-import { useThemeSetup } from '../../hooks/useThemeSetup';
 import { useGeneralStore } from '../../state/generalStore';
 
 interface PageWrapperProps {
@@ -8,7 +7,6 @@ interface PageWrapperProps {
 }
 
 export const PageWrapper = ({ children }: PageWrapperProps) => {
-  useThemeSetup();
   const themeYear = useGeneralStore((state) => state.themeYear);
   const theme = useGeneralStore((state) => state.theme);
   const shouldUseCustomBgImage = useGeneralStore(

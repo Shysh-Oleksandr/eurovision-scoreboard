@@ -103,7 +103,7 @@ export const PresetsSettings: React.FC = () => {
   return (
     <div className="space-y-3">
       <h5 className="text-white/70 flex items-center">
-        <InfoIcon className="w-4 h-4 inline-block mr-1" />
+        <InfoIcon className="w-4 h-4 inline-block mr-1 flex-none" />
         The current presets implementation is not stable. It'll be updated in
         the future.
       </h5>

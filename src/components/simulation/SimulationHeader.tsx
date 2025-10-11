@@ -5,6 +5,7 @@ import { useGeneralStore } from '../../state/generalStore';
 import { getHostingCountryLogo } from '../../theme/hosting';
 import Button from '../common/Button';
 
+import { LogoutIcon } from '@/assets/icons/LogoutIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { ShareIcon } from '@/assets/icons/ShareIcon';
 import { SlidersIcon } from '@/assets/icons/SlidersIcon';
@@ -32,6 +33,8 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const triggerRestartEvent = useScoreboardStore(
     (state) => state.triggerRestartEvent,
   );
+  const leaveEvent = useScoreboardStore((state) => state.leaveEvent);
+
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const { undo, pastStates } = useScoreboardStore.temporal.getState();
@@ -86,6 +89,19 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
         </div>
 
         <div className="flex gap-2 xs:w-auto w-full">
+          <Button
+            onClick={() => {
+              if (confirm('Are you sure you want to cancel the simulation?')) {
+                leaveEvent();
+              }
+            }}
+            className={buttonClassName}
+            aria-label="Cancel simulation"
+            title="Cancel simulation"
+            variant="destructive"
+          >
+            <LogoutIcon className="w-6 h-6" />
+          </Button>
           <Button
             onClick={() => undo()}
             className={buttonClassName}

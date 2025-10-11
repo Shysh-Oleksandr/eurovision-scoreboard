@@ -17,7 +17,7 @@ export const SyncCustomEntries: React.FC = () => {
   useEffect(() => {
     if (customEntries) {
       const customCountries: BaseCountry[] = customEntries.map((entry) => ({
-        name: entry.name,
+        name: entry.name || 'Custom',
         code: `custom-${entry._id}`,
         category: 'Custom',
         flag: entry.flagUrl,

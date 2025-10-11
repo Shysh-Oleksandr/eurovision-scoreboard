@@ -84,6 +84,8 @@ const EventSetupModal = () => {
   const startEvent = useScoreboardStore((state) => state.startEvent);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const restartCounter = useScoreboardStore((state) => state.restartCounter);
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+
   const setPredefinedVotesForStage = useScoreboardStore(
     (state) => state.setPredefinedVotesForStage,
   );
@@ -195,7 +197,13 @@ const EventSetupModal = () => {
     )
       .filter(([, group]) => group !== CountryAssignmentGroup.NOT_PARTICIPATING)
       .map(([countryCode, group]) => {
-        const country = allCountries.find((c) => c.code === countryCode)!;
+        const country = allCountries.find((c) => c.code === countryCode);
+
+        if (!country) {
+          console.log('country not found', countryCode);
+
+          return null;
+        }
         const odds = countryOdds[countryCode];
 
         const isAutoQualifier = group === CountryAssignmentGroup.AUTO_QUALIFIER;
@@ -212,7 +220,8 @@ const EventSetupModal = () => {
           isAutoQualified: isAutoQualifier,
           isQualified: isAutoQualifier || isGrandFinalist,
         };
-      });
+      })
+      .filter((country) => country !== null);
 
     startEvent(activeTab, allSelectedCountries);
 
@@ -412,7 +421,7 @@ const EventSetupModal = () => {
                 className="md:text-base text-sm"
                 onClick={onClose}
               >
-                Close
+                {winnerCountry ? 'Close' : 'Continue'}
               </Button>
             )}
             <Button className="w-full !text-base" onClick={handleStartEvent}>
