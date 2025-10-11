@@ -52,6 +52,12 @@ export const deleteCustomCountryFromDB = async (code: string) => {
   await db.delete(STORE_NAME, code);
 };
 
+export const deleteAllCustomCountriesFromDB = async () => {
+  const db = await getDB();
+
+  await db.clear(STORE_NAME);
+};
+
 // Background image helpers
 const CUSTOM_BG_KEY = 'customBgImage';
 

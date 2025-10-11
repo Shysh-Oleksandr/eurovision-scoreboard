@@ -32,6 +32,7 @@ import { useStageModalActions } from './hooks/useStageModalActions';
 import NotParticipatingSection from './NotParticipatingSection';
 import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
 import { SetupHeader } from './SetupHeader';
+import { SyncCustomEntries } from './SyncCustomEntries';
 import { validateEventSetup } from './utils/eventValidation';
 import WidgetsSection from './widgets-section/WidgetsSection';
 
@@ -385,6 +386,7 @@ const EventSetupModal = () => {
 
   return (
     <>
+      <SyncCustomEntries />
       <Suspense fallback={null}>
         {(predefModalOpen || isPredefModalLoaded) && predefStage && (
           <VotingPredefinitionModal

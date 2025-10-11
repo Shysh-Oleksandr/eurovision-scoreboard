@@ -5,11 +5,6 @@ import { devtools } from 'zustand/middleware';
 import { Year } from '../config';
 import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import {
-  deleteCustomCountryFromDB,
-  getCustomCountries,
-  saveCustomCountry,
-} from '../helpers/indexedDB';
-import {
   BaseCountry,
   CountryAssignmentGroup,
   EventMode,
@@ -62,17 +57,11 @@ export interface CountriesState {
     year: Year,
     options?: { force?: boolean; isJuniorContest?: boolean },
   ) => Promise<void>;
-  addCustomCountry: (
-    country: Omit<BaseCountry, 'code' | 'category'>,
-  ) => Promise<void>;
-  updateCustomCountry: (country: BaseCountry) => Promise<void>;
-  deleteCustomCountry: (countryCode: string) => Promise<void>;
   getAllCountries: (includeCustomCountries?: boolean) => BaseCountry[];
   setEventAssignments: (
     assignments: Record<EventMode, Record<string, string>>,
   ) => void;
   setConfiguredEventStages: (stages: EventStage[]) => void;
-  loadCustomCountries: () => Promise<void>;
   updateCountryOdds: (
     countryCode: string,
     odds: { juryOdds?: number; televoteOdds?: number },
@@ -380,42 +369,6 @@ export const useCountriesStore = create<CountriesState>()(
           });
         },
 
-        addCustomCountry: async (
-          country: Omit<BaseCountry, 'code' | 'category'>,
-        ) => {
-          const newCountry: BaseCountry = {
-            ...country,
-            code: `custom-${country.name
-              .toLowerCase()
-              .replace(/\s/g, '-')}-${Date.now()}`,
-            category: 'Custom',
-          };
-
-          await saveCustomCountry(newCountry);
-
-          set((state) => ({
-            customCountries: [...state.customCountries, newCountry],
-          }));
-        },
-
-        updateCustomCountry: async (country: BaseCountry) => {
-          await saveCustomCountry(country);
-          set((state) => ({
-            customCountries: state.customCountries.map((c) =>
-              c.code === country.code ? country : c,
-            ),
-          }));
-        },
-
-        deleteCustomCountry: async (countryCode: string) => {
-          await deleteCustomCountryFromDB(countryCode);
-          set((state) => ({
-            customCountries: state.customCountries.filter(
-              (c) => c.code !== countryCode,
-            ),
-          }));
-        },
-
         getAllCountries: (includeCustomCountries = true) => {
           const { customCountries } = get();
 
@@ -434,12 +387,6 @@ export const useCountriesStore = create<CountriesState>()(
 
         setConfiguredEventStages: (stages) => {
           set({ configuredEventStages: stages });
-        },
-
-        loadCustomCountries: async () => {
-          const customCountries = await getCustomCountries();
-
-          set({ customCountries });
         },
 
         updateCountryOdds: (countryCode, odds) => {

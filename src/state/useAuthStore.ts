@@ -1,13 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
 import {
   api,
   setAccessTokenGetter,
   attachRefreshInterceptor,
 } from '@/api/client';
+import { clearUserData } from '@/api/clearUserData';
+import { queryClient } from '@/api/queryClient';
+import { API_BASE_URL } from '@/config';
 import type { Profile } from '@/types/profile';
 import { toast } from 'react-toastify';
-import { API_BASE_URL } from '@/config';
+
+import { useCountriesStore } from './countriesStore';
 
 export interface AuthState {
   user: Profile | null;
@@ -85,7 +90,18 @@ export const useAuthStore = create<AuthState>()(
         set({ isBusy: true });
         try {
           await api.post('/auth/logout');
+
+          // Clear user data from React Query cache
+          clearUserData(queryClient);
+
+          // Clear auth state
           set({ user: null, accessToken: null });
+
+          // Clear user-specific data from Zustand stores
+          useCountriesStore.setState({ customCountries: [] });
+
+          // Add more store cleanups here as needed in the future:
+          // e.g., useSavedEventsStore.setState({ savedEvents: [] });
         } finally {
           set({ isBusy: false });
         }

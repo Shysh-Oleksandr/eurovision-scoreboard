@@ -7,9 +7,6 @@ export const useInitialLineup = () => {
   const eventSetupModalOpen = useCountriesStore(
     (state) => state.eventSetupModalOpen,
   );
-  const loadCustomCountries = useCountriesStore(
-    (state) => state.loadCustomCountries,
-  );
   const allCountriesForYear = useCountriesStore(
     (state) => state.allCountriesForYear,
   );
@@ -22,10 +19,6 @@ export const useInitialLineup = () => {
   const getInitialVotingCountries = useCountriesStore(
     (state) => state.getInitialVotingCountries,
   );
-
-  useEffect(() => {
-    loadCustomCountries();
-  }, [loadCustomCountries]);
 
   useEffect(() => {
     if (!eventSetupModalOpen) return;
