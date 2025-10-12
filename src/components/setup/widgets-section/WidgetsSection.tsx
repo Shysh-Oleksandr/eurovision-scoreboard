@@ -1,22 +1,16 @@
 import React from 'react';
 
+import ThemesWidget from './custom-themes/ThemesWidget';
 import ProfileWidget from './profile/ProfileWidget';
 
 import { ScoreboardIcon } from '@/assets/icons/ScoreboardIcon';
-import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
 
 const WidgetsSection = () => {
   return (
     <div className="flex gap-2 overflow-x-auto narrow-scrollbar w-full mt-1">
       <ProfileWidget />
-      <WidgetContainer
-        onClick={() => {}}
-        title="Themes"
-        description="Create custom themes (Coming soon)"
-        icon={<ThemeIcon className="w-6 h-6 flex-none" />}
-        disabled
-      />
+      <ThemesWidget />
       <WidgetContainer
         onClick={() => {}}
         title="Contests"

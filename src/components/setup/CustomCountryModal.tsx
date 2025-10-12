@@ -56,7 +56,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   const { mutateAsync: uploadFlag, isPending: isUploadingFlag } =
     useUploadCustomEntryFlagMutation();
 
-  const imageUpload = useImageUpload({ maxSizeInMB: 1 });
+  const imageUpload = useImageUpload({ maxSizeInMB: 0.5 });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
