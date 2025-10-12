@@ -39,6 +39,7 @@ export const useVotingPredefinition = ({
 
   const votingCountries = getStageVotingCountries(
     stage.id,
+    false,
     selectedType !== StageVotingType.JURY,
   );
 

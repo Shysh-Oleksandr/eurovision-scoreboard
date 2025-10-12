@@ -44,6 +44,17 @@ export const useAuthStore = create<AuthState>()(
           if (token) {
             await get().fetchMe();
 
+            // Refetch all user-specific data after successful token refresh
+            // This handles the case where the token was expired on app load
+            // and queries failed with 401 before the token was refreshed
+            // Invalidate by the 'user' prefix to catch all user queries
+            queryClient.invalidateQueries({
+              predicate: (query) => {
+                const key = query.queryKey[0];
+                return key === 'user';
+              },
+            });
+
             if (force) {
               toast('Logged in successfully', {
                 type: 'success',

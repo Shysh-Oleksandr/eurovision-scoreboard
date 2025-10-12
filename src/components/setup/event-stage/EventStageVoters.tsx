@@ -46,7 +46,7 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
   // Load existing voting countries for this stage if editing
   useEffect(() => {
     if (stageId) {
-      const existingVotingCountries = getStageVotingCountries(stageId);
+      const existingVotingCountries = getStageVotingCountries(stageId, false);
 
       if (existingVotingCountries.length > 0) {
         setLocalVotingCountries(existingVotingCountries);

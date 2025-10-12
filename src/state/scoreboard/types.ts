@@ -42,6 +42,7 @@ export type ScoreboardState = {
   lastPointsResetTimerId: NodeJS.Timeout | null;
   qualificationOrder: QualificationOrder;
   currentRevealTelevotePoints: number; // Current points to give in reveal mode
+  isWinnerAnimationAlreadyDisplayed: boolean;
 
   // Getters
   getCurrentStage: () => EventStage;
@@ -83,6 +84,7 @@ export type ScoreboardState = {
   setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
   setCurrentRevealTelevotePoints: (points: number) => void; // Set current points to give in reveal mode
+  setIsWinnerAnimationAlreadyDisplayed: (hasShown: boolean) => void;
   predefineVotesForStage: (
     stage: EventStage,
     resetOtherStages?: boolean,

@@ -44,6 +44,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
             countryPoints: state.countryPoints,
             qualificationOrder: state.qualificationOrder,
             currentRevealTelevotePoints: state.currentRevealTelevotePoints,
+            isWinnerAnimationAlreadyDisplayed: state.isWinnerAnimationAlreadyDisplayed,
           }),
         },
       ),

@@ -5,25 +5,23 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 
-import { useGeneralStore } from '@/state/generalStore';
-
 const WinnerModal = () => {
-  const showWinnerModal = useGeneralStore(
-    (state) => state.settings.showWinnerModal,
-  );
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const isWinnerAnimationAlreadyDisplayed = useScoreboardStore(
+    (state) => state.isWinnerAnimationAlreadyDisplayed,
+  );
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,
   );
   const [showModal, setShowModal] = useState(false);
 
-  const shouldShowWinnerModal = showWinnerModal && showModal && !!winnerCountry;
+  const shouldShowWinnerModal = showModal && !!winnerCountry;
 
   useEffect(() => {
-    if (winnerCountry) {
+    if (winnerCountry && !isWinnerAnimationAlreadyDisplayed) {
       setShowModal(true);
     }
-  }, [winnerCountry]);
+  }, [winnerCountry, isWinnerAnimationAlreadyDisplayed]);
 
   return (
     <Modal

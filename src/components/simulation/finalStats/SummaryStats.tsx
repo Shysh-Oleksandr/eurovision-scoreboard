@@ -4,6 +4,7 @@ import { Country, EventStage, StageVotingMode } from '../../../models';
 
 import { useBorderOpacity } from './useBorderOpacity';
 
+import { getFlagPath } from '@/helpers/getFlagPath';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
@@ -174,6 +175,9 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
                           loading="lazy"
                           width={32}
                           height={32}
+                          onError={(e) => {
+                            e.currentTarget.src = getFlagPath('ww');
+                          }}
                         />
                       );
                     })()}

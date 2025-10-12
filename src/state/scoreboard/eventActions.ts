@@ -145,6 +145,7 @@ export const createEventActions: StateCreator<
       televotingProgress: 0,
       hasShownManualTelevoteWarning: false,
       viewedStageId: null,
+      isWinnerAnimationAlreadyDisplayed: false,
     });
   },
 
@@ -249,6 +250,7 @@ export const createEventActions: StateCreator<
       showQualificationResults: false,
       showAllParticipants: false,
       televotingProgress: 0,
+      isWinnerAnimationAlreadyDisplayed: false,
     });
   },
   closeQualificationResults: () => {

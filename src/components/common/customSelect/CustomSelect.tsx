@@ -5,6 +5,7 @@ import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
 import { Year } from '../../../config';
 import { themes } from '../../../theme/themes';
 
+import { getFlagPath } from '@/helpers/getFlagPath';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 
@@ -61,6 +62,9 @@ const SelectDisplay: React.FC<{
             }`}
             width={24}
             height={24}
+            onError={(e) => {
+              e.currentTarget.src = getFlagPath('ww');
+            }}
           />
         ) : (
           <span
@@ -366,6 +370,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                       width={20}
                                       height={20}
                                       loading="lazy"
+                                      onError={(e) => {
+                                        e.currentTarget.src = getFlagPath('ww');
+                                      }}
                                     />
                                   ) : (
                                     <span
@@ -418,6 +425,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                               width={20}
                               height={20}
                               loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.src = getFlagPath('ww');
+                              }}
                             />
                           ) : (
                             <span

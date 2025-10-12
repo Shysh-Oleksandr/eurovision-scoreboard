@@ -5,6 +5,7 @@ import { Country, StageVotingType } from '../../../models';
 import CountryStatsRow from './CountryStatsRow';
 import { useBorderOpacity } from './useBorderOpacity';
 
+import { getFlagPath } from '@/helpers/getFlagPath';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
@@ -104,6 +105,9 @@ const StatsTable: React.FC<StatsTableProps> = ({
                       width={32}
                       height={24}
                       title={country.name}
+                      onError={(e) => {
+                        e.currentTarget.src = getFlagPath('ww');
+                      }}
                     />
                   </div>
                 </th>

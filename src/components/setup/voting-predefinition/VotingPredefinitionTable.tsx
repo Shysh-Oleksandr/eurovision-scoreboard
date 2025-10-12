@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { getFlagPath } from '@/helpers/getFlagPath';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 type Props = {
@@ -89,6 +90,9 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
                       width={32}
                       height={24}
                       title={country.name}
+                      onError={(e) => {
+                        e.currentTarget.src = getFlagPath('ww');
+                      }}
                     />
                   </div>
                 </th>
@@ -121,6 +125,9 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
                       loading="lazy"
                       width={32}
                       height={32}
+                      onError={(e) => {
+                        e.currentTarget.src = getFlagPath('ww');
+                      }}
                     />
                     <span className="font-medium truncate flex-1 leading-normal">
                       {country.name}

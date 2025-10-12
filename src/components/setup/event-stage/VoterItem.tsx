@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { CustomSortableItem } from '@/components/common/CustomSortableItem';
+import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -37,6 +38,9 @@ export const VoterItem: React.FC<VoterItemProps> = ({
           width={28}
           height={28}
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = getFlagPath('ww');
+          }}
         />
         <span
           className="text-white text-[0.94rem] font-medium truncate"

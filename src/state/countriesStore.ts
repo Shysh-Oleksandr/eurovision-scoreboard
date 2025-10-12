@@ -47,6 +47,7 @@ export interface CountriesState {
   };
   getStageVotingCountries: (
     stageId?: string,
+    fromScoreboard?: boolean,
     allowROTW?: boolean,
   ) => BaseCountry[];
   getVotingCountry: () => BaseCountry;
@@ -217,17 +218,23 @@ export const useCountriesStore = create<CountriesState>()(
             return { initialVotingCountries, extraVotingCountries };
           },
 
-          getStageVotingCountries: (stageId?: string, allowROTW = true) => {
+          getStageVotingCountries: (
+            stageId?: string,
+            fromScoreboard = true,
+            allowROTW = true,
+          ) => {
             const { configuredEventStages } = get();
             const { eventStages, currentStageId, predefinedVotes } =
               useScoreboardStore.getState();
 
             const relevantStageId = stageId ?? currentStageId;
+
+            const configuredEventStage = configuredEventStages.find(
+              (stage) => stage.id === relevantStageId,
+            );
             const relevantStage =
               eventStages.find((stage) => stage.id === relevantStageId) ||
-              configuredEventStages.find(
-                (stage) => stage.id === relevantStageId,
-              );
+              configuredEventStage;
 
             if (!relevantStage) {
               return [];
@@ -242,11 +249,12 @@ export const useCountriesStore = create<CountriesState>()(
                     !predefinedVotes[relevantStageId!]?.televote)));
 
             const votingCountries =
-              configuredEventStages
-                .find((stage) => stage.id === relevantStageId)
-                ?.votingCountries?.filter(
-                  (country) => country.code !== 'WW' || isRestOfWorldVoting,
-                ) || [];
+              (fromScoreboard
+                ? relevantStage
+                : configuredEventStage
+              )?.votingCountries?.filter(
+                (country) => country.code !== 'WW' || isRestOfWorldVoting,
+              ) || [];
 
             return votingCountries;
           },

@@ -10,6 +10,7 @@ import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { ShareIcon } from '@/assets/icons/ShareIcon';
 import { SlidersIcon } from '@/assets/icons/SlidersIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
+import { getFlagPath } from '@/helpers/getFlagPath';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const ShareResultsModal = React.lazy(() => import('./share/ShareResultsModal'));
@@ -78,6 +79,9 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
               }`}
               width={36}
               height={28}
+              onError={(e) => {
+                e.currentTarget.src = getFlagPath('ww');
+              }}
             />
           )}
           <h2

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
@@ -6,6 +6,7 @@ import { useGeneralStore } from '@/state/generalStore';
 
 const LazyConfetti = React.lazy(() => import('react-confetti'));
 
+const PIECES = 300;
 const CONFETTI_TIMEOUT = 10 * 1000;
 
 const CONFETTI_COLORS = [
@@ -21,6 +22,12 @@ const CONFETTI_COLORS = [
 
 const WinnerConfetti: React.FC = () => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const isWinnerAnimationAlreadyDisplayed = useScoreboardStore(
+    (state) => state.isWinnerAnimationAlreadyDisplayed,
+  );
+  const setIsWinnerAnimationAlreadyDisplayed = useScoreboardStore(
+    (state) => state.setIsWinnerAnimationAlreadyDisplayed,
+  );
   const showWinnerConfetti = useGeneralStore(
     (state) => state.settings.showWinnerConfetti,
   );
@@ -51,16 +58,20 @@ const WinnerConfetti: React.FC = () => {
 
       const timer = setTimeout(() => {
         setShouldRecycle(false);
+
+        setTimeout(() => {
+          setIsWinnerAnimationAlreadyDisplayed(true);
+        }, CONFETTI_TIMEOUT);
       }, CONFETTI_TIMEOUT);
 
       return () => clearTimeout(timer);
     }
     setShowConfetti(false);
     setShouldRecycle(false);
-  }, [winnerCountry]);
+  }, [winnerCountry, setIsWinnerAnimationAlreadyDisplayed]);
 
-  const shouldRender = showConfetti && showWinnerConfetti;
-  const pieces = useMemo(() => 300, []);
+  const shouldRender =
+    showConfetti && showWinnerConfetti && !isWinnerAnimationAlreadyDisplayed;
 
   if (!shouldRender) return null;
 
@@ -70,7 +81,7 @@ const WinnerConfetti: React.FC = () => {
         width={windowDimensions.width}
         height={windowDimensions.height}
         recycle={shouldRecycle}
-        numberOfPieces={pieces}
+        numberOfPieces={PIECES}
         gravity={0.1}
         colors={CONFETTI_COLORS}
       />

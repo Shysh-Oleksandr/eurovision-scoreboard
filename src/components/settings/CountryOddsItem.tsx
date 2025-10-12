@@ -4,6 +4,7 @@ import { useDebounceWithCancel } from '../../hooks/useDebounceWithCancel';
 import { BaseCountry } from '../../models';
 import { Input } from '../Input';
 
+import { getFlagPath } from '@/helpers/getFlagPath';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
@@ -108,6 +109,9 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
           loading="lazy"
           width={32}
           height={28}
+          onError={(e) => {
+            e.currentTarget.src = getFlagPath('ww');
+          }}
         />
         <span className="font-semibold truncate">{country.name}</span>
       </div>
