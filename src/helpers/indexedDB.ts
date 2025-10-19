@@ -1,24 +1,16 @@
 /* eslint-disable no-console */
 import { openDB } from 'idb';
 
-import { BaseCountry } from '../models';
 import { GeneralState } from '@/state/generalStore';
 import { CountriesState } from '@/state/countriesStore';
 
 const DB_NAME = 'DouzePoints';
-const STORE_NAME = 'customCountries';
 const ASSETS_STORE_NAME = 'appAssets';
 const PRESETS_STORE_NAME = 'presets';
 
 const getDB = async () => {
   return openDB(DB_NAME, 3, {
     upgrade(db, oldVersion) {
-      if (oldVersion < 1) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          db.createObjectStore(STORE_NAME, { keyPath: 'code' });
-        }
-      }
-
       if (oldVersion < 2) {
         if (!db.objectStoreNames.contains(ASSETS_STORE_NAME)) {
           db.createObjectStore(ASSETS_STORE_NAME);
@@ -32,30 +24,6 @@ const getDB = async () => {
       }
     },
   });
-};
-
-export const saveCustomCountry = async (entry: BaseCountry) => {
-  const db = await getDB();
-
-  await db.put(STORE_NAME, entry);
-};
-
-export const getCustomCountries = async (): Promise<BaseCountry[]> => {
-  const db = await getDB();
-
-  return db.getAll(STORE_NAME);
-};
-
-export const deleteCustomCountryFromDB = async (code: string) => {
-  const db = await getDB();
-
-  await db.delete(STORE_NAME, code);
-};
-
-export const deleteAllCustomCountriesFromDB = async () => {
-  const db = await getDB();
-
-  await db.clear(STORE_NAME);
 };
 
 // Background image helpers

@@ -7,7 +7,6 @@ import { Input } from '../Input';
 
 import { CountrySelectionList } from './CountrySelectionList';
 import { AvailableGroup } from './CountrySelectionListItem';
-import { CustomEntriesMigration } from './CustomEntriesMigration';
 import { useCountrySearch } from './hooks/useCountrySearch';
 import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
@@ -76,7 +75,6 @@ const NotParticipatingSection = ({
 
   return (
     <>
-      <CustomEntriesMigration />
       <div className="flex items-center justify-between gap-2">
         <p className="text-white text-base md:text-lg font-semibold">
           Not Participating
