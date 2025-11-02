@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-11-02',
+    title:
+      'Custom theme builder. The ability to use public themes. Small improvements',
+  },
+  {
     date: '2025-10-11',
     title:
       'Saving custom entries in user profile (with migration from locally stored entries). Persisting the setup and scoreboard progress.',
@@ -191,8 +196,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-11-01', end: '2025-11-02' },
-    title: 'Custom theme builder. The ability to use public themes',
+    approximateDates: { start: '2025-11-08', end: '2025-11-09' },
+    title: 'Custom theme improvements',
   },
   {
     title: 'Separate points system for jury and televote',

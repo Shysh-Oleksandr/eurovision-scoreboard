@@ -7,8 +7,8 @@ interface PageWrapperProps {
 }
 
 export const PageWrapper = ({ children }: PageWrapperProps) => {
-  const themeYear = useGeneralStore((state) => state.themeYear);
   const theme = useGeneralStore((state) => state.theme);
+  const customTheme = useGeneralStore((state) => state.customTheme);
   const shouldUseCustomBgImage = useGeneralStore(
     (state) => state.settings.shouldUseCustomBgImage,
   );
@@ -21,12 +21,21 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
       return customBgImage;
     }
 
+    if (customTheme?.backgroundImageUrl) {
+      return customTheme.backgroundImageUrl;
+    }
+
     return theme.backgroundImage;
-  }, [shouldUseCustomBgImage, customBgImage, theme.backgroundImage]);
+  }, [
+    customBgImage,
+    customTheme?.backgroundImageUrl,
+    shouldUseCustomBgImage,
+    theme.backgroundImage,
+  ]);
 
   return (
     <div
-      className={`w-full h-full theme-default theme-${themeYear}`}
+      className={`w-full h-full theme-default`}
       id="main"
       style={{
         backgroundColor: theme.colors.appBgColor,

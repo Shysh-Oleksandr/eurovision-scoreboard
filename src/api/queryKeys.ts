@@ -8,9 +8,17 @@ export const queryKeys = {
   user: {
     profile: () => ['user', 'profile'] as const,
     customEntries: () => ['user', 'custom-entries'] as const,
+    themes: () => ['user', 'themes'] as const,
+    themeById: (id: string) => ['user', 'theme', id] as const,
     // Add more user-specific queries here in the future:
     // savedEvents: () => ['user', 'saved-events'] as const,
     // preferences: () => ['user', 'preferences'] as const,
+  },
+
+  // Public queries
+  public: {
+    themes: (filters: { page?: number; search?: string; sortBy?: string }) =>
+      ['public', 'themes', filters] as const,
   },
 
   // Legacy keys (for backward compatibility)
@@ -27,6 +35,7 @@ export const queryKeys = {
 export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.profile(),
   queryKeys.user.customEntries(),
+  queryKeys.user.themes(),
   queryKeys.legacy.meProfile(),
   queryKeys.legacy.me(),
 ];

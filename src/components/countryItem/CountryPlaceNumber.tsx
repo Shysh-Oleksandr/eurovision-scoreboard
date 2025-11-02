@@ -144,7 +144,7 @@ const CountryPlaceNumber = ({
         currentSize.container
       } ${
         shouldShowAsNonQualified
-          ? 'bg-primary-900 opacity-70 text-countryItem-unqualifiedPlaceText'
+          ? 'bg-countryItem-unqualifiedBg opacity-70'
           : ''
       }`}
     >

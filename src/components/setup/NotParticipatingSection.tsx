@@ -3,6 +3,7 @@ import React from 'react';
 import { PlusIcon } from '../../assets/icons/PlusIcon';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
 import Button from '../common/Button';
+import GoogleAuthButton from '../common/GoogleAuthButton';
 import { Input } from '../Input';
 
 import { CountrySelectionList } from './CountrySelectionList';
@@ -50,10 +51,11 @@ const NotParticipatingSection = ({
     if (category === 'Custom') {
       if (!user) {
         return (
-          <div className="flex items-center col-span-full">
+          <div className="flex flex-col items-start col-span-full gap-2">
             <p className="text-white/80 text-sm">
               You need to be logged in to create and use custom entries.
             </p>
+            <GoogleAuthButton />
           </div>
         );
       }

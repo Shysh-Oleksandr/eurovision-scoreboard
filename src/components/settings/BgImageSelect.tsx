@@ -138,7 +138,7 @@ export const BgImageSelect: React.FC = () => {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/png, image/jpeg, image/webp"
               onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
               className="hidden"
             />

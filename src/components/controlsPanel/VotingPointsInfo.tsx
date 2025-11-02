@@ -3,17 +3,28 @@ import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const VotingPointsInfo = () => {
+type VotingPointsInfoProps = {
+  customVotingPointsIndex?: number; // used for custom theme preview
+};
+
+const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
+  customVotingPointsIndex,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const underlinesRef = useRef<Record<number, HTMLDivElement | null>>({});
 
-  const pointsSystem = useGeneralStore((state) => state.pointsSystem);
-  const votingPointsIndex = useScoreboardStore(
+  const _pointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const _votingPointsIndex = useScoreboardStore(
     (state) => state.votingPointsIndex,
   );
+  const pointsSystem = customVotingPointsIndex
+    ? PREDEFINED_SYSTEMS_MAP.default
+    : _pointsSystem;
+  const votingPointsIndex = customVotingPointsIndex ?? _votingPointsIndex;
 
   useGSAP(
     () => {

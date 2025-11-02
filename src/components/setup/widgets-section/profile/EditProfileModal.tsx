@@ -20,7 +20,7 @@ import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
-const MAX_IMAGE_SIZE = 3 * 1024 * 1024; // 3MB
+const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1MB
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -155,7 +155,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
     if (file.size > MAX_IMAGE_SIZE) {
       toast(
-        'Image is too large. Max size is 3MB. Please compress it or upload a smaller image.',
+        'Image is too large. Max size is 1MB. Please compress it or upload a smaller image.',
         {
           type: 'error',
           autoClose: 5000,

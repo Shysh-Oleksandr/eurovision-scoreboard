@@ -6,7 +6,6 @@ import { Tooltip } from '../common/Tooltip';
 
 import { CountryOddsItem } from './CountryOddsItem';
 
-import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
@@ -153,9 +152,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
                 </p>
               </div>
             }
-          >
-            <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
-          </Tooltip>
+          />
         </div>
         <RangeSlider
           id="randomness"

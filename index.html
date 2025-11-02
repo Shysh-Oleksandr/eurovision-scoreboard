@@ -58,6 +58,27 @@
         document.head.appendChild(s);
       }
     </script>
+
+    <!-- Custom Theme FOUC Prevention -->
+    <script>
+      try {
+        // Use the correct persist key and set a data-theme early to reduce flash
+        var stored = localStorage.getItem('general-storage');
+        if (stored) {
+          var parsed = JSON.parse(stored);
+          var state = parsed.state || parsed; // tolerate shapes
+          var customTheme = state?.customTheme;
+          var themeYear = state?.themeYear || '2025';
+          if (customTheme) {
+            document.documentElement.setAttribute('data-theme', 'custom');
+          } else if (themeYear) {
+            document.documentElement.setAttribute('data-theme', themeYear);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to apply stored theme:', e);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

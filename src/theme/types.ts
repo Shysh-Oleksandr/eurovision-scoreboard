@@ -28,19 +28,30 @@ export interface ThemeColors {
     televoteUnfinishedText: string;
     televoteUnfinishedPointsBg: string;
     televoteUnfinishedPointsText: string;
+    televoteLastPointsBg: string;
+    televoteLastPointsText: string;
+    
     televoteActiveBg: string;
     televoteActiveText: string;
     televoteActivePointsBg: string;
     televoteActivePointsText: string;
+    televoteActiveLastPointsBg: string;
+    televoteActiveLastPointsText: string;
     televoteOutline: string;
+
     televoteFinishedBg: string;
     televoteFinishedText: string;
     televoteFinishedPointsBg: string;
     televoteFinishedPointsText: string;
-    televoteLastPointsBg: string;
-    televoteLastPointsText: string;
+    televoteFinishedLastPointsBg: string;
+    televoteFinishedLastPointsText: string;
+
     unqualifiedBg: string;
     unqualifiedText: string;
+    unqualifiedPointsBg: string;
+    unqualifiedPointsText: string;
+    unqualifiedLastPointsBg: string;
+    unqualifiedLastPointsText: string;
 
     douzePointsBg: string;
     douzePointsText: string;
@@ -49,7 +60,6 @@ export interface ThemeColors {
 
     placeContainerBg: string;
     placeText: string;
-    unqualifiedPlaceText: string;
   };
   panelInfo: {
     activeBg: string;

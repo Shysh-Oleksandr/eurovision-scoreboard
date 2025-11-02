@@ -8,7 +8,9 @@ import { CircleXIcon } from './assets/icons/CircleXIcon';
 import { InfoIcon } from './assets/icons/InfoIcon';
 import { TriangleAlertIcon } from './assets/icons/TriangleAlertIcon';
 import ErrorFallback from './components/app/ErrorFallback';
+import { useActiveThemeSync } from './hooks/useActiveThemeSync';
 import { useFullscreen } from './hooks/useFullscreen';
+import { useThemeProfileSync } from './hooks/useThemeProfileSync';
 import { useThemeSetup } from './hooks/useThemeSetup';
 import { Main } from './pages/Main';
 import { useAuthStore } from './state/useAuthStore';
@@ -19,6 +21,8 @@ const About = React.lazy(() => import('./pages/About'));
 export const App = () => {
   useFullscreen();
   useThemeSetup();
+  useActiveThemeSync();
+  useThemeProfileSync();
 
   const { handlePostLogin } = useAuthStore();
 

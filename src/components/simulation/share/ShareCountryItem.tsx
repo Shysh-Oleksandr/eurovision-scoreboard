@@ -2,9 +2,11 @@ import React, { useMemo } from 'react';
 
 import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
 import { useQualificationStatus } from '@/components/countryItem/hooks/useQualificationStatus';
+import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import RoundedTriangle from '@/components/RoundedTriangle';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { Country } from '@/models';
+import { useGeneralStore } from '@/state/generalStore';
 
 type Props = {
   country: Country;
@@ -89,6 +91,12 @@ const ShareCountryItem: React.FC<Props> = ({
   const currentSize = sizeStyles[size];
   const buttonClassName = `relative flex justify-between shadow-md w-full overflow-hidden rounded-sm ${currentSize.button} ${buttonColors}`;
 
+  const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
+  const buttonGradientStyle = getGradientBackgroundStyle(
+    buttonClassName,
+    overrides,
+  );
+
   const pointsBgClass =
     'bg-countryItem-televoteFinishedPointsBg text-countryItem-televoteFinishedPointsBg';
   const pointsTextClass = 'text-countryItem-televoteFinishedPointsText';
@@ -106,7 +114,7 @@ const ShareCountryItem: React.FC<Props> = ({
         />
       )}
 
-      <div className={buttonClassName}>
+      <div className={buttonClassName} style={buttonGradientStyle}>
         <div className="flex items-center overflow-hidden flex-1 min-w-0">
           <img
             src={getFlagPath(country)}

@@ -608,3 +608,7 @@ h6 {
   .Toastify__progress-bar--info {
     background: theme('colors.primary-700');
   }
+
+/* .w-color-github {
+  --github-background-color: #323232 !important;
+} */

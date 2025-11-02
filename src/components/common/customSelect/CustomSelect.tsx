@@ -9,14 +9,15 @@ import { getFlagPath } from '@/helpers/getFlagPath';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 
-type Option = {
+export type Option = {
   label: string;
   value: string;
   imageUrl?: string;
   isExisting?: boolean;
+  color?: string;
 };
 
-type OptionGroup = {
+export type OptionGroup = {
   label: string;
   options: Option[];
 };
@@ -32,6 +33,7 @@ type CustomSelectProps = {
   getImageClassName?: (option: Option) => string;
   selectClassName?: string;
   labelClassName?: string;
+  customThemeColor?: string;
 };
 
 const getThemeColor = (year: string) => {
@@ -45,14 +47,21 @@ const SelectDisplay: React.FC<{
   options: Option[];
   getImageClassName?: (option: Option) => string;
   selectClassName?: string;
-}> = ({ value, options, getImageClassName, selectClassName }) => {
+  customThemeColor?: string;
+}> = ({
+  value,
+  options,
+  getImageClassName,
+  selectClassName,
+  customThemeColor,
+}) => {
   const selectedOption = options.find((option) => option.value === value);
 
   return (
     <div
       className={`select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer ${selectClassName}`}
     >
-      <div className="flex items-center">
+      <div className="flex items-center truncate mr-8">
         {selectedOption?.imageUrl ? (
           <img
             src={selectedOption.imageUrl}
@@ -68,9 +77,10 @@ const SelectDisplay: React.FC<{
           />
         ) : (
           <span
-            className="w-4 h-4 rounded-full mr-2.5 mb-0.5"
+            className="w-4 h-4 rounded-full mr-2.5 mb-0.5 flex-none"
             style={{
-              backgroundColor: getThemeColor(selectedOption?.value ?? ''),
+              backgroundColor:
+                customThemeColor ?? getThemeColor(selectedOption?.value ?? ''),
             }}
           ></span>
         )}
@@ -119,6 +129,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   getImageClassName,
   selectClassName,
   labelClassName,
+  customThemeColor,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -232,6 +243,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         options={groups ? groups.flatMap((g) => g.options) : options}
         getImageClassName={getImageClassName}
         selectClassName={selectClassName}
+        customThemeColor={customThemeColor}
       />
       <select
         value={value}
@@ -311,6 +323,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             options={groups ? groups.flatMap((g) => g.options) : options}
             getImageClassName={getImageClassName}
             selectClassName={selectClassName}
+            customThemeColor={customThemeColor}
           />
         )}
         {isOpen &&
@@ -376,11 +389,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                     />
                                   ) : (
                                     <span
-                                      className="w-4 h-4 rounded-full mr-3"
+                                      className="w-4 h-4 rounded-full mr-3 flex-none"
                                       style={{
-                                        backgroundColor: getThemeColor(
-                                          option.value,
-                                        ),
+                                        backgroundColor:
+                                          option.color ??
+                                          getThemeColor(option.value),
                                       }}
                                     ></span>
                                   )}
@@ -431,9 +444,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                             />
                           ) : (
                             <span
-                              className="w-4 h-4 rounded-full mr-3"
+                              className="w-4 h-4 rounded-full mr-3 flex-none"
                               style={{
-                                backgroundColor: getThemeColor(option.value),
+                                backgroundColor:
+                                  option.color ?? getThemeColor(option.value),
                               }}
                             ></span>
                           )}

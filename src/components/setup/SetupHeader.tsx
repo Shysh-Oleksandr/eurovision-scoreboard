@@ -1,55 +1,33 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import SyncIcon from '../../assets/icons/SyncIcon';
 import { Year } from '../../config';
 import {
-  JUNIOR_SUPPORTED_YEARS,
+  ESC_YEAR_OPTIONS,
+  JESC_THEME_OPTIONS,
+  JESC_YEAR_OPTIONS,
   JUNIOR_THEME_PREFIX,
-  SUPPORTED_YEARS,
+  THEME_OPTIONS,
 } from '../../data/data';
 import { StageId } from '../../models';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import { getHostingCountryByYear } from '../../theme/hosting';
-import {
-  ESC_YEARS_WITH_THEME,
-  JUNIOR_YEARS_WITH_THEME,
-  YEARS_WITH_THEME,
-} from '../../theme/themes';
+import { YEARS_WITH_THEME } from '../../theme/themes';
 import Button from '../common/Button';
-import CustomSelect from '../common/customSelect/CustomSelect';
+import CustomSelect, {
+  Option,
+  OptionGroup,
+} from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
+import { buildPrimaryFromHue } from '@/theme/themeUtils';
+
+const YEAR_OPTIONS = [...ESC_YEAR_OPTIONS, ...JESC_YEAR_OPTIONS];
+const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
 
 const isSmallScreen = window.innerWidth < 370;
-
-const escYearOptions = SUPPORTED_YEARS.map((year) => ({
-  value: year.toString(),
-  label: year.toString(),
-  imageUrl: getHostingCountryByYear(year.toString() as Year).logo,
-}));
-
-const jescYearOptions = JUNIOR_SUPPORTED_YEARS.map((year) => ({
-  value: `${JUNIOR_THEME_PREFIX}${year}`,
-  label: year.toString(),
-  imageUrl: getHostingCountryByYear(year.toString() as Year, true).logo,
-}));
-
-const themeOptions = ESC_YEARS_WITH_THEME.map((year) => ({
-  value: year.toString(),
-  label: year.toString(),
-}));
-
-const jescThemeOptions = JUNIOR_YEARS_WITH_THEME.map((year) => {
-  const yearNumber = parseInt(year.replace(JUNIOR_THEME_PREFIX, ''));
-
-  return {
-    value: `${JUNIOR_THEME_PREFIX}${yearNumber}`,
-    label: yearNumber.toString(),
-  };
-});
 
 type SetupHeaderProps = {
   openSettingsModal: () => void;
@@ -61,6 +39,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   const year = useGeneralStore((state) => state.year);
   const settings = useGeneralStore((state) => state.settings);
   const themeYear = useGeneralStore((state) => state.themeYear);
+  const customTheme = useGeneralStore((state) => state.customTheme);
   const setYear = useGeneralStore((state) => state.setYear);
   const setTheme = useGeneralStore((state) => state.setTheme);
   const setSettings = useGeneralStore((state) => state.setSettings);
@@ -103,6 +82,8 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   };
 
   const handleThemeChange = (newThemeValue: string) => {
+    if (newThemeValue === customTheme?._id) return;
+
     setTheme(newThemeValue);
   };
 
@@ -122,6 +103,47 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     themeYear !== expectedThemeKey &&
     !isSmallScreen;
 
+  const customThemeColor = useMemo(() => {
+    return customTheme?.hue
+      ? `hsl(${buildPrimaryFromHue(customTheme.hue)['700']})`
+      : undefined;
+  }, [customTheme]);
+
+  const themeGroups = useMemo(() => {
+    const groups: OptionGroup[] = [
+      { label: 'ESC', options: THEME_OPTIONS },
+      { label: 'JESC', options: JESC_THEME_OPTIONS },
+    ];
+
+    if (customTheme) {
+      groups.push({
+        label: 'Custom',
+        options: [
+          {
+            label: customTheme.name,
+            value: customTheme._id,
+            color: customThemeColor,
+          },
+        ],
+      });
+    }
+
+    return groups;
+  }, [customTheme, customThemeColor]);
+
+  const themeOptions = useMemo(() => {
+    const options: Option[] = [...ALL_THEME_OPTIONS];
+
+    if (customTheme) {
+      options.push({
+        label: customTheme.name,
+        value: customTheme._id,
+      });
+    }
+
+    return options;
+  }, [customTheme]);
+
   return (
     <div
       className={`flex justify-between items-end w-full ${
@@ -130,10 +152,10 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     >
       <div className="flex items-end sm:space-x-4 space-x-3">
         <CustomSelect
-          options={[...escYearOptions, ...jescYearOptions]}
+          options={YEAR_OPTIONS}
           groups={[
-            { label: 'ESC', options: escYearOptions },
-            { label: 'JESC', options: jescYearOptions },
+            { label: 'ESC', options: ESC_YEAR_OPTIONS },
+            { label: 'JESC', options: JESC_YEAR_OPTIONS },
           ]}
           value={
             settings.isJuniorContest ? `${JUNIOR_THEME_PREFIX}${year}` : year
@@ -145,16 +167,14 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
         />
 
         <CustomSelect
-          options={[...themeOptions, ...jescThemeOptions]}
-          groups={[
-            { label: 'ESC', options: themeOptions },
-            { label: 'JESC', options: jescThemeOptions },
-          ]}
-          value={themeYear}
+          options={themeOptions}
+          groups={themeGroups}
+          value={customTheme ? customTheme._id : themeYear}
           onChange={handleThemeChange}
           id="theme-select-box"
-          label="Theme"
+          label={customTheme ? `Theme (Custom)` : 'Theme'}
           className="sm:w-[130px] w-[110px]"
+          customThemeColor={customThemeColor}
         />
 
         {shouldShowSyncButton && (

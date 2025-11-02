@@ -1,5 +1,8 @@
 import { PointsItem } from '@/state/generalStore';
 import { BaseCountry } from '../models';
+import { getHostingCountryByYear } from '@/theme/hosting';
+import { Year } from '@/config';
+import { ESC_YEARS_WITH_THEME, JUNIOR_YEARS_WITH_THEME } from '@/theme/themes';
 
 export const SUPPORTED_YEARS = Array.from({ length: 22 }, (_, i) => 2004 + i);
 
@@ -15,6 +18,31 @@ export const ALL_THEMES = [
   ...SUPPORTED_YEARS,
   ...JUNIOR_SUPPORTED_YEARS.map((year) => `${JUNIOR_THEME_PREFIX}${year}`),
 ];
+
+export const ESC_YEAR_OPTIONS = SUPPORTED_YEARS.map((year) => ({
+  value: year.toString(),
+  label: year.toString(),
+  imageUrl: getHostingCountryByYear(year.toString() as Year).logo,
+}));
+
+export const JESC_YEAR_OPTIONS = JUNIOR_SUPPORTED_YEARS.map((year) => ({
+  value: `${JUNIOR_THEME_PREFIX}${year}`,
+  label: year.toString(),
+  imageUrl: getHostingCountryByYear(year.toString() as Year, true).logo,
+}));
+
+export const THEME_OPTIONS = ESC_YEARS_WITH_THEME.map((year) => ({
+  value: year.toString(),
+  label: year.toString(),
+}));
+export const JESC_THEME_OPTIONS = JUNIOR_YEARS_WITH_THEME.map((year) => {
+  const yearNumber = parseInt(year.replace(JUNIOR_THEME_PREFIX, ''));
+
+  return {
+    value: `${JUNIOR_THEME_PREFIX}${yearNumber}`,
+    label: yearNumber.toString(),
+  };
+});
 
 export const POINTS_ARRAY = new Array(10).fill(0).map((_, index) => {
   const points = index + 1;

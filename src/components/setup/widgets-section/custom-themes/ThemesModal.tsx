@@ -7,6 +7,10 @@ import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { CustomTheme } from '@/types/customTheme';
+
+// Lazy load the customize modal
+const CustomizeThemeModal = React.lazy(() => import('./CustomizeThemeModal'));
 
 enum SettingsTab {
   YOUR_THEMES = 'Your Themes',
@@ -31,12 +35,45 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState(SettingsTab.YOUR_THEMES);
   const [isPublicThemesLoaded, setIsPublicThemesLoaded] = useState(false);
+  const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
+  const [initialTheme, setInitialTheme] = useState<CustomTheme | undefined>();
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const handleCreateNew = () => {
+    setInitialTheme(undefined);
+    setIsEditMode(false);
+    setIsCustomizeModalOpen(true);
+  };
+
+  const handleEdit = (theme: CustomTheme) => {
+    setInitialTheme(theme);
+    setIsEditMode(true);
+    setIsCustomizeModalOpen(true);
+  };
+
+  const handleDuplicate = (theme: CustomTheme) => {
+    setInitialTheme({ ...theme, name: `${theme.name} (Copy)` });
+    setIsEditMode(false);
+    setIsCustomizeModalOpen(true);
+  };
+
+  const handleCloseCustomize = () => {
+    setIsCustomizeModalOpen(false);
+    setInitialTheme(undefined);
+    setIsEditMode(false);
+  };
 
   const tabsWithContent = useMemo(
     () => [
       {
         ...tabs[0],
-        content: <UserThemes />,
+        content: (
+          <UserThemes
+            onCreateNew={handleCreateNew}
+            onEdit={handleEdit}
+            onDuplicate={handleDuplicate}
+          />
+        ),
       },
       {
         ...tabs[1],
@@ -50,7 +87,11 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
           >
             {(activeTab === SettingsTab.PUBLIC_THEMES ||
               isPublicThemesLoaded) && (
-              <PublicThemes onLoaded={() => setIsPublicThemesLoaded(true)} />
+              <PublicThemes
+                onLoaded={() => setIsPublicThemesLoaded(true)}
+                onDuplicate={handleDuplicate}
+                onEdit={handleEdit}
+              />
             )}
           </Suspense>
         ),
@@ -62,30 +103,42 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
   useEffectOnce(onLoaded);
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      containerClassName="!w-[min(100%,800px)]"
-      contentClassName="text-white h-[60vh]"
-      overlayClassName="!z-[1001]"
-      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
-      topContent={
-        <Tabs
-          tabs={tabs}
-          activeTab={activeTab}
-          setActiveTab={(tab) => setActiveTab(tab as SettingsTab)}
-          containerClassName="!rounded-none"
-        />
-      }
-    >
-      <div className="py-4 px-2">
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        containerClassName="!w-[min(100%,800px)]"
+        contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh]"
+        overlayClassName="!z-[1001]"
+        bottomContent={<ModalBottomCloseButton onClose={onClose} />}
+        topContent={
+          <Tabs
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={(tab) => setActiveTab(tab as SettingsTab)}
+            containerClassName="!rounded-none"
+          />
+        }
+      >
         <TabContent
           tabs={tabsWithContent}
           activeTab={activeTab}
           preserveContent
         />
-      </div>
-    </Modal>
+      </Modal>
+
+      {/* Customize Theme Modal */}
+      {isCustomizeModalOpen && (
+        <Suspense fallback={null}>
+          <CustomizeThemeModal
+            isOpen={isCustomizeModalOpen}
+            onClose={handleCloseCustomize}
+            initialTheme={initialTheme}
+            isEditMode={isEditMode}
+          />
+        </Suspense>
+      )}
+    </>
   );
 };
 

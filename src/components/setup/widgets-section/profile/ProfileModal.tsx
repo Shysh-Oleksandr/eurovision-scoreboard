@@ -1,9 +1,9 @@
 import React, { Suspense, useState } from 'react';
 
-import GoogleIcon from '@/assets/icons/GoogleIcon';
 import { LogoutIcon } from '@/assets/icons/LogoutIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import Button from '@/components/common/Button';
+import GoogleAuthButton from '@/components/common/GoogleAuthButton';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
@@ -23,7 +23,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   onClose,
   onLoaded,
 }) => {
-  const { user, login, logout: storeLogout, isBusy } = useAuthStore();
+  const { user, logout: storeLogout, isBusy } = useAuthStore();
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isEditProfileModalLoaded, setIsEditProfileModalLoaded] =
@@ -36,10 +36,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   });
 
   const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
-
-  const handleGoogleLogin = () => {
-    login();
-  };
 
   const handleLogout = async () => {
     if (confirm('Are you sure you want to logout?')) {
@@ -108,12 +104,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           Icon={<LogoutIcon className="w-5 h-5 flex-none" />}
         />
       ) : (
-        <Button
-          label="Continue with Google"
-          Icon={<GoogleIcon className="w-6 h-6 flex-none" />}
-          variant="tertiary"
-          onClick={handleGoogleLogin}
-        />
+        <GoogleAuthButton />
       )}
 
       {(isEditProfileModalOpen || isEditProfileModalLoaded) && (

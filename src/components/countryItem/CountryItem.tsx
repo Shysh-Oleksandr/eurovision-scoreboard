@@ -14,6 +14,7 @@ import { useItemState } from './hooks/useItemState';
 import { useQualificationStatus } from './hooks/useQualificationStatus';
 import useVotingFinished from './hooks/useVotingFinished';
 
+import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import { useGeneralStore } from '@/state/generalStore';
 
 type Props = {
@@ -91,6 +92,7 @@ const CountryItem = ({
     isJuryVoting,
     isCountryVotingFinished: !!country.isVotingFinished,
     isActive,
+    isUnqualified: shouldShowAsNonQualified,
   });
 
   const { lastPointsContainerRef, lastPointsTextRef } = useAnimatePoints({
@@ -99,6 +101,12 @@ const CountryItem = ({
     isDouzePoints: !!country.showDouzePointsAnimation,
     douzePointsRefs,
   });
+
+  const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
+  const buttonGradientStyle = getGradientBackgroundStyle(
+    buttonClassName,
+    overrides,
+  );
 
   return (
     <div
@@ -117,6 +125,7 @@ const CountryItem = ({
 
       <button
         className={`${buttonClassName} flex-1 min-w-0 overflow-hidden`}
+        style={buttonGradientStyle}
         disabled={isDisabled}
         onClick={() => onClick(country.code)}
       >
@@ -128,6 +137,7 @@ const CountryItem = ({
               parallelogramYellowRef: douzePointsParallelogramYellowRef,
             }}
             pointsAmount={douzePoints ?? 0}
+            overrides={overrides}
           />
         )}
 

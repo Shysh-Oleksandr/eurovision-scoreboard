@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
+import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 
 interface TooltipProps {
   content: React.ReactNode;
-  children: React.ReactElement;
+  children?: React.ReactNode;
   className?: string;
+  withInfoIcon?: boolean;
   position?: 'left' | 'right' | 'center';
+  dataTheme?: string;
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({
@@ -16,6 +19,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
   content,
   className = '',
   position = 'left',
+  withInfoIcon = true,
+  dataTheme,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
@@ -108,7 +113,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
         onMouseLeave={handleMouseLeave}
         onClick={handleToggle}
       >
-        {children}
+        {withInfoIcon ? (
+          <div className="flex items-center gap-1">
+            {children}
+            <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+          </div>
+        ) : (
+          children
+        )}
       </div>
       {isOpen &&
         createPortal(
@@ -116,6 +128,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
             ref={tooltipRef}
             className={`bg-primary-900 bg-gradient-to-tl from-primary-900 to-primary-800/70 text-white text-sm rounded-md px-3 py-2 w-[min(300px,80vw)] shadow-xl ${className}`}
             style={tooltipStyle}
+            data-theme={dataTheme}
           >
             {content}
           </div>,
