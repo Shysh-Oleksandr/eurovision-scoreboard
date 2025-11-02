@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SparklesIcon } from '@/assets/icons/SparklesIcon';
 import Button from '@/components/common/Button';
@@ -51,9 +50,7 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
               </div>
             }
             position="center"
-          >
-            <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
-          </Tooltip>
+          />
         </div>
         <p className="text-sm text-white/50">Drag and drop to reorder</p>
       </div>

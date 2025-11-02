@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import ShuffleIcon from '@/assets/icons/ShuffleIcon';
 import SortAZIcon from '@/assets/icons/SortAZIcon';
@@ -41,9 +40,7 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
             </div>
           }
           position="left"
-        >
-          <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-        </Tooltip>
+        />
         <Checkbox
           checked={syncVotersWithParticipants}
           onChange={(e) => onSyncVotersChange(e.target.checked)}

@@ -3,7 +3,6 @@ import React from 'react';
 import { EventStage, StageVotingMode, StageVotingType } from '../../../models';
 import Badge from '../../common/Badge';
 
-import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { ShareIcon } from '@/assets/icons/ShareIcon';
 import Button from '@/components/common/Button';
 import { Tooltip } from '@/components/common/Tooltip';
@@ -68,9 +67,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
                 </p>
               </div>
             }
-          >
-            <InfoIcon className="w-5 h-5 text-white/60 cursor-pointer" />
-          </Tooltip>
+          />
         </div>
       )}
       <div className="flex flex-col sm:gap-2.5 gap-2">

@@ -637,3 +637,14 @@ export const useCountriesStore = create<CountriesState>()(
     },
   ),
 );
+
+
+// Initialize once at app startup using current settings.
+// We must pass the correct contest type to avoid defaulting to ESC.
+(() => {
+  const { settings, year } = useGeneralStore.getState();
+  useCountriesStore.getState().setInitialCountriesForYear(year, {
+    force: true,
+    isJuniorContest: settings.isJuniorContest,
+  });
+})();

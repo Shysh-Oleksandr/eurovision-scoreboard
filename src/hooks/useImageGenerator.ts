@@ -16,9 +16,6 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const settings = useGeneralStore((state) => state.settings);
-  const themeYear = useGeneralStore((state) => state.themeYear);
-
   const generateImage = useCallback(async (): Promise<string | null> => {
     if (!containerRef.current) return null;
 
@@ -94,21 +91,6 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
     // Remove settings and themeYear from dependencies as they're not used in the function
   ]);
 
-  const getBackgroundImage = useCallback(() => {
-    if (options.backgroundImage) {
-      return options.backgroundImage;
-    }
-    if (settings.shouldUseCustomBgImage && settings.customBgImage) {
-      return settings.customBgImage;
-    }
-    return getThemeBackground(themeYear);
-  }, [
-    options.backgroundImage,
-    settings.shouldUseCustomBgImage,
-    settings.customBgImage,
-    themeYear,
-  ]);
-
   const downloadImage = useCallback((dataUrl: string, filename: string) => {
     const link = document.createElement('a');
     link.download = filename;
@@ -120,7 +102,6 @@ export const useImageGenerator = (options: ImageGenerationOptions = {}) => {
     containerRef,
     isGenerating,
     generateImage,
-    getBackgroundImage,
     downloadImage,
   };
 };

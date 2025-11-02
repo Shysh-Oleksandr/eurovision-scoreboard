@@ -11,8 +11,6 @@ import { ContestSettings } from './ContestSettings';
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
 import { PresetsSettings } from './presets/PresetsSettings';
 
-import { InfoIcon } from '@/assets/icons/InfoIcon';
-
 export const GeneralSettings: React.FC = () => {
   const settings = useGeneralStore((state) => state.settings);
   const setSettings = useGeneralStore((state) => state.setSettings);
@@ -23,7 +21,6 @@ export const GeneralSettings: React.FC = () => {
   );
 
   const isFullScreenSupported = document.fullscreenEnabled;
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
   return (
     <div className="flex flex-col gap-4">
@@ -67,9 +64,7 @@ export const GeneralSettings: React.FC = () => {
                 </div>
               }
               position="left"
-            >
-              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-            </Tooltip>
+            />
             <Checkbox
               id="isPickQualifiersMode"
               label="Pick qualifiers without awarding points"
@@ -92,9 +87,7 @@ export const GeneralSettings: React.FC = () => {
                 </div>
               }
               position="left"
-            >
-              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-            </Tooltip>
+            />
             <Checkbox
               id="announce-televote-from-lowest-to-highest"
               label="Televote reveal order: lowest to highest"
@@ -116,9 +109,7 @@ export const GeneralSettings: React.FC = () => {
                 </div>
               }
               position="left"
-            >
-              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-            </Tooltip>
+            />
             <Checkbox
               id="limit-manual-televote-points"
               labelClassName="w-full !px-0 !pt-1 !items-start"
@@ -140,9 +131,7 @@ export const GeneralSettings: React.FC = () => {
                 </div>
               }
               position="left"
-            >
-              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-            </Tooltip>
+            />
             <Checkbox
               id="use-grouped-jury-points"
               labelClassName="w-full !px-0 !pt-1 !items-start"
@@ -164,9 +153,7 @@ export const GeneralSettings: React.FC = () => {
                 </div>
               }
               position="left"
-            >
-              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-            </Tooltip>
+            />
             <Checkbox
               id="enable-predefined-votes"
               labelClassName="w-full !px-0 !pt-1 !items-start"
@@ -188,9 +175,7 @@ export const GeneralSettings: React.FC = () => {
                 </div>
               }
               position="left"
-            >
-              <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-            </Tooltip>
+            />
             <Checkbox
               id="presentation-mode-enabled"
               labelClassName="w-full !px-0 !pt-1 !items-start"
@@ -213,9 +198,7 @@ export const GeneralSettings: React.FC = () => {
                   </div>
                 }
                 position="left"
-              >
-                <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
-              </Tooltip>
+              />
               <Checkbox
                 id="auto-start-presentation"
                 labelClassName="w-full !px-0 !pt-1 !items-start"
@@ -303,7 +286,8 @@ export const GeneralSettings: React.FC = () => {
           />
         )}
         {/* iOS doesn't support beforeunload event */}
-        {!isIOS && (
+        {/* Irrelevant as we persist the state anyway */}
+        {/* {!isIOS && (
           <Checkbox
             id="show-before-unload-warning"
             labelClassName="w-full"
@@ -313,7 +297,7 @@ export const GeneralSettings: React.FC = () => {
               setSettings({ shouldShowBeforeUnloadWarning: e.target.checked })
             }
           />
-        )}
+        )} */}
         <Checkbox
           id="show-reset-warning"
           labelClassName="w-full"

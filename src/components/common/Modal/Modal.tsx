@@ -16,6 +16,7 @@ interface ModalProps {
   contentClassName?: string;
   overlayClassName?: string;
   openDelay?: number; // Delay in milliseconds before opening the modal
+  dataTheme?: string;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -31,6 +32,7 @@ const Modal: React.FC<ModalProps> = ({
   overlayClassName = '',
   openDelay,
   ref,
+  dataTheme,
 }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -90,6 +92,7 @@ const Modal: React.FC<ModalProps> = ({
       style={{ pointerEvents: isActive ? 'auto' : 'none' }}
     >
       <div
+        data-theme={dataTheme}
         className={`bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 overflow-hidden rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
           isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         } ${containerClassName}`}

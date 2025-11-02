@@ -6,6 +6,8 @@ import { WHATS_NEW } from '../components/feedbackInfo/data';
 import { Year } from '../config';
 import { ALL_THEMES, POINTS_ARRAY } from '../data/data';
 import { getThemeForYear } from '../theme/themes';
+import { api } from '@/api/client';
+import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryByYear } from '../theme/hosting';
 import { Theme } from '../theme/types';
 
@@ -13,6 +15,11 @@ import { useCountriesStore } from './countriesStore';
 import { BaseCountry } from '@/models';
 import { useScoreboardStore } from './scoreboardStore';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
+import { CustomTheme } from '@/types/customTheme';
+import {
+  applyCustomTheme as applyCustomThemeUtil,
+  clearCustomTheme as clearCustomThemeUtil,
+} from '@/theme/themeUtils';
 
 export enum ShareImageAspectRatio {
   LANDSCAPE = '1200x630',
@@ -164,6 +171,7 @@ export interface GeneralState {
   year: Year;
   themeYear: string;
   theme: Theme;
+  customTheme: CustomTheme | null;
   settings: Settings;
   presentationSettings: PresentationSettings;
   imageCustomization: ImageCustomizationSettings;
@@ -180,6 +188,8 @@ export interface GeneralState {
   checkForNewUpdates: () => void;
   setYear: (year: Year) => void;
   setTheme: (year: string, isJuniorTheme?: boolean) => void;
+  applyCustomTheme: (theme: CustomTheme) => void;
+  clearCustomTheme: () => void;
   setSettings: (settings: Partial<Settings>) => void;
   setImageCustomization: (
     customization: Partial<ImageCustomizationSettings>,
@@ -192,6 +202,14 @@ export interface GeneralState {
   getHostingCountry: () => BaseCountry;
   resetAllSettings: () => void;
   setPresentationSettings: (settings: Partial<PresentationSettings>) => void;
+  // Transient flag to suppress applying profile active theme once
+  suppressActiveThemeOnce: boolean;
+  setSuppressActiveThemeOnce: (value: boolean) => void;
+  // Block re-applying this remote active theme id (previous custom) after local switch
+  blockedActiveThemeId: string | null;
+  setBlockedActiveThemeId: (id: string | null) => void;
+  // When true, ignore applying profile active theme while on static themes
+  suppressProfileActiveOnStatic: boolean;
 }
 
 const getLatestUpdate = () => {
@@ -219,6 +237,7 @@ export const useGeneralStore = create<GeneralState>()(
         year: INITIAL_YEAR,
         themeYear: INITIAL_YEAR,
         theme: getThemeForYear(INITIAL_YEAR),
+        customTheme: null,
         pointsSystem: initialPointsSystem,
         settingsPointsSystem: initialPointsSystem,
         generalSettingsExpansion: {
@@ -230,6 +249,9 @@ export const useGeneralStore = create<GeneralState>()(
         settings: DEFAULT_SETTINGS,
         presentationSettings: DEFAULT_PRESENTATION_SETTINGS,
         imageCustomization: DEFAULT_IMAGE_CUSTOMIZATION,
+        suppressActiveThemeOnce: false,
+        blockedActiveThemeId: null,
+        suppressProfileActiveOnStatic: false,
 
         setLastSeenUpdate: (update: string) => {
           set({ lastSeenUpdate: update });
@@ -261,17 +283,74 @@ export const useGeneralStore = create<GeneralState>()(
           useScoreboardStore.getState().leaveEvent();
         },
         setTheme: (year: string) => {
-          // Remove all theme classes
-          document.documentElement.classList.remove(
-            ...ALL_THEMES.map((y) => `theme-${y}`),
-          );
-          // Add the new theme class
-          document.documentElement.classList.add(`theme-${year}`);
+          // Clear any custom theme first
+          clearCustomThemeUtil();
 
+          // Remove all theme classes
+          // document.documentElement.classList.remove(
+          //   ...ALL_THEMES.map((y) => `theme-${y}`),
+          // );
+          // // Add the new theme class
+          // document.documentElement.classList.add(`theme-${year}`);
+
+          // Set data-theme immediately to avoid flash; useThemeSetup will also enforce
+          document.documentElement.setAttribute('data-theme', year);
+
+          const prevCustom = get().customTheme;
           set({
             themeYear: year,
             theme: getThemeForYear(year),
+            customTheme: null,
+            suppressActiveThemeOnce: true,
+            blockedActiveThemeId: prevCustom?._id ?? get().blockedActiveThemeId,
+            suppressProfileActiveOnStatic: true,
           });
+
+          // Proactively clear active theme on the server to avoid reapplication
+          (async () => {
+            try {
+              const auth = useAuthStore.getState();
+              if (auth.user) {
+                await api.post('/themes/clear-active');
+                useAuthStore.setState({
+                  user: { ...auth.user, activeThemeId: undefined },
+                });
+              }
+            } catch (_) {
+              // noop; guard via suppression below handles races
+            }
+          })();
+        },
+        applyCustomTheme: (theme: CustomTheme) => {
+          // Remove all predefined theme classes
+          document.documentElement.classList.remove(
+            ...ALL_THEMES.map((y) => `theme-${y}`),
+          );
+
+          // Apply custom theme
+          applyCustomThemeUtil(theme);
+
+          const prevCustom = get().customTheme;
+          set({
+            customTheme: theme,
+            blockedActiveThemeId: prevCustom?._id ?? get().blockedActiveThemeId,
+            suppressProfileActiveOnStatic: false,
+          });
+        },
+        clearCustomTheme: () => {
+          clearCustomThemeUtil();
+
+          // Reapply the current static theme
+          const { themeYear } = get();
+          document.documentElement.classList.add(`theme-${themeYear}`);
+
+          set({ customTheme: null });
+        },
+        setSuppressActiveThemeOnce: (value: boolean) => {
+          set({ suppressActiveThemeOnce: value });
+        },
+        setBlockedActiveThemeId: (id: string | null) => {
+          set({ blockedActiveThemeId: id });
         },
         setSettings: (settings: Partial<Settings>) => {
           set((state) => ({
@@ -347,6 +426,7 @@ export const useGeneralStore = create<GeneralState>()(
           return {
             year: state.year,
             themeYear: state.themeYear,
+            customTheme: state.customTheme,
             lastSeenUpdate: state.lastSeenUpdate,
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
             // Do not persist large image data URLs in localStorage to avoid quota issues
@@ -426,6 +506,7 @@ export const useGeneralStore = create<GeneralState>()(
             ...state,
             year,
             themeYear,
+            customTheme: state.customTheme ?? null,
             theme: getThemeForYear(themeYear),
             settingsPointsSystem,
             settings,
@@ -437,16 +518,6 @@ export const useGeneralStore = create<GeneralState>()(
     { name: 'general-store', enabled: process.env.NODE_ENV === 'development' },
   ),
 );
-
-// Initialize once at app startup using current settings.
-// We must pass the correct contest type to avoid defaulting to ESC.
-(() => {
-  const { settings, year } = useGeneralStore.getState();
-  useCountriesStore.getState().setInitialCountriesForYear(year, {
-    force: true,
-    isJuniorContest: settings.isJuniorContest,
-  });
-})();
 
 (async () => {
   const currentSettings = useGeneralStore.getState().settings;

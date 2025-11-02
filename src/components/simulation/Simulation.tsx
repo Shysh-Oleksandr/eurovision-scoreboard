@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 
 import { useShallow } from 'zustand/shallow';
 
-import { useBeforeUnload } from '../../hooks/useBeforeUnload';
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
 import Board from '../board/Board';
 import ControlsPanel from '../controlsPanel/ControlsPanel';
@@ -52,7 +51,7 @@ const Simulation = () => {
 
   const phaseTitle = usePhaseTitle();
 
-  useBeforeUnload();
+  // useBeforeUnload();
 
   if (eventStages.length === 0) {
     return null;

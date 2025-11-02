@@ -6,4 +6,5 @@ export interface Profile {
 	avatarUrl?: string;
 	email?: string;
 	googleId?: string;
+	activeThemeId?: string;
 }
