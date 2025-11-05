@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
-import type { CustomTheme, ThemeListResponse } from '@/types/customTheme';
+import type { CustomTheme, ThemeListResponse, ThemeState } from '@/types/customTheme';
 
 export type CreateThemeInput = {
   name: string;
@@ -140,10 +140,118 @@ export function useLikeThemeMutation() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/themes/${id}/like`);
-      return data as CustomTheme;
+      return data as { liked: boolean; likes: number };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.public.themes({}) });
+    },
+  });
+}
+
+export function useToggleLikeThemeMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await api.post(`/themes/${id}/like`);
+      return data as { liked: boolean; likes: number };
+    },
+    onSuccess: (res, id) => {
+      // Update counts in all cached public theme lists without refetching
+      const queries = qc.getQueriesData<ThemeListResponse>({
+        queryKey: ['public', 'themes'],
+      });
+      for (const [key, data] of queries) {
+        if (!data) continue;
+        const updated = {
+          ...data,
+          themes: data.themes.map((t) =>
+            t._id === id ? { ...t, likes: res.likes } : t,
+          ),
+        };
+        qc.setQueryData(key, updated);
+      }
+
+      // Refresh user-specific like/save state (small payload)
+      qc.invalidateQueries({ queryKey: ['user', 'themes-state'] });
+    },
+  });
+}
+
+export function useToggleSaveThemeMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await api.post(`/themes/${id}/save`);
+      return data as { saved: boolean; saves: number };
+    },
+    onSuccess: (res, id) => {
+      // Update counts in all cached public theme lists without refetching
+      const queries = qc.getQueriesData<ThemeListResponse>({
+        queryKey: ['public', 'themes'],
+      });
+      for (const [key, data] of queries) {
+        if (!data) continue;
+        const updated = {
+          ...data,
+          themes: data.themes.map((t) =>
+            t._id === id ? { ...t, saves: res.saves } : t,
+          ),
+        };
+        qc.setQueryData(key, updated);
+      }
+
+      // Update saved list and state; this won't shift public list
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+      qc.invalidateQueries({ queryKey: ['user', 'themes-state'] });
+    },
+  });
+}
+
+export function useSavedThemesQuery(enabled: boolean = true) {
+  return useQuery<CustomTheme[]>({
+    queryKey: queryKeys.user.savedThemes(),
+    queryFn: async () => {
+      const { data } = await api.get('/themes/me/saved');
+      return data as CustomTheme[];
+    },
+    enabled,
+  });
+}
+
+export function useThemesStateQuery(ids: string[], enabled: boolean = true) {
+  return useQuery<ThemeState>({
+    queryKey: queryKeys.user.themesState(ids),
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('ids', ids.join(','));
+      const { data } = await api.get(`/themes/state?${params.toString()}`);
+      return data as ThemeState;
+    },
+    enabled: enabled && ids.length > 0,
+  });
+}
+
+export function useReportThemeDuplicateMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (originalId: string) => {
+      const { data } = await api.post(`/themes/${originalId}/duplicate`);
+      return data as { duplicatesCount: number };
+    },
+    onSuccess: (res, id) => {
+      const queries = qc.getQueriesData<ThemeListResponse>({
+        queryKey: ['public', 'themes'],
+      });
+      for (const [key, data] of queries) {
+        if (!data) continue;
+        const updated = {
+          ...data,
+          themes: data.themes.map((t) =>
+            t._id === id ? { ...t, duplicatesCount: res.duplicatesCount } : t,
+          ),
+        };
+        qc.setQueryData(key, updated);
+      }
     },
   });
 }

@@ -2,8 +2,16 @@ import React, { useMemo, useState } from 'react';
 
 import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
 
+import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
+import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
+import { CopyIcon } from '@/assets/icons/CopyIcon';
+import { PencilIcon } from '@/assets/icons/PencilIcon';
+import { ThemeIcon } from '@/assets/icons/ThemeIcon';
+import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
+import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
+import { TrashIcon } from '@/assets/icons/TrashIcon';
 import Button from '@/components/common/Button';
-import { formatDate } from '@/components/feedbackInfo/types';
+import UserInfo from '@/components/common/UserInfo';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getCssVarsForCustomTheme } from '@/theme/themeUtils';
 import { CustomTheme } from '@/types/customTheme';
@@ -15,8 +23,11 @@ interface ThemeListItemProps {
   onDelete?: (id: string) => void;
   onApply: (theme: CustomTheme) => void;
   onLike?: (id: string) => void;
+  onSave?: (id: string, savedByMe: boolean) => void;
   onDuplicate: (theme: CustomTheme) => void;
   isApplied?: boolean;
+  likedByMe?: boolean;
+  savedByMe?: boolean;
 }
 
 const ThemeListItem: React.FC<ThemeListItemProps> = ({
@@ -25,9 +36,12 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   onEdit,
   onDelete,
   onApply,
-  // onLike,
+  onLike,
+  onSave,
   onDuplicate,
   isApplied,
+  likedByMe,
+  savedByMe,
 }) => {
   const user = useAuthStore((state) => state.user);
   const isMyTheme = variant === 'user' || theme.userId.toString() === user?._id;
@@ -52,95 +66,137 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
 
   return (
     <div
-      className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-800/60 shadow-lg rounded-lg overflow-hidden border border-white/20 hover:border-white/40 transition-colors"
+      className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-800/60 shadow-lg rounded-lg overflow-hidden p-4 border border-white/20 hover:border-white/40 transition-colors"
       style={cssVars as React.CSSProperties}
     >
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-white font-semibold text-lg truncate mb-1">
-              <div className="flex items-center justify-between">
-                <span className="truncate">{theme.name}</span>
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex-1 min-w-0">
+          <h3 className="text-white font-semibold text-l mb-1">
+            <div className="flex items-center justify-between flex-wrap gap-1.5">
+              <span className="">{theme.name}</span>
 
-                <span className="text-xs text-white/60">
-                  {formatDate(theme.createdAt)}
-                </span>
-              </div>
-            </h3>
-            {theme.description && (
-              <p className="text-white/70 text-sm line-clamp-2">
-                {theme.description}
-              </p>
-            )}
-          </div>
+              <span className="text-xs text-white/60">
+                {new Date(theme.createdAt).toLocaleDateString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </span>
+            </div>
+          </h3>
+          {theme.description && (
+            <p className="text-white/70 text-sm line-clamp-2">
+              {theme.description}
+            </p>
+          )}
         </div>
+      </div>
 
-        <div className="mb-2 md:gap-4 gap-2 flex justify-center sm:items-center items-start sm:flex-row-reverse flex-col">
-          <ThemePreviewCountryItemCompact
-            backgroundImage={theme.backgroundImageUrl || null}
-            overrides={theme.overrides || {}}
-            baseThemeYear={theme.baseThemeYear}
-            points={points}
-            lastPoints={lastPoints}
-            showDouzePointsAnimation={showDouzePointsAnimation}
-            isListItem
-            onClick={() => handleAwardPoints(12)}
-          />
+      <div className="mb-2 md:gap-4 gap-2 flex justify-center sm:items-center items-start sm:flex-row-reverse flex-col">
+        <ThemePreviewCountryItemCompact
+          backgroundImage={theme.backgroundImageUrl || null}
+          overrides={theme.overrides || {}}
+          baseThemeYear={theme.baseThemeYear}
+          points={points}
+          lastPoints={lastPoints}
+          showDouzePointsAnimation={showDouzePointsAnimation}
+          isListItem
+          onClick={() => handleAwardPoints(12)}
+          previewCountryCode={theme.creator?.country}
+        />
+      </div>
+      {theme.creator && (
+        <div className="mb-3">
+          <UserInfo user={theme.creator} size="sm" />
         </div>
+      )}
 
-        <div className="flex gap-2 flex-wrap">
-          <Button
-            variant="primary"
-            onClick={() => onApply(theme)}
-            className="!py-2 !px-4 !text-base"
-            disabled={isApplied}
-          >
-            {isApplied ? 'Applied' : 'Apply'}
-          </Button>
+      <div className="flex gap-2 flex-wrap">
+        <Button
+          variant="primary"
+          onClick={() => onApply(theme)}
+          className="!py-2 !px-4 !text-base"
+          disabled={isApplied}
+          Icon={<ThemeIcon className="sm:size-6 size-5" />}
+        >
+          {isApplied ? 'Applied' : 'Apply'}
+        </Button>
+        <Button
+          variant="tertiary"
+          onClick={() => onDuplicate(theme)}
+          className="!py-2 !px-4 !text-base"
+          disabled={!user}
+          Icon={<CopyIcon className="sm:size-6 size-5" />}
+        >
+          {theme.duplicatesCount
+            ? `${theme.duplicatesCount} ${
+                theme.duplicatesCount === 1 ? 'Duplicate' : 'Duplicates'
+              }`
+            : 'Duplicate'}
+        </Button>
+
+        {isMyTheme && onEdit && (
           <Button
             variant="tertiary"
-            onClick={() => onDuplicate(theme)}
+            onClick={() => onEdit(theme)}
             className="!py-2 !px-4 !text-base"
-            disabled={!user}
+            Icon={<PencilIcon className="sm:size-6 size-5" />}
           >
-            Duplicate
+            Edit
           </Button>
+        )}
 
-          {isMyTheme && onEdit && (
-            <Button
-              variant="tertiary"
-              onClick={() => onEdit(theme)}
-              className="!py-2 !px-4 !text-base"
-            >
-              Edit
-            </Button>
-          )}
+        {isMyTheme && onDelete && (
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (window.confirm(`Delete the "${theme.name}" theme?`)) {
+                onDelete(theme._id);
+              }
+            }}
+            className="!py-2 !px-4 !text-base text-red-300 hover:text-red-200"
+            Icon={<TrashIcon className="sm:size-6 size-5" />}
+          >
+            Delete
+          </Button>
+        )}
 
-          {isMyTheme && onDelete && (
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (window.confirm(`Delete the "${theme.name}" theme?`)) {
-                  onDelete(theme._id);
-                }
-              }}
-              className="!py-2 !px-4 !text-base text-red-300 hover:text-red-200"
-            >
-              Delete
-            </Button>
-          )}
-
-          {/* {variant === 'public' && !isMyTheme && onLike && (
-            <Button
-              variant="tertiary"
-              onClick={() => onLike(theme._id)}
-              className="!py-2 !px-4 !text-base"
-              disabled={!user}
-            >
-              Like
-            </Button>
-          )} */}
-        </div>
+        <Button
+          variant="tertiary"
+          onClick={() => onLike?.(theme._id)}
+          className="!py-2 !px-4 !text-base"
+          disabled={!user || isMyTheme}
+          Icon={
+            likedByMe ? (
+              <ThumbsUpSolidIcon className="sm:size-6 size-5" />
+            ) : (
+              <ThumbsUpIcon className="sm:size-6 size-5" />
+            )
+          }
+        >
+          {theme.likes > 0
+            ? `${theme.likes} ${theme.likes === 1 ? 'Like' : 'Likes'}`
+            : 'Like'}
+        </Button>
+        <Button
+          variant="tertiary"
+          onClick={() => onSave?.(theme._id, savedByMe ?? false)}
+          className="!py-2 !px-4 !text-base"
+          disabled={!user || isMyTheme}
+          Icon={
+            savedByMe ? (
+              <BookmarkCheckIcon className="sm:size-6 size-5" />
+            ) : (
+              <BookmarkIcon className="sm:size-6 size-5" />
+            )
+          }
+        >
+          {theme.saves > 0
+            ? `${theme.saves} ${theme.saves === 1 ? 'Save' : 'Saves'}`
+            : 'Save'}
+        </Button>
       </div>
     </div>
   );

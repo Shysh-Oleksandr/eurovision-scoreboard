@@ -7,8 +7,10 @@ import ThemesSearchHeader from './ThemesSearchHeader';
 import { api } from '@/api/client';
 import {
   useApplyThemeMutation,
-  useLikeThemeMutation,
   usePublicThemesQuery,
+  useToggleLikeThemeMutation,
+  useToggleSaveThemeMutation,
+  useThemesStateQuery,
 } from '@/api/themes';
 import Button from '@/components/common/Button';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -40,11 +42,18 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     sortBy,
   });
 
-  const { mutateAsync: likeTheme } = useLikeThemeMutation();
+  const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
+  const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
   const { mutateAsync: applyThemeToProfile } = useApplyThemeMutation();
   const applyCustomTheme = useGeneralStore((state) => state.applyCustomTheme);
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
   const user = useAuthStore((state) => state.user);
+
+  const themeIds = data?.themes?.map((t) => t._id) || [];
+  const { data: themeState } = useThemesStateQuery(
+    themeIds,
+    !!themeIds.length && !!user,
+  );
 
   useEffectOnce(onLoaded);
 
@@ -71,10 +80,30 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
 
   const handleLike = async (id: string) => {
     try {
-      await likeTheme(id);
-      toast.success('Theme liked!');
+      const res = await toggleLike(id);
+
+      toast.success(res.liked ? 'Theme liked!' : 'Like removed');
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to like theme');
+    }
+  };
+
+  const handleSave = async (id: string, savedByMe: boolean) => {
+    try {
+      if (savedByMe) {
+        if (
+          !window.confirm(
+            'Are you sure you want to remove this theme from your saved themes?',
+          )
+        ) {
+          return;
+        }
+      }
+      const res = await toggleSave(id);
+
+      toast.success(res.saved ? 'Theme saved!' : 'Removed from saved');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to save theme');
     }
   };
 
@@ -87,7 +116,10 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
           setPage(1);
         }}
         sortBy={sortBy}
-        onSortByChange={setSortBy}
+        onSortByChange={(sortBy) => {
+          setSortBy(sortBy);
+          setPage(1);
+        }}
       />
 
       <h3 className="text-white text-lg font-bold">
@@ -103,10 +135,13 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
                 theme={theme}
                 variant="public"
                 onLike={handleLike}
+                onSave={handleSave}
                 onApply={handleApply}
                 isApplied={currentCustomTheme?._id === theme._id}
                 onDuplicate={onDuplicate}
                 onEdit={onEdit}
+                likedByMe={!!themeState?.likedIds?.includes(theme._id)}
+                savedByMe={!!themeState?.savedIds?.includes(theme._id)}
               />
             ))}
           </div>

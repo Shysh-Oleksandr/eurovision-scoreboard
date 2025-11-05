@@ -9,6 +9,8 @@ import {
   useApplyThemeMutation,
   useDeleteThemeMutation,
   useMyThemesQuery,
+  useSavedThemesQuery,
+  useToggleSaveThemeMutation,
 } from '@/api/themes';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
@@ -34,8 +36,10 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const [sortBy, setSortBy] = useState<'createdAt' | 'likes'>('createdAt');
 
   const { data: themes, isLoading } = useMyThemesQuery(!!user);
+  const { data: savedThemes } = useSavedThemesQuery(!!user);
   const { mutateAsync: deleteTheme } = useDeleteThemeMutation();
   const { mutateAsync: applyThemeToProfile } = useApplyThemeMutation();
+  const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
   const applyCustomTheme = useGeneralStore((state) => state.applyCustomTheme);
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
 
@@ -146,6 +150,43 @@ const UserThemes: React.FC<UserThemesProps> = ({
               Create Theme
             </Button>
           )}
+        </div>
+      )}
+
+      <div className="h-px bg-white/10" />
+
+      {/* Saved themes */}
+      {savedThemes && savedThemes.length > 0 && (
+        <div className="sm:space-y-4 space-y-2">
+          <h3 className="text-white text-lg font-bold">
+            You saved {savedThemes.length}{' '}
+            {savedThemes.length === 1 ? 'theme' : 'themes'}
+          </h3>
+          <div className="grid gap-4">
+            {savedThemes.map((theme) => (
+              <ThemeListItem
+                key={theme._id}
+                theme={theme}
+                variant="public"
+                onApply={handleApply}
+                isApplied={currentCustomTheme?._id === theme._id}
+                onDuplicate={onDuplicate}
+                onSave={(id, savedByMe) => {
+                  if (savedByMe) {
+                    if (
+                      !window.confirm(
+                        'Are you sure you want to remove this theme from your saved themes?',
+                      )
+                    ) {
+                      return;
+                    }
+                  }
+                  toggleSave(id);
+                }}
+                savedByMe
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>

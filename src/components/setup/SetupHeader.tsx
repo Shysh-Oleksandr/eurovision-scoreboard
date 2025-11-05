@@ -116,7 +116,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     ];
 
     if (customTheme) {
-      groups.push({
+      groups.unshift({
         label: 'Custom',
         options: [
           {

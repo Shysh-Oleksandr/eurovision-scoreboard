@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-11-05',
+    title:
+      'Added the ability to save and like custom themes. Small improvements',
+  },
+  {
     date: '2025-11-02',
     title:
       'Custom theme builder. The ability to use public themes. Small improvements',

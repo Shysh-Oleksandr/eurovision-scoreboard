@@ -6,9 +6,9 @@ import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import UserInfo from '@/components/common/UserInfo';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useAuthStore } from '@/state/useAuthStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
 
 const EditProfileModal = React.lazy(() => import('./EditProfileModal'));
 
@@ -35,8 +35,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     onLoaded();
   });
 
-  const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
-
   const handleLogout = async () => {
     if (confirm('Are you sure you want to logout?')) {
       storeLogout();
@@ -55,31 +53,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       <h3 className="text-2xl font-bold mb-4">Profile</h3>
       {isAuthenticated ? (
         <div className="text-base mb-4 flex justify-between flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2.5">
-            <img
-              src={user?.avatarUrl || '/img/ProfileAvatarPlaceholder.png'}
-              alt={user?.username || 'avatar'}
-              className="w-14 h-14 rounded-full object-cover"
-            />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <div className="font-semibold">{user?.name || 'Anonymous'}</div>
-                {user?.country && (
-                  <img
-                    src={logo}
-                    alt={`${user?.country} flag`}
-                    className={`flex-none rounded-sm mb-0.5 pointer-events-none ${
-                      isExisting ? 'w-6 h-6' : 'w-7 h-5 object-cover'
-                    }`}
-                    width={28}
-                    height={28}
-                    loading="lazy"
-                  />
-                )}
-              </div>
-              <span className="text-sm text-white/70">@{user?.username}</span>
-            </div>
-          </div>
+          <UserInfo user={user} size="lg" />
 
           <Button
             label="Edit Profile"

@@ -10,6 +10,7 @@ import {
   useCreateThemeMutation,
   useUpdateThemeMutation,
   useUploadThemeBackgroundMutation,
+  useReportThemeDuplicateMutation,
 } from '@/api/themes';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { UploadIcon } from '@/assets/icons/UploadIcon';
@@ -28,6 +29,7 @@ import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
+import { useAuthStore } from '@/state/useAuthStore';
 import { applyCustomTheme, getDefaultThemeColors } from '@/theme/themeUtils';
 import { useThemeColor } from '@/theme/useThemeColor';
 import { CustomTheme } from '@/types/customTheme';
@@ -72,6 +74,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     useUpdateThemeMutation();
   const { mutateAsync: uploadBackground, isPending: isUploadingBg } =
     useUploadThemeBackgroundMutation();
+  const { mutateAsync: reportDuplicate } = useReportThemeDuplicateMutation();
+  const user = useAuthStore((s) => s.user);
 
   const imageUpload = useImageUpload({ maxSizeInMB: 1.5 });
 
@@ -114,6 +118,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       userId: 'preview',
       isPublic: false,
       likes: 0,
+      saves: 0,
       baseThemeYear,
       hue,
       overrides,
@@ -178,6 +183,16 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
             id: created._id,
             file: uploadedFile,
           });
+        }
+
+        // If created from someone else's theme, record duplicate
+        if (initialTheme && user && initialTheme.userId !== user._id) {
+          try {
+            await reportDuplicate(initialTheme._id);
+          } catch (e) {
+            // non-blocking
+            console.error(e);
+          }
         }
 
         toast.success('Theme created successfully!');
