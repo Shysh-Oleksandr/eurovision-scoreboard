@@ -58,6 +58,7 @@ type ThemePreviewCountryItemCompactProps = {
   lastPoints: number | null;
   showDouzePointsAnimation: boolean;
   isListItem?: boolean;
+  previewCountryCode?: string;
   onClick?: () => void;
 };
 
@@ -71,6 +72,7 @@ const ThemePreviewCountryItemCompact: React.FC<
   lastPoints,
   showDouzePointsAnimation,
   isListItem = false,
+  previewCountryCode,
   onClick,
 }) => {
   const { user } = useAuthStore();
@@ -78,9 +80,10 @@ const ThemePreviewCountryItemCompact: React.FC<
   const previewCountry = useMemo(() => {
     return ALL_COUNTRIES.find(
       (country) =>
-        country.code.toLowerCase() === (user?.country || 'ww').toLowerCase(),
+        country.code.toLowerCase() ===
+        (previewCountryCode || user?.country || 'ww').toLowerCase(),
     )!;
-  }, [user]);
+  }, [user, previewCountryCode]);
 
   const [state, setState] = useState<ItemState>('jury');
 

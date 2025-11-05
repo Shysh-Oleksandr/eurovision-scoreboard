@@ -6,6 +6,23 @@ import { UndoIcon } from '@/assets/icons/UndoIcon';
 import Button from '@/components/common/Button';
 import { hslStringToHex, parseColor } from '@/helpers/colorConversion';
 
+const sanitizeGradient = (input: string): string => {
+  if (!/linear-gradient\s*\(/i.test(input)) return input;
+  let out = input;
+
+  // Fix missing angle: "linear-gradient(deg, ..." -> "linear-gradient(180deg, ..."
+  out = out.replace(/linear-gradient\s*\(\s*deg\s*,/i, 'linear-gradient(0deg,');
+  // Fix NaNdeg
+  out = out.replace(
+    /linear-gradient\s*\(\s*NaNdeg\s*,/i,
+    'linear-gradient(0deg,',
+  );
+  // Guard against NaN% stops
+  out = out.replace(/NaN%/gi, '0%');
+
+  return out;
+};
+
 interface ColorOverridePickerProps {
   label: string;
   value: string | undefined;
@@ -30,7 +47,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   let displayColor: string;
 
   if (isGradient) {
-    displayColor = currentValue;
+    displayColor = sanitizeGradient(currentValue);
   } else if (currentValue.startsWith('#')) {
     displayColor = currentValue;
   } else if (
@@ -111,8 +128,11 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   const handleColorChange = (color: string) => {
     // react-best-gradient-color-picker provides a string for both solid and gradient
     const normalized = parseColor(color);
+    const sanitized = /gradient\(/i.test(normalized)
+      ? sanitizeGradient(normalized)
+      : normalized;
 
-    onChange(normalized);
+    onChange(sanitized);
   };
 
   const isCustom = value !== undefined && value !== defaultValue;

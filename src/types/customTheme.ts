@@ -5,6 +5,8 @@ export interface CustomTheme {
   userId: string;
   isPublic: boolean;
   likes: number;
+  saves: number;
+  duplicatesCount?: number;
   baseThemeYear: string;
   hue: number;
   overrides: Record<string, string>;
@@ -12,6 +14,7 @@ export interface CustomTheme {
   backgroundImageKey?: string;
   createdAt: string;
   updatedAt: string;
+  creator?: ThemeCreator;
 }
 
 export interface ThemeListResponse {
@@ -19,4 +22,17 @@ export interface ThemeListResponse {
   total: number;
   page: number;
   totalPages: number;
+}
+
+export interface ThemeState {
+  likedIds: string[];
+  savedIds: string[];
+}
+
+export interface ThemeCreator {
+  _id: string;
+  username: string;
+  name?: string;
+  country?: string;
+  avatarUrl?: string;
 }

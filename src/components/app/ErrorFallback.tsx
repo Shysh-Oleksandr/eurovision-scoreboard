@@ -107,13 +107,14 @@ const ErrorFallback = ({
             <div className="flex justify-center items-center gap-4">
               <Button
                 onClick={() => window.location.reload()}
-                className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
               >
                 Reload Page
               </Button>
               <Button
                 onClick={resetErrorBoundary}
-                className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                variant="destructive"
+                className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
               >
                 Reset Application
               </Button>

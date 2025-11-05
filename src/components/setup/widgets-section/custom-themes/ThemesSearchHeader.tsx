@@ -23,8 +23,8 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
   onCreateNew,
   search,
   onSearchChange,
-  // sortBy,
-  // onSortByChange,
+  sortBy,
+  onSortByChange,
 }) => {
   return (
     <div className="flex flex-col xs:flex-row gap-2 items-stretch xs:items-center">
@@ -35,7 +35,7 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
         onChange={(e) => onSearchChange(e.target.value)}
         className="flex-1 text-sm"
       />
-      {/* <Select
+      <Select
         id="sortBy"
         value={sortBy}
         onChange={(e) => onSortByChange(e.target.value as SortBy)}
@@ -47,7 +47,7 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
         <span className="flex-1">
           {sortBy === 'createdAt' ? 'Most Recent' : 'Most Liked'}
         </span>
-      </Select> */}
+      </Select>
       {onCreateNew && (
         <Button variant="tertiary" onClick={onCreateNew}>
           Create
