@@ -22,7 +22,7 @@ import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
-import { buildPrimaryFromHue } from '@/theme/themeUtils';
+import { buildPrimaryFromHsva } from '@/theme/themeUtils';
 
 const YEAR_OPTIONS = [...ESC_YEAR_OPTIONS, ...JESC_YEAR_OPTIONS];
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
@@ -105,7 +105,13 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
   const customThemeColor = useMemo(() => {
     return customTheme?.hue
-      ? `hsl(${buildPrimaryFromHue(customTheme.hue)['700']})`
+      ? `hsl(${
+          buildPrimaryFromHsva({
+            h: customTheme.hue,
+            s: 80,
+            v: customTheme.shadeValue || 60,
+          })['700']
+        })`
       : undefined;
   }, [customTheme]);
 

@@ -18,28 +18,79 @@ const GRAY_SL = {
   900: [31, 26],
 } as const;
 
+/** Lightweight HSVA shape used by shade slider */
+type HSVA = { h: number; s: number; v: number; a?: number };
+
+// Baseline values mirrored from CustomizeThemeModal initial state
+const DEFAULT_S = 80;
+const DEFAULT_V = 60;
+
 /**
- * Build primary colors from hue with fixed saturation/lightness
+ * Adjust given S/L with user-selected HSVA so users can make palette lighter/darker
+ * - Keeps relative differences across shades while applying global S and L adjustments
  */
-export function buildPrimaryFromHue(hue: number): Record<string, string> {
+function adjustSLWithHsva(s: number, l: number, hsva: HSVA): [number, number] {
+  // Saturation: multiply by factor relative to baseline
+  const satFactor = Math.max(hsva.s, 0) / DEFAULT_S;
+  const sAdj = Math.max(0, Math.min(100, s * satFactor));
+
+  // Lightness: scale multiplicatively by V ratio to preserve ordering
+  const vRatio = (Math.max(hsva.v, 0) || 0.0001) / DEFAULT_V;
+  const lAdj = Math.max(0, Math.min(100, l * vRatio));
+
+  return [sAdj, lAdj];
+}
+
+/** Build primary palette using HSVA (hue from hsva.h, S/L adjusted globally) */
+export function buildPrimaryFromHsva(hsva: HSVA): Record<string, string> {
+  const hue = hsva.h;
   return Object.fromEntries(
-    Object.entries(PRIMARY_SL).map(([key, [s, l]]) => [
-      key,
-      `${toFixedIfDecimal(hue)} ${s}% ${l}%`,
-    ]),
+    Object.entries(PRIMARY_SL).map(([key, [s, l]]) => {
+      const [sAdj, lAdj] = adjustSLWithHsva(s, l, hsva);
+      return [
+        key,
+        `${toFixedIfDecimal(hue)} ${toFixedIfDecimal(sAdj)}% ${toFixedIfDecimal(
+          lAdj,
+        )}%`,
+      ];
+    }),
+  );
+}
+
+/** Build gray palette using HSVA (hue from hsva.h, S/L adjusted globally) */
+export function buildGrayFromHsva(hsva: HSVA): Record<string, string> {
+  const hue = hsva.h;
+  return Object.fromEntries(
+    Object.entries(GRAY_SL).map(([key, [s, l]]) => {
+      const [sAdj, lAdj] = adjustSLWithHsva(s, l, hsva);
+      return [
+        key,
+        `${toFixedIfDecimal(hue)} ${toFixedIfDecimal(sAdj)}% ${toFixedIfDecimal(
+          lAdj,
+        )}%`,
+      ];
+    }),
   );
 }
 
 /**
- * Build gray colors from hue with fixed saturation/lightness
+ * Build palettes from hue and an optional shadeValue (0-100).
+ * Fallback: if shadeValue is missing, use DEFAULT_V baseline to preserve legacy look.
  */
-export function buildGrayFromHue(hue: number): Record<string, string> {
-  return Object.fromEntries(
-    Object.entries(GRAY_SL).map(([key, [s, l]]) => [
-      key,
-      `${toFixedIfDecimal(hue)} ${s}% ${l}%`,
-    ]),
-  );
+function buildPalettesFromHueAndShade(
+  hue: number,
+  shadeValue?: number,
+): { primary: Record<string, string>; gray: Record<string, string> } {
+  const hsva: HSVA = {
+    h: hue,
+    s: DEFAULT_S,
+    v: typeof shadeValue === 'number' ? shadeValue : DEFAULT_V,
+    a: 1,
+  };
+  return {
+    primary: buildPrimaryFromHsva(hsva),
+    gray: buildGrayFromHsva(hsva),
+  };
 }
 
 /**
@@ -124,8 +175,10 @@ export function getCssVarsForCustomTheme(
   theme: CustomTheme,
 ): Record<string, string> {
   const base = getThemeForYear(theme.baseThemeYear).colors;
-  const primary = buildPrimaryFromHue(theme.hue);
-  const gray = buildGrayFromHue(theme.hue);
+  const { primary, gray } = buildPalettesFromHueAndShade(
+    theme.hue,
+    theme.shadeValue,
+  );
 
   const parsedOverrides = parseOverrides(theme.overrides || {});
   const merged: ThemeColors = {
@@ -149,8 +202,10 @@ export function getCssVarsForCustomTheme(
  */
 export function applyCustomTheme(theme: CustomTheme, preview = false): void {
   const base = getThemeForYear(theme.baseThemeYear).colors;
-  const primary = buildPrimaryFromHue(theme.hue);
-  const gray = buildGrayFromHue(theme.hue);
+  const { primary, gray } = buildPalettesFromHueAndShade(
+    theme.hue,
+    theme.shadeValue,
+  );
 
   // Merge base + derived + overrides
   const parsedOverrides = parseOverrides(theme.overrides || {});
@@ -239,11 +294,14 @@ export function clearCustomTheme(): void {
  */
 export function getDefaultThemeColors(
   baseThemeYear: string,
-  hue: number,
+  hueOrHsva: HSVA,
 ): ThemeColors {
   const base = getThemeForYear(baseThemeYear).colors;
-  const primary = buildPrimaryFromHue(hue);
-  const gray = buildGrayFromHue(hue);
+
+  const { primary, gray } = buildPalettesFromHueAndShade(
+    hueOrHsva.h,
+    hueOrHsva.v,
+  );
 
   return {
     ...base,

@@ -9,6 +9,7 @@ export type CreateThemeInput = {
   description?: string;
   baseThemeYear?: string;
   hue: number;
+  shadeValue?: number;
   overrides?: Record<string, string>;
   backgroundImageUrl?: string;
   isPublic?: boolean;
@@ -19,6 +20,7 @@ export type UpdateThemeInput = {
   description?: string;
   baseThemeYear?: string;
   hue?: number;
+  shadeValue?: number;
   overrides?: Record<string, string>;
   backgroundImageUrl?: string;
   isPublic?: boolean;
@@ -27,7 +29,8 @@ export type UpdateThemeInput = {
 export type PublicThemesQueryParams = {
   page?: number;
   search?: string;
-  sortBy?: 'createdAt' | 'likes';
+  sortBy?: 'createdAt' | 'likes' | 'saves' | 'duplicatesCount';
+  sortOrder?: 'asc' | 'desc';
   enabled?: boolean;
 };
 
@@ -46,17 +49,18 @@ export function usePublicThemesQuery({
   page = 1,
   search,
   sortBy = 'createdAt',
+  sortOrder = 'desc',
   enabled = true,
 }: PublicThemesQueryParams) {
   return useQuery<ThemeListResponse>({
-    queryKey: queryKeys.public.themes({ page, search, sortBy }),
+    queryKey: queryKeys.public.themes({ page, search, sortBy, sortOrder }),
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', '10');
       if (search) params.append('search', search);
       params.append('sortBy', sortBy);
-      params.append('sortOrder', 'desc');
+      params.append('sortOrder', sortOrder);
 
       const { data } = await api.get(`/themes/public?${params.toString()}`);
       return data as ThemeListResponse;

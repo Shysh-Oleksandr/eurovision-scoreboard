@@ -1,5 +1,10 @@
 export const WHATS_NEW = [
   {
+    date: '2025-11-06',
+    title:
+      'The shade selector for the interface colors. Copying colors from one field to another. Small fixes',
+  },
+  {
     date: '2025-11-05',
     title:
       'Added the ability to save and like custom themes. Small improvements',

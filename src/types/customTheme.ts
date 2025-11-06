@@ -9,6 +9,7 @@ export interface CustomTheme {
   duplicatesCount?: number;
   baseThemeYear: string;
   hue: number;
+  shadeValue?: number;
   overrides: Record<string, string>;
   backgroundImageUrl?: string;
   backgroundImageKey?: string;

@@ -1,9 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ColorPicker from 'react-best-gradient-color-picker';
 import { createPortal } from 'react-dom';
 
+import { CopyIcon } from '@/assets/icons/CopyIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import Button from '@/components/common/Button';
+import { Checkbox } from '@/components/common/Checkbox';
+import { Input } from '@/components/Input';
 import { hslStringToHex, parseColor } from '@/helpers/colorConversion';
 
 const sanitizeGradient = (input: string): string => {
@@ -23,12 +32,22 @@ const sanitizeGradient = (input: string): string => {
   return out;
 };
 
+export interface ColorFieldDefinition {
+  key: string;
+  label: string;
+  enableGradient?: boolean;
+  groupKey: string;
+}
+
 interface ColorOverridePickerProps {
   label: string;
   value: string | undefined;
   defaultValue: string;
   onChange: (value: string | undefined) => void;
   enableGradient?: boolean;
+  allColorFields?: ColorFieldDefinition[];
+  currentFieldKey?: string;
+  onBulkChange?: (updates: Record<string, string>) => void;
 }
 
 const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
@@ -37,10 +56,21 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   defaultValue,
   onChange,
   enableGradient = false,
+  allColorFields = [],
+  currentFieldKey,
+  onBulkChange,
 }) => {
   const [showPicker, setShowPicker] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  const [showCopyPopup, setShowCopyPopup] = useState(false);
+  const [copyPopupPosition, setCopyPopupPosition] = useState({
+    top: 0,
+    left: 0,
+  });
+  const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
+  const [searchText, setSearchText] = useState('');
   const buttonRef = useRef<HTMLDivElement>(null);
+  const copyButtonRef = useRef<HTMLDivElement>(null);
 
   const currentValue = value || defaultValue;
   const isGradient = /gradient\(/i.test(currentValue);
@@ -79,51 +109,157 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
     return `hsl(${colorValue})`;
   };
 
-  // Calculate picker position when opening
-  useEffect(() => {
-    if (showPicker && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
-      const pickerHeight = 400; // Approximate Chrome picker height
-      const pickerWidth = 295; // Approximate Chrome picker width
+  // Filter available fields for copying
+  const availableFields = useMemo(() => {
+    return allColorFields.filter((field) => {
+      const fullKey = `${field.groupKey}.${field.key}`;
 
-      let top = rect.bottom + 8;
-      let { left } = rect;
+      // Exclude current field
+      if (fullKey === currentFieldKey) return false;
 
-      // Adjust if picker would go off bottom of screen
-      if (top + pickerHeight > viewportHeight) {
-        top = rect.top - pickerHeight - 8;
-      }
+      // If current value is a gradient, only show fields that support gradients
+      if (isGradient && !field.enableGradient) return false;
 
-      // Adjust if picker would go off right side of screen
-      if (left + pickerWidth > viewportWidth) {
-        left = viewportWidth - pickerWidth - 16;
-      }
+      return true;
+    });
+  }, [allColorFields, currentFieldKey, isGradient]);
 
-      // Ensure picker doesn't go off left side
-      if (left < 16) {
-        left = 16;
-      }
+  // Filter fields by search text
+  const filteredFields = useMemo(() => {
+    if (!searchText.trim()) return availableFields;
 
-      setPickerPosition({ top, left });
+    const searchLower = searchText.toLowerCase();
+
+    return availableFields.filter((field) =>
+      field.label.toLowerCase().includes(searchLower),
+    );
+  }, [availableFields, searchText]);
+
+  // Calculate picker position synchronously
+  const calculatePickerPosition = useCallback(() => {
+    if (!buttonRef.current) return { top: 0, left: 0 };
+
+    const rect = buttonRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const pickerHeight = 400; // Approximate Chrome picker height
+    const pickerWidth = 295; // Approximate Chrome picker width
+
+    let top = rect.bottom + 8;
+    let { left } = rect;
+
+    // Adjust if picker would go off bottom of screen
+    if (top + pickerHeight > viewportHeight) {
+      top = rect.top - pickerHeight - 8;
     }
-  }, [showPicker]);
 
-  // Handle escape key to close picker
+    // Adjust if picker would go off right side of screen
+    if (left + pickerWidth > viewportWidth) {
+      left = viewportWidth - pickerWidth - 16;
+    }
+
+    // Ensure picker doesn't go off left side
+    if (left < 16) {
+      left = 16;
+    }
+
+    return { top, left };
+  }, []);
+
+  // Calculate copy popup position synchronously
+  const calculateCopyPopupPosition = useCallback(() => {
+    if (!copyButtonRef.current)
+      return {
+        top: 0,
+        left: 0,
+      };
+
+    const rect = copyButtonRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const popupHeight = 400; // Approximate popup height
+    const popupWidth = 320; // Approximate popup width
+
+    let top = rect.bottom + 8;
+    let { left } = rect;
+
+    // Adjust if popup would go off bottom of screen
+    if (top + popupHeight > viewportHeight) {
+      top = rect.top - popupHeight - 8;
+    }
+
+    // Adjust if popup would go off right side of screen
+    if (left + popupWidth > viewportWidth) {
+      left = viewportWidth - popupWidth - 16;
+    }
+
+    // Ensure popup doesn't go off left side
+    if (left < 16) {
+      left = 16;
+    }
+
+    return { top, left };
+  }, []);
+
+  // Recalculate position on window resize/scroll when picker is open
+  useEffect(() => {
+    if (!showPicker) return;
+
+    const updatePosition = () => {
+      const position = calculatePickerPosition();
+
+      setPickerPosition(position);
+    };
+
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [showPicker, calculatePickerPosition]);
+
+  // Recalculate copy popup position on window resize/scroll when open
+  useEffect(() => {
+    if (!showCopyPopup) return;
+
+    const updatePosition = () => {
+      const position = calculateCopyPopupPosition();
+
+      setCopyPopupPosition(position);
+    };
+
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [showCopyPopup, calculateCopyPopupPosition]);
+
+  // Handle escape key to close picker or copy popup
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && showPicker) {
-        setShowPicker(false);
+      if (event.key === 'Escape') {
+        if (showPicker) {
+          setShowPicker(false);
+        }
+        if (showCopyPopup) {
+          setShowCopyPopup(false);
+          setSelectedFields(new Set());
+          setSearchText('');
+        }
       }
     };
 
-    if (showPicker) {
+    if (showPicker || showCopyPopup) {
       document.addEventListener('keydown', handleKeyDown);
 
       return () => document.removeEventListener('keydown', handleKeyDown);
     }
-  }, [showPicker]);
+  }, [showPicker, showCopyPopup]);
 
   const handleColorChange = (color: string) => {
     // react-best-gradient-color-picker provides a string for both solid and gradient
@@ -133,6 +269,53 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
       : normalized;
 
     onChange(sanitized);
+  };
+
+  const handleCopyButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    if (!showCopyPopup && copyButtonRef.current) {
+      // Calculate position before opening to prevent flash
+      const position = calculateCopyPopupPosition();
+
+      setCopyPopupPosition(position);
+    }
+    setShowCopyPopup(!showCopyPopup);
+
+    // Reset selection when closing
+    if (showCopyPopup) {
+      setSelectedFields(new Set());
+      setSearchText('');
+    }
+  };
+
+  const handleFieldToggle = (fullKey: string) => {
+    setSelectedFields((prev) => {
+      const next = new Set(prev);
+
+      if (next.has(fullKey)) {
+        next.delete(fullKey);
+      } else {
+        next.add(fullKey);
+      }
+
+      return next;
+    });
+  };
+
+  const handleCopy = () => {
+    if (selectedFields.size === 0 || !onBulkChange) return;
+
+    const updates: Record<string, string> = {};
+
+    selectedFields.forEach((fullKey) => {
+      updates[fullKey] = currentValue;
+    });
+
+    onBulkChange(updates);
+    setShowCopyPopup(false);
+    setSelectedFields(new Set());
+    setSearchText('');
   };
 
   const isCustom = value !== undefined && value !== defaultValue;
@@ -145,7 +328,15 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
 
       <div
         className="flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded-md p-1 transition-colors"
-        onClick={() => setShowPicker(!showPicker)}
+        onClick={() => {
+          if (!showPicker) {
+            // Calculate position before opening to prevent flash
+            const position = calculatePickerPosition();
+
+            setPickerPosition(position);
+          }
+          setShowPicker(!showPicker);
+        }}
       >
         <div
           ref={buttonRef}
@@ -167,6 +358,14 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
             Icon={<UndoIcon className="w-4 h-4" />}
           ></Button>
         )}
+        <div ref={copyButtonRef}>
+          <Button
+            variant="tertiary"
+            onClick={handleCopyButtonClick}
+            className="!px-2.5 !py-1.5"
+            Icon={<CopyIcon className="w-4 h-4" />}
+          ></Button>
+        </div>
       </div>
 
       {showPicker &&
@@ -190,6 +389,78 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
                 height={200}
                 hideColorTypeBtns={!enableGradient}
               />
+            </div>
+          </>,
+          document.body,
+        )}
+
+      {showCopyPopup &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0 z-[9998]"
+              onClick={() => {
+                setShowCopyPopup(false);
+                setSelectedFields(new Set());
+                setSearchText('');
+              }}
+            />
+            <div
+              className="fixed z-[9999] bg-primary-900 rounded-lg shadow-xl border border-white/20 p-4 flex flex-col"
+              style={{
+                top: `${copyPopupPosition.top}px`,
+                left: `${copyPopupPosition.left}px`,
+                width: '320px',
+                maxHeight: '400px',
+              }}
+              data-theme="custom-preview"
+            >
+              <h3 className="text-white text-sm font-semibold mb-3">
+                Copy to Fields
+              </h3>
+
+              <Input
+                placeholder="Search fields..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="mb-3 !py-2 !h-auto"
+              />
+
+              <div className="flex-1 overflow-y-auto mb-3 space-y-2">
+                {filteredFields.length === 0 ? (
+                  <div className="text-white/50 text-sm text-center py-4">
+                    {searchText.trim()
+                      ? 'No fields found'
+                      : 'No available fields'}
+                  </div>
+                ) : (
+                  filteredFields.map((field) => {
+                    const fullKey = `${field.groupKey}.${field.key}`;
+
+                    return (
+                      <div key={fullKey}>
+                        <Checkbox
+                          id={`copy-${fullKey}`}
+                          label={field.label}
+                          checked={selectedFields.has(fullKey)}
+                          onChange={() => handleFieldToggle(fullKey)}
+                          labelClassName="text-white text-sm"
+                        />
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              <Button
+                variant="primary"
+                onClick={handleCopy}
+                disabled={selectedFields.size === 0}
+                className="w-full"
+              >
+                Copy to {selectedFields.size} field
+                {selectedFields.size !== 1 ? 's' : ''}
+              </Button>
             </div>
           </>,
           document.body,

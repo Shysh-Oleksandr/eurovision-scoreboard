@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 
 import ThemeListItem from './ThemeListItem';
 import ThemesSearchHeader from './ThemesSearchHeader';
+import ThemesSortBadges, { PublicSortKey } from './ThemesSortBadges';
 
 import { api } from '@/api/client';
 import {
@@ -31,15 +32,26 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   onEdit,
 }) => {
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<'createdAt' | 'likes'>('createdAt');
+  const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
   const [page, setPage] = useState(1);
 
   const debouncedSearch = useDebounce(search, 400);
 
+  const serverSortBy =
+    sortKey === 'likes'
+      ? 'likes'
+      : sortKey === 'saves'
+      ? 'saves'
+      : sortKey === 'copies'
+      ? 'duplicatesCount'
+      : 'createdAt';
+  const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
+
   const { data } = usePublicThemesQuery({
     page,
     search: debouncedSearch,
-    sortBy,
+    sortBy: serverSortBy,
+    sortOrder: serverSortOrder,
   });
 
   const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
@@ -109,19 +121,22 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
 
   return (
     <div className="sm:space-y-4 space-y-2">
-      <ThemesSearchHeader
-        search={search}
-        onSearchChange={(search: string) => {
-          setSearch(search);
-          setPage(1);
-        }}
-        sortBy={sortBy}
-        onSortByChange={(sortBy) => {
-          setSortBy(sortBy);
-          setPage(1);
-        }}
-      />
-
+      <div className="sm:space-y-3 space-y-2">
+        <ThemesSearchHeader
+          search={search}
+          onSearchChange={(search: string) => {
+            setSearch(search);
+            setPage(1);
+          }}
+        />
+        <ThemesSortBadges
+          value={sortKey}
+          onChange={(k: PublicSortKey) => {
+            setSortKey(k);
+            setPage(1);
+          }}
+        />
+      </div>
       <h3 className="text-white text-lg font-bold">
         Found {data?.total} {data?.total === 1 ? 'theme' : 'themes'}
       </h3>

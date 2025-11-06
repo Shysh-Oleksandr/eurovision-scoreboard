@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 
 import ThemeListItem from './ThemeListItem';
 import ThemesSearchHeader from './ThemesSearchHeader';
+import ThemesSortBadges, { PublicSortKey } from './ThemesSortBadges';
 
 import { api } from '@/api/client';
 import {
@@ -12,11 +13,34 @@ import {
   useSavedThemesQuery,
   useToggleSaveThemeMutation,
 } from '@/api/themes';
+import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';
+
+const sortThemesBy =
+  (sortKey: PublicSortKey) => (a: CustomTheme, b: CustomTheme) => {
+    switch (sortKey) {
+      case 'latest':
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      case 'oldest':
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      case 'likes':
+        return (b.likes ?? 0) - (a.likes ?? 0);
+      case 'saves':
+        return (b.saves ?? 0) - (a.saves ?? 0);
+      case 'copies':
+        return (b.duplicatesCount ?? 0) - (a.duplicatesCount ?? 0);
+      default:
+        return 0;
+    }
+  };
 
 interface UserThemesProps {
   onLoaded?: () => void;
@@ -33,7 +57,8 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const user = useAuthStore((state) => state.user);
 
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<'createdAt' | 'likes'>('createdAt');
+  const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
+  const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
 
   const { data: themes, isLoading } = useMyThemesQuery(!!user);
   const { data: savedThemes } = useSavedThemesQuery(!!user);
@@ -74,20 +99,18 @@ const UserThemes: React.FC<UserThemesProps> = ({
     }
   };
 
-  // Filter and sort themes
-  const filteredThemes = themes
+  // Filter and sort lists
+  const filteredYours = themes
     ?.filter((theme) =>
       theme.name.toLowerCase().includes(search.trim().toLowerCase()),
     )
-    .sort((a, b) => {
-      if (sortBy === 'createdAt') {
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      }
+    .sort(sortThemesBy(sortKey));
 
-      return b.likes - a.likes;
-    });
+  const filteredSaved = savedThemes
+    ?.filter((theme) =>
+      theme.name.toLowerCase().includes(search.trim().toLowerCase()),
+    )
+    .sort(sortThemesBy(sortKey));
 
   if (isLoading) {
     return (
@@ -106,26 +129,38 @@ const UserThemes: React.FC<UserThemesProps> = ({
     );
   }
 
-  return (
-    <div className="sm:space-y-4 space-y-2">
-      {/* Top bar */}
-      <ThemesSearchHeader
-        search={search}
-        onSearchChange={setSearch}
-        sortBy={sortBy}
-        onSortByChange={setSortBy}
-        onCreateNew={onCreateNew}
-      />
+  // Derived header and content per selected view
+  const headerPrefix = search.trim()
+    ? 'Found'
+    : view === 'yours'
+    ? 'You have'
+    : 'You saved';
+  const headerCount =
+    (view === 'yours' ? filteredYours?.length : filteredSaved?.length) ?? 0;
+  const headerNoun = headerCount === 1 ? 'theme' : 'themes';
 
-      <h3 className="text-white text-lg font-bold">
-        {search.trim() ? 'Found' : 'You have'} {filteredThemes?.length}{' '}
-        {filteredThemes?.length === 1 ? 'theme' : 'themes'}
-      </h3>
+  let content: React.ReactNode = null;
 
-      {/* Theme list */}
-      {filteredThemes && filteredThemes.length > 0 ? (
+  if (view === 'current') {
+    content = currentCustomTheme ? (
+      <div className="grid gap-4">
+        <ThemeListItem
+          key={currentCustomTheme._id}
+          theme={currentCustomTheme}
+          variant="user"
+          onEdit={onEdit}
+          onDelete={handleDelete}
+          onApply={handleApply}
+          isApplied
+          onDuplicate={onDuplicate}
+        />
+      </div>
+    ) : null;
+  } else if (view === 'yours') {
+    content =
+      filteredYours && filteredYours.length > 0 ? (
         <div className="grid gap-4">
-          {filteredThemes.map((theme) => (
+          {filteredYours.map((theme) => (
             <ThemeListItem
               key={theme._id}
               theme={theme}
@@ -151,44 +186,86 @@ const UserThemes: React.FC<UserThemesProps> = ({
             </Button>
           )}
         </div>
-      )}
-
-      <div className="h-px bg-white/10" />
-
-      {/* Saved themes */}
-      {savedThemes && savedThemes.length > 0 && (
-        <div className="sm:space-y-4 space-y-2">
-          <h3 className="text-white text-lg font-bold">
-            You saved {savedThemes.length}{' '}
-            {savedThemes.length === 1 ? 'theme' : 'themes'}
-          </h3>
-          <div className="grid gap-4">
-            {savedThemes.map((theme) => (
-              <ThemeListItem
-                key={theme._id}
-                theme={theme}
-                variant="public"
-                onApply={handleApply}
-                isApplied={currentCustomTheme?._id === theme._id}
-                onDuplicate={onDuplicate}
-                onSave={(id, savedByMe) => {
-                  if (savedByMe) {
-                    if (
-                      !window.confirm(
-                        'Are you sure you want to remove this theme from your saved themes?',
-                      )
-                    ) {
-                      return;
-                    }
+      );
+  } else {
+    content =
+      filteredSaved && filteredSaved.length > 0 ? (
+        <div className="grid gap-4">
+          {filteredSaved.map((theme) => (
+            <ThemeListItem
+              key={theme._id}
+              theme={theme}
+              variant="public"
+              onApply={handleApply}
+              isApplied={currentCustomTheme?._id === theme._id}
+              onDuplicate={onDuplicate}
+              onSave={(id, savedByMe) => {
+                if (savedByMe) {
+                  if (
+                    !window.confirm(
+                      'Are you sure you want to remove this theme from your saved themes?',
+                    )
+                  ) {
+                    return;
                   }
-                  toggleSave(id);
-                }}
-                savedByMe
-              />
-            ))}
-          </div>
+                }
+                toggleSave(id);
+              }}
+              savedByMe
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-white/70 mb-4">
+            {search
+              ? 'No themes found matching your search.'
+              : 'No saved themes yet.'}
+          </p>
+        </div>
+      );
+  }
+
+  return (
+    <div className="sm:space-y-4 space-y-2">
+      <div className="sm:space-y-3 space-y-2">
+        <ThemesSearchHeader
+          search={search}
+          onSearchChange={setSearch}
+          onCreateNew={onCreateNew}
+        />
+
+        <div className="flex items-center justify-start gap-2">
+          <Badge
+            label="Created"
+            onClick={() => setView('yours')}
+            isActive={view === 'yours'}
+          />
+          <Badge
+            label="Saved"
+            onClick={() => setView('saved')}
+            isActive={view === 'saved'}
+          />
+          {!!currentCustomTheme && (
+            <Badge
+              label="Active"
+              onClick={() => setView('current')}
+              isActive={view === 'current'}
+            />
+          )}
+        </div>
+      </div>
+      {view !== 'current' && (
+        <div className="space-y-1">
+          <h3 className="text-white text-lg font-bold">
+            {headerPrefix} {headerCount} {headerNoun}
+          </h3>
+          <ThemesSortBadges value={sortKey} onChange={setSortKey} />
         </div>
       )}
+
+      {/* Content by view */}
+      {content}
     </div>
   );
 };

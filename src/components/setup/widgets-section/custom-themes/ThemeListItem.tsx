@@ -71,6 +71,11 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
+          {!theme.isPublic && (
+            <div className="text-xs text-white/60 bg-primary-800 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit mb-1.5">
+              Private
+            </div>
+          )}
           <h3 className="text-white font-semibold text-l mb-1">
             <div className="flex items-center justify-between flex-wrap gap-1.5">
               <span className="">{theme.name}</span>
@@ -132,9 +137,9 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
         >
           {theme.duplicatesCount
             ? `${theme.duplicatesCount} ${
-                theme.duplicatesCount === 1 ? 'Duplicate' : 'Duplicates'
+                theme.duplicatesCount === 1 ? 'Copy' : 'Copies'
               }`
-            : 'Duplicate'}
+            : 'Copy'}
         </Button>
 
         {isMyTheme && onEdit && (

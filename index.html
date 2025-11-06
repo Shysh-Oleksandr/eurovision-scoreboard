@@ -79,6 +79,44 @@
         console.error('Failed to apply stored theme:', e);
       }
     </script>
+
+    <!-- Recover from stale module graph where JS requests return HTML (MIME error) -->
+    <script>
+      (function () {
+        try {
+          var retried = sessionStorage.getItem('dp-mime-reload-tried');
+          function hardReload() {
+            if (retried) return;
+            sessionStorage.setItem('dp-mime-reload-tried', '1');
+            var clean = location.href.split('#')[0].split('?')[0];
+            location.replace(clean + '?v=' + Date.now());
+          }
+          function isMimeTypeError(ev) {
+            var msg = '';
+            if (ev && ev.message) msg = String(ev.message);
+            return /MIME type/i.test(msg) || /valid JavaScript MIME type/i.test(msg);
+          }
+          window.addEventListener(
+            'error',
+            function (ev) {
+              if (isMimeTypeError(ev)) {
+                hardReload();
+              }
+            },
+            true
+          );
+          window.addEventListener('unhandledrejection', function (ev) {
+            try {
+              var r = ev && ev.reason;
+              var msg = r && (r.message || r.toString());
+              if (msg && /MIME type/i.test(String(msg))) {
+                hardReload();
+              }
+            } catch (_) {}
+          });
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

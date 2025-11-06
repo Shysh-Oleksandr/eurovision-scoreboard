@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import Hue from '@uiw/react-color-hue';
+import ShadeSlider from '@uiw/react-color-shade-slider';
 
 import ColorOverridesSection from './ColorOverridesSection';
 import ThemePreviewCountryItem from './ThemePreviewCountryItem';
@@ -27,6 +28,7 @@ import { Input } from '@/components/Input';
 import { JESC_THEME_OPTIONS, THEME_OPTIONS } from '@/data/data';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -62,6 +64,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [description, setDescription] = useState('');
   const [baseThemeYear, setBaseThemeYear] = useState(themeYear);
   const [hue, setHue] = useState(themeHue);
+  const [hsva, setHsva] = useState({ h: themeHue, s: 80, v: 60, a: 1 });
+
   const [isPublic, setIsPublic] = useState(true);
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -79,10 +83,18 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   const imageUpload = useImageUpload({ maxSizeInMB: 1.5 });
 
-  // Get default colors for the current base theme and hue
+  // Debounce hue and shade to avoid heavy recomputation on every tick
+  const debouncedHue = useDebounce(hue, 40);
+  const debouncedShade = useDebounce(hsva.v, 40);
+  const debouncedHsva = useMemo(
+    () => ({ ...hsva, h: debouncedHue, v: debouncedShade }),
+    [hsva, debouncedHue, debouncedShade],
+  );
+
+  // Get default colors for the current base theme and selected HSVA (shade-aware)
   const defaultColors = useMemo(
-    () => getDefaultThemeColors(baseThemeYear, hue),
-    [baseThemeYear, hue],
+    () => getDefaultThemeColors(baseThemeYear, debouncedHsva),
+    [baseThemeYear, debouncedHsva],
   );
 
   // Initialize form with theme to edit
@@ -92,6 +104,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setDescription(initialTheme.description || '');
       setBaseThemeYear(initialTheme.baseThemeYear);
       setHue(initialTheme.hue);
+      setHsva({
+        h: initialTheme.hue,
+        s: 80,
+        v: initialTheme.shadeValue || 60,
+        a: 1,
+      });
       setIsPublic(initialTheme.isPublic);
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
@@ -101,6 +119,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setDescription('');
       setBaseThemeYear(themeYear);
       setHue(themeHue);
+      setHsva({ h: themeHue, s: 80, v: 60, a: 1 });
       setIsPublic(true);
       setBackgroundImageUrl('');
       setOverrides({});
@@ -120,7 +139,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       likes: 0,
       saves: 0,
       baseThemeYear,
-      hue,
+      hue: debouncedHue,
+      shadeValue: debouncedShade,
       overrides,
       backgroundImageUrl,
       createdAt: new Date().toISOString(),
@@ -128,7 +148,14 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     };
 
     applyCustomTheme(previewTheme, true);
-  }, [hue, baseThemeYear, backgroundImageUrl, overrides, isOpen]);
+  }, [
+    debouncedHue,
+    debouncedShade,
+    baseThemeYear,
+    backgroundImageUrl,
+    overrides,
+    isOpen,
+  ]);
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -146,6 +173,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           description,
           baseThemeYear,
           hue,
+          shadeValue: hsva.v,
           isPublic,
           backgroundImageUrl,
           overrides,
@@ -172,6 +200,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           description,
           baseThemeYear,
           hue,
+          shadeValue: hsva.v,
           isPublic,
           backgroundImageUrl,
           overrides,
@@ -327,7 +356,20 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 </h4>
                 <Hue
                   hue={hue}
-                  onChange={(newHue) => setHue(toFixedIfDecimalFloat(newHue.h))}
+                  onChange={(newHue) => {
+                    setHue(toFixedIfDecimalFloat(newHue.h));
+                    setHsva({ ...hsva, h: newHue.h });
+                  }}
+                />
+                <ShadeSlider
+                  className="mt-1"
+                  hsva={hsva}
+                  onChange={(newShade) => {
+                    setHsva({
+                      ...hsva,
+                      v: Math.max(15, Math.min(100, newShade.v)),
+                    });
+                  }}
                 />
               </div>
 

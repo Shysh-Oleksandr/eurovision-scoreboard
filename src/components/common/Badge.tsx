@@ -15,7 +15,7 @@ const Badge: React.FC<BadgeProps> = ({
 }) => (
   <button
     onClick={onClick}
-    className={`xs:px-4 px-3 py-1 text-base font-medium rounded-full transition-colors ${
+    className={`xs:px-4 px-3 py-1 text-base font-medium rounded-full whitespace-nowrap transition-colors ${
       isActive
         ? 'bg-primary-800 text-white'
         : 'bg-primary-900 hover:bg-primary-800 text-gray-300'

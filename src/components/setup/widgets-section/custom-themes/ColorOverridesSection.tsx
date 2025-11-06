@@ -1,6 +1,8 @@
 import React from 'react';
 
-import ColorOverridePicker from './ColorOverridePicker';
+import ColorOverridePicker, {
+  ColorFieldDefinition,
+} from './ColorOverridePicker';
 
 import { ThemeColors } from '@/theme/types';
 
@@ -23,6 +25,16 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     } else {
       next[key] = value;
     }
+    onChange(next);
+  };
+
+  const handleBulkChange = (updates: Record<string, string>) => {
+    const next = { ...overrides };
+
+    Object.entries(updates).forEach(([key, value]) => {
+      next[key] = value;
+    });
+
     onChange(next);
   };
 
@@ -191,6 +203,38 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     { key: 'inactiveText', label: 'Inactive Text' },
   ];
 
+  // Collect all color fields for copy functionality
+  const allColorFields: ColorFieldDefinition[] = (() => {
+    const fields: ColorFieldDefinition[] = [];
+
+    // Helper to add fields from a color array
+    const addFields = (
+      colors: typeof juryColors,
+      groupKey: keyof ThemeColors,
+    ) => {
+      colors.forEach(({ key, label, enableGradient }) => {
+        fields.push({
+          key,
+          label,
+          enableGradient,
+          groupKey: groupKey as string,
+        });
+      });
+    };
+
+    // Add all fields from each group
+    addFields(juryColors, 'countryItem');
+    addFields(douzePointsColors, 'countryItem');
+    addFields(televoteColors, 'countryItem');
+    addFields(televoteActiveColors, 'countryItem');
+    addFields(finishedColors, 'countryItem');
+    addFields(unqualifiedColors, 'countryItem');
+    addFields(rankColors, 'countryItem');
+    addFields(panelInfoColors, 'panelInfo');
+
+    return fields;
+  })();
+
   const renderColorGroup = (
     colors: typeof juryColors,
     title: string,
@@ -201,18 +245,25 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
         {title}
       </h5>
       <div className="grid grid-cols-2 gap-2">
-        {colors.map(({ key, label, enableGradient }) => (
-          <ColorOverridePicker
-            key={key}
-            label={label}
-            value={overrides[`${groupKey}.${key}`]}
-            defaultValue={
-              (defaultColors[groupKey as keyof ThemeColors] as any)[key]
-            }
-            onChange={(val) => setOverride(`${groupKey}.${key}`, val)}
-            enableGradient={enableGradient}
-          />
-        ))}
+        {colors.map(({ key, label, enableGradient }) => {
+          const fullKey = `${groupKey}.${key}`;
+
+          return (
+            <ColorOverridePicker
+              key={key}
+              label={label}
+              value={overrides[fullKey]}
+              defaultValue={
+                (defaultColors[groupKey as keyof ThemeColors] as any)[key]
+              }
+              onChange={(val) => setOverride(fullKey, val)}
+              enableGradient={enableGradient}
+              allColorFields={allColorFields}
+              currentFieldKey={fullKey}
+              onBulkChange={handleBulkChange}
+            />
+          );
+        })}
       </div>
     </div>
   );
