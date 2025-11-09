@@ -1,4 +1,7 @@
-import React, { Suspense, useState } from 'react';
+'use client';
+import React, { useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { LogoutIcon } from '@/assets/icons/LogoutIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
@@ -10,7 +13,9 @@ import UserInfo from '@/components/common/UserInfo';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useAuthStore } from '@/state/useAuthStore';
 
-const EditProfileModal = React.lazy(() => import('./EditProfileModal'));
+const EditProfileModal = dynamic(() => import('./EditProfileModal'), {
+  ssr: false,
+});
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -82,13 +87,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       )}
 
       {(isEditProfileModalOpen || isEditProfileModalLoaded) && (
-        <Suspense fallback={null}>
-          <EditProfileModal
-            isOpen={isEditProfileModalOpen}
-            onClose={() => setIsEditProfileModalOpen(false)}
-            onLoaded={() => setIsEditProfileModalLoaded(true)}
-          />
-        </Suspense>
+        <EditProfileModal
+          isOpen={isEditProfileModalOpen}
+          onClose={() => setIsEditProfileModalOpen(false)}
+          onLoaded={() => setIsEditProfileModalLoaded(true)}
+        />
       )}
     </Modal>
   );

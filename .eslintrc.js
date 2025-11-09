@@ -28,6 +28,7 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'react/no-array-index-key': 'error',
+    'react/react-in-jsx-scope': 'off',
 
     //typescript rules
     '@typescript-eslint/no-explicit-any': 'off',

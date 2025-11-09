@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 import { TriangleAlertIcon } from '../../assets/icons/TriangleAlertIcon';

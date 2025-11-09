@@ -1,4 +1,6 @@
-import React, { Suspense } from 'react';
+'use client';
+
+import dynamic from 'next/dynamic';
 
 import EventSetupModal from '../components/setup/EventSetupModal';
 import { PageWrapper } from '../components/simulation/PageWrapper';
@@ -8,9 +10,7 @@ import Button from '@/components/common/Button';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const Simulation = React.lazy(
-  () => import('../components/simulation/Simulation'),
-);
+const Simulation = dynamic(() => import('../components/simulation/Simulation'));
 
 export const Main = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
@@ -26,9 +26,7 @@ export const Main = () => {
     <PageWrapper>
       <EventSetupModal />
       {eventStages.length > 0 ? (
-        <Suspense fallback={null}>
-          <Simulation />
-        </Suspense>
+        <Simulation />
       ) : (
         !eventSetupModalOpen && (
           <div className="flex justify-center flex-1 items-center h-full">

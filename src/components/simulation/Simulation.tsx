@@ -1,5 +1,6 @@
-import React, { Suspense } from 'react';
+'use client';
 
+import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/shallow';
 
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
@@ -13,17 +14,30 @@ import { StageId } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const QualificationResultsModal = React.lazy(
+const QualificationResultsModal = dynamic(
   () => import('./qualification/QualificationResultsModal'),
+  {
+    ssr: false,
+  },
 );
-const PresentationPanel = React.lazy(
+const PresentationPanel = dynamic(
   () => import('../presentationPanel/PresentationPanel'),
+  {
+    ssr: false,
+  },
 );
-const PickQualifiersSimulation = React.lazy(
+const PickQualifiersSimulation = dynamic(
   () => import('./qualification/PickQualifiersSimulation'),
+  {
+    ssr: false,
+  },
 );
-const WinnerConfetti = React.lazy(() => import('./WinnerConfetti'));
-const WinnerModal = React.lazy(() => import('./WinnerModal'));
+const WinnerConfetti = dynamic(() => import('./WinnerConfetti'), {
+  ssr: false,
+});
+const WinnerModal = dynamic(() => import('./WinnerModal'), {
+  ssr: false,
+});
 
 const Simulation = () => {
   const {
@@ -64,42 +78,26 @@ const Simulation = () => {
           <SimulationHeader phaseTitle={phaseTitle} />
           <PhaseActions />
           {isPickQualifiersMode && isSemiFinalStage ? (
-            <Suspense fallback={null}>
-              <PickQualifiersSimulation />
-            </Suspense>
+            <PickQualifiersSimulation />
           ) : (
             <div className="pt-2 md:pt-1 lg:pt-0 w-full flex md:flex-row flex-col lg:gap-6 md:gap-4 gap-3">
               <Board />
               {!currentStage.isOver && (
                 <div className="mb-[6px] md:min-w-[180px] w-full md:max-w-[240px] lg:max-w-[258px] xl:max-w-[335px] flex md:flex-col xs:flex-row flex-col gap-2">
                   <ControlsPanel />
-                  <Suspense fallback={null}>
-                    {presentationModeEnabled && <PresentationPanel />}
-                  </Suspense>
+                  {presentationModeEnabled && <PresentationPanel />}
                 </div>
               )}
             </div>
           )}
 
-          {showWinnerModal && (
-            <Suspense fallback={null}>
-              <WinnerModal />
-            </Suspense>
-          )}
+          {showWinnerModal && <WinnerModal />}
 
-          {showQualificationModal && (
-            <Suspense fallback={null}>
-              <QualificationResultsModal />
-            </Suspense>
-          )}
+          {showQualificationModal && <QualificationResultsModal />}
         </div>
       </div>
 
-      {showWinnerConfetti && (
-        <Suspense fallback={null}>
-          <WinnerConfetti />
-        </Suspense>
-      )}
+      {showWinnerConfetti && <WinnerConfetti />}
     </>
   );
 };

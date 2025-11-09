@@ -1,4 +1,7 @@
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+'use client';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import Modal from '../../common/Modal/Modal';
 import Tabs, { TabContent } from '../../common/tabs/Tabs';
@@ -11,9 +14,21 @@ import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseBu
 import { StatsTableType } from '@/models';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const ShareStatsModal = React.lazy(() => import('../share/ShareStatsModal'));
-const SplitStats = React.lazy(() => import('./SplitStats'));
-const SummaryStats = React.lazy(() => import('./SummaryStats'));
+const ShareStatsModal = dynamic(() => import('../share/ShareStatsModal'), {
+  ssr: false,
+});
+const SplitStats = dynamic(() => import('./SplitStats'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-white text-center py-2 font-medium">Loading...</div>
+  ),
+});
+const SummaryStats = dynamic(() => import('./SummaryStats'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-white text-center py-2 font-medium">Loading...</div>
+  ),
+});
 
 enum FinalStatsTab {
   BREAKDOWN = 'Breakdown',
@@ -93,13 +108,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       {
         ...tabs[1],
         content: (
-          <Suspense
-            fallback={
-              <div className="text-white text-center py-2 font-medium">
-                Loading...
-              </div>
-            }
-          >
+          <>
             {activeTab === FinalStatsTab.SPLIT && (
               <SplitStats
                 rankedCountries={rankedCountries}
@@ -107,19 +116,13 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
                 getPoints={getPoints}
               />
             )}
-          </Suspense>
+          </>
         ),
       },
       {
         ...tabs[2],
         content: (
-          <Suspense
-            fallback={
-              <div className="text-white text-center py-2 font-medium">
-                Loading...
-              </div>
-            }
-          >
+          <>
             {activeTab === FinalStatsTab.SUMMARY && (
               <SummaryStats
                 rankedCountries={rankedCountries}
@@ -127,7 +130,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
                 getPoints={getPoints}
               />
             )}
-          </Suspense>
+          </>
         ),
       },
     ],
@@ -198,21 +201,19 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
 
       {/* Share Stats Modal */}
       {(isShareModalOpen || isShareModalLoaded) && (
-        <Suspense fallback={null}>
-          <ShareStatsModal
-            isOpen={isShareModalOpen}
-            onClose={() => setIsShareModalOpen(false)}
-            onLoaded={() => setIsShareModalLoaded(true)}
-            activeTab={statsTableType}
-            rankedCountries={rankedCountries}
-            selectedStageId={selectedStageId}
-            selectedVoteType={selectedVoteType}
-            getCellPoints={getCellPoints}
-            getCellClassName={getCellClassName}
-            getPoints={getPoints}
-            selectedStage={selectedStage}
-          />
-        </Suspense>
+        <ShareStatsModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          onLoaded={() => setIsShareModalLoaded(true)}
+          activeTab={statsTableType}
+          rankedCountries={rankedCountries}
+          selectedStageId={selectedStageId}
+          selectedVoteType={selectedVoteType}
+          getCellPoints={getCellPoints}
+          getCellClassName={getCellClassName}
+          getPoints={getPoints}
+          selectedStage={selectedStage}
+        />
       )}
     </Modal>
   );

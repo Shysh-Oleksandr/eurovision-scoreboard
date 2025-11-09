@@ -1,9 +1,14 @@
-import React, { Suspense, useState } from 'react';
+'use client';
+import { useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
 
-const ThemesModalModal = React.lazy(() => import('./ThemesModal'));
+const ThemesModalModal = dynamic(() => import('./ThemesModal'), {
+  ssr: false,
+});
 
 const ThemesWidget = () => {
   const [isThemesModalModalOpen, setIsThemesModalModalOpen] = useState(false);
@@ -22,13 +27,11 @@ const ThemesWidget = () => {
       />
 
       {(isThemesModalModalOpen || isThemesModalModalLoaded) && (
-        <Suspense fallback={null}>
-          <ThemesModalModal
-            isOpen={isThemesModalModalOpen}
-            onClose={() => setIsThemesModalModalOpen(false)}
-            onLoaded={() => setIsThemesModalModalLoaded(true)}
-          />
-        </Suspense>
+        <ThemesModalModal
+          isOpen={isThemesModalModalOpen}
+          onClose={() => setIsThemesModalModalOpen(false)}
+          onLoaded={() => setIsThemesModalModalLoaded(true)}
+        />
       )}
     </>
   );

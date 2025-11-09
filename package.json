@@ -4,8 +4,9 @@
   "description": "Eurovision scoreboard simulator",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run build:css && vite build",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "build:css": "tailwindcss -i ./src/styles.css -o ./src/output.css --minify",
     "tailwind": "tailwindcss -i ./src/styles.css -o ./src/output.css --watch",
     "preview": "vite preview",
@@ -26,6 +27,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "next": "^16.0.0",
     "@75lb/deep-merge": "^1.1.2",
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.2.2",
@@ -53,6 +55,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "eslint-config-next": "^16.0.0",
     "@types/node": "^24.1.0",
     "@types/react": "19.1.8",
     "@types/react-dom": "^19.1.6",

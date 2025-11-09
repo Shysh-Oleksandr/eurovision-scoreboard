@@ -1,3 +1,4 @@
+'use client';
 import React, { useRef } from 'react';
 
 import { getFlagPath } from '../../helpers/getFlagPath';

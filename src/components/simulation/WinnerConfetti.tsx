@@ -1,10 +1,15 @@
-import React, { Suspense, useEffect, useState } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { useScoreboardStore } from '../../state/scoreboardStore';
 
 import { useGeneralStore } from '@/state/generalStore';
 
-const LazyConfetti = React.lazy(() => import('react-confetti'));
+const LazyConfetti = dynamic(() => import('react-confetti'), {
+  ssr: false,
+});
 
 const PIECES = 300;
 const CONFETTI_TIMEOUT = 10 * 1000;
@@ -76,16 +81,14 @@ const WinnerConfetti: React.FC = () => {
   if (!shouldRender) return null;
 
   return (
-    <Suspense fallback={null}>
-      <LazyConfetti
-        width={windowDimensions.width}
-        height={windowDimensions.height}
-        recycle={shouldRecycle}
-        numberOfPieces={PIECES}
-        gravity={0.1}
-        colors={CONFETTI_COLORS}
-      />
-    </Suspense>
+    <LazyConfetti
+      width={windowDimensions.width}
+      height={windowDimensions.height}
+      recycle={shouldRecycle}
+      numberOfPieces={PIECES}
+      gravity={0.1}
+      colors={CONFETTI_COLORS}
+    />
   );
 };
 

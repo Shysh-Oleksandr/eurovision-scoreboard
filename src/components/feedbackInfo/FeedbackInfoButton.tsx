@@ -1,10 +1,15 @@
-import React, { useState, useEffect, Suspense } from 'react';
+'use client';
+import { useEffect, useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { useGeneralStore } from '../../state/generalStore';
 
 import FeedbackIcon from './FeedbackIcon';
 
-const FeedbackModal = React.lazy(() => import('./FeedbackModal'));
+const FeedbackModal = dynamic(() => import('./FeedbackModal'), {
+  ssr: false,
+});
 
 const FeedbackInfoButton = ({ className }: { className?: string }) => {
   const [showModal, setShowModal] = useState(false);
@@ -33,15 +38,13 @@ const FeedbackInfoButton = ({ className }: { className?: string }) => {
           <div className="absolute -top-[0.1rem] -right-[0.2rem] w-3.5 h-3.5 bg-primary-700 rounded-full animate-pulse" />
         )}
       </button>
-      <Suspense fallback={null}>
-        {(showModal || isFeedbackModalLoaded) && (
-          <FeedbackModal
-            showModal={showModal}
-            setShowModal={setShowModal}
-            onLoaded={() => setIsFeedbackModalLoaded(true)}
-          />
-        )}
-      </Suspense>
+      {(showModal || isFeedbackModalLoaded) && (
+        <FeedbackModal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          onLoaded={() => setIsFeedbackModalLoaded(true)}
+        />
+      )}
     </>
   );
 };
