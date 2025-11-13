@@ -10,7 +10,10 @@ import Button from '@/components/common/Button';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const Simulation = dynamic(() => import('../components/simulation/Simulation'));
+const Simulation = dynamic(
+  () => import('../components/simulation/Simulation'),
+  { ssr: false },
+);
 
 const Main = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);

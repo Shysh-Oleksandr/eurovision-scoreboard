@@ -13,10 +13,9 @@ Experience the excitement of Eurovision with DouzePoints, the interactive scoreb
 
 ## Tech Stack
 
-- **Frontend**: React 19 with TypeScript
+- **Frontend**: Next.js 16 with TypeScript
 - **Styling**: Tailwind CSS
 - **State Management**: Zustand
-- **Build Tool**: Vite
 - **Animations**: GSAP, React Flip Toolkit
 - **Deployment**: Cloudflare Workers (Wrangler)
 
@@ -53,14 +52,7 @@ yarn build
 
 Preview the production build:
 ```bash
-yarn preview:worker
-```
-
-### CSS Development
-
-Watch for Tailwind changes:
-```bash
-yarn tailwind
+yarn preview
 ```
 
 ### Deployment
