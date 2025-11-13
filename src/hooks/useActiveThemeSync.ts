@@ -63,10 +63,6 @@ export function useActiveThemeSync() {
       }
       // Apply the theme from the user's profile
       applyCustomTheme(activeTheme);
-    } else if (user && !user.activeThemeId && currentCustomTheme) {
-      // User logged in but has no active theme - clear any local custom theme
-      // (Optional: you may want to keep local theme, comment this out if so)
-      // clearCustomTheme();
-    }
+    } 
   }, [activeTheme, user, shouldFetch, suppressActiveThemeOnce, setSuppressActiveThemeOnce, blockedActiveThemeId, setBlockedActiveThemeId, currentCustomTheme, suppressProfileActiveOnStatic]);
 }

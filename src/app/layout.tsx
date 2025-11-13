@@ -2,6 +2,8 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 
+import Script from 'next/script';
+
 import { UmamiAnalytics } from './analytics';
 import AppBootstrap from './app-bootstrap';
 import Providers from './providers';
@@ -68,24 +70,33 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
-        {/* <Script id="theme-fouc-prevention" strategy="beforeInteractive">{`
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        {/* Prevent FOUC by applying stored theme */}
+        <Script id="theme-fouc-prevention" strategy="beforeInteractive">{`
           try {
             var stored = localStorage.getItem('general-storage');
+
             if (stored) {
               var parsed = JSON.parse(stored);
               var state = parsed.state || parsed;
               var customTheme = state?.customTheme;
               var themeYear = state?.themeYear || '2025';
+
               if (customTheme) {
                 document.documentElement.setAttribute('data-theme', 'custom');
+                document.documentElement.style.backgroundImage = "url(" + customTheme.backgroundImageUrl + ")";
               } else if (themeYear) {
                 document.documentElement.setAttribute('data-theme', themeYear);
+                document.documentElement.style.backgroundImage = "url(" + state.theme.backgroundImage + ")";
               }
+
+              document.documentElement.style.backgroundSize = 'cover';
+              document.documentElement.style.backgroundPosition = 'center';
+              document.documentElement.style.backgroundRepeat = 'no-repeat';
             }
           } catch (e) { console.error('Failed to apply stored theme:', e); }
-        `}</Script> */}
+        `}</Script>
 
         <Providers>
           <AppBootstrap />

@@ -425,6 +425,7 @@ export const useGeneralStore = create<GeneralState>()(
 
           return {
             year: state.year,
+            theme: state.theme,
             themeYear: state.themeYear,
             customTheme: state.customTheme,
             lastSeenUpdate: state.lastSeenUpdate,

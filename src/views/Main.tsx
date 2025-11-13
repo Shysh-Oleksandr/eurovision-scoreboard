@@ -12,7 +12,7 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const Simulation = dynamic(() => import('../components/simulation/Simulation'));
 
-export const Main = () => {
+const Main = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
 
   const eventSetupModalOpen = useCountriesStore(
@@ -43,3 +43,5 @@ export const Main = () => {
     </PageWrapper>
   );
 };
+
+export default Main;

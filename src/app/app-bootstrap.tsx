@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
-import { useThemeProfileSync } from '@/hooks/useThemeProfileSync';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -12,7 +11,6 @@ export default function AppBootstrap() {
   useFullscreen();
   useThemeSetup();
   useActiveThemeSync();
-  useThemeProfileSync();
 
   const { handlePostLogin } = useAuthStore();
 
