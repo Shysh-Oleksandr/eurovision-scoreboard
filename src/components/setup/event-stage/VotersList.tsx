@@ -31,7 +31,7 @@ const VotersList: React.FC<VotersListProps> = ({
   return (
     <>
       {localVotingCountries.length === 0 ? (
-        <p className="text-gray-400 text-sm">
+        <p className="text-white/60 text-sm">
           No voting countries selected. Add countries from the list below.
         </p>
       ) : (

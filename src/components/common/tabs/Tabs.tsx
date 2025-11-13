@@ -159,7 +159,7 @@ const Tabs: React.FC<TabsProps> = ({
       ref={containerRef}
       className={`flex ${
         alwaysHorizontal ? 'flex-row' : 'xs:flex-row flex-col'
-      } overflow-x-auto items-center p-1 px-2 gap-1 md:text-lg text-base text-gray-700 bg-primary-900 rounded-xl w-full relative ${containerClassName}`}
+      } overflow-x-auto items-center p-1 px-2 gap-1 md:text-lg text-base text-white/70 bg-primary-900 rounded-xl w-full relative ${containerClassName}`}
     >
       {isInitialized && (
         <div
@@ -178,7 +178,7 @@ const Tabs: React.FC<TabsProps> = ({
           className={`flex whitespace-nowrap items-center justify-center md:h-12 h-10 px-3 w-full font-medium rounded-lg outline-none transition-colors duration-300 relative z-10 ${
             activeTab === tab.value
               ? 'text-white'
-              : 'text-gray-400 hover:text-white'
+              : 'text-white/60 hover:text-white'
           } ${buttonClassName}`}
           aria-selected={activeTab === tab.value}
           onClick={() => setActiveTab(tab.value)}

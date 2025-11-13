@@ -36,7 +36,7 @@ export const PointItem: React.FC<PointItemProps> = ({
       >
         <SparklesIcon
           className={`w-4 h-4 transition-all duration-300 ${
-            showDouzePoints ? 'text-yellow-300' : 'text-gray-500'
+            showDouzePoints ? 'text-yellow-300' : 'text-white/60'
           }`}
         />
       </button>

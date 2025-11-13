@@ -194,7 +194,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
           preserveContent
         />
       ) : (
-        <div className="text-center p-8 text-gray-400">
+        <div className="text-center p-8 text-white/60">
           No finished stages to display stats for.
         </div>
       )}

@@ -118,7 +118,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
       <div className="grid grid-cols-2 gap-2 mt-2">
         <Input
           type="number"
-          className="!bg-primary-700/40 !px-1 !py-1.5 text-center placeholder:!text-gray-400 focus:!bg-primary-700/60 hover:!bg-primary-700/60 bg-none"
+          className="!bg-primary-700/40 !px-1 !py-1.5 text-center placeholder:!text-white/60 focus:!bg-primary-700/60 hover:!bg-primary-700/60 bg-none"
           placeholder="Jury"
           min={0}
           max={MAX_ODDS}
@@ -128,7 +128,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
         />
         <Input
           type="number"
-          className="!bg-primary-900/50 !px-1 !py-1.5 text-center placeholder:!text-gray-400 focus:!bg-primary-900/80 hover:!bg-primary-900/80 bg-none"
+          className="!bg-primary-900/50 !px-1 !py-1.5 text-center placeholder:!text-white/60 focus:!bg-primary-900/80 hover:!bg-primary-900/80 bg-none"
           placeholder="Tele"
           min={0}
           max={MAX_ODDS}

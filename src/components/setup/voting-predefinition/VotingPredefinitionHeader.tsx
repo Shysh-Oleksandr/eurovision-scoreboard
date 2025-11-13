@@ -58,7 +58,7 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
               ))}
             </div>
           </div>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-sm text-white/60 mt-1">
             Enter the points each voting country awards to participants (
             {pointsSystem.every(
               (p, index) =>

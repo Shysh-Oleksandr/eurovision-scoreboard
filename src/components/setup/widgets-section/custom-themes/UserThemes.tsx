@@ -11,7 +11,9 @@ import {
   useDeleteThemeMutation,
   useMyThemesQuery,
   useSavedThemesQuery,
+  useToggleLikeThemeMutation,
   useToggleSaveThemeMutation,
+  useThemesStateQuery,
 } from '@/api/themes';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
@@ -65,8 +67,21 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const { mutateAsync: deleteTheme } = useDeleteThemeMutation();
   const { mutateAsync: applyThemeToProfile } = useApplyThemeMutation();
   const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
+  const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
   const applyCustomTheme = useGeneralStore((state) => state.applyCustomTheme);
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
+
+  // Collect theme IDs for state query (current and saved views)
+  const themeIdsForState = [
+    ...(view === 'current' && currentCustomTheme
+      ? [currentCustomTheme._id]
+      : []),
+    ...(view === 'saved' && savedThemes ? savedThemes.map((t) => t._id) : []),
+  ];
+  const { data: themeState } = useThemesStateQuery(
+    themeIdsForState,
+    !!themeIdsForState.length && !!user,
+  );
 
   const handleApply = async (theme: CustomTheme) => {
     try {
@@ -96,6 +111,35 @@ const UserThemes: React.FC<UserThemesProps> = ({
       toast.success('Theme deleted successfully!');
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to delete theme');
+    }
+  };
+
+  const handleLike = async (id: string) => {
+    try {
+      const res = await toggleLike(id);
+
+      toast.success(res.liked ? 'Theme liked!' : 'Like removed');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to like theme');
+    }
+  };
+
+  const handleSave = async (id: string, savedByMe: boolean) => {
+    try {
+      if (savedByMe) {
+        if (
+          !window.confirm(
+            'Are you sure you want to remove this theme from your saved themes?',
+          )
+        ) {
+          return;
+        }
+      }
+      const res = await toggleSave(id);
+
+      toast.success(res.saved ? 'Theme saved!' : 'Removed from saved');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to save theme');
     }
   };
 
@@ -142,17 +186,31 @@ const UserThemes: React.FC<UserThemesProps> = ({
   let content: React.ReactNode = null;
 
   if (view === 'current') {
+    const isOwnedByUser = currentCustomTheme?.userId.toString() === user?._id;
+
     content = currentCustomTheme ? (
       <div className="grid gap-4">
         <ThemeListItem
           key={currentCustomTheme._id}
           theme={currentCustomTheme}
-          variant="user"
-          onEdit={onEdit}
-          onDelete={handleDelete}
+          variant={isOwnedByUser ? 'user' : 'public'}
+          onEdit={isOwnedByUser ? onEdit : undefined}
+          onDelete={isOwnedByUser ? handleDelete : undefined}
           onApply={handleApply}
+          onLike={!isOwnedByUser ? handleLike : undefined}
+          onSave={!isOwnedByUser ? handleSave : undefined}
           isApplied
           onDuplicate={onDuplicate}
+          likedByMe={
+            !isOwnedByUser
+              ? !!themeState?.likedIds?.includes(currentCustomTheme._id)
+              : undefined
+          }
+          savedByMe={
+            !isOwnedByUser
+              ? !!themeState?.savedIds?.includes(currentCustomTheme._id)
+              : undefined
+          }
         />
       </div>
     ) : null;
@@ -197,21 +255,12 @@ const UserThemes: React.FC<UserThemesProps> = ({
               theme={theme}
               variant="public"
               onApply={handleApply}
+              onLike={handleLike}
+              onSave={handleSave}
               isApplied={currentCustomTheme?._id === theme._id}
               onDuplicate={onDuplicate}
-              onSave={(id, savedByMe) => {
-                if (savedByMe) {
-                  if (
-                    !window.confirm(
-                      'Are you sure you want to remove this theme from your saved themes?',
-                    )
-                  ) {
-                    return;
-                  }
-                }
-                toggleSave(id);
-              }}
-              savedByMe
+              likedByMe={!!themeState?.likedIds?.includes(theme._id)}
+              savedByMe={!!themeState?.savedIds?.includes(theme._id)}
             />
           ))}
         </div>
