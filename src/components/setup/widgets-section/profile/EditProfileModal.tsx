@@ -193,6 +193,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             src={displayAvatarUrl}
             alt="Avatar preview"
             className="w-20 h-20 rounded-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
+            }}
           />
           <div className="flex flex-wrap items-center gap-2">
             <input

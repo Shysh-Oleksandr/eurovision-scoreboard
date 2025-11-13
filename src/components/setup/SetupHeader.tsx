@@ -1,3 +1,4 @@
+'use client';
 import React, { useMemo } from 'react';
 
 import SyncIcon from '../../assets/icons/SyncIcon';
@@ -27,7 +28,7 @@ import { buildPrimaryFromHsva } from '@/theme/themeUtils';
 const YEAR_OPTIONS = [...ESC_YEAR_OPTIONS, ...JESC_YEAR_OPTIONS];
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
 
-const isSmallScreen = window.innerWidth < 370;
+const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 480;
 
 type SetupHeaderProps = {
   openSettingsModal: () => void;

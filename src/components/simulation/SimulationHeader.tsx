@@ -1,4 +1,7 @@
-import React, { useState, Suspense } from 'react';
+'use client';
+import React, { useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
@@ -13,7 +16,9 @@ import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const ShareResultsModal = React.lazy(() => import('./share/ShareResultsModal'));
+const ShareResultsModal = dynamic(() => import('./share/ShareResultsModal'), {
+  ssr: false,
+});
 
 interface SimulationHeaderProps {
   phaseTitle: string;
@@ -56,15 +61,13 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
 
   return (
     <>
-      <Suspense fallback={null}>
-        {(showShareResultsModal || isShareResultsModalLoaded) && (
-          <ShareResultsModal
-            isOpen={showShareResultsModal}
-            onClose={() => setShowShareResultsModal(false)}
-            onLoaded={() => setIsShareResultsModalLoaded(true)}
-          />
-        )}
-      </Suspense>
+      {(showShareResultsModal || isShareResultsModalLoaded) && (
+        <ShareResultsModal
+          isOpen={showShareResultsModal}
+          onClose={() => setShowShareResultsModal(false)}
+          onLoaded={() => setIsShareResultsModalLoaded(true)}
+        />
+      )}
 
       <div className="flex flex-col xs:flex-row justify-between xs:gap-1.5 gap-2 xs:items-center mb-1 sm:mb-2 md:mb-3">
         <div className="flex items-center gap-2">

@@ -12,7 +12,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
+    "plugins": [
+      { "name": "next" }
+    ],
 
     /* Linting */
     "strict": true,
@@ -26,6 +29,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "declaration.d.ts"],
+  "include": ["next-env.d.ts", "src/**/*", "declaration.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

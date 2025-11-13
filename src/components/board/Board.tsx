@@ -1,3 +1,4 @@
+'use client';
 import React, { useCallback, useMemo, type JSX } from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
 

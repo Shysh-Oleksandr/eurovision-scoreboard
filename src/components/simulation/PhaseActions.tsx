@@ -1,4 +1,7 @@
-import React, { Suspense, useEffect, useState } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { useNextEventName } from '../../hooks/useNextEventName';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -7,9 +10,9 @@ import Select from '../common/Select';
 
 import { useContinueToNextPhase } from './hooks/useContinueToNextPhase';
 
-const FinalStatsModal = React.lazy(
-  () => import('./finalStats/FinalStatsModal'),
-);
+const FinalStatsModal = dynamic(() => import('./finalStats/FinalStatsModal'), {
+  ssr: false,
+});
 
 export const PhaseActions = () => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
@@ -61,15 +64,13 @@ export const PhaseActions = () => {
 
   return (
     <>
-      <Suspense fallback={null}>
-        {(showFinalStatsModal || isFinalStatsModalLoaded) && (
-          <FinalStatsModal
-            isOpen={showFinalStatsModal}
-            onClose={() => setShowFinalStatsModal(false)}
-            onLoaded={() => setIsFinalStatsModalLoaded(true)}
-          />
-        )}
-      </Suspense>
+      {(showFinalStatsModal || isFinalStatsModalLoaded) && (
+        <FinalStatsModal
+          isOpen={showFinalStatsModal}
+          onClose={() => setShowFinalStatsModal(false)}
+          onLoaded={() => setIsFinalStatsModalLoaded(true)}
+        />
+      )}
 
       <div className="flex gap-2 lg:mb-3 md:mb-2 pt-1 sm:pt-0 md:mt-0 min-h-12 whitespace-nowrap w-full overflow-x-auto sm:overflow-x-visible">
         {isVotingOver && (

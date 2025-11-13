@@ -1,4 +1,7 @@
-import React, { Suspense, useMemo, useState } from 'react';
+'use client';
+import { useMemo, useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import Modal from '../common/Modal/Modal';
 import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
@@ -9,7 +12,12 @@ import { GeneralSettings } from './GeneralSettings';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { BaseCountry } from '@/models';
 
-const OddsSettings = React.lazy(() => import('./OddsSettings'));
+const OddsSettings = dynamic(() => import('./OddsSettings'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-white text-center py-2 font-medium">Loading...</div>
+  ),
+});
 
 enum SettingsTab {
   GENERAL = 'General',
@@ -47,20 +55,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       {
         ...tabs[1],
         content: (
-          <Suspense
-            fallback={
-              <div className="text-white text-center py-2 font-medium">
-                Loading...
-              </div>
-            }
-          >
+          <>
             {(activeTab === SettingsTab.ODDS || isOddsLoaded) && (
               <OddsSettings
                 countries={participatingCountries}
                 onLoaded={() => setIsOddsLoaded(true)}
               />
             )}
-          </Suspense>
+          </>
         ),
       },
     ],

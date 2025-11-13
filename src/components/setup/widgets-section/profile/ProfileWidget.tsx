@@ -1,11 +1,16 @@
-import React, { Suspense, useState } from 'react';
+'use client';
+import React, { useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { UserCheckIcon } from '@/assets/icons/UserCheckIcon';
 import { UserIcon } from '@/assets/icons/UserIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
 import { useAuthStore } from '@/state/useAuthStore';
 
-const ProfileModal = React.lazy(() => import('./ProfileModal'));
+const ProfileModal = dynamic(() => import('./ProfileModal'), {
+  ssr: false,
+});
 
 const ProfileWidget = () => {
   const user = useAuthStore((state) => state.user);
@@ -31,13 +36,11 @@ const ProfileWidget = () => {
       />
 
       {(isProfileModalOpen || isProfileModalLoaded) && (
-        <Suspense fallback={null}>
-          <ProfileModal
-            isOpen={isProfileModalOpen}
-            onClose={() => setIsProfileModalOpen(false)}
-            onLoaded={() => setIsProfileModalLoaded(true)}
-          />
-        </Suspense>
+        <ProfileModal
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          onLoaded={() => setIsProfileModalLoaded(true)}
+        />
       )}
     </>
   );

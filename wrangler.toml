@@ -1,3 +1,5 @@
+main = ".open-next/worker.js"
 name = "douzepoints"
 compatibility_date = "2025-07-02"
-assets = { directory = "build", not_found_handling = "single-page-application" }
+compatibility_flags = ["nodejs_compat"]
+assets = { directory = ".open-next/assets", binding = "ASSETS" }

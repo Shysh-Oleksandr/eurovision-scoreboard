@@ -1,4 +1,7 @@
-import React, { Suspense, useMemo, useState } from 'react';
+'use client';
+import React, { useMemo, useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import PublicThemes from './PublicThemes';
 import UserThemes from './UserThemes';
@@ -9,8 +12,9 @@ import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { CustomTheme } from '@/types/customTheme';
 
-// Lazy load the customize modal
-const CustomizeThemeModal = React.lazy(() => import('./CustomizeThemeModal'));
+const CustomizeThemeModal = dynamic(() => import('./CustomizeThemeModal'), {
+  ssr: false,
+});
 
 enum SettingsTab {
   YOUR_THEMES = 'Your Themes',
@@ -78,13 +82,7 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
       {
         ...tabs[1],
         content: (
-          <Suspense
-            fallback={
-              <div className="text-white text-center py-2 font-medium">
-                Loading...
-              </div>
-            }
-          >
+          <>
             {(activeTab === SettingsTab.PUBLIC_THEMES ||
               isPublicThemesLoaded) && (
               <PublicThemes
@@ -93,7 +91,7 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
                 onEdit={handleEdit}
               />
             )}
-          </Suspense>
+          </>
         ),
       },
     ],
@@ -129,14 +127,12 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
 
       {/* Customize Theme Modal */}
       {isCustomizeModalOpen && (
-        <Suspense fallback={null}>
-          <CustomizeThemeModal
-            isOpen={isCustomizeModalOpen}
-            onClose={handleCloseCustomize}
-            initialTheme={initialTheme}
-            isEditMode={isEditMode}
-          />
-        </Suspense>
+        <CustomizeThemeModal
+          isOpen={isCustomizeModalOpen}
+          onClose={handleCloseCustomize}
+          initialTheme={initialTheme}
+          isEditMode={isEditMode}
+        />
       )}
     </>
   );

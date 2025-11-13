@@ -1,4 +1,4 @@
-import React from 'react';
+import Link from 'next/link';
 
 import { ArrowIcon } from '@/assets/icons/ArrowIcon';
 
@@ -8,13 +8,13 @@ const About = () => {
       <div className="mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-primary-800/50 backdrop-blur-sm rounded-2xl border border-primary-700/50 shadow-2xl overflow-hidden">
           <header className="bg-gradient-to-br from-primary-700/40 to-primary-800/60 px-8 py-6 border-b border-primary-700/30">
-            <a
+            <Link
               href="/"
               className="text-primary-200 hover:text-white text-base mb-4 inline-flex items-center gap-2 bg-primary-900/40 hover:bg-primary-900/60 rounded-lg px-3 py-2 transition-all duration-200 border border-primary-700/30"
             >
               <ArrowIcon className="w-5 h-5 rotate-180" />
               Back
-            </a>
+            </Link>
             <h1 className="text-4xl font-bold text-white mt-4">About</h1>
           </header>
 

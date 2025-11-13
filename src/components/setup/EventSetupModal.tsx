@@ -1,12 +1,8 @@
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+'use client';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/shallow';
 
 import {
@@ -41,14 +37,26 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
 
-const EventStageModal = React.lazy(
-  () => import('./event-stage/EventStageModal'),
-);
-const CustomCountryModal = React.lazy(() => import('./CustomCountryModal'));
-const SettingsModal = React.lazy(() => import('../settings/SettingsModal'));
-const GrandFinalOnlySetup = React.lazy(() => import('./GrandFinalOnlySetup'));
-const VotingPredefinitionModal = React.lazy(
+const EventStageModal = dynamic(() => import('./event-stage/EventStageModal'), {
+  ssr: false,
+});
+const CustomCountryModal = dynamic(() => import('./CustomCountryModal'), {
+  ssr: false,
+});
+const SettingsModal = dynamic(() => import('../settings/SettingsModal'), {
+  ssr: false,
+});
+const GrandFinalOnlySetup = dynamic(() => import('./GrandFinalOnlySetup'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-white text-center py-2 font-medium">Loading...</div>
+  ),
+});
+const VotingPredefinitionModal = dynamic(
   () => import('./voting-predefinition/VotingPredefinitionModal'),
+  {
+    ssr: false,
+  },
 );
 
 const EventSetupModal = () => {
@@ -348,13 +356,7 @@ const EventSetupModal = () => {
       {
         ...TABS[1],
         content: (
-          <Suspense
-            fallback={
-              <div className="text-white text-center py-2 font-medium">
-                Loading...
-              </div>
-            }
-          >
+          <>
             {activeTab === EventMode.GRAND_FINAL_ONLY && (
               <GrandFinalOnlySetup
                 grandFinalStage={eventStagesWithCountries.find(
@@ -368,7 +370,7 @@ const EventSetupModal = () => {
                 availableGroups={availableGroups}
               />
             )}
-          </Suspense>
+          </>
         ),
       },
     ],
@@ -396,17 +398,15 @@ const EventSetupModal = () => {
   return (
     <>
       <SyncCustomEntries />
-      <Suspense fallback={null}>
-        {(predefModalOpen || isPredefModalLoaded) && predefStage && (
-          <VotingPredefinitionModal
-            isOpen={predefModalOpen}
-            onClose={() => setPredefModalOpen(false)}
-            stage={predefStage}
-            onSave={isInitialPredef ? onVotingPredefSaveStart : onSaveContinue}
-            onLoaded={() => setIsPredefModalLoaded(true)}
-          />
-        )}
-      </Suspense>
+      {(predefModalOpen || isPredefModalLoaded) && predefStage && (
+        <VotingPredefinitionModal
+          isOpen={predefModalOpen}
+          onClose={() => setPredefModalOpen(false)}
+          stage={predefStage}
+          onSave={isInitialPredef ? onVotingPredefSaveStart : onSaveContinue}
+          onLoaded={() => setIsPredefModalLoaded(true)}
+        />
+      )}
 
       <Modal
         isOpen={eventSetupModalOpen}
@@ -432,38 +432,32 @@ const EventSetupModal = () => {
       >
         <SetupHeader openSettingsModal={() => setIsSettingsModalOpen(true)} />
 
-        <Suspense fallback={null}>
-          {(isSettingsModalOpen || isSettingsModalLoaded) && (
-            <SettingsModal
-              isOpen={isSettingsModalOpen}
-              onClose={() => setIsSettingsModalOpen(false)}
-              participatingCountries={participatingCountries}
-              onLoaded={() => setIsSettingsModalLoaded(true)}
-            />
-          )}
-        </Suspense>
+        {(isSettingsModalOpen || isSettingsModalLoaded) && (
+          <SettingsModal
+            isOpen={isSettingsModalOpen}
+            onClose={() => setIsSettingsModalOpen(false)}
+            participatingCountries={participatingCountries}
+            onLoaded={() => setIsSettingsModalLoaded(true)}
+          />
+        )}
 
         {isCustomCountryModalOpen && (
-          <Suspense fallback={null}>
-            <CustomCountryModal
-              isOpen={isCustomCountryModalOpen}
-              onClose={handleCloseModal}
-              countryToEdit={countryToEdit}
-            />
-          </Suspense>
+          <CustomCountryModal
+            isOpen={isCustomCountryModalOpen}
+            onClose={handleCloseModal}
+            countryToEdit={countryToEdit}
+          />
         )}
         {/*  */}
         {isEventStageModalOpen && (
-          <Suspense fallback={null}>
-            <EventStageModal
-              isOpen={isEventStageModalOpen}
-              onClose={handleCloseEventStageModal}
-              eventStageToEdit={eventStageToEdit}
-              localEventStagesLength={configuredEventStages.length}
-              onSave={handleSaveStage}
-              onDelete={handleDeleteStage}
-            />
-          </Suspense>
+          <EventStageModal
+            isOpen={isEventStageModalOpen}
+            onClose={handleCloseEventStageModal}
+            eventStageToEdit={eventStageToEdit}
+            localEventStagesLength={configuredEventStages.length}
+            onSave={handleSaveStage}
+            onDelete={handleDeleteStage}
+          />
         )}
 
         <WidgetsSection />

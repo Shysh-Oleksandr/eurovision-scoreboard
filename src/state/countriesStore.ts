@@ -92,13 +92,27 @@ export const useCountriesStore = create<CountriesState>()(
         const loadCountriesByPreset = async (year: Year, isJunior: boolean) => {
           const url = buildCountriesUrl(year, isJunior);
 
-          const res = await fetch(url, { cache: 'force-cache' });
+          const toAbsolute = (path: string) => {
+            if (typeof window !== 'undefined') return path;
+            const baseEnv =
+              process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+            try {
+              return new URL(path, baseEnv).toString();
+            } catch {
+              return `${baseEnv}${path}`;
+            }
+          };
+
+          const res = await fetch(toAbsolute(url), { cache: 'force-cache' });
           if (res.ok) return (await res.json()) as BaseCountry[];
 
           if (isJunior && res.status === 404) {
-            const escRes = await fetch(buildCountriesUrl(year, false), {
-              cache: 'force-cache',
-            });
+            const escRes = await fetch(
+              toAbsolute(buildCountriesUrl(year, false)),
+              {
+                cache: 'force-cache',
+              },
+            );
             if (escRes.ok) return (await escRes.json()) as BaseCountry[];
           }
 
@@ -637,7 +651,6 @@ export const useCountriesStore = create<CountriesState>()(
     },
   ),
 );
-
 
 // Initialize once at app startup using current settings.
 // We must pass the correct contest type to avoid defaulting to ESC.

@@ -1,4 +1,7 @@
-import React, { Suspense } from 'react';
+'use client';
+import React from 'react';
+
+import dynamic from 'next/dynamic';
 
 import QualificationBoard from './QualificationBoard';
 import QualifiedCountriesList from './QualifiedCountriesList';
@@ -7,8 +10,11 @@ import Button from '@/components/common/Button';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const PresentationPanel = React.lazy(
+const PresentationPanel = dynamic(
   () => import('../../presentationPanel/PresentationPanel'),
+  {
+    ssr: false,
+  },
 );
 
 const PickQualifiersSimulation = () => {
@@ -51,9 +57,7 @@ const PickQualifiersSimulation = () => {
         <QualificationBoard />
         <div className="flex flex-col gap-2 xl:w-[350px] lg:w-[320px] 2cols:w-[calc(min(300px,35%))] w-[50%]">
           <QualifiedCountriesList />
-          <Suspense fallback={null}>
-            {presentationModeEnabled && !isOver && <PresentationPanel />}
-          </Suspense>
+          {presentationModeEnabled && !isOver && <PresentationPanel />}
         </div>
       </div>
     </>

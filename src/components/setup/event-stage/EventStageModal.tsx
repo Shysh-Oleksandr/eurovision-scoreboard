@@ -1,6 +1,9 @@
-import React, { Suspense, useEffect, useState } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { toast } from 'react-toastify';
+
+import dynamic from 'next/dynamic';
 
 import { EventStage, StageVotingMode } from '../../../models';
 import Modal from '../../common/Modal/Modal';
@@ -10,7 +13,12 @@ import Tabs, { TabContent } from '../../common/tabs/Tabs';
 import EventStageSettings from './EventStageSettings';
 import { useEventStageForm } from './hooks';
 
-const EventStageVoters = React.lazy(() => import('./EventStageVoters'));
+const EventStageVoters = dynamic(() => import('./EventStageVoters'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-white text-center py-2 font-medium">Loading...</div>
+  ),
+});
 
 enum EventStageModalTab {
   SETTINGS = 'Settings',
@@ -123,20 +131,14 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
         {
           ...tabs[1],
           content: (
-            <Suspense
-              fallback={
-                <div className="text-white text-center py-2 font-medium">
-                  Loading...
-                </div>
-              }
-            >
+            <>
               {(activeTab === EventStageModalTab.VOTERS || isVotersLoaded) && (
                 <EventStageVoters
                   stageId={eventStageToEdit?.id}
                   onLoaded={() => setIsVotersLoaded(true)}
                 />
               )}
-            </Suspense>
+            </>
           ),
         },
       ];

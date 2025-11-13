@@ -425,6 +425,7 @@ export const useGeneralStore = create<GeneralState>()(
 
           return {
             year: state.year,
+            theme: state.theme,
             themeYear: state.themeYear,
             customTheme: state.customTheme,
             lastSeenUpdate: state.lastSeenUpdate,
@@ -460,7 +461,7 @@ export const useGeneralStore = create<GeneralState>()(
               const currentSettings = useGeneralStore.getState().settings;
               if (!currentSettings.shouldUseCustomBgImage) return;
 
-              requestIdleCallback(async () => {
+              requestAnimationFrame(async () => {
                 const image = await getCustomBgImageFromDB();
                 if (image) {
                   useGeneralStore.setState({
@@ -523,7 +524,7 @@ export const useGeneralStore = create<GeneralState>()(
   const currentSettings = useGeneralStore.getState().settings;
   if (!currentSettings.shouldUseCustomBgImage) return;
 
-  requestIdleCallback(async () => {
+  requestAnimationFrame(async () => {
     const image = await getCustomBgImageFromDB();
     if (image) {
       useGeneralStore.setState({

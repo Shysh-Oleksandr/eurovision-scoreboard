@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useMemo, Suspense } from 'react';
+'use client';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
@@ -328,7 +329,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         )}
         {isOpen &&
           createPortal(
-            <Suspense fallback={null}>
+            <>
               <div
                 ref={dropdownRef}
                 style={dropdownStyle}
@@ -458,7 +459,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                   );
                 })()}
               </div>
-            </Suspense>,
+            </>,
             document.body,
           )}
       </div>
