@@ -461,7 +461,7 @@ export const useGeneralStore = create<GeneralState>()(
               const currentSettings = useGeneralStore.getState().settings;
               if (!currentSettings.shouldUseCustomBgImage) return;
 
-              requestIdleCallback(async () => {
+              requestAnimationFrame(async () => {
                 const image = await getCustomBgImageFromDB();
                 if (image) {
                   useGeneralStore.setState({
@@ -524,7 +524,7 @@ export const useGeneralStore = create<GeneralState>()(
   const currentSettings = useGeneralStore.getState().settings;
   if (!currentSettings.shouldUseCustomBgImage) return;
 
-  requestIdleCallback(async () => {
+  requestAnimationFrame(async () => {
     const image = await getCustomBgImageFromDB();
     if (image) {
       useGeneralStore.setState({
