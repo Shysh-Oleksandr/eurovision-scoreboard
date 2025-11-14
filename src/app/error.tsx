@@ -1,6 +1,13 @@
 'use client';
+
+import isDeepEqual from 'fast-deep-equal';
+import { useEffect, useMemo } from 'react';
+
+import { useCreateErrorMutation } from '@/api/errors';
 import { TriangleAlertIcon } from '@/assets/icons/TriangleAlertIcon';
 import Button from '@/components/common/Button';
+import { useGeneralStore } from '@/state/generalStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const USER_DETAILS = {
   platform: navigator.platform,
@@ -14,14 +21,84 @@ export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
+  error: Error;
   reset: () => void;
 }) {
+  const generalState = useGeneralStore((state) => state);
+  const scoreboardState = useScoreboardStore((state) => state);
+  const createErrorMutation = useCreateErrorMutation();
+
+  // Generate a unique key for this error to track if it's been reported
+  const errorKey = useMemo(() => {
+    const message = error.message || 'Unknown error occurred';
+    const stack = error.stack || '';
+
+    // Create a stable key based on error message, and first line of stack
+    const stackFirstLine = stack.split('\n')[0] || '';
+    const keyContent = `${message}|${stackFirstLine}`;
+
+    // Create a simple hash from the content
+    let hash = 0;
+
+    for (let i = 0; i < keyContent.length; i += 1) {
+      const char = keyContent.charCodeAt(i);
+
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+
+    return `error_reported_${Math.abs(hash).toString(36)}`;
+  }, [error.message, error.stack]);
+
+  const isSameSettingsPointsSystem = isDeepEqual(
+    generalState.pointsSystem,
+    generalState.settingsPointsSystem,
+  );
+  const generalInfo = {
+    settings: generalState.settings,
+    theme: generalState.customTheme || generalState.theme,
+    pointsSystem: generalState.pointsSystem,
+    settingsPointsSystem: isSameSettingsPointsSystem
+      ? 'Same'
+      : generalState.settingsPointsSystem,
+  };
+
+  const scoreboardInfo = {
+    eventStages: scoreboardState.eventStages,
+    currentStageId: scoreboardState.currentStageId,
+    votingCountryIndex: scoreboardState.votingCountryIndex,
+    votingPointsIndex: scoreboardState.votingPointsIndex,
+    televotingProgress: scoreboardState.televotingProgress,
+    startCounter: scoreboardState.startCounter,
+    restartCounter: scoreboardState.restartCounter,
+  };
+
   const messageToShare =
     (error.stack || error.message || 'Unknown error occurred') +
     '\n\n' +
     'User Details: ' +
     JSON.stringify(USER_DETAILS);
+
+  // Silently report error to backend (for both authenticated and unauthenticated users)
+  // Use localStorage to prevent duplicate reports on page refresh
+  useEffect(() => {
+    // Check if this error has already been reported
+    const hasBeenReported = localStorage.getItem(errorKey);
+
+    if (!hasBeenReported) {
+      // Mark as reported before sending to prevent race conditions
+      localStorage.setItem(errorKey, Date.now().toString());
+
+      createErrorMutation.mutate({
+        message: error.message || 'Unknown error occurred',
+        stack: error.stack,
+        userDetails: USER_DETAILS,
+        generalInfo,
+        scoreboardInfo,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errorKey]);
 
   if (window.innerWidth < 768) {
     document.querySelector('#root')?.classList.add('!h-auto', '!overflow-auto');
@@ -125,7 +202,11 @@ export default function Error({
                     Reload Page
                   </Button>
                   <Button
-                    onClick={reset}
+                    onClick={() => {
+                      reset();
+                      window.location.reload();
+                      localStorage.clear();
+                    }}
                     variant="destructive"
                     className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
                   >

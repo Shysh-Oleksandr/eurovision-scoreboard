@@ -7,4 +7,5 @@ export interface Profile {
 	email?: string;
 	googleId?: string;
 	activeThemeId?: string;
+  isAdmin?: boolean;
 }

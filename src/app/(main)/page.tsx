@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 
-const Main = dynamic(() => import('../views/Main'), {
+const Main = dynamic(() => import('../../views/Main'), {
   ssr: false,
 });
 

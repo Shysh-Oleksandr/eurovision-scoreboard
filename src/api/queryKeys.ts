@@ -23,6 +23,22 @@ export const queryKeys = {
       ['public', 'themes', filters] as const,
   },
 
+  // Errors queries (admin only)
+  errors: {
+    all: () => ['errors'] as const,
+    list: (params: {
+      page?: number;
+      limit?: number;
+      message?: string;
+      userId?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    }) => ['errors', 'list', params] as const,
+    detail: (id: string) => ['errors', 'detail', id] as const,
+  },
+
   // Legacy keys (for backward compatibility)
   legacy: {
     meProfile: () => ['me-profile'] as const,

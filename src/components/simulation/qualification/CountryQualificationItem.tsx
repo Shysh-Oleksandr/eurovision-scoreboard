@@ -3,8 +3,10 @@ import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
+import { useGeneralStore } from '@/state/generalStore';
 
 interface CountryQualificationItemProps {
   country: BaseCountry | null;
@@ -23,7 +25,17 @@ export const CountryQualificationItem: React.FC<
   shouldAnimate = false,
   isModal = false,
 }) => {
+  const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
+
   const itemRef = useRef<HTMLDivElement>(null);
+
+  const itemClassName =
+    'bg-countryItem-juryBg text-countryItem-juryCountryText';
+
+  const itemGradientStyle = getGradientBackgroundStyle(
+    itemClassName,
+    overrides,
+  );
 
   useGSAP(
     () => {
@@ -48,7 +60,7 @@ export const CountryQualificationItem: React.FC<
   return (
     <div
       ref={itemRef}
-      className={`flex items-center bg-countryItem-juryBg text-countryItem-juryCountryText rounded-sm transition-all duration-300 relative shadow-md ${
+      className={`flex items-center rounded-sm transition-all duration-300 relative shadow-md ${
         onClick ? 'cursor-pointer hover:bg-countryItem-juryHoverBg' : ''
       } ${
         country.isQualifiedFromSemi && hideIfQualified
@@ -56,7 +68,8 @@ export const CountryQualificationItem: React.FC<
           : ''
       } ${shouldAnimate ? 'opacity-0 -translate-x-full' : ''} ${
         isModal ? 'opacity-0' : ''
-      }`}
+      } ${itemClassName}`}
+      style={itemGradientStyle}
       onClick={onClick}
     >
       <img

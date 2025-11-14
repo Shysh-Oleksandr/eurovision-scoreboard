@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-11-14',
+    title: 'Fixed some issues. Added automatic error reporting',
+  },
+  {
     date: '2025-11-06',
     title:
       'The shade selector for the interface colors. Copying colors from one field to another. Small fixes',
@@ -206,20 +210,20 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-11-08', end: '2025-11-09' },
+    approximateDates: { start: '2025-11-15', end: '2025-11-16' },
     title: 'Custom theme improvements',
-  },
-  {
-    title: 'Separate points system for jury and televote',
-  },
-  {
-    title: 'Pre-1975 points system support',
   },
   {
     title: 'Saving scoreboards in your profile',
   },
   {
     title: 'The ability to use public scoreboards',
+  },
+  {
+    title: 'Separate points system for jury and televote',
+  },
+  {
+    title: 'Pre-1975 points system support',
   },
   {
     title: 'Localization for different languages',
