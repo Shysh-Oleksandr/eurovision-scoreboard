@@ -384,11 +384,25 @@ export const useGeneralStore = create<GeneralState>()(
         getHostingCountry: () => {
           const countries = useCountriesStore.getState().getAllCountries();
 
+          if (countries.length === 0) {
+            // Return a default country structure if countries list is empty
+            return { name: 'Switzerland', code: 'CH' } as BaseCountry;
+          }
+
           const hostingCountryCode = get().settings.hostingCountryCode || 'CH';
 
-          return countries.find(
+          const found = countries.find(
             (country) => country.code === hostingCountryCode,
-          ) as BaseCountry;
+          );
+
+          if (found) {
+            return found;
+          }
+
+          // Fallback: try 'WW' (Rest of World) or 'CH' (Switzerland), or first country
+          return (
+            countries.find((country) => country.code === 'CH') || countries[0]
+          );
         },
         resetAllSettings: () => {
           get().setYear(INITIAL_YEAR);

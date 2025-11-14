@@ -116,9 +116,14 @@ export function getHostingLogoByCountryCode(
 }
 
 export function getHostingCountryLogo(
-  country: BaseCountry | string,
+  country: BaseCountry | string | undefined | null,
   shouldShowHeartFlagIcon = true,
 ): { logo: string; isExisting: boolean } {
+  // Handle undefined/null country - return default flag
+  if (!country) {
+    return { logo: getFlagPath('WW'), isExisting: false };
+  }
+
   if (!shouldShowHeartFlagIcon) {
     return { logo: getFlagPath(country), isExisting: false };
   }

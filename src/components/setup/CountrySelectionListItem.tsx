@@ -59,7 +59,7 @@ export const CountrySelectionListItem: React.FC<
   };
 
   const { logo, isExisting } = getHostingCountryLogo(
-    country,
+    country || 'WW',
     shouldShowHeartFlagIcon,
   );
 
