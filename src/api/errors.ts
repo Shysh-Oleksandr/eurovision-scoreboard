@@ -12,6 +12,7 @@ export type ErrorData = {
   countriesInfo?: Record<string, any>;
   scoreboardInfo?: Record<string, any>;
   userId?: string;
+  isFixed?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -32,6 +33,7 @@ export type QueryErrorsParams = {
   userId?: string;
   dateFrom?: string;
   dateTo?: string;
+  isFixed?: boolean;
   sortBy?: 'createdAt' | 'message';
   sortOrder?: 'asc' | 'desc';
 };
@@ -75,11 +77,54 @@ export function useErrorQuery(id: string, enabled: boolean = true) {
   });
 }
 
+export function useUpdateErrorMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...data }: { id: string; isFixed?: boolean }) => {
+      const { data: result } = await api.patch(`/errors/${id}`, data);
+      return result as ErrorData;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.errors.all() });
+    },
+  });
+}
+
+export function useBulkUpdateErrorsMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      ids,
+      data,
+    }: {
+      ids: string[];
+      data: { isFixed?: boolean };
+    }) => {
+      await api.patch('/errors/bulk/update', { ids, data });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.errors.all() });
+    },
+  });
+}
+
 export function useDeleteErrorMutation() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/errors/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.errors.all() });
+    },
+  });
+}
+
+export function useBulkDeleteErrorsMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      await api.delete('/errors/bulk/delete', { data: { ids } });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.errors.all() });

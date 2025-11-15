@@ -6,6 +6,7 @@ import { useEffect, useMemo } from 'react';
 import { useCreateErrorMutation } from '@/api/errors';
 import { TriangleAlertIcon } from '@/assets/icons/TriangleAlertIcon';
 import Button from '@/components/common/Button';
+import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -54,23 +55,37 @@ export default function Error({
     generalState.pointsSystem,
     generalState.settingsPointsSystem,
   );
+  const isDefaultPointsSystem = isDeepEqual(
+    generalState.pointsSystem,
+    PREDEFINED_SYSTEMS_MAP.default,
+  );
   const generalInfo = {
-    settings: generalState.settings,
-    theme: generalState.customTheme || generalState.theme,
-    pointsSystem: generalState.pointsSystem,
+    pointsSystem: isDefaultPointsSystem ? 'Default' : generalState.pointsSystem,
     settingsPointsSystem: isSameSettingsPointsSystem
       ? 'Same'
       : generalState.settingsPointsSystem,
+    settings: generalState.settings,
+    theme: generalState.customTheme || generalState.themeYear,
   };
 
   const scoreboardInfo = {
-    eventStages: scoreboardState.eventStages,
     currentStageId: scoreboardState.currentStageId,
     votingCountryIndex: scoreboardState.votingCountryIndex,
     votingPointsIndex: scoreboardState.votingPointsIndex,
     televotingProgress: scoreboardState.televotingProgress,
     startCounter: scoreboardState.startCounter,
     restartCounter: scoreboardState.restartCounter,
+    eventStages: scoreboardState.eventStages.map((stage) => ({
+      id: stage.id,
+      name: stage.name,
+      votingMode: stage.votingMode,
+      isOver: stage.isOver,
+      isJuryVoting: stage.isJuryVoting,
+      isLastStage: stage.isLastStage,
+      qualifiersAmount: stage.qualifiersAmount,
+      countries: stage.countries.map((country) => country.code),
+      votingCountries: stage.votingCountries?.map((country) => country.code),
+    })),
   };
 
   const messageToShare =

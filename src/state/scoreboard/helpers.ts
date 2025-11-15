@@ -28,13 +28,13 @@ export const getLastCountryCodeByPoints = (remainingCountries: Country[]) =>
   remainingCountries.length
     ? remainingCountries.slice().sort(compareCountriesByPoints)[
         remainingCountries.length - 1
-      ].code
+      ]?.code
     : '';
 
 export const getLastCountryIndexByPoints = (
   countries: Country[],
   countryCode: string,
-) => countries.findIndex((country) => country.code === countryCode);
+) => countries.findIndex((country) => country.code === countryCode) || 0;
 
 export const isVotingOver = (lastCountryIndexByPoints: number) =>
   lastCountryIndexByPoints === -1;

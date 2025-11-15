@@ -70,7 +70,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className="notranslate"
+      translate="no"
+    >
       <body suppressHydrationWarning>
         {/* Prevent FOUC by applying stored theme */}
         <Script id="theme-fouc-prevention" strategy="beforeInteractive">{`

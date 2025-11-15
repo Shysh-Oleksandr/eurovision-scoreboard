@@ -63,7 +63,7 @@ const TelevoteInput = () => {
   const [disableLimit, setDisableLimit] = useState(false);
   const [disableLimitForShow, setDisableLimitForShow] = useState(false);
 
-  const votingCountryCode = getVotingCountry().code;
+  const votingCountryCode = getVotingCountry()?.code;
 
   // Calculate televote points progress and limits
   const televoteProgress = useMemo(() => {
@@ -212,7 +212,7 @@ const TelevoteInput = () => {
     if (revealTelevoteLowestToHighest) {
       const nextCountry = getNextLowestTelevoteCountry();
 
-      if (nextCountry) {
+      if (nextCountry && nextCountry.country) {
         setCurrentRevealTelevotePoints(nextCountry.points);
         setEnteredPoints(nextCountry.points.toString());
       }

@@ -717,7 +717,7 @@ export const createVotingActions: StateCreator<
 
     const isJuryVotingOver =
       state.votingCountryIndex === votingCountries.length - 1;
-    const votingCountryCode = votingCountries[state.votingCountryIndex].code;
+    const votingCountryCode = votingCountries[state.votingCountryIndex]?.code;
 
     const isCombinedVoting =
       currentStage.votingMode === StageVotingMode.COMBINED;
@@ -880,7 +880,7 @@ export const createVotingActions: StateCreator<
 
     while (countriesLeft > 0) {
       const votingCountryIndex = votingCountries.length - countriesLeft;
-      const votingCountryCode = votingCountries[votingCountryIndex].code;
+      const votingCountryCode = votingCountries[votingCountryIndex]?.code;
 
       const votesForCountry = predefinedJuryVotes[votingCountryCode];
 
