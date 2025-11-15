@@ -11,6 +11,8 @@ export interface BaseCountry {
   juryOdds?: number;
   televoteOdds?: number;
   spokespersonOrder?: number;
+
+  updatedAt?: string; // For custom entries
 }
 
 export type SemiFinalGroup = 'SF1' | 'SF2';

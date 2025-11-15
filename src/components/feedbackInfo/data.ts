@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-11-15',
+    title: 'Fixed some crashes. Added the ability to reuse existing flags when adding custom entries',
+  },
+  {
     date: '2025-11-14',
     title: 'Fixed some issues. Added automatic error reporting',
   },

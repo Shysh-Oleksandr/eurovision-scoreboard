@@ -244,7 +244,7 @@ export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
     category: 'All-Time Participants',
   },
   Turkey: {
-    name: 'Turkey',
+    name: 'Türkiye',
     code: 'TR',
     category: 'All-Time Participants',
   },
@@ -449,6 +449,11 @@ export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
   Syria: {
     name: 'Syria',
     code: 'SY',
+    category: 'Asia',
+  },
+  Taiwan: {
+    name: 'Taiwan',
+    code: 'TW',
     category: 'Asia',
   },
   Tajikistan: {

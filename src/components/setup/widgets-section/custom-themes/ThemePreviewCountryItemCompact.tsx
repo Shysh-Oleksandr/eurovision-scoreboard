@@ -83,7 +83,7 @@ const ThemePreviewCountryItemCompact: React.FC<
     return ALL_COUNTRIES.find(
       (country) =>
         country.code.toLowerCase() ===
-        (previewCountryCode || user?.country || 'ww').toLowerCase(),
+        (previewCountryCode || user?.country || '/flags/ww.svg').toLowerCase(),
     )!;
   }, [user, previewCountryCode]);
 

@@ -21,6 +21,7 @@ export const SyncCustomEntries: React.FC = () => {
         code: `custom-${entry._id}`,
         category: 'Custom',
         flag: entry.flagUrl,
+        updatedAt: entry.updatedAt,
       }));
 
       useCountriesStore.setState({ customCountries });

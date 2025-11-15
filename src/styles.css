@@ -597,3 +597,30 @@ h6 {
 .Toastify__progress-bar--info {
 	background: theme('colors.primary-700');
 }
+
+
+.middle-line {
+  overflow: hidden;
+  text-align: center;
+}
+
+.middle-line::before,
+.middle-line::after {
+  background-color: #ffffff40;
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+
+.middle-line::before {
+  right: 0.5em;
+  margin-left: -50%;
+}
+
+.middle-line::after {
+  left: 0.5em;
+  margin-right: -50%;
+}

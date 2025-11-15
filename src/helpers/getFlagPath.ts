@@ -7,7 +7,7 @@ export const getFlagPath = (country: BaseCountry | string): string => {
 
   if (country.flag) return country.flag;
 
-  if (country.code.startsWith('custom')) return 'ww';
+  if (country.code.startsWith('custom')) return '/flags/ww.svg';
 
   return `/flags/${country.code.toLowerCase()}.svg`;
 };
