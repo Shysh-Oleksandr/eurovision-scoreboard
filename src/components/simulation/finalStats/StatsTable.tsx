@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Image from 'next/image';
+
 import { Country, StageVotingType } from '../../../models';
 
 import CountryStatsRow from './CountryStatsRow';
@@ -93,7 +95,7 @@ const StatsTable: React.FC<StatsTableProps> = ({
                         {country.code === 'WW' ? 'ROTW' : country.name}
                       </h5>
                     )}
-                    <img
+                    <Image
                       src={logo}
                       alt={country.name}
                       className={`${
@@ -101,7 +103,6 @@ const StatsTable: React.FC<StatsTableProps> = ({
                           ? 'w-8 h-8'
                           : 'w-8 h-6 object-cover rounded-sm'
                       } mx-auto flex-shrink-0`}
-                      loading="lazy"
                       width={32}
                       height={24}
                       title={country.name}

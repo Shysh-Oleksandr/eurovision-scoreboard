@@ -2,6 +2,8 @@
 // Note: dynamic import inside generateImage keeps it out of the initial bundle
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import Image from 'next/image';
+
 import {
   ASPECT_RATIO_PRESETS,
   ShareImageAspectRatio,
@@ -362,13 +364,12 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                 fontSize: `${imageCustomization.brandingFontSize}px`,
               }}
             >
-              <img
+              <Image
                 src="/img/favicon-128x128.png"
                 alt="DouzePoints.app"
                 className="w-8 h-8 mr-2"
                 width={32}
                 height={32}
-                loading="lazy"
                 style={{
                   width: `${imageCustomization.brandingFontSize * 1.4}px`,
                   height: `${imageCustomization.brandingFontSize * 1.4}px`,

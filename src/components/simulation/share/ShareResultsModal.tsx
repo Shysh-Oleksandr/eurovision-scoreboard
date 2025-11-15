@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import Image from 'next/image';
+
 import {
   ASPECT_RATIO_PRESETS,
   getInitialAspectRatio,
@@ -743,10 +745,12 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
           <div>
             <h3 className="text-lg font-semibold mb-2 ml-2">Result:</h3>
 
-            <img
+            <Image
               src={generatedImageUrl}
               alt="Generated scoreboard"
               className="max-w-full h-auto border rounded-sm"
+              width={1024}
+              height={768}
             />
             <Button
               onClick={handleDownload}

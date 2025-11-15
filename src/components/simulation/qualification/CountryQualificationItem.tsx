@@ -2,6 +2,7 @@ import { gsap } from 'gsap';
 import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
+import Image from 'next/image';
 
 import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import { getFlagPath } from '@/helpers/getFlagPath';
@@ -72,7 +73,7 @@ export const CountryQualificationItem: React.FC<
       style={itemGradientStyle}
       onClick={onClick}
     >
-      <img
+      <Image
         src={getFlagPath(country)}
         onError={(e) => {
           e.currentTarget.src = getFlagPath('ww');

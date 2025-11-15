@@ -1,6 +1,8 @@
 'use client';
 import React, { useRef } from 'react';
 
+import Image from 'next/image';
+
 import { getFlagPath } from '../../helpers/getFlagPath';
 import useAnimatePoints from '../../hooks/useAnimatePoints';
 import { Country } from '../../models';
@@ -143,8 +145,7 @@ const CountryItem = ({
         )}
 
         <div className="flex items-center overflow-hidden flex-1">
-          <img
-            loading="lazy"
+          <Image
             src={getFlagPath(country)}
             onError={(e) => {
               e.currentTarget.src = getFlagPath('ww');

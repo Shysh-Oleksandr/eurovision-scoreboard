@@ -6,6 +6,8 @@ import React, {
   useMemo,
 } from 'react';
 
+import Image from 'next/image';
+
 import { Country, StageVotingType } from '../../../models';
 import { useStatsCustomizationStore } from '../../../state/statsCustomizationStore';
 import Button from '../../common/Button';
@@ -417,13 +419,12 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
                 fontSize: `${getBrandingFontSize()}px`,
               }}
             >
-              <img
+              <Image
                 src="/img/favicon-128x128.png"
                 alt="DouzePoints.app"
                 className="mr-2"
                 width={24}
                 height={24}
-                loading="lazy"
                 style={{
                   width: `${getBrandingFontSize() * 1.4}px`,
                   height: `${getBrandingFontSize() * 1.4}px`,

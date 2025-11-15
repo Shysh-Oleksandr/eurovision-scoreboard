@@ -2,6 +2,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import Image from 'next/image';
+
 import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
 import { Year } from '../../../config';
 import { themes } from '../../../theme/themes';
@@ -64,7 +66,7 @@ const SelectDisplay: React.FC<{
     >
       <div className="flex items-center truncate mr-8">
         {selectedOption?.imageUrl ? (
-          <img
+          <Image
             src={selectedOption.imageUrl}
             alt={selectedOption.label}
             className={`w-6 h-6 mr-2 object-cover ${
@@ -375,7 +377,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                   }}
                                 >
                                   {option.imageUrl ? (
-                                    <img
+                                    <Image
                                       src={option.imageUrl}
                                       alt={option.label}
                                       className={`w-5 h-5 mr-3 object-cover ${
@@ -383,7 +385,6 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                       }`}
                                       width={20}
                                       height={20}
-                                      loading="lazy"
                                       onError={(e) => {
                                         e.currentTarget.src = getFlagPath('ww');
                                       }}
@@ -430,7 +431,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                           }}
                         >
                           {option.imageUrl ? (
-                            <img
+                            <Image
                               src={option.imageUrl}
                               alt={option.label}
                               className={`w-5 h-5 mr-3 object-cover ${
@@ -438,7 +439,6 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                               }`}
                               width={20}
                               height={20}
-                              loading="lazy"
                               onError={(e) => {
                                 e.currentTarget.src = getFlagPath('ww');
                               }}

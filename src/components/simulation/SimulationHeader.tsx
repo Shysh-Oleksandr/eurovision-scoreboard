@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 
 import { useCountriesStore } from '../../state/countriesStore';
 import { useGeneralStore } from '../../state/generalStore';
@@ -72,7 +73,7 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
       <div className="flex flex-col xs:flex-row justify-between xs:gap-1.5 gap-2 xs:items-center mb-1 sm:mb-2 md:mb-3">
         <div className="flex items-center gap-2">
           {showHostingCountryLogo && (
-            <img
+            <Image
               src={logo}
               alt="Hosting country logo"
               className={`flex-none rounded-sm ${

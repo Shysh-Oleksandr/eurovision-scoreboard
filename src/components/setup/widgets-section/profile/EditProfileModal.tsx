@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 
 import {
   useDeleteProfileAvatarMutation,
@@ -189,10 +190,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 gap-3">
         <div className="flex items-center gap-4 sm:col-span-2">
-          <img
+          <Image
             src={displayAvatarUrl}
             alt="Avatar preview"
             className="w-20 h-20 rounded-full object-cover"
+            width={80}
+            height={80}
             onError={(e) => {
               e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
             }}

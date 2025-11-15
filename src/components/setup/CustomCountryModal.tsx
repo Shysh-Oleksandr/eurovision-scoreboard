@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import Image from 'next/image';
+
 import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
 import Button from '../common/Button';
@@ -314,7 +316,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
           <div className="flex gap-2 flex-wrap">
             {PRESET_IMAGES.map((preset) => (
-              <img
+              <Image
                 key={preset}
                 src={preset}
                 width={50}
@@ -328,7 +330,6 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                   setUploadedFile(null);
                   imageUpload.clear();
                 }}
-                loading="lazy"
               />
             ))}
           </div>
@@ -336,7 +337,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           {displayFlag && (
             <div className="mt-2">
               <p className="text-white text-sm mb-1">Preview:</p>
-              <img
+              <Image
                 src={displayFlag}
                 alt="Selected flag"
                 className="rounded-md object-cover"

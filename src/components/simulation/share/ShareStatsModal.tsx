@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import Image from 'next/image';
+
 import Button from '../../common/Button';
 import { Checkbox } from '../../common/Checkbox';
 import { CollapsibleSection } from '../../common/CollapsibleSection';
@@ -270,10 +272,12 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
           <div>
             <h3 className="text-lg font-semibold mb-2 ml-2">Result:</h3>
 
-            <img
+            <Image
               src={generatedImageUrl}
               alt="Generated stats image"
               className="max-w-full h-auto border rounded-sm"
+              width={1024}
+              height={768}
             />
             <Button
               onClick={handleDownload}

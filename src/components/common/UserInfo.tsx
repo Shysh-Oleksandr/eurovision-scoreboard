@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Image from 'next/image';
+
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
 
@@ -51,11 +53,10 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
 
   return (
     <div className="flex items-center gap-2.5">
-      <img
+      <Image
         src={user.avatarUrl || '/img/ProfileAvatarPlaceholder.png'}
         alt={user.username || 'avatar'}
         className={`${s.avatar} rounded-full object-cover`}
-        loading="lazy"
         width={24}
         height={24}
         onError={(e) => {
@@ -68,7 +69,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
             {user.name || 'Anonymous'}
           </div>
           {user.country && logo && (
-            <img
+            <Image
               src={logo}
               alt={`${user.country} flag`}
               className={`flex-none rounded-sm pointer-events-none ${
@@ -76,7 +77,6 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
               }`}
               width={24}
               height={24}
-              loading="lazy"
             />
           )}
         </div>

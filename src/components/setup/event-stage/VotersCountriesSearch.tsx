@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
+import Image from 'next/image';
+
 import { PlusIcon } from '../../../assets/icons/PlusIcon';
 import { getFlagPath } from '../../../helpers/getFlagPath';
 import { BaseCountry } from '../../../models';
@@ -126,7 +128,7 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
                     onClick={() => onAddVoter(country)}
                     className="flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 p-2 rounded-md transition-colors duration-300 relative"
                   >
-                    <img
+                    <Image
                       src={logo}
                       onError={(e) => {
                         e.currentTarget.src = getFlagPath('ww');
@@ -137,7 +139,6 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
                       }`}
                       width={32}
                       height={28}
-                      loading="lazy"
                     />
                     <span
                       className="text-sm text-white flex-1 truncate ml-2"

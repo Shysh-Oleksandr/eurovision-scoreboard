@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Image from 'next/image';
+
 import { CustomSortableItem } from '@/components/common/CustomSortableItem';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
@@ -29,7 +31,7 @@ export const VoterItem: React.FC<VoterItemProps> = ({
   return (
     <CustomSortableItem id={id} key={id} onRemove={onRemove}>
       <div className="flex items-center gap-2 flex-1 min-w-0 h-8">
-        <img
+        <Image
           src={logo}
           alt={`${country.name} flag`}
           className={`flex-none rounded-sm pointer-events-none ${
@@ -37,7 +39,6 @@ export const VoterItem: React.FC<VoterItemProps> = ({
           }`}
           width={28}
           height={28}
-          loading="lazy"
           onError={(e) => {
             e.currentTarget.src = getFlagPath('ww');
           }}

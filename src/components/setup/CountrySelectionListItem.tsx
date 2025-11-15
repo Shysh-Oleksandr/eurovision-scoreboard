@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Image from 'next/image';
+
 import { ArrowIcon } from '../../assets/icons/ArrowIcon';
 import { PencilIcon } from '../../assets/icons/PencilIcon';
 import { getFlagPath } from '../../helpers/getFlagPath';
@@ -46,9 +48,6 @@ export const CountrySelectionListItem: React.FC<
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
-  const shouldLazyLoad =
-    countryGroupAssignment !== CountryAssignmentGroup.SF1 &&
-    countryGroupAssignment !== CountryAssignmentGroup.SF2;
 
   const handleAssignmentChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -69,8 +68,7 @@ export const CountrySelectionListItem: React.FC<
         countryGroupAssignment ? '' : 'pointer-events-none'
       }`}
     >
-      <img
-        loading={shouldLazyLoad ? 'lazy' : 'eager'}
+      <Image
         src={logo}
         onError={(e) => {
           e.currentTarget.src = getFlagPath('ww');

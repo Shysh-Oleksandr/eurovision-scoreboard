@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Image from 'next/image';
+
 import { Country, EventStage, StageVotingMode } from '../../../models';
 
 import { useBorderOpacity } from './useBorderOpacity';
@@ -173,7 +175,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                       );
 
                       return (
-                        <img
+                        <Image
                           src={logo}
                           alt={totalCountry.name}
                           className={`${
@@ -181,7 +183,6 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                               ? 'w-8 h-8'
                               : 'w-8 h-6 object-cover rounded-sm'
                           }`}
-                          loading="lazy"
                           width={32}
                           height={32}
                           onError={(e) => {
@@ -213,7 +214,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                           );
 
                           return (
-                            <img
+                            <Image
                               src={logo}
                               alt={juryCountry.name}
                               className={`${
@@ -221,7 +222,6 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                                   ? 'w-8 h-8'
                                   : 'w-8 h-6 object-cover rounded-sm'
                               }`}
-                              loading="lazy"
                               width={32}
                               height={32}
                               onError={(e) => {
@@ -255,7 +255,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                           );
 
                           return (
-                            <img
+                            <Image
                               src={logo}
                               alt={televoteCountry.name}
                               className={`${
@@ -263,7 +263,6 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                                   ? 'w-8 h-8'
                                   : 'w-8 h-6 object-cover rounded-sm'
                               }`}
-                              loading="lazy"
                               width={32}
                               height={32}
                               onError={(e) => {

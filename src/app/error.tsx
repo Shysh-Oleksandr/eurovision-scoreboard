@@ -97,6 +97,12 @@ export default function Error({
   // Silently report error to backend (for both authenticated and unauthenticated users)
   // Use localStorage to prevent duplicate reports on page refresh
   useEffect(() => {
+    const isDev = process.env.NODE_ENV === 'development';
+
+    if (isDev) {
+      return;
+    }
+
     // Check if this error has already been reported
     const hasBeenReported = localStorage.getItem(errorKey);
 

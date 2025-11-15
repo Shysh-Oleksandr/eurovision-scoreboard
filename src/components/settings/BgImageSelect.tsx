@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import Image from 'next/image';
+
 import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
 
@@ -154,7 +156,7 @@ export const BgImageSelect: React.FC = () => {
 
           {customBgImage && (
             <div className="flex items-center gap-2">
-              <img
+              <Image
                 src={customBgImage}
                 alt="Background preview"
                 className="rounded object-cover"
