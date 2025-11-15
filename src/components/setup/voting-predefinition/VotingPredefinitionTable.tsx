@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Image from 'next/image';
-
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
@@ -80,7 +78,8 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
                         )}`}
                       />
                     )}
-                    <Image
+                    <img
+                      loading="lazy"
                       src={logo}
                       alt={country.name}
                       className={`${
@@ -115,7 +114,8 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
                     <span className="text-lg font-bold w-6 text-center">
                       {country.rank}
                     </span>
-                    <Image
+                    <img
+                      loading="lazy"
                       src={logo}
                       alt={country.name}
                       className={`${

@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Image from 'next/image';
-
 import { Country, EventStage, StageVotingMode } from '../../../models';
 
 import { useBorderOpacity } from './useBorderOpacity';
@@ -175,7 +173,8 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                       );
 
                       return (
-                        <Image
+                        <img
+                          loading="lazy"
                           src={logo}
                           alt={totalCountry.name}
                           className={`${
@@ -214,7 +213,8 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                           );
 
                           return (
-                            <Image
+                            <img
+                              loading="lazy"
                               src={logo}
                               alt={juryCountry.name}
                               className={`${
@@ -255,7 +255,8 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                           );
 
                           return (
-                            <Image
+                            <img
+                              loading="lazy"
                               src={logo}
                               alt={televoteCountry.name}
                               className={`${

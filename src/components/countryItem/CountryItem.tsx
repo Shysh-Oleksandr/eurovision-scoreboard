@@ -1,8 +1,6 @@
 'use client';
 import React, { useRef } from 'react';
 
-import Image from 'next/image';
-
 import { getFlagPath } from '../../helpers/getFlagPath';
 import useAnimatePoints from '../../hooks/useAnimatePoints';
 import { Country } from '../../models';
@@ -145,7 +143,7 @@ const CountryItem = ({
         )}
 
         <div className="flex items-center overflow-hidden flex-1">
-          <Image
+          <img
             src={getFlagPath(country)}
             onError={(e) => {
               e.currentTarget.src = getFlagPath('ww');
@@ -153,6 +151,7 @@ const CountryItem = ({
             alt={`${country.name} flag`}
             width={48}
             height={36}
+            loading="lazy"
             className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-countryItem-juryBg self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
           />
           <h4

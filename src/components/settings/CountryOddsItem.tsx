@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import Image from 'next/image';
-
 import { useDebounceWithCancel } from '../../hooks/useDebounceWithCancel';
 import { BaseCountry } from '../../models';
 import { Input } from '../Input';
@@ -102,9 +100,10 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
   return (
     <div className="bg-primary-800 bg-gradient-to-tr from-[10%] from-primary-900/80 to-primary-700/50 rounded-lg p-3 text-white">
       <div className="flex items-center gap-3">
-        <Image
+        <img
           src={logo}
           alt={country.name}
+          loading="lazy"
           className={`flex-none rounded-sm ${
             isExisting ? 'w-8 h-8' : 'w-8 h-6 object-cover'
           }`}

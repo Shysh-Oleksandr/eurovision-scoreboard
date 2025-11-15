@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
 
-import Image from 'next/image';
-
 import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
 import { useQualificationStatus } from '@/components/countryItem/hooks/useQualificationStatus';
 import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
@@ -118,7 +116,8 @@ const ShareCountryItem: React.FC<Props> = ({
 
       <div className={buttonClassName} style={buttonGradientStyle}>
         <div className="flex items-center overflow-hidden flex-1 min-w-0">
-          <Image
+          <img
+            loading="lazy"
             src={getFlagPath(country)}
             onError={(e) => {
               e.currentTarget.src = getFlagPath('ww');

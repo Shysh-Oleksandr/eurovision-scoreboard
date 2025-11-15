@@ -103,10 +103,30 @@ export default function Error({
       return;
     }
 
+    const isFailedToLoadChunkError = error.message.includes(
+      'Failed to load chunk (',
+    );
+    const didErrorOccurWithinLastMinute =
+      localStorage.getItem('failedToLoadChunkErrorAt') &&
+      new Date(
+        localStorage.getItem('failedToLoadChunkErrorAt') || 0,
+      ).getTime() >
+        new Date().getTime() - 1 * 60 * 1000;
+
+    if (isFailedToLoadChunkError && !didErrorOccurWithinLastMinute) {
+      localStorage.setItem(
+        'failedToLoadChunkErrorAt',
+        new Date().getTime().toString(),
+      );
+      window.location.reload();
+
+      return;
+    }
+
     // Check if this error has already been reported
     const hasBeenReported = localStorage.getItem(errorKey);
 
-    if (!hasBeenReported) {
+    if (!hasBeenReported && !isFailedToLoadChunkError) {
       // Mark as reported before sending to prevent race conditions
       localStorage.setItem(errorKey, Date.now().toString());
 

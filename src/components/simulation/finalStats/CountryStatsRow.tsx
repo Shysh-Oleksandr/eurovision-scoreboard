@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Image from 'next/image';
-
 import { BaseCountry, Country } from '../../../models';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
@@ -47,7 +45,8 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
           <span className="text-lg font-bold w-6 text-center">
             {country.rank}
           </span>
-          <Image
+          <img
+            loading="lazy"
             src={logo}
             alt={country.name}
             className={`${

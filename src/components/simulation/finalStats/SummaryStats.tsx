@@ -1,7 +1,5 @@
 import React from 'react';
 
-import Image from 'next/image';
-
 import { Country, EventStage, StageVotingMode } from '../../../models';
 
 import { useBorderOpacity } from './useBorderOpacity';
@@ -166,7 +164,8 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
                       );
 
                       return (
-                        <Image
+                        <img
+                          loading="lazy"
                           src={logo}
                           alt={country.name}
                           className={`${

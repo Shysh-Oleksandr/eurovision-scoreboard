@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import Image from 'next/image';
-
 import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
 import CustomSelect from '../common/customSelect/CustomSelect';
@@ -500,7 +498,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                   }
 
                   return (
-                    <Image
+                    <img
+                      loading="lazy"
                       key={entry.code}
                       src={entryFlagSrc}
                       width={50}
@@ -532,7 +531,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             <p className="text-white text-sm">Presets:</p>
             <div className="flex gap-2 overflow-x-auto">
               {PRESET_IMAGES.map((preset) => (
-                <Image
+                <img
+                  loading="lazy"
                   key={preset}
                   src={preset}
                   width={50}
@@ -557,7 +557,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           <div className="">
             <h4 className="middle-line text-white text-sm mb-1">Preview</h4>
 
-            <Image
+            <img
+              loading="lazy"
               src={previewFlag}
               alt="Selected flag"
               className="rounded-md object-cover w-[100px] h-[70px]"

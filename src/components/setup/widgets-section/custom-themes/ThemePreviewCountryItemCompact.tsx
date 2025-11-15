@@ -1,7 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
 
-import Image from 'next/image';
-
 import Badge from '@/components/common/Badge';
 import VotingPointsInfo from '@/components/controlsPanel/VotingPointsInfo';
 import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
@@ -297,7 +295,8 @@ const ThemePreviewCountryItemCompact: React.FC<
               />
             )}
             <div className="flex items-center overflow-hidden flex-1">
-              <Image
+              <img
+                loading="lazy"
                 src={mockCountry.flag || '/flags/ww.svg'}
                 alt={`${mockCountry.name} flag`}
                 width={48}
