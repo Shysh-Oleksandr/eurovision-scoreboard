@@ -43,6 +43,8 @@ const FeedbackModal = ({
 
   const tabs = getTabs(shouldShowNewChangesIndicator);
 
+  console.log('tabs');
+
   return (
     <Modal
       isOpen={showModal}
