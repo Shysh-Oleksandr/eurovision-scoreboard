@@ -52,6 +52,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [selectedStandardCountry, setSelectedStandardCountry] = useState('');
   const [selectedCustomEntry, setSelectedCustomEntry] = useState('');
+  const [failedToLoadFlag, setFailedToLoadFlag] = useState(false);
 
   const { mutateAsync: createEntry, isPending: isCreating } =
     useCreateCustomEntryMutation();
@@ -82,6 +83,13 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       url.startsWith('data:')
     );
   };
+
+  const displayFlag = uploadedFile ? imageUpload.base64 : flagUrl || '';
+
+  const previewFlag: string =
+    displayFlag && isValidImageUrl(displayFlag) && !failedToLoadFlag
+      ? displayFlag
+      : PRESET_IMAGES[1];
 
   // Filter custom entries that are not from PRESET_IMAGES
   const reusableCustomEntries = useMemo(() => {
@@ -147,7 +155,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
       setFlagUrl(currentFlagUrl);
       setUploadedFile(null);
-
+      setFailedToLoadFlag(false);
       // Sync select states based on current flagUrl
       // Check if it's a standard country flag
       const standardCountry = getAllCountries(false).find((c) => {
@@ -177,6 +185,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       setName('');
       setFlagUrl('');
       setUploadedFile(null);
+      setFailedToLoadFlag(false);
       setSelectedStandardCountry('');
       setSelectedCustomEntry('');
     }
@@ -194,6 +203,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       setUploadedFile(null);
       imageUpload.clear();
       setSelectedStandardCountry(countryCode);
+      setFailedToLoadFlag(false);
       setSelectedCustomEntry('');
     }
   };
@@ -205,6 +215,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     imageUpload.clear();
     setSelectedCustomEntry(flagUrl);
     setSelectedStandardCountry('');
+    setFailedToLoadFlag(false);
   };
 
   // Handle custom entry click from horizontal list
@@ -214,6 +225,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     imageUpload.clear();
     setSelectedCustomEntry(flagUrl);
     setSelectedStandardCountry('');
+    setFailedToLoadFlag(false);
   };
 
   const getEntryId = (): string | null => {
@@ -240,6 +252,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     }
 
     try {
+      const urlToUpload = uploadedFile ? '' : previewFlag;
+
       if (isEditMode) {
         const entryId = getEntryId();
 
@@ -253,7 +267,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
         await updateEntry({
           id: entryId,
           name,
-          flagUrl,
+          flagUrl: urlToUpload,
         });
 
         // Upload file if provided
@@ -264,7 +278,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
         // Create new entry
         const newEntry = await createEntry({
           name,
-          flagUrl: flagUrl || PRESET_IMAGES[1],
+          flagUrl: urlToUpload,
         });
 
         // Upload file if provided
@@ -365,17 +379,6 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
   const isSaving = isCreating || isUpdating || isDeleting || isUploadingFlag;
 
-  const displayFlag = uploadedFile
-    ? imageUpload.base64
-    : flagUrl.startsWith('/flags/')
-    ? flagUrl
-    : flagUrl || '';
-
-  const previewFlag: string =
-    displayFlag && isValidImageUrl(displayFlag)
-      ? displayFlag
-      : PRESET_IMAGES[1];
-
   return (
     <Modal
       isOpen={isOpen}
@@ -423,6 +426,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
               imageUpload.clear();
               setSelectedStandardCountry('');
               setSelectedCustomEntry('');
+              setFailedToLoadFlag(false);
             }}
             className="lg:text-[0.95rem] text-sm"
             placeholder="Paste an image URL"
@@ -542,6 +546,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                     setUploadedFile(null);
                     imageUpload.clear();
                     setSelectedStandardCountry('');
+                    setFailedToLoadFlag(false);
                     setSelectedCustomEntry('');
                   }}
                 />
@@ -558,6 +563,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
               className="rounded-md object-cover w-[100px] h-[70px]"
               width={100}
               height={70}
+              onError={() => setFailedToLoadFlag(true)}
+              onLoad={() => setFailedToLoadFlag(false)}
             />
           </div>
         </div>

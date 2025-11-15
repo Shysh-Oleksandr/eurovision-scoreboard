@@ -1,2 +1,6 @@
+/*                                   # HTML + JSON, etc.
+  Cache-Control: no-store
+  Vary: *
+
 /_next/static/*
   Cache-Control: public,max-age=31536000,immutable

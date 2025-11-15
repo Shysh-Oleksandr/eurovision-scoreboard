@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   productionBrowserSourceMaps: true,
   expireTime: 0,
+  deploymentId: `${Date.now()}`,
   images: {
     remotePatterns: [
       {
@@ -17,6 +18,11 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '**',
         hostname: '**', // Allows images from all HTTP domains (if needed)
+      },
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        pathname: '/wikipedia/**',
       },
     ],
   },
