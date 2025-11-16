@@ -1,0 +1,21 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "close": "Cerrar",
+    "continue": "Continuar",
+    "start": "Empezar"
+  },
+  "home": {
+    "openSetup": {
+      "ariaLabel": "Configuración",
+      "title": "Configuración",
+      "label": "Abrir configuración"
+    }
+  },
+  "setup": {},
+  "setupNestedModals": {},
+  "simulation": {},
+  "simulationStats": {},
+  "widgets": {},
+  "settings": {}
+}

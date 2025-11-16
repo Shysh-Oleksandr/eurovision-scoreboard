@@ -8,6 +8,7 @@ import { Tooltip } from '../common/Tooltip';
 
 import { BgImageSelect } from './BgImageSelect';
 import { ContestSettings } from './ContestSettings';
+import { LanguageSelector } from './LanguageSelector';
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
 import { PresetsSettings } from './presets/PresetsSettings';
 
@@ -222,6 +223,8 @@ export const GeneralSettings: React.FC = () => {
         }
         contentClassName="grid sm:grid-cols-2 grid-cols-1 gap-1"
       >
+        <LanguageSelector />
+
         <Checkbox
           id="show-heart-flag-icon"
           labelClassName="w-full"

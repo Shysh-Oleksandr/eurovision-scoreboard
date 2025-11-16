@@ -1,6 +1,9 @@
 'use client';
 
+import { useLocale } from 'next-intl';
 import { useEffect } from 'react';
+
+import { useRouter } from 'next/navigation';
 
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
@@ -13,10 +16,12 @@ export default function AppBootstrap() {
   useThemeSetup();
   useActiveThemeSync();
 
-  const { handlePostLogin } = useAuthStore();
+  const { handlePostLogin, user } = useAuthStore();
   const setInitialCountriesForYear = useCountriesStore(
     (state) => state.setInitialCountriesForYear,
   );
+  const locale = useLocale();
+  const router = useRouter();
 
   // Initialize countries once on first load
   useEffect(() => {
@@ -44,6 +49,27 @@ export default function AppBootstrap() {
 
     handlePostLogin();
   }, [handlePostLogin]);
+
+  useEffect(() => {
+    const preferred = user?.preferredLocale;
+
+    if (!preferred || preferred === locale) return;
+
+    (async () => {
+      try {
+        await fetch('/api/locale', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ locale: preferred }),
+        });
+        router.refresh();
+      } catch (error) {
+        console.error('Failed to sync preferred locale', error);
+      }
+    })();
+  }, [user?.preferredLocale, locale, router]);
 
   return null;
 }

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -60,6 +61,8 @@ const VotingPredefinitionModal = dynamic(
 );
 
 const EventSetupModal = () => {
+  const t = useTranslations();
+
   const {
     eventSetupModalOpen,
     predefModalOpen,
@@ -425,7 +428,7 @@ const EventSetupModal = () => {
               </Button>
             )}
             <Button className="w-full !text-base" onClick={handleStartEvent}>
-              Start
+              {t('common.start')}
             </Button>
           </div>
         }

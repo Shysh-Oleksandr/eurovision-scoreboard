@@ -1,11 +1,14 @@
 import './globals.css';
 
 import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
 
 import Script from 'next/script';
+import { getLocale } from 'next-intl/server';
 
 import { UmamiAnalytics } from './analytics';
 import AppBootstrap from './app-bootstrap';
+import IntlProvider from './IntlProvider';
 import Providers from './providers';
 import ToastRoot from './toast-root';
 
@@ -64,14 +67,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       className="notranslate"
       translate="no"
@@ -103,12 +108,15 @@ export default function RootLayout({
           } catch (e) { console.error('Failed to apply stored theme:', e); }
         `}</Script>
 
-        <Providers>
-          <AppBootstrap />
-          {children}
-          <ToastRoot />
-          <UmamiAnalytics />
-        </Providers>
+        <NextIntlClientProvider>
+          <Providers>
+            <AppBootstrap />
+            {children}
+            <ToastRoot />
+            <UmamiAnalytics />
+            <IntlProvider />
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
