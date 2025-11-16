@@ -104,7 +104,7 @@ export default function Error({
     }
 
     const isFailedToLoadChunkError = error.message.includes(
-      'Failed to load chunk (',
+      'Failed to load chunk ',
     );
     const didErrorOccurWithinLastMinute =
       localStorage.getItem('failedToLoadChunkErrorAt') &&
