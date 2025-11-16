@@ -65,8 +65,6 @@ const Simulation = () => {
 
   const phaseTitle = usePhaseTitle();
 
-  // useBeforeUnload();
-
   if (eventStages.length === 0) {
     return null;
   }

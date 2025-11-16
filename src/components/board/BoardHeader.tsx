@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useMemo, type JSX } from 'react';
 
 import { useShallow } from 'zustand/shallow';
@@ -10,6 +11,8 @@ import Button from '../common/Button';
 import { getWinnerCountry } from '@/state/scoreboard/helpers';
 
 const BoardHeader = (): JSX.Element | null => {
+  const t = useTranslations('simulation');
+
   const {
     getCurrentStage,
     winnerCountry,
@@ -61,67 +64,55 @@ const BoardHeader = (): JSX.Element | null => {
       return (
         <>
           <span className="font-medium">
-            {pointsToShow} point{pointsToShow === 1 ? '' : 's'}
-          </span>{' '}
-          go to...
+            {t('pointsGoTo', { count: pointsToShow })}
+          </span>
         </>
       );
     }
 
     if (isJuryVoting) {
-      return (
-        <>
-          Choose a country to give{' '}
-          <span className="font-medium">{votingPoints}</span> point
-          {votingPoints === 1 ? '' : 's'}
-        </>
-      );
+      return <>{t('chooseCountryToGivePoints', { count: votingPoints })}</>;
     }
 
-    return (
-      <>
-        Enter televote points for{' '}
-        <span className="font-medium">{votingCountry?.name}</span>
-      </>
-    );
+    return t.rich('enterTelevotePointsFor', {
+      country: votingCountry?.name,
+      span: (chunks) => <span className="font-medium">{chunks}</span>,
+    });
   }, [
     isVotingOver,
     revealTelevoteLowestToHighest,
     isJuryVoting,
-    votingCountry?.name,
-    votingPoints,
     currentRevealTelevotePoints,
+    t,
+    votingPoints,
+    votingCountry?.name,
   ]);
 
   const winnerText = useMemo(() => {
     if (!winnerCountry) return null;
 
     if (isAnotherStageDisplayed && winnerCountryFromStage) {
-      return (
-        <>
-          <span className="font-semibold">{winnerCountryFromStage.name}</span>{' '}
-          is the winner of{' '}
-          <span className="font-medium">{viewedStage?.name}</span>!
-        </>
-      );
+      return t.rich('winnerOf', {
+        country: winnerCountryFromStage?.name ?? '',
+        event: viewedStage?.name ?? '',
+        span: (chunks) => <span className="font-semibold">{chunks}</span>,
+        span2: (chunks) => <span className="font-medium">{chunks}</span>,
+      });
     }
 
-    return (
-      <>
-        <span className="font-semibold">{winnerCountry.name}</span> is the
-        winner of{' '}
-        <span className="font-medium">
-          {contestName || 'Eurovision'} {contestYear || ''}
-        </span>
-        !
-      </>
-    );
+    return t.rich('winnerOf', {
+      country: winnerCountry.name,
+      event: `${contestName || 'Eurovision'} ${contestYear || ''}`,
+      span: (chunks) => <span className="font-semibold">{chunks}</span>,
+      span2: (chunks) => <span className="font-medium">{chunks}</span>,
+    });
   }, [
     winnerCountry,
     isAnotherStageDisplayed,
     winnerCountryFromStage,
-    contestYear,
+    t,
     contestName,
+    contestYear,
     viewedStage?.name,
   ]);
 
@@ -148,7 +139,11 @@ const BoardHeader = (): JSX.Element | null => {
         {winnerText || votingText}
       </h3>
       {!isVotingOver && (
-        <Button variant="tertiary" label="Random" onClick={chooseRandomly} />
+        <Button
+          variant="tertiary"
+          label={t('random')}
+          onClick={chooseRandomly}
+        />
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import isDeepEqual from 'fast-deep-equal';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo } from 'react';
 
 import { useCreateErrorMutation } from '@/api/errors';
@@ -25,6 +26,8 @@ export default function Error({
   error: Error;
   reset: () => void;
 }) {
+  const t = useTranslations();
+
   const generalState = useGeneralStore((state) => state);
   const scoreboardState = useScoreboardStore((state) => state);
   const createErrorMutation = useCreateErrorMutation();
@@ -168,10 +171,10 @@ export default function Error({
                 </div>
 
                 <h1 className="text-3xl font-bold text-white mb-3">
-                  Oops! Something Went Wrong
+                  {t('error.title')}
                 </h1>
                 <p className="text-primary-300 text-base">
-                  We encountered an unexpected error
+                  {t('error.description')}
                 </p>
               </div>
 
@@ -180,7 +183,7 @@ export default function Error({
                 <div className="flex items-center justify-between mb-2">
                   {/* Error Message */}
                   <h3 className="text-primary-300 text-sm font-medium">
-                    Error:
+                    {t('error.error')}:
                   </h3>
                   <Button
                     variant="tertiary"
@@ -188,7 +191,7 @@ export default function Error({
                       navigator.clipboard.writeText(messageToShare);
                     }}
                   >
-                    Copy
+                    {t('common.copy')}
                   </Button>
                 </div>
                 <div className="bg-primary-900/60 rounded-lg flex items-center justify-between border border-primary-700/40 p-5 mb-6 max-h-[150px] overflow-auto">
@@ -202,35 +205,32 @@ export default function Error({
                   <div className="flex items-start gap-3 text-primary-200">
                     <div className="mt-0.5 text-primary-400">•</div>
                     <p className="text-sm leading-relaxed">
-                      Clicking "Reload Page" will reload the page keeping all
-                      local data. Try it first.
+                      {t('error.errorInfoReloadPage')}
                     </p>
                   </div>
                   <div className="flex items-start gap-3 text-primary-200">
                     <div className="mt-0.5 text-primary-400">•</div>
                     <p className="text-sm leading-relaxed">
-                      Clicking "Reset Application" will clear all local data and
-                      reload the app
+                      {t('error.errorInfoResetApplication')}
                     </p>
                   </div>
                   <div className="flex items-start gap-3 text-primary-200">
                     <div className="mt-0.5 text-primary-400">•</div>
                     <p className="text-sm leading-relaxed">
-                      Your saved profile data and cloud-synced information won't
-                      be affected
+                      {t('error.errorInfoNotAffected')}
                     </p>
                   </div>
                   <div className="flex items-start gap-3 text-primary-200">
                     <div className="mt-0.5 text-primary-400">•</div>
                     <p className="text-sm leading-relaxed">
-                      If this problem persists, please send an email to the
-                      developer at{' '}
+                      {t('error.errorInfoReport')}{' '}
                       <a
                         href={`mailto:sasha.shysh23@gmail.com?subject=Error Report&body=${messageToShare}`}
-                        className="underline"
+                        className="text-primary-300 hover:text-white underline transition-colors"
                       >
                         sasha.shysh23@gmail.com
                       </a>
+                      .
                     </p>
                   </div>
                 </div>
@@ -240,7 +240,7 @@ export default function Error({
                     onClick={() => window.location.reload()}
                     className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
                   >
-                    Reload Page
+                    {t('error.reloadPage')}
                   </Button>
                   <Button
                     onClick={() => {
@@ -251,7 +251,7 @@ export default function Error({
                     variant="destructive"
                     className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
                   >
-                    Reset Application
+                    {t('error.resetApplication')}
                   </Button>
                 </div>
               </div>

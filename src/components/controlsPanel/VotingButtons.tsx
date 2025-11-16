@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useCallback } from 'react';
 
 import { useShallow } from 'zustand/shallow';
@@ -10,6 +11,8 @@ import TelevoteInput from './TelevoteInput';
 import { useGeneralStore } from '@/state/generalStore';
 
 const VotingButtons = () => {
+  const t = useTranslations('simulation');
+
   const useGroupedJuryPoints = useGeneralStore(
     (state) => state.settings.useGroupedJuryPoints,
   );
@@ -58,7 +61,7 @@ const VotingButtons = () => {
     <div className="w-full pt-1 lg:pb-4 pb-3 rounded-md rounded-t-none">
       {isJuryVoting ? (
         <div className="lg:px-4 px-3">
-          <Button label="Vote randomly" onClick={voteRandomlyJury} />
+          <Button label={t('voteRandomly')} onClick={voteRandomlyJury} />
         </div>
       ) : (
         <TelevoteInput />
@@ -67,7 +70,7 @@ const VotingButtons = () => {
       <div className="w-full bg-white/15 h-[1px] lg:my-4 my-3"></div>
       <div className="lg:px-4 px-3">
         <Button
-          label="Finish randomly"
+          label={t('finishRandomly')}
           onClick={finishRandomly}
           className="w-full"
         />

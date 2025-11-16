@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -41,6 +42,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   onClose,
   countryToEdit,
 }) => {
+  const t = useTranslations('setup.customCountryModal');
+
   const isEditMode = !!countryToEdit;
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = !!user;
@@ -234,7 +237,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
   const handleSave = async () => {
     if (!isAuthenticated) {
-      toast('Please sign in to create custom entries.', {
+      toast(t('pleaseSignInToCreateCustomEntries'), {
         type: 'error',
       });
 
@@ -242,7 +245,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     }
 
     if (name.trim() === '') {
-      toast('Entry name is required.', {
+      toast(t('entryNameIsRequired'), {
         type: 'error',
       });
 
@@ -285,7 +288,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
         }
       }
 
-      toast('Custom entry saved successfully!', { type: 'success' });
+      toast(t('customEntrySavedSuccessfully'), { type: 'success' });
 
       onClose();
     } catch (error: any) {
@@ -299,7 +302,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     if (!countryToEdit) return;
 
     if (!isAuthenticated) {
-      toast('Please sign in to delete custom entries.', {
+      toast(t('pleaseSignInToDeleteCustomEntries'), {
         type: 'error',
       });
 
@@ -307,7 +310,9 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     }
 
     if (
-      !window.confirm(`Are you sure you want to delete ${countryToEdit.name}?`)
+      !window.confirm(
+        t('areYouSureYouWantToDelete', { name: countryToEdit.name }),
+      )
     ) {
       return;
     }
@@ -322,7 +327,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       }
 
       await deleteEntry(entryId);
-      toast('Entry deleted successfully!', { type: 'success' });
+      toast(t('entryDeletedSuccessfully'), { type: 'success' });
 
       onClose();
     } catch (error: any) {
@@ -394,23 +399,23 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     >
       <div className="flex flex-col gap-4 p-2">
         <h2 className="text-xl font-bold text-white">
-          {isEditMode ? 'Edit' : 'Create'} Custom Entry
+          {isEditMode ? t('edit') : t('create')} {t('customEntry')}
         </h2>
         <div className="flex flex-col gap-1">
           <label htmlFor="countryName" className="text-white">
-            Name
+            {t('name')}
           </label>
           <Input
             id="countryName"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter name..."
+            placeholder={t('enterName')}
             className="lg:text-[0.95rem] text-sm"
           />
         </div>
         <div className="flex flex-col gap-3">
-          <label className="text-white">Image</label>
+          <label className="text-white">{t('image')}</label>
 
           <Input
             id="flagUrl"
@@ -427,7 +432,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
               setFailedToLoadFlag(false);
             }}
             className="lg:text-[0.95rem] text-sm"
-            placeholder="Paste an image URL"
+            placeholder={t('pasteImageUrl')}
             disabled={!!uploadedFile}
           />
           <div
@@ -450,11 +455,13 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             />
             <UploadIcon className="w-6 h-6 text-white pointer-events-none" />
             <p className="text-white text-sm pointer-events-none">
-              Drag & drop or click to upload
+              {t('dragAndDropOrClickToUpload')}
             </p>
           </div>
 
-          <h4 className="middle-line text-white text-sm">Or select existing</h4>
+          <h4 className="middle-line text-white text-sm">
+            {t('orSelectExisting')}
+          </h4>
 
           {/* Standard Countries and Custom Entries Selects */}
           <div className="flex gap-2 flex-wrap">
@@ -463,7 +470,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                 options={standardCountryOptions}
                 value={selectedStandardCountry}
                 onChange={handleStandardCountryChange}
-                label="Standard Countries"
+                label={t('standardCountries')}
                 id="standard-country-select"
                 getImageClassName={() => 'w-8 h-6 !object-cover'}
                 selectClassName="!shadow-none [&>div>span]:hidden"
@@ -475,7 +482,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                   options={customEntryOptions}
                   value={selectedCustomEntry}
                   onChange={handleCustomEntrySelectChange}
-                  label="Custom Entries"
+                  label={t('customEntries')}
                   id="custom-entry-select"
                   getImageClassName={() => 'w-8 h-6 !object-cover'}
                   selectClassName="!shadow-none [&>div>span]:hidden"
@@ -487,7 +494,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           {/* Recent Custom Entries Horizontal List */}
           {recentCustomEntries.length > 0 && (
             <div className="flex flex-col gap-1">
-              <p className="text-white text-sm">Recent Custom Entries:</p>
+              <p className="text-white text-sm">{t('recentCustomEntries')}:</p>
               <div className="flex gap-2 overflow-x-auto">
                 {recentCustomEntries.map((entry) => {
                   // Ensure we always have a valid URL for Next.js Image
@@ -528,7 +535,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
           {/* Preset Images */}
           <div className="flex flex-col gap-1">
-            <p className="text-white text-sm">Presets:</p>
+            <p className="text-white text-sm">{t('presets')}:</p>
             <div className="flex gap-2 overflow-x-auto">
               {PRESET_IMAGES.map((preset) => (
                 <img
@@ -555,7 +562,9 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           </div>
 
           <div className="">
-            <h4 className="middle-line text-white text-sm mb-1">Preview</h4>
+            <h4 className="middle-line text-white text-sm mb-1">
+              {t('preview')}
+            </h4>
 
             <img
               loading="lazy"

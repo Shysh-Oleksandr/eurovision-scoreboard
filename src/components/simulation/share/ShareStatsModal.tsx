@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
@@ -49,6 +50,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
   selectedStage,
   onLoaded,
 }) => {
+  const t = useTranslations('share');
   const modalRef = useRef<HTMLDivElement>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
     null,
@@ -133,7 +135,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       <div className="sm:space-y-6 space-y-4 sm:py-2 py-1">
         <div className="sm:mx-3 mx-2">
           <CollapsibleSection
-            title="Customization"
+            title={t('customization')}
             isExpanded={settings.isCustomizationExpanded}
             onToggle={() => {
               setSettings({
@@ -150,7 +152,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
                   setSettings({ title: defaultTitle });
                 }}
               >
-                Reset
+                {t('reset')}
               </Button>
             }
           >
@@ -158,7 +160,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 gap-2 items-center">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Title
+                    {t('title')}
                   </label>
                   <Input
                     type="text"
@@ -172,7 +174,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Border Opacity
+                    {t('borderOpacity')}
                   </label>
                   <Input
                     type="number"
@@ -193,7 +195,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
 
                 <Checkbox
                   id="showBackgroundImage"
-                  label="Show Background Image"
+                  label={t('showBackgroundImage')}
                   checked={settings.showBackgroundImage}
                   onChange={(e) =>
                     updateSetting('showBackgroundImage', e.target.checked)
@@ -203,7 +205,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
                 {settings.showBackgroundImage && (
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Background Image Opacity
+                      {t('backgroundOpacity')}
                     </label>
                     <Input
                       type="number"
@@ -228,7 +230,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
                 {activeTab === StatsTableType.BREAKDOWN && (
                   <Checkbox
                     id="showVotingCountriesNames"
-                    label="Show Voting Countries Names"
+                    label={t('showVotingCountriesNames')}
                     checked={settings.showVotingCountriesNames}
                     onChange={(e) =>
                       updateSetting(
@@ -241,7 +243,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
 
                 <Checkbox
                   id="generateOnOpen"
-                  label="Generate Image Automatically on Open"
+                  label={t('generateOnOpen')}
                   checked={settings.generateOnOpen}
                   onChange={(e) =>
                     updateSetting('generateOnOpen', e.target.checked)
@@ -270,7 +272,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
         {/* Generated Image Result */}
         {generatedImageUrl && (
           <div>
-            <h3 className="text-lg font-semibold mb-2 ml-2">Result:</h3>
+            <h3 className="text-lg font-semibold mb-2 ml-2">{t('result')}:</h3>
 
             <Image
               src={generatedImageUrl}
@@ -285,7 +287,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
               variant="tertiary"
               Icon={<DownloadIcon className="w-[20px] h-[20px]" />}
             >
-              Download Image
+              {t('downloadImage')}
             </Button>
           </div>
         )}

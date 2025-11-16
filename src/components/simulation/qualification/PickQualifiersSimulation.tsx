@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import dynamic from 'next/dynamic';
@@ -18,6 +19,7 @@ const PresentationPanel = dynamic(
 );
 
 const PickQualifiersSimulation = () => {
+  const t = useTranslations('simulation');
   const presentationModeEnabled = useGeneralStore(
     (state) => state.settings.presentationModeEnabled,
   );
@@ -38,11 +40,11 @@ const PickQualifiersSimulation = () => {
             className="lg:text-2xl xs:text-xl text-lg font-medium text-white"
             style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
           >
-            Choose a country to qualify
+            {t('chooseCountryToQualify')}
           </h2>
           <Button
             variant="tertiary"
-            label="Random"
+            label={t('random')}
             onClick={pickQualifierRandomly}
           />
         </div>

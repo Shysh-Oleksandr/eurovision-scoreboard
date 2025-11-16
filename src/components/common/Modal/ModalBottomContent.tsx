@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import Button from '../Button';
@@ -15,6 +16,8 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
   onDelete,
   isSaving,
 }) => {
+  const t = useTranslations('common');
+
   return (
     <div
       className={`flex items-center xs:gap-4 gap-2 bg-primary-900 p-4 z-30 ${
@@ -27,7 +30,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           variant="destructive"
           onClick={onDelete}
         >
-          Delete
+          {t('delete')}
         </Button>
       )}
       <div className="flex justify-end xs:gap-4 gap-2">
@@ -36,7 +39,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           className="sm:!text-base text-sm"
           onClick={onClose}
         >
-          Cancel
+          {t('cancel')}
         </Button>
         <Button
           className="w-full sm:!text-base text-sm px-6 font-semibold"
@@ -44,7 +47,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           isLoading={isSaving}
           disabled={isSaving}
         >
-          Save
+          {t('save')}
         </Button>
       </div>
     </div>

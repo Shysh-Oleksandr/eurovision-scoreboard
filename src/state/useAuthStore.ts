@@ -19,7 +19,7 @@ export interface AuthState {
   accessToken: string | null;
   isBusy: boolean;
   login: () => void;
-  handlePostLogin: (force?: boolean) => Promise<void>;
+  handlePostLogin: (force?: boolean) => Promise<boolean>;
   refresh: () => Promise<string | undefined>;
   fetchMe: () => Promise<void>;
   logout: () => Promise<void>;
@@ -35,7 +35,9 @@ export const useAuthStore = create<AuthState>()(
         window.location.href = `${API_BASE_URL}/auth/google`;
       },
       handlePostLogin: async (force?: boolean) => {
-        if (!get().user && !force) return;
+        if (!get().user && !force) return false;
+
+        let success = false;
 
         attachRefreshInterceptor(get().refresh);
         setAccessTokenGetter(() => useAuthStore.getState().accessToken);
@@ -56,23 +58,22 @@ export const useAuthStore = create<AuthState>()(
             });
 
             if (force) {
-              toast('Logged in successfully', {
-                type: 'success',
-              });
+              success = true;
             }
           }
         } catch (e) {
           // Refresh failed (e.g., expired/invalid refresh). Ensure we clear session state.
           set({ user: null, accessToken: null });
-          toast('Failed to login', {
-            type: 'error',
-          });
+
+          success = false;
         }
         // Strip query params after handling redirect
         const url = new URL(window.location.href);
         if (url.search) {
           window.history.replaceState({}, '', url.origin + url.pathname);
         }
+
+        return success;
       },
       refresh: async () => {
         // Always attempt; backend verifies cookie and returns 401 if not present

@@ -1,4 +1,5 @@
 import gsap from 'gsap';
+import { useTranslations } from 'next-intl';
 import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -10,6 +11,7 @@ import { CountryQualificationItem } from './CountryQualificationItem';
 import Button from '@/components/common/Button';
 
 const QualificationBoard = () => {
+  const t = useTranslations('simulation');
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const pickQualifier = useScoreboardStore((state) => state.pickQualifier);
@@ -50,11 +52,11 @@ const QualificationBoard = () => {
             className="lg:text-2xl xs:text-xl text-lg font-medium text-white"
             style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
           >
-            Choose a country to qualify
+            {t('chooseCountryToQualify')}
           </h2>
           <Button
             variant="tertiary"
-            label="Random"
+            label={t('random')}
             onClick={pickQualifierRandomly}
           />
         </div>

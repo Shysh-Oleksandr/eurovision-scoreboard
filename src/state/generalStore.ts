@@ -40,7 +40,6 @@ const DEFAULT_SETTINGS: Settings = {
   showWinnerModal: true,
   showWinnerConfetti: true,
   enableFullscreen: false,
-  shouldShowBeforeUnloadWarning: true,
   shouldShowResetWarning: true,
   showRankChangeIndicator: true,
   shouldShowManualTelevoteWarning: true,
@@ -110,7 +109,6 @@ interface Settings {
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
-  shouldShowBeforeUnloadWarning: boolean;
   shouldShowResetWarning: boolean;
   showRankChangeIndicator: boolean;
   shouldShowManualTelevoteWarning: boolean;

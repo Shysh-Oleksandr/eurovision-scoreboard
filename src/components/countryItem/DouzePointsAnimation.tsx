@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
@@ -17,6 +18,7 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   pointsAmount = 12,
   overrides = null,
 }) => {
+  const t = useTranslations('simulation');
   const containerClass =
     'absolute overflow-hidden left-0 right-0 top-0 bottom-0 z-40 bg-countryItem-douzePointsBg flex justify-center items-center opacity-0';
   const gradientStyle = getGradientBackgroundStyle(containerClass, overrides);
@@ -28,7 +30,9 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
       style={gradientStyle}
     >
       <h4 className="text-countryItem-douzePointsText lg:text-xl md:text-lg xs:text-base text-sm font-bold uppercase">
-        {pointsAmount} {pointsAmount === 1 ? 'point' : 'points'}
+        {t('douzePoints', {
+          count: pointsAmount,
+        })}
       </h4>
       <div
         ref={refs.parallelogramBlueRef}

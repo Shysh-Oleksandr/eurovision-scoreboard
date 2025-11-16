@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import {
@@ -44,10 +45,12 @@ const SemiFinalsAndGrandFinalSetup: React.FC<
   onCreateStage,
   availableGroups,
 }) => {
+  const t = useTranslations('setup.eventSetupModal');
+
   return (
     <div className="flex flex-col gap-3">
       <SectionWrapper
-        title="Auto-Qualifiers"
+        title={t('autoQualifiers')}
         countriesCount={autoQualifiers.length}
         defaultExpanded
         onBulkAssign={(group) => onBulkAssign(autoQualifiers, group)}

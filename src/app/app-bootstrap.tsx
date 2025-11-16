@@ -1,7 +1,8 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 import { useRouter } from 'next/navigation';
 
@@ -15,6 +16,8 @@ export default function AppBootstrap() {
   useFullscreen();
   useThemeSetup();
   useActiveThemeSync();
+
+  const t = useTranslations('widgets.profile');
 
   const { handlePostLogin, user } = useAuthStore();
   const setInitialCountriesForYear = useCountriesStore(
@@ -38,17 +41,31 @@ export default function AppBootstrap() {
   }, [setInitialCountriesForYear]);
 
   useEffect(() => {
-    const url = new URL(window.location.href);
+    const handleLogin = async () => {
+      const url = new URL(window.location.href);
 
-    if (url.searchParams.has('provider')) {
-      window.history.replaceState({}, '', url.origin + url.pathname);
-      handlePostLogin(true);
+      if (url.searchParams.has('provider')) {
+        window.history.replaceState({}, '', url.origin + url.pathname);
+        const success = await handlePostLogin(true);
 
-      return;
-    }
+        if (success) {
+          toast(t('success'), {
+            type: 'success',
+          });
+        } else {
+          toast(t('error'), {
+            type: 'error',
+          });
+        }
 
-    handlePostLogin();
-  }, [handlePostLogin]);
+        return;
+      }
+
+      handlePostLogin();
+    };
+
+    handleLogin();
+  }, [handlePostLogin, t]);
 
   useEffect(() => {
     const preferred = user?.preferredLocale;

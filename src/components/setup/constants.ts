@@ -1,15 +1,6 @@
 import { CountryAssignmentGroup, EventMode } from '../../models';
 
-export const TABS = [
-  {
-    label: 'All Shows',
-    value: EventMode.SEMI_FINALS_AND_GRAND_FINAL,
-  },
-  {
-    label: 'Grand Final Only',
-    value: EventMode.GRAND_FINAL_ONLY,
-  },
-];
+
 
 export const CATEGORY_ORDER = [
   'Custom',

@@ -233,15 +233,3 @@ export const UPCOMING_FEATURES = [
     title: 'Localization for different languages',
   },
 ];
-
-export const getTabs = (shouldShowNewChangesIndicator: boolean) => {
-  return [
-    { label: 'Feedback', value: 'feedback' },
-    {
-      label: 'Updates',
-      value: 'whats-new',
-      showIndicator: shouldShowNewChangesIndicator,
-    },
-    { label: 'Upcoming', value: 'upcoming' },
-  ];
-};

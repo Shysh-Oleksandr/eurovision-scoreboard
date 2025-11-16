@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { PencilIcon } from '../../assets/icons/PencilIcon';
@@ -32,6 +33,8 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
   onEditStage,
   availableGroups,
 }) => {
+  const t = useTranslations('setup.eventSetupModal');
+
   if (!grandFinalStage) {
     return null;
   }
@@ -67,7 +70,7 @@ const GrandFinalOnlySetup: React.FC<GrandFinalOnlySetupProps> = ({
         />
       </SectionWrapper>
       <SectionWrapper
-        title="Not Qualified"
+        title={t('notQualified')}
         countriesCount={notQualifiedCountries.length}
         defaultExpanded
         onBulkAssign={(group) => onBulkAssign(notQualifiedCountries, group)}

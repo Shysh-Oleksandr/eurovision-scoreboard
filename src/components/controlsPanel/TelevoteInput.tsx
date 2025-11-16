@@ -1,10 +1,10 @@
-import React, { ChangeEvent, useState, useMemo, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 
 import {
   getMaxPossibleTelevotePoints,
   getTotalTelevotePoints,
 } from '../../data/data';
-import { getSequenceNumber } from '../../helpers/getSequenceNumber';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
@@ -16,6 +16,8 @@ import { useGeneralStore } from '@/state/generalStore';
 const NUMBER_REGEX = /^\d*$/;
 
 const TelevoteInput = () => {
+  const t = useTranslations('simulation');
+
   const giveTelevotePoints = useScoreboardStore(
     (state) => state.giveTelevotePoints,
   );
@@ -119,7 +121,7 @@ const TelevoteInput = () => {
     const votingPoints = parseInt(enteredPoints);
 
     if (isNaN(votingPoints)) {
-      setError('Invalid input');
+      setError(t('invalidInput'));
 
       return;
     }
@@ -135,8 +137,12 @@ const TelevoteInput = () => {
       if (votingPoints > televoteProgress.maxPointsPerVotingCountry) {
         setError(
           revealTelevoteLowestToHighest
-            ? `The maximum possible number of points is ${televoteProgress.maxPointsPerVotingCountry}`
-            : `The maximum number of points for this country is ${televoteProgress.maxPointsPerVotingCountry}`,
+            ? t('maxPossibleTelevotePoints', {
+                count: televoteProgress.maxPointsPerVotingCountry,
+              })
+            : t('maxPossibleTelevotePointsForCountry', {
+                count: televoteProgress.maxPointsPerVotingCountry,
+              }),
         );
 
         return;
@@ -148,7 +154,9 @@ const TelevoteInput = () => {
         televoteProgress.totalAvailablePoints
       ) {
         setError(
-          `Total televote points cannot exceed ${televoteProgress.totalAvailablePoints}`,
+          t('totalTelevotePointsCannotExceed', {
+            count: televoteProgress.totalAvailablePoints,
+          }),
         );
 
         return;
@@ -163,9 +171,7 @@ const TelevoteInput = () => {
         return;
       }
 
-      const confirmation = window.confirm(
-        "Note: Manually adjusting televote points won't be reflected in the detailed stats. Are you sure you want to continue?",
-      );
+      const confirmation = window.confirm(t('manualTelevotePointsWarning'));
 
       if (confirmation) {
         setHasShownManualTelevoteWarning(true);
@@ -189,9 +195,7 @@ const TelevoteInput = () => {
       return;
     }
 
-    const confirmation = window.confirm(
-      "Note: Manually assigning televote points won't be reflected in the detailed stats. Are you sure you want to continue?",
-    );
+    const confirmation = window.confirm(t('manualTelevotePointsWarning'));
 
     if (confirmation) {
       setHasShownManualTelevoteWarning(true);
@@ -230,14 +234,15 @@ const TelevoteInput = () => {
         className="lg:text-[1.35rem] text-lg text-white"
         htmlFor="televoteInput"
       >
-        Enter televote points
+        {t('enterTelevotePoints')}
       </label>
 
       <h5 className="uppercase text-white/50 lg:text-sm text-xs mt-2 mb-1">
-        <span className="font-medium">
-          {getSequenceNumber(televotingProgress + 1)}
-        </span>{' '}
-        of <span className="font-medium">{countries.length}</span> countries
+        {t.rich('ordinalOfCountries', {
+          index: televotingProgress + 1,
+          length: countries.length,
+          span: (chunks) => <span className="font-medium">{chunks}</span>,
+        })}
       </h5>
 
       {/* Progress bar for televote points when limiting is enabled */}
@@ -257,12 +262,14 @@ const TelevoteInput = () => {
           </div>
           <div className="flex justify-between text-xs gap-1 text-white/50 mt-1">
             <span>
-              Awarded: {televoteProgress.totalAwardedPoints} /{' '}
-              {televoteProgress.totalAvailablePoints}
+              {t('awarded', {
+                count: televoteProgress.totalAwardedPoints,
+                totalAvailablePoints: televoteProgress.totalAvailablePoints,
+              })}
             </span>
             {(disableLimit || disableLimitForShow) && (
               <span className="text-yellow-400 text-right">
-                ⚠️ Limit disabled
+                ⚠️ {t('limitDisabled')}
               </span>
             )}
           </div>
@@ -275,12 +282,12 @@ const TelevoteInput = () => {
           name="televoteInput"
           id="televoteInput"
           type="number"
-          placeholder="Enter points..."
+          placeholder={t('enterPoints')}
           value={enteredPoints}
           onChange={handleInputChange}
         />
         <Button
-          label={revealTelevoteLowestToHighest ? 'Save' : 'Vote'}
+          label={revealTelevoteLowestToHighest ? t('save') : t('vote')}
           onClick={handleVoting}
           className="mt-2 ml-2 md:px-4 !px-6"
           disabled={
@@ -300,14 +307,14 @@ const TelevoteInput = () => {
             <div className="mt-1 space-y-1 text-white">
               <Checkbox
                 id="disableLimit"
-                label="Disable limit for this vote"
+                label={t('disableLimitForThisVote')}
                 checked={disableLimit}
                 onChange={(e) => setDisableLimit(e.target.checked)}
                 labelClassName="!p-0 !px-1 [&>span]:!text-sm"
               />
               <Checkbox
                 id="disableLimitForShow"
-                label="Disable limit for this show"
+                label={t('disableLimitForThisShow')}
                 checked={disableLimitForShow}
                 onChange={(e) => setDisableLimitForShow(e.target.checked)}
                 labelClassName="!p-0 !px-1 [&>span]:!text-sm"

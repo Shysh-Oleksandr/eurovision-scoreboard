@@ -1,4 +1,4 @@
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import React from 'react';
 import { toast } from 'react-toastify';
 
@@ -23,6 +23,7 @@ const options: LocaleOption[] = [
 ];
 
 export const LanguageSelector: React.FC = () => {
+  const t = useTranslations('settings.ui');
   const locale = useLocale();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -66,7 +67,7 @@ export const LanguageSelector: React.FC = () => {
         }
         id="language-select-box"
         getImageClassName={() => 'w-8 h-6'}
-        label="Language"
+        label={t('language')}
         className="ml-1"
         selectClassName="!shadow-none"
       />

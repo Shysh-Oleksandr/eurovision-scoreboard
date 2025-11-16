@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -24,11 +25,6 @@ enum SettingsTab {
   ODDS = 'Odds',
 }
 
-const tabs = [
-  { value: SettingsTab.GENERAL, label: 'General' },
-  { value: SettingsTab.ODDS, label: 'Odds' },
-];
-
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -42,9 +38,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   participatingCountries,
   onLoaded,
 }) => {
+  const t = useTranslations('settings.general');
   const [activeTab, setActiveTab] = useState(SettingsTab.GENERAL);
 
   const [isOddsLoaded, setIsOddsLoaded] = useState(false);
+
+  const tabs = useMemo(
+    () => [
+      { value: SettingsTab.GENERAL, label: t('general') },
+      { value: SettingsTab.ODDS, label: t('odds') },
+    ],
+    [t],
+  );
 
   const tabsWithContent = useMemo(
     () => [
@@ -66,7 +71,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         ),
       },
     ],
-    [activeTab, isOddsLoaded, participatingCountries],
+    [activeTab, isOddsLoaded, participatingCountries, tabs],
   );
 
   useEffectOnce(onLoaded);

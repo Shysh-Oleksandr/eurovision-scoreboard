@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
@@ -27,6 +28,7 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
   onSystemChange,
   onReset,
 }) => {
+  const t = useTranslations('settings.voting');
   const currentSystemOption = predefinedSystemsOptions.find(
     (option) => option.value === currentSystem,
   ) || { value: 'custom', label: 'Custom' };
@@ -37,22 +39,25 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
     <div className="flex items-center justify-between mb-2 flex-wrap gap-1">
       <div>
         <div className="flex items-center gap-2">
-          <h4 className="text-base sm:text-lg font-semibold">Points System</h4>
+          <h4 className="text-base sm:text-lg font-semibold">
+            {t('pointsSystem')}
+          </h4>
           <Tooltip
             content={
               <div className="space-y-2 font-medium">
                 <p>
-                  The{' '}
-                  <SparklesIcon className="w-4 h-4 mb-1 inline-block text-yellow-300" />{' '}
-                  icon indicates that the points will be animated when the
-                  country receives them. Click to toggle.
+                  {t.rich('sparklesIconTooltip', {
+                    span: () => (
+                      <SparklesIcon className="w-4 h-4 mb-1 inline-block text-yellow-300" />
+                    ),
+                  })}
                 </p>
               </div>
             }
             position="center"
           />
         </div>
-        <p className="text-sm text-white/50">Drag and drop to reorder</p>
+        <p className="text-sm text-white/50">{t('dragAndDropToReorder')}</p>
       </div>
       <div className="flex items-center gap-2 ml-auto">
         {!isDefaultSystem && (

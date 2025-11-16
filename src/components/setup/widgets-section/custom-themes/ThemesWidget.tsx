@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -11,6 +12,8 @@ const ThemesModalModal = dynamic(() => import('./ThemesModal'), {
 });
 
 const ThemesWidget = () => {
+  const t = useTranslations('widgets.themes');
+
   const [isThemesModalModalOpen, setIsThemesModalModalOpen] = useState(false);
   const [isThemesModalModalLoaded, setIsThemesModalModalLoaded] =
     useState(false);
@@ -21,8 +24,8 @@ const ThemesWidget = () => {
         onClick={() => {
           setIsThemesModalModalOpen(true);
         }}
-        title="Themes"
-        description="Create custom themes or select public themes"
+        title={t('title')}
+        description={t('widgetDescription')}
         icon={<ThemeIcon className="w-6 h-6 flex-none" />}
       />
 

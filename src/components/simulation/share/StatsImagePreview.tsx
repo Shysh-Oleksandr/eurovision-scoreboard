@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, {
   useCallback,
   useEffect,
@@ -57,6 +58,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
   onImageGenerated,
   generatedImageUrl,
 }) => {
+  const t = useTranslations('share');
   const [scale, setScale] = useState(1);
   // Only select the specific settings we need to prevent unnecessary re-renders
   const backgroundOpacity = useStatsCustomizationStore(
@@ -358,7 +360,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2 ml-2">Preview:</h3>
+      <h3 className="text-lg font-semibold mb-2 ml-2">{t('preview')}:</h3>
       <div
         className="relative w-full h-full max-w-full overflow-hidden rounded-sm"
         style={{
@@ -451,7 +453,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
           Icon={<GenerateImageIcon className="w-[20px] h-[20px]" />}
           disabled={isGenerating}
         >
-          {isGenerating ? 'Generating...' : 'Generate Image'}
+          {isGenerating ? t('generating') : t('generateImage')}
         </Button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
@@ -17,6 +18,8 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   overrides = {},
   baseThemeYear,
 }) => {
+  const t = useTranslations('widgets.themes');
+
   const [points, setPoints] = useState(42);
   const [lastPoints, setLastPoints] = useState<number | null>(12);
   const [showDouzePointsAnimation, setShowDouzePointsAnimation] =
@@ -55,14 +58,14 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
 
       {/* Actions */}
       <div className="sm:space-y-2 mt-2">
-        <p className="text-white text-xs">Award Points:</p>
+        <p className="text-white text-xs">{t('awardPoints')}:</p>
         <div className="flex flex-wrap gap-1">
           <Button
             variant="tertiary"
             onClick={() => handleAwardPoints(1)}
             className="!py-1.5"
           >
-            1 point
+            1 {t('points', { count: 1 })}
           </Button>
           <Button
             variant="tertiary"
@@ -70,7 +73,7 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
             className="!py-1.5"
             Icon={<SparklesIcon className="w-4 h-4" />}
           >
-            12 points
+            12 {t('points', { count: 12 })}
           </Button>
           <Button
             variant="tertiary"
@@ -81,8 +84,7 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
         </div>
       </div>
       <p className="text-white/60 text-xs sm:block hidden">
-        Preview shows how the theme colors will appear on country items in
-        different states.
+        {t('previewDescription')}
       </p>
     </div>
   );

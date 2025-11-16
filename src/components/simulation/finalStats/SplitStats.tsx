@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { Country, EventStage, StageVotingMode } from '../../../models';
@@ -24,6 +25,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
   getPoints,
   enableHover = true,
 }) => {
+  const t = useTranslations('simulation.finalStats');
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
@@ -114,34 +116,36 @@ const SplitStats: React.FC<SplitStatsProps> = ({
           {shouldShowJuryAndTelevote ? (
             <>
               <tr className={tableStyles.headerRow}>
-                <th className={tableStyles.rankHeader}>Rank</th>
+                <th className={tableStyles.rankHeader}>{t('rank')}</th>
                 <th className={tableStyles.totalHeader} colSpan={2}>
-                  Total
+                  {t('total')}
                 </th>
                 <th className={tableStyles.juryHeader} colSpan={2}>
-                  Jury
+                  {t('jury')}
                 </th>
                 <th className={tableStyles.televoteHeader} colSpan={2}>
-                  Televote
+                  {t('televote')}
                 </th>
               </tr>
               <tr className={tableStyles.headerRow}>
                 <th className={tableStyles.subHeader}></th>
-                <th className={tableStyles.countrySubHeader}>Country</th>
-                <th className={tableStyles.pointsSubHeader}>Points</th>
-                <th className={tableStyles.jurySubHeader}>Country</th>
-                <th className={tableStyles.pointsSubHeader}>Points</th>
-                <th className={tableStyles.televoteSubHeader}>Country</th>
+                <th className={tableStyles.countrySubHeader}>{t('country')}</th>
+                <th className={tableStyles.pointsSubHeader}>{t('points')}</th>
+                <th className={tableStyles.jurySubHeader}>{t('country')}</th>
+                <th className={tableStyles.pointsSubHeader}>{t('points')}</th>
+                <th className={tableStyles.televoteSubHeader}>
+                  {t('country')}
+                </th>
                 <th className={tableStyles.pointsSubHeader + ' border-r-0'}>
-                  Points
+                  {t('points')}
                 </th>
               </tr>
             </>
           ) : (
             <tr className={tableStyles.headerRow}>
-              <th className={tableStyles.rankHeader}>Rank</th>
-              <th className={tableStyles.countryHeader}>Country</th>
-              <th className={tableStyles.totalPointsHeader}>Points</th>
+              <th className={tableStyles.rankHeader}>{t('rank')}</th>
+              <th className={tableStyles.countryHeader}>{t('country')}</th>
+              <th className={tableStyles.totalPointsHeader}>{t('points')}</th>
             </tr>
           )}
         </thead>

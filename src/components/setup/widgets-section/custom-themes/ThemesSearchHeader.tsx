@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import Button from '@/components/common/Button';
@@ -14,11 +15,13 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
   search,
   onSearchChange,
 }) => {
+  const t = useTranslations('widgets.themes');
+
   return (
     <div className="flex flex-col xs:flex-row gap-2 items-stretch xs:items-center">
       <Input
         type="text"
-        placeholder="Search themes..."
+        placeholder={t('searchThemes')}
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         className="flex-1 text-sm"
@@ -26,7 +29,7 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
 
       {onCreateNew && (
         <Button variant="tertiary" onClick={onCreateNew}>
-          Create
+          {t('create')}
         </Button>
       )}
     </div>

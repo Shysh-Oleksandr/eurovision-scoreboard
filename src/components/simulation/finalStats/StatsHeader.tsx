@@ -1,11 +1,11 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
-import { EventStage, StageVotingMode, StageVotingType } from '../../../models';
+import { EventStage, StageVotingType } from '../../../models';
 import Badge from '../../common/Badge';
 
 import { ShareIcon } from '@/assets/icons/ShareIcon';
 import Button from '@/components/common/Button';
-import { Tooltip } from '@/components/common/Tooltip';
 
 interface StatsHeaderProps {
   finishedStages: EventStage[];
@@ -30,11 +30,12 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   hideVoteTypeOptions = false,
   handleShareClick,
 }) => {
-  const isCombinedVoting = finishedStages.some(
-    (stage) =>
-      stage.id === selectedStageId &&
-      stage.votingMode === StageVotingMode.COMBINED,
-  );
+  const t = useTranslations('simulation');
+  // const isCombinedVoting = finishedStages.some(
+  //   (stage) =>
+  //     stage.id === selectedStageId &&
+  //     stage.votingMode === StageVotingMode.COMBINED,
+  // );
 
   return (
     <div className="flex sm:flex-row items-center flex-col justify-between sm:gap-2.5 gap-2 px-2 relative sm:mb-4 mb-2">
@@ -44,10 +45,11 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
         onClick={handleShareClick}
         Icon={<ShareIcon className="w-[20px] h-[20px]" />}
       >
-        Share
+        {t('header.share')}
       </Button>
 
-      {isCombinedVoting && (
+      {/* TODO: the combined voting is not fully correct now */}
+      {/* {isCombinedVoting && (
         <div className="absolute top-1 right-1">
           <Tooltip
             position="right"
@@ -69,7 +71,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
             }
           />
         </div>
-      )}
+      )} */}
       <div className="flex flex-col sm:gap-2.5 gap-2">
         <div className="flex justify-center sm:gap-3 gap-2 flex-wrap">
           {finishedStages.map((stage) => (
@@ -111,7 +113,7 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
         onClick={() => {}}
         Icon={<ShareIcon className="w-[20px] h-[20px]" />}
       >
-        Share
+        {t('header.share')}
       </Button>
     </div>
   );

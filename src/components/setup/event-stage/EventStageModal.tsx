@@ -1,5 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -25,11 +26,6 @@ enum EventStageModalTab {
   VOTERS = 'Voters',
 }
 
-const tabs = [
-  { value: EventStageModalTab.SETTINGS, label: 'Settings' },
-  { value: EventStageModalTab.VOTERS, label: 'Voters' },
-];
-
 interface EventStageModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,11 +45,20 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   eventStageToEdit,
   localEventStagesLength,
 }) => {
+  const t = useTranslations('setup.eventStageModal');
   const isEditMode = !!eventStageToEdit;
   const [shouldClose, setShouldClose] = useState(false);
   const [activeTab, setActiveTab] = useState(EventStageModalTab.SETTINGS);
 
   const [isVotersLoaded, setIsVotersLoaded] = useState(false);
+
+  const tabs = useMemo(
+    () => [
+      { value: EventStageModalTab.SETTINGS, label: t('settings') },
+      { value: EventStageModalTab.VOTERS, label: t('voters') },
+    ],
+    [t],
+  );
 
   const {
     form,
@@ -82,7 +87,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
       const result = onSubmit(data);
 
       if (result.votingCountries.length === 0 && eventStageToEdit) {
-        toast('Please select at least one voting country', {
+        toast(t('pleaseSelectAtLeastOneVotingCountry'), {
           type: 'error',
         });
 
@@ -106,7 +111,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
 
     if (
       window.confirm(
-        `Are you sure you want to delete ${eventStageToEdit.name}?`,
+        t('areYouSureYouWantToDelete', { name: eventStageToEdit.name }),
       )
     ) {
       onDelete(eventStageToEdit.id);

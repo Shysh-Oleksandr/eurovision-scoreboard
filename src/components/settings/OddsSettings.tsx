@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect } from 'react';
 
 import Button from '../common/Button';
@@ -28,6 +29,7 @@ interface OddsSettingsProps {
 }
 
 const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
+  const t = useTranslations('settings.odds');
   const countryOdds = useCountriesStore((state) => state.countryOdds);
   const updateCountryOdds = useCountriesStore(
     (state) => state.updateCountryOdds,
@@ -114,11 +116,10 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
     return (
       <div className="text-center space-y-1 mt-10">
         <p className="font-medium text-white text-xl">
-          No participating countries selected yet
+          {t('noParticipatingCountriesSelectedYet')}
         </p>
         <p className="text-white/60 text-base">
-          Go back to the setup and select countries for the event to set their
-          odds
+          {t('goBackToSetupAndSelectCountriesForEventToSetTheirOdds')}
         </p>
       </div>
     );
@@ -133,22 +134,20 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
             content={
               <div className="space-y-2 font-medium">
                 <p>
-                  Each country has separate jury and televote odds (0–100).
-                  <br />
-                  <span className="font-bold">Higher number =</span> better
-                  chance of getting more points.
-                  <br />
-                  Initial values are based on countries' real Eurovision results
-                  for the selected year.
+                  {t.rich('oddsTooltip', {
+                    br: () => <br />,
+                    span: (chunks) => (
+                      <span className="font-bold">{chunks}</span>
+                    ),
+                  })}
                 </p>
                 <p>
-                  The Randomness Level slider controls predictability:
-                  <br />
-                  <span className="font-bold">Low =</span> more realistic,
-                  following odds closely.
-                  <br />
-                  <span className="font-bold">High =</span> more chaotic,
-                  unpredictable.
+                  {t.rich('randomnessLevelTooltip', {
+                    br: () => <br />,
+                    span: (chunks) => (
+                      <span className="font-bold">{chunks}</span>
+                    ),
+                  })}
                 </p>
               </div>
             }
@@ -156,33 +155,33 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
         </div>
         <RangeSlider
           id="randomness"
-          label="Randomness Level"
+          label={t('randomnessLevel')}
           min={0}
           max={100}
           value={randomnessLevel}
           onChange={(value) => setSettings({ randomnessLevel: value })}
-          minLabel="Predictable"
-          maxLabel="Chaotic"
+          minLabel={t('predictable')}
+          maxLabel={t('chaotic')}
         />
       </div>
       <div className="flex sm:items-end items-start gap-4 mb-4 justify-between flex-wrap sm:flex-row flex-col-reverse">
         <div className="flex items-center gap-2 flex-wrap">
           <Button className="md:text-base text-sm" onClick={handleRandomize}>
-            Randomize
+            {t('randomize')}
           </Button>
           <Button
             variant="tertiary"
             className="md:text-base text-sm"
             onClick={handleLoadYearData}
           >
-            Load Year Data
+            {t('loadYearData')}
           </Button>
           <Button
             variant="secondary"
             className="md:text-base text-sm"
             onClick={handleReset}
           >
-            Reset
+            {t('reset')}
           </Button>
         </div>
         <div className="flex items-center gap-2 justify-end">

@@ -5,6 +5,9 @@
     "continue": "Continuar",
     "start": "Empezar"
   },
+  "Metadata": {
+    "title": "DouzePoints - Simulador de Tablero de Puntuaciones de Eurovisión"
+  },
   "home": {
     "openSetup": {
       "ariaLabel": "Configuración",

@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, type JSX } from 'react';
+import { useTranslations } from 'next-intl';
+import React, { useEffect, useMemo, useRef, type JSX } from 'react';
 
 import { useShallow } from 'zustand/shallow';
 
@@ -19,12 +20,23 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 const MIN_SPEED_SECONDS = 0.5;
 const MAX_SPEED_SECONDS = 7.5;
 
-const tabs = [
-  { value: PresentationPointsGrouping.INDIVIDUAL, label: 'Individual' },
-  { value: PresentationPointsGrouping.GROUPED, label: 'Grouped' },
-];
-
 const PresentationPanel = (): JSX.Element | null => {
+  const t = useTranslations('simulation.presentation');
+
+  const tabs = useMemo(
+    () => [
+      {
+        value: PresentationPointsGrouping.INDIVIDUAL,
+        label: t('pointsGrouping.individual'),
+      },
+      {
+        value: PresentationPointsGrouping.GROUPED,
+        label: t('pointsGrouping.grouped'),
+      },
+    ],
+    [t],
+  );
+
   const {
     getCurrentStage,
     givePredefinedJuryPoint,
@@ -160,9 +172,9 @@ const PresentationPanel = (): JSX.Element | null => {
           withPointsGrouping ? 'pt-2' : 'xs:pt-3 pt-2'
         } lg:px-4 px-3 gap-2 flex flex-col`}
       >
-        <h3 className="lg:text-[1.35rem] text-lg text-white">Presentation</h3>
+        <h3 className="lg:text-[1.35rem] text-lg text-white">{t('title')}</h3>
         <Button
-          label={isPresenting ? 'Pause' : 'Start'}
+          label={isPresenting ? t('pause') : t('start')}
           className="w-full justify-center"
           variant={isPresenting ? 'secondary' : 'primary'}
           Icon={
@@ -179,7 +191,7 @@ const PresentationPanel = (): JSX.Element | null => {
         {withPointsGrouping && (
           <div className="flex flex-col gap-1">
             <h4 className="text-base font-medium text-white">
-              Points grouping
+              {t('pointsGrouping.title')}
             </h4>
             <Tabs
               tabs={tabs}
@@ -199,7 +211,7 @@ const PresentationPanel = (): JSX.Element | null => {
             <Checkbox
               id="pause-after-animated-points"
               labelClassName="w-full !px-0 !pt-1 text-white"
-              label="Pause after animated points"
+              label={t('pauseAfterAnimatedPoints')}
               checked={pauseAfterAnimatedPoints}
               onChange={(e) =>
                 setPresentationSettings({
@@ -221,8 +233,8 @@ const PresentationPanel = (): JSX.Element | null => {
               presentationSpeedSeconds: value,
             })
           }
-          minLabel="Slow"
-          maxLabel="Fast"
+          minLabel={t('slow')}
+          maxLabel={t('fast')}
           displayValue={false}
         />
       </div>

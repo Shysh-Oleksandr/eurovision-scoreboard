@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 
 import SyncIcon from '../../assets/icons/SyncIcon';
@@ -10,7 +11,6 @@ import {
   JUNIOR_THEME_PREFIX,
   THEME_OPTIONS,
 } from '../../data/data';
-import { StageId } from '../../models';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import { YEARS_WITH_THEME } from '../../theme/themes';
@@ -37,6 +37,8 @@ type SetupHeaderProps = {
 export const SetupHeader: React.FC<SetupHeaderProps> = ({
   openSettingsModal,
 }) => {
+  const t = useTranslations('setup.eventSetupModal');
+
   const year = useGeneralStore((state) => state.year);
   const settings = useGeneralStore((state) => state.settings);
   const themeYear = useGeneralStore((state) => state.themeYear);
@@ -45,7 +47,6 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   const setTheme = useGeneralStore((state) => state.setTheme);
   const setSettings = useGeneralStore((state) => state.setSettings);
   const eventStages = useScoreboardStore((state) => state.eventStages);
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
 
   const isTouchDevice = useTouchDevice();
@@ -59,16 +60,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     const nextContestName = isJunior ? 'Junior Eurovision' : 'Eurovision';
 
     if (eventStages.length > 0) {
-      const { id: currentStageId } = getCurrentStage();
-      const isGrandFinal = currentStageId === StageId.GF;
-
-      if (
-        window.confirm(
-          `A ${
-            isGrandFinal ? 'Grand Final' : 'semi-final'
-          } is in progress. Changing the year will reset the current scoreboard and start a new setup. Are you sure?`,
-        )
-      ) {
+      if (window.confirm(t('contestIsInProgress'))) {
         setSettings({
           contestName: nextContestName,
           isJuniorContest: isJunior,
@@ -124,7 +116,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
     if (customTheme) {
       groups.unshift({
-        label: 'Custom',
+        label: t('custom'),
         options: [
           {
             label: customTheme.name,
@@ -136,7 +128,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     }
 
     return groups;
-  }, [customTheme, customThemeColor]);
+  }, [customTheme, customThemeColor, t]);
 
   const themeOptions = useMemo(() => {
     const options: Option[] = [...ALL_THEME_OPTIONS];
@@ -169,7 +161,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           }
           onChange={handleYearChange}
           id="year-select-box"
-          label="Year"
+          label={t('year')}
           className="sm:w-[130px] w-[110px]"
         />
 
@@ -179,7 +171,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           value={customTheme ? customTheme._id : themeYear}
           onChange={handleThemeChange}
           id="theme-select-box"
-          label={customTheme ? `Theme (Custom)` : 'Theme'}
+          label={customTheme ? `${t('theme')} (${t('custom')})` : t('theme')}
           className="sm:w-[130px] w-[110px]"
           customThemeColor={customThemeColor}
         />
