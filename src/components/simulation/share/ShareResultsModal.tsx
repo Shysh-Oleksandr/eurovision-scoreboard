@@ -37,7 +37,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   onClose,
   onLoaded,
 }) => {
-  const t = useTranslations('share');
+  const t = useTranslations();
   const modalRef = useRef<HTMLDivElement>(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
     null,
@@ -153,7 +153,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   const layoutOptions = useMemo(() => {
     return Array.from({ length: 8 }, (_, index) => ({
       value: index + 1,
-      label: t('nColumns', { count: index + 1 }),
+      label: t('share.nColumns', { count: index + 1 }),
     }));
   }, [t]);
 
@@ -318,7 +318,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       <div className="sm:space-y-6 space-y-4 sm:py-2 py-1">
         <div className="sm:mx-3 mx-2">
           <CollapsibleSection
-            title={t('customization')}
+            title={t('share.customization')}
             isExpanded={imageCustomization.isCustomizationExpanded}
             onToggle={() => {
               setImageCustomization({
@@ -335,7 +335,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                   applyAutoSettings();
                 }}
               >
-                {t('autoFit')}
+                {t('share.autoFit')}
               </Button>
             }
           >
@@ -343,7 +343,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    {t('title')}
+                    {t('common.title')}
                   </label>
                   <Input
                     type="text"
@@ -352,13 +352,13 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                     onChange={(e) =>
                       updateImageSetting('title', e.target.value)
                     }
-                    placeholder="Enter title"
+                    placeholder={t('common.enterTitle')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    {t('subtitle')}
+                    {t('common.subtitle')}
                   </label>
                   <Input
                     type="text"
@@ -367,13 +367,13 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                     onChange={(e) =>
                       updateImageSetting('subtitle', e.target.value)
                     }
-                    placeholder="Enter subtitle"
+                    placeholder={t('common.enterSubtitle')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    {t('aspectRatio')}
+                    {t('share.aspectRatio')}
                   </label>
                   <Select
                     value={imageCustomization.aspectRatio}
@@ -400,7 +400,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    {t('layout')}
+                    {t('share.layout')}
                   </label>
                   <Select
                     value={imageCustomization.layout}
@@ -412,14 +412,16 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                     arrowClassName="!w-6 !h-6"
                   >
                     <span className="flex-1">
-                      {t('nColumns', { count: imageCustomization.layout })}
+                      {t('share.nColumns', {
+                        count: imageCustomization.layout,
+                      })}
                     </span>
                   </Select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    {t('itemSize')}
+                    {t('share.itemSize')}
                   </label>
                   <Select
                     value={imageCustomization.itemSize}
@@ -448,7 +450,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    {t('maxCountries')}
+                    {t('share.maxCountries')}
                   </label>
                   <Input
                     type="number"
@@ -474,7 +476,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                         updateImageSetting('maxCountries', 0);
                       }
                     }}
-                    placeholder={t('allByDefault')}
+                    placeholder={t('share.allByDefault')}
                   />
                 </div>
               </div>
@@ -484,7 +486,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
                 <div className="flex flex-col justify-end">
                   <label className="block text-sm font-medium mb-2">
-                    {t('titleSize')} (px)
+                    {t('share.titleSize')} (px)
                   </label>
                   <Input
                     type="number"
@@ -518,7 +520,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <div className="flex flex-col justify-end">
                   <label className="block text-sm font-medium mb-2">
-                    {t('subtitleSize')} (px)
+                    {t('share.subtitleSize')} (px)
                   </label>
                   <Input
                     type="number"
@@ -552,7 +554,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <div className="flex flex-col justify-end">
                   <label className="block text-sm font-medium mb-2">
-                    {t('brandingSize')} (px)
+                    {t('share.brandingSize')} (px)
                   </label>
                   <Input
                     type="number"
@@ -590,7 +592,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <div className="flex flex-col justify-end">
                   <label className="block text-sm font-medium mb-2">
-                    {t('verticalPadding')} (px)
+                    {t('share.verticalPadding')} (px)
                   </label>
                   <Input
                     type="number"
@@ -624,7 +626,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <div className="flex flex-col justify-end">
                   <label className="block text-sm font-medium mb-2">
-                    {t('horizontalPadding')} (px)
+                    {t('share.horizontalPadding')} (px)
                   </label>
                   <Input
                     type="number"
@@ -662,7 +664,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
               <div className="flex flex-wrap">
                 <Checkbox
                   id="showRankings"
-                  label={t('showRankings')}
+                  label={t('share.showRankings')}
                   checked={imageCustomization.showRankings}
                   onChange={(e) =>
                     updateImageSetting('showRankings', e.target.checked)
@@ -671,7 +673,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <Checkbox
                   id="shortCountryNames"
-                  label={t('shortCountryNames')}
+                  label={t('share.shortCountryNames')}
                   checked={imageCustomization.shortCountryNames}
                   onChange={(e) =>
                     updateImageSetting('shortCountryNames', e.target.checked)
@@ -680,7 +682,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
                 <Checkbox
                   id="showPoints"
-                  label={t('showPoints')}
+                  label={t('share.showPoints')}
                   checked={imageCustomization.showPoints}
                   onChange={(e) =>
                     updateImageSetting('showPoints', e.target.checked)
@@ -690,7 +692,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                 {!isTouchDevice && (
                   <Checkbox
                     id="highQuality"
-                    label={t('highQuality')}
+                    label={t('share.highQuality')}
                     checked={imageCustomization.highQuality}
                     onChange={(e) =>
                       updateImageSetting('highQuality', e.target.checked)
@@ -720,7 +722,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                   });
                 }}
               >
-                {t('reset')}
+                {t('common.reset')}
               </Button>
             </div>
           </CollapsibleSection>
@@ -736,7 +738,9 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
         {generatedImageUrl && (
           <div>
-            <h3 className="text-lg font-semibold mb-2 ml-2">{t('result')}:</h3>
+            <h3 className="text-lg font-semibold mb-2 ml-2">
+              {t('share.result')}:
+            </h3>
 
             <Image
               src={generatedImageUrl}
@@ -751,7 +755,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
               variant="tertiary"
               Icon={<DownloadIcon className="w-[20px] h-[20px]" />}
             >
-              {t('downloadImage')}
+              {t('share.downloadImage')}
             </Button>
           </div>
         )}

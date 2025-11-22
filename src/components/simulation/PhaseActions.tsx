@@ -86,8 +86,15 @@ export const PhaseActions = () => {
         )}
 
         {isSFAndGFEventOver && !isAnotherStageDisplayed && (
-          <Button onClick={toggleShowAllParticipants} className="normal-case">
-            {showAllParticipants ? t('finalistsOnly') : t('showNQs')}
+          <Button onClick={toggleShowAllParticipants}>
+            {showAllParticipants ? (
+              t('finalistsOnly')
+            ) : (
+              <>
+                {t('showNQs', { nonQualifiersLabel: '' })}{' '}
+                <span className="normal-case">NQs</span>
+              </>
+            )}
           </Button>
         )}
         {isSFAndGFEventOver && (

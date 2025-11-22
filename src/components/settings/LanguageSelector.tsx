@@ -20,6 +20,7 @@ type LocaleOption = {
 const options: LocaleOption[] = [
   { label: 'English', value: 'en', imageUrl: getFlagPath('gb') },
   { label: 'Español', value: 'es', imageUrl: getFlagPath('es') },
+  { label: 'Українська', value: 'uk', imageUrl: getFlagPath('ua') },
 ];
 
 export const LanguageSelector: React.FC = () => {

@@ -57,7 +57,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
   onEdit,
   onDuplicate,
 }) => {
-  const t = useTranslations('widgets.themes');
+  const t = useTranslations();
   const user = useAuthStore((state) => state.user);
 
   const [search, setSearch] = useState('');
@@ -98,7 +98,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
         await applyThemeToProfile(theme._id);
       }
 
-      toast.success(t('themeAppliedSuccessfully', { name: latest.name }));
+      toast.success(
+        t('widgets.themes.themeAppliedSuccessfully', { name: latest.name }),
+      );
     } catch (error: any) {
       console.error(error);
       toast.error(
@@ -121,7 +123,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
       const res = await toggleLike(id);
 
       toast.success(
-        res.liked ? t('themeLikedSuccessfully') : t('themeUnlikedSuccessfully'),
+        res.liked
+          ? t('widgets.themes.themeLikedSuccessfully')
+          : t('widgets.themes.themeUnlikedSuccessfully'),
       );
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to like theme');
@@ -133,7 +137,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
       if (savedByMe) {
         if (
           !window.confirm(
-            t('areYouSureYouWantToRemoveThisThemeFromYourSavedThemes'),
+            t(
+              'widgets.themes.areYouSureYouWantToRemoveThisThemeFromYourSavedThemes',
+            ),
           )
         ) {
           return;
@@ -142,7 +148,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
       const res = await toggleSave(id);
 
       toast.success(
-        res.saved ? t('themeSavedSuccessfully') : t('themeRemovedFromSaved'),
+        res.saved
+          ? t('widgets.themes.themeSavedSuccessfully')
+          : t('widgets.themes.themeRemovedFromSaved'),
       );
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to save theme');
@@ -164,9 +172,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
 
   if (isLoading) {
     return (
-      <div className="text-white text-center py-8">
-        {t('loadingYourThemes')}
-      </div>
+      <div className="text-white text-center py-8">{t('common.loading')}</div>
     );
   }
 
@@ -174,7 +180,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
     return (
       <div className="text-white text-center sm:py-8 py-4 flex flex-col items-center gap-4">
         <p className="text-white/70">
-          {t('authenticateToViewAndCreateYourOwnThemes')}
+          {t('widgets.themes.authenticateToViewAndCreateYourOwnThemes')}
         </p>
         <GoogleAuthButton />
       </div>
@@ -183,10 +189,12 @@ const UserThemes: React.FC<UserThemesProps> = ({
 
   // Derived header and content per selected view
   const headerLabel = search.trim()
-    ? t('fountNThemes', { count: filteredYours?.length ?? 0 })
+    ? t('widgets.themes.fountNThemes', { count: filteredYours?.length ?? 0 })
     : view === 'yours'
-    ? t('youHaveNThemes', { count: filteredYours?.length ?? 0 })
-    : t('youSavedNThemes', { count: filteredSaved?.length ?? 0 });
+    ? t('widgets.themes.youHaveNThemes', { count: filteredYours?.length ?? 0 })
+    : t('widgets.themes.youSavedNThemes', {
+        count: filteredSaved?.length ?? 0,
+      });
 
   let content: React.ReactNode = null;
 
@@ -240,12 +248,12 @@ const UserThemes: React.FC<UserThemesProps> = ({
         <div className="text-center py-12">
           <p className="text-white/70 mb-4">
             {search
-              ? t('noThemesFoundMatchingYourSearch')
-              : t('noThemesYetCreateYourFirstTheme')}
+              ? t('widgets.themes.noThemesFoundMatchingYourSearch')
+              : t('widgets.themes.noThemesYetCreateYourFirstTheme')}
           </p>
           {!search && (
             <Button variant="tertiary" onClick={onCreateNew}>
-              {t('createTheme')}
+              {t('widgets.themes.createTheme')}
             </Button>
           )}
         </div>
@@ -273,8 +281,8 @@ const UserThemes: React.FC<UserThemesProps> = ({
         <div className="text-center py-12">
           <p className="text-white/70 mb-4">
             {search
-              ? t('noThemesFoundMatchingYourSearch')
-              : t('noSavedThemesYet')}
+              ? t('widgets.themes.noThemesFoundMatchingYourSearch')
+              : t('widgets.themes.noSavedThemesYet')}
           </p>
         </div>
       );
@@ -289,20 +297,20 @@ const UserThemes: React.FC<UserThemesProps> = ({
           onCreateNew={onCreateNew}
         />
 
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-center flex-wrap justify-start gap-2">
           <Badge
-            label={t('created')}
+            label={t('widgets.created')}
             onClick={() => setView('yours')}
             isActive={view === 'yours'}
           />
           <Badge
-            label={t('saved')}
+            label={t('widgets.saved')}
             onClick={() => setView('saved')}
             isActive={view === 'saved'}
           />
           {!!currentCustomTheme && (
             <Badge
-              label={t('active')}
+              label={t('widgets.active')}
               onClick={() => setView('current')}
               isActive={view === 'current'}
             />

@@ -9,14 +9,14 @@ import { Input } from '../../Input';
 const getVotingModeLabel = (votingMode: StageVotingMode, t: any) => {
   switch (votingMode) {
     case StageVotingMode.TELEVOTE_ONLY:
-      return t('televoteOnly');
+      return t('setup.eventStageModal.televoteOnly');
     case StageVotingMode.JURY_ONLY:
-      return t('juryOnly');
+      return t('setup.eventStageModal.juryOnly');
     case StageVotingMode.COMBINED:
-      return t('combined');
+      return t('setup.eventStageModal.combined');
     case StageVotingMode.JURY_AND_TELEVOTE:
     default:
-      return t('juryAndTelevote');
+      return t('setup.eventStageModal.juryAndTelevote');
   }
 };
 
@@ -37,7 +37,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
     setValue,
     formState: { errors },
   } = useFormContext();
-  const t = useTranslations('setup.eventStageModal');
+  const t = useTranslations();
   const votingMode = watch('votingMode');
 
   const votingModeOptions = useMemo(() => {
@@ -50,19 +50,21 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
   return (
     <div className="flex flex-col gap-4 p-2">
       <h2 className="text-xl font-bold text-white">
-        {isEditMode ? t('edit') : t('add')}{' '}
-        {isGrandFinalStage ? t('grandFinal') : t('semiFinal')}
+        {isEditMode ? t('common.edit') : t('common.add')}{' '}
+        {isGrandFinalStage
+          ? t('setup.eventStageModal.grandFinal')
+          : t('setup.eventStageModal.semiFinal')}
       </h2>
       <div className="flex flex-col gap-2">
         <label htmlFor="stageName" className="text-white">
-          {t('name')}
+          {t('common.name')}
         </label>
         <Input
           id="stageName"
           type="text"
           {...register('name')}
           className="h-12 lg:text-[0.95rem] text-sm"
-          placeholder={t('enterName')}
+          placeholder={t('common.enterName')}
         />
         {errors.name && (
           <span className="text-red-400 text-sm">
@@ -72,7 +74,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
       </div>
       <div className="flex flex-col gap-2">
         <label htmlFor="votingMode" className="text-white">
-          {t('votingMode')}
+          {t('setup.eventStageModal.votingMode')}
         </label>
         <Select
           id="votingMode"
@@ -97,7 +99,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
               htmlFor={`qualifiers-${eventStageToEdit?.id}`}
               className="block text-base text-white"
             >
-              {t('numberOfQualifiers')}
+              {t('setup.eventStageModal.numberOfQualifiers')}
             </label>
             <Input
               id={`qualifiers-${eventStageToEdit?.id}`}

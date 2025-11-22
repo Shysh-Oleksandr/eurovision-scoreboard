@@ -37,7 +37,7 @@ type SetupHeaderProps = {
 export const SetupHeader: React.FC<SetupHeaderProps> = ({
   openSettingsModal,
 }) => {
-  const t = useTranslations('setup.eventSetupModal');
+  const t = useTranslations();
 
   const year = useGeneralStore((state) => state.year);
   const settings = useGeneralStore((state) => state.settings);
@@ -60,7 +60,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     const nextContestName = isJunior ? 'Junior Eurovision' : 'Eurovision';
 
     if (eventStages.length > 0) {
-      if (window.confirm(t('contestIsInProgress'))) {
+      if (window.confirm(t('setup.eventSetupModal.contestIsInProgress'))) {
         setSettings({
           contestName: nextContestName,
           isJuniorContest: isJunior,
@@ -116,7 +116,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
     if (customTheme) {
       groups.unshift({
-        label: t('custom'),
+        label: t('common.custom'),
         options: [
           {
             label: customTheme.name,
@@ -161,7 +161,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           }
           onChange={handleYearChange}
           id="year-select-box"
-          label={t('year')}
+          label={t('common.year')}
           className="sm:w-[130px] w-[110px]"
         />
 
@@ -171,7 +171,11 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           value={customTheme ? customTheme._id : themeYear}
           onChange={handleThemeChange}
           id="theme-select-box"
-          label={customTheme ? `${t('theme')} (${t('custom')})` : t('theme')}
+          label={
+            customTheme
+              ? `${t('common.theme')} (${t('common.custom')})`
+              : t('common.theme')
+          }
           className="sm:w-[130px] w-[110px]"
           customThemeColor={customThemeColor}
         />

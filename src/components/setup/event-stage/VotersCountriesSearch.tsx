@@ -7,6 +7,7 @@ import { BaseCountry } from '../../../models';
 import { useCountriesStore } from '../../../state/countriesStore';
 import { CollapsibleSection } from '../../common/CollapsibleSection';
 import { Input } from '../../Input';
+import { useGetCategoryLabel } from '../hooks/useGetCategoryLabel';
 import SearchInputIcon from '../SearchInputIcon';
 
 import { useVotersCountriesSearch } from './hooks/useVotersCountriesSearch';
@@ -69,6 +70,8 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
     countries.forEach((country) => onAddVoter(country));
   };
 
+  const getCategoryLabel = useGetCategoryLabel();
+
   return (
     <>
       <div className="flex items-center justify-between gap-2 mb-2">
@@ -97,7 +100,7 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
         {sortedCategories.map((category) => (
           <CollapsibleSection
             key={category}
-            title={category}
+            title={getCategoryLabel(category)}
             isExpanded={!!expandedCategories[category]}
             onToggle={() => handleToggleCategory(category)}
             extraContent={

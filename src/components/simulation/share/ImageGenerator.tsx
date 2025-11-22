@@ -36,7 +36,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   setLastGeneratedStageId,
   modalRef,
 }) => {
-  const t = useTranslations('share');
+  const t = useTranslations();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -265,7 +265,9 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2 ml-2">{t('preview')}:</h3>
+      <h3 className="text-lg font-semibold mb-2 ml-2">
+        {t('common.preview')}:
+      </h3>
       <div
         className="relative w-full h-full max-w-full overflow-hidden rounded-sm"
         style={{
@@ -397,7 +399,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
           className="w-full justify-center"
           Icon={<GenerateImageIcon className="w-[20px] h-[20px]" />}
         >
-          {isGenerating ? t('generating') : t('generateImage')}
+          {isGenerating ? t('share.generating') : t('share.generateImage')}
         </Button>
       </div>
     </div>

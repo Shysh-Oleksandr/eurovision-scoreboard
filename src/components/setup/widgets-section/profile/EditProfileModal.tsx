@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -45,6 +46,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onClose,
   onLoaded,
 }) => {
+  const t = useTranslations();
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const user = useAuthStore((s) => s.user);
   const { mutateAsync: updateProfile, isPending } = useUpdateProfileMutation();
@@ -123,7 +125,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       return;
     }
 
-    toast('Profile updated successfully!', {
+    toast(t('widgets.profile.profileUpdatedSuccessfully'), {
       type: 'success',
     });
     onClose();
@@ -146,7 +148,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'];
 
     if (!allowed.includes(file.type)) {
-      toast('Unsupported image type. Allowed: PNG, JPEG, WEBP, SVG', {
+      toast(t('error.imageUpload.errorUnsupportedImageType'), {
         type: 'error',
       });
       e.currentTarget.value = '';
@@ -155,13 +157,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-      toast(
-        'Image is too large. Max size is 1MB. Please compress it or upload a smaller image.',
-        {
-          type: 'error',
-          autoClose: 5000,
-        },
-      );
+      toast(t('error.imageUpload.errorImageTooLarge', { maxSize: 1 }), {
+        type: 'error',
+        autoClose: 5000,
+      });
       e.currentTarget.value = '';
 
       return;
@@ -186,7 +185,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         />
       }
     >
-      <h3 className="text-2xl font-bold mb-4">Edit Profile</h3>
+      <h3 className="text-2xl font-bold mb-4">
+        {t('widgets.profile.editProfile')}
+      </h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 gap-3">
         <div className="flex items-center gap-4 sm:col-span-2">
@@ -213,7 +214,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
               className="!px-3 !py-3 !text-sm"
               onClick={() => fileInputRef.current?.click()}
             >
-              Change Picture
+              {t('widgets.profile.changePicture')}
             </Button>
             {user?.avatarUrl || selectedFile ? (
               <Button
@@ -224,20 +225,20 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   setRemoveAvatar(true);
                 }}
               >
-                Delete Picture
+                {t('widgets.profile.deletePicture')}
               </Button>
             ) : null}
           </div>
         </div>
         <InputField
-          label="Username"
+          label={t('widgets.profile.username')}
           id="username"
           ref={register('username').ref}
           inputProps={{ ...register('username') }}
           errors={formState.errors}
         />
         <InputField
-          label="Name"
+          label={t('common.name')}
           id="name"
           ref={register('name').ref}
           inputProps={{ ...register('name') }}
@@ -252,7 +253,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           getImageClassName={(option) =>
             option.isExisting ? 'w-8 h-8 !object-contain' : 'w-8 h-6'
           }
-          label="Country"
+          label={t('common.country')}
           labelClassName="!text-base font-medium mb-1"
           selectClassName="!shadow-none"
         />

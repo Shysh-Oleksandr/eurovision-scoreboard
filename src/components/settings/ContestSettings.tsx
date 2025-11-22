@@ -7,7 +7,7 @@ import { Input } from '../Input';
 import { HostingCountrySelect } from './HostingCountrySelect';
 
 export const ContestSettings: React.FC = () => {
-  const t = useTranslations('settings.contest');
+  const t = useTranslations();
   const settings = useGeneralStore((state) => state.settings);
   const setSettings = useGeneralStore((state) => state.setSettings);
 
@@ -18,13 +18,13 @@ export const ContestSettings: React.FC = () => {
           htmlFor="contestName"
           className="text-white sm:text-base text-sm"
         >
-          {t('name')}
+          {t('common.name')}
         </label>
         <Input
           id="contestName"
           type="text"
           className="h-12 lg:text-[0.95rem] text-sm"
-          placeholder={t('enterContestName')}
+          placeholder={t('settings.contest.enterContestName')}
           value={settings.contestName}
           onChange={(e) => setSettings({ contestName: e.target.value })}
         />
@@ -34,13 +34,13 @@ export const ContestSettings: React.FC = () => {
           htmlFor="contestYear"
           className="text-white sm:text-base text-sm"
         >
-          {t('year')}
+          {t('common.year')}
         </label>
         <Input
           id="contestYear"
           type="number"
           className="h-12 lg:text-[0.95rem] text-sm pr-3"
-          placeholder={t('enterContestYear')}
+          placeholder={t('settings.contest.enterContestYear')}
           value={settings.contestYear}
           onChange={(e) => setSettings({ contestYear: e.target.value })}
         />

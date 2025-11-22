@@ -35,7 +35,7 @@ const QualifiedCountriesList = () => {
 
   return (
     <div className="lg:px-6 sm:px-4 xs:px-3 px-2 py-4 bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/50 rounded-sm shadow-md">
-      <h2 className="lg:text-2xl xs:text-xl text-lg text-center font-semibold uppercase mb-4 text-white tracking-wide">
+      <h2 className="lg:text-2xl xs:text-xl text-lg text-center font-semibold uppercase break-words mb-4 text-white tracking-wide">
         {t.rich('qualifiedForTheGrandFinal', {
           span: (chunks) => <span className="font-bold">{chunks}</span>,
           br: () => <br />,

@@ -32,7 +32,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   onDuplicate,
   onEdit,
 }) => {
-  const t = useTranslations('widgets.themes');
+  const t = useTranslations();
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
   const [page, setPage] = useState(1);
@@ -84,7 +84,9 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
         await applyThemeToProfile(theme._id);
       }
 
-      toast.success(t('themeAppliedSuccessfully', { name: latest.name }));
+      toast.success(
+        t('widgets.themes.themeAppliedSuccessfully', { name: latest.name }),
+      );
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message || 'Failed to save theme to profile',
@@ -97,7 +99,9 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       const res = await toggleLike(id);
 
       toast.success(
-        res.liked ? t('themeLikedSuccessfully') : t('themeUnlikedSuccessfully'),
+        res.liked
+          ? t('widgets.themes.themeLikedSuccessfully')
+          : t('widgets.themes.themeUnlikedSuccessfully'),
       );
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to like theme');
@@ -118,7 +122,9 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       const res = await toggleSave(id);
 
       toast.success(
-        res.saved ? t('themeSavedSuccessfully') : t('themeRemovedFromSaved'),
+        res.saved
+          ? t('widgets.themes.themeSavedSuccessfully')
+          : t('widgets.themes.themeRemovedFromSaved'),
       );
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to save theme');
@@ -144,7 +150,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
         />
       </div>
       <h3 className="text-white text-lg font-bold">
-        {t('foundNThemes', { count: data?.total ?? 0 })}
+        {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
       </h3>
 
       {data && data.themes.length > 0 ? (
@@ -175,17 +181,17 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
                 disabled={page === 1}
                 className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
               >
-                {t('previous')}
+                {t('widgets.previous')}
               </Button>
               <span className="px-3 py-1 text-white text-sm font-medium">
-                {t('pageNOfM', { page, totalPages: data.totalPages })}
+                {t('widgets.pageNOfM', { page, totalPages: data.totalPages })}
               </span>
               <Button
                 onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
                 disabled={page === data.totalPages}
                 className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
               >
-                {t('next')}
+                {t('widgets.next')}
               </Button>
             </div>
           )}
@@ -193,7 +199,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       ) : (
         <div className="text-center sm:py-12 py-8">
           <p className="text-white/70">
-            {t('noPublicThemesFoundMatchingYourSearch')}
+            {t('widgets.themes.noPublicThemesFoundMatchingYourSearch')}
           </p>
         </div>
       )}

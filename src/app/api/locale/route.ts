@@ -1,22 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-
-const SUPPORTED_LOCALES = ['en', 'es'] as const;
-
-type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
-
-const DEFAULT_LOCALE: SupportedLocale = 'en';
-
-function normalizeLocale(raw: string | null | undefined): SupportedLocale {
-  if (!raw) return DEFAULT_LOCALE;
-  const lower = raw.toLowerCase();
-
-  if (lower.startsWith('es')) return 'es';
-  if (lower.startsWith('en')) return 'en';
-
-  return DEFAULT_LOCALE;
-}
+import { normalizeLocale } from '@/i18n/request';
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));

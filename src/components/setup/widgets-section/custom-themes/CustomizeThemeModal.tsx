@@ -52,7 +52,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   initialTheme,
   isEditMode = false,
 }) => {
-  const t = useTranslations('widgets.themes');
+  const t = useTranslations();
 
   const themeYear = useGeneralStore((state) => state.themeYear);
   const applyCustomThemeToStore = useGeneralStore((s) => s.applyCustomTheme);
@@ -162,7 +162,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast.error(t('themeNameIsRequired'));
+      toast.error(t('widgets.themes.themeNameIsRequired'));
 
       return;
     }
@@ -195,7 +195,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           applyCustomThemeToStore(updated);
         }
 
-        toast.success(t('themeUpdatedSuccessfully'));
+        toast.success(t('widgets.themes.themeUpdatedSuccessfully'));
       } else {
         // Create new theme
         const created = await createTheme({
@@ -227,7 +227,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           }
         }
 
-        toast.success(t('themeCreatedSuccessfully'));
+        toast.success(t('widgets.themes.themeCreatedSuccessfully'));
       }
 
       onClose();
@@ -300,14 +300,19 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         {/* Left Column - Controls */}
         <div className="space-y-2.5 overflow-y-auto narrow-scrollbar md:pr-2 w-full">
           <h2 className="text-xl font-bold text-white">
-            {isEditMode ? t('editTheme') : t('createTheme')}
+            {isEditMode
+              ? t('widgets.themes.editTheme')
+              : t('widgets.themes.createTheme')}
           </h2>
 
           {/* Basic Info */}
-          <CollapsibleSection title={t('basicInfo')} defaultExpanded>
+          <CollapsibleSection
+            title={t('widgets.themes.basicInfo')}
+            defaultExpanded
+          >
             <div className="space-y-3">
               <InputField
-                label={t('name')}
+                label={t('common.name')}
                 id="themeName"
                 inputProps={{
                   value: name,
@@ -318,8 +323,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
               <TextareaField
                 id="themeDesc"
-                label={t('description')}
-                placeholder={t('optionalDescription')}
+                label={t('common.description')}
+                placeholder={t('common.optionalDescription')}
                 textareaProps={{
                   value: description,
                   onChange: (e) => setDescription(e.target.value),
@@ -328,7 +333,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
               <Checkbox
                 id="isPublic"
-                label={t('makeThemePublic')}
+                label={t('widgets.themes.makeThemePublic')}
                 labelClassName="w-full !px-0 !pt-1 !items-start"
                 checked={isPublic}
                 onChange={(e) => setIsPublic(e.target.checked)}
@@ -337,7 +342,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           </CollapsibleSection>
 
           {/* Main */}
-          <CollapsibleSection title={t('main')} defaultExpanded>
+          <CollapsibleSection title={t('widgets.themes.main')} defaultExpanded>
             <div className="space-y-4">
               <CustomSelect
                 options={ALL_THEME_OPTIONS}
@@ -349,13 +354,13 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 labelClassName="!text-base !font-medium mb-1"
                 onChange={(value) => setBaseThemeYear(value)}
                 id="baseTheme-select-box"
-                label={t('baseTheme')}
+                label={t('widgets.themes.baseTheme')}
                 className="sm:w-[130px] w-[110px]"
               />
 
               <div>
                 <h4 className="text-sm font-medium text-white mb-2">
-                  {t('interfaceColor')}
+                  {t('widgets.themes.interfaceColor')}
                 </h4>
                 <Hue
                   hue={hue}
@@ -379,7 +384,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <h4 className="text-sm font-medium text-white">
-                    {t('backgroundImage')}
+                    {t('widgets.themes.backgroundImage')}
                   </h4>
                   {!!uploadedFile && (
                     <Button
@@ -417,14 +422,14 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     />
                     <UploadIcon className="w-8 h-8 text-white pointer-events-none" />
                     <p className="text-white text-xs pointer-events-none">
-                      {t('dragAndDropOrClickToUpload')}
+                      {t('common.dragAndDropOrClickToUpload')}
                     </p>
                     <Button
                       variant="tertiary"
                       className="w-fit pointer-events-auto text-sm !py-1"
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      {t('browse')}
+                      {t('common.browse')}
                     </Button>
                   </div>
 
@@ -437,7 +442,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                       imageUpload.clear();
                     }}
                     className="text-sm"
-                    placeholder={t('orPasteImageUrl')}
+                    placeholder={t('common.pasteImageUrl')}
                     disabled={!!uploadedFile}
                   />
                 </div>
@@ -446,7 +451,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           </CollapsibleSection>
 
           {/* Country Item Colors */}
-          <CollapsibleSection title={t('countryItemColors')} defaultExpanded>
+          <CollapsibleSection
+            title={t('widgets.themes.countryItemColors')}
+            defaultExpanded
+          >
             <ColorOverridesSection
               defaultColors={defaultColors}
               overrides={overrides}
@@ -458,7 +466,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         {/* Right Column - Preview */}
         <div className="sm:space-y-4 space-y-2 sm:h-full flex flex-col">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-white">{t('preview')}</h3>
+            <h3 className="text-lg font-semibold text-white">
+              {t('common.preview')}
+            </h3>
 
             <Tooltip
               dataTheme="custom-preview"

@@ -22,7 +22,7 @@ const imageSize = 100;
 const MAX_IMAGE_SIZE = 1024 * 1024 * 4; // 4MB
 
 export const BgImageSelect: React.FC = () => {
-  const t = useTranslations('settings.ui');
+  const t = useTranslations();
   const shouldUseCustomBgImage = useGeneralStore(
     (state) => state.settings.shouldUseCustomBgImage,
   );
@@ -37,7 +37,7 @@ export const BgImageSelect: React.FC = () => {
   const handleFileChange = async (file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      toast(t('pleaseSelectValidImageFile'), {
+      toast(t('error.pleaseSelectValidImageFile'), {
         type: 'error',
       });
 
@@ -46,7 +46,7 @@ export const BgImageSelect: React.FC = () => {
 
     if (file.size > MAX_IMAGE_SIZE) {
       const shouldContinue = confirm(
-        t('imageSizeIsPrettyLarge', {
+        t('setup.ui.imageSizeIsPrettyLarge', {
           size: Math.round((file.size / 1024 / 1024) * 100) / 100,
         }),
       );
@@ -119,7 +119,7 @@ export const BgImageSelect: React.FC = () => {
         id="use-custom-bg-image"
         labelClassName="w-full"
         className="flex items-center"
-        label={t('useCustomBackgroundImage')}
+        label={t('settings.ui.useCustomBackgroundImage')}
         checked={shouldUseCustomBgImage}
         onChange={(e) =>
           setSettings({ shouldUseCustomBgImage: e.target.checked })
@@ -150,7 +150,7 @@ export const BgImageSelect: React.FC = () => {
             <UploadIcon className="w-6 h-6 text-white pointer-events-none" />
             <div className="flex flex-col pointer-events-none">
               <span className="text-white text-sm">
-                {t('dragAndDropToUpload')}
+                {t('settings.ui.dragAndDropToUpload')}
               </span>
               <span className="text-white/70 text-xs">PNG, JPG, WEBP</span>
             </div>
@@ -170,7 +170,7 @@ export const BgImageSelect: React.FC = () => {
                 }}
               />
               <Button variant="secondary" onClick={clearImage}>
-                {t('clear')}
+                {t('common.clear')}
               </Button>
             </div>
           )}

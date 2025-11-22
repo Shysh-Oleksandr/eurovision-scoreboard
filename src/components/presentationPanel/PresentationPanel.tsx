@@ -21,17 +21,17 @@ const MIN_SPEED_SECONDS = 0.5;
 const MAX_SPEED_SECONDS = 7.5;
 
 const PresentationPanel = (): JSX.Element | null => {
-  const t = useTranslations('simulation.presentation');
+  const t = useTranslations();
 
   const tabs = useMemo(
     () => [
       {
         value: PresentationPointsGrouping.INDIVIDUAL,
-        label: t('pointsGrouping.individual'),
+        label: t('simulation.presentation.pointsGrouping.individual'),
       },
       {
         value: PresentationPointsGrouping.GROUPED,
-        label: t('pointsGrouping.grouped'),
+        label: t('simulation.presentation.pointsGrouping.grouped'),
       },
     ],
     [t],
@@ -172,9 +172,15 @@ const PresentationPanel = (): JSX.Element | null => {
           withPointsGrouping ? 'pt-2' : 'xs:pt-3 pt-2'
         } lg:px-4 px-3 gap-2 flex flex-col`}
       >
-        <h3 className="lg:text-[1.35rem] text-lg text-white">{t('title')}</h3>
+        <h3 className="lg:text-[1.35rem] text-lg text-white">
+          {t('simulation.presentation.title')}
+        </h3>
         <Button
-          label={isPresenting ? t('pause') : t('start')}
+          label={
+            isPresenting
+              ? t('simulation.presentation.pause')
+              : t('common.start')
+          }
           className="w-full justify-center"
           variant={isPresenting ? 'secondary' : 'primary'}
           Icon={
@@ -191,7 +197,7 @@ const PresentationPanel = (): JSX.Element | null => {
         {withPointsGrouping && (
           <div className="flex flex-col gap-1">
             <h4 className="text-base font-medium text-white">
-              {t('pointsGrouping.title')}
+              {t('simulation.presentation.pointsGrouping.title')}
             </h4>
             <Tabs
               tabs={tabs}
@@ -211,7 +217,7 @@ const PresentationPanel = (): JSX.Element | null => {
             <Checkbox
               id="pause-after-animated-points"
               labelClassName="w-full !px-0 !pt-1 text-white"
-              label={t('pauseAfterAnimatedPoints')}
+              label={t('simulation.presentation.pauseAfterAnimatedPoints')}
               checked={pauseAfterAnimatedPoints}
               onChange={(e) =>
                 setPresentationSettings({
@@ -233,8 +239,8 @@ const PresentationPanel = (): JSX.Element | null => {
               presentationSpeedSeconds: value,
             })
           }
-          minLabel={t('slow')}
-          maxLabel={t('fast')}
+          minLabel={t('simulation.presentation.slow')}
+          maxLabel={t('simulation.presentation.fast')}
           displayValue={false}
         />
       </div>

@@ -29,7 +29,7 @@ interface OddsSettingsProps {
 }
 
 const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
-  const t = useTranslations('settings.odds');
+  const t = useTranslations();
   const countryOdds = useCountriesStore((state) => state.countryOdds);
   const updateCountryOdds = useCountriesStore(
     (state) => state.updateCountryOdds,
@@ -116,10 +116,12 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
     return (
       <div className="text-center space-y-1 mt-10">
         <p className="font-medium text-white text-xl">
-          {t('noParticipatingCountriesSelectedYet')}
+          {t('settings.odds.noParticipatingCountriesSelectedYet')}
         </p>
         <p className="text-white/60 text-base">
-          {t('goBackToSetupAndSelectCountriesForEventToSetTheirOdds')}
+          {t(
+            'settings.odds.goBackToSetupAndSelectCountriesForEventToSetTheirOdds',
+          )}
         </p>
       </div>
     );
@@ -134,7 +136,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
             content={
               <div className="space-y-2 font-medium">
                 <p>
-                  {t.rich('oddsTooltip', {
+                  {t.rich('settings.odds.oddsTooltip', {
                     br: () => <br />,
                     span: (chunks) => (
                       <span className="font-bold">{chunks}</span>
@@ -142,7 +144,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
                   })}
                 </p>
                 <p>
-                  {t.rich('randomnessLevelTooltip', {
+                  {t.rich('settings.odds.randomnessLevelTooltip', {
                     br: () => <br />,
                     span: (chunks) => (
                       <span className="font-bold">{chunks}</span>
@@ -155,33 +157,33 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
         </div>
         <RangeSlider
           id="randomness"
-          label={t('randomnessLevel')}
+          label={t('settings.odds.randomnessLevel')}
           min={0}
           max={100}
           value={randomnessLevel}
           onChange={(value) => setSettings({ randomnessLevel: value })}
-          minLabel={t('predictable')}
-          maxLabel={t('chaotic')}
+          minLabel={t('settings.odds.predictable')}
+          maxLabel={t('settings.odds.chaotic')}
         />
       </div>
       <div className="flex sm:items-end items-start gap-4 mb-4 justify-between flex-wrap sm:flex-row flex-col-reverse">
         <div className="flex items-center gap-2 flex-wrap">
           <Button className="md:text-base text-sm" onClick={handleRandomize}>
-            {t('randomize')}
+            {t('common.randomize')}
           </Button>
           <Button
             variant="tertiary"
             className="md:text-base text-sm"
             onClick={handleLoadYearData}
           >
-            {t('loadYearData')}
+            {t('settings.odds.loadYearData')}
           </Button>
           <Button
             variant="secondary"
             className="md:text-base text-sm"
             onClick={handleReset}
           >
-            {t('reset')}
+            {t('common.reset')}
           </Button>
         </div>
         <div className="flex items-center gap-2 justify-end">

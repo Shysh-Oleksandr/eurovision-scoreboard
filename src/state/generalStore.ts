@@ -44,7 +44,7 @@ const DEFAULT_SETTINGS: Settings = {
   showRankChangeIndicator: true,
   shouldShowManualTelevoteWarning: true,
   showHostingCountryLogo: true,
-  shouldShowHeartFlagIcon: false,
+  shouldShowHeartFlagIcon: true,
   shouldUseCustomBgImage: false,
   customBgImage: null,
   hostingCountryCode: 'CH', // Switzerland for 2025

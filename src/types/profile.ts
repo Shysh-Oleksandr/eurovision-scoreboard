@@ -11,4 +11,4 @@ export interface Profile {
   preferredLocale?: PreferredLocale;
 }
 
-export type PreferredLocale = 'en' | 'es';
+export type PreferredLocale = 'en' | 'es' | 'uk';

@@ -1,18 +1,19 @@
 import {cookies, headers} from 'next/headers';
 import {getRequestConfig} from 'next-intl/server';
 
-const SUPPORTED_LOCALES = ['en', 'es'] as const;
+const SUPPORTED_LOCALES = ['en', 'es', 'uk'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const DEFAULT_LOCALE: SupportedLocale = 'en';
 
-function normalizeLocale(raw: string | undefined | null): SupportedLocale {
+export function normalizeLocale(raw: string | undefined | null): SupportedLocale {
   if (!raw) return DEFAULT_LOCALE;
 
   const lower = raw.toLowerCase();
 
-  if (lower.startsWith('es')) return 'es';
-  if (lower.startsWith('en')) return 'en';
+  for (const locale of SUPPORTED_LOCALES) {
+    if (lower.startsWith(locale)) return locale;
+  }
 
   return DEFAULT_LOCALE;
 }
@@ -33,6 +34,36 @@ function parseAcceptLanguage(value: string | null): SupportedLocale {
   return DEFAULT_LOCALE;
 }
 
+function deepMergeMessages(
+  base: any,
+  override: any,
+): any {
+  if (typeof base !== 'object' || base === null) return override;
+  if (typeof override !== 'object' || override === null) return override ?? base;
+
+  const result: any = Array.isArray(base) ? [...base] : {...base};
+
+  for (const key of Object.keys(override)) {
+    const baseValue = (base as any)[key];
+    const overrideValue = (override as any)[key];
+
+    if (
+      typeof baseValue === 'object' &&
+      baseValue !== null &&
+      !Array.isArray(baseValue) &&
+      typeof overrideValue === 'object' &&
+      overrideValue !== null &&
+      !Array.isArray(overrideValue)
+    ) {
+      result[key] = deepMergeMessages(baseValue, overrideValue);
+    } else {
+      result[key] = overrideValue;
+    }
+  }
+
+  return result;
+}
+
 export default getRequestConfig(async () => {
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get('locale')?.value as
@@ -46,8 +77,16 @@ export default getRequestConfig(async () => {
     (cookieLocale && normalizeLocale(cookieLocale)) ||
     parseAcceptLanguage(acceptLanguage);
 
-  const messages = (await import(`../../messages/${resolvedLocale}.json`))
-    .default;
+  const defaultMessages = (await import('../../messages/en.json')).default;
+
+  let messages = defaultMessages;
+
+  if (resolvedLocale !== 'en') {
+    const localeMessages = (await import(
+      `../../messages/${resolvedLocale}.json`
+    )).default;
+    messages = deepMergeMessages(defaultMessages, localeMessages);
+  }
 
   return {
     locale: resolvedLocale,

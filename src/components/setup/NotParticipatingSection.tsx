@@ -10,6 +10,7 @@ import { Input } from '../Input';
 import { CountrySelectionList } from './CountrySelectionList';
 import { AvailableGroup } from './CountrySelectionListItem';
 import { useCountrySearch } from './hooks/useCountrySearch';
+import { useGetCategoryLabel } from './hooks/useGetCategoryLabel';
 import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
 
@@ -49,29 +50,7 @@ const NotParticipatingSection = ({
     sortedCategories,
   } = useCountrySearch(notParticipatingCountries);
 
-  const getCategoryLabel = (category: string) => {
-    console.log(category);
-    switch (category) {
-      case 'Custom':
-        return t('categories.custom');
-      case 'All-Time Participants':
-        return t('categories.allTimeParticipants');
-      case 'Asia':
-        return t('categories.asia');
-      case 'Africa':
-        return t('categories.africa');
-      case 'North America':
-        return t('categories.northAmerica');
-      case 'South America':
-        return t('categories.southAmerica');
-      case 'Oceania':
-        return t('categories.oceania');
-      case 'Rest of Europe':
-        return t('categories.restOfEurope');
-      default:
-        return category;
-    }
-  };
+  const getCategoryLabel = useGetCategoryLabel();
 
   const getExtraContent = (category: string) => {
     if (category === 'Custom') {
@@ -79,7 +58,9 @@ const NotParticipatingSection = ({
         return (
           <div className="flex flex-col items-start col-span-full gap-2">
             <p className="text-white/80 text-sm">
-              {t('youNeedToBeLoggedInToCreateAndUseCustomEntries')}
+              {t(
+                'eventSetupModal.youNeedToBeLoggedInToCreateAndUseCustomEntries',
+              )}
             </p>
             <GoogleAuthButton />
           </div>

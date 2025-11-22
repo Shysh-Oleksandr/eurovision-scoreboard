@@ -58,7 +58,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
   onImageGenerated,
   generatedImageUrl,
 }) => {
-  const t = useTranslations('share');
+  const t = useTranslations();
   const [scale, setScale] = useState(1);
   // Only select the specific settings we need to prevent unnecessary re-renders
   const backgroundOpacity = useStatsCustomizationStore(
@@ -360,7 +360,9 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-2 ml-2">{t('preview')}:</h3>
+      <h3 className="text-lg font-semibold mb-2 ml-2">
+        {t('common.preview')}:
+      </h3>
       <div
         className="relative w-full h-full max-w-full overflow-hidden rounded-sm"
         style={{
@@ -453,7 +455,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
           Icon={<GenerateImageIcon className="w-[20px] h-[20px]" />}
           disabled={isGenerating}
         >
-          {isGenerating ? t('generating') : t('generateImage')}
+          {isGenerating ? t('share.generating') : t('share.generateImage')}
         </Button>
       </div>
     </div>

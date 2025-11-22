@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 
 import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
@@ -44,7 +44,9 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   likedByMe,
   savedByMe,
 }) => {
-  const t = useTranslations('widgets.themes');
+  const locale = useLocale();
+
+  const t = useTranslations();
 
   const user = useAuthStore((state) => state.user);
   const isMyTheme = variant === 'user' || theme.userId.toString() === user?._id;
@@ -76,7 +78,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
         <div className="flex-1 min-w-0">
           {!theme.isPublic && (
             <div className="text-xs text-white/60 bg-primary-800 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit mb-1.5">
-              {t('private')}
+              {t('widgets.private')}
             </div>
           )}
           <h3 className="text-white font-semibold text-l mb-1">
@@ -84,7 +86,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
               <span className="">{theme.name}</span>
 
               <span className="text-xs text-white/60">
-                {new Date(theme.createdAt).toLocaleDateString('en-US', {
+                {new Date(theme.createdAt).toLocaleDateString(locale, {
                   hour: '2-digit',
                   minute: '2-digit',
                   year: 'numeric',
@@ -129,7 +131,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           disabled={isApplied}
           Icon={<ThemeIcon className="sm:size-6 size-5" />}
         >
-          {isApplied ? t('applied') : t('apply')}
+          {isApplied ? t('widgets.applied') : t('widgets.apply')}
         </Button>
         <Button
           variant="tertiary"
@@ -139,8 +141,8 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           Icon={<CopyIcon className="sm:size-6 size-5" />}
         >
           {theme.duplicatesCount
-            ? t('nCopies', { count: theme.duplicatesCount })
-            : t('copy')}
+            ? t('widgets.nCopies', { count: theme.duplicatesCount })
+            : t('widgets.copy')}
         </Button>
 
         {isMyTheme && onEdit && (
@@ -150,7 +152,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             className="!py-2 !px-4 !text-base"
             Icon={<PencilIcon className="sm:size-6 size-5" />}
           >
-            {t('edit')}
+            {t('common.edit')}
           </Button>
         )}
 
@@ -160,7 +162,9 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             onClick={() => {
               if (
                 window.confirm(
-                  t('areYouSureYouWantToDeleteThisTheme', { name: theme.name }),
+                  t('widgets.themes.areYouSureYouWantToDeleteThisTheme', {
+                    name: theme.name,
+                  }),
                 )
               ) {
                 onDelete(theme._id);
@@ -169,7 +173,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             className="!py-2 !px-4 !text-base text-red-300 hover:text-red-200"
             Icon={<TrashIcon className="sm:size-6 size-5" />}
           >
-            {t('delete')}
+            {t('common.delete')}
           </Button>
         )}
 
@@ -186,7 +190,9 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             )
           }
         >
-          {theme.likes > 0 ? t('nLikes', { count: theme.likes }) : t('like')}
+          {theme.likes > 0
+            ? t('widgets.nLikes', { count: theme.likes })
+            : t('widgets.like')}
         </Button>
         <Button
           variant="tertiary"
@@ -201,7 +207,9 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             )
           }
         >
-          {theme.saves > 0 ? t('nSaves', { count: theme.saves }) : t('save')}
+          {theme.saves > 0
+            ? t('widgets.nSaves', { count: theme.saves })
+            : t('widgets.save')}
         </Button>
       </div>
     </div>

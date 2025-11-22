@@ -15,13 +15,13 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
   search,
   onSearchChange,
 }) => {
-  const t = useTranslations('widgets.themes');
+  const t = useTranslations();
 
   return (
     <div className="flex flex-col xs:flex-row gap-2 items-stretch xs:items-center">
       <Input
         type="text"
-        placeholder={t('searchThemes')}
+        placeholder={t('widgets.themes.searchThemes')}
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         className="flex-1 text-sm"
@@ -29,7 +29,7 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
 
       {onCreateNew && (
         <Button variant="tertiary" onClick={onCreateNew}>
-          {t('create')}
+          {t('common.create')}
         </Button>
       )}
     </div>
