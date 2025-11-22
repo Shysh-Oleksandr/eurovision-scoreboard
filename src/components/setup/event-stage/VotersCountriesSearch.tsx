@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 
 import { PlusIcon } from '../../../assets/icons/PlusIcon';
@@ -6,6 +7,7 @@ import { BaseCountry } from '../../../models';
 import { useCountriesStore } from '../../../state/countriesStore';
 import { CollapsibleSection } from '../../common/CollapsibleSection';
 import { Input } from '../../Input';
+import { useGetCategoryLabel } from '../hooks/useGetCategoryLabel';
 import SearchInputIcon from '../SearchInputIcon';
 
 import { useVotersCountriesSearch } from './hooks/useVotersCountriesSearch';
@@ -30,6 +32,7 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
   localVotingCountries,
   onAddVoter,
 }) => {
+  const t = useTranslations('setup.eventStageModal');
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
@@ -67,21 +70,23 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
     countries.forEach((country) => onAddVoter(country));
   };
 
+  const getCategoryLabel = useGetCategoryLabel();
+
   return (
     <>
       <div className="flex items-center justify-between gap-2 mb-2">
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-white">
-            Non-Voting Countries
+            {t('nonVotingCountries')}
           </h3>
-          <p className="text-sm text-white/50">Search and click to add</p>
+          <p className="text-sm text-white/50">{t('searchAndClickToAdd')}</p>
         </div>
         <div className="relative">
           <Input
             className="sm:w-[200px] lg:text-[0.95rem] text-sm"
             name="countriesSearch"
             id="countriesSearch"
-            placeholder="Search countries..."
+            placeholder={t('searchCountries')}
             value={countriesSearch}
             onChange={handleCountriesSearch}
           />
@@ -95,7 +100,7 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
         {sortedCategories.map((category) => (
           <CollapsibleSection
             key={category}
-            title={category}
+            title={getCategoryLabel(category)}
             isExpanded={!!expandedCategories[category]}
             onToggle={() => handleToggleCategory(category)}
             extraContent={

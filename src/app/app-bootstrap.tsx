@@ -1,6 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
+import { toast } from 'react-toastify';
+
+import { useRouter } from 'next/navigation';
 
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
@@ -13,10 +17,13 @@ export default function AppBootstrap() {
   useThemeSetup();
   useActiveThemeSync();
 
-  const { handlePostLogin } = useAuthStore();
+  const t = useTranslations('widgets.profile');
+  const { handlePostLogin, user } = useAuthStore();
   const setInitialCountriesForYear = useCountriesStore(
     (state) => state.setInitialCountriesForYear,
   );
+  const router = useRouter();
+  const hasSyncedPreferredLocaleRef = useRef(false);
 
   // Initialize countries once on first load
   useEffect(() => {
@@ -33,17 +40,70 @@ export default function AppBootstrap() {
   }, [setInitialCountriesForYear]);
 
   useEffect(() => {
-    const url = new URL(window.location.href);
+    const handleLogin = async () => {
+      const url = new URL(window.location.href);
 
-    if (url.searchParams.has('provider')) {
-      window.history.replaceState({}, '', url.origin + url.pathname);
-      handlePostLogin(true);
+      if (url.searchParams.has('provider')) {
+        window.history.replaceState({}, '', url.origin + url.pathname);
+        const success = await handlePostLogin(true);
+
+        if (success) {
+          toast(t('success'), {
+            type: 'success',
+          });
+        } else {
+          toast(t('error'), {
+            type: 'error',
+          });
+        }
+
+        return;
+      }
+
+      handlePostLogin();
+    };
+
+    handleLogin();
+  }, [handlePostLogin, t]);
+
+  useEffect(() => {
+    const preferred = user?.preferredLocale;
+
+    // Only sync once per session and only when there's no explicit locale
+    // cookie yet. This avoids fighting with user changes via LanguageSelector.
+    if (hasSyncedPreferredLocaleRef.current || !preferred) {
+      return;
+    }
+
+    if (typeof document === 'undefined') return;
+
+    const hasLocaleCookie = document.cookie
+      .split(';')
+      .map((c) => c.trim())
+      .some((c) => c.startsWith('locale='));
+
+    if (hasLocaleCookie) {
+      hasSyncedPreferredLocaleRef.current = true;
 
       return;
     }
 
-    handlePostLogin();
-  }, [handlePostLogin]);
+    (async () => {
+      try {
+        await fetch('/api/locale', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ locale: preferred }),
+        });
+        hasSyncedPreferredLocaleRef.current = true;
+        router.refresh();
+      } catch (error) {
+        console.error('Failed to sync preferred locale', error);
+      }
+    })();
+  }, [user?.preferredLocale, router]);
 
   return null;
 }

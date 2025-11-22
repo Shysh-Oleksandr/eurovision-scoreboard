@@ -1,3 +1,4 @@
+import { useLocale } from 'next-intl';
 import React, { useState } from 'react';
 
 import { UpdateItem, getDateLabel } from './types';
@@ -15,6 +16,7 @@ const UpdateList = ({
   initialCount = 5,
   loadMoreCount = 5,
 }: UpdateListProps) => {
+  const locale = useLocale();
   const [displayCount, setDisplayCount] = useState(
     compact ? initialCount : items.length,
   );
@@ -35,7 +37,7 @@ const UpdateList = ({
             className="border-l-2 rounded border-solid border-white sm:pl-4 pl-3 bg-gradient-to-r from-primary-800/30 to-primary-900/30 shadow-sm rounded-r-lg sm:w-fit w-full sm:p-1 p-0.5 pr-2"
           >
             <p className="text-white/70 text-sm font-medium">
-              {getDateLabel(item)}
+              {getDateLabel(item, locale)}
             </p>
             <p className="mt-0.5 leading-normal">{item.title}</p>
           </li>

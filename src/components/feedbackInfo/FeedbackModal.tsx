@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
 import Modal from '../common/Modal/Modal';
 import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 import Tabs from '../common/tabs/Tabs';
 
-import { getTabs, WHATS_NEW, UPCOMING_FEATURES } from './data';
+import { UPCOMING_FEATURES, WHATS_NEW } from './data';
 import UpdateList from './UpdateList';
 
 import GitHubIcon from '@/assets/icons/GitHubIcon';
@@ -19,6 +20,8 @@ const FeedbackModal = ({
   setShowModal: (show: boolean) => void;
   onLoaded: () => void;
 }) => {
+  const locale = useLocale();
+  const t = useTranslations('feedbackInfo');
   const [activeTab, setActiveTab] = useState('feedback');
   const setLastSeenUpdate = useGeneralStore((state) => state.setLastSeenUpdate);
   const setShouldShowNewChangesIndicator = useGeneralStore(
@@ -41,9 +44,32 @@ const FeedbackModal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, setLastSeenUpdate, setShouldShowNewChangesIndicator]);
 
+  const getTabs = (shouldShowNewChangesIndicator: boolean) => {
+    return [
+      { label: t('feedback'), value: 'feedback' },
+      {
+        label: t('whatsNew'),
+        value: 'whats-new',
+        showIndicator: shouldShowNewChangesIndicator,
+      },
+      { label: t('upcomingFeatures'), value: 'upcoming' },
+    ];
+  };
+
   const tabs = getTabs(shouldShowNewChangesIndicator);
 
-  console.log('tabs');
+  const translationIssueTemplate = `
+    Language: ${locale}
+
+    Wrong translation:
+    - 
+
+    Correct translation:
+    - 
+
+    Reason:
+    - 
+  `;
 
   return (
     <Modal
@@ -67,12 +93,10 @@ const FeedbackModal = ({
       <div className="lg:text-lg sm:text-base text-base font-medium">
         {activeTab === 'feedback' && (
           <div className="lg:pt-2">
-            <p className="mb-2 font-semibold">
-              Found a bug, have a feature idea, or just want to share feedback?
-            </p>
+            <p className="mb-2 font-semibold">{t('foundBug')}</p>
 
             <p className="mb-3">
-              Feel free to open an issue on{' '}
+              {t('openIssueOnGitHub')}{' '}
               <a
                 href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/issues"
                 target="_blank"
@@ -82,7 +106,7 @@ const FeedbackModal = ({
                 <GitHubIcon className="w-5 h-5 inline-block mr-1 mb-1" />
                 GitHub
               </a>{' '}
-              or email me at{' '}
+              {t('orEmailMe')}{' '}
               <a
                 href="mailto:sasha.shysh23@gmail.com"
                 className="text-primary-300 hover:text-primary-400 underline font-semibold"
@@ -95,30 +119,40 @@ const FeedbackModal = ({
                 NEW
               </div> */}
               <p>
-                Alternatively, you can use{' '}
-                <a
-                  href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/discussions"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary-300 hover:text-primary-400 underline font-semibold"
-                >
-                  GitHub Discussions
-                </a>{' '}
-                to share suggestions, ask questions, or post your simulation
-                results.
+                {t.rich('gitHubDiscussions', {
+                  a: (chunks) => (
+                    <a
+                      href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/discussions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                    >
+                      {chunks}
+                    </a>
+                  ),
+                })}
               </p>
             </div>
             <div className="mb-4">
-              If you're reporting a bug, please include your:
+              {t('bugReportDetails')}
               <br />
               <ul className="list-disc list-inside">
-                <li>device (mobile, tablet, or PC)</li>
-                <li>OS (Android, iOS, Windows, macOS)</li>
-                <li>browser (Chrome, Safari, etc.)</li>
-                <li>and any helpful details like screenshots or videos</li>
+                <li>{t('bugReportDetailsItem1')}</li>
+                <li>{t('bugReportDetailsItem2')}</li>
+                <li>{t('bugReportDetailsItem3')}</li>
+                <li>{t('bugReportDetailsItem4')}</li>
               </ul>
             </div>
-            <p>Thank you!</p>
+            <p className="mb-2 font-semibold">
+              {t('translationIssueDescription')}{' '}
+              <a
+                href={`mailto:sasha.shysh23@gmail.com?subject=Translation Issue&body=${translationIssueTemplate}`}
+                className="text-primary-300 hover:text-primary-400 underline font-semibold"
+              >
+                sasha.shysh23@gmail.com
+              </a>
+            </p>
+            <p>{t('thankYou')}</p>
           </div>
         )}
 
@@ -128,7 +162,7 @@ const FeedbackModal = ({
           <div>
             <UpdateList items={UPCOMING_FEATURES} />
             <p className="text-white/70 text-sm font-medium mt-4">
-              * The dates are approximate and may change
+              * {t('datesAreApproximate')}
             </p>
           </div>
         )}

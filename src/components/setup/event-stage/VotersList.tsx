@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 import SortableList from 'react-easy-sort';
 
@@ -14,6 +15,7 @@ const VotersList: React.FC<VotersListProps> = ({
   localVotingCountries,
   setLocalVotingCountries,
 }) => {
+  const t = useTranslations('setup.eventStageModal');
   const handleSortEnd = (oldIndex: number, newIndex: number) => {
     const newVotingCountries = [...localVotingCountries];
     const [movedItem] = newVotingCountries.splice(oldIndex, 1);
@@ -32,7 +34,7 @@ const VotersList: React.FC<VotersListProps> = ({
     <>
       {localVotingCountries.length === 0 ? (
         <p className="text-white/60 text-sm">
-          No voting countries selected. Add countries from the list below.
+          {t('noVotingCountriesSelected')}
         </p>
       ) : (
         <SortableList

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 
 import SyncIcon from '../../assets/icons/SyncIcon';
@@ -10,7 +11,6 @@ import {
   JUNIOR_THEME_PREFIX,
   THEME_OPTIONS,
 } from '../../data/data';
-import { StageId } from '../../models';
 import { useGeneralStore } from '../../state/generalStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import { YEARS_WITH_THEME } from '../../theme/themes';
@@ -21,7 +21,6 @@ import CustomSelect, {
 } from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
-import { InfoIcon } from '@/assets/icons/InfoIcon';
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { buildPrimaryFromHsva } from '@/theme/themeUtils';
@@ -38,6 +37,8 @@ type SetupHeaderProps = {
 export const SetupHeader: React.FC<SetupHeaderProps> = ({
   openSettingsModal,
 }) => {
+  const t = useTranslations();
+
   const year = useGeneralStore((state) => state.year);
   const settings = useGeneralStore((state) => state.settings);
   const themeYear = useGeneralStore((state) => state.themeYear);
@@ -46,7 +47,6 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   const setTheme = useGeneralStore((state) => state.setTheme);
   const setSettings = useGeneralStore((state) => state.setSettings);
   const eventStages = useScoreboardStore((state) => state.eventStages);
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
 
   const isTouchDevice = useTouchDevice();
@@ -60,16 +60,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     const nextContestName = isJunior ? 'Junior Eurovision' : 'Eurovision';
 
     if (eventStages.length > 0) {
-      const { id: currentStageId } = getCurrentStage();
-      const isGrandFinal = currentStageId === StageId.GF;
-
-      if (
-        window.confirm(
-          `A ${
-            isGrandFinal ? 'Grand Final' : 'semi-final'
-          } is in progress. Changing the year will reset the current scoreboard and start a new setup. Are you sure?`,
-        )
-      ) {
+      if (window.confirm(t('setup.eventSetupModal.contestIsInProgress'))) {
         setSettings({
           contestName: nextContestName,
           isJuniorContest: isJunior,
@@ -125,7 +116,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
     if (customTheme) {
       groups.unshift({
-        label: 'Custom',
+        label: t('common.custom'),
         options: [
           {
             label: customTheme.name,
@@ -137,7 +128,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     }
 
     return groups;
-  }, [customTheme, customThemeColor]);
+  }, [customTheme, customThemeColor, t]);
 
   const themeOptions = useMemo(() => {
     const options: Option[] = [...ALL_THEME_OPTIONS];
@@ -152,86 +143,68 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     return options;
   }, [customTheme]);
 
-  const shouldShowMaintenanceModeWarning = useMemo(() => {
-    return (
-      new Date().getMonth() === 10 &&
-      new Date().getUTCDate() === 15 &&
-      new Date().getUTCHours() < 25
-    );
-  }, []);
-
-  console.log(shouldShowMaintenanceModeWarning);
-  console.log(new Date().getMonth());
-  console.log(new Date().getUTCDate());
-  console.log(new Date().getUTCHours());
-
   return (
-    <>
-      {shouldShowMaintenanceModeWarning && (
-        <p className="flex items-center gap-2 text-sm text-white/50 mb-2">
-          <InfoIcon className="w-4 h-4" />
-          The website will be in maintenance mode today (Saturday) until
-          midnight UTC. Some features may not work as expected during this time
-        </p>
-      )}
-      <div
-        className={`flex justify-between items-end w-full ${
-          isTouchDevice ? 'overflow-x-auto' : 'overflow-x-visible'
-        } space-x-3 pb-2`}
-      >
-        <div className="flex items-end sm:space-x-4 space-x-3">
-          <CustomSelect
-            options={YEAR_OPTIONS}
-            groups={[
-              { label: 'ESC', options: ESC_YEAR_OPTIONS },
-              { label: 'JESC', options: JESC_YEAR_OPTIONS },
-            ]}
-            value={
-              settings.isJuniorContest ? `${JUNIOR_THEME_PREFIX}${year}` : year
-            }
-            onChange={handleYearChange}
-            id="year-select-box"
-            label="Year"
-            className="sm:w-[130px] w-[110px]"
-          />
+    <div
+      className={`flex justify-between items-end w-full ${
+        isTouchDevice ? 'overflow-x-auto' : 'overflow-x-visible'
+      } space-x-3 pb-2`}
+    >
+      <div className="flex items-end sm:space-x-4 space-x-3">
+        <CustomSelect
+          options={YEAR_OPTIONS}
+          groups={[
+            { label: 'ESC', options: ESC_YEAR_OPTIONS },
+            { label: 'JESC', options: JESC_YEAR_OPTIONS },
+          ]}
+          value={
+            settings.isJuniorContest ? `${JUNIOR_THEME_PREFIX}${year}` : year
+          }
+          onChange={handleYearChange}
+          id="year-select-box"
+          label={t('common.year')}
+          className="sm:w-[130px] w-[110px]"
+        />
 
-          <CustomSelect
-            options={themeOptions}
-            groups={themeGroups}
-            value={customTheme ? customTheme._id : themeYear}
-            onChange={handleThemeChange}
-            id="theme-select-box"
-            label={customTheme ? `Theme (Custom)` : 'Theme'}
-            className="sm:w-[130px] w-[110px]"
-            customThemeColor={customThemeColor}
-          />
+        <CustomSelect
+          options={themeOptions}
+          groups={themeGroups}
+          value={customTheme ? customTheme._id : themeYear}
+          onChange={handleThemeChange}
+          id="theme-select-box"
+          label={
+            customTheme
+              ? `${t('common.theme')} (${t('common.custom')})`
+              : t('common.theme')
+          }
+          className="sm:w-[130px] w-[110px]"
+          customThemeColor={customThemeColor}
+        />
 
-          {shouldShowSyncButton && (
-            <Button
-              onClick={handleSyncTheme}
-              className="!p-3 group"
-              title="Sync Theme"
-              aria-label="Sync Theme"
-            >
-              <SyncIcon className="group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
-            </Button>
-          )}
-        </div>
-        <div className="flex items-end md:gap-4 gap-3">
+        {shouldShowSyncButton && (
           <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              openSettingsModal();
-            }}
+            onClick={handleSyncTheme}
             className="!p-3 group"
-            aria-label="Settings"
-            title="Settings"
+            title="Sync Theme"
+            aria-label="Sync Theme"
           >
-            <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
+            <SyncIcon className="group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
           </Button>
-          <FeedbackInfoButton className={`${isTouchDevice ? 'mr-1' : ''}`} />
-        </div>
+        )}
       </div>
-    </>
+      <div className="flex items-end md:gap-4 gap-3">
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            openSettingsModal();
+          }}
+          className="!p-3 group"
+          aria-label="Settings"
+          title="Settings"
+        >
+          <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
+        </Button>
+        <FeedbackInfoButton className={`${isTouchDevice ? 'mr-1' : ''}`} />
+      </div>
+    </div>
   );
 };

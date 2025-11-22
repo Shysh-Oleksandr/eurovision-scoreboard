@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -19,7 +20,6 @@ import Modal from '../common/Modal/Modal';
 import Tabs, { TabContent } from '../common/tabs/Tabs';
 import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
-import { TABS } from './constants';
 import { AvailableGroup } from './CountrySelectionListItem';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
@@ -60,6 +60,8 @@ const VotingPredefinitionModal = dynamic(
 );
 
 const EventSetupModal = () => {
+  const t = useTranslations();
+
   const {
     eventSetupModalOpen,
     predefModalOpen,
@@ -252,6 +254,7 @@ const EventSetupModal = () => {
         autoQualifiersCount: autoQualifiers.length,
         grandFinalQualifiersCount: grandFinalQualifiers.length,
       },
+      t,
     );
 
     if (validationError) {
@@ -331,10 +334,24 @@ const EventSetupModal = () => {
     setPredefModalOpen(false);
   };
 
+  const tabs = useMemo(
+    () => [
+      {
+        label: t('setup.eventSetupModal.allShows'),
+        value: EventMode.SEMI_FINALS_AND_GRAND_FINAL,
+      },
+      {
+        label: t('setup.eventSetupModal.grandFinalOnly'),
+        value: EventMode.GRAND_FINAL_ONLY,
+      },
+    ],
+    [t],
+  );
+
   const tabsWithContent = useMemo(
     () => [
       {
-        ...TABS[0],
+        ...tabs[0],
         content: (
           <SemiFinalsAndGrandFinalSetup
             autoQualifiers={autoQualifiers}
@@ -354,7 +371,7 @@ const EventSetupModal = () => {
         ),
       },
       {
-        ...TABS[1],
+        ...tabs[1],
         content: (
           <>
             {activeTab === EventMode.GRAND_FINAL_ONLY && (
@@ -375,6 +392,7 @@ const EventSetupModal = () => {
       },
     ],
     [
+      tabs,
       activeTab,
       autoQualifiers,
       availableGroups,
@@ -421,11 +439,11 @@ const EventSetupModal = () => {
                 className="md:text-base text-sm"
                 onClick={onClose}
               >
-                {winnerCountry ? 'Close' : 'Continue'}
+                {winnerCountry ? t('common.close') : t('common.continue')}
               </Button>
             )}
             <Button className="w-full !text-base" onClick={handleStartEvent}>
-              Start
+              {t('common.start')}
             </Button>
           </div>
         }
@@ -463,7 +481,7 @@ const EventSetupModal = () => {
         <WidgetsSection />
         <div className="mt-2 flex flex-col gap-3">
           <Tabs
-            tabs={TABS}
+            tabs={tabs}
             activeTab={activeTab}
             setActiveTab={(tab) => setActiveTab(tab as EventMode)}
           />

@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { getFlagPath } from '../../../helpers/getFlagPath';
+import { useTranslations } from 'next-intl';
 import {
-  BaseCountry,
   Country,
   EventStage,
   StageVotingMode,
-  StageVotingType,
+  StageVotingType
 } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 export const useFinalStats = () => {
+  const t = useTranslations('simulation.finalStats');
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const predefinedVotes = useScoreboardStore((state) => state.predefinedVotes);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
@@ -70,24 +70,24 @@ export const useFinalStats = () => {
   }, [selectedStage]);
 
   const totalBadgeLabel = useMemo(() => {
-    if (!selectedStage) return 'Total';
+    if (!selectedStage) return t('total');
 
     const { votingMode } = selectedStage;
 
     if (votingMode === StageVotingMode.JURY_ONLY) {
-      return 'Jury';
+      return t('jury');
     }
 
     if (votingMode === StageVotingMode.TELEVOTE_ONLY) {
-      return 'Televote';
+      return t('televote');
     }
 
     if (votingMode === StageVotingMode.COMBINED) {
-      return 'Combined';
+      return t('combined');
     }
 
-    return 'Total';
-  }, [selectedStage]);
+    return t('total')
+  }, [selectedStage, t]);
 
   const participatingCountries: Country[] = useMemo(
     () => (selectedStage ? selectedStage.countries : []),
@@ -206,7 +206,7 @@ export const useFinalStats = () => {
 
   const getCellClassName = (points: number) => {
     const isTotalVoteType =
-      selectedVoteType === 'Total' && totalBadgeLabel === 'Total';
+      selectedVoteType === 'Total' && totalBadgeLabel === t('total');
 
     if (
       (points === 12 && !isTotalVoteType) ||

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -15,6 +16,7 @@ const FinalStatsModal = dynamic(() => import('./finalStats/FinalStatsModal'), {
 });
 
 export const PhaseActions = () => {
+  const t = useTranslations('simulation.phaseActions');
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
@@ -79,13 +81,20 @@ export const PhaseActions = () => {
             onClick={() => setShowFinalStatsModal(true)}
             className="ml-auto xs:!px-4"
           >
-            View Stats
+            {t('viewStats')}
           </Button>
         )}
 
         {isSFAndGFEventOver && !isAnotherStageDisplayed && (
-          <Button onClick={toggleShowAllParticipants} className="normal-case">
-            {showAllParticipants ? 'FINALISTS ONLY' : 'SHOW NQs'}
+          <Button onClick={toggleShowAllParticipants}>
+            {showAllParticipants ? (
+              t('finalistsOnly')
+            ) : (
+              <>
+                {t('showNQs', { nonQualifiersLabel: '' })}{' '}
+                <span className="normal-case">NQs</span>
+              </>
+            )}
           </Button>
         )}
         {isSFAndGFEventOver && (
@@ -100,7 +109,7 @@ export const PhaseActions = () => {
                 eventStages.find((stage) => stage.id === e.target.value)!.id,
               );
             }}
-            aria-label="Select event stage"
+            aria-label={t('selectEventStage')}
             options={eventStages.map((stage) => ({
               value: stage.id,
               label: stage.name,
@@ -113,7 +122,7 @@ export const PhaseActions = () => {
         )}
         {isVotingOver && !isLastStage && (
           <Button onClick={handleContinue} className="animated-border">
-            Continue to {nextPhase}
+            {t('continueTo', { nextPhase: nextPhase ?? '' })}
           </Button>
         )}
       </div>

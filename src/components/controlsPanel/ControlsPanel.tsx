@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { type JSX } from 'react';
 
 import { StageVotingMode } from '../../models';
@@ -8,6 +9,8 @@ import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
 const ControlsPanel = (): JSX.Element | null => {
+  const t = useTranslations('simulation');
+
   const votingCountryIndex = useScoreboardStore(
     (state) => state.votingCountryIndex,
   );
@@ -19,12 +22,12 @@ const ControlsPanel = (): JSX.Element | null => {
     return null;
   }
 
-  let votingTitle = 'Televote';
+  let votingTitle = t('televote');
 
   if (votingMode === StageVotingMode.COMBINED) {
-    votingTitle = 'Voting';
+    votingTitle = t('voting');
   } else if (isJuryVoting) {
-    votingTitle = 'Jury voting';
+    votingTitle = t('juryVoting');
   }
 
   return (

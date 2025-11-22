@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -144,6 +145,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const initialSelectedLabelRef = useRef<string>('');
   const selectionChangedRef = useRef<boolean>(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('common');
 
   useEffect(() => {
     const handlePointerDownOutside = (event: PointerEvent) => {
@@ -312,7 +314,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                     setSearchText(initialSelectedLabelRef.current);
                   }
                 }}
-                placeholder="Search..."
+                placeholder={t('searchPlaceholder')}
                 className="w-full bg-transparent outline-none text-white placeholder:text-white/70"
               />
             </div>
@@ -350,7 +352,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                     if (nonEmptyGroups.length === 0) {
                       return (
                         <div className="px-3 py-4 text-white/70">
-                          No options
+                          {t('noOptions')}
                         </div>
                       );
                     }
@@ -413,7 +415,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
                   if (flat.length === 0) {
                     return (
-                      <div className="px-3 py-4 text-white/70">No options</div>
+                      <div className="px-3 py-4 text-white/70">
+                        {t('noOptions')}
+                      </div>
                     );
                   }
 

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
@@ -23,6 +24,8 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
   onSyncVotersChange,
   votersAmount,
 }) => {
+  const t = useTranslations('setup.eventStageModal');
+
   return (
     <div className="flex flex-col">
       <div className="flex items-start gap-2">
@@ -30,12 +33,14 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
           content={
             <div className="space-y-2 font-medium">
               <p>
-                If enabled, when you remove or add a participant country, the
-                voting countries will be updated automatically.
-              </p>
-              <p>
-                If disabled, you will need to manually add or remove voting
-                countries.
+                {t.rich('syncVotersWithParticipantCountriesTooltip', {
+                  br: () => (
+                    <>
+                      <br />
+                      <br />
+                    </>
+                  ),
+                })}
               </p>
             </div>
           }
@@ -45,16 +50,18 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
           checked={syncVotersWithParticipants}
           onChange={(e) => onSyncVotersChange(e.target.checked)}
           id="sync-voters-checkbox"
-          label="Sync voters with participant countries"
+          label={t('syncVotersWithParticipantCountries')}
           labelClassName="text-white !px-0 !pt-1 !pb-3 !items-start"
         />
       </div>
       <div className="flex gap-4 justify-between items-center">
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-white">
-            Voting Countries ({votersAmount})
+            {t('votingCountries', { count: votersAmount })}
           </h3>
-          <p className="text-sm text-white/50 mb-2">Drag and drop to reorder</p>
+          <p className="text-sm text-white/50 mb-2">
+            {t('dragAndDropToReorder')}
+          </p>
         </div>
 
         <div className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -56,6 +57,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
   onEdit,
   onDuplicate,
 }) => {
+  const t = useTranslations();
   const user = useAuthStore((state) => state.user);
 
   const [search, setSearch] = useState('');
@@ -96,7 +98,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
         await applyThemeToProfile(theme._id);
       }
 
-      toast.success(`Theme "${latest.name}" applied!`);
+      toast.success(
+        t('widgets.themes.themeAppliedSuccessfully', { name: latest.name }),
+      );
     } catch (error: any) {
       console.error(error);
       toast.error(
@@ -108,7 +112,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const handleDelete = async (id: string) => {
     try {
       await deleteTheme(id);
-      toast.success('Theme deleted successfully!');
+      toast.success(t('themeDeletedSuccessfully'));
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to delete theme');
     }
@@ -118,7 +122,11 @@ const UserThemes: React.FC<UserThemesProps> = ({
     try {
       const res = await toggleLike(id);
 
-      toast.success(res.liked ? 'Theme liked!' : 'Like removed');
+      toast.success(
+        res.liked
+          ? t('widgets.themes.themeLikedSuccessfully')
+          : t('widgets.themes.themeUnlikedSuccessfully'),
+      );
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to like theme');
     }
@@ -129,7 +137,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
       if (savedByMe) {
         if (
           !window.confirm(
-            'Are you sure you want to remove this theme from your saved themes?',
+            t(
+              'widgets.themes.areYouSureYouWantToRemoveThisThemeFromYourSavedThemes',
+            ),
           )
         ) {
           return;
@@ -137,7 +147,11 @@ const UserThemes: React.FC<UserThemesProps> = ({
       }
       const res = await toggleSave(id);
 
-      toast.success(res.saved ? 'Theme saved!' : 'Removed from saved');
+      toast.success(
+        res.saved
+          ? t('widgets.themes.themeSavedSuccessfully')
+          : t('widgets.themes.themeRemovedFromSaved'),
+      );
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to save theme');
     }
@@ -158,7 +172,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
 
   if (isLoading) {
     return (
-      <div className="text-white text-center py-8">Loading your themes...</div>
+      <div className="text-white text-center py-8">{t('common.loading')}</div>
     );
   }
 
@@ -166,7 +180,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
     return (
       <div className="text-white text-center sm:py-8 py-4 flex flex-col items-center gap-4">
         <p className="text-white/70">
-          Authenticate to view and create your own themes
+          {t('widgets.themes.authenticateToViewAndCreateYourOwnThemes')}
         </p>
         <GoogleAuthButton />
       </div>
@@ -174,14 +188,13 @@ const UserThemes: React.FC<UserThemesProps> = ({
   }
 
   // Derived header and content per selected view
-  const headerPrefix = search.trim()
-    ? 'Found'
+  const headerLabel = search.trim()
+    ? t('widgets.themes.fountNThemes', { count: filteredYours?.length ?? 0 })
     : view === 'yours'
-    ? 'You have'
-    : 'You saved';
-  const headerCount =
-    (view === 'yours' ? filteredYours?.length : filteredSaved?.length) ?? 0;
-  const headerNoun = headerCount === 1 ? 'theme' : 'themes';
+    ? t('widgets.themes.youHaveNThemes', { count: filteredYours?.length ?? 0 })
+    : t('widgets.themes.youSavedNThemes', {
+        count: filteredSaved?.length ?? 0,
+      });
 
   let content: React.ReactNode = null;
 
@@ -235,12 +248,12 @@ const UserThemes: React.FC<UserThemesProps> = ({
         <div className="text-center py-12">
           <p className="text-white/70 mb-4">
             {search
-              ? 'No themes found matching your search.'
-              : 'No themes yet. Create your first theme!'}
+              ? t('widgets.themes.noThemesFoundMatchingYourSearch')
+              : t('widgets.themes.noThemesYetCreateYourFirstTheme')}
           </p>
           {!search && (
             <Button variant="tertiary" onClick={onCreateNew}>
-              Create Theme
+              {t('widgets.themes.createTheme')}
             </Button>
           )}
         </div>
@@ -268,8 +281,8 @@ const UserThemes: React.FC<UserThemesProps> = ({
         <div className="text-center py-12">
           <p className="text-white/70 mb-4">
             {search
-              ? 'No themes found matching your search.'
-              : 'No saved themes yet.'}
+              ? t('widgets.themes.noThemesFoundMatchingYourSearch')
+              : t('widgets.themes.noSavedThemesYet')}
           </p>
         </div>
       );
@@ -284,20 +297,20 @@ const UserThemes: React.FC<UserThemesProps> = ({
           onCreateNew={onCreateNew}
         />
 
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-center flex-wrap justify-start gap-2">
           <Badge
-            label="Created"
+            label={t('widgets.created')}
             onClick={() => setView('yours')}
             isActive={view === 'yours'}
           />
           <Badge
-            label="Saved"
+            label={t('widgets.saved')}
             onClick={() => setView('saved')}
             isActive={view === 'saved'}
           />
           {!!currentCustomTheme && (
             <Badge
-              label="Active"
+              label={t('widgets.active')}
               onClick={() => setView('current')}
               isActive={view === 'current'}
             />
@@ -306,9 +319,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
       </div>
       {view !== 'current' && (
         <div className="space-y-1">
-          <h3 className="text-white text-lg font-bold">
-            {headerPrefix} {headerCount} {headerNoun}
-          </h3>
+          <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
           <ThemesSortBadges value={sortKey} onChange={setSortKey} />
         </div>
       )}

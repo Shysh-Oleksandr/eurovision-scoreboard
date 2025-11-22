@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { Country, EventStage, StageVotingMode } from '../../../models';
@@ -24,6 +25,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
   getPoints,
   enableHover = true,
 }) => {
+  const t = useTranslations('simulation.finalStats');
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
@@ -119,20 +121,24 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
       <table className="text-left border-collapse w-full">
         <thead className="sticky top-0 z-10">
           <tr className={tableStyles.headerRow}>
-            <th className={tableStyles.rankHeader}>Rank</th>
-            <th className={tableStyles.countryHeader}>Country</th>
-            <th className={tableStyles.totalPointsHeader}>Total Points</th>
+            <th className={tableStyles.rankHeader}>{t('rank')}</th>
+            <th className={tableStyles.countryHeader}>{t('country')}</th>
+            <th className={tableStyles.totalPointsHeader}>
+              {t('totalPoints')}
+            </th>
             {shouldShowJuryAndTelevote && (
               <>
-                <th className={tableStyles.juryPointsHeader}>Jury Points</th>
+                <th className={tableStyles.juryPointsHeader}>
+                  {t('juryPoints')}
+                </th>
                 <th className={tableStyles.telePointsHeader}>
-                  Televote Points
+                  {t('televotePoints')}
                 </th>
                 <th className={tableStyles.juryPlacementHeader}>
-                  Jury Placement
+                  {t('juryPlacement')}
                 </th>
                 <th className={tableStyles.telePlacementHeader}>
-                  Televote Placement
+                  {t('televotePlacement')}
                 </th>
               </>
             )}

@@ -40,12 +40,11 @@ const DEFAULT_SETTINGS: Settings = {
   showWinnerModal: true,
   showWinnerConfetti: true,
   enableFullscreen: false,
-  shouldShowBeforeUnloadWarning: true,
   shouldShowResetWarning: true,
   showRankChangeIndicator: true,
   shouldShowManualTelevoteWarning: true,
   showHostingCountryLogo: true,
-  shouldShowHeartFlagIcon: false,
+  shouldShowHeartFlagIcon: true,
   shouldUseCustomBgImage: false,
   customBgImage: null,
   hostingCountryCode: 'CH', // Switzerland for 2025
@@ -110,7 +109,6 @@ interface Settings {
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
-  shouldShowBeforeUnloadWarning: boolean;
   shouldShowResetWarning: boolean;
   showRankChangeIndicator: boolean;
   shouldShowManualTelevoteWarning: boolean;

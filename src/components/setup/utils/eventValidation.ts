@@ -18,6 +18,7 @@ export const validateEventSetup = (
   isGrandFinalOnly: boolean,
   pointsSystemLength: number,
   params: ValidationParams,
+  t: any,
 ) => {
   const { stages, autoQualifiersCount, grandFinalQualifiersCount } = params;
 
@@ -28,22 +29,22 @@ export const validateEventSetup = (
 
     for (const stage of semiFinalStages) {
       if (stage.countriesCount === 0) {
-        return `There are no countries in ${stage.name}.`;
+        return t('validation.noCountriesInStage', { stageName: stage.name });
       }
       if (stage.votingCountries.length === 0) {
-        return `There are no voting countries in ${stage.name}.`;
+        return t('validation.noVotingCountriesInStage', { stageName: stage.name });
       }
       if (stage.qualifiersAmount <= 0) {
-        return `The number of qualifiers in ${stage.name} must be at least 1.`;
+        return t('validation.qualifiersAmountMustBeAtLeast1', { stageName: stage.name });
       }
       if (stage.qualifiersAmount >= stage.countriesCount) {
-        return `The number of qualifiers in ${stage.name} must be less than the number of participants.`;
+        return t('validation.qualifiersAmountMustBeLessThanParticipants', { stageName: stage.name });
       }
       if (
         stage.countriesCount < minStageParticipants &&
         stage.votingMode !== StageVotingMode.TELEVOTE_ONLY
       ) {
-        return `The number of participants in ${stage.name} must be at least ${minStageParticipants} (depends on the number of items in the points system).`;
+        return t('validation.participantsMustBeAtLeast', { stageName: stage.name, count: minStageParticipants });
       }
     }
 
@@ -54,10 +55,10 @@ export const validateEventSetup = (
       ) + autoQualifiersCount;
 
     if (totalQualifiers < minStageParticipants) {
-      return `The total number of qualifiers for the Grand Final must be at least ${minStageParticipants}.`;
+      return t('validation.totalQualifiersMustBeAtLeast', { count: minStageParticipants });
     }
   } else if (grandFinalQualifiersCount < minStageParticipants) {
-    return `The number of the Grand Final participants must be at least ${minStageParticipants}.`;
+    return t('validation.grandFinalParticipantsMustBeAtLeast', { count: minStageParticipants });
   }
 
   return null;

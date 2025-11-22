@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import Badge from '@/components/common/Badge';
@@ -15,6 +16,8 @@ const ThemesSortBadges: React.FC<ThemesSortBadgesProps> = ({
   onChange,
   className,
 }) => {
+  const t = useTranslations('widgets.sortBadges');
+
   return (
     <div
       className={`flex items-center flex-wrap justify-start gap-2 ${
@@ -22,27 +25,27 @@ const ThemesSortBadges: React.FC<ThemesSortBadgesProps> = ({
       }`}
     >
       <Badge
-        label="Latest"
+        label={t('latest')}
         onClick={() => onChange('latest')}
         isActive={value === 'latest'}
       />
       <Badge
-        label="Oldest"
+        label={t('oldest')}
         onClick={() => onChange('oldest')}
         isActive={value === 'oldest'}
       />
       <Badge
-        label="Most Liked"
+        label={t('mostLiked')}
         onClick={() => onChange('likes')}
         isActive={value === 'likes'}
       />
       <Badge
-        label="Most Saved"
+        label={t('mostSaved')}
         onClick={() => onChange('saves')}
         isActive={value === 'saves'}
       />
       <Badge
-        label="Most Copied"
+        label={t('mostCopied')}
         onClick={() => onChange('copies')}
         isActive={value === 'copies'}
       />

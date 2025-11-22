@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -21,6 +22,7 @@ const imageSize = 100;
 const MAX_IMAGE_SIZE = 1024 * 1024 * 4; // 4MB
 
 export const BgImageSelect: React.FC = () => {
+  const t = useTranslations();
   const shouldUseCustomBgImage = useGeneralStore(
     (state) => state.settings.shouldUseCustomBgImage,
   );
@@ -35,7 +37,7 @@ export const BgImageSelect: React.FC = () => {
   const handleFileChange = async (file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      toast('Please select a valid image file.', {
+      toast(t('error.pleaseSelectValidImageFile'), {
         type: 'error',
       });
 
@@ -44,9 +46,9 @@ export const BgImageSelect: React.FC = () => {
 
     if (file.size > MAX_IMAGE_SIZE) {
       const shouldContinue = confirm(
-        `Image size is pretty large (${
-          Math.round((file.size / 1024 / 1024) * 100) / 100
-        }MB). This can slow down the simulation, so you might want to compress it or use a smaller image. Do you want to continue with this image?`,
+        t('setup.ui.imageSizeIsPrettyLarge', {
+          size: Math.round((file.size / 1024 / 1024) * 100) / 100,
+        }),
       );
 
       if (!shouldContinue) return;
@@ -117,7 +119,7 @@ export const BgImageSelect: React.FC = () => {
         id="use-custom-bg-image"
         labelClassName="w-full"
         className="flex items-center"
-        label="Use custom background image"
+        label={t('settings.ui.useCustomBackgroundImage')}
         checked={shouldUseCustomBgImage}
         onChange={(e) =>
           setSettings({ shouldUseCustomBgImage: e.target.checked })
@@ -148,7 +150,7 @@ export const BgImageSelect: React.FC = () => {
             <UploadIcon className="w-6 h-6 text-white pointer-events-none" />
             <div className="flex flex-col pointer-events-none">
               <span className="text-white text-sm">
-                Drag & drop or click to upload
+                {t('settings.ui.dragAndDropToUpload')}
               </span>
               <span className="text-white/70 text-xs">PNG, JPG, WEBP</span>
             </div>
@@ -168,7 +170,7 @@ export const BgImageSelect: React.FC = () => {
                 }}
               />
               <Button variant="secondary" onClick={clearImage}>
-                Clear
+                {t('common.clear')}
               </Button>
             </div>
           )}

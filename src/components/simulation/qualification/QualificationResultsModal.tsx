@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
@@ -14,6 +15,7 @@ import { useGeneralStore } from '@/state/generalStore';
 import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
 
 const QualificationResultsModal = () => {
+  const t = useTranslations();
   const showQualificationModal = useGeneralStore(
     (state) => state.settings.showQualificationModal,
   );
@@ -125,7 +127,7 @@ const QualificationResultsModal = () => {
       bottomContent={
         <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 sm:p-4 p-2 z-30">
           <Button variant="secondary" onClick={handleTriggerClose}>
-            Close
+            {t('common.close')}
           </Button>
           <Button
             onClick={() => {
@@ -136,13 +138,15 @@ const QualificationResultsModal = () => {
             }}
             className="animated-border !text-sm md:!text-base w-full"
           >
-            Continue to {nextPhase}
+            {t('simulation.phaseActions.continueTo', {
+              nextPhase: nextPhase ?? '',
+            })}
           </Button>
         </div>
       }
     >
       <h2 className="md:text-2xl text-xl font-bold mb-4 text-white">
-        {currentStageName} Qualifiers
+        {t('simulation.qualifiers', { stageName: currentStageName })}
       </h2>
 
       <div

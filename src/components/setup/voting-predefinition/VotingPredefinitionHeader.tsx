@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
@@ -33,6 +34,8 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
   onReset,
   onRandomize,
 }) => {
+  const t = useTranslations();
+
   return (
     <div className="sm:mb-1 gap-1 px-2">
       <div className="flex items-center justify-between md:gap-4 gap-2 flex-wrap">
@@ -59,7 +62,10 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
             </div>
           </div>
           <p className="text-sm text-white/60 mt-1">
-            Enter the points each voting country awards to participants (
+            {t(
+              'setup.eventSetupModal.enterThePointsEachVotingCountryAwardsToParticipants',
+            )}{' '}
+            (
             {pointsSystem.every(
               (p, index) =>
                 PREDEFINED_SYSTEMS_MAP['default'][index].value === p.value,
@@ -93,7 +99,7 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
             Icon={<RestartIcon className="w-5 h-5" />}
           />
           <Button variant="primary" onClick={onRandomize} className="!px-4">
-            Randomize
+            {t('settings.odds.randomize')}
           </Button>
         </div>
       </div>

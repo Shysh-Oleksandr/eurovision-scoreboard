@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 
 import { useCountriesStore } from '../../state/countriesStore';
@@ -6,6 +7,7 @@ import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 
 const WinnerModal = () => {
+  const t = useTranslations('simulation.winnerModal');
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const isWinnerAnimationAlreadyDisplayed = useScoreboardStore(
     (state) => state.isWinnerAnimationAlreadyDisplayed,
@@ -33,7 +35,7 @@ const WinnerModal = () => {
       bottomContent={
         <div className="flex w-full xs:gap-4 gap-2 bg-primary-900 sm:p-4 p-2 z-30">
           <Button
-            label="Start over"
+            label={t('startOver')}
             onClick={() => {
               setShowModal(false);
               setEventSetupModalOpen(true);
@@ -44,11 +46,14 @@ const WinnerModal = () => {
       }
     >
       <h3 className="lg:text-3xl sm:text-2xl text-xl font-semibold mb-4">
-        We have a winner!
+        {t('title')}
       </h3>
       <h4 className="lg:text-2xl sm:text-xl text-base font-medium">
-        <span className="font-bold">{winnerCountry?.name ?? ''}</span> won with{' '}
-        <span className="font-bold">{winnerCountry?.points ?? ''}</span> points!
+        {t.rich('points', {
+          country: winnerCountry?.name ?? '',
+          points: winnerCountry?.points ?? '',
+          span: (chunks) => <span className="font-bold">{chunks}</span>,
+        })}
       </h4>
     </Modal>
   );

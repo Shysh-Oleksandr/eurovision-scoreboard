@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -28,6 +29,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   onClose,
   onLoaded,
 }) => {
+  const t = useTranslations('widgets.profile');
   const { user, logout: storeLogout, isBusy } = useAuthStore();
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
@@ -41,7 +43,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   });
 
   const handleLogout = async () => {
-    if (confirm('Are you sure you want to logout?')) {
+    if (confirm(t('areYouSureYouWantToLogout'))) {
       storeLogout();
     }
   };
@@ -55,28 +57,25 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       overlayClassName="!z-[1001]"
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
-      <h3 className="text-2xl font-bold mb-4">Profile</h3>
+      <h3 className="text-2xl font-bold mb-4">{t('title')}</h3>
       {isAuthenticated ? (
         <div className="text-base mb-4 flex justify-between flex-wrap items-center gap-4">
           <UserInfo user={user} size="lg" />
 
           <Button
-            label="Edit Profile"
+            label={t('editProfile')}
             variant="primary"
             onClick={() => setIsEditProfileModalOpen(true)}
             Icon={<PencilIcon className="w-5 h-5" />}
           />
         </div>
       ) : (
-        <p className="text-base mb-4 text-white/80">
-          Authenticate to be able to create a profile, use custom countries, and
-          more.
-        </p>
+        <p className="text-base mb-4 text-white/80">{t('authDescription')}</p>
       )}
 
       {isAuthenticated ? (
         <Button
-          label={isBusy ? 'Logging out...' : 'Logout'}
+          label={isBusy ? t('loggingOut') : t('logout')}
           variant="destructive"
           onClick={handleLogout}
           disabled={isBusy}

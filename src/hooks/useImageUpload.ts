@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 export interface ImageUploadConfig {
@@ -22,12 +23,12 @@ const ALLOWED_TYPES = [
 ];
 
 export function useImageUpload(config: ImageUploadConfig): ImageUploadResult {
+  const t = useTranslations('error.imageUpload');
   const [file, setFile] = useState<File | null>(null);
   const [base64, setBase64] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
   const validateAndSetFile = async (fileToValidate: File | null) => {
-    console.log('fileToValidate', fileToValidate);
     if (!fileToValidate) {
       setFile(null);
       setBase64(null);
@@ -41,19 +42,18 @@ export function useImageUpload(config: ImageUploadConfig): ImageUploadResult {
       setIsValidating(false);
       return {
         isValid: false,
-        error: 'Unsupported image type. Allowed: PNG, JPEG, WEBP, SVG',
+        error: t('errorUnsupportedImageType'),
       };
     }
 
     // Validate file size
     const maxSizeInBytes = config.maxSizeInMB * 1024 * 1024;
-    console.log('fileToValidate.size', fileToValidate.size);
-    console.log('maxSizeInBytes', maxSizeInBytes);
+
     if (fileToValidate.size > maxSizeInBytes) {
       setIsValidating(false);
       return {
         isValid: false,
-        error: `Image is too large. Max size is ${config.maxSizeInMB}MB. Please compress it or upload a smaller image.`,
+        error: t('errorImageTooLarge', { maxSize: config.maxSizeInMB }),
       };
     }
 
@@ -72,7 +72,7 @@ export function useImageUpload(config: ImageUploadConfig): ImageUploadResult {
       return { isValid: true, error: null };
     } catch (err) {
       setIsValidating(false);
-      return { isValid: false, error: 'Failed to process image' };
+      return { isValid: false, error: t('error') };
     }
   };
 

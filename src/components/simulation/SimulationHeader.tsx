@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -26,6 +27,7 @@ interface SimulationHeaderProps {
 }
 
 export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
+  const t = useTranslations('simulation.header');
   const showHostingCountryLogo = useGeneralStore(
     (state) => state.settings.showHostingCountryLogo,
   );
@@ -75,7 +77,7 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
           {showHostingCountryLogo && (
             <Image
               src={logo}
-              alt="Hosting country logo"
+              alt={t('hostingCountryLogo')}
               className={`flex-none rounded-sm ${
                 isExisting
                   ? 'w-10 h-10 overflow-visible'
@@ -99,13 +101,13 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
         <div className="flex gap-2 xs:w-auto w-full">
           <Button
             onClick={() => {
-              if (confirm('Are you sure you want to cancel the simulation?')) {
+              if (confirm(t('cancelSimulationConfirmation'))) {
                 leaveEvent();
               }
             }}
             className={buttonClassName}
-            aria-label="Cancel simulation"
-            title="Cancel simulation"
+            aria-label={t('cancelSimulation')}
+            title={t('cancelSimulation')}
             variant="destructive"
           >
             <LogoutIcon className="w-6 h-6" />
@@ -113,8 +115,8 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
           <Button
             onClick={() => undo()}
             className={buttonClassName}
-            aria-label="Undo"
-            title="Undo"
+            aria-label={t('undo')}
+            title={t('undo')}
             disabled={!canUndo}
             variant="tertiary"
           >
@@ -123,7 +125,7 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
           <Button
             onClick={() => {
               if (shouldShowResetWarning) {
-                if (confirm('Are you sure you want to restart?')) {
+                if (confirm(t('restartConfirmation'))) {
                   triggerRestartEvent();
                 }
               } else {
@@ -131,8 +133,8 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
               }
             }}
             className={buttonClassName}
-            aria-label="Restart"
-            title="Restart"
+            aria-label={t('restart')}
+            title={t('restart')}
             variant="tertiary"
           >
             <RestartIcon className="w-6 h-6" />
@@ -142,14 +144,14 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
             variant="tertiary"
             onClick={() => setShowShareResultsModal(true)}
             Icon={<ShareIcon className="w-6 h-6" />}
-            aria-label="Share"
-            title="Share"
+            aria-label={t('share')}
+            title={t('share')}
           />
           <Button
             onClick={() => setEventSetupModalOpen(true)}
             Icon={<SlidersIcon className="w-[24px] h-[24px]" />}
-            aria-label="Setup"
-            title="Setup"
+            aria-label={t('setup')}
+            title={t('setup')}
             className={`${buttonClassName} xs:!px-6 xs:!py-2`}
           />
         </div>

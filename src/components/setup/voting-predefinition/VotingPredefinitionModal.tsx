@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { useVotingPredefinition } from './useVotingPredefinition';
@@ -48,6 +49,8 @@ const VotingPredefinitionModal = ({
     getCellValue,
     validateAllBeforeSave,
   } = useVotingPredefinition({ stage });
+
+  const t = useTranslations('common');
 
   const shouldShowHeartFlagIcon =
     (window as any)?.store?.general?.settings?.shouldShowHeartFlagIcon ?? false;
@@ -117,10 +120,10 @@ const VotingPredefinitionModal = ({
             className="md:text-base text-sm"
             onClick={onClose}
           >
-            Close
+            {t('close')}
           </Button>
           <Button className="w-full !text-base" onClick={handleSave}>
-            Save
+            {t('save')}
           </Button>
         </div>
       }

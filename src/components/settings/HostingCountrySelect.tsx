@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 
 import { Checkbox } from '../common/Checkbox';
@@ -8,6 +9,7 @@ import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 export const HostingCountrySelect: React.FC = () => {
+  const t = useTranslations('settings.contest');
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const settings = useGeneralStore((state) => state.settings);
   const setSettings = useGeneralStore((state) => state.setSettings);
@@ -31,7 +33,7 @@ export const HostingCountrySelect: React.FC = () => {
         id="show-contest-logo"
         labelClassName="w-full"
         className="min-h-[44px] flex items-center"
-        label="Show hosting country flag"
+        label={t('showHostingCountryFlag')}
         checked={settings.showHostingCountryLogo}
         onChange={(e) =>
           setSettings({ showHostingCountryLogo: e.target.checked })

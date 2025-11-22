@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -13,6 +14,7 @@ const ProfileModal = dynamic(() => import('./ProfileModal'), {
 });
 
 const ProfileWidget = () => {
+  const t = useTranslations('widgets.profile');
   const user = useAuthStore((state) => state.user);
 
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -24,8 +26,8 @@ const ProfileWidget = () => {
         onClick={() => {
           setIsProfileModalOpen(true);
         }}
-        title="Profile"
-        description="Manage your profile and settings"
+        title={t('title')}
+        description={t('description')}
         icon={
           user ? (
             <UserCheckIcon className="w-6 h-6 flex-none" />

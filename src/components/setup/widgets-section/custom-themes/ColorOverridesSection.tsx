@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import ColorOverridePicker, {
@@ -17,6 +18,8 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
   overrides,
   onChange,
 }) => {
+  const t = useTranslations('widgets.themes.colorOverrides');
+
   const setOverride = (key: string, value: string | undefined) => {
     const next = { ...overrides };
 
@@ -39,18 +42,18 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
   };
 
   const juryColors = [
-    { key: 'juryBg', label: 'Jury Background', enableGradient: true },
-    { key: 'juryCountryText', label: 'Jury Text' },
+    { key: 'juryBg', label: t('juryBg'), enableGradient: true },
+    { key: 'juryCountryText', label: t('juryText') },
     {
       key: 'juryPointsBg',
-      label: 'Jury Points Background',
+      label: t('juryPointsBg'),
     },
-    { key: 'juryPointsText', label: 'Jury Points Text' },
+    { key: 'juryPointsText', label: t('juryPointsText') },
     {
       key: 'juryLastPointsBg',
-      label: 'Jury Last Points Background',
+      label: t('juryLastPointsBg'),
     },
-    { key: 'juryLastPointsText', label: 'Jury Last Points Text' },
+    { key: 'juryLastPointsText', label: t('juryLastPointsText') },
   ];
 
   const isGradientJuryBg =
@@ -60,147 +63,147 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
   if (!isGradientJuryBg) {
     juryColors.push({
       key: 'juryHoverBg',
-      label: 'Jury Hover Background',
+      label: t('juryHoverBg'),
     });
   }
 
   const douzePointsColors = [
     {
       key: 'douzePointsBg',
-      label: 'Douze Points Background',
+      label: t('douzePointsBg'),
       enableGradient: true,
     },
-    { key: 'douzePointsText', label: 'Douze Points Text' },
-    { key: 'douzePointsBlock1', label: 'Douze Points Block 1' },
-    { key: 'douzePointsBlock2', label: 'Douze Points Block 2' },
+    { key: 'douzePointsText', label: t('douzePointsText') },
+    { key: 'douzePointsBlock1', label: t('douzePointsBlock1') },
+    { key: 'douzePointsBlock2', label: t('douzePointsBlock2') },
   ];
 
   const televoteColors = [
     {
       key: 'televoteUnfinishedBg',
-      label: 'Televote Background',
+      label: t('televoteUnfinishedBg'),
       enableGradient: true,
     },
-    { key: 'televoteUnfinishedText', label: 'Televote Text' },
+    { key: 'televoteUnfinishedText', label: t('televoteUnfinishedText') },
     {
       key: 'televoteUnfinishedPointsBg',
-      label: 'Televote Points Background',
+      label: t('televoteUnfinishedPointsBg'),
     },
     {
       key: 'televoteUnfinishedPointsText',
-      label: 'Televote Points Text',
+      label: t('televoteUnfinishedPointsText'),
     },
     {
       key: 'televoteLastPointsBg',
-      label: 'Televote Last Points Background',
+      label: t('televoteLastPointsBg'),
     },
     {
       key: 'televoteLastPointsText',
-      label: 'Televote Last Points Text',
+      label: t('televoteLastPointsText'),
     },
   ];
 
   const televoteActiveColors = [
     {
       key: 'televoteActiveBg',
-      label: 'Televote Active Background',
+      label: t('televoteActiveBg'),
       enableGradient: true,
     },
-    { key: 'televoteActiveText', label: 'Televote Active Text' },
+    { key: 'televoteActiveText', label: t('televoteActiveText') },
     {
       key: 'televoteActivePointsBg',
-      label: 'Televote Active Points Background',
+      label: t('televoteActivePointsBg'),
     },
     {
       key: 'televoteActivePointsText',
-      label: 'Televote Active Points Text',
+      label: t('televoteActivePointsText'),
     },
     {
       key: 'televoteActiveLastPointsBg',
-      label: 'Televote Active Last Points Background',
+      label: t('televoteActiveLastPointsBg'),
     },
     {
       key: 'televoteActiveLastPointsText',
-      label: 'Televote Active Last Points Text',
+      label: t('televoteActiveLastPointsText'),
     },
     {
       key: 'televoteOutline',
-      label: 'Televote Active Outline',
+      label: t('televoteOutline'),
     },
   ];
 
   const finishedColors = [
     {
       key: 'televoteFinishedBg',
-      label: 'Finished Background',
+      label: t('televoteFinishedBg'),
       enableGradient: true,
     },
-    { key: 'televoteFinishedText', label: 'Finished Text' },
+    { key: 'televoteFinishedText', label: t('televoteFinishedText') },
     {
       key: 'televoteFinishedPointsBg',
-      label: 'Finished Points Background',
+      label: t('televoteFinishedPointsBg'),
     },
     {
       key: 'televoteFinishedPointsText',
-      label: 'Finished Points Text',
+      label: t('televoteFinishedPointsText'),
     },
     {
       key: 'televoteFinishedLastPointsBg',
-      label: 'Finished Last Points Background',
+      label: t('televoteFinishedLastPointsBg'),
     },
     {
       key: 'televoteFinishedLastPointsText',
-      label: 'Finished Last Points Text',
+      label: t('televoteFinishedLastPointsText'),
     },
   ];
 
   const unqualifiedColors = [
     {
       key: 'unqualifiedBg',
-      label: 'Unqualified Background',
+      label: t('unqualifiedBg'),
       enableGradient: true,
     },
-    { key: 'unqualifiedText', label: 'Unqualified Text' },
+    { key: 'unqualifiedText', label: t('unqualifiedText') },
     {
       key: 'unqualifiedPointsBg',
-      label: 'Unqualified Points Background',
+      label: t('unqualifiedPointsBg'),
     },
     {
       key: 'unqualifiedPointsText',
-      label: 'Unqualified Points Text',
+      label: t('unqualifiedPointsText'),
     },
     {
       key: 'unqualifiedLastPointsBg',
-      label: 'Unqualified Last Points Background',
+      label: t('unqualifiedLastPointsBg'),
     },
     {
       key: 'unqualifiedLastPointsText',
-      label: 'Unqualified Last Points Text',
+      label: t('unqualifiedLastPointsText'),
     },
   ];
 
   const rankColors = [
     {
       key: 'placeContainerBg',
-      label: 'Rank Container Background',
+      label: t('placeContainerBg'),
       // enableGradient: true,
     },
-    { key: 'placeText', label: 'Rank Text' },
+    { key: 'placeText', label: t('placeText') },
   ];
 
   const panelInfoColors = [
     {
       key: 'activeBg',
-      label: 'Active Background',
+      label: t('activeBg'),
       // enableGradient: true
     },
-    { key: 'activeText', label: 'Active Text' },
+    { key: 'activeText', label: t('activeText') },
     {
       key: 'inactiveBg',
-      label: 'Inactive Background',
+      label: t('inactiveBg'),
       // enableGradient: true
     },
-    { key: 'inactiveText', label: 'Inactive Text' },
+    { key: 'inactiveText', label: t('inactiveText') },
   ];
 
   // Collect all color fields for copy functionality
@@ -270,36 +273,36 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      {renderColorGroup(juryColors, 'Jury Colors')}
+      {renderColorGroup(juryColors, t('juryColors'))}
 
       <div className="border-t border-white/20 border-solid"></div>
 
-      {renderColorGroup(douzePointsColors, 'Douze Points Animation Colors')}
+      {renderColorGroup(douzePointsColors, t('douzePointsAnimationColors'))}
 
       <div className="border-t border-white/20 border-solid"></div>
 
-      {renderColorGroup(televoteColors, 'Televote Colors')}
+      {renderColorGroup(televoteColors, t('televoteColors'))}
 
       <div className="border-t border-white/20 border-solid"></div>
 
-      {renderColorGroup(televoteActiveColors, 'Televote Active Colors')}
+      {renderColorGroup(televoteActiveColors, t('televoteActiveColors'))}
 
       <div className="border-t border-white/20 border-solid"></div>
 
-      {renderColorGroup(finishedColors, 'Finished Colors')}
+      {renderColorGroup(finishedColors, t('finishedColors'))}
 
       <div className="border-t border-white/20 border-solid"></div>
 
-      {renderColorGroup(unqualifiedColors, 'Unqualified Colors')}
+      {renderColorGroup(unqualifiedColors, t('unqualifiedColors'))}
 
       <div className="border-t border-white/20 border-solid"></div>
 
-      {renderColorGroup(rankColors, 'Rank Colors')}
+      {renderColorGroup(rankColors, t('rankColors'))}
       <div className="border-t border-white/20 border-solid"></div>
 
       {renderColorGroup(
         panelInfoColors,
-        'Jury Points Panel Colors',
+        t('juryPointsPanelColors'),
         'panelInfo',
       )}
     </div>

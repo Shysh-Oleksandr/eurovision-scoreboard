@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import { CollapsibleSection } from '../common/CollapsibleSection';
@@ -37,6 +38,7 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
   extraContent,
   isCollapsible = true,
 }) => {
+  const t = useTranslations('setup.eventSetupModal');
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
 
   const isControlled = controlledIsExpanded !== undefined;
@@ -46,11 +48,8 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
     if (getLabel) {
       return getLabel(itemsCount);
     }
-    if (itemsCount === 1) {
-      return 'country';
-    }
 
-    return 'countries';
+    return t('countriesAmount', { count: itemsCount });
   };
 
   const handleToggle = () => {

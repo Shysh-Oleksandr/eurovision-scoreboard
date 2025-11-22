@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React from 'react';
 
 import { PlusIcon } from '../../assets/icons/PlusIcon';
@@ -9,6 +10,7 @@ import { Input } from '../Input';
 import { CountrySelectionList } from './CountrySelectionList';
 import { AvailableGroup } from './CountrySelectionListItem';
 import { useCountrySearch } from './hooks/useCountrySearch';
+import { useGetCategoryLabel } from './hooks/useGetCategoryLabel';
 import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
 
@@ -36,6 +38,7 @@ const NotParticipatingSection = ({
   handleOpenCreateModal,
   availableGroups,
 }: NotParticipatingSectionProps) => {
+  const t = useTranslations('setup');
   const { user } = useAuthStore();
   const {
     countriesSearch,
@@ -47,13 +50,17 @@ const NotParticipatingSection = ({
     sortedCategories,
   } = useCountrySearch(notParticipatingCountries);
 
+  const getCategoryLabel = useGetCategoryLabel();
+
   const getExtraContent = (category: string) => {
     if (category === 'Custom') {
       if (!user) {
         return (
           <div className="flex flex-col items-start col-span-full gap-2">
             <p className="text-white/80 text-sm">
-              You need to be logged in to create and use custom entries.
+              {t(
+                'eventSetupModal.youNeedToBeLoggedInToCreateAndUseCustomEntries',
+              )}
             </p>
             <GoogleAuthButton />
           </div>
@@ -79,14 +86,14 @@ const NotParticipatingSection = ({
     <>
       <div className="flex items-center justify-between gap-2">
         <p className="text-white text-base md:text-lg font-semibold">
-          Not Participating
+          {t('eventSetupModal.notParticipating')}
         </p>
         <div className="relative">
           <Input
             className="sm:w-[200px] lg:text-[0.95rem] text-sm"
             name="countriesSearch"
             id="countriesSearch"
-            placeholder="Search countries..."
+            placeholder={t('eventSetupModal.searchCountries')}
             value={countriesSearch}
             onChange={handleCountriesSearch}
           />
@@ -100,7 +107,7 @@ const NotParticipatingSection = ({
         {sortedCategories.map((category) => (
           <SectionWrapper
             key={category}
-            title={category}
+            title={getCategoryLabel(category)}
             countriesCount={groupedNotParticipatingCountries[category].length}
             isExpanded={!!expandedCategories[category]}
             onToggle={() => handleToggleCategory(category)}
@@ -114,7 +121,8 @@ const NotParticipatingSection = ({
             currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
             getLabel={
               category === 'Custom'
-                ? (itemsCount) => (itemsCount === 1 ? 'entry' : 'entries')
+                ? (itemsCount) =>
+                    t('eventSetupModal.entriesAmount', { count: itemsCount })
                 : undefined
             }
           >

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
-import { getSequenceNumber } from '../../helpers/getSequenceNumber';
 import { useCountriesStore } from '../../state/countriesStore';
 
 import { useGeneralStore } from '@/state/generalStore';
@@ -8,6 +8,8 @@ import { useGeneralStore } from '@/state/generalStore';
 type Props = { votingCountryIndex: number };
 
 const CountryInfo = ({ votingCountryIndex }: Props) => {
+  const t = useTranslations('simulation');
+
   const [shouldBlink, setShouldBlink] = useState(false);
   const shouldShowJuryVotingProgress = useGeneralStore(
     (state) => state.settings.shouldShowJuryVotingProgress,
@@ -42,11 +44,11 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
         {votingCountry?.name || ''}
       </h4>
       <h5 className="uppercase text-white/50 lg:text-sm text-xs lg:mt-1 mt-2">
-        <span className="font-medium">
-          {getSequenceNumber(votingCountryIndex + 1)}
-        </span>{' '}
-        of <span className="font-medium">{votingCountriesLength}</span>{' '}
-        countries
+        {t.rich('ordinalOfCountries', {
+          index: votingCountryIndex + 1,
+          length: votingCountriesLength,
+          span: (chunks) => <span className="font-medium">{chunks}</span>,
+        })}
       </h5>
 
       {shouldShowJuryVotingProgress && (

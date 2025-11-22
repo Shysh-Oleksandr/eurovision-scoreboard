@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -36,12 +37,6 @@ enum FinalStatsTab {
   SUMMARY = 'Summary',
 }
 
-const tabs = [
-  { value: FinalStatsTab.BREAKDOWN, label: 'Breakdown' },
-  { value: FinalStatsTab.SPLIT, label: 'Split' },
-  { value: FinalStatsTab.SUMMARY, label: 'Summary' },
-];
-
 // Map FinalStatsTab to StatsTableType
 const getStatsTableType = (tab: FinalStatsTab): StatsTableType => {
   switch (tab) {
@@ -67,10 +62,21 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   onClose,
   onLoaded,
 }) => {
+  const t = useTranslations('simulation.finalStats');
+
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const [activeTab, setActiveTab] = useState(FinalStatsTab.BREAKDOWN);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isShareModalLoaded, setIsShareModalLoaded] = useState(false);
+
+  const tabs = useMemo(
+    () => [
+      { value: FinalStatsTab.BREAKDOWN, label: t('breakdown') },
+      { value: FinalStatsTab.SPLIT, label: t('split') },
+      { value: FinalStatsTab.SUMMARY, label: t('summary') },
+    ],
+    [t],
+  );
 
   const {
     finishedStages,
@@ -135,6 +141,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       },
     ],
     [
+      tabs,
       rankedCountries,
       getCellPoints,
       getCellClassName,
@@ -195,7 +202,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
         />
       ) : (
         <div className="text-center p-8 text-white/60">
-          No finished stages to display stats for.
+          {t('noFinishedStages')}
         </div>
       )}
 

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, {
   useCallback,
   useEffect,
@@ -61,6 +62,8 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   currentFieldKey,
   onBulkChange,
 }) => {
+  const t = useTranslations('widgets.themes');
+
   const [showPicker, setShowPicker] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
   const [showCopyPopup, setShowCopyPopup] = useState(false);
@@ -417,11 +420,11 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
               data-theme="custom-preview"
             >
               <h3 className="text-white text-sm font-semibold mb-3">
-                Copy to Fields
+                {t('copyToFields')}
               </h3>
 
               <Input
-                placeholder="Search fields..."
+                placeholder={t('searchFields')}
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 className="mb-3 !py-2 !h-auto"
@@ -430,9 +433,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
               <div className="flex-1 overflow-y-auto mb-3 space-y-2">
                 {filteredFields.length === 0 ? (
                   <div className="text-white/50 text-sm text-center py-4">
-                    {searchText.trim()
-                      ? 'No fields found'
-                      : 'No available fields'}
+                    {t('noFieldsFound')}
                   </div>
                 ) : (
                   filteredFields.map((field) => {
@@ -459,8 +460,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
                 disabled={selectedFields.size === 0}
                 className="w-full"
               >
-                Copy to {selectedFields.size} field
-                {selectedFields.size !== 1 ? 's' : ''}
+                {t('copyToNFields', { count: selectedFields.size })}
               </Button>
             </div>
           </>,

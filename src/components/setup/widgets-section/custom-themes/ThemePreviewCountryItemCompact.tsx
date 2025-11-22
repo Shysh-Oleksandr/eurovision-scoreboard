@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useMemo, useRef, useState } from 'react';
 
 import Badge from '@/components/common/Badge';
@@ -75,6 +76,7 @@ const ThemePreviewCountryItemCompact: React.FC<
   previewCountryCode,
   onClick,
 }) => {
+  const t = useTranslations('widgets.themes.previewCountryItemStates');
   const { user } = useAuthStore();
 
   const previewCountry = useMemo(() => {
@@ -251,7 +253,7 @@ const ThemePreviewCountryItemCompact: React.FC<
         {previewBadges.map((badge) => (
           <Badge
             key={badge.label}
-            label={badge.label}
+            label={t(badge.key)}
             onClick={() => setState(badge.key as ItemState)}
             isActive={state === (badge.key as ItemState)}
           />

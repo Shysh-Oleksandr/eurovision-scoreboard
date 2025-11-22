@@ -1,4 +1,5 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 
 import dynamic from 'next/dynamic';
@@ -21,11 +22,6 @@ enum SettingsTab {
   PUBLIC_THEMES = 'Public Themes',
 }
 
-const tabs = [
-  { value: SettingsTab.YOUR_THEMES, label: 'Your Themes' },
-  { value: SettingsTab.PUBLIC_THEMES, label: 'Public Themes' },
-];
-
 interface ThemesModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -37,11 +33,20 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
   onClose,
   onLoaded,
 }) => {
+  const t = useTranslations('widgets.themes');
   const [activeTab, setActiveTab] = useState(SettingsTab.YOUR_THEMES);
   const [isPublicThemesLoaded, setIsPublicThemesLoaded] = useState(false);
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
   const [initialTheme, setInitialTheme] = useState<CustomTheme | undefined>();
   const [isEditMode, setIsEditMode] = useState(false);
+
+  const tabs = useMemo(
+    () => [
+      { value: SettingsTab.YOUR_THEMES, label: t('yourThemes') },
+      { value: SettingsTab.PUBLIC_THEMES, label: t('publicThemes') },
+    ],
+    [t],
+  );
 
   const handleCreateNew = () => {
     setInitialTheme(undefined);
@@ -95,7 +100,7 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
         ),
       },
     ],
-    [activeTab, isPublicThemesLoaded],
+    [activeTab, isPublicThemesLoaded, tabs],
   );
 
   useEffectOnce(onLoaded);

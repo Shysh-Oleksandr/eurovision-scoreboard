@@ -1,8 +1,10 @@
+import { useLocale } from 'next-intl';
 import React from 'react';
 
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import { UploadIcon } from '@/assets/icons/UploadIcon';
 import Button from '@/components/common/Button';
+import { formatDate } from '@/components/feedbackInfo/types';
 import { Preset } from '@/helpers/indexedDB';
 import { EventMode, EventStage } from '@/models';
 
@@ -49,18 +51,12 @@ const getParticipantsCount = (eventAssignments: Record<string, string>) => {
   return filteredAssignments.length;
 };
 
-const formatDate = (ts: number) =>
-  new Date(ts).toLocaleString('en-GB', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-
 export const PresetsTable: React.FC<PresetsTableProps> = ({
   presets,
   onLoad,
   onEdit,
 }) => {
+  const locale = useLocale();
   const rows: PresetRow[] = presets.map((p) => {
     const activeMode =
       p.countries?.activeMode || EventMode.SEMI_FINALS_AND_GRAND_FINAL;
@@ -124,7 +120,10 @@ export const PresetsTable: React.FC<PresetsTableProps> = ({
                   }`}
                 >
                   {c.key === 'createdAt'
-                    ? formatDate(r[c.key as keyof PresetRow] as number)
+                    ? formatDate(
+                        new Date(r[c.key as keyof PresetRow]).toISOString(),
+                        locale,
+                      )
                     : r[c.key as keyof PresetRow]}
                 </td>
               ))}
