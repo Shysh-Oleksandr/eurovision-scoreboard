@@ -37,7 +37,7 @@
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
-    "description": "Experience the excitement of Eurovision with DouzePoints, the interactive scoreboard simulator. Vote for countries, watch points accumulate, and relive the magic of Eurovision Song Contest from 2004-2025."
+    "description": "Experience the excitement of Eurovision with DouzePoints, the interactive scoreboard simulator. Vote for countries, watch points accumulate, and relive the magic of Eurovision Song Contest"
   },
   "error": {
     "title": "Oops! Something Went Wrong",
@@ -109,9 +109,6 @@
       "pleaseSignInToDeleteCustomEntries": "Please sign in to delete custom entries.",
       "areYouSureYouWantToDelete": "Are you sure you want to delete {name}?",
       "entryDeletedSuccessfully": "Entry deleted successfully!",
-      "pasteImageUrl": "Paste an image URL",
-      "dragAndDropOrClickToUpload": "Drag & drop or click to upload",
-      "orSelectExisting": "Or select existing",
       "standardCountries": "Standard Countries",
       "customEntries": "Custom Entries",
       "recentCustomEntries": "Recent Custom Entries",
@@ -373,7 +370,8 @@
     "bugReportDetailsItem3": "browser (Chrome, Safari, etc.)",
     "bugReportDetailsItem4": "and any helpful details like screenshots or videos",
     "thankYou": "Thank you!",
-    "datesAreApproximate": "The dates are approximate and may change"
+    "datesAreApproximate": "The dates are approximate and may change",
+    "translationIssueDescription": "If you noticed some translation issues, please let me know by sending an email to"
   },
   "share": {
     "generating": "Generating...",

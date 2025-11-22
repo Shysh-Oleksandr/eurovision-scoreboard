@@ -1,7 +1,13 @@
 export const WHATS_NEW = [
   {
+    date: '2025-11-22',
+    title:
+      'Added localization for 8 languages',
+  },
+  {
     date: '2025-11-15',
-    title: 'Fixed some crashes. Added the ability to reuse existing flags when adding custom entries',
+    title:
+      'Fixed some crashes. Added the ability to reuse existing flags when adding custom entries',
   },
   {
     date: '2025-11-14',
@@ -214,8 +220,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-11-15', end: '2025-11-16' },
-    title: 'Custom theme improvements',
+    approximateDates: { start: '2025-11-29', end: '2025-11-30' },
+    title: 'Various small improvements & bug fixes',
   },
   {
     title: 'Saving scoreboards in your profile',
@@ -228,8 +234,5 @@ export const UPCOMING_FEATURES = [
   },
   {
     title: 'Pre-1975 points system support',
-  },
-  {
-    title: 'Localization for different languages',
-  },
+  }
 ];

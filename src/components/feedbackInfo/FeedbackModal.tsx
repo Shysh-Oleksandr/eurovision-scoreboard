@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
@@ -20,6 +20,7 @@ const FeedbackModal = ({
   setShowModal: (show: boolean) => void;
   onLoaded: () => void;
 }) => {
+  const locale = useLocale();
   const t = useTranslations('feedbackInfo');
   const [activeTab, setActiveTab] = useState('feedback');
   const setLastSeenUpdate = useGeneralStore((state) => state.setLastSeenUpdate);
@@ -56,6 +57,19 @@ const FeedbackModal = ({
   };
 
   const tabs = getTabs(shouldShowNewChangesIndicator);
+
+  const translationIssueTemplate = `
+    Language: ${locale}
+
+    Wrong translation:
+    - 
+
+    Correct translation:
+    - 
+
+    Reason:
+    - 
+  `;
 
   return (
     <Modal
@@ -129,6 +143,15 @@ const FeedbackModal = ({
                 <li>{t('bugReportDetailsItem4')}</li>
               </ul>
             </div>
+            <p className="mb-2 font-semibold">
+              {t('translationIssueDescription')}{' '}
+              <a
+                href={`mailto:sasha.shysh23@gmail.com?subject=Translation Issue&body=${translationIssueTemplate}`}
+                className="text-primary-300 hover:text-primary-400 underline font-semibold"
+              >
+                sasha.shysh23@gmail.com
+              </a>
+            </p>
             <p>{t('thankYou')}</p>
           </div>
         )}

@@ -13,12 +13,12 @@ import { useGeneralStore } from '@/state/generalStore';
 
 const LABELS = [
   {
-    label: 'Jury',
+    label: 'jury',
     color: 'bg-primary-700/80',
   },
 
   {
-    label: 'Televote',
+    label: 'televote',
     color: 'bg-primary-800',
   },
 ];
@@ -190,7 +190,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
           {LABELS.map((label) => (
             <div className="flex items-center gap-2" key={label.label}>
               <div className={`w-3 h-3 rounded-full ${label.color}`}></div>
-              <span>{label.label}</span>
+              <span>{t(`simulation.finalStats.${label.label}`)}</span>
             </div>
           ))}
         </div>

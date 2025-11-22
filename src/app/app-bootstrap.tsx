@@ -1,7 +1,7 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 
 import { useRouter } from 'next/navigation';
@@ -18,13 +18,12 @@ export default function AppBootstrap() {
   useActiveThemeSync();
 
   const t = useTranslations('widgets.profile');
-
   const { handlePostLogin, user } = useAuthStore();
   const setInitialCountriesForYear = useCountriesStore(
     (state) => state.setInitialCountriesForYear,
   );
-  const locale = useLocale();
   const router = useRouter();
+  const hasSyncedPreferredLocaleRef = useRef(false);
 
   // Initialize countries once on first load
   useEffect(() => {
@@ -70,7 +69,24 @@ export default function AppBootstrap() {
   useEffect(() => {
     const preferred = user?.preferredLocale;
 
-    if (!preferred || preferred === locale) return;
+    // Only sync once per session and only when there's no explicit locale
+    // cookie yet. This avoids fighting with user changes via LanguageSelector.
+    if (hasSyncedPreferredLocaleRef.current || !preferred) {
+      return;
+    }
+
+    if (typeof document === 'undefined') return;
+
+    const hasLocaleCookie = document.cookie
+      .split(';')
+      .map((c) => c.trim())
+      .some((c) => c.startsWith('locale='));
+
+    if (hasLocaleCookie) {
+      hasSyncedPreferredLocaleRef.current = true;
+
+      return;
+    }
 
     (async () => {
       try {
@@ -81,12 +97,13 @@ export default function AppBootstrap() {
           },
           body: JSON.stringify({ locale: preferred }),
         });
+        hasSyncedPreferredLocaleRef.current = true;
         router.refresh();
       } catch (error) {
         console.error('Failed to sync preferred locale', error);
       }
     })();
-  }, [user?.preferredLocale, locale, router]);
+  }, [user?.preferredLocale, router]);
 
   return null;
 }

@@ -37,7 +37,7 @@
   },
   "Metadata": {
     "title": "DouzePoints - Симулятор Євробачення",
-    "description": "Відчуйте атмосферу Євробачення з DouzePoints — інтерактивним симулятором голосування. Голосуйте за країни, спостерігайте за нарахуванням балів і занурюйтесь у магію конкурсу 2004–2025 років."
+    "description": "Відчуйте атмосферу Євробачення з DouzePoints — інтерактивним симулятором голосування. Голосуйте за країни, спостерігайте за нарахуванням балів і занурюйтесь у магію конкурсу Євробачення."
   },
   "error": {
     "title": "Ой! Щось пішло не так",
@@ -94,29 +94,26 @@
       "grandFinalOnly": "Лише Гранд-фінал",
       "notQualified": "Не кваліфікувалися",
       "notParticipating": "Не беруть участі",
-      "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Щоб створювати та використовувати власні записи, треба увійти в акаунт.",
+      "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Щоб створювати та використовувати власних учасників, треба увійти в акаунт.",
       "searchCountries": "Пошук країн...",
       "countriesAmount": "{count, plural, =1 {країна} other {країни}}",
-      "entriesAmount": "{count, plural, =1 {запис} other {записи}}",
+      "entriesAmount": "{count, plural, =1 {учасник} few {учасники} other {учасників}}",
       "autoQualifiers": "Автоматичні фіналісти",
       "contestIsInProgress": "Симуляція в процесі. Зміна року скине теперішню таблицю і почне нову симуляцію. Ви впевнені?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Введіть бали, які кожна країна-учасниця голосування надає учасникам"
     },
     "customCountryModal": {
-      "pleaseSignInToCreateCustomEntries": "Увійдіть у акаунт, щоб створювати власні записи.",
-      "entryNameIsRequired": "Ім’я запису є обов’язковим.",
-      "customEntrySavedSuccessfully": "Запис успішно збережено!",
-      "pleaseSignInToDeleteCustomEntries": "Увійдіть у акаунт, щоб видаляти власні записи.",
+      "pleaseSignInToCreateCustomEntries": "Увійдіть у акаунт, щоб створювати власних учасників.",
+      "entryNameIsRequired": "Ім’я учасника є обов’язковим.",
+      "customEntrySavedSuccessfully": "Учасник успішно збережений!",
+      "pleaseSignInToDeleteCustomEntries": "Увійдіть у акаунт, щоб видаляти власних учасників.",
       "areYouSureYouWantToDelete": "Ви впевнені, що хочете видалити {name}?",
-      "entryDeletedSuccessfully": "Запис успішно видалено!",
-      "pasteImageUrl": "Вставте URL зображення",
-      "dragAndDropOrClickToUpload": "Перетягніть або натисніть, щоб завантажити",
-      "orSelectExisting": "Або виберіть існуюче",
+      "entryDeletedSuccessfully": "Учасник успішно видалений!",
       "standardCountries": "Стандартні країни",
-      "customEntries": "Користувацькі записи",
-      "recentCustomEntries": "Нещодавні користувацькі записи",
+      "customEntries": "Користувацькі учасники",
+      "recentCustomEntries": "Нещодавні користувацькі учасники",
       "presets": "Пресети",
-      "customEntry": "Користувацький запис"
+      "customEntry": "Користувацький учасник"
     },
     "categories": {
       "custom": "Користувацькі",
@@ -170,7 +167,7 @@
     },
     "winnerModal": {
       "title": "Маємо переможця!",
-      "points": "<span>{country}</span> переміг(ла) з <span>{points}</span> {points, plural, =1 {балом} other {балами}}!",
+      "points": "<span>{country}</span> став переможцем з <span>{points}</span> {points, plural, =1 {балом} other {балами}}!",
       "startOver": "Почати заново"
     },
     "header": {
@@ -184,15 +181,15 @@
       "setup": "Налаштування"
     },
     "phaseActions": {
-      "viewStats": "Переглянути статистику",
+      "viewStats": "Статистика",
       "showNQs": "Показати {nonQualifiersLabel}",
       "finalistsOnly": "Тільки фіналісти",
       "selectEventStage": "Вибрати етап",
       "continueTo": "Продовжити до {nextPhase}"
     },
     "finalStats": {
-      "breakdown": "Деталізація",
-      "split": "Поділ",
+      "breakdown": "Детально",
+      "split": "Розподіл",
       "summary": "Підсумок",
       "noFinishedStages": "Немає завершених етапів для відображення статистики.",
       "rank": "Місце",
@@ -291,7 +288,6 @@
       "fountNThemes": "Знайдено {count} {count, plural, =1 {тему} other {тем}}",
       "youHaveNThemes": "У вас {count} {count, plural, =1 {тема} other {тем}}",
       "youSavedNThemes": "Ви зберегли {count} {count, plural, =1 {тему} other {тем}}",
-
       "colorOverrides": {
         "juryColors": "Кольори журі",
         "douzePointsAnimationColors": "Кольори анімації Douze Points",
@@ -352,7 +348,6 @@
         "unqualified": "Некваліфікована"
       }
     },
-
     "sortBadges": {
       "latest": "Нові",
       "oldest": "Старі",
@@ -361,7 +356,6 @@
       "mostCopied": "Найбільш скопійовані"
     }
   },
-
   "feedbackInfo": {
     "feedback": "Зворотний зв’язок",
     "whatsNew": "Що нового",
@@ -376,9 +370,9 @@
     "bugReportDetailsItem3": "браузер (Chrome, Safari тощо)",
     "bugReportDetailsItem4": "і корисні деталі, як-от скріншоти чи відео",
     "thankYou": "Дякую!",
-    "datesAreApproximate": "Дати приблизні та можуть змінюватися"
+    "datesAreApproximate": "Дати приблизні та можуть змінюватися",
+    "translationIssueDescription": "Якщо помітили деякі проблеми з перекладом, будь ласка, повідомте мене, надіславши електронний лист на"
   },
-
   "share": {
     "generating": "Генерація...",
     "generateImage": "Згенерувати зображення",
@@ -408,7 +402,6 @@
     "showVotingCountriesNames": "Показувати назви країн, що голосують",
     "generateOnOpen": "Генерувати автоматично при відкритті"
   },
-
   "settings": {
     "general": {
       "presets": "Пресети",
@@ -420,7 +413,6 @@
       "general": "Загальні",
       "odds": "Шанси"
     },
-
     "odds": {
       "noParticipatingCountriesSelectedYet": "Ще не вибрано жодної країни-учасниці",
       "goBackToSetupAndSelectCountriesForEventToSetTheirOdds": "Поверніться до налаштування та виберіть країни, щоб встановити для них шанси",
@@ -432,7 +424,6 @@
       "predictable": "Передбачувано",
       "chaotic": "Хаотично"
     },
-
     "voting": {
       "pointsSystem": "Система балів",
       "dragAndDropToReorder": "Перетягніть, щоб змінити порядок",
@@ -452,7 +443,6 @@
       "autoStartPresentation": "Автостарт презентації",
       "autoStartPresentationTooltip": "Автоматично запускає презентацію після початку голосування."
     },
-
     "ui": {
       "useCustomBackgroundImage": "Використовувати власне фонове зображення",
       "dragAndDropToUpload": "Перетягніть або натисніть, щоб завантажити",
@@ -469,7 +459,6 @@
       "imageSizeIsPrettyLarge": "Розмір зображення доволі великий ({size}MB). Це може сповільнити симуляцію — можливо, варто стиснути або використати менше зображення. Продовжити?",
       "language": "Мова"
     },
-
     "contest": {
       "enterContestName": "Введіть назву конкурсу...",
       "enterContestYear": "Введіть рік конкурсу...",

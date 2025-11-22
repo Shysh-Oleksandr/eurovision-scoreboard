@@ -1,6 +1,6 @@
 # DouzePoints - Eurovision Scoreboard Simulator
 
-Experience the excitement of Eurovision with DouzePoints, the interactive scoreboard simulator. Vote for countries, watch points accumulate, and relive the magic of Eurovision Song Contest from 2004-2025.
+Experience the excitement of Eurovision with DouzePoints, the interactive scoreboard simulator. Vote for countries, watch points accumulate, and relive the magic of Eurovision Song Contest.
 
 ## Features
 

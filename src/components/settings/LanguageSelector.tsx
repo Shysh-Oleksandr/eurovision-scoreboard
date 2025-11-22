@@ -19,8 +19,13 @@ type LocaleOption = {
 
 const options: LocaleOption[] = [
   { label: 'English', value: 'en', imageUrl: getFlagPath('gb') },
+  { label: 'Français', value: 'fr', imageUrl: getFlagPath('fr') },
   { label: 'Español', value: 'es', imageUrl: getFlagPath('es') },
+  { label: 'Italiano', value: 'it', imageUrl: getFlagPath('it') },
+  { label: 'Deutsch', value: 'de', imageUrl: getFlagPath('de') },
+  { label: 'Ελληνικά', value: 'gr', imageUrl: getFlagPath('gr') },
   { label: 'Українська', value: 'uk', imageUrl: getFlagPath('ua') },
+  { label: 'Polski', value: 'pl', imageUrl: getFlagPath('pl') },
 ];
 
 export const LanguageSelector: React.FC = () => {
@@ -60,7 +65,7 @@ export const LanguageSelector: React.FC = () => {
     <div className="sm:col-span-2 sm:w-1/2">
       <CustomSelect
         options={options}
-        value={user?.preferredLocale ?? locale ?? 'en'}
+        value={(locale as PreferredLocale) || user?.preferredLocale || 'en'}
         onChange={(value) =>
           handleLanguageChange({
             target: { value },

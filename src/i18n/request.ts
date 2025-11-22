@@ -1,7 +1,7 @@
 import {cookies, headers} from 'next/headers';
 import {getRequestConfig} from 'next-intl/server';
 
-const SUPPORTED_LOCALES = ['en', 'es', 'uk'] as const;
+const SUPPORTED_LOCALES = ['en', 'es', 'fr', 'uk', 'de', 'pl', 'it', 'gr'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const DEFAULT_LOCALE: SupportedLocale = 'en';

@@ -101,7 +101,7 @@ export default async function RootLayout({
       className="notranslate"
       translate="no"
     >
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning translate="no" className="notranslate">
         {/* Prevent FOUC by applying stored theme */}
         <Script id="theme-fouc-prevention" strategy="beforeInteractive">{`
           try {
