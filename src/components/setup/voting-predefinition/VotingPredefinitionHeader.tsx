@@ -68,7 +68,7 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
             (
             {pointsSystem.every(
               (p, index) =>
-                PREDEFINED_SYSTEMS_MAP['default'][index].value === p.value,
+                PREDEFINED_SYSTEMS_MAP['default']?.[index]?.value === p?.value,
             )
               ? '1-8, 10, 12'
               : pointsSystem.map((p) => p.value).join(', ')}

@@ -113,7 +113,8 @@
       "customEntries": "Voci personalizzate",
       "recentCustomEntries": "Voci personalizzate recenti",
       "presets": "Preset",
-      "customEntry": "Voce personalizzata"
+      "editCustomEntry": "Modifica Voce Personalizzata",
+      "createCustomEntry": "Crea Voce Personalizzata"
     },
     "categories": {
       "custom": "Personalizzato",
@@ -359,7 +360,7 @@
   "feedbackInfo": {
     "feedback": "Feedback",
     "whatsNew": "Novità",
-    "upcomingFeatures": "Funzionalità in arrivo",
+    "upcomingFeatures": "In arrivo",
     "foundBug": "Hai trovato un bug, un'idea per una funzionalità o vuoi solo lasciare un feedback?",
     "openIssueOnGitHub": "Sentiti libero di aprire un issue su",
     "orEmailMe": "o inviami una email a",

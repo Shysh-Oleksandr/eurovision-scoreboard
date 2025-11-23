@@ -405,8 +405,11 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     >
       <div className="flex flex-col gap-4 p-2">
         <h2 className="text-xl font-bold text-white">
-          {isEditMode ? t('common.edit') : t('common.create')}{' '}
-          {t('setup.customCountryModal.customEntry')}
+          {t(
+            isEditMode
+              ? 'setup.customCountryModal.editCustomEntry'
+              : 'setup.customCountryModal.createCustomEntry',
+          )}
         </h2>
         <div className="flex flex-col gap-1">
           <label htmlFor="countryName" className="text-white">

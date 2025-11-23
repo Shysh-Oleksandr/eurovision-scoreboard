@@ -113,7 +113,8 @@
       "customEntries": "Własne wpisy",
       "recentCustomEntries": "Ostatnie własne wpisy",
       "presets": "Presety",
-      "customEntry": "Własny wpis"
+      "editCustomEntry": "Edytuj własny wpis",
+      "createCustomEntry": "Utwórz własny wpis"
     },
     "categories": {
       "custom": "Niestandardowe",
@@ -359,7 +360,7 @@
   "feedbackInfo": {
     "feedback": "Opinie",
     "whatsNew": "Co nowego",
-    "upcomingFeatures": "Nadchodzące funkcje",
+    "upcomingFeatures": "Nadchodzące",
     "foundBug": "Znalazłeś błąd, masz pomysł na funkcję lub chcesz podzielić się opinią?",
     "openIssueOnGitHub": "Możesz otworzyć zgłoszenie na",
     "orEmailMe": "lub napisać do mnie na e-mail",

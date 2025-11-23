@@ -29,8 +29,8 @@ export const PointsSystemSelection = () => {
       value.length === settingsPointsSystem.length &&
       value.every(
         (v, i) =>
-          v.value === settingsPointsSystem[i].value &&
-          v.showDouzePoints === settingsPointsSystem[i].showDouzePoints,
+          v.value === settingsPointsSystem[i]?.value &&
+          v.showDouzePoints === settingsPointsSystem[i]?.showDouzePoints,
       ),
   )?.[0];
 

@@ -113,7 +113,8 @@
       "customEntries": "Entrées personnalisées",
       "recentCustomEntries": "Entrées personnalisées récentes",
       "presets": "Préréglages",
-      "customEntry": "Entrée personnalisée"
+      "editCustomEntry": "Modifier l’entrée personnalisée",
+      "createCustomEntry": "Créer une entrée personnalisée"
     },
     "categories": {
       "custom": "Personnalisé",
@@ -359,7 +360,7 @@
   "feedbackInfo": {
     "feedback": "Retour",
     "whatsNew": "Nouveautés",
-    "upcomingFeatures": "Fonctionnalités à venir",
+    "upcomingFeatures": "À venir",
     "foundBug": "Vous avez trouvé un bug, une idée de fonctionnalité, ou vous voulez simplement partager votre avis ?",
     "openIssueOnGitHub": "N’hésitez pas à ouvrir un ticket sur",
     "orEmailMe": "ou envoyez-moi un email à",

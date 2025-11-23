@@ -221,8 +221,8 @@ const TelevoteInput = () => {
       const nextCountry = getNextLowestTelevoteCountry();
 
       if (nextCountry && nextCountry.country) {
-        setCurrentRevealTelevotePoints(nextCountry.points);
-        setEnteredPoints(nextCountry.points.toString());
+        setCurrentRevealTelevotePoints(nextCountry.points ?? 0);
+        setEnteredPoints((nextCountry.points ?? 0).toString());
       }
     }
   }, [

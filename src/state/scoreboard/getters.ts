@@ -22,7 +22,10 @@ export const createGetters: StateCreator<
     const { votingPointsIndex } = get();
     const { pointsSystem } = useGeneralStore.getState();
 
-    return pointsSystem[votingPointsIndex].value;
+    if (votingPointsIndex > pointsSystem.length - 1)
+      return pointsSystem[pointsSystem.length - 1]?.value ?? 0;
+
+    return pointsSystem[votingPointsIndex]?.value ?? 0;
   },
 
   getCurrentStage: () => {
@@ -38,7 +41,7 @@ export const createGetters: StateCreator<
     );
 
     const nextStage =
-      currentStageIndex !== -1 ? eventStages[currentStageIndex + 1] : null;
+      currentStageIndex !== -1 ? eventStages?.[currentStageIndex + 1] : null;
 
     return nextStage;
   },
@@ -89,9 +92,12 @@ export const createGetters: StateCreator<
 
     const country =
       currentStage.countries.find(
-        (country) => country.code === nextLowestTelevoteCountry[0],
+        (country) => country.code === nextLowestTelevoteCountry?.[0],
       ) ?? null;
 
-    return { country, points: nextLowestTelevoteCountry[1].televotePoints };
+    return {
+      country,
+      points: nextLowestTelevoteCountry?.[1]?.televotePoints ?? 0,
+    };
   },
 });

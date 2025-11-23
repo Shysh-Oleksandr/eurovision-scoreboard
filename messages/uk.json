@@ -113,7 +113,8 @@
       "customEntries": "Користувацькі учасники",
       "recentCustomEntries": "Нещодавні користувацькі учасники",
       "presets": "Пресети",
-      "customEntry": "Користувацький учасник"
+      "editCustomEntry": "Редагувати користувацького учасника",
+      "createCustomEntry": "Створити користувацького учасника"
     },
     "categories": {
       "custom": "Користувацькі",
@@ -359,7 +360,7 @@
   "feedbackInfo": {
     "feedback": "Зворотний зв’язок",
     "whatsNew": "Що нового",
-    "upcomingFeatures": "Майбутні функції",
+    "upcomingFeatures": "Планується",
     "foundBug": "Знайшли баг, маєте ідею або хочете поділитися відгуком?",
     "openIssueOnGitHub": "Ви можете створити issue на",
     "orEmailMe": "або написати мені на",
