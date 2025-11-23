@@ -36,7 +36,7 @@ function adjustSLWithHsva(s: number, l: number, hsva: HSVA): [number, number] {
 
   // Lightness: scale multiplicatively by V ratio to preserve ordering
   const vRatio = (Math.max(hsva.v, 0) || 0.0001) / DEFAULT_V;
-  const lAdj = Math.max(0, Math.min(100, l * vRatio));
+  const lAdj = Math.max(0, Math.min(80, l * vRatio));
 
   return [sAdj, lAdj];
 }

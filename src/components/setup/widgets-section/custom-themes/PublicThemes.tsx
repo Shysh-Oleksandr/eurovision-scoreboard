@@ -2,6 +2,8 @@ import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 
+import { DateRangeFilter } from '../utils/getFilterDateRange';
+
 import ThemeListItem from './ThemeListItem';
 import ThemesSearchHeader from './ThemesSearchHeader';
 import ThemesSortBadges, { PublicSortKey } from './ThemesSortBadges';
@@ -36,6 +38,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
   const [page, setPage] = useState(1);
+  const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
 
   const debouncedSearch = useDebounce(search, 400);
 
@@ -49,11 +52,13 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       : 'createdAt';
   const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
 
-  const { data } = usePublicThemesQuery({
+  const { data, isLoading } = usePublicThemesQuery({
     page,
     search: debouncedSearch,
     sortBy: serverSortBy,
     sortOrder: serverSortOrder,
+    startDate: dateRange?.startDate,
+    endDate: dateRange?.endDate,
   });
 
   const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
@@ -147,13 +152,22 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
             setSortKey(k);
             setPage(1);
           }}
+          dateRange={dateRange}
+          onDateRangeChange={(range) => {
+            setDateRange(range);
+            setPage(1);
+          }}
         />
       </div>
       <h3 className="text-white text-lg font-bold">
         {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
       </h3>
 
-      {data && data.themes.length > 0 ? (
+      {isLoading ? (
+        <div className="text-center sm:py-12 py-8">
+          <p className="text-white/70">{t('common.loading')}</p>
+        </div>
+      ) : data && data.themes.length > 0 ? (
         <>
           <div className="grid gap-4">
             {data.themes.map((theme) => (

@@ -19,7 +19,7 @@ export const queryKeys = {
 
   // Public queries
   public: {
-    themes: (filters: { page?: number; search?: string; sortBy?: string; sortOrder?: string }) =>
+    themes: (filters: { page?: number; search?: string; sortBy?: string; sortOrder?: string; startDate?: string; endDate?: string }) =>
       ['public', 'themes', filters] as const,
   },
 

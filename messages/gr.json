@@ -354,7 +354,13 @@
       "oldest": "Πιο Παλιό",
       "mostLiked": "Πιο Αρεστό",
       "mostSaved": "Πιο Αποθηκευμένο",
-      "mostCopied": "Πιο Αντιγραμμένο"
+      "mostCopied": "Πιο Αντιγραμμένο",
+      "today": "Σήμερα",
+      "thisWeek": "Αυτή η εβδομάδα",
+      "lastWeek": "Την προηγούμενη εβδομάδα",
+      "thisMonth": "Αυτός ο μήνας",
+      "lastMonth": "Τον προηγούμενο μήνα",
+      "allTime": "Όλη η ώρα"
     }
   },
   "feedbackInfo": {

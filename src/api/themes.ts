@@ -31,6 +31,8 @@ export type PublicThemesQueryParams = {
   search?: string;
   sortBy?: 'createdAt' | 'likes' | 'saves' | 'duplicatesCount';
   sortOrder?: 'asc' | 'desc';
+  startDate?: string;
+  endDate?: string;
   enabled?: boolean;
 };
 
@@ -50,10 +52,12 @@ export function usePublicThemesQuery({
   search,
   sortBy = 'createdAt',
   sortOrder = 'desc',
+  startDate,
+  endDate,
   enabled = true,
 }: PublicThemesQueryParams) {
   return useQuery<ThemeListResponse>({
-    queryKey: queryKeys.public.themes({ page, search, sortBy, sortOrder }),
+    queryKey: queryKeys.public.themes({ page, search, sortBy, sortOrder, startDate, endDate }),
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());
@@ -61,6 +65,8 @@ export function usePublicThemesQuery({
       if (search) params.append('search', search);
       params.append('sortBy', sortBy);
       params.append('sortOrder', sortOrder);
+      if (startDate) params.append('startDate', startDate);
+      if (endDate) params.append('endDate', endDate);
 
       const { data } = await api.get(`/themes/public?${params.toString()}`);
       return data as ThemeListResponse;

@@ -112,7 +112,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const handleDelete = async (id: string) => {
     try {
       await deleteTheme(id);
-      toast.success(t('themeDeletedSuccessfully'));
+      toast.success(t('widgets.themes.themeDeletedSuccessfully'));
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to delete theme');
     }

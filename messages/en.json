@@ -354,7 +354,13 @@
       "oldest": "Oldest",
       "mostLiked": "Most Liked",
       "mostSaved": "Most Saved",
-      "mostCopied": "Most Copied"
+      "mostCopied": "Most Copied",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "lastWeek": "Last Week",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "allTime": "All Time"
     }
   },
   "feedbackInfo": {
