@@ -30,7 +30,7 @@ export const CountryQualificationItem: React.FC<
   const itemRef = useRef<HTMLDivElement>(null);
 
   const itemClassName =
-    'bg-countryItem-juryBg text-countryItem-juryCountryText';
+    'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
 
   const itemGradientStyle = getGradientBackgroundStyle(
     itemClassName,

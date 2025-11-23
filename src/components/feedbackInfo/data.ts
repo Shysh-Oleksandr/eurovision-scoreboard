@@ -1,8 +1,11 @@
 export const WHATS_NEW = [
   {
+    date: '2025-11-23',
+    title: 'Small improvements & bug fixes',
+  },
+  {
     date: '2025-11-22',
-    title:
-      'Added localization for 8 languages',
+    title: 'Added localization for 8 languages',
   },
   {
     date: '2025-11-15',
@@ -234,5 +237,5 @@ export const UPCOMING_FEATURES = [
   },
   {
     title: 'Pre-1975 points system support',
-  }
+  },
 ];

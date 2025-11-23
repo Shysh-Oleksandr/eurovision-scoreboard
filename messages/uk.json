@@ -128,7 +128,7 @@
     }
   },
   "simulation": {
-    "pointsGoTo": "{count, plural, =1 {# бал} few {бали} other {# балів}} отримує...",
+    "pointsGoTo": "{count, plural, =1 {# бал} few {# бали} other {# балів}} отримує...",
     "chooseCountryToGivePoints": "Виберіть країну, щоб надати {count, plural, =1 {# бал} few {бали} other {# балів}}",
     "enterTelevotePointsFor": "Введіть бали телеголосування для <span>{country}</span>",
     "winnerOf": "<span>{country}</span> — переможець <span2>{event}</span2>!",
