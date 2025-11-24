@@ -3,8 +3,6 @@ import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import Image from 'next/image';
-
 import { ArrowIcon } from '../../../assets/icons/ArrowIcon';
 import { Year } from '../../../config';
 import { themes } from '../../../theme/themes';
@@ -67,7 +65,8 @@ const SelectDisplay: React.FC<{
     >
       <div className="flex items-center truncate mr-8">
         {selectedOption?.imageUrl ? (
-          <Image
+          <img
+            loading="lazy"
             src={selectedOption.imageUrl}
             alt={selectedOption.label}
             className={`w-6 h-6 mr-2 object-cover ${
@@ -379,7 +378,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                   }}
                                 >
                                   {option.imageUrl ? (
-                                    <Image
+                                    <img
+                                      loading="lazy"
                                       src={option.imageUrl}
                                       alt={option.label}
                                       className={`w-5 h-5 mr-3 object-cover ${
@@ -435,7 +435,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                           }}
                         >
                           {option.imageUrl ? (
-                            <Image
+                            <img
+                              loading="lazy"
                               src={option.imageUrl}
                               alt={option.label}
                               className={`w-5 h-5 mr-3 object-cover ${
