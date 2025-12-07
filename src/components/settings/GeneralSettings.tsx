@@ -6,7 +6,6 @@ import Button from '../common/Button';
 import { CollapsibleSection } from '../common/CollapsibleSection';
 
 import { ContestSettings } from './ContestSettings';
-import { PresetsSettings } from './presets/PresetsSettings';
 import { UIPreferencesSettings } from './UIPreferencesSettings';
 import { VotingSettings } from './VotingSettings';
 
@@ -20,13 +19,14 @@ export const GeneralSettings: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <CollapsibleSection
+      {/* Deprecated: will be removed in future version */}
+      {/* <CollapsibleSection
         title={t('general.presets')}
         isExpanded={expansion.presets}
         onToggle={() => setExpansion({ presets: !expansion.presets })}
       >
         <PresetsSettings />
-      </CollapsibleSection>
+      </CollapsibleSection> */}
 
       <CollapsibleSection
         title={t('general.contest')}

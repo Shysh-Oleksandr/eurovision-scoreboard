@@ -1,64 +1,84 @@
-import { BaseCountry, StageId, StageVotingMode } from '../../../models';
+import { EventStage, StageVotingMode } from '../../../models';
+import { getQualifiersBreakdown } from './getQualifiersBreakdown';
 
-interface StageValidationInfo {
-  id: string;
-  qualifiersAmount: number;
-  countriesCount: number;
-  votingCountries: BaseCountry[];
-  name: string;
-  votingMode: StageVotingMode;
-}
 interface ValidationParams {
-  stages: StageValidationInfo[];
-  autoQualifiersCount: number;
-  grandFinalQualifiersCount: number;
+  stages: EventStage[];
 }
 
 export const validateEventSetup = (
-  isGrandFinalOnly: boolean,
   pointsSystemLength: number,
   params: ValidationParams,
   t: any,
 ) => {
-  const { stages, autoQualifiersCount, grandFinalQualifiersCount } = params;
+  const { stages } = params;
 
   const minStageParticipants = pointsSystemLength + 1;
 
-  if (!isGrandFinalOnly) {
-    const semiFinalStages = stages.filter((s) => s.id !== StageId.GF);
+  // Sort stages by order
+  const sortedStages = [...stages].sort((a, b) => a.order - b.order);
 
-    for (const stage of semiFinalStages) {
-      if (stage.countriesCount === 0) {
-        return t('validation.noCountriesInStage', { stageName: stage.name });
-      }
-      if (stage.votingCountries.length === 0) {
-        return t('validation.noVotingCountriesInStage', { stageName: stage.name });
-      }
-      if (stage.qualifiersAmount <= 0) {
-        return t('validation.qualifiersAmountMustBeAtLeast1', { stageName: stage.name });
-      }
-      if (stage.qualifiersAmount >= stage.countriesCount) {
-        return t('validation.qualifiersAmountMustBeLessThanParticipants', { stageName: stage.name });
-      }
-      if (
-        stage.countriesCount < minStageParticipants &&
-        stage.votingMode !== StageVotingMode.TELEVOTE_ONLY
-      ) {
-        return t('validation.participantsMustBeAtLeast', { stageName: stage.name, count: minStageParticipants });
-      }
+  // Validate each stage
+  for (const stage of sortedStages) {
+    const countriesCount = stage.countries.length;
+
+    const qualifiersBreakdown = getQualifiersBreakdown(stage, sortedStages);
+    const totalQualifiersFromOtherStages =
+      qualifiersBreakdown?.reduce((sum, q) => sum + q.amount, 0) || 0;
+    const totalParticipants =
+      stage.countries.length + totalQualifiersFromOtherStages;
+
+    if (totalParticipants === 0) {
+      return t('setup.validation.noCountriesInStage', {
+        stageName: stage.name,
+      });
     }
 
-    const totalQualifiers =
-      semiFinalStages.reduce(
-        (acc, stage) => acc + (stage.qualifiersAmount || 0),
-        0,
-      ) + autoQualifiersCount;
-
-    if (totalQualifiers < minStageParticipants) {
-      return t('validation.totalQualifiersMustBeAtLeast', { count: minStageParticipants });
+    if (
+      totalParticipants < minStageParticipants &&
+      stage.votingMode !== StageVotingMode.TELEVOTE_ONLY
+    ) {
+      return t('setup.validation.participantsMustBeAtLeast', {
+        stageName: stage.name,
+        count: minStageParticipants,
+      });
     }
-  } else if (grandFinalQualifiersCount < minStageParticipants) {
-    return t('validation.grandFinalParticipantsMustBeAtLeast', { count: minStageParticipants });
+
+    // Validate qualifier relationships
+    if (stage.qualifiesTo && stage.qualifiesTo.length > 0) {
+      const totalQualifiersFromThisStage =
+        stage.qualifiesTo.reduce((sum, target) => sum + target.amount, 0);
+
+      if (totalQualifiersFromThisStage > countriesCount) {
+        return t('setup.validation.qualifiersExceedParticipants', {
+          stageName: stage.name,
+        });
+      }
+      // Validate that qualifiers don't move to precedent stages
+      for (const target of stage.qualifiesTo) {
+        const targetStage = sortedStages.find(
+          (s) => s.id === target.targetStageId,
+        );
+        if (!targetStage) {
+          return t('setup.validation.targetStageNotFound', {
+            targetStageId: target.targetStageId,
+          });
+        }
+
+        if (targetStage.order <= stage.order) {
+          return t('setup.validation.qualifiersCannotMoveToPrecedentStage', {
+            stageName: stage.name,
+            targetStageName: targetStage.name,
+          });
+        }
+      }
+    }
+  }
+
+  // Validate stage order uniqueness
+  const orders = sortedStages.map((s) => s.order);
+  const uniqueOrders = new Set(orders);
+  if (orders.length !== uniqueOrders.size) {
+    return t('setup.validation.stageOrderMustBeUnique');
   }
 
   return null;

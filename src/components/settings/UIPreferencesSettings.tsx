@@ -76,15 +76,6 @@ export const UIPreferencesSettings: React.FC = () => {
         />
       )}
       <Checkbox
-        id="show-reset-warning"
-        labelClassName="w-full"
-        label={t('confirmBeforeRestarting')}
-        checked={settings.shouldShowResetWarning}
-        onChange={(e) =>
-          setSettings({ shouldShowResetWarning: e.target.checked })
-        }
-      />
-      <Checkbox
         id="show-manual-televote-warning"
         labelClassName="w-full"
         label={t('warnBeforeManuallyAssigningTelevotePoints')}

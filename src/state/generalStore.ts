@@ -40,7 +40,6 @@ const DEFAULT_SETTINGS: Settings = {
   showWinnerModal: true,
   showWinnerConfetti: true,
   enableFullscreen: false,
-  shouldShowResetWarning: true,
   showRankChangeIndicator: true,
   shouldShowManualTelevoteWarning: true,
   showHostingCountryLogo: true,
@@ -109,7 +108,6 @@ interface Settings {
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
-  shouldShowResetWarning: boolean;
   showRankChangeIndicator: boolean;
   shouldShowManualTelevoteWarning: boolean;
   shouldShowHeartFlagIcon: boolean;
@@ -167,6 +165,7 @@ export interface GeneralState {
   lastSeenUpdate: string | null;
   shouldShowNewChangesIndicator: boolean;
   year: Year;
+  isGfOnly: boolean;
   themeYear: string;
   theme: Theme;
   customTheme: CustomTheme | null;
@@ -185,6 +184,7 @@ export interface GeneralState {
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
   setYear: (year: Year) => void;
+  setIsGfOnly: (isGfOnly: boolean) => void;
   setTheme: (year: string, isJuniorTheme?: boolean) => void;
   applyCustomTheme: (theme: CustomTheme) => void;
   clearCustomTheme: () => void;
@@ -233,6 +233,7 @@ export const useGeneralStore = create<GeneralState>()(
         lastSeenUpdate: null,
         shouldShowNewChangesIndicator: false,
         year: INITIAL_YEAR,
+        isGfOnly: false,
         themeYear: INITIAL_YEAR,
         theme: getThemeForYear(INITIAL_YEAR),
         customTheme: null,
@@ -279,6 +280,9 @@ export const useGeneralStore = create<GeneralState>()(
 
           useCountriesStore.getState().updateCountriesForYear(year);
           useScoreboardStore.getState().leaveEvent();
+        },
+        setIsGfOnly: (isGfOnly: boolean) => {
+          set({ isGfOnly });
         },
         setTheme: (year: string) => {
           // Clear any custom theme first
@@ -437,6 +441,7 @@ export const useGeneralStore = create<GeneralState>()(
 
           return {
             year: state.year,
+            isGfOnly: state.isGfOnly,
             theme: state.theme,
             themeYear: state.themeYear,
             customTheme: state.customTheme,

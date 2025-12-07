@@ -28,7 +28,7 @@ import { buildPrimaryFromHsva } from '@/theme/themeUtils';
 const YEAR_OPTIONS = [...ESC_YEAR_OPTIONS, ...JESC_YEAR_OPTIONS];
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
 
-const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 480;
+const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 515;
 
 type SetupHeaderProps = {
   openSettingsModal: () => void;
@@ -40,10 +40,12 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   const t = useTranslations();
 
   const year = useGeneralStore((state) => state.year);
+  const isGfOnly = useGeneralStore((state) => state.isGfOnly);
   const settings = useGeneralStore((state) => state.settings);
   const themeYear = useGeneralStore((state) => state.themeYear);
   const customTheme = useGeneralStore((state) => state.customTheme);
   const setYear = useGeneralStore((state) => state.setYear);
+  const setIsGfOnly = useGeneralStore((state) => state.setIsGfOnly);
   const setTheme = useGeneralStore((state) => state.setTheme);
   const setSettings = useGeneralStore((state) => state.setSettings);
   const eventStages = useScoreboardStore((state) => state.eventStages);
@@ -51,7 +53,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
   const isTouchDevice = useTouchDevice();
 
-  const handleYearChange = (newValue: string) => {
+  const handleYearChange = (newValue: string, shouldToggleGfOnly = false) => {
     const isJunior = newValue.startsWith(JUNIOR_THEME_PREFIX);
     const newYear = isJunior
       ? newValue.replace(JUNIOR_THEME_PREFIX, '')
@@ -61,6 +63,9 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
     if (eventStages.length > 0) {
       if (window.confirm(t('setup.eventSetupModal.contestIsInProgress'))) {
+        if (shouldToggleGfOnly) {
+          setIsGfOnly(!isGfOnly);
+        }
         setSettings({
           contestName: nextContestName,
           isJuniorContest: isJunior,
@@ -69,8 +74,29 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
         setEventStages([]);
       }
     } else {
+      if (shouldToggleGfOnly) {
+        setIsGfOnly(!isGfOnly);
+      }
       setSettings({ contestName: nextContestName, isJuniorContest: isJunior });
       setYear(newYear as Year);
+    }
+  };
+
+  const handleGfOnlyChange = () => {
+    if (
+      confirm(
+        t(
+          !isGfOnly
+            ? 'setup.eventSetupModal.grandFinalOnlyConfirm'
+            : 'setup.eventSetupModal.grandFinalOnlyConfirmNotGfOnly',
+        ),
+      )
+    ) {
+      const currentYear = settings.isJuniorContest
+        ? `${JUNIOR_THEME_PREFIX}${year}`
+        : year;
+
+      handleYearChange(currentYear, true);
     }
   };
 
@@ -150,21 +176,29 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
       } space-x-3 pb-2`}
     >
       <div className="flex items-end sm:space-x-4 space-x-3">
-        <CustomSelect
-          options={YEAR_OPTIONS}
-          groups={[
-            { label: 'ESC', options: ESC_YEAR_OPTIONS },
-            { label: 'JESC', options: JESC_YEAR_OPTIONS },
-          ]}
-          value={
-            settings.isJuniorContest ? `${JUNIOR_THEME_PREFIX}${year}` : year
-          }
-          onChange={handleYearChange}
-          id="year-select-box"
-          label={t('common.year')}
-          className="sm:w-[130px] w-[110px]"
-        />
-
+        <div className="flex items-end gap-1.5">
+          <CustomSelect
+            options={YEAR_OPTIONS}
+            groups={[
+              { label: 'ESC', options: ESC_YEAR_OPTIONS },
+              { label: 'JESC', options: JESC_YEAR_OPTIONS },
+            ]}
+            value={
+              settings.isJuniorContest ? `${JUNIOR_THEME_PREFIX}${year}` : year
+            }
+            onChange={handleYearChange}
+            id="year-select-box"
+            label={t('settings.general.contest')}
+            className="sm:w-[130px] w-[110px]"
+          />
+          <Button
+            label={t('setup.eventSetupModal.grandFinalOnly')}
+            className={`!px-1 !py-0 h-[42px] normal-case w-[48px] !text-[0.8rem] !leading-4  ${
+              isGfOnly ? 'ring-primary-700/80 ring-2  ring-solid' : ''
+            }`}
+            onClick={handleGfOnlyChange}
+          />
+        </div>
         <CustomSelect
           options={themeOptions}
           groups={themeGroups}
@@ -179,7 +213,6 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           className="sm:w-[130px] w-[110px]"
           customThemeColor={customThemeColor}
         />
-
         {shouldShowSyncButton && (
           <Button
             onClick={handleSyncTheme}

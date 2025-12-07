@@ -40,7 +40,7 @@ export const PhaseActions = () => {
     isOver: isVotingOver,
     isLastStage,
     id: currentStageId,
-  } = getCurrentStage();
+  } = getCurrentStage() || {};
 
   const viewedStage =
     eventStages.find((s) => s.id === viewedStageId) || getCurrentStage();
@@ -54,7 +54,7 @@ export const PhaseActions = () => {
 
   useEffect(() => {
     if (isSFAndGFEventOver && !viewedStageId) {
-      setViewedStageId(getCurrentStage().id);
+      setViewedStageId(getCurrentStage()?.id ?? '');
     }
   }, [isSFAndGFEventOver, getCurrentStage, setViewedStageId, viewedStageId]);
 
@@ -100,7 +100,7 @@ export const PhaseActions = () => {
         {isSFAndGFEventOver && (
           <Select
             id="eventStage"
-            value={viewedStage.id}
+            value={viewedStage?.id ?? ''}
             onChange={(e) => {
               if (showAllParticipants) {
                 toggleShowAllParticipants();
@@ -117,7 +117,7 @@ export const PhaseActions = () => {
             className="py-2.5 sm:px-4 px-3 sm:min-w-[150px] font-medium bg-primary-800 bg-gradient-to-bl from-[20%] from-primary-900 to-primary-800/60 lg:text-base text-sm hover:bg-primary-700"
             arrowClassName="!w-6 !h-6"
           >
-            <span className="flex-1">{viewedStage.name}</span>
+            <span className="flex-1">{viewedStage?.name ?? ''}</span>
           </Select>
         )}
         {isVotingOver && !isLastStage && (

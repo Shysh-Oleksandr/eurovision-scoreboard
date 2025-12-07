@@ -33,6 +33,7 @@
     "dragAndDropOrClickToUpload": "Ziehen & ablegen oder klicken, um hochzuladen",
     "orSelectExisting": "Oder bestehendes auswählen",
     "randomize": "Zufällig",
+    "loadYearData": "Jahresdaten laden",
     "country": "Land"
   },
   "Metadata": {
@@ -69,16 +70,20 @@
       "juryAndTelevote": "Jury und Televote",
       "votingMode": "Abstimmungsmodus",
       "numberOfQualifiers": "Anzahl der Qualifikanten",
-      "grandFinal": "Grand Final",
-      "semiFinal": "Halbfinale",
+      "qualifierTargets": "Qualifikationsziele",
+      "addStage": "Stage hinzufügen",
+      "editStage": "Stage bearbeiten",
+      "stageNamePlaceholder": "Halbfinale 3, Viertelfinale 1, Heat 1, etc.",
+      "qualifiersFrom": "<span>{amount}</span> von <span2>{sourceStageName}</span2>",
       "nonVotingCountries": "Nicht abstimmende Länder",
       "searchAndClickToAdd": "Suchen und klicken, um hinzuzufügen",
       "searchCountries": "Länder suchen...",
       "noVotingCountriesSelected": "Keine abstimmenden Länder ausgewählt. Füge Länder aus der Liste unten hinzu.",
       "votingCountries": "Abstimmende Länder ({count})",
       "dragAndDropToReorder": "Ziehen und ablegen, um neu zu ordnen",
-      "syncVotersWithParticipantCountriesTooltip": "Wenn aktiviert, werden die abstimmenden Länder automatisch aktualisiert, wenn du Teilnehmerländer entfernst oder hinzufügst.<br></br>Wenn deaktiviert, musst du dies manuell tun.",
-      "syncVotersWithParticipantCountries": "Wähler mit Teilnehmerländern synchronisieren"
+      "inStageOnly": "Nur im Stage",
+      "otherStageOnly": "Nur im anderen Stage",
+      "allParticipants": "Alle Teilnehmer"
     },
     "validation": {
       "noCountriesInStage": "Es gibt keine Länder in {stageName}.",
@@ -87,11 +92,16 @@
       "qualifiersAmountMustBeLessThanParticipants": "Die Anzahl der Qualifikanten in {stageName} muss kleiner sein als die Anzahl der Teilnehmer.",
       "participantsMustBeAtLeast": "Die Anzahl der Teilnehmer in {stageName} muss mindestens {count} betragen (abhängig vom Punktesystem).",
       "totalQualifiersMustBeAtLeast": "Die Gesamtanzahl der Finalisten muss mindestens {count} betragen.",
-      "grandFinalParticipantsMustBeAtLeast": "Die Anzahl der Teilnehmer im Grand Final muss mindestens {count} betragen."
+      "grandFinalParticipantsMustBeAtLeast": "Die Anzahl der Teilnehmer im Grand Final muss mindestens {count} betragen.",
+      "qualifiersExceedParticipants": "Die Anzahl der Qualifikanten in {stageName} überschreitet die Anzahl der Teilnehmer.",
+      "qualifiersCannotMoveToPrecedentStage": "Qualifikanten können nicht zu einem vorherigen Stage ({stageName} -> {targetStageName}) verschoben werden.",
+      "targetStageNotFound": "Zielstage \"{targetStageId}\" nicht gefunden.",
+      "stageOrderMustBeUnique": "Stage-Reihenfolge muss eindeutig sein."
     },
     "eventSetupModal": {
-      "allShows": "Alle Shows",
-      "grandFinalOnly": "Nur Grand Final",
+      "grandFinalOnly": "Nur Finale",
+      "grandFinalOnlyConfirm": "Dies wird dein Setup zurücksetzen und nur das Grand Final behalten. Bist du sicher, dass du fortfahren möchtest?",
+      "grandFinalOnlyConfirmNotGfOnly": "Dies wird dein Setup zurücksetzen und alle Shows (Halbfinale + Grand Final) wiederherstellen. Bist du sicher, dass du fortfahren möchtest?",
       "notQualified": "Nicht qualifiziert",
       "notParticipating": "Nicht teilnehmend",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Du musst eingeloggt sein, um eigene Beiträge zu erstellen und zu nutzen.",
@@ -99,8 +109,10 @@
       "countriesAmount": "{count, plural, =1 {Land} other {Länder}}",
       "entriesAmount": "{count, plural, =1 {Beitrag} other {Beiträge}}",
       "autoQualifiers": "Auto-Qualifizierte",
+      "qualifiers": "Qualifikanten",
       "contestIsInProgress": "Ein Wettbewerb läuft gerade. Das Ändern des Jahres setzt das aktuelle Scoreboard zurück und startet ein neues Setup. Bist du sicher?",
-      "enterThePointsEachVotingCountryAwardsToParticipants": "Gib die Punkte ein, die jedes abstimmende Land den Teilnehmern vergibt"
+      "enterThePointsEachVotingCountryAwardsToParticipants": "Gib die Punkte ein, die jedes abstimmende Land den Teilnehmern vergibt",
+      "reorderStages": "Stages neu ordnen"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Bitte melde dich an, um eigene Beiträge zu erstellen.",
@@ -124,7 +136,11 @@
       "northAmerica": "Nordamerika",
       "southAmerica": "Südamerika",
       "oceania": "Ozeanien",
-      "restOfEurope": "Rest Europas"
+      "restOfEurope": "Rest Europas",
+      "inStage": "Im Stage",
+      "otherStage": "Im anderen Stage",
+      "notParticipating": "Nicht teilnehmend",
+      "autoQ": "Auto-Q"
     }
   },
   "simulation": {
@@ -176,7 +192,6 @@
       "cancelSimulation": "Simulation abbrechen",
       "cancelSimulationConfirmation": "Bist du sicher, dass du die Simulation abbrechen möchtest?",
       "restart": "Neustart",
-      "restartConfirmation": "Bist du sicher, dass du neu starten möchtest?",
       "undo": "Rückgängig",
       "share": "Teilen",
       "setup": "Setup"
@@ -426,8 +441,6 @@
       "oddsTooltip": "Jedes Land hat separate Jury- und Televote-Quoten (0–100).<br></br><span>Höhere Zahl =</span> höhere Chance auf mehr Punkte.<br></br>Anfangswerte basieren auf echten ESC-Ergebnissen des ausgewählten Jahres.",
       "randomnessLevel": "Zufallsgrad",
       "randomnessLevelTooltip": "Der Zufallsgrad-Regler bestimmt die Vorhersehbarkeit:<br></br><span>Niedrig =</span> realistischer, folgt den Quoten.<br></br><span>Hoch =</span> chaotischer, unvorhersehbarer.",
-      "randomize": "Zufällig",
-      "loadYearData": "Jahresdaten laden",
       "predictable": "Vorhersehbar",
       "chaotic": "Chaotisch"
     },
@@ -460,7 +473,6 @@
       "showWinnerPopup": "Sieger-Popup anzeigen",
       "showWinnerConfetti": "Sieger-Konfetti anzeigen",
       "enableFullscreenMode": "Vollbildmodus aktivieren",
-      "confirmBeforeRestarting": "Vor Neustart bestätigen",
       "warnBeforeManuallyAssigningTelevotePoints": "Vor manueller Televote-Punktevergabe warnen",
       "showJuryVotingProgressBar": "Jury-Fortschrittsbalken anzeigen",
       "imageSizeIsPrettyLarge": "Die Bildgröße ist ziemlich groß ({size}MB). Das kann die Simulation verlangsamen. Möchtest du trotzdem fortfahren?",

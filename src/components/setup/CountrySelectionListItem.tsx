@@ -9,7 +9,6 @@ import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 export const ASSIGNMENT_GROUP_LABELS: Record<string, string> = {
-  [CountryAssignmentGroup.AUTO_QUALIFIER]: 'Auto-Qualifier',
   [CountryAssignmentGroup.SF1]: 'Semi-Final 1',
   [CountryAssignmentGroup.SF2]: 'Semi-Final 2',
   [CountryAssignmentGroup.NOT_PARTICIPATING]: 'Not Participating',

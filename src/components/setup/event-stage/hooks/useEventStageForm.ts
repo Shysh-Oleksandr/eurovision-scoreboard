@@ -1,41 +1,36 @@
-import React, { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { EventStage, StageId, StageVotingMode } from '../../../../models';
+import { useCountriesStore } from '@/state/countriesStore';
+import {
+  EventStage,
+  QualifierTarget,
+  StageVotingMode,
+} from '../../../../models';
+
+// Schema for qualifier target
+const qualifierTargetSchema = z.object({
+  targetStageId: z.string().min(1, 'Target stage is required'),
+  amount: z.number().min(1, 'Amount must be at least 1'),
+});
 
 // Base schema for common fields
 const baseSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  votingMode: z.enum(Object.values(StageVotingMode) as [string, ...string[]]),
-  votingCountries: z
-    .array(
-      z.looseObject({
-        code: z.string(),
-        name: z.string(),
-      }),
-    )
-    .optional(),
-  syncVotersWithParticipants: z.boolean().optional(),
+  order: z.number().int(),
+  votingMode: z.enum(Object.values(StageVotingMode)),
+  qualifiesTo: z.array(qualifierTargetSchema).optional(),
 });
 
-// Schema for Grand Final (no qualifiersAmount)
-const grandFinalSchema = baseSchema.extend({
+// Schema for all stages (unified)
+const eventStageSchema = baseSchema.extend({
   qualifiersAmount: z.number().optional(),
 });
 
-// Schema for Semi-Finals (qualifiersAmount required)
-const semiFinalSchema = baseSchema.extend({
-  qualifiersAmount: z
-    .number()
-    .min(1, 'Number of qualifiers must be at least 1'),
-});
-
-type GrandFinalFormData = z.infer<typeof grandFinalSchema>;
-type SemiFinalFormData = z.infer<typeof semiFinalSchema>;
-export type EventStageFormData = GrandFinalFormData | SemiFinalFormData;
+export type EventStageFormData = z.infer<typeof eventStageSchema>;
 
 interface UseEventStageFormProps {
   eventStageToEdit?: EventStage;
@@ -49,33 +44,42 @@ export const useEventStageForm = ({
   isOpen,
 }: UseEventStageFormProps) => {
   const isEditMode = !!eventStageToEdit;
-  const isGrandFinalStage = eventStageToEdit?.id === StageId.GF;
+  const configuredEventStages = useCountriesStore(
+    (state) => state.configuredEventStages,
+  );
 
-  // Create separate form instances based on stage type
-  const grandFinalForm = useForm<GrandFinalFormData>({
-    resolver: zodResolver(grandFinalSchema),
+  // Determine if this is the last stage (highest order)
+  const isLastStage: boolean = useMemo(() => {
+    if (!eventStageToEdit) return false;
+    if (configuredEventStages.length === 0) return false;
+
+    const maxOrder = Math.max(
+      ...configuredEventStages.map((s) => s.order ?? 0),
+    );
+    return (eventStageToEdit.order ?? 0) === maxOrder;
+  }, [eventStageToEdit, configuredEventStages]);
+
+  const getDefaultOrder = () => {
+    if (eventStageToEdit) {
+      return eventStageToEdit.order ?? 0;
+    }
+
+    const minOrder = Math.min(
+      ...configuredEventStages.map((s) => s.order ?? 0),
+    );
+    return minOrder - 1;
+  };
+
+  const form = useForm<EventStageFormData>({
+    resolver: zodResolver(eventStageSchema),
     defaultValues: {
       name: '',
+      order: getDefaultOrder(),
       qualifiersAmount: undefined,
       votingMode: StageVotingMode.TELEVOTE_ONLY,
-      votingCountries: [],
-      syncVotersWithParticipants: true,
+      qualifiesTo: [],
     },
   });
-
-  const semiFinalForm = useForm<SemiFinalFormData>({
-    resolver: zodResolver(semiFinalSchema),
-    defaultValues: {
-      name: '',
-      qualifiersAmount: 10,
-      votingMode: StageVotingMode.TELEVOTE_ONLY,
-      votingCountries: [],
-      syncVotersWithParticipants: true,
-    },
-  });
-
-  // Always refer to the correct form based on whether the edited stage is GF
-  const form = isGrandFinalStage ? grandFinalForm : semiFinalForm;
 
   // Reset form when modal opens or eventStageToEdit changes
   useEffect(() => {
@@ -85,44 +89,62 @@ export const useEventStageForm = ({
       form.reset(
         {
           name: eventStageToEdit.name,
-          qualifiersAmount:
-            eventStageToEdit.qualifiersAmount ||
-            (isGrandFinalStage ? undefined : 0),
+          order: eventStageToEdit.order ?? 0,
+          qualifiersAmount: eventStageToEdit.qualifiersAmount,
           votingMode: eventStageToEdit.votingMode,
-          votingCountries: (eventStageToEdit.votingCountries as any) || [],
-          syncVotersWithParticipants:
-            eventStageToEdit.syncVotersWithParticipants ?? true,
+          qualifiesTo: (eventStageToEdit.qualifiesTo as any) || [],
         },
         { keepDefaultValues: false },
       );
     } else {
+      // When creating a new stage, initialize qualifiesTo with the last stage
+      // Default: 10 qualifiers for the last stage (highest order)
+      // Only include entries with amount > 0 to satisfy validation
+      const sortedStages = [...configuredEventStages].sort(
+        (a, b) => (b.order ?? 0) - (a.order ?? 0),
+      );
+      const lastStage = sortedStages[0];
+      const defaultQualifiesTo: QualifierTarget[] = lastStage
+        ? [
+            {
+              targetStageId: lastStage.id,
+              amount: 10,
+            },
+          ]
+        : [];
+
       form.reset(
         {
-          name: `Semi-Final ${localEventStagesLength}`,
-          qualifiersAmount: isGrandFinalStage ? undefined : 10,
+          name: `Stage ${localEventStagesLength + 1}`,
+          order: getDefaultOrder(),
+          qualifiersAmount: undefined,
           votingMode: StageVotingMode.TELEVOTE_ONLY,
-          votingCountries: [] as any,
-          syncVotersWithParticipants: true,
+          qualifiesTo: defaultQualifiesTo,
         },
         { keepDefaultValues: false },
       );
     }
-  }, [
-    eventStageToEdit,
-    isOpen,
-    localEventStagesLength,
-    form,
-    isGrandFinalStage,
-  ]);
+  }, [eventStageToEdit, isOpen, localEventStagesLength, form]);
 
   const onSubmit = (data: EventStageFormData) => {
+    // Filter out entries with amount <= 0 to satisfy validation
+    const validQualifiesTo = (data.qualifiesTo || []).filter(
+      (target) => target.amount > 0,
+    );
+
+    // Calculate qualifiersAmount from qualifiesTo if not explicitly set
+    const qualifiersAmount =
+      data.qualifiersAmount ??
+      (validQualifiesTo.reduce((sum, target) => sum + target.amount, 0) ||
+        undefined);
+
     return {
       id: eventStageToEdit?.id || new Date().toISOString(),
       name: data.name,
-      qualifiersAmount: data.qualifiersAmount,
+      order: data.order,
+      qualifiersAmount,
+      qualifiesTo: validQualifiesTo,
       votingMode: data.votingMode,
-      votingCountries: data.votingCountries || [],
-      syncVotersWithParticipants: data.syncVotersWithParticipants ?? true,
     };
   };
 
@@ -130,6 +152,7 @@ export const useEventStageForm = ({
     form,
     onSubmit,
     isEditMode,
-    isGrandFinalStage,
+    isLastStage,
+    configuredEventStages,
   };
 };

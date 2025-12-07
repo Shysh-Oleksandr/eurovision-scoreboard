@@ -33,6 +33,7 @@
     "dragAndDropOrClickToUpload": "Przeciągnij i upuść lub kliknij, aby przesłać",
     "orSelectExisting": "Lub wybierz istniejący",
     "randomize": "Losuj",
+    "loadYearData": "Załaduj dane roku",
     "country": "Kraj"
   },
   "Metadata": {
@@ -69,16 +70,20 @@
       "juryAndTelevote": "Jury i Televote",
       "votingMode": "Tryb głosowania",
       "numberOfQualifiers": "Liczba kwalifikantów",
-      "grandFinal": "Finał",
-      "semiFinal": "Półfinał",
+      "qualifierTargets": "Targets kwalifikacji",
+      "addStage": "Dodaj etap",
+      "editStage": "Edytuj etap",
+      "stageNamePlaceholder": "Półfinał 3, Kwartał 1, Heat 1, etc.",
+      "qualifiersFrom": "<span>{amount}</span> z <span2>{sourceStageName}</span2>",
       "nonVotingCountries": "Kraje niegłosujące",
       "searchAndClickToAdd": "Wyszukaj i kliknij, aby dodać",
       "searchCountries": "Wyszukaj kraje...",
       "noVotingCountriesSelected": "Nie wybrano krajów głosujących. Dodaj kraje z poniższej listy.",
       "votingCountries": "Kraje głosujące ({count})",
       "dragAndDropToReorder": "Przeciągnij i upuść, aby zmienić kolejność",
-      "syncVotersWithParticipantCountriesTooltip": "Jeśli włączone, po dodaniu lub usunięciu kraju uczestnika, kraje głosujące zostaną automatycznie zaktualizowane.<br></br>Jeśli wyłączone, musisz ręcznie dodać lub usunąć kraje głosujące.",
-      "syncVotersWithParticipantCountries": "Synchronizuj głosujących z krajami uczestników"
+      "inStageOnly": "Tylko w etapie",
+      "otherStageOnly": "Tylko w innym etapie",
+      "allParticipants": "Wszystkie uczestnicy"
     },
     "validation": {
       "noCountriesInStage": "Brak krajów w {stageName}.",
@@ -87,11 +92,16 @@
       "qualifiersAmountMustBeLessThanParticipants": "Liczba kwalifikantów w {stageName} musi być mniejsza niż liczba uczestników.",
       "participantsMustBeAtLeast": "Liczba uczestników w {stageName} musi wynosić co najmniej {count} (zależnie od liczby elementów w systemie punktacji).",
       "totalQualifiersMustBeAtLeast": "Łączna liczba kwalifikantów do Finału musi wynosić co najmniej {count}.",
-      "grandFinalParticipantsMustBeAtLeast": "Liczba uczestników Finału musi wynosić co najmniej {count}."
+      "grandFinalParticipantsMustBeAtLeast": "Liczba uczestników Finału musi wynosić co najmniej {count}.",
+      "qualifiersExceedParticipants": "Liczba kwalifikantów w {stageName} przekracza liczbę uczestników.",
+      "qualifiersCannotMoveToPrecedentStage": "Kwalifikanci nie mogą być przenoszeni do wcześniejszego etapu ({stageName} -> {targetStageName}).",
+      "targetStageNotFound": "Etap docelowy \"{targetStageId}\" nie został znaleziony.",
+      "stageOrderMustBeUnique": "Kolejność etapów musi być unikalna."
     },
     "eventSetupModal": {
-      "allShows": "Wszystkie występy",
       "grandFinalOnly": "Tylko Finał",
+      "grandFinalOnlyConfirm": "To zresetuje twoją konfigurację i zachowa tylko Finał. Czy na pewno chcesz kontynuować?",
+      "grandFinalOnlyConfirmNotGfOnly": "To zresetuje twoją konfigurację i przywróci wszystkie etapy (Półfinały + Finał). Czy na pewno chcesz kontynuować?",
       "notQualified": "Nie zakwalifikowany",
       "notParticipating": "Nie uczestniczy",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Musisz być zalogowany, aby tworzyć i używać własnych wpisów.",
@@ -99,8 +109,10 @@
       "countriesAmount": "{count, plural, =1 {kraj} other {kraje}}",
       "entriesAmount": "{count, plural, =1 {wpis} other {wpisy}}",
       "autoQualifiers": "Automatyczni kwalifikanci",
+      "qualifiers": "Kwalifikanci",
       "contestIsInProgress": "Trwa konkurs. Zmiana roku zresetuje bieżącą tablicę wyników i rozpocznie nową konfigurację. Czy na pewno?",
-      "enterThePointsEachVotingCountryAwardsToParticipants": "Wprowadź punkty przyznawane uczestnikom przez każdy kraj głosujący"
+      "enterThePointsEachVotingCountryAwardsToParticipants": "Wprowadź punkty przyznawane uczestnikom przez każdy kraj głosujący",
+      "reorderStages": "Zmień kolejność etapów"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Zaloguj się, aby tworzyć własne wpisy.",
@@ -124,7 +136,11 @@
       "northAmerica": "Ameryka Północna",
       "southAmerica": "Ameryka Południowa",
       "oceania": "Oceania",
-      "restOfEurope": "Reszta Europy"
+      "restOfEurope": "Reszta Europy",
+      "inStage": "W etapie",
+      "otherStage": "W innym etapie",
+      "notParticipating": "Nie uczestniczy",
+      "autoQ": "Auto-Q"
     }
   },
   "simulation": {
@@ -176,7 +192,6 @@
       "cancelSimulation": "Anuluj symulację",
       "cancelSimulationConfirmation": "Czy na pewno chcesz anulować symulację?",
       "restart": "Restart",
-      "restartConfirmation": "Czy na pewno chcesz rozpocząć od nowa?",
       "undo": "Cofnij",
       "share": "Udostępnij",
       "setup": "Ustawienia"
@@ -426,8 +441,6 @@
       "oddsTooltip": "Każdy kraj ma osobne szanse jury i televote (0–100).<br></br><span>Wyższa liczba =</span> większa szansa na zdobycie większej liczby punktów.<br></br>Początkowe wartości bazują na rzeczywistych wynikach krajów w wybranym roku Eurowizji.",
       "randomnessLevel": "Poziom losowości",
       "randomnessLevelTooltip": "Suwak Poziom losowości kontroluje przewidywalność:<br></br><span>Niski =</span> bardziej realistyczne, zgodne z szansami.<br></br><span>Wysoki =</span> bardziej chaotyczne, nieprzewidywalne.",
-      "randomize": "Losuj",
-      "loadYearData": "Załaduj dane roku",
       "predictable": "Przewidywalne",
       "chaotic": "Chaotyczne"
     },
@@ -460,7 +473,6 @@
       "showWinnerPopup": "Pokaż popup zwycięzcy",
       "showWinnerConfetti": "Pokaż konfetti zwycięzcy",
       "enableFullscreenMode": "Włącz tryb pełnoekranowy",
-      "confirmBeforeRestarting": "Potwierdź przed ponownym uruchomieniem",
       "warnBeforeManuallyAssigningTelevotePoints": "Ostrzeż przed ręcznym przydzielaniem punktów televote",
       "showJuryVotingProgressBar": "Pokaż pasek postępu głosowania jury",
       "imageSizeIsPrettyLarge": "Rozmiar obrazu jest dość duży ({size}MB). Może to spowolnić symulację, więc warto go skompresować lub użyć mniejszego obrazu. Czy chcesz kontynuować z tym obrazem?",

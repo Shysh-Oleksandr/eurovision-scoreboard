@@ -2,9 +2,11 @@ import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { EventStage, StageVotingMode } from '../../../models';
+import { StageVotingMode } from '../../../models';
 import Select from '../../common/Select';
 import { Input } from '../../Input';
+
+import QualifierTargetsSection from './QualifierTargetsSection';
 
 const getVotingModeLabel = (votingMode: StageVotingMode, t: any) => {
   switch (votingMode) {
@@ -21,15 +23,13 @@ const getVotingModeLabel = (votingMode: StageVotingMode, t: any) => {
 };
 
 interface EventStageSettingsProps {
-  eventStageToEdit?: EventStage;
   isEditMode: boolean;
-  isGrandFinalStage: boolean;
+  isLastStage: boolean;
 }
 
 const EventStageSettings: React.FC<EventStageSettingsProps> = ({
-  eventStageToEdit,
   isEditMode,
-  isGrandFinalStage,
+  isLastStage,
 }) => {
   const {
     register,
@@ -37,6 +37,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
     setValue,
     formState: { errors },
   } = useFormContext();
+
   const t = useTranslations();
   const votingMode = watch('votingMode');
 
@@ -50,10 +51,11 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
   return (
     <div className="flex flex-col gap-4 p-2">
       <h2 className="text-xl font-bold text-white">
-        {isEditMode ? t('common.edit') : t('common.add')}{' '}
-        {isGrandFinalStage
-          ? t('setup.eventStageModal.grandFinal')
-          : t('setup.eventStageModal.semiFinal')}
+        {t(
+          isEditMode
+            ? 'setup.eventStageModal.editStage'
+            : 'setup.eventStageModal.addStage',
+        )}
       </h2>
       <div className="flex flex-col gap-2">
         <label htmlFor="stageName" className="text-white">
@@ -64,7 +66,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
           type="text"
           {...register('name')}
           className="h-12 lg:text-[0.95rem] text-sm"
-          placeholder={t('common.enterName')}
+          placeholder={t('setup.eventStageModal.stageNamePlaceholder')}
         />
         {errors.name && (
           <span className="text-red-400 text-sm">
@@ -92,32 +94,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
           </span>
         </Select>
       </div>
-      {!isGrandFinalStage && (
-        <>
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor={`qualifiers-${eventStageToEdit?.id}`}
-              className="block text-base text-white"
-            >
-              {t('setup.eventStageModal.numberOfQualifiers')}
-            </label>
-            <Input
-              id={`qualifiers-${eventStageToEdit?.id}`}
-              type="number"
-              {...register('qualifiersAmount', { valueAsNumber: true })}
-              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-[64px]"
-              min={0}
-              max={eventStageToEdit?.countries.length}
-              aria-label={`Number of qualifiers for ${eventStageToEdit?.name}`}
-            />
-          </div>
-          {errors.qualifiersAmount && (
-            <span className="text-red-400 text-sm block pt-1">
-              {errors.qualifiersAmount.message as string}
-            </span>
-          )}
-        </>
-      )}
+      {!isLastStage && <QualifierTargetsSection isEditMode={isEditMode} />}
     </div>
   );
 };

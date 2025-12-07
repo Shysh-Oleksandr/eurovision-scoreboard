@@ -8,14 +8,12 @@ import { VotingPredefinitionTable } from './VotingPredefinitionTable';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
-import { BaseCountry, EventStage } from '@/models';
+import { EventStage } from '@/models';
 
 type VotingPredefinitionModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  stage: Pick<EventStage, 'id' | 'name' | 'votingMode'> & {
-    countries: (BaseCountry | any)[];
-  };
+  stage: EventStage;
   onSave: (votes: Partial<any>) => void;
   onLoaded?: () => void;
 };
@@ -101,8 +99,11 @@ const VotingPredefinitionModal = ({
       return;
     }
     if (!votes) return;
-    onSave(votes);
     onClose();
+
+    setTimeout(() => {
+      onSave(votes);
+    }, 300);
   };
 
   useEffectOnce(onLoaded);

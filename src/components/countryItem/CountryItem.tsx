@@ -43,11 +43,13 @@ const CountryItem = ({
 
   const shouldShowPlaceNumber = alwaysShowRankings || showPlaceAnimation;
 
-  const { isJuryVoting, isOver: isVotingOver } = getCurrentStage();
+  const currentStage = getCurrentStage();
+  const isJuryVoting = !!currentStage?.isJuryVoting;
+  const isVotingOver = !!currentStage?.isOver;
 
   const isVotingFinished = useVotingFinished(
     !!country.isVotingFinished,
-    isVotingOver,
+    !!isVotingOver,
   );
 
   const { shouldRender: showDouzePointsAnimationHook, points: douzePoints } =
@@ -71,7 +73,7 @@ const CountryItem = ({
 
   const shouldShowAsNonQualified = useQualificationStatus(
     country,
-    isVotingOver,
+    !!isVotingOver,
   );
   const { isDisabled, buttonClassName, isActive } = useItemState({
     country,

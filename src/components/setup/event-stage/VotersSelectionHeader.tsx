@@ -1,70 +1,49 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
+import { ListRestartIcon } from '@/assets/icons/ListRestartIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import ShuffleIcon from '@/assets/icons/ShuffleIcon';
 import SortAZIcon from '@/assets/icons/SortAZIcon';
 import SortZAIcon from '@/assets/icons/SortZAIcon';
 import Button from '@/components/common/Button';
-import { Checkbox } from '@/components/common/Checkbox';
-import { Tooltip } from '@/components/common/Tooltip';
 
 interface VotersSelectionHeaderProps {
   onReset: () => void;
+  onClearAll: () => void;
   onSort: (sort: 'az' | 'za' | 'shuffle') => void;
-  syncVotersWithParticipants?: boolean;
-  onSyncVotersChange: (sync: boolean) => void;
+  handleFilter: (
+    action: 'inStage' | 'otherStage' | 'allParticipants' | 'yearData',
+  ) => void;
   votersAmount: number;
+  disableLoadYearData: boolean;
 }
 
 const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
   onReset,
+  onClearAll,
   onSort,
-  syncVotersWithParticipants = true,
-  onSyncVotersChange,
   votersAmount,
+  handleFilter,
+  disableLoadYearData,
 }) => {
-  const t = useTranslations('setup.eventStageModal');
+  const t = useTranslations();
 
   return (
-    <div className="flex flex-col">
-      <div className="flex items-start gap-2">
-        <Tooltip
-          content={
-            <div className="space-y-2 font-medium">
-              <p>
-                {t.rich('syncVotersWithParticipantCountriesTooltip', {
-                  br: () => (
-                    <>
-                      <br />
-                      <br />
-                    </>
-                  ),
-                })}
-              </p>
-            </div>
-          }
-          position="left"
-        />
-        <Checkbox
-          checked={syncVotersWithParticipants}
-          onChange={(e) => onSyncVotersChange(e.target.checked)}
-          id="sync-voters-checkbox"
-          label={t('syncVotersWithParticipantCountries')}
-          labelClassName="text-white !px-0 !pt-1 !pb-3 !items-start"
-        />
-      </div>
-      <div className="flex gap-4 justify-between items-center">
+    <div className="flex flex-col sm:gap-0 gap-1">
+      <div className="flex justify-between flex-wrap items-center">
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-white">
-            {t('votingCountries', { count: votersAmount })}
+            {t('setup.eventStageModal.votingCountries', {
+              count: votersAmount,
+            })}
           </h3>
           <p className="text-sm text-white/50 mb-2">
-            {t('dragAndDropToReorder')}
+            {t('setup.eventStageModal.dragAndDropToReorder')}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center sm:gap-2 gap-1">
           <ActionButton
             onClick={() => onSort('az')}
             title="Sort A-Z"
@@ -82,10 +61,42 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
           />
           <ActionButton
             onClick={onReset}
-            title="Restart"
+            title="Reset list"
+            icon={<ListRestartIcon className="w-5 h-5" />}
+          />
+          <ActionButton
+            onClick={onClearAll}
+            title="Clear all"
             icon={<RestartIcon className="w-5 h-5" />}
           />
         </div>
+      </div>
+      <div className="flex items-center sm:gap-2 gap-1 flex-wrap">
+        <Button
+          className="!py-2 normal-case"
+          variant="tertiary"
+          onClick={() => handleFilter('yearData')}
+          disabled={disableLoadYearData}
+          label={t('common.loadYearData')}
+        />
+        <Button
+          className="!py-2 normal-case"
+          variant="tertiary"
+          onClick={() => handleFilter('inStage')}
+          label={t('setup.eventStageModal.inStageOnly')}
+        />
+        <Button
+          className="!py-2 normal-case"
+          variant="tertiary"
+          onClick={() => handleFilter('otherStage')}
+          label={t('setup.eventStageModal.otherStageOnly')}
+        />
+        <Button
+          className="!py-2 normal-case"
+          variant="tertiary"
+          onClick={() => handleFilter('allParticipants')}
+          label={t('setup.eventStageModal.allParticipants')}
+        />
       </div>
     </div>
   );

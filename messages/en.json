@@ -33,6 +33,7 @@
     "dragAndDropOrClickToUpload": "Drag & drop or click to upload",
     "orSelectExisting": "Or select existing",
     "randomize": "Randomize",
+    "loadYearData": "Load Year Data",
     "country": "Country"
   },
   "Metadata": {
@@ -69,16 +70,20 @@
       "juryAndTelevote": "Jury and Televote",
       "votingMode": "Voting Mode",
       "numberOfQualifiers": "Number of qualifiers",
-      "grandFinal": "Grand Final",
-      "semiFinal": "Semi-Final",
+      "qualifierTargets": "Qualifier targets",
+      "addStage": "Add Stage",
+      "editStage": "Edit Stage",
+      "stageNamePlaceholder": "Semi-Final 3, Quarter-Final 1, Heat 1, etc.",
+      "qualifiersFrom": "<span>{amount}</span> from <span2>{sourceStageName}</span2>",
       "nonVotingCountries": "Non-Voting Countries",
       "searchAndClickToAdd": "Search and click to add",
       "searchCountries": "Search countries...",
       "noVotingCountriesSelected": "No voting countries selected. Add countries from the list below.",
       "votingCountries": "Voting Countries ({count})",
       "dragAndDropToReorder": "Drag and drop to reorder",
-      "syncVotersWithParticipantCountriesTooltip": "If enabled, when you remove or add a participant country, the voting countries will be updated automatically.<br></br>If disabled, you will need to manually add or remove voting countries.",
-      "syncVotersWithParticipantCountries": "Sync voters with participant countries"
+      "inStageOnly": "In stage only",
+      "otherStageOnly": "Other stage only",
+      "allParticipants": "All participants"
     },
     "validation": {
       "noCountriesInStage": "There are no countries in {stageName}.",
@@ -87,11 +92,16 @@
       "qualifiersAmountMustBeLessThanParticipants": "The number of qualifiers in {stageName} must be less than the number of participants.",
       "participantsMustBeAtLeast": "The number of participants in {stageName} must be at least {count} (depends on the number of items in the points system).",
       "totalQualifiersMustBeAtLeast": "The total number of qualifiers for the Grand Final must be at least {count}.",
-      "grandFinalParticipantsMustBeAtLeast": "The number of the Grand Final participants must be at least {count}."
+      "grandFinalParticipantsMustBeAtLeast": "The number of the Grand Final participants must be at least {count}.",
+      "qualifiersExceedParticipants": "The number of qualifiers in {stageName} exceeds the number of participants.",
+      "qualifiersCannotMoveToPrecedentStage": "Qualifiers cannot move to a precedent stage ({stageName} -> {targetStageName}).",
+      "targetStageNotFound": "Target stage \"{targetStageId}\" not found.",
+      "stageOrderMustBeUnique": "Stage order must be unique."
     },
     "eventSetupModal": {
-      "allShows": "All Shows",
-      "grandFinalOnly": "Grand Final Only",
+      "grandFinalOnly": "GF only",
+      "grandFinalOnlyConfirm": "This will reset your setup and keep only the Grand Final. Are you sure you want to continue?",
+      "grandFinalOnlyConfirmNotGfOnly": "This will reset your setup and restore all shows (Semi-Finals + Grand Final). Are you sure you want to continue?",
       "notQualified": "Not Qualified",
       "notParticipating": "Not Participating",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "You need to be logged in to create and use custom entries.",
@@ -99,8 +109,10 @@
       "countriesAmount": "{count, plural, =1 {country} other {countries}}",
       "entriesAmount": "{count, plural, =1 {entry} other {entries}}",
       "autoQualifiers": "Auto-Qualifiers",
+      "qualifiers": "Qualifiers",
       "contestIsInProgress": "A contest is in progress. Changing the year will reset the current scoreboard and start a new setup. Are you sure?",
-      "enterThePointsEachVotingCountryAwardsToParticipants": "Enter the points each voting country awards to participants"
+      "enterThePointsEachVotingCountryAwardsToParticipants": "Enter the points each voting country awards to participants",
+      "reorderStages": "Reorder Stages"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Please sign in to create custom entries.",
@@ -124,7 +136,11 @@
       "northAmerica": "North America",
       "southAmerica": "South America",
       "oceania": "Oceania",
-      "restOfEurope": "Rest of Europe"
+      "restOfEurope": "Rest of Europe",
+      "inStage": "In stage",
+      "otherStage": "Other stage",
+      "notParticipating": "Not participating",
+      "autoQ": "Auto-Q"
     }
   },
   "simulation": {
@@ -176,7 +192,6 @@
       "cancelSimulation": "Cancel simulation",
       "cancelSimulationConfirmation": "Are you sure you want to cancel the simulation?",
       "restart": "Restart",
-      "restartConfirmation": "Are you sure you want to restart?",
       "undo": "Undo",
       "share": "Share",
       "setup": "Setup"
@@ -426,8 +441,6 @@
       "oddsTooltip": "Each country has separate jury and televote odds (0–100).<br></br><span>Higher number =</span> better chance of getting more points.<br></br>Initial values are based on countries' real Eurovision results for the selected year.",
       "randomnessLevel": "Randomness Level",
       "randomnessLevelTooltip": "The Randomness Level slider controls predictability:<br></br><span>Low =</span> more realistic, following odds closely.<br></br><span>High =</span> more chaotic, unpredictable.",
-      "randomize": "Randomize",
-      "loadYearData": "Load Year Data",
       "predictable": "Predictable",
       "chaotic": "Chaotic"
     },
@@ -460,7 +473,6 @@
       "showWinnerPopup": "Show winner popup",
       "showWinnerConfetti": "Show winner confetti",
       "enableFullscreenMode": "Enable fullscreen mode",
-      "confirmBeforeRestarting": "Confirm before restarting",
       "warnBeforeManuallyAssigningTelevotePoints": "Warn before manually assigning televote points",
       "showJuryVotingProgressBar": "Show jury voting progress bar",
       "imageSizeIsPrettyLarge": "Image size is pretty large ({size}MB). This can slow down the simulation, so you might want to compress it or use a smaller image. Do you want to continue with this image?",

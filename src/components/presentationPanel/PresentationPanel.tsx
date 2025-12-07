@@ -80,8 +80,8 @@ const PresentationPanel = (): JSX.Element | null => {
       : PresentationPointsGrouping.INDIVIDUAL;
 
   const withPointsGrouping =
-    currentStage.isJuryVoting &&
-    (!isPickQualifiersMode || currentStage.id === StageId.GF);
+    currentStage?.isJuryVoting &&
+    (!isPickQualifiersMode || currentStage?.id === StageId.GF);
 
   // Timer handling
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -136,7 +136,7 @@ const PresentationPanel = (): JSX.Element | null => {
       const awardedAnimated = useScoreboardStore
         .getState()
         .getCurrentStage()
-        .countries.some((c) => c.showDouzePointsAnimation);
+        ?.countries?.some((c) => c.showDouzePointsAnimation);
 
       const baseSeconds = MAX_SPEED_SECONDS - presentationSpeedSeconds;
       const delayAfterAnimation = pauseAfterAnimatedPoints

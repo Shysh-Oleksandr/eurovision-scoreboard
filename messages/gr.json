@@ -33,6 +33,7 @@
     "dragAndDropOrClickToUpload": "Σύρετε & αποθέστε ή κάντε κλικ για ανέβασμα",
     "orSelectExisting": "Ή επιλέξτε υπάρχουσα",
     "randomize": "Τυχαίο",
+    "loadYearData": "Φόρτωση Δεδομένων Έτους",
     "country": "Χώρα"
   },
   "Metadata": {
@@ -69,16 +70,20 @@
       "juryAndTelevote": "Κριτική Επιτροπή και Τηλεψήφισμα",
       "votingMode": "Λειτουργία Ψηφοφορίας",
       "numberOfQualifiers": "Αριθμός προκριθέντων",
-      "grandFinal": "Μεγάλος Τελικός",
-      "semiFinal": "Ημιτελικός",
+      "qualifierTargets": "Targets de qualification",
+      "addStage": "Προσθήκη σταδίου",
+      "editStage": "Επεξεργασία σταδίου",
+      "stageNamePlaceholder": "Ημιτελικός 3, Τεταρτημόριος 1, Heat 1, etc.",
+      "qualifiersFrom": "<span>{amount}</span> από <span2>{sourceStageName}</span2>",
       "nonVotingCountries": "Χώρες που δεν ψηφίζουν",
       "searchAndClickToAdd": "Αναζήτηση και κλικ για προσθήκη",
       "searchCountries": "Αναζήτηση χωρών...",
       "noVotingCountriesSelected": "Δεν έχει επιλεγεί καμία χώρα που ψηφίζει. Προσθέστε χώρες από τη λίστα παρακάτω.",
       "votingCountries": "Χώρες που ψηφίζουν ({count})",
       "dragAndDropToReorder": "Σύρετε και αποθέστε για αναδιάταξη",
-      "syncVotersWithParticipantCountriesTooltip": "Εάν είναι ενεργοποιημένο, όταν αφαιρείτε ή προσθέτετε μια συμμετέχουσα χώρα, οι χώρες που ψηφίζουν θα ενημερώνονται αυτόματα.<br></br>Εάν είναι απενεργοποιημένο, θα πρέπει να προσθέσετε ή να αφαιρέσετε χειροκίνητα τις χώρες που ψηφίζουν.",
-      "syncVotersWithParticipantCountries": "Συγχρονισμός ψηφοφόρων με συμμετέχουσες χώρες"
+      "inStageOnly": "Σταδιομόνο",
+      "otherStageOnly": "Άλλο σταδιομόνο",
+      "allParticipants": "Όλοι οι συμμετέχοντες"
     },
     "validation": {
       "noCountriesInStage": "Δεν υπάρχουν χώρες στο {stageName}.",
@@ -87,11 +92,16 @@
       "qualifiersAmountMustBeLessThanParticipants": "Ο αριθμός των προκριθέντων στο {stageName} πρέπει να είναι μικρότερος από τον αριθμό των συμμετεχόντων.",
       "participantsMustBeAtLeast": "Ο αριθμός των συμμετεχόντων στο {stageName} πρέπει να είναι τουλάχιστον {count} (εξαρτάται από τον αριθμό των αντικειμένων στο σύστημα βαθμών).",
       "totalQualifiersMustBeAtLeast": "Ο συνολικός αριθμός των προκριθέντων για τον Μεγάλο Τελικό πρέπει να είναι τουλάχιστον {count}.",
-      "grandFinalParticipantsMustBeAtLeast": "Ο αριθμός των συμμετεχόντων στον Μεγάλο Τελικό πρέπει να είναι τουλάχιστον {count}."
+      "grandFinalParticipantsMustBeAtLeast": "Ο αριθμός των συμμετεχόντων στον Μεγάλο Τελικό πρέπει να είναι τουλάχιστον {count}.",
+      "qualifiersExceedParticipants": "Ο αριθμός των προκριθέντων στο {stageName} υπερβαίνει τον αριθμό των συμμετεχόντων.",
+      "qualifiersCannotMoveToPrecedentStage": "Τα προκριθέντα δεν μπορούν να μετακινηθούν σε προηγούμενο στάδιο ({stageName} -> {targetStageName}).",
+      "targetStageNotFound": "Το στάδιο προορισμού \"{targetStageId}\" δεν βρέθηκε.",
+      "stageOrderMustBeUnique": "Η σειρά των σταδίων πρέπει να είναι μοναδική."
     },
     "eventSetupModal": {
-      "allShows": "Όλα τα Shows",
-      "grandFinalOnly": "Μόνο Μεγάλος Τελικός",
+      "grandFinalOnly": "Μόνο τελικός",
+      "grandFinalOnlyConfirm": "Αυτό θα επαναφέρει τη ρύθμιση σας και θα διατηρήσει μόνο τον Μεγάλο Τελικό. Είστε σίγουροι ότι θέλετε να συνεχίσετε;",
+      "grandFinalOnlyConfirmNotGfOnly": "Αυτό θα επαναφέρει τη ρύθμιση σας και θα επαναφέρει όλα τα στάδια (Ημιτελικά + Μεγάλος Τελικός). Είστε σίγουροι ότι θέλετε να συνεχίσετε;",
       "notQualified": "Μη Προκριθέντες",
       "notParticipating": "Μη Συμμετέχοντες",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Πρέπει να συνδεθείτε για να δημιουργήσετε και να χρησιμοποιήσετε προσαρμοσμένες συμμετοχές.",
@@ -99,8 +109,10 @@
       "countriesAmount": "{count, plural, =1 {χώρα} other {χώρες}}",
       "entriesAmount": "{count, plural, =1 {συμμετοχή} other {συμμετοχές}}",
       "autoQualifiers": "Αυτόματοι Προκριθέντες",
+      "qualifiers": "Προκριθέντες",
       "contestIsInProgress": "Ένας διαγωνισμός βρίσκεται σε εξέλιξη. Αλλάζοντας το έτος θα επαναφέρει τον τρέχοντα πίνακα σκορ και θα ξεκινήσει νέα ρύθμιση. Είστε σίγουροι;",
-      "enterThePointsEachVotingCountryAwardsToParticipants": "Εισάγετε τους βαθμούς που δίνει κάθε χώρα που ψηφίζει στους συμμετέχοντες"
+      "enterThePointsEachVotingCountryAwardsToParticipants": "Εισάγετε τους βαθμούς που δίνει κάθε χώρα που ψηφίζει στους συμμετέχοντες",
+      "reorderStages": "Αναδιάταξη σταδίων"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Συνδεθείτε για να δημιουργήσετε προσαρμοσμένες συμμετοχές.",
@@ -124,7 +136,11 @@
       "northAmerica": "Βόρεια Αμερική",
       "southAmerica": "Νότια Αμερική",
       "oceania": "Ωκεανία",
-      "restOfEurope": "Υπόλοιπη Ευρώπη"
+      "restOfEurope": "Υπόλοιπη Ευρώπη",
+      "inStage": "Σταδιομόνο",
+      "otherStage": "Άλλο σταδιομόνο",
+      "notParticipating": "Μη Συμμετέχοντες",
+      "autoQ": "Αυτόματοι Προκριθέντες"
     }
   },
   "simulation": {
@@ -176,7 +192,6 @@
       "cancelSimulation": "Ακύρωση προσομοίωσης",
       "cancelSimulationConfirmation": "Είστε σίγουροι ότι θέλετε να ακυρώσετε την προσομοίωση;",
       "restart": "Επανεκκίνηση",
-      "restartConfirmation": "Είστε σίγουροι ότι θέλετε να επανεκκινήσετε;",
       "undo": "Αναίρεση",
       "share": "Κοινοποίηση",
       "setup": "Ρυθμίσεις"
@@ -426,8 +441,6 @@
       "oddsTooltip": "Κάθε χώρα έχει ξεχωριστές πιθανότητες για κριτική και τηλεψηφοφορία (0–100).<br></br><span>Μεγαλύτερος αριθμός =</span> καλύτερη πιθανότητα να πάρει περισσότερους βαθμούς.<br></br>Αρχικές τιμές βασίζονται στα πραγματικά αποτελέσματα της Eurovision για το επιλεγμένο έτος.",
       "randomnessLevel": "Επίπεδο Τυχαιότητας",
       "randomnessLevelTooltip": "Ο ρυθμιστής Επίπεδο Τυχαιότητας ελέγχει την προβλεψιμότητα:<br></br><span>Χαμηλό =</span> πιο ρεαλιστικό, ακολουθώντας τις πιθανότητες στενά.<br></br><span>Υψηλό =</span> πιο χαοτικό, απρόβλεπτο.",
-      "randomize": "Τυχαιοποίηση",
-      "loadYearData": "Φόρτωση Δεδομένων Έτους",
       "predictable": "Προβλέψιμο",
       "chaotic": "Χαοτικό"
     },
@@ -460,7 +473,6 @@
       "showWinnerPopup": "Εμφάνιση popup νικητή",
       "showWinnerConfetti": "Εμφάνιση κονφετί για τον νικητή",
       "enableFullscreenMode": "Ενεργοποίηση πλήρους οθόνης",
-      "confirmBeforeRestarting": "Επιβεβαίωση πριν την επανεκκίνηση",
       "warnBeforeManuallyAssigningTelevotePoints": "Προειδοποίηση πριν χειροκίνητη κατανομή βαθμών τηλεψηφοφορίας",
       "showJuryVotingProgressBar": "Εμφάνιση μπάρας προόδου ψήφων κριτικής",
       "imageSizeIsPrettyLarge": "Το μέγεθος εικόνας είναι αρκετά μεγάλο ({size}MB). Αυτό μπορεί να επιβραδύνει τη προσομοίωση, ίσως θέλετε να τη συμπιέσετε ή να χρησιμοποιήσετε μικρότερη εικόνα. Θέλετε να συνεχίσετε με αυτήν την εικόνα;",

@@ -1,5 +1,5 @@
 import { PointsItem } from '@/state/generalStore';
-import { BaseCountry } from '../models';
+import { BaseCountry, VotingCountry } from '../models';
 import { getHostingCountryByYear } from '@/theme/hosting';
 import { Year } from '@/config';
 import { ESC_YEARS_WITH_THEME, JUNIOR_YEARS_WITH_THEME } from '@/theme/themes';
@@ -55,7 +55,7 @@ export const POINTS_ARRAY = new Array(10).fill(0).map((_, index) => {
 });
 
 export const getMaxPossibleTelevotePoints = (
-  votingCountries: BaseCountry[],
+  votingCountries: VotingCountry[],
   votingCountryCode: string,
   pointsSystem: PointsItem[],
 ) => {

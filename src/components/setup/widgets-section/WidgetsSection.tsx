@@ -1,10 +1,9 @@
 import { useTranslations } from 'next-intl';
-import React from 'react';
 
 import ThemesWidget from './custom-themes/ThemesWidget';
 import ProfileWidget from './profile/ProfileWidget';
 
-import { ScoreboardIcon } from '@/assets/icons/ScoreboardIcon';
+import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
 
 const WidgetsSection = () => {
@@ -18,7 +17,7 @@ const WidgetsSection = () => {
         onClick={() => {}}
         title={t('contests.title')}
         description={t('contests.description')}
-        icon={<ScoreboardIcon className="w-6 h-6 flex-none" />}
+        icon={<TrophyIcon className="w-6 h-6 flex-none" />}
         disabled
       />
     </div>

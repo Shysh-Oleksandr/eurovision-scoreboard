@@ -30,31 +30,41 @@ export const createGetters: StateCreator<
 
   getCurrentStage: () => {
     const { eventStages, currentStageId } = get();
+    if (!currentStageId) return undefined;
     return eventStages.find((s) => s.id === currentStageId);
   },
 
   getNextStage: () => {
     const { eventStages, currentStageId } = get();
 
-    const currentStageIndex = eventStages.findIndex(
-      (s: EventStage) => s.id === currentStageId,
+    const currentStage = eventStages.find((s: EventStage) => s.id === currentStageId);
+    if (!currentStage) return null;
+
+    const currentOrder = currentStage.order ?? 0;
+    // Find next stage by order (next highest order value)
+    const sortedStages = [...eventStages].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const nextStage = sortedStages.find(
+      (s: EventStage) => (s.order ?? 0) > currentOrder,
     );
 
-    const nextStage =
-      currentStageIndex !== -1 ? eventStages?.[currentStageIndex + 1] : null;
-
-    return nextStage;
+    return nextStage || null;
   },
 
   getCountryInSemiFinal: (countryCode: string) => {
     const { eventStages } = get();
 
-    for (const stage of eventStages) {
-      if (stage.id !== StageId.GF) {
-        const country = stage.countries.find((c) => c.code === countryCode);
-        if (country) {
-          return country;
-        }
+    // Consider only non-final stages, ordered by stage order,
+    // and return the country from the *latest* such stage.
+    const nonFinalStages = eventStages
+      .filter((stage) => stage.id !== StageId.GF)
+      .slice()
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    for (let i = nonFinalStages.length - 1; i >= 0; i -= 1) {
+      const stage = nonFinalStages[i];
+      const country = stage.countries.find((c) => c.code === countryCode);
+      if (country) {
+        return country;
       }
     }
 

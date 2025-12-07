@@ -29,7 +29,7 @@ const PickQualifiersSimulation = () => {
   );
 
   const currentStage = getCurrentStage();
-  const { isOver } = currentStage;
+  const isOver = !!currentStage?.isOver;
   const startCounter = useScoreboardStore((state) => state.startCounter);
 
   return (
@@ -52,7 +52,7 @@ const PickQualifiersSimulation = () => {
 
       <div
         className={`flex md:gap-6 xs:gap-4 gap-3 ${
-          currentStage.isOver ? 'pt-2' : 'xs:pt-2 pt-0'
+          isOver ? 'pt-2' : 'xs:pt-2 pt-0'
         }`}
         key={startCounter}
       >

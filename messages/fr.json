@@ -33,6 +33,7 @@
     "dragAndDropOrClickToUpload": "Glissez-déposez ou cliquez pour téléverser",
     "orSelectExisting": "Ou sélectionner un existant",
     "randomize": "Aléatoire",
+    "loadYearData": "Charger les données de l’année",
     "country": "Pays"
   },
   "Metadata": {
@@ -69,16 +70,20 @@
       "juryAndTelevote": "Jury et Télévote",
       "votingMode": "Mode de vote",
       "numberOfQualifiers": "Nombre de qualifiés",
-      "grandFinal": "Grande Finale",
-      "semiFinal": "Demi-finale",
+      "qualifierTargets": "Targets de qualification",
+      "addStage": "Ajouter une étape",
+      "editStage": "Modifier une étape",
+      "stageNamePlaceholder": "Demi-finale 3, Quart-finale 1, Heat 1, etc.",
+      "qualifiersFrom": "<span>{amount}</span> de <span2>{sourceStageName}</span2>",
       "nonVotingCountries": "Pays non votants",
       "searchAndClickToAdd": "Recherchez et cliquez pour ajouter",
       "searchCountries": "Rechercher des pays...",
       "noVotingCountriesSelected": "Aucun pays votant sélectionné. Ajoutez des pays depuis la liste ci-dessous.",
       "votingCountries": "Pays votants ({count})",
       "dragAndDropToReorder": "Glissez-déposez pour réorganiser",
-      "syncVotersWithParticipantCountriesTooltip": "Si activé, lorsque vous retirez ou ajoutez un pays participant, les pays votants seront mis à jour automatiquement.<br></br>Si désactivé, vous devrez ajouter ou retirer les pays votants manuellement.",
-      "syncVotersWithParticipantCountries": "Synchroniser les votants avec les pays participants"
+      "inStageOnly": "Dans la scène uniquement",
+      "otherStageOnly": "Autre scène uniquement",
+      "allParticipants": "Tous les participants"
     },
     "validation": {
       "noCountriesInStage": "Aucun pays dans {stageName}.",
@@ -87,11 +92,16 @@
       "qualifiersAmountMustBeLessThanParticipants": "Le nombre de qualifiés dans {stageName} doit être inférieur au nombre de participants.",
       "participantsMustBeAtLeast": "Le nombre de participants dans {stageName} doit être au moins {count} (selon le nombre d’éléments dans le système de points).",
       "totalQualifiersMustBeAtLeast": "Le nombre total de qualifiés pour la Grande Finale doit être au moins {count}.",
-      "grandFinalParticipantsMustBeAtLeast": "Le nombre de participants à la Grande Finale doit être au moins {count}."
+      "grandFinalParticipantsMustBeAtLeast": "Le nombre de participants à la Grande Finale doit être au moins {count}.",
+      "qualifiersExceedParticipants": "Le nombre de qualifiés dans {stageName} dépasse le nombre de participants.",
+      "qualifiersCannotMoveToPrecedentStage": "Les qualifiés ne peuvent pas être déplacés vers une étape précédente ({stageName} -> {targetStageName}).",
+      "targetStageNotFound": "Étape cible \"{targetStageId}\" non trouvée.",
+      "stageOrderMustBeUnique": "L’ordre des étapes doit être unique."
     },
     "eventSetupModal": {
-      "allShows": "Tous les shows",
-      "grandFinalOnly": "Grande Finale uniquement",
+      "grandFinalOnly": "Finale seule",
+      "grandFinalOnlyConfirm": "Cela réinitialisera votre configuration et ne gardera que la Grande Finale. Êtes-vous sûr de vouloir continuer ?",
+      "grandFinalOnlyConfirmNotGfOnly": "Cela réinitialisera votre configuration et restaurera toutes les étapes (Demi-finales + Grande Finale). Êtes-vous sûr de vouloir continuer ?",
       "notQualified": "Non qualifié",
       "notParticipating": "Ne participe pas",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Vous devez être connecté pour créer et utiliser des entrées personnalisées.",
@@ -99,8 +109,10 @@
       "countriesAmount": "{count, plural, =1 {pays} other {pays}}",
       "entriesAmount": "{count, plural, =1 {entrée} other {entrées}}",
       "autoQualifiers": "Qualifiés automatiques",
+      "qualifiers": "Qualifiés",
       "contestIsInProgress": "Un concours est en cours. Changer l’année réinitialisera le scoreboard actuel et lancera une nouvelle configuration. Êtes-vous sûr ?",
-      "enterThePointsEachVotingCountryAwardsToParticipants": "Entrez les points que chaque pays votant attribue aux participants"
+      "enterThePointsEachVotingCountryAwardsToParticipants": "Entrez les points que chaque pays votant attribue aux participants",
+      "reorderStages": "Réorganiser les étapes"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Veuillez vous connecter pour créer des entrées personnalisées.",
@@ -124,7 +136,11 @@
       "northAmerica": "Amérique du Nord",
       "southAmerica": "Amérique du Sud",
       "oceania": "Océanie",
-      "restOfEurope": "Reste de l’Europe"
+      "restOfEurope": "Reste de l’Europe",
+      "inStage": "Dans la scène",
+      "otherStage": "Autre scène",
+      "notParticipating": "Ne participe pas",
+      "autoQ": "Auto-Q"
     }
   },
   "simulation": {
@@ -176,7 +192,6 @@
       "cancelSimulation": "Annuler la simulation",
       "cancelSimulationConfirmation": "Êtes-vous sûr de vouloir annuler la simulation ?",
       "restart": "Redémarrer",
-      "restartConfirmation": "Êtes-vous sûr de vouloir redémarrer ?",
       "undo": "Annuler",
       "share": "Partager",
       "setup": "Configuration"
@@ -426,8 +441,6 @@
       "oddsTooltip": "Chaque pays possède des cotes distinctes pour le jury et le télévote (0–100).<br></br><span>Nombre élevé =</span> meilleure chance d’obtenir plus de points.<br></br>Les valeurs initiales sont basées sur les résultats réels de l’Eurovision pour l’année choisie.",
       "randomnessLevel": "Niveau d’aléatoire",
       "randomnessLevelTooltip": "Le curseur ajuste la prévisibilité :<br></br><span>Bas =</span> plus réaliste, suit davantage les cotes.<br></br><span>Élevé =</span> plus chaotique et imprévisible.",
-      "randomize": "Aléatoire",
-      "loadYearData": "Charger les données de l’année",
       "predictable": "Prévisible",
       "chaotic": "Chaotique"
     },
@@ -460,7 +473,6 @@
       "showWinnerPopup": "Afficher la fenêtre du gagnant",
       "showWinnerConfetti": "Afficher les confettis du gagnant",
       "enableFullscreenMode": "Activer le mode plein écran",
-      "confirmBeforeRestarting": "Confirmer avant de recommencer",
       "warnBeforeManuallyAssigningTelevotePoints": "Avertir avant d’attribuer manuellement des points de télévote",
       "showJuryVotingProgressBar": "Afficher la barre de progression du jury",
       "imageSizeIsPrettyLarge": "L’image est assez lourde ({size}MB). Cela peut ralentir la simulation — vous pouvez la compresser ou utiliser une image plus petite. Voulez-vous continuer ?",

@@ -57,7 +57,7 @@ const TelevoteInput = () => {
     (state) => state.getStageVotingCountries,
   );
 
-  const { countries } = getCurrentStage();
+  const { countries } = getCurrentStage() || {};
   const votingCountries = getStageVotingCountries();
 
   const [enteredPoints, setEnteredPoints] = useState('');
@@ -89,7 +89,7 @@ const TelevoteInput = () => {
 
     const maxPointsPerVotingCountry = getMaxPossibleTelevotePoints(
       votingCountries,
-      votingCountryCode,
+      votingCountryCode ?? '',
       pointsSystem,
     );
 
@@ -188,7 +188,7 @@ const TelevoteInput = () => {
       setError('');
       setDisableLimit(false); // Reset the limit disable state after voting
 
-      giveTelevotePoints(votingCountryCode, votingPoints);
+      giveTelevotePoints(votingCountryCode ?? '', votingPoints);
     };
 
     if (hasShownManualTelevoteWarning || !shouldShowManualTelevoteWarning) {
@@ -244,8 +244,10 @@ const TelevoteInput = () => {
       <h5 className="uppercase text-white/50 lg:text-sm text-xs mt-2 mb-1">
         {t.rich('simulation.ordinalOfCountries', {
           index: televotingProgress + 1,
-          length: countries.length,
-          span: (chunks) => <span className="font-medium">{chunks}</span>,
+          length: countries?.length ?? 0,
+          span: (chunks: React.ReactNode) => (
+            <span className="font-medium">{chunks}</span>
+          ),
         })}
       </h5>
 

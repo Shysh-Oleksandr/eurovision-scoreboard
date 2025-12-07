@@ -7,6 +7,7 @@ import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradi
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 interface CountryQualificationItemProps {
   country: BaseCountry | null;
@@ -26,6 +27,7 @@ export const CountryQualificationItem: React.FC<
   isModal = false,
 }) => {
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
+  const getCurrentStage = useScoreboardStore((s) => s.getCurrentStage);
 
   const itemRef = useRef<HTMLDivElement>(null);
 
@@ -57,13 +59,19 @@ export const CountryQualificationItem: React.FC<
     );
   }
 
+  const currentStageId = getCurrentStage()?.id;
+  const isQualifiedInCurrentStage =
+    !!country &&
+    !!currentStageId &&
+    country.qualifiedFromStageIds?.includes(currentStageId);
+
   return (
     <div
       ref={itemRef}
       className={`flex items-center rounded-sm transition-all duration-300 relative shadow-md ${
         onClick ? 'cursor-pointer hover:bg-countryItem-juryHoverBg' : ''
       } ${
-        country.isQualifiedFromSemi && hideIfQualified
+        isQualifiedInCurrentStage && hideIfQualified
           ? 'opacity-50 !cursor-not-allowed'
           : ''
       } ${shouldAnimate ? 'opacity-0 -translate-x-full' : ''} ${
