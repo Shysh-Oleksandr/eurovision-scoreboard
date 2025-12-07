@@ -33,6 +33,7 @@
     "dragAndDropOrClickToUpload": "Arrastra y suelta o haz clic para subir",
     "orSelectExisting": "O selecciona una existente",
     "randomize": "Aleatorio",
+    "loadYearData": "Cargar datos del año",
     "country": "País"
   },
   "Metadata": {
@@ -69,16 +70,20 @@
       "juryAndTelevote": "Jurado y televoto",
       "votingMode": "Modo de votación",
       "numberOfQualifiers": "Número de clasificados",
-      "grandFinal": "Gran Final",
-      "semiFinal": "Semifinal",
+      "qualifierTargets": "Objetivos de clasificación",
+      "addStage": "Añadir etapa",
+      "editStage": "Editar etapa",
+      "stageNamePlaceholder": "Semi-Final 3, Quarter-Final 1, Heat 1, etc.",
+      "qualifiersFrom": "<span>{amount}</span> de <span2>{sourceStageName}</span2>",
       "nonVotingCountries": "Países no votantes",
       "searchAndClickToAdd": "Busca y haz clic para añadir",
       "searchCountries": "Buscar países...",
       "noVotingCountriesSelected": "No hay países votantes seleccionados. Añade países desde la lista de abajo.",
       "votingCountries": "Países votantes ({count})",
       "dragAndDropToReorder": "Arrastra y suelta para reordenar",
-      "syncVotersWithParticipantCountriesTooltip": "Si está activado, al añadir o eliminar un país participante, los países votantes se actualizarán automáticamente.<br></br>Si está desactivado, tendrás que añadirlos o quitarlos manualmente.",
-      "syncVotersWithParticipantCountries": "Sincronizar votantes con participantes"
+      "inStageOnly": "Solo en etapa",
+      "otherStageOnly": "Solo en otra etapa",
+      "allParticipants": "Todos los participantes"
     },
     "validation": {
       "noCountriesInStage": "No hay países en {stageName}.",
@@ -87,11 +92,16 @@
       "qualifiersAmountMustBeLessThanParticipants": "Los clasificados en {stageName} deben ser menos que los participantes.",
       "participantsMustBeAtLeast": "Los participantes en {stageName} deben ser al menos {count} (según el número de elementos del sistema de puntos).",
       "totalQualifiersMustBeAtLeast": "El total de clasificados para la Gran Final debe ser al menos {count}.",
-      "grandFinalParticipantsMustBeAtLeast": "Los participantes en la Gran Final deben ser al menos {count}."
+      "grandFinalParticipantsMustBeAtLeast": "Los participantes en la Gran Final deben ser al menos {count}.",
+      "qualifiersExceedParticipants": "El número de clasificados en {stageName} excede el número de participantes.",
+      "qualifiersCannotMoveToPrecedentStage": "Los clasificados no pueden moverse a una etapa anterior ({stageName} -> {targetStageName}).",
+      "targetStageNotFound": "Etapa objetivo \"{targetStageId}\" no encontrada.",
+      "stageOrderMustBeUnique": "El orden de las etapas debe ser único."
     },
     "eventSetupModal": {
-      "allShows": "Todas las galas",
-      "grandFinalOnly": "Solo Gran Final",
+      "grandFinalOnly": "Solo final",
+      "grandFinalOnlyConfirm": "Esto restablecerá tu configuración y mantendrá solo el Gran Final. ¿Estás seguro de que quieres continuar?",
+      "grandFinalOnlyConfirmNotGfOnly": "Esto restablecerá tu configuración y restaurará todas las etapas (Semi-Finales + Gran Final). ¿Estás seguro de que quieres continuar?",
       "notQualified": "No clasificado",
       "notParticipating": "No participa",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Necesitas iniciar sesión para crear y usar entradas personalizadas.",
@@ -99,8 +109,10 @@
       "countriesAmount": "{count, plural, =1 {país} other {países}}",
       "entriesAmount": "{count, plural, =1 {entrada} other {entradas}}",
       "autoQualifiers": "Clasificados automáticos",
+      "qualifiers": "Clasificados",
       "contestIsInProgress": "Un concurso está en curso. Cambiar el año restablecerá el marcador actual y empezará una nueva configuración. ¿Seguro?",
-      "enterThePointsEachVotingCountryAwardsToParticipants": "Introduce los puntos que cada país otorga a los participantes"
+      "enterThePointsEachVotingCountryAwardsToParticipants": "Introduce los puntos que cada país otorga a los participantes",
+      "reorderStages": "Reordenar etapas"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Inicia sesión para crear entradas personalizadas.",
@@ -124,7 +136,11 @@
       "northAmerica": "América del Norte",
       "southAmerica": "América del Sur",
       "oceania": "Oceanía",
-      "restOfEurope": "Resto de Europa"
+      "restOfEurope": "Resto de Europa",
+      "inStage": "En etapa",
+      "otherStage": "En otra etapa",
+      "notParticipating": "No participa",
+      "autoQ": "Auto-Q"
     }
   },
   "simulation": {
@@ -176,7 +192,6 @@
       "cancelSimulation": "Cancelar simulación",
       "cancelSimulationConfirmation": "¿Seguro que quieres cancelar la simulación?",
       "restart": "Reiniciar",
-      "restartConfirmation": "¿Seguro que quieres reiniciar?",
       "undo": "Deshacer",
       "share": "Compartir",
       "setup": "Configuración"
@@ -426,8 +441,6 @@
       "oddsTooltip": "Cada país tiene probabilidades separadas para jurado y televoto (0–100).<br></br><span>Número más alto =</span> mayor probabilidad de obtener más puntos.<br></br>Los valores iniciales se basan en los resultados reales de Eurovisión del año seleccionado.",
       "randomnessLevel": "Nivel de aleatoriedad",
       "randomnessLevelTooltip": "El control deslizante de aleatoriedad determina la previsibilidad:<br></br><span>Bajo =</span> más realista, siguiendo estrechamente las probabilidades.<br></br><span>Alto =</span> más caótico e impredecible.",
-      "randomize": "Aleatorizar",
-      "loadYearData": "Cargar datos del año",
       "predictable": "Previsible",
       "chaotic": "Caótico"
     },
@@ -460,7 +473,6 @@
       "showWinnerPopup": "Mostrar ventana del ganador",
       "showWinnerConfetti": "Mostrar confeti del ganador",
       "enableFullscreenMode": "Activar modo de pantalla completa",
-      "confirmBeforeRestarting": "Confirmar antes de reiniciar",
       "warnBeforeManuallyAssigningTelevotePoints": "Avisar antes de asignar manualmente puntos del televoto",
       "showJuryVotingProgressBar": "Mostrar barra de progreso del jurado",
       "imageSizeIsPrettyLarge": "El tamaño de la imagen es bastante grande ({size}MB). Esto puede ralentizar la simulación, así que quizá prefieras comprimirla o usar una imagen más pequeña. ¿Quieres continuar con esta imagen?",

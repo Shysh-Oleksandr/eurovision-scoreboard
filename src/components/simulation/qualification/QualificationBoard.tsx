@@ -19,7 +19,9 @@ const QualificationBoard = () => {
     (state) => state.pickQualifierRandomly,
   );
 
-  const { countries, isOver } = getCurrentStage();
+  const currentStage = getCurrentStage();
+  const countries = currentStage?.countries ?? [];
+  const isOver = !!currentStage?.isOver;
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(

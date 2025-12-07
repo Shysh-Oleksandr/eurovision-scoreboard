@@ -1,23 +1,15 @@
 import { StateCreator } from 'zustand';
 
-import {
-  BaseCountry,
-  Country,
-  EventMode,
-  EventStage,
-  StageId,
-  StageVotingMode,
-} from '../../models';
+import { BaseCountry, EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 
-import { ScoreboardState } from './types';
 import { useGeneralStore } from '../generalStore';
+import { ScoreboardState } from './types';
+import { compareCountriesByPoints } from './helpers';
 
 type EventActions = {
-  setEventStages: (
-    stages: (Omit<EventStage, 'countries'> & { countries: BaseCountry[] })[],
-  ) => void;
-  startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
+  setEventStages: (eventStages: EventStage[]) => void;
+  startEvent: (selectedCountries: BaseCountry[]) => void;
   prepareForNextStage: (shouldUpdateStore?: boolean) => {
     updatedEventStages: EventStage[];
     nextStage: EventStage | null;
@@ -35,28 +27,11 @@ export const createEventActions: StateCreator<
   [],
   EventActions
 > = (set, get) => ({
-  setEventStages: (
-    stages: (Omit<EventStage, 'countries'> & {
-      countries: BaseCountry[];
-    })[],
-  ) => {
-    const eventStages: EventStage[] = stages.map((stage) => ({
-      ...stage,
-      isOver: false,
-      isJuryVoting: stage.votingMode !== StageVotingMode.TELEVOTE_ONLY,
-      countries: stage.countries.map((country) => ({
-        ...country,
-        juryPoints: 0,
-        televotePoints: 0,
-        points: 0,
-        lastReceivedPoints: null,
-      })),
-    }));
-
+  setEventStages: (eventStages: EventStage[]) => {
     set({ eventStages });
   },
 
-  startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => {
+  startEvent: (selectedCountries: BaseCountry[]) => {
     const countriesStore = useCountriesStore.getState();
 
     countriesStore.setSelectedCountries(selectedCountries);
@@ -76,37 +51,11 @@ export const createEventActions: StateCreator<
     });
 
     const allStagesFromSetup = get().eventStages;
-    let newEventStages: EventStage[];
-
-    if (mode === EventMode.GRAND_FINAL_ONLY) {
-      newEventStages = allStagesFromSetup.filter(
-        (s: EventStage) => s.id === StageId.GF,
-      );
-    } else {
-      newEventStages = allStagesFromSetup.filter(
-        (s: EventStage) => s.id === StageId.GF || s.countries.length > 0,
-      );
-      const gfStageIndex = newEventStages.findIndex(
-        (s: EventStage) => s.id === StageId.GF,
-      );
-
-      if (gfStageIndex > -1) {
-        const autoQualifiers = selectedCountries.filter(
-          (c: BaseCountry) => c.isAutoQualified,
-        );
-        const autoQualifiersCountries: Country[] = autoQualifiers.map(
-          (country) => ({
-            ...country,
-            juryPoints: 0,
-            televotePoints: 0,
-            points: 0,
-            lastReceivedPoints: null,
-          }),
-        );
-
-        newEventStages[gfStageIndex].countries = autoQualifiersCountries;
-      }
-    }
+    console.log('allStagesFromSetup', allStagesFromSetup);
+    // Sort stages by order property, filter out stages with no participants
+    const newEventStages: EventStage[] = allStagesFromSetup
+      .filter((s: EventStage) => s.countries.length > 0)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     const finalEventStages = newEventStages.map((stage, index) => ({
       ...stage,
@@ -131,6 +80,8 @@ export const createEventActions: StateCreator<
       isPresenting: generalStore.settings.autoStartPresentation,
     });
 
+    console.log('finalEventStages', finalEventStages);
+
     set({
       eventStages: finalEventStages,
       currentStageId: firstStage?.id ?? null,
@@ -149,7 +100,7 @@ export const createEventActions: StateCreator<
     });
   },
 
-  // Needed to display correct countries for predefinition modal
+  // Needed to display correct countries for post setup modals
   prepareForNextStage: (shouldUpdateStore = true) => {
     const state = get();
     const currentStage = state.getCurrentStage();
@@ -177,32 +128,63 @@ export const createEventActions: StateCreator<
       })),
     };
 
-    let nextStageCountries = nextStage.countries;
-
-    if (nextStage.id === StageId.GF) {
-      const qualifiedFromSemiCountries = state.eventStages
-        .slice(0, currentStageIndex + 1)
-        .flatMap((s: EventStage) => s.countries)
-        .filter((c: Country) => c.isQualifiedFromSemi)
+    // Collect qualifiers from current stage based on qualifiesTo relationships.
+    // Only do this once per transition; subsequent calls (e.g. from
+    // continueToNextPhase after handleContinue) should not re-append qualifiers.
+    const currentStageQualifiesTo = currentStage.qualifiesTo || [];
+    if (
+      currentStageQualifiesTo.length > 0 &&
+      !nextStage.isPreparedForNextStage
+    ) {
+      // Get all countries from current stage, sorted by total points (descending)
+      const countriesWithPoints = currentStage.countries
         .map((c) => ({
           ...c,
-          juryPoints: 0,
-          televotePoints: 0,
-          points: 0,
-          lastReceivedPoints: null,
-          isVotingFinished: false,
-        }));
+          totalPoints: c.points,
+        }))
+        .sort(compareCountriesByPoints);
 
-      nextStageCountries = [
-        ...nextStage.countries,
-        ...qualifiedFromSemiCountries,
-      ];
+      // Distribute qualifiers to target stages based on qualifiesTo
+      let qualifierIndex = 0;
+      for (const target of currentStageQualifiesTo) {
+        const targetStageIndex = updatedEventStages.findIndex(
+          (s) => s.id === target.targetStageId,
+        );
 
-      updatedEventStages[currentStageIndex + 1] = {
-        ...nextStage,
-        countries: nextStageCountries,
-        isReadyForPredef: true,
-      };
+        if (targetStageIndex === -1) continue;
+
+        const targetStage = updatedEventStages[targetStageIndex];
+        const qualifiersForTarget = countriesWithPoints
+          .slice(qualifierIndex, qualifierIndex + target.amount)
+          .map((c) => ({
+            ...c,
+            juryPoints: 0,
+            televotePoints: 0,
+            points: 0,
+            lastReceivedPoints: null,
+            isVotingFinished: false,
+            qualifiedFromStageIds: [
+              ...(c.qualifiedFromStageIds ?? []),
+              currentStage.id,
+            ],
+          }));
+
+        // Add qualifiers to target stage
+        const existingCountries = targetStage.countries || [];
+
+        const updatedTargetStage = {
+          ...targetStage,
+          countries: [...existingCountries, ...qualifiersForTarget],
+        };
+
+        updatedEventStages[targetStageIndex] = updatedTargetStage;
+        qualifierIndex += target.amount;
+      }
+    }
+
+    // Set isPreparedForNextStage for next stage
+    if (currentStageIndex + 1 < updatedEventStages.length) {
+      updatedEventStages[currentStageIndex + 1].isPreparedForNextStage = true;
     }
 
     if (shouldUpdateStore) {

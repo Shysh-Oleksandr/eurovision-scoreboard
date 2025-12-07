@@ -1,16 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useDebounce } from '../../../../hooks/useDebounce';
-import { BaseCountry } from '../../../../models';
+import { BaseCountry, CountryAssignmentGroup } from '../../../../models';
 import { CATEGORY_ORDER } from '../../constants';
+import { useCountriesStore } from '@/state/countriesStore';
 
-export const useVotersCountriesSearch = (availableCountries: BaseCountry[]) => {
+export const useVotersCountriesSearch = (
+  availableCountries: BaseCountry[],
+  currentStageId?: string,
+) => {
   const [countriesSearch, setCountriesSearch] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<
     Record<string, boolean>
   >({});
   const debouncedSearch = useDebounce(countriesSearch, 300);
   const prevDebouncedSearchRef = useRef<string>(undefined);
+  const eventAssignments = useCountriesStore((state) => state.eventAssignments);
 
   const handleCountriesSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCountriesSearch(e.target.value);
@@ -26,6 +31,7 @@ export const useVotersCountriesSearch = (availableCountries: BaseCountry[]) => {
       country.name.toLowerCase().includes(debouncedSearch.trim().toLowerCase()),
     );
 
+    // 1) Base grouping by continent/category (original behavior)
     filteredAvailableCountries.forEach((country) => {
       const category = country.category || 'Other';
 
@@ -35,13 +41,43 @@ export const useVotersCountriesSearch = (availableCountries: BaseCountry[]) => {
       groups[category].push(country);
     });
 
-    Object.keys(groups).forEach((category) => {
-      groups[category].sort((a, b) => a.name.localeCompare(b.name));
+    // 2) Additional participation-based groups: "In stage" and "Other stage"
+    if (currentStageId) {
+      const assignments = eventAssignments || {};
+
+      filteredAvailableCountries.forEach((country) => {
+        const assignedGroup = assignments[country.code];
+
+        const participatesHere = assignedGroup === currentStageId;
+
+        const participatesSomewhere =
+          assignedGroup &&
+          assignedGroup !== CountryAssignmentGroup.NOT_PARTICIPATING &&
+          assignedGroup !== CountryAssignmentGroup.NOT_QUALIFIED;
+
+        if (participatesHere) {
+          if (!groups['In stage']) {
+            groups['In stage'] = [];
+          }
+          groups['In stage'].push(country);
+        } else if (participatesSomewhere) {
+          if (!groups['Other stage']) {
+            groups['Other stage'] = [];
+          }
+          groups['Other stage'].push(country);
+        }
+      });
+    }
+
+    Object.keys(groups).forEach((groupKey) => {
+      groups[groupKey].sort((a, b) => a.name.localeCompare(b.name));
     });
 
+    const FULL_ORDER = ['In stage', 'Other stage', ...CATEGORY_ORDER, 'Other'];
+
     const sortedCategories = Object.keys(groups).sort((a, b) => {
-      const aIndex = CATEGORY_ORDER.indexOf(a);
-      const bIndex = CATEGORY_ORDER.indexOf(b);
+      const aIndex = FULL_ORDER.indexOf(a);
+      const bIndex = FULL_ORDER.indexOf(b);
 
       if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
       if (aIndex === -1) return 1;
@@ -54,7 +90,7 @@ export const useVotersCountriesSearch = (availableCountries: BaseCountry[]) => {
       groupedAvailableCountries: groups,
       sortedCategories,
     };
-  }, [availableCountries, debouncedSearch]);
+  }, [availableCountries, debouncedSearch, currentStageId, eventAssignments]);
 
   useEffect(() => {
     if (debouncedSearch !== prevDebouncedSearchRef.current) {

@@ -74,7 +74,7 @@ export interface Preset {
   >;
   countries: Pick<
     CountriesState,
-    'eventAssignments' | 'configuredEventStages' | 'countryOdds' | 'activeMode'
+    'eventAssignments' | 'configuredEventStages' | 'countryOdds'
   >;
 }
 

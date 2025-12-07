@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-12-07',
+    title: 'Flexible contest setup: create unlimited stages with custom qualifier targets (e.g., Heats, Quarter-finals, etc.). Improved voting country selection. Various small enhancements.',
+  },
+  {
     date: '2025-11-23',
     title: 'Small improvements & bug fixes',
   },
@@ -223,8 +227,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-11-29', end: '2025-11-30' },
-    title: 'Various small improvements & bug fixes',
+    approximateDates: { start: '2025-12-13', end: '2025-12-14' },
+    title: 'Running order setup',
   },
   {
     title: 'Saving scoreboards in your profile',

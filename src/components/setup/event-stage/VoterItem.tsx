@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { VoterGroupLabel } from './VoterGroupLabel';
+
 import { CustomSortableItem } from '@/components/common/CustomSortableItem';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
@@ -9,12 +11,14 @@ import { getHostingCountryLogo } from '@/theme/hosting';
 interface VoterItemProps {
   id: string;
   country: BaseCountry;
+  stageId: string;
   onRemove: () => void;
 }
 
 export const VoterItem: React.FC<VoterItemProps> = ({
   id,
   country,
+  stageId,
   onRemove,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -28,7 +32,8 @@ export const VoterItem: React.FC<VoterItemProps> = ({
 
   return (
     <CustomSortableItem id={id} key={id} onRemove={onRemove}>
-      <div className="flex items-center gap-2 flex-1 min-w-0 h-8">
+      <VoterGroupLabel country={country} stageId={stageId} />
+      <div className="relative flex items-center gap-2 flex-1 min-w-0 h-8">
         <img
           loading="lazy"
           src={logo}

@@ -45,7 +45,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
-  const { isOver: isVotingOver, id: currentStageId } = getCurrentStage();
+  const currentStage = getCurrentStage();
+  const { isOver: isVotingOver, id: currentStageId } = currentStage || {};
 
   const isTouchDevice = useTouchDevice();
 
@@ -218,7 +219,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   const backgroundImage = useShareBgImage();
 
   const allCountriesToDisplay = useCountryDisplay();
-  const sortedCountries = useCountrySorter(allCountriesToDisplay);
+  const sortedCountries = useCountrySorter(allCountriesToDisplay ?? []);
   const limitedCountries =
     imageCustomization.maxCountries > 0
       ? sortedCountries.slice(0, imageCustomization.maxCountries)
@@ -235,7 +236,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
       (!generatedImageUrl || currentStageId !== lastGeneratedStageId)
     ) {
       generateImage();
-      setLastGeneratedStageId(currentStageId);
+      setLastGeneratedStageId(currentStageId ?? null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatedImageUrl, isGenerating, currentStageId, lastGeneratedStageId]);

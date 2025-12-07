@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
@@ -9,26 +9,26 @@ import { useShallow } from 'zustand/shallow';
 import {
   BaseCountry,
   CountryAssignmentGroup,
-  EventMode,
   EventStage,
-  StageId,
+  StageVotingMode,
 } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
-import Tabs, { TabContent } from '../common/tabs/Tabs';
 import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
+import ContestCard from './ContestCard';
 import { AvailableGroup } from './CountrySelectionListItem';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
 import { useInitialLineup } from './hooks/useInitialLineup';
 import { useStageModalActions } from './hooks/useStageModalActions';
 import NotParticipatingSection from './NotParticipatingSection';
-import SemiFinalsAndGrandFinalSetup from './SemiFinalsAndGrandFinalSetup';
 import { SetupHeader } from './SetupHeader';
 import { SyncCustomEntries } from './SyncCustomEntries';
+import UnifiedStageSetup from './UnifiedStageSetup';
+import { buildEventStagesFromAssignments } from './utils/buildEventStagesFromAssignments';
 import { validateEventSetup } from './utils/eventValidation';
 import WidgetsSection from './widgets-section/WidgetsSection';
 
@@ -46,18 +46,18 @@ const CustomCountryModal = dynamic(() => import('./CustomCountryModal'), {
 const SettingsModal = dynamic(() => import('../settings/SettingsModal'), {
   ssr: false,
 });
-const GrandFinalOnlySetup = dynamic(() => import('./GrandFinalOnlySetup'), {
-  ssr: false,
-  loading: () => (
-    <div className="text-white text-center py-2 font-medium">Loading...</div>
-  ),
-});
 const VotingPredefinitionModal = dynamic(
   () => import('./voting-predefinition/VotingPredefinitionModal'),
   {
     ssr: false,
   },
 );
+const PostSetupModal = dynamic(() => import('./post-setup/PostSetupModal'), {
+  ssr: false,
+});
+const StageReorderModal = dynamic(() => import('./StageReorderModal'), {
+  ssr: false,
+});
 
 const EventSetupModal = () => {
   const t = useTranslations();
@@ -65,33 +65,37 @@ const EventSetupModal = () => {
   const {
     eventSetupModalOpen,
     predefModalOpen,
+    postSetupModalOpen,
     setEventSetupModalOpen,
+    setPostSetupModalOpen,
     setPredefModalOpen,
-    getAllCountries,
     configuredEventStages,
-    activeTab,
-    setActiveTab,
+    setConfiguredEventStages,
     countryOdds,
-    predefModalStageType,
-    setPredefModalStageType,
+    currentSetupStageType,
+    setCurrentSetupStageType,
   } = useCountriesStore(
     useShallow((state) => ({
       eventSetupModalOpen: state.eventSetupModalOpen,
       predefModalOpen: state.predefModalOpen,
+      postSetupModalOpen: state.postSetupModalOpen,
       setEventSetupModalOpen: state.setEventSetupModalOpen,
       setPredefModalOpen: state.setPredefModalOpen,
+      setPostSetupModalOpen: state.setPostSetupModalOpen,
       getAllCountries: state.getAllCountries,
       configuredEventStages: state.configuredEventStages,
-      activeTab: state.activeMode,
-      setActiveTab: state.setActiveMode,
+      setConfiguredEventStages: state.setConfiguredEventStages,
       countryOdds: state.countryOdds,
-      predefModalStageType: state.predefModalStageType,
-      setPredefModalStageType: state.setPredefModalStageType,
+      currentSetupStageType: state.currentSetupStageType,
+      setCurrentSetupStageType: state.setCurrentSetupStageType,
     })),
   );
 
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const startEvent = useScoreboardStore((state) => state.startEvent);
+  const continueToNextPhase = useScoreboardStore(
+    (state) => state.continueToNextPhase,
+  );
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const restartCounter = useScoreboardStore((state) => state.restartCounter);
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
@@ -102,6 +106,7 @@ const EventSetupModal = () => {
   const settingsPointsSystem = useGeneralStore(
     (state) => state.settingsPointsSystem,
   );
+  const isGfOnly = useGeneralStore((state) => state.isGfOnly);
   const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
   const enablePredefined = useGeneralStore(
     (state) => state.settings.enablePredefinedVotes,
@@ -111,17 +116,14 @@ const EventSetupModal = () => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isSettingsModalLoaded, setIsSettingsModalLoaded] = useState(false);
   const [isPredefModalLoaded, setIsPredefModalLoaded] = useState(false);
-  const [startPredefStage, setStartPredefStage] = useState<
-    | (Pick<EventStage, 'id' | 'name' | 'votingMode'> & {
-        countries: BaseCountry[];
-      })
-    | null
-  >(null);
+  const [isPostSetupModalLoaded, setIsPostSetupModalLoaded] = useState(false);
+  const [isStageReorderModalOpen, setIsStageReorderModalOpen] = useState(false);
+  const [initialSetupStage, setInitialSetupStage] = useState<EventStage | null>(
+    null,
+  );
 
   const {
     countryGroups: {
-      autoQualifiers,
-      grandFinalQualifiers,
       eventStagesWithCountries,
       notParticipatingCountries,
       notQualifiedCountries,
@@ -131,7 +133,7 @@ const EventSetupModal = () => {
     getCountryGroupAssignment,
     setAssignments,
     allAssignments,
-  } = useCountryAssignments(configuredEventStages);
+  } = useCountryAssignments();
 
   const {
     isEventStageModalOpen,
@@ -151,19 +153,53 @@ const EventSetupModal = () => {
     handleCloseModal,
   } = useCustomCountryModal();
 
-  const participatingCountries = [
-    ...autoQualifiers,
-    ...eventStagesWithCountries.flatMap((stage) => stage.countries),
-  ].sort((a, b) => a.name.localeCompare(b.name));
+  const handleStageOrderChange = useCallback(
+    (oldIndex: number, newIndex: number) => {
+      // Get sorted stages
+      const sortedStages = [...configuredEventStages].sort(
+        (a, b) => (a.order ?? 0) - (b.order ?? 0),
+      );
+
+      // Calculate new order values based on positions
+      // Use a simple incrementing sequence starting from 0
+      const updatedStages = sortedStages.map((stage, index) => ({
+        ...stage,
+        order: index,
+      }));
+
+      // Move the item from oldIndex to newIndex
+      const [movedStage] = updatedStages.splice(oldIndex, 1);
+
+      updatedStages.splice(newIndex, 0, movedStage);
+
+      // Update orders based on new positions
+      const finalStages = updatedStages.map((stage, index) => ({
+        ...stage,
+        order: index,
+      }));
+
+      setConfiguredEventStages(finalStages);
+    },
+    [configuredEventStages, setConfiguredEventStages],
+  );
+
+  const participatingCountries = useMemo(
+    () =>
+      [...eventStagesWithCountries.flatMap((stage) => stage.countries)].sort(
+        (a, b) => a.name.localeCompare(b.name),
+      ),
+    [eventStagesWithCountries],
+  );
 
   useInitialLineup();
 
-  const { onSaveContinue, nextStageForPredef } = useContinueToNextPhase();
+  const { onSaveContinue, nextSetupStage } = useContinueToNextPhase();
 
-  const isInitialPredef = predefModalStageType === 'initial';
-  const predefStage = isInitialPredef ? startPredefStage : nextStageForPredef;
+  const isInitialSetupStage = currentSetupStageType === 'initial';
+  const currentSetupStage = isInitialSetupStage
+    ? initialSetupStage
+    : nextSetupStage;
 
-  const isGrandFinalOnly = activeTab === EventMode.GRAND_FINAL_ONLY;
   const canClose = !!currentStageId;
 
   const debouncedCanClose = useDebounce(canClose, 300);
@@ -172,38 +208,62 @@ const EventSetupModal = () => {
     setEventSetupModalOpen(false);
   }, [setEventSetupModalOpen]);
 
-  const semiFinalsAvailableGroups: AvailableGroup[] = [
-    CountryAssignmentGroup.AUTO_QUALIFIER,
-    ...configuredEventStages
-      .filter((s) => s.id !== StageId.GF)
-      .map((s) => ({ id: s.id, name: s.name })),
-    CountryAssignmentGroup.NOT_PARTICIPATING,
-  ];
+  const availableGroups: AvailableGroup[] = useMemo(() => {
+    const groups = [
+      ...configuredEventStages
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        .map((s) => ({ id: s.id, name: s.name })),
+      CountryAssignmentGroup.NOT_PARTICIPATING,
+    ];
 
-  const grandFinalStage = configuredEventStages.find(
-    (s) => s.id === StageId.GF,
-  );
-  const grandFinalAvailableGroups: AvailableGroup[] = grandFinalStage
-    ? [
-        { id: grandFinalStage.id, name: grandFinalStage.name },
-        CountryAssignmentGroup.NOT_QUALIFIED,
-        CountryAssignmentGroup.NOT_PARTICIPATING,
-      ]
-    : [];
+    if (isGfOnly) {
+      groups.splice(groups.length - 1, 0, CountryAssignmentGroup.NOT_QUALIFIED);
+    }
 
-  const availableGroups =
-    activeTab === EventMode.GRAND_FINAL_ONLY
-      ? grandFinalAvailableGroups
-      : semiFinalsAvailableGroups;
+    return groups;
+  }, [configuredEventStages, isGfOnly]);
 
   const closeAndStartEvent = () => {
     onClose();
-    setEventStages(eventStagesWithCountries);
 
-    const allCountries = getAllCountries();
+    // Always use the latest configured stages and assignments from the store.
+    // This avoids relying on potentially stale hook values when called
+    // immediately after updating voting countries in the PostSetupModal.
+    const countriesStoreState = useCountriesStore.getState();
+    const {
+      configuredEventStages: latestConfiguredStages,
+      eventAssignments,
+      getAllCountries: getAllCountriesFromStore,
+    } = countriesStoreState;
+
+    const latestAssignments = eventAssignments || {};
+    const allCountries = getAllCountriesFromStore();
+
+    const { eventStagesWithCountries: eventStagesWithCountriesFresh } =
+      buildEventStagesFromAssignments(
+        allCountries,
+        latestConfiguredStages as EventStage[],
+        latestAssignments,
+      );
+
+    const eventStages = eventStagesWithCountriesFresh.map((stage) => ({
+      ...stage,
+      isOver: false,
+      isJuryVoting: stage.votingMode !== StageVotingMode.TELEVOTE_ONLY,
+      countries: stage.countries.map((country) => ({
+        ...country,
+        juryPoints: 0,
+        televotePoints: 0,
+        points: 0,
+        lastReceivedPoints: null,
+      })),
+    }));
+
+    console.log('eventStages', eventStages);
+    setEventStages(eventStages);
 
     const allSelectedCountries: BaseCountry[] = Object.entries(
-      allAssignments[activeTab],
+      latestAssignments,
     )
       .filter(([, group]) => group !== CountryAssignmentGroup.NOT_PARTICIPATING)
       .map(([countryCode, group]) => {
@@ -216,9 +276,7 @@ const EventSetupModal = () => {
         }
         const odds = countryOdds[countryCode];
 
-        const isAutoQualifier = group === CountryAssignmentGroup.AUTO_QUALIFIER;
-        const isGrandFinalist = group === StageId.GF;
-        const isSemiFinalist = eventStagesWithCountries.some(
+        const isStageParticipant = eventStagesWithCountriesFresh.some(
           (s) => s.id === group,
         );
 
@@ -226,33 +284,24 @@ const EventSetupModal = () => {
           ...country,
           juryOdds: odds?.juryOdds,
           televoteOdds: odds?.televoteOdds,
-          semiFinalGroup: isSemiFinalist ? group : undefined,
-          isAutoQualified: isAutoQualifier,
-          isQualified: isAutoQualifier || isGrandFinalist,
+          semiFinalGroup: isStageParticipant ? group : undefined,
+          isQualified: isStageParticipant,
         };
       })
-      .filter((country) => country !== null);
+      .filter((country) => country !== null) as BaseCountry[];
 
-    startEvent(activeTab, allSelectedCountries);
+    startEvent(allSelectedCountries);
 
     clear();
   };
 
   const handleStartEvent = () => {
+    setCurrentSetupStageType('initial');
+
     const validationError = validateEventSetup(
-      isGrandFinalOnly,
       settingsPointsSystem.length,
       {
-        stages: eventStagesWithCountries.map((s) => ({
-          id: s.id,
-          qualifiersAmount: s.qualifiersAmount || 0,
-          countriesCount: s.countries.length,
-          votingCountries: s.votingCountries || [],
-          name: s.name,
-          votingMode: s.votingMode,
-        })),
-        autoQualifiersCount: autoQualifiers.length,
-        grandFinalQualifiersCount: grandFinalQualifiers.length,
+        stages: eventStagesWithCountries,
       },
       t,
     );
@@ -272,55 +321,48 @@ const EventSetupModal = () => {
 
     setPointsSystem(resolvedPointsSystem);
 
-    // Compute first stage locally
-    const allStagesFromSetup = eventStagesWithCountries;
-    let stagesList: EventStage[] =
-      allStagesFromSetup as unknown as EventStage[];
+    // Compute first stage locally (sorted by order)
+    const sortedStages = [...eventStagesWithCountries].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
+    const firstStage = sortedStages.find((s) => s.countries.length > 0) || null;
+    const firstStageCountries: BaseCountry[] = firstStage?.countries || [];
 
-    if (activeTab === EventMode.GRAND_FINAL_ONLY) {
-      stagesList = allStagesFromSetup.filter((s) => s.id === StageId.GF) as any;
-    } else {
-      stagesList = allStagesFromSetup.filter(
-        (s) => s.id === StageId.GF || s.countries.length > 0,
-      ) as any;
-    }
-    const firstStage = stagesList[0] || null;
-
-    const isGFWithoutCountries =
-      firstStage.id === StageId.GF && firstStage?.countries.length === 0;
-
-    let firstStageCountries: BaseCountry[] = firstStage?.countries;
-
-    if (isGFWithoutCountries) {
-      const allCountries = getAllCountries();
-
-      firstStageCountries = Object.entries(allAssignments[activeTab])
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .filter(([_, group]) => group === CountryAssignmentGroup.AUTO_QUALIFIER)
-        .map(
-          ([countryCode]) => allCountries.find((c) => c.code === countryCode)!,
-        );
-    }
-
-    if (enablePredefined && firstStage) {
-      setStartPredefStage({
-        id: firstStage.id,
-        name: firstStage.name,
-        votingMode: firstStage.votingMode,
-        countries: firstStageCountries,
+    if (firstStage) {
+      setInitialSetupStage({
+        ...firstStage,
+        countries: firstStageCountries.map((c) => ({
+          ...c,
+          juryPoints: 0,
+          televotePoints: 0,
+          points: 0,
+          lastReceivedPoints: null,
+        })),
       });
-      setPredefModalStageType('initial');
+    }
+
+    setPostSetupModalOpen(true);
+
+    return;
+  };
+
+  const onPostSetupSave = () => {
+    if (enablePredefined) {
       setPredefModalOpen(true);
 
-      return; // Wait for modal Save to proceed
+      return;
     }
 
-    closeAndStartEvent();
+    if (isInitialSetupStage) {
+      closeAndStartEvent();
+    } else {
+      continueToNextPhase();
+    }
   };
 
   const onVotingPredefSaveStart = (votes: Partial<StageVotes>) => {
     // Persist votes for first stage and start
-    const firstStageId = startPredefStage?.id;
+    const firstStageId = initialSetupStage?.id;
 
     setPredefinedVotesForStage(
       {
@@ -334,78 +376,6 @@ const EventSetupModal = () => {
     setPredefModalOpen(false);
   };
 
-  const tabs = useMemo(
-    () => [
-      {
-        label: t('setup.eventSetupModal.allShows'),
-        value: EventMode.SEMI_FINALS_AND_GRAND_FINAL,
-      },
-      {
-        label: t('setup.eventSetupModal.grandFinalOnly'),
-        value: EventMode.GRAND_FINAL_ONLY,
-      },
-    ],
-    [t],
-  );
-
-  const tabsWithContent = useMemo(
-    () => [
-      {
-        ...tabs[0],
-        content: (
-          <SemiFinalsAndGrandFinalSetup
-            autoQualifiers={autoQualifiers}
-            eventStages={eventStagesWithCountries.filter(
-              (s) => s.id !== StageId.GF,
-            )}
-            grandFinalStage={eventStagesWithCountries.find(
-              (s) => s.id === StageId.GF,
-            )}
-            onAssignCountryAssignment={handleCountryAssignment}
-            getCountryGroupAssignment={getCountryGroupAssignment}
-            onBulkAssign={handleBulkCountryAssignment}
-            onEditStage={handleOpenEditEventStageModal}
-            onCreateStage={handleOpenCreateEventStageModal}
-            availableGroups={availableGroups}
-          />
-        ),
-      },
-      {
-        ...tabs[1],
-        content: (
-          <>
-            {activeTab === EventMode.GRAND_FINAL_ONLY && (
-              <GrandFinalOnlySetup
-                grandFinalStage={eventStagesWithCountries.find(
-                  (s) => s.id === StageId.GF,
-                )}
-                notQualifiedCountries={notQualifiedCountries}
-                onAssignCountryAssignment={handleCountryAssignment}
-                getCountryGroupAssignment={getCountryGroupAssignment}
-                onBulkAssign={handleBulkCountryAssignment}
-                onEditStage={handleOpenEditEventStageModal}
-                availableGroups={availableGroups}
-              />
-            )}
-          </>
-        ),
-      },
-    ],
-    [
-      tabs,
-      activeTab,
-      autoQualifiers,
-      availableGroups,
-      eventStagesWithCountries,
-      getCountryGroupAssignment,
-      handleBulkCountryAssignment,
-      handleCountryAssignment,
-      handleOpenCreateEventStageModal,
-      handleOpenEditEventStageModal,
-      notQualifiedCountries,
-    ],
-  );
-
   useEffect(() => {
     if (restartCounter > 0) {
       handleStartEvent();
@@ -416,13 +386,25 @@ const EventSetupModal = () => {
   return (
     <>
       <SyncCustomEntries />
-      {(predefModalOpen || isPredefModalLoaded) && predefStage && (
+      {(predefModalOpen || isPredefModalLoaded) && currentSetupStage && (
         <VotingPredefinitionModal
           isOpen={predefModalOpen}
           onClose={() => setPredefModalOpen(false)}
-          stage={predefStage}
-          onSave={isInitialPredef ? onVotingPredefSaveStart : onSaveContinue}
+          stage={currentSetupStage}
+          onSave={
+            isInitialSetupStage ? onVotingPredefSaveStart : onSaveContinue
+          }
           onLoaded={() => setIsPredefModalLoaded(true)}
+        />
+      )}
+
+      {(postSetupModalOpen || isPostSetupModalLoaded) && currentSetupStage && (
+        <PostSetupModal
+          isOpen={postSetupModalOpen}
+          onClose={() => setPostSetupModalOpen(false)}
+          stage={currentSetupStage}
+          onLoaded={() => setIsPostSetupModalLoaded(true)}
+          onSave={onPostSetupSave}
         />
       )}
 
@@ -466,7 +448,6 @@ const EventSetupModal = () => {
             countryToEdit={countryToEdit}
           />
         )}
-        {/*  */}
         {isEventStageModalOpen && (
           <EventStageModal
             isOpen={isEventStageModalOpen}
@@ -478,18 +459,31 @@ const EventSetupModal = () => {
           />
         )}
 
+        {isStageReorderModalOpen && (
+          <StageReorderModal
+            isOpen={isStageReorderModalOpen}
+            onClose={() => setIsStageReorderModalOpen(false)}
+            stages={configuredEventStages}
+            onReorder={handleStageOrderChange}
+            onDelete={handleDeleteStage}
+          />
+        )}
+
         <WidgetsSection />
-        <div className="mt-2 flex flex-col gap-3">
-          <Tabs
-            tabs={tabs}
-            activeTab={activeTab}
-            setActiveTab={(tab) => setActiveTab(tab as EventMode)}
+        <div className="mt-2 flex flex-col gap-2">
+          <ContestCard
+            onReorderClick={() => setIsStageReorderModalOpen(true)}
+            onAddStageClick={handleOpenCreateEventStageModal}
           />
 
-          <TabContent
-            tabs={tabsWithContent}
-            activeTab={activeTab}
-            preserveContent
+          <UnifiedStageSetup
+            eventStages={eventStagesWithCountries}
+            onAssignCountryAssignment={handleCountryAssignment}
+            getCountryGroupAssignment={getCountryGroupAssignment}
+            onBulkAssign={handleBulkCountryAssignment}
+            onEditStage={handleOpenEditEventStageModal}
+            availableGroups={availableGroups}
+            notQualifiedCountries={notQualifiedCountries}
           />
 
           <div className="h-px bg-primary-800 w-full my-1" />

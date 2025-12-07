@@ -25,7 +25,7 @@ const Board = (): JSX.Element => {
     (state) => state.showAllParticipants,
   );
 
-  const { isOver: isVotingOver, id: currentStageId } = getCurrentStage();
+  const { isOver: isVotingOver, id: currentStageId } = getCurrentStage() || {};
 
   const allCountriesToDisplay = useCountryDisplay();
   const sortedCountries = useCountrySorter(allCountriesToDisplay);
@@ -65,7 +65,7 @@ const Board = (): JSX.Element => {
             )}
             {...props}
             showPlaceAnimation={showPlace}
-            hasCountryFinishedVoting={hasCountryFinishedVoting}
+            hasCountryFinishedVoting={!!hasCountryFinishedVoting}
           />
         )}
       </Flipped>

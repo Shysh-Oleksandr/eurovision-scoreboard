@@ -1,4 +1,4 @@
-import { CountryAssignmentGroup, EventMode } from '../../models';
+import { CountryAssignmentGroup } from '../../models';
 
 
 
@@ -14,7 +14,6 @@ export const CATEGORY_ORDER = [
 ];
 
 export const SEMI_FINALS_GROUPS = [
-  CountryAssignmentGroup.AUTO_QUALIFIER,
   CountryAssignmentGroup.SF1,
   CountryAssignmentGroup.SF2,
   CountryAssignmentGroup.NOT_PARTICIPATING,

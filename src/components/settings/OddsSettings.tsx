@@ -176,7 +176,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
             className="md:text-base text-sm"
             onClick={handleLoadYearData}
           >
-            {t('settings.odds.loadYearData')}
+            {t('common.loadYearData')}
           </Button>
           <Button
             variant="secondary"

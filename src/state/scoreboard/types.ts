@@ -1,4 +1,4 @@
-import { BaseCountry, Country, EventMode, EventStage } from '../../models';
+import { BaseCountry, Country, EventStage } from '../../models';
 
 export type Vote = {
   countryCode: string;
@@ -45,7 +45,7 @@ export type ScoreboardState = {
   isWinnerAnimationAlreadyDisplayed: boolean;
 
   // Getters
-  getCurrentStage: () => EventStage;
+  getCurrentStage: () => EventStage | undefined;
   getNextStage: () => EventStage | null;
   getCountryInSemiFinal: (countryCode: string) => Country | null;
   getVotingPoints: () => number;
@@ -54,9 +54,7 @@ export type ScoreboardState = {
     points: number;
   } | null; // Get next country to receive points in reveal mode
   // Actions
-  setEventStages: (
-    stages: (Omit<EventStage, 'countries'> & { countries: BaseCountry[] })[],
-  ) => void;
+  setEventStages: (eventStages: EventStage[]) => void;
   giveJuryPoints: (countryCode: string) => void;
   giveTelevotePoints: (countryCode: string, votingPoints: number) => void;
   giveRandomJuryPoints: () => void;
@@ -68,7 +66,7 @@ export type ScoreboardState = {
   giveManualTelevotePointsInRevealMode: (countryCode: string) => void;
   resetLastPoints: () => void;
   hideLastReceivedPoints: () => void;
-  startEvent: (mode: EventMode, selectedCountries: BaseCountry[]) => void;
+  startEvent: (selectedCountries: BaseCountry[]) => void;
   triggerRestartEvent: () => void;
   leaveEvent: () => void;
   prepareForNextStage: (shouldUpdateStore?: boolean) => {

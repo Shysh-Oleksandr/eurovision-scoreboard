@@ -6,7 +6,7 @@ import { UploadIcon } from '@/assets/icons/UploadIcon';
 import Button from '@/components/common/Button';
 import { formatDate } from '@/components/feedbackInfo/types';
 import { Preset } from '@/helpers/indexedDB';
-import { EventMode, EventStage } from '@/models';
+import { EventStage } from '@/models';
 
 const TABLE_COLUMNS = [
   { key: 'name', label: 'Name' },
@@ -35,12 +35,18 @@ interface PresetsTableProps {
   onEdit: (preset: Preset) => void;
 }
 
-const countStages = (stages: EventStage[], activeMode: EventMode) => {
-  if (activeMode === EventMode.GRAND_FINAL_ONLY) {
-    return { sfCount: 0, gfCount: 1 };
-  }
+const countStages = (stages: EventStage[]) => {
+  // Count stages (excluding final stage if it's the only one)
+  const sortedStages = [...stages].sort(
+    (a, b) => (a.order ?? 0) - (b.order ?? 0),
+  );
+  const lastStage = sortedStages[sortedStages.length - 1];
+  const otherStages = sortedStages.slice(0, -1);
 
-  return { sfCount: stages.length - 1, gfCount: 1 };
+  return {
+    sfCount: otherStages.length,
+    gfCount: lastStage ? 1 : 0,
+  };
 };
 
 const getParticipantsCount = (eventAssignments: Record<string, string>) => {
@@ -58,17 +64,22 @@ export const PresetsTable: React.FC<PresetsTableProps> = ({
 }) => {
   const locale = useLocale();
   const rows: PresetRow[] = presets.map((p) => {
-    const activeMode =
-      p.countries?.activeMode || EventMode.SEMI_FINALS_AND_GRAND_FINAL;
     const stages: EventStage[] = p.countries?.configuredEventStages || [];
-    const { sfCount, gfCount } = countStages(stages, activeMode);
-    const participants = getParticipantsCount(
-      p.countries?.eventAssignments[activeMode] || {},
-    );
+    const { sfCount, gfCount } = countStages(stages);
+
+    // Handle both old (EventMode-based) and new (flat) eventAssignments structure
+    const eventAssignments = p.countries?.eventAssignments;
+    const assignments =
+      typeof eventAssignments === 'object' && !Array.isArray(eventAssignments)
+        ? (eventAssignments as any).SEMI_FINALS_AND_GRAND_FINAL ||
+          (eventAssignments as any).GRAND_FINAL_ONLY ||
+          eventAssignments ||
+          {}
+        : {};
+
+    const participants = getParticipantsCount(assignments);
     const contestName = p.general?.settings?.contestName || '—';
     const year = p.general?.year || p.general?.settings?.contestYear || '—';
-
-    const isGrandFinalOnly = activeMode === EventMode.GRAND_FINAL_ONLY;
 
     return {
       id: p.id,
@@ -77,8 +88,10 @@ export const PresetsTable: React.FC<PresetsTableProps> = ({
       year,
       themeYear: p.general?.themeYear.replace('-', ' ') || '—',
       stagesLabel:
-        isGrandFinalOnly || sfCount === 0
+        sfCount === 0 && gfCount === 1
           ? 'GF Only'
+          : sfCount === 0
+          ? `${stages.length} Stages`
           : `${sfCount} SF + ${gfCount} GF`,
       participants,
       createdAt: p.createdAt,

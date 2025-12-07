@@ -33,7 +33,7 @@ const VotingButtons = () => {
     })),
   );
 
-  const { isJuryVoting } = getCurrentStage();
+  const isJuryVoting = !!getCurrentStage()?.isJuryVoting;
 
   const voteRandomlyJury = useCallback(() => {
     if (useGroupedJuryPoints) {

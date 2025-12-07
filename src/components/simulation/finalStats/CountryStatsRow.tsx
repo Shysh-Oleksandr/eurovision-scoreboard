@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BaseCountry, Country } from '../../../models';
+import { Country, VotingCountry } from '../../../models';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useGeneralStore } from '@/state/generalStore';
@@ -8,7 +8,7 @@ import { getHostingCountryLogo } from '@/theme/hosting';
 
 interface CountryStatsRowProps {
   country: Country & { rank: number };
-  votingCountries: BaseCountry[];
+  votingCountries: VotingCountry[];
   getCellPoints: (
     participantCode: string,
     voterCode: string,

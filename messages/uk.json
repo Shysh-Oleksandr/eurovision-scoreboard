@@ -33,6 +33,7 @@
     "dragAndDropOrClickToUpload": "Перетягніть або натисніть, щоб завантажити",
     "orSelectExisting": "Або виберіть існуюче",
     "randomize": "Випадково",
+    "loadYearData": "Завантажити дані року",
     "country": "Країна"
   },
   "Metadata": {
@@ -69,16 +70,20 @@
       "juryAndTelevote": "Журі та телеголосування",
       "votingMode": "Режим голосування",
       "numberOfQualifiers": "Кількість фіналістів",
-      "grandFinal": "Гранд-фінал",
-      "semiFinal": "Півфінал",
+      "qualifierTargets": "Цілі для кваліфікації",
+      "addStage": "Додати етап",
+      "editStage": "Редагувати етап",
+      "stageNamePlaceholder": "Півфінал 3, Чвертьфінал 1, Heat 1, etc.",
+      "qualifiersFrom": "<span>{amount}</span> з <span2>{sourceStageName}</span2>",
       "nonVotingCountries": "Країни, що не голосують",
       "searchAndClickToAdd": "Знайдіть і натисніть, щоб додати",
       "searchCountries": "Пошук країн...",
       "noVotingCountriesSelected": "Не вибрано жодної країни для голосування. Додайте країни зі списку нижче.",
       "votingCountries": "Країни, що голосують ({count})",
       "dragAndDropToReorder": "Перетягуйте, щоб змінити порядок",
-      "syncVotersWithParticipantCountriesTooltip": "Якщо увімкнено, при видаленні або додаванні країни-учасниці список країн, що голосують, оновиться автоматично.<br></br>Якщо вимкнено — потрібно змінювати вручну.",
-      "syncVotersWithParticipantCountries": "Синхронізувати голосуючих з учасниками"
+      "inStageOnly": "Лише в етапі",
+      "otherStageOnly": "Лише в іншому етапі",
+      "allParticipants": "Всі учасники"
     },
     "validation": {
       "noCountriesInStage": "У {stageName} немає країн.",
@@ -87,20 +92,27 @@
       "qualifiersAmountMustBeLessThanParticipants": "Кількість фіналістів у {stageName} має бути меншою за кількість учасників.",
       "participantsMustBeAtLeast": "Кількість учасників у {stageName} має бути щонайменше {count} (залежить від кількості елементів у системі балів).",
       "totalQualifiersMustBeAtLeast": "Загальна кількість фіналістів для Гранд-фіналу має бути щонайменше {count}.",
-      "grandFinalParticipantsMustBeAtLeast": "Кількість учасників Гранд-фіналу має бути щонайменше {count}."
+      "grandFinalParticipantsMustBeAtLeast": "Кількість учасників Гранд-фіналу має бути щонайменше {count}.",
+      "qualifiersExceedParticipants": "Кількість фіналістів у {stageName} перевищує кількість учасників.",
+      "qualifiersCannotMoveToPrecedentStage": "Фіналісти не можуть переміщуватися до попереднього етапу ({stageName} -> {targetStageName}).",
+      "targetStageNotFound": "Етап призначення \"{targetStageId}\" не знайдено.",
+      "stageOrderMustBeUnique": "Порядок етапів має бути унікальним."
     },
     "eventSetupModal": {
-      "allShows": "Усі шоу",
-      "grandFinalOnly": "Лише Гранд-фінал",
+      "grandFinalOnly": "Лише фінал",
+      "grandFinalOnlyConfirm": "Це скине вашу конфігурацію і збереже лише фінал. Ви впевнені?",
+      "grandFinalOnlyConfirmNotGfOnly": "Це скине вашу конфігурацію і відновить всі етапи (півфінали + фінал). Ви впевнені?",
+      "qualifiers": "Фіналісти",
       "notQualified": "Не кваліфікувалися",
       "notParticipating": "Не беруть участі",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Щоб створювати та використовувати власних учасників, треба увійти в акаунт.",
       "searchCountries": "Пошук країн...",
-      "countriesAmount": "{count, plural, =1 {країна} other {країни}}",
+      "countriesAmount": "{count, plural, =1 {країна} few {країни} other {країн}}",
       "entriesAmount": "{count, plural, =1 {учасник} few {учасники} other {учасників}}",
       "autoQualifiers": "Автоматичні фіналісти",
       "contestIsInProgress": "Симуляція в процесі. Зміна року скине теперішню таблицю і почне нову симуляцію. Ви впевнені?",
-      "enterThePointsEachVotingCountryAwardsToParticipants": "Введіть бали, які кожна країна-учасниця голосування надає учасникам"
+      "enterThePointsEachVotingCountryAwardsToParticipants": "Введіть бали, які кожна країна-учасниця голосування надає учасникам",
+      "reorderStages": "Змінити порядок етапів"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Увійдіть у акаунт, щоб створювати власних учасників.",
@@ -124,12 +136,16 @@
       "northAmerica": "Північна Америка",
       "southAmerica": "Південна Америка",
       "oceania": "Океанія",
-      "restOfEurope": "Решта Європи"
+      "restOfEurope": "Решта Європи",
+      "inStage": "В етапі",
+      "otherStage": "В іншому етапі",
+      "notParticipating": "Не беруть участі",
+      "autoQ": "Автоматичні фіналісти"
     }
   },
   "simulation": {
     "pointsGoTo": "{count, plural, =1 {# бал} few {# бали} other {# балів}} отримує...",
-    "chooseCountryToGivePoints": "Виберіть країну, щоб надати {count, plural, =1 {# бал} few {бали} other {# балів}}",
+    "chooseCountryToGivePoints": "Виберіть країну, щоб надати {count, plural, =1 {# бал} few {# бали} other {# балів}}",
     "enterTelevotePointsFor": "Введіть бали телеголосування для <span>{country}</span>",
     "winnerOf": "<span>{country}</span> — переможець <span2>{event}</span2>!",
     "random": "Випадково",
@@ -176,7 +192,6 @@
       "cancelSimulation": "Скасувати симуляцію",
       "cancelSimulationConfirmation": "Ви впевнені, що хочете скасувати симуляцію?",
       "restart": "Перезапустити",
-      "restartConfirmation": "Ви впевнені, що хочете перезапустити?",
       "undo": "Скасувати дію",
       "share": "Поділитися",
       "setup": "Налаштування"
@@ -426,8 +441,6 @@
       "oddsTooltip": "У кожної країни окремі шанси для журі та телеголосування (0–100).<br></br><span>Більше число =</span> вища ймовірність отримати більше балів.<br></br>Початкові значення засновані на реальних результатах Євробачення за обраний рік.",
       "randomnessLevel": "Рівень випадковості",
       "randomnessLevelTooltip": "Повзунок керує передбачуваністю:<br></br><span>Низький =</span> реалістичніше, ближче до шансів.<br></br><span>Високий =</span> хаотичніше й менш передбачувано.",
-      "randomize": "Рандомізувати",
-      "loadYearData": "Завантажити дані року",
       "predictable": "Передбачувано",
       "chaotic": "Хаотично"
     },
@@ -460,7 +473,6 @@
       "showWinnerPopup": "Показувати попап переможця",
       "showWinnerConfetti": "Показувати конфеті для переможця",
       "enableFullscreenMode": "Увімкнути повноекранний режим",
-      "confirmBeforeRestarting": "Підтверджувати перед перезапуском",
       "warnBeforeManuallyAssigningTelevotePoints": "Попереджати перед ручним введенням телебалів",
       "showJuryVotingProgressBar": "Показувати прогрес-бар голосування журі",
       "imageSizeIsPrettyLarge": "Розмір зображення доволі великий ({size}MB). Це може сповільнити симуляцію — можливо, варто стиснути або використати менше зображення. Продовжити?",

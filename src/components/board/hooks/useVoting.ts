@@ -25,14 +25,14 @@ export const useVoting = () => {
 
   const MAX_COUNTRY_WITH_POINTS = pointsSystem.length;
 
-  const { countries, isJuryVoting } = getCurrentStage();
+  const { countries, isJuryVoting } = getCurrentStage() || {};
 
   const { countriesWithPointsLength, wasTheFirstPointsAwarded } =
     useMemo(() => {
       let length = 0;
       let hasPoints = false;
 
-      for (const country of countries) {
+      for (const country of countries ?? []) {
         if (country.lastReceivedPoints !== null) {
           length += 1;
         }

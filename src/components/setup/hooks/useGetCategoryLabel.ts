@@ -21,6 +21,14 @@ export const useGetCategoryLabel = () => {
         return t('oceania');
       case 'Rest of Europe':
         return t('restOfEurope');
+      case 'In stage':
+        return t('inStage');
+      case 'Other stage':
+        return t('otherStage');
+      case 'Not participating':
+        return t('notParticipating');
+      case 'Auto-Q':
+        return t('autoQ');
       default:
         return category;
     }

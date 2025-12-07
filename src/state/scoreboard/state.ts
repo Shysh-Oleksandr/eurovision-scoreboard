@@ -1,6 +1,6 @@
 import { ScoreboardState } from './types';
 
-import { EventMode, StageId } from '@/models';
+import { StageId } from '@/models';
 
 export const initialScoreboardState: Partial<ScoreboardState> = {
   eventStages: [],

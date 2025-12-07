@@ -33,7 +33,8 @@ const QualificationResultsModal = () => {
   const shouldShowQualificationModal =
     showQualificationModal && showQualificationResults;
 
-  const { name: currentStageName, countries, id: stageId } = getCurrentStage();
+  const currentStage = getCurrentStage();
+  const { name: currentStageName, countries, id: stageId } = currentStage || {};
   const { nextPhase } = useNextEventName();
 
   const { handleContinue } = useContinueToNextPhase();
@@ -41,9 +42,13 @@ const QualificationResultsModal = () => {
   const qualifiedCountries = useMemo(
     () =>
       countries
-        .filter((country) => country.isQualifiedFromSemi)
+        ?.filter((country) => {
+          if (!stageId) return false;
+
+          return country.qualifiedFromStageIds?.includes(stageId);
+        })
         .sort(compareCountriesByPoints),
-    [countries],
+    [countries, stageId],
   );
 
   const countriesContainerRef = useRef<HTMLDivElement>(null);
@@ -51,9 +56,11 @@ const QualificationResultsModal = () => {
   const [shouldClose, setShouldClose] = useState(false);
 
   const sortedQualifiedCountries = useMemo(() => {
-    const stageQualificationOrder = qualificationOrder[stageId] || {};
+    const stageQualificationOrder = stageId
+      ? qualificationOrder[stageId] || {}
+      : {};
 
-    return [...qualifiedCountries].sort((a, b) => {
+    return [...(qualifiedCountries ?? [])].sort((a, b) => {
       const orderA = stageQualificationOrder[a.code] || 0;
       const orderB = stageQualificationOrder[b.code] || 0;
 
@@ -146,7 +153,7 @@ const QualificationResultsModal = () => {
       }
     >
       <h2 className="md:text-2xl text-xl font-bold mb-4 text-white">
-        {t('simulation.qualifiers', { stageName: currentStageName })}
+        {t('simulation.qualifiers', { stageName: currentStageName ?? '' })}
       </h2>
 
       <div

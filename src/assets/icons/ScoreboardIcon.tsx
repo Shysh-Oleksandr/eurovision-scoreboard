@@ -4,6 +4,7 @@ interface ScoreboardIconProps {
   className?: string;
 }
 
+// Unused icon. TODO: check if needed
 export const ScoreboardIcon: React.FC<ScoreboardIconProps> = ({
   className,
 }) => (

@@ -8,9 +8,10 @@ import { useCountriesStore } from '../../../state/countriesStore';
 import { CollapsibleSection } from '../../common/CollapsibleSection';
 import { Input } from '../../Input';
 import { useGetCategoryLabel } from '../hooks/useGetCategoryLabel';
+import { useVotersCountriesSearch } from '../post-setup/hooks/useVotersCountriesSearch';
 import SearchInputIcon from '../SearchInputIcon';
 
-import { useVotersCountriesSearch } from './hooks/useVotersCountriesSearch';
+import { VoterGroupLabel } from './VoterGroupLabel';
 
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -26,11 +27,13 @@ const getAmountLabel = (itemsCount: number) => {
 interface VotersCountriesSearchProps {
   localVotingCountries: BaseCountry[];
   onAddVoter: (country: BaseCountry) => void;
+  stageId: string;
 }
 
 const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
   localVotingCountries,
   onAddVoter,
+  stageId,
 }) => {
   const t = useTranslations('setup.eventStageModal');
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -42,13 +45,20 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
   );
 
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  const allCountriesForYear = useCountriesStore(
+    (state) => state.allCountriesForYear,
+  );
 
   // Load available countries on mount
   useEffect(() => {
-    const countries = getAllCountries();
+    const countries: BaseCountry[] = getAllCountries().map((country) => ({
+      ...country,
+      aqSemiFinalGroup: allCountriesForYear.find((c) => c.code === country.code)
+        ?.aqSemiFinalGroup,
+    }));
 
     setAvailableCountries(countries);
-  }, [getAllCountries]);
+  }, [allCountriesForYear, getAllCountries]);
 
   // Filter out countries that are already in the voting list
   const availableCountriesToAdd = availableCountries.filter(
@@ -64,7 +74,7 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
     handleToggleCategory,
     groupedAvailableCountries,
     sortedCategories,
-  } = useVotersCountriesSearch(availableCountriesToAdd);
+  } = useVotersCountriesSearch(availableCountriesToAdd, stageId);
 
   const handleAddAll = (countries: BaseCountry[]) => {
     countries.forEach((country) => onAddVoter(country));
@@ -131,6 +141,7 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
                     onClick={() => onAddVoter(country)}
                     className="flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 p-2 rounded-md transition-colors duration-300 relative"
                   >
+                    <VoterGroupLabel country={country} stageId={stageId} />
                     <img
                       loading="lazy"
                       src={logo}

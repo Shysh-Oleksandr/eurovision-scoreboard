@@ -49,7 +49,7 @@ const BoardHeader = (): JSX.Element | null => {
     isJuryVoting,
     isOver: isVotingOver,
     id: currentStageId,
-  } = getCurrentStage();
+  } = getCurrentStage() || {};
 
   const votingCountry = getVotingCountry();
 
@@ -75,7 +75,7 @@ const BoardHeader = (): JSX.Element | null => {
     }
 
     return t.rich('enterTelevotePointsFor', {
-      country: votingCountry?.name,
+      country: votingCountry?.name ?? '',
       span: (chunks) => <span className="font-medium">{chunks}</span>,
     });
   }, [

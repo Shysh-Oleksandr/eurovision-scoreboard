@@ -99,7 +99,7 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
             Icon={<RestartIcon className="w-5 h-5" />}
           />
           <Button variant="primary" onClick={onRandomize} className="!px-4">
-            {t('settings.odds.randomize')}
+            {t('common.randomize')}
           </Button>
         </div>
       </div>

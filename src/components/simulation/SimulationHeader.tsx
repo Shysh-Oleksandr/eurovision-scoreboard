@@ -32,9 +32,6 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
     (state) => state.settings.showHostingCountryLogo,
   );
   const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
-  const shouldShowResetWarning = useGeneralStore(
-    (state) => state.settings.shouldShowResetWarning,
-  );
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,
   );
@@ -123,15 +120,7 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
             <UndoIcon className="w-6 h-6" />
           </Button>
           <Button
-            onClick={() => {
-              if (shouldShowResetWarning) {
-                if (confirm(t('restartConfirmation'))) {
-                  triggerRestartEvent();
-                }
-              } else {
-                triggerRestartEvent();
-              }
-            }}
+            onClick={triggerRestartEvent}
             className={buttonClassName}
             aria-label={t('restart')}
             title={t('restart')}

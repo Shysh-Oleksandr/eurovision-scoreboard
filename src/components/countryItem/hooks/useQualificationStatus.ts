@@ -16,31 +16,67 @@ export const useQualificationStatus = (
   );
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
 
+  // Note: Semi-final means any stage before the final stage (GF)
   const shouldShowAsNonQualified = useMemo(() => {
-    const currentStageId = viewedStageId || getCurrentStage().id;
-    const isSemiFinalPhase = currentStageId !== StageId.GF;
+    const fallbackStage = getCurrentStage();
+    const currentStageId = viewedStageId || fallbackStage?.id;
 
-    const countryInSemiFinal = getCountryInSemiFinal(country.code);
+    if (!currentStageId) return false;
 
-    const isNonQualifiedInSemiFinal =
-      isVotingOver &&
-      isSemiFinalPhase &&
-      !countryInSemiFinal?.isQualifiedFromSemi;
+    const currentStage =
+      eventStages.find((s) => s.id === currentStageId) || fallbackStage;
 
-    const isNonQualifiedInAllParticipantsMode =
+    if (!currentStage) return false;
+
+    const isGrandFinal = currentStage.id === StageId.GF;
+
+    // Find this country in the currently viewed stage (or latest non-final),
+    // falling back to the semi-final lookup for legacy/all-participants cases.
+    const countryInCurrentStage =
+      currentStage.countries.find((c) => c.code === country.code) ||
+      getCountryInSemiFinal(country.code);
+
+    const hasQualifiedFromCurrentStage =
+      !!countryInCurrentStage &&
+      countryInCurrentStage.qualifiedFromStageIds?.includes(currentStage.id);
+
+    // Non-final phases: mark countries as non-qualified once voting is over
+    // if they haven't qualified from this stage.
+    if (!isGrandFinal) {
+      const isNonQualifiedInSemiFinal =
+        isVotingOver && !hasQualifiedFromCurrentStage;
+
+      const isNonQualifiedInAllParticipantsMode =
+        showAllParticipants &&
+        winnerCountry &&
+        !hasQualifiedFromCurrentStage &&
+        !country?.isAutoQualified;
+
+      return Boolean(
+        isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode,
+      );
+    }
+
+    // Grand Final: in all-participants mode, any country not participating
+    // in the Grand Final should be shown as non-qualified (unless auto-qualified).
+    const isInGrandFinal = currentStage.countries.some(
+      (c) => c.code === country.code,
+    );
+
+    const isNonQualifiedInGrandFinalAllParticipants =
       showAllParticipants &&
       winnerCountry &&
-      !countryInSemiFinal?.isQualifiedFromSemi &&
+      !isInGrandFinal &&
       !country?.isAutoQualified;
 
-    return Boolean(
-      isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode,
-    );
+    return Boolean(isNonQualifiedInGrandFinalAllParticipants);
   }, [
     viewedStageId,
     getCurrentStage,
     getCountryInSemiFinal,
+    eventStages,
     country.code,
     country?.isAutoQualified,
     isVotingOver,

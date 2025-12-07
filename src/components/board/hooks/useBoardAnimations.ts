@@ -32,7 +32,7 @@ export const useBoardAnimations = (
   const [finalCountries, setFinalCountries] = useState<Country[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { id: currentStageId, isOver: isVotingOver } = getCurrentStage();
+  const { id: currentStageId, isOver: isVotingOver } = getCurrentStage() || {};
 
   const countriesToRender = useMemo(() => {
     const countryMap = new Map(sortedCountries.map((c) => [c.code, c]));

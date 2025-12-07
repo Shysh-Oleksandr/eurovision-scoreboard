@@ -1,6 +1,6 @@
 import rw from 'random-weighted-choice';
 
-import { BaseCountry, Country, StageVotingMode } from '../../models';
+import { BaseCountry, Country, StageVotingMode, VotingCountry } from '../../models';
 import { CountryOdds } from '../countriesStore';
 import { PointsItem } from '../generalStore';
 
@@ -169,7 +169,7 @@ const generateVotesForSource = (
 
 export const predefineStageVotes = (
   stageCountries: (Country | BaseCountry)[],
-  votingCountries: BaseCountry[],
+  votingCountries: VotingCountry[],
   votingMode: StageVotingMode,
   countryOdds: CountryOdds,
   randomnessLevel: number,

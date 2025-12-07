@@ -2,17 +2,13 @@ import { useState } from 'react';
 
 import {
   CountryAssignmentGroup,
-  EventMode,
   EventStage,
-  StageId,
 } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 
 interface UseStageModalActionsProps {
-  allAssignments: Record<EventMode, Record<string, string>>;
-  setAssignments: (
-    assignments: Record<EventMode, Record<string, string>>,
-  ) => void;
+  allAssignments: Record<string, string>;
+  setAssignments: (assignments: Record<string, string>) => void;
 }
 
 export const useStageModalActions = ({
@@ -30,7 +26,6 @@ export const useStageModalActions = ({
   const setConfiguredEventStages = useCountriesStore(
     (state) => state.setConfiguredEventStages,
   );
-  const activeTab = useCountriesStore((state) => state.activeMode);
 
   const handleOpenCreateEventStageModal = () => {
     setEventStageToEdit(undefined);
@@ -52,52 +47,48 @@ export const useStageModalActions = ({
     const isEditing = configuredEventStages.some((s) => s.id === stage.id);
 
     if (isEditing) {
+      // Update existing stage
       setConfiguredEventStages(
         configuredEventStages.map((s) =>
           s.id === stage.id ? { ...s, ...stage } : s,
         ),
       );
     } else {
+      // Append new stage to the end with order = minOrder - 1
+      const minOrder =
+        configuredEventStages.length > 0
+          ? Math.min(...configuredEventStages.map((s) => s.order ?? 0))
+          : 0;
+
       const newStage: EventStage = {
         ...stage,
+        order: minOrder - 1,
         countries: [],
         isOver: false,
         isJuryVoting: false,
-        syncVotersWithParticipants: true, // Default to true
       };
-      const grandFinalStage = configuredEventStages.find(
-        (s) => s.id === StageId.GF,
-      );
-      const semiFinalStages = configuredEventStages.filter(
-        (s) => s.id !== StageId.GF,
-      );
 
-      const newStages = [...semiFinalStages, newStage];
-
-      if (grandFinalStage) {
-        newStages.push(grandFinalStage);
-      }
-
-      setConfiguredEventStages(newStages);
+      setConfiguredEventStages([newStage, ...configuredEventStages]);
     }
   };
 
   const handleDeleteStage = (stageId: string) => {
-    setConfiguredEventStages(
-      configuredEventStages.filter((s) => s.id !== stageId),
+    const remainingStages = configuredEventStages.filter(
+      (s) => s.id !== stageId,
     );
 
-    const newAssignments = { ...allAssignments };
-    const updatedTabAssignments = { ...newAssignments[activeTab] };
+    setConfiguredEventStages(remainingStages);
 
-    for (const countryCode in updatedTabAssignments) {
-      if (updatedTabAssignments[countryCode] === stageId) {
-        updatedTabAssignments[countryCode] =
+    // Update assignments: move countries from deleted stage to NOT_PARTICIPATING
+    const newAssignments = { ...allAssignments };
+
+    for (const countryCode in newAssignments) {
+      if (newAssignments[countryCode] === stageId) {
+        newAssignments[countryCode] =
           CountryAssignmentGroup.NOT_PARTICIPATING;
       }
     }
 
-    newAssignments[activeTab] = updatedTabAssignments;
     setAssignments(newAssignments);
   };
 

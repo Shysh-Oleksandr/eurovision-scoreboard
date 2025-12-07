@@ -38,13 +38,15 @@ const Button = ({
       'bg-red-900 from-red-900 to-red-600/40 text-white hover:bg-red-700',
   };
 
+  const childrenContent = children || label;
+
   return (
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${
         Icon ? 'flex items-center gap-2' : ''
-      } ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
-        isLoading ? 'flex' : ''
-      }`}
+      } ${Icon && !childrenContent ? '!p-2' : ''} ${className} ${
+        disabled ? 'opacity-50 cursor-not-allowed' : ''
+      } ${isLoading ? 'flex' : ''}`}
       onClick={onClick}
       title={title}
       disabled={disabled || isLoading}
@@ -54,7 +56,7 @@ const Button = ({
       ) : (
         <>
           {Icon}
-          {children || label}
+          {childrenContent}
         </>
       )}
     </button>

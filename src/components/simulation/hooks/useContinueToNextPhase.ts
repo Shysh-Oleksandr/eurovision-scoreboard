@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { useCountriesStore } from '@/state/countriesStore';
-import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -9,8 +8,11 @@ export const useContinueToNextPhase = () => {
   const setPredefModalOpen = useCountriesStore(
     (state) => state.setPredefModalOpen,
   );
-  const setPredefModalStageType = useCountriesStore(
-    (state) => state.setPredefModalStageType,
+  const setPostSetupModalOpen = useCountriesStore(
+    (state) => state.setPostSetupModalOpen,
+  );
+  const setCurrentSetupStageType = useCountriesStore(
+    (state) => state.setCurrentSetupStageType,
   );
   const continueToNextPhase = useScoreboardStore(
     (state) => state.continueToNextPhase,
@@ -27,38 +29,36 @@ export const useContinueToNextPhase = () => {
     (state) => state.setPredefinedVotesForStage,
   );
 
-  const enablePredefinedVotes = useGeneralStore(
-    (s) => s.settings.enablePredefinedVotes,
-  );
-
-  const nextStageForPredef = useMemo(() => {
+  const nextSetupStage = useMemo(() => {
     const current = getCurrentStage();
+    if (!current) return undefined;
     const currentIndex = eventStages.findIndex((s) => s.id === current.id);
 
     return eventStages[currentIndex + 1];
   }, [eventStages, getCurrentStage]);
 
   const handleContinue = () => {
-    if (enablePredefinedVotes && nextStageForPredef) {
-      if (!nextStageForPredef.isReadyForPredef) prepareForNextStage();
-      setPredefModalStageType('next');
-      setPredefModalOpen(true);
+    setCurrentSetupStageType('next');
 
-      return;
+    console.log('nextSetupStage', nextSetupStage);
+    if (nextSetupStage && !nextSetupStage.isPreparedForNextStage) {
+      prepareForNextStage();
     }
 
-    continueToNextPhase();
+    setPostSetupModalOpen(true);
   };
 
   const onSaveContinue = (votes: Partial<StageVotes>) => {
-    setPredefinedVotesForStage(nextStageForPredef, votes);
+    if (nextSetupStage) {
+      setPredefinedVotesForStage(nextSetupStage, votes);
+    }
     setPredefModalOpen(false);
     continueToNextPhase();
   };
 
   return {
     handleContinue,
-    nextStageForPredef,
+    nextSetupStage,
     onSaveContinue,
   };
 };

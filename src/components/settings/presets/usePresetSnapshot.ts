@@ -21,7 +21,6 @@ export const usePresetSnapshot = () => {
       eventAssignments: countriesState.eventAssignments,
       configuredEventStages: countriesState.configuredEventStages,
       countryOdds: countriesState.countryOdds,
-      activeMode: countriesState.activeMode,
     };
 
     const now = Date.now();

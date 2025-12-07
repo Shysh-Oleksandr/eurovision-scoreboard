@@ -1,33 +1,35 @@
 export interface BaseCountry {
+  // Fields that can be derived from the preset countries file
   name: string;
   code: string;
   category?: string;
-  flag?: string;
   isQualified?: boolean;
   semiFinalGroup?: string;
   aqSemiFinalGroup?: string;
   isAutoQualified?: boolean;
-  isQualifiedFromSemi?: boolean;
   juryOdds?: number;
   televoteOdds?: number;
   spokespersonOrder?: number;
 
+  // Fields set during simulation
+  /**
+   * IDs of stages from which this country has qualified (in order).
+   * Useful for multi-stage qualification chains.
+   */
+  qualifiedFromStageIds?: string[];
+
+  // Fields for custom entries only
+  flag?: string;
   updatedAt?: string; // For custom entries
 }
 
 export type SemiFinalGroup = 'SF1' | 'SF2';
 
 export enum CountryAssignmentGroup {
-  AUTO_QUALIFIER = 'AUTO_QUALIFIER',
   SF1 = 'SF1',
   SF2 = 'SF2',
   NOT_QUALIFIED = 'NOT_QUALIFIED',
   NOT_PARTICIPATING = 'NOT_PARTICIPATING',
-}
-
-export enum EventMode {
-  GRAND_FINAL_ONLY = 'GRAND_FINAL_ONLY',
-  SEMI_FINALS_AND_GRAND_FINAL = 'SEMI_FINALS_AND_GRAND_FINAL',
 }
 
 export interface SemiFinalQualifiersAmount {
@@ -47,24 +49,32 @@ export enum StageVotingType {
   TELEVOTE = 'TELEVOTE',
 }
 
+export interface QualifierTarget {
+  targetStageId: string;
+  amount: number;
+}
+
+export type VotingCountry = Pick<BaseCountry, 'code' | 'name' | 'flag'>;
+
 export interface EventStage {
   id: string;
   name: string;
+  order: number; // Explicit ordering for stage sequence
   votingMode: StageVotingMode;
   countries: Country[];
-  votingCountries?: BaseCountry[];
-  syncVotersWithParticipants?: boolean;
+  votingCountries?: VotingCountry[];
   isOver: boolean;
   isJuryVoting: boolean;
   isLastStage?: boolean;
-  qualifiersAmount?: number;
-  isReadyForPredef?: boolean; // is set to true when user opens predefinition modal; needed to call prepareForNextStage only once
+  qualifiersAmount?: number; // Total qualifiers from this stage (sum of qualifiesTo amounts)
+  qualifiesTo?: QualifierTarget[]; // Which stages this stage qualifies to and how many
+  isPreparedForNextStage?: boolean; // is set to true when user opens predefinition modal; needed to call prepareForNextStage only once
 }
 
 export enum StageId {
-  SF1 = 'sf1',
-  SF2 = 'sf2',
-  GF = 'gf',
+  SF1 = 'SF1',
+  SF2 = 'SF2',
+  GF = 'GF',
 }
 
 export interface Country extends BaseCountry {

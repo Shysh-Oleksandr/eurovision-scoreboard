@@ -1093,17 +1093,23 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
+    const hasQualifiedFromCurrentStage = (country: Country) =>
+      !!(
+        country.qualifiedFromStageIds?.includes(currentStage.id)
+      );
+
     // Check if there are enough countries to qualify
     const availableCountries = currentStage.countries.filter(
-      (country) => !country.isQualifiedFromSemi,
+      (country) => !hasQualifiedFromCurrentStage(country),
     );
     if (availableCountries.length === 0) return;
 
-    // Check if the selected country is already qualified
+    // Check if the selected country is already qualified for this stage
     const selectedCountry = currentStage.countries.find(
       (country) => country.code === countryCode,
     );
-    if (!selectedCountry || selectedCountry.isQualifiedFromSemi) return;
+    if (!selectedCountry || hasQualifiedFromCurrentStage(selectedCountry))
+      return;
 
     // Get the top N countries by points (excluding already qualified ones)
     const countriesWithPoints = currentStage.countries
@@ -1132,7 +1138,7 @@ export const createVotingActions: StateCreator<
 
     const topCountries = countriesWithPoints
       .slice(0, qualifiersAmount)
-      .filter((country) => !country.isQualifiedFromSemi);
+      .filter((country) => !hasQualifiedFromCurrentStage(country));
 
     // Check if the selected country would have qualified by predefined votes
     const wouldHaveQualified = topCountries.some(
@@ -1193,7 +1199,10 @@ export const createVotingActions: StateCreator<
                 country.code === countryCode
                   ? {
                       ...country,
-                      isQualifiedFromSemi: true,
+                      qualifiedFromStageIds: [
+                        ...(country.qualifiedFromStageIds ?? []),
+                        currentStage.id,
+                      ],
                     }
                   : country,
               ),
@@ -1206,8 +1215,9 @@ export const createVotingActions: StateCreator<
         (stage) => stage.id === currentStage.id,
       );
       const qualifiedCount =
-        updatedStage?.countries.filter((country) => country.isQualifiedFromSemi)
-          .length || 0;
+        updatedStage?.countries.filter((country) =>
+          (country.qualifiedFromStageIds ?? []).includes(currentStage.id),
+        ).length || 0;
       const isStageComplete = qualifiedCount >= qualifiersAmount;
 
       const newQualificationOrder = {
@@ -1298,9 +1308,14 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
+    const hasQualifiedFromCurrentStage = (country: Country) =>
+      !!(
+        country.qualifiedFromStageIds?.includes(currentStage.id)
+      );
+
     // Check if there are enough countries to qualify
     const availableCountries = currentStage.countries.filter(
-      (country) => !country.isQualifiedFromSemi,
+      (country) => !hasQualifiedFromCurrentStage(country),
     );
     if (availableCountries.length === 0) return;
 
@@ -1330,7 +1345,7 @@ export const createVotingActions: StateCreator<
 
     const topCountries = countriesWithPoints
       .slice(0, qualifiersAmount)
-      .filter((country) => !country.isQualifiedFromSemi);
+      .filter((country) => !hasQualifiedFromCurrentStage(country));
 
     if (topCountries.length === 0) return;
 
@@ -1353,7 +1368,10 @@ export const createVotingActions: StateCreator<
                 country.code === selectedCountry.code
                   ? {
                       ...country,
-                      isQualifiedFromSemi: true,
+                      qualifiedFromStageIds: [
+                        ...(country.qualifiedFromStageIds ?? []),
+                        currentStage.id,
+                      ],
                     }
                   : country,
               ),
@@ -1366,8 +1384,9 @@ export const createVotingActions: StateCreator<
         (stage) => stage.id === currentStage.id,
       );
       const qualifiedCount =
-        updatedStage?.countries.filter((country) => country.isQualifiedFromSemi)
-          .length || 0;
+        updatedStage?.countries.filter((country) =>
+          (country.qualifiedFromStageIds ?? []).includes(currentStage.id),
+        ).length || 0;
       const isStageComplete = qualifiedCount >= qualifiersAmount;
 
       const newQualificationOrder = {

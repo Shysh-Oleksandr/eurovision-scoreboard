@@ -16,7 +16,11 @@ const ControlsPanel = (): JSX.Element | null => {
   );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
-  const { isJuryVoting, isOver: isVotingOver, votingMode } = getCurrentStage();
+  const {
+    isJuryVoting,
+    isOver: isVotingOver,
+    votingMode,
+  } = getCurrentStage() || {};
 
   if (isVotingOver) {
     return null;

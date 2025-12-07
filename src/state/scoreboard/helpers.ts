@@ -100,9 +100,11 @@ export const handleStageEnd = (
 
     updatedCountries = updatedCountries.map((country) => ({
       ...country,
-      isQualifiedFromSemi: qualifiedCountries.some(
+      qualifiedFromStageIds: qualifiedCountries.some(
         (c) => c.code === country.code,
-      ),
+      )
+        ? [...(country.qualifiedFromStageIds ?? []), currentStage.id]
+        : country.qualifiedFromStageIds,
     }));
   }
 

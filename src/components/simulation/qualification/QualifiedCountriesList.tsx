@@ -12,16 +12,24 @@ const QualifiedCountriesList = () => {
     (state) => state.qualificationOrder,
   );
 
-  const { countries, qualifiersAmount, id: stageId } = getCurrentStage();
+  const currentStage = getCurrentStage();
+  const { countries, qualifiersAmount, id: stageId } = currentStage || {};
 
   const qualifiedCountries = useMemo(
-    () => countries.filter((country) => country.isQualifiedFromSemi),
-    [countries],
+    () =>
+      countries?.filter((country) => {
+        if (!stageId) return false;
+
+        return country.qualifiedFromStageIds?.includes(stageId);
+      }) ?? [],
+    [countries, stageId],
   );
 
   // Sort qualified countries by their qualification order for this stage
   const sortedQualifiedCountries = useMemo(() => {
-    const stageQualificationOrder = qualificationOrder[stageId] || {};
+    const stageQualificationOrder = stageId
+      ? qualificationOrder[stageId] || {}
+      : {};
 
     return [...qualifiedCountries].sort((a, b) => {
       const orderA = stageQualificationOrder[a.code] || 0;
