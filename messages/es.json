@@ -71,6 +71,7 @@
       "votingMode": "Modo de votación",
       "numberOfQualifiers": "Número de clasificados",
       "qualifierTargets": "Objetivos de clasificación",
+      "qualifierTargetsDescription": "Elige cuántos participantes de esta etapa avanzan a cada etapa posterior.",
       "addStage": "Añadir etapa",
       "editStage": "Editar etapa",
       "stageNamePlaceholder": "Semi-Final 3, Quarter-Final 1, Heat 1, etc.",

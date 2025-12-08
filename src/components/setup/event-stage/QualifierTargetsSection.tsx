@@ -104,15 +104,18 @@ const QualifierTargetsSection: React.FC<{ isEditMode: boolean }> = ({
     });
   }, [allStages, currentOrder, isEditMode, qualifiesTo]);
 
-  console.log('availableStages', availableStages);
-
   return (
     <>
       <div className="flex flex-col gap-3">
-        <h4 className="middle-line text-white text-sm">
-          {t('setup.eventStageModal.qualifierTargets')}
-        </h4>
+        <div className="flex flex-col gap-1">
+          <h4 className="middle-line text-white text-sm">
+            {t('setup.eventStageModal.qualifierTargets')}
+          </h4>
 
+          <p className="text-white/70 text-sm">
+            {t('setup.eventStageModal.qualifierTargetsDescription')}
+          </p>
+        </div>
         {availableStages.length === 0 ? (
           <p className="text-white/70 text-sm">
             {t('setup.eventStageModal.noAvailableTargetStages')}

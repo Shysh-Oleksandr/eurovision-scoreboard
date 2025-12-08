@@ -51,7 +51,6 @@ export const createEventActions: StateCreator<
     });
 
     const allStagesFromSetup = get().eventStages;
-    console.log('allStagesFromSetup', allStagesFromSetup);
     // Sort stages by order property, filter out stages with no participants
     const newEventStages: EventStage[] = allStagesFromSetup
       .filter((s: EventStage) => s.countries.length > 0)
@@ -79,8 +78,6 @@ export const createEventActions: StateCreator<
     generalStore.setPresentationSettings({
       isPresenting: generalStore.settings.autoStartPresentation,
     });
-
-    console.log('finalEventStages', finalEventStages);
 
     set({
       eventStages: finalEventStages,
@@ -174,7 +171,7 @@ export const createEventActions: StateCreator<
 
         const updatedTargetStage = {
           ...targetStage,
-          countries: [...existingCountries, ...qualifiersForTarget],
+          countries: [...existingCountries, ...qualifiersForTarget].sort((a, b) => a.name.localeCompare(b.name)),
         };
 
         updatedEventStages[targetStageIndex] = updatedTargetStage;

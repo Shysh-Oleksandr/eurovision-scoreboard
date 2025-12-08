@@ -33,7 +33,7 @@
     "dragAndDropOrClickToUpload": "Drag & drop or click to upload",
     "orSelectExisting": "Or select existing",
     "randomize": "Randomize",
-    "loadYearData": "Load Year Data",
+    "loadYearData": "Load year data",
     "country": "Country"
   },
   "Metadata": {
@@ -71,6 +71,7 @@
       "votingMode": "Voting Mode",
       "numberOfQualifiers": "Number of qualifiers",
       "qualifierTargets": "Qualifier targets",
+      "qualifierTargetsDescription": "Choose how many entries from this stage advance to each later stage.",
       "addStage": "Add Stage",
       "editStage": "Edit Stage",
       "stageNamePlaceholder": "Semi-Final 3, Quarter-Final 1, Heat 1, etc.",

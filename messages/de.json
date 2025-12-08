@@ -71,6 +71,7 @@
       "votingMode": "Abstimmungsmodus",
       "numberOfQualifiers": "Anzahl der Qualifikanten",
       "qualifierTargets": "Qualifikationsziele",
+      "qualifierTargetsDescription": "Wähle, wie viele Einträge aus diesem Stage zu jedem späteren Stage vorrücken.",
       "addStage": "Stage hinzufügen",
       "editStage": "Stage bearbeiten",
       "stageNamePlaceholder": "Halbfinale 3, Viertelfinale 1, Heat 1, etc.",

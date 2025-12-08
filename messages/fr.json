@@ -71,6 +71,7 @@
       "votingMode": "Mode de vote",
       "numberOfQualifiers": "Nombre de qualifiés",
       "qualifierTargets": "Targets de qualification",
+      "qualifierTargetsDescription": "Choisissez combien d’entrées de cette étape avancent à chaque étape ultérieure.",
       "addStage": "Ajouter une étape",
       "editStage": "Modifier une étape",
       "stageNamePlaceholder": "Demi-finale 3, Quart-finale 1, Heat 1, etc.",

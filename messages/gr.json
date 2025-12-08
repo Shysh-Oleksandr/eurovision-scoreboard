@@ -71,6 +71,7 @@
       "votingMode": "Λειτουργία Ψηφοφορίας",
       "numberOfQualifiers": "Αριθμός προκριθέντων",
       "qualifierTargets": "Targets de qualification",
+      "qualifierTargetsDescription": "Επιλέξτε πόσες συμμετοχές από αυτό το στάδιο προχωρήσουν σε κάθε νέο στάδιο.",
       "addStage": "Προσθήκη σταδίου",
       "editStage": "Επεξεργασία σταδίου",
       "stageNamePlaceholder": "Ημιτελικός 3, Τεταρτημόριος 1, Heat 1, etc.",

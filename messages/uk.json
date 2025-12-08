@@ -71,6 +71,7 @@
       "votingMode": "Режим голосування",
       "numberOfQualifiers": "Кількість фіналістів",
       "qualifierTargets": "Цілі для кваліфікації",
+      "qualifierTargetsDescription": "Виберіть, скільки учасників з цього етапу перейдуть до кожного наступного етапу.",
       "addStage": "Додати етап",
       "editStage": "Редагувати етап",
       "stageNamePlaceholder": "Півфінал 3, Чвертьфінал 1, Heat 1, etc.",

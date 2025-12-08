@@ -67,6 +67,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
           {...register('name')}
           className="h-12 lg:text-[0.95rem] text-sm"
           placeholder={t('setup.eventStageModal.stageNamePlaceholder')}
+          autoFocus={!isEditMode}
         />
         {errors.name && (
           <span className="text-red-400 text-sm">

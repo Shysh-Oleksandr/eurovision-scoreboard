@@ -19,8 +19,6 @@ export const validateEventSetup = (
 
   // Validate each stage
   for (const stage of sortedStages) {
-    const countriesCount = stage.countries.length;
-
     const qualifiersBreakdown = getQualifiersBreakdown(stage, sortedStages);
     const totalQualifiersFromOtherStages =
       qualifiersBreakdown?.reduce((sum, q) => sum + q.amount, 0) || 0;
@@ -48,7 +46,8 @@ export const validateEventSetup = (
       const totalQualifiersFromThisStage =
         stage.qualifiesTo.reduce((sum, target) => sum + target.amount, 0);
 
-      if (totalQualifiersFromThisStage > countriesCount) {
+   
+      if (totalQualifiersFromThisStage > totalParticipants) {
         return t('setup.validation.qualifiersExceedParticipants', {
           stageName: stage.name,
         });

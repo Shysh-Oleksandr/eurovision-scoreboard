@@ -71,6 +71,7 @@
       "votingMode": "Tryb głosowania",
       "numberOfQualifiers": "Liczba kwalifikantów",
       "qualifierTargets": "Targets kwalifikacji",
+      "qualifierTargetsDescription": "Wybierz, ile uczestników z tego etapu awansuje do każdego następnego etapu.",
       "addStage": "Dodaj etap",
       "editStage": "Edytuj etap",
       "stageNamePlaceholder": "Półfinał 3, Kwartał 1, Heat 1, etc.",

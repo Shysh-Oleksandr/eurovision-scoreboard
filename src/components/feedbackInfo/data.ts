@@ -1,7 +1,13 @@
 export const WHATS_NEW = [
   {
+    date: '2025-12-08',
+    title:
+      'Fixed the issue with the qualifier targets validation',
+  },
+  {
     date: '2025-12-07',
-    title: 'Flexible contest setup: create unlimited stages with custom qualifier targets (e.g., Heats, Quarter-finals, etc.). Improved voting country selection. Various small enhancements.',
+    title:
+      'Flexible contest setup: create unlimited stages with custom qualifier targets (e.g., Heats, Quarter-finals, etc.). Improved voting country selection. Various small enhancements.',
   },
   {
     date: '2025-11-23',

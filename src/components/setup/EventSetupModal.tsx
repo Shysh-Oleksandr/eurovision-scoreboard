@@ -259,7 +259,6 @@ const EventSetupModal = () => {
       })),
     }));
 
-    console.log('eventStages', eventStages);
     setEventStages(eventStages);
 
     const allSelectedCountries: BaseCountry[] = Object.entries(
