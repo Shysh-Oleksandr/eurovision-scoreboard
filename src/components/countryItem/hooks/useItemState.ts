@@ -71,7 +71,7 @@ export const useItemState = ({
       return 'bg-countryItem-televoteActiveBg text-countryItem-televoteActiveText outline outline-2';
     }
 
-    if (isCountryVotingFinished) {
+    if (isCountryVotingFinished || isVotingOver) {
       return 'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
     }
 
@@ -85,6 +85,7 @@ export const useItemState = ({
     isJuryVoting,
     isActive,
     isCountryVotingFinished,
+    isVotingOver,
     showPlaceAnimation,
     isDisabled,
   ]);

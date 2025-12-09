@@ -18,16 +18,11 @@ const qualifierTargetSchema = z.object({
 });
 
 // Base schema for common fields
-const baseSchema = z.object({
+const eventStageSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   order: z.number().int(),
   votingMode: z.enum(Object.values(StageVotingMode)),
   qualifiesTo: z.array(qualifierTargetSchema).optional(),
-});
-
-// Schema for all stages (unified)
-const eventStageSchema = baseSchema.extend({
-  qualifiersAmount: z.number().optional(),
 });
 
 export type EventStageFormData = z.infer<typeof eventStageSchema>;
@@ -75,7 +70,6 @@ export const useEventStageForm = ({
     defaultValues: {
       name: '',
       order: getDefaultOrder(),
-      qualifiersAmount: undefined,
       votingMode: StageVotingMode.TELEVOTE_ONLY,
       qualifiesTo: [],
     },
@@ -90,7 +84,6 @@ export const useEventStageForm = ({
         {
           name: eventStageToEdit.name,
           order: eventStageToEdit.order ?? 0,
-          qualifiersAmount: eventStageToEdit.qualifiersAmount,
           votingMode: eventStageToEdit.votingMode,
           qualifiesTo: (eventStageToEdit.qualifiesTo as any) || [],
         },
@@ -117,7 +110,6 @@ export const useEventStageForm = ({
         {
           name: `Stage ${localEventStagesLength + 1}`,
           order: getDefaultOrder(),
-          qualifiersAmount: undefined,
           votingMode: StageVotingMode.TELEVOTE_ONLY,
           qualifiesTo: defaultQualifiesTo,
         },
@@ -132,17 +124,10 @@ export const useEventStageForm = ({
       (target) => target.amount > 0,
     );
 
-    // Calculate qualifiersAmount from qualifiesTo if not explicitly set
-    const qualifiersAmount =
-      data.qualifiersAmount ??
-      (validQualifiesTo.reduce((sum, target) => sum + target.amount, 0) ||
-        undefined);
-
     return {
       id: eventStageToEdit?.id || new Date().toISOString(),
       name: data.name,
       order: data.order,
-      qualifiersAmount,
       qualifiesTo: validQualifiesTo,
       votingMode: data.votingMode,
     };

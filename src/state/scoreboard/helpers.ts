@@ -95,7 +95,11 @@ export const handleStageEnd = (
     const sortedCountries = [...updatedCountries].sort(
       compareCountriesByPoints,
     );
-    const qualifiersAmount = currentStage.qualifiersAmount || 0;
+    const qualifiersAmount =
+      currentStage.qualifiesTo?.reduce(
+        (sum, target) => sum + target.amount,
+        0,
+      ) || 0;
     const qualifiedCountries = sortedCountries.slice(0, qualifiersAmount);
 
     updatedCountries = updatedCountries.map((country) => ({

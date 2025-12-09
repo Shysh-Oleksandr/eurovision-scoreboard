@@ -51,10 +51,10 @@ export const createEventActions: StateCreator<
     });
 
     const allStagesFromSetup = get().eventStages;
-    // Sort stages by order property, filter out stages with no participants
-    const newEventStages: EventStage[] = allStagesFromSetup
-      .filter((s: EventStage) => s.countries.length > 0)
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    // Sort stages by order property
+    const newEventStages: EventStage[] = allStagesFromSetup.sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
 
     const finalEventStages = newEventStages.map((stage, index) => ({
       ...stage,
@@ -160,10 +160,10 @@ export const createEventActions: StateCreator<
             points: 0,
             lastReceivedPoints: null,
             isVotingFinished: false,
-            qualifiedFromStageIds: [
-              ...(c.qualifiedFromStageIds ?? []),
-              currentStage.id,
-            ],
+            // qualifiedFromStageIds: [
+            //   ...(c.qualifiedFromStageIds ?? []),
+            //   currentStage.id,
+            // ],
           }));
 
         // Add qualifiers to target stage
@@ -171,7 +171,13 @@ export const createEventActions: StateCreator<
 
         const updatedTargetStage = {
           ...targetStage,
-          countries: [...existingCountries, ...qualifiersForTarget].sort((a, b) => a.name.localeCompare(b.name)),
+          countries: [...existingCountries, ...qualifiersForTarget]
+            // Remove duplicates just in case
+            .filter(
+              (country, index, self) =>
+                index === self.findIndex((t) => t.code === country.code),
+            )
+            .sort((a, b) => a.name.localeCompare(b.name)),
         };
 
         updatedEventStages[targetStageIndex] = updatedTargetStage;

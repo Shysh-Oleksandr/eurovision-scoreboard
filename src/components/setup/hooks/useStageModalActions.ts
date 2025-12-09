@@ -77,7 +77,13 @@ export const useStageModalActions = ({
       (s) => s.id !== stageId,
     );
 
-    setConfiguredEventStages(remainingStages);
+    // Remove the stage from qualifiesTo of all other stages
+    const updatedStages = remainingStages.map((s) => ({
+      ...s,
+      qualifiesTo: s.qualifiesTo?.filter((q) => q.targetStageId !== stageId),
+    }));
+
+    setConfiguredEventStages(updatedStages);
 
     // Update assignments: move countries from deleted stage to NOT_PARTICIPATING
     const newAssignments = { ...allAssignments };

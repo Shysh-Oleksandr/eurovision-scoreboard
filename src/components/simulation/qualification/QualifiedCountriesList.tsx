@@ -13,7 +13,11 @@ const QualifiedCountriesList = () => {
   );
 
   const currentStage = getCurrentStage();
-  const { countries, qualifiersAmount, id: stageId } = currentStage || {};
+  const { countries, qualifiesTo, id: stageId } = currentStage || {};
+
+  const qualifiersAmount = useMemo(() => {
+    return qualifiesTo?.reduce((sum, target) => sum + target.amount, 0) || 0;
+  }, [qualifiesTo]);
 
   const qualifiedCountries = useMemo(
     () =>

@@ -1,8 +1,11 @@
 export const WHATS_NEW = [
   {
+    date: '2025-12-09',
+    title: 'More fixes with the contest setup',
+  },
+  {
     date: '2025-12-08',
-    title:
-      'Fixed the issue with the qualifier targets validation',
+    title: 'Fixed the issue with the qualifier targets validation',
   },
   {
     date: '2025-12-07',

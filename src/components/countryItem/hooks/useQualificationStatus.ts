@@ -30,7 +30,8 @@ export const useQualificationStatus = (
 
     if (!currentStage) return false;
 
-    const isGrandFinal = currentStage.id === StageId.GF;
+    const isGrandFinal =
+      currentStage.id.toUpperCase() === StageId.GF.toUpperCase();
 
     // Find this country in the currently viewed stage (or latest non-final),
     // falling back to the semi-final lookup for legacy/all-participants cases.

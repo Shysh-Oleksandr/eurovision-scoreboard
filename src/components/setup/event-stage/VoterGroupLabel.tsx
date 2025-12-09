@@ -4,6 +4,7 @@ import { useGetCategoryLabel } from '../hooks/useGetCategoryLabel';
 
 import { BaseCountry, CountryAssignmentGroup } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 interface VoterGroupLabelProps {
   country: BaseCountry;
@@ -14,11 +15,15 @@ export const VoterGroupLabel: React.FC<VoterGroupLabelProps> = ({
   country,
   stageId,
 }) => {
+  const eventStages = useScoreboardStore((state) => state.eventStages);
   const eventAssignments = useCountriesStore((state) => state.eventAssignments);
   const getCategoryLabel = useGetCategoryLabel();
 
   const label = useMemo(() => {
     const normalizedStageId = stageId.toLowerCase();
+    const stage = eventStages.find(
+      (s) => s.id.toLowerCase() === normalizedStageId,
+    );
 
     const isAutoQ =
       country.aqSemiFinalGroup &&
@@ -28,7 +33,11 @@ export const VoterGroupLabel: React.FC<VoterGroupLabelProps> = ({
 
     const assignedGroup = eventAssignments[country.code];
 
-    if (assignedGroup === stageId) return 'In stage';
+    if (
+      assignedGroup === stageId ||
+      stage?.countries.some((c) => c.code === country.code)
+    )
+      return 'In stage';
 
     if (
       assignedGroup &&
@@ -39,7 +48,13 @@ export const VoterGroupLabel: React.FC<VoterGroupLabelProps> = ({
     }
 
     return 'Not participating';
-  }, [country, stageId, eventAssignments]);
+  }, [
+    stageId,
+    eventStages,
+    country.aqSemiFinalGroup,
+    country.code,
+    eventAssignments,
+  ]);
 
   return (
     <div className="absolute -top-[8px] -left-1 px-1 rounded-md bg-primary-700 z-10">

@@ -7,7 +7,7 @@ import VotersSelectionHeader from '../event-stage/VotersSelectionHeader';
 
 import { PostSetupStageFormData } from './hooks/usePostSetupStageForm';
 
-import { BaseCountry, EventStage, VotingCountry } from '@/models';
+import { BaseCountry, EventStage, StageId, VotingCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 
 const mapToVotingCountry = (country: BaseCountry) => ({
@@ -132,10 +132,23 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
 
   // Load existing voting countries for this stage
   useEffect(() => {
-    setLocalVotingCountriesAndForm(participatingVoters);
+    if (stage.id === StageId.GF) {
+      const contestParticipants =
+        getContestParticipants().map(mapToVotingCountry);
+
+      setLocalVotingCountriesAndForm(contestParticipants);
+    } else {
+      setLocalVotingCountriesAndForm(participatingVoters);
+    }
 
     onLoaded?.();
-  }, [onLoaded, participatingVoters, setLocalVotingCountriesAndForm]);
+  }, [
+    getContestParticipants,
+    onLoaded,
+    participatingVoters,
+    setLocalVotingCountriesAndForm,
+    stage.id,
+  ]);
 
   return (
     <div className="flex flex-col gap-4">

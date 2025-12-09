@@ -158,9 +158,9 @@ export const useCountriesStore = create<CountriesState>()(
 
             let initialVotingCountries: VotingCountry[] = [];
 
-            const stageKey = stageId ?? StageId.GF;
+            const stageKey = stageId ?? StageId.GF.toUpperCase();
 
-            if (stageKey !== StageId.GF) {
+            if (stageKey.toUpperCase() !== StageId.GF.toUpperCase()) {
               // In a semi-final, only participating countries and a few AQs are voting.
               allCountriesForYearCopy.forEach((c) => {
                 const isSemiFinalGroup =
@@ -429,105 +429,6 @@ export const useCountriesStore = create<CountriesState>()(
           countryOdds: state.countryOdds,
         }),
         merge: (persistedState, currentState) => {
-          // Migration: Convert old EventMode-based structure to new flat structure
-          if (persistedState && typeof persistedState === 'object') {
-            const persisted = persistedState as any;
-
-            // Migrate eventAssignments from EventMode-based to flat
-            if (
-              persisted.eventAssignments &&
-              typeof persisted.eventAssignments === 'object'
-            ) {
-              const oldAssignments = persisted.eventAssignments;
-
-              // Check if it's the old structure (has EventMode keys)
-              if (
-                oldAssignments.SEMI_FINALS_AND_GRAND_FINAL ||
-                oldAssignments.GRAND_FINAL_ONLY
-              ) {
-                // Migrate: use SEMI_FINALS_AND_GRAND_FINAL as default, or GRAND_FINAL_ONLY if that's what was active
-                const activeMode =
-                  persisted.activeMode || 'SEMI_FINALS_AND_GRAND_FINAL';
-                const migratedAssignments =
-                  oldAssignments[activeMode] ||
-                  oldAssignments.SEMI_FINALS_AND_GRAND_FINAL ||
-                  {};
-
-                // Convert AUTO_QUALIFIER assignments to direct stage assignments (last stage)
-                const stages = persisted.configuredEventStages || [];
-                const sortedStages = [...stages].sort(
-                  (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0),
-                );
-                const lastStage = sortedStages[sortedStages.length - 1];
-
-                const finalAssignments: Record<string, string> = {};
-                for (const [countryCode, group] of Object.entries(
-                  migratedAssignments,
-                )) {
-                  if (group === 'AUTO_QUALIFIER' && lastStage) {
-                    finalAssignments[countryCode] = lastStage.id;
-                  } else {
-                    finalAssignments[countryCode] = group as string;
-                  }
-                }
-
-                persisted.eventAssignments = finalAssignments;
-              }
-            }
-
-            // Migrate stages: add order and qualifiesTo if missing
-            if (
-              persisted.configuredEventStages &&
-              Array.isArray(persisted.configuredEventStages)
-            ) {
-              const stages = persisted.configuredEventStages as any[];
-
-              // Add order if missing (based on StageId or array position)
-              let hasOrder = stages.some((s: any) => s.order !== undefined);
-              if (!hasOrder) {
-                stages.forEach((stage: any, index: number) => {
-                  if (stage.order === undefined) {
-                    stage.order = index;
-                  }
-                });
-              }
-
-              // Add qualifiesTo relationships if missing (for backward compatibility)
-              stages.forEach((stage: any) => {
-                if (
-                  !stage.qualifiesTo &&
-                  stage.qualifiersAmount &&
-                  stage.qualifiersAmount > 0
-                ) {
-                  // Find the next stage (by order) or last stage
-                  const sortedStages = [...stages].sort(
-                    (a: any, b: any) => (a.order ?? 0) - (b.order ?? 0),
-                  );
-                  const currentIndex = sortedStages.findIndex(
-                    (s: any) => s.id === stage.id,
-                  );
-                  const nextStage =
-                    sortedStages[currentIndex + 1] ||
-                    sortedStages[sortedStages.length - 1];
-
-                  if (nextStage && nextStage.id !== stage.id) {
-                    stage.qualifiesTo = [
-                      {
-                        targetStageId: nextStage.id,
-                        amount: stage.qualifiersAmount,
-                      },
-                    ];
-                  }
-                }
-              });
-            }
-
-            // Remove activeMode if present
-            if (persisted.activeMode !== undefined) {
-              delete persisted.activeMode;
-            }
-          }
-
           const m = deepMerge(currentState, persistedState);
 
           return m;

@@ -56,7 +56,7 @@ export const createGetters: StateCreator<
     // Consider only non-final stages, ordered by stage order,
     // and return the country from the *latest* such stage.
     const nonFinalStages = eventStages
-      .filter((stage) => stage.id !== StageId.GF)
+      .filter((stage) => stage.id.toUpperCase() !== StageId.GF.toUpperCase())
       .slice()
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 

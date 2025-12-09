@@ -81,7 +81,8 @@ const PresentationPanel = (): JSX.Element | null => {
 
   const withPointsGrouping =
     currentStage?.isJuryVoting &&
-    (!isPickQualifiersMode || currentStage?.id === StageId.GF);
+    (!isPickQualifiersMode ||
+      currentStage?.id.toUpperCase() === StageId.GF.toUpperCase());
 
   // Timer handling
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -115,7 +116,7 @@ const PresentationPanel = (): JSX.Element | null => {
 
       if (
         generalStore.settings.isPickQualifiersMode &&
-        latestStage.id !== StageId.GF
+        latestStage.id.toUpperCase() !== StageId.GF.toUpperCase()
       ) {
         pickQualifierRandomly();
       } else if (latestStage.isJuryVoting) {

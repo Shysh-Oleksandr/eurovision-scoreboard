@@ -4,6 +4,7 @@ import { useDebounce } from '../../../../hooks/useDebounce';
 import { BaseCountry, CountryAssignmentGroup } from '../../../../models';
 import { CATEGORY_ORDER } from '../../constants';
 import { useCountriesStore } from '@/state/countriesStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 export const useVotersCountriesSearch = (
   availableCountries: BaseCountry[],
@@ -16,6 +17,11 @@ export const useVotersCountriesSearch = (
   const debouncedSearch = useDebounce(countriesSearch, 300);
   const prevDebouncedSearchRef = useRef<string>(undefined);
   const eventAssignments = useCountriesStore((state) => state.eventAssignments);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
+
+  const currentStage = useMemo(() => {
+    return eventStages.find((s) => s.id === currentStageId);
+  }, [currentStageId, eventStages]);
 
   const handleCountriesSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCountriesSearch(e.target.value);
@@ -55,7 +61,7 @@ export const useVotersCountriesSearch = (
           assignedGroup !== CountryAssignmentGroup.NOT_PARTICIPATING &&
           assignedGroup !== CountryAssignmentGroup.NOT_QUALIFIED;
 
-        if (participatesHere) {
+        if (participatesHere || currentStage?.countries.some((c) => c.code === country.code)) {
           if (!groups['In stage']) {
             groups['In stage'] = [];
           }

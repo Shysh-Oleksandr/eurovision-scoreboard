@@ -66,7 +66,6 @@ export interface EventStage {
   isOver: boolean;
   isJuryVoting: boolean;
   isLastStage?: boolean;
-  qualifiersAmount?: number; // Total qualifiers from this stage (sum of qualifiesTo amounts)
   qualifiesTo?: QualifierTarget[]; // Which stages this stage qualifies to and how many
   isPreparedForNextStage?: boolean; // is set to true when user opens predefinition modal; needed to call prepareForNextStage only once
 }

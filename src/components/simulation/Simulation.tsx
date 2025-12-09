@@ -61,7 +61,8 @@ const Simulation = () => {
 
   const currentStage = getCurrentStage();
 
-  const isSemiFinalStage = currentStage?.id !== StageId.GF;
+  const isSemiFinalStage =
+    currentStage?.id.toUpperCase() !== StageId.GF.toUpperCase();
 
   const phaseTitle = usePhaseTitle();
 

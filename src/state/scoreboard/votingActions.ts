@@ -1082,7 +1082,10 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage || currentStage.isOver) return;
 
-    const { qualifiersAmount = 0 } = currentStage;
+    const qualifiersAmount = currentStage.qualifiesTo?.reduce(
+      (sum, target) => sum + target.amount,
+      0,
+    ) || 0;
     if (qualifiersAmount === 0) return;
 
     const stageCountryPoints = state.countryPoints[currentStage.id];
@@ -1297,7 +1300,10 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage || currentStage.isOver) return;
 
-    const { qualifiersAmount = 0 } = currentStage;
+    const qualifiersAmount = currentStage.qualifiesTo?.reduce(
+      (sum, target) => sum + target.amount,
+      0,
+    ) || 0;
     if (qualifiersAmount === 0) return;
 
     const stageCountryPoints = state.countryPoints[currentStage.id];

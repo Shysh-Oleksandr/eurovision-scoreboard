@@ -33,7 +33,11 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           {t('delete')}
         </Button>
       )}
-      <div className="flex justify-end xs:gap-4 gap-2">
+      <div
+        className={`flex justify-end xs:gap-4 gap-2 ${
+          !onDelete ? 'w-full' : ''
+        }`}
+      >
         <Button
           variant="secondary"
           className="sm:!text-base text-sm"

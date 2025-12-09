@@ -85,7 +85,7 @@ export default function Error({
       isOver: stage.isOver,
       isJuryVoting: stage.isJuryVoting,
       isLastStage: stage.isLastStage,
-      qualifiersAmount: stage.qualifiersAmount,
+      qualifiesTo: stage.qualifiesTo,
       countries: stage.countries.map((country) => country.code),
       votingCountries: stage.votingCountries?.map((country) => country.code),
     })),

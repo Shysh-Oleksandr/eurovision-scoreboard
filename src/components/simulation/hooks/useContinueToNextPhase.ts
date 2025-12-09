@@ -40,7 +40,6 @@ export const useContinueToNextPhase = () => {
   const handleContinue = () => {
     setCurrentSetupStageType('next');
 
-    console.log('nextSetupStage', nextSetupStage);
     if (nextSetupStage && !nextSetupStage.isPreparedForNextStage) {
       prepareForNextStage();
     }
