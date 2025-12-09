@@ -77,7 +77,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
     currentStage || {};
 
   const { title: defaultTitle, subtitle: defaultSubtitle } = useMemo(() => {
-    const isGf = id.toUpperCase() === StageId.GF.toUpperCase();
+    const isGf = id?.toUpperCase() === StageId.GF.toUpperCase();
 
     let title = `${contestName} ${contestYear}`;
     let subtitle = isGf ? `Final Results - ${name}` : name;
