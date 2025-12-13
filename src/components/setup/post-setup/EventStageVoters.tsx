@@ -50,10 +50,7 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
     [stage.countries],
   );
 
-  const initialVotingCountries = useMemo(
-    () => getInitialVotingCountries(stage.id),
-    [getInitialVotingCountries, stage.id],
-  );
+  const initialVotingCountries = getInitialVotingCountries(stage.id);
 
   // Helper to update both local state and form value without causing loops
   const setLocalVotingCountriesAndForm: React.Dispatch<

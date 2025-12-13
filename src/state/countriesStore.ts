@@ -273,8 +273,7 @@ export const useCountriesStore = create<CountriesState>()(
 
               const participatesSomewhere =
                 assignedGroup &&
-                assignedGroup !== CountryAssignmentGroup.NOT_PARTICIPATING &&
-                assignedGroup !== CountryAssignmentGroup.NOT_QUALIFIED;
+                assignedGroup !== CountryAssignmentGroup.NOT_PARTICIPATING;
               if (participatesSomewhere) {
                 participants.push(country);
               }

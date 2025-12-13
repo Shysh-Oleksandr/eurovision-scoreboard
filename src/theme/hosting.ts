@@ -44,6 +44,7 @@ const juniorHostingLogosByYear: Record<string, HostingCountryData> = {
   '2022': { code: 'AM', logo: '/hostingCountryLogos/EuroArmenia.svg' },
   '2023': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
   '2024': { code: 'ES', logo: '/hostingCountryLogos/EuroEspana.png' },
+  '2025': { code: 'GE', logo: '/hostingCountryLogos/EuroGeorgia.svg' },
 };
 
 // Optional per-country overrides for a default hosting logo not tied to a specific year

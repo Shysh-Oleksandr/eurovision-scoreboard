@@ -199,30 +199,32 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
             onClick={handleGfOnlyChange}
           />
         </div>
-        <CustomSelect
-          options={themeOptions}
-          groups={themeGroups}
-          value={customTheme ? customTheme._id : themeYear}
-          onChange={handleThemeChange}
-          id="theme-select-box"
-          label={
-            customTheme
-              ? `${t('common.theme')} (${t('common.custom')})`
-              : t('common.theme')
-          }
-          className="sm:w-[130px] w-[110px]"
-          customThemeColor={customThemeColor}
-        />
-        {shouldShowSyncButton && (
-          <Button
-            onClick={handleSyncTheme}
-            className="!p-3 group"
-            title="Sync Theme"
-            aria-label="Sync Theme"
-          >
-            <SyncIcon className="group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
-          </Button>
-        )}
+        <div className="flex items-end gap-1.5">
+          <CustomSelect
+            options={themeOptions}
+            groups={themeGroups}
+            value={customTheme ? customTheme._id : themeYear}
+            onChange={handleThemeChange}
+            id="theme-select-box"
+            label={
+              customTheme
+                ? `${t('common.theme')} (${t('common.custom')})`
+                : t('common.theme')
+            }
+            className="sm:w-[130px] w-[110px]"
+            customThemeColor={customThemeColor}
+          />
+          {shouldShowSyncButton && (
+            <Button
+              onClick={handleSyncTheme}
+              className="!p-3 group"
+              title="Sync Theme"
+              aria-label="Sync Theme"
+            >
+              <SyncIcon className="group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
+            </Button>
+          )}
+        </div>
       </div>
       <div className="flex items-end md:gap-4 gap-3">
         <Button

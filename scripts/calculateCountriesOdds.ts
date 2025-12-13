@@ -87,142 +87,149 @@ const finalists: (
     }
 )[] = [
   {
-    "name": "Georgia",
-    "juryPoints": 144,
-    "televotePoints": 83
+    name: 'France',
+    juryPoints: 152,
+    televotePoints: 96,
   },
   {
-    "name": "Armenia",
-    "juryPoints": 99,
-    "televotePoints": 110
+    name: 'Ukraine',
+    juryPoints: 79,
+    televotePoints: 98,
   },
   {
-    "name": "Italy",
-    "juryPoints": 84,
-    "televotePoints": 103
+    name: 'Georgia',
+    juryPoints: 121,
+    televotePoints: 55,
   },
   {
-    "name": "Russia",
-    "juryPoints": 68,
-    "televotePoints": 105
+    name: 'Armenia',
+    juryPoints: 117,
+    televotePoints: 58,
   },
   {
-    "name": "Australia",
-    "juryPoints": 86,
-    "televotePoints": 99
+    name: 'Spain',
+    juryPoints: 98,
+    televotePoints: 54,
   },
   {
-    "name": "Malta",
-    "juryPoints": 80,
-    "televotePoints": 105
+    name: 'Albania',
+    juryPoints: 60,
+    televotePoints: 85,
   },
   {
-    "name": "Belarus",
-    "juryPoints": 92,
-    "televotePoints": 65
+    name: 'North MacedoniaN.Macedonia',
+    juryPoints: 92,
+    televotePoints: 49,
   },
   {
-    "name": "Netherlands",
-    "juryPoints": 94,
-    "televotePoints": 65
+    name: 'Poland',
+    juryPoints: 72,
+    televotePoints: 67,
   },
   {
-    "name": "Bulgaria",
-    "juryPoints": 78,
-    "televotePoints": 68
+    name: 'San Marino',
+    juryPoints: 38,
+    televotePoints: 87,
   },
   {
-    "name": "Ireland",
-    "juryPoints": 56,
-    "televotePoints": 57
+    name: 'Netherlands',
+    juryPoints: 47,
+    televotePoints: 46,
   },
   {
-    "name": "Poland",
-    "juryPoints": 21,
-    "televotePoints": 36
+    name: 'Malta',
+    juryPoints: 54,
+    televotePoints: 38,
   },
   {
-    "name": "North MacedoniaN.Macedonia",
-    "juryPoints": 17,
-    "televotePoints": 24
-  },
-  {
-    "name": "Albania",
-    "juryPoints": 23,
-    "televotePoints": 13
-  },
-  {
-    "name": "Ukraine",
-    "juryPoints": 18,
-    "televotePoints": 12
-  },
-  {
-    "name": "Israel",
-    "juryPoints": 6,
-    "televotePoints": 20
-  },
-  {
-    "name": "Cyprus",
-    "juryPoints": 15,
-    "televotePoints": 12
-  },
-  {
-    "name": "Serbia",
-    "juryPoints": 5,
-    "televotePoints": 9
-  }
-]
-
-const nonFinalists: { name: string; points: number }[] = IS_JESC ? [] : [
-  {
-    name: 'Estonia',
-    points: 57,
-  },
-  {
-    name: 'Israel',
-    points: 57,
-  },
-  {
-    name: 'Denmark',
-    points: 56,
-  },
-  {
-    name: 'Finland',
-    points: 51,
+    name: 'Italy',
+    juryPoints: 26,
+    televotePoints: 47,
   },
   {
     name: 'Portugal',
-    points: 38,
+    juryPoints: 32,
+    televotePoints: 41,
   },
   {
-    name: 'Lithuania',
-    points: 26,
+    name: 'Croatia',
+    juryPoints: 28,
+    televotePoints: 42,
   },
   {
-    name: 'Latvia',
-    points: 23,
+    name: 'Azerbaijan',
+    juryPoints: 12,
+    televotePoints: 54,
   },
   {
-    name: 'Andorra',
-    points: 12,
+    name: 'Cyprus',
+    juryPoints: 3,
+    televotePoints: 47,
   },
   {
-    name: 'Belarus',
-    points: 10,
+    name: 'Montenegro',
+    juryPoints: 10,
+    televotePoints: 39,
   },
   {
-    name: 'Monaco',
-    points: 10,
-  },
-  {
-    name: 'Slovenia',
-    points: 5,
-  },
-  {
-    name: 'Switzerland',
-    points: 0,
+    name: 'Ireland',
+    juryPoints: 3,
+    televotePoints: 41,
   },
 ];
+
+const nonFinalists: { name: string; points: number }[] = IS_JESC
+  ? []
+  : [
+      {
+        name: 'Estonia',
+        points: 57,
+      },
+      {
+        name: 'Israel',
+        points: 57,
+      },
+      {
+        name: 'Denmark',
+        points: 56,
+      },
+      {
+        name: 'Finland',
+        points: 51,
+      },
+      {
+        name: 'Portugal',
+        points: 38,
+      },
+      {
+        name: 'Lithuania',
+        points: 26,
+      },
+      {
+        name: 'Latvia',
+        points: 23,
+      },
+      {
+        name: 'Andorra',
+        points: 12,
+      },
+      {
+        name: 'Belarus',
+        points: 10,
+      },
+      {
+        name: 'Monaco',
+        points: 10,
+      },
+      {
+        name: 'Slovenia',
+        points: 5,
+      },
+      {
+        name: 'Switzerland',
+        points: 0,
+      },
+    ];
 
 function roundToHalf(n: number) {
   return Math.round(n * 2) / 2;

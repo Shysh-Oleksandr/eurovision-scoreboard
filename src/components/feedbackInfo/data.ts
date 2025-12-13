@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-12-13',
+    title: 'Added JESC 2025',
+  },
+  {
     date: '2025-12-09',
     title: 'More fixes with the contest setup',
   },
@@ -236,7 +240,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-12-13', end: '2025-12-14' },
+    approximateDates: { start: '2025-12-20', end: '2025-12-21' },
     title: 'Running order setup',
   },
   {

@@ -8,7 +8,7 @@ export const SUPPORTED_YEARS = Array.from({ length: 22 }, (_, i) => 2004 + i);
 
 // Junior Eurovision years supported in the app
 export const JUNIOR_SUPPORTED_YEARS = Array.from(
-  { length: 9 },
+  { length: 10 },
   (_, i) => 2016 + i,
 );
 
