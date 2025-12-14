@@ -80,6 +80,7 @@ export const PhaseActions = () => {
             variant="tertiary"
             onClick={() => setShowFinalStatsModal(true)}
             className="ml-auto xs:!px-4"
+            snowEffect="middle"
           >
             {t('viewStats')}
           </Button>
@@ -121,7 +122,11 @@ export const PhaseActions = () => {
           </Select>
         )}
         {isVotingOver && !isLastStage && (
-          <Button onClick={handleContinue} className="animated-border">
+          <Button
+            onClick={handleContinue}
+            className="animated-border"
+            snowEffect="right"
+          >
             {t('continueTo', { nextPhase: nextPhase ?? '' })}
           </Button>
         )}

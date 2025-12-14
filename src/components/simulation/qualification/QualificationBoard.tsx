@@ -60,6 +60,7 @@ const QualificationBoard = () => {
             variant="tertiary"
             label={t('random')}
             onClick={pickQualifierRandomly}
+            snowEffect="middle"
           />
         </div>
       )}

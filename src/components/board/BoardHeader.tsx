@@ -143,6 +143,7 @@ const BoardHeader = (): JSX.Element | null => {
           variant="tertiary"
           label={t('random')}
           onClick={chooseRandomly}
+          snowEffect="middle"
         />
       )}
     </div>

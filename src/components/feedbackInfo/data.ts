@@ -1,5 +1,9 @@
 export const WHATS_NEW = [
   {
+    date: '2025-12-14',
+    title: 'Added winter effects. Added JESC 2025 theme',
+  },
+  {
     date: '2025-12-13',
     title: 'Added JESC 2025',
   },

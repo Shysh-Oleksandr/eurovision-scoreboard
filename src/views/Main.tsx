@@ -14,6 +14,10 @@ const Simulation = dynamic(
   () => import('../components/simulation/Simulation'),
   { ssr: false },
 );
+const SnowfallAnimation = dynamic(
+  () => import('../components/effects/SnowfallAnimation'),
+  { ssr: false },
+);
 
 const Main = () => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
@@ -28,6 +32,8 @@ const Main = () => {
   return (
     <PageWrapper>
       <EventSetupModal />
+      <SnowfallAnimation />
+
       {eventStages.length > 0 ? (
         <Simulation />
       ) : (

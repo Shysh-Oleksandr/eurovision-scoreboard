@@ -235,6 +235,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           className="!p-3 group"
           aria-label="Settings"
           title="Settings"
+          snowEffect="right"
         >
           <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
         </Button>

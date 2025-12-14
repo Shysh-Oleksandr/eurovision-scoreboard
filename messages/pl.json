@@ -477,7 +477,11 @@
       "warnBeforeManuallyAssigningTelevotePoints": "Ostrzeż przed ręcznym przydzielaniem punktów televote",
       "showJuryVotingProgressBar": "Pokaż pasek postępu głosowania jury",
       "imageSizeIsPrettyLarge": "Rozmiar obrazu jest dość duży ({size}MB). Może to spowolnić symulację, więc warto go skompresować lub użyć mniejszego obrazu. Czy chcesz kontynuować z tym obrazem?",
-      "language": "Język"
+      "language": "Język",
+      "enableWinterEffects": "Włącz efekty zimowe",
+      "snowFallIntensity": "Spadek śniegu",
+      "low": "Niski",
+      "high": "Wysoki"
     },
     "contest": {
       "enterContestName": "Wpisz nazwę konkursu...",

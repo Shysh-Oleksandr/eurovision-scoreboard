@@ -1,6 +1,8 @@
 'use client';
 import React, { ReactNode } from 'react';
 
+import SnowPileEffect from '../effects/SnowPileEffect';
+
 type Props = {
   label?: string;
   className?: string;
@@ -11,6 +13,8 @@ type Props = {
   disabled?: boolean;
   Icon?: React.ReactNode;
   isLoading?: boolean;
+  snowEffect?: 'left' | 'right' | 'middle' | 'none';
+  snowEffectClassName?: string;
 };
 
 const Button = ({
@@ -23,9 +27,11 @@ const Button = ({
   disabled,
   Icon,
   isLoading,
+  snowEffect = 'none',
+  snowEffectClassName = '',
 }: Props) => {
   const baseClasses =
-    'lg:text-base md:text-base text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] font-medium uppercase rounded-md shadow-lg transition-colors lg:leading-5 duration-300 bg-gradient-to-tr from-[20%]';
+    'lg:text-base md:text-base text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] font-medium uppercase rounded-md shadow-lg transition-colors lg:leading-5 duration-300 bg-gradient-to-tr from-[20%] relative';
 
   const variantClasses = {
     primary:
@@ -51,6 +57,7 @@ const Button = ({
       title={title}
       disabled={disabled || isLoading}
     >
+      <SnowPileEffect snowEffect={snowEffect} className={snowEffectClassName} />
       {isLoading ? (
         <span className="loader" />
       ) : (

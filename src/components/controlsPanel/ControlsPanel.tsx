@@ -1,8 +1,9 @@
 import { useTranslations } from 'next-intl';
-import React, { type JSX } from 'react';
+import { type JSX } from 'react';
 
 import { StageVotingMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
+import SnowPileEffect from '../effects/SnowPileEffect';
 
 import CountryInfo from './CountryInfo';
 import VotingButtons from './VotingButtons';
@@ -44,7 +45,8 @@ const ControlsPanel = (): JSX.Element | null => {
           {votingTitle}
         </h3>
       </div>
-      <div className="bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md">
+      <div className="bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md relative">
+        <SnowPileEffect snowEffect="middle" className="!w-full" />
         {isJuryVoting && (
           <CountryInfo votingCountryIndex={votingCountryIndex} />
         )}

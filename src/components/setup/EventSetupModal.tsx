@@ -411,6 +411,7 @@ const EventSetupModal = () => {
         isOpen={eventSetupModalOpen}
         onClose={debouncedCanClose ? onClose : undefined}
         overlayClassName="!z-[1000]"
+        containerClassName="w-[calc(100%-1.5rem)]"
         contentClassName="!pb-4"
         bottomContent={
           <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
@@ -419,11 +420,16 @@ const EventSetupModal = () => {
                 variant="secondary"
                 className="md:text-base text-sm"
                 onClick={onClose}
+                snowEffect="middle"
               >
                 {winnerCountry ? t('common.close') : t('common.continue')}
               </Button>
             )}
-            <Button className="w-full !text-base" onClick={handleStartEvent}>
+            <Button
+              className="w-full !text-base"
+              onClick={handleStartEvent}
+              snowEffect="right"
+            >
               {t('common.start')}
             </Button>
           </div>

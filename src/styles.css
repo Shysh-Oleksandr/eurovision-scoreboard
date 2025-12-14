@@ -623,3 +623,11 @@ h6 {
   left: 0.5em;
   margin-right: -50%;
 }
+
+/* ----------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.hidden-on-reduced-motion {
+		display: none;
+	}
+}

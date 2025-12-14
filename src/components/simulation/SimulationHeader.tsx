@@ -142,6 +142,8 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
             aria-label={t('setup')}
             title={t('setup')}
             className={`${buttonClassName} xs:!px-6 xs:!py-2`}
+            snowEffect="right"
+            snowEffectClassName="!w-2/3"
           />
         </div>
       </div>

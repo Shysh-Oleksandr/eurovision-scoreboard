@@ -477,7 +477,11 @@
       "warnBeforeManuallyAssigningTelevotePoints": "Попереджати перед ручним введенням телебалів",
       "showJuryVotingProgressBar": "Показувати прогрес-бар голосування журі",
       "imageSizeIsPrettyLarge": "Розмір зображення доволі великий ({size}MB). Це може сповільнити симуляцію — можливо, варто стиснути або використати менше зображення. Продовжити?",
-      "language": "Мова"
+      "language": "Мова",
+      "enableWinterEffects": "Увімкнути зимові ефекти",
+      "snowFallIntensity": "Снігопад",
+      "low": "Низький",
+      "high": "Високий"
     },
     "contest": {
       "enterContestName": "Введіть назву конкурсу...",

@@ -3,6 +3,7 @@ import React from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
 import { Checkbox } from '../common/Checkbox';
+import { RangeSlider } from '../common/RangeSlider';
 
 import { BgImageSelect } from './BgImageSelect';
 import { LanguageSelector } from './LanguageSelector';
@@ -96,6 +97,32 @@ export const UIPreferencesSettings: React.FC = () => {
         }
       />
       <BgImageSelect />
+
+      <Checkbox
+        id="enable-winter-effects"
+        labelClassName="w-full"
+        label={t('enableWinterEffects')}
+        checked={settings.enableWinterEffects}
+        onChange={(e) =>
+          setSettings({
+            enableWinterEffects: e.target.checked,
+          })
+        }
+      />
+      {settings.enableWinterEffects && (
+        <RangeSlider
+          id="snow-fall-intensity"
+          label={t('snowFallIntensity')}
+          value={settings.snowFallIntensity}
+          onChange={(value) => setSettings({ snowFallIntensity: value })}
+          min={1}
+          max={10}
+          step={1}
+          displayValue={false}
+          minLabel={t('low')}
+          maxLabel={t('high')}
+        />
+      )}
     </>
   );
 };

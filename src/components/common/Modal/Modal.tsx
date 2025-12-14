@@ -3,7 +3,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import Image from 'next/image';
+
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useGeneralStore } from '@/state/generalStore';
 
 export const ANIMATION_DURATION = 200;
 
@@ -36,6 +39,9 @@ const Modal: React.FC<ModalProps> = ({
   ref,
   dataTheme,
 }) => {
+  const enableWinterEffects = useGeneralStore(
+    (state) => state.settings.enableWinterEffects,
+  );
   const [isMounted, setIsMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
 
@@ -95,8 +101,10 @@ const Modal: React.FC<ModalProps> = ({
     >
       <div
         data-theme={dataTheme}
-        className={`bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 overflow-hidden rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
+        className={`bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
           isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+        } ${
+          topContent && enableWinterEffects ? 'pt-1' : ''
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}
         ref={ref}
@@ -105,6 +113,35 @@ const Modal: React.FC<ModalProps> = ({
         <div
           className={`overflow-y-auto md:p-6 xs:p-5 p-3 py-5 narrow-scrollbar ${modalHeightStyle} ${contentClassName}`}
         >
+          {enableWinterEffects && (
+            <>
+              <Image
+                src="/effects/SnowMiddle.png"
+                alt="Snow pile"
+                className="absolute -top-3.5 z-50 left-1/2 -translate-x-1/2 object-fill h-10 xs:w-[290px] w-[470px] pointer-events-none"
+                width={
+                  typeof window !== 'undefined' && window.innerWidth > 480
+                    ? 290
+                    : 470
+                }
+                height={35}
+              />
+              <Image
+                src="/effects/SnowRight.png"
+                alt="Snow pile"
+                className="absolute rotate-6 -right-3.5 -top-3.5 z-50 object-fill h-10 xs:block hidden pointer-events-none"
+                width={80}
+                height={40}
+              />
+              <Image
+                src="/effects/SnowLeft.png"
+                alt="Snow pile"
+                className="absolute -left-2.5 -rotate-2 -top-3.5 z-50 object-fill h-10 xs:block hidden pointer-events-none"
+                width={80}
+                height={40}
+              />
+            </>
+          )}
           {children}
         </div>
         {bottomContent}

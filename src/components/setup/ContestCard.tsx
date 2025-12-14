@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 import Button from '../common/Button';
+import SnowPileEffect from '../effects/SnowPileEffect';
 
 import { ArrowDownAndUpIcon } from '@/assets/icons/ArrowDownAndUpIcon';
 import { PlusIcon } from '@/assets/icons/PlusIcon';
@@ -32,8 +33,10 @@ const ContestCard: React.FC<ContestCardProps> = ({
 
   return (
     <div
-      className={`w-full bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 p-3 text-white rounded-lg border border-primary-900 shadow-lg border-solid`}
+      className={`w-full relative bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 p-3 text-white rounded-lg border border-primary-900 shadow-lg border-solid`}
     >
+      <SnowPileEffect snowEffect="left" />
+
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           {showHostingCountryLogo && (
@@ -70,6 +73,7 @@ const ContestCard: React.FC<ContestCardProps> = ({
             title="Add Stage"
             aria-label="Add Stage"
             Icon={<PlusIcon className="w-5 h-5" />}
+            snowEffect="right"
           />
         </div>
       </div>

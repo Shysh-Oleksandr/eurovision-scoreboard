@@ -7148,6 +7148,11 @@ react-error-boundary@^6.0.0:
   dependencies:
     "@babel/runtime" "^7.12.5"
 
+react-fast-compare@^3.2.2:
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-3.2.2.tgz#929a97a532304ce9fee4bcae44234f1ce2c21d49"
+  integrity sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==
+
 react-flip-toolkit@^7.2.4:
   version "7.2.4"
   resolved "https://registry.npmjs.org/react-flip-toolkit/-/react-flip-toolkit-7.2.4.tgz"
@@ -7180,6 +7185,13 @@ react-lifecycles-compat@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
+
+react-snowfall@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/react-snowfall/-/react-snowfall-2.4.0.tgz#79ad34431f2353e842a87be1af3f1f5355e25806"
+  integrity sha512-KAPMiGnxt11PEgC2pTVrTQsvk5jt1kLUtG+ZamiKLphTZ7GiYT1Aa5kX6jp4jKWq1kqJHchnGT9CDm4g86A5Gg==
+  dependencies:
+    react-fast-compare "^3.2.2"
 
 react-textarea-autosize@^8.3.2:
   version "8.5.9"

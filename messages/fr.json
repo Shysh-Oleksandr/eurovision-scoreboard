@@ -477,7 +477,11 @@
       "warnBeforeManuallyAssigningTelevotePoints": "Avertir avant d’attribuer manuellement des points de télévote",
       "showJuryVotingProgressBar": "Afficher la barre de progression du jury",
       "imageSizeIsPrettyLarge": "L’image est assez lourde ({size}MB). Cela peut ralentir la simulation — vous pouvez la compresser ou utiliser une image plus petite. Voulez-vous continuer ?",
-      "language": "Langue"
+      "language": "Langue",
+      "enableWinterEffects": "Activer les effets de l’hiver",
+      "snowFallIntensity": "Intensité de la neige",
+      "low": "Bas",
+      "high": "Haut"
     },
     "contest": {
       "enterContestName": "Entrez le nom du concours...",

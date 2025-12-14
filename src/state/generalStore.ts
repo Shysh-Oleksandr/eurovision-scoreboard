@@ -59,6 +59,8 @@ const DEFAULT_SETTINGS: Settings = {
   useGroupedJuryPoints: false,
   autoStartPresentation: false,
   enablePredefinedVotes: false,
+  enableWinterEffects: true,
+  snowFallIntensity: 5, // 1-10
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -127,6 +129,8 @@ interface Settings {
   useGroupedJuryPoints: boolean;
   autoStartPresentation: boolean;
   enablePredefinedVotes: boolean;
+  enableWinterEffects: boolean;
+  snowFallIntensity: number;
 }
 
 interface PresentationSettings {

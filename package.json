@@ -51,6 +51,7 @@
     "react-flip-toolkit": "^7.2.4",
     "react-hook-form": "^7.63.0",
     "react-json-view": "^1.21.3",
+    "react-snowfall": "^2.4.0",
     "react-toastify": "^11.0.5",
     "zod": "^4.1.11",
     "zundo": "^2.3.0",

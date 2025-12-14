@@ -29,6 +29,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           className="sm:!text-base text-sm"
           variant="destructive"
           onClick={onDelete}
+          snowEffect="left"
         >
           {t('delete')}
         </Button>
@@ -42,6 +43,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           variant="secondary"
           className="sm:!text-base text-sm"
           onClick={onClose}
+          snowEffect="middle"
         >
           {t('cancel')}
         </Button>
@@ -50,6 +52,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           onClick={onSave}
           isLoading={isSaving}
           disabled={isSaving}
+          snowEffect="right"
         >
           {t('save')}
         </Button>

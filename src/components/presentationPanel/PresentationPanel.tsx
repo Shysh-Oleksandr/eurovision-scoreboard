@@ -7,6 +7,7 @@ import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
 import { RangeSlider } from '../common/RangeSlider';
 import Tabs from '../common/tabs/Tabs';
+import SnowPileEffect from '../effects/SnowPileEffect';
 
 import { PauseIcon } from '@/assets/icons/PauseIcon';
 import { PlayIcon } from '@/assets/icons/PlayIcon';
@@ -169,10 +170,12 @@ const PresentationPanel = (): JSX.Element | null => {
   return (
     <div className="w-full">
       <div
-        className={`min-h-[120px] bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md lg:pb-4 pb-3 lg:pt-3 md:pt-2 ${
+        className={`min-h-[120px] relative bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md lg:pb-4 pb-3 lg:pt-3 md:pt-2 ${
           withPointsGrouping ? 'pt-2' : 'xs:pt-3 pt-2'
         } lg:px-4 px-3 gap-2 flex flex-col`}
       >
+        <SnowPileEffect snowEffect="middle" className="!w-full" />
+
         <h3 className="lg:text-[1.35rem] text-lg text-white">
           {t('simulation.presentation.title')}
         </h3>
