@@ -16,6 +16,7 @@ import { useQualificationStatus } from './hooks/useQualificationStatus';
 import useVotingFinished from './hooks/useVotingFinished';
 
 import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { SENTINEL } from '@/data/data';
 import { useGeneralStore } from '@/state/generalStore';
 
 type Props = {
@@ -167,7 +168,8 @@ const CountryItem = ({
           <div
             ref={lastPointsContainerRef}
             style={{
-              display: country.lastReceivedPoints === -1 ? 'none' : 'block',
+              display:
+                country.lastReceivedPoints === SENTINEL ? 'none' : 'block',
             }}
             className={`absolute lg:right-10 md:right-9 right-8 z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8 will-change-all ${lastPointsBgClass}`}
           >
@@ -191,7 +193,7 @@ const CountryItem = ({
             <h6
               className={`lg:text-lg sm:text-[0.85rem] xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center ${pointsTextClass}`}
             >
-              {country.points === -1 ? 'NQ' : country.points}
+              {shouldShowAsNonQualified ? 'NQ' : country.points}
             </h6>
           </div>
         </div>

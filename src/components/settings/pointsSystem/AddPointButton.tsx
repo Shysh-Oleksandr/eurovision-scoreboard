@@ -13,11 +13,7 @@ export const AddPointButton: React.FC<AddPointButtonProps> = ({ onAdd }) => {
   const [newPoint, setNewPoint] = useState('');
 
   const handleAddPoint = () => {
-    if (
-      Number(newPoint) < 1 ||
-      Number.isNaN(Number(newPoint)) ||
-      newPoint.trim() === ''
-    ) {
+    if (Number.isNaN(Number(newPoint)) || newPoint.trim() === '') {
       setIsAdding(false);
       setNewPoint('');
 

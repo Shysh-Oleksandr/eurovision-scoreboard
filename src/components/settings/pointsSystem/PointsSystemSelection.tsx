@@ -55,18 +55,14 @@ export const PointsSystemSelection = () => {
   const handlePointBlur = (index: number) => {
     const pointValue = internalPoints[index].value;
 
-    if (pointValue < 1) {
-      handleRemovePoint(index);
-    } else {
-      const newPoints = [...internalPoints];
+    const newPoints = [...internalPoints];
 
-      newPoints[index] = {
-        ...newPoints[index],
-        value: pointValue,
-      };
-      setInternalPoints(newPoints);
-      setSettingsPointsSystem(newPoints);
-    }
+    newPoints[index] = {
+      ...newPoints[index],
+      value: pointValue,
+    };
+    setInternalPoints(newPoints);
+    setSettingsPointsSystem(newPoints);
   };
 
   const handlePredefinedSystemChange = (

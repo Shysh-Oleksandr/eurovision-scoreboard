@@ -13,7 +13,7 @@ import { Input } from '../Input';
 
 import { useGeneralStore } from '@/state/generalStore';
 
-const NUMBER_REGEX = /^\d*$/;
+const NUMBER_REGEX = /^-?\d*$/;
 
 const TelevoteInput = () => {
   const t = useTranslations();
@@ -110,6 +110,8 @@ const TelevoteInput = () => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
 
+    console.log('inputValue', inputValue);
+    console.log('NUMBER_REGEX.test(inputValue)', NUMBER_REGEX.test(inputValue));
     // Only allow whole numbers
     if (NUMBER_REGEX.test(inputValue)) {
       setError('');

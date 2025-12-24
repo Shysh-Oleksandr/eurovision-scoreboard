@@ -77,6 +77,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
               }`}
               width={24}
               height={24}
+              unoptimized
             />
           )}
         </div>

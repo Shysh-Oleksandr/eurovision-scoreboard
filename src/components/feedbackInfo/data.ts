@@ -1,4 +1,4 @@
-export const WHATS_NEW = [
+const OLD_WHATS_NEW = [
   {
     date: '2025-12-14',
     title: 'Added winter effects. Added JESC 2025 theme',
@@ -242,16 +242,22 @@ export const WHATS_NEW = [
   },
 ];
 
+export const WHATS_NEW = [
+  {
+    date: '2025-12-24',
+    title: 'Allowed the negative points in the points system',
+  },
+
+  ...OLD_WHATS_NEW,
+];
+
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-12-20', end: '2025-12-21' },
+    approximateDates: { start: '2025-12-27', end: '2025-12-28' },
+    title: 'Contests (saving and loading scoreboards)',
+  },
+  {
     title: 'Running order setup',
-  },
-  {
-    title: 'Saving scoreboards in your profile',
-  },
-  {
-    title: 'The ability to use public scoreboards',
   },
   {
     title: 'Separate points system for jury and televote',

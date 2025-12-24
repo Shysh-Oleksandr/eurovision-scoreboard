@@ -85,6 +85,7 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
               onError={(e) => {
                 e.currentTarget.src = getFlagPath('ww');
               }}
+              unoptimized
             />
           )}
           <h2

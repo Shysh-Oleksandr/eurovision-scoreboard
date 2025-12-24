@@ -111,3 +111,6 @@ export const PREDEFINED_SYSTEMS_MAP: Record<string, PointsItem[]> = {
     id: index,
   })),
 };
+
+// Sentinel value for non-qualified countries
+export const SENTINEL = -1000000;

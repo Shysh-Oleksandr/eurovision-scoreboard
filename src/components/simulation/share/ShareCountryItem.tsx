@@ -144,7 +144,7 @@ const ShareCountryItem: React.FC<Props> = ({
               <h6
                 className={`font-semibold absolute top-1/2 -translate-y-1/2 right-0.5 z-30 w-full h-full items-center flex justify-center ${currentSize.pointsText} ${pointsTextClass}`}
               >
-                {country.points === -1 ? 'NQ' : country.points}
+                {shouldShowAsNonQualified ? 'NQ' : country.points}
               </h6>
             </div>
           </div>

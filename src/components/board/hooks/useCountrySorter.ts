@@ -4,6 +4,7 @@ import { Country } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
+import { SENTINEL } from '@/data/data';
 
 export const useCountrySorter = (countriesToDisplay: Country[]) => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
@@ -19,26 +20,31 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
 
     if (showAllParticipants && winnerCountry) {
       return countriesToSort.sort((a, b) => {
-        if (a.points === b.points && a.points !== -1) {
-          const televoteComparison = b.televotePoints - a.televotePoints;
+        // Both countries are qualified (not non-qualified sentinel)
+        if (a.points !== SENTINEL && b.points !== SENTINEL) {
+          if (a.points === b.points) {
+            const televoteComparison = b.televotePoints - a.televotePoints;
 
-          if (televoteComparison === 0) {
-            return a.name.localeCompare(b.name);
+            if (televoteComparison === 0) {
+              return a.name.localeCompare(b.name);
+            }
+
+            return televoteComparison;
           }
 
-          return televoteComparison;
-        }
-
-        if (a.points >= 0 && b.points >= 0) {
+          // Sort qualified countries by points (higher points first, including negative points)
           return b.points - a.points;
         }
-        if (a.points >= 0 && b.points === -1) {
-          return -1;
+
+        // One is qualified, one is non-qualified
+        if (a.points !== SENTINEL && b.points === SENTINEL) {
+          return -1; // a (qualified) comes first
         }
-        if (a.points === -1 && b.points >= 0) {
-          return 1;
+        if (a.points === SENTINEL && b.points !== SENTINEL) {
+          return 1; // b (qualified) comes first
         }
 
+        // Both are non-qualified (sentinel), sort by semi-final points
         const aSemiPoints = getCountryInSemiFinal(a.code)?.points ?? 0;
         const bSemiPoints = getCountryInSemiFinal(b.code)?.points ?? 0;
         const pointsComparison = bSemiPoints - aSemiPoints;
