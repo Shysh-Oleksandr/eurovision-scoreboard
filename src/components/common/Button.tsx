@@ -52,13 +52,14 @@ const Button = ({
         Icon ? 'flex items-center gap-2' : ''
       } ${Icon && !childrenContent ? '!p-2' : ''} ${className} ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
-      } ${isLoading ? 'flex' : ''}`}
+      } ${isLoading ? 'flex justify-center' : ''}`}
       onClick={onClick}
       title={title}
       disabled={disabled || isLoading}
     >
       <SnowPileEffect snowEffect={snowEffect} className={snowEffectClassName} />
       {isLoading ? (
+        // TODO: fancy loading spinner
         <span className="loader" />
       ) : (
         <>

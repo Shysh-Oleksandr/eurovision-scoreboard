@@ -114,3 +114,6 @@ export const PREDEFINED_SYSTEMS_MAP: Record<string, PointsItem[]> = {
 
 // Sentinel value for non-qualified countries
 export const SENTINEL = -1000000;
+
+export const DEFAULT_HOSTING_COUNTRY_NAME = 'Switzerland';
+export const DEFAULT_HOSTING_COUNTRY_CODE = 'CH';

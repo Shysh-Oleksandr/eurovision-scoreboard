@@ -27,10 +27,8 @@ const ShareCountryItem: React.FC<Props> = ({
   shortCountryNames = false,
   isVotingOver = false,
 }) => {
-  const shouldShowAsNonQualified = useQualificationStatus(
-    country,
-    isVotingOver,
-  );
+  const { shouldShowAsNonQualified, shouldShowNQLabel } =
+    useQualificationStatus(country, isVotingOver);
 
   const buttonColors = useMemo(() => {
     if (shouldShowAsNonQualified) {
@@ -144,7 +142,7 @@ const ShareCountryItem: React.FC<Props> = ({
               <h6
                 className={`font-semibold absolute top-1/2 -translate-y-1/2 right-0.5 z-30 w-full h-full items-center flex justify-center ${currentSize.pointsText} ${pointsTextClass}`}
               >
-                {shouldShowAsNonQualified ? 'NQ' : country.points}
+                {shouldShowNQLabel ? 'NQ' : country.points}
               </h6>
             </div>
           </div>

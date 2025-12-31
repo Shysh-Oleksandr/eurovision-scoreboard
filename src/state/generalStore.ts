@@ -4,7 +4,12 @@ import { devtools, persist } from 'zustand/middleware';
 
 import { WHATS_NEW } from '../components/feedbackInfo/data';
 import { Year } from '../config';
-import { ALL_THEMES, POINTS_ARRAY } from '../data/data';
+import {
+  ALL_THEMES,
+  DEFAULT_HOSTING_COUNTRY_CODE,
+  DEFAULT_HOSTING_COUNTRY_NAME,
+  POINTS_ARRAY,
+} from '../data/data';
 import { getThemeForYear } from '../theme/themes';
 import { api } from '@/api/client';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -12,10 +17,11 @@ import { getHostingCountryByYear } from '../theme/hosting';
 import { Theme } from '../theme/types';
 
 import { useCountriesStore } from './countriesStore';
-import { BaseCountry } from '@/models';
 import { useScoreboardStore } from './scoreboardStore';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
 import { CustomTheme } from '@/types/customTheme';
+import { Contest } from '@/types/contest';
+import { BaseCountry } from '@/models';
 import {
   applyCustomTheme as applyCustomThemeUtil,
   clearCustomTheme as clearCustomThemeUtil,
@@ -46,8 +52,9 @@ const DEFAULT_SETTINGS: Settings = {
   shouldShowHeartFlagIcon: true,
   shouldUseCustomBgImage: false,
   customBgImage: null,
-  hostingCountryCode: 'CH', // Switzerland for 2025
+  hostingCountryCode: DEFAULT_HOSTING_COUNTRY_CODE,
   contestName: 'Eurovision',
+  contestDescription: '',
   isJuniorContest: false,
   contestYear: INITIAL_YEAR,
   shouldLimitManualTelevotePoints: true,
@@ -118,6 +125,7 @@ interface Settings {
   shouldUseCustomBgImage: boolean;
   customBgImage: string | null;
   contestName: string; // 'Eurovision' | 'Junior Eurovision'
+  contestDescription: string;
   isJuniorContest: boolean;
   contestYear: string;
   shouldLimitManualTelevotePoints: boolean;
@@ -212,6 +220,15 @@ export interface GeneralState {
   setBlockedActiveThemeId: (id: string | null) => void;
   // When true, ignore applying profile active theme while on static themes
   suppressProfileActiveOnStatic: boolean;
+  // Active contest tracking (similar to active theme)
+  activeContest: Contest | null;
+  importedCustomEntries: BaseCountry[]; // Imported from active contest
+  setActiveContest: (contest: Contest | null) => void;
+  setImportedCustomEntries: (entries: BaseCountry[]) => void;
+  suppressActiveContestOnce: boolean;
+  setSuppressActiveContestOnce: (value: boolean) => void;
+  blockedActiveContestId: string | null;
+  setBlockedActiveContestId: (id: string | null) => void;
 }
 
 const getLatestUpdate = () => {
@@ -241,6 +258,8 @@ export const useGeneralStore = create<GeneralState>()(
         themeYear: INITIAL_YEAR,
         theme: getThemeForYear(INITIAL_YEAR),
         customTheme: null,
+        activeContest: null,
+        importedCustomEntries: [],
         pointsSystem: initialPointsSystem,
         settingsPointsSystem: initialPointsSystem,
         generalSettingsExpansion: {
@@ -255,6 +274,8 @@ export const useGeneralStore = create<GeneralState>()(
         suppressActiveThemeOnce: false,
         blockedActiveThemeId: null,
         suppressProfileActiveOnStatic: false,
+        suppressActiveContestOnce: false,
+        blockedActiveContestId: null,
 
         setLastSeenUpdate: (update: string) => {
           set({ lastSeenUpdate: update });
@@ -279,7 +300,10 @@ export const useGeneralStore = create<GeneralState>()(
               ...get().settings,
               hostingCountryCode: getHostingCountryByYear(year, isJunior).code,
               contestYear: year,
+              contestDescription: '',
             },
+            activeContest: null,
+            importedCustomEntries: [],
           });
 
           useCountriesStore.getState().updateCountriesForYear(year);
@@ -358,6 +382,18 @@ export const useGeneralStore = create<GeneralState>()(
         setBlockedActiveThemeId: (id: string | null) => {
           set({ blockedActiveThemeId: id });
         },
+        setActiveContest: (contest: Contest | null) => {
+          set({ activeContest: contest });
+        },
+        setSuppressActiveContestOnce: (value: boolean) => {
+          set({ suppressActiveContestOnce: value });
+        },
+        setBlockedActiveContestId: (id: string | null) => {
+          set({ blockedActiveContestId: id });
+        },
+        setImportedCustomEntries: (entries: BaseCountry[]) => {
+          set({ importedCustomEntries: entries });
+        },
         setSettings: (settings: Partial<Settings>) => {
           set((state) => ({
             settings: { ...state.settings, ...settings },
@@ -392,10 +428,14 @@ export const useGeneralStore = create<GeneralState>()(
 
           if (countries.length === 0) {
             // Return a default country structure if countries list is empty
-            return { name: 'Switzerland', code: 'CH' } as BaseCountry;
+            return {
+              name: DEFAULT_HOSTING_COUNTRY_NAME,
+              code: DEFAULT_HOSTING_COUNTRY_CODE,
+            } as BaseCountry;
           }
 
-          const hostingCountryCode = get().settings.hostingCountryCode || 'CH';
+          const hostingCountryCode =
+            get().settings.hostingCountryCode || DEFAULT_HOSTING_COUNTRY_CODE;
 
           const found = countries.find(
             (country) => country.code === hostingCountryCode,
@@ -405,9 +445,10 @@ export const useGeneralStore = create<GeneralState>()(
             return found;
           }
 
-          // Fallback: try 'WW' (Rest of World) or 'CH' (Switzerland), or first country
           return (
-            countries.find((country) => country.code === 'CH') || countries[0]
+            countries.find(
+              (country) => country.code === DEFAULT_HOSTING_COUNTRY_CODE,
+            ) || countries[0]
           );
         },
         resetAllSettings: () => {
@@ -449,6 +490,8 @@ export const useGeneralStore = create<GeneralState>()(
             theme: state.theme,
             themeYear: state.themeYear,
             customTheme: state.customTheme,
+            activeContest: state.activeContest,
+            importedCustomEntries: state.importedCustomEntries,
             lastSeenUpdate: state.lastSeenUpdate,
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
             // Do not persist large image data URLs in localStorage to avoid quota issues

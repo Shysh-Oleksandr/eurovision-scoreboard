@@ -30,6 +30,15 @@ export const useCountrySearch = (notParticipatingCountries: BaseCountry[]) => {
     );
 
     filteredNotParticipatingCountries.forEach((country) => {
+      // Handle imported entries separately
+      if (country.isImported) {
+        if (!groups['Imported']) {
+          groups['Imported'] = [];
+        }
+        groups['Imported'].push(country);
+        return;
+      }
+
       const category = country.category || 'Other';
 
       if (!groups[category]) {
@@ -40,6 +49,11 @@ export const useCountrySearch = (notParticipatingCountries: BaseCountry[]) => {
 
     if (!groups['Custom']) {
       groups['Custom'] = [];
+    }
+
+    // Only add Imported category if there are imported entries
+    if (!groups['Imported']) {
+      groups['Imported'] = [];
     }
 
     Object.keys(groups).forEach((category) => {

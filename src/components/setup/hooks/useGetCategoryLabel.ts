@@ -5,6 +5,8 @@ export const useGetCategoryLabel = () => {
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
+      case 'Imported':
+        return t('imported');
       case 'Custom':
         return t('custom');
       case 'All-Time Participants':

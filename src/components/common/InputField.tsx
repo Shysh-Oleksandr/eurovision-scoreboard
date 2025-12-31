@@ -36,7 +36,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           ref={ref}
           type={type}
           {...inputProps}
-          className="h-12 lg:text-[0.95rem] text-sm"
+          className={`h-12 lg:text-[0.95rem] text-sm ${
+            inputProps?.className || ''
+          }`}
           placeholder={placeholder}
         />
         {errors?.[id] && (

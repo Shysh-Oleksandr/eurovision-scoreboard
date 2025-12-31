@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { Country } from '../../../models';
 import { useGeneralStore } from '@/state/generalStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 type useItemStateProps = {
   country: Country;
@@ -39,20 +40,39 @@ export const useItemState = ({
     [country.lastReceivedPoints, country.isVotingFinished],
   );
 
-  const isDisabled = useMemo(
-    () =>
-      (isVoted && !hasCountryFinishedVoting) ||
-      isVotingCountry ||
-      (!isJuryVoting && !revealTelevoteLowestToHighest) ||
-      isVotingOver,
-    [
-      isVoted,
-      hasCountryFinishedVoting,
-      isVotingCountry,
-      isJuryVoting,
-      isVotingOver,
-    ],
-  );
+  const isDisabled = useMemo(() => {
+    // Countries that have voted and voting hasn't finished yet are disabled
+    if (isVoted && !hasCountryFinishedVoting) return true;
+
+    // Current voting country during jury voting is disabled
+    if (isVotingCountry) return true;
+
+    // Voting is over
+    if (isVotingOver) return true;
+
+    // During televoting
+    if (!isJuryVoting) {
+      if (revealTelevoteLowestToHighest) {
+        // In reveal mode, all unfinished countries are clickable
+        return isVoted;
+      } else {
+        // In normal televoting mode, all countries are disabled
+        return true;
+      }
+    }
+
+    // During jury voting, all other countries are clickable
+    return false;
+  }, [
+    isVoted,
+    hasCountryFinishedVoting,
+    isVotingCountry,
+    isJuryVoting,
+    revealTelevoteLowestToHighest,
+    country.code,
+    votingCountryCode,
+    isVotingOver,
+  ]);
 
   const buttonColors = useMemo(() => {
     if (shouldShowAsNonQualified) {

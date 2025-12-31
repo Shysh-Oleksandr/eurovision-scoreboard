@@ -1,58 +1,51 @@
 import { useTranslations } from 'next-intl';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { DateRangeFilter } from '../utils/getFilterDateRange';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
-import ThemeListItem from './ThemeListItem';
+import ContestListItem from './ContestListItem';
 
-import { api } from '@/api/client';
 import {
-  useApplyThemeMutation,
-  usePublicThemesQuery,
-  useToggleLikeThemeMutation,
-  useToggleSaveThemeMutation,
-  useThemesStateQuery,
-} from '@/api/themes';
+  useContestsStateQuery,
+  usePublicContestsQuery,
+  useToggleLikeContestMutation,
+  useToggleSaveContestMutation,
+} from '@/api/contests';
 import Button from '@/components/common/Button';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { CustomTheme } from '@/types/customTheme';
+import { Contest } from '@/types/contest';
 
-interface PublicThemesProps {
+interface PublicContestsProps {
   onLoaded?: () => void;
-  onDuplicate: (theme: CustomTheme) => void;
-  onEdit: (theme: CustomTheme) => void;
+  onEdit: (contest: Contest) => void;
+  onLoad: (contest: Contest) => void;
 }
 
-const PublicThemes: React.FC<PublicThemesProps> = ({
+const PublicContests: React.FC<PublicContestsProps> = ({
   onLoaded,
-  onDuplicate,
   onEdit,
+  onLoad,
 }) => {
   const t = useTranslations();
+  const activeContest = useGeneralStore((state) => state.activeContest);
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
+  const [sortKey, setSortKey] =
+    useState<Exclude<PublicSortKey, 'copies'>>('latest');
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
-
   const debouncedSearch = useDebounce(search, 400);
 
   const serverSortBy =
-    sortKey === 'likes'
-      ? 'likes'
-      : sortKey === 'saves'
-      ? 'saves'
-      : sortKey === 'copies'
-      ? 'duplicatesCount'
-      : 'createdAt';
+    sortKey === 'likes' ? 'likes' : sortKey === 'saves' ? 'saves' : 'createdAt';
   const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
 
-  const { data, isLoading } = usePublicThemesQuery({
+  const { data, isLoading } = usePublicContestsQuery({
     page,
     search: debouncedSearch,
     sortBy: serverSortBy,
@@ -61,43 +54,20 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     endDate: dateRange?.endDate,
   });
 
-  const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
-  const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
-  const { mutateAsync: applyThemeToProfile } = useApplyThemeMutation();
-  const applyCustomTheme = useGeneralStore((state) => state.applyCustomTheme);
-  const currentCustomTheme = useGeneralStore((state) => state.customTheme);
+  const { mutateAsync: toggleLike } = useToggleLikeContestMutation();
+  const { mutateAsync: toggleSave } = useToggleSaveContestMutation();
   const user = useAuthStore((state) => state.user);
 
-  const themeIds = data?.themes?.map((t) => t._id) || [];
-  const { data: themeState } = useThemesStateQuery(
-    themeIds,
-    !!themeIds.length && !!user,
+  const contestIds = useMemo(
+    () => data?.contests?.map((c) => c._id) || [],
+    [data?.contests],
+  );
+  const { data: contestsState } = useContestsStateQuery(
+    contestIds,
+    !!contestIds.length && !!user,
   );
 
   useEffectOnce(onLoaded);
-
-  const handleApply = async (theme: CustomTheme) => {
-    try {
-      // Fetch the latest version before applying
-      const { data: latest } = await api.get(`/themes/${theme._id}`);
-
-      // Apply locally (immediate)
-      applyCustomTheme(latest);
-
-      // Save to profile (sync across devices)
-      if (user) {
-        await applyThemeToProfile(theme._id);
-      }
-
-      toast.success(
-        t('widgets.themes.themeAppliedSuccessfully', { name: latest.name }),
-      );
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message || 'Failed to save theme to profile',
-      );
-    }
-  };
 
   const handleLike = async (id: string) => {
     try {
@@ -105,11 +75,11 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
 
       toast.success(
         res.liked
-          ? t('widgets.themes.themeLikedSuccessfully')
-          : t('widgets.themes.themeUnlikedSuccessfully'),
+          ? 'Contest liked successfully'
+          : 'Contest unliked successfully',
       );
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to like theme');
+      toast.error(error?.response?.data?.message || 'Failed to like contest');
     }
   };
 
@@ -118,7 +88,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       if (savedByMe) {
         if (
           !window.confirm(
-            t('areYouSureYouWantToRemoveThisThemeFromYourSavedThemes'),
+            'Are you sure you want to remove this contest from your saved contests?',
           )
         ) {
           return;
@@ -127,12 +97,10 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       const res = await toggleSave(id);
 
       toast.success(
-        res.saved
-          ? t('widgets.themes.themeSavedSuccessfully')
-          : t('widgets.themes.themeRemovedFromSaved'),
+        res.saved ? 'Contest saved successfully' : 'Contest removed from saved',
       );
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save theme');
+      toast.error(error?.response?.data?.message || 'Failed to save contest');
     }
   };
 
@@ -141,18 +109,19 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       <div className="sm:space-y-3 space-y-2">
         <WidgetSearchHeader
           search={search}
-          onSearchChange={(search: string) => {
-            setSearch(search);
+          onSearchChange={(s: string) => {
+            setSearch(s);
             setPage(1);
           }}
-          placeholder={t('widgets.themes.searchThemes')}
+          placeholder={t('widgets.contests.searchContests')}
         />
         <WidgetSortBadges
           value={sortKey}
-          onChange={(k: PublicSortKey) => {
-            setSortKey(k);
+          onChange={(k) => {
+            setSortKey(k as any);
             setPage(1);
           }}
+          hideCopies
           dateRange={dateRange}
           onDateRangeChange={(range) => {
             setDateRange(range);
@@ -160,35 +129,34 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
           }}
         />
       </div>
+
       <h3 className="text-white text-lg font-bold">
-        {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
+        {`Found ${data?.total ?? 0} contests`}
       </h3>
 
       {isLoading ? (
         <div className="text-center sm:py-12 py-8">
           <p className="text-white/70">{t('common.loading')}</p>
         </div>
-      ) : data && data.themes.length > 0 ? (
+      ) : data && data.contests.length > 0 ? (
         <>
           <div className="grid gap-4">
-            {data.themes.map((theme) => (
-              <ThemeListItem
-                key={theme._id}
-                theme={theme}
+            {data.contests.map((contest) => (
+              <ContestListItem
+                key={contest._id}
+                contest={contest}
                 variant="public"
                 onLike={handleLike}
                 onSave={handleSave}
-                onApply={handleApply}
-                isApplied={currentCustomTheme?._id === theme._id}
-                onDuplicate={onDuplicate}
+                onLoad={onLoad}
                 onEdit={onEdit}
-                likedByMe={!!themeState?.likedIds?.includes(theme._id)}
-                savedByMe={!!themeState?.savedIds?.includes(theme._id)}
+                isActive={activeContest?._id === contest._id}
+                likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
+                savedByMe={!!contestsState?.savedIds?.includes(contest._id)}
               />
             ))}
           </div>
 
-          {/* Pagination */}
           {data.totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 pt-2">
               <Button
@@ -214,7 +182,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       ) : (
         <div className="text-center sm:py-12 py-8">
           <p className="text-white/70">
-            {t('widgets.themes.noPublicThemesFoundMatchingYourSearch')}
+            No public contests found matching your search.
           </p>
         </div>
       )}
@@ -222,4 +190,4 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   );
 };
 
-export default PublicThemes;
+export default PublicContests;

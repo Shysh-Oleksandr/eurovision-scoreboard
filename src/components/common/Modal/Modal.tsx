@@ -101,7 +101,7 @@ const Modal: React.FC<ModalProps> = ({
     >
       <div
         data-theme={dataTheme}
-        className={`bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
+        className={`text-white bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
           isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         } ${
           topContent && enableWinterEffects ? 'pt-1' : ''
@@ -125,20 +125,23 @@ const Modal: React.FC<ModalProps> = ({
                     : 470
                 }
                 height={35}
+                loading="eager"
               />
               <Image
                 src="/effects/SnowRight.png"
                 alt="Snow pile"
-                className="absolute rotate-6 -right-3.5 -top-3.5 z-50 object-fill h-10 xs:block hidden pointer-events-none"
+                className="absolute rotate-6 -right-3.5 -top-3.5 z-50 object-fill h-10 xs:block hidden pointer-events-none w-20"
                 width={80}
                 height={40}
+                loading="eager"
               />
               <Image
                 src="/effects/SnowLeft.png"
                 alt="Snow pile"
-                className="absolute -left-2.5 -rotate-2 -top-3.5 z-50 object-fill h-10 xs:block hidden pointer-events-none"
+                className="absolute -left-2.5 -rotate-2 -top-3.5 z-50 object-fill h-10 xs:block hidden pointer-events-none w-20"
                 width={80}
                 height={40}
+                loading="eager"
               />
             </>
           )}

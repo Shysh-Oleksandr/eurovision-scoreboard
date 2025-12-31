@@ -13,10 +13,6 @@ export const useCountryDisplay = () => {
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const eventStages = useScoreboardStore((state) => state.eventStages);
 
-  const selectedCountries = useCountriesStore(
-    (state) => state.selectedCountries,
-  );
-
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
   const { countries } =
@@ -27,11 +23,24 @@ export const useCountryDisplay = () => {
       return countries;
     }
 
+    // Get all unique countries that participated in any stage
+    const allEventParticipantsMap = new Map<string, Country>();
+    eventStages.forEach((stage) => {
+      stage.countries.forEach((country) => {
+        if (!allEventParticipantsMap.has(country.code)) {
+          allEventParticipantsMap.set(country.code, country);
+        }
+      });
+    });
+
+    const allEventParticipants = Array.from(allEventParticipantsMap.values());
+
+    // Merge with current stage's country data for points/state
     const countryMap = new Map<string, Country>(
       countries?.map((c) => [c.code, c]) ?? [],
     );
 
-    const allEventParticipants = selectedCountries.map((country) => {
+    return allEventParticipants.map((country) => {
       const existingCountry = countryMap.get(country.code);
 
       return {
@@ -43,9 +52,7 @@ export const useCountryDisplay = () => {
         isVotingFinished: existingCountry?.isVotingFinished ?? true,
       };
     });
-
-    return allEventParticipants;
-  }, [countries, showAllParticipants, winnerCountry, selectedCountries]);
+  }, [countries, showAllParticipants, winnerCountry, eventStages]);
 
   return allCountriesToDisplay ?? [];
 };

@@ -19,6 +19,7 @@ export interface BaseCountry {
   qualifiedFromStageIds?: string[];
 
   // Fields for custom entries only
+  isImported?: boolean; // set to true when imported from others' contest snapshots
   flag?: string;
   updatedAt?: string; // For custom entries
 }

@@ -88,7 +88,7 @@ export const CountrySelectionListItem: React.FC<
         {country.name}
       </span>
 
-      {country.category === 'Custom' && onEdit && (
+      {country.category === 'Custom' && !country.isImported && onEdit && (
         <button
           onClick={(e) => {
             e.stopPropagation();

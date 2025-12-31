@@ -2,9 +2,10 @@ import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 
+import WidgetSearchHeader from '../WidgetSearchHeader';
+import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
+
 import ThemeListItem from './ThemeListItem';
-import ThemesSearchHeader from './ThemesSearchHeader';
-import ThemesSortBadges, { PublicSortKey } from './ThemesSortBadges';
 
 import { api } from '@/api/client';
 import {
@@ -291,10 +292,11 @@ const UserThemes: React.FC<UserThemesProps> = ({
   return (
     <div className="sm:space-y-4 space-y-2">
       <div className="sm:space-y-3 space-y-2">
-        <ThemesSearchHeader
+        <WidgetSearchHeader
           search={search}
           onSearchChange={setSearch}
           onCreateNew={onCreateNew}
+          placeholder={t('widgets.themes.searchThemes')}
         />
 
         <div className="flex items-center flex-wrap justify-start gap-2">
@@ -320,7 +322,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
       {view !== 'current' && (
         <div className="space-y-1">
           <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
-          <ThemesSortBadges value={sortKey} onChange={setSortKey} />
+          <WidgetSortBadges value={sortKey} onChange={setSortKey} />
         </div>
       )}
 

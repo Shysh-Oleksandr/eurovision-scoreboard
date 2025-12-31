@@ -46,7 +46,6 @@ export const PointItem: React.FC<PointItemProps> = ({
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
         className="w-full text-center h-8 !px-0 bg-transparent bg-none md:mr-0 mr-1"
-        min={1}
         step={1}
       />
     </CustomSortableItem>

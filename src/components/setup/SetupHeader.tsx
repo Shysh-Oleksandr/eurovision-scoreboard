@@ -23,6 +23,7 @@ import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
+import { getHostingCountryLogo } from '@/theme/hosting';
 import { buildPrimaryFromHsva } from '@/theme/themeUtils';
 
 const YEAR_OPTIONS = [...ESC_YEAR_OPTIONS, ...JESC_YEAR_OPTIONS];
@@ -44,16 +45,20 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   const settings = useGeneralStore((state) => state.settings);
   const themeYear = useGeneralStore((state) => state.themeYear);
   const customTheme = useGeneralStore((state) => state.customTheme);
+  const activeContest = useGeneralStore((state) => state.activeContest);
   const setYear = useGeneralStore((state) => state.setYear);
   const setIsGfOnly = useGeneralStore((state) => state.setIsGfOnly);
   const setTheme = useGeneralStore((state) => state.setTheme);
   const setSettings = useGeneralStore((state) => state.setSettings);
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
+  const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
 
   const isTouchDevice = useTouchDevice();
 
   const handleYearChange = (newValue: string, shouldToggleGfOnly = false) => {
+    if (activeContest && newValue === activeContest._id) return;
+
     const isJunior = newValue.startsWith(JUNIOR_THEME_PREFIX);
     const newYear = isJunior
       ? newValue.replace(JUNIOR_THEME_PREFIX, '')
@@ -169,6 +174,56 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     return options;
   }, [customTheme]);
 
+  const contestGroups = useMemo(() => {
+    const groups: OptionGroup[] = [
+      { label: 'ESC', options: ESC_YEAR_OPTIONS },
+      { label: 'JESC', options: JESC_YEAR_OPTIONS },
+    ];
+
+    if (activeContest) {
+      const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
+
+      groups.unshift({
+        label: t('common.custom'),
+        options: [
+          {
+            label: activeContest.name,
+            value: activeContest._id,
+            imageUrl: logo,
+            isExisting,
+          },
+        ],
+      });
+    }
+
+    return groups;
+  }, [activeContest, t, getHostingCountry]);
+
+  const contestOptions = useMemo(() => {
+    const options: Option[] = [...YEAR_OPTIONS];
+
+    if (activeContest) {
+      const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
+
+      options.push({
+        label: activeContest.name,
+        value: activeContest._id,
+        imageUrl: logo,
+        isExisting,
+      });
+    }
+
+    return options;
+  }, [activeContest, getHostingCountry]);
+
+  const contestValue = useMemo(() => {
+    if (activeContest) {
+      return activeContest._id;
+    }
+
+    return settings.isJuniorContest ? `${JUNIOR_THEME_PREFIX}${year}` : year;
+  }, [activeContest, settings.isJuniorContest, year]);
+
   return (
     <div
       className={`flex justify-between items-end w-full ${
@@ -178,26 +233,27 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
       <div className="flex items-end sm:space-x-4 space-x-3">
         <div className="flex items-end gap-1.5">
           <CustomSelect
-            options={YEAR_OPTIONS}
-            groups={[
-              { label: 'ESC', options: ESC_YEAR_OPTIONS },
-              { label: 'JESC', options: JESC_YEAR_OPTIONS },
-            ]}
-            value={
-              settings.isJuniorContest ? `${JUNIOR_THEME_PREFIX}${year}` : year
-            }
+            options={contestOptions}
+            groups={contestGroups}
+            value={contestValue}
             onChange={handleYearChange}
             id="year-select-box"
-            label={t('settings.general.contest')}
+            label={
+              activeContest
+                ? `${t('settings.general.contest')} (${t('common.custom')})`
+                : t('settings.general.contest')
+            }
             className="sm:w-[130px] w-[110px]"
           />
-          <Button
-            label={t('setup.eventSetupModal.grandFinalOnly')}
-            className={`!px-1 !py-0 h-[42px] normal-case w-[48px] !text-[0.8rem] !leading-4  ${
-              isGfOnly ? 'ring-primary-700/80 ring-2  ring-solid' : ''
-            }`}
-            onClick={handleGfOnlyChange}
-          />
+          {!activeContest && (
+            <Button
+              label={t('setup.eventSetupModal.grandFinalOnly')}
+              className={`!px-1 !py-0 h-[42px] normal-case w-[48px] !text-[0.8rem] !leading-4  ${
+                isGfOnly ? 'ring-primary-700/80 ring-2  ring-solid' : ''
+              }`}
+              onClick={handleGfOnlyChange}
+            />
+          )}
         </div>
         <div className="flex items-end gap-1.5">
           <CustomSelect

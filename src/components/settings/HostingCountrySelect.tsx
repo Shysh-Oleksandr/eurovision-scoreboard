@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { Checkbox } from '../common/Checkbox';
 import CustomSelect from '../common/customSelect/CustomSelect';
 
+import { DEFAULT_HOSTING_COUNTRY_CODE } from '@/data/data';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -42,7 +43,7 @@ export const HostingCountrySelect: React.FC = () => {
       {settings.showHostingCountryLogo && (
         <CustomSelect
           options={options}
-          value={settings.hostingCountryCode || 'CH'}
+          value={settings.hostingCountryCode || DEFAULT_HOSTING_COUNTRY_CODE}
           onChange={(value) => setSettings({ hostingCountryCode: value })}
           id="hosting-country-select-box"
           className="ml-1"

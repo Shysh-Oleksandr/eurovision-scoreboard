@@ -1,21 +1,23 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
-import SearchInputIcon from '../../SearchInputIcon';
+import SearchInputIcon from '../SearchInputIcon';
 
 import Button from '@/components/common/Button';
 import { Input } from '@/components/Input';
 
-interface ThemesSearchHeaderProps {
+interface WidgetSearchHeaderProps {
   search: string;
   onSearchChange: (search: string) => void;
   onCreateNew?: () => void;
+  placeholder: string;
 }
 
-const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
+const WidgetSearchHeader: React.FC<WidgetSearchHeaderProps> = ({
   onCreateNew,
   search,
   onSearchChange,
+  placeholder,
 }) => {
   const t = useTranslations();
 
@@ -24,7 +26,7 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
       <div className="relative w-full">
         <Input
           type="text"
-          placeholder={t('widgets.themes.searchThemes')}
+          placeholder={placeholder}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           className="text-sm pr-10"
@@ -44,4 +46,4 @@ const ThemesSearchHeader: React.FC<ThemesSearchHeaderProps> = ({
   );
 };
 
-export default ThemesSearchHeader;
+export default WidgetSearchHeader;
