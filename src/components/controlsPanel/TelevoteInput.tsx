@@ -110,8 +110,6 @@ const TelevoteInput = () => {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
 
-    console.log('inputValue', inputValue);
-    console.log('NUMBER_REGEX.test(inputValue)', NUMBER_REGEX.test(inputValue));
     // Only allow whole numbers
     if (NUMBER_REGEX.test(inputValue)) {
       setError('');

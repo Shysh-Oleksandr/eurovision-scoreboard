@@ -26,7 +26,6 @@ export type CountryOdds = Record<
 export interface CountriesState {
   // State
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
-  selectedCountries: BaseCountry[]; // Countries selected for the current event
   eventSetupModalOpen: boolean;
   predefModalOpen: boolean;
   currentSetupStageType: 'initial' | 'next';
@@ -50,7 +49,6 @@ export interface CountriesState {
   getContestParticipants: () => BaseCountry[];
   getVotingCountry: () => VotingCountry | undefined;
   getVotingCountriesLength: () => number;
-  setSelectedCountries: (countries: BaseCountry[]) => void;
   updateCountriesForYear: (year: Year) => Promise<void>;
   setInitialCountriesForYear: (
     year: Year,
@@ -116,7 +114,6 @@ export const useCountriesStore = create<CountriesState>()(
         return {
           // Initial state
           allCountriesForYear: [],
-          selectedCountries: [],
           eventSetupModalOpen: true,
           predefModalOpen: false,
           postSetupModalOpen: false,
@@ -282,12 +279,6 @@ export const useCountriesStore = create<CountriesState>()(
             return participants;
           },
 
-          setSelectedCountries: (countries: BaseCountry[]) => {
-            set({
-              selectedCountries: countries,
-            });
-          },
-
           updateCountriesForYear: async (year: Year) => {
             const { settings } = useGeneralStore.getState();
             const countries = await loadCountriesByPreset(
@@ -309,7 +300,6 @@ export const useCountriesStore = create<CountriesState>()(
 
             set({
               allCountriesForYear: countries,
-              selectedCountries: [],
               configuredEventStages: [],
               eventAssignments: {},
               countryOdds: initialOdds,
@@ -422,7 +412,6 @@ export const useCountriesStore = create<CountriesState>()(
         name: 'countries-storage',
         partialize: (state) => ({
           eventSetupModalOpen: state.eventSetupModalOpen,
-          selectedCountries: state.selectedCountries,
           eventAssignments: state.eventAssignments,
           configuredEventStages: state.configuredEventStages,
           countryOdds: state.countryOdds,

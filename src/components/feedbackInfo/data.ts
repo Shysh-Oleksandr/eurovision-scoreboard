@@ -244,6 +244,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2025-12-31',
+    title: 'Contests - saving the simulation setup and results. Public contests browsing and loading.',
+  },
+  {
     date: '2025-12-24',
     title: 'Allowed the negative points in the points system',
   },
@@ -253,8 +257,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2025-12-27', end: '2025-12-28' },
-    title: 'Contests (saving and loading scoreboards)',
+    approximateDates: { start: '2026-01-02', end: '2026-01-04' },
+    title: 'Contests improvements',
   },
   {
     title: 'Running order setup',

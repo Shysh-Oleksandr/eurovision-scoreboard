@@ -1,8 +1,7 @@
 import { CountryAssignmentGroup } from '../../models';
 
-
-
 export const CATEGORY_ORDER = [
+  'Imported',
   'Custom',
   'All-Time Participants',
   'Europe',

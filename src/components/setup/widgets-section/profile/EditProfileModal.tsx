@@ -17,6 +17,7 @@ import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import { InputField } from '@/components/common/InputField';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
+import { DEFAULT_HOSTING_COUNTRY_CODE } from '@/data/data';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -90,7 +91,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     if (!isOpen) return;
 
     reset({ username: user?.username || '', name: user?.name || '' });
-    setSelectedCountry(user?.country || 'CH');
+    setSelectedCountry(user?.country || DEFAULT_HOSTING_COUNTRY_CODE);
 
     if (user?.avatarUrl) {
       setSelectedFile(null);

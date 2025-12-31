@@ -9,7 +9,7 @@ import { compareCountriesByPoints } from './helpers';
 
 type EventActions = {
   setEventStages: (eventStages: EventStage[]) => void;
-  startEvent: (selectedCountries: BaseCountry[]) => void;
+  startEvent: () => void;
   prepareForNextStage: (shouldUpdateStore?: boolean) => {
     updatedEventStages: EventStage[];
     nextStage: EventStage | null;
@@ -31,11 +31,7 @@ export const createEventActions: StateCreator<
     set({ eventStages });
   },
 
-  startEvent: (selectedCountries: BaseCountry[]) => {
-    const countriesStore = useCountriesStore.getState();
-
-    countriesStore.setSelectedCountries(selectedCountries);
-
+  startEvent: () => {
     const enablePredefined =
       useGeneralStore.getState().settings.enablePredefinedVotes;
 

@@ -7,33 +7,33 @@ import dynamic from 'next/dynamic';
 import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
 
-const ThemesModalModal = dynamic(() => import('./ThemesModal'), {
+const ThemesModal = dynamic(() => import('./ThemesModal'), {
   ssr: false,
 });
 
 const ThemesWidget = () => {
   const t = useTranslations('widgets.themes');
 
-  const [isThemesModalModalOpen, setIsThemesModalModalOpen] = useState(false);
-  const [isThemesModalModalLoaded, setIsThemesModalModalLoaded] =
+  const [isThemesModalOpen, setIsThemesModalOpen] = useState(false);
+  const [isThemesModalLoaded, setIsThemesModalLoaded] =
     useState(false);
 
   return (
     <>
       <WidgetContainer
         onClick={() => {
-          setIsThemesModalModalOpen(true);
+          setIsThemesModalOpen(true);
         }}
         title={t('title')}
         description={t('widgetDescription')}
         icon={<ThemeIcon className="w-6 h-6 flex-none" />}
       />
 
-      {(isThemesModalModalOpen || isThemesModalModalLoaded) && (
-        <ThemesModalModal
-          isOpen={isThemesModalModalOpen}
-          onClose={() => setIsThemesModalModalOpen(false)}
-          onLoaded={() => setIsThemesModalModalLoaded(true)}
+      {(isThemesModalOpen || isThemesModalLoaded) && (
+        <ThemesModal
+          isOpen={isThemesModalOpen}
+          onClose={() => setIsThemesModalOpen(false)}
+          onLoaded={() => setIsThemesModalLoaded(true)}
         />
       )}
     </>

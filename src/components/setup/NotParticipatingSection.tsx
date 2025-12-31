@@ -50,9 +50,28 @@ const NotParticipatingSection = ({
     sortedCategories,
   } = useCountrySearch(notParticipatingCountries);
 
+  // Filter out Imported category if empty
+  const filteredSortedCategories = sortedCategories.filter(
+    (category) =>
+      !(
+        category === 'Imported' &&
+        groupedNotParticipatingCountries['Imported'].length === 0
+      ),
+  );
+
   const getCategoryLabel = useGetCategoryLabel();
 
   const getExtraContent = (category: string) => {
+    if (category === 'Imported') {
+      return (
+        <div className="flex flex-col items-start col-span-full gap-2">
+          <p className="text-white/80 text-sm">
+            {t('eventSetupModal.importedEntriesDescription')}
+          </p>
+        </div>
+      );
+    }
+
     if (category === 'Custom') {
       if (!user) {
         return (
@@ -104,7 +123,7 @@ const NotParticipatingSection = ({
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        {sortedCategories.map((category) => (
+        {filteredSortedCategories.map((category) => (
           <SectionWrapper
             key={category}
             title={getCategoryLabel(category)}

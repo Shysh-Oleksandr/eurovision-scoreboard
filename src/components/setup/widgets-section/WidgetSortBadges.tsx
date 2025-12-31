@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
-import { DateRangeFilter, getDateRange } from '../utils/getFilterDateRange';
+import { DateRangeFilter, getDateRange } from './utils/getFilterDateRange';
 
 import { CalendarSearchIcon } from '@/assets/icons/CalendarSearchIcon';
 import { FilterIcon } from '@/assets/icons/FilterIcon';
@@ -9,20 +9,22 @@ import Badge from '@/components/common/Badge';
 
 export type PublicSortKey = 'latest' | 'oldest' | 'likes' | 'saves' | 'copies';
 
-interface ThemesSortBadgesProps {
+interface WidgetSortBadgesProps {
   value: PublicSortKey;
   onChange: (key: PublicSortKey) => void;
   className?: string;
   dateRange?: DateRangeFilter;
   onDateRangeChange?: (range: DateRangeFilter) => void;
+  hideCopies?: boolean;
 }
 
-const ThemesSortBadges: React.FC<ThemesSortBadgesProps> = ({
+const WidgetSortBadges: React.FC<WidgetSortBadgesProps> = ({
   value,
   onChange,
   className,
   dateRange,
   onDateRangeChange,
+  hideCopies = false,
 }) => {
   const t = useTranslations('widgets.sortBadges');
 
@@ -90,11 +92,13 @@ const ThemesSortBadges: React.FC<ThemesSortBadgesProps> = ({
           onClick={() => onChange('saves')}
           isActive={value === 'saves'}
         />
-        <Badge
-          label={t('mostCopied')}
-          onClick={() => onChange('copies')}
-          isActive={value === 'copies'}
-        />
+        {!hideCopies && (
+          <Badge
+            label={t('mostCopied')}
+            onClick={() => onChange('copies')}
+            isActive={value === 'copies'}
+          />
+        )}
       </div>
       {onDateRangeChange && (
         <div className="flex items-center flex-wrap justify-start gap-2">
@@ -135,4 +139,4 @@ const ThemesSortBadges: React.FC<ThemesSortBadgesProps> = ({
   );
 };
 
-export default ThemesSortBadges;
+export default WidgetSortBadges;

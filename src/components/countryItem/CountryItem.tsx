@@ -72,10 +72,8 @@ const CountryItem = ({
       }
     : null;
 
-  const shouldShowAsNonQualified = useQualificationStatus(
-    country,
-    !!isVotingOver,
-  );
+  const { shouldShowAsNonQualified, shouldShowNQLabel } =
+    useQualificationStatus(country, !!isVotingOver);
   const { isDisabled, buttonClassName, isActive } = useItemState({
     country,
     votingCountryCode,
@@ -193,7 +191,7 @@ const CountryItem = ({
             <h6
               className={`lg:text-lg sm:text-[0.85rem] xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center ${pointsTextClass}`}
             >
-              {shouldShowAsNonQualified ? 'NQ' : country.points}
+              {shouldShowNQLabel ? 'NQ' : country.points}
             </h6>
           </div>
         </div>

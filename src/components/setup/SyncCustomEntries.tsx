@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useMyCustomEntriesQuery } from '@/api/customEntries';
 import { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
+import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 /**
@@ -13,23 +14,28 @@ import { useAuthStore } from '@/state/useAuthStore';
 export const SyncCustomEntries: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const { data: customEntries } = useMyCustomEntriesQuery(!!user);
+  const importedCustomEntries = useGeneralStore((s) => s.importedCustomEntries);
 
   useEffect(() => {
     if (customEntries) {
-      const customCountries: BaseCountry[] = customEntries.map((entry) => ({
-        name: entry.name || 'Custom',
-        code: `custom-${entry._id}`,
-        category: 'Custom',
-        flag: entry.flagUrl,
-        updatedAt: entry.updatedAt,
-      }));
+      const userCustomEntries: BaseCountry[] = customEntries
+        .map((entry) => ({
+          name: entry.name || 'Custom',
+          code: `custom-${entry._id}`,
+          category: 'Custom',
+          flag: entry.flagUrl,
+          updatedAt: entry.updatedAt,
+        }))
+        .filter((c) => !importedCustomEntries.some((i) => i.code === c.code));
+
+      const customCountries = [...userCustomEntries, ...importedCustomEntries];
 
       useCountriesStore.setState({ customCountries });
     } else {
       // User is not authenticated or has no entries
-      useCountriesStore.setState({ customCountries: [] });
+      useCountriesStore.setState({ customCountries: importedCustomEntries });
     }
-  }, [customEntries, user]);
+  }, [customEntries, user, importedCustomEntries]);
 
   return null;
 };

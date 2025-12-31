@@ -12,6 +12,11 @@ export const queryKeys = {
     themeById: (id: string) => ['user', 'theme', id] as const,
     savedThemes: () => ['user', 'saved-themes'] as const,
     themesState: (ids: string[]) => ['user', 'themes-state', { ids: [...ids].sort() }] as const,
+    contests: () => ['user', 'contests'] as const,
+    contestById: (id: string) => ['user', 'contest', id] as const,
+    savedContests: () => ['user', 'saved-contests'] as const,
+    contestsState: (ids: string[]) =>
+      ['user', 'contests-state', { ids: [...ids].sort() }] as const,
     // Add more user-specific queries here in the future:
     // savedEvents: () => ['user', 'saved-events'] as const,
     // preferences: () => ['user', 'preferences'] as const,
@@ -21,6 +26,14 @@ export const queryKeys = {
   public: {
     themes: (filters: { page?: number; search?: string; sortBy?: string; sortOrder?: string; startDate?: string; endDate?: string }) =>
       ['public', 'themes', filters] as const,
+    contests: (filters: {
+      page?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+    }) => ['public', 'contests', filters] as const,
   },
 
   // Errors queries (admin only)
@@ -54,6 +67,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.profile(),
   queryKeys.user.customEntries(),
   queryKeys.user.themes(),
+  queryKeys.user.contests(),
   queryKeys.legacy.meProfile(),
   queryKeys.legacy.me(),
 ];

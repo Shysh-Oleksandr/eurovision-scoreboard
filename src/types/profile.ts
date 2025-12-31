@@ -7,6 +7,7 @@ export interface Profile {
   email?: string;
   googleId?: string;
   activeThemeId?: string;
+  activeContestId?: string;
   isAdmin?: boolean;
   preferredLocale?: PreferredLocale;
 }

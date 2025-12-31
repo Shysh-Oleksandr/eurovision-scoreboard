@@ -19,16 +19,18 @@ export const useQualificationStatus = (
   const eventStages = useScoreboardStore((state) => state.eventStages);
 
   // Note: Semi-final means any stage before the final stage (GF)
-  const shouldShowAsNonQualified = useMemo(() => {
+  const { shouldShowAsNonQualified, shouldShowNQLabel } = useMemo(() => {
     const fallbackStage = getCurrentStage();
     const currentStageId = viewedStageId || fallbackStage?.id;
 
-    if (!currentStageId) return false;
+    if (!currentStageId)
+      return { shouldShowAsNonQualified: false, shouldShowNQLabel: false };
 
     const currentStage =
       eventStages.find((s) => s.id === currentStageId) || fallbackStage;
 
-    if (!currentStage) return false;
+    if (!currentStage)
+      return { shouldShowAsNonQualified: false, shouldShowNQLabel: false };
 
     const isGrandFinal =
       currentStage.id.toUpperCase() === StageId.GF.toUpperCase();
@@ -55,9 +57,12 @@ export const useQualificationStatus = (
         !hasQualifiedFromCurrentStage &&
         !country?.isAutoQualified;
 
-      return Boolean(
-        isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode,
-      );
+      return {
+        shouldShowAsNonQualified: Boolean(
+          isNonQualifiedInSemiFinal || isNonQualifiedInAllParticipantsMode,
+        ),
+        shouldShowNQLabel: false,
+      };
     }
 
     // Grand Final: in all-participants mode, any country not participating
@@ -66,13 +71,18 @@ export const useQualificationStatus = (
       (c) => c.code === country.code,
     );
 
-    const isNonQualifiedInGrandFinalAllParticipants =
+    const isNonQualifiedInGrandFinalAllParticipants = Boolean(
       showAllParticipants &&
-      winnerCountry &&
-      !isInGrandFinal &&
-      !country?.isAutoQualified;
+        winnerCountry &&
+        !isInGrandFinal &&
+        !country?.isAutoQualified,
+    );
 
-    return Boolean(isNonQualifiedInGrandFinalAllParticipants);
+    return {
+      shouldShowAsNonQualified: isNonQualifiedInGrandFinalAllParticipants,
+      shouldShowNQLabel:
+        isNonQualifiedInGrandFinalAllParticipants && showAllParticipants,
+    };
   }, [
     viewedStageId,
     getCurrentStage,
@@ -85,5 +95,5 @@ export const useQualificationStatus = (
     winnerCountry,
   ]);
 
-  return shouldShowAsNonQualified;
+  return { shouldShowAsNonQualified, shouldShowNQLabel };
 };

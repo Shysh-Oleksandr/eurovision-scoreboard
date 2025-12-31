@@ -18,7 +18,6 @@ import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
-import ContestCard from './ContestCard';
 import { AvailableGroup } from './CountrySelectionListItem';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
@@ -30,6 +29,7 @@ import { SyncCustomEntries } from './SyncCustomEntries';
 import UnifiedStageSetup from './UnifiedStageSetup';
 import { buildEventStagesFromAssignments } from './utils/buildEventStagesFromAssignments';
 import { validateEventSetup } from './utils/eventValidation';
+import ContestCard from './widgets-section/contests/ContestCard';
 import WidgetsSection from './widgets-section/WidgetsSection';
 
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
@@ -71,7 +71,6 @@ const EventSetupModal = () => {
     setPredefModalOpen,
     configuredEventStages,
     setConfiguredEventStages,
-    countryOdds,
     currentSetupStageType,
     setCurrentSetupStageType,
   } = useCountriesStore(
@@ -261,35 +260,7 @@ const EventSetupModal = () => {
 
     setEventStages(eventStages);
 
-    const allSelectedCountries: BaseCountry[] = Object.entries(
-      latestAssignments,
-    )
-      .filter(([, group]) => group !== CountryAssignmentGroup.NOT_PARTICIPATING)
-      .map(([countryCode, group]) => {
-        const country = allCountries.find((c) => c.code === countryCode);
-
-        if (!country) {
-          console.log('country not found', countryCode);
-
-          return null;
-        }
-        const odds = countryOdds[countryCode];
-
-        const isStageParticipant = eventStagesWithCountriesFresh.some(
-          (s) => s.id === group,
-        );
-
-        return {
-          ...country,
-          juryOdds: odds?.juryOdds,
-          televoteOdds: odds?.televoteOdds,
-          semiFinalGroup: isStageParticipant ? group : undefined,
-          isQualified: isStageParticipant,
-        };
-      })
-      .filter((country) => country !== null) as BaseCountry[];
-
-    startEvent(allSelectedCountries);
+    startEvent();
 
     clear();
   };

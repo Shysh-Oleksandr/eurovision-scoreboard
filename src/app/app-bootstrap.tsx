@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 import { useRouter } from 'next/navigation';
 
+import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
@@ -16,6 +17,7 @@ export default function AppBootstrap() {
   useFullscreen();
   useThemeSetup();
   useActiveThemeSync();
+  useActiveContestSync();
 
   const t = useTranslations('widgets.profile');
   const { handlePostLogin, user } = useAuthStore();
