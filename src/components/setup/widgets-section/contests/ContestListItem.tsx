@@ -186,8 +186,8 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                   <Image
                     src={winnerFlag}
                     alt={winnerName ?? 'Winner flag'}
-                    className="w-4 h-4 rounded-sm"
-                    width={16}
+                    className="w-5 h-4 rounded-sm"
+                    width={20}
                     height={16}
                     onError={(e) => {
                       e.currentTarget.src = getFlagPath('ww');

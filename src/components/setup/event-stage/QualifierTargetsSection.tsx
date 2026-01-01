@@ -253,7 +253,7 @@ const QualifierTargetsSection: React.FC<{
                 <CustomSortableItem
                   key={stage.id}
                   id={stage.id}
-                  className={`pl-1.5 pr-3 h-[42px] shadow-sm ${
+                  className={`pl-1.5 pr-3 min-h-[42px] shadow-sm ${
                     isCurrentStage
                       ? ''
                       : 'bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/10'
@@ -306,7 +306,7 @@ const QualifierTargetsSection: React.FC<{
 
           {/* Grand Final - displayed separately, not sortable */}
           {grandFinalStage && (
-            <div className="flex items-center gap-2 bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/10 px-3 py-1 rounded-md shadow-sm h-[42px]">
+            <div className="flex items-center gap-2 bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/10 px-3 py-1 rounded-md shadow-sm min-h-[42px]">
               <div className="flex-1 text-white text-sm flex items-center gap-2">
                 {grandFinalStage.name}
               </div>

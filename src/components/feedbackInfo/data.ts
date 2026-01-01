@@ -244,8 +244,14 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2025-01-01',
+    title:
+      'Added reordering all stages during adding/editing a stage. Minor fixes',
+  },
+  {
     date: '2025-12-31',
-    title: 'Contests - saving the simulation setup and results. Public contests browsing and loading.',
+    title:
+      'Contests - saving the simulation setup and results. Public contests browsing and loading.',
   },
   {
     date: '2025-12-24',
@@ -257,7 +263,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-01-02', end: '2026-01-04' },
+    approximateDates: { start: '2026-01-03', end: '2026-01-04' },
     title: 'Contests improvements',
   },
   {

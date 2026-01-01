@@ -182,7 +182,7 @@ const PublicContests: React.FC<PublicContestsProps> = ({
       ) : (
         <div className="text-center sm:py-12 py-8">
           <p className="text-white/70">
-            No public contests found matching your search.
+            {t('widgets.contests.noContestsFoundMatchingYourSearch')}
           </p>
         </div>
       )}
