@@ -125,7 +125,10 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
             </div>
           </h3>
           {contest.description && (
-            <p className="text-white/70 text-sm line-clamp-2">
+            <p
+              className="text-white/70 text-sm line-clamp-2"
+              title={contest.description}
+            >
               {contest.description}
             </p>
           )}

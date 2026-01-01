@@ -49,7 +49,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
   }, [t]);
 
   return (
-    <div className="flex flex-col gap-4 p-2">
+    <div className="flex flex-col gap-4">
       <h2 className="text-xl font-bold text-white">
         {t(
           isEditMode

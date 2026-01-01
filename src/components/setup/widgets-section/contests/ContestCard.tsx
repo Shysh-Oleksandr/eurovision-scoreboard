@@ -128,7 +128,10 @@ const ContestCard: React.FC<ContestCardProps> = ({
                 {contestName} {contestYear}
               </h5>
               {contestDescription && (
-                <p className="text-xs text-white/60 line-clamp-2">
+                <p
+                  className="text-xs text-white/60 line-clamp-2"
+                  title={contestDescription}
+                >
                   {contestDescription}
                 </p>
               )}
