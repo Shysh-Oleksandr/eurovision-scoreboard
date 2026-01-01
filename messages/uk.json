@@ -38,7 +38,8 @@
     "orSelectExisting": "Або виберіть існуюче",
     "randomize": "Випадково",
     "loadYearData": "Завантажити дані року",
-    "country": "Країна"
+    "country": "Країна",
+    "current": "Поточний"
   },
   "Metadata": {
     "title": "DouzePoints - Симулятор Євробачення",

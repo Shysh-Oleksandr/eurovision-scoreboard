@@ -15,6 +15,7 @@ interface EventStageModalProps {
   onClose: () => void;
   onSave: (
     stage: Omit<EventStage, 'countries' | 'isOver' | 'isJuryVoting'>,
+    eventsOrder: string[],
   ) => void;
   onDelete: (stageId: string) => void;
   eventStageToEdit?: EventStage;
@@ -57,7 +58,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
       setTimeout(
         () => {
           if (result) {
-            onSave(result);
+            onSave(result, data.eventsOrder);
           }
           // Prevent displaying the new stage in the list before the modal is closed
         },
@@ -98,6 +99,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
         <EventStageSettings
           isEditMode={isEditModeFromHook}
           isLastStage={isLastStage}
+          eventStageToEdit={eventStageToEdit}
         />
       </FormProvider>
     </Modal>

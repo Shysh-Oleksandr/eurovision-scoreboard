@@ -38,7 +38,8 @@
     "orSelectExisting": "Lub wybierz istniejący",
     "randomize": "Losuj",
     "loadYearData": "Załaduj dane roku",
-    "country": "Kraj"
+    "country": "Kraj",
+    "current": "Bieżący"
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",

@@ -6,7 +6,7 @@ import { XCloseIcon } from '@/assets/icons/XClose';
 
 interface CustomSortableItemProps {
   id: number | string;
-  onRemove: () => void;
+  onRemove?: () => void;
   children: React.ReactNode;
   disabled?: boolean;
   className?: string;
@@ -32,7 +32,7 @@ export const CustomSortableItem: React.FC<CustomSortableItemProps> = ({
           </div>
         )}
         {children}
-        {!disabled && (
+        {!disabled && onRemove && (
           <button onClick={onRemove} className="ml-auto pr-1 group">
             <XCloseIcon className="w-6 h-6 text-white group-hover:text-red-200 transition-colors duration-300" />
           </button>

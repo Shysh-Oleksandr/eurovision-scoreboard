@@ -1,9 +1,6 @@
 import { useState } from 'react';
 
-import {
-  CountryAssignmentGroup,
-  EventStage,
-} from '@/models';
+import { CountryAssignmentGroup, EventStage } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 
 interface UseStageModalActionsProps {
@@ -43,32 +40,36 @@ export const useStageModalActions = ({
 
   const handleSaveStage = (
     stage: Omit<EventStage, 'countries' | 'isOver' | 'isJuryVoting'>,
+    eventsOrder: string[],
   ) => {
     const isEditing = configuredEventStages.some((s) => s.id === stage.id);
 
     if (isEditing) {
       // Update existing stage
-      setConfiguredEventStages(
-        configuredEventStages.map((s) =>
-          s.id === stage.id ? { ...s, ...stage } : s,
-        ),
-      );
+      const sortedStages = configuredEventStages
+        .map((s) => (s.id === stage.id ? { ...s, ...stage } : s))
+        .sort((a, b) => eventsOrder.indexOf(a.id) - eventsOrder.indexOf(b.id))
+        .map((s, index) => ({
+          ...s,
+          order: index,
+        }));
+      setConfiguredEventStages(sortedStages);
     } else {
-      // Append new stage to the end with order = minOrder - 1
-      const minOrder =
-        configuredEventStages.length > 0
-          ? Math.min(...configuredEventStages.map((s) => s.order ?? 0))
-          : 0;
-
       const newStage: EventStage = {
         ...stage,
-        order: minOrder - 1,
         countries: [],
         isOver: false,
         isJuryVoting: false,
       };
 
-      setConfiguredEventStages([newStage, ...configuredEventStages]);
+      const sortedStages = [newStage, ...configuredEventStages]
+        .sort((a, b) => eventsOrder.indexOf(a.id) - eventsOrder.indexOf(b.id))
+        .map((s, index) => ({
+          ...s,
+          order: index,
+        }));
+
+      setConfiguredEventStages(sortedStages);
     }
   };
 
@@ -90,8 +91,7 @@ export const useStageModalActions = ({
 
     for (const countryCode in newAssignments) {
       if (newAssignments[countryCode] === stageId) {
-        newAssignments[countryCode] =
-          CountryAssignmentGroup.NOT_PARTICIPATING;
+        newAssignments[countryCode] = CountryAssignmentGroup.NOT_PARTICIPATING;
       }
     }
 

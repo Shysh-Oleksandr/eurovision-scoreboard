@@ -19,10 +19,12 @@ const qualifierTargetSchema = z.object({
 
 // Base schema for common fields
 const eventStageSchema = z.object({
+  id: z.string().min(1, 'Id is required'),
   name: z.string().min(1, 'Name is required'),
   order: z.number().int(),
   votingMode: z.enum(Object.values(StageVotingMode)),
   qualifiesTo: z.array(qualifierTargetSchema).optional(),
+  eventsOrder: z.array(z.string()),
 });
 
 export type EventStageFormData = z.infer<typeof eventStageSchema>;
@@ -68,10 +70,12 @@ export const useEventStageForm = ({
   const form = useForm<EventStageFormData>({
     resolver: zodResolver(eventStageSchema),
     defaultValues: {
+      id: new Date().toISOString(),
       name: '',
       order: getDefaultOrder(),
       votingMode: StageVotingMode.TELEVOTE_ONLY,
       qualifiesTo: [],
+      eventsOrder: [],
     },
   });
 
@@ -79,13 +83,19 @@ export const useEventStageForm = ({
   useEffect(() => {
     if (!isOpen) return;
 
+    const sortedStagesIds = [...configuredEventStages]
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      .map((s) => s.id);
+
     if (eventStageToEdit) {
       form.reset(
         {
+          id: eventStageToEdit.id,
           name: eventStageToEdit.name,
           order: eventStageToEdit.order ?? 0,
           votingMode: eventStageToEdit.votingMode,
           qualifiesTo: (eventStageToEdit.qualifiesTo as any) || [],
+          eventsOrder: sortedStagesIds,
         },
         { keepDefaultValues: false },
       );
@@ -108,10 +118,12 @@ export const useEventStageForm = ({
 
       form.reset(
         {
+          id: new Date().toISOString(),
           name: `Stage ${localEventStagesLength + 1}`,
           order: getDefaultOrder(),
           votingMode: StageVotingMode.TELEVOTE_ONLY,
           qualifiesTo: defaultQualifiesTo,
+          eventsOrder: sortedStagesIds,
         },
         { keepDefaultValues: false },
       );
@@ -125,7 +137,7 @@ export const useEventStageForm = ({
     );
 
     return {
-      id: eventStageToEdit?.id || new Date().toISOString(),
+      id: data.id,
       name: data.name,
       order: data.order,
       qualifiesTo: validQualifiesTo,

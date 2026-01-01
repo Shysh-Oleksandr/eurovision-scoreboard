@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { StageVotingMode } from '../../../models';
+import { EventStage, StageVotingMode } from '../../../models';
 import Select from '../../common/Select';
 import { Input } from '../../Input';
 
@@ -25,11 +25,13 @@ const getVotingModeLabel = (votingMode: StageVotingMode, t: any) => {
 interface EventStageSettingsProps {
   isEditMode: boolean;
   isLastStage: boolean;
+  eventStageToEdit?: EventStage;
 }
 
 const EventStageSettings: React.FC<EventStageSettingsProps> = ({
   isEditMode,
   isLastStage,
+  eventStageToEdit,
 }) => {
   const {
     register,
@@ -95,7 +97,12 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
           </span>
         </Select>
       </div>
-      {!isLastStage && <QualifierTargetsSection isEditMode={isEditMode} />}
+      {!isLastStage && (
+        <QualifierTargetsSection
+          isEditMode={isEditMode}
+          eventStageToEdit={eventStageToEdit}
+        />
+      )}
     </div>
   );
 };

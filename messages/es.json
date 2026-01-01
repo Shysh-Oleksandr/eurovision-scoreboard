@@ -38,7 +38,8 @@
     "orSelectExisting": "O selecciona una existente",
     "randomize": "Aleatorio",
     "loadYearData": "Cargar datos del año",
-    "country": "País"
+    "country": "País",
+    "current": "Actual"
   },
   "Metadata": {
     "title": "DouzePoints - Simulador de Marcadores de Eurovisión",

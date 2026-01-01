@@ -38,7 +38,8 @@
     "orSelectExisting": "Ou sélectionner un existant",
     "randomize": "Aléatoire",
     "loadYearData": "Charger les données de l’année",
-    "country": "Pays"
+    "country": "Pays",
+    "current": "Actuel"
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",

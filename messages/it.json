@@ -38,7 +38,8 @@
     "orSelectExisting": "Oppure seleziona esistente",
     "randomize": "Casualizza",
     "loadYearData": "Carica Dati Anno",
-    "country": "Paese"
+    "country": "Paese",
+    "current": "Corrente"
   },
   "Metadata": {
     "title": "DouzePoints - Simulatore di Classifica Eurovision",

@@ -38,7 +38,8 @@
     "orSelectExisting": "Ή επιλέξτε υπάρχουσα",
     "randomize": "Τυχαίο",
     "loadYearData": "Φόρτωση Δεδομένων Έτους",
-    "country": "Χώρα"
+    "country": "Χώρα",
+    "current": "Τρέχον"
   },
   "Metadata": {
     "title": "DouzePoints - Προσομοιωτής Πίνακα Σκορ Eurovision",
