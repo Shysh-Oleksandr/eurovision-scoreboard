@@ -138,46 +138,104 @@ export const createEventActions: StateCreator<
         .sort(compareCountriesByPoints);
 
       // Distribute qualifiers to target stages based on qualifiesTo
-      let qualifierIndex = 0;
-      for (const target of currentStageQualifiesTo) {
-        const targetStageIndex = updatedEventStages.findIndex(
-          (s) => s.id === target.targetStageId,
-        );
+      if (
+        currentStageQualifiesTo.some(
+          (target) => target.minRank || target.maxRank,
+        )
+      ) {
+        // Rank-based qualification
+        for (const target of currentStageQualifiesTo) {
+          const targetStageIndex = updatedEventStages.findIndex(
+            (s) => s.id === target.targetStageId,
+          );
 
-        if (targetStageIndex === -1) continue;
+          if (targetStageIndex === -1) continue;
 
-        const targetStage = updatedEventStages[targetStageIndex];
-        const qualifiersForTarget = countriesWithPoints
-          .slice(qualifierIndex, qualifierIndex + target.amount)
-          .map((c) => ({
-            ...c,
-            juryPoints: 0,
-            televotePoints: 0,
-            points: 0,
-            lastReceivedPoints: null,
-            isVotingFinished: false,
-            // qualifiedFromStageIds: [
-            //   ...(c.qualifiedFromStageIds ?? []),
-            //   currentStage.id,
-            // ],
-          }));
+          const targetStage = updatedEventStages[targetStageIndex];
 
-        // Add qualifiers to target stage
-        const existingCountries = targetStage.countries || [];
+          let qualifiersForTarget: typeof countriesWithPoints = [];
 
-        const updatedTargetStage = {
-          ...targetStage,
-          countries: [...existingCountries, ...qualifiersForTarget]
-            // Remove duplicates just in case
-            .filter(
-              (country, index, self) =>
-                index === self.findIndex((t) => t.code === country.code),
-            )
-            .sort((a, b) => a.name.localeCompare(b.name)),
-        };
+          if (target.minRank && target.maxRank) {
+            // Specific range: minRank to maxRank (inclusive)
+            qualifiersForTarget = countriesWithPoints
+              .slice(target.minRank - 1, target.maxRank)
+              .map((c) => ({
+                ...c,
+                juryPoints: 0,
+                televotePoints: 0,
+                points: 0,
+                lastReceivedPoints: null,
+                isVotingFinished: false,
+              }));
+          } else if (target.minRank && !target.maxRank) {
+            // From minRank to end
+            qualifiersForTarget = countriesWithPoints
+              .slice(target.minRank - 1)
+              .map((c) => ({
+                ...c,
+                juryPoints: 0,
+                televotePoints: 0,
+                points: 0,
+                lastReceivedPoints: null,
+                isVotingFinished: false,
+              }));
+          }
 
-        updatedEventStages[targetStageIndex] = updatedTargetStage;
-        qualifierIndex += target.amount;
+          // Add qualifiers to target stage
+          const existingCountries = targetStage.countries || [];
+
+          const updatedTargetStage = {
+            ...targetStage,
+            countries: [...existingCountries, ...qualifiersForTarget]
+              // Remove duplicates just in case
+              .filter(
+                (country, index, self) =>
+                  index === self.findIndex((t) => t.code === country.code),
+              )
+              .sort((a, b) => a.name.localeCompare(b.name)),
+          };
+
+          updatedEventStages[targetStageIndex] = updatedTargetStage;
+        }
+      } else {
+        // Amount-based qualification (backward compatibility)
+        let qualifierIndex = 0;
+        for (const target of currentStageQualifiesTo) {
+          const targetStageIndex = updatedEventStages.findIndex(
+            (s) => s.id === target.targetStageId,
+          );
+
+          if (targetStageIndex === -1) continue;
+
+          const targetStage = updatedEventStages[targetStageIndex];
+          const qualifiersForTarget = countriesWithPoints
+            .slice(qualifierIndex, qualifierIndex + target.amount)
+            .map((c) => ({
+              ...c,
+              juryPoints: 0,
+              televotePoints: 0,
+              points: 0,
+              lastReceivedPoints: null,
+              isVotingFinished: false,
+            }));
+
+          // Add qualifiers to target stage
+          const existingCountries = targetStage.countries || [];
+
+          const updatedTargetStage = {
+            ...targetStage,
+            countries: [...existingCountries, ...qualifiersForTarget]
+              // Remove duplicates just in case
+              .filter(
+                (country, index, self) =>
+                  index === self.findIndex((t) => t.code === country.code),
+              )
+              .sort((a, b) => a.name.localeCompare(b.name)),
+          };
+
+          updatedEventStages[targetStageIndex] = updatedTargetStage;
+          qualifierIndex += target.amount;
+        }
       }
     }
 

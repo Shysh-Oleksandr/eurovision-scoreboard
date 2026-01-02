@@ -61,7 +61,10 @@ export const useVotersCountriesSearch = (
           assignedGroup !== CountryAssignmentGroup.NOT_PARTICIPATING &&
           assignedGroup !== CountryAssignmentGroup.NOT_QUALIFIED;
 
-        if (participatesHere || currentStage?.countries.some((c) => c.code === country.code)) {
+        if (
+          participatesHere ||
+          currentStage?.countries.some((c) => c.code === country.code)
+        ) {
           if (!groups['In stage']) {
             groups['In stage'] = [];
           }

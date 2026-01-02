@@ -1,6 +1,11 @@
 import rw from 'random-weighted-choice';
 
-import { BaseCountry, Country, StageVotingMode, VotingCountry } from '../../models';
+import {
+  BaseCountry,
+  Country,
+  StageVotingMode,
+  VotingCountry,
+} from '../../models';
 import { CountryOdds } from '../countriesStore';
 import { PointsItem } from '../generalStore';
 

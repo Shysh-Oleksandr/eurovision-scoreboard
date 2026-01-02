@@ -37,12 +37,16 @@ export const createGetters: StateCreator<
   getNextStage: () => {
     const { eventStages, currentStageId } = get();
 
-    const currentStage = eventStages.find((s: EventStage) => s.id === currentStageId);
+    const currentStage = eventStages.find(
+      (s: EventStage) => s.id === currentStageId,
+    );
     if (!currentStage) return null;
 
     const currentOrder = currentStage.order ?? 0;
     // Find next stage by order (next highest order value)
-    const sortedStages = [...eventStages].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const sortedStages = [...eventStages].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
     const nextStage = sortedStages.find(
       (s: EventStage) => (s.order ?? 0) > currentOrder,
     );

@@ -2,7 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
-import type { Contest, ContestListResponse, ContestState } from '@/types/contest';
+import type {
+  Contest,
+  ContestListResponse,
+  ContestState,
+} from '@/types/contest';
 import type { ContestSnapshot } from '@/types/contestSnapshot';
 
 export type CreateContestInput = {
@@ -60,7 +64,10 @@ export function useSavedContestsQuery(enabled: boolean = true) {
   });
 }
 
-export function useContestByIdQuery(contestId: string, enabled: boolean = true) {
+export function useContestByIdQuery(
+  contestId: string,
+  enabled: boolean = true,
+) {
   return useQuery<Contest>({
     queryKey: queryKeys.user.contestById(contestId),
     queryFn: async () => {
@@ -107,7 +114,14 @@ export function usePublicContestsQuery({
   enabled = true,
 }: PublicContestsQueryParams) {
   return useQuery<ContestListResponse>({
-    queryKey: queryKeys.public.contests({ page, search, sortBy, sortOrder, startDate, endDate }),
+    queryKey: queryKeys.public.contests({
+      page,
+      search,
+      sortBy,
+      sortOrder,
+      startDate,
+      endDate,
+    }),
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());
@@ -154,13 +168,19 @@ export function useCreateContestMutation() {
 export function useUpdateContestMutation() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...input }: UpdateContestInput & { id: string }) => {
+    mutationFn: async ({
+      id,
+      ...input
+    }: UpdateContestInput & { id: string }) => {
       const { data } = await api.patch(`/contests/${id}`, input);
       return data as Contest;
     },
     onSuccess: (data, variables) => {
       if ((variables as any)?.id) {
-        qc.setQueryData(queryKeys.user.contestById((variables as any).id), data);
+        qc.setQueryData(
+          queryKeys.user.contestById((variables as any).id),
+          data,
+        );
       }
       qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
       qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
@@ -196,7 +216,9 @@ export function useToggleLikeContestMutation() {
         if (!data) continue;
         qc.setQueryData(key, {
           ...data,
-          contests: data.contests.map((c) => (c._id === id ? { ...c, likes: res.likes } : c)),
+          contests: data.contests.map((c) =>
+            c._id === id ? { ...c, likes: res.likes } : c,
+          ),
         });
       }
       qc.invalidateQueries({ queryKey: ['user', 'contests-state'] });
@@ -219,7 +241,9 @@ export function useToggleSaveContestMutation() {
         if (!data) continue;
         qc.setQueryData(key, {
           ...data,
-          contests: data.contests.map((c) => (c._id === id ? { ...c, saves: res.saves } : c)),
+          contests: data.contests.map((c) =>
+            c._id === id ? { ...c, saves: res.saves } : c,
+          ),
         });
       }
       qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
@@ -228,10 +252,7 @@ export function useToggleSaveContestMutation() {
   });
 }
 
-export function useContestsStateQuery(
-  ids: string[],
-  enabled: boolean = true,
-) {
+export function useContestsStateQuery(ids: string[], enabled: boolean = true) {
   return useQuery<ContestState>({
     queryKey: queryKeys.user.contestsState(ids),
     queryFn: async () => {

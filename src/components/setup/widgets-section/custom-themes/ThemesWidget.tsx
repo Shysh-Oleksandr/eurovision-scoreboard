@@ -15,8 +15,7 @@ const ThemesWidget = () => {
   const t = useTranslations('widgets.themes');
 
   const [isThemesModalOpen, setIsThemesModalOpen] = useState(false);
-  const [isThemesModalLoaded, setIsThemesModalLoaded] =
-    useState(false);
+  const [isThemesModalLoaded, setIsThemesModalLoaded] = useState(false);
 
   return (
     <>

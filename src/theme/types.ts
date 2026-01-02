@@ -30,7 +30,7 @@ export interface ThemeColors {
     televoteUnfinishedPointsText: string;
     televoteLastPointsBg: string;
     televoteLastPointsText: string;
-    
+
     televoteActiveBg: string;
     televoteActiveText: string;
     televoteActivePointsBg: string;

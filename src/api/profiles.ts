@@ -3,10 +3,8 @@ import { api } from './client';
 import type { Profile } from '@/types/profile';
 import { useAuthStore } from '@/state/useAuthStore';
 
-export type UpdateProfileInput = Partial<Pick<
-    Profile,
-    'username' | 'name' | 'country' | 'preferredLocale'
-  >
+export type UpdateProfileInput = Partial<
+  Pick<Profile, 'username' | 'name' | 'country' | 'preferredLocale'>
 >;
 
 export function useMeProfileQuery(enabled: boolean = true) {

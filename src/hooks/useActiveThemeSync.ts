@@ -51,10 +51,7 @@ export function useActiveThemeSync() {
     }
     if (activeTheme && shouldFetch) {
       // Do not overwrite a locally present custom theme that differs from profile
-      if (
-        currentCustomTheme &&
-        currentCustomTheme._id !== activeTheme._id
-      ) {
+      if (currentCustomTheme && currentCustomTheme._id !== activeTheme._id) {
         return;
       }
       if (blockedActiveThemeId && activeTheme._id === blockedActiveThemeId) {
@@ -63,6 +60,16 @@ export function useActiveThemeSync() {
       }
       // Apply the theme from the user's profile
       applyCustomTheme(activeTheme);
-    } 
-  }, [activeTheme, user, shouldFetch, suppressActiveThemeOnce, setSuppressActiveThemeOnce, blockedActiveThemeId, setBlockedActiveThemeId, currentCustomTheme, suppressProfileActiveOnStatic]);
+    }
+  }, [
+    activeTheme,
+    user,
+    shouldFetch,
+    suppressActiveThemeOnce,
+    setSuppressActiveThemeOnce,
+    blockedActiveThemeId,
+    setBlockedActiveThemeId,
+    currentCustomTheme,
+    suppressProfileActiveOnStatic,
+  ]);
 }

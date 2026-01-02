@@ -77,6 +77,8 @@
       "numberOfQualifiers": "Anzahl der Qualifikanten",
       "qualifierTargets": "Qualifikationsziele",
       "qualifierTargetsDescription": "Wähle, wie viele Einträge aus diesem Stage zu jedem späteren Stage vorrücken.",
+      "rankBasedQualification": "Rangbasierte Qualifizierung",
+      "qualifierTargetsDescriptionRankBased": "Geben Sie Rangbereiche für die Qualifizierung an (z.B. Ränge 1-3 gehen ins Grand Final, Ränge 4-5 gehen ins Halbfinale, Ränge 6+ gehen in das Heat).",
       "addStage": "Stage hinzufügen",
       "editStage": "Stage bearbeiten",
       "stageNamePlaceholder": "Halbfinale 3, Viertelfinale 1, Heat 1, etc.",
@@ -102,7 +104,9 @@
       "qualifiersExceedParticipants": "Die Anzahl der Qualifikanten in {stageName} überschreitet die Anzahl der Teilnehmer.",
       "qualifiersCannotMoveToPrecedentStage": "Qualifikanten können nicht zu einem vorherigen Stage ({stageName} -> {targetStageName}) verschoben werden.",
       "targetStageNotFound": "Zielstage \"{targetStageId}\" nicht gefunden.",
-      "stageOrderMustBeUnique": "Stage-Reihenfolge muss eindeutig sein."
+      "stageOrderMustBeUnique": "Stage-Reihenfolge muss eindeutig sein.",
+      "rankRangesOverlap": "Rangbereiche überschneiden sich in {stageName}.",
+      "invalidRankRange": "Ungültiger Rangbereich in {stageName}."
     },
     "eventSetupModal": {
       "grandFinalOnly": "Nur Finale",
@@ -301,6 +305,8 @@
       "contestUpdatedSuccessfully": "Wettbewerb erfolgreich aktualisiert!",
       "contestCreatedSuccessfully": "Wettbewerb erfolgreich erstellt!",
       "failedToSaveContest": "Fehler beim Speichern des Wettbewerbs",
+      "contestLoaded": "Wettbewerb geladen!",
+      "failedToLoadContest": "Fehler beim Laden des Wettbewerbs",
       "confirmResetContest": "Bist du sicher, dass du den Wettbewerb auf die letzte gespeicherte Version zurücksetzen möchtest? Du wirst alle deine Änderungen seit der letzten Speicherung verlieren."
     },
     "themes": {

@@ -1084,10 +1084,15 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage || currentStage.isOver) return;
 
-    const qualifiersAmount = currentStage.qualifiesTo?.reduce(
-      (sum, target) => sum + target.amount,
-      0,
-    ) || 0;
+    const qualifiersAmount =
+      currentStage.qualifiesTo?.reduce((sum, target) => {
+        // If using rank ranges, calculate based on ranges
+        if (target.minRank && target.maxRank) {
+          return sum + (target.maxRank - target.minRank + 1);
+        }
+        // Amount-based (backward compatibility)
+        return sum + target.amount;
+      }, 0) || 0;
     if (qualifiersAmount === 0) return;
 
     const stageCountryPoints = state.countryPoints[currentStage.id];
@@ -1099,9 +1104,7 @@ export const createVotingActions: StateCreator<
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
     const hasQualifiedFromCurrentStage = (country: Country) =>
-      !!(
-        country.qualifiedFromStageIds?.includes(currentStage.id)
-      );
+      !!country.qualifiedFromStageIds?.includes(currentStage.id);
 
     // Check if there are enough countries to qualify
     const availableCountries = currentStage.countries.filter(
@@ -1302,10 +1305,15 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage || currentStage.isOver) return;
 
-    const qualifiersAmount = currentStage.qualifiesTo?.reduce(
-      (sum, target) => sum + target.amount,
-      0,
-    ) || 0;
+    const qualifiersAmount =
+      currentStage.qualifiesTo?.reduce((sum, target) => {
+        // If using rank ranges, calculate based on ranges
+        if (target.minRank && target.maxRank) {
+          return sum + (target.maxRank - target.minRank + 1);
+        }
+        // Amount-based (backward compatibility)
+        return sum + target.amount;
+      }, 0) || 0;
     if (qualifiersAmount === 0) return;
 
     const stageCountryPoints = state.countryPoints[currentStage.id];
@@ -1317,9 +1325,7 @@ export const createVotingActions: StateCreator<
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
     const hasQualifiedFromCurrentStage = (country: Country) =>
-      !!(
-        country.qualifiedFromStageIds?.includes(currentStage.id)
-      );
+      !!country.qualifiedFromStageIds?.includes(currentStage.id);
 
     // Check if there are enough countries to qualify
     const availableCountries = currentStage.countries.filter(

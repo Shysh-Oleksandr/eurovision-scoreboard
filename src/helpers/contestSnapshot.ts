@@ -592,13 +592,15 @@ export async function applyContestSnapshotToStores(
       .slice()
       .sort((a, b) => {
         // Get order from simulation stage or setup stage if same
-        const orderA = (a.isSameAsSetup || a.isSameAsSetupWithoutParticipants)
-          ? setupStagesMap.get(a.id)?.order ?? 0
-          : a.order ?? 0;
+        const orderA =
+          a.isSameAsSetup || a.isSameAsSetupWithoutParticipants
+            ? setupStagesMap.get(a.id)?.order ?? 0
+            : a.order ?? 0;
 
-        const orderB = (b.isSameAsSetup || b.isSameAsSetupWithoutParticipants)
-          ? setupStagesMap.get(b.id)?.order ?? 0
-          : b.order ?? 0;
+        const orderB =
+          b.isSameAsSetup || b.isSameAsSetupWithoutParticipants
+            ? setupStagesMap.get(b.id)?.order ?? 0
+            : b.order ?? 0;
 
         return orderA - orderB;
       })
@@ -622,7 +624,10 @@ export async function applyContestSnapshotToStores(
           } as Country;
         });
 
-        if ((s as any).isSameAsSetup || (s as any).isSameAsSetupWithoutParticipants) {
+        if (
+          (s as any).isSameAsSetup ||
+          (s as any).isSameAsSetupWithoutParticipants
+        ) {
           // Merge setup stage data with runtime state
           const setupStage = setupStagesMap.get(s.id);
           if (!setupStage) {

@@ -43,7 +43,9 @@ export const useCountryAssignments = () => {
 
       if (countryData?.semiFinalGroup && !isGfOnly) {
         const stageId = countryData.semiFinalGroup.toUpperCase();
-        const stageExists = configuredEventStages.some((s) => s.id.toUpperCase() === stageId);
+        const stageExists = configuredEventStages.some(
+          (s) => s.id.toUpperCase() === stageId,
+        );
 
         initialAssignments[country.code] = stageExists
           ? stageId

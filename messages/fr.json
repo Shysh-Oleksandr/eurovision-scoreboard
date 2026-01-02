@@ -77,6 +77,8 @@
       "numberOfQualifiers": "Nombre de qualifiés",
       "qualifierTargets": "Targets de qualification",
       "qualifierTargetsDescription": "Choisissez combien d’entrées de cette étape avancent à chaque étape ultérieure.",
+      "rankBasedQualification": "Qualification par rang",
+      "qualifierTargetsDescriptionRankBased": "Spécifiez les plages de rang pour la qualification (par exemple, les rangs 1-3 vont en finale, les rangs 4-5 vont en demi-finale, les rangs 6+ vont en heat).",
       "addStage": "Ajouter une étape",
       "editStage": "Modifier une étape",
       "stageNamePlaceholder": "Demi-finale 3, Quart-finale 1, Heat 1, etc.",
@@ -102,7 +104,9 @@
       "qualifiersExceedParticipants": "Le nombre de qualifiés dans {stageName} dépasse le nombre de participants.",
       "qualifiersCannotMoveToPrecedentStage": "Les qualifiés ne peuvent pas être déplacés vers une étape précédente ({stageName} -> {targetStageName}).",
       "targetStageNotFound": "Étape cible \"{targetStageId}\" non trouvée.",
-      "stageOrderMustBeUnique": "L’ordre des étapes doit être unique."
+      "stageOrderMustBeUnique": "L’ordre des étapes doit être unique.",
+      "rankRangesOverlap": "Les plages de classement se chevauchent dans {stageName}.",
+      "invalidRankRange": "Plage de classement invalide dans {stageName}."
     },
     "eventSetupModal": {
       "grandFinalOnly": "Finale seule",
@@ -301,6 +305,8 @@
       "contestUpdatedSuccessfully": "Concours mis à jour avec succès !",
       "contestCreatedSuccessfully": "Concours créé avec succès !",
       "failedToSaveContest": "Erreur lors de l’enregistrement du concours",
+      "contestLoaded": "Concours chargé !",
+      "failedToLoadContest": "Erreur lors du chargement du concours",
       "confirmResetContest": "Êtes-vous sûr de vouloir réinitialiser le concours à la dernière version enregistrée ? Vous perdrez tous vos changements depuis la dernière sauvegarde."
     },
     "themes": {

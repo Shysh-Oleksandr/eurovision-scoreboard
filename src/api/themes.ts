@@ -2,7 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
-import type { CustomTheme, ThemeListResponse, ThemeState } from '@/types/customTheme';
+import type {
+  CustomTheme,
+  ThemeListResponse,
+  ThemeState,
+} from '@/types/customTheme';
 
 export type CreateThemeInput = {
   name: string;
@@ -57,7 +61,14 @@ export function usePublicThemesQuery({
   enabled = true,
 }: PublicThemesQueryParams) {
   return useQuery<ThemeListResponse>({
-    queryKey: queryKeys.public.themes({ page, search, sortBy, sortOrder, startDate, endDate }),
+    queryKey: queryKeys.public.themes({
+      page,
+      search,
+      sortBy,
+      sortOrder,
+      startDate,
+      endDate,
+    }),
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append('page', page.toString());

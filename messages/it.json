@@ -77,6 +77,8 @@
       "numberOfQualifiers": "Numero di qualificati",
       "qualifierTargets": "Targets di qualificazione",
       "qualifierTargetsDescription": "Scegli quanti partecipanti da questo stadio avanzano a ciascuno stadio successivo.",
+      "rankBasedQualification": "Qualificazione basata sul ranking",
+      "qualifierTargetsDescriptionRankBased": "Specifica gli intervalli di classifica per la qualificazione (ad esempio, classifiche 1-3 vanno in finale, classifiche 4-5 vanno in semifinale, classifiche 6+ vanno in heat)",
       "addStage": "Aggiungi stadio",
       "editStage": "Modifica stadio",
       "stageNamePlaceholder": "Semifinale 3, Quarto finale 1, Heat 1, etc.",
@@ -102,7 +104,9 @@
       "qualifiersExceedParticipants": "Il numero di qualificati in {stageName} supera il numero di partecipanti.",
       "qualifiersCannotMoveToPrecedentStage": "I qualificati non possono essere spostati in uno stadio precedente ({stageName} -> {targetStageName}).",
       "targetStageNotFound": "Stadio di destinazione \"{targetStageId}\" non trovato.",
-      "stageOrderMustBeUnique": "L'ordine degli stadi deve essere univoco."
+      "stageOrderMustBeUnique": "L'ordine degli stadi deve essere univoco.",
+      "rankRangesOverlap": "Gli intervalli di classifica si sovrappongono in {stageName}.",
+      "invalidRankRange": "Intervallo di classifica non valido in {stageName}."
     },
     "eventSetupModal": {
       "grandFinalOnly": "Solo finale",
@@ -301,6 +305,8 @@
       "contestUpdatedSuccessfully": "Concorso aggiornato con successo!",
       "contestCreatedSuccessfully": "Concorso creato con successo!",
       "failedToSaveContest": "Errore durante il salvataggio del concorso",
+      "contestLoaded": "Concorso caricato!",
+      "failedToLoadContest": "Errore durante il caricamento del concorso",
       "confirmResetContest": "Sei sicuro di voler reimpostare il concorso alla sua ultima versione salvata? Perderai tutte le modifiche dall'ultimo salvataggio."
     },
     "themes": {

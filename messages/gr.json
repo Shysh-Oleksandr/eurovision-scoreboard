@@ -77,6 +77,8 @@
       "numberOfQualifiers": "Αριθμός προκριθέντων",
       "qualifierTargets": "Targets de qualification",
       "qualifierTargetsDescription": "Επιλέξτε πόσες συμμετοχές από αυτό το στάδιο προχωρήσουν σε κάθε νέο στάδιο.",
+      "rankBasedQualification": "Προκριματική βάση κατάταξης",
+      "qualifierTargetsDescriptionRankBased": "Καθορίστε εύρη κατάταξης για προκριματική (π.χ. θέσεις 1-3 πηγαίνουν στον Τελικό, θέσεις 4-5 πηγαίνουν στη δεύτερη ευκαιρία, θέσεις 6+ πηγαίνουν στη τρίτη ευκαιρία).",
       "addStage": "Προσθήκη σταδίου",
       "editStage": "Επεξεργασία σταδίου",
       "stageNamePlaceholder": "Ημιτελικός 3, Τεταρτημόριος 1, Heat 1, etc.",
@@ -102,7 +104,9 @@
       "qualifiersExceedParticipants": "Ο αριθμός των προκριθέντων στο {stageName} υπερβαίνει τον αριθμό των συμμετεχόντων.",
       "qualifiersCannotMoveToPrecedentStage": "Τα προκριθέντα δεν μπορούν να μετακινηθούν σε προηγούμενο στάδιο ({stageName} -> {targetStageName}).",
       "targetStageNotFound": "Το στάδιο προορισμού \"{targetStageId}\" δεν βρέθηκε.",
-      "stageOrderMustBeUnique": "Η σειρά των σταδίων πρέπει να είναι μοναδική."
+      "stageOrderMustBeUnique": "Η σειρά των σταδίων πρέπει να είναι μοναδική.",
+      "rankRangesOverlap": "Τα εύρη κατάταξης επικαλύπτονται στο {stageName}.",
+      "invalidRankRange": "Μη έγκυρο εύρος κατάταξης στο {stageName}."
     },
     "eventSetupModal": {
       "grandFinalOnly": "Μόνο τελικός",
@@ -301,6 +305,8 @@
       "contestUpdatedSuccessfully": "Ο διαγωνισμός ενημερώθηκε με επιτυχία!",
       "contestCreatedSuccessfully": "Ο διαγωνισμός δημιουργήθηκε με επιτυχία!",
       "failedToSaveContest": "Αποτυχία αποθήκευσης του διαγωνισμού",
+      "contestLoaded": "Ο διαγωνισμός φορτώθηκε!",
+      "failedToLoadContest": "Αποτυχία φόρτωσης του διαγωνισμού",
       "confirmResetContest": "Είστε σίγουροι ότι θέλετε να επαναφέρετε το διαγωνισμό στην τελευταία αποθηκευμένη έκδοση? Θα χάσετε όλες τις αλλαγές από την τελευταία αποθήκευση."
     },
     "themes": {

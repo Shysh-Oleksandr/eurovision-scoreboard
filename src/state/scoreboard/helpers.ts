@@ -96,10 +96,14 @@ export const handleStageEnd = (
       compareCountriesByPoints,
     );
     const qualifiersAmount =
-      currentStage.qualifiesTo?.reduce(
-        (sum, target) => sum + target.amount,
-        0,
-      ) || 0;
+      currentStage.qualifiesTo?.reduce((sum, target) => {
+      // If using rank ranges, calculate based on ranges
+      if (target.minRank && target.maxRank) {
+        return sum + (target.maxRank - target.minRank + 1);
+      }
+      // Amount-based (backward compatibility)
+      return sum + target.amount;
+      }, 0) || 0;
     const qualifiedCountries = sortedCountries.slice(0, qualifiersAmount);
 
     updatedCountries = updatedCountries.map((country) => ({

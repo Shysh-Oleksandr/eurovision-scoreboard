@@ -77,6 +77,8 @@
       "numberOfQualifiers": "Number of qualifiers",
       "qualifierTargets": "Qualifier targets",
       "qualifierTargetsDescription": "Choose how many entries from this stage advance to each later stage.",
+      "rankBasedQualification": "Rank-based qualification",
+      "qualifierTargetsDescriptionRankBased": "Specify rank ranges for qualification (e.g., ranks 1-3 go to Grand Final, ranks 4-5 go to Semi-Final, ranks 6+ go to Heat).",
       "addStage": "Add Stage",
       "editStage": "Edit Stage",
       "stageNamePlaceholder": "Semi-Final 3, Quarter-Final 1, Heat 1, etc.",
@@ -102,7 +104,9 @@
       "qualifiersExceedParticipants": "The number of qualifiers in {stageName} exceeds the number of participants.",
       "qualifiersCannotMoveToPrecedentStage": "Qualifiers cannot move to a precedent stage ({stageName} -> {targetStageName}).",
       "targetStageNotFound": "Target stage \"{targetStageId}\" not found.",
-      "stageOrderMustBeUnique": "Stage order must be unique."
+      "stageOrderMustBeUnique": "Stage order must be unique.",
+      "rankRangesOverlap": "Rank ranges overlap in {stageName}.",
+      "invalidRankRange": "Invalid rank range in {stageName}."
     },
     "eventSetupModal": {
       "grandFinalOnly": "GF only",
@@ -301,6 +305,8 @@
       "contestUpdatedSuccessfully": "Contest updated successfully!",
       "contestCreatedSuccessfully": "Contest created successfully!",
       "failedToSaveContest": "Failed to save contest",
+      "contestLoaded": "Contest loaded!",
+      "failedToLoadContest": "Failed to load contest",
       "confirmResetContest": "Are you sure you want to reset the contest to the last saved version? You will lose all your changes since the last save."
     },
     "themes": {

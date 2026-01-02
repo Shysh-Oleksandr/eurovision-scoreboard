@@ -15,6 +15,21 @@ import {
 const qualifierTargetSchema = z.object({
   targetStageId: z.string().min(1, 'Target stage is required'),
   amount: z.number().min(1, 'Amount must be at least 1'),
+  minRank: z.number().optional(),
+  maxRank: z.number().optional(),
+}).refine((data) => {
+  // If one rank is provided, both must be provided
+  if ((data.minRank && !data.maxRank) || (!data.minRank && data.maxRank)) {
+    return false;
+  }
+  // If both ranks are provided, validate they make sense
+  if (data.minRank && data.maxRank) {
+    return data.minRank >= 1 && data.maxRank >= data.minRank;
+  }
+  return true;
+}, {
+  message: 'Invalid rank range. Both min and max rank must be provided and min rank must be less than or equal to max rank.',
+  path: ['minRank'],
 });
 
 // Base schema for common fields
@@ -25,6 +40,50 @@ const eventStageSchema = z.object({
   votingMode: z.enum(Object.values(StageVotingMode)),
   qualifiesTo: z.array(qualifierTargetSchema).optional(),
   eventsOrder: z.array(z.string()),
+}).refine((data) => {
+  const qualifiesTo = data.qualifiesTo || [];
+
+  // Check if using rank-based qualification
+  const hasRankBased = qualifiesTo.some(target => target.minRank && target.maxRank);
+
+  if (!hasRankBased) {
+    // Amount-based validation is handled elsewhere
+    return true;
+  }
+
+  // Validate rank-based qualification
+  const ranges = qualifiesTo
+    .filter(target => target.minRank && target.maxRank)
+    .map(target => ({
+      minRank: target.minRank!,
+      maxRank: target.maxRank!,
+      targetStageId: target.targetStageId,
+    }))
+    .sort((a, b) => a.minRank - b.minRank);
+
+  // Check for overlapping ranges
+  for (let i = 0; i < ranges.length - 1; i++) {
+    const current = ranges[i];
+    const next = ranges[i + 1];
+
+    if (current.maxRank >= next.minRank) {
+      return false; // Overlapping ranges
+    }
+  }
+
+  // Check for gaps (non-consecutive ranges)
+  let expectedMinRank = 1;
+  for (const range of ranges) {
+    if (range.minRank !== expectedMinRank) {
+      return false; // Gap in ranges
+    }
+    expectedMinRank = range.maxRank + 1;
+  }
+
+  return true;
+}, {
+  message: 'Rank ranges must not overlap and must cover consecutive positions starting from rank 1.',
+  path: ['qualifiesTo'],
 });
 
 export type EventStageFormData = z.infer<typeof eventStageSchema>;
@@ -131,10 +190,26 @@ export const useEventStageForm = ({
   }, [eventStageToEdit, isOpen, localEventStagesLength, form]);
 
   const onSubmit = (data: EventStageFormData) => {
-    // Filter out entries with amount <= 0 to satisfy validation
-    const validQualifiesTo = (data.qualifiesTo || []).filter(
-      (target) => target.amount > 0,
-    );
+    // Process qualifiesTo based on whether it's rank-based or amount-based
+    const validQualifiesTo = (data.qualifiesTo || [])
+      .filter((target) => {
+        // For rank-based, check if ranks are valid
+        if (target.minRank && target.maxRank) {
+          return target.minRank >= 1 && target.maxRank >= target.minRank;
+        }
+        // For amount-based, check amount
+        return target.amount > 0;
+      })
+      .map((target) => {
+        // For rank-based, update amount to match the range size
+        if (target.minRank && target.maxRank) {
+          return {
+            ...target,
+            amount: target.maxRank - target.minRank + 1,
+          };
+        }
+        return target;
+      });
 
     return {
       id: data.id,

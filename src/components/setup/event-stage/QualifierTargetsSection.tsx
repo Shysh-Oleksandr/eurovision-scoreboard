@@ -11,6 +11,7 @@ import { Input } from '../../Input';
 import { MinusIcon } from '@/assets/icons/MinusIcon';
 import { PlusIcon } from '@/assets/icons/PlusIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
+import { ToggleButton } from '@/components/common/ToggleButton';
 import { useCountriesStore } from '@/state/countriesStore';
 
 const QualifierTargetsSection: React.FC<{
@@ -34,6 +35,99 @@ const QualifierTargetsSection: React.FC<{
 
   // Local state for visual ordering of stages
   const [visualStages, setVisualStages] = useState<EventStage[]>([]);
+
+  // Mode toggle for rank-based qualification
+  const [isRankBasedMode, setIsRankBasedMode] = useState(false);
+
+  // Detect initial mode based on existing data
+  useEffect(() => {
+    const hasRankBasedQualifiers = (qualifiesTo || []).some(
+      (target) => target.minRank || target.maxRank,
+    );
+
+    setIsRankBasedMode(hasRankBasedQualifiers);
+  }, [qualifiesTo]);
+
+  // Convert between amount-based and rank-based qualification
+  const convertToRankBased = () => {
+    const currentQualifiesTo = qualifiesTo || [];
+    const totalQualifiers = currentQualifiesTo.reduce(
+      (sum, target) => sum + target.amount,
+      0,
+    );
+
+    if (totalQualifiers === 0) {
+      setValue('qualifiesTo', []);
+
+      return;
+    }
+
+    // Get the total number of participants in the current stage
+    const currentStage = allStages.find((s) => s.id === currentId);
+    const totalParticipants = currentStage?.countries.length || totalQualifiers;
+
+    // Convert amounts to rank ranges
+    const targetStagesInOrder = currentQualifiesTo
+      .map((target) => allStages.find((s) => s.id === target.targetStageId))
+      .sort((a, b) => (b?.order ?? 0) - (a?.order ?? 0))
+      .filter(Boolean) as EventStage[];
+
+    let currentRank = 1;
+    const newQualifiesTo = targetStagesInOrder.map((stage) => {
+      const target = currentQualifiesTo.find(
+        (q) => q.targetStageId === stage.id,
+      )!;
+
+      const minRank = currentRank;
+      const maxRank = Math.min(
+        currentRank + target.amount - 1,
+        totalParticipants,
+      );
+
+      currentRank = maxRank + 1;
+
+      return {
+        targetStageId: stage.id,
+        amount: target.amount, // Keep amount for backward compatibility
+        minRank,
+        maxRank,
+      };
+    });
+
+    setValue('qualifiesTo', newQualifiesTo);
+  };
+
+  const convertToAmountBased = () => {
+    const currentQualifiesTo = qualifiesTo || [];
+    const newQualifiesTo = currentQualifiesTo.map((target) => {
+      // If rank-based, calculate amount from range
+      if (target.minRank && target.maxRank) {
+        return {
+          targetStageId: target.targetStageId,
+          amount: target.maxRank - target.minRank + 1,
+        };
+      }
+
+      // Otherwise keep the existing amount
+      return {
+        targetStageId: target.targetStageId,
+        amount: target.amount,
+      };
+    });
+
+    setValue('qualifiesTo', newQualifiesTo);
+  };
+
+  const handleModeToggle = (newMode: boolean) => {
+    if (newMode) {
+      // Switching to rank-based mode
+      convertToRankBased();
+    } else {
+      // Switching to amount-based mode
+      convertToAmountBased();
+    }
+    setIsRankBasedMode(newMode);
+  };
 
   // Create current stage object (for both editing and creating)
   const currentStage = useMemo(() => {
@@ -95,6 +189,20 @@ const QualifierTargetsSection: React.FC<{
     return target?.amount || 0;
   };
 
+  // Get qualifier min rank for a specific stage
+  const getQualifierMinRank = (stageId: string): number | undefined => {
+    const target = (qualifiesTo || []).find((q) => q.targetStageId === stageId);
+
+    return target?.minRank;
+  };
+
+  // Get qualifier max rank for a specific stage
+  const getQualifierMaxRank = (stageId: string): number | undefined => {
+    const target = (qualifiesTo || []).find((q) => q.targetStageId === stageId);
+
+    return target?.maxRank;
+  };
+
   // Update qualifier amount for a specific stage
   const updateQualifierAmount = (stageId: string, amount: number) => {
     const current = qualifiesTo || [];
@@ -104,9 +212,17 @@ const QualifierTargetsSection: React.FC<{
 
     if (existingIndex >= 0) {
       updated = [...current];
-
       if (amount > 0) {
-        updated[existingIndex] = { targetStageId: stageId, amount };
+        const existing = updated[existingIndex];
+
+        updated[existingIndex] = {
+          targetStageId: stageId,
+          amount,
+          // Keep existing rank data if in rank mode, otherwise clear it
+          ...(isRankBasedMode
+            ? { minRank: existing.minRank, maxRank: existing.maxRank }
+            : {}),
+        };
       } else {
         // Remove if amount is 0
         updated = updated.filter((_, i) => i !== existingIndex);
@@ -115,6 +231,42 @@ const QualifierTargetsSection: React.FC<{
       updated = [...current, { targetStageId: stageId, amount }];
     } else {
       updated = current;
+    }
+
+    setValue('qualifiesTo', updated);
+  };
+
+  // Update rank range for a specific stage
+  const updateQualifierRange = (
+    stageId: string,
+    minRank?: number,
+    maxRank?: number,
+  ) => {
+    const current = qualifiesTo || [];
+    const existingIndex = current.findIndex((q) => q.targetStageId === stageId);
+
+    let updated: QualifierTarget[];
+
+    if (existingIndex >= 0) {
+      updated = [...current];
+      const existing = updated[existingIndex];
+
+      updated[existingIndex] = {
+        ...existing,
+        minRank,
+        maxRank,
+      };
+    } else {
+      // This shouldn't happen in rank mode, but handle it gracefully
+      updated = [
+        ...current,
+        {
+          targetStageId: stageId,
+          amount: 0, // Will be calculated from range
+          minRank,
+          maxRank,
+        },
+      ];
     }
 
     setValue('qualifiesTo', updated);
@@ -202,8 +354,22 @@ const QualifierTargetsSection: React.FC<{
 
   // Calculate total qualifiers
   const totalQualifiers = useMemo(() => {
+    if (isRankBasedMode) {
+      // In rank-based mode, calculate based on ranges
+      const ranges = (qualifiesTo || []).map((target) => {
+        if (target.minRank && target.maxRank) {
+          return target.maxRank - target.minRank + 1;
+        }
+
+        return 0;
+      });
+
+      return ranges.reduce((sum, range) => sum + range, 0);
+    }
+
+    // In amount-based mode, use the amounts directly
     return (qualifiesTo || []).reduce((sum, target) => sum + target.amount, 0);
-  }, [qualifiesTo]);
+  }, [qualifiesTo, isRankBasedMode]);
 
   // Separate Grand Final from sortable stages (like StageReorderModal)
 
@@ -229,12 +395,25 @@ const QualifierTargetsSection: React.FC<{
     <>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
-          <h4 className="middle-line text-white text-sm">
-            {t('setup.eventStageModal.qualifierTargets')}
-          </h4>
+          <div className="flex items-center justify-between border-t border-white/40 border-solid pt-2">
+            <h4 className="text-white text-sm">
+              {t('setup.eventStageModal.qualifierTargets')}
+            </h4>
+            <div className="flex items-center gap-2">
+              <label className="text-white/70 text-xs">
+                {t('setup.eventStageModal.rankBasedQualification')}
+              </label>
+              <ToggleButton
+                isActive={isRankBasedMode}
+                onToggle={() => handleModeToggle(!isRankBasedMode)}
+              />
+            </div>
+          </div>
 
           <p className="text-white/70 text-sm">
-            {t('setup.eventStageModal.qualifierTargetsDescription')}
+            {isRankBasedMode
+              ? t('setup.eventStageModal.qualifierTargetsDescriptionRankBased')
+              : t('setup.eventStageModal.qualifierTargetsDescription')}
           </p>
         </div>
 
@@ -267,35 +446,112 @@ const QualifierTargetsSection: React.FC<{
 
                     {!isCurrentStage && (
                       <div className="flex items-center gap-1">
-                        <Button
-                          onClick={() => decrementQualifier(stage.id)}
-                          disabled={amount === 0 || isPrecedingStage}
-                          className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Decrease"
-                          aria-label={`Decrease qualifiers for ${stage.name}`}
-                        >
-                          <MinusIcon className="w-5 h-5" />
-                        </Button>
-                        <Input
-                          type="number"
-                          value={amount}
-                          onChange={(e) =>
-                            handleInputChange(stage.id, e.target.value)
-                          }
-                          className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                          min={0}
-                          placeholder="0"
-                          disabled={isPrecedingStage}
-                        />
-                        <Button
-                          onClick={() => incrementQualifier(stage.id)}
-                          disabled={isPrecedingStage}
-                          className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Increase"
-                          aria-label={`Increase qualifiers for ${stage.name}`}
-                        >
-                          <PlusIcon className="w-5 h-5" />
-                        </Button>
+                        {isRankBasedMode ? (
+                          // Rank-based mode: show reset button, min-max range inputs
+                          <>
+                            <Button
+                              onClick={() =>
+                                updateQualifierRange(
+                                  stage.id,
+                                  undefined,
+                                  undefined,
+                                )
+                              }
+                              disabled={
+                                !getQualifierMinRank(stage.id) &&
+                                !getQualifierMaxRank(stage.id)
+                              }
+                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Clear"
+                              aria-label={`Clear qualifiers for ${stage.name}`}
+                            >
+                              <RestartIcon className="w-5 h-5" />
+                            </Button>
+                            <Input
+                              type="number"
+                              value={getQualifierMinRank(stage.id) || ''}
+                              onChange={(e) => {
+                                const minRank =
+                                  parseInt(e.target.value) || undefined;
+                                const maxRank = getQualifierMaxRank(stage.id);
+
+                                updateQualifierRange(
+                                  stage.id,
+                                  minRank,
+                                  maxRank,
+                                );
+                              }}
+                              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              min={1}
+                              placeholder="Min"
+                              disabled={isPrecedingStage}
+                              title="Minimum rank"
+                            />
+                            <MinusIcon className="w-4 h-4 text-white/70" />
+                            <Input
+                              type="number"
+                              value={getQualifierMaxRank(stage.id) || ''}
+                              onChange={(e) => {
+                                const minRank = getQualifierMinRank(stage.id);
+                                const maxRank =
+                                  parseInt(e.target.value) || undefined;
+
+                                updateQualifierRange(
+                                  stage.id,
+                                  minRank,
+                                  maxRank,
+                                );
+                              }}
+                              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              min={1}
+                              placeholder="Max"
+                              disabled={isPrecedingStage}
+                              title="Maximum rank"
+                            />
+                          </>
+                        ) : (
+                          // Amount-based mode: show reset button, +/- buttons and amount input
+                          <>
+                            <Button
+                              onClick={() => updateQualifierAmount(stage.id, 0)}
+                              disabled={amount === 0}
+                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Clear"
+                              aria-label={`Clear qualifiers for ${stage.name}`}
+                            >
+                              <RestartIcon className="w-5 h-5" />
+                            </Button>
+                            <Button
+                              onClick={() => decrementQualifier(stage.id)}
+                              disabled={amount === 0 || isPrecedingStage}
+                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Decrease"
+                              aria-label={`Decrease qualifiers for ${stage.name}`}
+                            >
+                              <MinusIcon className="w-5 h-5" />
+                            </Button>
+                            <Input
+                              type="number"
+                              value={amount}
+                              onChange={(e) =>
+                                handleInputChange(stage.id, e.target.value)
+                              }
+                              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              min={0}
+                              placeholder="0"
+                              disabled={isPrecedingStage}
+                            />
+                            <Button
+                              onClick={() => incrementQualifier(stage.id)}
+                              disabled={isPrecedingStage}
+                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Increase"
+                              aria-label={`Increase qualifiers for ${stage.name}`}
+                            >
+                              <PlusIcon className="w-5 h-5" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -311,47 +567,115 @@ const QualifierTargetsSection: React.FC<{
                 {grandFinalStage.name}
               </div>
               <div className="flex items-center gap-1">
-                <Button
-                  onClick={() => updateQualifierAmount(grandFinalStage.id, 0)}
-                  disabled={getQualifierAmount(grandFinalStage.id) === 0}
-                  className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Clear"
-                  aria-label={`Clear qualifiers for ${grandFinalStage.name}`}
-                >
-                  <RestartIcon className="w-5 h-5" />
-                </Button>
-                <Button
-                  onClick={() => decrementQualifier(grandFinalStage.id)}
-                  disabled={
-                    getQualifierAmount(grandFinalStage.id) === 0 ||
-                    (grandFinalStage.order ?? 0) < currentOrder
-                  }
-                  className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Decrease"
-                  aria-label={`Decrease qualifiers for ${grandFinalStage.name}`}
-                >
-                  <MinusIcon className="w-5 h-5" />
-                </Button>
-                <Input
-                  type="number"
-                  value={getQualifierAmount(grandFinalStage.id)}
-                  onChange={(e) =>
-                    handleInputChange(grandFinalStage.id, e.target.value)
-                  }
-                  className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  min={0}
-                  placeholder="0"
-                  disabled={(grandFinalStage.order ?? 0) < currentOrder}
-                />
-                <Button
-                  onClick={() => incrementQualifier(grandFinalStage.id)}
-                  disabled={(grandFinalStage.order ?? 0) < currentOrder}
-                  className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="Increase"
-                  aria-label={`Increase qualifiers for ${grandFinalStage.name}`}
-                >
-                  <PlusIcon className="w-5 h-5" />
-                </Button>
+                {isRankBasedMode ? (
+                  // Rank-based mode for Grand Final
+                  <>
+                    <Button
+                      onClick={() =>
+                        updateQualifierRange(
+                          grandFinalStage.id,
+                          undefined,
+                          undefined,
+                        )
+                      }
+                      disabled={
+                        !getQualifierMinRank(grandFinalStage.id) &&
+                        !getQualifierMaxRank(grandFinalStage.id)
+                      }
+                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Clear"
+                      aria-label={`Clear qualifiers for ${grandFinalStage.name}`}
+                    >
+                      <RestartIcon className="w-5 h-5" />
+                    </Button>
+                    <Input
+                      type="number"
+                      value={getQualifierMinRank(grandFinalStage.id) || ''}
+                      onChange={(e) => {
+                        const minRank = parseInt(e.target.value) || undefined;
+                        const maxRank = getQualifierMaxRank(grandFinalStage.id);
+
+                        updateQualifierRange(
+                          grandFinalStage.id,
+                          minRank,
+                          maxRank,
+                        );
+                      }}
+                      className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      min={1}
+                      placeholder="Min"
+                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
+                      title="Minimum rank"
+                    />
+                    <MinusIcon className="w-4 h-4 text-white/70" />
+                    <Input
+                      type="number"
+                      value={getQualifierMaxRank(grandFinalStage.id) || ''}
+                      onChange={(e) => {
+                        const minRank = getQualifierMinRank(grandFinalStage.id);
+                        const maxRank = parseInt(e.target.value) || undefined;
+
+                        updateQualifierRange(
+                          grandFinalStage.id,
+                          minRank,
+                          maxRank,
+                        );
+                      }}
+                      className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      min={1}
+                      placeholder="Max"
+                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
+                      title="Maximum rank"
+                    />
+                  </>
+                ) : (
+                  // Amount-based mode for Grand Final
+                  <>
+                    <Button
+                      onClick={() =>
+                        updateQualifierAmount(grandFinalStage.id, 0)
+                      }
+                      disabled={getQualifierAmount(grandFinalStage.id) === 0}
+                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Clear"
+                      aria-label={`Clear qualifiers for ${grandFinalStage.name}`}
+                    >
+                      <RestartIcon className="w-5 h-5" />
+                    </Button>
+                    <Button
+                      onClick={() => decrementQualifier(grandFinalStage.id)}
+                      disabled={
+                        getQualifierAmount(grandFinalStage.id) === 0 ||
+                        (grandFinalStage.order ?? 0) < currentOrder
+                      }
+                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Decrease"
+                      aria-label={`Decrease qualifiers for ${grandFinalStage.name}`}
+                    >
+                      <MinusIcon className="w-5 h-5" />
+                    </Button>
+                    <Input
+                      type="number"
+                      value={getQualifierAmount(grandFinalStage.id)}
+                      onChange={(e) =>
+                        handleInputChange(grandFinalStage.id, e.target.value)
+                      }
+                      className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      min={0}
+                      placeholder="0"
+                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
+                    />
+                    <Button
+                      onClick={() => incrementQualifier(grandFinalStage.id)}
+                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
+                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Increase"
+                      aria-label={`Increase qualifiers for ${grandFinalStage.name}`}
+                    >
+                      <PlusIcon className="w-5 h-5" />
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           )}

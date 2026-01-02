@@ -5,7 +5,7 @@ import {
   Country,
   EventStage,
   StageVotingMode,
-  StageVotingType
+  StageVotingType,
 } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
@@ -86,7 +86,7 @@ export const useFinalStats = () => {
       return t('combined');
     }
 
-    return t('total')
+    return t('total');
   }, [selectedStage, t]);
 
   const participatingCountries: Country[] = useMemo(

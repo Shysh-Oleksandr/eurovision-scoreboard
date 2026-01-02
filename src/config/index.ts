@@ -25,5 +25,6 @@ export const years = [
 
 export type Year = (typeof years)[number];
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 // export const API_BASE_URL = 'https://api.douzepoints.app';

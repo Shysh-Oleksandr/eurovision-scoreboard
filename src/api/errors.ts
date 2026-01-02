@@ -55,7 +55,10 @@ export function useCreateErrorMutation() {
   });
 }
 
-export function useErrorsQuery(params: QueryErrorsParams, enabled: boolean = true) {
+export function useErrorsQuery(
+  params: QueryErrorsParams,
+  enabled: boolean = true,
+) {
   return useQuery<ErrorsResponse>({
     queryKey: queryKeys.errors.list(params),
     queryFn: async () => {

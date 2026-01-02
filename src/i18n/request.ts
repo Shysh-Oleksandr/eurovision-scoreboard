@@ -1,12 +1,23 @@
-import {cookies, headers} from 'next/headers';
-import {getRequestConfig} from 'next-intl/server';
+import { cookies, headers } from 'next/headers';
+import { getRequestConfig } from 'next-intl/server';
 
-const SUPPORTED_LOCALES = ['en', 'es', 'fr', 'uk', 'de', 'pl', 'it', 'gr'] as const;
+const SUPPORTED_LOCALES = [
+  'en',
+  'es',
+  'fr',
+  'uk',
+  'de',
+  'pl',
+  'it',
+  'gr',
+] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const DEFAULT_LOCALE: SupportedLocale = 'en';
 
-export function normalizeLocale(raw: string | undefined | null): SupportedLocale {
+export function normalizeLocale(
+  raw: string | undefined | null,
+): SupportedLocale {
   if (!raw) return DEFAULT_LOCALE;
 
   const lower = raw.toLowerCase();
@@ -34,14 +45,12 @@ function parseAcceptLanguage(value: string | null): SupportedLocale {
   return DEFAULT_LOCALE;
 }
 
-function deepMergeMessages(
-  base: any,
-  override: any,
-): any {
+function deepMergeMessages(base: any, override: any): any {
   if (typeof base !== 'object' || base === null) return override;
-  if (typeof override !== 'object' || override === null) return override ?? base;
+  if (typeof override !== 'object' || override === null)
+    return override ?? base;
 
-  const result: any = Array.isArray(base) ? [...base] : {...base};
+  const result: any = Array.isArray(base) ? [...base] : { ...base };
 
   for (const key of Object.keys(override)) {
     const baseValue = (base as any)[key];
@@ -82,9 +91,9 @@ export default getRequestConfig(async () => {
   let messages = defaultMessages;
 
   if (resolvedLocale !== 'en') {
-    const localeMessages = (await import(
-      `../../messages/${resolvedLocale}.json`
-    )).default;
+    const localeMessages = (
+      await import(`../../messages/${resolvedLocale}.json`)
+    ).default;
     messages = deepMergeMessages(defaultMessages, localeMessages);
   }
 

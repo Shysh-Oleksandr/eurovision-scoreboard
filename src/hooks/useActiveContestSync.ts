@@ -24,15 +24,12 @@ export function useActiveContestSync() {
   // const setBlockedActiveContestId = useGeneralStore(
   //   (state) => state.setBlockedActiveContestId,
   // );
-
   // // Only fetch if user has an activeContestId
   // const shouldFetch = !!user?.activeContestId;
-
   // const { data: activeContestData } = useContestByIdQuery(
   //   user?.activeContestId || '',
   //   shouldFetch,
   // );
-
   // TODO: decide if it's needed. Seems like not needed.
   // useEffect(() => {
   //   console.log('suppressActiveContestOnce', suppressActiveContestOnce);
@@ -47,7 +44,6 @@ export function useActiveContestSync() {
   //   if (user && !user.activeContestId && blockedActiveContestId) {
   //     setBlockedActiveContestId(null);
   //   }
-
   //   console.log('activeContest', activeContest);
   //   console.log('activeContestData', activeContestData);
   //   console.log('shouldFetch', shouldFetch);

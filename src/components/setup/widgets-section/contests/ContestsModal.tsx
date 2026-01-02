@@ -100,9 +100,9 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
       }
 
       onClose();
-      toast.success('Contest loaded');
+      toast.success(t('contestLoaded'));
     } catch (e: any) {
-      toast.error(e?.response?.data?.message || 'Failed to load contest');
+      toast.error(e?.response?.data?.message || t('failedToLoadContest'));
     }
   };
 

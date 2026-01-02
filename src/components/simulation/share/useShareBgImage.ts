@@ -3,9 +3,7 @@ import { getThemeBackground } from '@/theme/themes';
 import { useMemo } from 'react';
 
 export const useShareBgImage = () => {
-  const settings = useGeneralStore(
-    (state) => state.settings,
-  );
+  const settings = useGeneralStore((state) => state.settings);
   const themeYear = useGeneralStore((state) => state.themeYear);
   const customTheme = useGeneralStore((state) => state.customTheme);
 

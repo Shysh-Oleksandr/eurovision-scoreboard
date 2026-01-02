@@ -43,10 +43,18 @@ export const validateEventSetup = (
 
     // Validate qualifier relationships
     if (stage.qualifiesTo && stage.qualifiesTo.length > 0) {
-      const totalQualifiersFromThisStage =
-        stage.qualifiesTo.reduce((sum, target) => sum + target.amount, 0);
+      const totalQualifiersFromThisStage = stage.qualifiesTo.reduce(
+        (sum, target) => {
+          // If using rank ranges, calculate based on ranges
+          if (target.minRank && target.maxRank) {
+            return sum + (target.maxRank - target.minRank + 1);
+          }
+          // Amount-based (backward compatibility)
+          return sum + target.amount;
+        },
+        0,
+      );
 
-   
       if (totalQualifiersFromThisStage > totalParticipants) {
         return t('setup.validation.qualifiersExceedParticipants', {
           stageName: stage.name,

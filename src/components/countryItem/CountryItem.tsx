@@ -172,7 +172,7 @@ const CountryItem = ({
             className={`absolute lg:right-10 md:right-9 right-8 z-10 h-full pr-[0.6rem] lg:w-[2.8rem] md:w-9 w-8 will-change-all ${lastPointsBgClass}`}
           >
             <RoundedTriangle
-              className={lastPointsBgClass}
+              className={`${lastPointsBgClass} !z-[-1]`}
               withTransition={false}
             />
             <h6
@@ -187,7 +187,7 @@ const CountryItem = ({
           <div
             className={`relative h-full z-20 lg:w-[2.57rem] pr-1 md:w-9 w-8 transition-colors !duration-500 ${pointsBgClass}`}
           >
-            <RoundedTriangle className={pointsBgClass} />
+            <RoundedTriangle className={`${pointsBgClass} !z-[-1]`} />
             <h6
               className={`lg:text-lg sm:text-[0.85rem] xs:text-[13px] text-xs font-semibold h-full items-center flex justify-center ${pointsTextClass}`}
             >

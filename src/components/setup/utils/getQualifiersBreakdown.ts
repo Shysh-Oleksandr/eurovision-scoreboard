@@ -21,9 +21,19 @@ export const getQualifiersBreakdown = (
     );
 
     if (qualifierTarget) {
+      let amount = qualifierTarget.amount;
+
+      // If using rank ranges, calculate the amount from the range
+      if (qualifierTarget.minRank && qualifierTarget.maxRank) {
+        amount = qualifierTarget.maxRank - qualifierTarget.minRank + 1;
+      } else if (qualifierTarget.minRank && !qualifierTarget.maxRank) {
+        // This is tricky without knowing total participants, so keep the original amount
+        amount = qualifierTarget.amount;
+      }
+
       qualifiersFromOtherStages.push({
         sourceStageName: otherStage.name,
-        amount: qualifierTarget.amount,
+        amount,
       });
     }
   });

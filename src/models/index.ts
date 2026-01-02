@@ -53,6 +53,9 @@ export enum StageVotingType {
 export interface QualifierTarget {
   targetStageId: string;
   amount: number;
+  // Rank-based qualification (optional, for advanced mode)
+  minRank?: number;
+  maxRank?: number;
 }
 
 export type VotingCountry = Pick<BaseCountry, 'code' | 'name' | 'flag'>;

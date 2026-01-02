@@ -12,4 +12,12 @@ export interface Profile {
   preferredLocale?: PreferredLocale;
 }
 
-export type PreferredLocale = 'en' | 'es' | 'fr' | 'uk' | 'de' | 'pl' | 'it' | 'gr';
+export type PreferredLocale =
+  | 'en'
+  | 'es'
+  | 'fr'
+  | 'uk'
+  | 'de'
+  | 'pl'
+  | 'it'
+  | 'gr';

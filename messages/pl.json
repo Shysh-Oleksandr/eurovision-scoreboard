@@ -77,6 +77,8 @@
       "numberOfQualifiers": "Liczba kwalifikantów",
       "qualifierTargets": "Targets kwalifikacji",
       "qualifierTargetsDescription": "Wybierz, ile uczestników z tego etapu awansuje do każdego następnego etapu.",
+      "rankBasedQualification": "Kwalifikacja oparta na rankingu",
+      "qualifierTargetsDescriptionRankBased": "Określ zakresy rankingowe dla kwalifikacji (np. rankingi 1-3 idą do Finału, rankingi 4-5 idą do Półfinału, rankingi 6+ idą do Heat).",
       "addStage": "Dodaj etap",
       "editStage": "Edytuj etap",
       "stageNamePlaceholder": "Półfinał 3, Kwartał 1, Heat 1, etc.",
@@ -102,7 +104,9 @@
       "qualifiersExceedParticipants": "Liczba kwalifikantów w {stageName} przekracza liczbę uczestników.",
       "qualifiersCannotMoveToPrecedentStage": "Kwalifikanci nie mogą być przenoszeni do wcześniejszego etapu ({stageName} -> {targetStageName}).",
       "targetStageNotFound": "Etap docelowy \"{targetStageId}\" nie został znaleziony.",
-      "stageOrderMustBeUnique": "Kolejność etapów musi być unikalna."
+      "stageOrderMustBeUnique": "Kolejność etapów musi być unikalna.",
+      "rankRangesOverlap": "Zakresy rankingowe nakładają się w {stageName}.",
+      "invalidRankRange": "Nieprawidłowy zakres rankingowy w {stageName}."
     },
     "eventSetupModal": {
       "grandFinalOnly": "Tylko Finał",
@@ -301,6 +305,8 @@
       "contestUpdatedSuccessfully": "Konkurs zaktualizowany pomyślnie!",
       "contestCreatedSuccessfully": "Konkurs utworzony pomyślnie!",
       "failedToSaveContest": "Błąd podczas zapisywania konkursu",
+      "contestLoaded": "Konkurs załadowany!",
+      "failedToLoadContest": "Błąd podczas ładowania konkursu",
       "confirmResetContest": "Czy na pewno chcesz zresetować konkurs do ostatniej zapisanej wersji? Stracisz wszystkie zmiany od ostatniego zapisu."
     },
     "themes": {

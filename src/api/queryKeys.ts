@@ -11,7 +11,8 @@ export const queryKeys = {
     themes: () => ['user', 'themes'] as const,
     themeById: (id: string) => ['user', 'theme', id] as const,
     savedThemes: () => ['user', 'saved-themes'] as const,
-    themesState: (ids: string[]) => ['user', 'themes-state', { ids: [...ids].sort() }] as const,
+    themesState: (ids: string[]) =>
+      ['user', 'themes-state', { ids: [...ids].sort() }] as const,
     contests: () => ['user', 'contests'] as const,
     contestById: (id: string) => ['user', 'contest', id] as const,
     savedContests: () => ['user', 'saved-contests'] as const,
@@ -24,8 +25,14 @@ export const queryKeys = {
 
   // Public queries
   public: {
-    themes: (filters: { page?: number; search?: string; sortBy?: string; sortOrder?: string; startDate?: string; endDate?: string }) =>
-      ['public', 'themes', filters] as const,
+    themes: (filters: {
+      page?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+    }) => ['public', 'themes', filters] as const,
     contests: (filters: {
       page?: number;
       search?: string;
