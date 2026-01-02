@@ -123,7 +123,11 @@
       "contestIsInProgress": "Un contest è in corso. Cambiare l'anno resetterà la classifica corrente e inizierà una nuova configurazione. Sei sicuro?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Inserisci i punti che ogni paese votante assegna ai partecipanti",
       "reorderStages": "Riordina stadi",
-      "importedEntriesDescription": "Voci importate sono voci personalizzate che sono state importate da altri concorsi. Non sono editabili."
+      "importedEntriesDescription": "Voci importate sono voci personalizzate che sono state importate da altri concorsi. Non sono editabili.",
+      "areYouSureYouWantToSaveImportedEntries": "Sei sicuro di voler salvare {count, plural, =1 {questa voce importata} other {# voci importate}} nelle tue voci personalizzate?",
+      "customEntriesSavedSuccessfully": "Voci personalizzate salvate con successo!",
+      "failedToSaveCustomEntries": "Errore durante il salvataggio delle voci personalizzate. Per favore, prova di nuovo.",
+      "saveToYourCustomEntries": "Salva nelle tue voci personalizzate"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Accedi per creare voci personalizzate.",

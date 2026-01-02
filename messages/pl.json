@@ -123,7 +123,11 @@
       "contestIsInProgress": "Trwa konkurs. Zmiana roku zresetuje bieżącą tablicę wyników i rozpocznie nową konfigurację. Czy na pewno?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Wprowadź punkty przyznawane uczestnikom przez każdy kraj głosujący",
       "reorderStages": "Zmień kolejność etapów",
-      "importedEntriesDescription": "Wpisy importowane są własnymi wpisami, które zostały zaimportowane z innych konkursów. Nie są edytowalne."
+      "importedEntriesDescription": "Wpisy importowane są własnymi wpisami, które zostały zaimportowane z innych konkursów. Nie są edytowalne.",
+      "areYouSureYouWantToSaveImportedEntries": "Czy na pewno chcesz zapisać {count, plural, =1 {ten wpis importowany} other {# wpisy importowane}} do swoich własnych wpisów?",
+      "customEntriesSavedSuccessfully": "Własne wpisy zapisane pomyślnie!",
+      "failedToSaveCustomEntries": "Błąd podczas zapisywania własnych wpisów. Proszę spróbować ponownie.",
+      "saveToYourCustomEntries": "Zapisz do swoich własnych wpisów"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Zaloguj się, aby tworzyć własne wpisy.",

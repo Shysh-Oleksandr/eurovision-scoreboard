@@ -123,7 +123,11 @@
       "contestIsInProgress": "A contest is in progress. Changing the year will reset the current scoreboard and start a new setup. Are you sure?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Enter the points each voting country awards to participants",
       "reorderStages": "Reorder Stages",
-      "importedEntriesDescription": "Imported entries are custom entries that have been imported from other contests. They are not editable."
+      "importedEntriesDescription": "Imported entries are custom entries that have been imported from other contests. They are not editable.",
+      "areYouSureYouWantToSaveImportedEntries": "Are you sure you want to save {count, plural, =1 {this imported entry} other {# imported entries}} to your custom entries?",
+      "customEntriesSavedSuccessfully": "Custom entries saved successfully!",
+      "failedToSaveCustomEntries": "Failed to save custom entries. Please try again.",
+      "saveToYourCustomEntries": "Save to your custom entries"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Please sign in to create custom entries.",

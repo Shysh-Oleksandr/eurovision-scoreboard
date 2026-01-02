@@ -443,20 +443,22 @@ export async function applyContestSnapshotToStores(
   const existing = countriesStore.customCountries || [];
 
   // Merge custom entries into local custom countries (portable)
-  const importedCustoms: BaseCountry[] = (snapshot.customEntriesUsed || [])
-    .map((e) => ({
+  const importedCustoms: BaseCountry[] = (snapshot.customEntriesUsed || []).map(
+    (e) => ({
       code: e.code,
       name: e.name,
       category: 'Custom',
       flag: e.flag,
       isImported: true,
-    }))
-    .filter((c) => !existing.some((e) => e.code === c.code));
+    }),
+  );
 
   // Store imported entries separately for persistence
   useGeneralStore.setState({ importedCustomEntries: importedCustoms });
 
-  const mergedCustomCountries = [...existing, ...importedCustoms];
+  const mergedCustomCountries = [...existing, ...importedCustoms].filter(
+    (c, index, self) => index === self.findIndex((t) => t.code === c.code),
+  );
   useCountriesStore.setState({ customCountries: mergedCustomCountries });
 
   const allCountries = countriesStore.getAllCountries(true);

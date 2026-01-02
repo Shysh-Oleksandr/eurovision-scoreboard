@@ -9,6 +9,10 @@ export type CreateCustomEntryInput = {
   flagUrl: string;
 };
 
+export type BulkCreateCustomEntriesInput = {
+  entries: CreateCustomEntryInput[];
+};
+
 export type UpdateCustomEntryInput = {
   name?: string;
   flagUrl?: string;
@@ -31,6 +35,19 @@ export function useCreateCustomEntryMutation() {
     mutationFn: async (input: CreateCustomEntryInput) => {
       const { data } = await api.post('/custom-entries', input);
       return data as CustomEntry;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });
+    },
+  });
+}
+
+export function useBulkCreateCustomEntriesMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: BulkCreateCustomEntriesInput) => {
+      const { data } = await api.post('/custom-entries/bulk', input);
+      return data as CustomEntry[];
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });

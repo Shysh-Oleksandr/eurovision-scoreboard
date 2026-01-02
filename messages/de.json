@@ -123,7 +123,11 @@
       "contestIsInProgress": "Ein Wettbewerb läuft gerade. Das Ändern des Jahres setzt das aktuelle Scoreboard zurück und startet ein neues Setup. Bist du sicher?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Gib die Punkte ein, die jedes abstimmende Land den Teilnehmern vergibt",
       "reorderStages": "Stages neu ordnen",
-      "importedEntriesDescription": "Importierte Beiträge sind benutzerdefinierte Beiträge, die aus anderen Wettbewerben importiert wurden. Sie sind nicht editierbar."
+      "importedEntriesDescription": "Importierte Beiträge sind benutzerdefinierte Beiträge, die aus anderen Wettbewerben importiert wurden. Sie sind nicht editierbar.",
+      "areYouSureYouWantToSaveImportedEntries": "Möchtest du {count, plural, =1 {diesen importierten Beitrag} other {# importierten Beiträgen}} zu deinen benutzerdefinierten Beiträgen hinzufügen?",
+      "customEntriesSavedSuccessfully": "Benutzerdefinierte Beiträge erfolgreich gespeichert!",
+      "failedToSaveCustomEntries": "Fehler beim Speichern der benutzerdefinierten Beiträge. Bitte versuche es erneut.",
+      "saveToYourCustomEntries": "Zu deinen benutzerdefinierten Beiträgen hinzufügen"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Bitte melde dich an, um eigene Beiträge zu erstellen.",

@@ -123,7 +123,11 @@
       "contestIsInProgress": "Un concours est en cours. Changer l’année réinitialisera le scoreboard actuel et lancera une nouvelle configuration. Êtes-vous sûr ?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Entrez les points que chaque pays votant attribue aux participants",
       "reorderStages": "Réorganiser les étapes",
-      "importedEntriesDescription": "Les entrées importées sont des entrées personnalisées qui ont été importées depuis d’autres concours. Elles ne sont pas editables."
+      "importedEntriesDescription": "Les entrées importées sont des entrées personnalisées qui ont été importées depuis d’autres concours. Elles ne sont pas editables.",
+      "areYouSureYouWantToSaveImportedEntries": "Êtes-vous sûr de vouloir enregistrer {count, plural, =1 {cette entrée importée} other {# entrées importées}} dans vos entrées personnalisées ?",
+      "customEntriesSavedSuccessfully": "Entrées personnalisées enregistrées avec succès !",
+      "failedToSaveCustomEntries": "Erreur lors de l’enregistrement des entrées personnalisées. Veuillez réessayer.",
+      "saveToYourCustomEntries": "Enregistrer dans vos entrées personnalisées"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Veuillez vous connecter pour créer des entrées personnalisées.",

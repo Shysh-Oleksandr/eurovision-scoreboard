@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 import { PlusIcon } from '../../assets/icons/PlusIcon';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
@@ -14,6 +15,9 @@ import { useGetCategoryLabel } from './hooks/useGetCategoryLabel';
 import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
 
+import { useBulkCreateCustomEntriesMutation } from '@/api/customEntries';
+import { SaveIcon } from '@/assets/icons/SaveIcon';
+import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 interface NotParticipatingSectionProps {
@@ -40,6 +44,8 @@ const NotParticipatingSection = ({
 }: NotParticipatingSectionProps) => {
   const t = useTranslations('setup');
   const { user } = useAuthStore();
+  const { importedCustomEntries, setImportedCustomEntries } = useGeneralStore();
+  const bulkCreateMutation = useBulkCreateCustomEntriesMutation();
   const {
     countriesSearch,
     handleCountriesSearch,
@@ -61,6 +67,45 @@ const NotParticipatingSection = ({
 
   const getCategoryLabel = useGetCategoryLabel();
 
+  const handleSaveCustomEntries = () => {
+    if (
+      confirm(
+        t('eventSetupModal.areYouSureYouWantToSaveImportedEntries', {
+          count: groupedNotParticipatingCountries['Imported'].length,
+        }),
+      )
+    ) {
+      const customEntries = groupedNotParticipatingCountries['Imported'].map(
+        (country) => ({
+          name: country.name,
+          flagUrl: country.flag!,
+        }),
+      );
+
+      bulkCreateMutation.mutate(
+        { entries: customEntries },
+        {
+          onSuccess: () => {
+            toast.success(
+              t('eventSetupModal.customEntriesSavedSuccessfully', {
+                count: customEntries.length,
+              }),
+            );
+            setImportedCustomEntries(
+              importedCustomEntries.filter(
+                (entry) => !customEntries.some((c) => c.name === entry.name),
+              ),
+            );
+          },
+          onError: (error) => {
+            console.error('Failed to save custom entries:', error);
+            toast.error(t('eventSetupModal.failedToSaveCustomEntries'));
+          },
+        },
+      );
+    }
+  };
+
   const getExtraContent = (category: string) => {
     if (category === 'Imported') {
       return (
@@ -68,6 +113,18 @@ const NotParticipatingSection = ({
           <p className="text-white/80 text-sm">
             {t('eventSetupModal.importedEntriesDescription')}
           </p>
+
+          {user && (
+            <Button
+              onClick={handleSaveCustomEntries}
+              variant="tertiary"
+              Icon={<SaveIcon className="w-6 h-6" />}
+              disabled={bulkCreateMutation.isPending}
+              isLoading={bulkCreateMutation.isPending}
+            >
+              {t('eventSetupModal.saveToYourCustomEntries')}
+            </Button>
+          )}
         </div>
       );
     }

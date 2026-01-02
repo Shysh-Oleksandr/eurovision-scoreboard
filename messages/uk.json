@@ -123,7 +123,11 @@
       "contestIsInProgress": "Симуляція в процесі. Зміна року скине теперішню таблицю і почне нову симуляцію. Ви впевнені?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Введіть бали, які кожна країна-учасниця голосування надає учасникам",
       "reorderStages": "Змінити порядок етапів",
-      "importedEntriesDescription": "Імпортовані учасники — це користувацькі учасники, які були імпортовані з інших конкурсів. Їх не можна редагувати."
+      "importedEntriesDescription": "Імпортовані учасники — це користувацькі учасники, які були імпортовані з інших конкурсів. Їх не можна редагувати.",
+      "areYouSureYouWantToSaveImportedEntries": "Ви впевнені, що хочете зберегти {count, plural, =1 {цього імпортованого учасника} other {# імпортованих учасників}} до своїх користувацьких учасників?",
+      "customEntriesSavedSuccessfully": "Користувацькі учасники успішно збережені!",
+      "failedToSaveCustomEntries": "Не вдалося зберегти користувацьких учасників. Спробуйте знову.",
+      "saveToYourCustomEntries": "Зберегти до своїх користувацьких учасників"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Увійдіть у акаунт, щоб створювати власних учасників.",
@@ -140,6 +144,7 @@
       "createCustomEntry": "Створити користувацького учасника"
     },
     "categories": {
+      "imported": "Імпортовані",
       "custom": "Користувацькі",
       "allTimeParticipants": "Учасники всіх років",
       "asia": "Азія",
