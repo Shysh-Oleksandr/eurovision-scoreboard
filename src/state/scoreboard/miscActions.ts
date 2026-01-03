@@ -8,7 +8,6 @@ type MiscActions = {
   toggleShowAllParticipants: () => void;
   setViewedStageId: (stageId: string | null) => void;
   setCurrentStageId: (stageId: string | null) => void;
-  setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
   setCurrentRevealTelevotePoints: (points: number) => void;
   setIsWinnerAnimationAlreadyDisplayed: (hasShown: boolean) => void;
@@ -70,11 +69,6 @@ export const createMiscActions: StateCreator<
     });
   },
 
-  setHasShownManualTelevoteWarning: (hasShown: boolean) => {
-    set({
-      hasShownManualTelevoteWarning: hasShown,
-    });
-  },
   setIsWinnerAnimationAlreadyDisplayed: (hasShown: boolean) => {
     set({
       isWinnerAnimationAlreadyDisplayed: hasShown,

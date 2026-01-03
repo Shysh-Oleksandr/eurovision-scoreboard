@@ -11,12 +11,14 @@ import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
 import { Input } from '../Input';
 
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 
 const NUMBER_REGEX = /^-?\d*$/;
 
 const TelevoteInput = () => {
   const t = useTranslations();
+  const { confirm } = useConfirmation();
 
   const giveTelevotePoints = useScoreboardStore(
     (state) => state.giveTelevotePoints,
@@ -25,9 +27,7 @@ const TelevoteInput = () => {
   const televotingProgress = useScoreboardStore(
     (state) => state.televotingProgress,
   );
-  const shouldShowManualTelevoteWarning = useGeneralStore(
-    (state) => state.settings.shouldShowManualTelevoteWarning,
-  );
+
   const shouldLimitManualTelevotePoints = useGeneralStore(
     (state) => state.settings.shouldLimitManualTelevotePoints,
   );
@@ -36,12 +36,6 @@ const TelevoteInput = () => {
   );
   const pointsSystem = useGeneralStore((state) => state.pointsSystem);
 
-  const hasShownManualTelevoteWarning = useScoreboardStore(
-    (state) => state.hasShownManualTelevoteWarning,
-  );
-  const setHasShownManualTelevoteWarning = useScoreboardStore(
-    (state) => state.setHasShownManualTelevoteWarning,
-  );
   const currentRevealTelevotePoints = useScoreboardStore(
     (state) => state.currentRevealTelevotePoints,
   );
@@ -165,20 +159,14 @@ const TelevoteInput = () => {
 
     // In reveal mode, update the current reveal points as the user types
     if (revealTelevoteLowestToHighest) {
-      if (hasShownManualTelevoteWarning || !shouldShowManualTelevoteWarning) {
-        setCurrentRevealTelevotePoints(votingPoints);
-
-        return;
-      }
-
-      const confirmation = window.confirm(
-        t('simulation.manualTelevotePointsWarning'),
-      );
-
-      if (confirmation) {
-        setHasShownManualTelevoteWarning(true);
-        setCurrentRevealTelevotePoints(votingPoints);
-      }
+      confirm({
+        key: 'manual-televote-warning',
+        title: t('simulation.confirmWarningTitle'),
+        description: t('simulation.manualTelevotePointsWarning'),
+        onConfirm: () => {
+          setCurrentRevealTelevotePoints(votingPoints);
+        },
+      });
 
       return;
     }
@@ -191,20 +179,14 @@ const TelevoteInput = () => {
       giveTelevotePoints(votingCountryCode ?? '', votingPoints);
     };
 
-    if (hasShownManualTelevoteWarning || !shouldShowManualTelevoteWarning) {
-      vote();
-
-      return;
-    }
-
-    const confirmation = window.confirm(
-      t('simulation.manualTelevotePointsWarning'),
-    );
-
-    if (confirmation) {
-      setHasShownManualTelevoteWarning(true);
-      vote();
-    }
+    confirm({
+      key: 'manual-televote-warning',
+      title: t('simulation.confirmWarningTitle'),
+      description: t('simulation.manualTelevotePointsWarning'),
+      onConfirm: () => {
+        vote();
+      },
+    });
   };
 
   useEffect(() => {

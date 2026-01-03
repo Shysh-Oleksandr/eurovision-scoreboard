@@ -1,13 +1,18 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 import { useGeneralStore } from '../../state/generalStore';
 import Button from '../common/Button';
 import { CollapsibleSection } from '../common/CollapsibleSection';
 
+import { ConfirmationsSettings } from './ConfirmationsSettings';
 import { ContestSettings } from './ContestSettings';
 import { UIPreferencesSettings } from './UIPreferencesSettings';
 import { VotingSettings } from './VotingSettings';
+
+import { RestartIcon } from '@/assets/icons/RestartIcon';
+import { useConfirmation } from '@/hooks/useConfirmation';
 
 export const GeneralSettings: React.FC = () => {
   const t = useTranslations('settings');
@@ -16,18 +21,10 @@ export const GeneralSettings: React.FC = () => {
   const setExpansion = useGeneralStore(
     (state) => state.setGeneralSettingsExpansion,
   );
+  const { confirm } = useConfirmation();
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Deprecated: will be removed in future version */}
-      {/* <CollapsibleSection
-        title={t('general.presets')}
-        isExpanded={expansion.presets}
-        onToggle={() => setExpansion({ presets: !expansion.presets })}
-      >
-        <PresetsSettings />
-      </CollapsibleSection> */}
-
+    <div className="flex flex-col gap-3">
       <CollapsibleSection
         title={t('general.contest')}
         isExpanded={expansion.contest}
@@ -55,14 +52,31 @@ export const GeneralSettings: React.FC = () => {
         <UIPreferencesSettings />
       </CollapsibleSection>
 
+      <CollapsibleSection
+        title={t('general.confirmations')}
+        isExpanded={expansion.confirmations}
+        onToggle={() =>
+          setExpansion({ confirmations: !expansion.confirmations })
+        }
+      >
+        <ConfirmationsSettings />
+      </CollapsibleSection>
+
       <Button
         variant="tertiary"
-        className="w-full"
+        className="w-full justify-center"
         onClick={() => {
-          if (confirm(t('general.resetAllSettingsConfirmation'))) {
-            resetAllSettings();
-          }
+          confirm({
+            key: 'reset-all-settings',
+            title: t('confirmations.resetAllSettings'),
+            description: t('confirmations.resetAllSettingsDescription'),
+            onConfirm: () => {
+              resetAllSettings();
+              toast.success(t('confirmations.resetAllSettingsSuccess'));
+            },
+          });
         }}
+        Icon={<RestartIcon className="size-5" />}
       >
         {t('general.resetAllSettings')}
       </Button>

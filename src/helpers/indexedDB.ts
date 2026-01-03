@@ -1,9 +1,6 @@
 /* eslint-disable no-console */
 import { openDB } from 'idb';
 
-import { GeneralState } from '@/state/generalStore';
-import { CountriesState } from '@/state/countriesStore';
-
 const DB_NAME = 'DouzePoints';
 const ASSETS_STORE_NAME = 'appAssets';
 const PRESETS_STORE_NAME = 'presets';
@@ -58,64 +55,5 @@ export const deleteCustomBgImageFromDB = async () => {
       'Failed to delete custom background image from IndexedDB',
       err,
     );
-  }
-};
-
-// Presets helpers
-export interface Preset {
-  id: string;
-  name: string;
-  createdAt: number;
-  updatedAt: number;
-  // Keep only selected parts of the app state for portability
-  general: Pick<
-    GeneralState,
-    'year' | 'themeYear' | 'settings' | 'settingsPointsSystem'
-  >;
-  countries: Pick<
-    CountriesState,
-    'eventAssignments' | 'configuredEventStages' | 'countryOdds'
-  >;
-}
-
-export const savePresetToDB = async (preset: Preset) => {
-  try {
-    const db = await getDB();
-    await db.put(PRESETS_STORE_NAME, preset);
-  } catch (err) {
-    console.error('Failed to save preset to IndexedDB', err);
-    throw err;
-  }
-};
-
-export const getAllPresetsFromDB = async (): Promise<Preset[]> => {
-  try {
-    const db = await getDB();
-    const presets = await db.getAll(PRESETS_STORE_NAME);
-    return (presets as Preset[]) || [];
-  } catch (err) {
-    console.error('Failed to read presets from IndexedDB', err);
-    return [];
-  }
-};
-
-export const getPresetFromDB = async (id: string): Promise<Preset | null> => {
-  try {
-    const db = await getDB();
-    const preset = await db.get(PRESETS_STORE_NAME, id);
-    return (preset as Preset) ?? null;
-  } catch (err) {
-    console.error('Failed to read a preset from IndexedDB', err);
-    return null;
-  }
-};
-
-export const deletePresetFromDB = async (id: string) => {
-  try {
-    const db = await getDB();
-    await db.delete(PRESETS_STORE_NAME, id);
-  } catch (err) {
-    console.error('Failed to delete preset from IndexedDB', err);
-    throw err;
   }
 };

@@ -9,6 +9,7 @@
     "delete": "Löschen",
     "cancel": "Abbrechen",
     "save": "Speichern",
+    "confirm": "Bestätigen",
     "authenticationRequired": "Authentifizierung erforderlich",
     "lastSaved": "Gespeichert",
     "copy": "Kopieren",
@@ -110,8 +111,10 @@
     },
     "eventSetupModal": {
       "grandFinalOnly": "Nur Finale",
-      "grandFinalOnlyConfirm": "Dies wird dein Setup zurücksetzen und nur das Grand Final behalten. Bist du sicher, dass du fortfahren möchtest?",
-      "grandFinalOnlyConfirmNotGfOnly": "Dies wird dein Setup zurücksetzen und alle Shows (Halbfinale + Grand Final) wiederherstellen. Bist du sicher, dass du fortfahren möchtest?",
+      "confirmGFOnlyTitle": "Nur Finale?",
+      "confirmNotGFOnlyTitle": "Alle Shows wiederherstellen?",
+      "confirmGFOnlyDescription": "Dies wird dein Setup zurücksetzen und nur das Grand Final behalten.",
+      "confirmNotGFOnlyDescription": "Dies wird dein Setup zurücksetzen und alle Shows (Halbfinale + Grand Final) wiederherstellen.",
       "notQualified": "Nicht qualifiziert",
       "notParticipating": "Nicht teilnehmend",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Du musst eingeloggt sein, um eigene Beiträge zu erstellen und zu nutzen.",
@@ -125,6 +128,7 @@
       "reorderStages": "Stages neu ordnen",
       "importedEntriesDescription": "Importierte Beiträge sind benutzerdefinierte Beiträge, die aus anderen Wettbewerben importiert wurden. Sie sind nicht editierbar.",
       "areYouSureYouWantToSaveImportedEntries": "Möchtest du {count, plural, =1 {diesen importierten Beitrag} other {# importierten Beiträgen}} zu deinen benutzerdefinierten Beiträgen hinzufügen?",
+      "areYouSureYouWantToSaveImportedEntriesDescription": "Dies wird die importierten Beiträge zu deinen benutzerdefinierten Beiträgen hinzufügen.",
       "customEntriesSavedSuccessfully": "Benutzerdefinierte Beiträge erfolgreich gespeichert!",
       "failedToSaveCustomEntries": "Fehler beim Speichern der benutzerdefinierten Beiträge. Bitte versuche es erneut.",
       "saveToYourCustomEntries": "Zu deinen benutzerdefinierten Beiträgen hinzufügen"
@@ -173,7 +177,8 @@
     "totalTelevotePointsCannotExceed": "Die Gesamtzahl der Televote-Punkte darf {count} nicht überschreiten",
     "maxPossibleTelevotePoints": "Die maximal mögliche Punktzahl beträgt {count}",
     "maxPossibleTelevotePointsForCountry": "Die maximale Punktzahl für dieses Land beträgt {count}",
-    "manualTelevotePointsWarning": "Hinweis: Manuelle Änderungen der Televote-Punkte werden nicht in den detaillierten Statistiken angezeigt. Bist du sicher, dass du fortfahren möchtest?",
+    "manualTelevotePointsWarning": "Manuelle Änderungen der Televote-Punkte werden nicht in den detaillierten Statistiken angezeigt. Bist du sicher, dass du fortfahren möchtest?",
+    "confirmWarningTitle": "Warnung",
     "limitDisabled": "Limit deaktiviert",
     "awarded": "Vergeben: {count} / {totalAvailablePoints}",
     "enterPoints": "Punkte eingeben...",
@@ -311,7 +316,12 @@
       "failedToSaveContest": "Fehler beim Speichern des Wettbewerbs",
       "contestLoaded": "Wettbewerb geladen!",
       "failedToLoadContest": "Fehler beim Laden des Wettbewerbs",
-      "confirmResetContest": "Bist du sicher, dass du den Wettbewerb auf die letzte gespeicherte Version zurücksetzen möchtest? Du wirst alle deine Änderungen seit der letzten Speicherung verlieren."
+      "confirmResetContestTitle": "Wettbewerb zurücksetzen?",
+      "confirmResetContestDescription": "Dies wird den Wettbewerb auf die letzte gespeicherte Version zurücksetzen. Du wirst alle deine Änderungen seit der letzten Speicherung verlieren.",
+      "contestReset": "Wettbewerb erfolgreich zurückgesetzt!",
+      "confirmRemoveSavedContest": "Von gespeicherten Wettbewerben entfernen?",
+      "contestSavedSuccessfully": "Wettbewerb erfolgreich gespeichert!",
+      "contestRemovedFromSaved": "Wettbewerb aus den gespeicherten entfernt!"
     },
     "themes": {
       "title": "Themes",
@@ -344,7 +354,7 @@
       "foundNThemes": "{count} {count, plural, =1 {Theme gefunden} other {Themes gefunden}}",
       "noPublicThemesFoundMatchingYourSearch": "Keine öffentlichen Themes gefunden.",
       "searchThemes": "Themes suchen...",
-      "areYouSureYouWantToDeleteThisTheme": "Möchtest du das Theme „{name}“ wirklich löschen?",
+      "confirmRemoveSavedTheme": "Von gespeicherten Themes entfernen?",
       "yourThemes": "Deine Themes",
       "publicThemes": "Öffentliche Themes",
       "noThemesFoundMatchingYourSearch": "Keine Themes gefunden.",
@@ -477,12 +487,11 @@
   },
   "settings": {
     "general": {
-      "presets": "Voreinstellungen",
+      "confirmations": "Bestätigungspopups",
       "contest": "Wettbewerb",
       "voting": "Voting",
       "uiPreferences": "UI-Einstellungen",
       "resetAllSettings": "Alle Einstellungen zurücksetzen",
-      "resetAllSettingsConfirmation": "Bist du sicher, dass du alle Einstellungen zurücksetzen möchtest? Deine Presets bleiben erhalten.",
       "general": "Allgemein",
       "odds": "Quoten"
     },
@@ -537,6 +546,32 @@
       "enterContestName": "Wettbewerbsname eingeben...",
       "enterContestYear": "Wettbewerbsjahr eingeben...",
       "showHostingCountryFlag": "Gastgeberland-Flagge anzeigen"
+    },
+    "confirmations": {
+      "description": "Konfiguriere, welche Bestätigungspopups angezeigt werden, wenn du bestimmte Aktionen ausführst.",
+      "reset": "Zurücksetzen",
+      "resetAllConfirmations": "Alle Bestätigungspopups zurücksetzen",
+      "noConfirmationsDisabled": "Keine Bestätigungspopups deaktiviert",
+      "resetContest": "Wettbewerb zurücksetzen",
+      "resetAllSettings": "Alle Einstellungen zurücksetzen?",
+      "resetAllSettingsDescription": "Are you sure you want to reset all settings? This won't affect data saved to your account (profile, themes, contests, etc.).",
+      "resetAllSettingsSuccess": "All local settings have been reset successfully!",
+      "deleteItem": "{name} löschen?",
+      "actionCannotBeUndone": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "changeContest": "Wettbewerb ändern?",
+      "changeContestDescription": "Ein Wettbewerb läuft gerade. Das Ändern des Jahres setzt das aktuelle Scoreboard zurück und startet ein neues Setup.",
+      "manualTelevoteWarning": "Manuelle Televote-Punktewarnung",
+      "saveImportedCustomEntries": "Importierte benutzerdefinierte Beiträge speichern",
+      "changeContestYear": "Wettbewerb ändern",
+      "grandFinalOnlyChange": "Nur Grand Final ändern",
+      "deleteStage": "Stufe löschen",
+      "deleteContest": "Wettbewerb löschen",
+      "removeSavedContest": "Von gespeicherten Wettbewerben entfernen",
+      "removeSavedTheme": "Von gespeicherten Themes entfernen",
+      "deleteCustomCountry": "Benutzerdefiniertes Land löschen",
+      "deleteTheme": "Theme löschen",
+      "cancelSimulation": "Simulation abbrechen",
+      "logout": "Abmelden"
     }
   }
 }

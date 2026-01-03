@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2025-01-03',
+    title:
+      'Added custom confirmation popups for certain actions. Added loading spinner.',
+  },
+  {
     date: '2025-01-02',
     title:
       'Added rank-based qualifier targets. Added saving custom entries from other contests (to do this, load the contest → remove custom entries from participants → open the Imported section → click the "Save to your custom entries" button).',

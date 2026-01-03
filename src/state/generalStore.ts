@@ -47,7 +47,6 @@ const DEFAULT_SETTINGS: Settings = {
   showWinnerConfetti: true,
   enableFullscreen: false,
   showRankChangeIndicator: true,
-  shouldShowManualTelevoteWarning: true,
   showHostingCountryLogo: true,
   shouldShowHeartFlagIcon: true,
   shouldUseCustomBgImage: false,
@@ -118,7 +117,6 @@ interface Settings {
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
   showRankChangeIndicator: boolean;
-  shouldShowManualTelevoteWarning: boolean;
   shouldShowHeartFlagIcon: boolean;
   showHostingCountryLogo: boolean;
   hostingCountryCode: string;
@@ -187,10 +185,10 @@ export interface GeneralState {
   pointsSystem: PointsItem[]; // used during simulation
   settingsPointsSystem: PointsItem[]; // used locally in settings
   generalSettingsExpansion: {
-    presets: boolean;
     contest: boolean;
     voting: boolean;
     uiPreferences: boolean;
+    confirmations: boolean;
   };
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
@@ -263,10 +261,10 @@ export const useGeneralStore = create<GeneralState>()(
         pointsSystem: initialPointsSystem,
         settingsPointsSystem: initialPointsSystem,
         generalSettingsExpansion: {
-          presets: true,
           contest: true,
           voting: true,
           uiPreferences: true,
+          confirmations: true,
         },
         settings: DEFAULT_SETTINGS,
         presentationSettings: DEFAULT_PRESENTATION_SETTINGS,

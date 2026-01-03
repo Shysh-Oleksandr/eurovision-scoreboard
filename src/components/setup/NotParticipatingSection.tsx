@@ -17,6 +17,7 @@ import SectionWrapper from './SectionWrapper';
 
 import { useBulkCreateCustomEntriesMutation } from '@/api/customEntries';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -67,43 +68,48 @@ const NotParticipatingSection = ({
 
   const getCategoryLabel = useGetCategoryLabel();
 
-  const handleSaveCustomEntries = () => {
-    if (
-      confirm(
-        t('eventSetupModal.areYouSureYouWantToSaveImportedEntries', {
-          count: groupedNotParticipatingCountries['Imported'].length,
-        }),
-      )
-    ) {
-      const customEntries = groupedNotParticipatingCountries['Imported'].map(
-        (country) => ({
-          name: country.name,
-          flagUrl: country.flag!,
-        }),
-      );
+  const { confirm } = useConfirmation();
 
-      bulkCreateMutation.mutate(
-        { entries: customEntries },
-        {
-          onSuccess: () => {
-            toast.success(
-              t('eventSetupModal.customEntriesSavedSuccessfully', {
-                count: customEntries.length,
-              }),
-            );
-            setImportedCustomEntries(
-              importedCustomEntries.filter(
-                (entry) => !customEntries.some((c) => c.name === entry.name),
-              ),
-            );
+  const handleSaveCustomEntries = () => {
+    confirm({
+      key: 'save-imported-custom-entries',
+      title: t('eventSetupModal.areYouSureYouWantToSaveImportedEntries', {
+        count: groupedNotParticipatingCountries['Imported'].length,
+      }),
+      description: t(
+        'eventSetupModal.areYouSureYouWantToSaveImportedEntriesDescription',
+      ),
+      onConfirm: () => {
+        const customEntries = groupedNotParticipatingCountries['Imported'].map(
+          (country) => ({
+            name: country.name,
+            flagUrl: country.flag!,
+          }),
+        );
+
+        bulkCreateMutation.mutate(
+          { entries: customEntries },
+          {
+            onSuccess: () => {
+              toast.success(
+                t('eventSetupModal.customEntriesSavedSuccessfully', {
+                  count: customEntries.length,
+                }),
+              );
+              setImportedCustomEntries(
+                importedCustomEntries.filter(
+                  (entry) => !customEntries.some((c) => c.name === entry.name),
+                ),
+              );
+            },
+            onError: (error) => {
+              console.error('Failed to save custom entries:', error);
+              toast.error(t('eventSetupModal.failedToSaveCustomEntries'));
+            },
           },
-          onError: (error) => {
-            console.error('Failed to save custom entries:', error);
-            toast.error(t('eventSetupModal.failedToSaveCustomEntries'));
-          },
-        },
-      );
-    }
+        );
+      },
+    });
   };
 
   const getExtraContent = (category: string) => {

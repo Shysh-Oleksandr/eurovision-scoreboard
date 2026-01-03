@@ -16,7 +16,9 @@ import { BaseCountry } from '@/models';
 const OddsSettings = dynamic(() => import('./OddsSettings'), {
   ssr: false,
   loading: () => (
-    <div className="text-white text-center py-2 font-medium">Loading...</div>
+    <div className="text-center py-2">
+      <span className="loader" />
+    </div>
   ),
 });
 

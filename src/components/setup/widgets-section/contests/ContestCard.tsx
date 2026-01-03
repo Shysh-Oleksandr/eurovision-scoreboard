@@ -1,5 +1,6 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -13,6 +14,7 @@ import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
 import { applyContestSnapshotToStores } from '@/helpers/contestSnapshot';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -54,14 +56,26 @@ const ContestCard: React.FC<ContestCardProps> = ({
   const [isContestsModalOpen, setIsContestsModalOpen] = useState(false);
   const [isContestsModalLoaded, setIsContestsModalLoaded] = useState(false);
 
+  const { confirm: confirmResetContest } = useConfirmation();
+
   const onResetClick = async () => {
     if (!activeContest) return;
 
-    if (confirm(t('widgets.contests.confirmResetContest'))) {
-      const { data } = await api.get(`/contests/${activeContest._id}/snapshot`);
+    confirmResetContest({
+      key: 'reset-contest',
+      title: t('widgets.contests.confirmResetContestTitle'),
+      description: t('widgets.contests.confirmResetContestDescription'),
+      type: 'info',
+      onConfirm: async () => {
+        const { data } = await api.get(
+          `/contests/${activeContest._id}/snapshot`,
+        );
 
-      await applyContestSnapshotToStores(data, activeContest);
-    }
+        await applyContestSnapshotToStores(data, activeContest);
+
+        toast.success(t('widgets.contests.contestReset'));
+      },
+    });
   };
 
   const lastUpdatedBadge = useMemo(() => {

@@ -9,6 +9,7 @@
     "delete": "Usuń",
     "cancel": "Anuluj",
     "save": "Zapisz",
+    "confirm": "Potwierdź",
     "authenticationRequired": "Wymagana autoryzacja",
     "lastSaved": "Zapisane",
     "copy": "Kopiuj",
@@ -110,8 +111,10 @@
     },
     "eventSetupModal": {
       "grandFinalOnly": "Tylko Finał",
-      "grandFinalOnlyConfirm": "To zresetuje twoją konfigurację i zachowa tylko Finał. Czy na pewno chcesz kontynuować?",
-      "grandFinalOnlyConfirmNotGfOnly": "To zresetuje twoją konfigurację i przywróci wszystkie etapy (Półfinały + Finał). Czy na pewno chcesz kontynuować?",
+      "confirmGFOnlyTitle": "Tylko Finał?",
+      "confirmNotGFOnlyTitle": "Przywróć wszystkie etapy?",
+      "confirmGFOnlyDescription": "To zresetuje twoją konfigurację i zachowa tylko Finał.",
+      "confirmNotGFOnlyDescription": "To zresetuje twoją konfigurację i przywróci wszystkie etapy (Półfinały + Finał).",
       "notQualified": "Nie zakwalifikowany",
       "notParticipating": "Nie uczestniczy",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Musisz być zalogowany, aby tworzyć i używać własnych wpisów.",
@@ -124,7 +127,8 @@
       "enterThePointsEachVotingCountryAwardsToParticipants": "Wprowadź punkty przyznawane uczestnikom przez każdy kraj głosujący",
       "reorderStages": "Zmień kolejność etapów",
       "importedEntriesDescription": "Wpisy importowane są własnymi wpisami, które zostały zaimportowane z innych konkursów. Nie są edytowalne.",
-      "areYouSureYouWantToSaveImportedEntries": "Czy na pewno chcesz zapisać {count, plural, =1 {ten wpis importowany} other {# wpisy importowane}} do swoich własnych wpisów?",
+      "areYouSureYouWantToSaveImportedEntries": "Zapisać {count, plural, =1 {ten wpis importowany} other {# wpisy importowane}} do swoich własnych wpisów?",
+      "areYouSureYouWantToSaveImportedEntriesDescription": "To dodanie wpisów importowanych do swoich własnych wpisów.",
       "customEntriesSavedSuccessfully": "Własne wpisy zapisane pomyślnie!",
       "failedToSaveCustomEntries": "Błąd podczas zapisywania własnych wpisów. Proszę spróbować ponownie.",
       "saveToYourCustomEntries": "Zapisz do swoich własnych wpisów"
@@ -173,7 +177,8 @@
     "totalTelevotePointsCannotExceed": "Łączna liczba punktów televote nie może przekroczyć {count}",
     "maxPossibleTelevotePoints": "Maksymalna liczba punktów to {count}",
     "maxPossibleTelevotePointsForCountry": "Maksymalna liczba punktów dla tego kraju to {count}",
-    "manualTelevotePointsWarning": "Uwaga: Ręczne zmiany punktów televote nie zostaną odzwierciedlone w szczegółowych statystykach. Czy na pewno chcesz kontynuować?",
+    "manualTelevotePointsWarning": "Ręczne zmiany punktów televote nie zostaną odzwierciedlone w szczegółowych statystykach. Czy na pewno chcesz kontynuować?",
+    "confirmWarningTitle": "Ostrzeżenie",
     "limitDisabled": "Limit wyłączony",
     "awarded": "Przyznano: {count} / {totalAvailablePoints}",
     "enterPoints": "Wprowadź punkty...",
@@ -311,7 +316,12 @@
       "failedToSaveContest": "Błąd podczas zapisywania konkursu",
       "contestLoaded": "Konkurs załadowany!",
       "failedToLoadContest": "Błąd podczas ładowania konkursu",
-      "confirmResetContest": "Czy na pewno chcesz zresetować konkurs do ostatniej zapisanej wersji? Stracisz wszystkie zmiany od ostatniego zapisu."
+      "confirmResetContestTitle": "Zresetować konkurs?",
+      "confirmResetContestDescription": "To zresetuje konkurs do ostatniej zapisanej wersji. Stracisz wszystkie zmiany od ostatniego zapisu.",
+      "contestReset": "Konkurs zresetowany pomyślnie!",
+      "confirmRemoveSavedContest": "Usuń z zapisanych konkursów?",
+      "contestSavedSuccessfully": "Konkurs zapisany pomyślnie!",
+      "contestRemovedFromSaved": "Konkurs usunięty z zapisanych!"
     },
     "themes": {
       "title": "Motywy",
@@ -344,7 +354,7 @@
       "foundNThemes": "Znaleziono {count} {count, plural, =1 {motyw} other {motywów}}",
       "noPublicThemesFoundMatchingYourSearch": "Nie znaleziono publicznych motywów pasujących do wyszukiwania.",
       "searchThemes": "Szukaj motywów...",
-      "areYouSureYouWantToDeleteThisTheme": "Czy na pewno chcesz usunąć motyw \"{name}\"?",
+      "confirmRemoveSavedTheme": "Usuń z zapisanych motywów?",
       "yourThemes": "Twoje motywy",
       "publicThemes": "Publiczne motywy",
       "noThemesFoundMatchingYourSearch": "Nie znaleziono motywów pasujących do wyszukiwania.",
@@ -477,12 +487,11 @@
   },
   "settings": {
     "general": {
-      "presets": "Presety",
+      "confirmations": "Popupy potwierdzeń",
       "contest": "Konkurs",
       "voting": "Głosowanie",
       "uiPreferences": "Preferencje UI",
       "resetAllSettings": "Resetuj wszystkie ustawienia",
-      "resetAllSettingsConfirmation": "Czy na pewno chcesz zresetować wszystkie ustawienia? Nie wpłynie to na Twoje presety.",
       "general": "Ogólne",
       "odds": "Szanse"
     },
@@ -537,6 +546,32 @@
       "enterContestName": "Wpisz nazwę konkursu...",
       "enterContestYear": "Wpisz rok konkursu...",
       "showHostingCountryFlag": "Pokaż flagę kraju gospodarza"
+    },
+    "confirmations": {
+      "description": "Konfiguruj, które popupy potwierdzeń są wyświetlane podczas wykonywania określonych akcji.",
+      "reset": "Zresetuj",
+      "resetAllConfirmations": "Zresetuj wszystkie potwierdzenia",
+      "noConfirmationsDisabled": "Brak potwierdzeń wyłączonych",
+      "resetContest": "Zresetuj konkurs",
+      "resetAllSettings": "Zresetuj wszystkie ustawienia?",
+      "resetAllSettingsDescription": "Czy na pewno chcesz zresetować wszystkie ustawienia? To nie wpłynie na dane zapisane na Twoim koncie (profil, motywy, konkursy, itp.).",
+      "resetAllSettingsSuccess": "Wszystkie ustawienia lokalne zostały zresetowane pomyślnie!",
+      "deleteItem": "Usuń {name}?",
+      "actionCannotBeUndone": "Ta akcja nie może być cofnięta.",
+      "changeContest": "Zmienić konkurs?",
+      "changeContestDescription": "Konkurs jest w trakcie. Zmiana roku zresetuje bieżący scoreboard i uruchomi nową konfigurację.",
+      "manualTelevoteWarning": "Ostrzeżenie o ręcznym przydzielaniu punktów televote",
+      "saveImportedCustomEntries": "Zapisz importowane własne wpisy",
+      "changeContestYear": "Zmienić konkurs",
+      "grandFinalOnlyChange": "Zmienić tylko Grand Final",
+      "deleteStage": "Usuń etap",
+      "deleteContest": "Usuń konkurs",
+      "removeSavedContest": "Usuń zapisany konkurs",
+      "removeSavedTheme": "Usuń zapisany motyw",
+      "deleteCustomCountry": "Usuń własny wpis",
+      "deleteTheme": "Usuń motyw",
+      "cancelSimulation": "Anuluj symulację",
+      "logout": "Wyloguj się"
     }
   }
 }

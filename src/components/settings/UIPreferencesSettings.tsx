@@ -77,15 +77,6 @@ export const UIPreferencesSettings: React.FC = () => {
         />
       )}
       <Checkbox
-        id="show-manual-televote-warning"
-        labelClassName="w-full"
-        label={t('warnBeforeManuallyAssigningTelevotePoints')}
-        checked={settings.shouldShowManualTelevoteWarning}
-        onChange={(e) =>
-          setSettings({ shouldShowManualTelevoteWarning: e.target.checked })
-        }
-      />
-      <Checkbox
         id="show-jury-voting-progress"
         labelClassName="w-full"
         label={t('showJuryVotingProgressBar')}

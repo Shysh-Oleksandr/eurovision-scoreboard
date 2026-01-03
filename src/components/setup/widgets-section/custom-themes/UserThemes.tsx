@@ -20,6 +20,7 @@ import {
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';
@@ -64,6 +65,8 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
   const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
+
+  const { confirm } = useConfirmation();
 
   const { data: themes, isLoading } = useMyThemesQuery(!!user);
   const { data: savedThemes } = useSavedThemesQuery(!!user);
@@ -136,23 +139,28 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const handleSave = async (id: string, savedByMe: boolean) => {
     try {
       if (savedByMe) {
-        if (
-          !window.confirm(
-            t(
-              'widgets.themes.areYouSureYouWantToRemoveThisThemeFromYourSavedThemes',
-            ),
-          )
-        ) {
-          return;
-        }
-      }
-      const res = await toggleSave(id);
+        confirm({
+          key: 'remove-saved-theme',
+          title: t('widgets.themes.confirmRemoveSavedTheme'),
+          onConfirm: async () => {
+            const res = await toggleSave(id);
 
-      toast.success(
-        res.saved
-          ? t('widgets.themes.themeSavedSuccessfully')
-          : t('widgets.themes.themeRemovedFromSaved'),
-      );
+            toast.success(
+              res.saved
+                ? t('widgets.themes.themeSavedSuccessfully')
+                : t('widgets.themes.themeRemovedFromSaved'),
+            );
+          },
+        });
+      } else {
+        const res = await toggleSave(id);
+
+        toast.success(
+          res.saved
+            ? t('widgets.themes.themeSavedSuccessfully')
+            : t('widgets.themes.themeRemovedFromSaved'),
+        );
+      }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to save theme');
     }
@@ -173,7 +181,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
 
   if (isLoading) {
     return (
-      <div className="text-white text-center py-8">{t('common.loading')}</div>
+      <div className="text-center py-8">
+        <span className="loader" />
+      </div>
     );
   }
 

@@ -11,6 +11,7 @@ import GoogleAuthButton from '@/components/common/GoogleAuthButton';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import UserInfo from '@/components/common/UserInfo';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -36,6 +37,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const [isEditProfileModalLoaded, setIsEditProfileModalLoaded] =
     useState(false);
 
+  const { confirm } = useConfirmation();
+
   const isAuthenticated = !!user;
 
   useEffectOnce(() => {
@@ -43,9 +46,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   });
 
   const handleLogout = async () => {
-    if (confirm(t('areYouSureYouWantToLogout'))) {
-      storeLogout();
-    }
+    confirm({
+      key: 'logout',
+      title: t('areYouSureYouWantToLogout'),
+      onConfirm: () => {
+        storeLogout();
+      },
+    });
   };
 
   return (

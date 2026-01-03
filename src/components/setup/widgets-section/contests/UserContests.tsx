@@ -18,6 +18,7 @@ import {
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
@@ -69,6 +70,8 @@ const UserContests: React.FC<UserContestsProps> = ({
   const { mutateAsync: deleteContest } = useDeleteContestMutation();
   const { mutateAsync: toggleSave } = useToggleSaveContestMutation();
   const { mutateAsync: toggleLike } = useToggleLikeContestMutation();
+
+  const { confirm } = useConfirmation();
 
   const filteredYours = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -130,19 +133,32 @@ const UserContests: React.FC<UserContestsProps> = ({
   const handleSave = async (id: string, savedByMe: boolean) => {
     try {
       if (savedByMe) {
-        if (
-          !window.confirm(
-            'Are you sure you want to remove this contest from your saved contests?',
-          )
-        ) {
-          return;
-        }
-      }
-      const res = await toggleSave(id);
+        confirm({
+          key: 'remove-saved-contest',
+          title: t('widgets.contests.confirmRemoveSavedContest'),
+          onConfirm: async () => {
+            const res = await toggleSave(id);
 
-      toast.success(
-        res.saved ? 'Contest saved successfully' : 'Contest removed from saved',
-      );
+            toast.success(
+              t(
+                res.saved
+                  ? 'widgets.contests.contestSavedSuccessfully'
+                  : 'widgets.contests.contestRemovedFromSaved',
+              ),
+            );
+          },
+        });
+      } else {
+        const res = await toggleSave(id);
+
+        toast.success(
+          t(
+            res.saved
+              ? 'widgets.contests.contestSavedSuccessfully'
+              : 'widgets.contests.contestRemovedFromSaved',
+          ),
+        );
+      }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to save contest');
     }
@@ -150,7 +166,9 @@ const UserContests: React.FC<UserContestsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="text-white text-center py-8">{t('common.loading')}</div>
+      <div className="text-center py-8">
+        <span className="loader" />
+      </div>
     );
   }
 

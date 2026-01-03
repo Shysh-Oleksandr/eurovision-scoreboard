@@ -376,9 +376,7 @@ function AdminErrorsPage() {
   if (!accessToken || !user || !user.isAdmin) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 p-6 text-white">
-        <div className="text-center">
-          <p className="text-lg">Loading...</p>
-        </div>
+        <span className="loader" />
       </div>
     );
   }
@@ -565,7 +563,7 @@ function AdminErrorsPage() {
         <div className="bg-primary-800/70 backdrop-blur-sm rounded-lg border border-primary-700/70 overflow-hidden">
           {isLoading ? (
             <div className="p-8 text-center">
-              <p className="">Loading errors...</p>
+              <span className="loader" />
             </div>
           ) : (
             <>

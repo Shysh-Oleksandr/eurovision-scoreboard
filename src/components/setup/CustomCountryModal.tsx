@@ -16,6 +16,7 @@ import {
   useUploadCustomEntryFlagMutation,
 } from '@/api/customEntries';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -70,6 +71,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
 
   const customEntries = useCountriesStore((state) => state.customCountries);
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+
+  const { confirm } = useConfirmation();
 
   // Validate if displayFlag is a valid image URL for Next.js Image component
   const isValidImageUrl = (url: string | null | undefined): boolean => {
@@ -311,36 +314,36 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       return;
     }
 
-    if (
-      !window.confirm(
-        t('setup.customCountryModal.areYouSureYouWantToDelete', {
-          name: countryToEdit.name,
-        }),
-      )
-    ) {
-      return;
-    }
+    confirm({
+      key: 'delete-custom-country',
+      type: 'danger',
+      title: t('settings.confirmations.deleteItem', {
+        name: countryToEdit.name,
+      }),
+      description: t('settings.confirmations.actionCannotBeUndone'),
+      onConfirm: async () => {
+        try {
+          const entryId = getEntryId();
 
-    try {
-      const entryId = getEntryId();
+          if (!entryId) {
+            toast('Invalid entry ID', { type: 'error' });
 
-      if (!entryId) {
-        toast('Invalid entry ID', { type: 'error' });
+            return;
+          }
 
-        return;
-      }
+          await deleteEntry(entryId);
+          toast(t('setup.customCountryModal.entryDeletedSuccessfully'), {
+            type: 'success',
+          });
 
-      await deleteEntry(entryId);
-      toast(t('setup.customCountryModal.entryDeletedSuccessfully'), {
-        type: 'success',
-      });
-
-      onClose();
-    } catch (error: any) {
-      toast(error?.response?.data?.message || 'Failed to delete entry', {
-        type: 'error',
-      });
-    }
+          onClose();
+        } catch (error: any) {
+          toast(error?.response?.data?.message || 'Failed to delete entry', {
+            type: 'error',
+          });
+        }
+      },
+    });
   };
 
   const handleFileChange = async (file: File | null) => {

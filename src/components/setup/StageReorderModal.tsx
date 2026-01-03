@@ -7,6 +7,8 @@ import Button from '../common/Button';
 import { CustomSortableItem } from '../common/CustomSortableItem';
 import Modal from '../common/Modal/Modal';
 
+import { useConfirmation } from '@/hooks/useConfirmation';
+
 interface StageReorderModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +25,8 @@ const StageReorderModal: React.FC<StageReorderModalProps> = ({
   onDelete,
 }) => {
   const t = useTranslations();
+
+  const { confirm } = useConfirmation();
 
   // Sort stages by order
   const { lastStage, sortedStages } = useMemo(() => {
@@ -53,15 +57,17 @@ const StageReorderModal: React.FC<StageReorderModalProps> = ({
   };
 
   const handleDeleteClick = (stageId: string) => {
-    if (
-      confirm(
-        `Are you sure you want to delete "${
-          sortedStages.find((s) => s.id === stageId)?.name || ''
-        }" stage?`,
-      )
-    ) {
-      onDelete(stageId);
-    }
+    confirm({
+      key: 'delete-stage',
+      type: 'danger',
+      title: t('settings.confirmations.deleteItem', {
+        name: sortedStages.find((s) => s.id === stageId)?.name || '',
+      }),
+      description: t('settings.confirmations.actionCannotBeUndone'),
+      onConfirm: () => {
+        onDelete(stageId);
+      },
+    });
   };
 
   return (

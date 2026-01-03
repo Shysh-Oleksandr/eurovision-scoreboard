@@ -38,7 +38,6 @@ export type ScoreboardState = {
   televotingProgress: number;
   predefinedVotes: Record<string, Partial<StageVotes>>;
   countryPoints: Record<string, Record<string, CountryPoints>>; // stageId -> countryCode -> CountryPoints
-  hasShownManualTelevoteWarning: boolean;
   lastPointsResetTimerId: NodeJS.Timeout | null;
   qualificationOrder: QualificationOrder;
   currentRevealTelevotePoints: number; // Current points to give in reveal mode
@@ -79,7 +78,6 @@ export type ScoreboardState = {
   toggleShowAllParticipants: () => void;
   setViewedStageId: (stageId: string | null) => void;
   setCurrentStageId: (stageId: string | null) => void;
-  setHasShownManualTelevoteWarning: (hasShown: boolean) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
   setCurrentRevealTelevotePoints: (points: number) => void; // Set current points to give in reveal mode
   setIsWinnerAnimationAlreadyDisplayed: (hasShown: boolean) => void;

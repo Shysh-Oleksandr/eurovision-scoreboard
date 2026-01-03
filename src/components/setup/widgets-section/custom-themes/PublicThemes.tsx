@@ -17,6 +17,7 @@ import {
   useThemesStateQuery,
 } from '@/api/themes';
 import Button from '@/components/common/Button';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
@@ -74,6 +75,8 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     !!themeIds.length && !!user,
   );
 
+  const { confirm } = useConfirmation();
+
   useEffectOnce(onLoaded);
 
   const handleApply = async (theme: CustomTheme) => {
@@ -116,21 +119,32 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   const handleSave = async (id: string, savedByMe: boolean) => {
     try {
       if (savedByMe) {
-        if (
-          !window.confirm(
-            t('areYouSureYouWantToRemoveThisThemeFromYourSavedThemes'),
-          )
-        ) {
-          return;
-        }
-      }
-      const res = await toggleSave(id);
+        confirm({
+          key: 'remove-saved-theme',
+          title: t('widgets.themes.confirmRemoveSavedTheme'),
+          onConfirm: async () => {
+            const res = await toggleSave(id);
 
-      toast.success(
-        res.saved
-          ? t('widgets.themes.themeSavedSuccessfully')
-          : t('widgets.themes.themeRemovedFromSaved'),
-      );
+            toast.success(
+              t(
+                res.saved
+                  ? 'widgets.themes.themeSavedSuccessfully'
+                  : 'widgets.themes.themeRemovedFromSaved',
+              ),
+            );
+          },
+        });
+      } else {
+        const res = await toggleSave(id);
+
+        toast.success(
+          t(
+            res.saved
+              ? 'widgets.themes.themeSavedSuccessfully'
+              : 'widgets.themes.themeRemovedFromSaved',
+          ),
+        );
+      }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to save theme');
     }
@@ -166,7 +180,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
 
       {isLoading ? (
         <div className="text-center sm:py-12 py-8">
-          <p className="text-white/70">{t('common.loading')}</p>
+          <span className="loader" />
         </div>
       ) : data && data.themes.length > 0 ? (
         <>

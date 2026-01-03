@@ -15,6 +15,7 @@ import {
   useToggleSaveContestMutation,
 } from '@/api/contests';
 import Button from '@/components/common/Button';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
@@ -40,6 +41,8 @@ const PublicContests: React.FC<PublicContestsProps> = ({
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
   const debouncedSearch = useDebounce(search, 400);
+
+  const { confirm } = useConfirmation();
 
   const serverSortBy =
     sortKey === 'likes' ? 'likes' : sortKey === 'saves' ? 'saves' : 'createdAt';
@@ -86,19 +89,32 @@ const PublicContests: React.FC<PublicContestsProps> = ({
   const handleSave = async (id: string, savedByMe: boolean) => {
     try {
       if (savedByMe) {
-        if (
-          !window.confirm(
-            'Are you sure you want to remove this contest from your saved contests?',
-          )
-        ) {
-          return;
-        }
-      }
-      const res = await toggleSave(id);
+        confirm({
+          key: 'remove-saved-contest',
+          title: t('widgets.contests.confirmRemoveSavedContest'),
+          onConfirm: async () => {
+            const res = await toggleSave(id);
 
-      toast.success(
-        res.saved ? 'Contest saved successfully' : 'Contest removed from saved',
-      );
+            toast.success(
+              t(
+                res.saved
+                  ? 'widgets.contests.contestSavedSuccessfully'
+                  : 'widgets.contests.contestRemovedFromSaved',
+              ),
+            );
+          },
+        });
+      } else {
+        const res = await toggleSave(id);
+
+        toast.success(
+          t(
+            res.saved
+              ? 'widgets.contests.contestSavedSuccessfully'
+              : 'widgets.contests.contestRemovedFromSaved',
+          ),
+        );
+      }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Failed to save contest');
     }
@@ -136,7 +152,7 @@ const PublicContests: React.FC<PublicContestsProps> = ({
 
       {isLoading ? (
         <div className="text-center sm:py-12 py-8">
-          <p className="text-white/70">{t('common.loading')}</p>
+          <span className="loader" />
         </div>
       ) : data && data.contests.length > 0 ? (
         <>

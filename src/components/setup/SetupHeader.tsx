@@ -22,6 +22,7 @@ import CustomSelect, {
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import { buildPrimaryFromHsva } from '@/theme/themeUtils';
@@ -56,6 +57,8 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
   const isTouchDevice = useTouchDevice();
 
+  const { confirm } = useConfirmation();
+
   const handleYearChange = (newValue: string, shouldToggleGfOnly = false) => {
     if (activeContest && newValue === activeContest._id) return;
 
@@ -67,17 +70,22 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     const nextContestName = isJunior ? 'Junior Eurovision' : 'Eurovision';
 
     if (eventStages.length > 0) {
-      if (window.confirm(t('setup.eventSetupModal.contestIsInProgress'))) {
-        if (shouldToggleGfOnly) {
-          setIsGfOnly(!isGfOnly);
-        }
-        setSettings({
-          contestName: nextContestName,
-          isJuniorContest: isJunior,
-        });
-        setYear(newYear as Year);
-        setEventStages([]);
-      }
+      confirm({
+        key: 'change-contest-year',
+        title: t('settings.confirmations.changeContest'),
+        description: t('settings.confirmations.changeContestDescription'),
+        onConfirm: () => {
+          if (shouldToggleGfOnly) {
+            setIsGfOnly(!isGfOnly);
+          }
+          setSettings({
+            contestName: nextContestName,
+            isJuniorContest: isJunior,
+          });
+          setYear(newYear as Year);
+          setEventStages([]);
+        },
+      });
     } else {
       if (shouldToggleGfOnly) {
         setIsGfOnly(!isGfOnly);
@@ -88,21 +96,26 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   };
 
   const handleGfOnlyChange = () => {
-    if (
-      confirm(
-        t(
-          !isGfOnly
-            ? 'setup.eventSetupModal.grandFinalOnlyConfirm'
-            : 'setup.eventSetupModal.grandFinalOnlyConfirmNotGfOnly',
-        ),
-      )
-    ) {
-      const currentYear = settings.isJuniorContest
-        ? `${JUNIOR_THEME_PREFIX}${year}`
-        : year;
+    confirm({
+      key: 'grand-final-only-change',
+      title: t(
+        isGfOnly
+          ? 'setup.eventSetupModal.confirmNotGFOnlyTitle'
+          : 'setup.eventSetupModal.confirmGFOnlyTitle',
+      ),
+      description: t(
+        isGfOnly
+          ? 'setup.eventSetupModal.confirmNotGFOnlyDescription'
+          : 'setup.eventSetupModal.confirmGFOnlyDescription',
+      ),
+      onConfirm: () => {
+        const currentYear = settings.isJuniorContest
+          ? `${JUNIOR_THEME_PREFIX}${year}`
+          : year;
 
-      handleYearChange(currentYear, true);
-    }
+        handleYearChange(currentYear, true);
+      },
+    });
   };
 
   const handleThemeChange = (newThemeValue: string) => {

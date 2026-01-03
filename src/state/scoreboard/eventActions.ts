@@ -87,7 +87,6 @@ export const createEventActions: StateCreator<
       startCounter: get().startCounter + 1,
       showAllParticipants: false,
       televotingProgress: 0,
-      hasShownManualTelevoteWarning: false,
       viewedStageId: null,
       isWinnerAnimationAlreadyDisplayed: false,
     });

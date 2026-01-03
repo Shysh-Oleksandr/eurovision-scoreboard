@@ -16,6 +16,7 @@ import { ShareIcon } from '@/assets/icons/ShareIcon';
 import { SlidersIcon } from '@/assets/icons/SlidersIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const ShareResultsModal = dynamic(() => import('./share/ShareResultsModal'), {
@@ -44,6 +45,8 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const { undo, pastStates } = useScoreboardStore.temporal.getState();
+
+  const { confirm } = useConfirmation();
 
   const canUndo =
     pastStates.length > 0 &&
@@ -99,9 +102,13 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
         <div className="flex gap-2 xs:w-auto w-full">
           <Button
             onClick={() => {
-              if (confirm(t('cancelSimulationConfirmation'))) {
-                leaveEvent();
-              }
+              confirm({
+                key: 'cancel-simulation',
+                title: t('cancelSimulationConfirmation'),
+                onConfirm: () => {
+                  leaveEvent();
+                },
+              });
             }}
             className={buttonClassName}
             aria-label={t('cancelSimulation')}

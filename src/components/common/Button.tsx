@@ -59,8 +59,7 @@ const Button = ({
     >
       <SnowPileEffect snowEffect={snowEffect} className={snowEffectClassName} />
       {isLoading ? (
-        // TODO: fancy loading spinner
-        <span className="loader" />
+        <span className="loader small" />
       ) : (
         <>
           {Icon}

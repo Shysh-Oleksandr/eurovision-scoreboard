@@ -586,15 +586,19 @@ h6 {
 }
 
 .loader {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #e7dada;
-  border-bottom-color: transparent;
+  font-size: 60px;          /* change this to 20px, 32px, etc */
+  width: 1em;
+  height: 1em;
   border-radius: 50%;
   display: inline-block;
   box-sizing: border-box;
+  border-top: 0.0625em solid #fff;
+  border-right: 0.0625em solid transparent;
   animation: rotation 1s linear infinite;
 }
+
+.loader.small { font-size: 20px; }
+.loader.large { font-size: 64px; }
 
 @keyframes rotation {
   0% {

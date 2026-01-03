@@ -10,6 +10,8 @@ import ModalBottomContent from '../../common/Modal/ModalBottomContent';
 import EventStageSettings from './EventStageSettings';
 import { useEventStageForm } from './hooks/useEventStageForm';
 
+import { useConfirmation } from '@/hooks/useConfirmation';
+
 interface EventStageModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,9 +32,11 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   eventStageToEdit,
   localEventStagesLength,
 }) => {
-  const t = useTranslations('setup.eventStageModal');
+  const t = useTranslations();
   const isEditMode = !!eventStageToEdit;
   const [shouldClose, setShouldClose] = useState(false);
+
+  const { confirm } = useConfirmation();
 
   const {
     form,
@@ -70,14 +74,18 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   const handleDelete = () => {
     if (!eventStageToEdit) return;
 
-    if (
-      window.confirm(
-        t('areYouSureYouWantToDelete', { name: eventStageToEdit.name }),
-      )
-    ) {
-      onDelete(eventStageToEdit.id);
-      handleTriggerClose();
-    }
+    confirm({
+      key: 'delete-stage',
+      type: 'danger',
+      title: t('settings.confirmations.deleteItem', {
+        name: eventStageToEdit.name,
+      }),
+      description: t('settings.confirmations.actionCannotBeUndone'),
+      onConfirm: () => {
+        onDelete(eventStageToEdit.id);
+        handleTriggerClose();
+      },
+    });
   };
 
   return (

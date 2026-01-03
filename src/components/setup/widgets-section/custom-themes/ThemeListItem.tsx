@@ -13,6 +13,7 @@ import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
 import { TrashIcon } from '@/assets/icons/TrashIcon';
 import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getCssVarsForCustomTheme } from '@/theme/themeUtils';
 import { CustomTheme } from '@/types/customTheme';
@@ -50,6 +51,8 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
 
   const user = useAuthStore((state) => state.user);
   const isMyTheme = variant === 'user' || theme.userId.toString() === user?._id;
+
+  const { confirm } = useConfirmation();
 
   const [points, setPoints] = useState(42);
   const [lastPoints, setLastPoints] = useState<number | null>(12);
@@ -160,15 +163,17 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           <Button
             variant="destructive"
             onClick={() => {
-              if (
-                window.confirm(
-                  t('widgets.themes.areYouSureYouWantToDeleteThisTheme', {
-                    name: theme.name,
-                  }),
-                )
-              ) {
-                onDelete(theme._id);
-              }
+              confirm({
+                key: 'delete-theme',
+                title: t('settings.confirmations.deleteItem', {
+                  name: theme.name,
+                }),
+                description: t('settings.confirmations.actionCannotBeUndone'),
+                type: 'danger',
+                onConfirm: () => {
+                  onDelete(theme._id);
+                },
+              });
             }}
             className="!py-2 !px-4 !text-base text-red-300 hover:text-red-200"
             Icon={<TrashIcon className="sm:size-6 size-5" />}

@@ -31,7 +31,6 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
     [StageId.SF2]: {},
     [StageId.GF]: {},
   },
-  hasShownManualTelevoteWarning: false,
   lastPointsResetTimerId: null,
   currentRevealTelevotePoints: undefined,
   isWinnerAnimationAlreadyDisplayed: false,

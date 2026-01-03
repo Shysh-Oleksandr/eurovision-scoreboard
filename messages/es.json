@@ -9,6 +9,7 @@
     "delete": "Eliminar",
     "cancel": "Cancelar",
     "save": "Guardar",
+    "confirm": "Confirmar",
     "authenticationRequired": "Autenticación requerida",
     "lastSaved": "Guardado",
     "copy": "Copiar",
@@ -110,8 +111,10 @@
     },
     "eventSetupModal": {
       "grandFinalOnly": "Solo final",
-      "grandFinalOnlyConfirm": "Esto restablecerá tu configuración y mantendrá solo el Gran Final. ¿Estás seguro de que quieres continuar?",
-      "grandFinalOnlyConfirmNotGfOnly": "Esto restablecerá tu configuración y restaurará todas las etapas (Semi-Finales + Gran Final). ¿Estás seguro de que quieres continuar?",
+      "confirmGFOnlyTitle": "Solo final?",
+      "confirmNotGFOnlyTitle": "Restaurar todas las etapas?",
+      "confirmGFOnlyDescription": "Esto restablecerá tu configuración y mantendrá solo el Gran Final.",
+      "confirmNotGFOnlyDescription": "Esto restablecerá tu configuración y restaurará todas las etapas (Semi-Finales + Gran Final).",
       "notQualified": "No clasificado",
       "notParticipating": "No participa",
       "youNeedToBeLoggedInToCreateAndUseCustomEntries": "Necesitas iniciar sesión para crear y usar entradas personalizadas.",
@@ -124,7 +127,8 @@
       "enterThePointsEachVotingCountryAwardsToParticipants": "Introduce los puntos que cada país otorga a los participantes",
       "reorderStages": "Reordenar etapas",
       "importedEntriesDescription": "Las entradas importadas son entradas personalizadas que han sido importadas desde otros concursos. No son editables.",
-      "areYouSureYouWantToSaveImportedEntries": "¿Seguro que quieres guardar {count, plural, =1 {esta entrada importada} other {# entradas importadas}} en tus entradas personalizadas?",
+      "areYouSureYouWantToSaveImportedEntries": "¿Quieres guardar {count, plural, =1 {esta entrada importada} other {# entradas importadas}} en tus entradas personalizadas?",
+      "areYouSureYouWantToSaveImportedEntriesDescription": "Esto añadirá las entradas importadas a tus entradas personalizadas.",
       "customEntriesSavedSuccessfully": "¡Entradas personalizadas guardadas!",
       "failedToSaveCustomEntries": "Error al guardar las entradas personalizadas. Por favor, intenta de nuevo.",
       "saveToYourCustomEntries": "Guardar en tus entradas personalizadas"
@@ -173,7 +177,8 @@
     "totalTelevotePointsCannotExceed": "Los puntos totales del televoto no pueden superar {count}",
     "maxPossibleTelevotePoints": "El número máximo de puntos posibles es {count}",
     "maxPossibleTelevotePointsForCountry": "El máximo de puntos para este país es {count}",
-    "manualTelevotePointsWarning": "Nota: Ajustar manualmente los puntos del televoto no se reflejará en las estadísticas detalladas. ¿Seguro que quieres continuar?",
+    "manualTelevotePointsWarning": "Ajustar manualmente los puntos del televoto no se reflejará en las estadísticas detalladas. ¿Seguro que quieres continuar?",
+    "confirmWarningTitle": "Advertencia",
     "limitDisabled": "Límite desactivado",
     "awarded": "Otorgados: {count} / {totalAvailablePoints}",
     "enterPoints": "Introduce puntos...",
@@ -311,7 +316,12 @@
       "failedToSaveContest": "Error al guardar el concurso",
       "contestLoaded": "Concurso cargado!",
       "failedToLoadContest": "Error al cargar el concurso",
-      "confirmResetContest": "¿Estás seguro de que quieres restablecer el concurso a la última versión guardada? Perderás todos tus cambios desde la última guardada."
+      "confirmResetContestTitle": "Restablecer el concurso?",
+      "confirmResetContestDescription": "Esto restablecerá el concurso a la última versión guardada. Perderás todos tus cambios desde la última guardada.",
+      "contestReset": "Concurso restablecido correctamente!",
+      "confirmRemoveSavedContest": "Eliminar del concursos guardados?",
+      "contestSavedSuccessfully": "Concurso guardado correctamente!",
+      "contestRemovedFromSaved": "Concurso eliminado de guardados!"
     },
     "themes": {
       "title": "Temas",
@@ -344,7 +354,7 @@
       "foundNThemes": "Se encontraron {count} {count, plural, =1 {tema} other {temas}}",
       "noPublicThemesFoundMatchingYourSearch": "No se han encontrado temas públicos que coincidan con tu búsqueda.",
       "searchThemes": "Buscar temas...",
-      "areYouSureYouWantToDeleteThisTheme": "¿Seguro que quieres eliminar el tema \"{name}\"?",
+      "confirmRemoveSavedTheme": "Eliminar del temas guardados?",
       "yourThemes": "Tus temas",
       "publicThemes": "Temas públicos",
       "noThemesFoundMatchingYourSearch": "No se han encontrado temas que coincidan con tu búsqueda.",
@@ -477,12 +487,11 @@
   },
   "settings": {
     "general": {
-      "presets": "Presets",
+      "confirmations": "Confirmaciones",
       "contest": "Concurso",
       "voting": "Votación",
       "uiPreferences": "Preferencias de la interfaz",
       "resetAllSettings": "Restablecer todos los ajustes",
-      "resetAllSettingsConfirmation": "¿Seguro que quieres restablecer todos los ajustes? Esto no afectará a tus presets.",
       "general": "General",
       "odds": "Probabilidades"
     },
@@ -537,6 +546,32 @@
       "enterContestName": "Introduce el nombre del concurso...",
       "enterContestYear": "Introduce el año del concurso...",
       "showHostingCountryFlag": "Mostrar la bandera del país anfitrión"
+    },
+    "confirmations": {
+      "description": "Configura qué confirmaciones se muestran cuando realizas ciertas acciones.",
+      "reset": "Restablecer",
+      "resetAllConfirmations": "Restablecer todas las confirmaciones",
+      "noConfirmationsDisabled": "No hay confirmaciones desactivadas",
+      "resetContest": "Restablecer concurso",
+      "resetAllSettings": "Restablecer todos los ajustes?",
+      "resetAllSettingsDescription": "¿Estás seguro de que quieres restablecer todos los ajustes? Esto no afectará a los datos guardados en tu cuenta (perfil, temas, concursos, etc.).",
+      "resetAllSettingsSuccess": "Todos los ajustes locales se han restablecido correctamente!",
+      "deleteItem": "Eliminar {name}?",
+      "actionCannotBeUndone": "Esta acción no puede ser deshecha.",
+      "changeContest": "Cambiar concurso?",
+      "changeContestDescription": "Un concurso está en curso. Cambiarlo restablecerá el marcador actual y empezará una nueva configuración.",
+      "manualTelevoteWarning": "Advertencia de puntos de televoto manuales",
+      "saveImportedCustomEntries": "Guardar entradas personalizadas importadas",
+      "changeContestYear": "Cambiar concurso",
+      "grandFinalOnlyChange": "Solo cambiar final",
+      "deleteStage": "Eliminar etapa",
+      "deleteContest": "Eliminar concurso",
+      "removeSavedContest": "Eliminar concurso guardado",
+      "removeSavedTheme": "Eliminar tema guardado",
+      "deleteCustomCountry": "Eliminar entrada personalizada",
+      "deleteTheme": "Eliminar tema",
+      "cancelSimulation": "Cancelar simulación",
+      "logout": "Cerrar sesión"
     }
   }
 }

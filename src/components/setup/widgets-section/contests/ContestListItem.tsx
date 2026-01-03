@@ -13,6 +13,7 @@ import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -71,6 +72,8 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   }, [contest.winner, getAllCountries]);
 
   const t = useTranslations();
+
+  const { confirm } = useConfirmation();
 
   const user = useAuthStore((state) => state.user);
   const isMyContest =
@@ -233,15 +236,17 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
           <Button
             variant="destructive"
             onClick={() => {
-              if (
-                window.confirm(
-                  t('widgets.themes.areYouSureYouWantToDeleteThisTheme', {
-                    name: contest.name,
-                  }),
-                )
-              ) {
-                onDelete(contest._id);
-              }
+              confirm({
+                key: 'delete-contest',
+                title: t('settings.confirmations.deleteItem', {
+                  name: `${contest.name} ${contest.year}`,
+                }),
+                description: t('settings.confirmations.actionCannotBeUndone'),
+                type: 'danger',
+                onConfirm: () => {
+                  onDelete(contest._id);
+                },
+              });
             }}
             className="!py-2 !px-4 !text-base text-red-300 hover:text-red-200"
             Icon={<TrashIcon className="sm:size-6 size-5" />}

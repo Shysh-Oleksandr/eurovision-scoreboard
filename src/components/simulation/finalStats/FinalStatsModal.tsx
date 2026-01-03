@@ -21,13 +21,17 @@ const ShareStatsModal = dynamic(() => import('../share/ShareStatsModal'), {
 const SplitStats = dynamic(() => import('./SplitStats'), {
   ssr: false,
   loading: () => (
-    <div className="text-white text-center py-2 font-medium">Loading...</div>
+    <div className="text-center py-2">
+      <span className="loader" />
+    </div>
   ),
 });
 const SummaryStats = dynamic(() => import('./SummaryStats'), {
   ssr: false,
   loading: () => (
-    <div className="text-white text-center py-2 font-medium">Loading...</div>
+    <div className="text-center py-2">
+      <span className="loader" />
+    </div>
   ),
 });
 

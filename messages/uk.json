@@ -9,6 +9,7 @@
     "delete": "Видалити",
     "cancel": "Скасувати",
     "save": "Зберегти",
+    "confirm": "Підтвердити",
     "authenticationRequired": "Потрібна авторизація",
     "lastSaved": "Збережено",
     "copy": "Скопіювати",
@@ -110,8 +111,10 @@
     },
     "eventSetupModal": {
       "grandFinalOnly": "Лише фінал",
-      "grandFinalOnlyConfirm": "Це скине вашу конфігурацію і збереже лише фінал. Ви впевнені?",
-      "grandFinalOnlyConfirmNotGfOnly": "Це скине вашу конфігурацію і відновить всі етапи (півфінали + фінал). Ви впевнені?",
+      "confirmGFOnlyTitle": "Лише фінал?",
+      "confirmNotGFOnlyTitle": "Відновити всі етапи?",
+      "confirmGFOnlyDescription": "Це скине вашу конфігурацію і збереже лише фінал.",
+      "confirmNotGFOnlyDescription": "Це скине вашу конфігурацію і відновить всі етапи (півфінали + фінал).",
       "qualifiers": "Фіналісти",
       "notQualified": "Не кваліфікувалися",
       "notParticipating": "Не беруть участі",
@@ -124,7 +127,8 @@
       "enterThePointsEachVotingCountryAwardsToParticipants": "Введіть бали, які кожна країна-учасниця голосування надає учасникам",
       "reorderStages": "Змінити порядок етапів",
       "importedEntriesDescription": "Імпортовані учасники — це користувацькі учасники, які були імпортовані з інших конкурсів. Їх не можна редагувати.",
-      "areYouSureYouWantToSaveImportedEntries": "Ви впевнені, що хочете зберегти {count, plural, =1 {цього імпортованого учасника} other {# імпортованих учасників}} до своїх користувацьких учасників?",
+      "areYouSureYouWantToSaveImportedEntries": "Зберегти {count, plural, =1 {цього імпортованого учасника} other {# імпортованих учасників}} до своїх користувацьких учасників?",
+      "areYouSureYouWantToSaveImportedEntriesDescription": "Це додасть імпортованих учасників до ваших користувацьких учасників.",
       "customEntriesSavedSuccessfully": "Користувацькі учасники успішно збережені!",
       "failedToSaveCustomEntries": "Не вдалося зберегти користувацьких учасників. Спробуйте знову.",
       "saveToYourCustomEntries": "Зберегти до своїх користувацьких учасників"
@@ -173,7 +177,8 @@
     "totalTelevotePointsCannotExceed": "Загальна кількість балів телеголосування не може перевищувати {count}",
     "maxPossibleTelevotePoints": "Максимальна можлива кількість балів — {count}",
     "maxPossibleTelevotePointsForCountry": "Максимальна кількість балів для цієї країни — {count}",
-    "manualTelevotePointsWarning": "Увага: Ручні зміни балів телеголосування не будуть відображені в детальній статистиці. Ви впевнені, що хочете продовжити?",
+    "manualTelevotePointsWarning": "Ручні зміни балів телеголосування не будуть відображені в детальній статистиці. Ви впевнені, що хочете продовжити?",
+    "confirmWarningTitle": "Попередження",
     "limitDisabled": "Ліміт вимкнено",
     "awarded": "Надано: {count} / {totalAvailablePoints}",
     "enterPoints": "Введіть бали...",
@@ -311,7 +316,12 @@
       "failedToSaveContest": "Помилка при збереженні конкурсу",
       "contestLoaded": "Конкурс завантажено!",
       "failedToLoadContest": "Помилка при завантаженні конкурсу",
-      "confirmResetContest": "Ви впевнені, що хочете скинути конкурс до останньої збереженої версії? Ви втратите всі зміни з моменту останнього збереження."
+      "confirmResetContestTitle": "Скинути конкурс?",
+      "confirmResetContestDescription": "Це скине конкурс до останньої збереженої версії. Ви втратите всі зміни з моменту останнього збереження.",
+      "contestReset": "Конкурс успішно скинуто!",
+      "confirmRemoveSavedContest": "Вилучити з збережених конкурсів?",
+      "contestSavedSuccessfully": "Конкурс успішно збережено!",
+      "contestRemovedFromSaved": "Конкурс успішно вилучено із збережених!"
     },
     "themes": {
       "title": "Теми",
@@ -344,7 +354,7 @@
       "foundNThemes": "Знайдено {count} {count, plural, =1 {тему} other {тем}}",
       "noPublicThemesFoundMatchingYourSearch": "Публічних тем за вашим запитом не знайдено.",
       "searchThemes": "Пошук тем...",
-      "areYouSureYouWantToDeleteThisTheme": "Видалити тему \"{name}\"?",
+      "confirmRemoveSavedTheme": "Вилучити з збережених тем?",
       "yourThemes": "Ваші теми",
       "publicThemes": "Публічні теми",
       "noThemesFoundMatchingYourSearch": "Тем за вашим запитом не знайдено.",
@@ -477,12 +487,11 @@
   },
   "settings": {
     "general": {
-      "presets": "Пресети",
+      "confirmations": "Попапи підтверджень",
       "contest": "Конкурс",
       "voting": "Голосування",
       "uiPreferences": "Налаштування інтерфейсу",
       "resetAllSettings": "Скинути всі налаштування",
-      "resetAllSettingsConfirmation": "Скинути всі налаштування? Це не вплине на ваші пресети.",
       "general": "Загальні",
       "odds": "Шанси"
     },
@@ -537,6 +546,32 @@
       "enterContestName": "Введіть назву конкурсу...",
       "enterContestYear": "Введіть рік конкурсу...",
       "showHostingCountryFlag": "Показувати прапор країни-організатора"
+    },  
+    "confirmations": {
+      "description": "Налаштуйте, які попапи підтверджень показуються при виконанні певних дій.",
+      "reset": "Скинути",
+      "resetAllConfirmations": "Скинути всі попапи підтверджень",
+      "noConfirmationsDisabled": "Немає відключених попапів підтверджень",
+      "resetContest": "Скинути конкурс",
+      "resetAllSettings": "Скинути всі налаштування?",
+      "resetAllSettingsDescription": "Ви впевнені, що хочете скинути всі налаштування? Це не вплине на дані, збережені в вашому обліковому записі (профіль, теми, конкурси тощо).",
+      "resetAllSettingsSuccess": "Всі локальні налаштування успішно скинуті!",
+      "deleteItem": "Вилучити {name}?",
+      "actionCannotBeUndone": "Ця дія не може бути скасована.",
+      "changeContest": "Змінити конкурс?",
+      "changeContestDescription": "Конкурс відбувається. Зміна року скине поточний scoreboard і запустить нову конфігурацію.",
+      "manualTelevoteWarning": "Попередження про ручне нарахування телебалів",
+      "saveImportedCustomEntries": "Зберегти імпортовані користувацькі учасники",
+      "changeContestYear": "Змінити конкурс",
+      "grandFinalOnlyChange": "Змінити лише Гранд-фінал",
+      "deleteStage": "Вилучити етап",
+      "deleteContest": "Вилучити конкурс",
+      "removeSavedContest": "Вилучити збережений конкурс",
+      "removeSavedTheme": "Вилучити збережену тему",
+      "deleteCustomCountry": "Вилучити користувацького учасника",
+      "deleteTheme": "Вилучити тему",
+      "cancelSimulation": "Скасувати симуляцію",
+      "logout": "Вийти"
     }
   }
 }
