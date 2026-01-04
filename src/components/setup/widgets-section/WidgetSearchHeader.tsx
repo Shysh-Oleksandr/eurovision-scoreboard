@@ -3,6 +3,7 @@ import React from 'react';
 
 import SearchInputIcon from '../SearchInputIcon';
 
+import { PlusIcon } from '@/assets/icons/PlusIcon';
 import Button from '@/components/common/Button';
 import { Input } from '@/components/Input';
 
@@ -38,7 +39,12 @@ const WidgetSearchHeader: React.FC<WidgetSearchHeaderProps> = ({
       </div>
 
       {onCreateNew && (
-        <Button variant="tertiary" onClick={onCreateNew}>
+        <Button
+          variant="tertiary"
+          onClick={onCreateNew}
+          Icon={<PlusIcon className="w-6 h-6" />}
+          className="justify-center"
+        >
           {t('common.create')}
         </Button>
       )}

@@ -12,6 +12,7 @@ import { TrashIcon } from '@/assets/icons/TrashIcon';
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
+import { POINTS_ARRAY } from '@/data/data';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -78,6 +79,19 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const user = useAuthStore((state) => state.user);
   const isMyContest =
     variant === 'user' || contest.userId.toString() === user?._id;
+
+  const isCustomPointsSystem = useMemo(() => {
+    if (!contest.customPointsSystem || contest.customPointsSystem.length === 0)
+      return false;
+
+    if (contest.customPointsSystem.length !== POINTS_ARRAY.length) return true;
+
+    for (let i = 0; i < contest.customPointsSystem.length; i += 1) {
+      if (contest.customPointsSystem[i] !== POINTS_ARRAY[i]) return true;
+    }
+
+    return false;
+  }, [contest.customPointsSystem]);
 
   const { logo, isExisting } = getHostingCountryLogo(
     contest.hostingCountryCode,
@@ -164,13 +178,12 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
               </span>
             )}
 
-            {contest.customPointsSystem &&
-              contest.customPointsSystem.length > 0 && (
-                <span className="text-xs bg-purple-900/60 text-purple-200 px-2 py-1 rounded-full">
-                  {t('widgets.contests.pointsSystem')}:{' '}
-                  {contest.customPointsSystem.join(', ')}
-                </span>
-              )}
+            {isCustomPointsSystem && (
+              <span className="text-xs bg-purple-900/60 text-purple-200 px-2 py-1 rounded-full">
+                {t('widgets.contests.pointsSystem')}:{' '}
+                {contest.customPointsSystem?.join(', ')}
+              </span>
+            )}
 
             {contest.isSimulationStarted && !contest.winner && (
               <span className="text-xs bg-green-900/60 text-green-200 px-2 py-1 rounded-full">

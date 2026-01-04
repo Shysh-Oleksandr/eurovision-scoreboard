@@ -40,7 +40,8 @@
     "randomize": "Aleatorio",
     "loadYearData": "Cargar datos del año",
     "country": "País",
-    "current": "Actual"
+    "current": "Actual",
+    "dontShowAgain": "No mostrar de nuevo"
   },
   "Metadata": {
     "title": "DouzePoints - Simulador de Marcadores de Eurovisión",
@@ -321,7 +322,9 @@
       "contestReset": "Concurso restablecido correctamente!",
       "confirmRemoveSavedContest": "Eliminar del concursos guardados?",
       "contestSavedSuccessfully": "Concurso guardado correctamente!",
-      "contestRemovedFromSaved": "Concurso eliminado de guardados!"
+      "contestRemovedFromSaved": "Concurso eliminado de guardados!",
+      "confirmCreateNewContest": "Crear nuevo concurso?",
+      "confirmCreateNewContestDescription": "Tienes un concurso activo ({name}). Asegúrate de guardarlo antes de crear uno nuevo."
     },
     "themes": {
       "title": "Temas",
@@ -571,7 +574,8 @@
       "deleteCustomCountry": "Eliminar entrada personalizada",
       "deleteTheme": "Eliminar tema",
       "cancelSimulation": "Cancelar simulación",
-      "logout": "Cerrar sesión"
+      "logout": "Cerrar sesión",
+      "createNewContest": "Crear nuevo concurso"
     }
   }
 }

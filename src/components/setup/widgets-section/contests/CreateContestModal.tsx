@@ -128,13 +128,11 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
       }
 
       const snapshot = buildContestSnapshotFromStores();
-      // TODO: Add themeId back later
       // const themeId =
       //   useGeneralStore.getState().customTheme?._id ?? initialContest?.themeId;
 
       let contest: Contest;
 
-      // TODO: display warning alert if user already has an active contest with option to not show again
       if (isEditMode) {
         contest = await updateContest({
           id: initialContest._id,

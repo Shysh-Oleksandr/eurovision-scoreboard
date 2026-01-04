@@ -12,7 +12,7 @@ import {
 import { buildEventStagesFromAssignments } from '@/components/setup/utils/buildEventStagesFromAssignments';
 import { Year } from '@/config';
 import { useCountriesStore } from '@/state/countriesStore';
-import { useGeneralStore } from '@/state/generalStore';
+import { PointsItem, useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import type {
   ContestSnapshot,
@@ -20,23 +20,11 @@ import type {
   CountriesStateItem,
 } from '@/types/contestSnapshot';
 import { Contest } from '@/types/contest';
+import { isDefaultPointsSystem } from './pointsSystem';
 
 const DEFAULT_VOTING_MODE = 'JURY_AND_TELEVOTE';
 const DEFAULT_ODDS = { juryOdds: 50, televoteOdds: 50 };
 const DEFAULT_RANDOMNESS_LEVEL = 50;
-
-type PointsItem = { id: number; value: number; showDouzePoints: boolean };
-
-const isDefaultPointsSystem = (pointsSystem: PointsItem[]) => {
-  if (pointsSystem.length !== POINTS_ARRAY.length) return false;
-  for (let i = 0; i < pointsSystem.length; i++) {
-    const item = pointsSystem[i];
-    if (item.id !== i) return false;
-    if (item.value !== POINTS_ARRAY[i]) return false;
-    if (item.showDouzePoints !== (item.value === 12)) return false;
-  }
-  return true;
-};
 
 const encodePredefinedVotes = (
   predefinedVotes: Record<string, any>,
@@ -152,13 +140,15 @@ const defaultPointsSystem: PointsItem[] = POINTS_ARRAY.map((value, id) => ({
 }));
 
 const getPointsSystem = (
-  pointsSystem: Array<{ id: number; value: number }> | undefined,
+  pointsSystem:
+    | Array<{ id: number; value: number; showDouzePoints?: boolean }>
+    | undefined,
 ) => {
   return pointsSystem
     ? pointsSystem.map((p) => ({
         id: p.id,
         value: p.value,
-        showDouzePoints: p.value === 12,
+        showDouzePoints: p.showDouzePoints ?? p.value === 12, // Use saved value or default to value === 12
       }))
     : defaultPointsSystem;
 };
@@ -259,28 +249,28 @@ export function buildContestSnapshotFromStores() {
   let setupPointsPayload: any = undefined;
   let simulationPointsPayload: any = undefined;
 
+  // Helper to create optimized points payload
+  const createPointsPayload = (points: PointsItem[]) => {
+    return points.map((p) => ({
+      id: p.id,
+      value: p.value,
+      ...(p.showDouzePoints ? { showDouzePoints: true } : {}), // Only save when true
+    }));
+  };
+
   // If both are default, save nothing
   if (isSetupDefault && isSimulationDefault) {
     // No points systems to save
   }
   // If they're the same (but not default), save only in setup
   else if (isSamePointsSystems) {
-    setupPointsPayload = settingsPointsSystem.map((p) => ({
-      id: p.id,
-      value: p.value,
-    }));
+    setupPointsPayload = createPointsPayload(settingsPointsSystem);
     // simulationPointsPayload remains undefined - will use setup when loading
   }
   // If they're different, save both
   else {
-    setupPointsPayload = settingsPointsSystem.map((p) => ({
-      id: p.id,
-      value: p.value,
-    }));
-    simulationPointsPayload = pointsSystem.map((p) => ({
-      id: p.id,
-      value: p.value,
-    }));
+    setupPointsPayload = createPointsPayload(settingsPointsSystem);
+    simulationPointsPayload = createPointsPayload(pointsSystem);
   }
 
   // setup.stages: stable config with participants/voters by code

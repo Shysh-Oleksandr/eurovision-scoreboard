@@ -244,17 +244,17 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
-    date: '2025-01-03',
+    date: '2026-01-03',
     title:
       'Added custom confirmation popups for certain actions. Added loading spinner.',
   },
   {
-    date: '2025-01-02',
+    date: '2026-01-02',
     title:
       'Added rank-based qualifier targets. Added saving custom entries from other contests (to do this, load the contest → remove custom entries from participants → open the Imported section → click the "Save to your custom entries" button).',
   },
   {
-    date: '2025-01-01',
+    date: '2026-01-01',
     title:
       'Added reordering all stages during adding/editing a stage. Minor fixes',
   },
@@ -273,7 +273,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-01-03', end: '2026-01-04' },
+    approximateDates: { start: '2026-01-10', end: '2026-01-11' },
     title: 'Contests improvements',
   },
   {

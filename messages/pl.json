@@ -40,7 +40,8 @@
     "randomize": "Losuj",
     "loadYearData": "Załaduj dane roku",
     "country": "Kraj",
-    "current": "Bieżący"
+    "current": "Bieżący",
+    "dontShowAgain": "Nie pokazuj ponownie"
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",
@@ -321,7 +322,9 @@
       "contestReset": "Konkurs zresetowany pomyślnie!",
       "confirmRemoveSavedContest": "Usuń z zapisanych konkursów?",
       "contestSavedSuccessfully": "Konkurs zapisany pomyślnie!",
-      "contestRemovedFromSaved": "Konkurs usunięty z zapisanych!"
+      "contestRemovedFromSaved": "Konkurs usunięty z zapisanych!",
+      "confirmCreateNewContest": "Utwórz nowy konkurs?",
+      "confirmCreateNewContestDescription": "Masz aktywny konkurs ({name}). Upewnij się, że go zapiszesz przed utworzeniem nowego."
     },
     "themes": {
       "title": "Motywy",
@@ -571,7 +574,8 @@
       "deleteCustomCountry": "Usuń własny wpis",
       "deleteTheme": "Usuń motyw",
       "cancelSimulation": "Anuluj symulację",
-      "logout": "Wyloguj się"
+      "logout": "Wyloguj się",
+      "createNewContest": "Utwórz nowy konkurs"
     }
   }
 }

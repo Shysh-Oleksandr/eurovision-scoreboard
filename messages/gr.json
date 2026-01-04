@@ -40,7 +40,8 @@
     "randomize": "Τυχαίο",
     "loadYearData": "Φόρτωση Δεδομένων Έτους",
     "country": "Χώρα",
-    "current": "Τρέχον"
+    "current": "Τρέχον",
+    "dontShowAgain": "Να μην εμφανίζεται ξανά"
   },
   "Metadata": {
     "title": "DouzePoints - Προσομοιωτής Πίνακα Σκορ Eurovision",
@@ -321,7 +322,9 @@
       "contestReset": "Ο διαγωνισμός επαναφέρθηκε με επιτυχία!",
       "confirmRemoveSavedContest": "Αφαίρεση από τα αποθηκευμένα διαγωνισμάτα?",
       "contestSavedSuccessfully": "Ο διαγωνισμός αποθηκεύτηκε με επιτυχία!",
-      "contestRemovedFromSaved": "Ο διαγωνισμός αφαιρέθηκε από τα αποθηκευμένα!"
+      "contestRemovedFromSaved": "Ο διαγωνισμός αφαιρέθηκε από τα αποθηκευμένα!",
+      "confirmCreateNewContest": "Δημιουργήστε νέο διαγωνισμό?",
+      "confirmCreateNewContestDescription": "Έχετε έναν ενεργό διαγωνισμό ({name}). Επαληθεύστε ότι το αποθηκεύσετε πριν δημιουργήσετε έναν νέο."
     },
     "themes": {
       "title": "Θέματα",
@@ -571,7 +574,8 @@
       "deleteCustomCountry": "Διαγραφή προσαρμοσμένης καταχώρησης",
       "deleteTheme": "Διαγραφή θέματος",
       "cancelSimulation": "Ακύρωση προσομοίωσης",
-      "logout": "Αποσύνδεση"
+      "logout": "Αποσύνδεση",
+      "createNewContest": "Δημιουργήστε νέο διαγωνισμό"
     }
   }
 }

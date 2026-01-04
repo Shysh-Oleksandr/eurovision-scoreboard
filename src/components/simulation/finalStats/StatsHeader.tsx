@@ -38,7 +38,11 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   // );
 
   return (
-    <div className="flex sm:flex-row items-center flex-col justify-between sm:gap-2.5 gap-2 px-2 relative sm:mb-4 mb-2">
+    <div
+      className={`flex sm:flex-row items-center flex-col justify-between sm:gap-2.5 gap-2 px-2 relative sm:mb-4 mb-2 ${
+        finishedStages.length > 5 ? '!flex-col' : ''
+      }`}
+    >
       <Button
         variant="tertiary"
         className="!px-4 z-20 h-fit sm:w-fit w-full justify-center"
@@ -107,14 +111,16 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
         )}
       </div>
 
-      <Button
-        variant="tertiary"
-        className="!px-4 z-20 h-fit sm:block hidden invisible"
-        onClick={() => {}}
-        Icon={<ShareIcon className="w-[20px] h-[20px]" />}
-      >
-        {t('header.share')}
-      </Button>
+      {finishedStages.length <= 5 && (
+        <Button
+          variant="tertiary"
+          className="!px-4 z-20 h-fit sm:block hidden invisible"
+          onClick={() => {}}
+          Icon={<ShareIcon className="w-[20px] h-[20px]" />}
+        >
+          {t('header.share')}
+        </Button>
+      )}
     </div>
   );
 };

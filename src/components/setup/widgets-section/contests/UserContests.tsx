@@ -45,7 +45,7 @@ const sortContestsBy =
 
 interface UserContestsProps {
   onLoaded?: () => void;
-  onCreateNew?: () => void;
+  onCreateNew: () => void;
   onEdit?: (contest: Contest) => void;
   onLoad: (contest: Contest) => void;
 }
@@ -280,7 +280,29 @@ const UserContests: React.FC<UserContestsProps> = ({
         <WidgetSearchHeader
           search={search}
           onSearchChange={setSearch}
-          onCreateNew={view === 'yours' ? onCreateNew : undefined}
+          onCreateNew={() => {
+            if (
+              !activeContest ||
+              activeContest.userId.toString() !== user?._id
+            ) {
+              onCreateNew();
+
+              return;
+            }
+            confirm({
+              key: 'create-new-contest',
+              title: t('widgets.contests.confirmCreateNewContest'),
+              description: t(
+                'widgets.contests.confirmCreateNewContestDescription',
+                {
+                  name: activeContest.name,
+                },
+              ),
+              onConfirm: () => {
+                onCreateNew();
+              },
+            });
+          }}
           placeholder={t('widgets.contests.searchContests')}
         />
 

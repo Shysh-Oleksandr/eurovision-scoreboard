@@ -40,7 +40,8 @@
     "randomize": "Casualizza",
     "loadYearData": "Carica Dati Anno",
     "country": "Paese",
-    "current": "Corrente"
+    "current": "Corrente",
+    "dontShowAgain": "Non mostrare di nuovo"
   },
   "Metadata": {
     "title": "DouzePoints - Simulatore di Classifica Eurovision",
@@ -321,7 +322,9 @@
       "contestReset": "Concorso reimpostato con successo!",
       "confirmRemoveSavedContest": "Rimuovere dai concorsi salvati?",
       "contestSavedSuccessfully": "Concorso salvato con successo!",
-      "contestRemovedFromSaved": "Concorso rimosso dai salvati!"
+      "contestRemovedFromSaved": "Concorso rimosso dai salvati!",
+      "confirmCreateNewContest": "Creare un nuovo concorso?",
+      "confirmCreateNewContestDescription": "Hai un concorso attivo ({name}). Assicurati di salvarlo prima di creare uno nuovo."
     },
     "themes": {
       "title": "Temi",
@@ -571,7 +574,8 @@
       "deleteCustomCountry": "Elimina voce personalizzata",
       "deleteTheme": "Elimina tema",
       "cancelSimulation": "Annulla simulazione",
-      "logout": "Esci"
+      "logout": "Esci",
+      "createNewContest": "Creare un nuovo concorso"
     }
   }
 }

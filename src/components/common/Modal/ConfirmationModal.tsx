@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { Checkbox } from '../Checkbox';
@@ -29,6 +30,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   type = 'alert',
 }) => {
   const { preferences } = useConfirmationStore();
+  const t = useTranslations();
 
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
 
@@ -77,7 +79,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         <Checkbox
           id="confirmation"
-          label="Don't show this again"
+          label={t('common.dontShowAgain')}
           checked={doNotShowAgain}
           onChange={(e) => setDoNotShowAgain(e.target.checked)}
         />

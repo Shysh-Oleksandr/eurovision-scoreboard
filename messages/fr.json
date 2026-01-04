@@ -40,7 +40,8 @@
     "randomize": "Aléatoire",
     "loadYearData": "Charger les données de l’année",
     "country": "Pays",
-    "current": "Actuel"
+    "current": "Actuel",
+    "dontShowAgain": "Ne pas afficher à nouveau"
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",
@@ -321,7 +322,9 @@
       "contestReset": "Concours réinitialisé avec succès !",
       "confirmRemoveSavedContest": "Supprimer des concours enregistrés?",
       "contestSavedSuccessfully": "Concours enregistré avec succès !",
-      "contestRemovedFromSaved": "Concours supprimé des enregistrés !"
+      "contestRemovedFromSaved": "Concours supprimé des enregistrés !",
+      "confirmCreateNewContest": "Créer un nouveau concours?",
+      "confirmCreateNewContestDescription": "Vous avez un concours actif ({name}). Assurez-vous de le sauvegarder avant de créer un nouveau."
     },
     "themes": {
       "title": "Thèmes",
@@ -571,7 +574,8 @@
       "deleteCustomCountry": "Supprimer l’entrée personnalisée",
       "deleteTheme": "Supprimer le thème",
       "cancelSimulation": "Annuler la simulation",
-      "logout": "Se déconnecter"
+      "logout": "Se déconnecter",
+      "createNewContest": "Créer un nouveau concours"
     }
   }
 }

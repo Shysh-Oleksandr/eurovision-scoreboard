@@ -40,7 +40,8 @@
     "randomize": "Випадково",
     "loadYearData": "Завантажити дані року",
     "country": "Країна",
-    "current": "Поточний"
+    "current": "Поточний",
+    "dontShowAgain": "Не показувати знову"
   },
   "Metadata": {
     "title": "DouzePoints - Симулятор Євробачення",
@@ -321,7 +322,9 @@
       "contestReset": "Конкурс успішно скинуто!",
       "confirmRemoveSavedContest": "Вилучити з збережених конкурсів?",
       "contestSavedSuccessfully": "Конкурс успішно збережено!",
-      "contestRemovedFromSaved": "Конкурс успішно вилучено із збережених!"
+      "contestRemovedFromSaved": "Конкурс успішно вилучено із збережених!",
+      "confirmCreateNewContest": "Створити новий конкурс?",
+      "confirmCreateNewContestDescription": "У вас є активний конкурс ({name}). Переконайтеся, що зберегли його перед створенням нового."
     },
     "themes": {
       "title": "Теми",
@@ -571,7 +574,8 @@
       "deleteCustomCountry": "Вилучити користувацького учасника",
       "deleteTheme": "Вилучити тему",
       "cancelSimulation": "Скасувати симуляцію",
-      "logout": "Вийти"
+      "logout": "Вийти",
+      "createNewContest": "Створити новий конкурс"
     }
   }
 }
