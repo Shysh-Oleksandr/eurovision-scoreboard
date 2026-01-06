@@ -160,10 +160,12 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 
             {contest.totalParticipants > 0 && (
               <span className="text-xs bg-primary-800/60 text-white/80 px-2 py-1 rounded-full">
-                {t('widgets.contests.nParticipants', {
-                  count: contest.totalParticipants,
-                })}{' '}
-                |{' '}
+                {contest.stageNames.length > 1 ||
+                contest.grandFinalParticipants !== contest.totalParticipants
+                  ? t('widgets.contests.nParticipants', {
+                      count: contest.totalParticipants,
+                    }) + ' | '
+                  : ''}
                 {t('widgets.contests.nGrandFinalParticipants', {
                   count: contest.grandFinalParticipants,
                 })}

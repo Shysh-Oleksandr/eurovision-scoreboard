@@ -409,126 +409,73 @@ export function buildContestSnapshotFromStores() {
   return snapshot;
 }
 
+export enum SimulationLoadOptions {
+  RESULTS = 'results',
+  PRESENTATION = 'presentation',
+}
+
+export interface LoadContestOptions {
+  generalInfo: boolean;
+  setup: boolean;
+  simulation: boolean;
+  simulationLoadOption?: SimulationLoadOptions;
+}
+
 export async function applyContestSnapshotToStores(
   snapshot: ContestSnapshot,
   contest: Contest,
   updateMetadataOnly: boolean = false,
+  loadOptions: LoadContestOptions = {
+    generalInfo: true,
+    setup: true,
+    simulation: true,
+    simulationLoadOption: SimulationLoadOptions.RESULTS,
+  },
 ) {
   const countriesStore = useCountriesStore.getState();
   const general = useGeneralStore.getState();
 
   if (updateMetadataOnly) {
-    useGeneralStore.setState({
-      settings: {
-        ...general.settings,
-        contestName: contest.name,
-        contestDescription: contest.description ?? '',
-        contestYear: contest.year?.toString() ?? '',
-        hostingCountryCode: contest.hostingCountryCode,
-      },
-    });
+    if (loadOptions.generalInfo) {
+      useGeneralStore.setState({
+        settings: {
+          ...general.settings,
+          contestName: contest.name,
+          contestDescription: contest.description ?? '',
+          contestYear: contest.year?.toString() ?? '',
+          hostingCountryCode: contest.hostingCountryCode,
+        },
+      });
+    }
     return;
   }
 
-  const existing = countriesStore.customCountries || [];
+  // Apply custom entries if setup is enabled
+  if (loadOptions.setup || loadOptions.simulation) {
+    const existing = countriesStore.customCountries || [];
 
-  // Merge custom entries into local custom countries (portable)
-  const importedCustoms: BaseCountry[] = (snapshot.customEntriesUsed || []).map(
-    (e) => ({
+    // Merge custom entries into local custom countries (portable)
+    const importedCustoms: BaseCountry[] = (
+      snapshot.customEntriesUsed || []
+    ).map((e) => ({
       code: e.code,
       name: e.name,
       category: 'Custom',
       flag: e.flag,
       isImported: true,
-    }),
-  );
+    }));
 
-  // Store imported entries separately for persistence
-  useGeneralStore.setState({ importedCustomEntries: importedCustoms });
+    // Store imported entries separately for persistence
+    useGeneralStore.setState({ importedCustomEntries: importedCustoms });
 
-  const mergedCustomCountries = [...existing, ...importedCustoms].filter(
-    (c, index, self) => index === self.findIndex((t) => t.code === c.code),
-  );
-  useCountriesStore.setState({ customCountries: mergedCustomCountries });
+    const mergedCustomCountries = [...existing, ...importedCustoms].filter(
+      (c, index, self) => index === self.findIndex((t) => t.code === c.code),
+    );
+    useCountriesStore.setState({ customCountries: mergedCustomCountries });
+  }
 
   const allCountries = countriesStore.getAllCountries(true);
   const byCode = new Map(allCountries.map((c) => [c.code, c]));
-
-  // Apply points system and randomness, ensure predefined votes enabled for replay
-
-  const settingsPointsSystem = getPointsSystem(snapshot.setup.pointsSystem);
-  // If simulation doesn't have its own pointsSystem, use the setup one
-  const simulationPointsSystem = getPointsSystem(
-    snapshot.simulation?.pointsSystem || snapshot.setup.pointsSystem,
-  );
-  useGeneralStore.setState({
-    pointsSystem: simulationPointsSystem,
-    settingsPointsSystem: settingsPointsSystem,
-    settings: {
-      ...general.settings,
-      randomnessLevel:
-        snapshot.setup.randomnessLevel ?? DEFAULT_RANDOMNESS_LEVEL,
-      hostingCountryCode: contest.hostingCountryCode,
-      contestName: contest.name,
-      contestDescription: contest.description ?? '',
-      contestYear: contest.year?.toString() ?? '',
-    },
-  });
-
-  // Apply odds - merge with base year defaults
-  const oddsRecord: Record<
-    string,
-    { juryOdds?: number; televoteOdds?: number }
-  > = {};
-
-  // First, load base year defaults for all participants
-  const baseYear = snapshot.setup.baseYear;
-  const isJuniorContest = snapshot.setup.isJuniorContest ?? false;
-  if (baseYear) {
-    // Load the base year countries to get correct defaults (junior or senior)
-    await useCountriesStore
-      .getState()
-      .setInitialCountriesForYear(baseYear.toString() as Year, {
-        force: true,
-        isJuniorContest,
-      });
-
-    const baseYearCountries = useCountriesStore.getState().allCountriesForYear;
-    const yearDefaults = baseYearCountries.reduce((acc, country) => {
-      acc[country.code] = {
-        juryOdds: country.juryOdds ?? DEFAULT_ODDS.juryOdds,
-        televoteOdds: country.televoteOdds ?? DEFAULT_ODDS.televoteOdds,
-      };
-      return acc;
-    }, {} as Record<string, { juryOdds: number; televoteOdds: number }>);
-
-    // Apply defaults first
-    Object.entries(yearDefaults).forEach(([code, defaults]) => {
-      oddsRecord[code] = defaults;
-    });
-  }
-
-  // Then override with saved custom odds
-  (snapshot.setup.countryOdds || []).forEach(
-    ([code, juryOdds, televoteOdds]) => {
-      oddsRecord[code] = { juryOdds, televoteOdds };
-    },
-  );
-  useCountriesStore.getState().setBulkCountryOdds(oddsRecord);
-
-  // Rebuild eventAssignments + configuredEventStages for setup UI
-  const assignments: Record<string, string> = {};
-  allCountries.forEach((c) => {
-    assignments[c.code] = CountryAssignmentGroup.NOT_PARTICIPATING;
-  });
-  snapshot.setup.stages.forEach((stage) => {
-    stage.participants.forEach((code) => {
-      const currentAssignment = assignments[code];
-      if (currentAssignment === CountryAssignmentGroup.NOT_PARTICIPATING) {
-        assignments[code] = stage.id;
-      }
-    });
-  });
 
   const toVotingCountry = (code: string): VotingCountry => {
     const found = byCode.get(code);
@@ -539,25 +486,140 @@ export async function applyContestSnapshotToStores(
     };
   };
 
-  const configuredStages: EventStage[] = snapshot.setup.stages.map((s) => ({
-    id: s.id,
-    name: s.name,
-    order: s.order,
-    votingMode: (s.votingMode || DEFAULT_VOTING_MODE) as any,
-    qualifiesTo: s.qualifiesTo,
-    countries: [],
-    votingCountries: (s.voters || []).map(toVotingCountry),
-    isOver: false, // Setup stages are never "over"
-    isJuryVoting: (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY',
-  }));
+  const isPresentationMode =
+    loadOptions.simulationLoadOption === SimulationLoadOptions.PRESENTATION;
 
-  useCountriesStore.setState({
-    configuredEventStages: configuredStages,
-    eventAssignments: assignments,
-  });
+  // Apply general info settings
+  const generalSettingsUpdate: any = {};
+  const generalSettingsUpdateSettings: any = {};
 
-  // Apply simulation state if present
-  if (snapshot.simulation) {
+  if (loadOptions.generalInfo) {
+    generalSettingsUpdateSettings.contestName = contest.name;
+    generalSettingsUpdateSettings.contestDescription =
+      contest.description ?? '';
+    generalSettingsUpdateSettings.contestYear = contest.year?.toString() ?? '';
+    generalSettingsUpdateSettings.hostingCountryCode =
+      contest.hostingCountryCode;
+  }
+
+  // Apply setup settings
+  if (loadOptions.setup) {
+    const settingsPointsSystem = getPointsSystem(snapshot.setup.pointsSystem);
+    generalSettingsUpdate.pointsSystem = settingsPointsSystem;
+    generalSettingsUpdate.settingsPointsSystem = settingsPointsSystem;
+    generalSettingsUpdateSettings.randomnessLevel =
+      snapshot.setup.randomnessLevel ?? DEFAULT_RANDOMNESS_LEVEL;
+  }
+
+  // Apply simulation settings
+  if (loadOptions.simulation) {
+    const simulationPointsSystem = getPointsSystem(
+      snapshot.simulation?.pointsSystem || snapshot.setup.pointsSystem,
+    );
+    generalSettingsUpdate.pointsSystem = simulationPointsSystem;
+    generalSettingsUpdate.settingsPointsSystem = getPointsSystem(
+      snapshot.setup.pointsSystem,
+    );
+
+    // Enable presentation mode if selected
+    if (isPresentationMode) {
+      generalSettingsUpdateSettings.presentationModeEnabled = true;
+    }
+  }
+
+  if (Object.keys(generalSettingsUpdate).length > 0) {
+    useGeneralStore.setState({
+      ...generalSettingsUpdate,
+      settings: {
+        ...general.settings,
+        ...generalSettingsUpdateSettings,
+      },
+      presentationSettings: {
+        ...general.presentationSettings,
+        isPresenting: general.settings.autoStartPresentation,
+      },
+    });
+  }
+
+  // Apply odds - merge with base year defaults
+  if (loadOptions.setup) {
+    const oddsRecord: Record<
+      string,
+      { juryOdds?: number; televoteOdds?: number }
+    > = {};
+
+    // First, load base year defaults for all participants
+    const baseYear = snapshot.setup.baseYear;
+    const isJuniorContest = snapshot.setup.isJuniorContest ?? false;
+    if (baseYear) {
+      // Load the base year countries to get correct defaults (junior or senior)
+      await useCountriesStore
+        .getState()
+        .setInitialCountriesForYear(baseYear.toString() as Year, {
+          force: true,
+          isJuniorContest,
+        });
+
+      const baseYearCountries =
+        useCountriesStore.getState().allCountriesForYear;
+      const yearDefaults = baseYearCountries.reduce((acc, country) => {
+        acc[country.code] = {
+          juryOdds: country.juryOdds ?? DEFAULT_ODDS.juryOdds,
+          televoteOdds: country.televoteOdds ?? DEFAULT_ODDS.televoteOdds,
+        };
+        return acc;
+      }, {} as Record<string, { juryOdds: number; televoteOdds: number }>);
+
+      // Apply defaults first
+      Object.entries(yearDefaults).forEach(([code, defaults]) => {
+        oddsRecord[code] = defaults;
+      });
+    }
+
+    // Then override with saved custom odds
+    (snapshot.setup.countryOdds || []).forEach(
+      ([code, juryOdds, televoteOdds]) => {
+        oddsRecord[code] = { juryOdds, televoteOdds };
+      },
+    );
+    useCountriesStore.getState().setBulkCountryOdds(oddsRecord);
+  }
+
+  // Rebuild eventAssignments + configuredEventStages for setup UI
+  if (loadOptions.setup) {
+    const assignments: Record<string, string> = {};
+    allCountries.forEach((c) => {
+      assignments[c.code] = CountryAssignmentGroup.NOT_PARTICIPATING;
+    });
+    snapshot.setup.stages.forEach((stage) => {
+      stage.participants.forEach((code) => {
+        const currentAssignment = assignments[code];
+        if (currentAssignment === CountryAssignmentGroup.NOT_PARTICIPATING) {
+          assignments[code] = stage.id;
+        }
+      });
+    });
+
+    const configuredStages: EventStage[] = snapshot.setup.stages.map((s) => ({
+      id: s.id,
+      name: s.name,
+      order: s.order,
+      votingMode: (s.votingMode || DEFAULT_VOTING_MODE) as any,
+      qualifiesTo: s.qualifiesTo,
+      countries: [],
+      votingCountries: (s.voters || []).map(toVotingCountry),
+      isOver: false, // Setup stages are never "over"
+      isJuryVoting: (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY',
+    }));
+
+    useCountriesStore.setState({
+      configuredEventStages: configuredStages,
+      eventAssignments: assignments,
+    });
+  }
+
+  // Apply simulation state if present and enabled
+  if (snapshot.simulation && loadOptions.simulation) {
     // Use simulation's pointsSystem for vote decoding, fallback to setup, then default
     const simulationPointsSystemSource =
       snapshot.simulation!.pointsSystem || snapshot.setup.pointsSystem;
@@ -601,18 +663,25 @@ export async function applyContestSnapshotToStores(
           snapshot.simulation!.countriesStateByStage?.[s.id] || [];
         const countries: Country[] = stageCountriesState.map((cs) => {
           const base = byCode.get(cs.code);
-          const juryPoints = cs.juryPoints ?? 0;
-          const televotePoints = cs.televotePoints ?? 0;
+          // For presentation mode, start with no points
+          const juryPoints = isPresentationMode ? 0 : cs.juryPoints ?? 0;
+          const televotePoints = isPresentationMode
+            ? 0
+            : cs.televotePoints ?? 0;
           const points = juryPoints + televotePoints;
 
           return {
             ...(base || { code: cs.code, name: cs.code }),
-            qualifiedFromStageIds: cs.qualifiedFromStageIds,
+            qualifiedFromStageIds: isPresentationMode
+              ? []
+              : cs.qualifiedFromStageIds,
             juryPoints,
             televotePoints,
             points,
             lastReceivedPoints: null,
-            isVotingFinished: cs.isVotingFinished ?? false, // Use saved value or default to false
+            isVotingFinished: isPresentationMode
+              ? false
+              : cs.isVotingFinished ?? false, // Reset voting status for presentation
           } as Country;
         });
 
@@ -634,7 +703,7 @@ export async function applyContestSnapshotToStores(
             votingMode: (setupStage.votingMode || DEFAULT_VOTING_MODE) as any,
             qualifiesTo: setupStage.qualifiesTo,
             votingCountries: (setupStage.voters || []).map(toVotingCountry),
-            isOver: (s as any).isOver, // Runtime state
+            isOver: isPresentationMode ? false : (s as any).isOver, // Runtime state
             isJuryVoting: (s as any).isJuryVoting, // Runtime state
             isLastStage: idx === arr.length - 1,
             countries,
@@ -648,7 +717,7 @@ export async function applyContestSnapshotToStores(
             votingMode: (s.votingMode || DEFAULT_VOTING_MODE) as any,
             qualifiesTo: s.qualifiesTo,
             votingCountries: (s.voters || []).map(toVotingCountry),
-            isOver: s.isOver, // Preserve runtime state
+            isOver: isPresentationMode ? false : s.isOver, // Preserve runtime state
             isJuryVoting:
               s.isJuryVoting !== undefined
                 ? s.isJuryVoting
@@ -664,18 +733,48 @@ export async function applyContestSnapshotToStores(
       decodedPredefinedVotes,
     );
 
+    // For presentation mode, set everything to the starting state
+    const firstStage = scoreboardStages[0];
+    const presentationModeStages = isPresentationMode
+      ? scoreboardStages.map((stage, index) => ({
+          ...stage,
+          isOver: false, // Reset all stages to not over
+          isJuryVoting:
+            index === 0
+              ? stage.votingMode !== StageVotingMode.TELEVOTE_ONLY
+              : stage.isJuryVoting,
+        }))
+      : scoreboardStages;
+
+    let firstVotingCountryIndex = 0;
+
+    if (firstStage && firstStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
+      firstVotingCountryIndex = firstStage.countries.length - 1;
+    }
+
     useScoreboardStore.setState({
-      eventStages: scoreboardStages,
-      currentStageId: snapshot.simulation!.results.currentStageId,
+      eventStages: presentationModeStages,
+      currentStageId: isPresentationMode
+        ? firstStage?.id
+        : snapshot.simulation!.results.currentStageId,
       viewedStageId: null,
-      votingCountryIndex: snapshot.simulation!.results.votingCountryIndex,
-      votingPointsIndex: snapshot.simulation!.results.votingPointsIndex,
-      televotingProgress: snapshot.simulation!.results.televotingProgress,
-      currentRevealTelevotePoints:
-        snapshot.simulation!.results.currentRevealTelevotePoints ?? 0,
+      votingCountryIndex: isPresentationMode
+        ? firstVotingCountryIndex
+        : snapshot.simulation!.results.votingCountryIndex,
+      votingPointsIndex: isPresentationMode
+        ? 0
+        : snapshot.simulation!.results.votingPointsIndex,
+      televotingProgress: isPresentationMode
+        ? 0
+        : snapshot.simulation!.results.televotingProgress,
+      currentRevealTelevotePoints: isPresentationMode
+        ? 0
+        : snapshot.simulation!.results.currentRevealTelevotePoints ?? 0,
       predefinedVotes: decodedPredefinedVotes,
-      countryPoints,
-      winnerCountry: snapshot.simulation!.results.winnerCountryCode
+      countryPoints: isPresentationMode ? {} : countryPoints, // Clear country points for fresh presentation
+      winnerCountry: isPresentationMode
+        ? null
+        : snapshot.simulation!.results.winnerCountryCode
         ? (scoreboardStages
             .flatMap((s) => s.countries)
             .find(
@@ -697,5 +796,11 @@ export async function applyContestSnapshotToStores(
       winnerCountry: null,
       showQualificationResults: false,
     } as any);
+  }
+
+  if (isPresentationMode) {
+    useCountriesStore.setState({
+      eventSetupModalOpen: false,
+    });
   }
 }

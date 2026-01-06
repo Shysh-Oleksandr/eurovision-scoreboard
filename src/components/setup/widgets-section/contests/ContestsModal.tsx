@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
+import LoadContestModal from './LoadContestModal';
 import PublicContests from './PublicContests';
 import UserContests from './UserContests';
 
@@ -13,7 +14,10 @@ import { useApplyContestMutation } from '@/api/contests';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
-import { applyContestSnapshotToStores } from '@/helpers/contestSnapshot';
+import {
+  applyContestSnapshotToStores,
+  LoadContestOptions,
+} from '@/helpers/contestSnapshot';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -49,6 +53,11 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
   const [isPublicContestsLoaded, setIsPublicContestsLoaded] = useState(false);
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
   const [initialContest, setInitialContest] = useState<Contest | undefined>();
+  const [isLoadContestModalOpen, setIsLoadContestModalOpen] = useState(false);
+  const [contestToLoad, setContestToLoad] = useState<{
+    contest: Contest;
+    snapshot: any;
+  } | null>(null);
 
   const tabs = useMemo(
     () => [
@@ -77,6 +86,19 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
     try {
       const { data } = await api.get(`/contests/${contest._id}/snapshot`);
 
+      setContestToLoad({ contest, snapshot: data });
+      setIsLoadContestModalOpen(true);
+    } catch (e: any) {
+      toast.error(e?.response?.data?.message || t('failedToLoadContest'));
+    }
+  };
+
+  const handleConfirmLoadContest = async (options: LoadContestOptions) => {
+    if (!contestToLoad) return;
+
+    try {
+      const { contest, snapshot } = contestToLoad;
+
       // if (contest.themeId) {
       //   const { data: theme } = await api.get(`/themes/${contest.themeId}`);
 
@@ -89,7 +111,7 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
       //   }
       // }
 
-      await applyContestSnapshotToStores(data, contest);
+      await applyContestSnapshotToStores(snapshot, contest, false, options);
 
       // Set as active contest (immediate)
       useGeneralStore.getState().setActiveContest(contest);
@@ -103,6 +125,8 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
       toast.success(t('contestLoaded'));
     } catch (e: any) {
       toast.error(e?.response?.data?.message || t('failedToLoadContest'));
+    } finally {
+      setContestToLoad(null);
     }
   };
 
@@ -171,6 +195,19 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
           isOpen={isCustomizeModalOpen}
           onClose={handleCloseCustomize}
           initialContest={initialContest}
+        />
+      )}
+
+      {/* Load Contest Modal */}
+      {isLoadContestModalOpen && contestToLoad && (
+        <LoadContestModal
+          isOpen={isLoadContestModalOpen}
+          isSimulationStarted={contestToLoad.contest.isSimulationStarted}
+          onClose={() => {
+            setIsLoadContestModalOpen(false);
+            setContestToLoad(null);
+          }}
+          onLoad={handleConfirmLoadContest}
         />
       )}
     </>

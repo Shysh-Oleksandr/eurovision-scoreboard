@@ -12,7 +12,10 @@ import { ArrowDownAndUpIcon } from '@/assets/icons/ArrowDownAndUpIcon';
 import { ListPlusIcon } from '@/assets/icons/ListPlusIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
-import { applyContestSnapshotToStores } from '@/helpers/contestSnapshot';
+import {
+  applyContestSnapshotToStores,
+  LoadContestOptions,
+} from '@/helpers/contestSnapshot';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
@@ -20,6 +23,10 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 const CreateContestModal = dynamic(() => import('./CreateContestModal'), {
+  ssr: false,
+});
+
+const LoadContestModal = dynamic(() => import('./LoadContestModal'), {
   ssr: false,
 });
 
@@ -55,6 +62,9 @@ const ContestCard: React.FC<ContestCardProps> = ({
 
   const [isContestsModalOpen, setIsContestsModalOpen] = useState(false);
   const [isContestsModalLoaded, setIsContestsModalLoaded] = useState(false);
+  const [isLoadContestModalOpen, setIsLoadContestModalOpen] = useState(false);
+  const [contestSnapshotToReset, setContestSnapshotToReset] =
+    useState<any>(null);
 
   const { confirm: confirmResetContest } = useConfirmation();
 
@@ -71,11 +81,24 @@ const ContestCard: React.FC<ContestCardProps> = ({
           `/contests/${activeContest._id}/snapshot`,
         );
 
-        await applyContestSnapshotToStores(data, activeContest);
-
-        toast.success(t('widgets.contests.contestReset'));
+        setContestSnapshotToReset(data);
+        setIsLoadContestModalOpen(true);
       },
     });
+  };
+
+  const handleConfirmResetContest = async (options: LoadContestOptions) => {
+    if (!activeContest || !contestSnapshotToReset) return;
+
+    await applyContestSnapshotToStores(
+      contestSnapshotToReset,
+      activeContest,
+      false,
+      options,
+    );
+
+    toast.success(t('widgets.contests.contestReset'));
+    setContestSnapshotToReset(null);
   };
 
   const lastUpdatedBadge = useMemo(() => {
@@ -196,6 +219,18 @@ const ContestCard: React.FC<ContestCardProps> = ({
           onClose={() => setIsContestsModalOpen(false)}
           onLoaded={() => setIsContestsModalLoaded(true)}
           initialContest={isOwner && activeContest ? activeContest : undefined}
+        />
+      )}
+
+      {isLoadContestModalOpen && activeContest && (
+        <LoadContestModal
+          isOpen={isLoadContestModalOpen}
+          isSimulationStarted={activeContest.isSimulationStarted}
+          onClose={() => {
+            setIsLoadContestModalOpen(false);
+            setContestSnapshotToReset(null);
+          }}
+          onLoad={handleConfirmResetContest}
         />
       )}
     </>

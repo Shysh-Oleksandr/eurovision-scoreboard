@@ -264,9 +264,9 @@ const TelevoteInput = () => {
         </div>
       )}
 
-      <div className="flex">
+      <div className="flex overflow-hidden">
         <Input
-          className="w-full lg:!pt-3 md:!pt-2 !pt-1 lg:!pb-2 md:!pb-1 !pb-[2px] !px-2 !mt-2 lg:text-base text-sm"
+          className="w-full lg:!pt-3 md:!pt-2 !pt-1 lg:!pb-2 md:!pb-1 !pb-[2px] !px-2 !mt-2 lg:text-base text-sm !min-w-[70px]"
           name="televoteInput"
           id="televoteInput"
           type="number"
