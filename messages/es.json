@@ -80,7 +80,7 @@
       "qualifierTargets": "Objetivos de clasificación",
       "qualifierTargetsDescription": "Elige cuántos participantes de esta etapa avanzan a cada etapa posterior.",
       "rankBasedQualification": "Clasificación por ranking",
-      "qualifierTargetsDescriptionRankBased": "Especifique rangos de clasificación para la calificación (por ejemplo, rangos 1-3 van a la Gran Final, rangos 4-5 van a Semi-Final, rangos 6+ van a Heat).",
+      "qualifierTargetsDescriptionRankBased": "Especifique rangos de clasificación para la calificación (por ejemplo, rangos 1-3 van a la Gran Final, rangos 4-5 van a Semi-Final, rangos 6-10 van a Heat).",
       "addStage": "Añadir etapa",
       "editStage": "Editar etapa",
       "stageNamePlaceholder": "Semi-Final 3, Quarter-Final 1, Heat 1, etc.",

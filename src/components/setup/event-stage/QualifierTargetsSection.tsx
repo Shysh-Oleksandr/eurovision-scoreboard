@@ -41,11 +41,11 @@ const QualifierTargetsSection: React.FC<{
 
   // Detect initial mode based on existing data
   useEffect(() => {
-    const hasRankBasedQualifiers = (qualifiesTo || []).some(
-      (target) => target.minRank || target.maxRank,
+    const hasCompleteRankBasedQualifiers = (qualifiesTo || []).some(
+      (target) => target.minRank && target.maxRank,
     );
 
-    setIsRankBasedMode(hasRankBasedQualifiers);
+    setIsRankBasedMode(hasCompleteRankBasedQualifiers);
   }, [qualifiesTo]);
 
   // Convert between amount-based and rank-based qualification
@@ -481,7 +481,11 @@ const QualifierTargetsSection: React.FC<{
                                   maxRank,
                                 );
                               }}
-                              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
+                                errors.qualifiesTo
+                                  ? 'border border-red-400'
+                                  : ''
+                              }`}
                               min={1}
                               placeholder="Min"
                               disabled={isPrecedingStage}
@@ -502,7 +506,11 @@ const QualifierTargetsSection: React.FC<{
                                   maxRank,
                                 );
                               }}
-                              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
+                                errors.qualifiesTo
+                                  ? 'border border-red-400'
+                                  : ''
+                              }`}
                               min={1}
                               placeholder="Max"
                               disabled={isPrecedingStage}
@@ -601,7 +609,9 @@ const QualifierTargetsSection: React.FC<{
                           maxRank,
                         );
                       }}
-                      className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
+                        errors.qualifiesTo ? 'border border-red-400' : ''
+                      }`}
                       min={1}
                       placeholder="Min"
                       disabled={(grandFinalStage.order ?? 0) < currentOrder}
@@ -621,7 +631,9 @@ const QualifierTargetsSection: React.FC<{
                           maxRank,
                         );
                       }}
-                      className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
+                        errors.qualifiesTo ? 'border border-red-400' : ''
+                      }`}
                       min={1}
                       placeholder="Max"
                       disabled={(grandFinalStage.order ?? 0) < currentOrder}

@@ -17,19 +17,6 @@ const qualifierTargetSchema = z.object({
   amount: z.number().min(1, 'Amount must be at least 1'),
   minRank: z.number().optional(),
   maxRank: z.number().optional(),
-}).refine((data) => {
-  // If one rank is provided, both must be provided
-  if ((data.minRank && !data.maxRank) || (!data.minRank && data.maxRank)) {
-    return false;
-  }
-  // If both ranks are provided, validate they make sense
-  if (data.minRank && data.maxRank) {
-    return data.minRank >= 1 && data.maxRank >= data.minRank;
-  }
-  return true;
-}, {
-  message: 'Invalid rank range. Both min and max rank must be provided and min rank must be less than or equal to max rank.',
-  path: ['minRank'],
 });
 
 // Base schema for common fields
@@ -43,11 +30,25 @@ const eventStageSchema = z.object({
 }).refine((data) => {
   const qualifiesTo = data.qualifiesTo || [];
 
+  // Check for incomplete rank ranges (one rank provided but not the other)
+  const hasIncompleteRanks = qualifiesTo.some(target => (target.minRank && !target.maxRank) || (!target.minRank && target.maxRank));
+
+  // Check for invalid rank ranges (min > max or min < 1)
+  const hasInvalidRanges = qualifiesTo.some(target =>
+    target.minRank && target.maxRank && (target.minRank < 1 || target.maxRank < target.minRank)
+  );
+
   // Check if using rank-based qualification
   const hasRankBased = qualifiesTo.some(target => target.minRank && target.maxRank);
+  const hasAmountBased = qualifiesTo.some(target => !target.minRank && !target.maxRank);
 
+  // If there's any incomplete ranks, invalid ranges, or mixed qualification modes, it's invalid
+  if (hasIncompleteRanks || hasInvalidRanges || (hasRankBased && hasAmountBased)) {
+    return false;
+  }
+
+  // If not using rank-based qualification, skip range validation
   if (!hasRankBased) {
-    // Amount-based validation is handled elsewhere
     return true;
   }
 
@@ -82,7 +83,7 @@ const eventStageSchema = z.object({
 
   return true;
 }, {
-  message: 'Rank ranges must not overlap and must cover consecutive positions starting from rank 1.',
+  message: 'Rank ranges must not overlap, must cover consecutive positions starting from rank 1, cannot be mixed with amount-based qualification, and both min and max ranks must be provided.',
   path: ['qualifiesTo'],
 });
 

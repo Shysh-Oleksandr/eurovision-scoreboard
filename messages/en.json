@@ -79,7 +79,7 @@
       "qualifierTargets": "Qualifier targets",
       "qualifierTargetsDescription": "Choose how many entries from this stage advance to each later stage.",
       "rankBasedQualification": "Rank-based qualification",
-      "qualifierTargetsDescriptionRankBased": "Specify rank ranges for qualification (e.g., ranks 1-3 go to Grand Final, ranks 4-5 go to Semi-Final, ranks 6+ go to Heat).",
+      "qualifierTargetsDescriptionRankBased": "Specify rank ranges for qualification (e.g., ranks 1-3 go to Grand Final, ranks 4-5 go to Semi-Final, ranks 6-10 go to Heat).",
       "addStage": "Add Stage",
       "editStage": "Edit Stage",
       "stageNamePlaceholder": "Semi-Final 3, Quarter-Final 1, Heat 1, etc.",

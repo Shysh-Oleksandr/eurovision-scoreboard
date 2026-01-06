@@ -80,7 +80,7 @@
       "qualifierTargets": "Targets kwalifikacji",
       "qualifierTargetsDescription": "Wybierz, ile uczestników z tego etapu awansuje do każdego następnego etapu.",
       "rankBasedQualification": "Kwalifikacja oparta na rankingu",
-      "qualifierTargetsDescriptionRankBased": "Określ zakresy rankingowe dla kwalifikacji (np. rankingi 1-3 idą do Finału, rankingi 4-5 idą do Półfinału, rankingi 6+ idą do Heat).",
+      "qualifierTargetsDescriptionRankBased": "Określ zakresy rankingowe dla kwalifikacji (np. rankingi 1-3 idą do Finału, rankingi 4-5 idą do Półfinału, rankingi 6-10 idą do Heat).",
       "addStage": "Dodaj etap",
       "editStage": "Edytuj etap",
       "stageNamePlaceholder": "Półfinał 3, Kwartał 1, Heat 1, etc.",

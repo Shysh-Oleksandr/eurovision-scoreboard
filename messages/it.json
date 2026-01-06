@@ -80,7 +80,7 @@
       "qualifierTargets": "Targets di qualificazione",
       "qualifierTargetsDescription": "Scegli quanti partecipanti da questo stadio avanzano a ciascuno stadio successivo.",
       "rankBasedQualification": "Qualificazione basata sul ranking",
-      "qualifierTargetsDescriptionRankBased": "Specifica gli intervalli di classifica per la qualificazione (ad esempio, classifiche 1-3 vanno in finale, classifiche 4-5 vanno in semifinale, classifiche 6+ vanno in heat)",
+      "qualifierTargetsDescriptionRankBased": "Specifica gli intervalli di classifica per la qualificazione (ad esempio, classifiche 1-3 vanno in finale, classifiche 4-5 vanno in semifinale, classifiche 6-10 vanno in heat)",
       "addStage": "Aggiungi stadio",
       "editStage": "Modifica stadio",
       "stageNamePlaceholder": "Semifinale 3, Quarto finale 1, Heat 1, etc.",

@@ -80,7 +80,7 @@
       "qualifierTargets": "Qualifikationsziele",
       "qualifierTargetsDescription": "Wähle, wie viele Einträge aus diesem Stage zu jedem späteren Stage vorrücken.",
       "rankBasedQualification": "Rangbasierte Qualifizierung",
-      "qualifierTargetsDescriptionRankBased": "Geben Sie Rangbereiche für die Qualifizierung an (z.B. Ränge 1-3 gehen ins Grand Final, Ränge 4-5 gehen ins Halbfinale, Ränge 6+ gehen in das Heat).",
+      "qualifierTargetsDescriptionRankBased": "Geben Sie Rangbereiche für die Qualifizierung an (z.B. Ränge 1-3 gehen ins Grand Final, Ränge 4-5 gehen ins Halbfinale, Ränge 6-10 gehen in das Heat).",
       "addStage": "Stage hinzufügen",
       "editStage": "Stage bearbeiten",
       "stageNamePlaceholder": "Halbfinale 3, Viertelfinale 1, Heat 1, etc.",

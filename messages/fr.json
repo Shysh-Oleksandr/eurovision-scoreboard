@@ -80,7 +80,7 @@
       "qualifierTargets": "Targets de qualification",
       "qualifierTargetsDescription": "Choisissez combien d’entrées de cette étape avancent à chaque étape ultérieure.",
       "rankBasedQualification": "Qualification par rang",
-      "qualifierTargetsDescriptionRankBased": "Spécifiez les plages de rang pour la qualification (par exemple, les rangs 1-3 vont en finale, les rangs 4-5 vont en demi-finale, les rangs 6+ vont en heat).",
+      "qualifierTargetsDescriptionRankBased": "Spécifiez les plages de rang pour la qualification (par exemple, les rangs 1-3 vont en finale, les rangs 4-5 vont en demi-finale, les rangs 6-10 vont en heat).",
       "addStage": "Ajouter une étape",
       "editStage": "Modifier une étape",
       "stageNamePlaceholder": "Demi-finale 3, Quart-finale 1, Heat 1, etc.",
