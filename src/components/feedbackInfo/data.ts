@@ -244,6 +244,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-01-08',
+    title: 'Added saving and loading a theme with a contest',
+  },
+  {
     date: '2026-01-06',
     title:
       'Added the ability to load contest parts (general info, setup, simulation) and present the contest simulation with the same results as the original contest.',

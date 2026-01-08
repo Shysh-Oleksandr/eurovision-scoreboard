@@ -773,7 +773,7 @@ export async function applyContestSnapshotToStores(
         ? 0
         : snapshot.simulation!.results.currentRevealTelevotePoints ?? 0,
       predefinedVotes: decodedPredefinedVotes,
-      countryPoints: isPresentationMode ? {} : countryPoints, // Clear country points for fresh presentation
+      countryPoints: countryPoints, // TODO: we used to clear country points for fresh presentation(`isPresentationMode ? {} : countryPoints`), but it caused a bug when presenting a contest with no-points semis, so we keep the country points for now, but needs to check if it doesn't cause any other bugs later
       winnerCountry: isPresentationMode
         ? null
         : snapshot.simulation!.results.winnerCountryCode
