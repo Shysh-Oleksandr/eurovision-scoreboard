@@ -10,6 +10,7 @@ export interface Contest {
   _id: string;
   userId: string;
   themeId?: string;
+  standardThemeId?: string;
   name: string;
   description?: string;
   isPublic: boolean;

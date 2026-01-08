@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
+import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
 import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
 import { TrashIcon } from '@/assets/icons/TrashIcon';
@@ -184,6 +185,16 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
               <span className="text-xs bg-purple-900/60 text-purple-200 px-2 py-1 rounded-full">
                 {t('widgets.contests.pointsSystem')}:{' '}
                 {contest.customPointsSystem?.join(', ')}
+              </span>
+            )}
+
+            {(contest.themeId || contest.standardThemeId) && (
+              <span className="text-xs bg-pink-900/60 text-pink-200 px-2 py-1 rounded-full flex items-center gap-1">
+                <ThemeIcon className="size-4" />
+                {t('common.theme')}:{' '}
+                {contest.themeId
+                  ? t('common.custom')
+                  : contest.standardThemeId?.replace('-', ' ')}
               </span>
             )}
 

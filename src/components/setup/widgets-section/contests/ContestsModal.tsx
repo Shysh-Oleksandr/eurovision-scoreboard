@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
+import { useApplyContestTheme } from './hooks/useApplyContestTheme';
 import LoadContestModal from './LoadContestModal';
 import PublicContests from './PublicContests';
 import UserContests from './UserContests';
@@ -43,12 +44,10 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
   onClose,
   onLoaded,
 }) => {
-  // const { mutateAsync: applyThemeToProfile } = useApplyThemeMutation();
-  // const applyCustomTheme = useGeneralStore((state) => state.applyCustomTheme);
   const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
   const user = useAuthStore((state) => state.user);
 
-  const t = useTranslations('widgets.contests');
+  const t = useTranslations();
   const [activeTab, setActiveTab] = useState(ContestsTab.YOUR_CONTESTS);
   const [isPublicContestsLoaded, setIsPublicContestsLoaded] = useState(false);
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
@@ -61,11 +60,19 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
 
   const tabs = useMemo(
     () => [
-      { value: ContestsTab.YOUR_CONTESTS, label: t('yourContests') },
-      { value: ContestsTab.PUBLIC_CONTESTS, label: t('publicContests') },
+      {
+        value: ContestsTab.YOUR_CONTESTS,
+        label: t('widgets.contests.yourContests'),
+      },
+      {
+        value: ContestsTab.PUBLIC_CONTESTS,
+        label: t('widgets.contests.publicContests'),
+      },
     ],
     [t],
   );
+
+  const applyTheme = useApplyContestTheme();
 
   const handleCreateNew = () => {
     setInitialContest(undefined);
@@ -89,7 +96,9 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
       setContestToLoad({ contest, snapshot: data });
       setIsLoadContestModalOpen(true);
     } catch (e: any) {
-      toast.error(e?.response?.data?.message || t('failedToLoadContest'));
+      toast.error(
+        e?.response?.data?.message || t('widgets.contests.failedToLoadContest'),
+      );
     }
   };
 
@@ -99,17 +108,9 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
     try {
       const { contest, snapshot } = contestToLoad;
 
-      // if (contest.themeId) {
-      //   const { data: theme } = await api.get(`/themes/${contest.themeId}`);
-
-      //   // Apply locally (immediate)
-      //   applyCustomTheme(theme);
-
-      //   // Save to profile (sync across devices)
-      //   if (user) {
-      //     await applyThemeToProfile(theme._id);
-      //   }
-      // }
+      if (options.theme) {
+        await applyTheme(contest.themeId, contest.standardThemeId);
+      }
 
       await applyContestSnapshotToStores(snapshot, contest, false, options);
 
@@ -122,9 +123,11 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
       }
 
       onClose();
-      toast.success(t('contestLoaded'));
+      toast.success(t('widgets.contests.contestLoaded'));
     } catch (e: any) {
-      toast.error(e?.response?.data?.message || t('failedToLoadContest'));
+      toast.error(
+        e?.response?.data?.message || t('widgets.contests.failedToLoadContest'),
+      );
     } finally {
       setContestToLoad(null);
     }
@@ -203,6 +206,11 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
         <LoadContestModal
           isOpen={isLoadContestModalOpen}
           isSimulationStarted={contestToLoad.contest.isSimulationStarted}
+          themeDescription={
+            contestToLoad.contest.themeId
+              ? t('common.custom')
+              : contestToLoad.contest.standardThemeId?.replace('-', ' ')
+          }
           onClose={() => {
             setIsLoadContestModalOpen(false);
             setContestToLoad(null);

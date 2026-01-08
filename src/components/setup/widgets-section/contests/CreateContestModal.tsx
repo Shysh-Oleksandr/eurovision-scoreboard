@@ -46,6 +46,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
 
   const settings = useGeneralStore((state) => state.settings);
   const activeContest = useGeneralStore((state) => state.activeContest);
+  const customTheme = useGeneralStore((state) => state.customTheme);
+  const themeYear = useGeneralStore((state) => state.themeYear);
 
   const isEditingActiveContest = activeContest?._id === initialContest?._id;
 
@@ -128,8 +130,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
       }
 
       const snapshot = buildContestSnapshotFromStores();
-      // const themeId =
-      //   useGeneralStore.getState().customTheme?._id ?? initialContest?.themeId;
+      const themeId = customTheme?._id;
+      const standardThemeId = themeYear;
 
       let contest: Contest;
 
@@ -141,7 +143,9 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           description: description.trim() || undefined,
           isPublic,
           hostingCountryCode,
-          // ...(themeId ? { themeId } : {}),
+          ...(themeId
+            ? { themeId }
+            : { ...(standardThemeId ? { standardThemeId } : {}) }),
           ...(!overwriteContestSetupAndResults ? {} : { snapshot }),
         });
 
@@ -153,7 +157,9 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           description: description.trim() || undefined,
           isPublic,
           hostingCountryCode,
-          // ...(themeId ? { themeId } : {}),
+          ...(themeId
+            ? { themeId }
+            : { ...(standardThemeId ? { standardThemeId } : {}) }),
           snapshot,
         });
 

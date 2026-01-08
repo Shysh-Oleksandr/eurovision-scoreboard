@@ -669,7 +669,6 @@ export const createVotingActions: StateCreator<
     const currentRevealPoints = state.currentRevealTelevotePoints;
     const nextLowestCountry = state.getNextLowestTelevoteCountry();
 
-    console.log('nextLowestCountry', nextLowestCountry);
     if (!nextLowestCountry || !nextLowestCountry.country) return;
 
     // If the clicked country is not the next lowest country, we need to swap votes

@@ -14,6 +14,7 @@ import {
 interface LoadContestModalProps {
   isOpen: boolean;
   isSimulationStarted: boolean;
+  themeDescription?: string;
   onClose: () => void;
   onLoad: (options: LoadContestOptions) => void;
 }
@@ -21,6 +22,7 @@ interface LoadContestModalProps {
 const LoadContestModal: React.FC<LoadContestModalProps> = ({
   isOpen,
   isSimulationStarted,
+  themeDescription,
   onClose,
   onLoad,
 }) => {
@@ -40,8 +42,11 @@ const LoadContestModal: React.FC<LoadContestModalProps> = ({
     [t],
   );
 
+  const hasTheme = !!themeDescription;
+
   const [options, setOptions] = useState<LoadContestOptions>({
     generalInfo: true,
+    theme: hasTheme,
     setup: true,
     simulation: isSimulationStarted,
     simulationLoadOption: SimulationLoadOptions.RESULTS,
@@ -59,7 +64,8 @@ const LoadContestModal: React.FC<LoadContestModalProps> = ({
     onClose();
   };
 
-  const hasSelectedOptions = options.generalInfo || options.setup;
+  const hasSelectedOptions =
+    options.generalInfo || options.setup || options.theme;
 
   const isSimulationEnabled = options.simulation && options.setup;
 
@@ -69,6 +75,13 @@ const LoadContestModal: React.FC<LoadContestModalProps> = ({
       label: t('widgets.contests.generalInfo'),
       description: t('widgets.contests.generalInfoDescription'),
       checked: options.generalInfo,
+    },
+    {
+      id: 'theme' as keyof LoadContestOptions,
+      label: t('common.theme'),
+      description: themeDescription,
+      checked: options.theme,
+      disabled: !hasTheme,
     },
     {
       id: 'setup' as keyof LoadContestOptions,

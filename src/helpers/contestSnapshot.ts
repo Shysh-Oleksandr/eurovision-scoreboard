@@ -416,6 +416,7 @@ export enum SimulationLoadOptions {
 
 export interface LoadContestOptions {
   generalInfo: boolean;
+  theme?: boolean
   setup: boolean;
   simulation: boolean;
   simulationLoadOption?: SimulationLoadOptions;
@@ -427,6 +428,7 @@ export async function applyContestSnapshotToStores(
   updateMetadataOnly: boolean = false,
   loadOptions: LoadContestOptions = {
     generalInfo: true,
+    theme: true,
     setup: true,
     simulation: true,
     simulationLoadOption: SimulationLoadOptions.RESULTS,

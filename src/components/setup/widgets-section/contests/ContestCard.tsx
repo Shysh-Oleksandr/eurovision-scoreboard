@@ -7,6 +7,8 @@ import Image from 'next/image';
 
 import Button from '../../../common/Button';
 
+import { useApplyContestTheme } from './hooks/useApplyContestTheme';
+
 import { api } from '@/api/client';
 import { ArrowDownAndUpIcon } from '@/assets/icons/ArrowDownAndUpIcon';
 import { ListPlusIcon } from '@/assets/icons/ListPlusIcon';
@@ -68,6 +70,8 @@ const ContestCard: React.FC<ContestCardProps> = ({
 
   const { confirm: confirmResetContest } = useConfirmation();
 
+  const applyTheme = useApplyContestTheme();
+
   const onResetClick = async () => {
     if (!activeContest) return;
 
@@ -89,6 +93,10 @@ const ContestCard: React.FC<ContestCardProps> = ({
 
   const handleConfirmResetContest = async (options: LoadContestOptions) => {
     if (!activeContest || !contestSnapshotToReset) return;
+
+    if (options.theme) {
+      await applyTheme(activeContest.themeId, activeContest.standardThemeId);
+    }
 
     await applyContestSnapshotToStores(
       contestSnapshotToReset,
@@ -226,6 +234,11 @@ const ContestCard: React.FC<ContestCardProps> = ({
         <LoadContestModal
           isOpen={isLoadContestModalOpen}
           isSimulationStarted={activeContest.isSimulationStarted}
+          themeDescription={
+            activeContest.themeId
+              ? t('common.custom')
+              : activeContest.standardThemeId?.replace('-', ' ')
+          }
           onClose={() => {
             setIsLoadContestModalOpen(false);
             setContestSnapshotToReset(null);

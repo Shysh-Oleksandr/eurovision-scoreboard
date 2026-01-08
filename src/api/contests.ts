@@ -14,6 +14,7 @@ export type CreateContestInput = {
   description?: string;
   isPublic?: boolean;
   themeId?: string;
+  standardThemeId?: string;
   year?: number;
   hostingCountryCode: string;
   snapshot: Record<string, any>;
@@ -24,6 +25,7 @@ export type UpdateContestInput = {
   description?: string;
   isPublic?: boolean;
   themeId?: string;
+  standardThemeId?: string;
   year?: number;
   hostingCountryCode?: string;
   snapshot?: Record<string, any>;
