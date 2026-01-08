@@ -54,6 +54,7 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
         points={points}
         lastPoints={lastPoints}
         showDouzePointsAnimation={showDouzePointsAnimation}
+        onClick={() => handleAwardPoints(12)}
       />
 
       {/* Actions */}

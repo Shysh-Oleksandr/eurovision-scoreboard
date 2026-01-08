@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Country } from '../models';
 import { useMediaQuery } from './useMediaQuery';
+import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 
 export const MIN_COUNTRIES_FOR_3_COLUMNS = 24;
 
@@ -9,11 +10,13 @@ export const useReorderCountries = (
   customColumnCount?: number,
   isVotingOver?: boolean,
 ) => {
-  const isTablet = useMediaQuery('(min-width: 576px)');
+  const isTablet = useMediaQuery('(min-width: 480px)');
   const isDesktop = useMediaQuery('(min-width: 1280px)');
 
+  const scoreboardMobileLayout = useGeneralStore((state) => state.presentationSettings.scoreboardMobileLayout);
+
   const reorderedCountries = useMemo(() => {
-    let columnCount = 1;
+    let columnCount = scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN ? 2 : 1;
 
     if (customColumnCount) {
       columnCount = customColumnCount;
@@ -60,7 +63,7 @@ export const useReorderCountries = (
     }
 
     return reordered;
-  }, [countries, isTablet, isDesktop, customColumnCount, isVotingOver]);
+  }, [countries, isTablet, isDesktop, customColumnCount, isVotingOver, scoreboardMobileLayout]);
 
   return reorderedCountries;
 };

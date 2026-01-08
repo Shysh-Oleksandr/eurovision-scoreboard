@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useRef, type JSX } from 'react';
+import { useEffect, useMemo, useRef, type JSX } from 'react';
 
 import { useShallow } from 'zustand/shallow';
 
@@ -9,17 +9,31 @@ import { RangeSlider } from '../common/RangeSlider';
 import Tabs from '../common/tabs/Tabs';
 import SnowPileEffect from '../effects/SnowPileEffect';
 
+import { Columns2Icon } from '@/assets/icons/Columns2Icon';
 import { PauseIcon } from '@/assets/icons/PauseIcon';
 import { PlayIcon } from '@/assets/icons/PlayIcon';
+import { Rows2Icon } from '@/assets/icons/Rows2Icon';
 import { StageId } from '@/models';
 import {
   PresentationPointsGrouping,
+  ScoreboardMobileLayout,
   useGeneralStore,
 } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const MIN_SPEED_SECONDS = 0.5;
 const MAX_SPEED_SECONDS = 7.5;
+
+const layoutTabs = [
+  {
+    value: ScoreboardMobileLayout.ONE_COLUMN,
+    label: <Rows2Icon className="w-6 h-6" />,
+  },
+  {
+    value: ScoreboardMobileLayout.TWO_COLUMN,
+    label: <Columns2Icon className="w-6 h-6" />,
+  },
+];
 
 const PresentationPanel = (): JSX.Element | null => {
   const t = useTranslations();
@@ -80,10 +94,12 @@ const PresentationPanel = (): JSX.Element | null => {
       ? PresentationPointsGrouping.GROUPED
       : PresentationPointsGrouping.INDIVIDUAL;
 
+  const isNotQualifierModeStage =
+    !isPickQualifiersMode ||
+    currentStage?.id.toUpperCase() === StageId.GF.toUpperCase();
+
   const withPointsGrouping =
-    currentStage?.isJuryVoting &&
-    (!isPickQualifiersMode ||
-      currentStage?.id.toUpperCase() === StageId.GF.toUpperCase());
+    currentStage?.isJuryVoting && isNotQualifierModeStage;
 
   // Timer handling
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -176,9 +192,28 @@ const PresentationPanel = (): JSX.Element | null => {
       >
         <SnowPileEffect snowEffect="middle" className="!w-full" />
 
-        <h3 className="lg:text-[1.35rem] text-lg text-white">
-          {t('simulation.presentation.title')}
-        </h3>
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="lg:text-[1.35rem] text-lg text-white">
+            {t('simulation.presentation.title')}
+          </h3>
+
+          {isNotQualifierModeStage && (
+            <Tabs
+              tabs={layoutTabs}
+              activeTab={
+                presentationSettings.scoreboardMobileLayout ||
+                ScoreboardMobileLayout.ONE_COLUMN
+              }
+              setActiveTab={(tab) => {
+                setPresentationSettings({
+                  scoreboardMobileLayout: tab as ScoreboardMobileLayout,
+                });
+              }}
+              containerClassName="!px-0 !py-0 !overflow-hidden !h-8 !w-40 xs:hidden"
+              overlayClassName="!top-0 !h-8"
+            />
+          )}
+        </div>
         <Button
           label={
             isPresenting

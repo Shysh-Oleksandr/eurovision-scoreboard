@@ -114,7 +114,7 @@ export const useItemState = ({
     () =>
       `relative will-change-colors outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full transition-all !duration-500 ${
         isActive ? 'rounded-sm' : ''
-      } ${showPlaceAnimation ? 'lg:ml-2 ml-1.5' : ''}
+      } ${showPlaceAnimation ? 'lg:ml-2 xs:ml-1.5 ml-1' : ''}
       ${isVotingCountry ? 'opacity-70 cursor-not-allowed' : ''}
       ${buttonColors}
       ${isVotingOver ? 'pointer-events-none' : ''}

@@ -61,7 +61,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
     countryCell: 'p-2 border-r border-solid border-primary-900',
     pointsCell: 'p-2 text-center border-r border-solid border-primary-900',
     lastCell: 'p-2 text-center',
-    countryContent: 'flex items-center gap-3 pl-1',
+    countryContent: 'flex items-center gap-3 pl-1 max-w-[180px]',
     countryName: 'font-medium truncate flex-1 leading-normal',
     pointsText: 'font-semibold text-lg',
     rankText: 'text-lg font-semibold',

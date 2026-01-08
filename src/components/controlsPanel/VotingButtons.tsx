@@ -62,6 +62,7 @@ const VotingButtons = () => {
       {isJuryVoting ? (
         <div className="lg:px-4 px-3">
           <Button label={t('voteRandomly')} onClick={voteRandomlyJury} />
+          {/* TODO: maybe move it to CountryInfo on mobile */}
         </div>
       ) : (
         <TelevoteInput />
