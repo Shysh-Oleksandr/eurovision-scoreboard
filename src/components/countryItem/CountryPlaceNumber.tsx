@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 
 import { ArrowIcon } from '@/assets/icons/ArrowIcon';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import usePrevious from '@/hooks/usePrevious';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -25,6 +26,9 @@ const CountryPlaceNumber = ({
   isJuryVoting,
   size = 'scoreboard',
 }: Props) => {
+  const isSmallScreen = useMediaQuery('(max-width: 479px)');
+  const isTablet = useMediaQuery('(min-width: 576px)');
+
   const showRankChangeIndicator = useGeneralStore(
     (state) => state.settings.showRankChangeIndicator,
   );
@@ -72,13 +76,13 @@ const CountryPlaceNumber = ({
   // Calculate width dynamically to handle different screen sizes
   const width = useMemo(() => {
     if (typeof window !== 'undefined') {
-      const mobileWidth = window.innerWidth > 480 ? 32 : 28;
+      const mobileWidth = isSmallScreen ? 28 : 32;
 
-      return window.innerWidth > 576 ? 40 : mobileWidth;
+      return isTablet ? 40 : mobileWidth;
     }
 
     return 40; // fallback
-  }, []);
+  }, [isSmallScreen, isTablet]);
 
   useEffect(() => {
     if (points === 0 || !isJuryVoting || !showRankChangeIndicator) {

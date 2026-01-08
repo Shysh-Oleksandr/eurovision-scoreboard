@@ -13,12 +13,17 @@ import { useCountrySorter } from './hooks/useCountrySorter';
 import { useVoting } from './hooks/useVoting';
 
 import { MIN_COUNTRIES_FOR_3_COLUMNS } from '@/hooks/useReorderCountries';
+import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 
 const FLIP_SPRING = { damping: 5, stiffness: 25, overshootClamping: true };
 
 const Board = (): JSX.Element => {
   // This is needed to trigger a re-render of the board when the event stages change(usually when giving points)
   useScoreboardStore((state) => state.eventStages);
+
+  const scoreboardMobileLayout = useGeneralStore(
+    (state) => state.presentationSettings.scoreboardMobileLayout,
+  );
 
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const showAllParticipants = useScoreboardStore(
@@ -85,6 +90,10 @@ const Board = (): JSX.Element => {
       <div
         ref={containerRef}
         className={`container-wrapping-flipper will-change-all ${
+          scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN
+            ? 'two-column'
+            : ''
+        } ${
           isVotingOver && finalCountries.length >= MIN_COUNTRIES_FOR_3_COLUMNS
             ? 'is-over'
             : ''

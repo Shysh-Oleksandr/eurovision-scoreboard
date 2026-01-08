@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 
+import CountryItemBase from '@/components/countryItem/CountryItemBase';
 import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
 import { useQualificationStatus } from '@/components/countryItem/hooks/useQualificationStatus';
 import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
@@ -47,7 +48,7 @@ const ShareCountryItem: React.FC<Props> = ({
     sm: {
       button: 'mb-1 h-7',
       flag: 'w-8 h-7 min-w-[32px]',
-      name: 'text-sm truncate flex-1 min-w-[7rem] max-w-[11rem]',
+      name: 'text-sm mr-8',
       points: 'w-8',
       pointsText: 'text-sm',
       margin: 'mb-1',
@@ -55,7 +56,7 @@ const ShareCountryItem: React.FC<Props> = ({
     md: {
       button: 'mb-1 h-8',
       flag: 'w-10 h-8 min-w-[40px]',
-      name: 'text-sm min-w-[7rem] max-w-[20rem]',
+      name: 'text-sm mr-9',
       points: 'w-9',
       pointsText: 'text-base',
       margin: 'mb-1',
@@ -63,7 +64,7 @@ const ShareCountryItem: React.FC<Props> = ({
     lg: {
       button: 'mb-[6px] h-10',
       flag: 'w-[50px] h-10 min-w-[50px]',
-      name: 'text-lg min-w-[9rem] max-w-full',
+      name: 'text-lg mr-[2.57rem]',
       points: 'w-[2.57rem]',
       pointsText: 'text-[16px]',
       margin: 'mb-[6px]',
@@ -71,7 +72,7 @@ const ShareCountryItem: React.FC<Props> = ({
     xl: {
       button: 'mb-[6px] h-12',
       flag: 'w-[56px] h-12 min-w-[56px]',
-      name: 'text-xl min-w-[10rem] max-w-full',
+      name: 'text-xl mr-[3rem]',
       points: 'w-[3rem]',
       pointsText: 'text-[18px]',
       margin: 'mb-[6px]',
@@ -79,7 +80,7 @@ const ShareCountryItem: React.FC<Props> = ({
     '2xl': {
       button: 'mb-2 h-14',
       flag: 'w-[64px] h-14 min-w-[64px]',
-      name: 'text-2xl min-w-[12rem] max-w-full',
+      name: 'text-2xl mr-[3.5rem]',
       points: 'w-[3.5rem]',
       pointsText: 'text-2xl',
       margin: 'mb-[6px]',
@@ -100,55 +101,59 @@ const ShareCountryItem: React.FC<Props> = ({
   const pointsTextClass = 'text-countryItem-televoteFinishedPointsText';
 
   return (
-    <div className="flex relative">
-      {showRankings && (
+    <CountryItemBase
+      country={country}
+      index={index}
+      className="flex relative"
+      containerClassName={buttonClassName}
+      style={buttonGradientStyle}
+      as="div"
+      showPlaceNumber={showRankings}
+      renderPlaceNumber={(country, index) => (
         <CountryPlaceNumber
           shouldShowAsNonQualified={shouldShowAsNonQualified}
           index={index}
           showPlaceAnimation
-          points={country.points}
+          points={'points' in country ? country.points : 0}
           isJuryVoting={false}
           size={size}
         />
       )}
-
-      <div className={buttonClassName} style={buttonGradientStyle}>
-        <div className="flex items-center overflow-hidden flex-1 min-w-0">
-          <img
-            loading="lazy"
-            src={getFlagPath(country)}
-            onError={(e) => {
-              e.currentTarget.src = getFlagPath('ww');
-            }}
-            alt={`${country.name} flag`}
-            width={48}
-            height={36}
-            className={`${currentSize.flag} bg-countryItem-juryBg self-start object-cover`}
-          />
-          <h4
-            className={`${currentSize.name} uppercase text-left ml-2 font-bold truncate flex-1 pr-2`}
+      renderFlag={() => (
+        <img
+          loading="lazy"
+          src={getFlagPath(country)}
+          onError={(e) => {
+            e.currentTarget.src = getFlagPath('ww');
+          }}
+          alt={`${country.name} flag`}
+          width={48}
+          height={36}
+          className={`${currentSize.flag} bg-countryItem-juryBg self-start object-cover`}
+        />
+      )}
+      renderName={() => (
+        <h4
+          className={`${currentSize.name} uppercase text-left ml-2 font-bold truncate flex-1 pr-2 m`}
+        >
+          {shortCountryNames ? country.name.slice(0, 3) : country.name}
+        </h4>
+      )}
+      renderPoints={() =>
+        showPoints ? (
+          <div
+            className={`absolute right-0 top-0 h-full z-20 ${currentSize.points} ${pointsBgClass}`}
           >
-            {shortCountryNames ? country.name.slice(0, 3) : country.name}
-          </h4>
-        </div>
-
-        {showPoints && (
-          <div className="flex h-full flex-shrink-0">
-            {/* Points */}
-            <div
-              className={`relative h-full z-20 ${currentSize.points} ${pointsBgClass}`}
+            <RoundedTriangle className={pointsBgClass} />
+            <h6
+              className={`font-semibold absolute top-1/2 -translate-y-1/2 right-0.5 z-30 w-full h-full items-center flex justify-center ${currentSize.pointsText} ${pointsTextClass}`}
             >
-              <RoundedTriangle className={pointsBgClass} />
-              <h6
-                className={`font-semibold absolute top-1/2 -translate-y-1/2 right-0.5 z-30 w-full h-full items-center flex justify-center ${currentSize.pointsText} ${pointsTextClass}`}
-              >
-                {shouldShowNQLabel ? 'NQ' : country.points}
-              </h6>
-            </div>
+              {shouldShowNQLabel ? 'NQ' : country.points}
+            </h6>
           </div>
-        )}
-      </div>
-    </div>
+        ) : null
+      }
+    />
   );
 };
 

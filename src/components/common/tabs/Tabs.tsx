@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 
 interface TabItem {
-  label: string;
+  label: string | ReactNode;
   value: string;
   showIndicator?: boolean;
   content?: ReactNode;

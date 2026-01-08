@@ -190,12 +190,19 @@ h6 {
 .container-wrapping-flipper > div {
   display: grid;
   grid-template-columns: 1fr;
-  column-gap: 0.75rem;
+  column-gap: 0.5rem;
 }
 
-@media (min-width: 576px) {
+@media (max-width: 479px) {
+  .container-wrapping-flipper.two-column > div {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 480px) {
   .container-wrapping-flipper > div {
     grid-template-columns: repeat(2, 1fr);
+    column-gap: 0.75rem;
   }
 }
 

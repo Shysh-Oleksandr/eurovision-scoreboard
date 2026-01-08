@@ -27,6 +27,11 @@ import {
   clearCustomTheme as clearCustomThemeUtil,
 } from '@/theme/themeUtils';
 
+export enum ScoreboardMobileLayout {
+  ONE_COLUMN = 'one-column',
+  TWO_COLUMN = 'two-column',
+}
+
 export enum ShareImageAspectRatio {
   LANDSCAPE = '1200x630',
   SQUARE = '800x800',
@@ -74,6 +79,7 @@ const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
   presentationSpeedSeconds: 5,
   presentationJuryGrouping: PresentationPointsGrouping.INDIVIDUAL,
   pauseAfterAnimatedPoints: true,
+  scoreboardMobileLayout: ScoreboardMobileLayout.ONE_COLUMN,
 };
 
 // Function to determine initial aspect ratio based on device width
@@ -144,6 +150,7 @@ interface PresentationSettings {
   presentationSpeedSeconds: number; // delay between actions in seconds
   presentationJuryGrouping: PresentationPointsGrouping;
   pauseAfterAnimatedPoints: boolean;
+  scoreboardMobileLayout: ScoreboardMobileLayout;
 }
 
 export interface ImageCustomizationSettings {

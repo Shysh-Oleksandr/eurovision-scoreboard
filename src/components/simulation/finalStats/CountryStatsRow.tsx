@@ -41,7 +41,7 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
       }`}
     >
       <td className="p-2">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 max-w-[250px]">
           <span className="text-lg font-bold w-6 text-center">
             {country.rank}
           </span>

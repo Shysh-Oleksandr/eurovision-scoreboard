@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import CountryItemBase from '@/components/countryItem/CountryItemBase';
 import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
@@ -68,35 +69,44 @@ export const CountryQualificationItem: React.FC<
   return (
     <div
       ref={itemRef}
-      className={`flex items-center rounded-sm transition-all duration-300 relative shadow-md ${
-        onClick ? 'cursor-pointer hover:bg-countryItem-juryHoverBg' : ''
-      } ${
+      className={`duration-300 w-full ${
         isQualifiedInCurrentStage && hideIfQualified
           ? 'opacity-50 !cursor-not-allowed'
           : ''
       } ${shouldAnimate ? 'opacity-0 -translate-x-full' : ''} ${
         isModal ? 'opacity-0' : ''
-      } ${itemClassName}`}
-      style={itemGradientStyle}
-      onClick={onClick}
+      }`}
     >
-      <img
-        loading="lazy"
-        src={getFlagPath(country)}
-        onError={(e) => {
-          e.currentTarget.src = getFlagPath('ww');
-        }}
-        alt={`${country.name} flag`}
-        width={48}
-        height={36}
-        className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-countryItem-juryBg self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
+      <CountryItemBase
+        country={country}
+        containerClassName={`flex items-center rounded-sm transition-all duration-300 lg:h-10 md:h-9 xs:h-8 h-7 relative shadow-md w-full ${
+          onClick ? 'cursor-pointer hover:bg-countryItem-juryHoverBg' : ''
+        } ${itemClassName}`}
+        style={itemGradientStyle}
+        onClick={onClick ? () => onClick() : undefined}
+        as="div"
+        renderFlag={() => (
+          <img
+            loading="lazy"
+            src={getFlagPath(country)}
+            onError={(e) => {
+              e.currentTarget.src = getFlagPath('ww');
+            }}
+            alt={`${country.name} flag`}
+            width={48}
+            height={36}
+            className="lg:w-[50px] md:w-12 xs:w-10 w-8 lg:h-10 md:h-9 xs:h-8 h-7 bg-countryItem-juryBg self-start lg:min-w-[50px] md:min-w-[48px] xs:min-w-[40px] min-w-[32px] object-cover"
+          />
+        )}
+        renderName={() => (
+          <span
+            className="uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] truncate flex-1"
+            title={country.name}
+          >
+            {country.name}
+          </span>
+        )}
       />
-      <span
-        className="uppercase text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] truncate flex-1 min-w-[7rem] sm:min-w-[9rem] md:min-w-0 2cols:max-w-[11rem] sm:max-w-[9rem] xs:max-w-[20rem] 2xs:max-w-[14.7rem] max-w-[11rem] md:max-w-full"
-        title={country.name}
-      >
-        {country.name}
-      </span>
     </div>
   );
 };
