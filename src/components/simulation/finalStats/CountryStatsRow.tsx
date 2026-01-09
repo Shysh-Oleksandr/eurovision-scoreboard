@@ -4,7 +4,10 @@ import { Country, VotingCountry } from '../../../models';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useGeneralStore } from '@/state/generalStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
+import {
+  getHostingCountryLogo,
+  getHostingCountryLogoForImageGeneration,
+} from '@/theme/hosting';
 
 interface CountryStatsRowProps {
   country: Country & { rank: number };
@@ -29,10 +32,9 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
-  const { logo, isExisting } = getHostingCountryLogo(
-    country,
-    shouldShowHeartFlagIcon,
-  );
+  const { logo, isExisting } = enableHover
+    ? getHostingCountryLogo(country, shouldShowHeartFlagIcon)
+    : getHostingCountryLogoForImageGeneration(country, shouldShowHeartFlagIcon);
 
   return (
     <tr

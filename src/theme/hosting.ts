@@ -1,7 +1,7 @@
 import { years, Year } from '../config';
 
 import { BaseCountry } from '@/models';
-import { getFlagPath } from '@/helpers/getFlagPath';
+import { getFlagPath, getFlagPathForImageGeneration } from '@/helpers/getFlagPath';
 
 export type HostingCountryData = {
   code: string;
@@ -137,4 +137,31 @@ export function getHostingCountryLogo(
   }
 
   return { logo: getFlagPath(country), isExisting: false };
+}
+
+/**
+ * Get hosting country logo with proxy for external URLs to avoid CORS issues during image generation
+ * Only use this for image generation contexts where CORS is a problem
+ */
+export function getHostingCountryLogoForImageGeneration(
+  country: BaseCountry | string | undefined | null,
+  shouldShowHeartFlagIcon = true,
+): { logo: string; isExisting: boolean } {
+  // Handle undefined/null country - return default flag
+  if (!country) {
+    return { logo: getFlagPathForImageGeneration('WW'), isExisting: false };
+  }
+
+  if (!shouldShowHeartFlagIcon) {
+    return { logo: getFlagPathForImageGeneration(country), isExisting: false };
+  }
+
+  const countryCode = typeof country === 'string' ? country : country.code;
+
+  const existing = getHostingLogoByCountryCode(countryCode);
+  if (existing) {
+    return { logo: existing, isExisting: true };
+  }
+
+  return { logo: getFlagPathForImageGeneration(country), isExisting: false };
 }

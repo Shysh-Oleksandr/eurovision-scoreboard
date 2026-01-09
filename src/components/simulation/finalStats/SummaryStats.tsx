@@ -7,7 +7,10 @@ import { useBorderOpacity } from './useBorderOpacity';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useGeneralStore } from '@/state/generalStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
+import {
+  getHostingCountryLogo,
+  getHostingCountryLogoForImageGeneration,
+} from '@/theme/hosting';
 
 interface SummaryStatsProps {
   rankedCountries: (Country & { rank: number })[];
@@ -164,10 +167,15 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
                 <td className={tableStyles.countryCell}>
                   <div className={tableStyles.countryContent}>
                     {(() => {
-                      const { logo, isExisting } = getHostingCountryLogo(
-                        country,
-                        shouldShowHeartFlagIcon,
-                      );
+                      const { logo, isExisting } = enableHover
+                        ? getHostingCountryLogo(
+                            country,
+                            shouldShowHeartFlagIcon,
+                          )
+                        : getHostingCountryLogoForImageGeneration(
+                            country,
+                            shouldShowHeartFlagIcon,
+                          );
 
                       return (
                         <img

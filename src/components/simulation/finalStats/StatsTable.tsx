@@ -9,7 +9,10 @@ import { getFlagPath } from '@/helpers/getFlagPath';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
+import {
+  getHostingCountryLogo,
+  getHostingCountryLogoForImageGeneration,
+} from '@/theme/hosting';
 
 interface StatsTableProps {
   rankedCountries: (Country & { rank: number })[];
@@ -65,10 +68,12 @@ const StatsTable: React.FC<StatsTableProps> = ({
           <tr>
             <th className="p-2 min-w-[220px] w-[220px] h-auto"></th>
             {votingCountries.map((country) => {
-              const { logo, isExisting } = getHostingCountryLogo(
-                country,
-                shouldShowHeartFlagIcon,
-              );
+              const { logo, isExisting } = enableHover
+                ? getHostingCountryLogo(country, shouldShowHeartFlagIcon)
+                : getHostingCountryLogoForImageGeneration(
+                    country,
+                    shouldShowHeartFlagIcon,
+                  );
 
               return (
                 <th key={country.code} className="p-1 min-w-12 w-12">

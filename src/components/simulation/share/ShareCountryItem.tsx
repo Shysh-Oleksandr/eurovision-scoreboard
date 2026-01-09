@@ -5,7 +5,10 @@ import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
 import { useQualificationStatus } from '@/components/countryItem/hooks/useQualificationStatus';
 import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import RoundedTriangle from '@/components/RoundedTriangle';
-import { getFlagPath } from '@/helpers/getFlagPath';
+import {
+  getFlagPath,
+  getFlagPathForImageGeneration,
+} from '@/helpers/getFlagPath';
 import { Country } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -122,7 +125,7 @@ const ShareCountryItem: React.FC<Props> = ({
       renderFlag={() => (
         <img
           loading="lazy"
-          src={getFlagPath(country)}
+          src={getFlagPathForImageGeneration(country)}
           onError={(e) => {
             e.currentTarget.src = getFlagPath('ww');
           }}

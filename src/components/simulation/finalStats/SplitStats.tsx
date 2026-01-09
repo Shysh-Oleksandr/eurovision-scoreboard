@@ -7,7 +7,10 @@ import { useBorderOpacity } from './useBorderOpacity';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useGeneralStore } from '@/state/generalStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
+import {
+  getHostingCountryLogo,
+  getHostingCountryLogoForImageGeneration,
+} from '@/theme/hosting';
 
 interface SplitStatsProps {
   rankedCountries: (Country & { rank: number })[];
@@ -171,10 +174,15 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                 <td className={tableStyles.countryCell}>
                   <div className={tableStyles.countryContent}>
                     {(() => {
-                      const { logo, isExisting } = getHostingCountryLogo(
-                        totalCountry,
-                        shouldShowHeartFlagIcon,
-                      );
+                      const { logo, isExisting } = enableHover
+                        ? getHostingCountryLogo(
+                            totalCountry,
+                            shouldShowHeartFlagIcon,
+                          )
+                        : getHostingCountryLogoForImageGeneration(
+                            totalCountry,
+                            shouldShowHeartFlagIcon,
+                          );
 
                       return (
                         <img
@@ -211,10 +219,15 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                     <td className={tableStyles.countryCell}>
                       <div className={tableStyles.countryContent}>
                         {(() => {
-                          const { logo, isExisting } = getHostingCountryLogo(
-                            juryCountry,
-                            shouldShowHeartFlagIcon,
-                          );
+                          const { logo, isExisting } = enableHover
+                            ? getHostingCountryLogo(
+                                juryCountry,
+                                shouldShowHeartFlagIcon,
+                              )
+                            : getHostingCountryLogoForImageGeneration(
+                                juryCountry,
+                                shouldShowHeartFlagIcon,
+                              );
 
                           return (
                             <img
@@ -253,10 +266,15 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                     <td className={tableStyles.countryCell}>
                       <div className={tableStyles.countryContent}>
                         {(() => {
-                          const { logo, isExisting } = getHostingCountryLogo(
-                            televoteCountry,
-                            shouldShowHeartFlagIcon,
-                          );
+                          const { logo, isExisting } = enableHover
+                            ? getHostingCountryLogo(
+                                televoteCountry,
+                                shouldShowHeartFlagIcon,
+                              )
+                            : getHostingCountryLogoForImageGeneration(
+                                televoteCountry,
+                                shouldShowHeartFlagIcon,
+                              );
 
                           return (
                             <img

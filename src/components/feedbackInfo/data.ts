@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-01-09',
+    title:
+      'Fixed the issue with the image generation when it includes custom entries',
+  },
+  {
     date: '2026-01-08',
     title:
       'Added saving and loading a theme with a contest. Added two-column scoreboard layout on mobile. Improved the long entry names display',
