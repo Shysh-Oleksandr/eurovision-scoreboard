@@ -19,6 +19,7 @@ import SummaryStats from '../finalStats/SummaryStats';
 import { useShareBgImage } from './useShareBgImage';
 
 import { GenerateImageIcon } from '@/assets/icons/GenerateImageIcon';
+import { getBackgroundImageForImageGeneration } from '@/helpers/getFlagPath';
 import { useImageGenerator } from '@/hooks/useImageGenerator';
 import { StatsTableType } from '@/models';
 
@@ -385,7 +386,9 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
               <div
                 className="absolute inset-0"
                 style={{
-                  backgroundImage: `url(${backgroundImage})`,
+                  backgroundImage: `url(${getBackgroundImageForImageGeneration(
+                    backgroundImage,
+                  )})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   opacity: backgroundOpacity,

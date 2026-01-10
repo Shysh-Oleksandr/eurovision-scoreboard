@@ -17,6 +17,7 @@ import { useShareBgImage } from './useShareBgImage';
 
 import { GenerateImageIcon } from '@/assets/icons/GenerateImageIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
+import { getBackgroundImageForImageGeneration } from '@/helpers/getFlagPath';
 import { useReorderCountries } from '@/hooks/useReorderCountries';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -296,7 +297,9 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
             <div
               className="absolute inset-0"
               style={{
-                backgroundImage: `url(${backgroundImage})`,
+                backgroundImage: `url(${getBackgroundImageForImageGeneration(
+                  backgroundImage,
+                )})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}

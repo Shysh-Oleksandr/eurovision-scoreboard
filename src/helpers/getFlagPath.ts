@@ -16,13 +16,18 @@ export const getFlagPath = (country: BaseCountry | string): string => {
  * Get flag path with proxy for external URLs to avoid CORS issues during image generation
  * Only use this for image generation contexts where CORS is a problem
  */
-export const getFlagPathForImageGeneration = (country: BaseCountry | string): string => {
+export const getFlagPathForImageGeneration = (
+  country: BaseCountry | string,
+): string => {
   const flagPath = getFlagPath(country);
 
   // Check if it's an external URL (not from our domain)
   if (flagPath.startsWith('http://') || flagPath.startsWith('https://')) {
     // Check if it's already from our domain
-    if (flagPath.includes('douzepoints.app') || flagPath.includes('cdn.douzepoints.app')) {
+    if (
+      flagPath.includes('douzepoints.app') ||
+      flagPath.includes('cdn.douzepoints.app')
+    ) {
       return flagPath;
     }
 
@@ -32,6 +37,25 @@ export const getFlagPathForImageGeneration = (country: BaseCountry | string): st
 
   // Return local paths as-is
   return flagPath;
+};
+
+export const getBackgroundImageForImageGeneration = (
+  backgroundImage: string,
+): string => {
+  if (
+    backgroundImage.startsWith('http://') ||
+    backgroundImage.startsWith('https://')
+  ) {
+    if (
+      backgroundImage.includes('douzepoints.app') ||
+      backgroundImage.includes('cdn.douzepoints.app')
+    ) {
+      return backgroundImage;
+    }
+
+    return `/api/image-proxy?url=${encodeURIComponent(backgroundImage)}`;
+  }
+  return backgroundImage;
 };
 
 // After updating flags, run `yarn build` to update the flags in the build folder
