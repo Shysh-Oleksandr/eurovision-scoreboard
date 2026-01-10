@@ -5,23 +5,15 @@ import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
-import { useApplyContestTheme } from './hooks/useApplyContestTheme';
-import LoadContestModal from './LoadContestModal';
 import PublicContests from './PublicContests';
 import UserContests from './UserContests';
 
 import { api } from '@/api/client';
-import { useApplyContestMutation } from '@/api/contests';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
-import {
-  applyContestSnapshotToStores,
-  LoadContestOptions,
-} from '@/helpers/contestSnapshot';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
-import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
 
 const CreateContestModal = dynamic(() => import('./CreateContestModal'), {
@@ -44,19 +36,15 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
   onClose,
   onLoaded,
 }) => {
-  const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
-  const user = useAuthStore((state) => state.user);
+  const setContestToLoadGlobal = useGeneralStore(
+    (state) => state.setContestToLoad,
+  );
 
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState(ContestsTab.YOUR_CONTESTS);
   const [isPublicContestsLoaded, setIsPublicContestsLoaded] = useState(false);
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
   const [initialContest, setInitialContest] = useState<Contest | undefined>();
-  const [isLoadContestModalOpen, setIsLoadContestModalOpen] = useState(false);
-  const [contestToLoad, setContestToLoad] = useState<{
-    contest: Contest;
-    snapshot: any;
-  } | null>(null);
 
   const tabs = useMemo(
     () => [
@@ -71,8 +59,6 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
     ],
     [t],
   );
-
-  const applyTheme = useApplyContestTheme();
 
   const handleCreateNew = () => {
     setInitialContest(undefined);
@@ -93,43 +79,11 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
     try {
       const { data } = await api.get(`/contests/${contest._id}/snapshot`);
 
-      setContestToLoad({ contest, snapshot: data });
-      setIsLoadContestModalOpen(true);
+      setContestToLoadGlobal({ contest, snapshot: data });
     } catch (e: any) {
       toast.error(
         e?.response?.data?.message || t('widgets.contests.failedToLoadContest'),
       );
-    }
-  };
-
-  const handleConfirmLoadContest = async (options: LoadContestOptions) => {
-    if (!contestToLoad) return;
-
-    try {
-      const { contest, snapshot } = contestToLoad;
-
-      if (options.theme) {
-        await applyTheme(contest.themeId, contest.standardThemeId);
-      }
-
-      await applyContestSnapshotToStores(snapshot, contest, false, options);
-
-      // Set as active contest (immediate)
-      useGeneralStore.getState().setActiveContest(contest);
-
-      // Save to profile (sync across devices)
-      if (user) {
-        await applyContestToProfile(contest._id);
-      }
-
-      onClose();
-      toast.success(t('widgets.contests.contestLoaded'));
-    } catch (e: any) {
-      toast.error(
-        e?.response?.data?.message || t('widgets.contests.failedToLoadContest'),
-      );
-    } finally {
-      setContestToLoad(null);
     }
   };
 
@@ -198,24 +152,6 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
           isOpen={isCustomizeModalOpen}
           onClose={handleCloseCustomize}
           initialContest={initialContest}
-        />
-      )}
-
-      {/* Load Contest Modal */}
-      {isLoadContestModalOpen && contestToLoad && (
-        <LoadContestModal
-          isOpen={isLoadContestModalOpen}
-          isSimulationStarted={contestToLoad.contest.isSimulationStarted}
-          themeDescription={
-            contestToLoad.contest.themeId
-              ? t('common.custom')
-              : contestToLoad.contest.standardThemeId?.replace('-', ' ')
-          }
-          onClose={() => {
-            setIsLoadContestModalOpen(false);
-            setContestToLoad(null);
-          }}
-          onLoad={handleConfirmLoadContest}
         />
       )}
     </>

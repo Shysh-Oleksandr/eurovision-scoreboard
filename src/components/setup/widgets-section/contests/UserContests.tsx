@@ -92,9 +92,9 @@ const UserContests: React.FC<UserContestsProps> = ({
   // Collect contest IDs for state query (current and saved views)
   const contestIdsForState = [
     ...(view === 'current' && activeContest ? [activeContest._id] : []),
-    ...(view === 'saved' && filteredSaved
-      ? filteredSaved.map((c) => c._id)
-      : []),
+    ...(view === 'saved' && savedContests
+      ? savedContests.map((c) => c._id)
+      : contests?.map((c) => c._id) || []),
   ];
   const { data: contestsState } = useContestsStateQuery(
     contestIdsForState,
@@ -223,6 +223,9 @@ const UserContests: React.FC<UserContestsProps> = ({
               ? !!contestsState?.savedIds?.includes(activeContest._id)
               : undefined
           }
+          quickSelectedByMe={
+            !!contestsState?.quickSelectedIds?.includes(activeContest._id)
+          }
         />
       </div>
     ) : null;
@@ -252,6 +255,9 @@ const UserContests: React.FC<UserContestsProps> = ({
                 view === 'saved'
                   ? !!contestsState?.savedIds?.includes(contest._id)
                   : undefined
+              }
+              quickSelectedByMe={
+                !!contestsState?.quickSelectedIds?.includes(contest._id)
               }
             />
           ))}

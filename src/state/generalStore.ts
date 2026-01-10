@@ -234,6 +234,10 @@ export interface GeneralState {
   setSuppressActiveContestOnce: (value: boolean) => void;
   blockedActiveContestId: string | null;
   setBlockedActiveContestId: (id: string | null) => void;
+  contestToLoad: { contest: Contest; snapshot: any } | null;
+  setContestToLoad: (data: { contest: Contest; snapshot: any } | null) => void;
+  isContestsModalOpen: boolean;
+  setIsContestsModalOpen: (open: boolean) => void;
 }
 
 const getLatestUpdate = () => {
@@ -281,7 +285,8 @@ export const useGeneralStore = create<GeneralState>()(
         suppressProfileActiveOnStatic: false,
         suppressActiveContestOnce: false,
         blockedActiveContestId: null,
-
+        contestToLoad: null,
+        isContestsModalOpen: false,
         setLastSeenUpdate: (update: string) => {
           set({ lastSeenUpdate: update });
         },
@@ -395,6 +400,12 @@ export const useGeneralStore = create<GeneralState>()(
         },
         setBlockedActiveContestId: (id: string | null) => {
           set({ blockedActiveContestId: id });
+        },
+        setContestToLoad: (data: { contest: Contest; snapshot: any } | null) => {
+          set({ contestToLoad: data });
+        },
+        setIsContestsModalOpen: (open: boolean) => {
+          set({ isContestsModalOpen: open });
         },
         setImportedCustomEntries: (entries: BaseCountry[]) => {
           set({ importedCustomEntries: entries });

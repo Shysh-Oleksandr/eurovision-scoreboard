@@ -264,6 +264,9 @@
     "nCopies": "{count} {count, plural, =1 {copy} other {copies}}",
     "nLikes": "{count} {count, plural, =1 {like} other {likes}}",
     "nSaves": "{count} {count, plural, =1 {save} other {saves}}",
+    "quickSelect": "Quick Select",
+    "quickSelectAdded": "Added to quick select!",
+    "quickSelectRemoved": "Removed from quick select!",
     "profile": {
       "title": "Profile",
       "description": "Manage your profile and settings",

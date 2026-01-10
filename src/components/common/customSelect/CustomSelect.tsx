@@ -180,7 +180,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         position: 'fixed',
         top: rect.bottom + 4, // mt-1 spacing
         left: rect.left,
-        width: rect.width,
+        width: Math.max(rect.width, 250),
         zIndex: 10000,
       });
     };

@@ -18,6 +18,10 @@ export const queryKeys = {
     savedContests: () => ['user', 'saved-contests'] as const,
     contestsState: (ids: string[]) =>
       ['user', 'contests-state', { ids: [...ids].sort() }] as const,
+    quickSelectContests: () => ['user', 'quick-select-contests'] as const,
+    quickSelectThemes: () => ['user', 'quick-select-themes'] as const,
+    quickSelectState: (ids: string[]) =>
+      ['user', 'quick-select-state', { ids: [...ids].sort() }] as const,
     // Add more user-specific queries here in the future:
     // savedEvents: () => ['user', 'saved-events'] as const,
     // preferences: () => ['user', 'preferences'] as const,

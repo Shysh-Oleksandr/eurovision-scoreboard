@@ -6,15 +6,14 @@ import { DateRangeFilter } from '../utils/getFilterDateRange';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
+import { useApplyCustomTheme } from './hooks/useApplyCustomTheme';
 import ThemeListItem from './ThemeListItem';
 
-import { api } from '@/api/client';
 import {
-  useApplyThemeMutation,
   usePublicThemesQuery,
+  useThemesStateQuery,
   useToggleLikeThemeMutation,
   useToggleSaveThemeMutation,
-  useThemesStateQuery,
 } from '@/api/themes';
 import Button from '@/components/common/Button';
 import { useConfirmation } from '@/hooks/useConfirmation';
@@ -64,8 +63,6 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
 
   const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
   const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
-  const { mutateAsync: applyThemeToProfile } = useApplyThemeMutation();
-  const applyCustomTheme = useGeneralStore((state) => state.applyCustomTheme);
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
   const user = useAuthStore((state) => state.user);
 
@@ -79,28 +76,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
 
   useEffectOnce(onLoaded);
 
-  const handleApply = async (theme: CustomTheme) => {
-    try {
-      // Fetch the latest version before applying
-      const { data: latest } = await api.get(`/themes/${theme._id}`);
-
-      // Apply locally (immediate)
-      applyCustomTheme(latest);
-
-      // Save to profile (sync across devices)
-      if (user) {
-        await applyThemeToProfile(theme._id);
-      }
-
-      toast.success(
-        t('widgets.themes.themeAppliedSuccessfully', { name: latest.name }),
-      );
-    } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message || 'Failed to save theme to profile',
-      );
-    }
-  };
+  const handleApply = useApplyCustomTheme();
 
   const handleLike = async (id: string) => {
     try {
@@ -198,6 +174,9 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
                 onEdit={onEdit}
                 likedByMe={!!themeState?.likedIds?.includes(theme._id)}
                 savedByMe={!!themeState?.savedIds?.includes(theme._id)}
+                quickSelectedByMe={
+                  !!themeState?.quickSelectedIds?.includes(theme._id)
+                }
               />
             ))}
           </div>

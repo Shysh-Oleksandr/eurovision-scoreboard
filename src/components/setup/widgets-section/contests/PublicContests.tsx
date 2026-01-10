@@ -169,6 +169,9 @@ const PublicContests: React.FC<PublicContestsProps> = ({
                 isActive={activeContest?._id === contest._id}
                 likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
                 savedByMe={!!contestsState?.savedIds?.includes(contest._id)}
+                quickSelectedByMe={
+                  !!contestsState?.quickSelectedIds?.includes(contest._id)
+                }
               />
             ))}
           </div>

@@ -28,6 +28,7 @@ export interface ThemeListResponse {
 export interface ThemeState {
   likedIds: string[];
   savedIds: string[];
+  quickSelectedIds: string[];
 }
 
 export interface ThemeCreator {

@@ -267,6 +267,9 @@
     "nCopies": "{count} {count, plural, =1 {копія} few {копії} other {копій}}",
     "nLikes": "{count} {count, plural, =1 {вподобання} few {вподобання} other {вподобань}}",
     "nSaves": "{count} {count, plural, =1 {збереження} few {збереження} other {збережень}}",
+    "quickSelect": "Швидкий вибір",
+    "quickSelectAdded": "Додано до швидкого вибору!",
+    "quickSelectRemoved": "Вилучено з швидкого вибору!",
     "profile": {
       "title": "Профіль",
       "description": "Керуйте своїм профілем та налаштуваннями",

@@ -1,23 +1,16 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
 import Button from '../../../common/Button';
 
-import { useApplyContestTheme } from './hooks/useApplyContestTheme';
-
 import { api } from '@/api/client';
 import { ArrowDownAndUpIcon } from '@/assets/icons/ArrowDownAndUpIcon';
 import { ListPlusIcon } from '@/assets/icons/ListPlusIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
-import {
-  applyContestSnapshotToStores,
-  LoadContestOptions,
-} from '@/helpers/contestSnapshot';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
@@ -25,10 +18,6 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 const CreateContestModal = dynamic(() => import('./CreateContestModal'), {
-  ssr: false,
-});
-
-const LoadContestModal = dynamic(() => import('./LoadContestModal'), {
   ssr: false,
 });
 
@@ -64,13 +53,12 @@ const ContestCard: React.FC<ContestCardProps> = ({
 
   const [isContestsModalOpen, setIsContestsModalOpen] = useState(false);
   const [isContestsModalLoaded, setIsContestsModalLoaded] = useState(false);
-  const [isLoadContestModalOpen, setIsLoadContestModalOpen] = useState(false);
-  const [contestSnapshotToReset, setContestSnapshotToReset] =
-    useState<any>(null);
 
   const { confirm: confirmResetContest } = useConfirmation();
 
-  const applyTheme = useApplyContestTheme();
+  const setContestToLoadGlobal = useGeneralStore(
+    (state) => state.setContestToLoad,
+  );
 
   const onResetClick = async () => {
     if (!activeContest) return;
@@ -85,28 +73,9 @@ const ContestCard: React.FC<ContestCardProps> = ({
           `/contests/${activeContest._id}/snapshot`,
         );
 
-        setContestSnapshotToReset(data);
-        setIsLoadContestModalOpen(true);
+        setContestToLoadGlobal({ contest: activeContest, snapshot: data });
       },
     });
-  };
-
-  const handleConfirmResetContest = async (options: LoadContestOptions) => {
-    if (!activeContest || !contestSnapshotToReset) return;
-
-    if (options.theme) {
-      await applyTheme(activeContest.themeId, activeContest.standardThemeId);
-    }
-
-    await applyContestSnapshotToStores(
-      contestSnapshotToReset,
-      activeContest,
-      false,
-      options,
-    );
-
-    toast.success(t('widgets.contests.contestReset'));
-    setContestSnapshotToReset(null);
   };
 
   const lastUpdatedBadge = useMemo(() => {
@@ -138,7 +107,7 @@ const ContestCard: React.FC<ContestCardProps> = ({
         className={`w-full relative bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 p-3 text-white rounded-lg border border-primary-900 shadow-lg border-solid`}
       >
         {/* Ownershib badge */}
-        <div className="flex items-center flex-wrap gap-1 z-[60] absolute -top-2 left-2">
+        <div className="flex items-center flex-wrap gap-1 z-[60] absolute -top-[5px] left-2">
           <div className="px-2 py-0.5 font-medium rounded-md whitespace-nowrap bg-primary-800 text-white text-xs shadow-sm">
             {ownershipBadge}
           </div>
@@ -227,23 +196,6 @@ const ContestCard: React.FC<ContestCardProps> = ({
           onClose={() => setIsContestsModalOpen(false)}
           onLoaded={() => setIsContestsModalLoaded(true)}
           initialContest={isOwner && activeContest ? activeContest : undefined}
-        />
-      )}
-
-      {isLoadContestModalOpen && activeContest && (
-        <LoadContestModal
-          isOpen={isLoadContestModalOpen}
-          isSimulationStarted={activeContest.isSimulationStarted}
-          themeDescription={
-            activeContest.themeId
-              ? t('common.custom')
-              : activeContest.standardThemeId?.replace('-', ' ')
-          }
-          onClose={() => {
-            setIsLoadContestModalOpen(false);
-            setContestSnapshotToReset(null);
-          }}
-          onLoad={handleConfirmResetContest}
         />
       )}
     </>

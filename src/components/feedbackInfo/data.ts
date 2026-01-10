@@ -244,6 +244,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-01-10',
+    title: 'Added the ability to quick select themes and contests from the dropdowns',
+  },
+  {
     date: '2026-01-09',
     title:
       'Fixed the issue with the image generation when it includes custom entries',

@@ -1,6 +1,7 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
+import { toast } from 'react-toastify';
 
 import SyncIcon from '../../assets/icons/SyncIcon';
 import { Year } from '../../config';
@@ -21,11 +22,21 @@ import CustomSelect, {
 } from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
 
+import { useApplyCustomTheme } from './widgets-section/custom-themes/hooks/useApplyCustomTheme';
+
+import { api } from '@/api/client';
+import {
+  useQuickSelectContestsQuery,
+  useQuickSelectThemesQuery,
+} from '@/api/quickSelect';
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
+import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import { buildPrimaryFromHsva } from '@/theme/themeUtils';
+import { Contest } from '@/types/contest';
+import { ContestSnapshot } from '@/types/contestSnapshot';
 
 const YEAR_OPTIONS = [...ESC_YEAR_OPTIONS, ...JESC_YEAR_OPTIONS];
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
@@ -40,7 +51,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   openSettingsModal,
 }) => {
   const t = useTranslations();
-
+  const user = useAuthStore((state) => state.user);
   const year = useGeneralStore((state) => state.year);
   const isGfOnly = useGeneralStore((state) => state.isGfOnly);
   const settings = useGeneralStore((state) => state.settings);
@@ -59,8 +70,38 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
 
   const { confirm } = useConfirmation();
 
-  const handleYearChange = (newValue: string, shouldToggleGfOnly = false) => {
+  const handleApplyCustomTheme = useApplyCustomTheme();
+
+  // Use queries to get quick select data
+  const { data: quickSelectContestsData } = useQuickSelectContestsQuery(!!user);
+  const { data: quickSelectThemesData } = useQuickSelectThemesQuery(!!user);
+
+  const handleYearChange = async (
+    newValue: string,
+    shouldToggleGfOnly = false,
+  ) => {
     if (activeContest && newValue === activeContest._id) return;
+
+    if (newValue.length > 16) {
+      try {
+        const { data: contest } = await api.get(`/contests/${newValue}`);
+        const { data: snapshot } = await api.get(
+          `/contests/${newValue}/snapshot`,
+        );
+
+        useGeneralStore.getState().setContestToLoad({
+          contest: contest as Contest,
+          snapshot: snapshot as ContestSnapshot,
+        });
+      } catch (e: any) {
+        toast.error(
+          e?.response?.data?.message ||
+            t('widgets.contests.failedToLoadContest'),
+        );
+      }
+
+      return;
+    }
 
     const isJunior = newValue.startsWith(JUNIOR_THEME_PREFIX);
     const newYear = isJunior
@@ -121,6 +162,12 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
   const handleThemeChange = (newThemeValue: string) => {
     if (newThemeValue === customTheme?._id) return;
 
+    if (newThemeValue.length > 16) {
+      handleApplyCustomTheme(newThemeValue);
+
+      return;
+    }
+
     setTheme(newThemeValue);
   };
 
@@ -158,6 +205,26 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
       { label: 'JESC', options: JESC_THEME_OPTIONS },
     ];
 
+    // Add quick select themes group if any exist
+    if (quickSelectThemesData && quickSelectThemesData.length > 0) {
+      groups.unshift({
+        label: t('widgets.quickSelect'),
+        options: quickSelectThemesData
+          .filter((theme) => theme._id !== customTheme?._id)
+          .map((theme) => ({
+            label: theme.name,
+            value: theme._id,
+            color: `hsl(${
+              buildPrimaryFromHsva({
+                h: theme.hue,
+                s: 80,
+                v: theme.shadeValue || 60,
+              })['700']
+            })`,
+          })),
+      });
+    }
+
     if (customTheme) {
       groups.unshift({
         label: t('common.custom'),
@@ -172,7 +239,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     }
 
     return groups;
-  }, [customTheme, customThemeColor, t]);
+  }, [customTheme, customThemeColor, t, quickSelectThemesData]);
 
   const themeOptions = useMemo(() => {
     const options: Option[] = [...ALL_THEME_OPTIONS];
@@ -193,6 +260,22 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
       { label: 'JESC', options: JESC_YEAR_OPTIONS },
     ];
 
+    // Add quick select contests group if any exist
+    if (quickSelectContestsData && quickSelectContestsData.length > 0) {
+      groups.unshift({
+        label: t('widgets.quickSelect'),
+        options: quickSelectContestsData
+          .filter((contest) => contest._id !== activeContest?._id)
+          .map((contest) => ({
+            label: `${contest.name} ${contest.year || ''}`.trim(),
+            value: contest._id,
+            imageUrl: getHostingCountryLogo(contest.hostingCountryCode).logo,
+            isExisting: getHostingCountryLogo(contest.hostingCountryCode)
+              .isExisting,
+          })),
+      });
+    }
+
     if (activeContest) {
       const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
 
@@ -210,7 +293,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
     }
 
     return groups;
-  }, [activeContest, t, getHostingCountry]);
+  }, [activeContest, t, getHostingCountry, quickSelectContestsData]);
 
   const contestOptions = useMemo(() => {
     const options: Option[] = [...YEAR_OPTIONS];

@@ -47,4 +47,5 @@ export interface ContestListResponse {
 export interface ContestState {
   likedIds: string[];
   savedIds: string[];
+  quickSelectedIds: string[];
 }

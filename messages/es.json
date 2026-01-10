@@ -267,6 +267,9 @@
     "nCopies": "{count} {count, plural, =1 {copia} other {copias}}",
     "nLikes": "{count} {count, plural, =1 {like} other {likes}}",
     "nSaves": "{count} {count, plural, =1 {guardado} other {guardados}}",
+    "quickSelect": "Seleccionar rápido",
+    "quickSelectAdded": "Añadido a seleccionar rápido!",
+    "quickSelectRemoved": "Eliminado de seleccionar rápido!",
     "profile": {
       "title": "Perfil",
       "description": "Gestiona tu perfil y ajustes",

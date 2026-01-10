@@ -30,12 +30,19 @@ import UnifiedStageSetup from './UnifiedStageSetup';
 import { buildEventStagesFromAssignments } from './utils/buildEventStagesFromAssignments';
 import { validateEventSetup } from './utils/eventValidation';
 import ContestCard from './widgets-section/contests/ContestCard';
+import { useApplyContestTheme } from './widgets-section/contests/hooks/useApplyContestTheme';
 import WidgetsSection from './widgets-section/WidgetsSection';
 
+import { useApplyContestMutation } from '@/api/contests';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
+import {
+  applyContestSnapshotToStores,
+  LoadContestOptions,
+} from '@/helpers/contestSnapshot';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
+import { useAuthStore } from '@/state/useAuthStore';
 
 const EventStageModal = dynamic(() => import('./event-stage/EventStageModal'), {
   ssr: false,
@@ -58,6 +65,12 @@ const PostSetupModal = dynamic(() => import('./post-setup/PostSetupModal'), {
 const StageReorderModal = dynamic(() => import('./StageReorderModal'), {
   ssr: false,
 });
+const LoadContestModal = dynamic(
+  () => import('./widgets-section/contests/LoadContestModal'),
+  {
+    ssr: false,
+  },
+);
 
 const EventSetupModal = () => {
   const t = useTranslations();
@@ -110,6 +123,12 @@ const EventSetupModal = () => {
   const enablePredefined = useGeneralStore(
     (state) => state.settings.enablePredefinedVotes,
   );
+  const setIsContestsModalOpen = useGeneralStore(
+    (state) => state.setIsContestsModalOpen,
+  );
+
+  const contestToLoad = useGeneralStore((state) => state.contestToLoad);
+  const setContestToLoad = useGeneralStore((state) => state.setContestToLoad);
   const { clear } = useScoreboardStore.temporal.getState();
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -193,6 +212,9 @@ const EventSetupModal = () => {
   useInitialLineup();
 
   const { onSaveContinue, nextSetupStage } = useContinueToNextPhase();
+  const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
+  const user = useAuthStore((state) => state.user);
+  const applyTheme = useApplyContestTheme();
 
   const isInitialSetupStage = currentSetupStageType === 'initial';
   const currentSetupStage = isInitialSetupStage
@@ -346,6 +368,49 @@ const EventSetupModal = () => {
     setPredefModalOpen(false);
   };
 
+  const handleConfirmLoadContest = useCallback(
+    async (options: LoadContestOptions) => {
+      if (!contestToLoad) return;
+
+      try {
+        const { contest, snapshot } = contestToLoad;
+
+        if (options.theme) {
+          await applyTheme(contest.themeId, contest.standardThemeId);
+        }
+
+        setIsContestsModalOpen(false);
+
+        await applyContestSnapshotToStores(snapshot, contest, false, options);
+
+        // Set as active contest (immediate)
+        useGeneralStore.getState().setActiveContest(contest);
+
+        // Save to profile (sync across devices)
+        if (user) {
+          await applyContestToProfile(contest._id);
+        }
+
+        setContestToLoad(null);
+        toast.success(t('widgets.contests.contestLoaded'));
+      } catch (e: any) {
+        toast.error(
+          e?.response?.data?.message ||
+            t('widgets.contests.failedToLoadContest'),
+        );
+      }
+    },
+    [
+      contestToLoad,
+      setIsContestsModalOpen,
+      user,
+      setContestToLoad,
+      t,
+      applyTheme,
+      applyContestToProfile,
+    ],
+  );
+
   useEffect(() => {
     if (restartCounter > 0) {
       handleStartEvent();
@@ -482,6 +547,23 @@ const EventSetupModal = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Load Contest Modal */}
+      {contestToLoad && (
+        <LoadContestModal
+          isOpen
+          isSimulationStarted={contestToLoad.contest.isSimulationStarted}
+          themeDescription={
+            contestToLoad.contest.themeId
+              ? t('common.custom')
+              : contestToLoad.contest.standardThemeId?.replace('-', ' ')
+          }
+          onClose={() => {
+            setContestToLoad(null);
+          }}
+          onLoad={handleConfirmLoadContest}
+        />
+      )}
     </>
   );
 };

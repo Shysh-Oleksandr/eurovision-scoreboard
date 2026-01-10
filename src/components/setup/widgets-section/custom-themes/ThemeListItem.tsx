@@ -1,12 +1,16 @@
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
 
+import { useToggleThemeQuickSelectMutation } from '@/api/quickSelect';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
 import { CopyIcon } from '@/assets/icons/CopyIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
+import { PinIcon } from '@/assets/icons/PinIcon';
+import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
 import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
 import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
@@ -30,6 +34,7 @@ interface ThemeListItemProps {
   isApplied?: boolean;
   likedByMe?: boolean;
   savedByMe?: boolean;
+  quickSelectedByMe?: boolean;
 }
 
 const ThemeListItem: React.FC<ThemeListItemProps> = ({
@@ -44,6 +49,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   isApplied,
   likedByMe,
   savedByMe,
+  quickSelectedByMe,
 }) => {
   const locale = useLocale();
 
@@ -52,7 +58,26 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   const user = useAuthStore((state) => state.user);
   const isMyTheme = variant === 'user' || theme.userId.toString() === user?._id;
 
+  const { mutateAsync: toggleQuickSelect } =
+    useToggleThemeQuickSelectMutation();
+
   const { confirm } = useConfirmation();
+
+  const handleQuickSelect = async () => {
+    if (!user) return;
+
+    try {
+      await toggleQuickSelect(theme._id);
+
+      if (quickSelectedByMe) {
+        toast.success(t('widgets.quickSelectRemoved'));
+      } else {
+        toast.success(t('widgets.quickSelectAdded'));
+      }
+    } catch (error: any) {
+      console.error('Failed to toggle quick select:', error);
+    }
+  };
 
   const [points, setPoints] = useState(42);
   const [lastPoints, setLastPoints] = useState<number | null>(12);
@@ -215,6 +240,23 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           {theme.saves > 0
             ? t('widgets.nSaves', { count: theme.saves })
             : t('widgets.save')}
+        </Button>
+        <Button
+          variant="tertiary"
+          onClick={handleQuickSelect}
+          className={`!py-2 !px-4 !text-base ${
+            quickSelectedByMe ? 'bg-primary-700/50' : ''
+          } `}
+          disabled={!user}
+          Icon={
+            quickSelectedByMe ? (
+              <PinSolidIcon className="sm:size-6 size-5" />
+            ) : (
+              <PinIcon className="sm:size-6 size-5" />
+            )
+          }
+        >
+          {t('widgets.quickSelect')}
         </Button>
       </div>
     </div>

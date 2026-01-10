@@ -1,11 +1,15 @@
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
+import { toast } from 'react-toastify';
 
 import Image from 'next/image';
 
+import { useToggleContestQuickSelectMutation } from '@/api/quickSelect';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
+import { PinIcon } from '@/assets/icons/PinIcon';
+import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
 import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
 import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
@@ -31,6 +35,7 @@ interface ContestListItemProps {
   onSave?: (id: string, savedByMe: boolean) => void;
   likedByMe?: boolean;
   savedByMe?: boolean;
+  quickSelectedByMe?: boolean;
   isActive?: boolean;
 }
 
@@ -44,6 +49,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   onSave,
   likedByMe,
   savedByMe,
+  quickSelectedByMe,
   isActive,
 }) => {
   const locale = useLocale();
@@ -76,6 +82,25 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const t = useTranslations();
 
   const { confirm } = useConfirmation();
+
+  const { mutateAsync: toggleQuickSelect } =
+    useToggleContestQuickSelectMutation();
+
+  const handleQuickSelect = async () => {
+    if (!user) return;
+
+    try {
+      await toggleQuickSelect(contest._id);
+
+      if (quickSelectedByMe) {
+        toast.success(t('widgets.quickSelectRemoved'));
+      } else {
+        toast.success(t('widgets.quickSelectAdded'));
+      }
+    } catch (error: any) {
+      console.error('Failed to toggle quick select:', error);
+    }
+  };
 
   const user = useAuthStore((state) => state.user);
   const isMyContest =
@@ -314,6 +339,23 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
           {contest.saves > 0
             ? t('widgets.nSaves', { count: contest.saves })
             : t('widgets.save')}
+        </Button>
+        <Button
+          variant="tertiary"
+          onClick={handleQuickSelect}
+          className={`!py-2 !px-4 !text-base ${
+            quickSelectedByMe ? 'bg-primary-700/50' : ''
+          }`}
+          disabled={!user}
+          Icon={
+            quickSelectedByMe ? (
+              <PinSolidIcon className="sm:size-6 size-5" />
+            ) : (
+              <PinIcon className="sm:size-6 size-5" />
+            )
+          }
+        >
+          {t('widgets.quickSelect')}
         </Button>
       </div>
     </div>

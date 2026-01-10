@@ -267,6 +267,9 @@
     "nCopies": "{count} {count, plural, =1 {αντιγραφή} other {αντιγραφές}}",
     "nLikes": "{count} {count, plural, =1 {μου αρέσει} other {μου αρέσουν}}",
     "nSaves": "{count} {count, plural, =1 {αποθήκευση} other {αποθηκεύσεις}}",
+    "quickSelect": "Γρήγορη επιλογή",
+    "quickSelectAdded": "Προστέθηκε στην γρήγορη επιλογή!",
+    "quickSelectRemoved": "Αφαιρέθηκε από την γρήγορη επιλογή!",
     "profile": {
       "title": "Προφίλ",
       "description": "Διαχειριστείτε το προφίλ και τις ρυθμίσεις σας",

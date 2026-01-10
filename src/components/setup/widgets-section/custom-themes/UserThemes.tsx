@@ -5,17 +5,16 @@ import { toast } from 'react-toastify';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
+import { useApplyCustomTheme } from './hooks/useApplyCustomTheme';
 import ThemeListItem from './ThemeListItem';
 
-import { api } from '@/api/client';
 import {
-  useApplyThemeMutation,
   useDeleteThemeMutation,
   useMyThemesQuery,
   useSavedThemesQuery,
+  useThemesStateQuery,
   useToggleLikeThemeMutation,
   useToggleSaveThemeMutation,
-  useThemesStateQuery,
 } from '@/api/themes';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
@@ -71,47 +70,25 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const { data: themes, isLoading } = useMyThemesQuery(!!user);
   const { data: savedThemes } = useSavedThemesQuery(!!user);
   const { mutateAsync: deleteTheme } = useDeleteThemeMutation();
-  const { mutateAsync: applyThemeToProfile } = useApplyThemeMutation();
   const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
   const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
-  const applyCustomTheme = useGeneralStore((state) => state.applyCustomTheme);
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
+
+  const handleApply = useApplyCustomTheme();
 
   // Collect theme IDs for state query (current and saved views)
   const themeIdsForState = [
     ...(view === 'current' && currentCustomTheme
       ? [currentCustomTheme._id]
       : []),
-    ...(view === 'saved' && savedThemes ? savedThemes.map((t) => t._id) : []),
+    ...(view === 'saved' && savedThemes
+      ? savedThemes.map((t) => t._id)
+      : themes?.map((t) => t._id) || []),
   ];
   const { data: themeState } = useThemesStateQuery(
     themeIdsForState,
     !!themeIdsForState.length && !!user,
   );
-
-  const handleApply = async (theme: CustomTheme) => {
-    try {
-      // Fetch the latest version before applying
-      const { data: latest } = await api.get(`/themes/${theme._id}`);
-
-      // Apply locally (immediate)
-      applyCustomTheme(latest);
-
-      // Save to profile (sync across devices)
-      if (user) {
-        await applyThemeToProfile(theme._id);
-      }
-
-      toast.success(
-        t('widgets.themes.themeAppliedSuccessfully', { name: latest.name }),
-      );
-    } catch (error: any) {
-      console.error(error);
-      toast.error(
-        error?.response?.data?.message || 'Failed to save theme to profile',
-      );
-    }
-  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -235,6 +212,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
               ? !!themeState?.savedIds?.includes(currentCustomTheme._id)
               : undefined
           }
+          quickSelectedByMe={
+            !!themeState?.quickSelectedIds?.includes(currentCustomTheme._id)
+          }
         />
       </div>
     ) : null;
@@ -252,6 +232,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
               onApply={handleApply}
               isApplied={currentCustomTheme?._id === theme._id}
               onDuplicate={onDuplicate}
+              quickSelectedByMe={
+                !!themeState?.quickSelectedIds?.includes(theme._id)
+              }
             />
           ))}
         </div>
@@ -285,6 +268,9 @@ const UserThemes: React.FC<UserThemesProps> = ({
               onDuplicate={onDuplicate}
               likedByMe={!!themeState?.likedIds?.includes(theme._id)}
               savedByMe={!!themeState?.savedIds?.includes(theme._id)}
+              quickSelectedByMe={
+                !!themeState?.quickSelectedIds?.includes(theme._id)
+              }
             />
           ))}
         </div>

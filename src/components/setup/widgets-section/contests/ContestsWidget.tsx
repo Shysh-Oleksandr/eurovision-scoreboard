@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
+import { useGeneralStore } from '@/state/generalStore';
 
 const ContestsModal = dynamic(() => import('./ContestsModal'), {
   ssr: false,
@@ -14,7 +15,12 @@ const ContestsModal = dynamic(() => import('./ContestsModal'), {
 const ContestsWidget = () => {
   const t = useTranslations('widgets.contests');
 
-  const [isContestsModalOpen, setIsContestsModalOpen] = useState(false);
+  const isContestsModalOpen = useGeneralStore(
+    (state) => state.isContestsModalOpen,
+  );
+  const setIsContestsModalOpen = useGeneralStore(
+    (state) => state.setIsContestsModalOpen,
+  );
   const [isContestsModalLoaded, setIsContestsModalLoaded] = useState(false);
 
   return (
