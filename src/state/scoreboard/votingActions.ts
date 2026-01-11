@@ -1277,12 +1277,19 @@ export const createVotingActions: StateCreator<
         },
       };
 
-      // If stage is complete, mark stage as over
+      // If stage is complete, assign points to all countries and mark stage as over
       if (isStageComplete) {
         const finalUpdatedEventStages = updatedEventStages.map((stage) =>
           stage.id === currentStage.id
             ? {
                 ...stage,
+                countries: stage.countries.map((country) =>
+                  assignPointsToCountry(
+                    currentStage,
+                    stageCountryPoints[country.code],
+                    country,
+                  ),
+                ),
                 isOver: true,
               }
             : stage,
@@ -1419,12 +1426,19 @@ export const createVotingActions: StateCreator<
         },
       };
 
-      // If stage is complete, mark stage as over
+      // If stage is complete, assign points to all countries and mark stage as over
       if (isStageComplete) {
         const finalUpdatedEventStages = updatedEventStages.map((stage) =>
           stage.id === currentStage.id
             ? {
                 ...stage,
+                countries: stage.countries.map((country) =>
+                  assignPointsToCountry(
+                    currentStage,
+                    stageCountryPoints[country.code],
+                    country,
+                  ),
+                ),
                 isOver: true,
               }
             : stage,
