@@ -32,6 +32,7 @@ const hostingLogosByYear: Record<Year, HostingCountryData> = {
   '2023': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
   '2024': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
   '2025': { code: 'CH', logo: '/hostingCountryLogos/Switzerland2025.svg' },
+  '2026': { code: 'AT', logo: '/hostingCountryLogos/Austria2015.svg' },
 };
 
 const juniorHostingLogosByYear: Record<string, HostingCountryData> = {
@@ -45,6 +46,7 @@ const juniorHostingLogosByYear: Record<string, HostingCountryData> = {
   '2023': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
   '2024': { code: 'ES', logo: '/hostingCountryLogos/EuroEspana.png' },
   '2025': { code: 'GE', logo: '/hostingCountryLogos/EuroGeorgia.svg' },
+  '2026': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
 };
 
 // Optional per-country overrides for a default hosting logo not tied to a specific year

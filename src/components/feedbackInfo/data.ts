@@ -244,8 +244,13 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-01-13',
+    title: 'Added ESC 2026 setup',
+  },
+  {
     date: '2026-01-10',
-    title: 'Added the ability to quick select themes and contests from the dropdowns',
+    title:
+      'Added the ability to quick select themes and contests from the dropdowns',
   },
   {
     date: '2026-01-09',
@@ -292,8 +297,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-01-10', end: '2026-01-11' },
-    title: 'Contests improvements',
+    approximateDates: { start: '2026-01-17', end: '2026-01-18' },
+    title: 'Better theme customization',
   },
   {
     title: 'Running order setup',

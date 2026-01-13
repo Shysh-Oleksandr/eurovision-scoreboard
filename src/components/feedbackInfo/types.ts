@@ -20,6 +20,10 @@ export const getDateLabel = (item: UpdateItem, locale: string) => {
   }
 
   if (item.approximateDates) {
+    const isInPast = new Date(item.approximateDates.end) < new Date();
+    if (isInPast) {
+      return ""
+    }
     return `${formatDate(item.approximateDates.start, locale)} - ${formatDate(
       item.approximateDates.end,
       locale,
