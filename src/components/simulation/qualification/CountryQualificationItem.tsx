@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 
 import CountryItemBase from '@/components/countryItem/CountryItemBase';
-import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
@@ -35,10 +35,7 @@ export const CountryQualificationItem: React.FC<
   const itemClassName =
     'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
 
-  const itemGradientStyle = getGradientBackgroundStyle(
-    itemClassName,
-    overrides,
-  );
+  const itemSpecialStyle = getSpecialBackgroundStyle(itemClassName, overrides);
 
   useGSAP(
     () => {
@@ -82,7 +79,7 @@ export const CountryQualificationItem: React.FC<
         containerClassName={`flex items-center rounded-sm transition-all duration-300 lg:h-10 md:h-9 xs:h-8 h-7 relative shadow-md w-full ${
           onClick ? 'cursor-pointer hover:bg-countryItem-juryHoverBg' : ''
         } ${itemClassName}`}
-        style={itemGradientStyle}
+        style={itemSpecialStyle}
         onClick={onClick ? () => onClick() : undefined}
         as="div"
         renderFlag={() => (

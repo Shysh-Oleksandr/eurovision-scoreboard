@@ -6,10 +6,12 @@ import DouzePointsAnimation from '@/components/countryItem/DouzePointsAnimation'
 import useDouzePointsAnimation from '@/components/countryItem/hooks/useDouzePointsAnimation';
 import RoundedTriangle from '@/components/RoundedTriangle';
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
+import { getSpecialColorStyle } from '@/helpers/colorConversion';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import useAnimatePoints from '@/hooks/useAnimatePoints';
 import { Country } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
+import { ItemState } from '@/theme/types';
 
 // Determine colors based on state
 type DerivedColors = {
@@ -22,13 +24,6 @@ type DerivedColors = {
   buttonBgStyle?: React.CSSProperties;
   pointsBgStyle?: React.CSSProperties;
 };
-
-export type ItemState =
-  | 'jury'
-  | 'unfinished'
-  | 'active'
-  | 'finished'
-  | 'unqualified';
 
 type ThemePreviewCountryItemUIProps = {
   state: ItemState;
@@ -115,6 +110,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     let lastPointsText = 'text-countryItem-televoteLastPointsText';
 
     let buttonBgStyle: React.CSSProperties | undefined;
+    let bgOverride: string | undefined;
 
     if (state === 'unqualified') {
       buttonBg = 'bg-countryItem-unqualifiedBg opacity-70';
@@ -126,12 +122,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
         'bg-countryItem-unqualifiedLastPointsBg text-countryItem-unqualifiedLastPointsBg';
       lastPointsText = 'text-countryItem-unqualifiedLastPointsText';
 
-      const bgOverride = overrides['countryItem.unqualifiedBg'];
-
-      if (bgOverride && /gradient\(/i.test(bgOverride)) {
-        buttonBg = '';
-        buttonBgStyle = { background: bgOverride };
-      }
+      bgOverride = overrides['countryItem.unqualifiedBg'];
     }
 
     if (state === 'jury') {
@@ -144,15 +135,10 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
         'bg-countryItem-juryLastPointsBg text-countryItem-juryLastPointsBg';
       lastPointsText = 'text-countryItem-juryLastPointsText';
 
-      const bgOverride = overrides['countryItem.juryBg'];
-
-      if (bgOverride && /gradient\(/i.test(bgOverride)) {
-        buttonBg = '';
-        buttonBgStyle = { background: bgOverride };
-      }
+      bgOverride = overrides['countryItem.juryBg'];
     }
 
-    if (state === 'unfinished') {
+    if (state === 'televoteUnfinished') {
       buttonBg = 'bg-countryItem-televoteUnfinishedBg';
       buttonText = 'text-countryItem-televoteUnfinishedText';
       pointsBg =
@@ -163,15 +149,10 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
         'bg-countryItem-televoteLastPointsBg text-countryItem-televoteLastPointsBg';
       lastPointsText = 'text-countryItem-televoteLastPointsText';
 
-      const bgOverride = overrides['countryItem.televoteUnfinishedBg'];
-
-      if (bgOverride && /gradient\(/i.test(bgOverride)) {
-        buttonBg = '';
-        buttonBgStyle = { background: bgOverride };
-      }
+      bgOverride = overrides['countryItem.televoteUnfinishedBg'];
     }
 
-    if (state === 'active') {
+    if (state === 'televoteActive') {
       buttonBg =
         'bg-countryItem-televoteActiveBg outline outline-2 outline-countryItem-televoteOutline';
       buttonText = 'text-countryItem-televoteActiveText';
@@ -182,13 +163,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
         'bg-countryItem-televoteActiveLastPointsBg text-countryItem-televoteActiveLastPointsBg';
       lastPointsText = 'text-countryItem-televoteActiveLastPointsText';
 
-      const bgOverride = overrides['countryItem.televoteActiveBg'];
-
-      if (bgOverride && /gradient\(/i.test(bgOverride)) {
-        buttonBgStyle = { background: bgOverride };
-      }
+      bgOverride = overrides['countryItem.televoteActiveBg'];
     }
-    if (state === 'finished') {
+    if (state === 'televoteFinished') {
       buttonBg = 'bg-countryItem-televoteFinishedBg';
       buttonText = 'text-countryItem-televoteFinishedText';
       pointsBg =
@@ -198,12 +175,15 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
         'bg-countryItem-televoteFinishedLastPointsBg text-countryItem-televoteFinishedLastPointsBg';
       lastPointsText = 'text-countryItem-televoteFinishedLastPointsText';
 
-      const bgOverride = overrides['countryItem.televoteFinishedBg'];
+      bgOverride = overrides['countryItem.televoteFinishedBg'];
+    }
 
-      if (bgOverride && /gradient\(/i.test(bgOverride)) {
-        buttonBg = '';
-        buttonBgStyle = { background: bgOverride };
-      }
+    const { className: specialClassName, style: specialStyle } =
+      getSpecialColorStyle(bgOverride);
+
+    if (specialStyle) {
+      buttonBg = specialClassName;
+      buttonBgStyle = specialStyle;
     }
 
     return {
@@ -234,6 +214,8 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
           points={0}
           isJuryVoting={false}
           size="lg"
+          state={state}
+          overrides={overrides}
         />
       )}
       renderDouzePointsAnimation={() =>

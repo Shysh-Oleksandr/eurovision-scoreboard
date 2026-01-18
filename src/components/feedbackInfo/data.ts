@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-01-18',
+    title:
+      'Extended the theme customization: separate ranking colors for each state, opacity control for background colors, and gradient support for ranking and jury points panel backgrounds',
+  },
+  {
     date: '2026-01-13',
     title: 'Added ESC 2026 setup',
   },
@@ -297,8 +302,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-01-17', end: '2026-01-18' },
-    title: 'Better theme customization',
+    approximateDates: { start: '2026-01-24', end: '2026-01-25' },
+    title: 'Extended theme customization',
   },
   {
     title: 'Running order setup',

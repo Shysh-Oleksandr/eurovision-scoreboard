@@ -2,8 +2,9 @@ import React, { useMemo } from 'react';
 
 import CountryItemBase from '@/components/countryItem/CountryItemBase';
 import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
+import { useCountryItemColors } from '@/components/countryItem/hooks/useCountryItemColors';
 import { useQualificationStatus } from '@/components/countryItem/hooks/useQualificationStatus';
-import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import RoundedTriangle from '@/components/RoundedTriangle';
 import {
   getFlagPath,
@@ -11,6 +12,8 @@ import {
 } from '@/helpers/getFlagPath';
 import { Country } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
+import { ItemState } from '@/theme/types';
 
 type Props = {
   country: Country;
@@ -34,9 +37,22 @@ const ShareCountryItem: React.FC<Props> = ({
   const { shouldShowAsNonQualified, shouldShowNQLabel } =
     useQualificationStatus(country, isVotingOver);
 
+  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
+
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+
+  const currentStage =
+    eventStages.find((s) => s.id === viewedStageId) || getCurrentStage();
+  const isJuryVoting = !!currentStage?.isJuryVoting;
+
   const buttonColors = useMemo(() => {
     if (shouldShowAsNonQualified) {
       return 'bg-countryItem-unqualifiedBg text-countryItem-unqualifiedText opacity-70';
+    }
+
+    if (isJuryVoting) {
+      return 'bg-countryItem-juryBg text-countryItem-juryCountryText';
     }
 
     if (country.isVotingFinished) {
@@ -44,7 +60,7 @@ const ShareCountryItem: React.FC<Props> = ({
     }
 
     return 'bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText';
-  }, [shouldShowAsNonQualified, country.isVotingFinished]);
+  }, [shouldShowAsNonQualified, country.isVotingFinished, isJuryVoting]);
 
   // Size-based styles
   const sizeStyles = {
@@ -94,14 +110,17 @@ const ShareCountryItem: React.FC<Props> = ({
   const buttonClassName = `relative flex justify-between shadow-md w-full overflow-hidden rounded-sm ${currentSize.button} ${buttonColors}`;
 
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const buttonGradientStyle = getGradientBackgroundStyle(
+  const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
     overrides,
   );
 
-  const pointsBgClass =
-    'bg-countryItem-televoteFinishedPointsBg text-countryItem-televoteFinishedPointsBg';
-  const pointsTextClass = 'text-countryItem-televoteFinishedPointsText';
+  const { pointsBgClass, pointsTextClass } = useCountryItemColors({
+    isJuryVoting,
+    isCountryVotingFinished: !!country.isVotingFinished,
+    isActive: false,
+    isUnqualified: shouldShowAsNonQualified,
+  });
 
   return (
     <CountryItemBase
@@ -109,19 +128,35 @@ const ShareCountryItem: React.FC<Props> = ({
       index={index}
       className="flex relative"
       containerClassName={buttonClassName}
-      style={buttonGradientStyle}
+      style={buttonSpecialStyle}
       as="div"
       showPlaceNumber={showRankings}
-      renderPlaceNumber={(country, index) => (
-        <CountryPlaceNumber
-          shouldShowAsNonQualified={shouldShowAsNonQualified}
-          index={index}
-          showPlaceAnimation
-          points={'points' in country ? country.points : 0}
-          isJuryVoting={false}
-          size={size}
-        />
-      )}
+      renderPlaceNumber={(country, index) => {
+        // Determine the current state for rank colors
+        let currentState: ItemState = 'televoteUnfinished';
+
+        if (shouldShowAsNonQualified) {
+          currentState = 'unqualified';
+        } else if (isJuryVoting) {
+          currentState = 'jury';
+        } else if ('isVotingFinished' in country && country.isVotingFinished) {
+          currentState = 'televoteFinished';
+        } else {
+          currentState = 'televoteUnfinished';
+        }
+
+        return (
+          <CountryPlaceNumber
+            shouldShowAsNonQualified={shouldShowAsNonQualified}
+            index={index}
+            showPlaceAnimation
+            points={'points' in country ? country.points : 0}
+            isJuryVoting={false}
+            size={size}
+            state={currentState}
+          />
+        );
+      }}
       renderFlag={() => (
         <img
           loading="lazy"

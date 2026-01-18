@@ -1,3 +1,4 @@
+import { hslStringToHex } from '@/helpers/colorConversion';
 import React from 'react';
 
 /**
@@ -10,15 +11,21 @@ const BG_CLASS_TO_OVERRIDE_KEY: Record<string, string> = {
   'bg-countryItem-televoteFinishedBg': 'countryItem.televoteFinishedBg',
   'bg-countryItem-unqualifiedBg': 'countryItem.unqualifiedBg',
   'bg-countryItem-douzePointsBg': 'countryItem.douzePointsBg',
-  'bg-countryItem-placeContainerBg': 'countryItem.placeContainerBg',
+  'bg-countryItem-juryPlaceContainerBg': 'countryItem.juryPlaceContainerBg',
+  'bg-countryItem-televoteUnfinishedPlaceContainerBg': 'countryItem.televoteUnfinishedPlaceContainerBg',
+  'bg-countryItem-televoteActivePlaceContainerBg': 'countryItem.televoteActivePlaceContainerBg',
+  'bg-countryItem-televoteFinishedPlaceContainerBg': 'countryItem.televoteFinishedPlaceContainerBg',
+  'bg-countryItem-unqualifiedPlaceContainerBg': 'countryItem.unqualifiedPlaceContainerBg',
+  'bg-panelInfo-activeBg': 'panelInfo.activeBg',
+  'bg-panelInfo-inactiveBg': 'panelInfo.inactiveBg',
 };
 
 /**
  * Given a className that contains bg-countryItem-* classes and the current overrides,
- * returns an inline style with a gradient background if the corresponding override
- * contains a CSS gradient string. Otherwise returns undefined.
+ * returns an inline style if the corresponding override contains a special color format
+ * (gradient, rgba, or HSL with alpha) that can't be handled by CSS variables.
  */
-export function getGradientBackgroundStyle(
+export function getSpecialBackgroundStyle(
   className: string,
   overrides?: Record<string, string> | null,
 ): React.CSSProperties | undefined {
@@ -31,9 +38,15 @@ export function getGradientBackgroundStyle(
     if (!key) continue;
 
     const value = overrides[key];
-    if (typeof value === 'string' && /gradient\(/i.test(value)) {
-      // Use shorthand background to fully override any background-color
-      return { background: value } as React.CSSProperties;
+    if (typeof value === 'string') {
+      // Check for special color formats that need inline styles
+      if (
+        /gradient\(/i.test(value) ||
+        /rgba?\(/.test(value) ||
+        /^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?$/.test(value.trim())
+      ) {
+        return { background: hslStringToHex(value) } as React.CSSProperties;
+      }
     }
   }
 

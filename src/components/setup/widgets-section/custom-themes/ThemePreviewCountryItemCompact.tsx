@@ -1,13 +1,12 @@
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
-import ThemePreviewCountryItemUI, {
-  ItemState,
-} from './ThemePreviewCountryItemUI';
+import ThemePreviewCountryItemUI from './ThemePreviewCountryItemUI';
 
 import Badge from '@/components/common/Badge';
 import VotingPointsInfo from '@/components/controlsPanel/VotingPointsInfo';
 import { getThemeBackground } from '@/theme/themes';
+import { ItemState } from '@/theme/types';
 
 const previewBadges = [
   {
@@ -16,15 +15,15 @@ const previewBadges = [
   },
   {
     label: 'Televote',
-    key: 'unfinished',
+    key: 'televoteUnfinished',
   },
   {
     label: 'Active',
-    key: 'active',
+    key: 'televoteActive',
   },
   {
     label: 'Finished',
-    key: 'finished',
+    key: 'televoteFinished',
   },
   {
     label: 'Unqualified',
@@ -99,7 +98,10 @@ const ThemePreviewCountryItemCompact: React.FC<
           previewCountryCode={previewCountryCode}
         />
 
-        <VotingPointsInfo customVotingPointsIndex={isListItem ? 9 : 0} />
+        <VotingPointsInfo
+          customVotingPointsIndex={isListItem ? 9 : 0}
+          overrides={overrides}
+        />
       </div>
     </>
   );

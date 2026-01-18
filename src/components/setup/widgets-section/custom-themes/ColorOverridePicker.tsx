@@ -37,8 +37,9 @@ const sanitizeGradient = (input: string): string => {
 export interface ColorFieldDefinition {
   key: string;
   label: string;
-  enableGradient?: boolean;
   groupKey: string;
+  enableGradient?: boolean;
+  enableOpacity?: boolean;
 }
 
 interface ColorOverridePickerProps {
@@ -47,6 +48,7 @@ interface ColorOverridePickerProps {
   defaultValue: string;
   onChange: (value: string | undefined) => void;
   enableGradient?: boolean;
+  enableOpacity?: boolean;
   allColorFields?: ColorFieldDefinition[];
   currentFieldKey?: string;
   onBulkChange?: (updates: Record<string, string>) => void;
@@ -58,6 +60,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   defaultValue,
   onChange,
   enableGradient = false,
+  enableOpacity = false,
   allColorFields = [],
   currentFieldKey,
   onBulkChange,
@@ -76,7 +79,8 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   const buttonRef = useRef<HTMLDivElement>(null);
   const copyButtonRef = useRef<HTMLDivElement>(null);
 
-  const currentValue = value || defaultValue;
+  const currentValue = value || defaultValue || '#000000';
+
   const isGradient = /gradient\(/i.test(currentValue);
   let displayColor: string;
 
@@ -86,7 +90,10 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
     displayColor = currentValue;
   } else if (
     /^hsl\(/i.test(currentValue) ||
-    /^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%$/.test(currentValue)
+    /^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%$/.test(currentValue) ||
+    /^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%\s+(\d+(?:\.\d+)?)$/.test(
+      currentValue,
+    )
   ) {
     displayColor = hslStringToHex(currentValue);
   } else {
@@ -94,22 +101,45 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
     displayColor = currentValue;
   }
 
-  // Normalize display format to always show as hsl(...)
+  // Normalize display format to always show as hsl(...) or hsla(...)
   const getDisplayValue = (colorValue: string) => {
     if (/gradient\(/i.test(colorValue)) {
       return colorValue;
     }
-    if (colorValue.startsWith('hsl(')) {
+    if (colorValue.startsWith('hsl(') || colorValue.startsWith('hsla(')) {
       return colorValue;
     }
-    if (colorValue.startsWith('#')) {
-      // Convert hex to hsl format for display
+    if (
+      colorValue.startsWith('#') ||
+      colorValue.startsWith('rgba(') ||
+      colorValue.startsWith('rgb(')
+    ) {
+      // Convert to hsl format for display
       const hsl = parseColor(colorValue);
+      const parts = hsl.split(/\s+/);
 
+      if (parts.length === 4) {
+        // Has alpha: "h s% l% a"
+        const [h, s, l, a] = parts;
+
+        return `hsla(${h}, ${s}, ${l}, ${a})`;
+      }
+
+      // No alpha: "h s% l%"
       return `hsl(${hsl})`;
     }
 
-    // Convert "h s% l%" to "hsl(h, s%, l%)"
+    // Handle our custom "h s% l%" or "h s% l% a" format
+    const parts = colorValue.split(/\s+/);
+
+    if (parts.length === 4) {
+      // Has alpha: "h s% l% a"
+      const [h, s, l, a] = parts;
+
+      return `hsla(${h}, ${s}, ${l}, ${a})`;
+    }
+
+    // No alpha: "h s% l%"
     return `hsl(${colorValue})`;
   };
 
@@ -389,9 +419,9 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
               <ColorPicker
                 value={displayColor}
                 onChange={handleColorChange}
-                hideOpacity
                 height={200}
                 hideColorTypeBtns={!enableGradient}
+                hideOpacity={!enableOpacity}
               />
             </div>
           </>,

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 
 type DouzePointsAnimationProps = {
   refs: {
@@ -19,13 +19,13 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
 }) => {
   const containerClass =
     'absolute overflow-hidden left-0 right-0 top-0 bottom-0 z-40 bg-countryItem-douzePointsBg flex justify-center items-center opacity-0';
-  const gradientStyle = getGradientBackgroundStyle(containerClass, overrides);
+  const specialStyle = getSpecialBackgroundStyle(containerClass, overrides);
 
   return (
     <div
       ref={refs.containerRef}
       className={containerClass}
-      style={gradientStyle}
+      style={specialStyle}
     >
       <h4 className="text-countryItem-douzePointsText lg:text-xl md:text-lg xs:text-base text-sm font-bold uppercase">
         {pointsAmount} {pointsAmount === 1 ? 'point' : 'points'}
