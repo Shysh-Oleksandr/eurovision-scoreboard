@@ -1,9 +1,12 @@
+import React from 'react';
+
 import { toFixedIfDecimal } from './toFixedIfDecimal';
 
 export interface HSL {
   h: number;
   s: number;
   l: number;
+  a?: number; // alpha value (0-1), optional, defaults to 1
 }
 
 /**
@@ -49,9 +52,15 @@ export function hexToHsl(hex: string): HSL {
 }
 
 /**
- * Convert HSL object to string format "h s% l%"
+ * Convert HSL object to string format "h s% l%" or "h s% l% a" if alpha < 1
  */
 export function hslToString(hsl: HSL): string {
+  const alpha = hsl.a ?? 1;
+  if (alpha < 1) {
+    return `${toFixedIfDecimal(hsl.h)} ${toFixedIfDecimal(
+      hsl.s,
+    )}% ${toFixedIfDecimal(hsl.l)}% ${toFixedIfDecimal(alpha)}`;
+  }
   return `${toFixedIfDecimal(hsl.h)} ${toFixedIfDecimal(
     hsl.s,
   )}% ${toFixedIfDecimal(hsl.l)}%`;
@@ -69,8 +78,8 @@ export function parseColor(value: string): string {
     return value;
   }
 
-  // Already in "h s% l%" format
-  if (/^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%$/.test(value.trim())) {
+  // Already in "h s% l%" or "h s% l% a" format
+  if (/^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%(?:\s+\d+(?:\.\d+)?)?$/.test(value.trim())) {
     return value.trim();
   }
 
@@ -90,6 +99,7 @@ export function parseColor(value: string): string {
     const r = Math.min(255, Math.max(0, parseInt(rgbMatch[1], 10))) / 255;
     const g = Math.min(255, Math.max(0, parseInt(rgbMatch[2], 10))) / 255;
     const b = Math.min(255, Math.max(0, parseInt(rgbMatch[3], 10))) / 255;
+    const a = rgbMatch[4] !== undefined ? parseFloat(rgbMatch[4]) : 1;
 
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
@@ -117,6 +127,7 @@ export function parseColor(value: string): string {
       h: Math.round(h * 360),
       s: Math.round(s * 100),
       l: Math.round(l * 100),
+      a: a,
     });
   }
 
@@ -133,9 +144,22 @@ export function parseColor(value: string): string {
 }
 
 /**
- * Convert "h s% l%" to hex
+ * Convert "h s% l%" or "h s% l% a" to hex or rgba
  */
 export function hslStringToHex(hsl: string): string {
+  // Handle our "h s% l% a" format (with alpha)
+  const matchWithAlpha = hsl.match(
+    /^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)$/,
+  );
+  if (matchWithAlpha) {
+    const [_, h, s, l, a] = matchWithAlpha;
+    const hue = parseFloat(h);
+    const sat = parseFloat(s) / 100;
+    const light = parseFloat(l) / 100;
+    const alpha = parseFloat(a);
+    return hslaToRgba(hue, sat, light, alpha);
+  }
+
   // Handle our "h s% l%" format
   const match = hsl.match(
     /^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/,
@@ -181,4 +205,51 @@ function hslToHex(hue: number, sat: number, light: number): string {
       .padStart(2, '0');
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function hslaToRgba(hue: number, sat: number, light: number, alpha: number): string {
+  const c = (1 - Math.abs(2 * light - 1)) * sat;
+  const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
+  const m = light - c / 2;
+
+  let [r, g, b]: number[] = [0, 0, 0];
+
+  if (hue < 60) [r, g, b] = [c, x, 0];
+  else if (hue < 120) [r, g, b] = [x, c, 0];
+  else if (hue < 180) [r, g, b] = [0, c, x];
+  else if (hue < 240) [r, g, b] = [0, x, c];
+  else if (hue < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+
+  const toRgb = (n: number) => Math.round((n + m) * 255);
+
+  return `rgba(${toRgb(r)}, ${toRgb(g)}, ${toRgb(b)}, ${toFixedIfDecimal(alpha)})`;
+}
+
+/**
+ * Check if a color value requires special CSS handling (gradient, rgba, or HSL string)
+ * and return appropriate CSS properties for background styling
+ */
+export function getSpecialColorStyle(colorValue: string | undefined): {
+  className: string;
+  style?: React.CSSProperties;
+} {
+  if (
+    colorValue &&
+    (/gradient\(/i.test(colorValue) ||
+      /rgba?\(/.test(colorValue) ||
+      /^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?$/.test(
+        colorValue,
+      ))
+  ) {
+    return {
+      className: '',
+      style: { background: hslStringToHex(colorValue) },
+    };
+  }
+
+  return {
+    className: '',
+    style: undefined,
+  };
 }

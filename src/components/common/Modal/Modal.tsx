@@ -102,8 +102,8 @@ const Modal: React.FC<ModalProps> = ({
       <div
         data-theme={dataTheme}
         className={`text-white bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
-          isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-        } ${
+          enableWinterEffects ? '' : 'overflow-hidden'
+        } ${isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} ${
           topContent && enableWinterEffects ? 'pt-1' : ''
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}

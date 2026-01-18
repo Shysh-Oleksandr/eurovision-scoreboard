@@ -82,7 +82,7 @@ export const createGetters: StateCreator<
     if (!currentStage) return null;
 
     const notFinishedCountries = Object.entries(
-      countryPoints[currentStage.id],
+      countryPoints[currentStage.id] || {},
     ).filter(
       ([code]) =>
         !currentStage.countries.find((country) => country.code === code)

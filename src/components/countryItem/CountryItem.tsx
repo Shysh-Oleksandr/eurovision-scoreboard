@@ -16,9 +16,10 @@ import { useItemState } from './hooks/useItemState';
 import { useQualificationStatus } from './hooks/useQualificationStatus';
 import useVotingFinished from './hooks/useVotingFinished';
 
-import { getGradientBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import { SENTINEL } from '@/data/data';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
+import { ItemState } from '@/theme/types';
 
 type Props = {
   country: Country;
@@ -112,7 +113,7 @@ const CountryItem = ({
   });
 
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const buttonGradientStyle = getGradientBackgroundStyle(
+  const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
     overrides,
   );
@@ -123,20 +124,38 @@ const CountryItem = ({
       index={index}
       className={isVotingOver ? '' : 'md:~md/xl:~w-[14rem]/[26rem]'}
       containerClassName={`${buttonClassName} flex-1 min-w-0 overflow-hidden`}
-      style={buttonGradientStyle}
+      style={buttonSpecialStyle}
       disabled={isDisabled}
       onClick={onClick}
       as="button"
       showPlaceNumber={shouldShowPlaceNumber}
-      renderPlaceNumber={(country, index) => (
-        <CountryPlaceNumber
-          shouldShowAsNonQualified={shouldShowAsNonQualified}
-          index={index}
-          showPlaceAnimation={shouldShowPlaceNumber}
-          points={'points' in country ? country.points : 0}
-          isJuryVoting={isJuryVoting}
-        />
-      )}
+      renderPlaceNumber={(country, index) => {
+        // Determine the current state for rank colors
+        let currentState: ItemState = 'televoteUnfinished';
+
+        if (shouldShowAsNonQualified) {
+          currentState = 'unqualified';
+        } else if (isJuryVoting) {
+          currentState = 'jury';
+        } else if (isActive) {
+          currentState = 'televoteActive';
+        } else if (isVotingFinished) {
+          currentState = 'televoteFinished';
+        } else {
+          currentState = 'televoteUnfinished';
+        }
+
+        return (
+          <CountryPlaceNumber
+            shouldShowAsNonQualified={shouldShowAsNonQualified}
+            index={index}
+            showPlaceAnimation={shouldShowPlaceNumber}
+            points={'points' in country ? country.points : 0}
+            isJuryVoting={isJuryVoting}
+            state={currentState}
+          />
+        );
+      }}
       renderDouzePointsAnimation={() =>
         showDouzePointsAnimationHook ? (
           <DouzePointsAnimation

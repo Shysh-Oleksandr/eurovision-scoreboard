@@ -1,5 +1,12 @@
 import { Year } from '../config';
 
+export type ItemState =
+  | 'jury'
+  | 'televoteUnfinished'
+  | 'televoteActive'
+  | 'televoteFinished'
+  | 'unqualified';
+
 export interface ThemeColors {
   primary: {
     700: string;
@@ -23,6 +30,8 @@ export interface ThemeColors {
     juryPointsText: string;
     juryLastPointsBg: string;
     juryLastPointsText: string;
+    juryPlaceContainerBg: string;
+    juryPlaceText: string;
 
     televoteUnfinishedBg: string;
     televoteUnfinishedText: string;
@@ -30,6 +39,8 @@ export interface ThemeColors {
     televoteUnfinishedPointsText: string;
     televoteLastPointsBg: string;
     televoteLastPointsText: string;
+    televoteUnfinishedPlaceContainerBg: string;
+    televoteUnfinishedPlaceText: string;
 
     televoteActiveBg: string;
     televoteActiveText: string;
@@ -38,6 +49,8 @@ export interface ThemeColors {
     televoteActiveLastPointsBg: string;
     televoteActiveLastPointsText: string;
     televoteOutline: string;
+    televoteActivePlaceContainerBg: string;
+    televoteActivePlaceText: string;
 
     televoteFinishedBg: string;
     televoteFinishedText: string;
@@ -45,6 +58,8 @@ export interface ThemeColors {
     televoteFinishedPointsText: string;
     televoteFinishedLastPointsBg: string;
     televoteFinishedLastPointsText: string;
+    televoteFinishedPlaceContainerBg: string;
+    televoteFinishedPlaceText: string;
 
     unqualifiedBg: string;
     unqualifiedText: string;
@@ -52,14 +67,13 @@ export interface ThemeColors {
     unqualifiedPointsText: string;
     unqualifiedLastPointsBg: string;
     unqualifiedLastPointsText: string;
+    unqualifiedPlaceContainerBg: string;
+    unqualifiedPlaceText: string;
 
     douzePointsBg: string;
     douzePointsText: string;
     douzePointsBlock1: string;
     douzePointsBlock2: string;
-
-    placeContainerBg: string;
-    placeText: string;
   };
   panelInfo: {
     activeBg: string;

@@ -7,6 +7,8 @@ import ColorOverridePicker, {
 
 import { ThemeColors } from '@/theme/types';
 
+type ColorField = Omit<ColorFieldDefinition, 'groupKey'>;
+
 interface ColorOverridesSectionProps {
   defaultColors: ThemeColors;
   overrides: Record<string, string>;
@@ -41,8 +43,13 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     onChange(next);
   };
 
-  const juryColors = [
-    { key: 'juryBg', label: t('juryBg'), enableGradient: true },
+  const juryColors: ColorField[] = [
+    {
+      key: 'juryBg',
+      label: t('juryBg'),
+      enableGradient: true,
+      enableOpacity: true,
+    },
     { key: 'juryCountryText', label: t('juryText') },
     {
       key: 'juryPointsBg',
@@ -54,6 +61,13 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       label: t('juryLastPointsBg'),
     },
     { key: 'juryLastPointsText', label: t('juryLastPointsText') },
+    {
+      key: 'juryPlaceContainerBg',
+      label: t('juryPlaceContainerBg'),
+      enableGradient: true,
+      enableOpacity: true,
+    },
+    { key: 'juryPlaceText', label: t('juryPlaceText') },
   ];
 
   const isGradientJuryBg =
@@ -67,22 +81,24 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     });
   }
 
-  const douzePointsColors = [
+  const douzePointsColors: ColorField[] = [
     {
       key: 'douzePointsBg',
       label: t('douzePointsBg'),
       enableGradient: true,
+      enableOpacity: true,
     },
     { key: 'douzePointsText', label: t('douzePointsText') },
     { key: 'douzePointsBlock1', label: t('douzePointsBlock1') },
     { key: 'douzePointsBlock2', label: t('douzePointsBlock2') },
   ];
 
-  const televoteColors = [
+  const televoteColors: ColorField[] = [
     {
       key: 'televoteUnfinishedBg',
       label: t('televoteUnfinishedBg'),
       enableGradient: true,
+      enableOpacity: true,
     },
     { key: 'televoteUnfinishedText', label: t('televoteUnfinishedText') },
     {
@@ -101,13 +117,23 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       key: 'televoteLastPointsText',
       label: t('televoteLastPointsText'),
     },
+    {
+      key: 'televoteUnfinishedPlaceContainerBg',
+      label: t('televoteUnfinishedPlaceContainerBg'),
+      enableGradient: true,
+    },
+    {
+      key: 'televoteUnfinishedPlaceText',
+      label: t('televoteUnfinishedPlaceText'),
+    },
   ];
 
-  const televoteActiveColors = [
+  const televoteActiveColors: ColorField[] = [
     {
       key: 'televoteActiveBg',
       label: t('televoteActiveBg'),
       enableGradient: true,
+      enableOpacity: true,
     },
     { key: 'televoteActiveText', label: t('televoteActiveText') },
     {
@@ -127,16 +153,24 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       label: t('televoteActiveLastPointsText'),
     },
     {
+      key: 'televoteActivePlaceContainerBg',
+      label: t('televoteActivePlaceContainerBg'),
+      enableGradient: true,
+      enableOpacity: true,
+    },
+    { key: 'televoteActivePlaceText', label: t('televoteActivePlaceText') },
+    {
       key: 'televoteOutline',
       label: t('televoteOutline'),
     },
   ];
 
-  const finishedColors = [
+  const finishedColors: ColorField[] = [
     {
       key: 'televoteFinishedBg',
       label: t('televoteFinishedBg'),
       enableGradient: true,
+      enableOpacity: true,
     },
     { key: 'televoteFinishedText', label: t('televoteFinishedText') },
     {
@@ -155,13 +189,21 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       key: 'televoteFinishedLastPointsText',
       label: t('televoteFinishedLastPointsText'),
     },
+    {
+      key: 'televoteFinishedPlaceContainerBg',
+      label: t('televoteFinishedPlaceContainerBg'),
+      enableGradient: true,
+      enableOpacity: true,
+    },
+    { key: 'televoteFinishedPlaceText', label: t('televoteFinishedPlaceText') },
   ];
 
-  const unqualifiedColors = [
+  const unqualifiedColors: ColorField[] = [
     {
       key: 'unqualifiedBg',
       label: t('unqualifiedBg'),
       enableGradient: true,
+      enableOpacity: true,
     },
     { key: 'unqualifiedText', label: t('unqualifiedText') },
     {
@@ -180,28 +222,27 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       key: 'unqualifiedLastPointsText',
       label: t('unqualifiedLastPointsText'),
     },
-  ];
-
-  const rankColors = [
     {
-      key: 'placeContainerBg',
-      label: t('placeContainerBg'),
-      // enableGradient: true,
+      key: 'unqualifiedPlaceContainerBg',
+      label: t('unqualifiedPlaceContainerBg'),
+      enableGradient: true,
     },
-    { key: 'placeText', label: t('placeText') },
+    { key: 'unqualifiedPlaceText', label: t('unqualifiedPlaceText') },
   ];
 
-  const panelInfoColors = [
+  const panelInfoColors: ColorField[] = [
     {
       key: 'activeBg',
       label: t('activeBg'),
-      // enableGradient: true
+      enableGradient: true,
+      enableOpacity: true,
     },
     { key: 'activeText', label: t('activeText') },
     {
       key: 'inactiveBg',
       label: t('inactiveBg'),
-      // enableGradient: true
+      enableGradient: true,
+      enableOpacity: true,
     },
     { key: 'inactiveText', label: t('inactiveText') },
   ];
@@ -211,15 +252,13 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     const fields: ColorFieldDefinition[] = [];
 
     // Helper to add fields from a color array
-    const addFields = (
-      colors: typeof juryColors,
-      groupKey: keyof ThemeColors,
-    ) => {
-      colors.forEach(({ key, label, enableGradient }) => {
+    const addFields = (colors: ColorField[], groupKey: keyof ThemeColors) => {
+      colors.forEach(({ key, label, enableGradient, enableOpacity }) => {
         fields.push({
           key,
           label,
           enableGradient,
+          enableOpacity,
           groupKey: groupKey as string,
         });
       });
@@ -232,7 +271,6 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     addFields(televoteActiveColors, 'countryItem');
     addFields(finishedColors, 'countryItem');
     addFields(unqualifiedColors, 'countryItem');
-    addFields(rankColors, 'countryItem');
     addFields(panelInfoColors, 'panelInfo');
 
     return fields;
@@ -248,7 +286,7 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
         {title}
       </h5>
       <div className="grid grid-cols-2 gap-2">
-        {colors.map(({ key, label, enableGradient }) => {
+        {colors.map(({ key, label, enableGradient, enableOpacity }) => {
           const fullKey = `${groupKey}.${key}`;
 
           return (
@@ -261,6 +299,7 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
               }
               onChange={(val) => setOverride(fullKey, val)}
               enableGradient={enableGradient}
+              enableOpacity={enableOpacity}
               allColorFields={allColorFields}
               currentFieldKey={fullKey}
               onBulkChange={handleBulkChange}
@@ -295,9 +334,6 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
 
       {renderColorGroup(unqualifiedColors, t('unqualifiedColors'))}
 
-      <div className="border-t border-white/20 border-solid"></div>
-
-      {renderColorGroup(rankColors, t('rankColors'))}
       <div className="border-t border-white/20 border-solid"></div>
 
       {renderColorGroup(

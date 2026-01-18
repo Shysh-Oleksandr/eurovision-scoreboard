@@ -4,10 +4,19 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { getSpecialBackgroundStyle } from './utils/gradientUtils';
+
 import { ArrowIcon } from '@/assets/icons/ArrowIcon';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import usePrevious from '@/hooks/usePrevious';
 import { useGeneralStore } from '@/state/generalStore';
+
+type CountryItemState =
+  | 'jury'
+  | 'televoteUnfinished'
+  | 'televoteActive'
+  | 'televoteFinished'
+  | 'unqualified';
 
 type Props = {
   shouldShowAsNonQualified: boolean;
@@ -16,6 +25,8 @@ type Props = {
   points: number;
   isJuryVoting: boolean;
   size?: 'scoreboard' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  state?: CountryItemState;
+  overrides?: Record<string, string>;
 };
 
 const CountryPlaceNumber = ({
@@ -25,6 +36,8 @@ const CountryPlaceNumber = ({
   points,
   isJuryVoting,
   size = 'scoreboard',
+  state,
+  overrides: propOverrides,
 }: Props) => {
   const isSmallScreen = useMediaQuery('(max-width: 479px)');
   const isTablet = useMediaQuery('(min-width: 576px)');
@@ -32,6 +45,11 @@ const CountryPlaceNumber = ({
   const showRankChangeIndicator = useGeneralStore(
     (state) => state.settings.showRankChangeIndicator,
   );
+
+  const globalOverrides = useGeneralStore(
+    (s) => s.customTheme?.overrides || null,
+  );
+  const overrides = propOverrides || globalOverrides;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
@@ -42,6 +60,37 @@ const CountryPlaceNumber = ({
   const previousDisplayArrow = usePrevious(displayArrow);
 
   const isScoreboard = size === 'scoreboard';
+
+  // Determine state for rank colors
+  const rankState: CountryItemState =
+    state ||
+    (() => {
+      if (shouldShowAsNonQualified) return 'unqualified';
+      if (isJuryVoting) return 'jury';
+
+      // For televote, we need more context. For now, default to unfinished
+      // This will be passed explicitly from the parent components
+      return 'televoteUnfinished';
+    })();
+
+  // State-specific rank color classes
+  const rankColorClasses = {
+    jury: 'bg-countryItem-juryPlaceContainerBg text-countryItem-juryPlaceText',
+    televoteUnfinished:
+      'bg-countryItem-televoteUnfinishedPlaceContainerBg text-countryItem-televoteUnfinishedPlaceText',
+    televoteActive:
+      'bg-countryItem-televoteActivePlaceContainerBg text-countryItem-televoteActivePlaceText',
+    televoteFinished:
+      'bg-countryItem-televoteFinishedPlaceContainerBg text-countryItem-televoteFinishedPlaceText',
+    unqualified:
+      'bg-countryItem-unqualifiedPlaceContainerBg text-countryItem-unqualifiedPlaceText',
+  };
+
+  // Get special background style for rank container (gradients, rgba, hsl with alpha)
+  const rankContainerSpecialStyle = getSpecialBackgroundStyle(
+    rankColorClasses[rankState],
+    overrides,
+  );
 
   // Size-based styles
   const sizeStyles = {
@@ -145,18 +194,14 @@ const CountryPlaceNumber = ({
   return (
     <div
       ref={containerRef}
-      className={`flex flex-none items-center justify-center rounded-sm bg-countryItem-placeContainerBg text-countryItem-placeText relative ${
-        currentSize.container
-      } ${
-        shouldShowAsNonQualified
-          ? 'bg-countryItem-unqualifiedBg opacity-70'
-          : ''
-      }`}
+      className={`flex flex-none items-center justify-center rounded-sm ${rankColorClasses[rankState]} relative ${currentSize.container}`}
+      style={rankContainerSpecialStyle}
     >
       <ArrowIcon
-        className={`text-countryItem-placeText -rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 2cols:w-8 w-7 2cols:h-8 h-7 ${
+        className={`-rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 2cols:w-8 w-7 2cols:h-8 h-7 ${
           displayArrow ? 'blinker' : 'opacity-0'
         }`}
+        style={{ color: `var(--countryItem-${rankState}PlaceText)` }}
       />
 
       <h4
