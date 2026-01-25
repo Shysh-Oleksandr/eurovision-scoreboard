@@ -34,6 +34,7 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { applyCustomTheme, getDefaultThemeColors } from '@/theme/themeUtils';
+import { FlagShape, PointsContainerShape } from '@/theme/types';
 import { useThemeColor } from '@/theme/useThemeColor';
 import { CustomTheme } from '@/types/customTheme';
 
@@ -74,6 +75,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
+
+  // Theme-specific UI options
+  const [uppercaseEntryName, setUppercaseEntryName] = useState(true);
+  const [pointsContainerShape, setPointsContainerShape] =
+    useState<PointsContainerShape>('triangle');
+  const [flagShape, setFlagShape] = useState<FlagShape>('big-rectangle');
 
   const { mutateAsync: createTheme, isPending: isCreating } =
     useCreateThemeMutation();
@@ -117,6 +124,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
       setUploadedFile(null);
+      setPointsContainerShape(initialTheme.pointsContainerShape || 'triangle');
+      setUppercaseEntryName(initialTheme.uppercaseEntryName ?? true);
+      setFlagShape(initialTheme.flagShape || 'big-rectangle');
     } else {
       setName('');
       setDescription('');
@@ -127,6 +137,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setBackgroundImageUrl('');
       setOverrides({});
       setUploadedFile(null);
+      setPointsContainerShape('triangle');
+      setUppercaseEntryName(true);
+      setFlagShape('big-rectangle');
     }
   }, [initialTheme, isOpen, themeYear, themeHue]);
 
@@ -167,19 +180,67 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       return;
     }
 
+    // Build payload with only non-default values for theme-specific options
+    const buildThemePayload = (isUpdate = false) => {
+      const payload: any = {
+        name,
+        description,
+        baseThemeYear,
+        hue,
+        shadeValue: hsva.v,
+        isPublic,
+        backgroundImageUrl,
+        overrides,
+      };
+
+      // For updates, we need to explicitly handle reverting to defaults
+      if (isUpdate && initialTheme) {
+        // If previously had a non-default value but now is default, set to null to delete
+        if (
+          initialTheme.pointsContainerShape &&
+          pointsContainerShape === 'triangle'
+        ) {
+          payload.pointsContainerShape = null;
+        } else if (pointsContainerShape !== 'triangle') {
+          payload.pointsContainerShape = pointsContainerShape;
+        }
+
+        if (
+          initialTheme.uppercaseEntryName === false &&
+          uppercaseEntryName === true
+        ) {
+          payload.uppercaseEntryName = null;
+        } else if (uppercaseEntryName !== true) {
+          payload.uppercaseEntryName = uppercaseEntryName;
+        }
+
+        if (initialTheme.flagShape && flagShape === 'big-rectangle') {
+          payload.flagShape = null;
+        } else if (flagShape !== 'big-rectangle') {
+          payload.flagShape = flagShape;
+        }
+      } else {
+        // For creates, only include if different from defaults
+        if (pointsContainerShape !== 'triangle') {
+          payload.pointsContainerShape = pointsContainerShape;
+        }
+        if (uppercaseEntryName !== true) {
+          payload.uppercaseEntryName = uppercaseEntryName;
+        }
+        if (flagShape !== 'big-rectangle') {
+          payload.flagShape = flagShape;
+        }
+      }
+
+      return payload;
+    };
+
     try {
       if (isEditMode && initialTheme) {
         // Update existing theme
         let updated = await updateTheme({
           id: initialTheme._id,
-          name,
-          description,
-          baseThemeYear,
-          hue,
-          shadeValue: hsva.v,
-          isPublic,
-          backgroundImageUrl,
-          overrides,
+          ...buildThemePayload(true),
         });
 
         // Upload background if provided
@@ -198,16 +259,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         toast.success(t('widgets.themes.themeUpdatedSuccessfully'));
       } else {
         // Create new theme
-        const created = await createTheme({
-          name,
-          description,
-          baseThemeYear,
-          hue,
-          shadeValue: hsva.v,
-          isPublic,
-          backgroundImageUrl,
-          overrides,
-        });
+        const created = await createTheme(buildThemePayload());
 
         // Upload background if provided
         if (uploadedFile) {
@@ -304,7 +356,6 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               ? t('widgets.themes.editTheme')
               : t('widgets.themes.createTheme')}
           </h2>
-
           {/* Basic Info */}
           <CollapsibleSection
             title={t('widgets.themes.basicInfo')}
@@ -340,7 +391,6 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               />
             </div>
           </CollapsibleSection>
-
           {/* Main */}
           <CollapsibleSection title={t('widgets.themes.main')} defaultExpanded>
             <div className="space-y-4">
@@ -356,6 +406,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 id="baseTheme-select-box"
                 label={t('widgets.themes.baseTheme')}
                 className="sm:w-[130px] w-[110px]"
+                dataTheme="custom-preview"
               />
 
               <div>
@@ -449,7 +500,105 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               </div>
             </div>
           </CollapsibleSection>
+          {/* Theme Specifics */}
+          <CollapsibleSection
+            title={t('widgets.themes.visualDetails.title')}
+            defaultExpanded
+          >
+            <div className="space-y-3">
+              <Checkbox
+                id="uppercase-entry-name"
+                label={t('widgets.themes.visualDetails.uppercaseEntryName')}
+                labelClassName="w-full !px-0 !pt-1 !items-start"
+                checked={uppercaseEntryName}
+                onChange={(e) => setUppercaseEntryName(e.target.checked)}
+              />
 
+              <div className="grid xs:grid-cols-2 grid-cols-1 items-center xs:gap-3 gap-2">
+                <CustomSelect
+                  options={[
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.pointsContainerShapes.curvedEdge',
+                      ),
+                      value: 'triangle',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.pointsContainerShapes.square',
+                      ),
+                      value: 'square',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.pointsContainerShapes.transparent',
+                      ),
+                      value: 'transparent',
+                    },
+                  ]}
+                  value={pointsContainerShape}
+                  labelClassName="!text-base !font-medium mb-1"
+                  onChange={(value) =>
+                    setPointsContainerShape(
+                      value as 'triangle' | 'square' | 'transparent',
+                    )
+                  }
+                  id="points-container-shape-select"
+                  label={t(
+                    'widgets.themes.visualDetails.pointsContainerShapes.title',
+                  )}
+                  dataTheme="custom-preview"
+                  withIndicator={false}
+                />
+
+                <CustomSelect
+                  options={[
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.flagShapes.largeRectangle',
+                      ),
+                      value: 'big-rectangle',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.flagShapes.smallRectangle',
+                      ),
+                      value: 'small-rectangle',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.flagShapes.square',
+                      ),
+                      value: 'square',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.flagShapes.circle',
+                      ),
+                      value: 'round',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.flagShapes.circleWithBorder',
+                      ),
+                      value: 'round-border',
+                    },
+                    {
+                      label: t('widgets.themes.visualDetails.flagShapes.none'),
+                      value: 'none',
+                    },
+                  ]}
+                  value={flagShape}
+                  labelClassName="!text-base !font-medium mb-1"
+                  onChange={(value) => setFlagShape(value as FlagShape)}
+                  id="flag-shape-select"
+                  label={t('widgets.themes.visualDetails.flagShapes.title')}
+                  dataTheme="custom-preview"
+                  withIndicator={false}
+                />
+              </div>
+            </div>
+          </CollapsibleSection>
           {/* Country Item Colors */}
           <CollapsibleSection
             title={t('widgets.themes.countryItemColors')}
@@ -508,6 +657,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               backgroundImage={displayBg}
               overrides={overrides}
               baseThemeYear={baseThemeYear}
+              uppercaseEntryName={uppercaseEntryName}
+              pointsContainerShape={pointsContainerShape}
+              flagShape={flagShape}
             />
           </div>
         </div>

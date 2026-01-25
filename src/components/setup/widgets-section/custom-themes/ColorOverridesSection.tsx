@@ -70,17 +70,6 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     { key: 'juryPlaceText', label: t('juryPlaceText') },
   ];
 
-  const isGradientJuryBg =
-    overrides['countryItem.juryBg'] &&
-    /gradient\(/i.test(overrides['countryItem.juryBg']);
-
-  if (!isGradientJuryBg) {
-    juryColors.push({
-      key: 'juryHoverBg',
-      label: t('juryHoverBg'),
-    });
-  }
-
   const douzePointsColors: ColorField[] = [
     {
       key: 'douzePointsBg',

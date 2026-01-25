@@ -1,5 +1,14 @@
 import { Year } from '../config';
 
+export type PointsContainerShape = 'triangle' | 'square' | 'transparent';
+export type FlagShape =
+  | 'big-rectangle'
+  | 'small-rectangle'
+  | 'square'
+  | 'round'
+  | 'round-border'
+  | 'none';
+
 export type ItemState =
   | 'jury'
   | 'televoteUnfinished'
@@ -24,7 +33,6 @@ export interface ThemeColors {
   animatedBorder: string;
   countryItem: {
     juryBg: string;
-    juryHoverBg: string;
     juryCountryText: string;
     juryPointsBg: string;
     juryPointsText: string;

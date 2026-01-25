@@ -396,7 +396,6 @@
         "juryPointsText": "Testo Punti Giuria",
         "juryLastPointsBg": "Sfondo Ultimi Punti Giuria",
         "juryLastPointsText": "Testo Ultimi Punti Giuria",
-        "juryHoverBg": "Sfondo Hover Giuria",
         "juryPlaceContainerBg": "Sfondo Contenitore Posizione Giuria",
         "juryPlaceText": "Testo Posizione Giuria",
         "douzePointsBg": "Sfondo Douze Points",
@@ -447,6 +446,25 @@
         "televoteActive": "Attivo",
         "televoteFinished": "Completato",
         "unqualified": "Non Qualificato"
+      },
+      "visualDetails": {
+        "title": "Dettagli Visivi",
+        "uppercaseEntryName": "Nomi Paesi in Maiuscolo",
+        "pointsContainerShapes": {
+          "title": "Forma Contenitore Punti",
+          "curvedEdge": "Bordo Curvo",
+          "square": "Quadrato",
+          "transparent": "Trasparente"
+        },
+        "flagShapes": {
+          "title": "Forma Bandiera",
+          "largeRectangle": "Rettangolo Grande",
+          "smallRectangle": "Rettangolo Piccolo",
+          "square": "Quadrato",
+          "circle": "Cerchio",
+          "circleWithBorder": "Cerchio con Bordo",
+          "none": "Nessuno"
+        }
       }
     },
     "sortBadges": {

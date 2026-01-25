@@ -6,17 +6,24 @@ import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SparklesIcon } from '@/assets/icons/SparklesIcon';
 import Button from '@/components/common/Button';
+import { FlagShape, PointsContainerShape } from '@/theme/types';
 
 type ThemePreviewCountryItemProps = {
   backgroundImage: string | null;
   overrides?: Record<string, string>;
   baseThemeYear: string;
+  uppercaseEntryName?: boolean;
+  pointsContainerShape?: PointsContainerShape;
+  flagShape?: FlagShape;
 };
 
 const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   backgroundImage,
   overrides = {},
   baseThemeYear,
+  uppercaseEntryName = true,
+  pointsContainerShape = 'triangle',
+  flagShape = 'big-rectangle',
 }) => {
   const t = useTranslations('widgets.themes');
 
@@ -55,6 +62,9 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
         lastPoints={lastPoints}
         showDouzePointsAnimation={showDouzePointsAnimation}
         onClick={() => handleAwardPoints(12)}
+        uppercaseEntryName={uppercaseEntryName}
+        pointsContainerShape={pointsContainerShape}
+        flagShape={flagShape}
       />
 
       {/* Actions */}

@@ -6,7 +6,7 @@ import ThemePreviewCountryItemUI from './ThemePreviewCountryItemUI';
 import Badge from '@/components/common/Badge';
 import VotingPointsInfo from '@/components/controlsPanel/VotingPointsInfo';
 import { getThemeBackground } from '@/theme/themes';
-import { ItemState } from '@/theme/types';
+import { FlagShape, ItemState, PointsContainerShape } from '@/theme/types';
 
 const previewBadges = [
   {
@@ -41,6 +41,9 @@ type ThemePreviewCountryItemCompactProps = {
   isListItem?: boolean;
   previewCountryCode?: string;
   onClick?: () => void;
+  uppercaseEntryName?: boolean;
+  pointsContainerShape?: PointsContainerShape;
+  flagShape?: FlagShape;
 };
 
 const ThemePreviewCountryItemCompact: React.FC<
@@ -55,6 +58,9 @@ const ThemePreviewCountryItemCompact: React.FC<
   isListItem = false,
   previewCountryCode,
   onClick,
+  uppercaseEntryName = true,
+  pointsContainerShape = 'triangle',
+  flagShape = 'big-rectangle',
 }) => {
   const t = useTranslations('widgets.themes.previewCountryItemStates');
 
@@ -96,6 +102,9 @@ const ThemePreviewCountryItemCompact: React.FC<
           lastPoints={lastPoints}
           showDouzePointsAnimation={showDouzePointsAnimation}
           previewCountryCode={previewCountryCode}
+          uppercaseEntryName={uppercaseEntryName}
+          pointsContainerShape={pointsContainerShape}
+          flagShape={flagShape}
         />
 
         <VotingPointsInfo

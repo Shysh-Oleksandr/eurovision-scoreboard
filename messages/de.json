@@ -396,7 +396,6 @@
         "juryPointsText": "Jury-Punkte-Text",
         "juryLastPointsBg": "Jury-Letzte-Punkte-Hintergrund",
         "juryLastPointsText": "Jury-Letzte-Punkte-Text",
-        "juryHoverBg": "Jury-Hover-Hintergrund",
         "juryPlaceContainerBg": "Jury-Platz-Container-Hintergrund",
         "juryPlaceText": "Jury-Platz-Text",
         "douzePointsBg": "Douze-Points-Hintergrund",
@@ -447,6 +446,25 @@
         "televoteActive": "Aktiv",
         "televoteFinished": "Abgeschlossen",
         "unqualified": "Nicht qualifiziert"
+      },
+      "visualDetails": {
+        "title": "Visuelle Details",
+        "uppercaseEntryName": "Großbuchstaben Einträge",
+        "pointsContainerShapes": {
+          "title": "Punktecontainer-Form",
+          "curvedEdge": "Gekrümmte Kante",
+          "square": "Quadrat",
+          "transparent": "Transparent"
+        },
+        "flagShapes": {
+          "title": "Flaggenform",
+          "largeRectangle": "Großes Rechteck",
+          "smallRectangle": "Kleines Rechteck",
+          "square": "Quadrat",
+          "circle": "Kreis",
+          "circleWithBorder": "Kreis mit Rand",
+          "none": "Keine"
+        }
       }
     },
     "sortBadges": {

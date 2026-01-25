@@ -7,6 +7,7 @@ import type {
   ThemeListResponse,
   ThemeState,
 } from '@/types/customTheme';
+import { FlagShape, PointsContainerShape } from '@/theme/types';
 
 export type CreateThemeInput = {
   name: string;
@@ -17,6 +18,9 @@ export type CreateThemeInput = {
   overrides?: Record<string, string>;
   backgroundImageUrl?: string;
   isPublic?: boolean;
+  pointsContainerShape?: PointsContainerShape;
+  uppercaseEntryName?: boolean;
+  flagShape?: FlagShape;
 };
 
 export type UpdateThemeInput = {
@@ -28,6 +32,9 @@ export type UpdateThemeInput = {
   overrides?: Record<string, string>;
   backgroundImageUrl?: string;
   isPublic?: boolean;
+  pointsContainerShape?: PointsContainerShape | null;
+  uppercaseEntryName?: boolean | null;
+  flagShape?: FlagShape | null;
 };
 
 export type PublicThemesQueryParams = {

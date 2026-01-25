@@ -4,14 +4,15 @@ import CountryItemBase from '@/components/countryItem/CountryItemBase';
 import CountryPlaceNumber from '@/components/countryItem/CountryPlaceNumber';
 import DouzePointsAnimation from '@/components/countryItem/DouzePointsAnimation';
 import useDouzePointsAnimation from '@/components/countryItem/hooks/useDouzePointsAnimation';
-import RoundedTriangle from '@/components/RoundedTriangle';
+import useFlagClassName from '@/components/countryItem/hooks/useFlagClassName';
+import PointsSection from '@/components/countryItem/PointsSection';
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
 import { getSpecialColorStyle } from '@/helpers/colorConversion';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import useAnimatePoints from '@/hooks/useAnimatePoints';
 import { Country } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
-import { ItemState } from '@/theme/types';
+import { FlagShape, ItemState, PointsContainerShape } from '@/theme/types';
 
 // Determine colors based on state
 type DerivedColors = {
@@ -32,6 +33,9 @@ type ThemePreviewCountryItemUIProps = {
   lastPoints: number | null;
   showDouzePointsAnimation: boolean;
   previewCountryCode?: string;
+  uppercaseEntryName?: boolean;
+  pointsContainerShape?: PointsContainerShape;
+  flagShape?: FlagShape;
 };
 
 const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
@@ -41,6 +45,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   lastPoints,
   showDouzePointsAnimation,
   previewCountryCode,
+  uppercaseEntryName = true,
+  pointsContainerShape = 'triangle',
+  flagShape = 'big-rectangle',
 }) => {
   const { user } = useAuthStore();
 
@@ -56,6 +63,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   const douzePointsContainerRef = useRef<HTMLDivElement>(null);
   const douzePointsParallelogramBlueRef = useRef<HTMLDivElement>(null);
   const douzePointsParallelogramYellowRef = useRef<HTMLDivElement>(null);
+
+  // Use lg+ styles only for consistent preview sizing
+  const flagClassName = useFlagClassName(flagShape, true);
 
   const { shouldRender: showDouzePointsAnimationHook } =
     useDouzePointsAnimation(
@@ -126,8 +136,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     }
 
     if (state === 'jury') {
-      buttonBg =
-        'bg-countryItem-juryBg hover:bg-countryItem-juryHoverBg cursor-pointer transition-colors !duration-500';
+      buttonBg = 'bg-countryItem-juryBg';
       buttonText = 'text-countryItem-juryCountryText';
       pointsBg = 'bg-countryItem-juryPointsBg text-countryItem-juryPointsBg';
       pointsText = 'text-countryItem-juryPointsText';
@@ -186,6 +195,10 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       buttonBgStyle = specialStyle;
     }
 
+    if (state === 'jury') {
+      buttonBg += ' brighten-on-hover';
+    }
+
     return {
       buttonBg,
       buttonText,
@@ -230,52 +243,43 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
           />
         ) : null
       }
-      renderFlag={() => (
-        <img
-          loading="lazy"
-          src={mockCountry.flag || '/flags/ww.svg'}
-          alt={`${mockCountry.name} flag`}
-          width={48}
-          height={36}
-          className="w-[50px] h-10 min-w-[50px] bg-countryItem-juryBg self-start object-cover"
-          onError={(e) => {
-            e.currentTarget.src = getFlagPath('ww');
-          }}
-        />
-      )}
+      renderFlag={
+        flagShape === 'none'
+          ? undefined
+          : () => (
+              <img
+                loading="lazy"
+                src={mockCountry.flag || '/flags/ww.svg'}
+                alt={`${mockCountry.name} flag`}
+                width={48}
+                height={36}
+                className={`${flagClassName} bg-countryItem-juryBg object-cover`}
+                onError={(e) => {
+                  e.currentTarget.src = getFlagPath('ww');
+                }}
+              />
+            )
+      }
       renderName={() => (
-        <h4 className="uppercase text-left ml-2 font-bold text-sm truncate flex-1">
+        <h4
+          className={`${
+            uppercaseEntryName ? 'uppercase' : ''
+          } text-left ml-2 font-bold text-sm truncate flex-1`}
+        >
           {mockCountry.name}
         </h4>
       )}
-      renderPoints={() => (
-        <>
-          {/* Last points */}
-          {lastPoints !== null && lastPoints > 0 && (
-            <div
-              className={`absolute right-8 z-10 h-full pr-[0.6rem] w-8 transition-colors !duration-500 ${lastPointsBg}`}
-            >
-              <RoundedTriangle className={lastPointsBg} />
-              <h6
-                className={`text-sm font-semibold h-full items-center flex justify-center ${lastPointsText}`}
-              >
-                {lastPoints}
-              </h6>
-            </div>
-          )}
-
-          {/* Points */}
-          <div
-            className={`absolute right-0 top-0 h-full z-20 w-8 pr-1 transition-colors !duration-500 ${pointsBg}`}
-          >
-            <RoundedTriangle className={pointsBg} />
-            <h6
-              className={`text-sm font-semibold h-full items-center flex justify-center ${pointsText}`}
-            >
-              {state === 'unqualified' ? 'NQ' : points}
-            </h6>
-          </div>
-        </>
+      renderPoints={(country) => (
+        <PointsSection
+          country={country}
+          pointsBgClass={pointsBg}
+          pointsTextClass={pointsText}
+          shouldShowNQLabel={state === 'unqualified'}
+          showLastPoints={lastPoints !== null && lastPoints > 0}
+          lastPointsBgClass={lastPointsBg}
+          lastPointsTextClass={lastPointsText}
+          pointsContainerShape={pointsContainerShape}
+        />
       )}
     />
   );

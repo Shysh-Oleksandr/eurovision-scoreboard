@@ -1,3 +1,5 @@
+import { FlagShape, PointsContainerShape } from "@/theme/types";
+
 export interface CustomTheme {
   _id: string;
   name: string;
@@ -13,6 +15,9 @@ export interface CustomTheme {
   overrides: Record<string, string>;
   backgroundImageUrl?: string;
   backgroundImageKey?: string;
+  pointsContainerShape?: PointsContainerShape;
+  uppercaseEntryName?: boolean;
+  flagShape?: FlagShape;
   createdAt: string;
   updatedAt: string;
   creator?: ThemeCreator;

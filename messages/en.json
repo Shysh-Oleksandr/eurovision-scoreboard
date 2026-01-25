@@ -393,7 +393,6 @@
         "juryPointsText": "Jury Points Text",
         "juryLastPointsBg": "Jury Last Points Background",
         "juryLastPointsText": "Jury Last Points Text",
-        "juryHoverBg": "Jury Hover Background",
         "juryPlaceContainerBg": "Jury Place Background",
         "juryPlaceText": "Jury Place Text",
         "douzePointsBg": "Douze Points Background",
@@ -444,6 +443,25 @@
         "televoteActive": "Active",
         "televoteFinished": "Finished",
         "unqualified": "Unqualified"
+      },
+      "visualDetails": {
+        "title": "Visual Details",
+        "uppercaseEntryName": "Uppercase entry names",
+        "pointsContainerShapes": {
+          "title": "Points container shape",
+          "curvedEdge": "Curved edge",
+          "square": "Square",
+          "transparent": "Transparent"
+        },
+        "flagShapes": {
+          "title": "Flag shape",
+          "largeRectangle": "Large rectangle",
+          "smallRectangle": "Small rectangle",
+          "square": "Square",
+          "circle": "Circle",
+          "circleWithBorder": "Circle with border",
+          "none": "None"
+        }
       }
     },
     "sortBadges": {

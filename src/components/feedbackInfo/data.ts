@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-01-25',
+    title:
+      'Extended the theme customization: different flag and points container shapes. Option to not use uppercase for entry names. Better hover effect',
+  },
+  {
     date: '2026-01-18',
     title:
       'Extended the theme customization: separate ranking colors for each state, opacity control for background colors, and gradient support for ranking and jury points panel backgrounds',
@@ -302,7 +307,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-01-24', end: '2026-01-25' },
+    approximateDates: { start: '2026-01-31', end: '2026-02-01' },
     title: 'Extended theme customization',
   },
   {

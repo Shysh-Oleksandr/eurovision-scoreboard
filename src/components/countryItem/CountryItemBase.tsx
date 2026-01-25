@@ -72,7 +72,7 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
         {renderDouzePointsAnimation && renderDouzePointsAnimation(country)}
 
         {/* Content */}
-        <div className="flex items-center overflow-hidden flex-1 absolute w-full">
+        <div className="flex items-center overflow-hidden flex-1 absolute w-full h-full">
           {/* Flag */}
           {renderFlag && renderFlag(country)}
 

@@ -67,7 +67,7 @@ const QualificationBoard = () => {
 
       <div
         ref={containerRef}
-        className="grid grid-cols-1 2cols:grid-cols-2 gap-x-3 gap-y-1.5"
+        className="grid grid-cols-1 2cols:grid-cols-2 gap-x-3 xs:gap-y-1.5 gap-y-1"
       >
         {countries.map((country) => (
           <CountryQualificationItem

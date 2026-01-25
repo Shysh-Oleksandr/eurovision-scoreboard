@@ -95,7 +95,7 @@ const CountryPlaceNumber = ({
   // Size-based styles
   const sizeStyles = {
     scoreboard: {
-      container: 'lg:h-10 md:h-9 xs:h-8 h-7',
+      container: 'lg:h-10 md:h-9 h-8',
       text: 'md:text-lg xs:text-base text-sm',
     },
     sm: {

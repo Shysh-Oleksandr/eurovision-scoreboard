@@ -143,6 +143,9 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           isListItem
           onClick={() => handleAwardPoints(12)}
           previewCountryCode={theme.creator?.country}
+          uppercaseEntryName={theme.uppercaseEntryName}
+          pointsContainerShape={theme.pointsContainerShape}
+          flagShape={theme.flagShape}
         />
       </div>
       {theme.creator && (

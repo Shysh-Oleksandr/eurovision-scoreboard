@@ -396,7 +396,6 @@
         "juryPointsText": "Texto de puntos del jurado",
         "juryLastPointsBg": "Fondo de últimos puntos del jurado",
         "juryLastPointsText": "Texto de últimos puntos del jurado",
-        "juryHoverBg": "Fondo al pasar el cursor (jurado)",
         "juryPlaceContainerBg": "Fondo del contenedor de posición del jurado",
         "juryPlaceText": "Texto de posición del jurado",
         "douzePointsBg": "Fondo de Douze Points",
@@ -447,6 +446,25 @@
         "televoteActive": "Activo",
         "televoteFinished": "Finalizado",
         "unqualified": "Descalificado"
+      },
+      "visualDetails": {
+        "title": "Detalles visuales",
+        "uppercaseEntryName": "Nombres de entrada en mayúsculas",
+        "pointsContainerShapes": {
+          "title": "Forma del contenedor de puntos",
+          "curvedEdge": "Borde curvado",
+          "square": "Cuadrado",
+          "transparent": "Transparente"
+        },
+        "flagShapes": {
+          "title": "Forma de la bandera",
+          "largeRectangle": "Rectángulo grande",
+          "smallRectangle": "Rectángulo pequeño",
+          "square": "Cuadrado",
+          "circle": "Círculo",
+          "circleWithBorder": "Círculo con borde",
+          "none": "Ninguno"
+        }
       }
     },
     "sortBadges": {

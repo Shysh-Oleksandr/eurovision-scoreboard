@@ -396,7 +396,6 @@
         "juryPointsText": "Κείμενο Βαθμών Κριτικής",
         "juryLastPointsBg": "Φόντο Τελευταίων Βαθμών Κριτικής",
         "juryLastPointsText": "Κείμενο Τελευταίων Βαθμών Κριτικής",
-        "juryHoverBg": "Φόντο Κινήσεως Κριτικής",
         "juryPlaceContainerBg": "Φόντο Κάδου Θέσης Κριτικής",
         "juryPlaceText": "Κείμενο Θέσης Κριτικής",
         "douzePointsBg": "Φόντο Douze Points",
@@ -447,6 +446,25 @@
         "televoteActive": "Ενεργό",
         "televoteFinished": "Ολοκληρωμένο",
         "unqualified": "Μη Προκριθέν"
+      },
+      "visualDetails": {
+        "title": "Γραφικά Λεπτομέρειες",
+        "uppercaseEntryName": "Μεγάλα Επίθετα Χώρων",
+        "pointsContainerShapes": {
+          "title": "Μορφή Κάδου Βαθμών",
+          "curvedEdge": "Καμπύλη Άκρη",
+          "square": "Τετράγωνο",
+          "transparent": "Διαφανές"
+        },
+        "flagShapes": {
+          "title": "Μορφή Ταμπλό",
+          "largeRectangle": "Μεγάλο Ορθογώνιο",
+          "smallRectangle": "Μικρό Ορθογώνιο",
+          "square": "Τετράγωνο",
+          "circle": "Κύκλος",
+          "circleWithBorder": "Κύκλος με Περίγραμμα",
+          "none": "Καμία"
+        }
       }
     },
     "sortBadges": {

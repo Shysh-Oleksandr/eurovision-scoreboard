@@ -21,7 +21,7 @@ export const TextareaField = forwardRef<
     ref,
   ) => {
     const baseClasses = [
-      'w-full',
+      'w-full leading-5',
       'min-h-12 max-h-48',
       'py-3',
       'pl-3',

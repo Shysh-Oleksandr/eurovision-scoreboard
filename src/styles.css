@@ -648,6 +648,12 @@ h6 {
   margin-right: -50%;
 }
 
+.brighten-on-hover:hover {
+  filter: brightness(1.15);
+  transition: brightness 0.3s ease;
+  cursor: pointer;
+}
+
 /* ----------------------------- */
 
 @media (prefers-reduced-motion: reduce) {

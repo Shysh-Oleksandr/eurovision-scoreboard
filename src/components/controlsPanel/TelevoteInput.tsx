@@ -292,7 +292,7 @@ const TelevoteInput = () => {
       </div>
       {error !== '' && (
         <div className="lg:ml-2 ml-1 lg:pt-2 pt-1">
-          <h5 className="text-countryItem-douzePointsBlock2 lg:text-[0.95rem] text-sm">
+          <h5 className="text-red-400 font-medium lg:text-[0.95rem] text-sm">
             {error}
           </h5>
           {shouldLimitManualTelevotePoints && televoteProgress && (

@@ -36,6 +36,8 @@ type CustomSelectProps = {
   selectClassName?: string;
   labelClassName?: string;
   customThemeColor?: string;
+  dataTheme?: string;
+  withIndicator?: boolean;
 };
 
 const getThemeColor = (year: string) => {
@@ -50,12 +52,14 @@ const SelectDisplay: React.FC<{
   getImageClassName?: (option: Option) => string;
   selectClassName?: string;
   customThemeColor?: string;
+  withIndicator?: boolean;
 }> = ({
   value,
   options,
   getImageClassName,
   selectClassName,
   customThemeColor,
+  withIndicator = true,
 }) => {
   const selectedOption = options.find((option) => option.value === value);
 
@@ -64,29 +68,31 @@ const SelectDisplay: React.FC<{
       className={`select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between cursor-pointer ${selectClassName}`}
     >
       <div className="flex items-center truncate mr-8">
-        {selectedOption?.imageUrl ? (
-          <img
-            loading="lazy"
-            src={selectedOption.imageUrl}
-            alt={selectedOption.label}
-            className={`w-6 h-6 mr-2 object-cover ${
-              getImageClassName?.(selectedOption) ?? ''
-            }`}
-            width={24}
-            height={24}
-            onError={(e) => {
-              e.currentTarget.src = getFlagPath('ww');
-            }}
-          />
-        ) : (
-          <span
-            className="w-4 h-4 rounded-full mr-2.5 mb-0.5 flex-none"
-            style={{
-              backgroundColor:
-                customThemeColor ?? getThemeColor(selectedOption?.value ?? ''),
-            }}
-          ></span>
-        )}
+        {withIndicator &&
+          (selectedOption?.imageUrl ? (
+            <img
+              loading="lazy"
+              src={selectedOption.imageUrl}
+              alt={selectedOption.label}
+              className={`w-6 h-6 mr-2 object-cover ${
+                getImageClassName?.(selectedOption) ?? ''
+              }`}
+              width={24}
+              height={24}
+              onError={(e) => {
+                e.currentTarget.src = getFlagPath('ww');
+              }}
+            />
+          ) : (
+            <span
+              className="w-4 h-4 rounded-full mr-2.5 mb-0.5 flex-none"
+              style={{
+                backgroundColor:
+                  customThemeColor ??
+                  getThemeColor(selectedOption?.value ?? ''),
+              }}
+            ></span>
+          ))}
         {selectedOption?.label}
       </div>
       <ArrowIcon
@@ -133,6 +139,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   selectClassName,
   labelClassName,
   customThemeColor,
+  dataTheme,
+  withIndicator = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -248,6 +256,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         getImageClassName={getImageClassName}
         selectClassName={selectClassName}
         customThemeColor={customThemeColor}
+        withIndicator={withIndicator}
       />
       <select
         value={value}
@@ -328,6 +337,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             getImageClassName={getImageClassName}
             selectClassName={selectClassName}
             customThemeColor={customThemeColor}
+            withIndicator={withIndicator}
           />
         )}
         {isOpen &&
@@ -338,6 +348,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                 style={dropdownStyle}
                 className="bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto"
                 onMouseDown={(e) => e.stopPropagation()}
+                data-theme={dataTheme}
               >
                 {(() => {
                   const hasGroups = !!(groups && groups.length > 0);
@@ -377,30 +388,32 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                     handleOptionClick(option.value);
                                   }}
                                 >
-                                  {option.imageUrl ? (
-                                    <img
-                                      loading="lazy"
-                                      src={option.imageUrl}
-                                      alt={option.label}
-                                      className={`w-5 h-5 mr-3 object-cover ${
-                                        getImageClassName?.(option) ?? ''
-                                      }`}
-                                      width={20}
-                                      height={20}
-                                      onError={(e) => {
-                                        e.currentTarget.src = getFlagPath('ww');
-                                      }}
-                                    />
-                                  ) : (
-                                    <span
-                                      className="w-4 h-4 rounded-full mr-3 flex-none"
-                                      style={{
-                                        backgroundColor:
-                                          option.color ??
-                                          getThemeColor(option.value),
-                                      }}
-                                    ></span>
-                                  )}
+                                  {withIndicator &&
+                                    (option.imageUrl ? (
+                                      <img
+                                        loading="lazy"
+                                        src={option.imageUrl}
+                                        alt={option.label}
+                                        className={`w-5 h-5 mr-3 object-cover ${
+                                          getImageClassName?.(option) ?? ''
+                                        }`}
+                                        width={20}
+                                        height={20}
+                                        onError={(e) => {
+                                          e.currentTarget.src =
+                                            getFlagPath('ww');
+                                        }}
+                                      />
+                                    ) : (
+                                      <span
+                                        className="w-4 h-4 rounded-full mr-3 flex-none"
+                                        style={{
+                                          backgroundColor:
+                                            option.color ??
+                                            getThemeColor(option.value),
+                                        }}
+                                      ></span>
+                                    ))}
                                   {option.label}
                                 </li>
                               ))}
@@ -434,29 +447,30 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                             handleOptionClick(option.value);
                           }}
                         >
-                          {option.imageUrl ? (
-                            <img
-                              loading="lazy"
-                              src={option.imageUrl}
-                              alt={option.label}
-                              className={`w-5 h-5 mr-3 object-cover ${
-                                getImageClassName?.(option) ?? ''
-                              }`}
-                              width={20}
-                              height={20}
-                              onError={(e) => {
-                                e.currentTarget.src = getFlagPath('ww');
-                              }}
-                            />
-                          ) : (
-                            <span
-                              className="w-4 h-4 rounded-full mr-3 flex-none"
-                              style={{
-                                backgroundColor:
-                                  option.color ?? getThemeColor(option.value),
-                              }}
-                            ></span>
-                          )}
+                          {withIndicator &&
+                            (option.imageUrl ? (
+                              <img
+                                loading="lazy"
+                                src={option.imageUrl}
+                                alt={option.label}
+                                className={`w-5 h-5 mr-3 object-cover ${
+                                  getImageClassName?.(option) ?? ''
+                                }`}
+                                width={20}
+                                height={20}
+                                onError={(e) => {
+                                  e.currentTarget.src = getFlagPath('ww');
+                                }}
+                              />
+                            ) : (
+                              <span
+                                className="w-4 h-4 rounded-full mr-3 flex-none"
+                                style={{
+                                  backgroundColor:
+                                    option.color ?? getThemeColor(option.value),
+                                }}
+                              ></span>
+                            ))}
                           {option.label}
                         </li>
                       ))}

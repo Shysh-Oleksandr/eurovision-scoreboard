@@ -20,7 +20,6 @@ const juniorThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(35, 98%, 79%)',
       countryItem: {
         juryBg: 'hsl(228, 88%, 35%)',
-        juryHoverBg: 'hsl(228, 88%, 30%)',
         juryCountryText: 'hsl(191, 100%, 94%)',
         juryPointsBg: 'hsl(221, 59%, 51%)',
         juryPointsText: 'hsl(191, 100%, 94%)',
@@ -93,7 +92,6 @@ const juniorThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(45, 98%, 79%)',
       countryItem: {
         juryBg: 'hsl(214, 88%, 35%)',
-        juryHoverBg: 'hsl(214, 88%, 30%)',
         juryCountryText: 'hsl(191, 100%, 94%)',
         juryPointsBg: 'hsl(214, 88%, 50%)',
         juryPointsText: 'hsl(191, 100%, 94%)',
@@ -166,7 +164,6 @@ const juniorThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(45, 98%, 79%)',
       countryItem: {
         juryBg: 'hsl(205, 88%, 44%)',
-        juryHoverBg: 'hsl(205, 88%, 40%)',
         juryCountryText: 'hsl(188, 100%, 93%)',
         juryPointsBg: 'hsl(203, 55%, 91%)',
         juryPointsText: 'hsl(215, 56%, 46%)',
@@ -239,7 +236,6 @@ const juniorThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(30, 84%, 49%)',
       countryItem: {
         juryBg: 'hsl(300, 58%, 48%)',
-        juryHoverBg: 'hsl(300, 58%, 44%)',
         juryCountryText: 'hsl(310, 100%, 98%)',
         juryPointsBg: 'hsl(285, 59%, 43%)',
         juryPointsText: 'hsl(310, 100%, 98%)',
@@ -312,7 +308,6 @@ const juniorThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(313, 100%, 49%)',
       countryItem: {
         juryBg: 'hsl(271, 83%, 51%)',
-        juryHoverBg: 'hsl(271, 83%, 43%)',
         juryCountryText: 'hsl(0, 0%, 100%)',
         juryPointsBg: 'hsl(271, 83%, 51%)',
         juryPointsText: 'hsl(0, 0%, 100%)',
@@ -388,7 +383,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(309, 92%, 33%)',
       countryItem: {
         juryBg: 'hsl(214, 58%, 13%)',
-        juryHoverBg: 'hsl(214, 59%, 19%)',
         juryCountryText: 'hsl(180, 100%, 98%)',
         juryPointsBg: 'hsl(214, 58%, 13%)',
         juryPointsText: 'hsl(180, 100%, 98%)',
@@ -461,7 +455,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(350, 69%, 41%)',
       countryItem: {
         juryBg: 'hsl(235, 97%, 12%)',
-        juryHoverBg: 'hsl(234, 100%, 17%)',
         juryCountryText: 'hsl(180, 10%, 90%)',
         juryPointsBg: 'hsl(235, 97%, 12%)',
         juryPointsText: 'hsl(180, 10%, 90%)',
@@ -534,7 +527,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(169, 79%, 72%)',
       countryItem: {
         juryBg: 'hsl(213, 100%, 27%)',
-        juryHoverBg: 'hsl(213, 99%, 33%)',
         juryCountryText: 'hsl(208, 100%, 91%)',
         juryPointsBg: 'hsl(213, 100%, 27%)',
         juryPointsText: 'hsl(208, 100%, 91%)',
@@ -607,7 +599,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(47, 89%, 90%)',
       countryItem: {
         juryBg: 'hsl(216, 74%, 17%)',
-        juryHoverBg: 'hsl(216, 75%, 22%)',
         juryCountryText: 'hsl(180, 100%, 97%)',
         juryPointsBg: 'hsl(216, 74%, 17%)',
         juryPointsText: 'hsl(180, 100%, 97%)',
@@ -680,7 +671,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(319, 39%, 54%)',
       countryItem: {
         juryBg: 'hsl(240, 85%, 97%)',
-        juryHoverBg: 'hsl(240, 33%, 89%)',
         juryCountryText: 'hsl(247, 47%, 4%)',
         juryPointsBg: 'hsl(240, 85%, 97%)',
         juryPointsText: 'hsl(247, 47%, 4%)',
@@ -753,7 +743,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(319, 39%, 54%)',
       countryItem: {
         juryBg: 'hsl(240, 85%, 97%)',
-        juryHoverBg: 'hsl(240, 33%, 89%)',
         juryCountryText: 'hsl(247, 47%, 4%)',
         juryPointsBg: 'hsl(240, 85%, 97%)',
         juryPointsText: 'hsl(247, 47%, 4%)',
@@ -826,7 +815,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(21, 95%, 36%)',
       countryItem: {
         juryBg: 'hsl(309, 52%, 18%)',
-        juryHoverBg: 'hsl(307, 43%, 24%)',
         juryCountryText: 'hsl(272, 87%, 97%)',
         juryPointsBg: 'hsl(309, 52%, 18%)',
         juryPointsText: 'hsl(272, 87%, 97%)',
@@ -899,7 +887,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(329, 99%, 50%)',
       countryItem: {
         juryBg: 'hsl(0, 0%, 100%)',
-        juryHoverBg: 'hsl(204, 94%, 94%)',
         juryCountryText: 'hsl(240, 2%, 11%)',
         juryPointsBg: 'hsl(329, 99%, 50%)',
         juryPointsText: 'hsl(0, 0%, 100%)',
@@ -972,7 +959,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(305, 56%, 52%)',
       countryItem: {
         juryBg: 'hsl(271, 58%, 38%)',
-        juryHoverBg: 'hsl(271, 61%, 31%)',
         juryCountryText: 'hsl(330, 100%, 99%)',
         juryPointsBg: 'hsl(305, 56%, 52%)',
         juryPointsText: 'hsl(330, 100%, 99%)',
@@ -1045,7 +1031,6 @@ export const escThemes: Partial<ThemeRecord> = {
       animatedBorder: 'hsl(0, 0%, 100%)',
       countryItem: {
         juryBg: 'hsl(265, 67%, 43%)',
-        juryHoverBg: 'hsl(265, 70%, 36%)',
         juryCountryText: 'hsl(0, 0%, 100%)',
         juryPointsBg: 'hsl(0, 0%, 100%)',
         juryPointsText: 'hsl(270, 100%, 0%)',

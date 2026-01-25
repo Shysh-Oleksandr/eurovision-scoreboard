@@ -83,7 +83,7 @@ export const useItemState = ({
 
     if (isJuryVoting) {
       return `bg-countryItem-juryBg text-countryItem-juryCountryText ${
-        isDisabled ? '' : 'hover:bg-countryItem-juryHoverBg cursor-pointer'
+        isDisabled ? '' : 'brighten-on-hover cursor-pointer'
       }`;
     }
 
@@ -97,7 +97,7 @@ export const useItemState = ({
 
     return `bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText ${
       revealTelevoteLowestToHighest
-        ? 'hover:bg-countryItem-juryHoverBg cursor-pointer'
+        ? 'brighten-on-hover cursor-pointer'
         : ''
     }`;
   }, [
@@ -112,7 +112,7 @@ export const useItemState = ({
 
   const buttonClassName = useMemo(
     () =>
-      `relative will-change-colors outline-countryItem-televoteOutline flex justify-between shadow-md lg:mb-[6px] mb-1 lg:h-10 md:h-9 xs:h-8 h-7 w-full transition-all !duration-500 ${
+      `relative will-change-colors outline-countryItem-televoteOutline flex justify-between shadow-md rounded-[1px] lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full transition-all !duration-500 ${
         isActive ? 'rounded-sm' : ''
       } ${showPlaceAnimation ? 'lg:ml-2 xs:ml-1.5 ml-1' : ''}
       ${isVotingCountry ? 'opacity-70 cursor-not-allowed' : ''}
