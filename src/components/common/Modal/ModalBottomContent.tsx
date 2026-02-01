@@ -54,7 +54,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           {t('cancel')}
         </Button>
         <Button
-          className="w-full sm:!text-base text-sm px-6 font-semibold justify-center overflow-hidden"
+          className="w-full sm:!text-base text-sm px-6 font-semibold justify-center"
           onClick={onSave}
           isLoading={isSaving}
           disabled={isSaving || saveButtonDisabled}

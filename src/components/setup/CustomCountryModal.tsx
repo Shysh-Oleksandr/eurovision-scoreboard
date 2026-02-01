@@ -397,6 +397,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       onClose={onClose}
       overlayClassName="!z-[1001]"
       containerClassName="!w-[min(100%,500px)]"
+      withBlur
       bottomContent={
         <ModalBottomContent
           onClose={onClose}

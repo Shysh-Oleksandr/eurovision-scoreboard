@@ -22,6 +22,7 @@
     "enterName": "Entrez le nom...",
     "description": "Description",
     "optionalDescription": "Description optionnelle...",
+    "optional": "Optionnel",
     "subtitle": "Sous-titre",
     "enterSubtitle": "Entrez le sous-titre...",
     "edit": "Modifier",
@@ -337,7 +338,9 @@
       "contestSavedSuccessfully": "Concours enregistré avec succès !",
       "contestRemovedFromSaved": "Concours supprimé des enregistrés !",
       "confirmCreateNewContest": "Créer un nouveau concours?",
-      "confirmCreateNewContestDescription": "Vous avez un concours actif ({name}). Assurez-vous de le sauvegarder avant de créer un nouveau."
+      "confirmCreateNewContestDescription": "Vous avez un concours actif ({name}). Assurez-vous de le sauvegarder avant de créer un nouveau.",
+      "venue": "Lieu",
+      "hosts": "Présentateurs"
     },
     "themes": {
       "title": "Thèmes",
@@ -450,6 +453,8 @@
       "visualDetails": {
         "title": "Détails visuels",
         "uppercaseEntryName": "Noms de pays en majuscules",
+        "juryActivePointsUnderline": "Soulignement des points actifs du jury",
+        "juryPointsPanelRounded": "Panel des points du jury arrondi",
         "pointsContainerShapes": {
           "title": "Forme du conteneur de points",
           "curvedEdge": "Bord curvé",
@@ -582,7 +587,8 @@
       "enableWinterEffects": "Activer les effets de l’hiver",
       "snowFallIntensity": "Intensité de la neige",
       "low": "Bas",
-      "high": "Haut"
+      "high": "Haut",
+      "blurModalBackground": "Dégradé de fond du modal"
     },
     "contest": {
       "enterContestName": "Entrez le nom du concours...",

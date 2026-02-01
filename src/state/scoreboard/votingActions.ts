@@ -740,7 +740,6 @@ export const createVotingActions: StateCreator<
       }
     }
 
-    console.log('currentRevealPoints', currentRevealPoints);
     // Give the televote points to the clicked country
     get().giveTelevotePoints(countryCode, currentRevealPoints);
   },

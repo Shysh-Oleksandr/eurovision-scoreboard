@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { useGeneralStore } from '@/state/generalStore';
 
 type DouzePointsAnimationProps = {
   refs: {
@@ -17,9 +18,17 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   pointsAmount = 12,
   overrides = null,
 }) => {
+  const pointsSystem = useGeneralStore((state) => state.pointsSystem);
+
   const containerClass =
     'absolute overflow-hidden left-0 right-0 top-0 bottom-0 z-40 bg-countryItem-douzePointsBg flex justify-center items-center opacity-0';
   const specialStyle = getSpecialBackgroundStyle(containerClass, overrides);
+
+  const isDouzePoints = pointsSystem.some(
+    (point) => point.showDouzePoints && point.value === pointsAmount,
+  );
+
+  if (!isDouzePoints) return null;
 
   return (
     <div

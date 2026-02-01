@@ -3,9 +3,9 @@ import React, { useMemo } from 'react';
 import SortableList from 'react-easy-sort';
 
 import { EventStage } from '../../models';
-import Button from '../common/Button';
 import { CustomSortableItem } from '../common/CustomSortableItem';
 import Modal from '../common/Modal/Modal';
+import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 
 import { useConfirmation } from '@/hooks/useConfirmation';
 
@@ -77,13 +77,8 @@ const StageReorderModal: React.FC<StageReorderModalProps> = ({
       containerClassName="!w-[min(100%,500px)]"
       contentClassName="text-white"
       overlayClassName="!z-[1001]"
-      bottomContent={
-        <div className="flex justify-end gap-2 bg-primary-900 p-4">
-          <Button variant="secondary" onClick={onClose}>
-            {t('common.close')}
-          </Button>
-        </div>
-      }
+      withBlur
+      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <div className="flex flex-col gap-2">
         <div className="flex flex-col">

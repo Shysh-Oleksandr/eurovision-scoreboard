@@ -22,6 +22,7 @@ interface ModalProps {
   overlayClassName?: string;
   openDelay?: number; // Delay in milliseconds before opening the modal
   dataTheme?: string;
+  withBlur?: boolean;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -38,9 +39,13 @@ const Modal: React.FC<ModalProps> = ({
   openDelay,
   ref,
   dataTheme,
+  withBlur = false,
 }) => {
   const enableWinterEffects = useGeneralStore(
     (state) => state.settings.enableWinterEffects,
+  );
+  const blurModalBackground = useGeneralStore(
+    (state) => state.settings.blurModalBackground,
   );
   const [isMounted, setIsMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
@@ -94,7 +99,13 @@ const Modal: React.FC<ModalProps> = ({
   const modalContent = (
     <div
       className={`fixed inset-0 flex items-center justify-center z-[100] transition-colors duration-[200ms] ${
-        isActive ? 'bg-black bg-opacity-60' : 'bg-opacity-0'
+        isActive
+          ? `bg-black bg-opacity-60 ${
+              blurModalBackground && withBlur
+                ? 'transform-gpu backdrop-blur-[3px]'
+                : ''
+            }`
+          : 'bg-opacity-0'
       } ${overlayClassName}`}
       onClick={isActive ? onClose : undefined}
       style={{ pointerEvents: isActive ? 'auto' : 'none' }}

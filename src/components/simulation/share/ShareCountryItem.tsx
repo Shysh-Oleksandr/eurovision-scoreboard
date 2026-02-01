@@ -7,8 +7,8 @@ import { useQualificationStatus } from '@/components/countryItem/hooks/useQualif
 import PointsSection from '@/components/countryItem/PointsSection';
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import {
-  getFlagPath,
   getFlagPathForImageGeneration,
+  handleFlagError,
 } from '@/helpers/getFlagPath';
 import { Country } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
@@ -157,8 +157,8 @@ const ShareCountryItem: React.FC<Props> = ({
     switch (flagShape) {
       case 'round':
       case 'round-border': {
-        // For round, use 85% of the smaller dimension for both width and height
-        const size = Math.round(Math.min(baseWidthPx, baseHeightPx) * 0.85);
+        // For round, use 75% of the smaller dimension for both width and height
+        const size = Math.round(Math.min(baseWidthPx, baseHeightPx) * 0.75);
         const borderClass =
           flagShape === 'round-border' ? 'border-[1.5px] border-solid' : '';
 
@@ -168,23 +168,32 @@ const ShareCountryItem: React.FC<Props> = ({
         };
       }
       case 'small-rectangle': {
-        let height = Math.round(baseWidthPx - 24);
+        let height = Math.round(baseWidthPx - 26);
+        let marginLeft = 5;
 
         switch (size) {
           case 'sm':
-            height = Math.round(baseWidthPx - 10);
+            height = Math.round(baseWidthPx - 12);
             break;
           case 'md':
-            height = Math.round(baseWidthPx - 13);
+            height = Math.round(baseWidthPx - 16);
+            break;
+          case 'xl':
+            marginLeft = 6;
             break;
           case '2xl':
-            height = Math.round(baseWidthPx - 28);
+            height = Math.round(baseWidthPx - 30);
+            marginLeft = 8;
             break;
         }
 
         return {
-          flagClassName: 'ml-[4px] rounded-sm',
-          flagStyle: { width: `${baseHeightPx}px`, height: `${height}px` },
+          flagClassName: 'rounded-sm',
+          flagStyle: {
+            width: `${baseHeightPx}px`,
+            height: `${height}px`,
+            marginLeft: `${marginLeft}px`,
+          },
         };
       }
       case 'square': {
@@ -253,10 +262,10 @@ const ShareCountryItem: React.FC<Props> = ({
           : () => (
               <img
                 loading="lazy"
-                src={getFlagPathForImageGeneration(country)}
-                onError={(e) => {
-                  e.currentTarget.src = getFlagPath('ww');
-                }}
+                src={getFlagPathForImageGeneration(country, flagShape)}
+                onError={(e) =>
+                  handleFlagError(e.currentTarget, country, flagShape)
+                }
                 alt={`${country.name} flag`}
                 width={48}
                 height={36}

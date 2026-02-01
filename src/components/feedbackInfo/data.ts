@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-02-01',
+    title:
+      'Extended the theme customization: options for jury points panel rounding and removing underline. Added venue and hosts fields for custom contests. Added new rounded flags. Added an option to blur modal background. Small improvements',
+  },
+  {
     date: '2026-01-25',
     title:
       'Extended the theme customization: different flag and points container shapes. Option to not use uppercase for entry names. Better hover effect',

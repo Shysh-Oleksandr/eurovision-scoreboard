@@ -855,6 +855,16 @@ export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
     code: 'PA',
     category: 'North America',
   },
+  SaintLucia: {
+    name: 'Saint Lucia',
+    code: 'LC',
+    category: 'North America',
+  },
+  SaintKittsAndNevis: {
+    name: 'Saint Kitts and Nevis',
+    code: 'KN',
+    category: 'North America',
+  },
   TrinidadAndTobago: {
     name: 'Trinidad and Tobago',
     code: 'TT',

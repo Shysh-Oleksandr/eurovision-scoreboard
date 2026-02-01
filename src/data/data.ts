@@ -23,12 +23,14 @@ export const ESC_YEAR_OPTIONS = SUPPORTED_YEARS.map((year) => ({
   value: year.toString(),
   label: year.toString(),
   imageUrl: getHostingCountryByYear(year.toString() as Year).logo,
+  isExisting: true
 }));
 
 export const JESC_YEAR_OPTIONS = JUNIOR_SUPPORTED_YEARS.map((year) => ({
   value: `${JUNIOR_THEME_PREFIX}${year}`,
   label: year.toString(),
   imageUrl: getHostingCountryByYear(year.toString() as Year, true).logo,
+  isExisting: true
 }));
 
 export const THEME_OPTIONS = ESC_YEARS_WITH_THEME.map((year) => ({

@@ -32,7 +32,7 @@ type CustomSelectProps = {
   className?: string;
   id?: string;
   label?: string;
-  getImageClassName?: (option: Option) => string;
+  getImageClassName?: (option: Option, type: 'display' | 'select') => string;
   selectClassName?: string;
   labelClassName?: string;
   customThemeColor?: string;
@@ -49,7 +49,7 @@ const getThemeColor = (year: string) => {
 const SelectDisplay: React.FC<{
   value: string;
   options: Option[];
-  getImageClassName?: (option: Option) => string;
+  getImageClassName?: (option: Option, type: 'display' | 'select') => string;
   selectClassName?: string;
   customThemeColor?: string;
   withIndicator?: boolean;
@@ -75,7 +75,7 @@ const SelectDisplay: React.FC<{
               src={selectedOption.imageUrl}
               alt={selectedOption.label}
               className={`w-6 h-6 mr-2 object-cover ${
-                getImageClassName?.(selectedOption) ?? ''
+                getImageClassName?.(selectedOption, 'display') ?? ''
               }`}
               width={24}
               height={24}
@@ -346,7 +346,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               <div
                 ref={dropdownRef}
                 style={dropdownStyle}
-                className="bg-primary-900 rounded-md shadow-lg max-h-[300px] overflow-y-auto"
+                className="bg-primary-900/60 backdrop-blur-sm rounded-md shadow-lg max-h-[300px] overflow-y-auto"
                 onMouseDown={(e) => e.stopPropagation()}
                 data-theme={dataTheme}
               >
@@ -395,7 +395,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                         src={option.imageUrl}
                                         alt={option.label}
                                         className={`w-5 h-5 mr-3 object-cover ${
-                                          getImageClassName?.(option) ?? ''
+                                          getImageClassName?.(
+                                            option,
+                                            'select',
+                                          ) ?? ''
                                         }`}
                                         width={20}
                                         height={20}
@@ -454,7 +457,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                                 src={option.imageUrl}
                                 alt={option.label}
                                 className={`w-5 h-5 mr-3 object-cover ${
-                                  getImageClassName?.(option) ?? ''
+                                  getImageClassName?.(option, 'display') ?? ''
                                 }`}
                                 width={20}
                                 height={20}

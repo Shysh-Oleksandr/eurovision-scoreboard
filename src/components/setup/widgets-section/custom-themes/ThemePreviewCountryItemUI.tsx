@@ -8,7 +8,7 @@ import useFlagClassName from '@/components/countryItem/hooks/useFlagClassName';
 import PointsSection from '@/components/countryItem/PointsSection';
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
 import { getSpecialColorStyle } from '@/helpers/colorConversion';
-import { getFlagPath } from '@/helpers/getFlagPath';
+import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import useAnimatePoints from '@/hooks/useAnimatePoints';
 import { Country } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -92,7 +92,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   const mockCountry: Country = {
     code: previewCountry.code,
     name: previewCountry.name,
-    flag: getFlagPath(previewCountry),
+    flag: getFlagPath(previewCountry, flagShape),
     points,
     juryPoints: 0,
     televotePoints: 0,
@@ -254,9 +254,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
                 width={48}
                 height={36}
                 className={`${flagClassName} bg-countryItem-juryBg object-cover`}
-                onError={(e) => {
-                  e.currentTarget.src = getFlagPath('ww');
-                }}
+                onError={(e) =>
+                  handleFlagError(e.currentTarget, mockCountry, flagShape)
+                }
               />
             )
       }

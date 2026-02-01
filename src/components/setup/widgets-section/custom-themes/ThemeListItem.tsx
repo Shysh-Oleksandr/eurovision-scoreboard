@@ -146,6 +146,8 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           uppercaseEntryName={theme.uppercaseEntryName}
           pointsContainerShape={theme.pointsContainerShape}
           flagShape={theme.flagShape}
+          isJuryPointsPanelRounded={theme.isJuryPointsPanelRounded}
+          juryActivePointsUnderline={theme.juryActivePointsUnderline}
         />
       </div>
       {theme.creator && (

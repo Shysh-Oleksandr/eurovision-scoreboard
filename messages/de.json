@@ -22,6 +22,7 @@
     "enterName": "Name eingeben...",
     "description": "Beschreibung",
     "optionalDescription": "Optionale Beschreibung...",
+    "optional": "Optional",
     "subtitle": "Untertitel",
     "enterSubtitle": "Untertitel eingeben...",
     "edit": "Bearbeiten",
@@ -337,7 +338,9 @@
       "contestSavedSuccessfully": "Wettbewerb erfolgreich gespeichert!",
       "contestRemovedFromSaved": "Wettbewerb aus den gespeicherten entfernt!",
       "confirmCreateNewContest": "Neuen Wettbewerb erstellen?",
-      "confirmCreateNewContestDescription": "Du hast einen aktiven Wettbewerb ({name}). Stelle sicher, dass du ihn speicherst, bevor du einen neuen erstellst."
+      "confirmCreateNewContestDescription": "Du hast einen aktiven Wettbewerb ({name}). Stelle sicher, dass du ihn speicherst, bevor du einen neuen erstellst.",
+      "venue": "Veranstaltungsort",
+      "hosts": "Moderatoren"
     },
     "themes": {
       "title": "Themes",
@@ -450,6 +453,8 @@
       "visualDetails": {
         "title": "Visuelle Details",
         "uppercaseEntryName": "Großbuchstaben Einträge",
+        "juryActivePointsUnderline": "Jury-Aktive-Punkte-Unterstreichung",
+        "juryPointsPanelRounded": "Jury-Punktepanel-Rund",
         "pointsContainerShapes": {
           "title": "Punktecontainer-Form",
           "curvedEdge": "Gekrümmte Kante",
@@ -582,7 +587,8 @@
       "enableWinterEffects": "Winter-Effekte aktivieren",
       "snowFallIntensity": "Schneefall-Intensität",
       "low": "Niedrig",
-      "high": "Hoch"
+      "high": "Hoch",
+      "blurModalBackground": "Hintergrund des Modal-Fensters verwischen"
     },
     "contest": {
       "enterContestName": "Wettbewerbsname eingeben...",

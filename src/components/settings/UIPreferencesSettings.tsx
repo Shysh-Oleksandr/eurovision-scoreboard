@@ -87,6 +87,17 @@ export const UIPreferencesSettings: React.FC = () => {
           })
         }
       />
+      <Checkbox
+        id="blur-modal-background"
+        labelClassName="w-full"
+        label={t('blurModalBackground')}
+        checked={settings.blurModalBackground}
+        onChange={(e) =>
+          setSettings({
+            blurModalBackground: e.target.checked,
+          })
+        }
+      />
       <BgImageSelect />
 
       <Checkbox

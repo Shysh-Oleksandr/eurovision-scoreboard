@@ -22,6 +22,7 @@
     "enterName": "Введіть ім’я...",
     "description": "Опис",
     "optionalDescription": "Опис (необов’язково)",
+    "optional": "Опціонально",
     "subtitle": "Підзаголовок",
     "enterSubtitle": "Введіть підзаголовок...",
     "edit": "Редагувати",
@@ -337,7 +338,9 @@
       "contestSavedSuccessfully": "Конкурс успішно збережено!",
       "contestRemovedFromSaved": "Конкурс успішно вилучено із збережених!",
       "confirmCreateNewContest": "Створити новий конкурс?",
-      "confirmCreateNewContestDescription": "У вас є активний конкурс ({name}). Переконайтеся, що зберегли його перед створенням нового."
+      "confirmCreateNewContestDescription": "У вас є активний конкурс ({name}). Переконайтеся, що зберегли його перед створенням нового.",
+      "venue": "Місце",
+      "hosts": "Ведучі"
     },
     "themes": {
       "title": "Теми",
@@ -397,7 +400,7 @@
         "juryLastPointsBg": "Фон останніх балів журі",
         "juryLastPointsText": "Текст останніх балів журі",
         "juryPlaceContainerBg": "Фон контейнера місця журі",
-        "juryPlaceText": "Текст місця журі",  
+        "juryPlaceText": "Текст місця журі",
         "douzePointsBg": "Фон Douze Points",
         "douzePointsText": "Текст Douze Points",
         "douzePointsBlock1": "Блок Douze Points 1",
@@ -450,6 +453,8 @@
       "visualDetails": {
         "title": "Візуальні деталі",
         "uppercaseEntryName": "Назви країн великими літерами",
+        "juryActivePointsUnderline": "Підкреслення активних балів журі",
+        "juryPointsPanelRounded": "Заокруглений панель балів журі",
         "pointsContainerShapes": {
           "title": "Форма контейнера балів",
           "curvedEdge": "Зігнута крайка",
@@ -582,13 +587,14 @@
       "enableWinterEffects": "Увімкнути зимові ефекти",
       "snowFallIntensity": "Снігопад",
       "low": "Низький",
-      "high": "Високий"
+      "high": "Високий",
+      "blurModalBackground": "Розмитий фон модального вікна"
     },
     "contest": {
       "enterContestName": "Введіть назву конкурсу...",
       "enterContestYear": "Введіть рік конкурсу...",
       "showHostingCountryFlag": "Показувати прапор країни-організатора"
-    },  
+    },
     "confirmations": {
       "description": "Налаштуйте, які попапи підтверджень показуються при виконанні певних дій.",
       "reset": "Скинути",

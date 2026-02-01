@@ -8,6 +8,7 @@ import {
   useUpdateContestMutation,
 } from '@/api/contests';
 import { Checkbox } from '@/components/common/Checkbox';
+import { CollapsibleSection } from '@/components/common/CollapsibleSection';
 import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import { InputField } from '@/components/common/InputField';
 import Modal from '@/components/common/Modal/Modal';
@@ -58,6 +59,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   );
 
   const [description, setDescription] = useState('');
+  const [venue, setVenue] = useState('');
+  const [hosts, setHosts] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [overwriteContestSetupAndResults, setOverwriteContestSetupAndResults] =
     useState(true);
@@ -91,6 +94,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
     if (initialContest) {
       setName(initialContest.name ?? '');
       setDescription(initialContest.description ?? '');
+      setVenue(initialContest.venue ?? '');
+      setHosts(initialContest.hosts ?? '');
       setIsPublic(!!initialContest.isPublic);
       setYear(initialContest.year ?? new Date().getFullYear());
       setHostingCountryCode(
@@ -104,6 +109,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
         settings.hostingCountryCode || DEFAULT_HOSTING_COUNTRY_CODE,
       );
       setDescription(settings.contestDescription);
+      setVenue('');
+      setHosts('');
       setIsPublic(true);
     }
   }, [
@@ -141,6 +148,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           year,
           name: name.trim(),
           description: description.trim() || undefined,
+          venue: venue.trim() || undefined,
+          hosts: hosts.trim() || undefined,
           isPublic,
           hostingCountryCode,
           ...(themeId
@@ -155,6 +164,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           name: name.trim(),
           year,
           description: description.trim() || undefined,
+          venue: venue.trim() || undefined,
+          hosts: hosts.trim() || undefined,
           isPublic,
           hostingCountryCode,
           ...(themeId
@@ -197,6 +208,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
       onClose={onClose}
       containerClassName="!w-[min(100%,500px)]"
       overlayClassName="!z-[1002]"
+      withBlur
       bottomContent={
         <ModalBottomContent
           onClose={onClose}
@@ -279,16 +291,6 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           />
         </div>
 
-        <TextareaField
-          id="contestDesc"
-          label={t('common.description')}
-          placeholder={t('common.optionalDescription')}
-          textareaProps={{
-            value: description,
-            onChange: (e) => setDescription(e.target.value),
-          }}
-        />
-
         <Checkbox
           id="isPublic"
           label={t('widgets.contests.makeContestPublic')}
@@ -296,6 +298,44 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           checked={isPublic}
           onChange={(e) => setIsPublic(e.target.checked)}
         />
+
+        <CollapsibleSection
+          title={t('common.optional')}
+          contentClassName="space-y-3"
+        >
+          <TextareaField
+            id="contestDesc"
+            label={t('common.description')}
+            placeholder={t('common.optionalDescription')}
+            textareaProps={{
+              value: description,
+              onChange: (e) => setDescription(e.target.value),
+            }}
+            className="!min-h-[64px] !py-2"
+          />
+          <InputField
+            label={t('widgets.contests.venue')}
+            id="contestVenue"
+            inputProps={{
+              value: venue,
+              onChange: (e) => setVenue(e.target.value),
+              maxLength: 100,
+            }}
+            placeholder="E.g. Wiener Stadthalle, Vienna. St. Jakobshalle, Basel"
+            className="w-full"
+          />
+          <InputField
+            label={t('widgets.contests.hosts')}
+            id="contestHosts"
+            inputProps={{
+              value: hosts,
+              onChange: (e) => setHosts(e.target.value),
+              maxLength: 100,
+            }}
+            placeholder="e.g. Petra Mede and Hannah Waddingham"
+            className="w-full"
+          />
+        </CollapsibleSection>
       </div>
     </Modal>
   );

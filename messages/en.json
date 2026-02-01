@@ -22,6 +22,7 @@
     "enterName": "Enter name...",
     "description": "Description",
     "optionalDescription": "Optional description...",
+    "optional": "Optional",
     "subtitle": "Subtitle",
     "enterSubtitle": "Enter subtitle...",
     "edit": "Edit",
@@ -334,7 +335,9 @@
       "contestSavedSuccessfully": "Contest saved successfully!",
       "contestRemovedFromSaved": "Contest removed from saved!",
       "confirmCreateNewContest": "Create new contest?",
-      "confirmCreateNewContestDescription": "You have an active contest ({name}). Make sure you save it before creating a new one."
+      "confirmCreateNewContestDescription": "You have an active contest ({name}). Make sure you save it before creating a new one.",
+      "venue": "Venue",
+      "hosts": "Hosts"
     },
     "themes": {
       "title": "Themes",
@@ -447,6 +450,8 @@
       "visualDetails": {
         "title": "Visual Details",
         "uppercaseEntryName": "Uppercase entry names",
+        "juryActivePointsUnderline": "Jury active points underline",
+        "juryPointsPanelRounded": "Jury points panel rounded",
         "pointsContainerShapes": {
           "title": "Points container shape",
           "curvedEdge": "Curved edge",
@@ -579,7 +584,8 @@
       "enableWinterEffects": "Enable winter effects",
       "snowFallIntensity": "Snow fall intensity",
       "low": "Low",
-      "high": "High"
+      "high": "High",
+      "blurModalBackground": "Blur modal background"
     },
     "contest": {
       "enterContestName": "Enter contest name...",

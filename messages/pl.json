@@ -22,6 +22,7 @@
     "enterName": "Wprowadź nazwę...",
     "description": "Opis",
     "optionalDescription": "Opcjonalny opis...",
+    "optional": "Opcjonalny",
     "subtitle": "Podtytuł",
     "enterSubtitle": "Wprowadź podtytuł...",
     "edit": "Edytuj",
@@ -337,7 +338,9 @@
       "contestSavedSuccessfully": "Konkurs zapisany pomyślnie!",
       "contestRemovedFromSaved": "Konkurs usunięty z zapisanych!",
       "confirmCreateNewContest": "Utwórz nowy konkurs?",
-      "confirmCreateNewContestDescription": "Masz aktywny konkurs ({name}). Upewnij się, że go zapiszesz przed utworzeniem nowego."
+      "confirmCreateNewContestDescription": "Masz aktywny konkurs ({name}). Upewnij się, że go zapiszesz przed utworzeniem nowego.",
+      "venue": "Miejsce",
+      "hosts": "Gospodarze"
     },
     "themes": {
       "title": "Motywy",
@@ -450,6 +453,8 @@
       "visualDetails": {
         "title": "Szczegóły wizualne",
         "uppercaseEntryName": "Nazwy krajów wielkimi literami",
+        "juryActivePointsUnderline": "Podkreślenie aktywnych punktów jury",
+        "juryPointsPanelRounded": "Zaokrąglony panel punktów jury",
         "pointsContainerShapes": {
           "title": "Forma kontenera punktów",
           "curvedEdge": "Zakrzywiona krawędź",
@@ -582,7 +587,8 @@
       "enableWinterEffects": "Włącz efekty zimowe",
       "snowFallIntensity": "Spadek śniegu",
       "low": "Niski",
-      "high": "Wysoki"
+      "high": "Wysoki",
+      "blurModalBackground": "Tło modalu rozmyte"
     },
     "contest": {
       "enterContestName": "Wpisz nazwę konkursu...",

@@ -72,6 +72,7 @@ const DEFAULT_SETTINGS: Settings = {
   enablePredefinedVotes: false,
   enableWinterEffects: true,
   snowFallIntensity: 5, // 1-10
+  blurModalBackground: false,
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -143,6 +144,7 @@ interface Settings {
   enablePredefinedVotes: boolean;
   enableWinterEffects: boolean;
   snowFallIntensity: number;
+  blurModalBackground: boolean;
 }
 
 interface PresentationSettings {

@@ -12,6 +12,8 @@ import type { ContestSnapshot } from '@/types/contestSnapshot';
 export type CreateContestInput = {
   name: string;
   description?: string;
+  venue?: string;
+  hosts?: string;
   isPublic?: boolean;
   themeId?: string;
   standardThemeId?: string;
@@ -23,6 +25,8 @@ export type CreateContestInput = {
 export type UpdateContestInput = {
   name?: string;
   description?: string;
+  venue?: string;
+  hosts?: string;
   isPublic?: boolean;
   themeId?: string;
   standardThemeId?: string;

@@ -22,6 +22,7 @@
     "enterName": "Εισάγετε όνομα...",
     "description": "Περιγραφή",
     "optionalDescription": "Προαιρετική περιγραφή...",
+    "optional": "Προαιρετικό",
     "subtitle": "Υπότιτλος",
     "enterSubtitle": "Εισάγετε υπότιτλο...",
     "edit": "Επεξεργασία",
@@ -337,7 +338,9 @@
       "contestSavedSuccessfully": "Ο διαγωνισμός αποθηκεύτηκε με επιτυχία!",
       "contestRemovedFromSaved": "Ο διαγωνισμός αφαιρέθηκε από τα αποθηκευμένα!",
       "confirmCreateNewContest": "Δημιουργήστε νέο διαγωνισμό?",
-      "confirmCreateNewContestDescription": "Έχετε έναν ενεργό διαγωνισμό ({name}). Επαληθεύστε ότι το αποθηκεύσετε πριν δημιουργήσετε έναν νέο."
+      "confirmCreateNewContestDescription": "Έχετε έναν ενεργό διαγωνισμό ({name}). Επαληθεύστε ότι το αποθηκεύσετε πριν δημιουργήσετε έναν νέο.",
+      "venue": "Τοπος",
+      "hosts": "Παρουσιαστές"
     },
     "themes": {
       "title": "Θέματα",
@@ -450,6 +453,8 @@
       "visualDetails": {
         "title": "Γραφικά Λεπτομέρειες",
         "uppercaseEntryName": "Μεγάλα Επίθετα Χώρων",
+        "juryActivePointsUnderline": "Υπογράμμιση Ενεργών Βαθμών Κριτικής",
+        "juryPointsPanelRounded": "Κυκλικό Πλαίσιο Βαθμών Κριτικής",
         "pointsContainerShapes": {
           "title": "Μορφή Κάδου Βαθμών",
           "curvedEdge": "Καμπύλη Άκρη",
@@ -582,7 +587,8 @@
       "enableWinterEffects": "Ενεργοποίηση εφέ χιονιού",
       "snowFallIntensity": "Πτώση χιονιού",
       "low": "Χαμηλό",
-      "high": "Υψηλό"
+      "high": "Υψηλό",
+      "blurModalBackground": "Μετάβαση του φόντου του modal"
     },
     "contest": {
       "enterContestName": "Εισάγετε όνομα διαγωνισμού...",

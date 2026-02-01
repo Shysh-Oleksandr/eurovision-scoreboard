@@ -60,6 +60,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       onClose={onClose}
       overlayClassName="!z-[1002]"
       containerClassName="!w-[min(90%,450px)]"
+      withBlur
       bottomContent={
         <ModalBottomContent
           onClose={onClose}

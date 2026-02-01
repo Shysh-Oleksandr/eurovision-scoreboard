@@ -449,6 +449,7 @@ const EventSetupModal = () => {
         overlayClassName="!z-[1000]"
         containerClassName="w-[calc(100%-1.5rem)]"
         contentClassName="!pb-4"
+        withBlur
         bottomContent={
           <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
             {debouncedCanClose && (

@@ -17,6 +17,8 @@ export interface CustomTheme {
   backgroundImageKey?: string;
   pointsContainerShape?: PointsContainerShape;
   uppercaseEntryName?: boolean;
+  juryActivePointsUnderline?: boolean;
+  isJuryPointsPanelRounded?: boolean;
   flagShape?: FlagShape;
   createdAt: string;
   updatedAt: string;

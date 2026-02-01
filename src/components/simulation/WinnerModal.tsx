@@ -32,6 +32,7 @@ const WinnerModal = () => {
       onClose={() => setShowModal(false)}
       containerClassName="lg:!w-2/5 md:!w-1/2 xs:!w-3/4 w-full"
       contentClassName="md:pt-12 sm:pt-8 pt-6 lg:px-10 md:px-8 px-4 sm:!pb-8 !pb-4 text-white text-center"
+      withBlur
       bottomContent={
         <div className="flex w-full xs:gap-4 gap-2 bg-primary-900 sm:p-4 p-2 z-30">
           <Button

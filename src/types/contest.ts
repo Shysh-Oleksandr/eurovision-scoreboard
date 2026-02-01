@@ -13,6 +13,8 @@ export interface Contest {
   standardThemeId?: string;
   name: string;
   description?: string;
+  venue?: string;
+  hosts?: string;
   isPublic: boolean;
   year?: number;
   hostingCountryCode: string;

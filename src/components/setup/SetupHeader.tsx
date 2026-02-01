@@ -340,6 +340,13 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
                 : t('settings.general.contest')
             }
             className="sm:w-[130px] w-[110px]"
+            getImageClassName={(option, type) => {
+              if (option.isExisting) return '';
+
+              if (type === 'display') return 'w-8 h-6 rounded-sm';
+
+              return 'w-7 h-5 rounded-sm';
+            }}
           />
           {!activeContest && (
             <Button

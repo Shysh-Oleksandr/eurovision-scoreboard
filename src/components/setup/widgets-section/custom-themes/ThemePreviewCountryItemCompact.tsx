@@ -42,8 +42,10 @@ type ThemePreviewCountryItemCompactProps = {
   previewCountryCode?: string;
   onClick?: () => void;
   uppercaseEntryName?: boolean;
+  juryActivePointsUnderline?: boolean;
   pointsContainerShape?: PointsContainerShape;
   flagShape?: FlagShape;
+  isJuryPointsPanelRounded?: boolean;
 };
 
 const ThemePreviewCountryItemCompact: React.FC<
@@ -59,8 +61,10 @@ const ThemePreviewCountryItemCompact: React.FC<
   previewCountryCode,
   onClick,
   uppercaseEntryName = true,
+  juryActivePointsUnderline = true,
   pointsContainerShape = 'triangle',
   flagShape = 'big-rectangle',
+  isJuryPointsPanelRounded = false,
 }) => {
   const t = useTranslations('widgets.themes.previewCountryItemStates');
 
@@ -110,6 +114,8 @@ const ThemePreviewCountryItemCompact: React.FC<
         <VotingPointsInfo
           customVotingPointsIndex={isListItem ? 9 : 0}
           overrides={overrides}
+          juryActivePointsUnderline={juryActivePointsUnderline}
+          isRounded={isJuryPointsPanelRounded}
         />
       </div>
     </>

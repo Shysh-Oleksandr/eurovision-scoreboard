@@ -22,6 +22,7 @@
     "enterName": "Introduce un nombre...",
     "description": "Descripción",
     "optionalDescription": "Descripción opcional...",
+    "optional": "Opcional",
     "subtitle": "Subtítulo",
     "enterSubtitle": "Introduce un subtítulo...",
     "edit": "Editar",
@@ -337,7 +338,9 @@
       "contestSavedSuccessfully": "Concurso guardado correctamente!",
       "contestRemovedFromSaved": "Concurso eliminado de guardados!",
       "confirmCreateNewContest": "Crear nuevo concurso?",
-      "confirmCreateNewContestDescription": "Tienes un concurso activo ({name}). Asegúrate de guardarlo antes de crear uno nuevo."
+      "confirmCreateNewContestDescription": "Tienes un concurso activo ({name}). Asegúrate de guardarlo antes de crear uno nuevo.",
+      "venue": "Lugar",
+      "hosts": "Presentadores"
     },
     "themes": {
       "title": "Temas",
@@ -450,6 +453,8 @@
       "visualDetails": {
         "title": "Detalles visuales",
         "uppercaseEntryName": "Nombres de entrada en mayúsculas",
+        "juryActivePointsUnderline": "Subrayado de puntos activos del jurado",
+        "juryPointsPanelRounded": "Panel de puntos del jurado redondeado",
         "pointsContainerShapes": {
           "title": "Forma del contenedor de puntos",
           "curvedEdge": "Borde curvado",
@@ -582,7 +587,8 @@
       "enableWinterEffects": "Activar efectos de invierno",
       "snowFallIntensity": "Intensidad de la nieve",
       "low": "Bajo",
-      "high": "Alto"
+      "high": "Alto",
+      "blurModalBackground": "Desenfocar fondo del modal"
     },
     "contest": {
       "enterContestName": "Introduce el nombre del concurso...",

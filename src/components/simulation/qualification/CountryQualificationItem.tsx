@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react';
 import CountryItemBase from '@/components/countryItem/CountryItemBase';
 import useFlagClassName from '@/components/countryItem/hooks/useFlagClassName';
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
-import { getFlagPath } from '@/helpers/getFlagPath';
+import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -98,10 +98,10 @@ export const CountryQualificationItem: React.FC<
             : () => (
                 <img
                   loading="lazy"
-                  src={getFlagPath(country)}
-                  onError={(e) => {
-                    e.currentTarget.src = getFlagPath('ww');
-                  }}
+                  src={getFlagPath(country, flagShape)}
+                  onError={(e) =>
+                    handleFlagError(e.currentTarget, country, flagShape)
+                  }
                   alt={`${country.name} flag`}
                   width={48}
                   height={36}

@@ -11,11 +11,15 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 type VotingPointsInfoProps = {
   customVotingPointsIndex?: number; // used for custom theme preview
   overrides?: Record<string, string>; // theme overrides for preview
+  juryActivePointsUnderline?: boolean;
+  isRounded?: boolean;
 };
 
 const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
   customVotingPointsIndex,
   overrides: propOverrides,
+  juryActivePointsUnderline = true,
+  isRounded = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const underlinesRef = useRef<Record<number, HTMLDivElement | null>>({});
@@ -36,6 +40,8 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
 
   useGSAP(
     () => {
+      if (!juryActivePointsUnderline) return;
+
       const activeUnderline = underlinesRef.current[votingPointsIndex];
 
       if (activeUnderline) {
@@ -52,7 +58,10 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
         );
       }
     },
-    { dependencies: [votingPointsIndex], scope: containerRef },
+    {
+      dependencies: [votingPointsIndex, juryActivePointsUnderline],
+      scope: containerRef,
+    },
   );
 
   return (
@@ -79,7 +88,11 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
         return (
           <div
             key={pointsItem.id}
-            className={`lg:h-8 h-7 flex justify-center transition-colors duration-500 items-center relative ${bgClassName}`}
+            className={`lg:h-[28px] h-[24px] flex justify-center transition-colors duration-500 items-center relative ${
+              isRounded
+                ? 'rounded-full overflow-hidden lg:w-[28px] w-[24px] justify-self-center'
+                : ''
+            } ${bgClassName}`}
             style={specialBgStyle}
           >
             <h6
@@ -91,14 +104,16 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
             >
               {pointsItem.value}
             </h6>
-            <div
-              ref={(el) => {
-                underlinesRef.current[index] = el;
-              }}
-              className={`block w-full lg:h-[5px] h-1 ${
-                isActive ? 'bg-panelInfo-activeText' : 'bg-transparent'
-              } absolute bottom-0 z-20`}
-            />
+            {juryActivePointsUnderline && (
+              <div
+                ref={(el) => {
+                  underlinesRef.current[index] = el;
+                }}
+                className={`block w-full lg:h-[5px] h-1 ${
+                  isActive ? 'bg-panelInfo-activeText' : 'bg-transparent'
+                } absolute bottom-0 z-20`}
+              />
+            )}
           </div>
         );
       })}

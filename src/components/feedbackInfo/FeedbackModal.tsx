@@ -78,6 +78,7 @@ const FeedbackModal = ({
       containerClassName="!w-[min(100%,650px)]"
       contentClassName="pb-2 xs:!pt-6 !pt-4 sm:!px-12 xs:!px-8 !px-6 text-white sm:h-[50vh] h-[55vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
+      withBlur
       topContent={
         <Tabs
           tabs={tabs}

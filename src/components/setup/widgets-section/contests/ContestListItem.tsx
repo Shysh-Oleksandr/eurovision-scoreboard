@@ -7,6 +7,11 @@ import Image from 'next/image';
 import { useToggleContestQuickSelectMutation } from '@/api/quickSelect';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
+import { CircleDashedIcon } from '@/assets/icons/CircleDashedIcon';
+import { ListIcon } from '@/assets/icons/ListIcon';
+import { LoaderCircleIcon } from '@/assets/icons/LoaderCircleIcon';
+import { MapPinIcon } from '@/assets/icons/MapPinIcon';
+import { MicIcon } from '@/assets/icons/MicIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import { PinIcon } from '@/assets/icons/PinIcon';
 import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
@@ -15,6 +20,9 @@ import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
 import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
 import { TrashIcon } from '@/assets/icons/TrashIcon';
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
+import { UserCogIcon } from '@/assets/icons/UserCogIcon';
+import { UsersIcon } from '@/assets/icons/UsersIcon';
+import { UserStarIcon } from '@/assets/icons/UserStarIcon';
 import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
 import { POINTS_ARRAY } from '@/data/data';
@@ -178,14 +186,30 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 
           {/* Contest metadata */}
           <div className="flex flex-wrap gap-1.5 mt-2">
+            {contest.venue && (
+              <ContestMetadataBadge>
+                <MapPinIcon className="size-4" />
+                {contest.venue}
+              </ContestMetadataBadge>
+            )}
+
+            {contest.hosts && (
+              <ContestMetadataBadge>
+                <MicIcon className="size-4" />
+                {contest.hosts}
+              </ContestMetadataBadge>
+            )}
+
             {contest.stageNames.length > 0 && (
-              <span className="text-xs bg-primary-800/60 text-white/80 px-2 py-1 rounded-full">
+              <ContestMetadataBadge>
+                <ListIcon className="size-4" />
                 {contest.stageNames.join(' → ')}
-              </span>
+              </ContestMetadataBadge>
             )}
 
             {contest.totalParticipants > 0 && (
-              <span className="text-xs bg-primary-800/60 text-white/80 px-2 py-1 rounded-full">
+              <ContestMetadataBadge>
+                <UsersIcon className="size-4" />
                 {contest.stageNames.length > 1 ||
                 contest.grandFinalParticipants !== contest.totalParticipants
                   ? t('widgets.contests.nParticipants', {
@@ -195,47 +219,53 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                 {t('widgets.contests.nGrandFinalParticipants', {
                   count: contest.grandFinalParticipants,
                 })}
-              </span>
+              </ContestMetadataBadge>
             )}
 
             {contest.customEntriesCount > 0 && (
-              <span className="text-xs bg-amber-900/60 text-amber-200 px-2 py-1 rounded-full">
+              <ContestMetadataBadge className="!bg-amber-900/60 !text-amber-200">
+                <UserCogIcon className="size-4" />
                 {t('widgets.contests.nCustom', {
                   count: contest.customEntriesCount,
                 })}
-              </span>
+              </ContestMetadataBadge>
             )}
 
             {isCustomPointsSystem && (
-              <span className="text-xs bg-purple-900/60 text-purple-200 px-2 py-1 rounded-full">
+              <ContestMetadataBadge className="!bg-purple-900/60 !text-purple-200">
+                <UserStarIcon className="size-4" />
                 {t('widgets.contests.pointsSystem')}:{' '}
                 {contest.customPointsSystem?.join(', ')}
-              </span>
+              </ContestMetadataBadge>
             )}
 
             {(contest.themeId || contest.standardThemeId) && (
-              <span className="text-xs bg-pink-900/60 text-pink-200 px-2 py-1 rounded-full flex items-center gap-1">
-                <ThemeIcon className="size-4" />
+              <ContestMetadataBadge
+                className="!bg-pink-900/60 !text-pink-200"
+                icon={<ThemeIcon className="size-4" />}
+              >
                 {t('common.theme')}:{' '}
                 {contest.themeId
                   ? t('common.custom')
                   : contest.standardThemeId?.replace('-', ' ')}
-              </span>
+              </ContestMetadataBadge>
             )}
 
             {contest.isSimulationStarted && !contest.winner && (
-              <span className="text-xs bg-green-900/60 text-green-200 px-2 py-1 rounded-full">
+              <ContestMetadataBadge className="!bg-green-900/60 !text-green-200">
+                <LoaderCircleIcon className="size-4" />
                 {t('widgets.contests.inProgress')}
-              </span>
+              </ContestMetadataBadge>
             )}
             {!contest.isSimulationStarted && (
-              <span className="text-xs bg-red-900/60 text-red-200 px-2 py-1 rounded-full">
+              <ContestMetadataBadge className="!bg-red-900/60 !text-red-200">
+                <CircleDashedIcon className="size-4" />
                 {t('widgets.contests.notStarted')}
-              </span>
+              </ContestMetadataBadge>
             )}
 
             {contest.winner && (
-              <span className="text-xs bg-yellow-900/60 text-yellow-200 px-2 py-1 rounded-full flex items-center gap-1">
+              <ContestMetadataBadge className="!bg-yellow-900/60 !text-yellow-200">
                 {winnerFlag && (
                   <Image
                     src={winnerFlag}
@@ -250,7 +280,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                   />
                 )}{' '}
                 {winnerName} 🏆
-              </span>
+              </ContestMetadataBadge>
             )}
           </div>
         </div>
@@ -363,3 +393,22 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 };
 
 export default ContestListItem;
+
+const ContestMetadataBadge = ({
+  icon,
+  className,
+  children,
+}: {
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+  className?: string;
+}) => {
+  return (
+    <span
+      className={`text-xs bg-primary-800/60 text-white/80 px-2 py-1 rounded-full flex items-center gap-1 ${className}`}
+    >
+      {icon && icon}
+      {children}
+    </span>
+  );
+};

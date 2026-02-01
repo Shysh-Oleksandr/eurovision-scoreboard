@@ -22,6 +22,7 @@
     "enterName": "Inserisci nome...",
     "description": "Descrizione",
     "optionalDescription": "Descrizione opzionale...",
+    "optional": "Opzionale",
     "subtitle": "Sottotitolo",
     "enterSubtitle": "Inserisci sottotitolo...",
     "edit": "Modifica",
@@ -337,7 +338,9 @@
       "contestSavedSuccessfully": "Concorso salvato con successo!",
       "contestRemovedFromSaved": "Concorso rimosso dai salvati!",
       "confirmCreateNewContest": "Creare un nuovo concorso?",
-      "confirmCreateNewContestDescription": "Hai un concorso attivo ({name}). Assicurati di salvarlo prima di creare uno nuovo."
+      "confirmCreateNewContestDescription": "Hai un concorso attivo ({name}). Assicurati di salvarlo prima di creare uno nuovo.",
+      "venue": "Luogo",
+      "hosts": "Conduttori"
     },
     "themes": {
       "title": "Temi",
@@ -450,6 +453,8 @@
       "visualDetails": {
         "title": "Dettagli Visivi",
         "uppercaseEntryName": "Nomi Paesi in Maiuscolo",
+        "juryActivePointsUnderline": "Sottolineatura Punti Attivi Giuria",
+        "juryPointsPanelRounded": "Pannello Punti Giuria Arrotondato",
         "pointsContainerShapes": {
           "title": "Forma Contenitore Punti",
           "curvedEdge": "Bordo Curvo",
@@ -582,7 +587,8 @@
       "enableWinterEffects": "Abilita effetti invernali",
       "snowFallIntensity": "Intensità neve",
       "low": "Basso",
-      "high": "Alto"
+      "high": "Alto",
+      "blurModalBackground": "Sfondo del modal sfocato"
     },
     "contest": {
       "enterContestName": "Inserisci il nome del concorso...",

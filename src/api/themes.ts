@@ -20,6 +20,8 @@ export type CreateThemeInput = {
   isPublic?: boolean;
   pointsContainerShape?: PointsContainerShape;
   uppercaseEntryName?: boolean;
+  juryActivePointsUnderline?: boolean;
+  isJuryPointsPanelRounded?: boolean;
   flagShape?: FlagShape;
 };
 
@@ -34,6 +36,8 @@ export type UpdateThemeInput = {
   isPublic?: boolean;
   pointsContainerShape?: PointsContainerShape | null;
   uppercaseEntryName?: boolean | null;
+  juryActivePointsUnderline?: boolean | null;
+  isJuryPointsPanelRounded?: boolean | null;
   flagShape?: FlagShape | null;
 };
 

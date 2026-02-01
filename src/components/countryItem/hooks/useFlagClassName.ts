@@ -11,18 +11,18 @@ const useFlagClassName = (
       case 'round':
       case 'round-border':
         if (lgOnly) {
-          return `w-[30px] h-[30px] aspect-square rounded-full ml-[4px] ${
+          return `w-[28px] h-[28px] aspect-square rounded-full ml-[4px] ${
             flagShape === 'round-border' ? 'border-[1.5px] border-solid' : ''
           }`;
         }
-        return `lg:w-[30px] md:w-[26px] w-[24px] lg:h-[30px] md:h-[26px] h-[24px] aspect-square rounded-full ml-[4px] ${
+        return `lg:w-[28px] md:w-[25px] w-[22px] lg:h-[28px] md:h-[25px] h-[22px] aspect-square rounded-full ml-[4px] ${
           flagShape === 'round-border' ? 'border-[1.5px] border-solid' : ''
         }`;
       case 'small-rectangle':
         if (lgOnly) {
-          return 'w-[40px] h-[26px] ml-[4px] rounded-sm';
+          return 'w-[34px] h-[23px] ml-[4px] rounded-sm';
         }
-        return 'lg:w-[40px] md:w-10 w-9 lg:h-[26px] md:h-[22px] h-6 ml-[4px] rounded-sm';
+        return 'lg:w-[34px] md:w-[30px] w-[26px] lg:h-[23px] md:h-[20px] h-[18px] ml-[5px] rounded-sm';
       case 'square':
         if (lgOnly) {
           return 'w-[36px] h-[36px] aspect-square';

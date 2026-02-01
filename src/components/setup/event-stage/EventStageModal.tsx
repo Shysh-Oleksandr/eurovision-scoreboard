@@ -95,6 +95,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
       onClosed={onClose}
       overlayClassName="!z-[1001]"
       containerClassName="!w-[min(100%,500px)]"
+      withBlur
       bottomContent={
         <ModalBottomContent
           onClose={handleTriggerClose}

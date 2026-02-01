@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef } from 'react';
 
-import { getFlagPath } from '../../helpers/getFlagPath';
+import { getFlagPath, handleFlagError } from '../../helpers/getFlagPath';
 import useAnimatePoints from '../../hooks/useAnimatePoints';
 import { Country } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -184,10 +184,10 @@ const CountryItem = ({
         flagShape !== 'none'
           ? () => (
               <img
-                src={getFlagPath(country)}
-                onError={(e) => {
-                  e.currentTarget.src = getFlagPath('ww');
-                }}
+                src={getFlagPath(country, flagShape)}
+                onError={(e) =>
+                  handleFlagError(e.currentTarget, country, flagShape)
+                }
                 alt={`${country.name} flag`}
                 width={48}
                 height={36}

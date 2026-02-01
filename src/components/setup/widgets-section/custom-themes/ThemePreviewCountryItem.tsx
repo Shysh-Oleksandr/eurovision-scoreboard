@@ -13,8 +13,10 @@ type ThemePreviewCountryItemProps = {
   overrides?: Record<string, string>;
   baseThemeYear: string;
   uppercaseEntryName?: boolean;
+  juryActivePointsUnderline?: boolean;
   pointsContainerShape?: PointsContainerShape;
   flagShape?: FlagShape;
+  isJuryPointsPanelRounded?: boolean;
 };
 
 const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
@@ -22,8 +24,10 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   overrides = {},
   baseThemeYear,
   uppercaseEntryName = true,
+  juryActivePointsUnderline = true,
   pointsContainerShape = 'triangle',
   flagShape = 'big-rectangle',
+  isJuryPointsPanelRounded = false,
 }) => {
   const t = useTranslations('widgets.themes');
 
@@ -63,8 +67,10 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
         showDouzePointsAnimation={showDouzePointsAnimation}
         onClick={() => handleAwardPoints(12)}
         uppercaseEntryName={uppercaseEntryName}
+        juryActivePointsUnderline={juryActivePointsUnderline}
         pointsContainerShape={pointsContainerShape}
         flagShape={flagShape}
+        isJuryPointsPanelRounded={isJuryPointsPanelRounded}
       />
 
       {/* Actions */}

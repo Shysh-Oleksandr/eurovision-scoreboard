@@ -20,6 +20,7 @@ import { Input } from '../../Input';
 import ImageGenerator from './ImageGenerator';
 
 import { DownloadIcon } from '@/assets/icons/DownloadIcon';
+import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
@@ -313,6 +314,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       containerClassName="!w-[min(100%,_95vw)]"
       contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
+      withBlur
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <div className="sm:space-y-6 space-y-4 sm:py-2 py-1">
@@ -327,17 +329,6 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
               });
             }}
             contentClassName="lg:px-6 sm:px-4 px-3"
-            extraContent={
-              <Button
-                className="h-10 !py-2 ml-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  applyAutoSettings();
-                }}
-              >
-                {t('share.autoFit')}
-              </Button>
-            }
           >
             <div className="space-y-3">
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -703,7 +694,8 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
               <Button
                 variant="tertiary"
-                className="w-full"
+                className="w-full justify-center"
+                Icon={<RestartIcon className="w-[20px] h-[20px]" />}
                 onClick={() => {
                   const count = sortedCountries.length;
                   const auto = getAutoSettingsByCount(

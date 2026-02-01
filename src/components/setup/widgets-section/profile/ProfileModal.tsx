@@ -62,6 +62,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       containerClassName="!w-[min(100%,500px)]"
       contentClassName="text-white !h-[max(25vh,250px)]"
       overlayClassName="!z-[1001]"
+      withBlur
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <h3 className="text-2xl font-bold mb-4">{t('title')}</h3>

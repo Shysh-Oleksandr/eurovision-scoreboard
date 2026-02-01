@@ -81,7 +81,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [pointsContainerShape, setPointsContainerShape] =
     useState<PointsContainerShape>('triangle');
   const [flagShape, setFlagShape] = useState<FlagShape>('big-rectangle');
-
+  const [juryActivePointsUnderline, setJuryActivePointsUnderline] =
+    useState(true);
+  const [isJuryPointsPanelRounded, setIsJuryPointsPanelRounded] =
+    useState(false);
   const { mutateAsync: createTheme, isPending: isCreating } =
     useCreateThemeMutation();
   const { mutateAsync: updateTheme, isPending: isUpdating } =
@@ -126,6 +129,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setUploadedFile(null);
       setPointsContainerShape(initialTheme.pointsContainerShape || 'triangle');
       setUppercaseEntryName(initialTheme.uppercaseEntryName ?? true);
+      setJuryActivePointsUnderline(
+        initialTheme.juryActivePointsUnderline ?? true,
+      );
+      setIsJuryPointsPanelRounded(
+        initialTheme.isJuryPointsPanelRounded ?? false,
+      );
       setFlagShape(initialTheme.flagShape || 'big-rectangle');
     } else {
       setName('');
@@ -139,6 +148,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setUploadedFile(null);
       setPointsContainerShape('triangle');
       setUppercaseEntryName(true);
+      setJuryActivePointsUnderline(true);
+      setIsJuryPointsPanelRounded(false);
       setFlagShape('big-rectangle');
     }
   }, [initialTheme, isOpen, themeYear, themeHue]);
@@ -213,6 +224,23 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         } else if (uppercaseEntryName !== true) {
           payload.uppercaseEntryName = uppercaseEntryName;
         }
+        if (
+          initialTheme.juryActivePointsUnderline === false &&
+          juryActivePointsUnderline === true
+        ) {
+          payload.juryActivePointsUnderline = null;
+        } else if (juryActivePointsUnderline !== true) {
+          payload.juryActivePointsUnderline = juryActivePointsUnderline;
+        }
+
+        if (
+          initialTheme.isJuryPointsPanelRounded === true &&
+          isJuryPointsPanelRounded === false
+        ) {
+          payload.isJuryPointsPanelRounded = null;
+        } else if (isJuryPointsPanelRounded !== false) {
+          payload.isJuryPointsPanelRounded = isJuryPointsPanelRounded;
+        }
 
         if (initialTheme.flagShape && flagShape === 'big-rectangle') {
           payload.flagShape = null;
@@ -226,6 +254,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         }
         if (uppercaseEntryName !== true) {
           payload.uppercaseEntryName = uppercaseEntryName;
+        }
+        if (juryActivePointsUnderline !== true) {
+          payload.juryActivePointsUnderline = juryActivePointsUnderline;
+        }
+        if (isJuryPointsPanelRounded !== false) {
+          payload.isJuryPointsPanelRounded = isJuryPointsPanelRounded;
         }
         if (flagShape !== 'big-rectangle') {
           payload.flagShape = flagShape;
@@ -513,6 +547,22 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 checked={uppercaseEntryName}
                 onChange={(e) => setUppercaseEntryName(e.target.checked)}
               />
+              <Checkbox
+                id="jury-active-points-underline"
+                label={t(
+                  'widgets.themes.visualDetails.juryActivePointsUnderline',
+                )}
+                labelClassName="w-full !px-0 !pt-1 !items-start"
+                checked={juryActivePointsUnderline}
+                onChange={(e) => setJuryActivePointsUnderline(e.target.checked)}
+              />
+              <Checkbox
+                id="jury-points-panel-rounded"
+                label={t('widgets.themes.visualDetails.juryPointsPanelRounded')}
+                labelClassName="w-full !px-0 !pt-1 !items-start"
+                checked={isJuryPointsPanelRounded}
+                onChange={(e) => setIsJuryPointsPanelRounded(e.target.checked)}
+              />
 
               <div className="grid xs:grid-cols-2 grid-cols-1 items-center xs:gap-3 gap-2">
                 <CustomSelect
@@ -658,8 +708,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               overrides={overrides}
               baseThemeYear={baseThemeYear}
               uppercaseEntryName={uppercaseEntryName}
+              juryActivePointsUnderline={juryActivePointsUnderline}
               pointsContainerShape={pointsContainerShape}
               flagShape={flagShape}
+              isJuryPointsPanelRounded={isJuryPointsPanelRounded}
             />
           </div>
         </div>
