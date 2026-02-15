@@ -41,9 +41,6 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
   );
   const contestToEdit = useGeneralStore((state) => state.contestToEdit);
   const setContestToEdit = useGeneralStore((state) => state.setContestToEdit);
-  const setSelectedProfileUser = useGeneralStore(
-    (state) => state.setSelectedProfileUser,
-  );
 
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState(ContestsTab.YOUR_CONTESTS);
@@ -123,7 +120,6 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
                 onLoaded={() => setIsPublicContestsLoaded(true)}
                 onEdit={handleEdit}
                 onLoad={handleLoadContest}
-                onCreatorClick={(u) => setSelectedProfileUser(u)}
               />
             )}
           </>

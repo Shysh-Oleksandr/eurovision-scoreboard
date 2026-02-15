@@ -22,7 +22,7 @@ import GoogleAuthButton from '@/components/common/GoogleAuthButton';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { CustomTheme, ThemeCreator } from '@/types/customTheme';
+import { CustomTheme } from '@/types/customTheme';
 
 const sortThemesBy =
   (sortKey: PublicSortKey) => (a: CustomTheme, b: CustomTheme) => {
@@ -51,14 +51,12 @@ interface UserThemesProps {
   onCreateNew?: () => void;
   onEdit?: (theme: CustomTheme) => void;
   onDuplicate: (theme: CustomTheme) => void;
-  onCreatorClick: (user: ThemeCreator) => void;
 }
 
 const UserThemes: React.FC<UserThemesProps> = ({
   onCreateNew,
   onEdit,
   onDuplicate,
-  onCreatorClick,
 }) => {
   const t = useTranslations();
   const user = useAuthStore((state) => state.user);
@@ -204,7 +202,6 @@ const UserThemes: React.FC<UserThemesProps> = ({
           onSave={!isOwnedByUser ? handleSave : undefined}
           isApplied
           onDuplicate={onDuplicate}
-          onCreatorClick={onCreatorClick}
           likedByMe={
             !isOwnedByUser
               ? !!themeState?.likedIds?.includes(currentCustomTheme._id)
@@ -274,7 +271,6 @@ const UserThemes: React.FC<UserThemesProps> = ({
               quickSelectedByMe={
                 !!themeState?.quickSelectedIds?.includes(theme._id)
               }
-              onCreatorClick={onCreatorClick}
             />
           ))}
         </div>

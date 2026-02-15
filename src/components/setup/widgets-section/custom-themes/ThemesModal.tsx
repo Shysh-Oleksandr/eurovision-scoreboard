@@ -41,9 +41,6 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
   const setThemeToDuplicate = useGeneralStore(
     (state) => state.setThemeToDuplicate,
   );
-  const setSelectedProfileUser = useGeneralStore(
-    (state) => state.setSelectedProfileUser,
-  );
 
   const [activeTab, setActiveTab] = useState(SettingsTab.YOUR_THEMES);
   const [isPublicThemesLoaded, setIsPublicThemesLoaded] = useState(false);
@@ -113,7 +110,6 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
             onCreateNew={handleCreateNew}
             onEdit={handleEdit}
             onDuplicate={handleDuplicate}
-            onCreatorClick={(u) => setSelectedProfileUser(u)}
           />
         ),
       },
@@ -127,14 +123,13 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
                 onLoaded={() => setIsPublicThemesLoaded(true)}
                 onDuplicate={handleDuplicate}
                 onEdit={handleEdit}
-                onCreatorClick={(u) => setSelectedProfileUser(u)}
               />
             )}
           </>
         ),
       },
     ],
-    [activeTab, isPublicThemesLoaded, tabs, setSelectedProfileUser],
+    [activeTab, isPublicThemesLoaded, tabs],
   );
 
   useEffectOnce(onLoaded);

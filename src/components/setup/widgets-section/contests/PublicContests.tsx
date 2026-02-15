@@ -15,20 +15,17 @@ import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
-import type { ThemeCreator } from '@/types/customTheme';
 
 interface PublicContestsProps {
   onLoaded?: () => void;
   onEdit: (contest: Contest) => void;
   onLoad: (contest: Contest) => void;
-  onCreatorClick?: (user: ThemeCreator) => void;
 }
 
 const PublicContests: React.FC<PublicContestsProps> = ({
   onLoaded,
   onEdit,
   onLoad,
-  onCreatorClick,
 }) => {
   const t = useTranslations();
   const activeContest = useGeneralStore((state) => state.activeContest);
@@ -112,7 +109,6 @@ const PublicContests: React.FC<PublicContestsProps> = ({
                 onSave={handleSave}
                 onLoad={onLoad}
                 onEdit={onEdit}
-                onCreatorClick={onCreatorClick}
                 isActive={activeContest?._id === contest._id}
                 likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
                 savedByMe={!!contestsState?.savedIds?.includes(contest._id)}

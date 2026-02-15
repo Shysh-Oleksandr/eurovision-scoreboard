@@ -14,20 +14,18 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { CustomTheme, ThemeCreator } from '@/types/customTheme';
+import { CustomTheme } from '@/types/customTheme';
 
 interface PublicThemesProps {
   onLoaded?: () => void;
   onDuplicate: (theme: CustomTheme) => void;
   onEdit: (theme: CustomTheme) => void;
-  onCreatorClick?: (user: ThemeCreator) => void;
 }
 
 const PublicThemes: React.FC<PublicThemesProps> = ({
   onLoaded,
   onDuplicate,
   onEdit,
-  onCreatorClick,
 }) => {
   const t = useTranslations();
   const [search, setSearch] = useState('');
@@ -115,7 +113,6 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
                 isApplied={currentCustomTheme?._id === theme._id}
                 onDuplicate={onDuplicate}
                 onEdit={onEdit}
-                onCreatorClick={onCreatorClick}
                 likedByMe={!!themeState?.likedIds?.includes(theme._id)}
                 savedByMe={!!themeState?.savedIds?.includes(theme._id)}
                 quickSelectedByMe={
