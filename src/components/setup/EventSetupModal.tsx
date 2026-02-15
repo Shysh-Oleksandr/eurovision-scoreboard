@@ -22,6 +22,7 @@ import { AvailableGroup } from './CountrySelectionListItem';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
 import { useInitialLineup } from './hooks/useInitialLineup';
+import { useLoadContest } from './hooks/useLoadContest';
 import { useStageModalActions } from './hooks/useStageModalActions';
 import NotParticipatingSection from './NotParticipatingSection';
 import { SetupHeader } from './SetupHeader';
@@ -70,6 +71,10 @@ const LoadContestModal = dynamic(
   {
     ssr: false,
   },
+);
+const UserProfileModal = dynamic(
+  () => import('./widgets-section/user-profile/UserProfileModal'),
+  { ssr: false },
 );
 
 const EventSetupModal = () => {
@@ -129,6 +134,20 @@ const EventSetupModal = () => {
 
   const contestToLoad = useGeneralStore((state) => state.contestToLoad);
   const setContestToLoad = useGeneralStore((state) => state.setContestToLoad);
+  const selectedProfileUser = useGeneralStore(
+    (state) => state.selectedProfileUser,
+  );
+  const setSelectedProfileUser = useGeneralStore(
+    (state) => state.setSelectedProfileUser,
+  );
+  const setIsThemesModalOpen = useGeneralStore(
+    (state) => state.setIsThemesModalOpen,
+  );
+  const setThemeToEdit = useGeneralStore((state) => state.setThemeToEdit);
+  const setThemeToDuplicate = useGeneralStore(
+    (state) => state.setThemeToDuplicate,
+  );
+  const setContestToEdit = useGeneralStore((state) => state.setContestToEdit);
   const { clear } = useScoreboardStore.temporal.getState();
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -215,6 +234,8 @@ const EventSetupModal = () => {
   const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
   const user = useAuthStore((state) => state.user);
   const applyTheme = useApplyContestTheme();
+
+  const handleProfileLoadContest = useLoadContest();
 
   const isInitialSetupStage = currentSetupStageType === 'initial';
   const currentSetupStage = isInitialSetupStage
@@ -563,6 +584,31 @@ const EventSetupModal = () => {
             setContestToLoad(null);
           }}
           onLoad={handleConfirmLoadContest}
+        />
+      )}
+
+      {/* User Profile Modal (global so LoadContestModal can show when loading from profile) */}
+      {selectedProfileUser && (
+        <UserProfileModal
+          isOpen
+          onClose={() => setSelectedProfileUser(null)}
+          user={selectedProfileUser}
+          onDuplicate={(theme) => {
+            setSelectedProfileUser(null);
+            setThemeToDuplicate({ ...theme, name: `${theme.name} (Copy)` });
+            setIsThemesModalOpen(true);
+          }}
+          onEditTheme={(theme) => {
+            setSelectedProfileUser(null);
+            setThemeToEdit(theme);
+            setIsThemesModalOpen(true);
+          }}
+          onEditContest={(contest) => {
+            setSelectedProfileUser(null);
+            setContestToEdit(contest);
+            setIsContestsModalOpen(true);
+          }}
+          onLoadContest={handleProfileLoadContest}
         />
       )}
     </>

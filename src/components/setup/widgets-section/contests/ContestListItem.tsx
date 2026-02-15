@@ -32,6 +32,7 @@ import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import { Contest } from '@/types/contest';
+import type { ThemeCreator } from '@/types/customTheme';
 
 interface ContestListItemProps {
   contest: Contest;
@@ -41,6 +42,7 @@ interface ContestListItemProps {
   onLoad: (contest: Contest) => void;
   onLike?: (id: string) => void;
   onSave?: (id: string, savedByMe: boolean) => void;
+  onCreatorClick?: (user: ThemeCreator) => void;
   likedByMe?: boolean;
   savedByMe?: boolean;
   quickSelectedByMe?: boolean;
@@ -55,6 +57,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   onLoad,
   onLike,
   onSave,
+  onCreatorClick,
   likedByMe,
   savedByMe,
   quickSelectedByMe,
@@ -288,7 +291,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 
       {contest.creator && (
         <div className="mb-3">
-          <UserInfo user={contest.creator} size="sm" />
+          <UserInfo user={contest.creator} size="sm" onClick={onCreatorClick} />
         </div>
       )}
 

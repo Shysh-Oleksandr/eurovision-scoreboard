@@ -2,6 +2,7 @@ import React from 'react';
 
 import Image from 'next/image';
 
+import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
 
@@ -48,11 +49,28 @@ const sizeMap: Record<
 const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
   const s = sizeMap[size];
 
+  const selectedProfileUser = useGeneralStore(
+    (state) => state.selectedProfileUser,
+  );
+  const setSelectedProfileUser = useGeneralStore(
+    (state) => state.setSelectedProfileUser,
+  );
+
+  const hasSelectedProfileUser = !!selectedProfileUser;
+
   if (!user) return null;
   const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
 
   return (
-    <div className="flex items-center gap-2.5">
+    <div
+      className={`flex items-center gap-2.5 rounded-md p-1 ${
+        hasSelectedProfileUser
+          ? ''
+          : 'transition-colors duration-300 cursor-pointer hover:bg-primary-800/60'
+      }`}
+      onClick={() => !hasSelectedProfileUser && setSelectedProfileUser?.(user)}
+      role={hasSelectedProfileUser ? undefined : 'button'}
+    >
       <Image
         src={user.avatarUrl || '/img/ProfileAvatarPlaceholder.png'}
         alt={user.username || 'avatar'}

@@ -19,7 +19,7 @@ import { Theme } from '../theme/types';
 import { useCountriesStore } from './countriesStore';
 import { useScoreboardStore } from './scoreboardStore';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
-import { CustomTheme } from '@/types/customTheme';
+import { CustomTheme, ThemeCreator } from '@/types/customTheme';
 import { Contest } from '@/types/contest';
 import { BaseCountry } from '@/models';
 import {
@@ -240,6 +240,16 @@ export interface GeneralState {
   setContestToLoad: (data: { contest: Contest; snapshot: any } | null) => void;
   isContestsModalOpen: boolean;
   setIsContestsModalOpen: (open: boolean) => void;
+  selectedProfileUser: ThemeCreator | null;
+  setSelectedProfileUser: (user: ThemeCreator | null) => void;
+  isThemesModalOpen: boolean;
+  setIsThemesModalOpen: (open: boolean) => void;
+  themeToEdit: CustomTheme | null;
+  setThemeToEdit: (theme: CustomTheme | null) => void;
+  themeToDuplicate: CustomTheme | null;
+  setThemeToDuplicate: (theme: CustomTheme | null) => void;
+  contestToEdit: Contest | null;
+  setContestToEdit: (contest: Contest | null) => void;
 }
 
 const getLatestUpdate = () => {
@@ -289,6 +299,11 @@ export const useGeneralStore = create<GeneralState>()(
         blockedActiveContestId: null,
         contestToLoad: null,
         isContestsModalOpen: false,
+        selectedProfileUser: null,
+        isThemesModalOpen: false,
+        themeToEdit: null,
+        themeToDuplicate: null,
+        contestToEdit: null,
         setLastSeenUpdate: (update: string) => {
           set({ lastSeenUpdate: update });
         },
@@ -408,6 +423,21 @@ export const useGeneralStore = create<GeneralState>()(
         },
         setIsContestsModalOpen: (open: boolean) => {
           set({ isContestsModalOpen: open });
+        },
+        setSelectedProfileUser: (user: ThemeCreator | null) => {
+          set({ selectedProfileUser: user });
+        },
+        setIsThemesModalOpen: (open: boolean) => {
+          set({ isThemesModalOpen: open });
+        },
+        setThemeToEdit: (theme: CustomTheme | null) => {
+          set({ themeToEdit: theme });
+        },
+        setThemeToDuplicate: (theme: CustomTheme | null) => {
+          set({ themeToDuplicate: theme });
+        },
+        setContestToEdit: (contest: Contest | null) => {
+          set({ contestToEdit: contest });
         },
         setImportedCustomEntries: (entries: BaseCountry[]) => {
           set({ importedCustomEntries: entries });

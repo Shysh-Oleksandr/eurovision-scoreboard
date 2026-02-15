@@ -45,6 +45,15 @@ export const queryKeys = {
       startDate?: string;
       endDate?: string;
     }) => ['public', 'contests', filters] as const,
+    userContent: (userId: string, filters: {
+      page?: number;
+      type?: string;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+    }) => ['public', 'user-content', userId, filters] as const,
   },
 
   // Errors queries (admin only)

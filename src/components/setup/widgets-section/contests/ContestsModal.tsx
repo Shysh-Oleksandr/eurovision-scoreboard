@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
@@ -39,12 +39,26 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
   const setContestToLoadGlobal = useGeneralStore(
     (state) => state.setContestToLoad,
   );
+  const contestToEdit = useGeneralStore((state) => state.contestToEdit);
+  const setContestToEdit = useGeneralStore((state) => state.setContestToEdit);
+  const setSelectedProfileUser = useGeneralStore(
+    (state) => state.setSelectedProfileUser,
+  );
 
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState(ContestsTab.YOUR_CONTESTS);
   const [isPublicContestsLoaded, setIsPublicContestsLoaded] = useState(false);
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
   const [initialContest, setInitialContest] = useState<Contest | undefined>();
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (contestToEdit) {
+      setInitialContest(contestToEdit);
+      setIsCustomizeModalOpen(true);
+      setContestToEdit(null);
+    }
+  }, [isOpen, contestToEdit, setContestToEdit]);
 
   const tabs = useMemo(
     () => [
@@ -109,6 +123,7 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
                 onLoaded={() => setIsPublicContestsLoaded(true)}
                 onEdit={handleEdit}
                 onLoad={handleLoadContest}
+                onCreatorClick={(u) => setSelectedProfileUser(u)}
               />
             )}
           </>

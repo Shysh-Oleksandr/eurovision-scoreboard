@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
@@ -11,6 +11,7 @@ import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { useGeneralStore } from '@/state/generalStore';
 import { CustomTheme } from '@/types/customTheme';
 
 const CustomizeThemeModal = dynamic(() => import('./CustomizeThemeModal'), {
@@ -34,11 +35,42 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
   onLoaded,
 }) => {
   const t = useTranslations('widgets.themes');
+  const themeToEdit = useGeneralStore((state) => state.themeToEdit);
+  const themeToDuplicate = useGeneralStore((state) => state.themeToDuplicate);
+  const setThemeToEdit = useGeneralStore((state) => state.setThemeToEdit);
+  const setThemeToDuplicate = useGeneralStore(
+    (state) => state.setThemeToDuplicate,
+  );
+  const setSelectedProfileUser = useGeneralStore(
+    (state) => state.setSelectedProfileUser,
+  );
+
   const [activeTab, setActiveTab] = useState(SettingsTab.YOUR_THEMES);
   const [isPublicThemesLoaded, setIsPublicThemesLoaded] = useState(false);
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
   const [initialTheme, setInitialTheme] = useState<CustomTheme | undefined>();
   const [isEditMode, setIsEditMode] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (themeToEdit) {
+      setInitialTheme(themeToEdit);
+      setIsEditMode(true);
+      setIsCustomizeModalOpen(true);
+      setThemeToEdit(null);
+    } else if (themeToDuplicate) {
+      setInitialTheme(themeToDuplicate);
+      setIsEditMode(false);
+      setIsCustomizeModalOpen(true);
+      setThemeToDuplicate(null);
+    }
+  }, [
+    isOpen,
+    themeToEdit,
+    themeToDuplicate,
+    setThemeToEdit,
+    setThemeToDuplicate,
+  ]);
 
   const tabs = useMemo(
     () => [
@@ -81,6 +113,7 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
             onCreateNew={handleCreateNew}
             onEdit={handleEdit}
             onDuplicate={handleDuplicate}
+            onCreatorClick={(u) => setSelectedProfileUser(u)}
           />
         ),
       },
@@ -94,13 +127,14 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
                 onLoaded={() => setIsPublicThemesLoaded(true)}
                 onDuplicate={handleDuplicate}
                 onEdit={handleEdit}
+                onCreatorClick={(u) => setSelectedProfileUser(u)}
               />
             )}
           </>
         ),
       },
     ],
-    [activeTab, isPublicThemesLoaded, tabs],
+    [activeTab, isPublicThemesLoaded, tabs, setSelectedProfileUser],
   );
 
   useEffectOnce(onLoaded);

@@ -286,7 +286,17 @@
       "deletePicture": "Usuń zdjęcie",
       "username": "Nazwa użytkownika",
       "name": "Nazwa",
-      "profileUpdatedSuccessfully": "Profil zaktualizowany pomyślnie!"
+      "profileUpdatedSuccessfully": "Profil zaktualizowany pomyślnie!",
+      "joinedOn": "Dołączył"
+    },
+    "contentType": {
+      "all": "Wszystkie",
+      "themes": "Motywy",
+      "contests": "Konkursy"
+    },
+    "foundNItems": "Znaleziono {count} {count, plural, =1 {element} other {elementów}}",
+    "userProfile": {
+      "noContentFound": "Brak treści pasujących do wyszukiwania."
     },
     "contests": {
       "title": "Konkursy",

@@ -286,7 +286,17 @@
       "deletePicture": "Вилучити зображення",
       "username": "Ім’я користувача",
       "name": "Ім’я",
-      "profileUpdatedSuccessfully": "Профіль успішно оновлено!"
+      "profileUpdatedSuccessfully": "Профіль успішно оновлено!",
+      "joinedOn": "Приєднався"
+    },
+    "contentType": {
+      "all": "Усе",
+      "themes": "Теми",
+      "contests": "Конкурси"
+    },
+    "foundNItems": "Знайдено {count} {count, plural, =1 {елемент} other {елементів}}",
+    "userProfile": {
+      "noContentFound": "За вашим запитом нічого не знайдено."
     },
     "contests": {
       "title": "Конкурси",

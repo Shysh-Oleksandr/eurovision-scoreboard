@@ -10,6 +10,7 @@ import {
   LoadContestOptions,
   SimulationLoadOptions,
 } from '@/helpers/contestSnapshot';
+import { useGeneralStore } from '@/state/generalStore';
 
 interface LoadContestModalProps {
   isOpen: boolean;
@@ -27,6 +28,10 @@ const LoadContestModal: React.FC<LoadContestModalProps> = ({
   onLoad,
 }) => {
   const t = useTranslations();
+
+  const setSelectedProfileUser = useGeneralStore(
+    (state) => state.setSelectedProfileUser,
+  );
 
   const tabs = useMemo(
     () => [
@@ -61,6 +66,7 @@ const LoadContestModal: React.FC<LoadContestModalProps> = ({
 
   const handleLoad = () => {
     onLoad(options);
+    setSelectedProfileUser(null);
     onClose();
   };
 

@@ -20,7 +20,7 @@ import UserInfo from '@/components/common/UserInfo';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getCssVarsForCustomTheme } from '@/theme/themeUtils';
-import { CustomTheme } from '@/types/customTheme';
+import { CustomTheme, ThemeCreator } from '@/types/customTheme';
 
 interface ThemeListItemProps {
   theme: CustomTheme;
@@ -31,6 +31,7 @@ interface ThemeListItemProps {
   onLike?: (id: string) => void;
   onSave?: (id: string, savedByMe: boolean) => void;
   onDuplicate: (theme: CustomTheme) => void;
+  onCreatorClick?: (user: ThemeCreator) => void;
   isApplied?: boolean;
   likedByMe?: boolean;
   savedByMe?: boolean;
@@ -46,6 +47,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   onLike,
   onSave,
   onDuplicate,
+  onCreatorClick,
   isApplied,
   likedByMe,
   savedByMe,
@@ -152,7 +154,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
       </div>
       {theme.creator && (
         <div className="mb-3">
-          <UserInfo user={theme.creator} size="sm" />
+          <UserInfo user={theme.creator} size="sm" onClick={onCreatorClick} />
         </div>
       )}
 

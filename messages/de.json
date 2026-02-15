@@ -286,7 +286,17 @@
       "deletePicture": "Bild löschen",
       "username": "Benutzername",
       "name": "Name",
-      "profileUpdatedSuccessfully": "Profil erfolgreich aktualisiert!"
+      "profileUpdatedSuccessfully": "Profil erfolgreich aktualisiert!",
+      "joinedOn": "Beigetreten am"
+    },
+    "contentType": {
+      "all": "Alle",
+      "themes": "Themen",
+      "contests": "Wettbewerbe"
+    },
+    "foundNItems": "{count} {count, plural, =1 {Element} other {Elemente}} gefunden",
+    "userProfile": {
+      "noContentFound": "Keine Inhalte entsprechen Ihrer Suche."
     },
     "contests": {
       "title": "Wettbewerbe",

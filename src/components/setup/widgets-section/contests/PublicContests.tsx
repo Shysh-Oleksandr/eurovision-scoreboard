@@ -1,37 +1,34 @@
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { DateRangeFilter } from '../utils/getFilterDateRange';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
 import ContestListItem from './ContestListItem';
+import { usePublicContestActions } from './hooks/usePublicContestActions';
 
-import {
-  useContestsStateQuery,
-  usePublicContestsQuery,
-  useToggleLikeContestMutation,
-  useToggleSaveContestMutation,
-} from '@/api/contests';
+import { useContestsStateQuery, usePublicContestsQuery } from '@/api/contests';
 import Button from '@/components/common/Button';
-import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
+import type { ThemeCreator } from '@/types/customTheme';
 
 interface PublicContestsProps {
   onLoaded?: () => void;
   onEdit: (contest: Contest) => void;
   onLoad: (contest: Contest) => void;
+  onCreatorClick?: (user: ThemeCreator) => void;
 }
 
 const PublicContests: React.FC<PublicContestsProps> = ({
   onLoaded,
   onEdit,
   onLoad,
+  onCreatorClick,
 }) => {
   const t = useTranslations();
   const activeContest = useGeneralStore((state) => state.activeContest);
@@ -41,8 +38,6 @@ const PublicContests: React.FC<PublicContestsProps> = ({
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
   const debouncedSearch = useDebounce(search, 400);
-
-  const { confirm } = useConfirmation();
 
   const serverSortBy =
     sortKey === 'likes' ? 'likes' : sortKey === 'saves' ? 'saves' : 'createdAt';
@@ -57,8 +52,7 @@ const PublicContests: React.FC<PublicContestsProps> = ({
     endDate: dateRange?.endDate,
   });
 
-  const { mutateAsync: toggleLike } = useToggleLikeContestMutation();
-  const { mutateAsync: toggleSave } = useToggleSaveContestMutation();
+  const { handleLike, handleSave } = usePublicContestActions();
   const user = useAuthStore((state) => state.user);
 
   const contestIds = useMemo(
@@ -71,54 +65,6 @@ const PublicContests: React.FC<PublicContestsProps> = ({
   );
 
   useEffectOnce(onLoaded);
-
-  const handleLike = async (id: string) => {
-    try {
-      const res = await toggleLike(id);
-
-      toast.success(
-        res.liked
-          ? 'Contest liked successfully'
-          : 'Contest unliked successfully',
-      );
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to like contest');
-    }
-  };
-
-  const handleSave = async (id: string, savedByMe: boolean) => {
-    try {
-      if (savedByMe) {
-        confirm({
-          key: 'remove-saved-contest',
-          title: t('widgets.contests.confirmRemoveSavedContest'),
-          onConfirm: async () => {
-            const res = await toggleSave(id);
-
-            toast.success(
-              t(
-                res.saved
-                  ? 'widgets.contests.contestSavedSuccessfully'
-                  : 'widgets.contests.contestRemovedFromSaved',
-              ),
-            );
-          },
-        });
-      } else {
-        const res = await toggleSave(id);
-
-        toast.success(
-          t(
-            res.saved
-              ? 'widgets.contests.contestSavedSuccessfully'
-              : 'widgets.contests.contestRemovedFromSaved',
-          ),
-        );
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save contest');
-    }
-  };
 
   return (
     <div className="sm:space-y-4 space-y-2">
@@ -166,6 +112,7 @@ const PublicContests: React.FC<PublicContestsProps> = ({
                 onSave={handleSave}
                 onLoad={onLoad}
                 onEdit={onEdit}
+                onCreatorClick={onCreatorClick}
                 isActive={activeContest?._id === contest._id}
                 likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
                 savedByMe={!!contestsState?.savedIds?.includes(contest._id)}

@@ -286,7 +286,17 @@
       "deletePicture": "Διαγραφή Εικόνας",
       "username": "Όνομα χρήστη",
       "name": "Όνομα",
-      "profileUpdatedSuccessfully": "Το προφίλ ενημερώθηκε με επιτυχία!"
+      "profileUpdatedSuccessfully": "Το προφίλ ενημερώθηκε με επιτυχία!",
+      "joinedOn": "Έγινε μέλος"
+    },
+    "contentType": {
+      "all": "Όλα",
+      "themes": "Θέματα",
+      "contests": "Διαγωνισμοί"
+    },
+    "foundNItems": "Βρέθηκαν {count} {count, plural, =1 {στοιχείο} other {στοιχεία}}",
+    "userProfile": {
+      "noContentFound": "Δεν βρέθηκε περιεχόμενο που να ταιριάζει με την αναζήτησή σας."
     },
     "contests": {
       "title": "Διαγωνισμοί",

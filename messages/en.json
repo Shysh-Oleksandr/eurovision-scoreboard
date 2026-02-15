@@ -283,7 +283,17 @@
       "deletePicture": "Delete Picture",
       "username": "Username",
       "name": "Name",
-      "profileUpdatedSuccessfully": "Profile updated successfully!"
+      "profileUpdatedSuccessfully": "Profile updated successfully!",
+      "joinedOn": "Joined on"
+    },
+    "contentType": {
+      "all": "All",
+      "themes": "Themes",
+      "contests": "Contests"
+    },
+    "foundNItems": "Found {count} {count, plural, =1 {item} other {items}}",
+    "userProfile": {
+      "noContentFound": "No content found matching your search."
     },
     "contests": {
       "title": "Contests",

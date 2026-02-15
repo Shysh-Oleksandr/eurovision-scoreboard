@@ -1,38 +1,33 @@
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { DateRangeFilter } from '../utils/getFilterDateRange';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
-import { useApplyCustomTheme } from './hooks/useApplyCustomTheme';
+import { usePublicThemeActions } from './hooks/usePublicThemeActions';
 import ThemeListItem from './ThemeListItem';
 
-import {
-  usePublicThemesQuery,
-  useThemesStateQuery,
-  useToggleLikeThemeMutation,
-  useToggleSaveThemeMutation,
-} from '@/api/themes';
+import { usePublicThemesQuery, useThemesStateQuery } from '@/api/themes';
 import Button from '@/components/common/Button';
-import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { CustomTheme } from '@/types/customTheme';
+import { CustomTheme, ThemeCreator } from '@/types/customTheme';
 
 interface PublicThemesProps {
   onLoaded?: () => void;
   onDuplicate: (theme: CustomTheme) => void;
   onEdit: (theme: CustomTheme) => void;
+  onCreatorClick?: (user: ThemeCreator) => void;
 }
 
 const PublicThemes: React.FC<PublicThemesProps> = ({
   onLoaded,
   onDuplicate,
   onEdit,
+  onCreatorClick,
 }) => {
   const t = useTranslations();
   const [search, setSearch] = useState('');
@@ -61,8 +56,6 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     endDate: dateRange?.endDate,
   });
 
-  const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
-  const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
   const user = useAuthStore((state) => state.user);
 
@@ -72,59 +65,9 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     !!themeIds.length && !!user,
   );
 
-  const { confirm } = useConfirmation();
+  const { handleLike, handleSave, handleApply } = usePublicThemeActions();
 
   useEffectOnce(onLoaded);
-
-  const handleApply = useApplyCustomTheme();
-
-  const handleLike = async (id: string) => {
-    try {
-      const res = await toggleLike(id);
-
-      toast.success(
-        res.liked
-          ? t('widgets.themes.themeLikedSuccessfully')
-          : t('widgets.themes.themeUnlikedSuccessfully'),
-      );
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to like theme');
-    }
-  };
-
-  const handleSave = async (id: string, savedByMe: boolean) => {
-    try {
-      if (savedByMe) {
-        confirm({
-          key: 'remove-saved-theme',
-          title: t('widgets.themes.confirmRemoveSavedTheme'),
-          onConfirm: async () => {
-            const res = await toggleSave(id);
-
-            toast.success(
-              t(
-                res.saved
-                  ? 'widgets.themes.themeSavedSuccessfully'
-                  : 'widgets.themes.themeRemovedFromSaved',
-              ),
-            );
-          },
-        });
-      } else {
-        const res = await toggleSave(id);
-
-        toast.success(
-          t(
-            res.saved
-              ? 'widgets.themes.themeSavedSuccessfully'
-              : 'widgets.themes.themeRemovedFromSaved',
-          ),
-        );
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save theme');
-    }
-  };
 
   return (
     <div className="sm:space-y-4 space-y-2">
@@ -172,6 +115,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
                 isApplied={currentCustomTheme?._id === theme._id}
                 onDuplicate={onDuplicate}
                 onEdit={onEdit}
+                onCreatorClick={onCreatorClick}
                 likedByMe={!!themeState?.likedIds?.includes(theme._id)}
                 savedByMe={!!themeState?.savedIds?.includes(theme._id)}
                 quickSelectedByMe={

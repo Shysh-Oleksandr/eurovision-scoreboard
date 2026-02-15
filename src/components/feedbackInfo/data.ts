@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-02-15',
+    title:
+      "Implemented the user profile page, which displays the user's public custom themes, contests, and profile information (click the user's profile picture to access)",
+  },
+  {
     date: '2026-02-01',
     title:
       'Extended the theme customization: options for jury points panel rounding and removing underline. Added venue and hosts fields for custom contests. Added new rounded flags. Added an option to blur modal background. Small improvements',
@@ -312,8 +317,9 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-01-31', end: '2026-02-01' },
-    title: 'Extended theme customization',
+    approximateDates: { start: '2026-02-21', end: '2026-02-22' },
+    title:
+      'The ability to follow other users. The ability to share a profile, theme, or contest by link.',
   },
   {
     title: 'Running order setup',

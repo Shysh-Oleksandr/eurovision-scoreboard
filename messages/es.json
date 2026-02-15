@@ -286,7 +286,17 @@
       "deletePicture": "Eliminar foto",
       "username": "Nombre de usuario",
       "name": "Nombre",
-      "profileUpdatedSuccessfully": "¡Perfil actualizado!"
+      "profileUpdatedSuccessfully": "¡Perfil actualizado!",
+      "joinedOn": "Unido el"
+    },
+    "contentType": {
+      "all": "Todo",
+      "themes": "Temas",
+      "contests": "Concursos"
+    },
+    "foundNItems": "Se encontró {count} {count, plural, =1 {elemento} other {elementos}}",
+    "userProfile": {
+      "noContentFound": "No se encontró contenido que coincida con su búsqueda."
     },
     "contests": {
       "title": "Concursos",

@@ -23,6 +23,7 @@ interface ModalProps {
   openDelay?: number; // Delay in milliseconds before opening the modal
   dataTheme?: string;
   withBlur?: boolean;
+  fixedHeight?: boolean;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -40,6 +41,7 @@ const Modal: React.FC<ModalProps> = ({
   ref,
   dataTheme,
   withBlur = false,
+  fixedHeight = false,
 }) => {
   const enableWinterEffects = useGeneralStore(
     (state) => state.settings.enableWinterEffects,
@@ -84,13 +86,20 @@ const Modal: React.FC<ModalProps> = ({
 
   const modalHeightStyle = useMemo(() => {
     if (isMobileInLandscape) {
-      if (topContent) return '!max-h-[calc(80vh-140px)]';
+      if (topContent)
+        return fixedHeight
+          ? '!h-[calc(80vh-140px)]'
+          : '!max-h-[calc(80vh-140px)]';
 
-      return '!max-h-[calc(80vh-100px)]';
+      return fixedHeight
+        ? '!h-[calc(80vh-100px)]'
+        : '!max-h-[calc(80vh-100px)]';
     }
 
-    return 'sm:!max-h-[calc(90vh-70px)] max-h-[calc(90vh-110px)]';
-  }, [isMobileInLandscape, topContent]);
+    return fixedHeight
+      ? 'sm:!h-[calc(90vh-70px)] !h-[calc(90vh-110px)]'
+      : 'sm:!max-h-[calc(90vh-70px)] !max-h-[calc(90vh-110px)]';
+  }, [isMobileInLandscape, topContent, fixedHeight]);
 
   if (!isMounted) {
     return null;

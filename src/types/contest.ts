@@ -4,6 +4,7 @@ export interface ContestCreator {
   name?: string;
   country?: string;
   avatarUrl?: string;
+  createdAt?: string;
 }
 
 export interface Contest {

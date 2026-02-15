@@ -44,4 +44,5 @@ export interface ThemeCreator {
   name?: string;
   country?: string;
   avatarUrl?: string;
+  createdAt?: string;
 }

@@ -4,13 +4,16 @@ import React, { useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
+import { useLoadContest } from '../../hooks/useLoadContest';
+import UserContentSection from '../user-profile/UserContentSection';
+import UserProfileHeader from '../user-profile/UserProfileHeader';
+
 import { LogoutIcon } from '@/assets/icons/LogoutIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
-import UserInfo from '@/components/common/UserInfo';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -39,6 +42,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
   const { confirm } = useConfirmation();
 
+  const onLoadContest = useLoadContest();
+
   const isAuthenticated = !!user;
 
   useEffectOnce(() => {
@@ -59,38 +64,44 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      containerClassName="!w-[min(100%,500px)]"
-      contentClassName="text-white !h-[max(25vh,250px)]"
+      containerClassName="!w-[min(100%,750px)]"
+      fixedHeight
       overlayClassName="!z-[1001]"
       withBlur
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <h3 className="text-2xl font-bold mb-4">{t('title')}</h3>
       {isAuthenticated ? (
-        <div className="text-base mb-4 flex justify-between flex-wrap items-center gap-4">
-          <UserInfo user={user} size="lg" />
-
-          <Button
-            label={t('editProfile')}
-            variant="primary"
-            onClick={() => setIsEditProfileModalOpen(true)}
-            Icon={<PencilIcon className="w-5 h-5" />}
-          />
+        <div className="text-base flex justify-between flex-wrap items-center gap-4">
+          <div className="w-full">
+            <UserProfileHeader
+              user={user}
+              additionalContent={
+                <div className="flex items-center gap-2">
+                  <Button
+                    label={t('editProfile')}
+                    variant="primary"
+                    onClick={() => setIsEditProfileModalOpen(true)}
+                    Icon={<PencilIcon className="w-5 h-5" />}
+                  />
+                  <Button
+                    label={isBusy ? t('loggingOut') : t('logout')}
+                    variant="destructive"
+                    onClick={handleLogout}
+                    disabled={isBusy}
+                    Icon={<LogoutIcon className="w-5 h-5 flex-none" />}
+                  />
+                </div>
+              }
+            />
+          </div>
+          <UserContentSection userId={user._id} onLoadContest={onLoadContest} />
         </div>
       ) : (
-        <p className="text-base mb-4 text-white/80">{t('authDescription')}</p>
-      )}
-
-      {isAuthenticated ? (
-        <Button
-          label={isBusy ? t('loggingOut') : t('logout')}
-          variant="destructive"
-          onClick={handleLogout}
-          disabled={isBusy}
-          Icon={<LogoutIcon className="w-5 h-5 flex-none" />}
-        />
-      ) : (
-        <GoogleAuthButton />
+        <div className="flex flex-col items-center gap-4 mt-8">
+          <p className="text-base text-white/80">{t('authDescription')}</p>
+          <GoogleAuthButton />
+        </div>
       )}
 
       {(isEditProfileModalOpen || isEditProfileModalLoaded) && (

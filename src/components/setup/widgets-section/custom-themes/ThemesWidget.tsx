@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 
 import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
+import { useGeneralStore } from '@/state/generalStore';
 
 const ThemesModal = dynamic(() => import('./ThemesModal'), {
   ssr: false,
@@ -14,7 +15,10 @@ const ThemesModal = dynamic(() => import('./ThemesModal'), {
 const ThemesWidget = () => {
   const t = useTranslations('widgets.themes');
 
-  const [isThemesModalOpen, setIsThemesModalOpen] = useState(false);
+  const isThemesModalOpen = useGeneralStore((state) => state.isThemesModalOpen);
+  const setIsThemesModalOpen = useGeneralStore(
+    (state) => state.setIsThemesModalOpen,
+  );
   const [isThemesModalLoaded, setIsThemesModalLoaded] = useState(false);
 
   return (
