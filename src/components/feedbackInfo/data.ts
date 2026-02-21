@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-02-21',
+    title:
+      'Added the ability to follow other users and see the feed with their activities. The ability to share a profile, theme, or contest by link. Small improvements',
+  },
+  {
     date: '2026-02-15',
     title:
       "Implemented the user profile page, which displays the user's public custom themes, contests, and profile information (click the user's profile picture to access)",
@@ -317,9 +322,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-02-21', end: '2026-02-22' },
-    title:
-      'The ability to follow other users. The ability to share a profile, theme, or contest by link.',
+    approximateDates: { start: '2026-02-22', end: '2026-02-22' },
+    title: 'Categorize custom entries. Theme customization improvements.',
   },
   {
     title: 'Running order setup',
