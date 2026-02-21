@@ -70,7 +70,7 @@ const DEFAULT_SETTINGS: Settings = {
   useGroupedJuryPoints: false,
   autoStartPresentation: false,
   enablePredefinedVotes: false,
-  enableWinterEffects: true,
+  enableWinterEffects: false,
   snowFallIntensity: 5, // 1-10
   blurModalBackground: false,
 };

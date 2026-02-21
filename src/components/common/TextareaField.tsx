@@ -26,6 +26,7 @@ export const TextareaField = forwardRef<
       'py-3',
       'pl-3',
       'rounded-md',
+      '!text-[1.145rem] md:!text-sm',
       'bg-primary-900',
       'bg-gradient-to-bl',
       'from-[10%]',

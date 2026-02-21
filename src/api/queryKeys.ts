@@ -27,6 +27,24 @@ export const queryKeys = {
     // preferences: () => ['user', 'preferences'] as const,
   },
 
+  // Follows
+  follows: {
+    status: (userId: string) => ['follows', 'status', userId] as const,
+    followers: (
+      userId: string,
+      filters: { page?: number; search?: string },
+    ) => ['follows', 'followers', userId, filters] as const,
+    followingFeed: (filters: {
+      page?: number;
+      type?: string;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+    }) => ['follows', 'following-feed', filters] as const,
+  },
+
   // Public queries
   public: {
     themes: (filters: {
@@ -88,6 +106,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.customEntries(),
   queryKeys.user.themes(),
   queryKeys.user.contests(),
+  queryKeys.follows.followingFeed({}),
   queryKeys.legacy.meProfile(),
   queryKeys.legacy.me(),
 ];

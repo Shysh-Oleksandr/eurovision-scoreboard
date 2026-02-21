@@ -287,7 +287,14 @@
       "username": "Nom d’utilisateur",
       "name": "Nom",
       "profileUpdatedSuccessfully": "Profil mis à jour avec succès !",
-      "joinedOn": "Inscrit le"
+      "joinedOn": "Inscrit le",
+      "followers": "{count} {count, plural, =1 {abonné} few {abonnés} other {abonnés}}",
+      "yourProfile": "Votre profil",
+      "following": "Suivant",
+      "followedUser": "Suivi avec succès !",
+      "unfollowedUser": "Suivi avec succès !",
+      "follow": "Suivre",
+      "signInToFollow": "Connectez-vous pour suivre"
     },
     "contentType": {
       "all": "Tout",
@@ -296,7 +303,8 @@
     },
     "foundNItems": "{count} {count, plural, =1 {élément} other {éléments}} trouvé(s)",
     "userProfile": {
-      "noContentFound": "Aucun contenu ne correspond à votre recherche."
+      "noContentFound": "Aucun contenu ne correspond à votre recherche.",
+      "noFollowingContent": "Aucun contenu de personnes que vous suivez encore. Suivez des personnes pour voir leurs thèmes et concours ici."
     },
     "contests": {
       "title": "Concours",

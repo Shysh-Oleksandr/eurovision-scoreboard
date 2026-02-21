@@ -45,4 +45,6 @@ export interface ThemeCreator {
   country?: string;
   avatarUrl?: string;
   createdAt?: string;
+  followerCount?: number;
+  isFollowing?: boolean;
 }

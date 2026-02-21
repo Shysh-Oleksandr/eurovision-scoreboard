@@ -1,8 +1,13 @@
+import { ChevronRight } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import React from 'react';
+import React, { useState } from 'react';
 
 import Image from 'next/image';
 
+import FollowersModal from './FollowersModal';
+
+import { useFollowingStatusQuery } from '@/api/follows';
+import FollowButton from '@/components/common/FollowButton';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
 
@@ -15,9 +20,13 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   user,
   additionalContent,
 }) => {
+  const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
   const t = useTranslations('widgets.profile');
   const locale = useLocale();
+  const { data: followStatus } = useFollowingStatusQuery(user._id);
   const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
+
+  const followerCount = followStatus?.followerCount ?? user.followerCount ?? 0;
 
   const joinedOn = user.createdAt
     ? new Date(user.createdAt).toLocaleDateString(locale, {
@@ -40,7 +49,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
           }}
         />
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 flex flex-col">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-lg text-white">
               {user.name || 'Anonymous'}
@@ -64,10 +73,27 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
               {t('joinedOn')} {joinedOn}
             </p>
           )}
+          <button
+            type="button"
+            onClick={() => setIsFollowersModalOpen(true)}
+            className="text-white/60 text-sm mt-1 hover:text-white/80 transition-colors text-left flex items-center gap-1"
+          >
+            {t('followers', { count: followerCount })}
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      {additionalContent}
+      <FollowersModal
+        isOpen={isFollowersModalOpen}
+        onClose={() => setIsFollowersModalOpen(false)}
+        userId={user._id}
+      />
+
+      <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+        <FollowButton userId={user._id} variant="md" />
+        {additionalContent}
+      </div>
     </div>
   );
 };

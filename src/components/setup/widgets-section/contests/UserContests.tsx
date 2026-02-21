@@ -1,3 +1,4 @@
+import { User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -15,6 +16,10 @@ import {
   useToggleLikeContestMutation,
   useToggleSaveContestMutation,
 } from '@/api/contests';
+import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
+import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
+import { PinIcon } from '@/assets/icons/PinIcon';
+import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
@@ -317,17 +322,32 @@ const UserContests: React.FC<UserContestsProps> = ({
             label={t('widgets.contests.yourContests')}
             onClick={() => setView('yours')}
             isActive={view === 'yours'}
+            Icon={<User className="w-4 h-4 flex-none" />}
           />
           <Badge
             label={t('widgets.saved')}
             onClick={() => setView('saved')}
             isActive={view === 'saved'}
+            Icon={
+              view === 'saved' ? (
+                <BookmarkCheckIcon className="w-4 h-4 flex-none" />
+              ) : (
+                <BookmarkIcon className="w-4 h-4 flex-none" />
+              )
+            }
           />
           {!!activeContest && (
             <Badge
               label={t('widgets.active')}
               onClick={() => setView('current')}
               isActive={view === 'current'}
+              Icon={
+                view === 'current' ? (
+                  <PinSolidIcon className="w-4 h-4 flex-none" />
+                ) : (
+                  <PinIcon className="w-4 h-4 flex-none" />
+                )
+              }
             />
           )}
         </div>

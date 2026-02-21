@@ -287,7 +287,14 @@
       "username": "Nazwa użytkownika",
       "name": "Nazwa",
       "profileUpdatedSuccessfully": "Profil zaktualizowany pomyślnie!",
-      "joinedOn": "Dołączył"
+      "joinedOn": "Dołączył",
+      "followers": "{count} {count, plural, =1 {obserwujący} few {obserwujący} other {obserwujących}}",
+      "yourProfile": "Twój profil",
+      "following": "Obserwujący",
+      "followedUser": "Obserwowany pomyślnie!",
+      "unfollowedUser": "Obserwowany pomyślnie!",
+      "follow": "Obserwuj",
+      "signInToFollow": "Zaloguj się, aby obserwować"
     },
     "contentType": {
       "all": "Wszystkie",
@@ -296,7 +303,8 @@
     },
     "foundNItems": "Znaleziono {count} {count, plural, =1 {element} other {elementów}}",
     "userProfile": {
-      "noContentFound": "Brak treści pasujących do wyszukiwania."
+      "noContentFound": "Brak treści pasujących do wyszukiwania.",
+      "noFollowingContent": "Brak treści od osób, które obserwujesz. Obserwuj osoby, aby zobaczyć ich motywy i konkursy tutaj."
     },
     "contests": {
       "title": "Konkursy",

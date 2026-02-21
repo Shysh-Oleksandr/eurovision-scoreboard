@@ -270,7 +270,7 @@
     "quickSelectRemoved": "Removed from quick select!",
     "profile": {
       "title": "Profile",
-      "description": "Manage your profile and settings",
+      "description": "Manage your profile and followers",
       "continueWithGoogle": "Continue with Google",
       "editProfile": "Edit Profile",
       "authDescription": "Authenticate to be able to create a profile, use custom countries, and more.",
@@ -284,7 +284,14 @@
       "username": "Username",
       "name": "Name",
       "profileUpdatedSuccessfully": "Profile updated successfully!",
-      "joinedOn": "Joined on"
+      "joinedOn": "Joined on",
+      "followers": "{count} {count, plural, =1 {follower} other {followers}}",
+      "yourProfile": "Your profile",
+      "following": "Following",
+      "follow": "Follow",
+      "signInToFollow": "Sign in to follow",
+      "followedUser": "Followed user!",
+      "unfollowedUser": "Unfollowed user!"
     },
     "contentType": {
       "all": "All",
@@ -293,7 +300,8 @@
     },
     "foundNItems": "Found {count} {count, plural, =1 {item} other {items}}",
     "userProfile": {
-      "noContentFound": "No content found matching your search."
+      "noContentFound": "No content found matching your search.",
+      "noFollowingContent": "No content from people you follow yet. Follow users to see their themes and contests here."
     },
     "contests": {
       "title": "Contests",

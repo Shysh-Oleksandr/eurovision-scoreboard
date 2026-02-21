@@ -1,3 +1,5 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 
@@ -11,8 +13,8 @@ import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
 import { useContestsStateQuery } from '@/api/contests';
+import { useFollowingFeedQuery } from '@/api/follows';
 import { useThemesStateQuery } from '@/api/themes';
-import { useUserContentQuery } from '@/api/userContent';
 import type { UserContentType } from '@/api/userContent';
 import Button from '@/components/common/Button';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -21,16 +23,14 @@ import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
 import { CustomTheme } from '@/types/customTheme';
 
-interface UserContentSectionProps {
-  userId: string;
+interface FollowingFeedSectionProps {
   onDuplicate?: (theme: CustomTheme) => void;
   onEditTheme?: (theme: CustomTheme) => void;
   onEditContest?: (contest: Contest) => void;
   onLoadContest?: (contest: Contest) => void;
 }
 
-const UserContentSection: React.FC<UserContentSectionProps> = ({
-  userId,
+const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
   onDuplicate,
   onEditTheme,
   onEditContest,
@@ -55,7 +55,7 @@ const UserContentSection: React.FC<UserContentSectionProps> = ({
       : 'createdAt';
   const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
 
-  const { data, isLoading } = useUserContentQuery(userId, {
+  const { data, isLoading } = useFollowingFeedQuery({
     page,
     type: contentType,
     search: debouncedSearch,
@@ -63,6 +63,7 @@ const UserContentSection: React.FC<UserContentSectionProps> = ({
     sortOrder: serverSortOrder,
     startDate: dateRange?.startDate ?? undefined,
     endDate: dateRange?.endDate ?? undefined,
+    enabled: true,
   });
 
   const themeActions = usePublicThemeActions();
@@ -205,7 +206,7 @@ const UserContentSection: React.FC<UserContentSectionProps> = ({
       ) : (
         <div className="text-center sm:py-12 py-8">
           <p className="text-white/70">
-            {t('widgets.userProfile.noContentFound')}
+            {t('widgets.userProfile.noFollowingContent')}
           </p>
         </div>
       )}
@@ -213,4 +214,4 @@ const UserContentSection: React.FC<UserContentSectionProps> = ({
   );
 };
 
-export default UserContentSection;
+export default FollowingFeedSection;

@@ -287,7 +287,14 @@
       "username": "Ім’я користувача",
       "name": "Ім’я",
       "profileUpdatedSuccessfully": "Профіль успішно оновлено!",
-      "joinedOn": "Приєднався"
+      "joinedOn": "Приєднався",
+      "followers": "{count} {count, plural, =1 {підписник} few {підписники} other {підписників}}",
+      "yourProfile": "Ваш профіль",
+      "following": "Підписані",
+      "followedUser": "Підписано!",
+      "unfollowedUser": "Відписано!",
+      "follow": "Підписатись",
+      "signInToFollow": "Увійдіть, щоб підписатись"
     },
     "contentType": {
       "all": "Усе",
@@ -296,7 +303,8 @@
     },
     "foundNItems": "Знайдено {count} {count, plural, =1 {елемент} other {елементів}}",
     "userProfile": {
-      "noContentFound": "За вашим запитом нічого не знайдено."
+      "noContentFound": "За вашим запитом нічого не знайдено.",
+      "noFollowingContent": "Немає контенту від людей, яких ви слідуєте. Слідуйте за людьми, щоб побачити їх теми та конкурси тут."
     },
     "contests": {
       "title": "Конкурси",

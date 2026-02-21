@@ -526,7 +526,6 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                       setUploadedFile(null);
                       imageUpload.clear();
                     }}
-                    className="text-sm"
                     placeholder={t('common.pasteImageUrl')}
                     disabled={!!uploadedFile}
                   />

@@ -2,6 +2,7 @@ import React from 'react';
 
 import Image from 'next/image';
 
+import FollowButton from '@/components/common/FollowButton';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
@@ -56,50 +57,60 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
     (state) => state.setSelectedProfileUser,
   );
 
-  const hasSelectedProfileUser = !!selectedProfileUser;
+  const isViewedUser = selectedProfileUser?._id === user?._id;
 
   if (!user) return null;
   const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
 
   return (
     <div
-      className={`flex items-center gap-2.5 rounded-md p-1 ${
-        hasSelectedProfileUser
+      className={`flex items-center flex-wrap justify-between gap-2.5 rounded-md p-1 ${
+        isViewedUser
           ? ''
           : 'transition-colors duration-300 cursor-pointer hover:bg-primary-800/60'
       }`}
-      onClick={() => !hasSelectedProfileUser && setSelectedProfileUser?.(user)}
-      role={hasSelectedProfileUser ? undefined : 'button'}
+      onClick={() => !isViewedUser && setSelectedProfileUser?.(user)}
+      role={isViewedUser ? undefined : 'button'}
     >
-      <Image
-        src={user.avatarUrl || '/img/ProfileAvatarPlaceholder.png'}
-        alt={user.username || 'avatar'}
-        className={`${s.avatar} rounded-full object-cover`}
-        width={24}
-        height={24}
-        onError={(e) => {
-          e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
-        }}
-      />
-      <div>
-        <div className="flex items-center gap-1.5">
-          <div className={`font-semibold ${s.name}`}>
-            {user.name || 'Anonymous'}
+      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <Image
+          src={user.avatarUrl || '/img/ProfileAvatarPlaceholder.png'}
+          alt={user.username || 'avatar'}
+          className={`${s.avatar} rounded-full object-cover`}
+          width={24}
+          height={24}
+          onError={(e) => {
+            e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
+          }}
+        />
+        <div className="space-y-[1px] flex flex-col">
+          <div className="flex items-center gap-1.5 !min-h-[21px]">
+            <div className={`font-semibold ${s.name}`}>
+              {user.name || 'Anonymous'}
+            </div>
+            {user.country && logo && (
+              <Image
+                src={logo}
+                alt={`${user.country} flag`}
+                className={`flex-none rounded-sm pointer-events-none ${
+                  isExisting ? s.flagExisting : `${s.flag} object-cover`
+                }`}
+                width={24}
+                height={24}
+                unoptimized
+              />
+            )}
           </div>
-          {user.country && logo && (
-            <Image
-              src={logo}
-              alt={`${user.country} flag`}
-              className={`flex-none rounded-sm pointer-events-none ${
-                isExisting ? s.flagExisting : `${s.flag} object-cover`
-              }`}
-              width={24}
-              height={24}
-              unoptimized
-            />
-          )}
+          <span className={`${s.username} text-white/70`}>
+            @{user.username}
+          </span>
         </div>
-        <span className={`${s.username} text-white/70`}>@{user.username}</span>
+      </div>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex-shrink-0 ml-auto"
+      >
+        <FollowButton userId={user._id} variant={size === 'sm' ? 'sm' : 'md'} />
       </div>
     </div>
   );
