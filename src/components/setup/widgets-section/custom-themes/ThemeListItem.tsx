@@ -1,6 +1,9 @@
+import { Share2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+
+import { useHandleShare } from '../../hooks/useHandleShare';
 
 import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
 
@@ -78,7 +81,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
       console.error('Failed to toggle quick select:', error);
     }
   };
-
+  const handleShare = useHandleShare();
   const [points, setPoints] = useState(42);
   const [lastPoints, setLastPoints] = useState<number | null>(12);
   const [showDouzePointsAnimation, setShowDouzePointsAnimation] =
@@ -262,6 +265,14 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           }
         >
           {t('widgets.quickSelect')}
+        </Button>
+        <Button
+          variant="tertiary"
+          onClick={() => handleShare('theme', theme._id, theme.name)}
+          className={`!py-2 !px-4 !text-base`}
+          Icon={<Share2 className="sm:size-6 size-5" />}
+        >
+          {t('simulation.header.share')}
         </Button>
       </div>
     </div>

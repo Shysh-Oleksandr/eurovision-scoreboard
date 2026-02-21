@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
+import { useShareLinks } from '@/hooks/useShareLinks';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -18,6 +19,7 @@ export default function AppBootstrap() {
   useThemeSetup();
   useActiveThemeSync();
   useActiveContestSync();
+  useShareLinks();
 
   const t = useTranslations('widgets.profile');
   const { handlePostLogin, user } = useAuthStore();

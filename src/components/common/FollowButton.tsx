@@ -80,14 +80,22 @@ const FollowButton: React.FC<FollowButtonProps> = ({
         disabled={isLoading || isMutating}
         isLoading={isMutating}
         className={cn(
-          '!gap-1.5 min-w-[80px]',
-          variant === 'sm' ? '!py-2 !px-2.5 !text-xs' : '!py-2 !px-3 !text-sm',
+          '!gap-1.5 min-w-[80px] !py-2.5 !px-3',
+          variant === 'sm' ? '!text-xs' : '!text-sm',
         )}
         Icon={
           isFollowing ? (
-            <UserCheckIcon className="w-4 h-4 flex-none" />
+            <UserCheckIcon
+              className={`${
+                variant === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
+              } flex-none`}
+            />
           ) : (
-            <UserPlus className="w-4 h-4 flex-none" />
+            <UserPlus
+              className={`${
+                variant === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
+              } flex-none`}
+            />
           )
         }
       />

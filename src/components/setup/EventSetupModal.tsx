@@ -76,6 +76,14 @@ const UserProfileModal = dynamic(
   () => import('./widgets-section/user-profile/UserProfileModal'),
   { ssr: false },
 );
+const ThemeShareModal = dynamic(
+  () => import('./widgets-section/custom-themes/ThemeShareModal'),
+  { ssr: false },
+);
+const ContestShareModal = dynamic(
+  () => import('./widgets-section/contests/ContestShareModal'),
+  { ssr: false },
+);
 
 const EventSetupModal = () => {
   const t = useTranslations();
@@ -148,6 +156,18 @@ const EventSetupModal = () => {
     (state) => state.setThemeToDuplicate,
   );
   const setContestToEdit = useGeneralStore((state) => state.setContestToEdit);
+  const selectedShareTheme = useGeneralStore(
+    (state) => state.selectedShareTheme,
+  );
+  const setSelectedShareTheme = useGeneralStore(
+    (state) => state.setSelectedShareTheme,
+  );
+  const selectedShareContest = useGeneralStore(
+    (state) => state.selectedShareContest,
+  );
+  const setSelectedShareContest = useGeneralStore(
+    (state) => state.setSelectedShareContest,
+  );
   const { clear } = useScoreboardStore.temporal.getState();
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -609,6 +629,37 @@ const EventSetupModal = () => {
             setIsContestsModalOpen(true);
           }}
           onLoadContest={handleProfileLoadContest}
+        />
+      )}
+
+      {/* Theme Share Modal (from share link) */}
+      {selectedShareTheme && (
+        <ThemeShareModal
+          theme={selectedShareTheme}
+          onClose={() => setSelectedShareTheme(null)}
+          onDuplicate={(theme) => {
+            setSelectedShareTheme(null);
+            setThemeToDuplicate({ ...theme, name: `${theme.name} (Copy)` });
+            setIsThemesModalOpen(true);
+          }}
+          onEdit={(theme) => {
+            setSelectedShareTheme(null);
+            setThemeToEdit(theme);
+            setIsThemesModalOpen(true);
+          }}
+        />
+      )}
+
+      {/* Contest Share Modal (from share link) */}
+      {selectedShareContest && (
+        <ContestShareModal
+          contest={selectedShareContest}
+          onClose={() => setSelectedShareContest(null)}
+          onEdit={(contest) => {
+            setSelectedShareContest(null);
+            setContestToEdit(contest);
+            setIsContestsModalOpen(true);
+          }}
         />
       )}
     </>

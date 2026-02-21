@@ -242,6 +242,10 @@ export interface GeneralState {
   setIsContestsModalOpen: (open: boolean) => void;
   selectedProfileUser: ThemeCreator | null;
   setSelectedProfileUser: (user: ThemeCreator | null) => void;
+  selectedShareTheme: CustomTheme | null;
+  setSelectedShareTheme: (theme: CustomTheme | null) => void;
+  selectedShareContest: Contest | null;
+  setSelectedShareContest: (contest: Contest | null) => void;
   isThemesModalOpen: boolean;
   setIsThemesModalOpen: (open: boolean) => void;
   themeToEdit: CustomTheme | null;
@@ -300,6 +304,8 @@ export const useGeneralStore = create<GeneralState>()(
         contestToLoad: null,
         isContestsModalOpen: false,
         selectedProfileUser: null,
+        selectedShareTheme: null,
+        selectedShareContest: null,
         isThemesModalOpen: false,
         themeToEdit: null,
         themeToDuplicate: null,
@@ -426,6 +432,12 @@ export const useGeneralStore = create<GeneralState>()(
         },
         setSelectedProfileUser: (user: ThemeCreator | null) => {
           set({ selectedProfileUser: user });
+        },
+        setSelectedShareTheme: (theme: CustomTheme | null) => {
+          set({ selectedShareTheme: theme });
+        },
+        setSelectedShareContest: (contest: Contest | null) => {
+          set({ selectedShareContest: contest });
         },
         setIsThemesModalOpen: (open: boolean) => {
           set({ isThemesModalOpen: open });

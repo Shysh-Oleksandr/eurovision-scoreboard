@@ -18,6 +18,10 @@ export function useMeProfileQuery(enabled: boolean = true) {
   });
 }
 
+export function fetchProfileById(id: string) {
+  return api.get<Profile>(`/profiles/${id}`);
+}
+
 export function useUpdateProfileMutation() {
   const qc = useQueryClient();
   return useMutation({

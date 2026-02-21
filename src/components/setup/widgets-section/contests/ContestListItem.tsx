@@ -1,8 +1,11 @@
+import { Share2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import { toast } from 'react-toastify';
 
 import Image from 'next/image';
+
+import { useHandleShare } from '../../hooks/useHandleShare';
 
 import { useToggleContestQuickSelectMutation } from '@/api/quickSelect';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
@@ -63,6 +66,9 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const locale = useLocale();
 
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+
+  const handleShare = useHandleShare();
+
   const { winnerName, winnerFlag } = useMemo(() => {
     if (!contest.winner)
       return { winnerName: undefined, winnerFlag: undefined };
@@ -386,6 +392,14 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
           }
         >
           {t('widgets.quickSelect')}
+        </Button>
+        <Button
+          variant="tertiary"
+          onClick={() => handleShare('contest', contest._id, contest.name)}
+          className={`!py-2 !px-4 !text-base`}
+          Icon={<Share2 className="sm:size-6 size-5" />}
+        >
+          {t('simulation.header.share')}
         </Button>
       </div>
     </div>

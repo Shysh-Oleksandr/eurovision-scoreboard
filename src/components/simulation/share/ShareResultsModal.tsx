@@ -1,5 +1,7 @@
+import { Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import Image from 'next/image';
 
@@ -56,6 +58,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   );
   const contestName = useGeneralStore((state) => state.settings.contestName);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
+  const activeContest = useGeneralStore((state) => state.activeContest);
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const currentStageId = useScoreboardStore(
     (state) => state.viewedStageId || state.currentStageId,
@@ -137,6 +140,38 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
     link.download = `${defaultTitle} - ${defaultSubtitle} - DouzePoints.app - ${Date.now()}.png`;
     link.href = generatedImageUrl;
     link.click();
+  };
+
+  const handleShareImage = async () => {
+    if (!generatedImageUrl) return;
+
+    try {
+      const res = await fetch(generatedImageUrl);
+      const blob = await res.blob();
+      const file = new File([blob], `${defaultTitle} - DouzePoints.app.png`, {
+        type: blob.type || 'image/png',
+      });
+
+      const shareData = {
+        title: defaultTitle,
+        text: defaultSubtitle,
+        files: [file],
+        url:
+          window.location.href +
+          (activeContest ? `?contest=${activeContest._id}` : ''),
+      };
+
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        toast.error('Sharing is not supported on this device.');
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') {
+        console.error('Share failed:', err);
+        toast.error('Failed to share');
+      }
+    }
   };
 
   const updateImageSetting = (key: string, value: any) => {
@@ -741,14 +776,22 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
               width={1024}
               height={768}
             />
-            <Button
-              onClick={handleDownload}
-              className="mt-4 w-full justify-center"
-              variant="tertiary"
-              Icon={<DownloadIcon className="w-[20px] h-[20px]" />}
-            >
-              {t('share.downloadImage')}
-            </Button>
+            <div className="mt-4 flex gap-2">
+              <Button
+                onClick={handleDownload}
+                className="flex-1 justify-center"
+                variant="tertiary"
+                Icon={<DownloadIcon className="w-[20px] h-[20px]" />}
+              >
+                {t('share.downloadImage')}
+              </Button>
+              <Button
+                onClick={handleShareImage}
+                className="justify-center !px-8 !text-base"
+                variant="tertiary"
+                Icon={<Share2 className="size-6" />}
+              ></Button>
+            </div>
           </div>
         )}
       </div>

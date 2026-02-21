@@ -1,12 +1,15 @@
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Share2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import Image from 'next/image';
 
+import { useHandleShare } from '../../hooks/useHandleShare';
+
 import FollowersModal from './FollowersModal';
 
 import { useFollowingStatusQuery } from '@/api/follows';
+import Button from '@/components/common/Button';
 import FollowButton from '@/components/common/FollowButton';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
@@ -21,12 +24,14 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   additionalContent,
 }) => {
   const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
-  const t = useTranslations('widgets.profile');
+  const t = useTranslations();
   const locale = useLocale();
   const { data: followStatus } = useFollowingStatusQuery(user._id);
   const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
 
   const followerCount = followStatus?.followerCount ?? user.followerCount ?? 0;
+
+  const handleShare = useHandleShare();
 
   const joinedOn = user.createdAt
     ? new Date(user.createdAt).toLocaleDateString(locale, {
@@ -70,7 +75,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           <span className="text-white/70 text-sm">@{user.username}</span>
           {joinedOn && (
             <p className="text-white/60 text-sm mt-1">
-              {t('joinedOn')} {joinedOn}
+              {t('widgets.profile.joinedOn')} {joinedOn}
             </p>
           )}
           <button
@@ -78,7 +83,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
             onClick={() => setIsFollowersModalOpen(true)}
             className="text-white/60 text-sm mt-1 hover:text-white/80 transition-colors text-left flex items-center gap-1"
           >
-            {t('followers', { count: followerCount })}
+            {t('widgets.profile.followers', { count: followerCount })}
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -90,8 +95,14 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
         userId={user._id}
       />
 
-      <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+      <div className="flex flex-wrap items-center gap-2 flex-shrink-0 ml-auto">
         <FollowButton userId={user._id} variant="md" />
+        <Button
+          variant="tertiary"
+          onClick={() => handleShare('profile', user._id, user.name || '')}
+          className={`!py-2 !px-4 !text-base`}
+          Icon={<Share2 className="sm:size-6 size-5" />}
+        ></Button>
         {additionalContent}
       </div>
     </div>
