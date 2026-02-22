@@ -635,6 +635,8 @@
       "removeSavedContest": "Von gespeicherten Wettbewerben entfernen",
       "removeSavedTheme": "Von gespeicherten Themes entfernen",
       "deleteCustomCountry": "Benutzerdefiniertes Land löschen",
+      "deleteCustomEntries": "Benutzerdefinierte Beiträge löschen",
+      "deleteCustomEntriesDescription": "Möchtest du {count} ausgewählte benutzerdefinierte Beiträge löschen?",
       "deleteTheme": "Theme löschen",
       "cancelSimulation": "Simulation abbrechen",
       "logout": "Abmelden",

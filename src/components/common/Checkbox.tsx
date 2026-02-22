@@ -34,3 +34,29 @@ export const Checkbox = ({
     </div>
   );
 };
+
+export const CheckboxButton = ({
+  id,
+  className = '',
+  ...rest
+}: Omit<CheckboxProps, 'label' | 'labelClassName'>) => {
+  const checkSymbolId = `check-${id}`;
+
+  return (
+    <div className={`checkbox-wrapper ${className}`}>
+      <input className="inp-cbx" id={id} type="checkbox" {...rest} />
+      <label className="cbx !mr-1 !p-1" htmlFor={id}>
+        <span>
+          <svg width="12px" height="10px">
+            <use xlinkHref={`#${checkSymbolId}`} />
+          </svg>
+        </span>
+      </label>
+      <svg className="inline-svg">
+        <symbol id={checkSymbolId} viewBox="0 0 12 10">
+          <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+        </symbol>
+      </svg>
+    </div>
+  );
+};

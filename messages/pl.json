@@ -635,6 +635,8 @@
       "removeSavedContest": "Usuń zapisany konkurs",
       "removeSavedTheme": "Usuń zapisany motyw",
       "deleteCustomCountry": "Usuń własny wpis",
+      "deleteCustomEntries": "Usuń {count} wybranych własnych wpisów",
+      "deleteCustomEntriesDescription": "Czy na pewno chcesz usunąć {count} wybranych własnych wpisów?",
       "deleteTheme": "Usuń motyw",
       "cancelSimulation": "Anuluj symulację",
       "logout": "Wyloguj się",

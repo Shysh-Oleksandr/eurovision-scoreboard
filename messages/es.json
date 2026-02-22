@@ -635,6 +635,8 @@
       "removeSavedContest": "Eliminar concurso guardado",
       "removeSavedTheme": "Eliminar tema guardado",
       "deleteCustomCountry": "Eliminar entrada personalizada",
+      "deleteCustomEntries": "Eliminar {count} entradas personalizadas seleccionadas",
+      "deleteCustomEntriesDescription": "¿Estás seguro de que quieres eliminar {count} entradas personalizadas seleccionadas?",
       "deleteTheme": "Eliminar tema",
       "cancelSimulation": "Cancelar simulación",
       "logout": "Cerrar sesión",

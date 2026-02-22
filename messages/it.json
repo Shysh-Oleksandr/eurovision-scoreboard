@@ -635,6 +635,8 @@
       "removeSavedContest": "Rimuovi concorso salvato",
       "removeSavedTheme": "Rimuovi tema salvato",
       "deleteCustomCountry": "Elimina voce personalizzata",
+      "deleteCustomEntries": "Elimina {count} voci personalizzate selezionate",
+      "deleteCustomEntriesDescription": "Sei sicuro di voler eliminare {count} voci personalizzate selezionate?",
       "deleteTheme": "Elimina tema",
       "cancelSimulation": "Annulla simulazione",
       "logout": "Esci",

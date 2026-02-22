@@ -83,6 +83,18 @@ export function useDeleteCustomEntryMutation() {
   });
 }
 
+export function useBulkDeleteCustomEntriesMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      await api.delete('/custom-entries/bulk', { data: { ids } });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });
+    },
+  });
+}
+
 export function useUploadCustomEntryFlagMutation() {
   const qc = useQueryClient();
   return useMutation({

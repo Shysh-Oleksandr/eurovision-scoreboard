@@ -48,9 +48,9 @@ const UnifiedStageSetup: React.FC<UnifiedStageSetupProps> = ({
           <SectionWrapper
             key={stage.id}
             title={stage.name}
-            countriesCount={stage.countries.length}
+            countries={stage.countries}
             defaultExpanded
-            onBulkAssign={(group) => onBulkAssign(stage.countries, group)}
+            onBulkAssign={(countries, group) => onBulkAssign(countries, group)}
             availableGroups={availableGroups}
             currentGroup={stage.id}
             extraContent={
@@ -111,9 +111,9 @@ const UnifiedStageSetup: React.FC<UnifiedStageSetupProps> = ({
       {isGfOnly && (
         <SectionWrapper
           title={t('setup.eventSetupModal.notQualified')}
-          countriesCount={notQualifiedCountries.length}
+          countries={notQualifiedCountries}
           defaultExpanded
-          onBulkAssign={(group) => onBulkAssign(notQualifiedCountries, group)}
+          onBulkAssign={(countries, group) => onBulkAssign(countries, group)}
           availableGroups={availableGroups}
           currentGroup={CountryAssignmentGroup.NOT_QUALIFIED}
         >

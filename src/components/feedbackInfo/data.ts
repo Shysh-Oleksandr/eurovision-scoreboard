@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-02-22',
+    title:
+      'Added the ability to select multiple entries in a section and move them in bulk',
+  },
+  {
     date: '2026-02-21',
     title:
       'Added the ability to follow other users and see the feed with their activities. The ability to share a profile, theme, or contest by link. Small improvements',
@@ -322,7 +327,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-02-22', end: '2026-02-22' },
+    approximateDates: { start: '2026-02-28', end: '2026-03-01' },
     title: 'Categorize custom entries. Theme customization improvements.',
   },
   {

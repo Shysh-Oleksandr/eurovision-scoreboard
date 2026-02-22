@@ -10,6 +10,8 @@ import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { useConfirmationStore } from '@/state/confirmationStore';
 
+const IGNORE_DO_NOT_SHOW_AGAIN_KEYS = ['delete-custom-entries'];
+
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -78,12 +80,14 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <div className="text-white/80 leading-6">{description}</div>
         )}
 
-        <Checkbox
-          id="confirmation"
-          label={t('common.dontShowAgain')}
-          checked={doNotShowAgain}
-          onChange={(e) => setDoNotShowAgain(e.target.checked)}
-        />
+        {!IGNORE_DO_NOT_SHOW_AGAIN_KEYS.includes(confirmationKey || '') && (
+          <Checkbox
+            id="confirmation"
+            label={t('common.dontShowAgain')}
+            checked={doNotShowAgain}
+            onChange={(e) => setDoNotShowAgain(e.target.checked)}
+          />
+        )}
       </div>
     </Modal>
   );

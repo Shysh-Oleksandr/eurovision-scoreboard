@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 import { PlusIcon } from '../../assets/icons/PlusIcon';
@@ -14,8 +14,12 @@ import { useCountrySearch } from './hooks/useCountrySearch';
 import { useGetCategoryLabel } from './hooks/useGetCategoryLabel';
 import SearchInputIcon from './SearchInputIcon';
 import SectionWrapper from './SectionWrapper';
+import { getCustomEntryId } from './utils/getCustomEntryId';
 
-import { useBulkCreateCustomEntriesMutation } from '@/api/customEntries';
+import {
+  useBulkCreateCustomEntriesMutation,
+  useBulkDeleteCustomEntriesMutation,
+} from '@/api/customEntries';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
@@ -56,6 +60,18 @@ const NotParticipatingSection = ({
     groupedNotParticipatingCountries,
     sortedCategories,
   } = useCountrySearch(notParticipatingCountries);
+
+  const { mutateAsync: bulkDeleteCustomEntries } =
+    useBulkDeleteCustomEntriesMutation();
+
+  const handleBulkDeleteCustomEntries = useCallback(
+    (countries: BaseCountry[]) => {
+      bulkDeleteCustomEntries(
+        countries.map((c) => getCustomEntryId(c.code) || '').filter(Boolean),
+      );
+    },
+    [bulkDeleteCustomEntries],
+  );
 
   // Filter out Imported category if empty
   const filteredSortedCategories = sortedCategories.filter(
@@ -190,15 +206,14 @@ const NotParticipatingSection = ({
           <SectionWrapper
             key={category}
             title={getCategoryLabel(category)}
-            countriesCount={groupedNotParticipatingCountries[category].length}
+            category={category}
+            countries={groupedNotParticipatingCountries[category]}
             isExpanded={!!expandedCategories[category]}
             onToggle={() => handleToggleCategory(category)}
-            onBulkAssign={(group) =>
-              handleBulkCountryAssignment(
-                groupedNotParticipatingCountries[category],
-                group,
-              )
+            onBulkAssign={(countries, group) =>
+              handleBulkCountryAssignment(countries, group)
             }
+            onBulkDelete={handleBulkDeleteCustomEntries}
             availableGroups={availableGroups}
             currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
             getLabel={

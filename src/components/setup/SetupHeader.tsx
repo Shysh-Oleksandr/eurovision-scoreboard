@@ -352,7 +352,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
             <Button
               label={t('setup.eventSetupModal.grandFinalOnly')}
               className={`!px-1 !py-0 h-[42px] normal-case w-[48px] !text-[0.8rem] !leading-4  ${
-                isGfOnly ? 'ring-primary-700/80 ring-2  ring-solid' : ''
+                isGfOnly ? 'ring-primary-700/80 ring-2 ring-solid' : ''
               }`}
               onClick={handleGfOnlyChange}
             />

@@ -635,6 +635,8 @@
       "removeSavedContest": "Вилучити збережений конкурс",
       "removeSavedTheme": "Вилучити збережену тему",
       "deleteCustomCountry": "Вилучити користувацького учасника",
+      "deleteCustomEntries": "Вилучити {count} вибраних користувацьких учасників",
+      "deleteCustomEntriesDescription": "Ви впевнені, що хочете вилучити {count} вибраних користувацьких учасників?",
       "deleteTheme": "Вилучити тему",
       "cancelSimulation": "Скасувати симуляцію",
       "logout": "Вийти",

@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
@@ -36,6 +37,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           variant="destructive"
           onClick={onDelete}
           snowEffect="left"
+          Icon={<Trash2 className="w-5 h-5" />}
         >
           {t('delete')}
         </Button>

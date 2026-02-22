@@ -635,6 +635,8 @@
       "removeSavedContest": "Αφαίρεση αποθηκευμένου διαγωνισμού",
       "removeSavedTheme": "Αφαίρεση αποθηκευμένου θέματος",
       "deleteCustomCountry": "Διαγραφή προσαρμοσμένης καταχώρησης",
+      "deleteCustomEntries": "Διαγραφή {count} επιλεγμένων προσαρμοσμένων καταχωρήσεων",
+      "deleteCustomEntriesDescription": "Είστε βέβαιοι ότι θέλετε να διαγράψετε {count} επιλεγμένων προσαρμοσμένων καταχωρήσεων?",
       "deleteTheme": "Διαγραφή θέματος",
       "cancelSimulation": "Ακύρωση προσομοίωσης",
       "logout": "Αποσύνδεση",

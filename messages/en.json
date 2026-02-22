@@ -632,6 +632,8 @@
       "removeSavedContest": "Remove saved contest",
       "removeSavedTheme": "Remove saved theme",
       "deleteCustomCountry": "Delete custom entry",
+      "deleteCustomEntries": "Delete {count} selected custom {count, plural, =1 {entry} other {entries}}",
+      "deleteCustomEntriesDescription": "Are you sure you want to delete {count} selected custom {count, plural, =1 {entry} other {entries}}?",
       "deleteTheme": "Delete theme",
       "cancelSimulation": "Cancel simulation",
       "logout": "Logout",

@@ -63,8 +63,7 @@ export async function generateMetadata({
     },
     icons: {
       icon: [
-        { url: '/img/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-        { url: '/img/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/img/favicon-32x32.ico', sizes: '32x32', type: 'image/x-icon' },
         { url: '/img/favicon-64x64.png', sizes: '64x64', type: 'image/png' },
         {
           url: '/img/favicon-128x128.png',

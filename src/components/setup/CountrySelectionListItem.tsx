@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { ArrowIcon } from '../../assets/icons/ArrowIcon';
 import { PencilIcon } from '../../assets/icons/PencilIcon';
 import { getFlagPath } from '../../helpers/getFlagPath';
 import { BaseCountry, CountryAssignmentGroup } from '../../models';
+import { CheckboxButton } from '../common/Checkbox';
+
+import { SectionMultiselectContext } from './SectionMultiselectContext';
 
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -42,6 +45,11 @@ export const CountrySelectionListItem: React.FC<
   availableGroups = Object.values(CountryAssignmentGroup),
   onEdit,
 }) => {
+  const multiselectContext = useContext(SectionMultiselectContext);
+  const isMultiselectEnabled =
+    multiselectContext?.isMultiselectEnabled ?? false;
+  const isSelected = multiselectContext?.isSelected(country.code) ?? false;
+  const onToggleSelect = multiselectContext?.onToggleSelect;
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
@@ -62,12 +70,41 @@ export const CountrySelectionListItem: React.FC<
     shouldShowHeartFlagIcon,
   );
 
+  const handleItemClick = () => {
+    if (isMultiselectEnabled && onToggleSelect) {
+      onToggleSelect(country.code);
+    }
+  };
+
   return (
     <div
+      role={isMultiselectEnabled ? 'button' : undefined}
+      tabIndex={isMultiselectEnabled ? 0 : undefined}
+      onKeyDown={
+        isMultiselectEnabled
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleItemClick();
+              }
+            }
+          : undefined
+      }
+      onClick={handleItemClick}
       className={`flex items-center bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 hover:!bg-primary-700 p-2 rounded-md transition-colors duration-300 relative ${
-        countryGroupAssignment ? '' : 'pointer-events-none'
+        countryGroupAssignment || isMultiselectEnabled
+          ? 'cursor-pointer'
+          : 'pointer-events-none'
       }`}
     >
+      {isMultiselectEnabled && (
+        <CheckboxButton
+          id={`country-selection-list-item-${country.code}`}
+          checked={isSelected}
+          readOnly
+          className="pointer-events-none"
+        />
+      )}
       <img
         src={logo}
         loading={shouldLazyLoad ? 'lazy' : 'eager'}
@@ -102,31 +139,33 @@ export const CountrySelectionListItem: React.FC<
         </button>
       )}
 
-      {countryGroupAssignment && onAssignCountryAssignment && (
-        <>
-          <ArrowIcon className="text-white w-6 h-6 rotate-90" />
-          <select
-            value={countryGroupAssignment}
-            onChange={handleAssignmentChange}
-            className="absolute inset-0 opacity-0 cursor-pointer select"
-            id={`country-assignment-${country.code}`}
-            aria-label={`Assign ${country.name} to a group`}
-          >
-            {availableGroups.map((group) => {
-              const value = isStageGroup(group) ? group.id : group;
-              const label = isStageGroup(group)
-                ? group.name
-                : ASSIGNMENT_GROUP_LABELS[group];
+      {countryGroupAssignment &&
+        onAssignCountryAssignment &&
+        !isMultiselectEnabled && (
+          <>
+            <ArrowIcon className="text-white w-6 h-6 rotate-90" />
+            <select
+              value={countryGroupAssignment}
+              onChange={handleAssignmentChange}
+              className="absolute inset-0 opacity-0 cursor-pointer select"
+              id={`country-assignment-${country.code}`}
+              aria-label={`Assign ${country.name} to a group`}
+            >
+              {availableGroups.map((group) => {
+                const value = isStageGroup(group) ? group.id : group;
+                const label = isStageGroup(group)
+                  ? group.name
+                  : ASSIGNMENT_GROUP_LABELS[group];
 
-              return (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              );
-            })}
-          </select>
-        </>
-      )}
+                return (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                );
+              })}
+            </select>
+          </>
+        )}
     </div>
   );
 };

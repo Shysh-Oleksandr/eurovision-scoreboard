@@ -9,6 +9,8 @@ import Modal from '../common/Modal/Modal';
 import ModalBottomContent from '../common/Modal/ModalBottomContent';
 import { Input } from '../Input';
 
+import { getCustomEntryId } from './utils/getCustomEntryId';
+
 import {
   useCreateCustomEntryMutation,
   useDeleteCustomEntryMutation,
@@ -232,12 +234,6 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     setFailedToLoadFlag(false);
   };
 
-  const getEntryId = (): string | null => {
-    if (!countryToEdit?.code.startsWith('custom-')) return null;
-
-    return countryToEdit.code.replace('custom-', '');
-  };
-
   const handleSave = async () => {
     if (!isAuthenticated) {
       toast(t('setup.customCountryModal.pleaseSignInToCreateCustomEntries'), {
@@ -259,7 +255,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       const urlToUpload = uploadedFile ? '' : previewFlag;
 
       if (isEditMode) {
-        const entryId = getEntryId();
+        const entryId = getCustomEntryId(countryToEdit?.code || '');
 
         if (!entryId) {
           toast('Invalid entry ID', { type: 'error' });
@@ -323,7 +319,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       description: t('settings.confirmations.actionCannotBeUndone'),
       onConfirm: async () => {
         try {
-          const entryId = getEntryId();
+          const entryId = getCustomEntryId(countryToEdit.code);
 
           if (!entryId) {
             toast('Invalid entry ID', { type: 'error' });
@@ -566,6 +562,9 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
                   className={`cursor-pointer flex-none w-[50px] h-[37px] object-cover rounded-md border-2 ${
                     flagUrl === preset ? 'border-white' : 'border-transparent'
                   }`}
+                  onError={(e) => {
+                    e.currentTarget.src = getFlagPath('ww');
+                  }}
                   onClick={() => {
                     setFlagUrl(preset);
                     setUploadedFile(null);
@@ -591,7 +590,10 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
               className="rounded-md object-cover w-[100px] h-[70px]"
               width={100}
               height={70}
-              onError={() => setFailedToLoadFlag(true)}
+              onError={(e) => {
+                e.currentTarget.src = getFlagPath('ww');
+                setFailedToLoadFlag(true);
+              }}
               onLoad={() => setFailedToLoadFlag(false)}
             />
           </div>
