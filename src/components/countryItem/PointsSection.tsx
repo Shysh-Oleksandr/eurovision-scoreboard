@@ -3,6 +3,7 @@ import React from 'react';
 import { BaseCountry, Country } from '../../models';
 import RoundedTriangle from '../RoundedTriangle';
 
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { PointsContainerShape } from '@/theme/types';
 
 export interface PointsSectionProps {
@@ -70,7 +71,9 @@ const PointsSection: React.FC<PointsSectionProps> = ({
               isTwoColumnLayout ? 'xs:text-sm text-xs' : 'text-sm'
             } font-semibold h-full items-center flex justify-center will-change-all !z-[40] relative ${lastPointsTextClass}`}
           >
-            {'lastReceivedPoints' in country ? country.lastReceivedPoints : 0}
+            {'lastReceivedPoints' in country
+              ? toFixedIfDecimalFloat(country.lastReceivedPoints ?? 0)
+              : 0}
           </h6>
         </div>
       )}
@@ -95,7 +98,11 @@ const PointsSection: React.FC<PointsSectionProps> = ({
             isTwoColumnLayout ? 'xs:text-sm text-xs' : 'text-sm'
           } font-semibold h-full items-center flex justify-center !z-[40] relative ${pointsTextClass}`}
         >
-          {shouldShowNQLabel ? 'NQ' : 'points' in country ? country.points : 0}
+          {shouldShowNQLabel
+            ? 'NQ'
+            : 'points' in country
+            ? toFixedIfDecimalFloat(country.points)
+            : 0}
         </h6>
       </div>
     </>

@@ -11,6 +11,7 @@ import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
 import { Input } from '../Input';
 
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -251,8 +252,12 @@ const TelevoteInput = () => {
           <div className="flex justify-between text-xs gap-1 text-white/50 mt-1">
             <span>
               {t('simulation.awarded', {
-                count: televoteProgress.totalAwardedPoints,
-                totalAvailablePoints: televoteProgress.totalAvailablePoints,
+                count: toFixedIfDecimalFloat(
+                  televoteProgress.totalAwardedPoints,
+                ),
+                totalAvailablePoints: toFixedIfDecimalFloat(
+                  televoteProgress.totalAvailablePoints,
+                ),
               })}
             </span>
             {(disableLimit || disableLimitForShow) && (

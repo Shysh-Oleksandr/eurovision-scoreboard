@@ -4,6 +4,7 @@ import { Country } from '../../../models';
 import { useCountriesStore } from '../../../state/countriesStore';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 import { SENTINEL } from '@/data/data';
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 
 export const useCountryDisplay = () => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
@@ -47,7 +48,7 @@ export const useCountryDisplay = () => {
         ...country,
         juryPoints: existingCountry?.juryPoints ?? 0,
         televotePoints: existingCountry?.televotePoints ?? 0,
-        points: existingCountry?.points ?? SENTINEL,
+        points: toFixedIfDecimalFloat(existingCountry?.points ?? SENTINEL),
         lastReceivedPoints: existingCountry?.lastReceivedPoints ?? SENTINEL,
         isVotingFinished: existingCountry?.isVotingFinished ?? true,
       };

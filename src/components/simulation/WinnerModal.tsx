@@ -6,6 +6,8 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+
 const WinnerModal = () => {
   const t = useTranslations('simulation.winnerModal');
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
@@ -52,7 +54,7 @@ const WinnerModal = () => {
       <h4 className="lg:text-2xl sm:text-xl text-base font-medium">
         {t.rich('points', {
           country: winnerCountry?.name ?? '',
-          points: winnerCountry?.points ?? '',
+          points: toFixedIfDecimalFloat(winnerCountry?.points ?? 0),
           span: (chunks) => <span className="font-bold">{chunks}</span>,
         })}
       </h4>

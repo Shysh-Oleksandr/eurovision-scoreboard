@@ -8,6 +8,7 @@ import {
   StageVotingType,
 } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 
 export const useFinalStats = () => {
   const t = useTranslations('simulation.finalStats');
@@ -107,7 +108,7 @@ export const useFinalStats = () => {
     return Object.values(votesForStage[type]!).reduce((total, votes) => {
       const vote = votes.find((v) => v.countryCode === countryCode);
 
-      return total + (vote?.points || 0);
+      return toFixedIfDecimalFloat(total + (vote?.points || 0));
     }, 0);
   };
 
@@ -141,7 +142,7 @@ export const useFinalStats = () => {
       return getTotalPointsForCountry(country.code, 'combined');
     }
 
-    return country.points;
+    return toFixedIfDecimalFloat(country.points);
   };
 
   const rankedCountries = [...participatingCountries]
@@ -172,7 +173,7 @@ export const useFinalStats = () => {
     if (!votes) return 0;
     const vote = votes.find((v) => v.countryCode === participantCode);
 
-    return vote ? vote.points : 0;
+    return vote ? toFixedIfDecimalFloat(vote.points) : 0;
   };
 
   const getCellPoints = (participantCode: string, voterCode: string) => {

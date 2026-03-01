@@ -6,6 +6,7 @@ import { Country, EventStage, StageVotingMode } from '../../../models';
 import { useBorderOpacity } from './useBorderOpacity';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useGeneralStore } from '@/state/generalStore';
 import {
   getHostingCountryLogo,
@@ -209,7 +210,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                 </td>
                 <td className={tableStyles.pointsCell}>
                   <span className={tableStyles.pointsText}>
-                    {getPoints(totalCountry, 'combined')}
+                    {toFixedIfDecimalFloat(getPoints(totalCountry, 'combined'))}
                   </span>
                 </td>
 
@@ -254,7 +255,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                     </td>
                     <td className={tableStyles.pointsCell}>
                       <span className={tableStyles.pointsText}>
-                        {getPoints(juryCountry, 'jury')}
+                        {toFixedIfDecimalFloat(getPoints(juryCountry, 'jury'))}
                       </span>
                     </td>
                   </>
@@ -301,7 +302,9 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                     </td>
                     <td className={tableStyles.lastPointsCell}>
                       <span className={tableStyles.pointsText}>
-                        {getPoints(televoteCountry, 'televote')}
+                        {toFixedIfDecimalFloat(
+                          getPoints(televoteCountry, 'televote'),
+                        )}
                       </span>
                     </td>
                   </>

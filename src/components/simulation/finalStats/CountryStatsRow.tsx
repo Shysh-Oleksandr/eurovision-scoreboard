@@ -3,6 +3,7 @@ import React from 'react';
 import { Country, VotingCountry } from '../../../models';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useGeneralStore } from '@/state/generalStore';
 import {
   getHostingCountryLogo,
@@ -63,7 +64,9 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
           <span className="font-medium truncate flex-1 leading-normal">
             {country.name}
           </span>
-          <span className="font-bold text-lg">{getPoints(country)}</span>
+          <span className="font-bold text-lg">
+            {toFixedIfDecimalFloat(getPoints(country))}
+          </span>
         </div>
       </td>
       {votingCountries.map((voter) => {
@@ -76,7 +79,9 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
               (points as number) || 0,
             )}`}
           >
-            {points}
+            {typeof points === 'number'
+              ? toFixedIfDecimalFloat(points)
+              : points}
           </td>
         );
       })}
