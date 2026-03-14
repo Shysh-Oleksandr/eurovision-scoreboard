@@ -4461,6 +4461,11 @@ cosmiconfig@^9.0.0:
     js-yaml "^4.1.0"
     parse-json "^5.2.0"
 
+countup.js@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/countup.js/-/countup.js-2.10.0.tgz#5199c923a33b51cb9fbfc0d4c0672c554dea394f"
+  integrity sha512-QQpZx7oYxsR+OeITlZe46fY/OQjV11oBqjY8wgIXzLU2jIz8GzOrbMhqKLysGY8bWI3T1ZNrYkwGzKb4JNgyzg==
+
 cross-fetch@^3.1.5:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.2.0.tgz#34e9192f53bc757d6614304d9e5e6fb4edb782e3"
