@@ -25,6 +25,7 @@ export const SyncCustomEntries: React.FC = () => {
           category: 'Custom',
           flag: entry.flagUrl,
           updatedAt: entry.updatedAt,
+          groupId: entry.groupId ?? undefined,
         }))
         .filter((c) => !importedCustomEntries.some((i) => i.code === c.code));
 

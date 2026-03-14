@@ -147,7 +147,20 @@
       "recentCustomEntries": "Voci personalizzate recenti",
       "presets": "Preset",
       "editCustomEntry": "Modifica Voce Personalizzata",
-      "createCustomEntry": "Crea Voce Personalizzata"
+      "createCustomEntry": "Crea Voce Personalizzata",
+      "group": "Gruppo",
+      "noGroup": "Nessun gruppo"
+    },
+    "customEntryGroupModal": {
+      "createGroup": "Crea Gruppo",
+      "editGroup": "Modifica Gruppo",
+      "groupCreatedSuccessfully": "Gruppo creato con successo!",
+      "groupUpdatedSuccessfully": "Gruppo aggiornato con successo!",
+      "groupDeletedSuccessfully": "Gruppo eliminato con successo!",
+      "failedToSaveGroup": "Errore durante la creazione del gruppo",
+      "failedToDeleteGroup": "Errore durante l'eliminazione del gruppo",
+      "group": "Gruppo",
+      "noGroup": "Nessun gruppo"
     },
     "categories": {
       "imported": "Importato",

@@ -13,6 +13,7 @@ import { getCustomEntryId } from './utils/getCustomEntryId';
 
 import {
   useCreateCustomEntryMutation,
+  useCustomEntryGroupsQuery,
   useDeleteCustomEntryMutation,
   useUpdateCustomEntryMutation,
   useUploadCustomEntryFlagMutation,
@@ -56,7 +57,11 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [selectedStandardCountry, setSelectedStandardCountry] = useState('');
   const [selectedCustomEntry, setSelectedCustomEntry] = useState('');
+  const [groupId, setGroupId] = useState<string>('');
   const [failedToLoadFlag, setFailedToLoadFlag] = useState(false);
+
+  const { data: customEntryGroups = [] } =
+    useCustomEntryGroupsQuery(isAuthenticated);
 
   const { mutateAsync: createEntry, isPending: isCreating } =
     useCreateCustomEntryMutation();
@@ -153,9 +158,23 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     });
   }, [reusableCustomEntries]);
 
+  const customEntryGroupOptions = useMemo(() => {
+    return [
+      {
+        label: t('setup.customCountryModal.noGroup'),
+        value: '',
+      },
+      ...customEntryGroups.map((group) => ({
+        label: group.name,
+        value: group._id,
+      })),
+    ];
+  }, [customEntryGroups, t]);
+
   useEffect(() => {
     if (countryToEdit) {
       setName(countryToEdit.name);
+      setGroupId(countryToEdit.groupId ?? '');
 
       const currentFlagUrl = countryToEdit.flag || '';
 
@@ -194,6 +213,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       setFailedToLoadFlag(false);
       setSelectedStandardCountry('');
       setSelectedCustomEntry('');
+      setGroupId('');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countryToEdit, isOpen, reusableCustomEntries]);
@@ -268,6 +288,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           id: entryId,
           name,
           flagUrl: urlToUpload,
+          groupId: groupId || null,
         });
 
         // Upload file if provided
@@ -279,6 +300,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
         const newEntry = await createEntry({
           name,
           flagUrl: urlToUpload,
+          groupId: groupId || undefined,
         });
 
         // Upload file if provided
@@ -422,6 +444,17 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             onChange={(e) => setName(e.target.value)}
             placeholder={t('common.enterName')}
             className="lg:text-[0.95rem] text-sm"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <CustomSelect
+            options={customEntryGroupOptions}
+            value={groupId}
+            onChange={setGroupId}
+            label={t('setup.customCountryModal.group')}
+            id="entry-group-select"
+            withIndicator={false}
+            selectClassName="!shadow-none"
           />
         </div>
         <div className="flex flex-col gap-3">

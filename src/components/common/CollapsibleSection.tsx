@@ -13,6 +13,8 @@ interface CollapsibleSectionProps {
   titleClassName?: string;
   contentClassName?: string;
   overflowClassName?: string;
+  extraContentClassName?: string;
+  isChildSection?: boolean;
 }
 
 export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
@@ -26,6 +28,8 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   titleClassName = '',
   contentClassName = '',
   overflowClassName = '',
+  extraContentClassName = '',
+  isChildSection = false,
 }) => {
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
   const [hasBeenOpened, setHasBeenOpened] = useState(defaultExpanded);
@@ -48,7 +52,13 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   };
 
   return (
-    <div className="bg-primary-800 bg-gradient-to-tl from-primary-900 to-primary-800 rounded-lg">
+    <div
+      className={`rounded-lg ${
+        isChildSection
+          ? 'bg-gradient-to-bl bg-primary-900 from-primary-800 to-primary-700/50'
+          : 'bg-gradient-to-tl bg-primary-800 from-primary-900 to-primary-800'
+      }`}
+    >
       <div
         className={`flex flex-wrap justify-between items-center cursor-pointer sm:p-4 p-3 sm:pl-3 pl-2 gap-1 ${
           headerClassName ?? ''
@@ -72,7 +82,13 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           </h3>
         </div>
         {extraContent && (
-          <div className="flex items-center gap-2 ml-auto">{extraContent}</div>
+          <div
+            className={`flex items-center gap-2 ml-auto ${
+              extraContentClassName ?? ''
+            }`}
+          >
+            {extraContent}
+          </div>
         )}
       </div>
 

@@ -147,7 +147,20 @@
       "recentCustomEntries": "Ostatnie własne wpisy",
       "presets": "Presety",
       "editCustomEntry": "Edytuj własny wpis",
-      "createCustomEntry": "Utwórz własny wpis"
+      "createCustomEntry": "Utwórz własny wpis",
+      "group": "Grupa",
+      "noGroup": "Brak grupy"
+    },
+    "customEntryGroupModal": {
+      "createGroup": "Utwórz grupę",
+      "editGroup": "Edytuj grupę",
+      "groupCreatedSuccessfully": "Grupa utworzona pomyślnie!",
+      "groupUpdatedSuccessfully": "Grupa zaktualizowana pomyślnie!",
+      "groupDeletedSuccessfully": "Grupa usunięta pomyślnie!",
+      "failedToSaveGroup": "Błąd podczas tworzenia grupy",
+      "failedToDeleteGroup": "Błąd podczas usuwania grupy",
+      "group": "Grupa",
+      "noGroup": "Brak grupy"
     },
     "categories": {
       "imported": "Importowane",

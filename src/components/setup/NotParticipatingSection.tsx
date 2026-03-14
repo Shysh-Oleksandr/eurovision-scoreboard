@@ -1,5 +1,6 @@
+import { FolderPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { PlusIcon } from '../../assets/icons/PlusIcon';
@@ -10,6 +11,7 @@ import { Input } from '../Input';
 
 import { CountrySelectionList } from './CountrySelectionList';
 import { AvailableGroup } from './CountrySelectionListItem';
+import CustomEntryGroupModal from './CustomEntryGroupModal';
 import { useCountrySearch } from './hooks/useCountrySearch';
 import { useGetCategoryLabel } from './hooks/useGetCategoryLabel';
 import SearchInputIcon from './SearchInputIcon';
@@ -17,8 +19,10 @@ import SectionWrapper from './SectionWrapper';
 import { getCustomEntryId } from './utils/getCustomEntryId';
 
 import {
+  useBulkAssignCustomEntryGroupMutation,
   useBulkCreateCustomEntriesMutation,
   useBulkDeleteCustomEntriesMutation,
+  useCustomEntryGroupsQuery,
 } from '@/api/customEntries';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
 import { useConfirmation } from '@/hooks/useConfirmation';
@@ -38,6 +42,8 @@ interface NotParticipatingSectionProps {
   availableGroups: AvailableGroup[];
 }
 
+const UNGROUPED_KEY = '__ungrouped__';
+
 const NotParticipatingSection = ({
   notParticipatingCountries,
   handleBulkCountryAssignment,
@@ -51,6 +57,14 @@ const NotParticipatingSection = ({
   const { user } = useAuthStore();
   const { importedCustomEntries, setImportedCustomEntries } = useGeneralStore();
   const bulkCreateMutation = useBulkCreateCustomEntriesMutation();
+  const { data: customEntryGroups = [] } = useCustomEntryGroupsQuery(!!user);
+  const { mutateAsync: bulkAssignToGroup } =
+    useBulkAssignCustomEntryGroupMutation();
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [groupToEdit, setGroupToEdit] = useState<{
+    _id: string;
+    name: string;
+  } | null>(null);
   const {
     countriesSearch,
     handleCountriesSearch,
@@ -71,6 +85,19 @@ const NotParticipatingSection = ({
       );
     },
     [bulkDeleteCustomEntries],
+  );
+
+  const handleBulkAssignToCustomEntryGroup = useCallback(
+    (countries: BaseCountry[], groupId: string | null) => {
+      const entryIds = countries
+        .map((c) => getCustomEntryId(c.code))
+        .filter((id): id is string => !!id);
+
+      if (entryIds.length === 0) return;
+
+      bulkAssignToGroup({ groupId, entryIds });
+    },
+    [bulkAssignToGroup],
   );
 
   // Filter out Imported category if empty
@@ -166,14 +193,32 @@ const NotParticipatingSection = ({
       }
 
       return (
-        <Button
-          onClick={handleOpenCreateModal}
-          className="mr-1 !py-1 w-fit"
-          title="Add Custom Country"
-          aria-label="Add Custom Country"
-        >
-          <PlusIcon className="w-7 h-7" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOpenCreateModal();
+            }}
+            className="!py-1 !px-4 h-[30px]"
+            title="Add Custom Country"
+            aria-label="Add Custom Country"
+            variant="tertiary"
+          >
+            <PlusIcon className="w-6 h-6" />
+          </Button>
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              setGroupToEdit(null);
+              setGroupModalOpen(true);
+            }}
+            className="!py-1 !px-4 h-[30px]"
+            title="Add Group"
+            aria-label="Add Group"
+          >
+            <FolderPlus className="w-6 h-6" />
+          </Button>
+        </div>
       );
     }
 
@@ -182,6 +227,14 @@ const NotParticipatingSection = ({
 
   return (
     <>
+      <CustomEntryGroupModal
+        isOpen={groupModalOpen}
+        onClose={() => {
+          setGroupModalOpen(false);
+          setGroupToEdit(null);
+        }}
+        groupToEdit={groupToEdit}
+      />
       <div className="flex items-center justify-between gap-2">
         <p className="text-white text-base md:text-lg font-semibold">
           {t('eventSetupModal.notParticipating')}
@@ -202,37 +255,157 @@ const NotParticipatingSection = ({
         </div>
       </div>
       <div className="flex flex-col gap-2">
-        {filteredSortedCategories.map((category) => (
-          <SectionWrapper
-            key={category}
-            title={getCategoryLabel(category)}
-            category={category}
-            countries={groupedNotParticipatingCountries[category]}
-            isExpanded={!!expandedCategories[category]}
-            onToggle={() => handleToggleCategory(category)}
-            onBulkAssign={(countries, group) =>
-              handleBulkCountryAssignment(countries, group)
+        {filteredSortedCategories.map((category) => {
+          const countries = groupedNotParticipatingCountries[category];
+
+          if (category === 'Custom' && user) {
+            const groupedByCustomEntryGroup: Record<string, BaseCountry[]> = {
+              [UNGROUPED_KEY]: [],
+            };
+
+            for (const g of customEntryGroups) {
+              groupedByCustomEntryGroup[g._id] = [];
             }
-            onBulkDelete={handleBulkDeleteCustomEntries}
-            availableGroups={availableGroups}
-            currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
-            getLabel={
-              category === 'Custom'
-                ? (itemsCount) =>
-                    t('eventSetupModal.entriesAmount', { count: itemsCount })
-                : undefined
-            }
-          >
-            <CountrySelectionList
-              countries={groupedNotParticipatingCountries[category]}
-              onAssignCountryAssignment={handleCountryAssignment}
-              getCountryGroupAssignment={getCountryGroupAssignment}
+
+            const validGroupIds = new Set(customEntryGroups.map((g) => g._id));
+
+            countries.forEach((c) => {
+              const gid =
+                c.groupId && validGroupIds.has(c.groupId)
+                  ? c.groupId
+                  : UNGROUPED_KEY;
+
+              if (!groupedByCustomEntryGroup[gid]) {
+                groupedByCustomEntryGroup[gid] = [];
+              }
+
+              groupedByCustomEntryGroup[gid].push(c);
+            });
+
+            const groupSections: {
+              id: string | null;
+              title: string;
+              countries: BaseCountry[];
+            }[] = [
+              {
+                id: UNGROUPED_KEY,
+                title: t('customCountryModal.noGroup'),
+                countries: groupedByCustomEntryGroup[UNGROUPED_KEY] ?? [],
+              },
+              ...customEntryGroups.map((g) => ({
+                id: g._id,
+                title: g.name,
+                countries: groupedByCustomEntryGroup[g._id] ?? [],
+              })),
+            ];
+
+            return (
+              <SectionWrapper
+                key={category}
+                title={getCategoryLabel(category)}
+                category={category}
+                countries={countries}
+                isExpanded={!!expandedCategories[category]}
+                onToggle={() => handleToggleCategory(category)}
+                onBulkAssign={(cs, group) =>
+                  handleBulkCountryAssignment(cs, group)
+                }
+                onBulkDelete={handleBulkDeleteCustomEntries}
+                availableGroups={availableGroups}
+                currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
+                getLabel={(itemsCount) =>
+                  t('eventSetupModal.entriesAmount', { count: itemsCount })
+                }
+                extraContent={getExtraContent(category)}
+                extraContentClassName={
+                  category === 'Custom' ? 'flex-row-reverse' : ''
+                }
+              >
+                <div className="flex flex-col gap-2">
+                  {groupSections.map((section) => (
+                    <SectionWrapper
+                      key={section.id ?? UNGROUPED_KEY}
+                      title={section.title}
+                      category="Custom"
+                      countries={section.countries}
+                      defaultExpanded={section.id === UNGROUPED_KEY}
+                      onBulkAssign={(cs, group) =>
+                        handleBulkCountryAssignment(cs, group)
+                      }
+                      onBulkAssignToCustomEntryGroup={
+                        handleBulkAssignToCustomEntryGroup
+                      }
+                      onBulkDelete={handleBulkDeleteCustomEntries}
+                      availableGroups={availableGroups}
+                      currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
+                      customEntryGroups={customEntryGroups}
+                      currentCustomEntryGroupId={section.id}
+                      getLabel={(itemsCount) =>
+                        t('eventSetupModal.entriesAmount', {
+                          count: itemsCount,
+                        })
+                      }
+                      onEditGroup={
+                        section.id
+                          ? () => {
+                              setGroupToEdit({
+                                _id: section.id!,
+                                name: section.title,
+                              });
+                              setGroupModalOpen(true);
+                            }
+                          : undefined
+                      }
+                      isChildSection
+                    >
+                      <CountrySelectionList
+                        countries={section.countries}
+                        onAssignCountryAssignment={handleCountryAssignment}
+                        getCountryGroupAssignment={getCountryGroupAssignment}
+                        availableGroups={availableGroups}
+                        onEdit={handleOpenEditModal}
+                      />
+                    </SectionWrapper>
+                  ))}
+                </div>
+              </SectionWrapper>
+            );
+          }
+
+          return (
+            <SectionWrapper
+              key={category}
+              title={getCategoryLabel(category)}
+              category={category}
+              countries={countries}
+              isExpanded={!!expandedCategories[category]}
+              onToggle={() => handleToggleCategory(category)}
+              onBulkAssign={(cs, group) =>
+                handleBulkCountryAssignment(cs, group)
+              }
+              onBulkDelete={handleBulkDeleteCustomEntries}
               availableGroups={availableGroups}
-              onEdit={handleOpenEditModal}
-              extraContent={getExtraContent(category)}
-            />
-          </SectionWrapper>
-        ))}
+              currentGroup={CountryAssignmentGroup.NOT_PARTICIPATING}
+              getLabel={
+                category === 'Custom'
+                  ? (itemsCount) =>
+                      t('eventSetupModal.entriesAmount', {
+                        count: itemsCount,
+                      })
+                  : undefined
+              }
+            >
+              <CountrySelectionList
+                countries={countries}
+                onAssignCountryAssignment={handleCountryAssignment}
+                getCountryGroupAssignment={getCountryGroupAssignment}
+                availableGroups={availableGroups}
+                onEdit={handleOpenEditModal}
+                extraContent={getExtraContent(category)}
+              />
+            </SectionWrapper>
+          );
+        })}
       </div>
     </>
   );

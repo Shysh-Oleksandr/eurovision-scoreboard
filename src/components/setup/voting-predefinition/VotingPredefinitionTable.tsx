@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 type Props = {
@@ -133,7 +134,9 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
                       {country.name}
                     </span>
                     <span className="font-bold text-lg">
-                      {getTotalPointsForCountry(country.code)}
+                      {toFixedIfDecimalFloat(
+                        getTotalPointsForCountry(country.code),
+                      )}
                     </span>
                   </div>
                 </td>

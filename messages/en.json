@@ -144,7 +144,18 @@
       "recentCustomEntries": "Recent Custom Entries",
       "presets": "Presets",
       "editCustomEntry": "Edit Custom Entry",
-      "createCustomEntry": "Create Custom Entry"
+      "createCustomEntry": "Create Custom Entry",
+      "group": "Group",
+      "noGroup": "No group"
+    },
+    "customEntryGroupModal": {
+      "createGroup": "Create Group",
+      "editGroup": "Edit Group",
+      "groupCreatedSuccessfully": "Group created successfully!",
+      "groupUpdatedSuccessfully": "Group updated successfully!",
+      "groupDeletedSuccessfully": "Group deleted successfully!",
+      "failedToSaveGroup": "Failed to save group",
+      "failedToDeleteGroup": "Failed to delete group"
     },
     "categories": {
       "imported": "Imported",

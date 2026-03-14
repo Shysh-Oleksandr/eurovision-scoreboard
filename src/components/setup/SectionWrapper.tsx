@@ -1,4 +1,4 @@
-import { CopyCheck, Trash2 } from 'lucide-react';
+import { CopyCheck, Folder, FolderEdit, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useMemo, useState } from 'react';
 
@@ -19,6 +19,11 @@ import {
 
 import { useConfirmation } from '@/hooks/useConfirmation';
 
+export interface CustomEntryGroupForSelect {
+  _id: string;
+  name: string;
+}
+
 interface SectionWrapperProps {
   title: string;
   category?: string;
@@ -29,12 +34,21 @@ interface SectionWrapperProps {
   onToggle?: () => void;
   defaultExpanded?: boolean;
   onBulkAssign?: (countries: BaseCountry[], group: string) => void;
+  onBulkAssignToCustomEntryGroup?: (
+    countries: BaseCountry[],
+    groupId: string | null,
+  ) => void;
   onBulkDelete?: (countries: BaseCountry[]) => void;
   availableGroups?: AvailableGroup[];
   currentGroup?: string;
+  customEntryGroups?: CustomEntryGroupForSelect[];
+  currentCustomEntryGroupId?: string | null;
   getLabel?: (itemsCount: number) => string;
   extraContent?: React.ReactNode;
   isCollapsible?: boolean;
+  onEditGroup?: () => void;
+  extraContentClassName?: string;
+  isChildSection?: boolean;
 }
 
 const SectionWrapper: React.FC<SectionWrapperProps> = ({
@@ -47,12 +61,18 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
   onToggle,
   defaultExpanded = false,
   onBulkAssign,
+  onBulkAssignToCustomEntryGroup,
   onBulkDelete,
   availableGroups,
   currentGroup,
+  customEntryGroups,
+  currentCustomEntryGroupId,
   getLabel,
   extraContent,
   isCollapsible = true,
+  onEditGroup,
+  extraContentClassName,
+  isChildSection = false,
 }) => {
   const t = useTranslations();
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded);
@@ -157,9 +177,146 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
     setSelectedCountryCodes(new Set());
   };
 
+  const handleBulkAssignToCustomEntryGroup = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    e.stopPropagation();
+    const { value } = e.target;
+    const groupId = value === '__ungrouped__' ? null : value;
+
+    onBulkAssignToCustomEntryGroup?.(countriesToAssign, groupId);
+    setSelectedCountryCodes(new Set());
+  };
+
+  const isCustomEntryGroupMode =
+    !!onBulkAssignToCustomEntryGroup && !!customEntryGroups;
+  const currentCustomEntryGroupLabel = useMemo(() => {
+    if (!customEntryGroups) return t('setup.customCountryModal.noGroup');
+    const selectedGroup = customEntryGroups.find(
+      (group) => group._id === currentCustomEntryGroupId,
+    );
+
+    return selectedGroup?.name ?? t('setup.customCountryModal.noGroup');
+  }, [customEntryGroups, currentCustomEntryGroupId, t]);
+
   const headerExtraContent = (
     <>
-      {onBulkAssign && availableGroups && currentGroup ? (
+      {isCustomEntryGroupMode ? (
+        <div className="flex items-center gap-1">
+          {onBulkAssign && availableGroups && currentGroup && (
+            <div
+              className="relative min-w-[120px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Select
+                value={currentGroup}
+                onChange={handleBulkAssign}
+                id={`country-assignment-${title}`}
+                disabled={isMultiselectEnabled && selectedCount === 0}
+                aria-label={
+                  isMultiselectEnabled
+                    ? `Bulk assign ${selectedCount} selected countries in ${title} to a stage`
+                    : `Bulk assign all countries in ${title} to a stage`
+                }
+                options={availableGroups.map((group) => {
+                  if (isStageGroup(group)) {
+                    return { value: group.id, label: group.name };
+                  }
+
+                  return {
+                    value: group,
+                    label: ASSIGNMENT_GROUP_LABELS[group],
+                  };
+                })}
+                className="gap-1 justify-between pr-2 pl-3 py-1 bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/40 shadow"
+                arrowClassName="!w-6 !h-6 mb-0.5"
+              >
+                {displayCount !== undefined && (
+                  <span className="text-white text-sm whitespace-nowrap">
+                    {displayCount} {getAmountLabel(displayCount)}
+                  </span>
+                )}
+              </Select>
+            </div>
+          )}
+          {isMultiselectEnabled && (
+            <div
+              className="relative min-w-[120px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Select
+                value={currentCustomEntryGroupId ?? '__ungrouped__'}
+                onChange={handleBulkAssignToCustomEntryGroup}
+                id={`custom-entry-group-assign-${title}`}
+                disabled={isMultiselectEnabled && selectedCount === 0}
+                aria-label={`Bulk assign entries in ${title} to a group`}
+                options={[
+                  {
+                    value: '__ungrouped__',
+                    label: t('setup.customCountryModal.noGroup'),
+                  },
+                  ...customEntryGroups!.map((g) => ({
+                    value: g._id,
+                    label: g.name,
+                  })),
+                ]}
+                className="gap-1 justify-between pr-2 pl-3 py-1 bg-primary-800 bg-gradient-to-bl from-[10%] from-primary-900/40 to-primary-800/60 hover:bg-primary-700/40 shadow"
+                arrowClassName="!w-6 !h-6 mb-0.5"
+              >
+                <span className="text-white text-sm whitespace-nowrap flex items-center gap-1">
+                  <Folder className="w-4 h-4" />
+                  {currentCustomEntryGroupLabel}
+                </span>
+              </Select>
+            </div>
+          )}
+          {isMultiselectEnabled && (
+            <Button
+              onClick={handleBulkDelete}
+              variant="tertiary"
+              className="!p-2 mx-2"
+              aria-label={`Delete ${selectedCount} selected custom entries in ${title}`}
+              title={`Delete ${selectedCount} selected custom entries in ${title}`}
+              disabled={selectedCount === 0}
+            >
+              <Trash2 className="w-5 h-5" />
+            </Button>
+          )}
+          <Button
+            onClick={handleToggleMultiselect}
+            className={`!p-2 ${
+              isMultiselectEnabled
+                ? 'ring-primary-700/80 ring-2 ring-solid hover:ring-primary-700/80 to-primary-700/80'
+                : ''
+            }`}
+            aria-label={
+              isMultiselectEnabled
+                ? `Disable multiselect for ${title}`
+                : `Enable multiselect for ${title}`
+            }
+            title={
+              isMultiselectEnabled
+                ? `Disable multiselect for ${title}`
+                : `Enable multiselect for ${title}`
+            }
+          >
+            <CopyCheck className="w-5 h-5" />
+          </Button>
+          {onEditGroup && (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditGroup();
+              }}
+              className="!p-2"
+              aria-label={`Edit ${title}`}
+              title={`Edit ${title}`}
+            >
+              <FolderEdit className="w-5 h-5" />
+            </Button>
+          )}
+        </div>
+      ) : onBulkAssign && availableGroups && currentGroup ? (
         <div className="flex items-center gap-1">
           <div
             className="relative min-w-[120px]"
@@ -197,6 +354,17 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
               )}
             </Select>
           </div>
+          {isMultiselectEnabled && category === 'Custom' && (
+            <Button
+              onClick={handleBulkDelete}
+              variant="tertiary"
+              className={`!p-2 mx-2`}
+              aria-label={`Delete ${selectedCount} selected custom entries in ${title}`}
+              title={`Delete ${selectedCount} selected custom entries in ${title}`}
+            >
+              <Trash2 className="w-5 h-5" />
+            </Button>
+          )}
           <Button
             onClick={handleToggleMultiselect}
             className={`!p-2 ${
@@ -217,17 +385,6 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
           >
             <CopyCheck className="w-5 h-5" />
           </Button>
-          {isMultiselectEnabled && category === 'Custom' && (
-            <Button
-              onClick={handleBulkDelete}
-              variant="tertiary"
-              className={`!p-2 ml-2`}
-              aria-label={`Delete ${selectedCount} selected custom entries in ${title}`}
-              title={`Delete ${selectedCount} selected custom entries in ${title}`}
-            >
-              <Trash2 className="w-5 h-5" />
-            </Button>
-          )}
         </div>
       ) : (
         countriesCount !== undefined && (
@@ -249,6 +406,8 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
           onToggle={handleToggle}
           defaultExpanded={defaultExpanded}
           extraContent={headerExtraContent}
+          extraContentClassName={extraContentClassName}
+          isChildSection={isChildSection}
         >
           {children}
         </CollapsibleSection>

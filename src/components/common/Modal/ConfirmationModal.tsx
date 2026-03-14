@@ -10,7 +10,10 @@ import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { useConfirmationStore } from '@/state/confirmationStore';
 
-const IGNORE_DO_NOT_SHOW_AGAIN_KEYS = ['delete-custom-entries'];
+const IGNORE_DO_NOT_SHOW_AGAIN_KEYS = [
+  'delete-custom-entries',
+  'delete-custom-entry-group',
+];
 
 interface ConfirmationModalProps {
   isOpen: boolean;

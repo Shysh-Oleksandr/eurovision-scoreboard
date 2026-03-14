@@ -8,6 +8,7 @@ export const queryKeys = {
   user: {
     profile: () => ['user', 'profile'] as const,
     customEntries: () => ['user', 'custom-entries'] as const,
+    customEntryGroups: () => ['user', 'custom-entry-groups'] as const,
     themes: () => ['user', 'themes'] as const,
     themeById: (id: string) => ['user', 'theme', id] as const,
     savedThemes: () => ['user', 'saved-themes'] as const,
@@ -104,6 +105,7 @@ export const queryKeys = {
 export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.profile(),
   queryKeys.user.customEntries(),
+  queryKeys.user.customEntryGroups(),
   queryKeys.user.themes(),
   queryKeys.user.contests(),
   queryKeys.follows.followingFeed({}),

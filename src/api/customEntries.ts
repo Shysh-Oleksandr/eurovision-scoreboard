@@ -2,11 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
-import type { CustomEntry } from '@/types/customEntry';
+import type { CustomEntry, CustomEntryGroup } from '@/types/customEntry';
 
 export type CreateCustomEntryInput = {
   name: string;
   flagUrl: string;
+  groupId?: string;
 };
 
 export type BulkCreateCustomEntriesInput = {
@@ -16,6 +17,20 @@ export type BulkCreateCustomEntriesInput = {
 export type UpdateCustomEntryInput = {
   name?: string;
   flagUrl?: string;
+  groupId?: string | null;
+};
+
+export type CreateCustomEntryGroupInput = {
+  name: string;
+};
+
+export type UpdateCustomEntryGroupInput = {
+  name?: string;
+};
+
+export type BulkAssignCustomEntryGroupInput = {
+  groupId?: string | null;
+  entryIds: string[];
 };
 
 export function useMyCustomEntriesQuery(enabled: boolean = true) {
@@ -90,6 +105,74 @@ export function useBulkDeleteCustomEntriesMutation() {
       await api.delete('/custom-entries/bulk', { data: { ids } });
     },
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });
+    },
+  });
+}
+
+export function useCustomEntryGroupsQuery(enabled: boolean = true) {
+  return useQuery<CustomEntryGroup[]>({
+    queryKey: queryKeys.user.customEntryGroups(),
+    queryFn: async () => {
+      const { data } = await api.get('/custom-entries/groups');
+      return data as CustomEntryGroup[];
+    },
+    enabled,
+  });
+}
+
+export function useCreateCustomEntryGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: CreateCustomEntryGroupInput) => {
+      const { data } = await api.post('/custom-entries/groups', input);
+      return data as CustomEntryGroup;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntryGroups() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });
+    },
+  });
+}
+
+export function useUpdateCustomEntryGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      ...input
+    }: UpdateCustomEntryGroupInput & { id: string }) => {
+      const { data } = await api.patch(`/custom-entries/groups/${id}`, input);
+      return data as CustomEntryGroup;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntryGroups() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });
+    },
+  });
+}
+
+export function useDeleteCustomEntryGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/custom-entries/groups/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntryGroups() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });
+    },
+  });
+}
+
+export function useBulkAssignCustomEntryGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: BulkAssignCustomEntryGroupInput) => {
+      await api.post('/custom-entries/groups/bulk-assign', input);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.customEntryGroups() });
       qc.invalidateQueries({ queryKey: queryKeys.user.customEntries() });
     },
   });

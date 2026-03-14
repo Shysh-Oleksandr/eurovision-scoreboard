@@ -147,7 +147,20 @@
       "recentCustomEntries": "Нещодавні користувацькі учасники",
       "presets": "Пресети",
       "editCustomEntry": "Редагувати користувацького учасника",
-      "createCustomEntry": "Створити користувацького учасника"
+      "createCustomEntry": "Створити користувацького учасника",
+      "group": "Група",
+      "noGroup": "Немає групи"
+    },
+    "customEntryGroupModal": {
+      "createGroup": "Створити групу",
+      "editGroup": "Редагувати групу",
+      "groupCreatedSuccessfully": "Група успішно створена!",
+      "groupUpdatedSuccessfully": "Група успішно оновлена!",
+      "groupDeletedSuccessfully": "Група успішно видалена!",
+      "failedToSaveGroup": "Не вдалося зберегти групу",
+      "failedToDeleteGroup": "Не вдалося видалити групу",
+      "group": "Група",
+      "noGroup": "Немає групи"
     },
     "categories": {
       "imported": "Імпортовані",

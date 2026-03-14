@@ -147,7 +147,20 @@
       "recentCustomEntries": "Πρόσφατες Προσαρμοσμένες Συμμετοχές",
       "presets": "Προεπιλογές",
       "editCustomEntry": "Επεξεργασία Προσαρμοσμένης Συμμετοχής",
-      "createCustomEntry": "Δημιουργία Προσαρμοσμένης Συμμετοχής"
+      "createCustomEntry": "Δημιουργία Προσαρμοσμένης Συμμετοχής",
+      "group": "Ομάδα",
+      "noGroup": "Χωρίς ομάδα"
+    },
+    "customEntryGroupModal": {
+      "createGroup": "Δημιουργία Ομάδας",
+      "editGroup": "Επεξεργασία Ομάδας",
+      "groupCreatedSuccessfully": "Η ομάδα δημιουργήθηκε με επιτυχία!",
+      "groupUpdatedSuccessfully": "Η ομάδα ενημερώθηκε με επιτυχία!",
+      "groupDeletedSuccessfully": "Η ομάδα διαγράφηκε με επιτυχία!",
+      "failedToSaveGroup": "Σφάλμα κατά τη δημιουργία της ομάδας",
+      "failedToDeleteGroup": "Σφάλμα κατά τη διαγραφή της ομάδας",
+      "group": "Ομάδα",
+      "noGroup": "Χωρίς ομάδα"
     },
     "categories": {
       "imported": "Εισαχθείσες",

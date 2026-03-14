@@ -147,7 +147,18 @@
       "recentCustomEntries": "Entradas personalizadas recientes",
       "presets": "Presets",
       "editCustomEntry": "Editar entrada personalizada",
-      "createCustomEntry": "Crear entrada personalizada"
+      "createCustomEntry": "Crear entrada personalizada",
+      "group": "Grupo",
+      "noGroup": "Sin grupo"
+    },
+    "customEntryGroupModal": {
+      "createGroup": "Crear grupo",
+      "editGroup": "Editar grupo",
+      "groupCreatedSuccessfully": "Grupo creado correctamente!",
+      "groupUpdatedSuccessfully": "Grupo actualizado correctamente!",
+      "groupDeletedSuccessfully": "Grupo eliminado correctamente!",
+      "failedToSaveGroup": "Error al guardar el grupo",
+      "failedToDeleteGroup": "Error al eliminar el grupo"
     },
     "categories": {
       "imported": "Importado",

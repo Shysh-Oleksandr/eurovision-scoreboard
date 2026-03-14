@@ -7,6 +7,7 @@ import { VotingPredefinitionTable } from './VotingPredefinitionTable';
 
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { EventStage } from '@/models';
 
@@ -160,7 +161,9 @@ const VotingPredefinitionModal = ({
         }
         valueForCell={(participant, voter) => {
           const key: CellKey = `${participant}:${voter}`;
-          const displayValue = getCellValue(participant, voter);
+          const displayValue = toFixedIfDecimalFloat(
+            getCellValue(participant, voter),
+          );
 
           return (editing[key] ?? String(displayValue || '')) as string;
         }}

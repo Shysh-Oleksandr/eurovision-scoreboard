@@ -147,10 +147,21 @@
       "recentCustomEntries": "Kürzlich verwendete Beiträge",
       "presets": "Voreinstellungen",
       "editCustomEntry": "Benutzerdefinierten Beitrag bearbeiten",
-      "createCustomEntry": "Benutzerdefinierten Beitrag erstellen"
+      "createCustomEntry": "Benutzerdefinierten Beitrag erstellen",
+      "group": "Gruppe",
+      "noGroup": "Keine Gruppe"
+    },
+    "customEntryGroupModal": {
+      "createGroup": "Gruppe erstellen",
+      "editGroup": "Gruppe bearbeiten",
+      "groupCreatedSuccessfully": "Gruppe erfolgreich erstellt!",
+      "groupUpdatedSuccessfully": "Gruppe erfolgreich aktualisiert!",
+      "groupDeletedSuccessfully": "Gruppe erfolgreich gelöscht!",
+      "failedToSaveGroup": "Fehler beim Speichern der Gruppe",
+      "failedToDeleteGroup": "Fehler beim Löschen der Gruppe"
     },
     "categories": {
-      "imported": "Imported",
+      "imported": "Importiert",
       "custom": "Benutzerdefiniert",
       "allTimeParticipants": "Alle Teilnehmer",
       "asia": "Asien",

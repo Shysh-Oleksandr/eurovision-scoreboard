@@ -22,6 +22,7 @@ export interface BaseCountry {
   isImported?: boolean; // set to true when imported from others' contest snapshots
   flag?: string;
   updatedAt?: string; // For custom entries
+  groupId?: string | null; // custom entry group id
 }
 
 export type SemiFinalGroup = 'SF1' | 'SF2';
