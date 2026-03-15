@@ -6,6 +6,7 @@ import ColorOverridePicker, {
 } from './ColorOverridePicker';
 
 import { ThemeColors } from '@/theme/types';
+import { DouzePointsAnimationMode } from '@/types/customTheme';
 
 type ColorField = Omit<ColorFieldDefinition, 'groupKey'>;
 
@@ -13,12 +14,14 @@ interface ColorOverridesSectionProps {
   defaultColors: ThemeColors;
   overrides: Record<string, string>;
   onChange: (overrides: Record<string, string>) => void;
+  douzePointsAnimationMode: DouzePointsAnimationMode;
 }
 
 const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
   defaultColors,
   overrides,
   onChange,
+  douzePointsAnimationMode,
 }) => {
   const t = useTranslations('widgets.themes.colorOverrides');
 
@@ -74,12 +77,21 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     {
       key: 'douzePointsBg',
       label: t('douzePointsBg'),
-      enableGradient: true,
+      enableGradient: douzePointsAnimationMode === 'parallelograms',
       enableOpacity: true,
     },
     { key: 'douzePointsText', label: t('douzePointsText') },
-    { key: 'douzePointsBlock1', label: t('douzePointsBlock1') },
-    { key: 'douzePointsBlock2', label: t('douzePointsBlock2') },
+  ];
+  const douzePointsParallelogramOnlyColors: ColorField[] =
+    douzePointsAnimationMode === 'parallelograms'
+      ? [
+          { key: 'douzePointsBlock1', label: t('douzePointsBlock1') },
+          { key: 'douzePointsBlock2', label: t('douzePointsBlock2') },
+        ]
+      : [];
+  const allDouzePointsColors = [
+    ...douzePointsColors,
+    ...douzePointsParallelogramOnlyColors,
   ];
 
   const televoteColors: ColorField[] = [
@@ -255,7 +267,7 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
 
     // Add all fields from each group
     addFields(juryColors, 'countryItem');
-    addFields(douzePointsColors, 'countryItem');
+    addFields(allDouzePointsColors, 'countryItem');
     addFields(televoteColors, 'countryItem');
     addFields(televoteActiveColors, 'countryItem');
     addFields(finishedColors, 'countryItem');
@@ -305,7 +317,7 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
 
       <div className="border-t border-white/20 border-solid"></div>
 
-      {renderColorGroup(douzePointsColors, t('douzePointsAnimationColors'))}
+      {renderColorGroup(allDouzePointsColors, t('douzePointsAnimationColors'))}
 
       <div className="border-t border-white/20 border-solid"></div>
 

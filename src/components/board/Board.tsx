@@ -14,6 +14,7 @@ import { useVoting } from './hooks/useVoting';
 
 import { MIN_COUNTRIES_FOR_3_COLUMNS } from '@/hooks/useReorderCountries';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const FLIP_SPRING = { damping: 5, stiffness: 25, overshootClamping: true };
 
@@ -29,6 +30,11 @@ const Board = (): JSX.Element => {
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
   );
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const isLastSimulationAnimationFinished = useScoreboardStore(
+    (state) => state.isLastSimulationAnimationFinished,
+  );
+  const { boardAnimationMode: defaultBoardAnimationMode } = useThemeSpecifics();
 
   const { isOver: isVotingOver, id: currentStageId } = getCurrentStage() || {};
 
@@ -45,42 +51,71 @@ const Board = (): JSX.Element => {
     return sortedCountries.some((country) => country.showDouzePointsAnimation);
   }, [sortedCountries]);
 
+  const boardItemAnimationMode = useMemo(() => {
+    if (winnerCountry && isLastSimulationAnimationFinished) {
+      return 'flip';
+    }
+
+    return defaultBoardAnimationMode;
+  }, [
+    winnerCountry,
+    isLastSimulationAnimationFinished,
+    defaultBoardAnimationMode,
+  ]);
+
   const {
     delayedSortedCountries,
     finalCountries,
     showPlace,
     flipKey,
     containerRef,
+    getCountryAnimationClassName,
+    shouldUseFlipAnimationForCountry,
   } = useBoardAnimations(
     sortedCountries,
     wasTheFirstPointsAwarded,
     isDouzePointsAwarded,
+    boardItemAnimationMode,
   );
 
   const renderItem = useCallback(
-    (country: Country) => (
-      <Flipped key={country.code} flipId={country.code}>
-        {(props) => (
-          <CountryItem
-            country={country}
-            votingCountryCode={votingCountry?.code}
-            onClick={onClick}
-            index={delayedSortedCountries.findIndex(
-              (c) => c.code === country.code,
-            )}
-            {...props}
-            showPlaceAnimation={showPlace}
-            hasCountryFinishedVoting={!!hasCountryFinishedVoting}
-          />
-        )}
-      </Flipped>
-    ),
+    (country: Country) => {
+      const itemIndex = delayedSortedCountries.findIndex(
+        (c) => c.code === country.code,
+      );
+      const boardAnimationClassName = getCountryAnimationClassName(
+        country.code,
+      );
+
+      return (
+        <Flipped
+          key={country.code}
+          flipId={country.code}
+          shouldFlip={() => shouldUseFlipAnimationForCountry(country.code)}
+        >
+          {(props) => (
+            <CountryItem
+              country={country}
+              votingCountryCode={votingCountry?.code}
+              onClick={onClick}
+              index={itemIndex}
+              {...props}
+              showPlaceAnimation={showPlace}
+              hasCountryFinishedVoting={!!hasCountryFinishedVoting}
+              boardAnimationClassName={boardAnimationClassName}
+            />
+          )}
+        </Flipped>
+      );
+    },
     [
       votingCountry?.code,
       onClick,
       showPlace,
       delayedSortedCountries,
       hasCountryFinishedVoting,
+      getCountryAnimationClassName,
+      shouldUseFlipAnimationForCountry,
     ],
   );
 

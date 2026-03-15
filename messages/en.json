@@ -228,7 +228,7 @@
       "setup": "Setup"
     },
     "phaseActions": {
-      "viewStats": "View stats",
+      "viewStats": "Stats",
       "showNQs": "Show {nonQualifiersLabel}",
       "finalistsOnly": "Finalists only",
       "selectEventStage": "Select event stage",
@@ -481,6 +481,17 @@
         "uppercaseEntryName": "Uppercase entry names",
         "juryActivePointsUnderline": "Jury active points underline",
         "juryPointsPanelRounded": "Jury points panel rounded",
+        "usePointsCountUpAnimation": "Use points count-up animation",
+        "boardAnimation": "Board animation",
+        "douzePointsAnimation": "Douze points animation",
+        "boardAnimations": {
+          "flip": "Flip movement (default)",
+          "teleport": "Teleport movement (ESC 2025)"
+        },
+        "douzePointsAnimations": {
+          "parallelograms": "Parallelograms (ESC 2023)",
+          "heartsGrid": "Hearts grid (ESC 2025)"
+        },
         "pointsContainerShapes": {
           "title": "Points container shape",
           "curvedEdge": "Curved edge",

@@ -8,6 +8,19 @@ export type FlagShape =
   | 'round'
   | 'round-border'
   | 'none';
+export type BoardAnimationMode = 'flip' | 'teleport';
+export type DouzePointsAnimationMode = 'parallelograms' | 'heartsGrid';
+
+export interface ThemeSpecifics {
+  flagShape: FlagShape;
+  pointsContainerShape: PointsContainerShape;
+  boardAnimationMode: BoardAnimationMode;
+  douzePointsAnimationMode: DouzePointsAnimationMode;
+  uppercaseEntryName: boolean;
+  juryActivePointsUnderline: boolean;
+  isJuryPointsPanelRounded: boolean;
+  usePointsCountUpAnimation: boolean;
+}
 
 export type ItemState =
   | 'jury'
@@ -94,6 +107,7 @@ export interface ThemeColors {
 export interface Theme {
   colors: ThemeColors;
   backgroundImage: string;
+  themeSpecifics?: Partial<ThemeSpecifics>;
 }
 
 export type ThemeRecord = Record<string, Theme>;

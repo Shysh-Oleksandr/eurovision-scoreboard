@@ -1,4 +1,5 @@
 'use client';
+import { PlayIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -504,9 +505,10 @@ const EventSetupModal = () => {
               </Button>
             )}
             <Button
-              className="w-full !text-base"
+              className="w-full !text-base justify-center"
               onClick={handleStartEvent}
               snowEffect="right"
+              Icon={<PlayIcon className="w-5 h-5" />}
             >
               {t('common.start')}
             </Button>

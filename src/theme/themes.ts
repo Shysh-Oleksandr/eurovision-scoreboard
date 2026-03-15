@@ -1,4 +1,5 @@
 import { ThemeRecord } from './types';
+import { defaultThemeSpecificsByYear } from './defaultThemeSpecificsByYear';
 
 // Junior Eurovision specific themes for select years (merged under keys like JESC-<year>)
 const juniorThemes: Partial<ThemeRecord> = {
@@ -940,6 +941,11 @@ export const escThemes: Partial<ThemeRecord> = {
       },
     },
     backgroundImage: '/bgImages/BlueBg2023.webp',
+    themeSpecifics: {
+      boardAnimationMode: 'flip',
+      douzePointsAnimationMode: 'parallelograms',
+      usePointsCountUpAnimation: false,
+    },
   },
   '2024': {
     colors: {
@@ -1084,6 +1090,11 @@ export const escThemes: Partial<ThemeRecord> = {
       },
     },
     backgroundImage: '/bgImages/PurpleBg2025.webp',
+    themeSpecifics: {
+      pointsContainerShape: 'square',
+      flagShape: 'square',
+      uppercaseEntryName: false,
+    },
   },
 };
 

@@ -19,6 +19,17 @@ import {
 import { ScoreboardState, Vote } from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
+import { resolveThemeSpecificsForGeneralState } from '@/theme/themeSpecifics';
+
+const isTeleportBoardAnimationEnabled = () => {
+  const generalState = useGeneralStore.getState();
+  const themeSpecifics = resolveThemeSpecificsForGeneralState({
+    themeYear: generalState.themeYear,
+    customTheme: generalState.customTheme,
+  });
+
+  return themeSpecifics.boardAnimationMode === 'teleport';
+};
 
 // Reusable function to swap predefined votes between two countries (jury, televote, combined)
 const swapVotesBetweenCountries = (
@@ -253,18 +264,25 @@ export const createVotingActions: StateCreator<
       nextVotingCountryIndex === countriesStore.getVotingCountriesLength();
 
     if (isNextVotingCountry) {
-      const timerId = setTimeout(() => {
-        get().resetLastPoints();
-        set({ lastPointsResetTimerId: null });
-      }, ANIMATION_DURATION);
+      if (isTeleportBoardAnimationEnabled()) {
+        get().setShouldResetLastPointsAfterTeleport(true);
+      } else {
+        const timerId = setTimeout(() => {
+          get().resetLastPoints();
+          set({ lastPointsResetTimerId: null });
+        }, ANIMATION_DURATION);
 
-      set({ lastPointsResetTimerId: timerId });
+        set({ lastPointsResetTimerId: timerId });
+      }
     }
 
     const isFirstPointOfSet = state.votingPointsIndex === 0;
 
     if (isFirstPointOfSet && state.lastPointsResetTimerId) {
       clearTimeout(state.lastPointsResetTimerId);
+    }
+    if (isFirstPointOfSet && isTeleportBoardAnimationEnabled()) {
+      get().setShouldResetLastPointsAfterTeleport(false);
     }
 
     const updatedCountries = currentStage.countries.map((country) => {
@@ -314,6 +332,7 @@ export const createVotingActions: StateCreator<
         shouldShowLastPoints: false,
         shouldClearPoints: true,
         winnerCountry,
+        isLastSimulationAnimationFinished: winnerCountry ? false : true,
         showQualificationResults,
         predefinedVotes: newPredefinedJuryVotes
           ? {
@@ -477,12 +496,16 @@ export const createVotingActions: StateCreator<
     }
 
     if (isEndOfPointsSet) {
-      const timerId = setTimeout(() => {
-        get().resetLastPoints();
-        set({ lastPointsResetTimerId: null });
-      }, ANIMATION_DURATION);
+      if (isTeleportBoardAnimationEnabled()) {
+        get().setShouldResetLastPointsAfterTeleport(true);
+      } else {
+        const timerId = setTimeout(() => {
+          get().resetLastPoints();
+          set({ lastPointsResetTimerId: null });
+        }, ANIMATION_DURATION);
 
-      set({ lastPointsResetTimerId: timerId });
+        set({ lastPointsResetTimerId: timerId });
+      }
     }
 
     const nextVotingCountryIndex =
@@ -507,6 +530,7 @@ export const createVotingActions: StateCreator<
         ),
         shouldShowLastPoints: true,
         winnerCountry,
+        isLastSimulationAnimationFinished: winnerCountry ? false : true,
         showQualificationResults,
       });
 
@@ -595,6 +619,7 @@ export const createVotingActions: StateCreator<
       shouldShowLastPoints: false,
       shouldClearPoints: true,
       winnerCountry,
+      isLastSimulationAnimationFinished: winnerCountry ? false : true,
       showQualificationResults,
       televotingProgress: state.televotingProgress + 1,
     });
@@ -829,12 +854,16 @@ export const createVotingActions: StateCreator<
       clearTimeout(state.lastPointsResetTimerId);
     }
 
-    const timerId = setTimeout(() => {
-      get().resetLastPoints();
-      set({ lastPointsResetTimerId: null });
-    }, ANIMATION_DURATION);
+    if (isTeleportBoardAnimationEnabled()) {
+      get().setShouldResetLastPointsAfterTeleport(true);
+    } else {
+      const timerId = setTimeout(() => {
+        get().resetLastPoints();
+        set({ lastPointsResetTimerId: null });
+      }, ANIMATION_DURATION);
 
-    set({ lastPointsResetTimerId: timerId });
+      set({ lastPointsResetTimerId: timerId });
+    }
 
     if (
       isJuryVotingOver &&
@@ -861,6 +890,7 @@ export const createVotingActions: StateCreator<
         }),
         shouldShowLastPoints: true,
         winnerCountry,
+        isLastSimulationAnimationFinished: winnerCountry ? false : true,
         showQualificationResults,
       });
 
@@ -991,12 +1021,16 @@ export const createVotingActions: StateCreator<
     if (state.lastPointsResetTimerId) {
       clearTimeout(state.lastPointsResetTimerId);
     }
-    const timerId = setTimeout(() => {
-      get().resetLastPoints();
-      set({ lastPointsResetTimerId: null });
-    }, ANIMATION_DURATION);
+    if (isTeleportBoardAnimationEnabled()) {
+      get().setShouldResetLastPointsAfterTeleport(true);
+    } else {
+      const timerId = setTimeout(() => {
+        get().resetLastPoints();
+        set({ lastPointsResetTimerId: null });
+      }, ANIMATION_DURATION);
 
-    set({ lastPointsResetTimerId: timerId });
+      set({ lastPointsResetTimerId: timerId });
+    }
 
     const isStageOver =
       currentStage.votingMode === StageVotingMode.JURY_ONLY ||
@@ -1016,6 +1050,7 @@ export const createVotingActions: StateCreator<
         ),
         shouldShowLastPoints: false,
         winnerCountry,
+        isLastSimulationAnimationFinished: winnerCountry ? false : true,
         showQualificationResults,
       });
     } else {
@@ -1109,6 +1144,7 @@ export const createVotingActions: StateCreator<
       shouldShowLastPoints: false,
       shouldClearPoints: true,
       winnerCountry,
+      isLastSimulationAnimationFinished: winnerCountry ? false : true,
       showQualificationResults,
       televotingProgress: state.televotingProgress + countriesToVote.length,
     });

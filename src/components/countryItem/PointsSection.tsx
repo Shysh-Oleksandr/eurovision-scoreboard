@@ -1,10 +1,13 @@
-import React from 'react';
+import { CountUp } from 'countup.js';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import { BaseCountry, Country } from '../../models';
 import RoundedTriangle from '../RoundedTriangle';
 
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 import { PointsContainerShape } from '@/theme/types';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 export interface PointsSectionProps {
   country: Country | BaseCountry;
@@ -20,6 +23,7 @@ export interface PointsSectionProps {
   lastPointsContainerRef?: React.RefObject<HTMLDivElement | null>;
   triangleClassName?: string;
   isTwoColumnLayout?: boolean;
+  usePointsCountUpAnimationOverride?: boolean;
 }
 
 const PointsSection: React.FC<PointsSectionProps> = ({
@@ -36,9 +40,67 @@ const PointsSection: React.FC<PointsSectionProps> = ({
   lastPointsContainerRef,
   triangleClassName,
   isTwoColumnLayout = false,
+  usePointsCountUpAnimationOverride,
 }) => {
+  const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
+  const isLastSimulationAnimationFinished = useScoreboardStore(
+    (state) => state.isLastSimulationAnimationFinished,
+  );
+  const { usePointsCountUpAnimation } = useThemeSpecifics();
+
   const withTriangle = pointsContainerShape === 'triangle';
   const isTransparent = pointsContainerShape === 'transparent';
+  const pointsRef = useRef<HTMLHeadingElement | null>(null);
+  const previousPointsRef = useRef<number | null>(null);
+  const currentPoints = useMemo(() => {
+    return 'points' in country ? toFixedIfDecimalFloat(country.points) : 0;
+  }, [country]);
+
+  useEffect(() => {
+    if (!pointsRef.current || shouldShowNQLabel) {
+      previousPointsRef.current = currentPoints;
+
+      return;
+    }
+
+    const startVal = previousPointsRef.current ?? currentPoints;
+    const shouldUsePointsCountUpAnimation =
+      usePointsCountUpAnimationOverride ?? usePointsCountUpAnimation;
+    const shouldDisableAnimation =
+      !shouldUsePointsCountUpAnimation ||
+      (winnerCountry && isLastSimulationAnimationFinished);
+    const countUp = new CountUp(pointsRef.current, currentPoints, {
+      startVal,
+      duration: shouldDisableAnimation ? 0 : 0.8,
+      useGrouping: false,
+      formattingFn: (value) => String(toFixedIfDecimalFloat(value)),
+    });
+
+    if (countUp.error) {
+      pointsRef.current.textContent = String(currentPoints);
+      previousPointsRef.current = currentPoints;
+
+      return;
+    }
+
+    if (startVal === currentPoints) {
+      pointsRef.current.textContent = String(currentPoints);
+      previousPointsRef.current = currentPoints;
+
+      return;
+    }
+
+    countUp.start(() => {
+      previousPointsRef.current = currentPoints;
+    });
+  }, [
+    currentPoints,
+    winnerCountry,
+    isLastSimulationAnimationFinished,
+    usePointsCountUpAnimation,
+    usePointsCountUpAnimationOverride,
+    shouldShowNQLabel,
+  ]);
 
   return (
     <>
@@ -94,15 +156,12 @@ const PointsSection: React.FC<PointsSectionProps> = ({
           />
         )}
         <h6
+          ref={pointsRef}
           className={`xl:text-lg lg:text-base ${
             isTwoColumnLayout ? 'xs:text-sm text-xs' : 'text-sm'
           } font-semibold h-full items-center flex justify-center !z-[40] relative ${pointsTextClass}`}
         >
-          {shouldShowNQLabel
-            ? 'NQ'
-            : 'points' in country
-            ? toFixedIfDecimalFloat(country.points)
-            : 0}
+          {shouldShowNQLabel ? 'NQ' : currentPoints}
         </h6>
       </div>
     </>

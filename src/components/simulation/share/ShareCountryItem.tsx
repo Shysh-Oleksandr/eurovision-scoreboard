@@ -14,6 +14,7 @@ import { Country } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { ItemState } from '@/theme/types';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 type Props = {
   country: Country;
@@ -110,15 +111,8 @@ const ShareCountryItem: React.FC<Props> = ({
   const buttonClassName = `relative flex justify-between shadow-md w-full overflow-hidden rounded-[1px] ${currentSize.button} ${buttonColors}`;
 
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const uppercaseEntryName = useGeneralStore(
-    (s) => s.customTheme?.uppercaseEntryName ?? true,
-  );
-  const pointsContainerShape = useGeneralStore(
-    (s) => s.customTheme?.pointsContainerShape ?? 'triangle',
-  );
-  const flagShape = useGeneralStore(
-    (s) => s.customTheme?.flagShape ?? 'big-rectangle',
-  );
+  const { uppercaseEntryName, pointsContainerShape, flagShape } =
+    useThemeSpecifics();
   const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
     overrides,

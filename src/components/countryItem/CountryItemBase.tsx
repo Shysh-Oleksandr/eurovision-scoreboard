@@ -81,7 +81,7 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
         </div>
 
         {/* Points */}
-        <div className="flex h-full flex-shrink-0">
+        <div className="flex h-full flex-shrink-0 ml-auto">
           {renderPoints && renderPoints(country)}
         </div>
       </Container>

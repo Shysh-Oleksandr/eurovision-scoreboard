@@ -10,6 +10,7 @@ import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 interface CountryQualificationItemProps {
   country: BaseCountry | null;
@@ -29,12 +30,7 @@ export const CountryQualificationItem: React.FC<
   isModal = false,
 }) => {
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const uppercaseEntryName = useGeneralStore(
-    (s) => s.customTheme?.uppercaseEntryName ?? true,
-  );
-  const flagShape = useGeneralStore(
-    (s) => s.customTheme?.flagShape ?? 'big-rectangle',
-  );
+  const { uppercaseEntryName, flagShape } = useThemeSpecifics();
   const getCurrentStage = useScoreboardStore((s) => s.getCurrentStage);
 
   const itemRef = useRef<HTMLDivElement>(null);

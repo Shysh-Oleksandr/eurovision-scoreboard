@@ -32,6 +32,9 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
     [StageId.GF]: {},
   },
   lastPointsResetTimerId: null,
+  isBoardTeleportAnimationRunning: false,
+  shouldResetLastPointsAfterTeleport: false,
   currentRevealTelevotePoints: undefined,
   isWinnerAnimationAlreadyDisplayed: false,
+  isLastSimulationAnimationFinished: true,
 };

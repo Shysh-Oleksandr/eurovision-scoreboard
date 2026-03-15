@@ -89,6 +89,7 @@ export const createEventActions: StateCreator<
       televotingProgress: 0,
       viewedStageId: null,
       isWinnerAnimationAlreadyDisplayed: false,
+      isLastSimulationAnimationFinished: true,
     });
   },
 
@@ -289,6 +290,7 @@ export const createEventActions: StateCreator<
       showAllParticipants: false,
       televotingProgress: 0,
       isWinnerAnimationAlreadyDisplayed: false,
+      isLastSimulationAnimationFinished: true,
     });
   },
   closeQualificationResults: () => {
@@ -309,6 +311,7 @@ export const createEventActions: StateCreator<
     set({
       eventStages: [],
       currentStageId: null,
+      isLastSimulationAnimationFinished: true,
     });
   },
 });

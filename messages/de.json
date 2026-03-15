@@ -484,6 +484,17 @@
         "uppercaseEntryName": "Großbuchstaben Einträge",
         "juryActivePointsUnderline": "Jury-Aktive-Punkte-Unterstreichung",
         "juryPointsPanelRounded": "Jury-Punktepanel-Rund",
+        "usePointsCountUpAnimation": "Punkte-Zähl-Animation verwenden",
+        "boardAnimation": "Board-Animation",
+        "douzePointsAnimation": "Douze-Punkte-Animation",
+        "boardAnimations": {
+          "flip": "Flip-Bewegung (Standard)",
+          "teleport": "Teleport-Bewegung (ESC 2025)"
+        },
+        "douzePointsAnimations": {
+          "parallelograms": "Parallelogramme (ESC 2023)",
+          "heartsGrid": "Herzen-Gitter (ESC 2025)"
+        },
         "pointsContainerShapes": {
           "title": "Punktecontainer-Form",
           "curvedEdge": "Gekrümmte Kante",

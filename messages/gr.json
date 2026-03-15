@@ -233,7 +233,7 @@
       "setup": "Ρυθμίσεις"
     },
     "phaseActions": {
-      "viewStats": "Δείτε στατιστικά",
+      "viewStats": "Στατιστικά",
       "showNQs": "Εμφάνιση {nonQualifiersLabel}",
       "finalistsOnly": "Μόνο φιναλίστ",
       "selectEventStage": "Επιλέξτε στάδιο διαγωνισμού",
@@ -486,6 +486,17 @@
         "uppercaseEntryName": "Μεγάλα Επίθετα Χώρων",
         "juryActivePointsUnderline": "Υπογράμμιση Ενεργών Βαθμών Κριτικής",
         "juryPointsPanelRounded": "Κυκλικό Πλαίσιο Βαθμών Κριτικής",
+        "usePointsCountUpAnimation": "Χρήση κινήσεων υπολογισμού βαθμών",
+        "boardAnimation": "Κίνηση Πίνακα",
+        "douzePointsAnimation": "Κίνηση Douze Points",
+        "boardAnimations": {
+          "flip": "Κίνηση Flip (προεπιλογή)",
+          "teleport": "Κίνηση Teleport (ESC 2025)"
+        },
+        "douzePointsAnimations": {
+          "parallelograms": "Parallélogrammes (ESC 2023)",
+          "heartsGrid": "Κάδος Βαθμών Herzen (ESC 2025)"
+        },
         "pointsContainerShapes": {
           "title": "Μορφή Κάδου Βαθμών",
           "curvedEdge": "Καμπύλη Άκρη",

@@ -52,3 +52,61 @@ export function getSpecialBackgroundStyle(
 
   return undefined;
 }
+
+/**
+ * Extract a solid color from a color value.
+ * - Solid colors are returned as-is (normalized when possible).
+ * - Gradients return the first explicit color stop.
+ */
+export function extractSolidColorFromColorValue(
+  colorValue?: string | null,
+): string | undefined {
+  if (!colorValue || typeof colorValue !== 'string') return undefined;
+
+  const value = colorValue.trim();
+  if (!value) return undefined;
+
+  const firstExplicitColorMatch = value.match(
+    /#(?:[0-9a-fA-F]{3,8})|rgba?\([^)]*\)|hsla?\([^)]*\)/i,
+  );
+
+  if (firstExplicitColorMatch) {
+    return hslStringToHex(toOpaqueColorValue(firstExplicitColorMatch[0]));
+  }
+
+  if (/gradient\(/i.test(value)) {
+    return undefined;
+  }
+
+  return hslStringToHex(toOpaqueColorValue(value));
+}
+
+const toOpaqueColorValue = (rawValue: string): string => {
+  const value = rawValue.trim();
+
+  const rgbaMatch = value.match(
+    /^rgba\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*[\d.]+\s*\)$/i,
+  );
+  if (rgbaMatch) {
+    const [, r, g, b] = rgbaMatch;
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  const hslaMatch = value.match(
+    /^hsla\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*,\s*[\d.]+\s*\)$/i,
+  );
+  if (hslaMatch) {
+    const [, h, s, l] = hslaMatch;
+    return `hsl(${h}, ${s}%, ${l}%)`;
+  }
+
+  const hslAlphaTupleMatch = value.match(
+    /^(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%\s+\d+(?:\.\d+)?$/,
+  );
+  if (hslAlphaTupleMatch) {
+    const [, h, s, l] = hslAlphaTupleMatch;
+    return `${h} ${s}% ${l}%`;
+  }
+
+  return value;
+};

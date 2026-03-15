@@ -486,6 +486,17 @@
         "uppercaseEntryName": "Nazwy krajów wielkimi literami",
         "juryActivePointsUnderline": "Podkreślenie aktywnych punktów jury",
         "juryPointsPanelRounded": "Zaokrąglony panel punktów jury",
+        "usePointsCountUpAnimation": "Użyj animacji liczenia punktów",
+        "boardAnimation": "Animacja tablicy",
+        "douzePointsAnimation": "Animacja Douze Points",
+        "boardAnimations": {
+          "flip": "Animacja Flip (default)",
+          "teleport": "Animacja Teleport (ESC 2025)"
+        },
+        "douzePointsAnimations": {
+          "parallelograms": "Parallelogramy (ESC 2023)",
+          "heartsGrid": "Serca (ESC 2025)"
+        },
         "pointsContainerShapes": {
           "title": "Forma kontenera punktów",
           "curvedEdge": "Zakrzywiona krawędź",

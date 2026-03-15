@@ -1,4 +1,12 @@
-import { FlagShape, PointsContainerShape } from "@/theme/types";
+import {
+  BoardAnimationMode,
+  DouzePointsAnimationMode,
+  FlagShape,
+  PointsContainerShape,
+  ThemeSpecifics,
+} from '@/theme/types';
+
+export type { BoardAnimationMode, DouzePointsAnimationMode };
 
 export interface CustomTheme {
   _id: string;
@@ -20,6 +28,10 @@ export interface CustomTheme {
   juryActivePointsUnderline?: boolean;
   isJuryPointsPanelRounded?: boolean;
   flagShape?: FlagShape;
+  usePointsCountUpAnimation?: boolean;
+  boardAnimationMode?: BoardAnimationMode;
+  douzePointsAnimationMode?: DouzePointsAnimationMode;
+  themeSpecifics?: Partial<ThemeSpecifics>;
   createdAt: string;
   updatedAt: string;
   creator?: ThemeCreator;

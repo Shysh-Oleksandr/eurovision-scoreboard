@@ -12,7 +12,12 @@ import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import useAnimatePoints from '@/hooks/useAnimatePoints';
 import { Country } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
-import { FlagShape, ItemState, PointsContainerShape } from '@/theme/types';
+import {
+  DouzePointsAnimationMode,
+  FlagShape,
+  ItemState,
+  PointsContainerShape,
+} from '@/theme/types';
 
 // Determine colors based on state
 type DerivedColors = {
@@ -36,6 +41,8 @@ type ThemePreviewCountryItemUIProps = {
   uppercaseEntryName?: boolean;
   pointsContainerShape?: PointsContainerShape;
   flagShape?: FlagShape;
+  usePointsCountUpAnimation?: boolean;
+  douzePointsAnimationMode?: DouzePointsAnimationMode;
 };
 
 const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
@@ -48,6 +55,8 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   uppercaseEntryName = true,
   pointsContainerShape = 'triangle',
   flagShape = 'big-rectangle',
+  usePointsCountUpAnimation = true,
+  douzePointsAnimationMode = 'heartsGrid',
 }) => {
   const { user } = useAuthStore();
 
@@ -72,6 +81,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       showDouzePointsAnimation,
       previewCountry.code,
       lastPoints,
+      true,
     );
 
   const douzePointsRefs = showDouzePointsAnimationHook
@@ -86,6 +96,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     shouldShowLastPoints: false,
     isDouzePoints: showDouzePointsAnimation,
     douzePointsRefs,
+    douzePointsAnimationModeOverride: douzePointsAnimationMode,
   });
 
   // Mock country
@@ -240,6 +251,12 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
               parallelogramYellowRef: douzePointsParallelogramYellowRef,
             }}
             overrides={overrides}
+            countryName={mockCountry.name}
+            flagShape={flagShape}
+            isTwoColumnLayout={false}
+            uppercaseEntryName={uppercaseEntryName}
+            isThemePreview
+            douzePointsAnimationModeOverride={douzePointsAnimationMode}
           />
         ) : null
       }
@@ -279,6 +296,8 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
           lastPointsBgClass={lastPointsBg}
           lastPointsTextClass={lastPointsText}
           pointsContainerShape={pointsContainerShape}
+          pointsContainerClassName="ml-auto"
+          usePointsCountUpAnimationOverride={usePointsCountUpAnimation}
         />
       )}
     />

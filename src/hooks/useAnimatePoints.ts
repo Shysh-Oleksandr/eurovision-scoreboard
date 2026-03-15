@@ -3,6 +3,9 @@ import { useMemo, useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { DouzePointsAnimationMode } from '@/theme/types';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
+
 type ReturnType = {
   lastPointsContainerRef: React.RefObject<HTMLDivElement | null>;
   lastPointsTextRef: React.RefObject<HTMLDivElement | null>;
@@ -12,6 +15,7 @@ const useAnimatePoints = ({
   shouldShowLastPoints,
   isDouzePoints,
   douzePointsRefs,
+  douzePointsAnimationModeOverride,
 }: {
   shouldShowLastPoints: boolean;
   isDouzePoints: boolean;
@@ -20,18 +24,29 @@ const useAnimatePoints = ({
     parallelogramBlueRef: React.RefObject<HTMLDivElement | null>;
     parallelogramYellowRef: React.RefObject<HTMLDivElement | null>;
   } | null;
+  douzePointsAnimationModeOverride?: DouzePointsAnimationMode;
 }): ReturnType => {
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
+  const { douzePointsAnimationMode } = useThemeSpecifics();
+  const resolvedDouzePointsAnimationMode =
+    douzePointsAnimationModeOverride ?? douzePointsAnimationMode;
 
   useGSAP(
     () => {
+      if (resolvedDouzePointsAnimationMode !== 'parallelograms') {
+        return;
+      }
+
       if (!douzePointsRefs?.containerRef.current) {
         return;
       }
 
       const { containerRef, parallelogramBlueRef, parallelogramYellowRef } =
         douzePointsRefs;
+      if (!parallelogramBlueRef.current || !parallelogramYellowRef.current) {
+        return;
+      }
 
       if (isDouzePoints) {
         gsap.to(containerRef.current, {
@@ -82,7 +97,11 @@ const useAnimatePoints = ({
       }
     },
     {
-      dependencies: [isDouzePoints, douzePointsRefs],
+      dependencies: [
+        isDouzePoints,
+        douzePointsRefs,
+        resolvedDouzePointsAnimationMode,
+      ],
       scope: douzePointsRefs?.containerRef,
     },
   );

@@ -39,9 +39,12 @@ export type ScoreboardState = {
   predefinedVotes: Record<string, Partial<StageVotes>>;
   countryPoints: Record<string, Record<string, CountryPoints>>; // stageId -> countryCode -> CountryPoints
   lastPointsResetTimerId: NodeJS.Timeout | null;
+  isBoardTeleportAnimationRunning: boolean;
+  shouldResetLastPointsAfterTeleport: boolean;
   qualificationOrder: QualificationOrder;
   currentRevealTelevotePoints: number; // Current points to give in reveal mode
   isWinnerAnimationAlreadyDisplayed: boolean;
+  isLastSimulationAnimationFinished: boolean;
 
   // Getters
   getCurrentStage: () => EventStage | undefined;
@@ -79,6 +82,12 @@ export type ScoreboardState = {
   setViewedStageId: (stageId: string | null) => void;
   setCurrentStageId: (stageId: string | null) => void;
   hideDouzePointsAnimation: (countryCode: string) => void;
+  setBoardTeleportAnimationRunning: (isRunning: boolean) => void;
+  setShouldResetLastPointsAfterTeleport: (shouldReset: boolean) => void;
+  handleBoardTeleportAnimationComplete: (
+    hasDouzePointsAnimation: boolean,
+  ) => void;
+  setIsLastSimulationAnimationFinished: (isFinished: boolean) => void;
   setCurrentRevealTelevotePoints: (points: number) => void; // Set current points to give in reveal mode
   setIsWinnerAnimationAlreadyDisplayed: (hasShown: boolean) => void;
   predefineVotesForStage: (

@@ -1,6 +1,7 @@
 'use client';
+import { ArrowRightIcon, ChartBar } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
@@ -81,6 +82,7 @@ export const PhaseActions = () => {
             onClick={() => setShowFinalStatsModal(true)}
             className="ml-auto xs:!px-4"
             snowEffect="middle"
+            Icon={<ChartBar className="w-5 h-5" />}
           >
             {t('viewStats')}
           </Button>
@@ -124,8 +126,9 @@ export const PhaseActions = () => {
         {isVotingOver && !isLastStage && (
           <Button
             onClick={handleContinue}
-            className="animated-border"
+            className="animated-border !flex flex-row-reverse"
             snowEffect="right"
+            Icon={<ArrowRightIcon className="w-5 h-5" />}
           >
             {t('continueTo', { nextPhase: nextPhase ?? '' })}
           </Button>

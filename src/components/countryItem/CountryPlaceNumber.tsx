@@ -1,8 +1,5 @@
 'use client';
-import gsap from 'gsap';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-
-import { useGSAP } from '@gsap/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { getSpecialBackgroundStyle } from './utils/gradientUtils';
 
@@ -10,6 +7,8 @@ import { ArrowIcon } from '@/assets/icons/ArrowIcon';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import usePrevious from '@/hooks/usePrevious';
 import { useGeneralStore } from '@/state/generalStore';
+
+const ARROW_DISPLAY_DURATION_MS = 3000;
 
 type CountryItemState =
   | 'jury'
@@ -51,15 +50,12 @@ const CountryPlaceNumber = ({
   );
   const overrides = propOverrides || globalOverrides;
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
 
   const [displayArrow, setDisplayArrow] = useState(false);
 
   const previousIndex = usePrevious(index);
   const previousDisplayArrow = usePrevious(displayArrow);
-
-  const isScoreboard = size === 'scoreboard';
 
   // Determine state for rank colors
   const rankState: CountryItemState =
@@ -149,41 +145,9 @@ const CountryPlaceNumber = ({
 
       setTimeout(() => {
         setDisplayArrow(false);
-      }, 1800);
+      }, ARROW_DISPLAY_DURATION_MS);
     }
   }, [index, isJuryVoting, points, previousIndex, showRankChangeIndicator]);
-
-  useGSAP(
-    () => {
-      if (showPlaceAnimation && isScoreboard) {
-        gsap.fromTo(
-          containerRef.current,
-          {
-            width: 0,
-          },
-          {
-            width,
-            duration: 0.3,
-            delay: 0.08,
-            ease: 'power3.inOut',
-          },
-        );
-        gsap.fromTo(
-          textRef.current,
-          {
-            opacity: 0,
-          },
-          {
-            opacity: 1,
-            duration: 0.3,
-            delay: 0.08,
-            ease: 'power3.inOut',
-          },
-        );
-      }
-    },
-    { dependencies: [showPlaceAnimation, width], scope: containerRef },
-  );
 
   const placeText = index + 1 < 10 ? `0${index + 1}` : index + 1;
 
@@ -193,9 +157,8 @@ const CountryPlaceNumber = ({
 
   return (
     <div
-      ref={containerRef}
       className={`flex flex-none items-center justify-center rounded-sm ${rankColorClasses[rankState]} relative ${currentSize.container}`}
-      style={rankContainerSpecialStyle}
+      style={{ ...rankContainerSpecialStyle, width }}
     >
       <ArrowIcon
         className={`-rotate-90 mb-0.5 absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10 2cols:w-8 w-7 2cols:h-8 h-7 ${

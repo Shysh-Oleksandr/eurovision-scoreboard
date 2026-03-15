@@ -20,6 +20,7 @@ import {
   useGeneralStore,
 } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const MIN_SPEED_SECONDS = 0.5;
 const MAX_SPEED_SECONDS = 7.5;
@@ -37,6 +38,7 @@ const layoutTabs = [
 
 const PresentationPanel = (): JSX.Element | null => {
   const t = useTranslations();
+  const { boardAnimationMode } = useThemeSpecifics();
 
   const tabs = useMemo(
     () => [
@@ -158,7 +160,7 @@ const PresentationPanel = (): JSX.Element | null => {
 
       const baseSeconds = MAX_SPEED_SECONDS - presentationSpeedSeconds;
       const delayAfterAnimation = pauseAfterAnimatedPoints
-        ? Math.max(4.5, baseSeconds)
+        ? Math.max(boardAnimationMode === 'teleport' ? 6 : 4.5, baseSeconds)
         : baseSeconds;
       const nextDelaySeconds = awardedAnimated
         ? delayAfterAnimation
@@ -181,7 +183,12 @@ const PresentationPanel = (): JSX.Element | null => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPresenting, currentStage?.id, currentStage?.isJuryVoting]);
+  }, [
+    isPresenting,
+    currentStage?.id,
+    currentStage?.isJuryVoting,
+    boardAnimationMode,
+  ]);
 
   return (
     <div className="w-full">

@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from './client';
 import { queryKeys } from './queryKeys';
 import type {
+  BoardAnimationMode,
   CustomTheme,
+  DouzePointsAnimationMode,
   ThemeListResponse,
   ThemeState,
 } from '@/types/customTheme';
@@ -23,6 +25,9 @@ export type CreateThemeInput = {
   juryActivePointsUnderline?: boolean;
   isJuryPointsPanelRounded?: boolean;
   flagShape?: FlagShape;
+  usePointsCountUpAnimation?: boolean;
+  boardAnimationMode?: BoardAnimationMode;
+  douzePointsAnimationMode?: DouzePointsAnimationMode;
 };
 
 export type UpdateThemeInput = {
@@ -39,6 +44,9 @@ export type UpdateThemeInput = {
   juryActivePointsUnderline?: boolean | null;
   isJuryPointsPanelRounded?: boolean | null;
   flagShape?: FlagShape | null;
+  usePointsCountUpAnimation?: boolean | null;
+  boardAnimationMode?: BoardAnimationMode | null;
+  douzePointsAnimationMode?: DouzePointsAnimationMode | null;
 };
 
 export type PublicThemesQueryParams = {

@@ -486,6 +486,17 @@
         "uppercaseEntryName": "Назви країн великими літерами",
         "juryActivePointsUnderline": "Підкреслення активних балів журі",
         "juryPointsPanelRounded": "Заокруглений панель балів журі",
+        "usePointsCountUpAnimation": "Використовувати анімацію лічби балів",
+        "boardAnimation": "Анімація таблиці",
+        "douzePointsAnimation": "Анімація Douze Points",
+        "boardAnimations": {
+          "flip": "Анімація Flip (default)",
+          "teleport": "Анімація Teleport (ESC 2025)"
+        },
+        "douzePointsAnimations": {
+          "parallelograms": "Паралелограми (ESC 2023)",
+          "heartsGrid": "Серця (ESC 2025)"
+        },
         "pointsContainerShapes": {
           "title": "Форма контейнера балів",
           "curvedEdge": "Зігнута крайка",

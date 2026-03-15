@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-03-15',
+    title:
+      'Added the ability to categorize custom entries. Improved round flags and added square flags. Added the new scoreboard and DouzePoints animations (ESC 2025 style). Added a count-up points animation. Small improvements',
+  },
+  {
     date: '2026-02-22',
     title:
       'Added the ability to select multiple entries in a section and move them in bulk',
@@ -327,8 +332,8 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-02-28', end: '2026-03-01' },
-    title: 'Categorize custom entries. Theme customization improvements.',
+    approximateDates: { start: '2026-03-21', end: '2026-03-22' },
+    title: 'Update default themes (2016-2025) to use new theme features.',
   },
   {
     title: 'Running order setup',

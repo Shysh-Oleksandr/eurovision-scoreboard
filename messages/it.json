@@ -233,7 +233,7 @@
       "setup": "Configurazione"
     },
     "phaseActions": {
-      "viewStats": "Visualizza statistiche",
+      "viewStats": "Statistiche",
       "showNQs": "Mostra {nonQualifiersLabel}",
       "finalistsOnly": "Solo finalisti",
       "selectEventStage": "Seleziona fase dell'evento",
@@ -486,6 +486,17 @@
         "uppercaseEntryName": "Nomi Paesi in Maiuscolo",
         "juryActivePointsUnderline": "Sottolineatura Punti Attivi Giuria",
         "juryPointsPanelRounded": "Pannello Punti Giuria Arrotondato",
+        "usePointsCountUpAnimation": "Usa animazione punti contando",
+        "boardAnimation": "Animazione Tabella",
+        "douzePointsAnimation": "Animazione Punti Douze",
+        "boardAnimations": {
+          "flip": "Movimento Flip (default)",
+          "teleport": "Movimento Teleport (ESC 2025)"
+        },
+        "douzePointsAnimations": {
+          "parallelograms": "Parallelogrammi (ESC 2023)",
+          "heartsGrid": "Griglia di Corazioni (ESC 2025)"
+        },
         "pointsContainerShapes": {
           "title": "Forma Contenitore Punti",
           "curvedEdge": "Bordo Curvo",

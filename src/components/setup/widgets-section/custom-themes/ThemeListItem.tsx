@@ -22,6 +22,7 @@ import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useAuthStore } from '@/state/useAuthStore';
+import { resolveThemeSpecificsForCustomTheme } from '@/theme/themeSpecifics';
 import { getCssVarsForCustomTheme } from '@/theme/themeUtils';
 import { CustomTheme } from '@/types/customTheme';
 
@@ -99,6 +100,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   };
 
   const cssVars = useMemo(() => getCssVarsForCustomTheme(theme), [theme]);
+  const themeSpecifics = useMemo(
+    () => resolveThemeSpecificsForCustomTheme(theme),
+    [theme],
+  );
 
   return (
     <div
@@ -146,11 +151,13 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           isListItem
           onClick={() => handleAwardPoints(12)}
           previewCountryCode={theme.creator?.country}
-          uppercaseEntryName={theme.uppercaseEntryName}
-          pointsContainerShape={theme.pointsContainerShape}
-          flagShape={theme.flagShape}
-          isJuryPointsPanelRounded={theme.isJuryPointsPanelRounded}
-          juryActivePointsUnderline={theme.juryActivePointsUnderline}
+          uppercaseEntryName={themeSpecifics.uppercaseEntryName}
+          pointsContainerShape={themeSpecifics.pointsContainerShape}
+          flagShape={themeSpecifics.flagShape}
+          isJuryPointsPanelRounded={themeSpecifics.isJuryPointsPanelRounded}
+          juryActivePointsUnderline={themeSpecifics.juryActivePointsUnderline}
+          usePointsCountUpAnimation={themeSpecifics.usePointsCountUpAnimation}
+          douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
         />
       </div>
       {theme.creator && (

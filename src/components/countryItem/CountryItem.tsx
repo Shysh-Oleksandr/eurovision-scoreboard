@@ -20,6 +20,7 @@ import PointsSection from './PointsSection';
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 import { ItemState } from '@/theme/types';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 type Props = {
   country: Country;
@@ -28,6 +29,7 @@ type Props = {
   onClick: (countryCode: string) => void;
   showPlaceAnimation: boolean;
   hasCountryFinishedVoting: boolean;
+  boardAnimationClassName?: string;
 };
 
 const CountryItem = ({
@@ -37,6 +39,7 @@ const CountryItem = ({
   onClick,
   showPlaceAnimation,
   hasCountryFinishedVoting,
+  boardAnimationClassName,
   ...props
 }: Props) => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
@@ -113,15 +116,9 @@ const CountryItem = ({
   });
 
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const uppercaseEntryName = useGeneralStore(
-    (s) => s.customTheme?.uppercaseEntryName ?? true,
-  );
-  const flagShape = useGeneralStore(
-    (s) => s.customTheme?.flagShape ?? 'big-rectangle',
-  );
-  const pointsContainerShape = useGeneralStore(
-    (s) => s.customTheme?.pointsContainerShape ?? 'triangle',
-  );
+  const { uppercaseEntryName, flagShape, pointsContainerShape } =
+    useThemeSpecifics();
+
   const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
     overrides,
@@ -133,7 +130,9 @@ const CountryItem = ({
     <CountryItemBase
       country={country}
       index={index}
-      className={isVotingOver ? '' : 'md:~md/xl:~w-[14rem]/[26rem]'}
+      className={`${isVotingOver ? '' : 'md:~md/xl:~w-[14rem]/[26rem]'} ${
+        boardAnimationClassName || ''
+      }`}
       containerClassName={`${buttonClassName} flex-1 min-w-0 overflow-hidden`}
       style={buttonSpecialStyle}
       disabled={isDisabled}
@@ -177,6 +176,10 @@ const CountryItem = ({
             }}
             pointsAmount={douzePoints ?? 0}
             overrides={overrides}
+            countryName={country.name}
+            flagShape={flagShape}
+            isTwoColumnLayout={isTwoColumnLayout}
+            uppercaseEntryName={uppercaseEntryName}
           />
         ) : null
       }

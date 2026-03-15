@@ -33,10 +33,18 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
+import {
+  resolveThemeSpecificsForBaseThemeYear,
+  resolveThemeSpecificsForCustomTheme,
+} from '@/theme/themeSpecifics';
 import { applyCustomTheme, getDefaultThemeColors } from '@/theme/themeUtils';
 import { FlagShape, PointsContainerShape } from '@/theme/types';
 import { useThemeColor } from '@/theme/useThemeColor';
-import { CustomTheme } from '@/types/customTheme';
+import {
+  BoardAnimationMode,
+  CustomTheme,
+  DouzePointsAnimationMode,
+} from '@/types/customTheme';
 
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
 
@@ -85,6 +93,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     useState(true);
   const [isJuryPointsPanelRounded, setIsJuryPointsPanelRounded] =
     useState(false);
+  const [usePointsCountUpAnimation, setUsePointsCountUpAnimation] =
+    useState(true);
+  const [boardAnimationMode, setBoardAnimationMode] =
+    useState<BoardAnimationMode>('flip');
+  const [douzePointsAnimationMode, setDouzePointsAnimationMode] =
+    useState<DouzePointsAnimationMode>('heartsGrid');
   const { mutateAsync: createTheme, isPending: isCreating } =
     useCreateThemeMutation();
   const { mutateAsync: updateTheme, isPending: isUpdating } =
@@ -113,6 +127,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   // Initialize form with theme to edit
   useEffect(() => {
     if (initialTheme) {
+      const resolvedInitialThemeSpecifics =
+        resolveThemeSpecificsForCustomTheme(initialTheme);
+
       setName(initialTheme.name);
       setDescription(initialTheme.description || '');
       setBaseThemeYear(initialTheme.baseThemeYear);
@@ -127,15 +144,24 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
       setUploadedFile(null);
-      setPointsContainerShape(initialTheme.pointsContainerShape || 'triangle');
-      setUppercaseEntryName(initialTheme.uppercaseEntryName ?? true);
+      setPointsContainerShape(
+        resolvedInitialThemeSpecifics.pointsContainerShape,
+      );
+      setUppercaseEntryName(resolvedInitialThemeSpecifics.uppercaseEntryName);
       setJuryActivePointsUnderline(
-        initialTheme.juryActivePointsUnderline ?? true,
+        resolvedInitialThemeSpecifics.juryActivePointsUnderline,
       );
       setIsJuryPointsPanelRounded(
-        initialTheme.isJuryPointsPanelRounded ?? false,
+        resolvedInitialThemeSpecifics.isJuryPointsPanelRounded,
       );
-      setFlagShape(initialTheme.flagShape || 'big-rectangle');
+      setFlagShape(resolvedInitialThemeSpecifics.flagShape);
+      setUsePointsCountUpAnimation(
+        resolvedInitialThemeSpecifics.usePointsCountUpAnimation,
+      );
+      setBoardAnimationMode(resolvedInitialThemeSpecifics.boardAnimationMode);
+      setDouzePointsAnimationMode(
+        resolvedInitialThemeSpecifics.douzePointsAnimationMode,
+      );
     } else {
       setName('');
       setDescription('');
@@ -151,6 +177,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setJuryActivePointsUnderline(true);
       setIsJuryPointsPanelRounded(false);
       setFlagShape('big-rectangle');
+      setUsePointsCountUpAnimation(true);
+      setBoardAnimationMode('flip');
+      setDouzePointsAnimationMode('heartsGrid');
     }
   }, [initialTheme, isOpen, themeYear, themeHue]);
 
@@ -172,6 +201,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       backgroundImageUrl,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      usePointsCountUpAnimation,
+      boardAnimationMode,
+      douzePointsAnimationMode,
     };
 
     applyCustomTheme(previewTheme, true);
@@ -181,6 +213,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     baseThemeYear,
     backgroundImageUrl,
     overrides,
+    usePointsCountUpAnimation,
+    boardAnimationMode,
+    douzePointsAnimationMode,
     isOpen,
   ]);
 
@@ -193,6 +228,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
     // Build payload with only non-default values for theme-specific options
     const buildThemePayload = (isUpdate = false) => {
+      const defaultThemeSpecifics =
+        resolveThemeSpecificsForBaseThemeYear(baseThemeYear);
       const payload: any = {
         name,
         description,
@@ -206,63 +243,183 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
       // For updates, we need to explicitly handle reverting to defaults
       if (isUpdate && initialTheme) {
+        const hasCustomPointsContainerShape =
+          (initialTheme.pointsContainerShape !== undefined &&
+            initialTheme.pointsContainerShape !== null) ||
+          (initialTheme.themeSpecifics?.pointsContainerShape !== undefined &&
+            initialTheme.themeSpecifics?.pointsContainerShape !== null);
+        const hasCustomUppercaseEntryName =
+          (initialTheme.uppercaseEntryName !== undefined &&
+            initialTheme.uppercaseEntryName !== null) ||
+          (initialTheme.themeSpecifics?.uppercaseEntryName !== undefined &&
+            initialTheme.themeSpecifics?.uppercaseEntryName !== null);
+        const hasCustomJuryActivePointsUnderline =
+          (initialTheme.juryActivePointsUnderline !== undefined &&
+            initialTheme.juryActivePointsUnderline !== null) ||
+          (initialTheme.themeSpecifics?.juryActivePointsUnderline !==
+            undefined &&
+            initialTheme.themeSpecifics?.juryActivePointsUnderline !== null);
+        const hasCustomIsJuryPointsPanelRounded =
+          (initialTheme.isJuryPointsPanelRounded !== undefined &&
+            initialTheme.isJuryPointsPanelRounded !== null) ||
+          (initialTheme.themeSpecifics?.isJuryPointsPanelRounded !==
+            undefined &&
+            initialTheme.themeSpecifics?.isJuryPointsPanelRounded !== null);
+        const hasCustomFlagShape =
+          (initialTheme.flagShape !== undefined &&
+            initialTheme.flagShape !== null) ||
+          (initialTheme.themeSpecifics?.flagShape !== undefined &&
+            initialTheme.themeSpecifics?.flagShape !== null);
+        const hasCustomUsePointsCountUpAnimation =
+          (initialTheme.usePointsCountUpAnimation !== undefined &&
+            initialTheme.usePointsCountUpAnimation !== null) ||
+          (initialTheme.themeSpecifics?.usePointsCountUpAnimation !==
+            undefined &&
+            initialTheme.themeSpecifics?.usePointsCountUpAnimation !== null);
+        const hasCustomBoardAnimationMode =
+          (initialTheme.boardAnimationMode !== undefined &&
+            initialTheme.boardAnimationMode !== null) ||
+          (initialTheme.themeSpecifics?.boardAnimationMode !== undefined &&
+            initialTheme.themeSpecifics?.boardAnimationMode !== null);
+        const hasCustomDouzePointsAnimationMode =
+          (initialTheme.douzePointsAnimationMode !== undefined &&
+            initialTheme.douzePointsAnimationMode !== null) ||
+          (initialTheme.themeSpecifics?.douzePointsAnimationMode !==
+            undefined &&
+            initialTheme.themeSpecifics?.douzePointsAnimationMode !== null);
+
         // If previously had a non-default value but now is default, set to null to delete
         if (
-          initialTheme.pointsContainerShape &&
-          pointsContainerShape === 'triangle'
+          hasCustomPointsContainerShape &&
+          pointsContainerShape === defaultThemeSpecifics.pointsContainerShape
         ) {
           payload.pointsContainerShape = null;
-        } else if (pointsContainerShape !== 'triangle') {
+        } else if (
+          pointsContainerShape !== defaultThemeSpecifics.pointsContainerShape
+        ) {
           payload.pointsContainerShape = pointsContainerShape;
         }
 
         if (
-          initialTheme.uppercaseEntryName === false &&
-          uppercaseEntryName === true
+          hasCustomUppercaseEntryName &&
+          uppercaseEntryName === defaultThemeSpecifics.uppercaseEntryName
         ) {
           payload.uppercaseEntryName = null;
-        } else if (uppercaseEntryName !== true) {
+        } else if (
+          uppercaseEntryName !== defaultThemeSpecifics.uppercaseEntryName
+        ) {
           payload.uppercaseEntryName = uppercaseEntryName;
         }
         if (
-          initialTheme.juryActivePointsUnderline === false &&
-          juryActivePointsUnderline === true
+          hasCustomJuryActivePointsUnderline &&
+          juryActivePointsUnderline ===
+            defaultThemeSpecifics.juryActivePointsUnderline
         ) {
           payload.juryActivePointsUnderline = null;
-        } else if (juryActivePointsUnderline !== true) {
+        } else if (
+          juryActivePointsUnderline !==
+          defaultThemeSpecifics.juryActivePointsUnderline
+        ) {
           payload.juryActivePointsUnderline = juryActivePointsUnderline;
         }
 
         if (
-          initialTheme.isJuryPointsPanelRounded === true &&
-          isJuryPointsPanelRounded === false
+          hasCustomIsJuryPointsPanelRounded &&
+          isJuryPointsPanelRounded ===
+            defaultThemeSpecifics.isJuryPointsPanelRounded
         ) {
           payload.isJuryPointsPanelRounded = null;
-        } else if (isJuryPointsPanelRounded !== false) {
+        } else if (
+          isJuryPointsPanelRounded !==
+          defaultThemeSpecifics.isJuryPointsPanelRounded
+        ) {
           payload.isJuryPointsPanelRounded = isJuryPointsPanelRounded;
         }
 
-        if (initialTheme.flagShape && flagShape === 'big-rectangle') {
+        if (
+          hasCustomFlagShape &&
+          flagShape === defaultThemeSpecifics.flagShape
+        ) {
           payload.flagShape = null;
-        } else if (flagShape !== 'big-rectangle') {
+        } else if (flagShape !== defaultThemeSpecifics.flagShape) {
           payload.flagShape = flagShape;
+        }
+
+        if (
+          hasCustomUsePointsCountUpAnimation &&
+          usePointsCountUpAnimation ===
+            defaultThemeSpecifics.usePointsCountUpAnimation
+        ) {
+          payload.usePointsCountUpAnimation = null;
+        } else if (
+          usePointsCountUpAnimation !==
+          defaultThemeSpecifics.usePointsCountUpAnimation
+        ) {
+          payload.usePointsCountUpAnimation = usePointsCountUpAnimation;
+        }
+
+        if (
+          hasCustomBoardAnimationMode &&
+          boardAnimationMode === defaultThemeSpecifics.boardAnimationMode
+        ) {
+          payload.boardAnimationMode = null;
+        } else if (
+          boardAnimationMode !== defaultThemeSpecifics.boardAnimationMode
+        ) {
+          payload.boardAnimationMode = boardAnimationMode;
+        }
+
+        if (
+          hasCustomDouzePointsAnimationMode &&
+          douzePointsAnimationMode ===
+            defaultThemeSpecifics.douzePointsAnimationMode
+        ) {
+          payload.douzePointsAnimationMode = null;
+        } else if (
+          douzePointsAnimationMode !==
+          defaultThemeSpecifics.douzePointsAnimationMode
+        ) {
+          payload.douzePointsAnimationMode = douzePointsAnimationMode;
         }
       } else {
         // For creates, only include if different from defaults
-        if (pointsContainerShape !== 'triangle') {
+        if (
+          pointsContainerShape !== defaultThemeSpecifics.pointsContainerShape
+        ) {
           payload.pointsContainerShape = pointsContainerShape;
         }
-        if (uppercaseEntryName !== true) {
+        if (uppercaseEntryName !== defaultThemeSpecifics.uppercaseEntryName) {
           payload.uppercaseEntryName = uppercaseEntryName;
         }
-        if (juryActivePointsUnderline !== true) {
+        if (
+          juryActivePointsUnderline !==
+          defaultThemeSpecifics.juryActivePointsUnderline
+        ) {
           payload.juryActivePointsUnderline = juryActivePointsUnderline;
         }
-        if (isJuryPointsPanelRounded !== false) {
+        if (
+          isJuryPointsPanelRounded !==
+          defaultThemeSpecifics.isJuryPointsPanelRounded
+        ) {
           payload.isJuryPointsPanelRounded = isJuryPointsPanelRounded;
         }
-        if (flagShape !== 'big-rectangle') {
+        if (flagShape !== defaultThemeSpecifics.flagShape) {
           payload.flagShape = flagShape;
+        }
+        if (
+          usePointsCountUpAnimation !==
+          defaultThemeSpecifics.usePointsCountUpAnimation
+        ) {
+          payload.usePointsCountUpAnimation = usePointsCountUpAnimation;
+        }
+        if (boardAnimationMode !== defaultThemeSpecifics.boardAnimationMode) {
+          payload.boardAnimationMode = boardAnimationMode;
+        }
+        if (
+          douzePointsAnimationMode !==
+          defaultThemeSpecifics.douzePointsAnimationMode
+        ) {
+          payload.douzePointsAnimationMode = douzePointsAnimationMode;
         }
       }
 
@@ -562,8 +719,69 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 checked={isJuryPointsPanelRounded}
                 onChange={(e) => setIsJuryPointsPanelRounded(e.target.checked)}
               />
+              <Checkbox
+                id="use-points-count-up-animation"
+                label={t(
+                  'widgets.themes.visualDetails.usePointsCountUpAnimation',
+                )}
+                labelClassName="w-full !px-0 !pt-1 !items-start"
+                checked={usePointsCountUpAnimation}
+                onChange={(e) => setUsePointsCountUpAnimation(e.target.checked)}
+              />
 
               <div className="grid xs:grid-cols-2 grid-cols-1 items-center xs:gap-3 gap-2">
+                <CustomSelect
+                  options={[
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.boardAnimations.flip',
+                      ),
+                      value: 'flip',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.boardAnimations.teleport',
+                      ),
+                      value: 'teleport',
+                    },
+                  ]}
+                  value={boardAnimationMode}
+                  labelClassName="!text-base !font-medium mb-1"
+                  onChange={(value) =>
+                    setBoardAnimationMode(value as BoardAnimationMode)
+                  }
+                  id="board-animation-mode-select"
+                  label={t('widgets.themes.visualDetails.boardAnimation')}
+                  dataTheme="custom-preview"
+                  withIndicator={false}
+                />
+                <CustomSelect
+                  options={[
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.douzePointsAnimations.parallelograms',
+                      ),
+                      value: 'parallelograms',
+                    },
+                    {
+                      label: t(
+                        'widgets.themes.visualDetails.douzePointsAnimations.heartsGrid',
+                      ),
+                      value: 'heartsGrid',
+                    },
+                  ]}
+                  value={douzePointsAnimationMode}
+                  labelClassName="!text-base !font-medium mb-1"
+                  onChange={(value) =>
+                    setDouzePointsAnimationMode(
+                      value as DouzePointsAnimationMode,
+                    )
+                  }
+                  id="douze-points-animation-mode-select"
+                  label={t('widgets.themes.visualDetails.douzePointsAnimation')}
+                  dataTheme="custom-preview"
+                  withIndicator={false}
+                />
                 <CustomSelect
                   options={[
                     {
@@ -599,7 +817,6 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                   dataTheme="custom-preview"
                   withIndicator={false}
                 />
-
                 <CustomSelect
                   options={[
                     {
@@ -657,6 +874,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               defaultColors={defaultColors}
               overrides={overrides}
               onChange={setOverrides}
+              douzePointsAnimationMode={douzePointsAnimationMode}
             />
           </CollapsibleSection>
         </div>
@@ -711,6 +929,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               pointsContainerShape={pointsContainerShape}
               flagShape={flagShape}
               isJuryPointsPanelRounded={isJuryPointsPanelRounded}
+              usePointsCountUpAnimation={usePointsCountUpAnimation}
+              douzePointsAnimationMode={douzePointsAnimationMode}
             />
           </div>
         </div>

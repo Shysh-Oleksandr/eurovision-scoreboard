@@ -9,7 +9,7 @@ import CountryInfo from './CountryInfo';
 import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
-import { useGeneralStore } from '@/state/generalStore';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const ControlsPanel = (): JSX.Element | null => {
   const t = useTranslations('simulation');
@@ -18,12 +18,8 @@ const ControlsPanel = (): JSX.Element | null => {
     (state) => state.votingCountryIndex,
   );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const isJuryPointsPanelRounded = useGeneralStore(
-    (state) => state.customTheme?.isJuryPointsPanelRounded ?? false,
-  );
-  const juryActivePointsUnderline = useGeneralStore(
-    (state) => state.customTheme?.juryActivePointsUnderline ?? true,
-  );
+  const { isJuryPointsPanelRounded, juryActivePointsUnderline } =
+    useThemeSpecifics();
 
   const {
     isJuryVoting,

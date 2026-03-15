@@ -6,7 +6,12 @@ import ThemePreviewCountryItemUI from './ThemePreviewCountryItemUI';
 import Badge from '@/components/common/Badge';
 import VotingPointsInfo from '@/components/controlsPanel/VotingPointsInfo';
 import { getThemeBackground } from '@/theme/themes';
-import { FlagShape, ItemState, PointsContainerShape } from '@/theme/types';
+import {
+  DouzePointsAnimationMode,
+  FlagShape,
+  ItemState,
+  PointsContainerShape,
+} from '@/theme/types';
 
 const previewBadges = [
   {
@@ -46,6 +51,8 @@ type ThemePreviewCountryItemCompactProps = {
   pointsContainerShape?: PointsContainerShape;
   flagShape?: FlagShape;
   isJuryPointsPanelRounded?: boolean;
+  usePointsCountUpAnimation?: boolean;
+  douzePointsAnimationMode?: DouzePointsAnimationMode;
 };
 
 const ThemePreviewCountryItemCompact: React.FC<
@@ -65,6 +72,8 @@ const ThemePreviewCountryItemCompact: React.FC<
   pointsContainerShape = 'triangle',
   flagShape = 'big-rectangle',
   isJuryPointsPanelRounded = false,
+  usePointsCountUpAnimation = true,
+  douzePointsAnimationMode = 'heartsGrid',
 }) => {
   const t = useTranslations('widgets.themes.previewCountryItemStates');
 
@@ -109,6 +118,8 @@ const ThemePreviewCountryItemCompact: React.FC<
           uppercaseEntryName={uppercaseEntryName}
           pointsContainerShape={pointsContainerShape}
           flagShape={flagShape}
+          usePointsCountUpAnimation={usePointsCountUpAnimation}
+          douzePointsAnimationMode={douzePointsAnimationMode}
         />
 
         <VotingPointsInfo

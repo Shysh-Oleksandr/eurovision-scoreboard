@@ -1,3 +1,4 @@
+import { ArrowRightIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -144,7 +145,8 @@ const QualificationResultsModal = () => {
                 handleContinue();
               }, ANIMATION_DURATION / 2);
             }}
-            className="animated-border !text-sm md:!text-base w-full"
+            className="animated-border !flex flex-row-reverse flex-nowrap !text-sm md:!text-base w-full"
+            Icon={<ArrowRightIcon className="w-5 h-5" />}
           >
             {t('simulation.phaseActions.continueTo', {
               nextPhase: nextPhase ?? '',

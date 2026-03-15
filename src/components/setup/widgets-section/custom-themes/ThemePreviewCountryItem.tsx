@@ -6,7 +6,11 @@ import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SparklesIcon } from '@/assets/icons/SparklesIcon';
 import Button from '@/components/common/Button';
-import { FlagShape, PointsContainerShape } from '@/theme/types';
+import {
+  DouzePointsAnimationMode,
+  FlagShape,
+  PointsContainerShape,
+} from '@/theme/types';
 
 type ThemePreviewCountryItemProps = {
   backgroundImage: string | null;
@@ -17,6 +21,8 @@ type ThemePreviewCountryItemProps = {
   pointsContainerShape?: PointsContainerShape;
   flagShape?: FlagShape;
   isJuryPointsPanelRounded?: boolean;
+  usePointsCountUpAnimation?: boolean;
+  douzePointsAnimationMode?: DouzePointsAnimationMode;
 };
 
 const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
@@ -28,6 +34,8 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   pointsContainerShape = 'triangle',
   flagShape = 'big-rectangle',
   isJuryPointsPanelRounded = false,
+  usePointsCountUpAnimation = true,
+  douzePointsAnimationMode = 'heartsGrid',
 }) => {
   const t = useTranslations('widgets.themes');
 
@@ -71,6 +79,8 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
         pointsContainerShape={pointsContainerShape}
         flagShape={flagShape}
         isJuryPointsPanelRounded={isJuryPointsPanelRounded}
+        usePointsCountUpAnimation={usePointsCountUpAnimation}
+        douzePointsAnimationMode={douzePointsAnimationMode}
       />
 
       {/* Actions */}
