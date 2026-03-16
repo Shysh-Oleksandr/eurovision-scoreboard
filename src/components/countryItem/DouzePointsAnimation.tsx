@@ -33,12 +33,12 @@ type DouzePointsAnimationProps = {
 const DOUZE_VISIBLE_ROWS = 3;
 const DOUZE_OVERFLOW_ROWS = 1;
 const DOUZE_POINTS_ROWS = DOUZE_VISIBLE_ROWS + DOUZE_OVERFLOW_ROWS * 2;
-const DOUZE_POINTS_TARGET_COLUMNS = 14;
+const DOUZE_POINTS_TARGET_COLUMNS = 15;
 const HEARTS_MAX_SCALE = 2.25;
-const HEARTS_GROW_COLUMN_DURATION_SECONDS = 0.7;
-const HEARTS_SHRINK_COLUMN_DURATION_SECONDS = 0.7;
-const HEARTS_GROW_STAGGER_SPAN_SECONDS = 0.7;
-const HEARTS_SHRINK_STAGGER_SPAN_SECONDS = 0.7;
+const HEARTS_GROW_COLUMN_DURATION_SECONDS = 0.8;
+const HEARTS_SHRINK_COLUMN_DURATION_SECONDS = 0.8;
+const HEARTS_GROW_STAGGER_SPAN_SECONDS = 0.8;
+const HEARTS_SHRINK_STAGGER_SPAN_SECONDS = 0.8;
 const HEARTS_REVERSE_DELAY_SECONDS = 0.7;
 
 type BaseVariantProps = {
@@ -180,9 +180,9 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
         timeline.to(
           columnHearts,
           {
-            scale: maxScale,
+            scale: maxScale * (Math.random() * 0.2 + 0.95),
             duration: HEARTS_GROW_COLUMN_DURATION_SECONDS,
-            ease: 'power2.out',
+            ease: 'power1.out',
           },
           columnPosition,
         );
@@ -232,7 +232,7 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
       style={specialStyle}
     >
       <div
-        className="absolute z-40 grid left-0 lg:-right-2 md:right-0 -right-2"
+        className="absolute z-40 grid left-0 -right-2"
         style={{
           top: `${(-DOUZE_OVERFLOW_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
           height: `${(DOUZE_POINTS_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
@@ -313,7 +313,10 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
     ? resolvedDouzePointsAnimationMode
     : DEFAULT_THEME_SPECIFICS.douzePointsAnimationMode;
 
-  const flagOverlayOffsetClassName = getFlagOverlayOffsetClassName(flagShape);
+  const flagOverlayOffsetClassName = getFlagOverlayOffsetClassName(
+    flagShape,
+    isThemePreview,
+  );
   const containerClass = `absolute overflow-hidden ${
     activeDouzePointsAnimationMode === 'heartsGrid'
       ? flagOverlayOffsetClassName

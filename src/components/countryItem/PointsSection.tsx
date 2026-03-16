@@ -124,7 +124,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
         >
           {withTriangle && (
             <RoundedTriangle
-              className={`${lastPointsBgClass} !z-[-1] ${triangleClassName}`}
+              className={`${lastPointsBgClass} ${triangleClassName} !z-[-1]`}
             />
           )}
           <h6
@@ -152,7 +152,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       >
         {withTriangle && (
           <RoundedTriangle
-            className={`${pointsBgClass} !z-[-1] ${triangleClassName}`}
+            className={`${pointsBgClass} ${triangleClassName} !z-[1]`}
           />
         )}
         <h6
