@@ -73,6 +73,8 @@ export interface EventStage {
   isLastStage?: boolean;
   qualifiesTo?: QualifierTarget[]; // Which stages this stage qualifies to and how many
   isPreparedForNextStage?: boolean; // is set to true when user opens predefinition modal; needed to call prepareForNextStage only once
+  /** User-defined running order (country codes). Used for initial display before points exist. */
+  runningOrder?: string[];
 }
 
 export enum StageId {

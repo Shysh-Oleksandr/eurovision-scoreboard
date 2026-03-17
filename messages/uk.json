@@ -70,6 +70,7 @@
     "eventStageModal": {
       "settings": "Налаштування",
       "voters": "Голосуючі",
+      "runningOrder": "Порядок виступів",
       "pleaseSelectAtLeastOneVotingCountry": "Виберіть хоча б одну країну-учасницю голосування",
       "areYouSureYouWantToDelete": "Ви впевнені, що хочете видалити {name}?",
       "televoteOnly": "Лише телеголосування",
@@ -91,6 +92,8 @@
       "searchCountries": "Пошук країн...",
       "noVotingCountriesSelected": "Не вибрано жодної країни для голосування. Додайте країни зі списку нижче.",
       "votingCountries": "Країни, що голосують ({count})",
+      "participants": "Учасники ({count})",
+      "shareRunningOrder": "Поділитися порядком виступів",
       "dragAndDropToReorder": "Перетягуйте, щоб змінити порядок",
       "inStageOnly": "Лише в етапі",
       "otherStageOnly": "Лише в іншому етапі",

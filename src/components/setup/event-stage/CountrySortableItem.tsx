@@ -8,18 +8,24 @@ import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
-interface VoterItemProps {
+interface CountrySortableItemProps {
   id: string;
   country: BaseCountry;
   stageId: string;
-  onRemove: () => void;
+  label?: string;
+  withGroupLabel?: boolean;
+  onRemove?: () => void;
+  index?: number;
 }
 
-export const VoterItem: React.FC<VoterItemProps> = ({
+export const CountrySortableItem: React.FC<CountrySortableItemProps> = ({
   id,
   country,
   stageId,
+  label,
+  withGroupLabel = true,
   onRemove,
+  index,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
@@ -32,8 +38,16 @@ export const VoterItem: React.FC<VoterItemProps> = ({
 
   return (
     <CustomSortableItem id={id} key={id} onRemove={onRemove}>
-      <VoterGroupLabel country={country} stageId={stageId} />
+      {withGroupLabel && (
+        <VoterGroupLabel country={country} stageId={stageId} />
+      )}
       <div className="relative flex items-center gap-2 flex-1 min-w-0 h-8">
+        {index !== undefined && (
+          <h4 className="text-white text-lg font-medium tabular-nums">
+            {index + 1}
+          </h4>
+        )}
+
         <img
           loading="lazy"
           src={logo}
@@ -51,7 +65,7 @@ export const VoterItem: React.FC<VoterItemProps> = ({
           className="text-white text-[0.94rem] font-medium truncate"
           title={country.name}
         >
-          {country.name}
+          {label || country.name}
         </span>
       </div>
     </CustomSortableItem>

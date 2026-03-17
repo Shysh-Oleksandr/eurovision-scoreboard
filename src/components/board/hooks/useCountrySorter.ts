@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Country } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
-import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
+import { createCountriesComparator } from '@/state/scoreboard/helpers';
 import { SENTINEL } from '@/data/data';
 
 export const useCountrySorter = (countriesToDisplay: Country[]) => {
@@ -14,9 +14,17 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
   const getCountryInSemiFinal = useScoreboardStore(
     (state) => state.getCountryInSemiFinal,
   );
+  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
 
   const sortedCountries = useMemo(() => {
     const countriesToSort = [...countriesToDisplay];
+    const currentStage = getCurrentStage();
+    const runningOrder = currentStage?.runningOrder;
+    const orderComparator = createCountriesComparator(runningOrder);
+    const orderMap =
+      runningOrder && runningOrder.length > 0
+        ? new Map(runningOrder.map((code, idx) => [code, idx]))
+        : null;
 
     if (showAllParticipants && winnerCountry) {
       return countriesToSort.sort((a, b) => {
@@ -26,6 +34,17 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
             const televoteComparison = b.televotePoints - a.televotePoints;
 
             if (televoteComparison === 0) {
+              if (orderMap) {
+                const aIdx = orderMap.get(a.code);
+                const bIdx = orderMap.get(b.code);
+                if (
+                  aIdx !== undefined &&
+                  bIdx !== undefined &&
+                  aIdx !== bIdx
+                ) {
+                  return aIdx - bIdx;
+                }
+              }
               return a.name.localeCompare(b.name);
             }
 
@@ -53,6 +72,17 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
           const televoteComparison = b.televotePoints - a.televotePoints;
 
           if (televoteComparison === 0) {
+            if (orderMap) {
+              const aIdx = orderMap.get(a.code);
+              const bIdx = orderMap.get(b.code);
+              if (
+                aIdx !== undefined &&
+                bIdx !== undefined &&
+                aIdx !== bIdx
+              ) {
+                return aIdx - bIdx;
+              }
+            }
             return a.name.localeCompare(b.name);
           }
 
@@ -63,12 +93,13 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
       });
     }
 
-    return countriesToSort.sort(compareCountriesByPoints);
+    return countriesToSort.sort(orderComparator);
   }, [
     countriesToDisplay,
     showAllParticipants,
     winnerCountry,
     getCountryInSemiFinal,
+    getCurrentStage,
   ]);
 
   return sortedCountries;

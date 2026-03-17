@@ -26,19 +26,26 @@ import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
-import { StageId, StageVotingMode } from '@/models';
+import { Country, StageId, StageVotingMode } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 
 interface ShareResultsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoaded: () => void;
+  /** When provided, use this ordered list instead of scoreboard (e.g. for running order share) */
+  countriesOverride?: Country[];
+  titleOverride?: string;
+  subtitleOverride?: string;
 }
 
 const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   isOpen,
   onClose,
   onLoaded,
+  countriesOverride,
+  titleOverride,
+  subtitleOverride,
 }) => {
   const t = useTranslations();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -81,6 +88,10 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
     currentStage || {};
 
   const { title: defaultTitle, subtitle: defaultSubtitle } = useMemo(() => {
+    if (titleOverride !== undefined && subtitleOverride !== undefined) {
+      return { title: titleOverride, subtitle: subtitleOverride };
+    }
+
     const isGf = id?.toUpperCase() === StageId.GF.toUpperCase();
 
     let title = `${contestName} ${contestYear}`;
@@ -108,6 +119,8 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
 
     return { title, subtitle };
   }, [
+    titleOverride,
+    subtitleOverride,
     id,
     contestName,
     contestYear,
@@ -122,7 +135,8 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   ]);
 
   const allCountriesToDisplay = useCountryDisplay();
-  const sortedCountries = useCountrySorter(allCountriesToDisplay);
+  const sortedCountriesFromBoard = useCountrySorter(allCountriesToDisplay);
+  const sortedCountries = countriesOverride ?? sortedCountriesFromBoard;
   const limitedCountries =
     (imageCustomization.maxCountries || 0) > 0
       ? sortedCountries.slice(0, imageCustomization.maxCountries as number)
@@ -348,7 +362,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       onClose={onClose}
       containerClassName="!w-[min(100%,_95vw)]"
       contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
-      overlayClassName="!z-[1001]"
+      overlayClassName={countriesOverride ? '!z-[1003]' : '!z-[1001]'}
       withBlur
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
@@ -761,6 +775,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
           lastGeneratedStageId={lastGeneratedStageId}
           setLastGeneratedStageId={setLastGeneratedStageId}
           modalRef={modalRef}
+          countriesOverride={countriesOverride}
         />
 
         {generatedImageUrl && (

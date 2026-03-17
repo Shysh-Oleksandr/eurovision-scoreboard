@@ -158,6 +158,25 @@ export function buildContestSnapshotFromStores() {
   const scoreboard = useScoreboardStore.getState();
   const general = useGeneralStore.getState();
 
+  const getOrderedStageParticipantCodes = (stage: EventStage): string[] => {
+    const stageCountries = stage.countries || [];
+    const codesInStage = new Set(stageCountries.map((c) => c.code));
+
+    const baseOrder =
+      stage.runningOrder && stage.runningOrder.length > 0
+        ? stage.runningOrder.filter((code) => codesInStage.has(code))
+        : stageCountries.map((c) => c.code);
+
+    const baseSet = new Set(baseOrder);
+    const missing = stageCountries
+      .filter((c) => !baseSet.has(c.code))
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((c) => c.code);
+
+    return [...baseOrder, ...missing];
+  };
+
   const allCountries = countriesStore.getAllCountries(true);
   const { configuredEventStages, eventAssignments, countryOdds } =
     countriesStore;
@@ -275,6 +294,7 @@ export function buildContestSnapshotFromStores() {
 
   // setup.stages: stable config with participants/voters by code
   const setupStagesPayload = setupStages.map((stage) => {
+    const participants = getOrderedStageParticipantCodes(stage);
     const stageData: any = {
       id: stage.id,
       name: stage.name,
@@ -283,7 +303,7 @@ export function buildContestSnapshotFromStores() {
         ? { votingMode: stage.votingMode }
         : {}),
       ...(stage.qualifiesTo ? { qualifiesTo: stage.qualifiesTo } : {}),
-      participants: stage.countries.map((c) => c.code),
+      participants,
       ...(stage.votingCountries && stage.votingCountries.length > 0
         ? { voters: stage.votingCountries.map((v) => v.code) }
         : {}),
@@ -315,7 +335,13 @@ export function buildContestSnapshotFromStores() {
   if (hasActiveStages) {
     const countriesStateByStage: Record<string, CountriesStateItem[]> = {};
     for (const stage of scoreboard.eventStages) {
-      countriesStateByStage[stage.id] = stage.countries.map((c) => {
+      const orderedCodes = getOrderedStageParticipantCodes(stage);
+      const byCode = new Map(stage.countries.map((c) => [c.code, c]));
+
+      countriesStateByStage[stage.id] = orderedCodes
+        .map((code) => byCode.get(code))
+        .filter((c): c is Country => !!c)
+        .map((c) => {
         const countryState: CountriesStateItem = {
           code: c.code,
           qualifiedFromStageIds: c.qualifiedFromStageIds,
@@ -358,7 +384,7 @@ export function buildContestSnapshotFromStores() {
         );
 
       if (isSameAsSetupWithoutParticipants) {
-        const participants = stage.countries.map((c) => c.code);
+        const participants = getOrderedStageParticipantCodes(stage);
         const isParticipantsSame = isDeepEqual(
           setupStage.participants,
           participants,
@@ -380,7 +406,7 @@ export function buildContestSnapshotFromStores() {
           order: stage.order ?? 0,
           votingMode: stage.votingMode,
           qualifiesTo: stage.qualifiesTo,
-          participants: stage.countries.map((c) => c.code),
+          participants: getOrderedStageParticipantCodes(stage),
           voters: (stage.votingCountries || []).map((v) => v.code),
           isOver: !!stage.isOver,
           isJuryVoting: !!stage.isJuryVoting,
@@ -602,17 +628,36 @@ export async function applyContestSnapshotToStores(
       });
     });
 
-    const configuredStages: EventStage[] = snapshot.setup.stages.map((s) => ({
-      id: s.id,
-      name: s.name,
-      order: s.order,
-      votingMode: (s.votingMode || DEFAULT_VOTING_MODE) as any,
-      qualifiesTo: s.qualifiesTo,
-      countries: [],
-      votingCountries: (s.voters || []).map(toVotingCountry),
-      isOver: false, // Setup stages are never "over"
-      isJuryVoting: (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY',
-    }));
+    const simStagesById =
+      snapshot.simulation?.stages && Array.isArray(snapshot.simulation.stages)
+        ? new Map(
+            (snapshot.simulation.stages as any[]).map((st) => [st.id, st]),
+          )
+        : null;
+
+    const configuredStages: EventStage[] = snapshot.setup.stages.map((s) => {
+      const simStage: any | undefined = simStagesById?.get(s.id);
+
+      // Prefer simulation participants order when available (e.g. GF with qualifiers),
+      // otherwise fall back to setup participants.
+      const runningOrder =
+        (simStage?.participants && simStage.participants.length > 0
+          ? simStage.participants
+          : s.participants) || [];
+
+      return {
+        id: s.id,
+        name: s.name,
+        order: s.order,
+        votingMode: (s.votingMode || DEFAULT_VOTING_MODE) as any,
+        qualifiesTo: s.qualifiesTo,
+        countries: [],
+        votingCountries: (s.voters || []).map(toVotingCountry),
+        isOver: false, // Setup stages are never "over"
+        isJuryVoting: (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY',
+        runningOrder,
+      };
+    });
 
     useCountriesStore.setState({
       configuredEventStages: configuredStages,
@@ -663,7 +708,7 @@ export async function applyContestSnapshotToStores(
       .map((s, idx, arr) => {
         const stageCountriesState: CountriesStateItem[] =
           snapshot.simulation!.countriesStateByStage?.[s.id] || [];
-        const countries: Country[] = stageCountriesState.map((cs) => {
+        const countriesFromState: Country[] = stageCountriesState.map((cs) => {
           const base = byCode.get(cs.code);
           // For presentation mode, start with no points
           const juryPoints = isPresentationMode ? 0 : cs.juryPoints ?? 0;
@@ -687,6 +732,28 @@ export async function applyContestSnapshotToStores(
           } as Country;
         });
 
+        const reorderCountries = (
+          participantsOrder: string[] | undefined,
+          fallbackOrder: string[] | undefined,
+        ) => {
+          const byCode = new Map(countriesFromState.map((c) => [c.code, c]));
+          const base =
+            (participantsOrder && participantsOrder.length > 0
+              ? participantsOrder
+              : fallbackOrder) || [];
+
+          const baseCodes = base.filter((code) => byCode.has(code));
+          const baseSet = new Set(baseCodes);
+          const missing = countriesFromState
+            .filter((c) => !baseSet.has(c.code))
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((c) => c.code);
+
+          return [...baseCodes, ...missing]
+            .map((code) => byCode.get(code))
+            .filter((c): c is Country => !!c);
+        };
+
         if (
           (s as any).isSameAsSetup ||
           (s as any).isSameAsSetupWithoutParticipants
@@ -698,6 +765,17 @@ export async function applyContestSnapshotToStores(
               `Setup stage not found for simulation stage ${s.id}`,
             );
           }
+
+          const simStage = s as any;
+          const participantsOrder = simStage.participants as
+            | string[]
+            | undefined;
+
+          const countries = reorderCountries(
+            participantsOrder,
+            setupStage.participants,
+          );
+
           return {
             id: s.id,
             name: setupStage.name,
@@ -709,9 +787,17 @@ export async function applyContestSnapshotToStores(
             isJuryVoting: (s as any).isJuryVoting, // Runtime state
             isLastStage: idx === arr.length - 1,
             countries,
+            runningOrder: participantsOrder ?? setupStage.participants,
           } as EventStage;
         } else {
           // Use full stage data from simulation
+          const simStage = s as any;
+
+          const countries = reorderCountries(
+            simStage.participants as string[] | undefined,
+            undefined,
+          );
+
           return {
             id: s.id,
             name: s.name,
@@ -726,6 +812,7 @@ export async function applyContestSnapshotToStores(
                 : (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY', // Preserve runtime state or fallback to default
             isLastStage: idx === arr.length - 1,
             countries,
+            runningOrder: simStage.participants ?? countries.map((c) => c.code),
           } as EventStage;
         }
       });

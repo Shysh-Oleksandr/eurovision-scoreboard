@@ -70,6 +70,7 @@
     "eventStageModal": {
       "settings": "Einstellungen",
       "voters": "Wähler",
+      "runningOrder": "Startreihenfolge",
       "pleaseSelectAtLeastOneVotingCountry": "Bitte wähle mindestens ein abstimmendes Land aus.",
       "areYouSureYouWantToDelete": "Möchtest du {name} wirklich löschen?",
       "televoteOnly": "Nur Televoting",
@@ -91,6 +92,8 @@
       "searchCountries": "Länder suchen...",
       "noVotingCountriesSelected": "Keine abstimmenden Länder ausgewählt. Füge Länder aus der Liste unten hinzu.",
       "votingCountries": "Abstimmende Länder ({count})",
+      "participants": "Teilnehmer ({count})",
+      "shareRunningOrder": "Startreihenfolge teilen",
       "dragAndDropToReorder": "Ziehen und ablegen, um neu zu ordnen",
       "inStageOnly": "Nur im Stage",
       "otherStageOnly": "Nur im anderen Stage",

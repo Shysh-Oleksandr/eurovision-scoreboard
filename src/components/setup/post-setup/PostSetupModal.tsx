@@ -10,10 +10,13 @@ import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
 import EventStageVoters from './EventStageVoters';
 import { usePostSetupStageForm } from './hooks/usePostSetupStageForm';
+import { RunningOrderTab, useRunningOrder } from './running-order';
 
+import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { EventStage } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
+import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 enum PostSetupModalTab {
@@ -37,9 +40,12 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   onSave,
 }) => {
   const t = useTranslations('setup.eventStageModal');
-  const [activeTab, setActiveTab] = useState(PostSetupModalTab.VOTERS);
+  const [activeTab, setActiveTab] = useState(PostSetupModalTab.RUNNING_ORDER);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const [isVotersLoaded, setIsVotersLoaded] = useState(false);
+
+  const [selectedLayout, setSelectedLayout] = useState<'list' | 'grid'>('grid');
 
   const configuredEventStages = useCountriesStore(
     (state) => state.configuredEventStages,
@@ -49,6 +55,25 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   );
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
+  const contestName = useGeneralStore((state) => state.settings.contestName);
+  const contestYear = useGeneralStore((state) => state.settings.contestYear);
+
+  const configuredStage = useMemo(
+    () => configuredEventStages.find((s) => s.id === stage.id),
+    [configuredEventStages, stage.id],
+  );
+
+  const {
+    orderedCodes,
+    orderedCountries,
+    handleRunningOrderSortEnd,
+    handleQuickSort,
+  } = useRunningOrder({
+    isOpen,
+    stageId: stage.id,
+    stageCountries: stage.countries,
+    savedRunningOrder: configuredStage?.runningOrder,
+  });
 
   const form = usePostSetupStageForm({
     stage,
@@ -57,7 +82,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
 
   const tabs = useMemo(
     () => [
-      // { value: PostSetupModalTab.RUNNING_ORDER, label: t('runningOrder') },
+      { value: PostSetupModalTab.RUNNING_ORDER, label: t('runningOrder') },
       { value: PostSetupModalTab.VOTERS, label: t('voters') },
     ],
     [t],
@@ -74,14 +99,23 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       onClose();
 
       setTimeout(() => {
+        const runningOrder = orderedCodes;
         const updatedStages = configuredEventStages.map((s) =>
           s.id === stage.id
-            ? { ...s, votingCountries: data.votingCountries }
+            ? {
+                ...s,
+                votingCountries: data.votingCountries,
+                runningOrder,
+              }
             : s,
         );
         const updatedEventStages = eventStages.map((s) =>
           s.id === stage.id
-            ? { ...s, votingCountries: data.votingCountries }
+            ? {
+                ...s,
+                votingCountries: data.votingCountries,
+                runningOrder,
+              }
             : s,
         );
 
@@ -93,19 +127,27 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     })();
   };
 
+  const shareTitleOverride = `${contestName} ${contestYear} - ${stage.name}`;
+  const shareSubtitleOverride = t('runningOrder');
+
   const renderContent = () => {
     const tabsWithContent = [
-      // {
-      //   ...tabs[0],
-      //   content: (
-      //     <EventStageSettings
-      //       isEditMode={isEditModeFromHook}
-      //       isLastStage={isLastStage}
-      //     />
-      //   ),
-      // },
       {
         ...tabs[0],
+        content: (
+          <RunningOrderTab
+            stageId={stage.id}
+            orderedCountries={orderedCountries}
+            selectedLayout={selectedLayout}
+            setSelectedLayout={setSelectedLayout}
+            onSortEnd={handleRunningOrderSortEnd}
+            onQuickSort={handleQuickSort}
+            onShare={() => setIsShareModalOpen(true)}
+          />
+        ),
+      },
+      {
+        ...tabs[1],
         content: (
           <>
             {(activeTab === PostSetupModalTab.VOTERS || isVotersLoaded) && (
@@ -154,6 +196,14 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
         {stage.name}
       </h3>
       <FormProvider {...(form as any)}>{renderContent()}</FormProvider>
+      <ShareResultsModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        onLoaded={() => {}}
+        countriesOverride={orderedCountries}
+        titleOverride={shareTitleOverride}
+        subtitleOverride={shareSubtitleOverride}
+      />
     </Modal>
   );
 };

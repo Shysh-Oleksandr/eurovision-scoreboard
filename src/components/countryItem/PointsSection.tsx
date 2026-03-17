@@ -71,7 +71,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       (winnerCountry && isLastSimulationAnimationFinished);
     const countUp = new CountUp(pointsRef.current, currentPoints, {
       startVal,
-      duration: shouldDisableAnimation ? 0 : 0.8,
+      duration: shouldDisableAnimation ? 0 : 0.6,
       useGrouping: false,
       formattingFn: (value) => String(toFixedIfDecimalFloat(value)),
     });

@@ -70,6 +70,7 @@
     "eventStageModal": {
       "settings": "Ajustes",
       "voters": "Votantes",
+      "runningOrder": "Orden de inicio",
       "pleaseSelectAtLeastOneVotingCountry": "Selecciona al menos un país votante",
       "areYouSureYouWantToDelete": "¿Seguro que quieres eliminar {name}?",
       "televoteOnly": "Solo televoto",
@@ -91,6 +92,8 @@
       "searchCountries": "Buscar países...",
       "noVotingCountriesSelected": "No hay países votantes seleccionados. Añade países desde la lista de abajo.",
       "votingCountries": "Países votantes ({count})",
+      "participants": "Participantes ({count})",
+      "shareRunningOrder": "Compartir orden de inicio",
       "dragAndDropToReorder": "Arrastra y suelta para reordenar",
       "inStageOnly": "Solo en etapa",
       "otherStageOnly": "Solo en otra etapa",

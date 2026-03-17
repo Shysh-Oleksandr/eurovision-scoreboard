@@ -13,7 +13,7 @@ import { useContinueToNextPhase } from '../hooks/useContinueToNextPhase';
 import { CountryQualificationItem } from './CountryQualificationItem';
 
 import { useGeneralStore } from '@/state/generalStore';
-import { compareCountriesByPoints } from '@/state/scoreboard/helpers';
+import { createCountriesComparator } from '@/state/scoreboard/helpers';
 
 const QualificationResultsModal = () => {
   const t = useTranslations();
@@ -48,8 +48,8 @@ const QualificationResultsModal = () => {
 
           return country.qualifiedFromStageIds?.includes(stageId);
         })
-        .sort(compareCountriesByPoints),
-    [countries, stageId],
+        .sort(createCountriesComparator(currentStage?.runningOrder)),
+    [countries, stageId, currentStage?.runningOrder],
   );
 
   const countriesContainerRef = useRef<HTMLDivElement>(null);

@@ -72,6 +72,29 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
   };
 
   // Calculate placements for jury and televote
+  const runningOrder = selectedStage?.runningOrder;
+  const runningOrderMap = React.useMemo(() => {
+    if (!runningOrder || runningOrder.length === 0) return null;
+
+    return new Map(runningOrder.map((code, idx) => [code, idx]));
+  }, [runningOrder]);
+
+  const tieBreakByRunningOrder = React.useCallback(
+    (a: Country, b: Country) => {
+      if (runningOrderMap) {
+        const aIdx = runningOrderMap.get(a.code);
+        const bIdx = runningOrderMap.get(b.code);
+
+        if (aIdx !== undefined && bIdx !== undefined && aIdx !== bIdx) {
+          return aIdx - bIdx;
+        }
+      }
+
+      return a.name.localeCompare(b.name);
+    },
+    [runningOrderMap],
+  );
+
   const juryPlacements = React.useMemo(() => {
     if (!shouldShowJuryAndTelevote) return new Map();
 
@@ -79,7 +102,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
       const juryComparison = getPoints(b, 'jury') - getPoints(a, 'jury');
 
       if (juryComparison === 0) {
-        return a.name.localeCompare(b.name);
+        return tieBreakByRunningOrder(a, b);
       }
 
       return juryComparison;
@@ -92,7 +115,12 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
     });
 
     return placements;
-  }, [rankedCountries, shouldShowJuryAndTelevote, getPoints]);
+  }, [
+    rankedCountries,
+    shouldShowJuryAndTelevote,
+    getPoints,
+    tieBreakByRunningOrder,
+  ]);
 
   const televotePlacements = React.useMemo(() => {
     if (!shouldShowJuryAndTelevote) return new Map();
@@ -102,7 +130,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
         getPoints(b, 'televote') - getPoints(a, 'televote');
 
       if (televoteComparison === 0) {
-        return a.name.localeCompare(b.name);
+        return tieBreakByRunningOrder(a, b);
       }
 
       return televoteComparison;
@@ -115,7 +143,12 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
     });
 
     return placements;
-  }, [rankedCountries, shouldShowJuryAndTelevote, getPoints]);
+  }, [
+    rankedCountries,
+    shouldShowJuryAndTelevote,
+    getPoints,
+    tieBreakByRunningOrder,
+  ]);
 
   return (
     <div

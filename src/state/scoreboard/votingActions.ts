@@ -355,6 +355,7 @@ export const createVotingActions: StateCreator<
             updatedCountries,
             getLastCountryCodeByPoints(
               getRemainingCountries(updatedCountries, countryCode),
+              currentStage.runningOrder,
             ),
           )
         : nextVotingCountryIndex,
@@ -541,6 +542,7 @@ export const createVotingActions: StateCreator<
       updatedCountries,
       getLastCountryCodeByPoints(
         getRemainingCountries(updatedCountries, undefined),
+        currentStage.runningOrder,
       ),
     );
 
@@ -588,6 +590,7 @@ export const createVotingActions: StateCreator<
       updatedCountries,
       getLastCountryCodeByPoints(
         getRemainingCountries(updatedCountries, countryCode),
+        currentStage.runningOrder,
       ),
     );
     const isVotingFinished = isVotingOver(lastCountryIndexByPoints);
@@ -901,6 +904,7 @@ export const createVotingActions: StateCreator<
       updatedCountries,
       getLastCountryCodeByPoints(
         getRemainingCountries(updatedCountries, undefined),
+        currentStage.runningOrder,
       ),
     );
 
@@ -1059,6 +1063,7 @@ export const createVotingActions: StateCreator<
         updatedCountries,
         getLastCountryCodeByPoints(
           getRemainingCountries(updatedCountries, undefined),
+          currentStage.runningOrder,
         ),
       );
 
@@ -1402,7 +1407,7 @@ export const createVotingActions: StateCreator<
         };
       })
       .sort((a, b) => b.totalPoints - a.totalPoints);
-
+// TODO: go through .sort( to always use the running order; fix the issue when selecting televote active country
     const topCountries = countriesWithPoints
       .slice(0, qualifiersAmount)
       .filter((country) => !hasQualifiedFromCurrentStage(country));

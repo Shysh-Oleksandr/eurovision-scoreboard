@@ -70,6 +70,7 @@
     "eventStageModal": {
       "settings": "Settings",
       "voters": "Voters",
+      "runningOrder": "Running Order",
       "pleaseSelectAtLeastOneVotingCountry": "Please select at least one voting country",
       "televoteOnly": "Televote Only",
       "juryOnly": "Jury Only",
@@ -90,6 +91,8 @@
       "searchCountries": "Search countries...",
       "noVotingCountriesSelected": "No voting countries selected. Add countries from the list below.",
       "votingCountries": "Voting Countries ({count})",
+      "participants": "Participants ({count})",
+      "shareRunningOrder": "Share running order",
       "dragAndDropToReorder": "Drag and drop to reorder",
       "inStageOnly": "In stage only",
       "otherStageOnly": "Other stage only",

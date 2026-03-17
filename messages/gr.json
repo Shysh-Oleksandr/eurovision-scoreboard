@@ -70,6 +70,7 @@
     "eventStageModal": {
       "settings": "Ρυθμίσεις",
       "voters": "Ψηφοφόροι",
+      "runningOrder": "Σειρά Εμφάνισης",
       "pleaseSelectAtLeastOneVotingCountry": "Επιλέξτε τουλάχιστον μία χώρα που ψηφίζει",
       "areYouSureYouWantToDelete": "Είστε σίγουροι ότι θέλετε να διαγράψετε {name};",
       "televoteOnly": "Μόνο Τηλεψήφισμα",
@@ -91,6 +92,8 @@
       "searchCountries": "Αναζήτηση χωρών...",
       "noVotingCountriesSelected": "Δεν έχει επιλεγεί καμία χώρα που ψηφίζει. Προσθέστε χώρες από τη λίστα παρακάτω.",
       "votingCountries": "Χώρες που ψηφίζουν ({count})",
+      "participants": "Συμμετέχοντες ({count})",
+      "shareRunningOrder": "Κοινοποίηση σειράς εμφάνισης",
       "dragAndDropToReorder": "Σύρετε και αποθέστε για αναδιάταξη",
       "inStageOnly": "Σταδιομόνο",
       "otherStageOnly": "Άλλο σταδιομόνο",

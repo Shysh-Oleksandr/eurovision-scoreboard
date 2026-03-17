@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-03-17',
+    title:
+      'Added the running order setup. Improved the tie-break logic.',
+  },
+  {
     date: '2026-03-15',
     title:
       'Added the ability to categorize custom entries. Improved round flags and added square flags. Added the new scoreboard and DouzePoints animations (ESC 2025 style). Added a count-up points animation. Small improvements',

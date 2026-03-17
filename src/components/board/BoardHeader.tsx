@@ -41,7 +41,10 @@ const BoardHeader = (): JSX.Element | null => {
   );
 
   const viewedStage = eventStages.find((s) => s.id === viewedStageId);
-  const winnerCountryFromStage = getWinnerCountry(viewedStage?.countries ?? []);
+  const winnerCountryFromStage = getWinnerCountry(
+    viewedStage?.countries ?? [],
+    viewedStage?.runningOrder,
+  );
 
   const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
 

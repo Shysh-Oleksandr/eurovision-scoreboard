@@ -4,7 +4,8 @@ import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { EventStage } from '../../../../models';
+import { StageId, type EventStage, type VotingCountry } from '../../../../models';
+import { useCountriesStore } from '../../../../state/countriesStore';
 
 // Base schema for common fields
 const postSetupStageSchema = z.object({
@@ -39,9 +40,35 @@ export const usePostSetupStageForm = ({
   useEffect(() => {
     if (!isOpen) return;
 
+    const getDefaultVotingCountries = (): VotingCountry[] => {
+      if (!stage) return [];
+
+      if (stage.votingCountries && stage.votingCountries.length > 0) {
+        return stage.votingCountries;
+      }
+
+      if (stage.id?.toUpperCase() === StageId.GF.toUpperCase()) {
+        return useCountriesStore
+          .getState()
+          .getContestParticipants()
+          .map((c) => ({
+            code: c.code,
+            name: c.name,
+            ...(c.flag ? { flag: c.flag } : {}),
+          }));
+      }
+
+      // Semi-finals/other stages default: stage participants vote
+      return (stage.countries || []).map((c) => ({
+        code: c.code,
+        name: c.name,
+        ...(c.flag ? { flag: c.flag } : {}),
+      }));
+    };
+
     form.reset(
       {
-        votingCountries: stage?.votingCountries || [],
+        votingCountries: getDefaultVotingCountries(),
       },
       { keepDefaultValues: false },
     );

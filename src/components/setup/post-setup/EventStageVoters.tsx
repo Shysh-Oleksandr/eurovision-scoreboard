@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import VotersCountriesSearch from '../event-stage/VotersCountriesSearch';
@@ -32,6 +38,12 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
     name: 'votingCountries',
     defaultValue: [],
   }) as VotingCountry[];
+
+  const votingCountriesRef = useRef<VotingCountry[]>(votingCountries || []);
+
+  useEffect(() => {
+    votingCountriesRef.current = votingCountries || [];
+  }, [votingCountries]);
 
   const [localVotingCountries, setLocalVotingCountries] = useState<
     VotingCountry[]
@@ -128,23 +140,46 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
   };
 
   // Load existing voting countries for this stage
+  const initializedForStageIdRef = useRef<string | null>(null);
+
   useEffect(() => {
+    if (initializedForStageIdRef.current === stage.id) return;
+    initializedForStageIdRef.current = stage.id;
+
+    const existing =
+      (stage.votingCountries && stage.votingCountries.length > 0
+        ? stage.votingCountries
+        : votingCountriesRef.current) || [];
+
+    const setInitial = (list: VotingCountry[]) => {
+      setLocalVotingCountries(list);
+      setValue('votingCountries', list as any, { shouldDirty: false });
+      onLoaded?.();
+    };
+
+    if (existing.length > 0) {
+      setInitial(existing as VotingCountry[]);
+
+      return;
+    }
+
     if (stage.id === StageId.GF) {
       const contestParticipants =
         getContestParticipants().map(mapToVotingCountry);
 
-      setLocalVotingCountriesAndForm(contestParticipants);
-    } else {
-      setLocalVotingCountriesAndForm(participatingVoters);
+      setInitial(contestParticipants);
+
+      return;
     }
 
-    onLoaded?.();
+    setInitial(participatingVoters);
   }, [
     getContestParticipants,
     onLoaded,
     participatingVoters,
-    setLocalVotingCountriesAndForm,
     stage.id,
+    stage.votingCountries,
+    setValue,
   ]);
 
   return (

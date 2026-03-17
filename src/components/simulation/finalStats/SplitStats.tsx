@@ -78,12 +78,43 @@ const SplitStats: React.FC<SplitStatsProps> = ({
     rankText: 'text-lg font-semibold',
   };
 
+  const runningOrder = selectedStage?.runningOrder;
+  const runningOrderMap = React.useMemo(() => {
+    if (!runningOrder || runningOrder.length === 0) return null;
+
+    return new Map(runningOrder.map((code, idx) => [code, idx]));
+  }, [runningOrder]);
+
+  const tieBreakByRunningOrder = React.useCallback(
+    (a: Country, b: Country) => {
+      if (runningOrderMap) {
+        const aIdx = runningOrderMap.get(a.code);
+        const bIdx = runningOrderMap.get(b.code);
+
+        if (aIdx !== undefined && bIdx !== undefined && aIdx !== bIdx) {
+          return aIdx - bIdx;
+        }
+      }
+
+      return a.name.localeCompare(b.name);
+    },
+    [runningOrderMap],
+  );
+
   // Sort countries by different criteria for each column
   const countriesByTotal = [...rankedCountries].sort((a, b) => {
     const totalComparison = getPoints(b, 'combined') - getPoints(a, 'combined');
 
     if (totalComparison === 0) {
-      return a.name.localeCompare(b.name);
+      // Eurovision-style: total ties broken by televote, then running order.
+      const televoteComparison =
+        getPoints(b, 'televote') - getPoints(a, 'televote');
+
+      if (televoteComparison !== 0) {
+        return televoteComparison;
+      }
+
+      return tieBreakByRunningOrder(a, b);
     }
 
     return totalComparison;
@@ -93,7 +124,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
     const juryComparison = getPoints(b, 'jury') - getPoints(a, 'jury');
 
     if (juryComparison === 0) {
-      return a.name.localeCompare(b.name);
+      return tieBreakByRunningOrder(a, b);
     }
 
     return juryComparison;
@@ -104,7 +135,7 @@ const SplitStats: React.FC<SplitStatsProps> = ({
       getPoints(b, 'televote') - getPoints(a, 'televote');
 
     if (televoteComparison === 0) {
-      return a.name.localeCompare(b.name);
+      return tieBreakByRunningOrder(a, b);
     }
 
     return televoteComparison;

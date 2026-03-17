@@ -1,19 +1,41 @@
 import { Country, EventStage, StageVotingMode } from '../../models';
 
-export const compareCountriesByPoints = (a: Country, b: Country) => {
-  const pointsComparison = b.points - a.points;
+export const createCountriesComparator = (runningOrder?: string[]) => {
+  const orderMap =
+    runningOrder && runningOrder.length > 0
+      ? new Map(runningOrder.map((code, idx) => [code, idx]))
+      : null;
 
-  if (pointsComparison === 0) {
-    const televoteComparison = b.televotePoints - a.televotePoints;
+  return (a: Country, b: Country) => {
+    const pointsComparison = b.points - a.points;
 
-    if (televoteComparison === 0) {
-      return a.name.localeCompare(b.name);
+    if (pointsComparison !== 0) {
+      return pointsComparison;
     }
 
-    return televoteComparison;
-  }
+    const televoteComparison = b.televotePoints - a.televotePoints;
 
-  return pointsComparison;
+    if (televoteComparison !== 0) {
+      return televoteComparison;
+    }
+
+    if (orderMap) {
+      const aIdx = orderMap.get(a.code);
+      const bIdx = orderMap.get(b.code);
+
+      if (aIdx !== undefined && bIdx !== undefined && aIdx !== bIdx) {
+        // Earlier in running order wins as last resort
+        return aIdx - bIdx;
+      }
+    }
+
+    // Safety fallback when running order is missing/unknown
+    return a.name.localeCompare(b.name);
+  };
+};
+
+export const compareCountriesByPoints = (a: Country, b: Country) => {
+  return createCountriesComparator()(a, b);
 };
 
 export const getRemainingCountries = (
@@ -24,11 +46,15 @@ export const getRemainingCountries = (
     (country) => !country.isVotingFinished && country.code !== countryCode,
   );
 
-export const getLastCountryCodeByPoints = (remainingCountries: Country[]) =>
+export const getLastCountryCodeByPoints = (
+  remainingCountries: Country[],
+  runningOrder?: string[],
+) =>
   remainingCountries.length
-    ? remainingCountries.slice().sort(compareCountriesByPoints)[
-        remainingCountries.length - 1
-      ]?.code
+    ? remainingCountries
+        .slice()
+        .sort(createCountriesComparator(runningOrder))[remainingCountries.length - 1]
+        ?.code
     : '';
 
 export const getLastCountryIndexByPoints = (
@@ -39,29 +65,13 @@ export const getLastCountryIndexByPoints = (
 export const isVotingOver = (lastCountryIndexByPoints: number) =>
   lastCountryIndexByPoints === -1;
 
-export const getWinnerCountry = (countries: Country[]) => {
+export const getWinnerCountry = (countries: Country[], runningOrder?: string[]) => {
   if (countries.length === 0) {
     return null;
   }
 
-  return countries.reduce((prev, current) => {
-    if (current.points > prev.points) {
-      return current;
-    }
-    if (current.points < prev.points) {
-      return prev;
-    }
-    // points are equal, check televotePoints
-    if (current.televotePoints > prev.televotePoints) {
-      return current;
-    }
-    if (current.televotePoints < prev.televotePoints) {
-      return prev;
-    }
-
-    // televotePoints are also equal, use alphabetical order (A-Z wins)
-    return current.name.localeCompare(prev.name) < 0 ? current : prev;
-  });
+  const comparator = createCountriesComparator(runningOrder);
+  return countries.slice().sort(comparator)[0] ?? null;
 };
 
 export const handleStageEnd = (
@@ -88,12 +98,12 @@ export const handleStageEnd = (
           ? false
           : country.showDouzePointsAnimation,
     }));
-    winnerCountry = getWinnerCountry(updatedCountries);
+    winnerCountry = getWinnerCountry(updatedCountries, currentStage.runningOrder);
   }
 
   if (showQualificationResults) {
     const sortedCountries = [...updatedCountries].sort(
-      compareCountriesByPoints,
+      createCountriesComparator(currentStage.runningOrder),
     );
     const qualifiersAmount =
       currentStage.qualifiesTo?.reduce((sum, target) => {

@@ -51,18 +51,41 @@ export const buildEventStagesFromAssignments = (
     }
   });
 
-  // Sort countries within each group by name for stable ordering
-  Object.values(initialGroups).forEach((group) => {
-    group.sort((a, b) => a.name.localeCompare(b.name));
-  });
-
-  const eventStagesWithCountries: EventStage[] = configuredEventStages
+  // Sort countries within each group
+  // For stage groups: use runningOrder if present, else alphabetical
+  // For NOT_PARTICIPATING / NOT_QUALIFIED: alphabetical
+  const sortedStages = configuredEventStages
     .slice()
-    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    .map((stage) => ({
-      ...stage,
-      countries: initialGroups[stage.id] || [],
-    }));
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  for (const stage of sortedStages) {
+    const group = initialGroups[stage.id];
+    if (!group) continue;
+    if (stage.runningOrder && stage.runningOrder.length > 0) {
+      const orderMap = new Map(
+        stage.runningOrder.map((code, idx) => [code, idx]),
+      );
+      const inOrder = group.filter((c) => orderMap.has(c.code));
+      const notInOrder = group.filter((c) => !orderMap.has(c.code));
+      inOrder.sort((a, b) => (orderMap.get(a.code) ?? 0) - (orderMap.get(b.code) ?? 0));
+      notInOrder.sort((a, b) => a.name.localeCompare(b.name));
+      initialGroups[stage.id] = [...inOrder, ...notInOrder];
+    } else {
+      group.sort((a, b) => a.name.localeCompare(b.name));
+    }
+  }
+
+  [CountryAssignmentGroup.NOT_PARTICIPATING, CountryAssignmentGroup.NOT_QUALIFIED].forEach(
+    (key) => {
+      const group = initialGroups[key];
+      if (group) group.sort((a, b) => a.name.localeCompare(b.name));
+    },
+  );
+
+  const eventStagesWithCountries: EventStage[] = sortedStages.map((stage) => ({
+    ...stage,
+    countries: initialGroups[stage.id] || [],
+  }));
 
   return {
     eventStagesWithCountries,

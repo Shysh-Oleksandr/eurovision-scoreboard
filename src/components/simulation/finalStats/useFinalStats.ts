@@ -9,6 +9,7 @@ import {
 } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { createCountriesComparator } from '@/state/scoreboard/helpers';
 
 export const useFinalStats = () => {
   const t = useTranslations('simulation.finalStats');
@@ -146,21 +147,7 @@ export const useFinalStats = () => {
   };
 
   const rankedCountries = [...participatingCountries]
-    .sort((a, b) => {
-      const pointsComparison = getPoints(b) - getPoints(a);
-
-      if (pointsComparison === 0) {
-        const televoteComparison = b.televotePoints - a.televotePoints;
-
-        if (televoteComparison === 0) {
-          return a.name.localeCompare(b.name);
-        }
-
-        return televoteComparison;
-      }
-
-      return pointsComparison;
-    })
+    .sort(createCountriesComparator(selectedStage?.runningOrder))
     .map((country, index) => ({ ...country, rank: index + 1 }));
 
   const getPointsFromVoter = (

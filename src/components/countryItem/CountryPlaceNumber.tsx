@@ -95,23 +95,23 @@ const CountryPlaceNumber = ({
       text: 'md:text-lg xs:text-base text-sm',
     },
     sm: {
-      container: 'h-7 w-9 mr-1',
+      container: 'h-7 !w-9 mr-1',
       text: 'text-sm',
     },
     md: {
-      container: 'h-8 w-10 mr-1',
+      container: 'h-8 !w-10 mr-1',
       text: 'text-sm',
     },
     lg: {
-      container: 'h-10 w-12 mr-[6px]',
+      container: 'h-10 !w-12 mr-[6px]',
       text: 'text-lg',
     },
     xl: {
-      container: 'h-12 w-[48px] mr-[6px]',
+      container: 'h-12 !w-[48px] mr-[6px]',
       text: 'text-xl',
     },
     '2xl': {
-      container: 'h-14 w-16 mr-2',
+      container: 'h-14 !w-16 mr-2',
       text: 'text-2xl',
     },
   };

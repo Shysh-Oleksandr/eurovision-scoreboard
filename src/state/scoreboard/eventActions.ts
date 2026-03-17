@@ -1,11 +1,16 @@
 import { StateCreator } from 'zustand';
 
-import { BaseCountry, EventStage, StageVotingMode } from '../../models';
+import { EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 
 import { useGeneralStore } from '../generalStore';
+import {
+  createCountriesComparator,
+  getLastCountryCodeByPoints,
+  getLastCountryIndexByPoints,
+  getRemainingCountries,
+} from './helpers';
 import { ScoreboardState } from './types';
-import { compareCountriesByPoints } from './helpers';
 
 type EventActions = {
   setEventStages: (eventStages: EventStage[]) => void;
@@ -66,7 +71,13 @@ export const createEventActions: StateCreator<
         get().predefineVotesForStage(firstStage, true);
       }
       if (firstStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
-        firstVotingCountryIndex = firstStage.countries.length - 1;
+        firstVotingCountryIndex = getLastCountryIndexByPoints(
+          firstStage.countries,
+          getLastCountryCodeByPoints(
+            getRemainingCountries(firstStage.countries, undefined),
+            firstStage.runningOrder,
+          ),
+        );
       }
     }
 
@@ -135,7 +146,7 @@ export const createEventActions: StateCreator<
           ...c,
           totalPoints: c.points,
         }))
-        .sort(compareCountriesByPoints);
+        .sort(createCountriesComparator(currentStage.runningOrder));
 
       // Distribute qualifiers to target stages based on qualifiesTo
       if (
@@ -192,7 +203,7 @@ export const createEventActions: StateCreator<
                 (country, index, self) =>
                   index === self.findIndex((t) => t.code === country.code),
               )
-              .sort((a, b) => a.name.localeCompare(b.name)),
+              .sort(createCountriesComparator(targetStage.runningOrder)),
           };
 
           updatedEventStages[targetStageIndex] = updatedTargetStage;
@@ -230,7 +241,7 @@ export const createEventActions: StateCreator<
                 (country, index, self) =>
                   index === self.findIndex((t) => t.code === country.code),
               )
-              .sort((a, b) => a.name.localeCompare(b.name)),
+              .sort(createCountriesComparator(targetStage.runningOrder)),
           };
 
           updatedEventStages[targetStageIndex] = updatedTargetStage;
@@ -262,7 +273,13 @@ export const createEventActions: StateCreator<
     let nextVotingCountryIndex = 0;
 
     if (nextStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
-      nextVotingCountryIndex = nextStageCountries.length - 1;
+      nextVotingCountryIndex = getLastCountryIndexByPoints(
+        nextStageCountries,
+        getLastCountryCodeByPoints(
+          getRemainingCountries(nextStageCountries, undefined),
+          nextStage.runningOrder,
+        ),
+      );
     }
 
     const enablePredefined =

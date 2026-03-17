@@ -149,7 +149,7 @@ const CountryItem = ({
           currentState = 'jury';
         } else if (isActive) {
           currentState = 'televoteActive';
-        } else if (isVotingFinished) {
+        } else if ('isVotingFinished' in country && country.isVotingFinished) {
           currentState = 'televoteFinished';
         } else {
           currentState = 'televoteUnfinished';

@@ -20,6 +20,7 @@ import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
 import { getBackgroundImageForImageGeneration } from '@/helpers/getFlagPath';
 import { useReorderCountries } from '@/hooks/useReorderCountries';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
+import { Country } from '@/models';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 interface ImageGeneratorProps {
@@ -28,6 +29,8 @@ interface ImageGeneratorProps {
   lastGeneratedStageId: string | null;
   setLastGeneratedStageId: (stageId: string | null) => void;
   modalRef: React.RefObject<HTMLDivElement | null>;
+  /** When provided, use this ordered list instead of scoreboard display (e.g. for running order share) */
+  countriesOverride?: Country[];
 }
 
 const ImageGenerator: React.FC<ImageGeneratorProps> = ({
@@ -36,10 +39,13 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   lastGeneratedStageId,
   setLastGeneratedStageId,
   modalRef,
+  countriesOverride,
 }) => {
   const t = useTranslations();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  const withConsistentCountryStatus = !!countriesOverride;
 
   const imageCustomization = useGeneralStore(
     (state) => state.imageCustomization,
@@ -220,7 +226,10 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   const backgroundImage = useShareBgImage();
 
   const allCountriesToDisplay = useCountryDisplay();
-  const sortedCountries = useCountrySorter(allCountriesToDisplay ?? []);
+  const sortedCountriesFromBoard = useCountrySorter(
+    allCountriesToDisplay ?? [],
+  );
+  const sortedCountries = countriesOverride ?? sortedCountriesFromBoard;
   const limitedCountries =
     imageCustomization.maxCountries > 0
       ? sortedCountries.slice(0, imageCustomization.maxCountries)
@@ -234,7 +243,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   useEffect(() => {
     if (
       !isGenerating &&
-      (!generatedImageUrl || currentStageId !== lastGeneratedStageId)
+      // eslint-disable-next-line eqeqeq
+      (!generatedImageUrl || currentStageId != lastGeneratedStageId) // It should be != because it may be null vs undefined when generating the image in post setup modal for running order, as it doesn't require to have an active stage
     ) {
       generateImage();
       setLastGeneratedStageId(currentStageId ?? null);
@@ -361,7 +371,8 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                   showRankings={imageCustomization.showRankings}
                   size={imageCustomization.itemSize}
                   shortCountryNames={imageCustomization.shortCountryNames}
-                  isVotingOver={isVotingOver}
+                  isVotingOver={countriesOverride ? false : isVotingOver}
+                  withConsistentCountryStatus={withConsistentCountryStatus}
                 />
               ))}
             </div>

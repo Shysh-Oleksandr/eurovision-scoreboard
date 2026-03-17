@@ -2,7 +2,7 @@ import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import SortableList from 'react-easy-sort';
 
-import { VoterItem } from './VoterItem';
+import { CountrySortableItem } from './CountrySortableItem';
 
 import { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -62,7 +62,7 @@ const VotersList: React.FC<VotersListProps> = ({
           draggedItemClassName="dragged"
         >
           {currentVotingCountries.map((country) => (
-            <VoterItem
+            <CountrySortableItem
               key={country.code}
               id={country.code}
               country={country}

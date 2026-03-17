@@ -24,6 +24,7 @@ type Props = {
   showRankings?: boolean;
   shortCountryNames?: boolean;
   isVotingOver?: boolean;
+  withConsistentCountryStatus?: boolean;
 };
 
 const ShareCountryItem: React.FC<Props> = ({
@@ -34,6 +35,7 @@ const ShareCountryItem: React.FC<Props> = ({
   showRankings = true,
   shortCountryNames = false,
   isVotingOver = false,
+  withConsistentCountryStatus = false,
 }) => {
   const { shouldShowAsNonQualified, shouldShowNQLabel } =
     useQualificationStatus(country, isVotingOver);
@@ -48,6 +50,10 @@ const ShareCountryItem: React.FC<Props> = ({
   const isJuryVoting = !!currentStage?.isJuryVoting;
 
   const buttonColors = useMemo(() => {
+    if (withConsistentCountryStatus) {
+      return 'bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText';
+    }
+
     if (shouldShowAsNonQualified) {
       return 'bg-countryItem-unqualifiedBg text-countryItem-unqualifiedText opacity-70';
     }
@@ -61,7 +67,12 @@ const ShareCountryItem: React.FC<Props> = ({
     }
 
     return 'bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText';
-  }, [shouldShowAsNonQualified, country.isVotingFinished, isJuryVoting]);
+  }, [
+    withConsistentCountryStatus,
+    shouldShowAsNonQualified,
+    isJuryVoting,
+    country.isVotingFinished,
+  ]);
 
   // Size-based styles
   const sizeStyles = {
