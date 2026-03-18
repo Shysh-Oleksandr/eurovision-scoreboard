@@ -146,9 +146,44 @@ export const useFinalStats = () => {
     return toFixedIfDecimalFloat(country.points);
   };
 
-  const rankedCountries = [...participatingCountries]
-    .sort(createCountriesComparator(selectedStage?.runningOrder))
-    .map((country, index) => ({ ...country, rank: index + 1 }));
+  const rankedCountries = useMemo(
+    () =>
+      [...participatingCountries]
+        .sort((a, b) => {
+          const orderMap =
+            selectedStage?.runningOrder &&
+            selectedStage?.runningOrder.length > 0
+              ? new Map(
+                  selectedStage?.runningOrder.map((code, idx) => [code, idx]),
+                )
+              : null;
+
+          const pointsComparison = getPoints(b) - getPoints(a);
+
+          if (pointsComparison === 0) {
+            const televoteComparison = b.televotePoints - a.televotePoints;
+
+            if (televoteComparison === 0) {
+              if (orderMap) {
+                const aIdx = orderMap.get(a.code);
+                const bIdx = orderMap.get(b.code);
+
+                if (aIdx !== undefined && bIdx !== undefined && aIdx !== bIdx) {
+                  return aIdx - bIdx;
+                }
+              }
+
+              return a.name.localeCompare(b.name);
+            }
+
+            return televoteComparison;
+          }
+
+          return pointsComparison;
+        })
+        .map((country, index) => ({ ...country, rank: index + 1 })),
+    [participatingCountries, selectedVoteType, selectedStage],
+  );
 
   const getPointsFromVoter = (
     participantCode: string,

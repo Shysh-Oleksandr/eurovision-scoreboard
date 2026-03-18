@@ -341,9 +341,6 @@ export const UPCOMING_FEATURES = [
     title: 'Update default themes (2016-2025) to use new theme features.',
   },
   {
-    title: 'Running order setup',
-  },
-  {
     title: 'Separate points system for jury and televote',
   },
   {
