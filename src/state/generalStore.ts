@@ -99,6 +99,7 @@ export const DEFAULT_IMAGE_CUSTOMIZATION: ImageCustomizationSettings = {
   maxCountries: 0, // 0 means show all
   showRankings: true,
   showPoints: true,
+  showPointsForRunningOrder: false,
   shortCountryNames: false,
   aspectRatio: getInitialAspectRatio(),
   itemSize: 'lg' as 'sm' | 'md' | 'lg' | 'xl' | '2xl',
@@ -163,6 +164,7 @@ export interface ImageCustomizationSettings {
   maxCountries: number;
   showRankings: boolean;
   showPoints: boolean;
+  showPointsForRunningOrder: boolean;
   shortCountryNames: boolean;
   aspectRatio: ShareImageAspectRatio;
   itemSize: 'sm' | 'md' | 'lg' | 'xl' | '2xl';

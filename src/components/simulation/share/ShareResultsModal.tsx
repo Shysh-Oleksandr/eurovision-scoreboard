@@ -723,9 +723,18 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                 <Checkbox
                   id="showPoints"
                   label={t('share.showPoints')}
-                  checked={imageCustomization.showPoints}
+                  checked={
+                    countriesOverride
+                      ? imageCustomization.showPointsForRunningOrder
+                      : imageCustomization.showPoints
+                  }
                   onChange={(e) =>
-                    updateImageSetting('showPoints', e.target.checked)
+                    updateImageSetting(
+                      countriesOverride
+                        ? 'showPointsForRunningOrder'
+                        : 'showPoints',
+                      e.target.checked,
+                    )
                   }
                 />
 

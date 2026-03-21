@@ -44,7 +44,7 @@ export const CountrySortableItem: React.FC<CountrySortableItemProps> = ({
       <div className="relative flex items-center gap-2 flex-1 min-w-0 h-8">
         {index !== undefined && (
           <h4 className="text-white text-lg font-medium tabular-nums">
-            {index + 1}
+            {(index + 1).toString().padStart(2, '0')}
           </h4>
         )}
 

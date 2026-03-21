@@ -367,7 +367,11 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                   index={sortedCountries.findIndex(
                     (c) => c.code === country.code,
                   )}
-                  showPoints={imageCustomization.showPoints}
+                  showPoints={
+                    withConsistentCountryStatus
+                      ? imageCustomization.showPointsForRunningOrder
+                      : imageCustomization.showPoints
+                  }
                   showRankings={imageCustomization.showRankings}
                   size={imageCustomization.itemSize}
                   shortCountryNames={imageCustomization.shortCountryNames}
