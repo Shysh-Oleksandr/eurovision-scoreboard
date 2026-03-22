@@ -31,6 +31,7 @@ interface ImageGeneratorProps {
   modalRef: React.RefObject<HTMLDivElement | null>;
   /** When provided, use this ordered list instead of scoreboard display (e.g. for running order share) */
   countriesOverride?: Country[];
+  isRunningOrder?: boolean;
 }
 
 const ImageGenerator: React.FC<ImageGeneratorProps> = ({
@@ -40,6 +41,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   setLastGeneratedStageId,
   modalRef,
   countriesOverride,
+  isRunningOrder = false,
 }) => {
   const t = useTranslations();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -368,7 +370,7 @@ const ImageGenerator: React.FC<ImageGeneratorProps> = ({
                     (c) => c.code === country.code,
                   )}
                   showPoints={
-                    withConsistentCountryStatus
+                    isRunningOrder
                       ? imageCustomization.showPointsForRunningOrder
                       : imageCustomization.showPoints
                   }

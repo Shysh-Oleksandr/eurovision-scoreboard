@@ -203,6 +203,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
         countriesOverride={orderedCountries}
         titleOverride={shareTitleOverride}
         subtitleOverride={shareSubtitleOverride}
+        isRunningOrder
       />
     </Modal>
   );

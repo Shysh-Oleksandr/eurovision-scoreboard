@@ -138,6 +138,14 @@
       "failedToSaveCustomEntries": "Не вдалося зберегти користувацьких учасників. Спробуйте знову.",
       "saveToYourCustomEntries": "Зберегти до своїх користувацьких учасників"
     },
+    "votingPredefinition": {
+      "tabDetailed": "Детально",
+      "tabTotals": "Сума (лише для поширення)",
+      "totalsHint": "Сума є для поширення результатів. Використовуйте вкладку Детально і збережіть, щоб запустити симуляцію.",
+      "shareScoreboardResults": "Поділитися scoreboard",
+      "shareSplit": "Поділитися таблицею splits",
+      "shareSummary": "Поділитися таблицею підсумків"
+    },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Увійдіть у акаунт, щоб створювати власних учасників.",
       "entryNameIsRequired": "Ім’я учасника є обов’язковим.",

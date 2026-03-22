@@ -44,6 +44,7 @@ interface StatsImagePreviewProps {
   modalRef: React.RefObject<HTMLDivElement | null>;
   onImageGenerated?: (dataUrl: string) => void;
   generatedImageUrl?: string | null;
+  aggregateTotalsOnly?: boolean;
 }
 
 const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
@@ -58,6 +59,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
   modalRef,
   onImageGenerated,
   generatedImageUrl,
+  aggregateTotalsOnly = false,
 }) => {
   const t = useTranslations();
   const [scale, setScale] = useState(1);
@@ -137,6 +139,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
             selectedStage={selectedStage}
             getPoints={getPoints}
             enableHover={false}
+            aggregateTotalsOnly={aggregateTotalsOnly}
           />
         );
       case StatsTableType.SUMMARY:
@@ -146,6 +149,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
             selectedStage={selectedStage}
             getPoints={getPoints}
             enableHover={false}
+            aggregateTotalsOnly={aggregateTotalsOnly}
           />
         );
       default:
@@ -160,6 +164,7 @@ const StatsImagePreview: React.FC<StatsImagePreviewProps> = ({
     selectedStageId,
     selectedVoteType,
     selectedStage,
+    aggregateTotalsOnly,
   ]);
 
   useEffect(() => {

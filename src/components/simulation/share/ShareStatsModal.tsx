@@ -33,8 +33,10 @@ interface ShareStatsModalProps {
     country: Country,
     type?: 'jury' | 'televote' | 'combined',
   ) => number;
-  selectedStage?: EventStage; // EventStage type
+  selectedStage?: EventStage;
   onLoaded: () => void;
+  /** When true, only SPLIT/SUMMARY tabs are used; breakdown is not shown. For COMBINED mode, hides jury/televote sub-columns. */
+  aggregateOnly?: boolean;
 }
 
 const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
@@ -49,6 +51,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
   getPoints,
   selectedStage,
   onLoaded,
+  aggregateOnly = false,
 }) => {
   const t = useTranslations();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -267,6 +270,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
           modalRef={modalRef}
           onImageGenerated={handleImageGenerated}
           generatedImageUrl={generatedImageUrl}
+          aggregateTotalsOnly={aggregateOnly}
         />
 
         {/* Generated Image Result */}

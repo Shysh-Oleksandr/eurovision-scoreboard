@@ -136,6 +136,14 @@
       "failedToSaveCustomEntries": "Failed to save custom entries. Please try again.",
       "saveToYourCustomEntries": "Save to your custom entries"
     },
+    "votingPredefinition": {
+      "tabDetailed": "Detailed",
+      "tabTotals": "Totals (share only)",
+      "totalsHint": "Totals are for sharing results only. Use the Detailed tab and Save to run a simulation.",
+      "shareScoreboardResults": "Share scoreboard",
+      "shareSplit": "Share split table",
+      "shareSummary": "Share summary table"
+    },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Please sign in to create custom entries.",
       "entryNameIsRequired": "Entry name is required.",

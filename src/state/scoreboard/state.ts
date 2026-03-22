@@ -21,6 +21,7 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
     [StageId.SF2]: {},
     [StageId.GF]: {},
   },
+  manualShareTotals: {},
   countryPoints: {
     [StageId.SF1]: {},
     [StageId.SF2]: {},

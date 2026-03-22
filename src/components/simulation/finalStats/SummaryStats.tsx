@@ -21,6 +21,8 @@ interface SummaryStatsProps {
     type?: 'jury' | 'televote' | 'combined',
   ) => number;
   enableHover?: boolean;
+  /** When true and COMBINED mode, show only rank/country/total (no jury/televote split) */
+  aggregateTotalsOnly?: boolean;
 }
 
 const SummaryStats: React.FC<SummaryStatsProps> = ({
@@ -28,6 +30,7 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
   selectedStage,
   getPoints,
   enableHover = true,
+  aggregateTotalsOnly = false,
 }) => {
   const t = useTranslations('simulation.finalStats');
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -36,9 +39,12 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
 
   const cssVars = useBorderOpacity(!enableHover);
 
-  // Check if we should show jury and televote columns
   const shouldShowJuryAndTelevote =
     selectedStage &&
+    !(
+      aggregateTotalsOnly &&
+      selectedStage.votingMode === StageVotingMode.COMBINED
+    ) &&
     (selectedStage.votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
       selectedStage.votingMode === StageVotingMode.COMBINED);
 

@@ -138,6 +138,14 @@
       "failedToSaveCustomEntries": "Błąd podczas zapisywania własnych wpisów. Proszę spróbować ponownie.",
       "saveToYourCustomEntries": "Zapisz do swoich własnych wpisów"
     },
+    "votingPredefinition": {
+      "tabDetailed": "Szczegółowy",
+      "tabTotals": "Sumy (tylko udostępnianie)",
+      "totalsHint": "Sumy są tylko do udostępniania wyników. Użyj szczegółowej karty i zapisz, aby uruchomić symulację.",
+      "shareScoreboardResults": "Udostępnij scoreboard",
+      "shareSplit": "Udostępnij tabelę splits",
+      "shareSummary": "Udostępnij tabelę podsumowania"
+    },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Zaloguj się, aby tworzyć własne wpisy.",
       "entryNameIsRequired": "Nazwa wpisu jest wymagana.",

@@ -15,6 +15,17 @@ export type CountryPoints = {
 
 export type QualificationOrder = Record<string, Record<string, number>>; // stageId -> countryCode -> qualificationOrder
 
+export type ManualShareTotalsRow = {
+  jury?: number;
+  televote?: number;
+  combined?: number;
+};
+
+export type ManualShareTotalsByStage = Record<
+  string,
+  Record<string, ManualShareTotalsRow>
+>; // stageId -> countryCode -> ManualShareTotalsRow
+
 export type StageVotes = {
   jury?: Record<string, Vote[]>; // voting country code -> votes
   televote?: Record<string, Vote[]>; // voting country code -> votes
@@ -37,6 +48,7 @@ export type ScoreboardState = {
   showAllParticipants: boolean;
   televotingProgress: number;
   predefinedVotes: Record<string, Partial<StageVotes>>;
+  manualShareTotals: ManualShareTotalsByStage;
   countryPoints: Record<string, Record<string, CountryPoints>>; // stageId -> countryCode -> CountryPoints
   lastPointsResetTimerId: NodeJS.Timeout | null;
   isBoardTeleportAnimationRunning: boolean;
@@ -98,6 +110,10 @@ export type ScoreboardState = {
     stage: EventStage,
     votes: Partial<StageVotes>,
     resetOtherStages?: boolean,
+  ) => void;
+  setManualShareTotalsForStage: (
+    stageId: string,
+    partial: Record<string, Partial<ManualShareTotalsRow>>,
   ) => void;
   pickQualifier: (countryCode: string) => void;
   pickQualifierRandomly: () => void;

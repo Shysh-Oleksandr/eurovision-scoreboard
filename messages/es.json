@@ -138,6 +138,14 @@
       "failedToSaveCustomEntries": "Error al guardar las entradas personalizadas. Por favor, intenta de nuevo.",
       "saveToYourCustomEntries": "Guardar en tus entradas personalizadas"
     },
+    "votingPredefinition": {
+      "tabDetailed": "Detallado",
+      "tabTotals": "Totales (solo compartir)",
+      "totalsHint": "Los totales son solo para compartir resultados. Utiliza la pestaña Detallada y guarda para ejecutar una simulación.",
+      "shareScoreboardResults": "Compartir scoreboard",
+      "shareSplit": "Compartir tabla de splits",
+      "shareSummary": "Compartir tabla de resumen"
+    },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Inicia sesión para crear entradas personalizadas.",
       "entryNameIsRequired": "El nombre de la entrada es obligatorio.",

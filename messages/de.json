@@ -138,6 +138,14 @@
       "failedToSaveCustomEntries": "Fehler beim Speichern der benutzerdefinierten Beiträge. Bitte versuche es erneut.",
       "saveToYourCustomEntries": "Zu deinen benutzerdefinierten Beiträgen hinzufügen"
     },
+    "votingPredefinition": {
+      "tabDetailed": "Detailliert",
+      "tabTotals": "Totals (nur teilen)",
+      "totalsHint": "Totals sind nur zum Teilen der Ergebnisse. Verwende die Detaillierte Tabelle und speichere, um eine Simulation zu starten.",
+      "shareScoreboardResults": "Scoreboard teilen",
+      "shareSplit": "Teilen Split-Tabelle",
+      "shareSummary": "Teilen Summary-Tabelle"
+    },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Bitte melde dich an, um eigene Beiträge zu erstellen.",
       "entryNameIsRequired": "Der Beitragsname ist erforderlich.",

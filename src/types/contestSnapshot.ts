@@ -54,6 +54,10 @@ export interface ContestSnapshot {
     }>;
     results: {
       predefinedVotes: Record<string, Partial<CompactStageVotes>>;
+      manualShareTotals?: Record<
+        string,
+        Record<string, { jury?: number; televote?: number; combined?: number }>
+      >;
       currentStageId: string | null;
       votingCountryIndex: number;
       votingPointsIndex: number;

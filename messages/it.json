@@ -138,6 +138,14 @@
       "failedToSaveCustomEntries": "Errore durante il salvataggio delle voci personalizzate. Per favore, prova di nuovo.",
       "saveToYourCustomEntries": "Salva nelle tue voci personalizzate"
     },
+    "votingPredefinition": {
+      "tabDetailed": "Dettagliato",
+      "tabTotals": "Totali (solo condivisione)",
+      "totalsHint": "I totali sono per la condivisione dei risultati. Usa la scheda Dettagliata e Salva per eseguire una simulazione.",
+      "shareScoreboardResults": "Condividi scoreboard",
+      "shareSplit": "Condividi tabella di splits",
+      "shareSummary": "Condividi tabella di riepilogo"
+    },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Accedi per creare voci personalizzate.",
       "entryNameIsRequired": "Il nome della voce è obbligatorio.",

@@ -4,7 +4,7 @@ import { EventStage } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
-import { ScoreboardState } from './types';
+import { ManualShareTotalsRow, ScoreboardState } from './types';
 import { predefineStageVotes } from './votesPredefinition';
 
 // Helper function to calculate and store country points from predefined votes
@@ -76,6 +76,10 @@ type PredefinitionActions = {
     votes: any,
     resetOtherStages?: boolean,
   ) => void;
+  setManualShareTotalsForStage: (
+    stageId: string,
+    partial: Record<string, Partial<ManualShareTotalsRow>>,
+  ) => void;
 };
 
 export const createPredefinitionActions: StateCreator<
@@ -135,5 +139,29 @@ export const createPredefinitionActions: StateCreator<
     }));
 
     calculateAndStoreCountryPoints(stage, votes, set);
+  },
+
+  setManualShareTotalsForStage: (
+    stageId: string,
+    partial: Record<string, Partial<ManualShareTotalsRow>>,
+  ) => {
+    set((state) => {
+      const existing = state.manualShareTotals[stageId] || {};
+      const merged: Record<string, ManualShareTotalsRow> = {
+        ...existing,
+      };
+      for (const [countryCode, row] of Object.entries(partial)) {
+        merged[countryCode] = {
+          ...(merged[countryCode] || {}),
+          ...row,
+        };
+      }
+      return {
+        manualShareTotals: {
+          ...state.manualShareTotals,
+          [stageId]: merged,
+        },
+      };
+    });
   },
 });

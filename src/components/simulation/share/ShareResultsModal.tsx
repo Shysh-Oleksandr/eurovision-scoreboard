@@ -37,6 +37,7 @@ interface ShareResultsModalProps {
   countriesOverride?: Country[];
   titleOverride?: string;
   subtitleOverride?: string;
+  isRunningOrder?: boolean;
 }
 
 const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
@@ -46,6 +47,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   countriesOverride,
   titleOverride,
   subtitleOverride,
+  isRunningOrder = false,
 }) => {
   const t = useTranslations();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -724,13 +726,13 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
                   id="showPoints"
                   label={t('share.showPoints')}
                   checked={
-                    countriesOverride
+                    isRunningOrder
                       ? imageCustomization.showPointsForRunningOrder
                       : imageCustomization.showPoints
                   }
                   onChange={(e) =>
                     updateImageSetting(
-                      countriesOverride
+                      isRunningOrder
                         ? 'showPointsForRunningOrder'
                         : 'showPoints',
                       e.target.checked,
@@ -785,6 +787,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
           setLastGeneratedStageId={setLastGeneratedStageId}
           modalRef={modalRef}
           countriesOverride={countriesOverride}
+          isRunningOrder={isRunningOrder}
         />
 
         {generatedImageUrl && (
