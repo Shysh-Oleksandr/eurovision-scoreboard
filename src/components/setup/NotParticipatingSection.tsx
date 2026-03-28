@@ -241,7 +241,7 @@ const NotParticipatingSection = ({
         </p>
         <div className="relative">
           <Input
-            className="sm:w-[200px] lg:text-[0.95rem] text-sm pr-10"
+            className="sm:w-[200px] pr-10"
             name="countriesSearch"
             id="countriesSearch"
             placeholder={t('eventSetupModal.searchCountries')}

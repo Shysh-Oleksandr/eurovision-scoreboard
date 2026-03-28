@@ -36,7 +36,7 @@ const tableStyles = {
     'p-2 min-w-[100px] w-[100px] h-auto text-center border-r border-solid border-primary-900',
   telePointsHeader:
     'p-2 min-w-[100px] w-[100px] h-auto text-center border-r border-solid border-primary-900',
-  bodyRow: 'border-b border-solid border-primary-900 hover:bg-primary-800/50',
+  bodyRow: 'border-b border-solid border-primary-900',
   rankCell: 'p-2 text-center border-r border-solid border-primary-900',
   countryCell: 'p-2 border-r border-solid border-primary-900',
   pointsCell: 'p-2 text-center border-r border-solid border-primary-900',
@@ -98,7 +98,7 @@ const VotingTotalsShareTable: React.FC<VotingTotalsShareTableProps> = ({
         type="number"
         min={0}
         step={1}
-        className="!py-1.5 !text-base text-center"
+        className="!py-1.5 text-center"
         value={displayVal}
         onChange={(e) => {
           setDrafts((prev) => ({ ...prev, [key]: e.target.value }));

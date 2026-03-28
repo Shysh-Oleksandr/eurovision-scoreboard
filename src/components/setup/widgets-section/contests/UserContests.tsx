@@ -1,7 +1,9 @@
-import { User } from 'lucide-react';
+import { ChartColumn, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+
+import dynamic from 'next/dynamic';
 
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
@@ -27,6 +29,14 @@ import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
+
+const CountryStatsPickerModal = dynamic(
+  () => import('./CountryStatsPickerModal'),
+  { ssr: false },
+);
+const CountryStatsModal = dynamic(() => import('./CountryStatsModal'), {
+  ssr: false,
+});
 
 const sortContestsBy =
   (sortKey: Exclude<PublicSortKey, 'copies'>) => (a: Contest, b: Contest) => {
@@ -69,6 +79,9 @@ const UserContests: React.FC<UserContestsProps> = ({
   const [sortKey, setSortKey] =
     useState<Exclude<PublicSortKey, 'copies'>>('latest');
   const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
+  const [entryStatsPickerOpen, setEntryStatsPickerOpen] = useState(false);
+  const [entryStatsOpen, setEntryStatsOpen] = useState(false);
+  const [entryStatsCode, setEntryStatsCode] = useState<string | null>(null);
 
   const { data: contests, isLoading } = useMyContestsQuery(!!user);
   const { data: savedContests } = useSavedContestsQuery(!!user);
@@ -315,6 +328,14 @@ const UserContests: React.FC<UserContestsProps> = ({
             });
           }}
           placeholder={t('widgets.contests.searchContests')}
+          extraActions={
+            <Button
+              onClick={() => setEntryStatsPickerOpen(true)}
+              Icon={<ChartColumn className="w-6 h-6" />}
+              className="justify-center whitespace-nowrap !p-3"
+              title={t('widgets.contests.entryStats.pickerTitle')}
+            ></Button>
+          }
         />
 
         <div className="flex items-center flex-wrap justify-start gap-2">
@@ -366,6 +387,28 @@ const UserContests: React.FC<UserContestsProps> = ({
 
       {/* Content by view */}
       {content}
+
+      {entryStatsPickerOpen && (
+        <CountryStatsPickerModal
+          isOpen={entryStatsPickerOpen}
+          onClose={() => setEntryStatsPickerOpen(false)}
+          onSelectEntry={(code) => {
+            setEntryStatsCode(code);
+            setEntryStatsOpen(true);
+          }}
+        />
+      )}
+      {entryStatsOpen && entryStatsCode && (
+        <CountryStatsModal
+          isOpen={entryStatsOpen}
+          onClose={() => {
+            setEntryStatsOpen(false);
+            setEntryStatsCode(null);
+          }}
+          onContestLoaded={() => setEntryStatsPickerOpen(false)}
+          entryCode={entryStatsCode}
+        />
+      )}
     </div>
   );
 };

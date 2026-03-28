@@ -382,7 +382,28 @@
       "confirmCreateNewContest": "Створити новий конкурс?",
       "confirmCreateNewContestDescription": "У вас є активний конкурс ({name}). Переконайтеся, що зберегли його перед створенням нового.",
       "venue": "Місце",
-      "hosts": "Ведучі"
+      "hosts": "Ведучі",
+      "entryStats": {
+        "pickerTitle": "Статистика за учасником",
+        "pickerSubtitle": "Знайдіть і оберіть країну або власний запис, щоб побачити підсумки у завершених конкурсах.",
+        "searchEntries": "Пошук країн...",
+        "participations": "Участі",
+        "victories": "Перемоги",
+        "finals": "Фінали",
+        "nulPoints": "Нуль очок",
+        "lastPlaces": "Останні місця",
+        "bestResult": "Найкращий результат",
+        "noParticipations": "У завершених конкурсах ще немає цього учасника.",
+        "contest": "Конкурс",
+        "year": "Рік",
+        "winner": "Переможець",
+        "gfResult": "Гранд-фінал",
+        "nonQualified": "Не пройшов",
+        "points": "оч.",
+        "load": "Завантажити",
+        "failedToLoadStats": "Не вдалося завантажити статистику",
+        "noEntriesMatch": "Немає збігів за запитом."
+      }
     },
     "themes": {
       "title": "Теми",

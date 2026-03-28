@@ -27,7 +27,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
 
   return (
     <div
-      className={`flex items-center xs:gap-4 gap-2 bg-primary-900 p-4 z-30 ${
+      className={`flex items-center overflow-x-auto xs:gap-4 gap-2 bg-primary-900 p-4 z-30 ${
         onDelete ? 'justify-between' : 'justify-end'
       }`}
     >
@@ -39,7 +39,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           snowEffect="left"
           Icon={<Trash2 className="w-5 h-5" />}
         >
-          {t('delete')}
+          <span className="xs:block hidden">{t('delete')}</span>
         </Button>
       )}
       <div

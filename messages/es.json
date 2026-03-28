@@ -380,7 +380,28 @@
       "confirmCreateNewContest": "Crear nuevo concurso?",
       "confirmCreateNewContestDescription": "Tienes un concurso activo ({name}). Asegúrate de guardarlo antes de crear uno nuevo.",
       "venue": "Lugar",
-      "hosts": "Presentadores"
+      "hosts": "Presentadores",
+      "entryStats": {
+        "pickerTitle": "Tus estadísticas de entrada",
+        "pickerSubtitle": "Busca y selecciona un país o entrada personalizada para ver los resultados de tus concursos completados.",
+        "searchEntries": "Buscar países...",
+        "participations": "Participaciones",
+        "victories": "Victorias",
+        "finals": "Finales",
+        "nulPoints": "Ceros puntos",
+        "lastPlaces": "Últimos puestos",
+        "bestResult": "Mejor resultado",
+        "noParticipations": "No hay concursos completados que incluyan esta entrada todavía.",
+        "contest": "Concurso",
+        "year": "Año",
+        "winner": "Ganador",
+        "gfResult": "Gran final",
+        "nonQualified": "No clasificado",
+        "points": "puntos",
+        "load": "Cargar",
+        "failedToLoadStats": "Error al cargar las estadísticas",
+        "noEntriesMatch": "No hay entradas que coincidan con tu búsqueda."
+      }
     },
     "themes": {
       "title": "Temas",

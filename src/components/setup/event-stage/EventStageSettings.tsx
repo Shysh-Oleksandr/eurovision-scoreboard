@@ -67,7 +67,7 @@ const EventStageSettings: React.FC<EventStageSettingsProps> = ({
           id="stageName"
           type="text"
           {...register('name')}
-          className="h-12 lg:text-[0.95rem] text-sm"
+          className="h-12"
           placeholder={t('setup.eventStageModal.stageNamePlaceholder')}
           autoFocus={!isEditMode}
         />

@@ -382,7 +382,28 @@
       "confirmCreateNewContest": "Utwórz nowy konkurs?",
       "confirmCreateNewContestDescription": "Masz aktywny konkurs ({name}). Upewnij się, że go zapiszesz przed utworzeniem nowego.",
       "venue": "Miejsce",
-      "hosts": "Gospodarze"
+      "hosts": "Gospodarze",
+      "entryStats": {
+        "pickerTitle": "Twoje statystyki wkładu",
+        "pickerSubtitle": "Szukaj i wybierz kraj lub własny wkład, aby zobaczyć wyniki w swoich zakończonych konkursach.",
+        "searchEntries": "Szukaj krajów...",
+        "participations": "Uczestnictwa",
+        "victories": "Zwycięstwa",
+        "finals": "Finały",
+        "nulPoints": "Punkty zerowe",
+        "lastPlaces": "Ostatnie miejsca",
+        "bestResult": "Najlepszy wynik",
+        "noParticipations": "Brak zakończonych konkursów, które zawierają ten wkład.",
+        "contest": "Konkurs",
+        "year": "Rok",
+        "winner": "Zwycięzca",
+        "gfResult": "Grand Final",
+        "nonQualified": "Nie zakwalifikowany",
+        "points": "punkty",
+        "load": "Ładowanie",
+        "failedToLoadStats": "Błąd podczas ładowania statystyk",
+        "noEntriesMatch": "Nie znaleziono wkładów pasujących do wyszukiwania."
+      }
     },
     "themes": {
       "title": "Motywy",

@@ -443,7 +443,6 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t('common.enterName')}
-            className="lg:text-[0.95rem] text-sm"
           />
         </div>
         <div className="flex flex-col gap-1">

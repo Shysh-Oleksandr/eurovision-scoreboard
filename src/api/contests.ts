@@ -2,12 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
+
 import type {
   Contest,
   ContestListResponse,
   ContestState,
 } from '@/types/contest';
 import type { ContestSnapshot } from '@/types/contestSnapshot';
+import type { EntryStatsResponse } from '@/types/entryStats';
 
 export type CreateContestInput = {
   name: string;
@@ -46,11 +48,12 @@ export type PublicContestsQueryParams = {
   enabled?: boolean;
 };
 
-export function useMyContestsQuery(enabled: boolean = true) {
+export function useMyContestsQuery(enabled = true) {
   return useQuery<Contest[]>({
     queryKey: queryKeys.user.contests(),
     queryFn: async () => {
       const { data } = await api.get('/contests/me');
+
       return data as Contest[];
     },
     enabled,
@@ -58,11 +61,12 @@ export function useMyContestsQuery(enabled: boolean = true) {
   });
 }
 
-export function useSavedContestsQuery(enabled: boolean = true) {
+export function useSavedContestsQuery(enabled = true) {
   return useQuery<Contest[]>({
     queryKey: queryKeys.user.savedContests(),
     queryFn: async () => {
       const { data } = await api.get('/contests/me/saved');
+
       return data as Contest[];
     },
     enabled,
@@ -70,14 +74,12 @@ export function useSavedContestsQuery(enabled: boolean = true) {
   });
 }
 
-export function useContestByIdQuery(
-  contestId: string,
-  enabled: boolean = true,
-) {
+export function useContestByIdQuery(contestId: string, enabled = true) {
   return useQuery<Contest>({
     queryKey: queryKeys.user.contestById(contestId),
     queryFn: async () => {
       const { data } = await api.get(`/contests/${contestId}`);
+
       return data as Contest;
     },
     enabled: enabled && !!contestId,
@@ -86,9 +88,11 @@ export function useContestByIdQuery(
 
 export function useApplyContestMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/contests/${id}/apply`);
+
       return data;
     },
     onSuccess: () => {
@@ -99,9 +103,11 @@ export function useApplyContestMutation() {
 
 export function useClearActiveContestMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async () => {
       const { data } = await api.post('/contests/clear-active');
+
       return data;
     },
     onSuccess: () => {
@@ -130,6 +136,7 @@ export function usePublicContestsQuery({
     }),
     queryFn: async () => {
       const params = new URLSearchParams();
+
       params.append('page', page.toString());
       params.append('limit', '10');
       if (search) params.append('q', search);
@@ -139,6 +146,7 @@ export function usePublicContestsQuery({
       if (endDate) params.append('endDate', endDate);
 
       const { data } = await api.get(`/contests/public?${params.toString()}`);
+
       return data as ContestListResponse;
     },
     enabled,
@@ -146,22 +154,41 @@ export function usePublicContestsQuery({
   });
 }
 
-export function useContestSnapshotQuery(id: string, enabled: boolean = true) {
+export function useContestSnapshotQuery(id: string, enabled = true) {
   return useQuery<ContestSnapshot>({
     queryKey: ['contest', 'snapshot', id],
     queryFn: async () => {
       const { data } = await api.get(`/contests/${id}/snapshot`);
+
       return data as ContestSnapshot;
     },
     enabled: !!id && enabled,
   });
 }
 
+export function useMyEntryStatsQuery(entryCode: string | null, enabled = true) {
+  const encoded = entryCode ? encodeURIComponent(entryCode) : '';
+
+  return useQuery<EntryStatsResponse>({
+    queryKey: queryKeys.user.entryStats(entryCode || ''),
+    queryFn: async () => {
+      const { data } = await api.get(`/contests/me/entry-stats/${encoded}`);
+
+      return data as EntryStatsResponse;
+    },
+    enabled: !!entryCode && enabled,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
+  });
+}
+
 export function useCreateContestMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (input: CreateContestInput) => {
       const { data } = await api.post('/contests', input);
+
       return data as Contest;
     },
     onSuccess: () => {
@@ -173,12 +200,14 @@ export function useCreateContestMutation() {
 
 export function useUpdateContestMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async ({
       id,
       ...input
     }: UpdateContestInput & { id: string }) => {
       const { data } = await api.patch(`/contests/${id}`, input);
+
       return data as Contest;
     },
     onSuccess: (data, variables) => {
@@ -196,6 +225,7 @@ export function useUpdateContestMutation() {
 
 export function useDeleteContestMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/contests/${id}`);
@@ -209,15 +239,18 @@ export function useDeleteContestMutation() {
 
 export function useToggleLikeContestMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/contests/${id}/like`);
+
       return data as { liked: boolean; likes: number };
     },
     onSuccess: (res, id) => {
       const queries = qc.getQueriesData<ContestListResponse>({
         queryKey: ['public', 'contests'],
       });
+
       for (const [key, data] of queries) {
         if (!data) continue;
         qc.setQueryData(key, {
@@ -234,15 +267,18 @@ export function useToggleLikeContestMutation() {
 
 export function useToggleSaveContestMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/contests/${id}/save`);
+
       return data as { saved: boolean; saves: number };
     },
     onSuccess: (res, id) => {
       const queries = qc.getQueriesData<ContestListResponse>({
         queryKey: ['public', 'contests'],
       });
+
       for (const [key, data] of queries) {
         if (!data) continue;
         qc.setQueryData(key, {
@@ -258,11 +294,12 @@ export function useToggleSaveContestMutation() {
   });
 }
 
-export function useContestsStateQuery(ids: string[], enabled: boolean = true) {
+export function useContestsStateQuery(ids: string[], enabled = true) {
   return useQuery<ContestState>({
     queryKey: queryKeys.user.contestsState(ids),
     queryFn: async () => {
       const { data } = await api.get(`/contests/state?ids=${ids.join(',')}`);
+
       return data as ContestState;
     },
     enabled: enabled && ids.length > 0,

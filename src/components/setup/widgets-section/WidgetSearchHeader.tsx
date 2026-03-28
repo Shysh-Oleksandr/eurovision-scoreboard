@@ -12,6 +12,7 @@ interface WidgetSearchHeaderProps {
   onSearchChange: (search: string) => void;
   onCreateNew?: () => void;
   placeholder: string;
+  extraActions?: React.ReactNode;
 }
 
 const WidgetSearchHeader: React.FC<WidgetSearchHeaderProps> = ({
@@ -19,6 +20,7 @@ const WidgetSearchHeader: React.FC<WidgetSearchHeaderProps> = ({
   search,
   onSearchChange,
   placeholder,
+  extraActions,
 }) => {
   const t = useTranslations();
 
@@ -30,7 +32,7 @@ const WidgetSearchHeader: React.FC<WidgetSearchHeaderProps> = ({
           placeholder={placeholder}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="text-sm pr-10"
+          className="pr-10"
         />
         <SearchInputIcon
           showClearIcon={search.length > 0}
@@ -38,16 +40,19 @@ const WidgetSearchHeader: React.FC<WidgetSearchHeaderProps> = ({
         />
       </div>
 
-      {onCreateNew && (
-        <Button
-          variant="tertiary"
-          onClick={onCreateNew}
-          Icon={<PlusIcon className="w-6 h-6" />}
-          className="justify-center"
-        >
-          {t('common.create')}
-        </Button>
-      )}
+      <div className="flex items-center gap-2">
+        {onCreateNew && (
+          <Button
+            variant="tertiary"
+            onClick={onCreateNew}
+            Icon={<PlusIcon className="w-6 h-6" />}
+            className="justify-center w-full"
+          >
+            {t('common.create')}
+          </Button>
+        )}
+        {extraActions}
+      </div>
     </div>
   );
 };

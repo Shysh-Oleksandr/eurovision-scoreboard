@@ -382,7 +382,28 @@
       "confirmCreateNewContest": "Creare un nuovo concorso?",
       "confirmCreateNewContestDescription": "Hai un concorso attivo ({name}). Assicurati di salvarlo prima di creare uno nuovo.",
       "venue": "Luogo",
-      "hosts": "Conduttori"
+      "hosts": "Conduttori",
+      "entryStats": {
+        "pickerTitle": "Le tue statistiche di voce",
+        "pickerSubtitle": "Cerca e seleziona un paese o una voce personalizzata per vedere i risultati dei tuoi concorsi completati.",
+        "searchEntries": "Cerca paesi...",
+        "participations": "Partecipazioni",
+        "victories": "Vittorie",
+        "finals": "Finali",
+        "nulPoints": "Punti nulli",
+        "lastPlaces": "Ultimi posti",
+        "bestResult": "Miglior risultato",
+        "noParticipations": "Ancora nessun concorso completo che includa questa voce.",
+        "contest": "Concorso",
+        "year": "Anno",
+        "winner": "Vincitore",
+        "gfResult": "Grand finale",
+        "nonQualified": "Non qualificato",
+        "points": "punti",
+        "load": "Carica",
+        "failedToLoadStats": "Errore durante il caricamento delle statistiche",
+        "noEntriesMatch": "Nessuna voce corrisponde alla tua ricerca."
+      }
     },
     "themes": {
       "title": "Temi",

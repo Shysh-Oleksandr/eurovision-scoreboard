@@ -110,7 +110,7 @@ const LoadContestModal: React.FC<LoadContestModalProps> = ({
       onClose={onClose}
       containerClassName="!w-[min(100%,500px)]"
       contentClassName="text-white"
-      overlayClassName="!z-[1002]"
+      overlayClassName="!z-[1012]"
       withBlur
       bottomContent={
         <ModalBottomContent

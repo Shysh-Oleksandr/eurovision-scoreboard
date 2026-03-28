@@ -64,7 +64,7 @@ export const RunningOrderTab = ({
           </h3>
           <p className="text-white/50 text-sm">{t('dragAndDropToReorder')}</p>
         </div>
-        <div className="flex items-center flex-wrap sm:gap-3 gap-2">
+        <div className="flex items-center flex-wrap sm:gap-3 gap-2 sm:w-auto w-full">
           <div className="flex items-center sm:gap-2 gap-1">
             <ActionButton
               onClick={() => onQuickSort('az')}
@@ -91,7 +91,7 @@ export const RunningOrderTab = ({
             tabs={layoutTabs}
             activeTab={layoutValue}
             setActiveTab={(tab) => setSelectedLayout(tab as 'list' | 'grid')}
-            containerClassName="!px-0 !py-0 !overflow-hidden !h-10 !w-32"
+            containerClassName="!px-0 !py-0 ml-auto !overflow-hidden !h-10 !w-32"
             overlayClassName="!top-0 !h-10"
           />
         </div>

@@ -382,7 +382,28 @@
       "confirmCreateNewContest": "Créer un nouveau concours?",
       "confirmCreateNewContestDescription": "Vous avez un concours actif ({name}). Assurez-vous de le sauvegarder avant de créer un nouveau.",
       "venue": "Lieu",
-      "hosts": "Présentateurs"
+      "hosts": "Présentateurs",
+      "entryStats": {
+        "pickerTitle": "Vos statistiques de participation",
+        "pickerSubtitle": "Recherchez et sélectionnez un pays ou une entrée personnalisée pour voir les résultats de vos concours terminés.",
+        "searchEntries": "Rechercher des pays...",
+        "participations": "Participations",
+        "victories": "Victoires",
+        "finals": "Finales",
+        "nulPoints": "Zéro points",
+        "lastPlaces": "Derniers places",
+        "bestResult": "Meilleur résultat",
+        "noParticipations": "Aucun concours terminé ne contient encore cette entrée.",
+        "contest": "Concours",
+        "year": "Année",
+        "winner": "Gagnant",
+        "gfResult": "Grand final",
+        "nonQualified": "Non qualifié",
+        "points": "points",
+        "load": "Charger",
+        "failedToLoadStats": "Erreur lors du chargement des statistiques",
+        "noEntriesMatch": "Aucune entrée ne correspond à votre recherche."
+      }
     },
     "themes": {
       "title": "Thèmes",

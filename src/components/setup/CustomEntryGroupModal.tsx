@@ -113,7 +113,7 @@ const CustomEntryGroupModal: React.FC<CustomEntryGroupModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       overlayClassName="!z-[1001]"
-      containerClassName="!w-[min(100%,400px)]"
+      containerClassName="!w-[min(100%,500px)]"
       withBlur
       bottomContent={
         <ModalBottomContent
@@ -140,7 +140,6 @@ const CustomEntryGroupModal: React.FC<CustomEntryGroupModalProps> = ({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t('common.enterName')}
-            className="lg:text-[0.95rem] text-sm"
           />
         </div>
       </div>

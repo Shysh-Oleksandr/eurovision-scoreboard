@@ -377,7 +377,28 @@
       "confirmCreateNewContest": "Create new contest?",
       "confirmCreateNewContestDescription": "You have an active contest ({name}). Make sure you save it before creating a new one.",
       "venue": "Venue",
-      "hosts": "Hosts"
+      "hosts": "Hosts",
+      "entryStats": {
+        "pickerTitle": "Your entry stats",
+        "pickerSubtitle": "Search and select a country or custom entry to see results across your completed contests.",
+        "searchEntries": "Search countries...",
+        "participations": "Participations",
+        "victories": "Victories",
+        "finals": "Finals",
+        "nulPoints": "Nul points",
+        "lastPlaces": "Last places",
+        "bestResult": "Best result",
+        "noParticipations": "No completed contests include this entry yet.",
+        "contest": "Contest",
+        "year": "Year",
+        "winner": "Winner",
+        "gfResult": "Grand final",
+        "nonQualified": "Did not qualify",
+        "points": "pts",
+        "load": "Load",
+        "failedToLoadStats": "Failed to load stats",
+        "noEntriesMatch": "No entries match your search."
+      }
     },
     "themes": {
       "title": "Themes",

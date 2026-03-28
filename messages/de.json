@@ -380,7 +380,28 @@
       "confirmCreateNewContest": "Neuen Wettbewerb erstellen?",
       "confirmCreateNewContestDescription": "Du hast einen aktiven Wettbewerb ({name}). Stelle sicher, dass du ihn speicherst, bevor du einen neuen erstellst.",
       "venue": "Veranstaltungsort",
-      "hosts": "Moderatoren"
+      "hosts": "Moderatoren",
+      "entryStats": {
+        "pickerTitle": "Deine Eintragsstatistiken",
+        "pickerSubtitle": "Suche und wähle ein Land oder einen benutzerdefinierten Eintrag, um die Ergebnisse über deine abgeschlossenen Wettbewerbe zu sehen.",
+        "searchEntries": "Länder suchen...",
+        "participations": "Teilnahmen",
+        "victories": "Siege",
+        "finals": "Finale",
+        "nulPoints": "Nul-Punkte",
+        "lastPlaces": "Letzte Plätze",
+        "bestResult": "Bestes Ergebnis",
+        "noParticipations": "Noch keine abgeschlossenen Wettbewerbe enthalten diesen Eintrag.",
+        "contest": "Wettbewerb",
+        "year": "Jahr",
+        "winner": "Gewinner",
+        "gfResult": "Grand Final",
+        "nonQualified": "Nicht qualifiziert",
+        "points": "Punkte",
+        "load": "Laden",
+        "failedToLoadStats": "Fehler beim Laden der Statistiken",
+        "noEntriesMatch": "Keine Einträge entsprechen Ihrer Suche."
+      }
     },
     "themes": {
       "title": "Themes",
