@@ -403,6 +403,26 @@
         "load": "Carica",
         "failedToLoadStats": "Errore durante il caricamento delle statistiche",
         "noEntriesMatch": "Nessuna voce corrisponde alla tua ricerca."
+      },
+      "leaderboard": {
+        "title": "Classifica paesi",
+        "chartButtonTitle": "Classifica paesi",
+        "yearLabel": "Ambito",
+        "globalOption": "Globale (tutti gli anni)",
+        "contestCount": "Basata su {count} {count, plural, =1 {concorso completato} other {concorsi completati}}.",
+        "country": "Paese",
+        "wins": "Vittorie",
+        "finals": "Finali",
+        "participations": "Partecipazioni",
+        "winRate": "Tasso di vittorie",
+        "top3": "Top 3",
+        "top5": "Top 5",
+        "top10": "Top 10",
+        "avgGfPoints": "Media pt GF",
+        "totalGfPoints": "Totale pt GF",
+        "computedAt": "Ultimo aggiornamento: {time}",
+        "failedToLoad": "Impossibile caricare la classifica",
+        "useYearButton": "Usa anno {year}"
       }
     },
     "themes": {

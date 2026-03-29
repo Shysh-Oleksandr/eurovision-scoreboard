@@ -24,6 +24,17 @@ export type OptionGroup = {
   options: Option[];
 };
 
+/** Rendered at the bottom of the desktop dropdown; use `close()` after applying a custom value. */
+export type CustomSelectDropdownFooterRender = (ctx: {
+  close: () => void;
+}) => React.ReactNode;
+
+/** When the search filter matches no options, render this instead of “no options” if non-null. */
+export type CustomSelectEmptyFilterContent = (ctx: {
+  searchText: string;
+  close: () => void;
+}) => React.ReactNode | null;
+
 type CustomSelectProps = {
   options: Option[];
   groups?: { label: string; options: Option[] }[]; // optional grouped options
@@ -38,6 +49,10 @@ type CustomSelectProps = {
   customThemeColor?: string;
   dataTheme?: string;
   withIndicator?: boolean;
+  /** Pinned below the scrollable option list (desktop). On touch, shown below the native select. */
+  dropdownFooter?: CustomSelectDropdownFooterRender | React.ReactNode;
+  /** When the search yields no matches, optional replacement (e.g. “use this year” button). Return null to show default “no options”. */
+  emptyFilterContent?: CustomSelectEmptyFilterContent;
 };
 
 const getThemeColor = (year: string) => {
@@ -141,6 +156,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   customThemeColor,
   dataTheme,
   withIndicator = true,
+  dropdownFooter,
+  emptyFilterContent,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -229,6 +246,18 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     setIsOpen(false);
   };
 
+  const closeDropdown = () => setIsOpen(false);
+
+  const renderDropdownFooter = () => {
+    if (dropdownFooter === undefined || dropdownFooter === null) return null;
+
+    return typeof dropdownFooter === 'function'
+      ? (dropdownFooter as CustomSelectDropdownFooterRender)({
+          close: closeDropdown,
+        })
+      : dropdownFooter;
+  };
+
   const filteredOptions = useMemo(() => {
     const q = debouncedSearch.trim().toLowerCase();
 
@@ -248,40 +277,180 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     return (options || []).filter((o) => o.label.toLowerCase().includes(q));
   }, [options, groups, debouncedSearch]);
 
-  const renderTouchSelect = () => (
-    <SelectContainer className={className}>
-      <SelectDisplay
-        value={value}
-        options={groups ? groups.flatMap((g) => g.options) : options}
-        getImageClassName={getImageClassName}
-        selectClassName={selectClassName}
-        customThemeColor={customThemeColor}
-        withIndicator={withIndicator}
-      />
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="absolute top-0 left-0 w-full h-full opacity-0"
-        aria-label={label}
-        id={id}
-      >
-        {groups
-          ? groups.map((group) => (
-              <optgroup key={group.label} label={group.label}>
+  const renderEmptyFilterFallback = () => {
+    if (!emptyFilterContent) {
+      return <div className="px-3 py-4 text-white/70">{t('noOptions')}</div>;
+    }
+
+    const node = emptyFilterContent({
+      searchText: debouncedSearch.trim(),
+      close: closeDropdown,
+    });
+
+    if (node !== null && node !== undefined) return node;
+
+    return <div className="px-3 py-4 text-white/70">{t('noOptions')}</div>;
+  };
+
+  const renderDropdownOptionsList = () => {
+    const hasGroups = !!(groups && groups.length > 0);
+
+    if (hasGroups) {
+      const grouped = filteredOptions as OptionGroup[];
+      const nonEmptyGroups = grouped.filter((g) => g.options.length > 0);
+
+      if (nonEmptyGroups.length === 0) {
+        return renderEmptyFilterFallback();
+      }
+
+      return (
+        <div className="py-1">
+          {nonEmptyGroups.map((group) => (
+            <div key={group.label}>
+              <div className="px-3 py-1 text-xs uppercase tracking-wider text-white/70">
+                {group.label}
+              </div>
+              <ul>
                 {group.options.map((option) => (
-                  <option key={option.value} value={option.value}>
+                  <li
+                    key={option.value}
+                    className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
+                      option.value === value ? 'bg-primary-800' : ''
+                    }`}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      handleOptionClick(option.value);
+                    }}
+                  >
+                    {withIndicator &&
+                      (option.imageUrl ? (
+                        <img
+                          loading="lazy"
+                          src={option.imageUrl}
+                          alt={option.label}
+                          className={`w-5 h-5 mr-3 object-cover ${
+                            getImageClassName?.(option, 'select') ?? ''
+                          }`}
+                          width={20}
+                          height={20}
+                          onError={(e) => {
+                            e.currentTarget.src = getFlagPath('ww');
+                          }}
+                        />
+                      ) : (
+                        <span
+                          className="w-4 h-4 rounded-full mr-3 flex-none"
+                          style={{
+                            backgroundColor:
+                              option.color ?? getThemeColor(option.value),
+                          }}
+                        ></span>
+                      ))}
                     {option.label}
-                  </option>
+                  </li>
                 ))}
-              </optgroup>
-            ))
-          : options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-      </select>
-    </SelectContainer>
+              </ul>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    const flat = filteredOptions as Option[];
+
+    if (flat.length === 0) {
+      return renderEmptyFilterFallback();
+    }
+
+    return (
+      <ul className="py-1">
+        {flat.map((option) => (
+          <li
+            key={option.value}
+            className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
+              option.value === value ? 'bg-primary-800' : ''
+            }`}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              handleOptionClick(option.value);
+            }}
+          >
+            {withIndicator &&
+              (option.imageUrl ? (
+                <img
+                  loading="lazy"
+                  src={option.imageUrl}
+                  alt={option.label}
+                  className={`w-5 h-5 mr-3 object-cover ${
+                    getImageClassName?.(option, 'display') ?? ''
+                  }`}
+                  width={20}
+                  height={20}
+                  onError={(e) => {
+                    e.currentTarget.src = getFlagPath('ww');
+                  }}
+                />
+              ) : (
+                <span
+                  className="w-4 h-4 rounded-full mr-3 flex-none"
+                  style={{
+                    backgroundColor:
+                      option.color ?? getThemeColor(option.value),
+                  }}
+                ></span>
+              ))}
+            {option.label}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
+  const renderTouchSelect = () => (
+    <div className="flex flex-col gap-2">
+      <SelectContainer className={className}>
+        <SelectDisplay
+          value={value}
+          options={groups ? groups.flatMap((g) => g.options) : options}
+          getImageClassName={getImageClassName}
+          selectClassName={selectClassName}
+          customThemeColor={customThemeColor}
+          withIndicator={withIndicator}
+        />
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="absolute top-0 left-0 w-full h-full opacity-0"
+          aria-label={label}
+          id={id}
+        >
+          {groups
+            ? groups.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))
+            : options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+        </select>
+      </SelectContainer>
+      {dropdownFooter ? (
+        <div className="rounded-md border border-primary-700 bg-primary-900/80 p-2 sm:min-w-[200px]">
+          {typeof dropdownFooter === 'function'
+            ? (dropdownFooter as CustomSelectDropdownFooterRender)({
+                close: () => {},
+              })
+            : dropdownFooter}
+        </div>
+      ) : null}
+    </div>
   );
 
   const renderDesktopSelect = () => (
@@ -346,140 +515,26 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               <div
                 ref={dropdownRef}
                 style={dropdownStyle}
-                className="bg-primary-900/60 backdrop-blur-sm rounded-md shadow-lg max-h-[300px] overflow-y-auto"
+                className={`bg-primary-900/60 backdrop-blur-sm rounded-md shadow-lg ${
+                  dropdownFooter
+                    ? 'flex flex-col max-h-[min(300px,calc(100vh-120px))] overflow-hidden'
+                    : 'max-h-[300px] overflow-y-auto'
+                }`}
                 onMouseDown={(e) => e.stopPropagation()}
                 data-theme={dataTheme}
               >
-                {(() => {
-                  const hasGroups = !!(groups && groups.length > 0);
-
-                  if (hasGroups) {
-                    const grouped = filteredOptions as OptionGroup[];
-                    const nonEmptyGroups = grouped.filter(
-                      (g) => g.options.length > 0,
-                    );
-
-                    if (nonEmptyGroups.length === 0) {
-                      return (
-                        <div className="px-3 py-4 text-white/70">
-                          {t('noOptions')}
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div className="py-1">
-                        {nonEmptyGroups.map((group) => (
-                          <div key={group.label}>
-                            <div className="px-3 py-1 text-xs uppercase tracking-wider text-white/70">
-                              {group.label}
-                            </div>
-                            <ul>
-                              {group.options.map((option) => (
-                                <li
-                                  key={option.value}
-                                  className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
-                                    option.value === value
-                                      ? 'bg-primary-800'
-                                      : ''
-                                  }`}
-                                  onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    handleOptionClick(option.value);
-                                  }}
-                                >
-                                  {withIndicator &&
-                                    (option.imageUrl ? (
-                                      <img
-                                        loading="lazy"
-                                        src={option.imageUrl}
-                                        alt={option.label}
-                                        className={`w-5 h-5 mr-3 object-cover ${
-                                          getImageClassName?.(
-                                            option,
-                                            'select',
-                                          ) ?? ''
-                                        }`}
-                                        width={20}
-                                        height={20}
-                                        onError={(e) => {
-                                          e.currentTarget.src =
-                                            getFlagPath('ww');
-                                        }}
-                                      />
-                                    ) : (
-                                      <span
-                                        className="w-4 h-4 rounded-full mr-3 flex-none"
-                                        style={{
-                                          backgroundColor:
-                                            option.color ??
-                                            getThemeColor(option.value),
-                                        }}
-                                      ></span>
-                                    ))}
-                                  {option.label}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    );
-                  }
-
-                  const flat = filteredOptions as Option[];
-
-                  if (flat.length === 0) {
-                    return (
-                      <div className="px-3 py-4 text-white/70">
-                        {t('noOptions')}
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <ul className="py-1">
-                      {flat.map((option) => (
-                        <li
-                          key={option.value}
-                          className={`px-3 py-2 text-base truncate text-white cursor-pointer transition-colors duration-300 hover:bg-primary-800 flex items-center ${
-                            option.value === value ? 'bg-primary-800' : ''
-                          }`}
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            handleOptionClick(option.value);
-                          }}
-                        >
-                          {withIndicator &&
-                            (option.imageUrl ? (
-                              <img
-                                loading="lazy"
-                                src={option.imageUrl}
-                                alt={option.label}
-                                className={`w-5 h-5 mr-3 object-cover ${
-                                  getImageClassName?.(option, 'display') ?? ''
-                                }`}
-                                width={20}
-                                height={20}
-                                onError={(e) => {
-                                  e.currentTarget.src = getFlagPath('ww');
-                                }}
-                              />
-                            ) : (
-                              <span
-                                className="w-4 h-4 rounded-full mr-3 flex-none"
-                                style={{
-                                  backgroundColor:
-                                    option.color ?? getThemeColor(option.value),
-                                }}
-                              ></span>
-                            ))}
-                          {option.label}
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                })()}
+                {dropdownFooter ? (
+                  <>
+                    <div className="min-h-0 flex-1 overflow-y-auto">
+                      {renderDropdownOptionsList()}
+                    </div>
+                    <div className="shrink-0 border-t border-primary-800/80 bg-primary-900/95">
+                      {renderDropdownFooter()}
+                    </div>
+                  </>
+                ) : (
+                  renderDropdownOptionsList()
+                )}
               </div>
             </>,
             document.body,

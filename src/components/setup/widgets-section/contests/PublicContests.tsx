@@ -1,3 +1,4 @@
+import { ChartColumn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 
@@ -6,6 +7,7 @@ import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
 import ContestListItem from './ContestListItem';
+import GlobalLeaderboardModal from './GlobalLeaderboardModal';
 import { usePublicContestActions } from './hooks/usePublicContestActions';
 
 import { useContestsStateQuery, usePublicContestsQuery } from '@/api/contests';
@@ -33,6 +35,7 @@ const PublicContests: React.FC<PublicContestsProps> = ({
   const [sortKey, setSortKey] =
     useState<Exclude<PublicSortKey, 'copies'>>('latest');
   const [page, setPage] = useState(1);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
   const debouncedSearch = useDebounce(search, 400);
 
@@ -73,6 +76,14 @@ const PublicContests: React.FC<PublicContestsProps> = ({
             setPage(1);
           }}
           placeholder={t('widgets.contests.searchContests')}
+          extraActions={
+            <Button
+              onClick={() => setLeaderboardOpen(true)}
+              Icon={<ChartColumn className="w-6 h-6" />}
+              className="justify-center whitespace-nowrap !p-3"
+              title={t('widgets.contests.leaderboard.chartButtonTitle')}
+            />
+          }
         />
         <WidgetSortBadges
           value={sortKey}
@@ -148,6 +159,11 @@ const PublicContests: React.FC<PublicContestsProps> = ({
           </p>
         </div>
       )}
+
+      <GlobalLeaderboardModal
+        isOpen={leaderboardOpen}
+        onClose={() => setLeaderboardOpen(false)}
+      />
     </div>
   );
 };

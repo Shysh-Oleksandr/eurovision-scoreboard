@@ -157,7 +157,7 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
                       )}`}
                     >
                       <input
-                        className={`w-full h-full rounded-sm text-center focus:outline-none focus:ring-0 border-none ${
+                        className={`w-full h-full !text-[1.145rem] md:!text-base rounded-sm text-center focus:outline-none focus:ring-0 border-none ${
                           value === '' && !same && !isTotalOrCombinedVoteType
                             ? 'bg-primary-800/30'
                             : 'bg-transparent'

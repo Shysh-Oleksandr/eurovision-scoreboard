@@ -66,6 +66,8 @@ export const queryKeys = {
       startDate?: string;
       endDate?: string;
     }) => ['public', 'contests', filters] as const,
+    leaderboard: (year: number | 'global') =>
+      ['public', 'leaderboard', year] as const,
     userContent: (userId: string, filters: {
       page?: number;
       type?: string;

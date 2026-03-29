@@ -401,6 +401,26 @@
         "load": "Laden",
         "failedToLoadStats": "Fehler beim Laden der Statistiken",
         "noEntriesMatch": "Keine Einträge entsprechen Ihrer Suche."
+      },
+      "leaderboard": {
+        "title": "Länder-Rangliste",
+        "chartButtonTitle": "Länder-Rangliste",
+        "yearLabel": "Bereich",
+        "globalOption": "Gesamt (alle Jahre)",
+        "contestCount": "Basierend auf {count} abgeschlossenen {count, plural, =1 {Wettbewerb} other {Wettbewerben}}.",
+        "country": "Land",
+        "wins": "Siege",
+        "finals": "Finale",
+        "participations": "Teilnahmen",
+        "winRate": "Siegquote",
+        "top3": "Top 3",
+        "top5": "Top 5",
+        "top10": "Top 10",
+        "avgGfPoints": "Ø GF-Pkt.",
+        "totalGfPoints": "GF-Pkt. gesamt",
+        "computedAt": "Zuletzt aktualisiert: {time}",
+        "failedToLoad": "Rangliste konnte nicht geladen werden",
+        "useYearButton": "Jahr {year} verwenden"
       }
     },
     "themes": {

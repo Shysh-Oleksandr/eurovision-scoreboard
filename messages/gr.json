@@ -403,6 +403,26 @@
         "load": "Φόρτωση",
         "failedToLoadStats": "Αποτυχία φόρτωσης των στατιστικών",
         "noEntriesMatch": "Κανένα στοιχείο δεν ταιριάζει με την αναζήτησή σας."
+      },
+      "leaderboard": {
+        "title": "Κατάταξη χωρών",
+        "chartButtonTitle": "Κατάταξη χωρών",
+        "yearLabel": "Εύρος",
+        "globalOption": "Συνολικά (όλα τα έτη)",
+        "contestCount": "Με βάση {count} {count, plural, =1 {ολοκληρωμένο διαγωνισμό} other {ολοκληρωμένους διαγωνισμούς}}.",
+        "country": "Χώρα",
+        "wins": "Νίκες",
+        "finals": "Τελικοί",
+        "participations": "Συμμετοχές",
+        "winRate": "Ποσοστό νικών",
+        "top3": "Top 3",
+        "top5": "Top 5",
+        "top10": "Top 10",
+        "avgGfPoints": "Μέσος όρος βαθμών τελ.",
+        "totalGfPoints": "Σύνολο βαθμών τελ.",
+        "computedAt": "Τελευταία ενημέρωση: {time}",
+        "failedToLoad": "Αποτυχία φόρτωσης κατάταξης",
+        "useYearButton": "Χρήση έτους {year}"
       }
     },
     "themes": {

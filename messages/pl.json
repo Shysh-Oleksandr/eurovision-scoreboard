@@ -403,6 +403,26 @@
         "load": "Ładowanie",
         "failedToLoadStats": "Błąd podczas ładowania statystyk",
         "noEntriesMatch": "Nie znaleziono wkładów pasujących do wyszukiwania."
+      },
+      "leaderboard": {
+        "title": "Ranking krajów",
+        "chartButtonTitle": "Ranking krajów",
+        "yearLabel": "Zakres",
+        "globalOption": "Globalnie (wszystkie lata)",
+        "contestCount": "Na podstawie {count} {count, plural, =1 {ukończonego konkursu} other {ukończonych konkursów}}.",
+        "country": "Kraj",
+        "wins": "Zwycięstwa",
+        "finals": "Finały",
+        "participations": "Udziały",
+        "winRate": "Wskaźnik wygranych",
+        "top3": "Top 3",
+        "top5": "Top 5",
+        "top10": "Top 10",
+        "avgGfPoints": "Śr. pkt finału",
+        "totalGfPoints": "Suma pkt finału",
+        "computedAt": "Ostatnia aktualizacja: {time}",
+        "failedToLoad": "Nie udało się wczytać rankingu",
+        "useYearButton": "Użyj roku {year}"
       }
     },
     "themes": {

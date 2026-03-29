@@ -398,6 +398,26 @@
         "load": "Load",
         "failedToLoadStats": "Failed to load stats",
         "noEntriesMatch": "No entries match your search."
+      },
+      "leaderboard": {
+        "title": "Country leaderboard",
+        "chartButtonTitle": "Country leaderboard",
+        "yearLabel": "Scope",
+        "globalOption": "Global (all years)",
+        "contestCount": "Based on {count} completed {count, plural, =1 {contest} other {contests}}.",
+        "country": "Country",
+        "wins": "Wins",
+        "finals": "Finals",
+        "participations": "Participations",
+        "winRate": "Win rate",
+        "top3": "Top 3",
+        "top5": "Top 5",
+        "top10": "Top 10",
+        "avgGfPoints": "Avg GF pts",
+        "totalGfPoints": "Total GF pts",
+        "computedAt": "Last updated: {time}",
+        "failedToLoad": "Failed to load leaderboard",
+        "useYearButton": "Use year {year}"
       }
     },
     "themes": {

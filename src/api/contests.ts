@@ -10,6 +10,7 @@ import type {
 } from '@/types/contest';
 import type { ContestSnapshot } from '@/types/contestSnapshot';
 import type { EntryStatsResponse } from '@/types/entryStats';
+import type { PublicLeaderboardResponse } from '@/types/publicLeaderboard';
 
 export type CreateContestInput = {
   name: string;
@@ -113,6 +114,29 @@ export function useClearActiveContestMutation() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.profile() });
     },
+  });
+}
+
+export function usePublicLeaderboardQuery(opts: {
+  year?: number | 'global';
+  enabled?: boolean;
+}) {
+  const year = opts.year ?? 'global';
+
+  return useQuery<PublicLeaderboardResponse>({
+    queryKey: queryKeys.public.leaderboard(year),
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (year !== 'global') params.set('year', String(year));
+      const qs = params.toString();
+      const { data } = await api.get(
+        `/contests/leaderboard/public${qs ? `?${qs}` : ''}`,
+      );
+
+      return data as PublicLeaderboardResponse;
+    },
+    enabled: opts.enabled !== false,
+    staleTime: 5 * 60_000,
   });
 }
 

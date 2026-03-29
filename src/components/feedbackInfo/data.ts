@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-03-29',
+    title:
+      'Added the global country leaderboard and per-user country statistics based on the completed contests',
+  },
+  {
     date: '2026-03-22',
     title:
       'Added the ability to enter the total country points to quickly share the results (requires enabling predefined voting in the settings).',
@@ -341,13 +346,25 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-03-28', end: '2026-03-29' },
-    title: 'Update default themes (2016-2025) to use new theme features.',
+    approximateDates: { start: '2026-04-04', end: '2026-04-05' },
+    title: 'Different points system per stage. Bug fixes',
+  },
+  {
+    title: 'Odds system improvements',
+  },
+  {
+    title: 'Sound effects support for custom themes',
+  },
+  {
+    title: 'Updated default themes (2016-2025)',
   },
   {
     title: 'Separate points system for jury and televote',
   },
   {
     title: 'Pre-1975 points system support',
+  },
+  {
+    title: 'Allocation draw',
   },
 ];

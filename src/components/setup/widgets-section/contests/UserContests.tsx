@@ -334,7 +334,7 @@ const UserContests: React.FC<UserContestsProps> = ({
               Icon={<ChartColumn className="w-6 h-6" />}
               className="justify-center whitespace-nowrap !p-3"
               title={t('widgets.contests.entryStats.pickerTitle')}
-            ></Button>
+            />
           }
         />
 

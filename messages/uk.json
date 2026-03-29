@@ -403,6 +403,26 @@
         "load": "Завантажити",
         "failedToLoadStats": "Не вдалося завантажити статистику",
         "noEntriesMatch": "Немає збігів за запитом."
+      },
+      "leaderboard": {
+        "title": "Рейтинг країн",
+        "chartButtonTitle": "Рейтинг країн",
+        "yearLabel": "Охоплення",
+        "globalOption": "Загалом (усі роки)",
+        "contestCount": "На основі {count} {count, plural, =1 {завершеного конкурсу} other {завершених конкурсів}}.",
+        "country": "Країна",
+        "wins": "Перемоги",
+        "finals": "Фінали",
+        "participations": "Участі",
+        "winRate": "Частка перемог",
+        "top3": "Top 3",
+        "top5": "Топ 5",
+        "top10": "Топ 10",
+        "avgGfPoints": "Сер. бали Ф",
+        "totalGfPoints": "Усього балів Ф",
+        "computedAt": "Оновлено: {time}",
+        "failedToLoad": "Не вдалося завантажити рейтинг",
+        "useYearButton": "Використати рік {year}"
       }
     },
     "themes": {
