@@ -226,13 +226,23 @@ export const useCountriesStore = create<CountriesState>()(
               return [];
             }
 
+            // WW is a televote-only voter. During live simulation (fromScoreboard),
+            // hide the WW column until the televote phase (or until televote predefs
+            // do not exist yet). In setup / voting predefinition (fromScoreboard false),
+            // never tie visibility to isJuryVoting or persisted predefinedVotes — those
+            // reflect a previous run and would hide WW on the Televote tab while
+            // stale televote.WW data still affects totals.
+            const votingMode = relevantStage.votingMode;
             const isRestOfWorldVoting =
               allowROTW &&
-              (relevantStage?.votingMode === StageVotingMode.TELEVOTE_ONLY ||
-                (relevantStage?.votingMode ===
-                  StageVotingMode.JURY_AND_TELEVOTE &&
-                  (!relevantStage.isJuryVoting ||
-                    !predefinedVotes[relevantStageId!]?.televote)));
+              (fromScoreboard
+                ? votingMode === StageVotingMode.TELEVOTE_ONLY ||
+                  (votingMode === StageVotingMode.JURY_AND_TELEVOTE &&
+                    (!relevantStage.isJuryVoting ||
+                      !predefinedVotes[relevantStageId!]?.televote))
+                : votingMode === StageVotingMode.TELEVOTE_ONLY ||
+                  votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+                  votingMode === StageVotingMode.COMBINED);
 
             const votingCountries =
               (fromScoreboard
