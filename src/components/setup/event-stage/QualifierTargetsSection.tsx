@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useState } from 'react';
 import SortableList from 'react-easy-sort';
@@ -250,19 +251,28 @@ const QualifierTargetsSection: React.FC<{
     if (existingIndex >= 0) {
       updated = [...current];
       const existing = updated[existingIndex];
+      const derivedAmount =
+        minRank != null && maxRank != null && minRank >= 1 && maxRank >= minRank
+          ? maxRank - minRank + 1
+          : existing.amount;
 
       updated[existingIndex] = {
         ...existing,
         minRank,
         maxRank,
+        amount: derivedAmount,
       };
     } else {
-      // This shouldn't happen in rank mode, but handle it gracefully
+      const derivedAmount =
+        minRank != null && maxRank != null && minRank >= 1 && maxRank >= minRank
+          ? maxRank - minRank + 1
+          : 0;
+
       updated = [
         ...current,
         {
           targetStageId: stageId,
-          amount: 0, // Will be calculated from range
+          amount: derivedAmount,
           minRank,
           maxRank,
         },

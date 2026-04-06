@@ -422,7 +422,9 @@
         "totalGfPoints": "Suma pkt finału",
         "computedAt": "Ostatnia aktualizacja: {time}",
         "failedToLoad": "Nie udało się wczytać rankingu",
-        "useYearButton": "Użyj roku {year}"
+        "useYearButton": "Użyj roku {year}",
+        "onlyEurovisionCountries": "Tylko kraje Eurovision",
+        "rank": "Miejsce"
       }
     },
     "themes": {

@@ -422,7 +422,9 @@
         "totalGfPoints": "Pts GF tot.",
         "computedAt": "Dernière mise à jour : {time}",
         "failedToLoad": "Échec du chargement du classement",
-        "useYearButton": "Utiliser l’année {year}"
+        "useYearButton": "Utiliser l’année {year}",
+        "onlyEurovisionCountries": "Seuls les pays de l’Eurovision",
+        "rank": "Rang"
       }
     },
     "themes": {

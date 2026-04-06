@@ -11,13 +11,38 @@ import {
   StageVotingMode,
 } from '../../../../models';
 
-// Schema for qualifier target
-const qualifierTargetSchema = z.object({
-  targetStageId: z.string().min(1, 'Target stage is required'),
-  amount: z.number().min(1, 'Amount must be at least 1'),
-  minRank: z.number().optional(),
-  maxRank: z.number().optional(),
-});
+// Schema for qualifier target — amount is authoritative in amount-based mode; in rank-based
+// mode (both ranks set) amount is derived on save and the UI may use 0 until ranges are edited.
+const qualifierTargetSchema = z
+  .object({
+    targetStageId: z.string().min(1, 'Target stage is required'),
+    amount: z.number(),
+    minRank: z.number().optional(),
+    maxRank: z.number().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const rankComplete =
+      data.minRank != null &&
+      data.maxRank != null &&
+      data.minRank >= 1 &&
+      data.maxRank >= data.minRank;
+    if (rankComplete) {
+      return;
+    }
+    const rankPartial =
+      data.minRank != null ||
+      data.maxRank != null;
+    if (rankPartial) {
+      return;
+    }
+    if (data.amount < 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Amount must be at least 1',
+        path: ['amount'],
+      });
+    }
+  });
 
 // Base schema for common fields
 const eventStageSchema = z.object({

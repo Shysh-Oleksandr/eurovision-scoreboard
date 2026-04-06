@@ -422,7 +422,9 @@
         "totalGfPoints": "Усього балів Ф",
         "computedAt": "Оновлено: {time}",
         "failedToLoad": "Не вдалося завантажити рейтинг",
-        "useYearButton": "Використати рік {year}"
+        "useYearButton": "Використати рік {year}",
+        "onlyEurovisionCountries": "Тільки країни Євробачення",
+        "rank": "Ранг"
       }
     },
     "themes": {

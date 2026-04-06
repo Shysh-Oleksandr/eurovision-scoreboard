@@ -1039,3 +1039,7 @@ export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
 };
 
 export const ALL_COUNTRIES: CommonCountry[] = Object.values(COMMON_COUNTRIES);
+
+export const EUROVISION_COUNTRIES: CommonCountry[] = Object.values(
+  COMMON_COUNTRIES,
+).filter((c) => c.category === 'All-Time Participants');

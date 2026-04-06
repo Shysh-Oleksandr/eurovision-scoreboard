@@ -422,7 +422,9 @@
         "totalGfPoints": "Σύνολο βαθμών τελ.",
         "computedAt": "Τελευταία ενημέρωση: {time}",
         "failedToLoad": "Αποτυχία φόρτωσης κατάταξης",
-        "useYearButton": "Χρήση έτους {year}"
+        "useYearButton": "Χρήση έτους {year}",
+        "onlyEurovisionCountries": "Μόνο χώρες Eurovision",
+        "rank": "Τάξη"
       }
     },
     "themes": {

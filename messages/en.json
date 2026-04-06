@@ -417,7 +417,9 @@
         "totalGfPoints": "Total GF pts",
         "computedAt": "Last updated: {time}",
         "failedToLoad": "Failed to load leaderboard",
-        "useYearButton": "Use year {year}"
+        "useYearButton": "Use year {year}",
+        "onlyEurovisionCountries": "Only Eurovision countries",
+        "rank": "Rank"
       }
     },
     "themes": {

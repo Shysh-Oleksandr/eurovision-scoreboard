@@ -5,11 +5,13 @@ import React, { useMemo, useState } from 'react';
 
 import { usePublicLeaderboardQuery } from '@/api/contests';
 import Button from '@/components/common/Button';
+import { Checkbox } from '@/components/common/Checkbox';
 import CustomSelect, {
   type Option,
 } from '@/components/common/customSelect/CustomSelect';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import { EUROVISION_COUNTRIES } from '@/data/countries/common-countries';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
@@ -76,6 +78,8 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
   const [sortKey, setSortKey] = useState<SortKey>('wins');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
+  const [onlyEurovisionCountries, setOnlyEurovisionCountries] = useState(false);
+
   const yearSelectOptions: Option[] = useMemo(() => {
     const opts: Option[] = [
       { label: t('globalOption'), value: 'global' },
@@ -103,7 +107,13 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
 
   const sortedRows = useMemo(() => {
     if (!data?.rows) return [];
-    const rows = [...data.rows];
+    const rows = [...data.rows].filter((row) => {
+      if (onlyEurovisionCountries) {
+        return EUROVISION_COUNTRIES.some((c) => c.code === row.code);
+      }
+
+      return true;
+    });
 
     rows.sort((a, b) => {
       if (sortKey === 'country') {
@@ -121,7 +131,7 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
     });
 
     return rows;
-  }, [data?.rows, sortKey, sortDir, getAllCountries]);
+  }, [data?.rows, sortKey, sortDir, getAllCountries, onlyEurovisionCountries]);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -133,7 +143,7 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
   };
 
   const headerClass =
-    'py-2 px-2 font-medium text-left whitespace-nowrap cursor-pointer select-none hover:text-white';
+    'py-2 px-2 font-medium text-left whitespace-nowrap cursor-pointer transition-colors duration-200 select-none hover:text-white';
 
   const formatWinRate = (v: number | null) => {
     if (v === null) return '—';
@@ -231,13 +241,26 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
 
         {data && !isLoading && (
           <>
-            <p className="text-white/70 text-sm">
-              {t('contestCount', { count: data.contestCount })}
-            </p>
+            <div className="flex items-center flex-wrap justify-between gap-2">
+              <p className="text-white/70 text-sm">
+                {t('contestCount', { count: data.contestCount })}
+              </p>
+              <Checkbox
+                id="only-eurovision-countries"
+                label={t('onlyEurovisionCountries')}
+                checked={onlyEurovisionCountries}
+                onChange={(e) => setOnlyEurovisionCountries(e.target.checked)}
+              />
+            </div>
             <div className="overflow-x-auto -mx-1">
               <table className="w-full text-left border-collapse text-[0.9rem] min-w-[720px]">
                 <thead>
                   <tr className="text-white/70 border-b border-primary-800">
+                    <th
+                      className={`${headerClass} w-[40px] pointer-events-none`}
+                    >
+                      {t('rank')}
+                    </th>
                     <th
                       className={headerClass}
                       onClick={() => toggleSort('country')}
@@ -274,7 +297,7 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedRows.map((row) => {
+                  {sortedRows.map((row, index) => {
                     const country =
                       getAllCountries(true).find((c) => c.code === row.code) ??
                       null;
@@ -287,8 +310,11 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
                         key={row.code}
                         className="border-b border-primary-800/60 align-middle"
                       >
+                        <td className="py-2 px-2 tabular-nums text-center">
+                          {index + 1}
+                        </td>
                         <td className="py-2 px-2">
-                          <div className="flex items-center gap-2 min-w-0 max-w-[200px]">
+                          <div className="flex items-center gap-2 min-w-0 max-w-[200px] min-h-[24.5px]">
                             <img
                               src={logo}
                               alt=""

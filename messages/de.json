@@ -420,7 +420,9 @@
         "totalGfPoints": "GF-Pkt. gesamt",
         "computedAt": "Zuletzt aktualisiert: {time}",
         "failedToLoad": "Rangliste konnte nicht geladen werden",
-        "useYearButton": "Jahr {year} verwenden"
+        "useYearButton": "Jahr {year} verwenden",
+        "onlyEurovisionCountries": "Nur Eurovision-Länder",
+        "rank": "Rang"
       }
     },
     "themes": {

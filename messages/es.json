@@ -420,7 +420,9 @@
         "totalGfPoints": "Pts. GF total",
         "computedAt": "Última actualización: {time}",
         "failedToLoad": "No se pudo cargar la clasificación",
-        "useYearButton": "Usar año {year}"
+        "useYearButton": "Usar año {year}",
+        "onlyEurovisionCountries": "Solo países de Eurovisión",
+        "rank": "Puesto"
       }
     },
     "themes": {
