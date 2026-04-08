@@ -1,6 +1,8 @@
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
+import VotingPresetToolbar from './VotingPresetToolbar';
+
 import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import SortAZIcon from '@/assets/icons/SortAZIcon';
@@ -20,6 +22,8 @@ type Props = {
   setIsSorting: (v: boolean) => void;
   onReset: () => void;
   onRandomize: () => void;
+  onSavePreset: () => void;
+  onLoadPreset: () => void;
 };
 
 export const VotingPredefinitionHeader: React.FC<Props> = ({
@@ -33,77 +37,95 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
   setIsSorting,
   onReset,
   onRandomize,
+  onSavePreset,
+  onLoadPreset,
 }) => {
   const t = useTranslations();
 
   return (
-    <div className="sm:mb-1 gap-1 px-2">
-      <div className="flex items-center justify-between md:gap-4 gap-2 flex-wrap">
-        <div className="md:w-auto w-full">
-          <div className="flex gap-4 items-center sm:justify-start justify-between">
-            <h3 className="text-lg font-bold">{stageName}</h3>
+    <>
+      <div className="sm:mb-1 gap-1 px-2">
+        <div className="flex items-center justify-between md:gap-4 gap-2 flex-wrap">
+          <div className="md:w-auto w-full">
+            <div className="flex gap-4 items-center sm:justify-start justify-between">
+              <h3 className="text-lg font-bold">{stageName}</h3>
 
-            <div className="flex flex-wrap sm:gap-2 gap-1.5 items-center justify-end">
-              <Badge
-                label={totalBadgeLabel}
-                onClick={() => setSelectedType('Total')}
-                isActive={selectedType === 'Total'}
-              />
-              {voteTypeOptions.map((type) => (
+              <div className="flex flex-wrap sm:gap-2 gap-1.5 items-center justify-end">
                 <Badge
-                  key={type}
-                  label={
-                    type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()
-                  }
-                  onClick={() => setSelectedType(type)}
-                  isActive={selectedType === type}
+                  label={totalBadgeLabel}
+                  onClick={() => setSelectedType('Total')}
+                  isActive={selectedType === 'Total'}
                 />
-              ))}
+                {voteTypeOptions.map((type) => (
+                  <Badge
+                    key={type}
+                    label={
+                      type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()
+                    }
+                    onClick={() => setSelectedType(type)}
+                    isActive={selectedType === type}
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="text-sm text-white/60 mt-1">
+              {t(
+                'setup.eventSetupModal.enterThePointsEachVotingCountryAwardsToParticipants',
+              )}{' '}
+              (
+              {pointsSystem.every(
+                (p, index) =>
+                  PREDEFINED_SYSTEMS_MAP['default']?.[index]?.value ===
+                  p?.value,
+              )
+                ? '1-8, 10, 12'
+                : pointsSystem.map((p) => p.value).join(', ')}
+              )
+            </p>
+          </div>
+
+          <div className="flex items-start flex-wrap justify-between w-full md:w-auto gap-2 md:mb-0 mb-2">
+            <VotingPresetToolbar
+              onSavePreset={onSavePreset}
+              onLoadPreset={onLoadPreset}
+              wrapperClassName="md:hidden flex-wrap flex gap-2"
+            />
+
+            <div className="flex gap-2 ml-auto">
+              <Button
+                onClick={() => setIsSorting(!isSorting)}
+                className="!p-3"
+                aria-label={isSorting ? 'Sort by name' : 'Sort by points'}
+                title={isSorting ? 'Sort by name' : 'Sort by points'}
+                Icon={
+                  isSorting ? (
+                    <SortAZIcon className="w-5 h-5" />
+                  ) : (
+                    <ArrowDown10 className="w-5 h-5" />
+                  )
+                }
+              />
+              <Button
+                variant="primary"
+                onClick={onReset}
+                className="!p-3"
+                aria-label="Restart"
+                title="Restart"
+                Icon={<RestartIcon className="w-5 h-5" />}
+              />
+              <Button variant="primary" onClick={onRandomize} className="!px-4">
+                {t('common.randomize')}
+              </Button>
             </div>
           </div>
-          <p className="text-sm text-white/60 mt-1">
-            {t(
-              'setup.eventSetupModal.enterThePointsEachVotingCountryAwardsToParticipants',
-            )}{' '}
-            (
-            {pointsSystem.every(
-              (p, index) =>
-                PREDEFINED_SYSTEMS_MAP['default']?.[index]?.value === p?.value,
-            )
-              ? '1-8, 10, 12'
-              : pointsSystem.map((p) => p.value).join(', ')}
-            )
-          </p>
-        </div>
-
-        <div className="flex gap-2 ml-auto">
-          <Button
-            onClick={() => setIsSorting(!isSorting)}
-            className="!p-3"
-            aria-label={isSorting ? 'Sort by name' : 'Sort by points'}
-            title={isSorting ? 'Sort by name' : 'Sort by points'}
-            Icon={
-              isSorting ? (
-                <SortAZIcon className="w-5 h-5" />
-              ) : (
-                <ArrowDown10 className="w-5 h-5" />
-              )
-            }
-          />
-          <Button
-            variant="primary"
-            onClick={onReset}
-            className="!p-3"
-            aria-label="Restart"
-            title="Restart"
-            Icon={<RestartIcon className="w-5 h-5" />}
-          />
-          <Button variant="primary" onClick={onRandomize} className="!px-4">
-            {t('common.randomize')}
-          </Button>
         </div>
       </div>
-    </div>
+      <VotingPresetToolbar
+        onSavePreset={onSavePreset}
+        onLoadPreset={onLoadPreset}
+        wrapperClassName="md:flex hidden pb-2 px-2"
+      />
+    </>
   );
 };
 

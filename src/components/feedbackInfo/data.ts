@@ -244,6 +244,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-04-08',
+    title: 'Added presets for the predefined voting',
+  },
+  {
     date: '2026-03-29',
     title:
       'Added the global country leaderboard and per-user country statistics based on the completed contests',
@@ -346,7 +350,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-04-04', end: '2026-04-05' },
+    approximateDates: { start: '2026-04-11', end: '2026-04-12' },
     title: 'Different points system per stage. Bug fixes',
   },
   {

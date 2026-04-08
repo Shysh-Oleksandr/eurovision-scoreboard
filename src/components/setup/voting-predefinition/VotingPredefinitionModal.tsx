@@ -7,8 +7,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import { useVotingPredefinition } from './useVotingPredefinition';
+import { useVotingPresetsFlow } from './useVotingPresetsFlow';
 import { VotingPredefinitionHeader } from './VotingPredefinitionHeader';
+import { VotingPredefinitionPresetModals } from './VotingPredefinitionPresetModals';
 import { VotingPredefinitionTable } from './VotingPredefinitionTable';
+import { VotingPresetToolbar } from './VotingPresetToolbar';
 import VotingTotalsShareTable from './VotingTotalsShareTable';
 
 import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
@@ -77,6 +80,7 @@ const VotingPredefinitionModal = ({
     selectedType,
     setSelectedType,
     votes,
+    setVotes,
     isSorting,
     setIsSorting,
     totalBadgeLabel,
@@ -93,8 +97,33 @@ const VotingPredefinitionModal = ({
     validateAllBeforeSave,
   } = useVotingPredefinition({ stage });
 
-  const t = useTranslations('common');
+  const t = useTranslations();
   const tSetup = useTranslations('setup.votingPredefinition');
+
+  // local-only state for matrix cell editing (must be before useVotingPresetsFlow)
+  const [editing, setEditing] = React.useState<Record<CellKey, string>>({});
+
+  const clearDetailedCellEditing = useCallback(() => {
+    setEditing({});
+  }, []);
+
+  const {
+    openSavePresetCreate,
+    openLoadPresetModal,
+    savePresetModalProps,
+    loadPresetModalProps,
+  } = useVotingPresetsFlow({
+    stage,
+    contestName,
+    contestYear,
+    votingCountries,
+    pointsSystem,
+    votes,
+    setVotes,
+    localTotals,
+    setLocalTotals,
+    clearDetailedCellEditing,
+  });
 
   const shouldShowHeartFlagIcon =
     (window as any)?.store?.general?.settings?.shouldShowHeartFlagIcon ?? false;
@@ -160,9 +189,6 @@ const VotingPredefinitionModal = ({
     [isTotalOrCombinedVoteType],
   );
 
-  // local-only state for input editing visuals
-  const [editing, setEditing] = React.useState<Record<CellKey, string>>({});
-
   const handleSave = () => {
     const { ok, errors } = validateAllBeforeSave();
 
@@ -219,7 +245,10 @@ const VotingPredefinitionModal = ({
                 setEditing({});
               }}
               onRandomize={randomizeAll}
+              onSavePreset={() => openSavePresetCreate('detailed')}
+              onLoadPreset={() => openLoadPresetModal('detailed')}
             />
+
             <VotingPredefinitionTable
               rankedCountries={rankedCountries as any}
               votingCountries={votingCountries as any}
@@ -274,57 +303,75 @@ const VotingPredefinitionModal = ({
         label: tSetup('tabTotals'),
         content: (
           <div className="flex flex-col gap-4 flex-1 min-h-0">
-            <div className="flex flex-wrap items-center justify-between gap-2 px-2">
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="tertiary"
-                  className="gap-2"
-                  Icon={<Share className="w-4 h-4" />}
-                  onClick={() => setShareResultsOpen(true)}
-                >
-                  {tSetup('shareScoreboardResults')}
-                </Button>
-                <Button
-                  variant="tertiary"
-                  className="gap-2"
-                  Icon={<Grid3x2 className="w-4 h-4" />}
-                  onClick={() => setShareStatsOpen(StatsTableType.SPLIT)}
-                >
-                  {tSetup('shareSplit')}
-                </Button>
-                <Button
-                  variant="tertiary"
-                  Icon={<Sheet className="w-4 h-4" />}
-                  onClick={() => setShareStatsOpen(StatsTableType.SUMMARY)}
-                >
-                  {tSetup('shareSummary')}
-                </Button>
+            <div className="px-2 flex flex-col gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap gap-2 items-center border-b w-full sm:w-auto sm:border-none border-solid border-primary-800 pb-2 sm:pb-0">
+                  <h4 className="sm:text-lg text-base font-medium mr-1">
+                    {t('simulation.header.share')}
+                  </h4>
+                  <Button
+                    variant="tertiary"
+                    className="gap-2 sm:!px-4 !px-2.5"
+                    Icon={<Share className="w-5 h-5" />}
+                    onClick={() => setShareResultsOpen(true)}
+                  >
+                    {tSetup('shareScoreboardResults')}
+                  </Button>
+                  <Button
+                    variant="tertiary"
+                    className="gap-2 sm:!px-4 !px-2.5"
+                    Icon={<Grid3x2 className="w-5 h-5" />}
+                    onClick={() => setShareStatsOpen(StatsTableType.SPLIT)}
+                  >
+                    {tSetup('shareSplit')}
+                  </Button>
+                  <Button
+                    variant="tertiary"
+                    className="gap-2 sm:!px-4 !px-2.5"
+                    Icon={<Sheet className="w-5 h-5" />}
+                    onClick={() => setShareStatsOpen(StatsTableType.SUMMARY)}
+                  >
+                    {tSetup('shareSummary')}
+                  </Button>
+                </div>
+                <div className="flex gap-2 items-start flex-wrap">
+                  <VotingPresetToolbar
+                    wrapperClassName="flex flex-wrap gap-2 md:hidden"
+                    onSavePreset={() => openSavePresetCreate('totals')}
+                    onLoadPreset={() => openLoadPresetModal('totals')}
+                  />
+                  <Button
+                    onClick={() => setIsTotalsSortByName(!isTotalsSortByName)}
+                    className="!p-3"
+                    aria-label={
+                      isTotalsSortByName ? 'Sort by points' : 'Sort by name'
+                    }
+                    title={
+                      isTotalsSortByName ? 'Sort by points' : 'Sort by name'
+                    }
+                    Icon={
+                      isTotalsSortByName ? (
+                        <SortAZIcon className="w-5 h-5" />
+                      ) : (
+                        <ArrowDown10 className="w-5 h-5" />
+                      )
+                    }
+                  />
+                  <Button
+                    variant="primary"
+                    onClick={() => setLocalTotals({})}
+                    className="!p-3"
+                    aria-label="Reset"
+                    title="Reset"
+                    Icon={<RestartIcon className="w-5 h-5" />}
+                  />
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setIsTotalsSortByName(!isTotalsSortByName)}
-                  className="!p-3"
-                  aria-label={
-                    isTotalsSortByName ? 'Sort by points' : 'Sort by name'
-                  }
-                  title={isTotalsSortByName ? 'Sort by points' : 'Sort by name'}
-                  Icon={
-                    isTotalsSortByName ? (
-                      <SortAZIcon className="w-5 h-5" />
-                    ) : (
-                      <ArrowDown10 className="w-5 h-5" />
-                    )
-                  }
-                />
-                <Button
-                  variant="primary"
-                  onClick={() => setLocalTotals({})}
-                  className="!p-3"
-                  aria-label="Reset"
-                  title="Reset"
-                  Icon={<RestartIcon className="w-5 h-5" />}
-                />
-              </div>
+              <VotingPresetToolbar
+                wrapperClassName="md:flex flex-wrap gap-2 hidden"
+                onSavePreset={() => openSavePresetCreate('totals')}
+                onLoadPreset={() => openLoadPresetModal('totals')}
+              />
             </div>
             <VotingTotalsShareTable
               stage={stage}
@@ -345,8 +392,6 @@ const VotingPredefinitionModal = ({
       setSelectedType,
       voteTypeOptions,
       isSorting,
-      setIsSorting,
-      resetVotes,
       randomizeAll,
       rankedCountries,
       votingCountries,
@@ -356,89 +401,101 @@ const VotingPredefinitionModal = ({
       getTotalPointsForCountry,
       getCellClassName,
       getCellValue,
-      applyInputValue,
-      editing,
-      localTotals,
+      t,
       isTotalsSortByName,
+      localTotals,
       handleTotalsCellChange,
+      setIsSorting,
+      resetVotes,
+      openSavePresetCreate,
+      openLoadPresetModal,
+      editing,
+      applyInputValue,
     ],
   );
 
   const isTotalsTab = activeTab === PredefinitionTab.TOTALS;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      overlayClassName="!z-[1000]"
-      contentClassName="h-[70vh] !px-2 text-white flex flex-col"
-      topContent={
-        <Tabs
-          tabs={tabs}
-          activeTab={activeTab}
-          setActiveTab={(v) => setActiveTab(v as PredefinitionTab)}
-          containerClassName="!rounded-none"
-        />
-      }
-      bottomContent={
-        <div className="flex flex-col gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
-          {isTotalsTab && (
-            <p className="text-sm text-white/70">{tSetup('totalsHint')}</p>
-          )}
-          <div className="flex justify-end xs:gap-4 gap-2">
-            <Button
-              variant="secondary"
-              className="md:text-base text-sm"
-              onClick={onClose}
-            >
-              {t('close')}
-            </Button>
-            <Button
-              className="w-full !text-base"
-              onClick={handleSave}
-              disabled={isTotalsTab}
-            >
-              {t('save')}
-            </Button>
-          </div>
-        </div>
-      }
-    >
-      <TabContent
-        tabs={tabsWithContent}
-        activeTab={activeTab}
-        preserveContent
-      />
-
-      {(shareResultsOpen || shareStatsOpen) && (
-        <>
-          <ShareResultsModal
-            isOpen={shareResultsOpen}
-            onClose={() => setShareResultsOpen(false)}
-            onLoaded={() => {}}
-            countriesOverride={countriesOverrideForPodium}
-            titleOverride={shareTitleOverride}
-            subtitleOverride={shareSubtitleOverride}
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        overlayClassName="!z-[1000]"
+        contentClassName="h-[75vh] !px-2 text-white flex flex-col"
+        topContent={
+          <Tabs
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={(v) => setActiveTab(v as PredefinitionTab)}
+            containerClassName="!rounded-none"
           />
-          {shareStatsOpen && (
-            <ShareStatsModal
-              isOpen={!!shareStatsOpen}
-              onClose={() => setShareStatsOpen(null)}
+        }
+        bottomContent={
+          <div className="flex flex-col gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
+            {isTotalsTab && (
+              <p className="text-sm text-white/70">{tSetup('totalsHint')}</p>
+            )}
+            <div className="flex justify-end xs:gap-4 gap-2">
+              <Button
+                variant="secondary"
+                className="md:text-base text-sm"
+                onClick={onClose}
+              >
+                {t('common.close')}
+              </Button>
+              <Button
+                className="w-full !text-base"
+                onClick={handleSave}
+                disabled={isTotalsTab}
+              >
+                {t('common.save')}
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <TabContent
+          tabs={tabsWithContent}
+          activeTab={activeTab}
+          preserveContent
+        />
+
+        {(shareResultsOpen || shareStatsOpen) && (
+          <>
+            <ShareResultsModal
+              isOpen={shareResultsOpen}
+              onClose={() => setShareResultsOpen(false)}
               onLoaded={() => {}}
-              activeTab={shareStatsOpen}
-              rankedCountries={totalsRankedCountries}
-              selectedStageId={stage.id}
-              selectedVoteType="Total"
-              getCellPoints={() => ''}
-              getCellClassName={() => ''}
-              getPoints={totalsGetPoints}
-              selectedStage={stage}
-              aggregateOnly
+              countriesOverride={countriesOverrideForPodium}
+              titleOverride={shareTitleOverride}
+              subtitleOverride={shareSubtitleOverride}
             />
-          )}
-        </>
-      )}
-    </Modal>
+            {shareStatsOpen && (
+              <ShareStatsModal
+                isOpen={!!shareStatsOpen}
+                onClose={() => setShareStatsOpen(null)}
+                onLoaded={() => {}}
+                activeTab={shareStatsOpen}
+                rankedCountries={totalsRankedCountries}
+                selectedStageId={stage.id}
+                selectedVoteType="Total"
+                getCellPoints={() => ''}
+                getCellClassName={() => ''}
+                getPoints={totalsGetPoints}
+                selectedStage={stage}
+                aggregateOnly
+              />
+            )}
+          </>
+        )}
+      </Modal>
+
+      <VotingPredefinitionPresetModals
+        saveProps={savePresetModalProps}
+        loadProps={loadPresetModalProps}
+      />
+    </>
   );
 };
 
