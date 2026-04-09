@@ -32,6 +32,8 @@ export type StageVotes = {
   combined?: Record<string, Vote[]>;
 };
 
+export type SplitScreenQualifierCandidate = Pick<BaseCountry, 'code' | 'name'>;
+
 export type ScoreboardState = {
   // State
   eventStages: EventStage[];
@@ -57,6 +59,12 @@ export type ScoreboardState = {
   currentRevealTelevotePoints: number; // Current points to give in reveal mode
   isWinnerAnimationAlreadyDisplayed: boolean;
   isLastSimulationAnimationFinished: boolean;
+  splitScreenQualifierModalOpen: boolean;
+  splitScreenQualifierCandidates: SplitScreenQualifierCandidate[];
+  splitScreenQualifierCandidatesStageId: string | null;
+  splitScreenQualifierCandidatesQualifiedCount: number | null;
+  splitScreenQualifierShownCountByStage: Record<string, Record<string, number>>;
+  splitScreenQualifierLastShownByStage: Record<string, string[]>;
 
   // Getters
   getCurrentStage: () => EventStage | undefined;
@@ -117,4 +125,8 @@ export type ScoreboardState = {
   ) => void;
   pickQualifier: (countryCode: string) => void;
   pickQualifierRandomly: () => void;
+  openSplitScreenQualifierModal: () => boolean;
+  closeSplitScreenQualifierModal: () => void;
+  computeSplitScreenQualifierCandidatesIfNeeded: () => boolean;
+  pickQualifierFromSplitScreenCandidatesRandomly: () => void;
 };

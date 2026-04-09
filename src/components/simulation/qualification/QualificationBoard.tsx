@@ -1,6 +1,7 @@
 import gsap from 'gsap';
+import { Columns3 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
@@ -9,14 +10,25 @@ import { useScoreboardStore } from '../../../state/scoreboardStore';
 import { CountryQualificationItem } from './CountryQualificationItem';
 
 import Button from '@/components/common/Button';
+import { useGeneralStore } from '@/state/generalStore';
 
-const QualificationBoard = () => {
+const QualificationBoard = ({
+  canUseSplitScreenForThisStep,
+}: {
+  canUseSplitScreenForThisStep: boolean;
+}) => {
   const t = useTranslations('simulation');
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
   const pickQualifier = useScoreboardStore((state) => state.pickQualifier);
   const pickQualifierRandomly = useScoreboardStore(
     (state) => state.pickQualifierRandomly,
+  );
+  const openSplitScreenQualifierModal = useScoreboardStore(
+    (state) => state.openSplitScreenQualifierModal,
+  );
+  const enableSplitScreenQualifierRevealMode = useGeneralStore(
+    (state) => state.settings.enableSplitScreenQualifierRevealMode,
   );
 
   const currentStage = getCurrentStage();
@@ -47,36 +59,48 @@ const QualificationBoard = () => {
   );
 
   return (
-    <div className="flex-1 rounded-sm">
-      {!isOver && (
-        <div className="2cols:flex hidden justify-between items-center flex-wrap gap-2 mb-2">
-          <h2
-            className="lg:text-2xl xs:text-xl text-lg font-medium text-white !leading-tight"
-            style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
-          >
-            {t('chooseCountryToQualify')}
-          </h2>
-          <Button
-            variant="tertiary"
-            label={t('random')}
-            onClick={pickQualifierRandomly}
-            snowEffect="middle"
-          />
-        </div>
-      )}
+    <div className="flex-1 space-y-2">
+      <div className="flex-1 rounded-sm">
+        {!isOver && (
+          <div className="2cols:flex hidden justify-between items-center flex-wrap gap-2 mb-2">
+            <h2
+              className="lg:text-2xl xs:text-xl text-lg font-medium text-white !leading-tight"
+              style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
+            >
+              {t('chooseCountryToQualify')}
+            </h2>
+            <div className="flex gap-2 items-center ml-auto">
+              {enableSplitScreenQualifierRevealMode && (
+                <Button
+                  Icon={<Columns3 className="w-6 h-6" />}
+                  className="!px-3 !py-2.5"
+                  onClick={openSplitScreenQualifierModal}
+                  disabled={!canUseSplitScreenForThisStep}
+                />
+              )}
+              <Button
+                variant="tertiary"
+                label={t('random')}
+                onClick={pickQualifierRandomly}
+                snowEffect="middle"
+              />
+            </div>
+          </div>
+        )}
 
-      <div
-        ref={containerRef}
-        className="grid grid-cols-1 2cols:grid-cols-2 gap-x-3 xs:gap-y-1.5 gap-y-1"
-      >
-        {countries.map((country) => (
-          <CountryQualificationItem
-            key={country.code}
-            country={country}
-            onClick={isOver ? undefined : () => pickQualifier(country.code)}
-            hideIfQualified
-          />
-        ))}
+        <div
+          ref={containerRef}
+          className="grid grid-cols-1 2cols:grid-cols-2 gap-x-3 xs:gap-y-1.5 gap-y-1"
+        >
+          {countries.map((country) => (
+            <CountryQualificationItem
+              key={country.code}
+              country={country}
+              onClick={isOver ? undefined : () => pickQualifier(country.code)}
+              hideIfQualified
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

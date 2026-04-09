@@ -101,6 +101,12 @@ export const createEventActions: StateCreator<
       viewedStageId: null,
       isWinnerAnimationAlreadyDisplayed: false,
       isLastSimulationAnimationFinished: true,
+      splitScreenQualifierModalOpen: false,
+      splitScreenQualifierCandidates: [],
+      splitScreenQualifierCandidatesStageId: null,
+      splitScreenQualifierCandidatesQualifiedCount: null,
+      splitScreenQualifierShownCountByStage: {},
+      splitScreenQualifierLastShownByStage: {},
     });
   },
 
@@ -308,6 +314,12 @@ export const createEventActions: StateCreator<
       televotingProgress: 0,
       isWinnerAnimationAlreadyDisplayed: false,
       isLastSimulationAnimationFinished: true,
+      splitScreenQualifierModalOpen: false,
+      splitScreenQualifierCandidates: [],
+      splitScreenQualifierCandidatesStageId: null,
+      splitScreenQualifierCandidatesQualifiedCount: null,
+      splitScreenQualifierShownCountByStage: {},
+      splitScreenQualifierLastShownByStage: {},
     });
   },
   closeQualificationResults: () => {
@@ -329,6 +341,12 @@ export const createEventActions: StateCreator<
       eventStages: [],
       currentStageId: null,
       isLastSimulationAnimationFinished: true,
+      splitScreenQualifierModalOpen: false,
+      splitScreenQualifierCandidates: [],
+      splitScreenQualifierCandidatesStageId: null,
+      splitScreenQualifierCandidatesQualifiedCount: null,
+      splitScreenQualifierShownCountByStage: {},
+      splitScreenQualifierLastShownByStage: {},
     });
   },
 });

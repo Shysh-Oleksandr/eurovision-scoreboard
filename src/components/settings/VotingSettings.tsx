@@ -4,6 +4,7 @@ import React from 'react';
 import { useGeneralStore } from '../../state/generalStore';
 import { Checkbox } from '../common/Checkbox';
 import { Tooltip } from '../common/Tooltip';
+import { Input } from '../Input';
 
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
 
@@ -39,6 +40,97 @@ export const VotingSettings: React.FC = () => {
             }}
           />
         </div>
+        {settings.isPickQualifiersMode && (
+          <div className="flex items-start gap-2 text-white">
+            <Tooltip
+              content={
+                <div className="font-medium">
+                  {t('splitScreenCandidatesCountTooltipDescription')}
+                </div>
+              }
+              position="left"
+            />
+            <Checkbox
+              id="enableSplitScreenQualifierRevealMode"
+              label={t('enableSplitScreenQualifierRevealMode')}
+              labelClassName="w-full !px-0 !pt-1 !items-start"
+              checked={settings.enableSplitScreenQualifierRevealMode}
+              onChange={(e) => {
+                setSettings({
+                  enableSplitScreenQualifierRevealMode: e.target.checked,
+                });
+              }}
+            />
+          </div>
+        )}
+        {settings.isPickQualifiersMode &&
+          settings.enableSplitScreenQualifierRevealMode && (
+            <div className="flex items-start gap-2 text-white">
+              <Tooltip
+                content={
+                  <div className="font-medium">
+                    {t.rich('enableSplitScreenQualifierRevealModeTooltip', {
+                      br: () => <br />,
+                    })}
+                  </div>
+                }
+                position="left"
+              />
+
+              <div className="flex items-center gap-2">
+                <Input
+                  id="splitScreenCandidatesCount"
+                  type="number"
+                  min={2}
+                  max={6}
+                  step={1}
+                  value={settings.splitScreenCandidatesCount.toString()}
+                  onChange={(e) => {
+                    const parsedValue = parseInt(e.target.value, 10);
+
+                    if (Number.isNaN(parsedValue)) return;
+
+                    setSettings({
+                      splitScreenCandidatesCount: Math.max(
+                        2,
+                        Math.min(6, parsedValue),
+                      ),
+                    });
+                  }}
+                  className="!w-12 !h-8 text-center font-medium"
+                />
+                <span className="text-white font-medium">
+                  {t('splitScreenCandidatesCount')}
+                </span>
+              </div>
+            </div>
+          )}
+        {settings.isPickQualifiersMode &&
+          settings.enableSplitScreenQualifierRevealMode && (
+            <div className="flex items-start gap-2 text-white">
+              <Tooltip
+                content={
+                  <div className="font-medium">
+                    {t.rich('enableSplitScreenForLastQualifierTooltip', {
+                      br: () => <br />,
+                    })}
+                  </div>
+                }
+                position="left"
+              />
+              <Checkbox
+                id="enable-split-screen-for-last-qualifier"
+                label={t('enableSplitScreenForLastQualifier')}
+                labelClassName="w-full !px-0 !pt-1 !items-start"
+                checked={settings.enableSplitScreenForLastQualifier}
+                onChange={(e) => {
+                  setSettings({
+                    enableSplitScreenForLastQualifier: e.target.checked,
+                  });
+                }}
+              />
+            </div>
+          )}
         <div className="flex items-start gap-2 text-white">
           <Tooltip
             content={

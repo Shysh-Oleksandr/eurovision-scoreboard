@@ -38,4 +38,10 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   currentRevealTelevotePoints: undefined,
   isWinnerAnimationAlreadyDisplayed: false,
   isLastSimulationAnimationFinished: true,
+  splitScreenQualifierModalOpen: false,
+  splitScreenQualifierCandidates: [],
+  splitScreenQualifierCandidatesStageId: null,
+  splitScreenQualifierCandidatesQualifiedCount: null,
+  splitScreenQualifierShownCountByStage: {},
+  splitScreenQualifierLastShownByStage: {},
 };

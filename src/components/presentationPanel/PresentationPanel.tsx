@@ -59,6 +59,8 @@ const PresentationPanel = (): JSX.Element | null => {
     givePredefinedJuryPoint,
     givePredefinedJuryPointsGrouped,
     givePredefinedTelevotePoints,
+    openSplitScreenQualifierModal,
+    pickQualifierFromSplitScreenCandidatesRandomly,
     pickQualifierRandomly,
   } = useScoreboardStore(
     useShallow((state) => ({
@@ -66,6 +68,9 @@ const PresentationPanel = (): JSX.Element | null => {
       givePredefinedJuryPoint: state.givePredefinedJuryPoint,
       givePredefinedJuryPointsGrouped: state.givePredefinedJuryPointsGrouped,
       givePredefinedTelevotePoints: state.givePredefinedTelevotePoints,
+      openSplitScreenQualifierModal: state.openSplitScreenQualifierModal,
+      pickQualifierFromSplitScreenCandidatesRandomly:
+        state.pickQualifierFromSplitScreenCandidatesRandomly,
       pickQualifierRandomly: state.pickQualifierRandomly,
     })),
   );
@@ -73,11 +78,14 @@ const PresentationPanel = (): JSX.Element | null => {
   const {
     presentationSettings,
     isPickQualifiersMode,
+    enableSplitScreenQualifierRevealMode,
     setPresentationSettings,
   } = useGeneralStore(
     useShallow((s) => ({
       presentationSettings: s.presentationSettings,
       isPickQualifiersMode: s.settings.isPickQualifiersMode,
+      enableSplitScreenQualifierRevealMode:
+        s.settings.enableSplitScreenQualifierRevealMode,
       setPresentationSettings: s.setPresentationSettings,
     })),
   );
@@ -133,10 +141,49 @@ const PresentationPanel = (): JSX.Element | null => {
 
       if (!latestStage || latestStage.isOver) return;
 
+      const getNextDelayMs = (awardedAnimated: boolean) => {
+        const baseSeconds = MAX_SPEED_SECONDS - presentationSpeedSeconds;
+        const delayAfterAnimation = pauseAfterAnimatedPoints
+          ? Math.max(boardAnimationMode === 'teleport' ? 6 : 4.5, baseSeconds)
+          : baseSeconds;
+        const nextDelaySeconds = awardedAnimated
+          ? delayAfterAnimation
+          : baseSeconds;
+
+        return Math.max(MIN_SPEED_SECONDS, nextDelaySeconds) * 1000;
+      };
+
       if (
         generalStore.settings.isPickQualifiersMode &&
         latestStage.id.toUpperCase() !== StageId.GF.toUpperCase()
       ) {
+        const isSplitScreenEnabled =
+          generalStore.settings.enableSplitScreenQualifierRevealMode;
+
+        if (isSplitScreenEnabled) {
+          const didOpenModal = openSplitScreenQualifierModal();
+          const nextDelay = getNextDelayMs(false);
+
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+
+          if (!didOpenModal) {
+            pickQualifierRandomly();
+            timeoutRef.current = setTimeout(runOnce, nextDelay);
+
+            return;
+          }
+
+          timeoutRef.current = setTimeout(() => {
+            pickQualifierFromSplitScreenCandidatesRandomly();
+
+            timeoutRef.current = setTimeout(runOnce, nextDelay);
+          }, nextDelay);
+
+          return;
+        }
+
         pickQualifierRandomly();
       } else if (latestStage.isJuryVoting) {
         if (presentationJuryGrouping === 'grouped') {
@@ -157,16 +204,7 @@ const PresentationPanel = (): JSX.Element | null => {
         .getState()
         .getCurrentStage()
         ?.countries?.some((c) => c.showDouzePointsAnimation);
-
-      const baseSeconds = MAX_SPEED_SECONDS - presentationSpeedSeconds;
-      const delayAfterAnimation = pauseAfterAnimatedPoints
-        ? Math.max(boardAnimationMode === 'teleport' ? 6 : 4.5, baseSeconds)
-        : baseSeconds;
-      const nextDelaySeconds = awardedAnimated
-        ? delayAfterAnimation
-        : baseSeconds;
-
-      const nextDelay = Math.max(MIN_SPEED_SECONDS, nextDelaySeconds) * 1000;
+      const nextDelay = getNextDelayMs(!!awardedAnimated);
 
       timeoutRef.current = setTimeout(runOnce, nextDelay);
     };
@@ -187,6 +225,8 @@ const PresentationPanel = (): JSX.Element | null => {
     isPresenting,
     currentStage?.id,
     currentStage?.isJuryVoting,
+    isPickQualifiersMode,
+    enableSplitScreenQualifierRevealMode,
     boardAnimationMode,
   ]);
 

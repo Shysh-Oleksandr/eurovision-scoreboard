@@ -16,7 +16,11 @@ import {
   handleStageEnd,
   isVotingOver,
 } from './helpers';
-import { ScoreboardState, Vote } from './types';
+import {
+  ScoreboardState,
+  SplitScreenQualifierCandidate,
+  Vote,
+} from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
 import { resolveThemeSpecificsForGeneralState } from '@/theme/themeSpecifics';
@@ -135,6 +139,261 @@ const recalculateCountryPoints = (
   return pointsByCountry;
 };
 
+const SPLIT_SCREEN_MAX_EXPOSURE = 3;
+const SPLIT_SCREEN_EXPOSURE_ALPHA = 1.5;
+
+const canUseSplitScreenForRemainingSlots = (
+  remainingSlots: number,
+  enableSplitScreenForLastQualifier: boolean,
+): boolean =>
+  remainingSlots > 1 || (enableSplitScreenForLastQualifier && remainingSlots === 1);
+
+const clampSplitScreenCandidatesCount = (value: number): number =>
+  Math.max(2, Math.min(6, value || 3));
+
+const getQualifiersAmount = (stage: EventStage): number =>
+  stage.qualifiesTo?.reduce((sum, target) => {
+    if (target.minRank && target.maxRank) {
+      return sum + (target.maxRank - target.minRank + 1);
+    }
+
+    return sum + target.amount;
+  }, 0) || 0;
+
+const hasQualifiedFromStage = (country: Country, stageId: string): boolean =>
+  !!country.qualifiedFromStageIds?.includes(stageId);
+
+const getCountryTotalPoints = (
+  stage: EventStage,
+  country: Country,
+  stageCountryPoints?: Record<string, any>,
+): number => {
+  const points = stageCountryPoints?.[country.code];
+
+  if (stage.votingMode === StageVotingMode.COMBINED) {
+    return points?.combinedPoints || 0;
+  }
+
+  if (stage.votingMode === StageVotingMode.JURY_ONLY) {
+    return points?.juryPoints || 0;
+  }
+
+  if (stage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
+    return points?.televotePoints || 0;
+  }
+
+  return (points?.juryPoints || 0) + (points?.televotePoints || 0);
+};
+
+const getRankedCountriesWithPoints = (
+  stage: EventStage,
+  stageCountryPoints?: Record<string, any>,
+): (Country & { totalPoints: number })[] =>
+  stage.countries
+    .map((country) => ({
+      ...country,
+      totalPoints: getCountryTotalPoints(stage, country, stageCountryPoints),
+    }))
+    .sort((a, b) => b.totalPoints - a.totalPoints);
+
+const getCurrentSplitScreenContext = (state: ScoreboardState) => {
+  const currentStage = state.getCurrentStage();
+  if (!currentStage || currentStage.isOver) return null;
+
+  if (!currentStage.countries || currentStage.countries.length === 0) return null;
+
+  const qualifiersAmount = getQualifiersAmount(currentStage);
+  if (qualifiersAmount <= 0) return null;
+
+  const qualifiedCount = currentStage.countries.filter((country) =>
+    hasQualifiedFromStage(country, currentStage.id),
+  ).length;
+  const remainingSlots = Math.max(qualifiersAmount - qualifiedCount, 0);
+
+  return {
+    currentStage,
+    qualifiersAmount,
+    qualifiedCount,
+    remainingSlots,
+  };
+};
+
+const weightedPick = <T>(
+  items: T[],
+  getWeight: (item: T) => number,
+): T | null => {
+  if (items.length === 0) return null;
+
+  const weights = items.map((item) => Math.max(getWeight(item), 0));
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+
+  if (totalWeight <= 0) {
+    return items[Math.floor(Math.random() * items.length)] || null;
+  }
+
+  const target = Math.random() * totalWeight;
+  let current = 0;
+
+  for (let i = 0; i < items.length; i += 1) {
+    current += weights[i];
+    if (target <= current) {
+      return items[i];
+    }
+  }
+
+  return items[items.length - 1] || null;
+};
+
+const weightedSampleWithoutReplacement = <T>(
+  items: T[],
+  count: number,
+  getWeight: (item: T) => number,
+): T[] => {
+  if (count <= 0 || items.length === 0) return [];
+
+  const source = [...items];
+  const selected: T[] = [];
+
+  while (source.length > 0 && selected.length < count) {
+    const picked = weightedPick(source, getWeight);
+    if (!picked) break;
+
+    selected.push(picked);
+
+    const pickedIndex = source.indexOf(picked);
+    if (pickedIndex >= 0) {
+      source.splice(pickedIndex, 1);
+    }
+  }
+
+  return selected;
+};
+
+const shuffleArray = <T>(items: T[]): T[] => {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[randomIndex]] = [copy[randomIndex], copy[i]];
+  }
+  return copy;
+};
+
+const pickSplitScreenCandidates = (
+  state: ScoreboardState,
+  currentStage: EventStage,
+  qualifiedCount: number,
+): SplitScreenQualifierCandidate[] => {
+  const stageCountryPoints = state.countryPoints[currentStage.id];
+  const rankedRemainingCountries = getRankedCountriesWithPoints(
+    currentStage,
+    stageCountryPoints,
+  ).filter((country) => !hasQualifiedFromStage(country, currentStage.id));
+
+  if (rankedRemainingCountries.length === 0) return [];
+
+  const qualifiersAmount = getQualifiersAmount(currentStage);
+  const remainingSlots = Math.max(qualifiersAmount - qualifiedCount, 0);
+  if (remainingSlots <= 0) return [];
+
+  const maxCandidates = clampSplitScreenCandidatesCount(
+    useGeneralStore.getState().settings.splitScreenCandidatesCount,
+  );
+  const candidateCount = Math.min(maxCandidates, rankedRemainingCountries.length);
+
+  if (rankedRemainingCountries.length <= candidateCount) {
+    return shuffleArray(rankedRemainingCountries).map((country) => ({
+      code: country.code,
+      name: country.name,
+    }));
+  }
+
+  const shownCountByCountry =
+    state.splitScreenQualifierShownCountByStage[currentStage.id] || {};
+  const lastShownCountryCodes =
+    state.splitScreenQualifierLastShownByStage[currentStage.id] || [];
+  const lastShownSet = new Set(lastShownCountryCodes);
+  const rankByCode = rankedRemainingCountries.reduce<Record<string, number>>(
+    (acc, country, index) => {
+      acc[country.code] = index + 1;
+      return acc;
+    },
+    {},
+  );
+
+  const exposurePenalty = (code: string): number =>
+    1 / Math.pow(1 + (shownCountByCountry[code] || 0), SPLIT_SCREEN_EXPOSURE_ALPHA);
+  const recentPenalty = (code: string): number =>
+    lastShownSet.has(code) ? 0.3 : 1;
+  const cutoffBoost = (code: string): number => {
+    const rank = rankByCode[code] || Number.MAX_SAFE_INTEGER;
+    const distance = Math.abs(rank - remainingSlots);
+    if (distance <= 1) return 1.7;
+    if (distance <= 3) return 1.35;
+    if (rank <= remainingSlots) return 1.15;
+    return 1;
+  };
+
+  const underSoftCap = (country: Country) =>
+    (shownCountByCountry[country.code] || 0) < SPLIT_SCREEN_MAX_EXPOSURE;
+
+  const wouldQualifyNow = rankedRemainingCountries.slice(
+    0,
+    Math.min(remainingSlots, rankedRemainingCountries.length),
+  );
+
+  const anchorPoolWithCap = wouldQualifyNow.filter(underSoftCap);
+  const anchorPool =
+    anchorPoolWithCap.length > 0
+      ? anchorPoolWithCap
+      : wouldQualifyNow.length > 0
+        ? wouldQualifyNow
+        : rankedRemainingCountries;
+
+  const anchor = weightedPick(
+    anchorPool,
+    (country) => exposurePenalty(country.code) * recentPenalty(country.code),
+  );
+
+  const anchorCountry = anchor || rankedRemainingCountries[0];
+  const decoySource = rankedRemainingCountries.filter(
+    (country) => country.code !== anchorCountry.code,
+  );
+  const decoySourceWithCap = decoySource.filter(underSoftCap);
+  const decoyPool =
+    decoySourceWithCap.length >= candidateCount - 1
+      ? decoySourceWithCap
+      : decoySource;
+
+  const decoys = weightedSampleWithoutReplacement(
+    decoyPool,
+    candidateCount - 1,
+    (country) =>
+      exposurePenalty(country.code) *
+      recentPenalty(country.code) *
+      cutoffBoost(country.code),
+  );
+
+  if (decoys.length < candidateCount - 1) {
+    const selectedCodes = new Set([
+      anchorCountry.code,
+      ...decoys.map((country) => country.code),
+    ]);
+    const fallback = shuffleArray(decoySource).filter(
+      (country) => !selectedCodes.has(country.code),
+    );
+
+    for (const country of fallback) {
+      decoys.push(country);
+      if (decoys.length >= candidateCount - 1) break;
+    }
+  }
+
+  return shuffleArray([anchorCountry, ...decoys]).map((country) => ({
+    code: country.code,
+    name: country.name,
+  }));
+};
+
 type VotingActions = {
   giveJuryPoints: (countryCode: string) => void;
   giveTelevotePoints: (countryCode: string, votingPoints: number) => void;
@@ -147,6 +406,10 @@ type VotingActions = {
   giveManualTelevotePointsInRevealMode: (countryCode: string) => void;
   pickQualifier: (countryCode: string) => void;
   pickQualifierRandomly: () => void;
+  openSplitScreenQualifierModal: () => boolean;
+  closeSplitScreenQualifierModal: () => void;
+  computeSplitScreenQualifierCandidatesIfNeeded: () => boolean;
+  pickQualifierFromSplitScreenCandidatesRandomly: () => void;
 };
 
 // Helper function to assign points to a country based on current stage voting mode
@@ -1155,21 +1418,112 @@ export const createVotingActions: StateCreator<
     });
   },
 
+  computeSplitScreenQualifierCandidatesIfNeeded: () => {
+    const state = get();
+    const context = getCurrentSplitScreenContext(state);
+    if (!context) return false;
+
+    const { currentStage, qualifiedCount, remainingSlots } = context;
+    const { enableSplitScreenForLastQualifier } = useGeneralStore.getState()
+      .settings;
+    const canUseSplitScreen = canUseSplitScreenForRemainingSlots(
+      remainingSlots,
+      enableSplitScreenForLastQualifier,
+    );
+
+    if (!canUseSplitScreen) return false;
+
+    const hasCachedCandidates =
+      state.splitScreenQualifierCandidatesStageId === currentStage.id &&
+      state.splitScreenQualifierCandidatesQualifiedCount === qualifiedCount &&
+      state.splitScreenQualifierCandidates.length > 0;
+
+    if (hasCachedCandidates) {
+      return true;
+    }
+
+    const candidates = pickSplitScreenCandidates(state, currentStage, qualifiedCount);
+    if (candidates.length === 0) return false;
+
+    set((s) => {
+      const currentShownCountByStage =
+        s.splitScreenQualifierShownCountByStage[currentStage.id] || {};
+
+      const nextShownCountByStage = { ...currentShownCountByStage };
+      candidates.forEach((candidate) => {
+        nextShownCountByStage[candidate.code] =
+          (nextShownCountByStage[candidate.code] || 0) + 1;
+      });
+
+      return {
+        splitScreenQualifierCandidates: candidates,
+        splitScreenQualifierCandidatesStageId: currentStage.id,
+        splitScreenQualifierCandidatesQualifiedCount: qualifiedCount,
+        splitScreenQualifierShownCountByStage: {
+          ...s.splitScreenQualifierShownCountByStage,
+          [currentStage.id]: nextShownCountByStage,
+        },
+        splitScreenQualifierLastShownByStage: {
+          ...s.splitScreenQualifierLastShownByStage,
+          [currentStage.id]: candidates.map((candidate) => candidate.code),
+        },
+      };
+    });
+
+    return true;
+  },
+
+  openSplitScreenQualifierModal: () => {
+    if (get().splitScreenQualifierModalOpen) {
+      return true;
+    }
+
+    const hasCandidates = get().computeSplitScreenQualifierCandidatesIfNeeded();
+    if (!hasCandidates) {
+      return false;
+    }
+
+    set({
+      splitScreenQualifierModalOpen: true,
+    });
+
+    return true;
+  },
+
+  closeSplitScreenQualifierModal: () => {
+    if (!get().splitScreenQualifierModalOpen) {
+      return;
+    }
+
+    set({
+      splitScreenQualifierModalOpen: false,
+    });
+  },
+
+  pickQualifierFromSplitScreenCandidatesRandomly: () => {
+    const state = get();
+    if (state.splitScreenQualifierCandidates.length === 0) return;
+
+    const randomIndex = Math.floor(
+      Math.random() * state.splitScreenQualifierCandidates.length,
+    );
+    const selectedCandidate = state.splitScreenQualifierCandidates[randomIndex];
+    if (!selectedCandidate) return;
+
+    set({
+      splitScreenQualifierModalOpen: false,
+    });
+
+    get().pickQualifier(selectedCandidate.code);
+  },
+
   pickQualifier: (countryCode: string) => {
     const state = get();
     const currentStage = state.getCurrentStage();
 
     if (!currentStage || currentStage.isOver) return;
 
-    const qualifiersAmount =
-      currentStage.qualifiesTo?.reduce((sum, target) => {
-        // If using rank ranges, calculate based on ranges
-        if (target.minRank && target.maxRank) {
-          return sum + (target.maxRank - target.minRank + 1);
-        }
-        // Amount-based (backward compatibility)
-        return sum + target.amount;
-      }, 0) || 0;
+    const qualifiersAmount = getQualifiersAmount(currentStage);
     if (qualifiersAmount === 0) return;
 
     const stageCountryPoints = state.countryPoints[currentStage.id];
@@ -1180,12 +1534,9 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
-    const hasQualifiedFromCurrentStage = (country: Country) =>
-      !!country.qualifiedFromStageIds?.includes(currentStage.id);
-
     // Check if there are enough countries to qualify
     const availableCountries = currentStage.countries.filter(
-      (country) => !hasQualifiedFromCurrentStage(country),
+      (country) => !hasQualifiedFromStage(country, currentStage.id),
     );
     if (availableCountries.length === 0) return;
 
@@ -1193,37 +1544,18 @@ export const createVotingActions: StateCreator<
     const selectedCountry = currentStage.countries.find(
       (country) => country.code === countryCode,
     );
-    if (!selectedCountry || hasQualifiedFromCurrentStage(selectedCountry))
+    if (!selectedCountry || hasQualifiedFromStage(selectedCountry, currentStage.id))
       return;
 
     // Get the top N countries by points (excluding already qualified ones)
-    const countriesWithPoints = currentStage.countries
-      .map((country) => {
-        const points = stageCountryPoints[country.code];
-        let totalPoints = 0;
-
-        if (currentStage.votingMode === StageVotingMode.COMBINED) {
-          totalPoints = points?.combinedPoints || 0;
-        } else if (currentStage.votingMode === StageVotingMode.JURY_ONLY) {
-          totalPoints = points?.juryPoints || 0;
-        } else if (currentStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
-          totalPoints = points?.televotePoints || 0;
-        } else {
-          // JURY_AND_TELEVOTE mode - combine both
-          totalPoints =
-            (points?.juryPoints || 0) + (points?.televotePoints || 0);
-        }
-
-        return {
-          ...country,
-          totalPoints,
-        };
-      })
-      .sort((a, b) => b.totalPoints - a.totalPoints);
+    const countriesWithPoints = getRankedCountriesWithPoints(
+      currentStage,
+      stageCountryPoints,
+    );
 
     const topCountries = countriesWithPoints
       .slice(0, qualifiersAmount)
-      .filter((country) => !hasQualifiedFromCurrentStage(country));
+      .filter((country) => !hasQualifiedFromStage(country, currentStage.id));
 
     // Check if the selected country would have qualified by predefined votes
     const wouldHaveQualified = topCountries.some(
@@ -1339,6 +1671,10 @@ export const createVotingActions: StateCreator<
           eventStages: finalUpdatedEventStages,
           showQualificationResults: true,
           qualificationOrder: newQualificationOrder,
+          splitScreenQualifierModalOpen: false,
+          splitScreenQualifierCandidates: [],
+          splitScreenQualifierCandidatesStageId: null,
+          splitScreenQualifierCandidatesQualifiedCount: null,
         };
       }
 
@@ -1346,6 +1682,10 @@ export const createVotingActions: StateCreator<
       return {
         eventStages: updatedEventStages,
         qualificationOrder: newQualificationOrder,
+        splitScreenQualifierModalOpen: false,
+        splitScreenQualifierCandidates: [],
+        splitScreenQualifierCandidatesStageId: null,
+        splitScreenQualifierCandidatesQualifiedCount: null,
       };
     });
   },
@@ -1356,15 +1696,7 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage || currentStage.isOver) return;
 
-    const qualifiersAmount =
-      currentStage.qualifiesTo?.reduce((sum, target) => {
-        // If using rank ranges, calculate based on ranges
-        if (target.minRank && target.maxRank) {
-          return sum + (target.maxRank - target.minRank + 1);
-        }
-        // Amount-based (backward compatibility)
-        return sum + target.amount;
-      }, 0) || 0;
+    const qualifiersAmount = getQualifiersAmount(currentStage);
     if (qualifiersAmount === 0) return;
 
     const stageCountryPoints = state.countryPoints[currentStage.id];
@@ -1375,42 +1707,21 @@ export const createVotingActions: StateCreator<
 
     if (!currentStage.countries || currentStage.countries.length === 0) return;
 
-    const hasQualifiedFromCurrentStage = (country: Country) =>
-      !!country.qualifiedFromStageIds?.includes(currentStage.id);
-
     // Check if there are enough countries to qualify
     const availableCountries = currentStage.countries.filter(
-      (country) => !hasQualifiedFromCurrentStage(country),
+      (country) => !hasQualifiedFromStage(country, currentStage.id),
     );
     if (availableCountries.length === 0) return;
 
-    const countriesWithPoints = currentStage.countries
-      .map((country) => {
-        const points = stageCountryPoints[country.code];
-        let totalPoints = 0;
+    const countriesWithPoints = getRankedCountriesWithPoints(
+      currentStage,
+      stageCountryPoints,
+    );
 
-        if (currentStage.votingMode === StageVotingMode.COMBINED) {
-          totalPoints = points?.combinedPoints || 0;
-        } else if (currentStage.votingMode === StageVotingMode.JURY_ONLY) {
-          totalPoints = points?.juryPoints || 0;
-        } else if (currentStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
-          totalPoints = points?.televotePoints || 0;
-        } else {
-          // JURY_AND_TELEVOTE mode - combine both
-          totalPoints =
-            (points?.juryPoints || 0) + (points?.televotePoints || 0);
-        }
-
-        return {
-          ...country,
-          totalPoints,
-        };
-      })
-      .sort((a, b) => b.totalPoints - a.totalPoints);
-// TODO: go through .sort( to always use the running order; fix the issue when selecting televote active country
+    // TODO: go through .sort( to always use the running order; fix the issue when selecting televote active country
     const topCountries = countriesWithPoints
       .slice(0, qualifiersAmount)
-      .filter((country) => !hasQualifiedFromCurrentStage(country));
+      .filter((country) => !hasQualifiedFromStage(country, currentStage.id));
 
     if (topCountries.length === 0) return;
 
@@ -1488,6 +1799,10 @@ export const createVotingActions: StateCreator<
           eventStages: finalUpdatedEventStages,
           showQualificationResults: true,
           qualificationOrder: newQualificationOrder,
+          splitScreenQualifierModalOpen: false,
+          splitScreenQualifierCandidates: [],
+          splitScreenQualifierCandidatesStageId: null,
+          splitScreenQualifierCandidatesQualifiedCount: null,
         };
       }
 
@@ -1495,6 +1810,10 @@ export const createVotingActions: StateCreator<
       return {
         eventStages: updatedEventStages,
         qualificationOrder: newQualificationOrder,
+        splitScreenQualifierModalOpen: false,
+        splitScreenQualifierCandidates: [],
+        splitScreenQualifierCandidatesStageId: null,
+        splitScreenQualifierCandidatesQualifiedCount: null,
       };
     });
   },

@@ -23,6 +23,7 @@ interface ModalProps {
   openDelay?: number; // Delay in milliseconds before opening the modal
   dataTheme?: string;
   withBlur?: boolean;
+  shouldBlur?: boolean;
   fixedHeight?: boolean;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
@@ -41,6 +42,7 @@ const Modal: React.FC<ModalProps> = ({
   ref,
   dataTheme,
   withBlur = false,
+  shouldBlur = false,
   fixedHeight = false,
 }) => {
   const enableWinterEffects = useGeneralStore(
@@ -110,7 +112,7 @@ const Modal: React.FC<ModalProps> = ({
       className={`fixed inset-0 flex items-center justify-center z-[100] transition-colors duration-[200ms] ${
         isActive
           ? `bg-black bg-opacity-60 ${
-              blurModalBackground && withBlur
+              (blurModalBackground && withBlur) || shouldBlur
                 ? 'transform-gpu backdrop-blur-[3px]'
                 : ''
             }`

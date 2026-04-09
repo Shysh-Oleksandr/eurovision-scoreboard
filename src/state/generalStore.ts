@@ -65,6 +65,9 @@ const DEFAULT_SETTINGS: Settings = {
   shouldShowJuryVotingProgress: true,
   randomnessLevel: 50, // 0-100
   isPickQualifiersMode: false,
+  enableSplitScreenQualifierRevealMode: false,
+  enableSplitScreenForLastQualifier: false,
+  splitScreenCandidatesCount: 3,
   revealTelevoteLowestToHighest: false,
   presentationModeEnabled: true,
   useGroupedJuryPoints: false,
@@ -138,6 +141,9 @@ interface Settings {
   shouldShowJuryVotingProgress: boolean;
   randomnessLevel: number;
   isPickQualifiersMode: boolean;
+  enableSplitScreenQualifierRevealMode: boolean;
+  enableSplitScreenForLastQualifier: boolean;
+  splitScreenCandidatesCount: number;
   revealTelevoteLowestToHighest: boolean;
   presentationModeEnabled: boolean;
   useGroupedJuryPoints: boolean;
@@ -426,7 +432,9 @@ export const useGeneralStore = create<GeneralState>()(
         setBlockedActiveContestId: (id: string | null) => {
           set({ blockedActiveContestId: id });
         },
-        setContestToLoad: (data: { contest: Contest; snapshot: any } | null) => {
+        setContestToLoad: (
+          data: { contest: Contest; snapshot: any } | null,
+        ) => {
           set({ contestToLoad: data });
         },
         setIsContestsModalOpen: (open: boolean) => {
@@ -457,8 +465,16 @@ export const useGeneralStore = create<GeneralState>()(
           set({ importedCustomEntries: entries });
         },
         setSettings: (settings: Partial<Settings>) => {
+          const nextSettings = { ...settings };
+          if (typeof nextSettings.splitScreenCandidatesCount === 'number') {
+            nextSettings.splitScreenCandidatesCount = Math.max(
+              2,
+              Math.min(6, nextSettings.splitScreenCandidatesCount),
+            );
+          }
+
           set((state) => ({
-            settings: { ...state.settings, ...settings },
+            settings: { ...state.settings, ...nextSettings },
           }));
         },
         setImageCustomization: (
