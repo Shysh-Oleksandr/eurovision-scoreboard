@@ -32,7 +32,7 @@ export type StageVotes = {
   combined?: Record<string, Vote[]>;
 };
 
-export type SplitScreenQualifierCandidate = Pick<BaseCountry, 'code' | 'name'>;
+export type SplitScreenQualifierCandidate = Pick<BaseCountry, 'code' | 'name' | 'flag'>;
 
 export type ScoreboardState = {
   // State

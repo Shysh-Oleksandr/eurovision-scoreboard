@@ -29,6 +29,7 @@ const SplitScreenQualifierModal = () => {
   const candidates = useScoreboardStore(
     (state) => state.splitScreenQualifierCandidates,
   );
+
   const closeSplitScreenQualifierModal = useScoreboardStore(
     (state) => state.closeSplitScreenQualifierModal,
   );
@@ -168,9 +169,12 @@ const SplitScreenQualifierModal = () => {
           >
             <div className="px-1 xs:px-4 sm:px-6 md:px-8">
               <img
-                src={getFlagPath(country.code)}
+                src={getFlagPath(country)}
+                onError={(e) => (e.currentTarget.src = getFlagPath('ww'))}
                 alt={country.name}
-                className="w-full  aspect-[13/9] object-cover rounded"
+                className="w-full aspect-[13/9] object-cover rounded"
+                width={48}
+                height={36}
               />
             </div>
             <h2 className="text-white sm:text-2xl xs:text-xl text-lg leading-tight font-bold text-center line-clamp-2">

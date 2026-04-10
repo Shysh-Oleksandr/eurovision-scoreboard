@@ -304,6 +304,7 @@ const pickSplitScreenCandidates = (
     return shuffleArray(rankedRemainingCountries).map((country) => ({
       code: country.code,
       name: country.name,
+      flag: country.flag,
     }));
   }
 
@@ -391,6 +392,7 @@ const pickSplitScreenCandidates = (
   return shuffleArray([anchorCountry, ...decoys]).map((country) => ({
     code: country.code,
     name: country.name,
+    flag: country.flag,
   }));
 };
 
