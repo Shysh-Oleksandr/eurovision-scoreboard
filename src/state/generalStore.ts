@@ -76,6 +76,10 @@ const DEFAULT_SETTINGS: Settings = {
   enableWinterEffects: false,
   snowFallIntensity: 5, // 1-10
   blurModalBackground: false,
+  themeSoundVolume: 100,
+  themeAmbienceVolume: 100,
+  hideThemeSoundVolumeHud: false,
+  disableAllThemeAudio: false,
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -152,6 +156,10 @@ interface Settings {
   enableWinterEffects: boolean;
   snowFallIntensity: number;
   blurModalBackground: boolean;
+  themeSoundVolume: number;
+  themeAmbienceVolume: number;
+  hideThemeSoundVolumeHud: boolean;
+  disableAllThemeAudio: boolean;
 }
 
 interface PresentationSettings {

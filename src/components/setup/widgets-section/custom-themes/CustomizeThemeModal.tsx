@@ -1,5 +1,12 @@
+import { Pause, Play, TrashIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'react-toastify';
 
 import Hue from '@uiw/react-color-hue';
@@ -10,9 +17,10 @@ import ThemePreviewCountryItem from './ThemePreviewCountryItem';
 
 import {
   useCreateThemeMutation,
+  useReportThemeDuplicateMutation,
   useUpdateThemeMutation,
   useUploadThemeBackgroundMutation,
-  useReportThemeDuplicateMutation,
+  useUploadThemeSoundMutation,
 } from '@/api/themes';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { UploadIcon } from '@/assets/icons/UploadIcon';
@@ -34,6 +42,10 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import {
+  THEME_SOUND_EVENTS,
+  type ThemeSoundEventId,
+} from '@/theme/themeSoundEvents';
+import {
   resolveThemeSpecificsForBaseThemeYear,
   resolveThemeSpecificsForCustomTheme,
 } from '@/theme/themeSpecifics';
@@ -47,6 +59,48 @@ import {
 } from '@/types/customTheme';
 
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
+
+const THEME_SOUND_LABEL_KEYS: Record<ThemeSoundEventId, string> = {
+  douzePoints: 'soundDouzePoints',
+  stageStart: 'soundStageStart',
+  pointsAwarded: 'soundPointsAwarded',
+  televotePointsReveal: 'soundTelevotePointsReveal',
+  winner: 'soundWinner',
+  stageComplete: 'soundStageComplete',
+  simulationBackground: 'soundSimulationBackground',
+  qualifierReveal: 'soundQualifierReveal',
+  qualifierPicked: 'soundQualifierPicked',
+};
+
+const SOUND_MAX_BYTES = 7 * 1024 * 1024;
+const SOUND_ACCEPT_MIMES = new Set([
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/webm',
+  'audio/ogg',
+  'audio/wav',
+  'audio/x-wav',
+]);
+
+function emptySoundUrlState(): Record<ThemeSoundEventId, string> {
+  return Object.fromEntries(THEME_SOUND_EVENTS.map((e) => [e, ''])) as Record<
+    ThemeSoundEventId,
+    string
+  >;
+}
+
+function emptySoundFileState(): Record<ThemeSoundEventId, File | null> {
+  return Object.fromEntries(THEME_SOUND_EVENTS.map((e) => [e, null])) as Record<
+    ThemeSoundEventId,
+    File | null
+  >;
+}
+
+function isValidHttpsSoundUrl(s: string): boolean {
+  const u = s.trim();
+
+  return /^https:\/\/.+/i.test(u);
+}
 
 interface CustomizeThemeModalProps {
   isOpen: boolean;
@@ -99,12 +153,43 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     useState<BoardAnimationMode>('flip');
   const [douzePointsAnimationMode, setDouzePointsAnimationMode] =
     useState<DouzePointsAnimationMode>('heartsGrid');
+  const [soundUrls, setSoundUrls] =
+    useState<Record<ThemeSoundEventId, string>>(emptySoundUrlState);
+  const [soundFiles, setSoundFiles] =
+    useState<Record<ThemeSoundEventId, File | null>>(emptySoundFileState);
+  const [soundDragOver, setSoundDragOver] = useState<ThemeSoundEventId | null>(
+    null,
+  );
+  const [soundPreviewState, setSoundPreviewState] = useState<{
+    event: ThemeSoundEventId;
+    paused: boolean;
+  } | null>(null);
+  const soundPreviewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const soundPreviewObjectUrlRef = useRef<string | null>(null);
+
+  const stopSoundPreview = useCallback(() => {
+    const a = soundPreviewAudioRef.current;
+
+    if (a) {
+      a.pause();
+      a.src = '';
+    }
+    if (soundPreviewObjectUrlRef.current) {
+      URL.revokeObjectURL(soundPreviewObjectUrlRef.current);
+      soundPreviewObjectUrlRef.current = null;
+    }
+    soundPreviewAudioRef.current = null;
+    setSoundPreviewState(null);
+  }, []);
+
   const { mutateAsync: createTheme, isPending: isCreating } =
     useCreateThemeMutation();
   const { mutateAsync: updateTheme, isPending: isUpdating } =
     useUpdateThemeMutation();
   const { mutateAsync: uploadBackground, isPending: isUploadingBg } =
     useUploadThemeBackgroundMutation();
+  const { mutateAsync: uploadThemeSound, isPending: isUploadingSounds } =
+    useUploadThemeSoundMutation();
   const { mutateAsync: reportDuplicate } = useReportThemeDuplicateMutation();
   const user = useAuthStore((s) => s.user);
 
@@ -162,6 +247,20 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setDouzePointsAnimationMode(
         resolvedInitialThemeSpecifics.douzePointsAnimationMode,
       );
+      setSoundUrls(() => {
+        const next = emptySoundUrlState();
+
+        if (initialTheme.themeSounds) {
+          for (const e of THEME_SOUND_EVENTS) {
+            const u = initialTheme.themeSounds?.[e]?.url;
+
+            if (u) next[e] = u;
+          }
+        }
+
+        return next;
+      });
+      setSoundFiles(emptySoundFileState());
     } else {
       setName('');
       setDescription('');
@@ -180,12 +279,24 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setUsePointsCountUpAnimation(true);
       setBoardAnimationMode('flip');
       setDouzePointsAnimationMode('heartsGrid');
+      setSoundUrls(emptySoundUrlState());
+      setSoundFiles(emptySoundFileState());
     }
   }, [initialTheme, isOpen, themeYear, themeHue]);
 
   // Live preview effect
   useEffect(() => {
     if (!isOpen) return;
+
+    const previewThemeSounds: Partial<
+      Record<ThemeSoundEventId, { url: string }>
+    > = {};
+
+    for (const e of THEME_SOUND_EVENTS) {
+      const u = soundUrls[e].trim();
+
+      if (u) previewThemeSounds[e] = { url: u };
+    }
 
     const previewTheme: CustomTheme = {
       _id: 'preview',
@@ -204,6 +315,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       usePointsCountUpAnimation,
       boardAnimationMode,
       douzePointsAnimationMode,
+      themeSounds:
+        Object.keys(previewThemeSounds).length > 0
+          ? previewThemeSounds
+          : undefined,
     };
 
     applyCustomTheme(previewTheme, true);
@@ -216,14 +331,131 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     usePointsCountUpAnimation,
     boardAnimationMode,
     douzePointsAnimationMode,
+    soundUrls,
     isOpen,
   ]);
+
+  useEffect(() => {
+    if (!isOpen) stopSoundPreview();
+  }, [isOpen, stopSoundPreview]);
+
+  const handleSoundDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleSoundRowDragEnter =
+    (event: ThemeSoundEventId) => (e: React.DragEvent) => {
+      handleSoundDrag(e);
+      if (e.dataTransfer?.types?.includes('Files')) {
+        setSoundDragOver(event);
+      }
+    };
+
+  const handleSoundRowDragLeave =
+    (event: ThemeSoundEventId) => (e: React.DragEvent) => {
+      handleSoundDrag(e);
+      const related = e.relatedTarget as Node | null;
+
+      if (!related || !e.currentTarget.contains(related)) {
+        setSoundDragOver((cur) => (cur === event ? null : cur));
+      }
+    };
+
+  const handleSoundRowDrop =
+    (event: ThemeSoundEventId) => (e: React.DragEvent) => {
+      handleSoundDrag(e);
+      setSoundDragOver(null);
+      const f = e.dataTransfer.files?.[0];
+
+      if (f) handleSoundFilePick(event, f);
+      e.dataTransfer.clearData();
+    };
+
+  const handleSoundFilePick = (event: ThemeSoundEventId, file: File | null) => {
+    if (!file) return;
+    if (file.size > SOUND_MAX_BYTES) {
+      toast.error(t('widgets.themes.soundFileTooLarge'));
+
+      return;
+    }
+    if (!SOUND_ACCEPT_MIMES.has(file.type)) {
+      toast.error(t('widgets.themes.invalidSoundFile'));
+
+      return;
+    }
+    if (soundPreviewState?.event === event) stopSoundPreview();
+    setSoundFiles((p) => ({ ...p, [event]: file }));
+    setSoundUrls((p) => ({ ...p, [event]: '' }));
+  };
+
+  const toggleSoundPreview = (event: ThemeSoundEventId) => {
+    const file = soundFiles[event];
+    const url = soundUrls[event].trim();
+
+    if (!file && !isValidHttpsSoundUrl(url)) return;
+
+    if (soundPreviewState?.event === event && soundPreviewAudioRef.current) {
+      const a = soundPreviewAudioRef.current;
+
+      if (!soundPreviewState.paused) {
+        a.pause();
+        setSoundPreviewState({ event, paused: true });
+
+        return;
+      }
+      void a
+        .play()
+        .then(() => setSoundPreviewState({ event, paused: false }))
+        .catch(() => {
+          toast.error(t('widgets.themes.previewSoundFailed'));
+          stopSoundPreview();
+        });
+
+      return;
+    }
+
+    stopSoundPreview();
+
+    let src: string;
+
+    if (file) {
+      const ou = URL.createObjectURL(file);
+
+      soundPreviewObjectUrlRef.current = ou;
+      src = ou;
+    } else {
+      src = url;
+    }
+
+    const audio = new Audio(src);
+
+    soundPreviewAudioRef.current = audio;
+    audio.addEventListener('ended', () => {
+      stopSoundPreview();
+    });
+    setSoundPreviewState({ event, paused: false });
+    void audio.play().catch(() => {
+      toast.error(t('widgets.themes.previewSoundFailed'));
+      stopSoundPreview();
+    });
+  };
 
   const handleSave = async () => {
     if (!name.trim()) {
       toast.error(t('widgets.themes.themeNameIsRequired'));
 
       return;
+    }
+
+    for (const event of THEME_SOUND_EVENTS) {
+      const u = soundUrls[event].trim();
+
+      if (!soundFiles[event] && u && !u.startsWith('https://')) {
+        toast.error(t('widgets.themes.soundUrlHttpsOnly'));
+
+        return;
+      }
     }
 
     // Build payload with only non-default values for theme-specific options
@@ -423,6 +655,25 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         }
       }
 
+      const themeSoundsPatch: Record<string, { url: string } | null> = {};
+
+      for (const event of THEME_SOUND_EVENTS) {
+        if (soundFiles[event]) continue;
+        const trimmed = soundUrls[event].trim();
+        const hadInitial = !!initialTheme?.themeSounds?.[event]?.url;
+
+        if (!trimmed) {
+          if (isUpdate && initialTheme && hadInitial) {
+            themeSoundsPatch[event] = null;
+          }
+          continue;
+        }
+        themeSoundsPatch[event] = { url: trimmed };
+      }
+      if (Object.keys(themeSoundsPatch).length > 0) {
+        payload.themeSounds = themeSoundsPatch;
+      }
+
       return payload;
     };
 
@@ -442,6 +693,18 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           });
         }
 
+        for (const event of THEME_SOUND_EVENTS) {
+          const f = soundFiles[event];
+
+          if (f) {
+            updated = await uploadThemeSound({
+              id: updated._id,
+              eventId: event,
+              file: f,
+            });
+          }
+        }
+
         // If we edited the currently applied theme, reapply immediately
         if (currentCustomTheme?._id === updated._id) {
           applyCustomThemeToStore(updated);
@@ -450,14 +713,26 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         toast.success(t('widgets.themes.themeUpdatedSuccessfully'));
       } else {
         // Create new theme
-        const created = await createTheme(buildThemePayload());
+        let created = await createTheme(buildThemePayload());
 
         // Upload background if provided
         if (uploadedFile) {
-          await uploadBackground({
+          created = await uploadBackground({
             id: created._id,
             file: uploadedFile,
           });
+        }
+
+        for (const event of THEME_SOUND_EVENTS) {
+          const f = soundFiles[event];
+
+          if (f) {
+            created = await uploadThemeSound({
+              id: created._id,
+              eventId: event,
+              file: f,
+            });
+          }
         }
 
         // If created from someone else's theme, record duplicate
@@ -519,7 +794,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   };
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const isSaving = isCreating || isUpdating || isUploadingBg;
+  const isSaving =
+    isCreating || isUpdating || isUploadingBg || isUploadingSounds;
 
   const displayBg = uploadedFile ? imageUpload.base64 : backgroundImageUrl;
 
@@ -529,7 +805,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,950px)]"
-      contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh]"
+      contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh] sm:!pb-0 !pb-3"
       overlayClassName="!z-[1002]"
       bottomContent={
         <ModalBottomContent
@@ -541,7 +817,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     >
       <div className="flex flex-col sm:flex-row sm:gap-6 gap-2 h-full">
         {/* Left Column - Controls */}
-        <div className="space-y-2.5 overflow-y-auto narrow-scrollbar md:pr-2 w-full">
+        <div className="space-y-2.5 overflow-y-auto narrow-scrollbar md:pr-2 w-full sm:pb-4">
           <h2 className="text-xl font-bold text-white">
             {isEditMode
               ? t('widgets.themes.editTheme')
@@ -647,7 +923,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     onDragLeave={handleDragOut}
                     onDragOver={handleDrag}
                     onDrop={handleDrop}
-                    className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-md p-4 cursor-pointer transition-colors ${
+                    className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-md p-3 cursor-pointer transition-colors ${
                       isDragOver
                         ? 'border-white bg-primary-700/50'
                         : 'border-white/40'
@@ -668,7 +944,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     </p>
                     <Button
                       variant="tertiary"
-                      className="w-fit pointer-events-auto text-sm !py-1"
+                      className="w-fit pointer-events-auto text-sm !py-1.5"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {t('common.browse')}
@@ -876,6 +1152,123 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               onChange={setOverrides}
               douzePointsAnimationMode={douzePointsAnimationMode}
             />
+          </CollapsibleSection>
+
+          {/* Main */}
+          <CollapsibleSection
+            title={t('widgets.themes.soundEffects')}
+            defaultExpanded
+          >
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-white/60">
+                {t('widgets.themes.soundEffectsHint')}
+              </p>
+              <div className="space-y-4">
+                {THEME_SOUND_EVENTS.map((event) => {
+                  const canPreviewSound =
+                    !!soundFiles[event] ||
+                    isValidHttpsSoundUrl(soundUrls[event]);
+
+                  return (
+                    <div
+                      key={event}
+                      className={`space-y-2 rounded-md p-1 -m-1 transition-colors ${
+                        soundDragOver === event
+                          ? 'ring-1 ring-white/60 bg-primary-700/25'
+                          : ''
+                      }`}
+                      onDragEnter={handleSoundRowDragEnter(event)}
+                      onDragLeave={handleSoundRowDragLeave(event)}
+                      onDragOver={handleSoundDrag}
+                      onDrop={handleSoundRowDrop(event)}
+                    >
+                      <h5 className="text-sm font-medium text-white">
+                        {t(`widgets.themes.${THEME_SOUND_LABEL_KEYS[event]}`)}
+                      </h5>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <input
+                          id={`theme-sound-file-${event}`}
+                          type="file"
+                          accept="audio/mpeg,audio/mp3,audio/webm,audio/ogg,audio/wav,.mp3,.webm,.ogg,.wav"
+                          className="hidden"
+                          onChange={(e) =>
+                            handleSoundFilePick(
+                              event,
+                              e.target.files?.[0] ?? null,
+                            )
+                          }
+                        />
+                        <Input
+                          type="text"
+                          value={
+                            soundFiles[event]
+                              ? soundFiles[event]!.name
+                              : soundUrls[event]
+                          }
+                          onChange={(e) => {
+                            if (soundPreviewState?.event === event) {
+                              stopSoundPreview();
+                            }
+                            setSoundUrls((p) => ({
+                              ...p,
+                              [event]: e.target.value,
+                            }));
+                            setSoundFiles((p) => ({ ...p, [event]: null }));
+                          }}
+                          placeholder={t('widgets.themes.soundUrl')}
+                          disabled={!!soundFiles[event]}
+                          className="w-full md:w-auto md:flex-1"
+                        />
+                        <span className="text-sm text-white/90 font-medium lowercase">
+                          {t('common.or')}
+                        </span>
+
+                        <Button
+                          variant="tertiary"
+                          className="md:h-[40px] h-[35px] md:!px-3 flex-1 md:flex-none justify-center"
+                          onClick={() =>
+                            document
+                              .getElementById(`theme-sound-file-${event}`)
+                              ?.click()
+                          }
+                          Icon={<UploadIcon className="w-5 h-5" />}
+                          label={t('common.upload')}
+                        />
+
+                        <Button
+                          onClick={() => toggleSoundPreview(event)}
+                          disabled={!canPreviewSound}
+                          title={t('widgets.themes.previewSound')}
+                          aria-label={t('widgets.themes.previewSound')}
+                          className="md:h-[40px] h-[35px] !px-3"
+                          Icon={
+                            soundPreviewState?.event === event &&
+                            !soundPreviewState.paused ? (
+                              <Pause className="w-5 h-5" />
+                            ) : (
+                              <Play className="w-5 h-5" />
+                            )
+                          }
+                        />
+                        <Button
+                          variant="destructive"
+                          className="md:h-[40px] h-[35px] !px-3"
+                          onClick={() => {
+                            if (soundPreviewState?.event === event) {
+                              stopSoundPreview();
+                            }
+                            setSoundUrls((p) => ({ ...p, [event]: '' }));
+                            setSoundFiles((p) => ({ ...p, [event]: null }));
+                          }}
+                          Icon={<TrashIcon className="w-5 h-5" />}
+                          disabled={!canPreviewSound}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </CollapsibleSection>
         </div>
 

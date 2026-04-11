@@ -8,12 +8,17 @@ import { RangeSlider } from '../common/RangeSlider';
 import { BgImageSelect } from './BgImageSelect';
 import { LanguageSelector } from './LanguageSelector';
 
+import { InfoIcon } from '@/assets/icons/InfoIcon';
+import { customThemeHasSimulationBackground } from '@/theme/customThemeHasAudio';
+
 export const UIPreferencesSettings: React.FC = () => {
   const t = useTranslations('settings.ui');
   const settings = useGeneralStore((state) => state.settings);
+  const customTheme = useGeneralStore((state) => state.customTheme);
   const setSettings = useGeneralStore((state) => state.setSettings);
 
   const isFullScreenSupported = document.fullscreenEnabled;
+  const hasSimBg = customThemeHasSimulationBackground(customTheme);
 
   return (
     <>
@@ -98,6 +103,7 @@ export const UIPreferencesSettings: React.FC = () => {
           })
         }
       />
+
       <BgImageSelect />
 
       <Checkbox
@@ -125,6 +131,65 @@ export const UIPreferencesSettings: React.FC = () => {
           maxLabel={t('high')}
         />
       )}
+
+      <div className="sm:col-span-2">
+        <h3 className="text-sm text-white font-medium middle-line after:bg-primary-800 before:bg-primary-800 my-1">
+          {t('audioPreferences')}
+        </h3>
+        <p className="text-sm text-white/60 flex items-center gap-1">
+          <InfoIcon className="size-4" /> {t('audioPreferencesHint')}
+        </p>
+        <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
+          <Checkbox
+            id="disable-all-theme-audio"
+            labelClassName="w-full"
+            label={t('disableAllThemeAudio')}
+            checked={settings.disableAllThemeAudio}
+            onChange={(e) =>
+              setSettings({ disableAllThemeAudio: e.target.checked })
+            }
+          />
+          <Checkbox
+            id="hide-theme-sound-volume-hud"
+            labelClassName="w-full"
+            label={t('hideThemeSoundVolumeHud')}
+            checked={settings.hideThemeSoundVolumeHud}
+            onChange={(e) =>
+              setSettings({ hideThemeSoundVolumeHud: e.target.checked })
+            }
+          />
+
+          <RangeSlider
+            containerClassName="ml-2 sm:pr-0 pr-2 [&>label]:mb-0"
+            id="theme-sound-volume"
+            label={t('themeSoundVolume')}
+            value={settings.themeSoundVolume}
+            onChange={(value) => setSettings({ themeSoundVolume: value })}
+            min={0}
+            max={100}
+            step={1}
+            displayValue
+            minLabel="0%"
+            maxLabel="100%"
+          />
+
+          {hasSimBg && (
+            <RangeSlider
+              containerClassName="ml-2 sm:pr-0 pr-2 [&>label]:mb-0"
+              id="theme-ambience-volume"
+              label={t('themeAmbienceVolume')}
+              value={settings.themeAmbienceVolume}
+              onChange={(value) => setSettings({ themeAmbienceVolume: value })}
+              min={0}
+              max={100}
+              step={1}
+              displayValue
+              minLabel="0%"
+              maxLabel="100%"
+            />
+          )}
+        </div>
+      </div>
     </>
   );
 };

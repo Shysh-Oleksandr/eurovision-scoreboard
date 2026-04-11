@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 import { useRouter } from 'next/navigation';
 
+import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
@@ -109,5 +110,5 @@ export default function AppBootstrap() {
     })();
   }, [user?.preferredLocale, router]);
 
-  return null;
+  return <ThemeSoundVolumeHud />;
 }

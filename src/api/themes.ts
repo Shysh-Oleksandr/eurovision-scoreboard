@@ -10,6 +10,7 @@ import type {
   ThemeState,
 } from '@/types/customTheme';
 import { FlagShape, PointsContainerShape } from '@/theme/types';
+import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 
 export type CreateThemeInput = {
   name: string;
@@ -28,6 +29,7 @@ export type CreateThemeInput = {
   usePointsCountUpAnimation?: boolean;
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
+  themeSounds?: Record<string, { url: string } | null>;
 };
 
 export type UpdateThemeInput = {
@@ -47,6 +49,7 @@ export type UpdateThemeInput = {
   usePointsCountUpAnimation?: boolean | null;
   boardAnimationMode?: BoardAnimationMode | null;
   douzePointsAnimationMode?: DouzePointsAnimationMode | null;
+  themeSounds?: Record<string, { url: string } | null>;
 };
 
 export type PublicThemesQueryParams = {
@@ -56,6 +59,8 @@ export type PublicThemesQueryParams = {
   sortOrder?: 'asc' | 'desc';
   startDate?: string;
   endDate?: string;
+  /** When true, only themes with custom audio (server flag). */
+  hasCustomAudio?: boolean;
   enabled?: boolean;
 };
 
@@ -77,6 +82,7 @@ export function usePublicThemesQuery({
   sortOrder = 'desc',
   startDate,
   endDate,
+  hasCustomAudio,
   enabled = true,
 }: PublicThemesQueryParams) {
   return useQuery<ThemeListResponse>({
@@ -87,6 +93,7 @@ export function usePublicThemesQuery({
       sortOrder,
       startDate,
       endDate,
+      hasCustomAudio,
     }),
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -97,6 +104,7 @@ export function usePublicThemesQuery({
       params.append('sortOrder', sortOrder);
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
+      if (hasCustomAudio === true) params.append('hasCustomAudio', 'true');
 
       const { data } = await api.get(`/themes/public?${params.toString()}`);
       return data as ThemeListResponse;
@@ -167,6 +175,35 @@ export function useUploadThemeBackgroundMutation() {
       const { data } = await api.post(`/themes/${id}/background`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+      return data as CustomTheme;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+    },
+  });
+}
+
+export function useUploadThemeSoundMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      eventId,
+      file,
+    }: {
+      id: string;
+      eventId: ThemeSoundEventId;
+      file: File;
+    }) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const { data } = await api.post(
+        `/themes/${id}/sounds/${eventId}`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
       return data as CustomTheme;
     },
     onSuccess: () => {

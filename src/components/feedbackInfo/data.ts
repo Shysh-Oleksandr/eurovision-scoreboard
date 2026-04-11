@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-04-11',
+    title:
+      'Sound effects support for custom themes',
+  },
+  {
     date: '2026-04-09',
     title:
       'Added the split screen qualifier reveal mode (ESC 2025 format). To use it, enable "Pick qualifiers without awarding points" in the settings and then enable "Enable split screen qualifier reveal mode".',

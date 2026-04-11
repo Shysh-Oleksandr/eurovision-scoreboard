@@ -1,4 +1,4 @@
-import { Share2 } from 'lucide-react';
+import { Share2, Volume1 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -119,7 +119,12 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           )}
           <h3 className="text-white font-semibold text-l mb-1">
             <div className="flex items-center justify-between flex-wrap gap-1.5">
-              <span className="">{theme.name}</span>
+              <span className="flex items-center gap-1.5">
+                {theme.name}
+                <span className="text-xs text-white/60">
+                  {theme.hasCustomAudio ? <Volume1 className="size-4" /> : null}
+                </span>
+              </span>
 
               <span className="text-xs text-white/60">
                 {new Date(theme.createdAt).toLocaleDateString(locale, {

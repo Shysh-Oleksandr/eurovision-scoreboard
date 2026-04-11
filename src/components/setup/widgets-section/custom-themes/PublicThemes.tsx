@@ -10,6 +10,7 @@ import ThemeListItem from './ThemeListItem';
 
 import { usePublicThemesQuery, useThemesStateQuery } from '@/api/themes';
 import Button from '@/components/common/Button';
+import { Checkbox } from '@/components/common/Checkbox';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
@@ -32,7 +33,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
-
+  const [hasCustomAudio, setHasCustomAudio] = useState(false);
   const debouncedSearch = useDebounce(search, 400);
 
   const serverSortBy =
@@ -52,6 +53,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     sortOrder: serverSortOrder,
     startDate: dateRange?.startDate,
     endDate: dateRange?.endDate,
+    hasCustomAudio,
   });
 
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
@@ -91,9 +93,21 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
           }}
         />
       </div>
-      <h3 className="text-white text-lg font-bold">
-        {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
-      </h3>
+      <div className="flex items-center gap-x-2 justify-between flex-wrap">
+        <h3 className="text-white text-lg font-bold">
+          {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
+        </h3>
+        <Checkbox
+          id="public-themes-audio-filter"
+          label={t('widgets.themes.audioFilterWithAudio')}
+          checked={hasCustomAudio}
+          onChange={(v) => {
+            setHasCustomAudio(v.target.checked);
+            setPage(1);
+          }}
+          labelClassName="!mr-0"
+        />
+      </div>
 
       {isLoading ? (
         <div className="text-center sm:py-12 py-8">

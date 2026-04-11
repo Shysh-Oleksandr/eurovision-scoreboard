@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
+import { cn } from '@/helpers/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import usePrevious from '@/hooks/usePrevious';
 
@@ -15,6 +16,7 @@ interface RangeSliderProps {
   delay?: number;
   step?: number;
   displayValue?: boolean;
+  containerClassName?: string;
 }
 
 export const RangeSlider: React.FC<RangeSliderProps> = ({
@@ -29,6 +31,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   delay = 400,
   step,
   displayValue = true,
+  containerClassName = '',
 }) => {
   const [internalValue, setInternalValue] = useState(value);
   const debouncedValue = useDebounce(internalValue, delay);
@@ -51,7 +54,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   const progress = ((internalValue - min) / (max - min)) * 100;
 
   return (
-    <div className="w-full">
+    <div className={cn('w-full', containerClassName)}>
       {label && (
         <label
           htmlFor={id}

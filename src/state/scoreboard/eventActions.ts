@@ -4,6 +4,7 @@ import { EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 
 import { useGeneralStore } from '../generalStore';
+import { playThemeSound } from '@/theme/playThemeSound';
 import {
   createCountriesComparator,
   getLastCountryCodeByPoints,
@@ -108,6 +109,8 @@ export const createEventActions: StateCreator<
       splitScreenQualifierShownCountByStage: {},
       splitScreenQualifierLastShownByStage: {},
     });
+
+    playThemeSound('stageStart');
   },
 
   // Needed to display correct countries for post setup modals
@@ -321,6 +324,8 @@ export const createEventActions: StateCreator<
       splitScreenQualifierShownCountByStage: {},
       splitScreenQualifierLastShownByStage: {},
     });
+
+    playThemeSound('stageStart');
   },
   closeQualificationResults: () => {
     set({

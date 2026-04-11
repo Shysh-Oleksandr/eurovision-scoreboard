@@ -12,6 +12,7 @@ import { getFlagPath } from '@/helpers/getFlagPath';
 import { cn } from '@/helpers/utils';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import { playThemeSound } from '@/theme/playThemeSound';
 
 const CLOSE_ANIMATION_DELAY_MS = 150;
 
@@ -58,6 +59,10 @@ const SplitScreenQualifierModal = () => {
         );
 
         if (candidateItems.length === 0) return;
+
+        setTimeout(() => {
+          playThemeSound('qualifierReveal');
+        }, 100);
 
         const rowTolerancePx = 12;
         const orderedItems = [...candidateItems].sort((a, b) => {

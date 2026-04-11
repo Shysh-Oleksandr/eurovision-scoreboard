@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useEffect } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';
@@ -13,6 +14,10 @@ import { SimulationHeader } from './SimulationHeader';
 import { StageId } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import {
+  stopSimulationBackgroundThemeSound,
+  syncSimulationBackgroundThemeSound,
+} from '@/theme/simulationBackgroundThemeSound';
 
 const QualificationResultsModal = dynamic(
   () => import('./qualification/QualificationResultsModal'),
@@ -58,6 +63,30 @@ const Simulation = () => {
 
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const themeAmbienceVolume = useGeneralStore(
+    (state) => state.settings.themeAmbienceVolume,
+  );
+  const disableAllThemeAudio = useGeneralStore(
+    (state) => state.settings.disableAllThemeAudio,
+  );
+  const simulationBackgroundUrl = useGeneralStore(
+    (state) => state.customTheme?.themeSounds?.simulationBackground?.url,
+  );
+
+  useEffect(() => {
+    syncSimulationBackgroundThemeSound(eventStages.length > 0);
+  }, [
+    eventStages.length,
+    themeAmbienceVolume,
+    simulationBackgroundUrl,
+    disableAllThemeAudio,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      stopSimulationBackgroundThemeSound();
+    };
+  }, []);
 
   const currentStage = getCurrentStage();
 

@@ -10,6 +10,7 @@ import {
   getSpecialBackgroundStyle,
 } from '@/components/countryItem/utils/gradientUtils';
 import { useGeneralStore } from '@/state/generalStore';
+import { playThemeSound } from '@/theme/playThemeSound';
 import { DEFAULT_THEME_SPECIFICS } from '@/theme/themeSpecifics';
 import { DouzePointsAnimationMode, FlagShape } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -140,6 +141,8 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
         return;
       }
 
+      playThemeSound('douzePoints', { skip: isThemePreview });
+
       gsap.killTweensOf(hearts);
       gsap.set(hearts, {
         scale: 0,
@@ -217,7 +220,7 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
     },
     {
       scope: refs.containerRef,
-      dependencies: [columns, heartsCount],
+      dependencies: [columns, heartsCount, isThemePreview],
     },
   );
 

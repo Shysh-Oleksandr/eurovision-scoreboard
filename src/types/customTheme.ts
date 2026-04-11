@@ -5,6 +5,7 @@ import {
   PointsContainerShape,
   ThemeSpecifics,
 } from '@/theme/types';
+import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 
 export type { BoardAnimationMode, DouzePointsAnimationMode };
 
@@ -23,6 +24,10 @@ export interface CustomTheme {
   overrides: Record<string, string>;
   backgroundImageUrl?: string;
   backgroundImageKey?: string;
+  themeSounds?: Partial<
+    Record<ThemeSoundEventId, { url: string; key?: string }>
+  >;
+  hasCustomAudio?: boolean;
   pointsContainerShape?: PointsContainerShape;
   uppercaseEntryName?: boolean;
   juryActivePointsUnderline?: boolean;

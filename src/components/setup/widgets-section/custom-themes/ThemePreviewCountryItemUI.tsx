@@ -97,6 +97,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     isDouzePoints: showDouzePointsAnimation,
     douzePointsRefs,
     douzePointsAnimationModeOverride: douzePointsAnimationMode,
+    isThemePreview: true,
   });
 
   // Mock country

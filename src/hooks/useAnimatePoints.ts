@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 
 import { DouzePointsAnimationMode } from '@/theme/types';
+import { playThemeSound } from '@/theme/playThemeSound';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 type ReturnType = {
@@ -16,6 +17,7 @@ const useAnimatePoints = ({
   isDouzePoints,
   douzePointsRefs,
   douzePointsAnimationModeOverride,
+  isThemePreview = false,
 }: {
   shouldShowLastPoints: boolean;
   isDouzePoints: boolean;
@@ -25,6 +27,8 @@ const useAnimatePoints = ({
     parallelogramYellowRef: React.RefObject<HTMLDivElement | null>;
   } | null;
   douzePointsAnimationModeOverride?: DouzePointsAnimationMode;
+  /** When true, skip custom theme sounds (e.g. customize-theme modal preview). */
+  isThemePreview?: boolean;
 }): ReturnType => {
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
@@ -49,6 +53,7 @@ const useAnimatePoints = ({
       }
 
       if (isDouzePoints) {
+        playThemeSound('douzePoints', { skip: isThemePreview });
         gsap.to(containerRef.current, {
           opacity: 1,
           duration: 0.4,
@@ -101,6 +106,7 @@ const useAnimatePoints = ({
         isDouzePoints,
         douzePointsRefs,
         resolvedDouzePointsAnimationMode,
+        isThemePreview,
       ],
       scope: douzePointsRefs?.containerRef,
     },

@@ -57,6 +57,7 @@ export const queryKeys = {
       sortOrder?: string;
       startDate?: string;
       endDate?: string;
+      hasCustomAudio?: boolean;
     }) => ['public', 'themes', filters] as const,
     contests: (filters: {
       page?: number;
