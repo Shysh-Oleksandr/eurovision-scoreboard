@@ -11,6 +11,7 @@ import { getSpecialColorStyle } from '@/helpers/colorConversion';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import useAnimatePoints from '@/hooks/useAnimatePoints';
 import { Country } from '@/models';
+import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import {
   DouzePointsAnimationMode,
@@ -59,7 +60,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   douzePointsAnimationMode = 'heartsGrid',
 }) => {
   const { user } = useAuthStore();
-
+  const enableMinimalisticFlags = useGeneralStore(
+    (s) => s.settings.enableMinimalisticFlags,
+  );
   const previewCountry = useMemo(() => {
     return ALL_COUNTRIES.find(
       (country) =>
@@ -104,7 +107,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   const mockCountry: Country = {
     code: previewCountry.code,
     name: previewCountry.name,
-    flag: getFlagPath(previewCountry, flagShape),
+    flag: getFlagPath(previewCountry, flagShape, enableMinimalisticFlags),
     points,
     juryPoints: 0,
     televotePoints: 0,

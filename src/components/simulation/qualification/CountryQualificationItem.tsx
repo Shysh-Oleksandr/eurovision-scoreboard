@@ -32,7 +32,9 @@ export const CountryQualificationItem: React.FC<
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
   const { uppercaseEntryName, flagShape } = useThemeSpecifics();
   const getCurrentStage = useScoreboardStore((s) => s.getCurrentStage);
-
+  const enableMinimalisticFlags = useGeneralStore(
+    (s) => s.settings.enableMinimalisticFlags,
+  );
   const itemRef = useRef<HTMLDivElement>(null);
 
   const itemClassName =
@@ -94,7 +96,7 @@ export const CountryQualificationItem: React.FC<
             : () => (
                 <img
                   loading="lazy"
-                  src={getFlagPath(country, flagShape)}
+                  src={getFlagPath(country, flagShape, enableMinimalisticFlags)}
                   onError={(e) =>
                     handleFlagError(e.currentTarget, country, flagShape)
                   }

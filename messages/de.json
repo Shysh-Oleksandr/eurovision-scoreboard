@@ -731,6 +731,7 @@
       "showJuryVotingProgressBar": "Jury-Fortschrittsbalken anzeigen",
       "imageSizeIsPrettyLarge": "Die Bildgröße ist ziemlich groß ({size}MB). Das kann die Simulation verlangsamen. Möchtest du trotzdem fortfahren?",
       "language": "Sprache",
+      "enableMinimalisticFlags": "Minimalistische Flaggen aktivieren",
       "enableWinterEffects": "Winter-Effekte aktivieren",
       "snowFallIntensity": "Schneefall-Intensität",
       "low": "Niedrig",

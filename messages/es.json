@@ -731,6 +731,7 @@
       "showJuryVotingProgressBar": "Mostrar barra de progreso del jurado",
       "imageSizeIsPrettyLarge": "El tamaño de la imagen es bastante grande ({size}MB). Esto puede ralentizar la simulación, así que quizá prefieras comprimirla o usar una imagen más pequeña. ¿Quieres continuar con esta imagen?",
       "language": "Idioma",
+      "enableMinimalisticFlags": "Activar banderas minimalistas",
       "enableWinterEffects": "Activar efectos de invierno",
       "snowFallIntensity": "Intensidad de la nieve",
       "low": "Bajo",

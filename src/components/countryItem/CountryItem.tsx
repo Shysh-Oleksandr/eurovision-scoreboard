@@ -46,6 +46,9 @@ const CountryItem = ({
   const alwaysShowRankings = useGeneralStore(
     (state) => state.settings.alwaysShowRankings,
   );
+  const enableMinimalisticFlags = useGeneralStore(
+    (s) => s.settings.enableMinimalisticFlags,
+  );
 
   const scoreboardMobileLayout = useGeneralStore(
     (s) => s.presentationSettings.scoreboardMobileLayout,
@@ -187,7 +190,7 @@ const CountryItem = ({
         flagShape !== 'none'
           ? () => (
               <img
-                src={getFlagPath(country, flagShape)}
+                src={getFlagPath(country, flagShape, enableMinimalisticFlags)}
                 onError={(e) =>
                   handleFlagError(e.currentTarget, country, flagShape)
                 }

@@ -80,6 +80,7 @@ const DEFAULT_SETTINGS: Settings = {
   themeAmbienceVolume: 100,
   hideThemeSoundVolumeHud: false,
   disableAllThemeAudio: false,
+  enableMinimalisticFlags: false,
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -160,6 +161,7 @@ interface Settings {
   themeAmbienceVolume: number;
   hideThemeSoundVolumeHud: boolean;
   disableAllThemeAudio: boolean;
+  enableMinimalisticFlags: boolean;
 }
 
 interface PresentationSettings {

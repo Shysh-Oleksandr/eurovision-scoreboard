@@ -124,6 +124,9 @@ const ShareCountryItem: React.FC<Props> = ({
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
   const { uppercaseEntryName, pointsContainerShape, flagShape } =
     useThemeSpecifics();
+  const enableMinimalisticFlags = useGeneralStore(
+    (s) => s.settings.enableMinimalisticFlags,
+  );
   const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
     overrides,
@@ -267,7 +270,11 @@ const ShareCountryItem: React.FC<Props> = ({
           : () => (
               <img
                 loading="lazy"
-                src={getFlagPathForImageGeneration(country, flagShape)}
+                src={getFlagPathForImageGeneration(
+                  country,
+                  flagShape,
+                  enableMinimalisticFlags,
+                )}
                 onError={(e) =>
                   handleFlagError(e.currentTarget, country, flagShape)
                 }

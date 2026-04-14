@@ -107,6 +107,16 @@ export const UIPreferencesSettings: React.FC = () => {
       <BgImageSelect />
 
       <Checkbox
+        id="enable-minimalistic-flags"
+        labelClassName="w-full"
+        label={t('enableMinimalisticFlags')}
+        checked={settings.enableMinimalisticFlags}
+        onChange={(e) =>
+          setSettings({ enableMinimalisticFlags: e.target.checked })
+        }
+      />
+
+      <Checkbox
         id="enable-winter-effects"
         labelClassName="w-full"
         label={t('enableWinterEffects')}

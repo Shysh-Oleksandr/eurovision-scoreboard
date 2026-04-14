@@ -244,9 +244,12 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-04-14',
+    title: 'Added the option to enable minimalistic round and square flags',
+  },
+  {
     date: '2026-04-11',
-    title:
-      'Sound effects support for custom themes',
+    title: 'Sound effects support for custom themes',
   },
   {
     date: '2026-04-09',
