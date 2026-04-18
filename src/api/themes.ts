@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
@@ -6,6 +11,7 @@ import type {
   BoardAnimationMode,
   CustomTheme,
   DouzePointsAnimationMode,
+  ThemeGroupSummary,
   ThemeListResponse,
   ThemeState,
 } from '@/types/customTheme';
@@ -30,6 +36,7 @@ export type CreateThemeInput = {
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
+  groupId?: string;
 };
 
 export type UpdateThemeInput = {
@@ -50,6 +57,7 @@ export type UpdateThemeInput = {
   boardAnimationMode?: BoardAnimationMode | null;
   douzePointsAnimationMode?: DouzePointsAnimationMode | null;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
+  groupId?: string | null;
 };
 
 export type PublicThemesQueryParams = {
@@ -64,14 +72,108 @@ export type PublicThemesQueryParams = {
   enabled?: boolean;
 };
 
-export function useMyThemesQuery(enabled: boolean = true) {
-  return useQuery<CustomTheme[]>({
-    queryKey: queryKeys.user.themes(),
+export type MyThemesListQueryParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: 'createdAt' | 'likes' | 'saves' | 'duplicatesCount';
+  sortOrder?: 'asc' | 'desc';
+  startDate?: string;
+  endDate?: string;
+  hasCustomAudio?: boolean;
+  /** Passed to GET /themes/me only */
+  groupId?: string;
+  enabled?: boolean;
+};
+
+export type ThemeGroup = ThemeGroupSummary & {
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+function buildThemesListQueryParams(
+  params: Omit<MyThemesListQueryParams, 'enabled'>,
+) {
+  const searchParams = new URLSearchParams();
+  searchParams.append('page', (params.page ?? 1).toString());
+  searchParams.append('limit', (params.limit ?? 10).toString());
+  if (params.search) searchParams.append('search', params.search);
+  searchParams.append('sortBy', params.sortBy ?? 'createdAt');
+  searchParams.append('sortOrder', params.sortOrder ?? 'desc');
+  if (params.startDate) searchParams.append('startDate', params.startDate);
+  if (params.endDate) searchParams.append('endDate', params.endDate);
+  if (params.hasCustomAudio === true) {
+    searchParams.append('hasCustomAudio', 'true');
+  }
+  if (params.groupId) searchParams.append('groupId', params.groupId);
+  return searchParams.toString();
+}
+
+export function useMyThemesListQuery({
+  page = 1,
+  limit = 10,
+  search,
+  sortBy = 'createdAt',
+  sortOrder = 'desc',
+  startDate,
+  endDate,
+  hasCustomAudio,
+  groupId,
+  enabled = true,
+}: MyThemesListQueryParams) {
+  const filters = {
+    page,
+    limit,
+    search: search || undefined,
+    sortBy,
+    sortOrder,
+    startDate,
+    endDate,
+    hasCustomAudio,
+    groupId,
+  };
+  return useQuery<ThemeListResponse>({
+    queryKey: queryKeys.user.themesMeList(filters),
     queryFn: async () => {
-      const { data } = await api.get('/themes/me');
-      return data as CustomTheme[];
+      const qs = buildThemesListQueryParams(filters);
+      const { data } = await api.get(`/themes/me?${qs}`);
+      return data as ThemeListResponse;
     },
     enabled,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useSavedThemesListQuery({
+  page = 1,
+  limit = 10,
+  search,
+  sortBy = 'createdAt',
+  sortOrder = 'desc',
+  startDate,
+  endDate,
+  hasCustomAudio,
+  enabled = true,
+}: MyThemesListQueryParams) {
+  const filters = {
+    page,
+    limit,
+    search: search || undefined,
+    sortBy,
+    sortOrder,
+    startDate,
+    endDate,
+    hasCustomAudio,
+  };
+  return useQuery<ThemeListResponse>({
+    queryKey: queryKeys.user.savedThemesList(filters),
+    queryFn: async () => {
+      const qs = buildThemesListQueryParams(filters);
+      const { data } = await api.get(`/themes/me/saved?${qs}`);
+      return data as ThemeListResponse;
+    },
+    enabled,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -124,6 +226,59 @@ export function useThemeByIdQuery(id: string, enabled: boolean = true) {
   });
 }
 
+export function useThemeGroupsQuery(enabled = true) {
+  return useQuery<ThemeGroup[]>({
+    queryKey: queryKeys.user.themeGroups(),
+    queryFn: async () => {
+      const { data } = await api.get('/themes/groups');
+      return data as ThemeGroup[];
+    },
+    enabled,
+  });
+}
+
+export function useCreateThemeGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { name: string }) => {
+      const { data } = await api.post('/themes/groups', input);
+      return data as ThemeGroup;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.themeGroups() });
+    },
+  });
+}
+
+export function useUpdateThemeGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      const { data } = await api.patch(`/themes/groups/${id}`, { name });
+      return data as ThemeGroup;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.themeGroups() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+    },
+  });
+}
+
+export function useDeleteThemeGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/themes/groups/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.themeGroups() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+    },
+  });
+}
+
 export function useCreateThemeMutation() {
   const qc = useQueryClient();
   return useMutation({
@@ -150,6 +305,7 @@ export function useUpdateThemeMutation() {
         qc.setQueryData(queryKeys.user.themeById((variables as any).id), data);
       }
       qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
     },
   });
 }
@@ -162,6 +318,7 @@ export function useDeleteThemeMutation() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
     },
   });
 }
@@ -179,6 +336,7 @@ export function useUploadThemeBackgroundMutation() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
     },
   });
 }
@@ -208,6 +366,7 @@ export function useUploadThemeSoundMutation() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
     },
   });
 }
@@ -250,6 +409,8 @@ export function useToggleLikeThemeMutation() {
 
       // Refresh user-specific like/save state (small payload)
       qc.invalidateQueries({ queryKey: ['user', 'themes-state'] });
+      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
     },
   });
 }
@@ -284,17 +445,6 @@ export function useToggleSaveThemeMutation() {
   });
 }
 
-export function useSavedThemesQuery(enabled: boolean = true) {
-  return useQuery<CustomTheme[]>({
-    queryKey: queryKeys.user.savedThemes(),
-    queryFn: async () => {
-      const { data } = await api.get('/themes/me/saved');
-      return data as CustomTheme[];
-    },
-    enabled,
-  });
-}
-
 export function useThemesStateQuery(ids: string[], enabled: boolean = true) {
   return useQuery<ThemeState>({
     queryKey: queryKeys.user.themesState(ids),
@@ -321,6 +471,34 @@ export function useReportThemeDuplicateMutation() {
       });
       for (const [key, data] of queries) {
         if (!data) continue;
+        const updated = {
+          ...data,
+          themes: data.themes.map((t) =>
+            t._id === id ? { ...t, duplicatesCount: res.duplicatesCount } : t,
+          ),
+        };
+        qc.setQueryData(key, updated);
+      }
+
+      const userListQueries = qc.getQueriesData<ThemeListResponse>({
+        queryKey: queryKeys.user.themes(),
+      });
+      for (const [key, data] of userListQueries) {
+        if (!data?.themes) continue;
+        const updated = {
+          ...data,
+          themes: data.themes.map((t) =>
+            t._id === id ? { ...t, duplicatesCount: res.duplicatesCount } : t,
+          ),
+        };
+        qc.setQueryData(key, updated);
+      }
+
+      const savedListQueries = qc.getQueriesData<ThemeListResponse>({
+        queryKey: queryKeys.user.savedThemes(),
+      });
+      for (const [key, data] of savedListQueries) {
+        if (!data?.themes) continue;
         const updated = {
           ...data,
           themes: data.themes.map((t) =>

@@ -9,11 +9,18 @@ import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 
 export type { BoardAnimationMode, DouzePointsAnimationMode };
 
+export interface ThemeGroupSummary {
+  _id: string;
+  name: string;
+}
+
 export interface CustomTheme {
   _id: string;
   name: string;
   description?: string;
   userId: string;
+  groupId?: string;
+  group?: ThemeGroupSummary | null;
   isPublic: boolean;
   likes: number;
   saves: number;

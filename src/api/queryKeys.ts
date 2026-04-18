@@ -9,14 +9,62 @@ export const queryKeys = {
     profile: () => ['user', 'profile'] as const,
     customEntries: () => ['user', 'custom-entries'] as const,
     customEntryGroups: () => ['user', 'custom-entry-groups'] as const,
+    /** Prefix for invalidating all current-user theme list queries */
     themes: () => ['user', 'themes'] as const,
+    themeGroups: () => ['user', 'theme-groups'] as const,
+    themesMeList: (filters: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+      hasCustomAudio?: boolean;
+      groupId?: string;
+    }) => ['user', 'themes', 'me', filters] as const,
     themeById: (id: string) => ['user', 'theme', id] as const,
+    /** Prefix for invalidating all saved-theme list queries */
     savedThemes: () => ['user', 'saved-themes'] as const,
+    savedThemesList: (filters: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+      hasCustomAudio?: boolean;
+    }) => ['user', 'saved-themes', filters] as const,
     themesState: (ids: string[]) =>
       ['user', 'themes-state', { ids: [...ids].sort() }] as const,
+    /** Prefix for invalidating all current-user contest list queries */
     contests: () => ['user', 'contests'] as const,
+    contestGroups: () => ['user', 'contest-groups'] as const,
+    contestsMeList: (filters: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+      year?: number;
+      groupId?: string;
+    }) => ['user', 'contests', 'me', filters] as const,
     contestById: (id: string) => ['user', 'contest', id] as const,
+    /** Prefix for invalidating all saved-contest list queries */
     savedContests: () => ['user', 'saved-contests'] as const,
+    savedContestsList: (filters: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+      year?: number;
+    }) => ['user', 'saved-contests', filters] as const,
     contestsState: (ids: string[]) =>
       ['user', 'contests-state', { ids: [...ids].sort() }] as const,
     entryStats: (entryCode: string) =>
@@ -112,7 +160,11 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.customEntries(),
   queryKeys.user.customEntryGroups(),
   queryKeys.user.themes(),
+  queryKeys.user.savedThemes(),
+  queryKeys.user.themeGroups(),
   queryKeys.user.contests(),
+  queryKeys.user.savedContests(),
+  queryKeys.user.contestGroups(),
   ['user', 'entry-stats'] as const,
   queryKeys.follows.followingFeed({}),
   queryKeys.legacy.meProfile(),

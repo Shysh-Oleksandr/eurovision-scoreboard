@@ -3,11 +3,12 @@ import React from 'react';
 import { cn } from '@/helpers/utils';
 
 type BadgeProps = {
-  label: string;
+  label?: string;
   onClick: () => void;
   isActive: boolean;
   Icon?: React.ReactNode;
   className?: string;
+  children?: React.ReactNode;
 };
 
 const Badge: React.FC<BadgeProps> = ({
@@ -16,6 +17,7 @@ const Badge: React.FC<BadgeProps> = ({
   isActive,
   Icon,
   className = '',
+  children,
 }) => (
   <button
     onClick={onClick}
@@ -30,6 +32,7 @@ const Badge: React.FC<BadgeProps> = ({
   >
     {Icon}
     {label}
+    {children}
   </button>
 );
 

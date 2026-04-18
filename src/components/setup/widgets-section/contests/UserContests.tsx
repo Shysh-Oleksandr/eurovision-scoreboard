@@ -1,22 +1,27 @@
 import { ChartColumn, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
+import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
 import ContestListItem from './ContestListItem';
 
 import {
+  useContestGroupsQuery,
   useContestsStateQuery,
+  useCreateContestGroupMutation,
+  useDeleteContestGroupMutation,
   useDeleteContestMutation,
-  useMyContestsQuery,
-  useSavedContestsQuery,
+  useMyContestsListQuery,
+  useSavedContestsListQuery,
   useToggleLikeContestMutation,
   useToggleSaveContestMutation,
+  useUpdateContestGroupMutation,
 } from '@/api/contests';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
@@ -25,7 +30,9 @@ import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
+import UserResourceGroupModal from '@/components/setup/UserResourceGroupModal';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
@@ -38,25 +45,9 @@ const CountryStatsModal = dynamic(() => import('./CountryStatsModal'), {
   ssr: false,
 });
 
-const sortContestsBy =
-  (sortKey: Exclude<PublicSortKey, 'copies'>) => (a: Contest, b: Contest) => {
-    switch (sortKey) {
-      case 'latest':
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      case 'oldest':
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      case 'likes':
-        return (b.likes ?? 0) - (a.likes ?? 0);
-      case 'saves':
-        return (b.saves ?? 0) - (a.saves ?? 0);
-      default:
-        return 0;
-    }
-  };
+const PAGE_SIZE = 10;
+
+type ContestSortKey = Exclude<PublicSortKey, 'copies'>;
 
 interface UserContestsProps {
   onLoaded?: () => void;
@@ -76,44 +67,91 @@ const UserContests: React.FC<UserContestsProps> = ({
   const setActiveContest = useGeneralStore((state) => state.setActiveContest);
 
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] =
-    useState<Exclude<PublicSortKey, 'copies'>>('latest');
+  const [sortKey, setSortKey] = useState<ContestSortKey>('latest');
   const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
+  const [page, setPage] = useState(1);
   const [entryStatsPickerOpen, setEntryStatsPickerOpen] = useState(false);
   const [entryStatsOpen, setEntryStatsOpen] = useState(false);
   const [entryStatsCode, setEntryStatsCode] = useState<string | null>(null);
+  const [selectedContestGroupId, setSelectedContestGroupId] = useState<
+    string | null
+  >(null);
+  const [contestGroupModalOpen, setContestGroupModalOpen] = useState(false);
+  const [contestGroupToEdit, setContestGroupToEdit] = useState<{
+    _id: string;
+    name: string;
+  } | null>(null);
 
-  const { data: contests, isLoading } = useMyContestsQuery(!!user);
-  const { data: savedContests } = useSavedContestsQuery(!!user);
+  const debouncedSearch = useDebounce(search, 400);
+
+  const serverSortBy =
+    sortKey === 'likes' ? 'likes' : sortKey === 'saves' ? 'saves' : 'createdAt';
+  const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
+
+  const { data: contestGroups = [] } = useContestGroupsQuery(
+    !!user && view === 'yours',
+  );
+
+  const { mutateAsync: createContestGroup, isPending: isCreatingContestGroup } =
+    useCreateContestGroupMutation();
+  const { mutateAsync: updateContestGroup, isPending: isUpdatingContestGroup } =
+    useUpdateContestGroupMutation();
+  const { mutateAsync: deleteContestGroup, isPending: isDeletingContestGroup } =
+    useDeleteContestGroupMutation();
+
+  useEffect(() => {
+    if (
+      selectedContestGroupId &&
+      !contestGroups.some((g) => g._id === selectedContestGroupId)
+    ) {
+      setSelectedContestGroupId(null);
+    }
+  }, [contestGroups, selectedContestGroupId]);
+
+  const myContestsQuery = useMyContestsListQuery({
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedSearch,
+    sortBy: serverSortBy,
+    sortOrder: serverSortOrder,
+    groupId: selectedContestGroupId ?? undefined,
+    enabled: !!user && view === 'yours',
+  });
+
+  const savedContestsQuery = useSavedContestsListQuery({
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedSearch,
+    sortBy: serverSortBy,
+    sortOrder: serverSortOrder,
+    enabled: !!user && view === 'saved',
+  });
+
   const { mutateAsync: deleteContest } = useDeleteContestMutation();
   const { mutateAsync: toggleSave } = useToggleSaveContestMutation();
   const { mutateAsync: toggleLike } = useToggleLikeContestMutation();
 
   const { confirm } = useConfirmation();
 
-  const filteredYours = useMemo(() => {
-    const q = search.trim().toLowerCase();
+  const listData =
+    view === 'yours'
+      ? myContestsQuery.data
+      : view === 'saved'
+      ? savedContestsQuery.data
+      : undefined;
 
-    return (contests || [])
-      .filter((c) => (!q ? true : c.name.toLowerCase().includes(q)))
-      .sort(sortContestsBy(sortKey));
-  }, [contests, search, sortKey]);
+  const isListLoading =
+    view === 'yours'
+      ? myContestsQuery.isLoading
+      : view === 'saved'
+      ? savedContestsQuery.isLoading
+      : false;
 
-  const filteredSaved = useMemo(() => {
-    const q = search.trim().toLowerCase();
+  const contestIdsForState =
+    view === 'current' && activeContest
+      ? [activeContest._id]
+      : listData?.contests.map((c) => c._id) ?? [];
 
-    return (savedContests || [])
-      .filter((c) => (!q ? true : c.name.toLowerCase().includes(q)))
-      .sort(sortContestsBy(sortKey));
-  }, [savedContests, search, sortKey]);
-
-  // Collect contest IDs for state query (current and saved views)
-  const contestIdsForState = [
-    ...(view === 'current' && activeContest ? [activeContest._id] : []),
-    ...(view === 'saved' && savedContests
-      ? savedContests.map((c) => c._id)
-      : contests?.map((c) => c._id) || []),
-  ];
   const { data: contestsState } = useContestsStateQuery(
     contestIdsForState,
     !!contestIdsForState.length && !!user,
@@ -182,13 +220,13 @@ const UserContests: React.FC<UserContestsProps> = ({
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="text-center py-8">
-        <span className="loader" />
-      </div>
-    );
-  }
+  const setViewAndResetPage = (next: 'yours' | 'saved' | 'current') => {
+    setView(next);
+    setPage(1);
+  };
+
+  const contestGroupModalSaving =
+    isCreatingContestGroup || isUpdatingContestGroup || isDeletingContestGroup;
 
   if (!user) {
     return (
@@ -201,18 +239,17 @@ const UserContests: React.FC<UserContestsProps> = ({
     );
   }
 
-  // Derived header and content per selected view
+  const total = listData?.total ?? 0;
+  const contestsOnPage = listData?.contests ?? [];
+  const totalPages = listData?.totalPages ?? 0;
+
   const headerLabel = search.trim()
-    ? t('widgets.contests.foundNContests', {
-        count: filteredYours?.length ?? 0,
-      })
+    ? t('widgets.contests.foundNContests', { count: total })
     : view === 'yours'
-    ? t('widgets.contests.youHaveNContests', {
-        count: filteredYours?.length ?? 0,
-      })
-    : t('widgets.contests.youSavedNContests', {
-        count: filteredSaved?.length ?? 0,
-      });
+    ? t('widgets.contests.youHaveNContests', { count: total })
+    : view === 'saved'
+    ? t('widgets.contests.youSavedNContests', { count: total })
+    : '';
 
   let content: React.ReactNode = null;
 
@@ -247,55 +284,90 @@ const UserContests: React.FC<UserContestsProps> = ({
         />
       </div>
     ) : null;
-  } else {
-    const list = view === 'saved' ? filteredSaved : filteredYours;
-
-    content =
-      list.length > 0 ? (
+  } else if (isListLoading) {
+    content = (
+      <div className="text-center py-8">
+        <span className="loader" />
+      </div>
+    );
+  } else if (contestsOnPage.length > 0) {
+    content = (
+      <>
         <div className="grid gap-4">
-          {list.map((contest) => (
-            <ContestListItem
-              key={contest._id}
-              contest={contest}
-              variant={view === 'yours' ? 'user' : 'public'}
-              onLoad={onLoad}
-              onEdit={view === 'yours' ? onEdit : onEdit}
-              onDelete={view === 'yours' ? handleDelete : undefined}
-              onLike={view === 'saved' ? handleLike : undefined}
-              onSave={view === 'saved' ? handleSave : undefined}
-              isActive={activeContest?._id === contest._id}
-              likedByMe={
-                view === 'saved'
-                  ? !!contestsState?.likedIds?.includes(contest._id)
-                  : undefined
-              }
-              savedByMe={
-                view === 'saved'
-                  ? !!contestsState?.savedIds?.includes(contest._id)
-                  : undefined
-              }
-              quickSelectedByMe={
-                !!contestsState?.quickSelectedIds?.includes(contest._id)
-              }
-            />
-          ))}
+          {view === 'yours'
+            ? contestsOnPage.map((contest) => (
+                <ContestListItem
+                  key={contest._id}
+                  contest={contest}
+                  variant="user"
+                  onLoad={onLoad}
+                  onEdit={onEdit}
+                  onDelete={handleDelete}
+                  isActive={activeContest?._id === contest._id}
+                  quickSelectedByMe={
+                    !!contestsState?.quickSelectedIds?.includes(contest._id)
+                  }
+                />
+              ))
+            : contestsOnPage.map((contest) => (
+                <ContestListItem
+                  key={contest._id}
+                  contest={contest}
+                  variant="public"
+                  onLoad={onLoad}
+                  onEdit={onEdit}
+                  onLike={handleLike}
+                  onSave={handleSave}
+                  isActive={activeContest?._id === contest._id}
+                  likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
+                  savedByMe={!!contestsState?.savedIds?.includes(contest._id)}
+                  quickSelectedByMe={
+                    !!contestsState?.quickSelectedIds?.includes(contest._id)
+                  }
+                />
+              ))}
         </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-white/70 mb-4">
-            {search.trim()
-              ? t('widgets.contests.noContestsFoundMatchingYourSearch')
-              : view === 'yours'
-              ? t('widgets.contests.noContestsYetCreateYourFirstContest')
-              : t('widgets.contests.noSavedContestsYet')}
-          </p>
-          {view === 'yours' && !search.trim() && (
-            <Button variant="tertiary" onClick={onCreateNew}>
-              {t('widgets.contests.createContest')}
+
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 pt-2">
+            <Button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
+            >
+              {t('widgets.previous')}
             </Button>
-          )}
-        </div>
-      );
+            <span className="px-3 py-1 text-white text-sm font-medium">
+              {t('widgets.pageNOfM', { page, totalPages })}
+            </span>
+            <Button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
+            >
+              {t('widgets.next')}
+            </Button>
+          </div>
+        )}
+      </>
+    );
+  } else {
+    content = (
+      <div className="text-center py-12">
+        <p className="text-white/70 mb-4">
+          {debouncedSearch.trim()
+            ? t('widgets.contests.noContestsFoundMatchingYourSearch')
+            : view === 'yours'
+            ? t('widgets.contests.noContestsYetCreateYourFirstContest')
+            : t('widgets.contests.noSavedContestsYet')}
+        </p>
+        {view === 'yours' && !debouncedSearch.trim() && (
+          <Button variant="tertiary" onClick={onCreateNew}>
+            {t('widgets.contests.createContest')}
+          </Button>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -303,7 +375,10 @@ const UserContests: React.FC<UserContestsProps> = ({
       <div className="sm:space-y-3 space-y-2">
         <WidgetSearchHeader
           search={search}
-          onSearchChange={setSearch}
+          onSearchChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
           onCreateNew={() => {
             if (
               !activeContest ||
@@ -341,13 +416,13 @@ const UserContests: React.FC<UserContestsProps> = ({
         <div className="flex items-center flex-wrap justify-start gap-2">
           <Badge
             label={t('widgets.contests.yourContests')}
-            onClick={() => setView('yours')}
+            onClick={() => setViewAndResetPage('yours')}
             isActive={view === 'yours'}
             Icon={<User className="w-4 h-4 flex-none" />}
           />
           <Badge
             label={t('widgets.saved')}
-            onClick={() => setView('saved')}
+            onClick={() => setViewAndResetPage('saved')}
             isActive={view === 'saved'}
             Icon={
               view === 'saved' ? (
@@ -360,7 +435,7 @@ const UserContests: React.FC<UserContestsProps> = ({
           {!!activeContest && (
             <Badge
               label={t('widgets.active')}
-              onClick={() => setView('current')}
+              onClick={() => setViewAndResetPage('current')}
               isActive={view === 'current'}
               Icon={
                 view === 'current' ? (
@@ -376,17 +451,84 @@ const UserContests: React.FC<UserContestsProps> = ({
 
       {view !== 'current' && (
         <div className="space-y-1">
-          <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
+          {!(isListLoading && listData === undefined) && (
+            <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
+          )}
           <WidgetSortBadges
             value={sortKey}
-            onChange={setSortKey as any}
+            onChange={(k: PublicSortKey) => {
+              setSortKey(k as ContestSortKey);
+              setPage(1);
+            }}
             hideCopies
           />
+          {view === 'yours' && (
+            <WidgetResourceGroupBadges
+              groups={contestGroups}
+              selectedGroupId={selectedContestGroupId}
+              onSelectAll={() => {
+                setSelectedContestGroupId(null);
+                setPage(1);
+              }}
+              onSelectGroup={(id) => {
+                setSelectedContestGroupId(id);
+                setPage(1);
+              }}
+              onAddGroup={() => {
+                setContestGroupToEdit(null);
+                setContestGroupModalOpen(true);
+              }}
+              onEditGroup={(g) => {
+                setContestGroupToEdit(g);
+                setContestGroupModalOpen(true);
+              }}
+              allLabel={t('widgets.contests.groups.all')}
+              addGroupAriaLabel={t('widgets.contests.groups.addGroupAria')}
+              editGroupAriaLabel={t('widgets.contests.groups.editGroupAria')}
+              className="pt-1"
+            />
+          )}
         </div>
       )}
 
       {/* Content by view */}
       {content}
+
+      <UserResourceGroupModal
+        isOpen={contestGroupModalOpen}
+        onClose={() => {
+          setContestGroupModalOpen(false);
+          setContestGroupToEdit(null);
+        }}
+        groupToEdit={contestGroupToEdit}
+        isSaving={contestGroupModalSaving}
+        confirmDeleteKey="delete-contest-group"
+        confirmDeleteTitle={
+          contestGroupToEdit
+            ? t('settings.confirmations.deleteItem', {
+                name: contestGroupToEdit.name,
+              })
+            : ''
+        }
+        confirmDeleteDescription={t(
+          'widgets.contests.groups.deleteGroupConfirmDescription',
+        )}
+        labels={{
+          createTitle: t('widgets.contests.groups.createTitle'),
+          editTitle: t('widgets.contests.groups.editTitle'),
+          nameRequired: t('widgets.contests.groups.nameRequired'),
+          createdSuccess: t('widgets.contests.groups.createdSuccess'),
+          updatedSuccess: t('widgets.contests.groups.updatedSuccess'),
+          deletedSuccess: t('widgets.contests.groups.deletedSuccess'),
+          failedSave: t('widgets.contests.groups.failedSave'),
+          failedDelete: t('widgets.contests.groups.failedDelete'),
+          nameLabel: t('common.name'),
+          namePlaceholder: t('common.enterName'),
+        }}
+        onCreate={(name) => createContestGroup({ name })}
+        onUpdate={(id, name) => updateContestGroup({ id, name })}
+        onDelete={(id) => deleteContestGroup(id)}
+      />
 
       {entryStatsPickerOpen && (
         <CountryStatsPickerModal

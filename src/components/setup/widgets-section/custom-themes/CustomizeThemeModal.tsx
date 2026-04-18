@@ -28,6 +28,7 @@ import ThemePreviewCountryItem from './ThemePreviewCountryItem';
 import {
   useCreateThemeMutation,
   useReportThemeDuplicateMutation,
+  useThemeGroupsQuery,
   useUpdateThemeMutation,
   useUploadThemeBackgroundMutation,
   useUploadThemeSoundMutation,
@@ -135,6 +136,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     event: ThemeSoundEventId;
     paused: boolean;
   } | null>(null);
+  const [themeGroupId, setThemeGroupId] = useState('');
   const soundPreviewAudioRef = useRef<HTMLAudioElement | null>(null);
   const soundPreviewObjectUrlRef = useRef<string | null>(null);
   const stopSoundPreview = useCallback(() => {
@@ -162,6 +164,16 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     useUploadThemeSoundMutation();
   const { mutateAsync: reportDuplicate } = useReportThemeDuplicateMutation();
   const user = useAuthStore((s) => s.user);
+
+  const { data: themeGroups = [] } = useThemeGroupsQuery(!!user && isOpen);
+
+  const themeGroupOptions = useMemo(
+    () => [
+      { value: '', label: t('widgets.themes.groups.noGroup') },
+      ...themeGroups.map((g) => ({ value: g._id, label: g.name })),
+    ],
+    [themeGroups, t],
+  );
 
   const imageUpload = useImageUpload({ maxSizeInMB: 1.5 });
 
@@ -196,6 +208,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         a: 1,
       });
       setIsPublic(initialTheme.isPublic);
+      setThemeGroupId(initialTheme.groupId || '');
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
       setUploadedFile(null);
@@ -267,6 +280,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setSoundUrls(emptySoundUrlState());
       setSoundFiles(emptySoundFileState());
       setSoundDelaySecText(emptySoundDelaySecTextState());
+      setThemeGroupId('');
     }
   }, [initialTheme, isOpen, themeYear, themeHue]);
 
@@ -476,6 +490,16 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         backgroundImageUrl,
         overrides,
       };
+
+      if (isUpdate && initialTheme) {
+        if (themeGroupId) {
+          payload.groupId = themeGroupId;
+        } else if (initialTheme.groupId) {
+          payload.groupId = null;
+        }
+      } else if (themeGroupId) {
+        payload.groupId = themeGroupId;
+      }
 
       // For updates, we need to explicitly handle reverting to defaults
       if (isUpdate && initialTheme) {
@@ -890,6 +914,22 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 }}
                 placeholder="Eurovision 2026"
               />
+
+              {!!user && (
+                <div className="flex flex-col gap-1">
+                  <CustomSelect
+                    options={themeGroupOptions}
+                    value={themeGroupId}
+                    onChange={setThemeGroupId}
+                    label={t('widgets.themes.groups.groupLabel')}
+                    id="theme-group-select"
+                    withIndicator={false}
+                    selectClassName="!shadow-none"
+                    labelClassName="!text-base mb-1"
+                    dataTheme="custom-preview"
+                  />
+                </div>
+              )}
 
               <TextareaField
                 id="themeDesc"

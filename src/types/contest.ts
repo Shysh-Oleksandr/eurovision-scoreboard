@@ -7,9 +7,16 @@ export interface ContestCreator {
   createdAt?: string;
 }
 
+export interface ContestGroupSummary {
+  _id: string;
+  name: string;
+}
+
 export interface Contest {
   _id: string;
   userId: string;
+  groupId?: string;
+  group?: ContestGroupSummary | null;
   themeId?: string;
   standardThemeId?: string;
   name: string;

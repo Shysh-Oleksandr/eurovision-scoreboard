@@ -1,10 +1,16 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
 
 import type {
   Contest,
+  ContestGroupSummary,
   ContestListResponse,
   ContestState,
 } from '@/types/contest';
@@ -23,6 +29,7 @@ export type CreateContestInput = {
   year?: number;
   hostingCountryCode: string;
   snapshot: Record<string, any>;
+  groupId?: string;
 };
 
 export type UpdateContestInput = {
@@ -36,6 +43,7 @@ export type UpdateContestInput = {
   year?: number;
   hostingCountryCode?: string;
   snapshot?: Record<string, any>;
+  groupId?: string | null;
 };
 
 export type PublicContestsQueryParams = {
@@ -49,29 +57,108 @@ export type PublicContestsQueryParams = {
   enabled?: boolean;
 };
 
-export function useMyContestsQuery(enabled = true) {
-  return useQuery<Contest[]>({
-    queryKey: queryKeys.user.contests(),
-    queryFn: async () => {
-      const { data } = await api.get('/contests/me');
+export type MyContestsListQueryParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: 'createdAt' | 'likes' | 'saves';
+  sortOrder?: 'asc' | 'desc';
+  year?: number;
+  startDate?: string;
+  endDate?: string;
+  /** GET /contests/me only */
+  groupId?: string;
+  enabled?: boolean;
+};
 
-      return data as Contest[];
+export type ContestGroup = ContestGroupSummary & {
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+function buildMyContestsListQueryString(
+  params: Omit<MyContestsListQueryParams, 'enabled'>,
+) {
+  const searchParams = new URLSearchParams();
+  searchParams.append('page', (params.page ?? 1).toString());
+  searchParams.append('limit', (params.limit ?? 10).toString());
+  if (params.search) searchParams.append('q', params.search);
+  searchParams.append('sortBy', params.sortBy ?? 'createdAt');
+  searchParams.append('sortDir', params.sortOrder ?? 'desc');
+  if (params.year != null) searchParams.append('year', String(params.year));
+  if (params.startDate) searchParams.append('startDate', params.startDate);
+  if (params.endDate) searchParams.append('endDate', params.endDate);
+  if (params.groupId) searchParams.append('groupId', params.groupId);
+  return searchParams.toString();
+}
+
+export function useMyContestsListQuery({
+  page = 1,
+  limit = 10,
+  search,
+  sortBy = 'createdAt',
+  sortOrder = 'desc',
+  year,
+  startDate,
+  endDate,
+  groupId,
+  enabled = true,
+}: MyContestsListQueryParams) {
+  const filters = {
+    page,
+    limit,
+    search: search || undefined,
+    sortBy,
+    sortOrder,
+    year,
+    startDate,
+    endDate,
+    groupId,
+  };
+  return useQuery<ContestListResponse>({
+    queryKey: queryKeys.user.contestsMeList(filters),
+    queryFn: async () => {
+      const qs = buildMyContestsListQueryString(filters);
+      const { data } = await api.get(`/contests/me?${qs}`);
+      return data as ContestListResponse;
     },
     enabled,
-    refetchOnMount: 'always', // Always refetch when component mounts
+    placeholderData: keepPreviousData,
+    refetchOnMount: 'always',
   });
 }
 
-export function useSavedContestsQuery(enabled = true) {
-  return useQuery<Contest[]>({
-    queryKey: queryKeys.user.savedContests(),
+export function useSavedContestsListQuery({
+  page = 1,
+  limit = 10,
+  search,
+  sortBy = 'createdAt',
+  sortOrder = 'desc',
+  year,
+  startDate,
+  endDate,
+  enabled = true,
+}: MyContestsListQueryParams) {
+  const filters = {
+    page,
+    limit,
+    search: search || undefined,
+    sortBy,
+    sortOrder,
+    year,
+    startDate,
+    endDate,
+  };
+  return useQuery<ContestListResponse>({
+    queryKey: queryKeys.user.savedContestsList(filters),
     queryFn: async () => {
-      const { data } = await api.get('/contests/me/saved');
-
-      return data as Contest[];
+      const qs = buildMyContestsListQueryString(filters);
+      const { data } = await api.get(`/contests/me/saved?${qs}`);
+      return data as ContestListResponse;
     },
     enabled,
-    refetchOnMount: 'always', // Always refetch when component mounts
+    placeholderData: keepPreviousData,
+    refetchOnMount: 'always',
   });
 }
 
@@ -84,6 +171,59 @@ export function useContestByIdQuery(contestId: string, enabled = true) {
       return data as Contest;
     },
     enabled: enabled && !!contestId,
+  });
+}
+
+export function useContestGroupsQuery(enabled = true) {
+  return useQuery<ContestGroup[]>({
+    queryKey: queryKeys.user.contestGroups(),
+    queryFn: async () => {
+      const { data } = await api.get('/contests/groups');
+      return data as ContestGroup[];
+    },
+    enabled,
+  });
+}
+
+export function useCreateContestGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { name: string }) => {
+      const { data } = await api.post('/contests/groups', input);
+      return data as ContestGroup;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.contestGroups() });
+    },
+  });
+}
+
+export function useUpdateContestGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, name }: { id: string; name: string }) => {
+      const { data } = await api.patch(`/contests/groups/${id}`, { name });
+      return data as ContestGroup;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.contestGroups() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
+    },
+  });
+}
+
+export function useDeleteContestGroupMutation() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await api.delete(`/contests/groups/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.user.contestGroups() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
+    },
   });
 }
 
@@ -242,6 +382,7 @@ export function useUpdateContestMutation() {
         );
       }
       qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
       qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
     },
   });
@@ -256,6 +397,7 @@ export function useDeleteContestMutation() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
       qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
     },
   });
@@ -285,6 +427,8 @@ export function useToggleLikeContestMutation() {
         });
       }
       qc.invalidateQueries({ queryKey: ['user', 'contests-state'] });
+      qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
     },
   });
 }

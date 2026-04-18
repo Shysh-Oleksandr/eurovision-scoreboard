@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 
 import {
   useApplyContestMutation,
+  useContestGroupsQuery,
   useCreateContestMutation,
   useUpdateContestMutation,
 } from '@/api/contests';
@@ -64,6 +65,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const [isPublic, setIsPublic] = useState(true);
   const [overwriteContestSetupAndResults, setOverwriteContestSetupAndResults] =
     useState(true);
+  const [contestGroupId, setContestGroupId] = useState('');
 
   const { mutateAsync: createContest, isPending: isCreating } =
     useCreateContestMutation();
@@ -73,6 +75,16 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const user = useAuthStore((s) => s.user);
 
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+
+  const { data: contestGroups = [] } = useContestGroupsQuery(!!user && isOpen);
+
+  const contestGroupOptions = useMemo(
+    () => [
+      { value: '', label: t('widgets.contests.groups.noGroup') },
+      ...contestGroups.map((g) => ({ value: g._id, label: g.name })),
+    ],
+    [contestGroups, t],
+  );
 
   const hostingCountryOptions = useMemo(() => {
     // For now, we only show the countries that are not custom
@@ -102,6 +114,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
         initialContest.hostingCountryCode || DEFAULT_HOSTING_COUNTRY_CODE,
       );
       setOverwriteContestSetupAndResults(isEditingActiveContest);
+      setContestGroupId(initialContest.groupId || '');
     } else {
       setName(settings.contestName);
       setYear(Number(settings.contestYear));
@@ -112,6 +125,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
       setVenue('');
       setHosts('');
       setIsPublic(true);
+      setContestGroupId('');
     }
   }, [
     initialContest,
@@ -143,6 +157,14 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
       let contest: Contest;
 
       if (isEditMode) {
+        const groupPayload: { groupId?: string | null } = {};
+
+        if (contestGroupId) {
+          groupPayload.groupId = contestGroupId;
+        } else if (initialContest.groupId) {
+          groupPayload.groupId = null;
+        }
+
         contest = await updateContest({
           id: initialContest._id,
           year,
@@ -156,6 +178,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
             ? { themeId }
             : { ...(standardThemeId ? { standardThemeId } : {}) }),
           ...(!overwriteContestSetupAndResults ? {} : { snapshot }),
+          ...groupPayload,
         });
 
         toast.success(t('widgets.contests.contestUpdatedSuccessfully'));
@@ -172,6 +195,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
             ? { themeId }
             : { ...(standardThemeId ? { standardThemeId } : {}) }),
           snapshot,
+          ...(contestGroupId ? { groupId: contestGroupId } : {}),
         });
 
         toast.success(t('widgets.contests.contestCreatedSuccessfully'));
@@ -298,6 +322,21 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           checked={isPublic}
           onChange={(e) => setIsPublic(e.target.checked)}
         />
+
+        {!!user && (
+          <div className="flex flex-col gap-1">
+            <CustomSelect
+              options={contestGroupOptions}
+              value={contestGroupId}
+              onChange={setContestGroupId}
+              label={t('widgets.contests.groups.groupLabel')}
+              id="contest-group-select"
+              withIndicator={false}
+              selectClassName="!shadow-none"
+              labelClassName="!text-base mb-1"
+            />
+          </div>
+        )}
 
         <CollapsibleSection
           title={t('common.optional')}

@@ -1,4 +1,4 @@
-import { Share2, Volume1 } from 'lucide-react';
+import { Folder, Share2, Volume1 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -112,11 +112,19 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
-          {!theme.isPublic && (
-            <div className="text-xs text-white/60 bg-primary-800 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit mb-1.5">
-              {t('widgets.private')}
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+            {!theme.isPublic && (
+              <div className="text-xs text-white/60 bg-primary-800 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit">
+                {t('widgets.private')}
+              </div>
+            )}
+            {theme.group && (
+              <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
+                <Folder className="size-3 shrink-0" aria-hidden />
+                <span className="truncate">{theme.group.name}</span>
+              </div>
+            )}
+          </div>
           <h3 className="text-white font-semibold text-l mb-1">
             <div className="flex items-center justify-between flex-wrap gap-1.5">
               <span className="flex items-center gap-1.5">

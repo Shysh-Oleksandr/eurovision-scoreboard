@@ -1,8 +1,9 @@
 import { User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
@@ -10,12 +11,16 @@ import { useApplyCustomTheme } from './hooks/useApplyCustomTheme';
 import ThemeListItem from './ThemeListItem';
 
 import {
+  useCreateThemeGroupMutation,
+  useDeleteThemeGroupMutation,
   useDeleteThemeMutation,
-  useMyThemesQuery,
-  useSavedThemesQuery,
+  useMyThemesListQuery,
+  useSavedThemesListQuery,
+  useThemeGroupsQuery,
   useThemesStateQuery,
   useToggleLikeThemeMutation,
   useToggleSaveThemeMutation,
+  useUpdateThemeGroupMutation,
 } from '@/api/themes';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
@@ -24,32 +29,14 @@ import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import GoogleAuthButton from '@/components/common/GoogleAuthButton';
+import UserResourceGroupModal from '@/components/setup/UserResourceGroupModal';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';
 
-const sortThemesBy =
-  (sortKey: PublicSortKey) => (a: CustomTheme, b: CustomTheme) => {
-    switch (sortKey) {
-      case 'latest':
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      case 'oldest':
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      case 'likes':
-        return (b.likes ?? 0) - (a.likes ?? 0);
-      case 'saves':
-        return (b.saves ?? 0) - (a.saves ?? 0);
-      case 'copies':
-        return (b.duplicatesCount ?? 0) - (a.duplicatesCount ?? 0);
-      default:
-        return 0;
-    }
-  };
+const PAGE_SIZE = 10;
 
 interface UserThemesProps {
   onLoaded?: () => void;
@@ -69,11 +56,69 @@ const UserThemes: React.FC<UserThemesProps> = ({
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
   const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
+  const [page, setPage] = useState(1);
+  const [selectedThemeGroupId, setSelectedThemeGroupId] = useState<
+    string | null
+  >(null);
+  const [themeGroupModalOpen, setThemeGroupModalOpen] = useState(false);
+  const [themeGroupToEdit, setThemeGroupToEdit] = useState<{
+    _id: string;
+    name: string;
+  } | null>(null);
 
   const { confirm } = useConfirmation();
 
-  const { data: themes, isLoading } = useMyThemesQuery(!!user);
-  const { data: savedThemes } = useSavedThemesQuery(!!user);
+  const debouncedSearch = useDebounce(search, 400);
+
+  const serverSortBy =
+    sortKey === 'likes'
+      ? 'likes'
+      : sortKey === 'saves'
+      ? 'saves'
+      : sortKey === 'copies'
+      ? 'duplicatesCount'
+      : 'createdAt';
+  const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
+
+  const { data: themeGroups = [] } = useThemeGroupsQuery(
+    !!user && view === 'yours',
+  );
+
+  const { mutateAsync: createThemeGroup, isPending: isCreatingThemeGroup } =
+    useCreateThemeGroupMutation();
+  const { mutateAsync: updateThemeGroup, isPending: isUpdatingThemeGroup } =
+    useUpdateThemeGroupMutation();
+  const { mutateAsync: deleteThemeGroup, isPending: isDeletingThemeGroup } =
+    useDeleteThemeGroupMutation();
+
+  useEffect(() => {
+    if (
+      selectedThemeGroupId &&
+      !themeGroups.some((g) => g._id === selectedThemeGroupId)
+    ) {
+      setSelectedThemeGroupId(null);
+    }
+  }, [themeGroups, selectedThemeGroupId]);
+
+  const myThemesQuery = useMyThemesListQuery({
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedSearch,
+    sortBy: serverSortBy,
+    sortOrder: serverSortOrder,
+    groupId: selectedThemeGroupId ?? undefined,
+    enabled: !!user && view === 'yours',
+  });
+
+  const savedThemesQuery = useSavedThemesListQuery({
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedSearch,
+    sortBy: serverSortBy,
+    sortOrder: serverSortOrder,
+    enabled: !!user && view === 'saved',
+  });
+
   const { mutateAsync: deleteTheme } = useDeleteThemeMutation();
   const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
   const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
@@ -81,15 +126,25 @@ const UserThemes: React.FC<UserThemesProps> = ({
 
   const handleApply = useApplyCustomTheme();
 
-  // Collect theme IDs for state query (current and saved views)
-  const themeIdsForState = [
-    ...(view === 'current' && currentCustomTheme
+  const listData =
+    view === 'yours'
+      ? myThemesQuery.data
+      : view === 'saved'
+      ? savedThemesQuery.data
+      : undefined;
+
+  const isListLoading =
+    view === 'yours'
+      ? myThemesQuery.isLoading
+      : view === 'saved'
+      ? savedThemesQuery.isLoading
+      : false;
+
+  const themeIdsForState =
+    view === 'current' && currentCustomTheme
       ? [currentCustomTheme._id]
-      : []),
-    ...(view === 'saved' && savedThemes
-      ? savedThemes.map((t) => t._id)
-      : themes?.map((t) => t._id) || []),
-  ];
+      : listData?.themes.map((th) => th._id) ?? [];
+
   const { data: themeState } = useThemesStateQuery(
     themeIdsForState,
     !!themeIdsForState.length && !!user,
@@ -148,26 +203,13 @@ const UserThemes: React.FC<UserThemesProps> = ({
     }
   };
 
-  // Filter and sort lists
-  const filteredYours = themes
-    ?.filter((theme) =>
-      theme.name.toLowerCase().includes(search.trim().toLowerCase()),
-    )
-    .sort(sortThemesBy(sortKey));
+  const setViewAndResetPage = (next: 'yours' | 'saved' | 'current') => {
+    setView(next);
+    setPage(1);
+  };
 
-  const filteredSaved = savedThemes
-    ?.filter((theme) =>
-      theme.name.toLowerCase().includes(search.trim().toLowerCase()),
-    )
-    .sort(sortThemesBy(sortKey));
-
-  if (isLoading) {
-    return (
-      <div className="text-center py-8">
-        <span className="loader" />
-      </div>
-    );
-  }
+  const themeGroupModalSaving =
+    isCreatingThemeGroup || isUpdatingThemeGroup || isDeletingThemeGroup;
 
   if (!user) {
     return (
@@ -180,14 +222,17 @@ const UserThemes: React.FC<UserThemesProps> = ({
     );
   }
 
-  // Derived header and content per selected view
+  const total = listData?.total ?? 0;
+  const themesOnPage = listData?.themes ?? [];
+  const totalPages = listData?.totalPages ?? 0;
+
   const headerLabel = search.trim()
-    ? t('widgets.themes.fountNThemes', { count: filteredYours?.length ?? 0 })
+    ? t('widgets.themes.foundNThemes', { count: total })
     : view === 'yours'
-    ? t('widgets.themes.youHaveNThemes', { count: filteredYours?.length ?? 0 })
-    : t('widgets.themes.youSavedNThemes', {
-        count: filteredSaved?.length ?? 0,
-      });
+    ? t('widgets.themes.youHaveNThemes', { count: total })
+    : view === 'saved'
+    ? t('widgets.themes.youSavedNThemes', { count: total })
+    : '';
 
   let content: React.ReactNode = null;
 
@@ -223,71 +268,91 @@ const UserThemes: React.FC<UserThemesProps> = ({
         />
       </div>
     ) : null;
-  } else if (view === 'yours') {
-    content =
-      filteredYours && filteredYours.length > 0 ? (
+  } else if (isListLoading) {
+    content = (
+      <div className="text-center py-8">
+        <span className="loader" />
+      </div>
+    );
+  } else if (themesOnPage.length > 0) {
+    content = (
+      <>
         <div className="grid gap-4">
-          {filteredYours.map((theme) => (
-            <ThemeListItem
-              key={theme._id}
-              theme={theme}
-              variant="user"
-              onEdit={onEdit}
-              onDelete={handleDelete}
-              onApply={handleApply}
-              isApplied={currentCustomTheme?._id === theme._id}
-              onDuplicate={onDuplicate}
-              quickSelectedByMe={
-                !!themeState?.quickSelectedIds?.includes(theme._id)
-              }
-            />
-          ))}
+          {view === 'yours'
+            ? themesOnPage.map((theme) => (
+                <ThemeListItem
+                  key={theme._id}
+                  theme={theme}
+                  variant="user"
+                  onEdit={onEdit}
+                  onDelete={handleDelete}
+                  onApply={handleApply}
+                  isApplied={currentCustomTheme?._id === theme._id}
+                  onDuplicate={onDuplicate}
+                  quickSelectedByMe={
+                    !!themeState?.quickSelectedIds?.includes(theme._id)
+                  }
+                />
+              ))
+            : themesOnPage.map((theme) => (
+                <ThemeListItem
+                  key={theme._id}
+                  theme={theme}
+                  variant="public"
+                  onApply={handleApply}
+                  onLike={handleLike}
+                  onSave={handleSave}
+                  isApplied={currentCustomTheme?._id === theme._id}
+                  onDuplicate={onDuplicate}
+                  likedByMe={!!themeState?.likedIds?.includes(theme._id)}
+                  savedByMe={!!themeState?.savedIds?.includes(theme._id)}
+                  quickSelectedByMe={
+                    !!themeState?.quickSelectedIds?.includes(theme._id)
+                  }
+                />
+              ))}
         </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-white/70 mb-4">
-            {search
-              ? t('widgets.themes.noThemesFoundMatchingYourSearch')
-              : t('widgets.themes.noThemesYetCreateYourFirstTheme')}
-          </p>
-          {!search && (
-            <Button variant="tertiary" onClick={onCreateNew}>
-              {t('widgets.themes.createTheme')}
+
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 pt-2">
+            <Button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
+            >
+              {t('widgets.previous')}
             </Button>
-          )}
-        </div>
-      );
+            <span className="px-3 py-1 text-white text-sm font-medium">
+              {t('widgets.pageNOfM', { page, totalPages })}
+            </span>
+            <Button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
+            >
+              {t('widgets.next')}
+            </Button>
+          </div>
+        )}
+      </>
+    );
   } else {
-    content =
-      filteredSaved && filteredSaved.length > 0 ? (
-        <div className="grid gap-4">
-          {filteredSaved.map((theme) => (
-            <ThemeListItem
-              key={theme._id}
-              theme={theme}
-              variant="public"
-              onApply={handleApply}
-              onLike={handleLike}
-              onSave={handleSave}
-              isApplied={currentCustomTheme?._id === theme._id}
-              onDuplicate={onDuplicate}
-              likedByMe={!!themeState?.likedIds?.includes(theme._id)}
-              savedByMe={!!themeState?.savedIds?.includes(theme._id)}
-              quickSelectedByMe={
-                !!themeState?.quickSelectedIds?.includes(theme._id)
-              }
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-white/70 mb-4">
-            {search
-              ? t('widgets.themes.noThemesFoundMatchingYourSearch')
-              : t('widgets.themes.noSavedThemesYet')}
-          </p>
-        </div>
-      );
+    content = (
+      <div className="text-center py-12">
+        <p className="text-white/70 mb-4">
+          {debouncedSearch.trim()
+            ? t('widgets.themes.noThemesFoundMatchingYourSearch')
+            : view === 'yours'
+            ? t('widgets.themes.noThemesYetCreateYourFirstTheme')
+            : t('widgets.themes.noSavedThemesYet')}
+        </p>
+        {!debouncedSearch.trim() && view === 'yours' && (
+          <Button variant="tertiary" onClick={onCreateNew}>
+            {t('widgets.themes.createTheme')}
+          </Button>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -295,7 +360,10 @@ const UserThemes: React.FC<UserThemesProps> = ({
       <div className="sm:space-y-3 space-y-2">
         <WidgetSearchHeader
           search={search}
-          onSearchChange={setSearch}
+          onSearchChange={(value) => {
+            setSearch(value);
+            setPage(1);
+          }}
           onCreateNew={onCreateNew}
           placeholder={t('widgets.themes.searchThemes')}
         />
@@ -303,13 +371,13 @@ const UserThemes: React.FC<UserThemesProps> = ({
         <div className="flex items-center flex-wrap justify-start gap-2">
           <Badge
             label={t('widgets.created')}
-            onClick={() => setView('yours')}
+            onClick={() => setViewAndResetPage('yours')}
             isActive={view === 'yours'}
             Icon={<User className="w-4 h-4 flex-none" />}
           />
           <Badge
             label={t('widgets.saved')}
-            onClick={() => setView('saved')}
+            onClick={() => setViewAndResetPage('saved')}
             isActive={view === 'saved'}
             Icon={
               view === 'saved' ? (
@@ -322,7 +390,7 @@ const UserThemes: React.FC<UserThemesProps> = ({
           {!!currentCustomTheme && (
             <Badge
               label={t('widgets.active')}
-              onClick={() => setView('current')}
+              onClick={() => setViewAndResetPage('current')}
               isActive={view === 'current'}
               Icon={
                 view === 'current' ? (
@@ -337,13 +405,83 @@ const UserThemes: React.FC<UserThemesProps> = ({
       </div>
       {view !== 'current' && (
         <div className="space-y-1">
-          <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
-          <WidgetSortBadges value={sortKey} onChange={setSortKey} />
+          {!(isListLoading && listData === undefined) && (
+            <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
+          )}
+          <WidgetSortBadges
+            value={sortKey}
+            onChange={(k: PublicSortKey) => {
+              setSortKey(k);
+              setPage(1);
+            }}
+          />
+          {view === 'yours' && (
+            <WidgetResourceGroupBadges
+              groups={themeGroups}
+              selectedGroupId={selectedThemeGroupId}
+              onSelectAll={() => {
+                setSelectedThemeGroupId(null);
+                setPage(1);
+              }}
+              onSelectGroup={(id) => {
+                setSelectedThemeGroupId(id);
+                setPage(1);
+              }}
+              onAddGroup={() => {
+                setThemeGroupToEdit(null);
+                setThemeGroupModalOpen(true);
+              }}
+              onEditGroup={(g) => {
+                setThemeGroupToEdit(g);
+                setThemeGroupModalOpen(true);
+              }}
+              allLabel={t('widgets.themes.groups.all')}
+              addGroupAriaLabel={t('widgets.themes.groups.addGroupAria')}
+              editGroupAriaLabel={t('widgets.themes.groups.editGroupAria')}
+              className="pt-1"
+            />
+          )}
         </div>
       )}
 
       {/* Content by view */}
       {content}
+
+      <UserResourceGroupModal
+        isOpen={themeGroupModalOpen}
+        onClose={() => {
+          setThemeGroupModalOpen(false);
+          setThemeGroupToEdit(null);
+        }}
+        groupToEdit={themeGroupToEdit}
+        isSaving={themeGroupModalSaving}
+        confirmDeleteKey="delete-theme-group"
+        confirmDeleteTitle={
+          themeGroupToEdit
+            ? t('settings.confirmations.deleteItem', {
+                name: themeGroupToEdit.name,
+              })
+            : ''
+        }
+        confirmDeleteDescription={t(
+          'widgets.themes.groups.deleteGroupConfirmDescription',
+        )}
+        labels={{
+          createTitle: t('widgets.themes.groups.createTitle'),
+          editTitle: t('widgets.themes.groups.editTitle'),
+          nameRequired: t('widgets.themes.groups.nameRequired'),
+          createdSuccess: t('widgets.themes.groups.createdSuccess'),
+          updatedSuccess: t('widgets.themes.groups.updatedSuccess'),
+          deletedSuccess: t('widgets.themes.groups.deletedSuccess'),
+          failedSave: t('widgets.themes.groups.failedSave'),
+          failedDelete: t('widgets.themes.groups.failedDelete'),
+          nameLabel: t('common.name'),
+          namePlaceholder: t('common.enterName'),
+        }}
+        onCreate={(name) => createThemeGroup({ name })}
+        onUpdate={(id, name) => updateThemeGroup({ id, name })}
+        onDelete={(id) => deleteThemeGroup(id)}
+      />
     </div>
   );
 };

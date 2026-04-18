@@ -454,6 +454,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             id="entry-group-select"
             withIndicator={false}
             selectClassName="!shadow-none"
+            labelClassName="!text-base mb-1"
           />
         </div>
         <div className="flex flex-col gap-3">
