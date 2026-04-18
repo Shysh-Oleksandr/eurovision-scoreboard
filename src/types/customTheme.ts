@@ -25,7 +25,7 @@ export interface CustomTheme {
   backgroundImageUrl?: string;
   backgroundImageKey?: string;
   themeSounds?: Partial<
-    Record<ThemeSoundEventId, { url: string; key?: string }>
+    Record<ThemeSoundEventId, { url: string; key?: string; delayMs?: number }>
   >;
   hasCustomAudio?: boolean;
   pointsContainerShape?: PointsContainerShape;

@@ -1,13 +1,13 @@
 export const THEME_SOUND_EVENTS = [
-  'douzePoints',
+  'simulationBackground',
   'stageStart',
+  'douzePoints',
   'pointsAwarded',
   'televotePointsReveal',
-  'winner',
-  'stageComplete',
-  'simulationBackground',
   'qualifierReveal',
   'qualifierPicked',
+  'stageComplete',
+  'winner',
 ] as const;
 
 export type ThemeSoundEventId = (typeof THEME_SOUND_EVENTS)[number];

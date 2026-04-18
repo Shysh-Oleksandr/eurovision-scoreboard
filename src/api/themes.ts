@@ -29,7 +29,7 @@ export type CreateThemeInput = {
   usePointsCountUpAnimation?: boolean;
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
-  themeSounds?: Record<string, { url: string } | null>;
+  themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
 };
 
 export type UpdateThemeInput = {
@@ -49,7 +49,7 @@ export type UpdateThemeInput = {
   usePointsCountUpAnimation?: boolean | null;
   boardAnimationMode?: BoardAnimationMode | null;
   douzePointsAnimationMode?: DouzePointsAnimationMode | null;
-  themeSounds?: Record<string, { url: string } | null>;
+  themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
 };
 
 export type PublicThemesQueryParams = {

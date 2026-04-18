@@ -3,8 +3,8 @@ import { useMemo, useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
-import { DouzePointsAnimationMode } from '@/theme/types';
 import { playThemeSound } from '@/theme/playThemeSound';
+import { DouzePointsAnimationMode } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 type ReturnType = {
@@ -32,6 +32,8 @@ const useAnimatePoints = ({
 }): ReturnType => {
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
+  /** Avoids playing douze SFX on every useGSAP re-run (e.g. Strict Mode or ref churn). */
+  const douzePointsSoundPlayedForParallelogramsRef = useRef(false);
   const { douzePointsAnimationMode } = useThemeSpecifics();
   const resolvedDouzePointsAnimationMode =
     douzePointsAnimationModeOverride ?? douzePointsAnimationMode;
@@ -39,6 +41,8 @@ const useAnimatePoints = ({
   useGSAP(
     () => {
       if (resolvedDouzePointsAnimationMode !== 'parallelograms') {
+        douzePointsSoundPlayedForParallelogramsRef.current = false;
+
         return;
       }
 
@@ -48,12 +52,16 @@ const useAnimatePoints = ({
 
       const { containerRef, parallelogramBlueRef, parallelogramYellowRef } =
         douzePointsRefs;
+
       if (!parallelogramBlueRef.current || !parallelogramYellowRef.current) {
         return;
       }
 
       if (isDouzePoints) {
-        playThemeSound('douzePoints', { skip: isThemePreview });
+        if (!douzePointsSoundPlayedForParallelogramsRef.current) {
+          playThemeSound('douzePoints', { skip: isThemePreview });
+          douzePointsSoundPlayedForParallelogramsRef.current = true;
+        }
         gsap.to(containerRef.current, {
           opacity: 1,
           duration: 0.4,
@@ -73,6 +81,7 @@ const useAnimatePoints = ({
           ease: 'cubic.inOut',
         });
       } else {
+        douzePointsSoundPlayedForParallelogramsRef.current = false;
         gsap.to(containerRef.current, {
           opacity: 0,
           duration: 0.5,

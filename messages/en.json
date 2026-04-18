@@ -478,6 +478,7 @@
       "invalidSoundFile": "Unsupported audio format. Use MP3, OGG, WAV, or WebM.",
       "soundFileTooLarge": "Audio file must be 7 MB or smaller.",
       "previewSound": "Preview",
+      "soundDelaySec": "Delay (s)",
       "previewSoundFailed": "Could not play this audio. Check the URL or file.",
       "audioFilterLabel": "Audio",
       "audioFilterWithAudio": "With audio",
@@ -748,7 +749,8 @@
       "themeSoundHudOpenControls": "Open volume controls",
       "themeSoundHudCloseControls": "Close volume controls",
       "themeSoundHudMuteAllShort": "Mute all",
-      "themeSoundHudRestoreShort": "Restore"
+      "themeSoundHudRestoreShort": "Restore",
+      "themeSoundHudStopSfxShort": "Stop clips"
     },
     "contest": {
       "enterContestName": "Enter contest name...",

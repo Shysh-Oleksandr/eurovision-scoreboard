@@ -3,6 +3,14 @@ import { useGeneralStore } from '@/state/generalStore';
 let audioEl: HTMLAudioElement | null = null;
 let boundUrl: string | null = null;
 let isAwaitingAutoplayUnlock = false;
+let initialPlayTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function clearInitialPlayTimeout() {
+  if (initialPlayTimeout) {
+    clearTimeout(initialPlayTimeout);
+    initialPlayTimeout = null;
+  }
+}
 
 const AUTOPLAY_UNLOCK_EVENTS: Array<keyof WindowEventMap> = [
   'pointerdown',
@@ -74,6 +82,11 @@ function applyBgAudioVolume(linear0to1: number) {
 export function syncSimulationBackgroundThemeSound(enabled: boolean): void {
   const { customTheme } = useGeneralStore.getState();
   const url = customTheme?.themeSounds?.simulationBackground?.url?.trim() ?? '';
+  const delayRaw = customTheme?.themeSounds?.simulationBackground?.delayMs;
+  const startDelayMs =
+    typeof delayRaw === 'number' && Number.isFinite(delayRaw) && delayRaw > 0
+      ? Math.min(60_000, Math.floor(delayRaw))
+      : 0;
   const effective = getEffectiveAmbienceLinear();
 
   if (!enabled || !url) {
@@ -90,9 +103,18 @@ export function syncSimulationBackgroundThemeSound(enabled: boolean): void {
     audioEl = new Audio(url);
     audioEl.loop = true;
     applyBgAudioVolume(effective);
-    void audioEl.play().catch(() => {
-      scheduleAutoplayUnlockRetry();
-    });
+    const tryPlay = () => {
+      void audioEl!.play().catch(() => {
+        scheduleAutoplayUnlockRetry();
+      });
+    };
+
+    clearInitialPlayTimeout();
+    if (startDelayMs > 0) {
+      initialPlayTimeout = setTimeout(tryPlay, startDelayMs);
+    } else {
+      tryPlay();
+    }
 
     return;
   }
@@ -106,6 +128,7 @@ export function syncSimulationBackgroundThemeSound(enabled: boolean): void {
 }
 
 export function stopSimulationBackgroundThemeSound(): void {
+  clearInitialPlayTimeout();
   isAwaitingAutoplayUnlock = false;
   clearAutoplayUnlockListeners();
   if (audioEl) {

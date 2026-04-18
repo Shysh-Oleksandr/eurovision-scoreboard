@@ -96,6 +96,8 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   const [columns, setColumns] = useState(DOUZE_POINTS_TARGET_COLUMNS);
   const heartRefs = useRef<Array<HTMLDivElement | null>>([]);
   const countryNameRef = useRef<HTMLHeadingElement | null>(null);
+  /** useGSAP re-runs when `columns` / ResizeObserver updates — play douze SFX only once per mount. */
+  const douzePointsSoundPlayedRef = useRef(false);
   const heartsCount = columns * DOUZE_POINTS_ROWS;
 
   useEffect(() => {
@@ -138,10 +140,15 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
       );
 
       if (hearts.length === 0) {
+        douzePointsSoundPlayedRef.current = false;
+
         return;
       }
 
-      playThemeSound('douzePoints', { skip: isThemePreview });
+      if (!douzePointsSoundPlayedRef.current) {
+        playThemeSound('douzePoints', { skip: isThemePreview });
+        douzePointsSoundPlayedRef.current = true;
+      }
 
       gsap.killTweensOf(hearts);
       gsap.set(hearts, {

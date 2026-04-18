@@ -2,6 +2,7 @@
 
 import {
   AudioLines,
+  CircleStop,
   Music,
   Volume,
   Volume1,
@@ -25,6 +26,7 @@ import {
   customThemeHasAnyAudio,
   customThemeHasSimulationBackground,
 } from '@/theme/customThemeHasAudio';
+import { stopAllPlayingThemeSfx } from '@/theme/playThemeSound';
 
 const HUD_SLIDER_CLASS =
   'min-w-0 flex-1 [&_.range-wrapper]:mt-0 [&_input]:touch-none';
@@ -259,6 +261,17 @@ export default function ThemeSoundVolumeHud() {
                     {t('themeSoundHudMuteAllShort')}
                   </>
                 )}
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  stopAllPlayingThemeSfx();
+                }}
+                className="flex w-full items-center justify-center gap-1.5 rounded-md bg-white/10 py-1.5 text-xs font-medium text-white/90 transition-colors hover:bg-white/15"
+              >
+                <CircleStop className="h-3.5 w-3.5" strokeWidth={2} />
+                {t('themeSoundHudStopSfxShort')}
               </button>
             </div>
           </div>
