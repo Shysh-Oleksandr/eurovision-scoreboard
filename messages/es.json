@@ -479,6 +479,7 @@
       "makeThemePublic": "Hacer público el tema",
       "main": "Principal",
       "baseTheme": "Tema base",
+      "interfaceFont": "Fuente de la interfaz",
       "interfaceColor": "Color de la interfaz",
       "backgroundImage": "Imagen de fondo",
       "soundDouzePoints": "Animación de puntos Douze",

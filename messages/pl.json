@@ -481,6 +481,7 @@
       "makeThemePublic": "Udostępnij motyw publicznie",
       "main": "Główny",
       "baseTheme": "Motyw bazowy",
+      "interfaceFont": "Czcionka interfejsu",
       "interfaceColor": "Kolor interfejsu",
       "backgroundImage": "Obraz tła",
       "soundDouzePoints": "Animacja DouzePoints",

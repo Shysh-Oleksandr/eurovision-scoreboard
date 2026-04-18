@@ -52,6 +52,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
+import { FONT_ALIAS_ALLOWLIST, normalizeFontAlias } from '@/theme/fontAliases';
 import {
   THEME_SOUND_EVENTS,
   type ThemeSoundEventId,
@@ -106,6 +107,23 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
+  const [fontAlias, setFontAlias] = useState('montserrat');
+
+  const interfaceFontOptions = useMemo(() => {
+    const labelByAlias: Record<string, string> = {
+      montserrat: 'Montserrat (Default)',
+      geist: 'Geist',
+      'dm-sans': 'DM Sans',
+      gotham: 'Gotham',
+      'plus-jakarta-sans': 'Plus Jakarta Sans',
+      unbounded: 'Unbounded',
+    };
+
+    return FONT_ALIAS_ALLOWLIST.map((value) => ({
+      value,
+      label: labelByAlias[value] ?? value,
+    }));
+  }, []);
 
   // Theme-specific UI options
   const [uppercaseEntryName, setUppercaseEntryName] = useState(true);
@@ -211,6 +229,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setThemeGroupId(initialTheme.groupId || '');
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
+      setFontAlias(normalizeFontAlias(initialTheme.fontAlias));
       setUploadedFile(null);
       setPointsContainerShape(
         resolvedInitialThemeSpecifics.pointsContainerShape,
@@ -281,6 +300,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setSoundFiles(emptySoundFileState());
       setSoundDelaySecText(emptySoundDelaySecTextState());
       setThemeGroupId('');
+      setFontAlias('montserrat');
     }
   }, [initialTheme, isOpen, themeYear, themeHue]);
 
@@ -323,6 +343,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         Object.keys(previewThemeSounds).length > 0
           ? previewThemeSounds
           : undefined,
+      fontAlias: normalizeFontAlias(fontAlias),
     };
 
     applyCustomTheme(previewTheme, true);
@@ -338,6 +359,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     soundUrls,
     soundDelaySecText,
     isOpen,
+    fontAlias,
   ]);
 
   // Stop preview when closing. Parent often unmounts us via `{open && <Modal />}` so `isOpen`
@@ -489,6 +511,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         isPublic,
         backgroundImageUrl,
         overrides,
+        fontAlias: normalizeFontAlias(fontAlias),
       };
 
       if (isUpdate && initialTheme) {
@@ -953,20 +976,34 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           {/* Main */}
           <CollapsibleSection title={t('widgets.themes.main')} defaultExpanded>
             <div className="space-y-4">
-              <CustomSelect
-                options={ALL_THEME_OPTIONS}
-                groups={[
-                  { label: 'ESC', options: THEME_OPTIONS },
-                  { label: 'JESC', options: JESC_THEME_OPTIONS },
-                ]}
-                value={baseThemeYear}
-                labelClassName="!text-base !font-medium mb-1"
-                onChange={(value) => setBaseThemeYear(value)}
-                id="baseTheme-select-box"
-                label={t('widgets.themes.baseTheme')}
-                className="sm:w-[130px] w-[110px]"
-                dataTheme="custom-preview"
-              />
+              <div className="flex gap-3 items-end flex-wrap">
+                <CustomSelect
+                  options={ALL_THEME_OPTIONS}
+                  groups={[
+                    { label: 'ESC', options: THEME_OPTIONS },
+                    { label: 'JESC', options: JESC_THEME_OPTIONS },
+                  ]}
+                  value={baseThemeYear}
+                  labelClassName="!text-base !font-medium mb-1"
+                  onChange={(value) => setBaseThemeYear(value)}
+                  id="baseTheme-select-box"
+                  label={t('widgets.themes.baseTheme')}
+                  className="sm:w-[130px] w-[110px]"
+                  dataTheme="custom-preview"
+                />
+
+                <CustomSelect
+                  options={interfaceFontOptions}
+                  value={fontAlias}
+                  labelClassName="!text-base !font-medium mb-1"
+                  onChange={(value) => setFontAlias(value)}
+                  id="interface-font-select"
+                  label={t('widgets.themes.interfaceFont')}
+                  className="sm:w-[200px] w-full"
+                  dataTheme="custom-preview"
+                  withIndicator={false}
+                />
+              </div>
 
               <div>
                 <h4 className="text-sm font-medium text-white mb-2">

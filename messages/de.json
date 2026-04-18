@@ -479,6 +479,7 @@
       "makeThemePublic": "Theme öffentlich machen",
       "main": "Haupt",
       "baseTheme": "Basis-Theme",
+      "interfaceFont": "Schriftart",
       "interfaceColor": "Interface-Farbe",
       "backgroundImage": "Hintergrundbild",
       "soundDouzePoints": "Douze-Punkte-Animation",

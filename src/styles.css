@@ -34,16 +34,48 @@ aside {
   display: block;
 }
 
+:root {
+  --dp-font-family: montserrat, sans-serif;
+}
+
+html[data-font='montserrat'] {
+  --dp-font-family: montserrat, sans-serif;
+}
+
+html[data-font='geist'] {
+  --dp-font-family: "Geist Sans", sans-serif;
+}
+
+html[data-font='dm-sans'] {
+  --dp-font-family: "DM Sans", sans-serif;
+}
+
+html[data-font='gotham'] {
+  --dp-font-family: Gotham, sans-serif;
+}
+
+html[data-font='plus-jakarta-sans'] {
+  --dp-font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+html[data-font='unbounded'] {
+  --dp-font-family: Unbounded, sans-serif;
+}
+
 html,
 body,
 #root {
-  font-family: Montserrat, sans-serif;
+  font-family: var(--dp-font-family);
   height: 100%;
   width: 100%;
   overflow: hidden;
   line-height: 1;
   font-size: 14px;
   text-size-adjust: 100%;
+}
+
+[data-theme='custom-preview'] {
+  font-family: var(--dp-font-family);
 }
 
 input,
@@ -161,6 +193,171 @@ h6 {
   src: url('/fonts/Montserrat-Bold.woff2') format('woff2');
 
   /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
+/* geist sans - latin */
+@font-face {
+  font-display: swap;
+  font-family: "Geist Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/geist-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Geist Sans";
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/geist-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Geist Sans";
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/geist-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Geist Sans";
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/geist-700.woff2') format('woff2');
+}
+
+/* dm sans - latin */
+@font-face {
+  font-display: swap;
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/dm-sans-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/dm-sans-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/dm-sans-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/dm-sans-700.woff2') format('woff2');
+}
+
+/* Gotham (Book / Medium / Bold / Black → 400–700) */
+@font-face {
+  font-display: swap;
+  font-family: Gotham;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Gotham-Book.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Gotham;
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/Gotham-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Gotham;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/Gotham-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Gotham;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/Gotham-Bold.woff2') format('woff2');
+}
+
+/* Plus Jakarta Sans */
+@font-face {
+  font-display: swap;
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/plus-jakarta-sans-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/plus-jakarta-sans-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/plus-jakarta-sans-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/plus-jakarta-sans-700.woff2') format('woff2');
+}
+
+/* Unbounded */
+@font-face {
+  font-display: swap;
+  font-family: Unbounded;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/unbounded-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Unbounded;
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/unbounded-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Unbounded;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/unbounded-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Unbounded;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/unbounded-700.woff2') format('woff2');
 }
 
 #main {

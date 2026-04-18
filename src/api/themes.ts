@@ -37,6 +37,7 @@ export type CreateThemeInput = {
   douzePointsAnimationMode?: DouzePointsAnimationMode;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
   groupId?: string;
+  fontAlias?: string;
 };
 
 export type UpdateThemeInput = {
@@ -58,6 +59,7 @@ export type UpdateThemeInput = {
   douzePointsAnimationMode?: DouzePointsAnimationMode | null;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
   groupId?: string | null;
+  fontAlias?: string | null;
 };
 
 export type PublicThemesQueryParams = {

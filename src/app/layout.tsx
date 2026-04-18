@@ -12,6 +12,12 @@ import IntlProvider from './IntlProvider';
 import Providers from './providers';
 import ToastRoot from './toast-root';
 
+import { FONT_ALIAS_ALLOWLIST } from '@/theme/fontAliases';
+
+const FOUC_FONT_ALLOWED_LITERAL = `{${FONT_ALIAS_ALLOWLIST.map(
+  (a) => `'${a}':1`,
+).join(',')}}`;
+
 export async function generateMetadata({
   params,
 }: {
@@ -115,9 +121,14 @@ export default async function RootLayout({
               if (customTheme) {
                 document.documentElement.setAttribute('data-theme', 'custom');
                 document.documentElement.style.backgroundImage = "url(" + customTheme.backgroundImageUrl + ")";
+                var fa = (customTheme.fontAlias || 'montserrat').toLowerCase();
+                var allowedFont = ${FOUC_FONT_ALLOWED_LITERAL};
+                if (!allowedFont[fa]) fa = 'montserrat';
+                document.documentElement.setAttribute('data-font', fa);
               } else if (themeYear) {
                 document.documentElement.setAttribute('data-theme', themeYear);
                 document.documentElement.style.backgroundImage = "url(" + state.theme.backgroundImage + ")";
+                document.documentElement.setAttribute('data-font', 'montserrat');
               }
 
               document.documentElement.style.backgroundSize = 'cover';

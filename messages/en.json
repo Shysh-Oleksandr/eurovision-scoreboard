@@ -476,6 +476,7 @@
       "makeThemePublic": "Make theme public",
       "main": "Main",
       "baseTheme": "Base Theme",
+      "interfaceFont": "Interface font",
       "interfaceColor": "Interface Color",
       "backgroundImage": "Background Image",
       "soundDouzePoints": "Douze points animation",

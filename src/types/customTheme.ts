@@ -44,6 +44,8 @@ export interface CustomTheme {
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
   themeSpecifics?: Partial<ThemeSpecifics>;
+  /** e.g. `montserrat` | `geist` | `dm-sans` — see `normalizeFontAlias` */
+  fontAlias?: string;
   createdAt: string;
   updatedAt: string;
   creator?: ThemeCreator;

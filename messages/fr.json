@@ -481,6 +481,7 @@
       "makeThemePublic": "Rendre le thème public",
       "main": "Principal",
       "baseTheme": "Thème de base",
+      "interfaceFont": "Police de l'interface",
       "interfaceColor": "Couleur de l’interface",
       "backgroundImage": "Image d’arrière-plan",
       "soundDouzePoints": "Animation des points Douze",

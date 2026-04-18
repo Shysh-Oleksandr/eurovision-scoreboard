@@ -1,7 +1,13 @@
-import { CustomTheme } from '@/types/customTheme';
-import { ThemeColors } from './types';
 import { getThemeForYear, getThemeBackground } from './themes';
+import { ThemeColors } from './types';
+
 import { toFixedIfDecimal } from '@/helpers/toFixedIfDecimal';
+import {
+  DEFAULT_FONT_ALIAS,
+  getFontFamilyStackCss,
+  normalizeFontAlias,
+} from '@/theme/fontAliases';
+import { CustomTheme } from '@/types/customTheme';
 
 // Constants for primary/gray shade generation
 const PRIMARY_SL = {
@@ -44,9 +50,11 @@ function adjustSLWithHsva(s: number, l: number, hsva: HSVA): [number, number] {
 /** Build primary palette using HSVA (hue from hsva.h, S/L adjusted globally) */
 export function buildPrimaryFromHsva(hsva: HSVA): Record<string, string> {
   const hue = hsva.h;
+
   return Object.fromEntries(
     Object.entries(PRIMARY_SL).map(([key, [s, l]]) => {
       const [sAdj, lAdj] = adjustSLWithHsva(s, l, hsva);
+
       return [
         key,
         `${toFixedIfDecimal(hue)} ${toFixedIfDecimal(sAdj)}% ${toFixedIfDecimal(
@@ -60,9 +68,11 @@ export function buildPrimaryFromHsva(hsva: HSVA): Record<string, string> {
 /** Build gray palette using HSVA (hue from hsva.h, S/L adjusted globally) */
 export function buildGrayFromHsva(hsva: HSVA): Record<string, string> {
   const hue = hsva.h;
+
   return Object.fromEntries(
     Object.entries(GRAY_SL).map(([key, [s, l]]) => {
       const [sAdj, lAdj] = adjustSLWithHsva(s, l, hsva);
+
       return [
         key,
         `${toFixedIfDecimal(hue)} ${toFixedIfDecimal(sAdj)}% ${toFixedIfDecimal(
@@ -87,6 +97,7 @@ function buildPalettesFromHueAndShade(
     v: typeof shadeValue === 'number' ? shadeValue : DEFAULT_V,
     a: 1,
   };
+
   return {
     primary: buildPrimaryFromHsva(hsva),
     gray: buildGrayFromHsva(hsva),
@@ -105,8 +116,9 @@ function parseOverrides(
     const keys = path.split('.');
     let current = parsed;
 
-    for (let i = 0; i < keys.length - 1; i++) {
+    for (let i = 0; i < keys.length - 1; i += 1) {
       const key = keys[i];
+
       if (!current[key]) {
         current[key] = {};
       }
@@ -114,6 +126,7 @@ function parseOverrides(
     }
 
     const lastKey = keys[keys.length - 1];
+
     current[lastKey] = value;
   }
 
@@ -137,6 +150,7 @@ export function toCssVarMap(colors: ThemeColors): Record<string, string> {
 
     // If it's in hsl(...) format, extract the content and remove commas
     const hslMatch = cssValue.match(/hsl\(([^)]+)\)/i);
+
     if (hslMatch) {
       // Remove commas and normalize spacing
       triplet = hslMatch[1].replace(/,/g, '').replace(/\s+/g, ' ').trim();
@@ -230,20 +244,27 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     : '[data-theme="custom"]';
 
   let style = document.getElementById(styleId) as HTMLStyleElement | null;
+
   if (!style) {
     style = document.createElement('style');
     style.id = styleId;
     document.head.appendChild(style);
   }
 
-  const cssText = Object.entries(vars)
-    .map(([k, v]) => `  ${k}: ${v};`)
+  const fontAlias = normalizeFontAlias(theme.fontAlias);
+  const fontStack = getFontFamilyStackCss(fontAlias);
+  const fontVarLine = `  --dp-font-family: ${fontStack};`;
+
+  const cssText = [fontVarLine]
+    .concat(Object.entries(vars).map(([k, v]) => `  ${k}: ${v};`))
     .join('\n');
+
   style.textContent = `${selector} {\n${cssText}\n}`;
 
   if (!preview) {
     // Set theme attribute
     document.documentElement.setAttribute('data-theme', 'custom');
+    document.documentElement.dataset.font = fontAlias;
 
     // Apply background image if present
     if (theme.backgroundImageUrl) {
@@ -254,6 +275,7 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     } else {
       // Use background from base theme
       const baseBg = getThemeBackground(theme.baseThemeYear);
+
       document.body.style.backgroundImage = `url(${baseBg})`;
       document.body.style.backgroundSize = 'cover';
       document.body.style.backgroundPosition = 'center';
@@ -268,11 +290,13 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
 export function clearCustomTheme(): void {
   // Remove custom theme style
   const style = document.getElementById('custom-theme-vars');
+
   if (style) {
     style.remove();
   }
   // Remove preview style if present
   const previewStyle = document.getElementById('custom-theme-preview-vars');
+
   if (previewStyle) {
     previewStyle.remove();
   }
@@ -281,6 +305,8 @@ export function clearCustomTheme(): void {
   if (document.documentElement.getAttribute('data-theme') === 'custom') {
     document.documentElement.removeAttribute('data-theme');
   }
+
+  document.documentElement.dataset.font = DEFAULT_FONT_ALIAS;
 
   // Clear background styles
   document.body.style.backgroundImage = '';

@@ -481,6 +481,7 @@
       "makeThemePublic": "Зробити тему публічною",
       "main": "Головне",
       "baseTheme": "Базова тема",
+      "interfaceFont": "Шрифт інтерфейсу",
       "interfaceColor": "Колір інтерфейсу",
       "backgroundImage": "Фонове зображення",
       "soundDouzePoints": "Анімація DouzePoints",
