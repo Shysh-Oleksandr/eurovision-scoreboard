@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-04-18',
+    title:
+      'Improved the sound effects logic: fixed overlap issue, added an optional delay for each sound. Fixed the issue with disappearing sound and theme background images. Added grouping for themes and contests. Added the interface font selection for custom themes',
+  },
+  {
     date: '2026-04-14',
     title: 'Added the option to enable minimalistic round and square flags',
   },
@@ -364,13 +369,10 @@ export const WHATS_NEW = [
 export const UPCOMING_FEATURES = [
   {
     approximateDates: { start: '2026-04-11', end: '2026-04-12' },
-    title: 'Different points system per stage. Bug fixes',
+    title: 'Different points system per stage',
   },
   {
     title: 'Odds system improvements',
-  },
-  {
-    title: 'Sound effects support for custom themes',
   },
   {
     title: 'Updated default themes (2016-2025)',
