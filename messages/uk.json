@@ -622,6 +622,7 @@
         "juryActivePointsUnderline": "Підкреслення активних балів журі",
         "juryPointsPanelRounded": "Заокруглений панель балів журі",
         "usePointsCountUpAnimation": "Використовувати анімацію лічби балів",
+        "roundedCountryContainer": "Заокруглений дизайн країни",
         "boardAnimation": "Анімація таблиці",
         "douzePointsAnimation": "Анімація Douze Points",
         "boardAnimations": {

@@ -41,6 +41,7 @@ export interface CustomTheme {
   isJuryPointsPanelRounded?: boolean;
   flagShape?: FlagShape;
   usePointsCountUpAnimation?: boolean;
+  roundedCountryContainer?: boolean;
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
   themeSpecifics?: Partial<ThemeSpecifics>;

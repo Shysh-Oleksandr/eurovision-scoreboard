@@ -22,6 +22,7 @@ type ThemePreviewCountryItemProps = {
   flagShape?: FlagShape;
   isJuryPointsPanelRounded?: boolean;
   usePointsCountUpAnimation?: boolean;
+  roundedCountryContainer?: boolean;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
 };
 
@@ -35,6 +36,7 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   flagShape = 'big-rectangle',
   isJuryPointsPanelRounded = false,
   usePointsCountUpAnimation = true,
+  roundedCountryContainer = false,
   douzePointsAnimationMode = 'heartsGrid',
 }) => {
   const t = useTranslations('widgets.themes');
@@ -80,6 +82,7 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
         flagShape={flagShape}
         isJuryPointsPanelRounded={isJuryPointsPanelRounded}
         usePointsCountUpAnimation={usePointsCountUpAnimation}
+        roundedCountryContainer={roundedCountryContainer}
         douzePointsAnimationMode={douzePointsAnimationMode}
       />
 

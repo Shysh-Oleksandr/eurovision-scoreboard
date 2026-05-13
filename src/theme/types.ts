@@ -20,6 +20,7 @@ export interface ThemeSpecifics {
   juryActivePointsUnderline: boolean;
   isJuryPointsPanelRounded: boolean;
   usePointsCountUpAnimation: boolean;
+  roundedCountryContainer: boolean;
 }
 
 export type ItemState =

@@ -119,8 +119,12 @@ const CountryItem = ({
   });
 
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const { uppercaseEntryName, flagShape, pointsContainerShape } =
-    useThemeSpecifics();
+  const {
+    uppercaseEntryName,
+    flagShape,
+    pointsContainerShape,
+    roundedCountryContainer,
+  } = useThemeSpecifics();
 
   const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
@@ -136,7 +140,9 @@ const CountryItem = ({
       className={`${isVotingOver ? '' : 'md:~md/xl:~w-[14rem]/[26rem]'} ${
         boardAnimationClassName || ''
       }`}
-      containerClassName={`${buttonClassName} flex-1 min-w-0 overflow-hidden`}
+      containerClassName={`${buttonClassName} flex-1 min-w-0 overflow-hidden ${
+        roundedCountryContainer ? '!rounded-full' : ''
+      }`}
       style={buttonSpecialStyle}
       disabled={isDisabled}
       onClick={onClick}
@@ -166,6 +172,7 @@ const CountryItem = ({
             points={'points' in country ? country.points : 0}
             isJuryVoting={isJuryVoting}
             state={currentState}
+            roundedCountryContainer={roundedCountryContainer}
           />
         );
       }}

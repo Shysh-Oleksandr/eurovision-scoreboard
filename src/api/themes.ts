@@ -33,6 +33,7 @@ export type CreateThemeInput = {
   isJuryPointsPanelRounded?: boolean;
   flagShape?: FlagShape;
   usePointsCountUpAnimation?: boolean;
+  roundedCountryContainer?: boolean;
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
@@ -55,6 +56,7 @@ export type UpdateThemeInput = {
   isJuryPointsPanelRounded?: boolean | null;
   flagShape?: FlagShape | null;
   usePointsCountUpAnimation?: boolean | null;
+  roundedCountryContainer?: boolean | null;
   boardAnimationMode?: BoardAnimationMode | null;
   douzePointsAnimationMode?: DouzePointsAnimationMode | null;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;

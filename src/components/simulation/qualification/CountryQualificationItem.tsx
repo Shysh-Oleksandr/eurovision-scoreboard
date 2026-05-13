@@ -30,7 +30,8 @@ export const CountryQualificationItem: React.FC<
   isModal = false,
 }) => {
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const { uppercaseEntryName, flagShape } = useThemeSpecifics();
+  const { uppercaseEntryName, flagShape, roundedCountryContainer } =
+    useThemeSpecifics();
   const getCurrentStage = useScoreboardStore((s) => s.getCurrentStage);
   const enableMinimalisticFlags = useGeneralStore(
     (s) => s.settings.enableMinimalisticFlags,
@@ -60,7 +61,11 @@ export const CountryQualificationItem: React.FC<
 
   if (!country) {
     return (
-      <div className="bg-primary-800 bg-gradient-to-r from-[10%] from-primary-700 to-primary-900 rounded-[1px] w-full lg:h-10 md:h-9 h-8 shadow-md"></div>
+      <div
+        className={`bg-primary-800 bg-gradient-to-r from-[10%] from-primary-700 to-primary-900 rounded-[1px] ${
+          roundedCountryContainer ? '!rounded-full' : ''
+        } w-full lg:h-10 md:h-9 h-8 shadow-md`}
+      ></div>
     );
   }
 
@@ -83,9 +88,12 @@ export const CountryQualificationItem: React.FC<
     >
       <CountryItemBase
         country={country}
-        containerClassName={`flex items-center rounded-[1px] duration-300 lg:h-10 md:h-9 h-8 relative shadow-md w-full ${
+        containerClassName={`flex items-center rounded-[1px] ${
+          roundedCountryContainer ? '!rounded-full' : ''
+        } duration-300 lg:h-10 md:h-9 h-8 relative shadow-md w-full ${
           onClick && !isDisabled ? 'brighten-on-hover' : ''
         } ${itemClassName}`}
+        contentClassName={roundedCountryContainer ? 'rounded-full' : ''}
         style={itemSpecialStyle}
         onClick={onClick ? () => onClick() : undefined}
         as="div"

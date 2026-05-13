@@ -622,6 +622,7 @@
         "juryActivePointsUnderline": "Soulignement des points actifs du jury",
         "juryPointsPanelRounded": "Panel des points du jury arrondi",
         "usePointsCountUpAnimation": "Utiliser l’animation de points comptant",
+        "roundedCountryContainer": "Design de pays arrondis",
         "boardAnimation": "Animation du tableau",
         "douzePointsAnimation": "Animation des points Douze",
         "boardAnimations": {

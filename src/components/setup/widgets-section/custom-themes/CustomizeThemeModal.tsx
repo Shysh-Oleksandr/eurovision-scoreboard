@@ -140,6 +140,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     useState<BoardAnimationMode>('flip');
   const [douzePointsAnimationMode, setDouzePointsAnimationMode] =
     useState<DouzePointsAnimationMode>('heartsGrid');
+  const [roundedCountryContainer, setRoundedCountryContainer] = useState(false);
   const [soundUrls, setSoundUrls] =
     useState<Record<ThemeSoundEventId, string>>(emptySoundUrlState);
   const [soundFiles, setSoundFiles] =
@@ -245,6 +246,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setUsePointsCountUpAnimation(
         resolvedInitialThemeSpecifics.usePointsCountUpAnimation,
       );
+      setRoundedCountryContainer(
+        resolvedInitialThemeSpecifics.roundedCountryContainer,
+      );
       setBoardAnimationMode(resolvedInitialThemeSpecifics.boardAnimationMode);
       setDouzePointsAnimationMode(
         resolvedInitialThemeSpecifics.douzePointsAnimationMode,
@@ -294,6 +298,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setIsJuryPointsPanelRounded(false);
       setFlagShape('big-rectangle');
       setUsePointsCountUpAnimation(true);
+      setRoundedCountryContainer(false);
       setBoardAnimationMode('flip');
       setDouzePointsAnimationMode('heartsGrid');
       setSoundUrls(emptySoundUrlState());
@@ -559,6 +564,11 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           (initialTheme.themeSpecifics?.usePointsCountUpAnimation !==
             undefined &&
             initialTheme.themeSpecifics?.usePointsCountUpAnimation !== null);
+        const hasCustomRoundedCountryContainer =
+          (initialTheme.roundedCountryContainer !== undefined &&
+            initialTheme.roundedCountryContainer !== null) ||
+          (initialTheme.themeSpecifics?.roundedCountryContainer !== undefined &&
+            initialTheme.themeSpecifics?.roundedCountryContainer !== null);
         const hasCustomBoardAnimationMode =
           (initialTheme.boardAnimationMode !== undefined &&
             initialTheme.boardAnimationMode !== null) ||
@@ -642,6 +652,19 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         }
 
         if (
+          hasCustomRoundedCountryContainer &&
+          roundedCountryContainer ===
+            defaultThemeSpecifics.roundedCountryContainer
+        ) {
+          payload.roundedCountryContainer = null;
+        } else if (
+          roundedCountryContainer !==
+          defaultThemeSpecifics.roundedCountryContainer
+        ) {
+          payload.roundedCountryContainer = roundedCountryContainer;
+        }
+
+        if (
           hasCustomBoardAnimationMode &&
           boardAnimationMode === defaultThemeSpecifics.boardAnimationMode
         ) {
@@ -694,6 +717,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           defaultThemeSpecifics.usePointsCountUpAnimation
         ) {
           payload.usePointsCountUpAnimation = usePointsCountUpAnimation;
+        }
+        if (
+          roundedCountryContainer !==
+          defaultThemeSpecifics.roundedCountryContainer
+        ) {
+          payload.roundedCountryContainer = roundedCountryContainer;
         }
         if (boardAnimationMode !== defaultThemeSpecifics.boardAnimationMode) {
           payload.boardAnimationMode = boardAnimationMode;
@@ -1133,6 +1162,15 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 checked={usePointsCountUpAnimation}
                 onChange={(e) => setUsePointsCountUpAnimation(e.target.checked)}
               />
+              <Checkbox
+                id="rounded-country-container"
+                label={t(
+                  'widgets.themes.visualDetails.roundedCountryContainer',
+                )}
+                labelClassName="w-full !px-0 !pt-1 !items-start"
+                checked={roundedCountryContainer}
+                onChange={(e) => setRoundedCountryContainer(e.target.checked)}
+              />
 
               <div className="grid xs:grid-cols-2 grid-cols-1 items-center xs:gap-3 gap-2">
                 <CustomSelect
@@ -1353,6 +1391,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
               flagShape={flagShape}
               isJuryPointsPanelRounded={isJuryPointsPanelRounded}
               usePointsCountUpAnimation={usePointsCountUpAnimation}
+              roundedCountryContainer={roundedCountryContainer}
               douzePointsAnimationMode={douzePointsAnimationMode}
             />
           </div>

@@ -12,6 +12,7 @@ export const DEFAULT_THEME_SPECIFICS: ThemeSpecifics = {
   juryActivePointsUnderline: true,
   isJuryPointsPanelRounded: false,
   usePointsCountUpAnimation: true,
+  roundedCountryContainer: false,
 };
 
 const BOARD_ANIMATION_MODES = ['flip', 'teleport'] as const;
@@ -73,6 +74,10 @@ const sanitizeThemeSpecifics = (
     sanitized.usePointsCountUpAnimation = specifics.usePointsCountUpAnimation;
   }
 
+  if (typeof specifics.roundedCountryContainer === 'boolean') {
+    sanitized.roundedCountryContainer = specifics.roundedCountryContainer;
+  }
+
   return sanitized;
 };
 
@@ -92,6 +97,7 @@ const mapLegacyCustomThemeSpecifics = (
     juryActivePointsUnderline: customTheme.juryActivePointsUnderline,
     isJuryPointsPanelRounded: customTheme.isJuryPointsPanelRounded,
     usePointsCountUpAnimation: customTheme.usePointsCountUpAnimation,
+    roundedCountryContainer: customTheme.roundedCountryContainer,
   };
 };
 

@@ -7,6 +7,7 @@ import { ArrowIcon } from '@/assets/icons/ArrowIcon';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import usePrevious from '@/hooks/usePrevious';
 import { useGeneralStore } from '@/state/generalStore';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const ARROW_DISPLAY_DURATION_MS = 3000;
 
@@ -26,6 +27,7 @@ type Props = {
   size?: 'scoreboard' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   state?: CountryItemState;
   overrides?: Record<string, string>;
+  roundedCountryContainer?: boolean;
 };
 
 const CountryPlaceNumber = ({
@@ -37,6 +39,7 @@ const CountryPlaceNumber = ({
   size = 'scoreboard',
   state,
   overrides: propOverrides,
+  roundedCountryContainer: roundedCountryContainerProp,
 }: Props) => {
   const isSmallScreen = useMediaQuery('(max-width: 479px)');
   const isTablet = useMediaQuery('(min-width: 576px)');
@@ -49,6 +52,10 @@ const CountryPlaceNumber = ({
     (s) => s.customTheme?.overrides || null,
   );
   const overrides = propOverrides || globalOverrides;
+  const { roundedCountryContainer: themeRoundedCountryContainer } =
+    useThemeSpecifics();
+  const roundedCountryContainer =
+    roundedCountryContainerProp ?? themeRoundedCountryContainer;
 
   const textRef = useRef<HTMLHeadingElement>(null);
 
@@ -157,7 +164,9 @@ const CountryPlaceNumber = ({
 
   return (
     <div
-      className={`flex flex-none items-center justify-center rounded-sm ${rankColorClasses[rankState]} relative ${currentSize.container}`}
+      className={`flex flex-none items-center justify-center rounded-sm ${
+        roundedCountryContainer ? '!rounded-full' : ''
+      } ${rankColorClasses[rankState]} relative ${currentSize.container}`}
       style={{ ...rankContainerSpecialStyle, width }}
     >
       <ArrowIcon

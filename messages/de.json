@@ -620,6 +620,7 @@
         "juryActivePointsUnderline": "Jury-Aktive-Punkte-Unterstreichung",
         "juryPointsPanelRounded": "Jury-Punktepanel-Rund",
         "usePointsCountUpAnimation": "Punkte-Zähl-Animation verwenden",
+        "roundedCountryContainer": "Rundes Länderelementdesign",
         "boardAnimation": "Board-Animation",
         "douzePointsAnimation": "Douze-Punkte-Animation",
         "boardAnimations": {

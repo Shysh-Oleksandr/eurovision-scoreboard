@@ -7,6 +7,7 @@ export interface CountryItemBaseProps {
   country: Country | BaseCountry;
   index?: number;
   className?: string;
+  contentClassName?: string;
   containerClassName?: string;
   style?: React.CSSProperties;
   disabled?: boolean;
@@ -33,6 +34,7 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   country,
   index = 0,
   className,
+  contentClassName,
   containerClassName,
   style,
   disabled = false,
@@ -72,7 +74,11 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
         {renderDouzePointsAnimation && renderDouzePointsAnimation(country)}
 
         {/* Content */}
-        <div className="flex items-center overflow-hidden flex-1 absolute w-full h-full">
+        <div
+          className={`flex items-center overflow-hidden flex-1 absolute w-full h-full ${
+            contentClassName || ''
+          }`}
+        >
           {/* Flag */}
           {renderFlag && renderFlag(country)}
 

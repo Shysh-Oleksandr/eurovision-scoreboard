@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-05-13',
+    title:
+      'Added the option to have rounded country design in custom themes (ESC 2026 style)',
+  },
+  {
     date: '2026-04-18',
     title:
       'Improved the sound effects logic: fixed overlap issue, added an optional delay for each sound. Fixed the issue with disappearing sound and theme background images. Added grouping for themes and contests. Added the interface font selection for custom themes',

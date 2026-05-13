@@ -622,6 +622,7 @@
         "juryActivePointsUnderline": "Υπογράμμιση Ενεργών Βαθμών Κριτικής",
         "juryPointsPanelRounded": "Κυκλικό Πλαίσιο Βαθμών Κριτικής",
         "usePointsCountUpAnimation": "Χρήση κινήσεων υπολογισμού βαθμών",
+        "roundedCountryContainer": "Κυκλικό Διάταξη Χώρων",
         "boardAnimation": "Κίνηση Πίνακα",
         "douzePointsAnimation": "Κίνηση Douze Points",
         "boardAnimations": {

@@ -43,6 +43,7 @@ type ThemePreviewCountryItemUIProps = {
   pointsContainerShape?: PointsContainerShape;
   flagShape?: FlagShape;
   usePointsCountUpAnimation?: boolean;
+  roundedCountryContainer?: boolean;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
 };
 
@@ -57,6 +58,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   pointsContainerShape = 'triangle',
   flagShape = 'big-rectangle',
   usePointsCountUpAnimation = true,
+  roundedCountryContainer = false,
   douzePointsAnimationMode = 'heartsGrid',
 }) => {
   const { user } = useAuthStore();
@@ -230,7 +232,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       country={mockCountry}
       index={0}
       className="flex items-center"
-      containerClassName={`relative flex justify-between shadow-md w-full overflow-hidden rounded-sm h-10 ${buttonBg} ${buttonText}`}
+      containerClassName={`relative flex justify-between shadow-md w-full overflow-hidden rounded-sm ${
+        roundedCountryContainer ? '!rounded-full' : ''
+      } h-10 ${buttonBg} ${buttonText}`}
       style={buttonBgStyle}
       as="div"
       showPlaceNumber
@@ -244,6 +248,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
           size="lg"
           state={state}
           overrides={overrides}
+          roundedCountryContainer={roundedCountryContainer}
         />
       )}
       renderDouzePointsAnimation={() =>

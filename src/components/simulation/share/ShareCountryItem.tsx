@@ -119,11 +119,17 @@ const ShareCountryItem: React.FC<Props> = ({
   };
 
   const currentSize = sizeStyles[size];
-  const buttonClassName = `relative flex justify-between shadow-md w-full overflow-hidden rounded-[1px] ${currentSize.button} ${buttonColors}`;
 
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const { uppercaseEntryName, pointsContainerShape, flagShape } =
-    useThemeSpecifics();
+  const {
+    uppercaseEntryName,
+    pointsContainerShape,
+    flagShape,
+    roundedCountryContainer,
+  } = useThemeSpecifics();
+  const buttonClassName = `relative flex justify-between shadow-md w-full overflow-hidden rounded-[1px] ${
+    roundedCountryContainer ? 'rounded-full' : ''
+  } ${currentSize.button} ${buttonColors}`;
   const enableMinimalisticFlags = useGeneralStore(
     (s) => s.settings.enableMinimalisticFlags,
   );
@@ -261,6 +267,7 @@ const ShareCountryItem: React.FC<Props> = ({
             isJuryVoting={false}
             size={size}
             state={currentState}
+            roundedCountryContainer={roundedCountryContainer}
           />
         );
       }}

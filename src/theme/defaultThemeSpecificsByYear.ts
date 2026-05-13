@@ -12,5 +12,6 @@ export const defaultThemeSpecificsByYear: Partial<
     juryActivePointsUnderline: true,
     isJuryPointsPanelRounded: false,
     usePointsCountUpAnimation: true,
+    roundedCountryContainer: false,
   },
 };

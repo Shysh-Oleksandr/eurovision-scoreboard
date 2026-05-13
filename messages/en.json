@@ -615,8 +615,9 @@
         "title": "Visual Details",
         "uppercaseEntryName": "Uppercase entry names",
         "juryActivePointsUnderline": "Jury active points underline",
-        "juryPointsPanelRounded": "Jury points panel rounded",
+        "juryPointsPanelRounded": "Rounded jury points panel",
         "usePointsCountUpAnimation": "Use points count-up animation",
+        "roundedCountryContainer": "Rounded country design",
         "boardAnimation": "Board animation",
         "douzePointsAnimation": "Douze points animation",
         "boardAnimations": {

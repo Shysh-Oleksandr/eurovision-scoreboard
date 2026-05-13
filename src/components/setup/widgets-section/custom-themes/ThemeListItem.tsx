@@ -170,6 +170,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           isJuryPointsPanelRounded={themeSpecifics.isJuryPointsPanelRounded}
           juryActivePointsUnderline={themeSpecifics.juryActivePointsUnderline}
           usePointsCountUpAnimation={themeSpecifics.usePointsCountUpAnimation}
+          roundedCountryContainer={themeSpecifics.roundedCountryContainer}
           douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
         />
       </div>
