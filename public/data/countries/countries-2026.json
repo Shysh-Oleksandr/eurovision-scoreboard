@@ -12,7 +12,7 @@
     "name": "Armenia",
     "code": "AM",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF2",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -40,7 +40,7 @@
     "name": "Azerbaijan",
     "code": "AZ",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF2",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -103,7 +103,7 @@
     "name": "Estonia",
     "code": "EE",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF1",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -132,7 +132,7 @@
     "name": "Georgia",
     "code": "GE",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF1",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -181,7 +181,7 @@
     "name": "Latvia",
     "code": "LV",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF2",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -199,7 +199,7 @@
     "name": "Luxembourg",
     "code": "LU",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF2",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -226,7 +226,7 @@
     "name": "Montenegro",
     "code": "ME",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF1",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -253,7 +253,7 @@
     "name": "Portugal",
     "code": "PT",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF1",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -271,7 +271,7 @@
     "name": "San Marino",
     "code": "SM",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "semiFinalGroup": "SF1",
     "juryOdds": 50,
     "televoteOdds": 50
@@ -298,7 +298,7 @@
     "name": "Switzerland",
     "code": "CH",
     "category": "All-Time Participants",
-    "isQualified": true,
+    "isQualified": false,
     "isAutoQualified": true,
     "juryOdds": 50,
     "televoteOdds": 50,
