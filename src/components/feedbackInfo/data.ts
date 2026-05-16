@@ -378,7 +378,13 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-04-11', end: '2026-04-12' },
+    approximateDates: { start: '2026-05-17', end: '2026-05-18' },
+    title: 'Eurovision 2026 theme',
+  },
+  {
+    title: 'Pre-1975 points system support',
+  },
+  {
     title: 'Different points system per stage',
   },
   {
@@ -389,9 +395,6 @@ export const UPCOMING_FEATURES = [
   },
   {
     title: 'Separate points system for jury and televote',
-  },
-  {
-    title: 'Pre-1975 points system support',
   },
   {
     title: 'Allocation draw',
