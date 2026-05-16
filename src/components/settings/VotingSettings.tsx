@@ -8,6 +8,48 @@ import { Input } from '../Input';
 
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
 
+const SPLIT_SCREEN_CANDIDATES_MIN = 2;
+const SPLIT_SCREEN_CANDIDATES_MAX = 6;
+
+const clampSplitScreenCandidatesCount = (value: number) =>
+  Math.max(
+    SPLIT_SCREEN_CANDIDATES_MIN,
+    Math.min(SPLIT_SCREEN_CANDIDATES_MAX, value),
+  );
+
+const SplitScreenCandidatesCountInput: React.FC<{
+  value: number;
+  onChange: (value: number) => void;
+}> = ({ value, onChange }) => {
+  const [inputValue, setInputValue] = React.useState(value.toString());
+
+  React.useEffect(() => {
+    setInputValue(value.toString());
+  }, [value]);
+
+  const handleBlur = () => {
+    const parsedValue = parseInt(inputValue, 10);
+    const validatedValue = Number.isNaN(parsedValue)
+      ? value
+      : clampSplitScreenCandidatesCount(parsedValue);
+
+    setInputValue(validatedValue.toString());
+    onChange(validatedValue);
+  };
+
+  return (
+    <Input
+      id="splitScreenCandidatesCount"
+      type="number"
+      step={1}
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onBlur={handleBlur}
+      className="!w-12 !h-8 text-center font-medium"
+    />
+  );
+};
+
 export const VotingSettings: React.FC = () => {
   const t = useTranslations('settings.voting');
   const settings = useGeneralStore((state) => state.settings);
@@ -78,26 +120,11 @@ export const VotingSettings: React.FC = () => {
               />
 
               <div className="flex items-center gap-2">
-                <Input
-                  id="splitScreenCandidatesCount"
-                  type="number"
-                  min={2}
-                  max={6}
-                  step={1}
-                  value={settings.splitScreenCandidatesCount.toString()}
-                  onChange={(e) => {
-                    const parsedValue = parseInt(e.target.value, 10);
-
-                    if (Number.isNaN(parsedValue)) return;
-
-                    setSettings({
-                      splitScreenCandidatesCount: Math.max(
-                        2,
-                        Math.min(6, parsedValue),
-                      ),
-                    });
-                  }}
-                  className="!w-12 !h-8 text-center font-medium"
+                <SplitScreenCandidatesCountInput
+                  value={settings.splitScreenCandidatesCount}
+                  onChange={(splitScreenCandidatesCount) =>
+                    setSettings({ splitScreenCandidatesCount })
+                  }
                 />
                 <span className="text-white font-medium">
                   {t('splitScreenCandidatesCount')}

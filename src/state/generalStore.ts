@@ -81,6 +81,7 @@ const DEFAULT_SETTINGS: Settings = {
   hideThemeSoundVolumeHud: false,
   disableAllThemeAudio: false,
   enableMinimalisticFlags: false,
+  splitPointsSystem: false,
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -162,6 +163,7 @@ interface Settings {
   hideThemeSoundVolumeHud: boolean;
   disableAllThemeAudio: boolean;
   enableMinimalisticFlags: boolean;
+  splitPointsSystem: boolean;
 }
 
 interface PresentationSettings {
@@ -209,8 +211,10 @@ export interface GeneralState {
   settings: Settings;
   presentationSettings: PresentationSettings;
   imageCustomization: ImageCustomizationSettings;
-  pointsSystem: PointsItem[]; // used during simulation
-  settingsPointsSystem: PointsItem[]; // used locally in settings
+  pointsSystem: PointsItem[]; // jury system used during simulation
+  settingsPointsSystem: PointsItem[]; // jury system used locally in settings
+  televotePointsSystem: PointsItem[]; // televote system used during simulation (only when splitPointsSystem=true)
+  settingsTelevotePointsSystem: PointsItem[]; // televote system used locally in settings (only when splitPointsSystem=true)
   generalSettingsExpansion: {
     contest: boolean;
     voting: boolean;
@@ -231,6 +235,8 @@ export interface GeneralState {
   ) => void;
   setPointsSystem: (points: PointsItem[]) => void;
   setSettingsPointsSystem: (points: PointsItem[]) => void;
+  setTelevotePointsSystem: (points: PointsItem[]) => void;
+  setSettingsTelevotePointsSystem: (points: PointsItem[]) => void;
   setGeneralSettingsExpansion: (
     expansion: Partial<GeneralState['generalSettingsExpansion']>,
   ) => void;
@@ -305,6 +311,8 @@ export const useGeneralStore = create<GeneralState>()(
         importedCustomEntries: [],
         pointsSystem: initialPointsSystem,
         settingsPointsSystem: initialPointsSystem,
+        televotePointsSystem: initialPointsSystem,
+        settingsTelevotePointsSystem: initialPointsSystem,
         generalSettingsExpansion: {
           contest: true,
           voting: true,
@@ -502,6 +510,12 @@ export const useGeneralStore = create<GeneralState>()(
         },
         setSettingsPointsSystem: (points: PointsItem[]) => {
           set({ settingsPointsSystem: points });
+        },
+        setTelevotePointsSystem: (points: PointsItem[]) => {
+          set({ televotePointsSystem: points });
+        },
+        setSettingsTelevotePointsSystem: (points: PointsItem[]) => {
+          set({ settingsTelevotePointsSystem: points });
         },
         setGeneralSettingsExpansion: (expansion) => {
           set((state) => ({
