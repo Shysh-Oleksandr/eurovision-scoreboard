@@ -443,7 +443,8 @@
         "points": "Punkte",
         "load": "Laden",
         "failedToLoadStats": "Fehler beim Laden der Statistiken",
-        "noEntriesMatch": "Keine Einträge entsprechen Ihrer Suche."
+        "noEntriesMatch": "Keine Einträge entsprechen Ihrer Suche.",
+        "customEntryName": "Benutzerdefinierter Eintrag"
       },
       "leaderboard": {
         "title": "Länder-Rangliste",
@@ -466,6 +467,14 @@
         "useYearButton": "Jahr {year} verwenden",
         "onlyEurovisionCountries": "Nur Eurovision-Länder",
         "rank": "Rang"
+      },
+      "myLeaderboard": {
+        "title": "Mein Teilnehmer-Leaderboard",
+        "subtitle": "Klicke auf eine Zeile, um detaillierte Ergebnisse deiner abgeschlossenen Wettbewerbe zu sehen.",
+        "noData": "Noch keine abgeschlossenen Wettbewerbe. Schließe einen Wettbewerb ab, um deine Statistiken zu sehen.",
+        "searchPlaceholder": "Länder suchen...",
+        "noEntriesMatch": "Keine Einträge entsprechen deiner Suche.",
+        "customEntryName": "Benutzerdefinierter Eintrag"
       }
     },
     "themes": {

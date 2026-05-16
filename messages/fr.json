@@ -445,7 +445,8 @@
         "points": "points",
         "load": "Charger",
         "failedToLoadStats": "Erreur lors du chargement des statistiques",
-        "noEntriesMatch": "Aucune entrée ne correspond à votre recherche."
+        "noEntriesMatch": "Aucune entrée ne correspond à votre recherche.",
+        "customEntryName": "Entrée personnalisée"
       },
       "leaderboard": {
         "title": "Classement des pays",
@@ -468,6 +469,14 @@
         "useYearButton": "Utiliser l’année {year}",
         "onlyEurovisionCountries": "Seuls les pays de l’Eurovision",
         "rank": "Rang"
+      },
+      "myLeaderboard": {
+        "title": "Mon classement de participations",
+        "subtitle": "Cliquez sur une ligne pour voir les résultats détaillés dans vos concours terminés.",
+        "noData": "Aucun concours terminé pour l'instant. Terminez un concours pour voir vos statistiques ici.",
+        "searchPlaceholder": "Rechercher des pays...",
+        "noEntriesMatch": "Aucune participation ne correspond à votre recherche.",
+        "customEntryName": "Entrée personnalisée"
       }
     },
     "themes": {

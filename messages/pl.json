@@ -445,7 +445,8 @@
         "points": "punkty",
         "load": "Ładowanie",
         "failedToLoadStats": "Błąd podczas ładowania statystyk",
-        "noEntriesMatch": "Nie znaleziono wkładów pasujących do wyszukiwania."
+        "noEntriesMatch": "Nie znaleziono wkładów pasujących do wyszukiwania.",
+        "customEntryName": "Niestandardowy wpis"
       },
       "leaderboard": {
         "title": "Ranking krajów",
@@ -468,6 +469,14 @@
         "useYearButton": "Użyj roku {year}",
         "onlyEurovisionCountries": "Tylko kraje Eurovision",
         "rank": "Miejsce"
+      },
+      "myLeaderboard": {
+        "title": "Moje zestawienie uczestników",
+        "subtitle": "Kliknij wiersz, aby zobaczyć szczegółowe wyniki w ukończonych konkursach.",
+        "noData": "Brak ukończonych konkursów. Ukończ konkurs, aby zobaczyć tu swoje statystyki.",
+        "searchPlaceholder": "Szukaj krajów...",
+        "noEntriesMatch": "Brak wyników dla podanego zapytania.",
+        "customEntryName": "Niestandardowy wpis"
       }
     },
     "themes": {

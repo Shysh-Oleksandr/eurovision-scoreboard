@@ -69,6 +69,7 @@ export const queryKeys = {
       ['user', 'contests-state', { ids: [...ids].sort() }] as const,
     entryStats: (entryCode: string) =>
       ['user', 'entry-stats', entryCode] as const,
+    myLeaderboard: () => ['user', 'my-leaderboard'] as const,
     quickSelectContests: () => ['user', 'quick-select-contests'] as const,
     quickSelectThemes: () => ['user', 'quick-select-themes'] as const,
     quickSelectState: (ids: string[]) =>
@@ -166,6 +167,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.savedContests(),
   queryKeys.user.contestGroups(),
   ['user', 'entry-stats'] as const,
+  queryKeys.user.myLeaderboard(),
   queryKeys.follows.followingFeed({}),
   queryKeys.legacy.meProfile(),
   queryKeys.legacy.me(),

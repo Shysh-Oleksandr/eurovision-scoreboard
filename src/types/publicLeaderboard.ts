@@ -18,3 +18,11 @@ export type PublicLeaderboardResponse = {
   contestCount: number;
   rows: PublicLeaderboardRow[];
 };
+
+export type CustomEntryMeta = { code: string; name: string; flag: string };
+
+export type MyLeaderboardResponse = {
+  contestCount: number;
+  rows: PublicLeaderboardRow[];
+  customEntries: CustomEntryMeta[];
+};

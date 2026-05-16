@@ -16,7 +16,10 @@ import type {
 } from '@/types/contest';
 import type { ContestSnapshot } from '@/types/contestSnapshot';
 import type { EntryStatsResponse } from '@/types/entryStats';
-import type { PublicLeaderboardResponse } from '@/types/publicLeaderboard';
+import type {
+  MyLeaderboardResponse,
+  PublicLeaderboardResponse,
+} from '@/types/publicLeaderboard';
 
 export type CreateContestInput = {
   name: string;
@@ -327,6 +330,20 @@ export function useContestSnapshotQuery(id: string, enabled = true) {
       return data as ContestSnapshot;
     },
     enabled: !!id && enabled,
+  });
+}
+
+export function useMyLeaderboardQuery(enabled = true) {
+  return useQuery<MyLeaderboardResponse>({
+    queryKey: queryKeys.user.myLeaderboard(),
+    queryFn: async () => {
+      const { data } = await api.get('/contests/me/leaderboard');
+
+      return data as MyLeaderboardResponse;
+    },
+    enabled,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
   });
 }
 

@@ -440,7 +440,8 @@
         "points": "pts",
         "load": "Load",
         "failedToLoadStats": "Failed to load stats",
-        "noEntriesMatch": "No entries match your search."
+        "noEntriesMatch": "No entries match your search.",
+        "customEntryName": "Custom entry"
       },
       "leaderboard": {
         "title": "Country leaderboard",
@@ -463,6 +464,14 @@
         "useYearButton": "Use year {year}",
         "onlyEurovisionCountries": "Only Eurovision countries",
         "rank": "Rank"
+      },
+      "myLeaderboard": {
+        "title": "My entry leaderboard",
+        "subtitle": "Click any row to view detailed results across your completed contests.",
+        "noData": "No completed contests yet. Complete a contest to see your entry stats here.",
+        "searchPlaceholder": "Search countries...",
+        "noEntriesMatch": "No entries match your search.",
+        "customEntryName": "Custom entry"
       }
     },
     "themes": {

@@ -27,4 +27,5 @@ export interface EntryStatsResponse {
   entryCode: string;
   summary: EntryStatsSummary;
   participations: EntryStatsParticipation[];
+  customEntriesUsed: Array<{ code: string; name: string; flag: string }>;
 }

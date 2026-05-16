@@ -32,6 +32,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
 }) => {
   const t = useTranslations('widgets.contests.entryStats');
   const tContests = useTranslations('widgets.contests');
+
   const setContestToLoad = useGeneralStore((s) => s.setContestToLoad);
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
@@ -43,21 +44,52 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
     isOpen && !!entryCode,
   );
 
-  const entryCountry = useMemo(() => {
-    if (!entryCode) return null;
+  const customEntryFallback = t('customEntryName');
 
-    return getAllCountries(true).find((c) => c.code === entryCode) ?? null;
-  }, [entryCode, getAllCountries]);
+  const customEntriesMap = useMemo(() => {
+    const map = new Map<string, { name: string; flag: string }>();
 
-  const { logo: entryLogo, isExisting: entryIsExisting } = entryCountry
-    ? getHostingCountryLogo(entryCountry, shouldShowHeartFlagIcon)
-    : { logo: getFlagPath('ww'), isExisting: false };
+    for (const ce of data?.customEntriesUsed ?? []) {
+      map.set(ce.code, { name: ce.name, flag: ce.flag });
+    }
 
-  const resolveCountry = (code?: string) => {
-    if (!code) return null;
+    return map;
+  }, [data?.customEntriesUsed]);
 
-    return getAllCountries(true).find((c) => c.code === code) ?? null;
+  const resolveEntry = (code: string | null | undefined) => {
+    if (!code) return { name: '—', logo: getFlagPath('ww'), isExisting: false };
+
+    const localCountry = getAllCountries(true).find((c) => c.code === code);
+
+    if (localCountry) {
+      return {
+        name: localCountry.name,
+        ...getHostingCountryLogo(localCountry, shouldShowHeartFlagIcon),
+      };
+    }
+
+    const apiEntry = customEntriesMap.get(code);
+
+    if (apiEntry) {
+      return {
+        name: apiEntry.name,
+        logo: apiEntry.flag || getFlagPath('ww'),
+        isExisting: false,
+      };
+    }
+
+    return {
+      name: code.startsWith('custom-') ? customEntryFallback : code,
+      logo: getFlagPath('ww'),
+      isExisting: false,
+    };
   };
+
+  const {
+    name: entryName,
+    logo: entryLogo,
+    isExisting: entryIsExisting,
+  } = resolveEntry(entryCode);
 
   const handleLoadContest = async (contestId: string) => {
     try {
@@ -99,7 +131,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
           />
           <div className="min-w-0 flex-1">
             <h2 className="text-lg sm:text-2xl font-bold text-white truncate">
-              {entryCountry?.name ?? entryCode ?? '—'}
+              {entryName}
             </h2>
           </div>
         </div>
@@ -155,11 +187,9 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
                   </thead>
                   <tbody>
                     {data.participations.map((row) => {
-                      const winner = resolveCountry(row.winnerCode);
-                      const wLogo = winner
-                        ? getHostingCountryLogo(winner, shouldShowHeartFlagIcon)
-                            .logo
-                        : getFlagPath('ww');
+                      const { name: winnerName, logo: wLogo } = resolveEntry(
+                        row.winnerCode,
+                      );
 
                       return (
                         <tr
@@ -187,9 +217,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
                                   e.currentTarget.src = getFlagPath('ww');
                                 }}
                               />
-                              <span className="truncate">
-                                {winner?.name ?? row.winnerCode ?? '—'}
-                              </span>
+                              <span className="truncate">{winnerName}</span>
                             </div>
                           </td>
                           <td className="py-2 pr-2 whitespace-nowrap">

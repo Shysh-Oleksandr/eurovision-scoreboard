@@ -271,7 +271,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                 {t('widgets.contests.inProgress')}
               </ContestMetadataBadge>
             )}
-            {!contest.isSimulationStarted && (
+            {!contest.isSimulationStarted && !contest.winner && (
               <ContestMetadataBadge className="!bg-red-900/60 !text-red-200">
                 <CircleDashedIcon className="size-4" />
                 {t('widgets.contests.notStarted')}

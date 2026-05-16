@@ -37,10 +37,9 @@ import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
 
-const CountryStatsPickerModal = dynamic(
-  () => import('./CountryStatsPickerModal'),
-  { ssr: false },
-);
+const MyLeaderboardModal = dynamic(() => import('./MyLeaderboardModal'), {
+  ssr: false,
+});
 const CountryStatsModal = dynamic(() => import('./CountryStatsModal'), {
   ssr: false,
 });
@@ -70,7 +69,7 @@ const UserContests: React.FC<UserContestsProps> = ({
   const [sortKey, setSortKey] = useState<ContestSortKey>('latest');
   const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
   const [page, setPage] = useState(1);
-  const [entryStatsPickerOpen, setEntryStatsPickerOpen] = useState(false);
+  const [myLeaderboardOpen, setMyLeaderboardOpen] = useState(false);
   const [entryStatsOpen, setEntryStatsOpen] = useState(false);
   const [entryStatsCode, setEntryStatsCode] = useState<string | null>(null);
   const [selectedContestGroupId, setSelectedContestGroupId] = useState<
@@ -405,7 +404,7 @@ const UserContests: React.FC<UserContestsProps> = ({
           placeholder={t('widgets.contests.searchContests')}
           extraActions={
             <Button
-              onClick={() => setEntryStatsPickerOpen(true)}
+              onClick={() => setMyLeaderboardOpen(true)}
               Icon={<ChartColumn className="w-6 h-6" />}
               className="justify-center whitespace-nowrap !p-3"
               title={t('widgets.contests.entryStats.pickerTitle')}
@@ -530,10 +529,10 @@ const UserContests: React.FC<UserContestsProps> = ({
         onDelete={(id) => deleteContestGroup(id)}
       />
 
-      {entryStatsPickerOpen && (
-        <CountryStatsPickerModal
-          isOpen={entryStatsPickerOpen}
-          onClose={() => setEntryStatsPickerOpen(false)}
+      {myLeaderboardOpen && (
+        <MyLeaderboardModal
+          isOpen={myLeaderboardOpen}
+          onClose={() => setMyLeaderboardOpen(false)}
           onSelectEntry={(code) => {
             setEntryStatsCode(code);
             setEntryStatsOpen(true);
@@ -547,7 +546,7 @@ const UserContests: React.FC<UserContestsProps> = ({
             setEntryStatsOpen(false);
             setEntryStatsCode(null);
           }}
-          onContestLoaded={() => setEntryStatsPickerOpen(false)}
+          onContestLoaded={() => setMyLeaderboardOpen(false)}
           entryCode={entryStatsCode}
         />
       )}
