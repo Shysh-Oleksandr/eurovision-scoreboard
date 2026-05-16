@@ -397,6 +397,8 @@
       "nGrandFinalParticipants": "{count} πρωταθλητές",
       "nCustom": "{count} προσαρμοσμένες συμμετοχές",
       "pointsSystem": "Σύστημα βαθμολογίας",
+      "juryPointsSystem": "Σύστημα βαθμών κριτικής επιτροπής",
+      "televotePointsSystem": "Σύστημα βαθμών τηλεψηφοφορίας",
       "inProgress": "Σε εξέλιξη",
       "notStarted": "Μη ξεκινημένο",
       "contestNameIsRequired": "Το όνομα του διαγωνισμού είναι απαραίτητο",
@@ -741,6 +743,9 @@
     "voting": {
       "pointsSystem": "Σύστημα Βαθμών",
       "dragAndDropToReorder": "Σύρετε και αφήστε για αναδιάταξη",
+      "splitPointsSystem": "Ξεχωριστό σύστημα βαθμών για κριτική επιτροπή / τηλεψηφοφορία",
+      "juryPointsSystem": "Σύστημα βαθμών κριτικής επιτροπής",
+      "televotePointsSystem": "Σύστημα βαθμών τηλεψηφοφορίας",
       "sparklesIconTooltip": "Το εικονίδιο <span></span> δείχνει ότι οι βαθμοί θα εμφανιστούν με animation όταν η χώρα τους λάβει. Κάντε κλικ για ενεργοποίηση/απενεργοποίηση.",
       "pickQualifiersWithoutAwardingPoints": "Επιλέξτε προκριθέντες χωρίς απονομή βαθμών",
       "pickQualifiersWithoutAwardingPointsTooltip": "Κάντε κλικ σε χώρες (ή επιλέξτε τυχαία) για να προκριθούν χωρίς βαθμούς.<br></br>Η λειτουργία ημιτελικής ψηφοφορίας επηρεάζει ακόμα τυχαία την πρόκριση και τη διανομή βαθμών.",

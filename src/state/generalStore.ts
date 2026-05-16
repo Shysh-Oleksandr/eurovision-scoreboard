@@ -562,6 +562,8 @@ export const useGeneralStore = create<GeneralState>()(
             settings: DEFAULT_SETTINGS,
             pointsSystem: initialPointsSystem,
             settingsPointsSystem: initialPointsSystem,
+            televotePointsSystem: initialPointsSystem,
+            settingsTelevotePointsSystem: initialPointsSystem,
             presentationSettings: DEFAULT_PRESENTATION_SETTINGS,
             imageCustomization: DEFAULT_IMAGE_CUSTOMIZATION,
           });
@@ -604,7 +606,10 @@ export const useGeneralStore = create<GeneralState>()(
               isCustomizationExpanded:
                 state.imageCustomization.isCustomizationExpanded,
             },
+            pointsSystem: state.pointsSystem,
             settingsPointsSystem: state.settingsPointsSystem,
+            televotePointsSystem: state.televotePointsSystem,
+            settingsTelevotePointsSystem: state.settingsTelevotePointsSystem,
             generalSettingsExpansion: state.generalSettingsExpansion,
             presentationSettings: restPresentationSettings,
           };
@@ -644,8 +649,14 @@ export const useGeneralStore = create<GeneralState>()(
           const year = state.year ?? INITIAL_YEAR;
           const themeYear = state.themeYear ?? INITIAL_YEAR;
 
+          const pointsSystem: PointsItem[] =
+            state.pointsSystem || initialPointsSystem;
           const settingsPointsSystem: PointsItem[] =
             state.settingsPointsSystem || initialPointsSystem;
+          const televotePointsSystem: PointsItem[] =
+            state.televotePointsSystem || initialPointsSystem;
+          const settingsTelevotePointsSystem: PointsItem[] =
+            state.settingsTelevotePointsSystem || initialPointsSystem;
 
           const persistedSettings = {
             ...currentState.settings,
@@ -675,7 +686,10 @@ export const useGeneralStore = create<GeneralState>()(
             themeYear,
             customTheme: state.customTheme ?? null,
             theme: getThemeForYear(themeYear),
+            pointsSystem,
             settingsPointsSystem,
+            televotePointsSystem,
+            settingsTelevotePointsSystem,
             settings,
             imageCustomization,
           };

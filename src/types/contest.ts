@@ -36,6 +36,8 @@ export interface Contest {
   // Derived metadata from snapshot
   stageNames: string[];
   customPointsSystem?: Array<number>;
+  juryPointsSystem?: Array<number>;
+  televotePointsSystem?: Array<number>;
   totalParticipants: number;
   grandFinalParticipants: number;
   customEntriesCount: number;

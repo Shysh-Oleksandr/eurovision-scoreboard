@@ -397,6 +397,8 @@
       "nGrandFinalParticipants": "{count} finaliści",
       "nCustom": "{count} własnych wpisów",
       "pointsSystem": "System punktacji",
+      "juryPointsSystem": "System punktacji jury",
+      "televotePointsSystem": "System punktacji telewizji",
       "inProgress": "W trakcie",
       "notStarted": "Nie rozpoczęty",
       "contestNameIsRequired": "Nazwa konkursu jest wymagana",
@@ -741,6 +743,9 @@
     "voting": {
       "pointsSystem": "System punktacji",
       "dragAndDropToReorder": "Przeciągnij i upuść, aby zmienić kolejność",
+      "splitPointsSystem": "Oddzielny system punktacji jury / telewizji",
+      "juryPointsSystem": "System punktacji jury",
+      "televotePointsSystem": "System punktacji telewizji",
       "sparklesIconTooltip": "Ikona <span></span> wskazuje, że punkty będą animowane po przyznaniu krajowi. Kliknij, aby włączyć/wyłączyć.",
       "pickQualifiersWithoutAwardingPoints": "Wybierz kwalifikantów bez przyznawania punktów",
       "pickQualifiersWithoutAwardingPointsTooltip": "Kliknij kraje (lub wybierz losowo), aby zakwalifikować je bez przyznawania punktów.<br></br>Tryb głosowania półfinałów nadal wpływa na losowych kwalifikantów i przydział punktów.",

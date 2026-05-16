@@ -397,6 +397,8 @@
       "nGrandFinalParticipants": "{count} finalisti",
       "nCustom": "{count} voci personalizzate",
       "pointsSystem": "Sistema di punti",
+      "juryPointsSystem": "Sistema di punti della giuria",
+      "televotePointsSystem": "Sistema di punti del televoto",
       "inProgress": "In corso",
       "notStarted": "Non iniziato",
       "contestNameIsRequired": "Il nome del concorso è obbligatorio",
@@ -741,6 +743,9 @@
     "voting": {
       "pointsSystem": "Sistema di Punti",
       "dragAndDropToReorder": "Trascina e rilascia per riordinare",
+      "splitPointsSystem": "Sistema di punti separato per giuria / televoto",
+      "juryPointsSystem": "Sistema di punti della giuria",
+      "televotePointsSystem": "Sistema di punti del televoto",
       "sparklesIconTooltip": "L'icona <span></span> indica che i punti saranno animati quando il paese li riceverà. Clicca per attivare/disattivare.",
       "pickQualifiersWithoutAwardingPoints": "Seleziona qualificati senza assegnare punti",
       "pickQualifiersWithoutAwardingPointsTooltip": "Clicca sui paesi (o scegli casualmente) per qualificarli senza assegnare punti.<br></br>La modalità di votazione delle Semifinali influenza comunque i qualificati casuali e la distribuzione dei punti.",

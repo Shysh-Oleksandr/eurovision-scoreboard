@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-05-16',
+    title:
+      "Added the ability to have different points system for jury and televote. Added the country leaderboard based on user's own completed contests. Added more font options. Added a setting to use the same font regardless of the theme. Small fixes.",
+  },
+  {
     date: '2026-05-13',
     title:
       'Added the option to have rounded country design in custom themes (ESC 2026 style)',

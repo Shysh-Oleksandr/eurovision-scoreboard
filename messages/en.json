@@ -392,6 +392,8 @@
       "nGrandFinalParticipants": "{count} finalists",
       "nCustom": "{count} custom entries",
       "pointsSystem": "Points System",
+      "juryPointsSystem": "Jury Points System",
+      "televotePointsSystem": "Televote Points System",
       "inProgress": "In progress",
       "notStarted": "Not started yet",
       "contestNameIsRequired": "Contest name is required",
@@ -736,6 +738,9 @@
     "voting": {
       "pointsSystem": "Points System",
       "dragAndDropToReorder": "Drag and drop to reorder",
+      "splitPointsSystem": "Separate jury / televote points system",
+      "juryPointsSystem": "Jury points system",
+      "televotePointsSystem": "Televote points system",
       "sparklesIconTooltip": "The <span></span> icon indicates that the points will be animated when the country receives them. Click to toggle.",
       "pickQualifiersWithoutAwardingPoints": "Pick qualifiers without awarding points",
       "pickQualifiersWithoutAwardingPointsTooltip": "Click countries (or choose randomly) to qualify them without awarding points.<br></br>The Semi-Finals voting mode still affects random qualifiers and points distribution.",

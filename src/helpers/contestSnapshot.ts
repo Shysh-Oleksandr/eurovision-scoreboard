@@ -51,15 +51,18 @@ const encodePredefinedVotes = (
 
 const decodePredefinedVotes = (
   encoded: Record<string, any>,
-  pointsSystem: PointsItem[],
+  juryPointsSystem: PointsItem[],
+  televotePointsSystem: PointsItem[],
 ) => {
-  const byId = new Map(pointsSystem.map((p) => [p.id, p]));
+  const juryById = new Map(juryPointsSystem.map((p) => [p.id, p]));
+  const televoteById = new Map(televotePointsSystem.map((p) => [p.id, p]));
   const out: Record<string, any> = {};
   for (const [stageId, stageVotes] of Object.entries(encoded || {})) {
     const decodedStage: any = {};
     for (const source of ['jury', 'televote', 'combined'] as const) {
       const byVoter = (stageVotes as any)?.[source];
       if (!byVoter) continue;
+      const byId = source === 'televote' ? televoteById : juryById;
       const decodedByVoter: Record<string, any[]> = {};
       for (const [voterCode, votes] of Object.entries(byVoter)) {
         decodedByVoter[voterCode] = (votes as any[]).map((tuple) => {
@@ -259,14 +262,11 @@ export function buildContestSnapshotFromStores() {
   const pointsSystem = general.pointsSystem as unknown as PointsItem[];
   const settingsPointsSystem =
     general.settingsPointsSystem as unknown as PointsItem[];
-
-  // Determine what to save based on setup vs simulation points systems
-  const isSetupDefault = isDefaultPointsSystem(settingsPointsSystem);
-  const isSimulationDefault = isDefaultPointsSystem(pointsSystem);
-  const isSamePointsSystems = isDeepEqual(pointsSystem, settingsPointsSystem);
-
-  let setupPointsPayload: any = undefined;
-  let simulationPointsPayload: any = undefined;
+  const televotePointsSystem =
+    general.televotePointsSystem as unknown as PointsItem[];
+  const settingsTelevotePointsSystem =
+    general.settingsTelevotePointsSystem as unknown as PointsItem[];
+  const splitPointsSystem = general.settings.splitPointsSystem;
 
   // Helper to create optimized points payload
   const createPointsPayload = (points: PointsItem[]) => {
@@ -277,19 +277,57 @@ export function buildContestSnapshotFromStores() {
     }));
   };
 
-  // If both are default, save nothing
-  if (isSetupDefault && isSimulationDefault) {
-    // No points systems to save
-  }
-  // If they're the same (but not default), save only in setup
-  else if (isSamePointsSystems) {
-    setupPointsPayload = createPointsPayload(settingsPointsSystem);
-    // simulationPointsPayload remains undefined - will use setup when loading
-  }
-  // If they're different, save both
-  else {
-    setupPointsPayload = createPointsPayload(settingsPointsSystem);
-    simulationPointsPayload = createPointsPayload(pointsSystem);
+  let setupPointsPayload: any = undefined;
+  let simulationPointsPayload: any = undefined;
+  let setupJuryPointsPayload: any = undefined;
+  let setupTelevotePointsPayload: any = undefined;
+  let simulationJuryPointsPayload: any = undefined;
+  let simulationTelevotePointsPayload: any = undefined;
+
+  if (splitPointsSystem) {
+    // Save jury and televote systems separately
+    if (!isDefaultPointsSystem(settingsPointsSystem)) {
+      setupJuryPointsPayload = createPointsPayload(settingsPointsSystem);
+    }
+    if (!isDefaultPointsSystem(settingsTelevotePointsSystem)) {
+      setupTelevotePointsPayload = createPointsPayload(
+        settingsTelevotePointsSystem,
+      );
+    }
+    if (
+      !isDeepEqual(pointsSystem, settingsPointsSystem) &&
+      !isDefaultPointsSystem(pointsSystem)
+    ) {
+      simulationJuryPointsPayload = createPointsPayload(pointsSystem);
+    }
+    if (
+      !isDeepEqual(televotePointsSystem, settingsTelevotePointsSystem) &&
+      !isDefaultPointsSystem(televotePointsSystem)
+    ) {
+      simulationTelevotePointsPayload = createPointsPayload(
+        televotePointsSystem,
+      );
+    }
+  } else {
+    // Determine what to save based on setup vs simulation points systems
+    const isSetupDefault = isDefaultPointsSystem(settingsPointsSystem);
+    const isSimulationDefault = isDefaultPointsSystem(pointsSystem);
+    const isSamePointsSystems = isDeepEqual(pointsSystem, settingsPointsSystem);
+
+    // If both are default, save nothing
+    if (isSetupDefault && isSimulationDefault) {
+      // No points systems to save
+    }
+    // If they're the same (but not default), save only in setup
+    else if (isSamePointsSystems) {
+      setupPointsPayload = createPointsPayload(settingsPointsSystem);
+      // simulationPointsPayload remains undefined - will use setup when loading
+    }
+    // If they're different, save both
+    else {
+      setupPointsPayload = createPointsPayload(settingsPointsSystem);
+      simulationPointsPayload = createPointsPayload(pointsSystem);
+    }
   }
 
   // setup.stages: stable config with participants/voters by code
@@ -322,6 +360,13 @@ export function buildContestSnapshotFromStores() {
         ? { randomnessLevel: general.settings.randomnessLevel }
         : {}),
       ...(setupPointsPayload ? { pointsSystem: setupPointsPayload } : {}),
+      ...(splitPointsSystem ? { splitPointsSystem: true } : {}),
+      ...(setupJuryPointsPayload
+        ? { juryPointsSystem: setupJuryPointsPayload }
+        : {}),
+      ...(setupTelevotePointsPayload
+        ? { televotePointsSystem: setupTelevotePointsPayload }
+        : {}),
       ...(countryOddsTuples.length > 0
         ? { countryOdds: countryOddsTuples }
         : {}),
@@ -417,7 +462,13 @@ export function buildContestSnapshotFromStores() {
     snapshot.simulation = {
       ...(simulationPointsPayload
         ? { pointsSystem: simulationPointsPayload }
-        : {}), // Only save if different from setup
+        : {}),
+      ...(simulationJuryPointsPayload
+        ? { juryPointsSystem: simulationJuryPointsPayload }
+        : {}),
+      ...(simulationTelevotePointsPayload
+        ? { televotePointsSystem: simulationTelevotePointsPayload }
+        : {}),
       stages: simulationStages,
       results: {
         predefinedVotes: encodePredefinedVotes(scoreboard.predefinedVotes),
@@ -532,22 +583,61 @@ export async function applyContestSnapshotToStores(
 
   // Apply setup settings
   if (loadOptions.setup) {
-    const settingsPointsSystem = getPointsSystem(snapshot.setup.pointsSystem);
-    generalSettingsUpdate.pointsSystem = settingsPointsSystem;
-    generalSettingsUpdate.settingsPointsSystem = settingsPointsSystem;
+    if (snapshot.setup.splitPointsSystem) {
+      const jurySystem = getPointsSystem(snapshot.setup.juryPointsSystem);
+      const televoteSystem = getPointsSystem(
+        snapshot.setup.televotePointsSystem,
+      );
+      generalSettingsUpdate.pointsSystem = jurySystem;
+      generalSettingsUpdate.settingsPointsSystem = jurySystem;
+      generalSettingsUpdate.televotePointsSystem = televoteSystem;
+      generalSettingsUpdate.settingsTelevotePointsSystem = televoteSystem;
+      generalSettingsUpdateSettings.splitPointsSystem = true;
+    } else {
+      const settingsPointsSystem = getPointsSystem(snapshot.setup.pointsSystem);
+      generalSettingsUpdate.pointsSystem = settingsPointsSystem;
+      generalSettingsUpdate.settingsPointsSystem = settingsPointsSystem;
+      generalSettingsUpdate.televotePointsSystem = settingsPointsSystem;
+      generalSettingsUpdate.settingsTelevotePointsSystem = settingsPointsSystem;
+      generalSettingsUpdateSettings.splitPointsSystem = false;
+    }
     generalSettingsUpdateSettings.randomnessLevel =
       snapshot.setup.randomnessLevel ?? DEFAULT_RANDOMNESS_LEVEL;
   }
 
   // Apply simulation settings
   if (loadOptions.simulation) {
-    const simulationPointsSystem = getPointsSystem(
-      snapshot.simulation?.pointsSystem || snapshot.setup.pointsSystem,
-    );
-    generalSettingsUpdate.pointsSystem = simulationPointsSystem;
-    generalSettingsUpdate.settingsPointsSystem = getPointsSystem(
-      snapshot.setup.pointsSystem,
-    );
+    if (snapshot.setup.splitPointsSystem) {
+      const simJurySystem = getPointsSystem(
+        snapshot.simulation?.juryPointsSystem || snapshot.setup.juryPointsSystem,
+      );
+      const simTelevoteSystem = getPointsSystem(
+        snapshot.simulation?.televotePointsSystem ||
+          snapshot.setup.televotePointsSystem,
+      );
+      generalSettingsUpdate.pointsSystem = simJurySystem;
+      generalSettingsUpdate.settingsPointsSystem = getPointsSystem(
+        snapshot.setup.juryPointsSystem,
+      );
+      generalSettingsUpdate.televotePointsSystem = simTelevoteSystem;
+      generalSettingsUpdate.settingsTelevotePointsSystem = getPointsSystem(
+        snapshot.setup.televotePointsSystem,
+      );
+      generalSettingsUpdateSettings.splitPointsSystem = true;
+    } else {
+      const simulationPointsSystem = getPointsSystem(
+        snapshot.simulation?.pointsSystem || snapshot.setup.pointsSystem,
+      );
+      generalSettingsUpdate.pointsSystem = simulationPointsSystem;
+      generalSettingsUpdate.settingsPointsSystem = getPointsSystem(
+        snapshot.setup.pointsSystem,
+      );
+      generalSettingsUpdate.televotePointsSystem = simulationPointsSystem;
+      generalSettingsUpdate.settingsTelevotePointsSystem = getPointsSystem(
+        snapshot.setup.pointsSystem,
+      );
+      generalSettingsUpdateSettings.splitPointsSystem = false;
+    }
 
     // Enable presentation mode if selected
     if (isPresentationMode) {
@@ -667,20 +757,30 @@ export async function applyContestSnapshotToStores(
 
   // Apply simulation state if present and enabled
   if (snapshot.simulation && loadOptions.simulation) {
-    // Use simulation's pointsSystem for vote decoding, fallback to setup, then default
-    const simulationPointsSystemSource =
-      snapshot.simulation!.pointsSystem || snapshot.setup.pointsSystem;
-    const simulationPointsSystem: PointsItem[] = simulationPointsSystemSource
-      ? simulationPointsSystemSource.map((p) => ({
-          id: p.id,
-          value: p.value,
-          showDouzePoints: p.value === 12,
-        }))
-      : defaultPointsSystem;
+    // Resolve jury and televote systems for vote decoding
+    let decodeJurySystem: PointsItem[];
+    let decodeTelevoteSystem: PointsItem[];
+
+    if (snapshot.setup.splitPointsSystem) {
+      decodeJurySystem = getPointsSystem(
+        snapshot.simulation!.juryPointsSystem || snapshot.setup.juryPointsSystem,
+      );
+      decodeTelevoteSystem = getPointsSystem(
+        snapshot.simulation!.televotePointsSystem ||
+          snapshot.setup.televotePointsSystem,
+      );
+    } else {
+      const sharedSource =
+        snapshot.simulation!.pointsSystem || snapshot.setup.pointsSystem;
+      const sharedSystem = getPointsSystem(sharedSource);
+      decodeJurySystem = sharedSystem;
+      decodeTelevoteSystem = sharedSystem;
+    }
 
     const decodedPredefinedVotes = decodePredefinedVotes(
       snapshot.simulation!.results.predefinedVotes as any,
-      simulationPointsSystem,
+      decodeJurySystem,
+      decodeTelevoteSystem,
     );
 
     // Create lookup map for setup stages

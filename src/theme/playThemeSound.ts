@@ -209,12 +209,16 @@ export function playThemeSound(
   }
 }
 
-/** True if this point value is the animated “douze” tier in the active points system. */
+/** True if this point value is the animated “douze” tier in the active televote points system. */
 export function isVotingPointsValueDouzeTier(points: number): boolean {
   if (points <= 0) return false;
-  const { pointsSystem } = useGeneralStore.getState();
+  const { pointsSystem, televotePointsSystem, settings } =
+    useGeneralStore.getState();
+  const effectiveSystem = settings.splitPointsSystem
+    ? televotePointsSystem
+    : pointsSystem;
 
-  return pointsSystem.some((p) => p.value === points && p.showDouzePoints);
+  return effectiveSystem.some((p) => p.value === points && p.showDouzePoints);
 }
 
 /** Jury / combined-style point lines only; not televote reveal. */

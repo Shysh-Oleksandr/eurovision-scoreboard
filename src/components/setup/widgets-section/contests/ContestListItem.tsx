@@ -120,7 +120,12 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const isMyContest =
     variant === 'user' || contest.userId.toString() === user?._id;
 
+  const hasSplitPointsSystem = !!(
+    contest.juryPointsSystem?.length || contest.televotePointsSystem?.length
+  );
+
   const isCustomPointsSystem = useMemo(() => {
+    if (hasSplitPointsSystem) return false;
     if (!contest.customPointsSystem || contest.customPointsSystem.length === 0)
       return false;
 
@@ -131,7 +136,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     }
 
     return false;
-  }, [contest.customPointsSystem]);
+  }, [contest.customPointsSystem, hasSplitPointsSystem]);
 
   const { logo, isExisting } = getHostingCountryLogo(
     contest.hostingCountryCode,
@@ -250,6 +255,20 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                 <UserStarIcon className="size-4" />
                 {t('widgets.contests.pointsSystem')}:{' '}
                 {contest.customPointsSystem?.join(', ')}
+              </ContestMetadataBadge>
+            )}
+            {hasSplitPointsSystem && contest.juryPointsSystem && (
+              <ContestMetadataBadge className="!bg-purple-900/60 !text-purple-200">
+                <UserStarIcon className="size-4" />
+                {t('widgets.contests.juryPointsSystem')}:{' '}
+                {contest.juryPointsSystem.join(', ')}
+              </ContestMetadataBadge>
+            )}
+            {hasSplitPointsSystem && contest.televotePointsSystem && (
+              <ContestMetadataBadge className="!bg-violet-900/60 !text-violet-200">
+                <UserStarIcon className="size-4" />
+                {t('widgets.contests.televotePointsSystem')}:{' '}
+                {contest.televotePointsSystem.join(', ')}
               </ContestMetadataBadge>
             )}
 

@@ -397,6 +397,8 @@
       "nGrandFinalParticipants": "{count} фіналістів",
       "nCustom": "{count} користувацьких учасників",
       "pointsSystem": "Система балів",
+      "juryPointsSystem": "Система балів журі",
+      "televotePointsSystem": "Система балів глядацького голосування",
       "inProgress": "В процесі",
       "notStarted": "Не почато",
       "contestNameIsRequired": "Назва конкурсу є обов'язковою",
@@ -741,6 +743,9 @@
     "voting": {
       "pointsSystem": "Система балів",
       "dragAndDropToReorder": "Перетягніть, щоб змінити порядок",
+      "splitPointsSystem": "Окремі системи балів для журі та глядачів",
+      "juryPointsSystem": "Система балів журі",
+      "televotePointsSystem": "Система балів глядацького голосування",
       "sparklesIconTooltip": "Іконка <span></span> означає, що бали будуть анімовані при їх отриманні. Натисніть, щоб вимкнути/увімкнути.",
       "pickQualifiersWithoutAwardingPoints": "Обирати фіналістів без нарахування балів",
       "pickQualifiersWithoutAwardingPointsTooltip": "Натискайте на країни (або виберіть рандомно), щоб кваліфікувати їх без балів.<br></br>Режим голосування півфіналів усе ще впливає на випадковий вибір та розподіл балів.",

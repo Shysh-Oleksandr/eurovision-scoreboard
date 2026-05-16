@@ -21,6 +21,10 @@ export const useVotingPredefinition = ({
   stage,
 }: UseVotingPredefinitionArgs) => {
   const pointsSystem = useGeneralStore((s) => s.pointsSystem);
+  const televotePointsSystem = useGeneralStore((s) => s.televotePointsSystem);
+  const splitPointsSystem = useGeneralStore(
+    (s) => s.settings.splitPointsSystem,
+  );
   const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
   const getStageVotingCountries = useCountriesStore(
     (s) => s.getStageVotingCountries,
@@ -88,6 +92,9 @@ export const useVotingPredefinition = ({
   };
 
   const randomizeAll = () => {
+    const effectiveTelevoteSystem = splitPointsSystem
+      ? televotePointsSystem
+      : pointsSystem;
     const generated = predefineStageVotes(
       stage.countries,
       votingCountries,
@@ -95,6 +102,7 @@ export const useVotingPredefinition = ({
       countryOdds,
       randomnessLevel,
       pointsSystem,
+      effectiveTelevoteSystem,
     );
 
     setVotes(generated);

@@ -35,7 +35,16 @@ const TelevoteInput = () => {
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
   );
-  const pointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const _juryPointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const _televotePointsSystem = useGeneralStore(
+    (state) => state.televotePointsSystem,
+  );
+  const splitPointsSystem = useGeneralStore(
+    (state) => state.settings.splitPointsSystem,
+  );
+  const pointsSystem = splitPointsSystem
+    ? _televotePointsSystem
+    : _juryPointsSystem;
 
   const currentRevealTelevotePoints = useScoreboardStore(
     (state) => state.currentRevealTelevotePoints,

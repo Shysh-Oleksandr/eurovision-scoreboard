@@ -69,10 +69,12 @@ const PointsSection: React.FC<PointsSectionProps> = ({
     const shouldDisableAnimation =
       !shouldUsePointsCountUpAnimation ||
       (winnerCountry && isLastSimulationAnimationFinished);
+    const decimalPlaces = (currentPoints.toString().split('.')[1] ?? '').length;
     const countUp = new CountUp(pointsRef.current, currentPoints, {
       startVal,
       duration: shouldDisableAnimation ? 0 : 0.6,
       useGrouping: false,
+      decimalPlaces,
       formattingFn: (value) => String(toFixedIfDecimalFloat(value)),
     });
 

@@ -178,7 +178,8 @@ export const predefineStageVotes = (
   votingMode: StageVotingMode,
   countryOdds: CountryOdds,
   randomnessLevel: number,
-  pointsSystem: PointsItem[],
+  juryPointsSystem: PointsItem[],
+  televotePointsSystem: PointsItem[],
 ): Partial<StageVotes> => {
   // Create a new set of odds with randomness "baked in" for this simulation.
   // This ensures that a country's "luck" is consistent across all voters.
@@ -246,7 +247,7 @@ export const predefineStageVotes = (
         perturbedOdds,
         'juryOdds',
         temperature,
-        pointsSystem,
+        juryPointsSystem,
       );
     }
   }
@@ -259,7 +260,7 @@ export const predefineStageVotes = (
         stageCountries,
         perturbedOdds,
         temperature,
-        pointsSystem,
+        juryPointsSystem,
       );
     }
   }
@@ -273,7 +274,7 @@ export const predefineStageVotes = (
         perturbedOdds,
         'televoteOdds',
         temperature,
-        pointsSystem,
+        televotePointsSystem,
       );
     }
   }

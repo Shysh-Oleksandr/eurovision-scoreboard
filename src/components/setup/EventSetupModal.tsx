@@ -132,8 +132,17 @@ const EventSetupModal = () => {
   const settingsPointsSystem = useGeneralStore(
     (state) => state.settingsPointsSystem,
   );
+  const settingsTelevotePointsSystem = useGeneralStore(
+    (state) => state.settingsTelevotePointsSystem,
+  );
+  const splitPointsSystem = useGeneralStore(
+    (state) => state.settings.splitPointsSystem,
+  );
   const isGfOnly = useGeneralStore((state) => state.isGfOnly);
   const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
+  const setTelevotePointsSystem = useGeneralStore(
+    (state) => state.setTelevotePointsSystem,
+  );
   const enablePredefined = useGeneralStore(
     (state) => state.settings.enablePredefinedVotes,
   );
@@ -354,6 +363,12 @@ const EventSetupModal = () => {
         : PREDEFINED_SYSTEMS_MAP['default'];
 
     setPointsSystem(resolvedPointsSystem);
+
+    const resolvedTelevotePointsSystem =
+      splitPointsSystem && settingsTelevotePointsSystem.length > 0
+        ? settingsTelevotePointsSystem
+        : resolvedPointsSystem;
+    setTelevotePointsSystem(resolvedTelevotePointsSystem);
 
     // Compute first stage locally (sorted by order)
     const sortedStages = [...eventStagesWithCountries].sort(

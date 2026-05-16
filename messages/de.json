@@ -395,6 +395,8 @@
       "nGrandFinalParticipants": "{count} Finalisten",
       "nCustom": "{count} benutzerdefinierte Beiträge",
       "pointsSystem": "Punktesystem",
+      "juryPointsSystem": "Jury-Punktesystem",
+      "televotePointsSystem": "Televote-Punktesystem",
       "inProgress": "In Bearbeitung",
       "notStarted": "Noch nicht gestartet",
       "contestNameIsRequired": "Wettbewerb-Name ist erforderlich",
@@ -739,6 +741,9 @@
     "voting": {
       "pointsSystem": "Punktesystem",
       "dragAndDropToReorder": "Ziehen und ablegen zum Neuordnen",
+      "splitPointsSystem": "Separates Jury-/Televote-Punktesystem",
+      "juryPointsSystem": "Jury-Punktesystem",
+      "televotePointsSystem": "Televote-Punktesystem",
       "sparklesIconTooltip": "Das <span></span>-Symbol zeigt an, dass die Punkte animiert werden. Klick zum Umschalten.",
       "pickQualifiersWithoutAwardingPoints": "Qualifikanten ohne Punktevergabe auswählen",
       "pickQualifiersWithoutAwardingPointsTooltip": "Klicke Länder an (oder wähle zufällig), um sie ohne Punktevergabe zu qualifizieren.<br></br>Der Halbfinalmodus beeinflusst weiterhin zufällige Qualifikanten und Punkteverteilung.",
