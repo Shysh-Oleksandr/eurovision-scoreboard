@@ -10,22 +10,28 @@ import {
   DEFAULT_HOSTING_COUNTRY_NAME,
   POINTS_ARRAY,
 } from '../data/data';
-import { getThemeForYear } from '../theme/themes';
-import { api } from '@/api/client';
-import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryByYear } from '../theme/hosting';
+import { getThemeForYear } from '../theme/themes';
 import { Theme } from '../theme/types';
 
 import { useCountriesStore } from './countriesStore';
 import { useScoreboardStore } from './scoreboardStore';
+
+import { api } from '@/api/client';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
-import { CustomTheme, ThemeCreator } from '@/types/customTheme';
-import { Contest } from '@/types/contest';
 import { BaseCountry } from '@/models';
+import { useAuthStore } from '@/state/useAuthStore';
+import {
+  applyDocumentFontAlias,
+  normalizeFontAlias,
+  resolveActiveFontAlias,
+} from '@/theme/fontAliases';
 import {
   applyCustomTheme as applyCustomThemeUtil,
   clearCustomTheme as clearCustomThemeUtil,
 } from '@/theme/themeUtils';
+import { Contest } from '@/types/contest';
+import { CustomTheme, ThemeCreator } from '@/types/customTheme';
 
 export enum ScoreboardMobileLayout {
   ONE_COLUMN = 'one-column',
@@ -82,6 +88,9 @@ const DEFAULT_SETTINGS: Settings = {
   disableAllThemeAudio: false,
   enableMinimalisticFlags: false,
   splitPointsSystem: false,
+  hideVotingHints: false,
+  overrideThemeFont: false,
+  overrideThemeFontAlias: 'montserrat',
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -97,6 +106,7 @@ export const getInitialAspectRatio = (): ShareImageAspectRatio => {
   if (typeof window !== 'undefined' && window.innerWidth < 576) {
     return ShareImageAspectRatio.SQUARE;
   }
+
   return ShareImageAspectRatio.LANDSCAPE;
 };
 
@@ -163,7 +173,11 @@ interface Settings {
   hideThemeSoundVolumeHud: boolean;
   disableAllThemeAudio: boolean;
   enableMinimalisticFlags: boolean;
+  hideVotingHints: boolean;
   splitPointsSystem: boolean;
+  /** When true, ignore the active theme's font and use `overrideThemeFontAlias`. */
+  overrideThemeFont: boolean;
+  overrideThemeFontAlias: string;
 }
 
 interface PresentationSettings {
@@ -386,6 +400,7 @@ export const useGeneralStore = create<GeneralState>()(
           document.documentElement.setAttribute('data-theme', year);
 
           const prevCustom = get().customTheme;
+
           set({
             themeYear: year,
             theme: getThemeForYear(year),
@@ -395,10 +410,13 @@ export const useGeneralStore = create<GeneralState>()(
             suppressProfileActiveOnStatic: true,
           });
 
+          syncDocumentFont();
+
           // Proactively clear active theme on the server to avoid reapplication
           (async () => {
             try {
               const auth = useAuthStore.getState();
+
               if (auth.user) {
                 await api.post('/themes/clear-active');
                 useAuthStore.setState({
@@ -420,20 +438,26 @@ export const useGeneralStore = create<GeneralState>()(
           applyCustomThemeUtil(theme);
 
           const prevCustom = get().customTheme;
+
           set({
             customTheme: theme,
             blockedActiveThemeId: prevCustom?._id ?? get().blockedActiveThemeId,
             suppressProfileActiveOnStatic: false,
           });
+
+          syncDocumentFont();
         },
         clearCustomTheme: () => {
           clearCustomThemeUtil();
 
           // Reapply the current static theme
           const { themeYear } = get();
+
           document.documentElement.classList.add(`theme-${themeYear}`);
 
           set({ customTheme: null });
+
+          syncDocumentFont();
         },
         setSuppressActiveThemeOnce: (value: boolean) => {
           set({ suppressActiveThemeOnce: value });
@@ -484,6 +508,7 @@ export const useGeneralStore = create<GeneralState>()(
         },
         setSettings: (settings: Partial<Settings>) => {
           const nextSettings = { ...settings };
+
           if (typeof nextSettings.splitScreenCandidatesCount === 'number') {
             nextSettings.splitScreenCandidatesCount = Math.max(
               2,
@@ -491,9 +516,22 @@ export const useGeneralStore = create<GeneralState>()(
             );
           }
 
+          if (nextSettings.overrideThemeFontAlias !== undefined) {
+            nextSettings.overrideThemeFontAlias = normalizeFontAlias(
+              nextSettings.overrideThemeFontAlias,
+            );
+          }
+
           set((state) => ({
             settings: { ...state.settings, ...nextSettings },
           }));
+
+          if (
+            nextSettings.overrideThemeFont !== undefined ||
+            nextSettings.overrideThemeFontAlias !== undefined
+          ) {
+            syncDocumentFont();
+          }
         },
         setImageCustomization: (
           customization: Partial<ImageCustomizationSettings>,
@@ -617,6 +655,7 @@ export const useGeneralStore = create<GeneralState>()(
         onRehydrateStorage: () => (state) => {
           if (state) {
             const isJunior = state.settings?.isJuniorContest ?? false;
+
             useCountriesStore
               .getState()
               .setInitialCountriesForYear(state.year, {
@@ -626,14 +665,17 @@ export const useGeneralStore = create<GeneralState>()(
 
             // Ensure theme is consistent; fallback to standard theme for the year
             const theme = getThemeForYear(state.themeYear ?? state.year);
+
             useGeneralStore.setState({ theme });
 
             (async () => {
               const currentSettings = useGeneralStore.getState().settings;
+
               if (!currentSettings.shouldUseCustomBgImage) return;
 
               requestAnimationFrame(async () => {
                 const image = await getCustomBgImageFromDB();
+
                 if (image) {
                   useGeneralStore.setState({
                     settings: { ...currentSettings, customBgImage: image },
@@ -641,6 +683,8 @@ export const useGeneralStore = create<GeneralState>()(
                 }
               });
             })();
+
+            syncDocumentFont();
           }
         },
         merge: (persistedState, currentState) => {
@@ -667,6 +711,10 @@ export const useGeneralStore = create<GeneralState>()(
           const settings = {
             ...persistedSettings,
             isJuniorContest: isJunior,
+            overrideThemeFont: persistedSettings.overrideThemeFont ?? false,
+            overrideThemeFontAlias: normalizeFontAlias(
+              persistedSettings.overrideThemeFontAlias,
+            ),
           };
 
           // Merge imageCustomization, keeping only aspectRatio from persistence
@@ -700,12 +748,27 @@ export const useGeneralStore = create<GeneralState>()(
   ),
 );
 
+export function syncDocumentFont() {
+  if (typeof document === 'undefined') return;
+
+  const { settings, customTheme } = useGeneralStore.getState();
+  const alias = resolveActiveFontAlias({
+    overrideEnabled: settings.overrideThemeFont,
+    overrideAlias: settings.overrideThemeFontAlias,
+    themeAlias: customTheme?.fontAlias,
+  });
+
+  applyDocumentFontAlias(alias);
+}
+
 (async () => {
   const currentSettings = useGeneralStore.getState().settings;
+
   if (!currentSettings.shouldUseCustomBgImage) return;
 
   requestAnimationFrame(async () => {
     const image = await getCustomBgImageFromDB();
+
     if (image) {
       useGeneralStore.setState({
         settings: { ...currentSettings, customBgImage: image },

@@ -246,7 +246,7 @@ export const WHATS_NEW = [
   {
     date: '2026-05-16',
     title:
-      "Added the ability to have different points system for jury and televote. Added the country leaderboard based on user's own completed contests. Added more font options. Added a setting to use the same font regardless of the theme. Small fixes.",
+      "Added the ability to have different points system for jury and televote. Added the country leaderboard based on user's own completed contests. Added more font options. Added a setting to use the same font regardless of the theme. Added a setting to hide voting hints. Small fixes.",
   },
   {
     date: '2026-05-13',

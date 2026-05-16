@@ -2,11 +2,7 @@ import { getThemeForYear, getThemeBackground } from './themes';
 import { ThemeColors } from './types';
 
 import { toFixedIfDecimal } from '@/helpers/toFixedIfDecimal';
-import {
-  DEFAULT_FONT_ALIAS,
-  getFontFamilyStackCss,
-  normalizeFontAlias,
-} from '@/theme/fontAliases';
+import { getFontFamilyStackCss, normalizeFontAlias } from '@/theme/fontAliases';
 import { CustomTheme } from '@/types/customTheme';
 
 // Constants for primary/gray shade generation
@@ -251,8 +247,9 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     document.head.appendChild(style);
   }
 
-  const fontAlias = normalizeFontAlias(theme.fontAlias);
-  const fontStack = getFontFamilyStackCss(fontAlias);
+  const fontStack = getFontFamilyStackCss(
+    normalizeFontAlias(theme.fontAlias),
+  );
   const fontVarLine = `  --dp-font-family: ${fontStack};`;
 
   const cssText = [fontVarLine]
@@ -264,7 +261,6 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
   if (!preview) {
     // Set theme attribute
     document.documentElement.setAttribute('data-theme', 'custom');
-    document.documentElement.dataset.font = fontAlias;
 
     // Apply background image if present
     if (theme.backgroundImageUrl) {
@@ -305,8 +301,6 @@ export function clearCustomTheme(): void {
   if (document.documentElement.getAttribute('data-theme') === 'custom') {
     document.documentElement.removeAttribute('data-theme');
   }
-
-  document.documentElement.dataset.font = DEFAULT_FONT_ALIAS;
 
   // Clear background styles
   document.body.style.backgroundImage = '';

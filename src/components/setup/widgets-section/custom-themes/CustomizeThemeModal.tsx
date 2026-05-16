@@ -52,7 +52,10 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { FONT_ALIAS_ALLOWLIST, normalizeFontAlias } from '@/theme/fontAliases';
+import {
+  getInterfaceFontSelectOptions,
+  normalizeFontAlias,
+} from '@/theme/fontAliases';
 import {
   THEME_SOUND_EVENTS,
   type ThemeSoundEventId,
@@ -109,21 +112,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [overrides, setOverrides] = useState<Record<string, string>>({});
   const [fontAlias, setFontAlias] = useState('montserrat');
 
-  const interfaceFontOptions = useMemo(() => {
-    const labelByAlias: Record<string, string> = {
-      montserrat: 'Montserrat (Default)',
-      geist: 'Geist',
-      'dm-sans': 'DM Sans',
-      gotham: 'Gotham',
-      'plus-jakarta-sans': 'Plus Jakarta Sans',
-      unbounded: 'Unbounded',
-    };
-
-    return FONT_ALIAS_ALLOWLIST.map((value) => ({
-      value,
-      label: labelByAlias[value] ?? value,
-    }));
-  }, []);
+  const interfaceFontOptions = useMemo(() => getInterfaceFontSelectOptions(), []);
 
   // Theme-specific UI options
   const [uppercaseEntryName, setUppercaseEntryName] = useState(true);

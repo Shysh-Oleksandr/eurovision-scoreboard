@@ -30,6 +30,9 @@ const SplitScreenQualifierModal = () => {
   const candidates = useScoreboardStore(
     (state) => state.splitScreenQualifierCandidates,
   );
+  const hideVotingHints = useGeneralStore(
+    (state) => state.settings.hideVotingHints,
+  );
 
   const closeSplitScreenQualifierModal = useScoreboardStore(
     (state) => state.closeSplitScreenQualifierModal,
@@ -134,9 +137,11 @@ const SplitScreenQualifierModal = () => {
     >
       {!isPresenting && (
         <div className="flex justify-between gap-2 items-center mb-2">
-          <h2 className="text-white md:text-2xl text-xl leading-tight font-bold">
-            {t('chooseCountryToQualify')}
-          </h2>
+          {!hideVotingHints && (
+            <h2 className="text-white md:text-2xl text-xl leading-tight font-bold">
+              {t('chooseCountryToQualify')}
+            </h2>
+          )}
           <Button
             variant="tertiary"
             label={t('random')}
@@ -147,6 +152,7 @@ const SplitScreenQualifierModal = () => {
               }, CLOSE_ANIMATION_DELAY_MS);
             }}
             snowEffect="middle"
+            className="ml-auto"
           />
         </div>
       )}

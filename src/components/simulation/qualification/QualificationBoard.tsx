@@ -30,6 +30,9 @@ const QualificationBoard = ({
   const enableSplitScreenQualifierRevealMode = useGeneralStore(
     (state) => state.settings.enableSplitScreenQualifierRevealMode,
   );
+  const hideVotingHints = useGeneralStore(
+    (state) => state.settings.hideVotingHints,
+  );
 
   const currentStage = getCurrentStage();
   const countries = currentStage?.countries ?? [];
@@ -63,12 +66,14 @@ const QualificationBoard = ({
       <div className="flex-1 rounded-sm">
         {!isOver && (
           <div className="2cols:flex hidden justify-between items-center flex-wrap gap-2 mb-2">
-            <h2
-              className="lg:text-2xl xs:text-xl text-lg font-medium text-white !leading-tight"
-              style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
-            >
-              {t('chooseCountryToQualify')}
-            </h2>
+            {!hideVotingHints && (
+              <h2
+                className="lg:text-2xl xs:text-xl text-lg font-medium text-white !leading-tight"
+                style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
+              >
+                {t('chooseCountryToQualify')}
+              </h2>
+            )}
             <div className="flex gap-2 items-center ml-auto">
               {enableSplitScreenQualifierRevealMode && (
                 <Button

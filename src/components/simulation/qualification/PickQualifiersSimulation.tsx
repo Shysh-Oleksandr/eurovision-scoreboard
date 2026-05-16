@@ -47,6 +47,9 @@ const PickQualifiersSimulation = () => {
   const presentationSpeedSeconds = useGeneralStore(
     (state) => state.presentationSettings.presentationSpeedSeconds,
   );
+  const hideVotingHints = useGeneralStore(
+    (state) => state.settings.hideVotingHints,
+  );
   const isPresenting = useGeneralStore(
     (state) => state.presentationSettings.isPresenting,
   );
@@ -144,12 +147,14 @@ const PickQualifiersSimulation = () => {
     <>
       {!isOver && (
         <div className="flex 2cols:hidden justify-between items-center gap-2 xs:mb-1 mb-2 mt-2">
-          <h2
-            style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
-            className="lg:text-2xl xs:text-xl text-lg font-medium text-white !leading-tight"
-          >
-            {t('chooseCountryToQualify')}
-          </h2>
+          {!hideVotingHints && (
+            <h2
+              style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
+              className="lg:text-2xl xs:text-xl text-lg font-medium text-white !leading-tight"
+            >
+              {t('chooseCountryToQualify')}
+            </h2>
+          )}
           <div className="flex gap-2 items-center ml-auto">
             {enableSplitScreenQualifierRevealMode && (
               <Button

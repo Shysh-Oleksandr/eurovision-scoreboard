@@ -62,6 +62,34 @@ html[data-font='unbounded'] {
   --dp-font-family: Unbounded, sans-serif;
 }
 
+html[data-font='antonio'] {
+  --dp-font-family: Antonio, sans-serif;
+}
+
+html[data-font='brygada-1918'] {
+  --dp-font-family: "Brygada 1918", serif;
+}
+
+html[data-font='cabinet-grotesk'] {
+  --dp-font-family: "Cabinet Grotesk", sans-serif;
+}
+
+html[data-font='orbitron'] {
+  --dp-font-family: Orbitron, sans-serif;
+}
+
+html[data-font='oxanium'] {
+  --dp-font-family: Oxanium, sans-serif;
+}
+
+html[data-font='satoshi'] {
+  --dp-font-family: Satoshi, sans-serif;
+}
+
+html[data-font='zodiak'] {
+  --dp-font-family: Zodiak, serif;
+}
+
 html,
 body,
 #root {
@@ -358,6 +386,237 @@ h6 {
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/unbounded-700.woff2') format('woff2');
+}
+
+/* Antonio */
+@font-face {
+  font-display: swap;
+  font-family: Antonio;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/antonio-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Antonio;
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/antonio-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Antonio;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/antonio-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Antonio;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/antonio-700.woff2') format('woff2');
+}
+
+/* Brygada 1918 */
+@font-face {
+  font-display: swap;
+  font-family: "Brygada 1918";
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/brygada-1918-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Brygada 1918";
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/brygada-1918-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Brygada 1918";
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/brygada-1918-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Brygada 1918";
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/brygada-1918-700.woff2') format('woff2');
+}
+
+/* Cabinet Grotesk */
+@font-face {
+  font-display: swap;
+  font-family: "Cabinet Grotesk";
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/cabinet-grotesk-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Cabinet Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/cabinet-grotesk-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Cabinet Grotesk";
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/cabinet-grotesk-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Cabinet Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/cabinet-grotesk-700.woff2') format('woff2');
+}
+
+/* Orbitron */
+@font-face {
+  font-display: swap;
+  font-family: Orbitron;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/orbitron-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Orbitron;
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/orbitron-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Orbitron;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/orbitron-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Orbitron;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/orbitron-700.woff2') format('woff2');
+}
+
+/* Oxanium */
+@font-face {
+  font-display: swap;
+  font-family: Oxanium;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/oxanium-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Oxanium;
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/oxanium-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Oxanium;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/oxanium-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Oxanium;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/oxanium-700.woff2') format('woff2');
+}
+
+/* Satoshi */
+@font-face {
+  font-display: swap;
+  font-family: Satoshi;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/satoshi-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Satoshi;
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/satoshi-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Satoshi;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/satoshi-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Satoshi;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/satoshi-700.woff2') format('woff2');
+}
+
+/* Zodiak */
+@font-face {
+  font-display: swap;
+  font-family: Zodiak;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/zodiak-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Zodiak;
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/zodiak-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Zodiak;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/zodiak-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-display: swap;
+  font-family: Zodiak;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/zodiak-700.woff2') format('woff2');
 }
 
 #main {

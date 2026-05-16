@@ -118,18 +118,27 @@ export default async function RootLayout({
               var customTheme = state?.customTheme;
               var themeYear = state?.themeYear || '2025';
 
+              var settings = state?.settings || {};
+              var allowedFont = ${FOUC_FONT_ALLOWED_LITERAL};
+              var fa = 'montserrat';
+
+              if (settings.overrideThemeFont) {
+                fa = (settings.overrideThemeFontAlias || 'montserrat').toLowerCase();
+                if (!allowedFont[fa]) fa = 'montserrat';
+              } else if (customTheme) {
+                fa = (customTheme.fontAlias || 'montserrat').toLowerCase();
+                if (!allowedFont[fa]) fa = 'montserrat';
+              }
+
               if (customTheme) {
                 document.documentElement.setAttribute('data-theme', 'custom');
                 document.documentElement.style.backgroundImage = "url(" + customTheme.backgroundImageUrl + ")";
-                var fa = (customTheme.fontAlias || 'montserrat').toLowerCase();
-                var allowedFont = ${FOUC_FONT_ALLOWED_LITERAL};
-                if (!allowedFont[fa]) fa = 'montserrat';
-                document.documentElement.setAttribute('data-font', fa);
               } else if (themeYear) {
                 document.documentElement.setAttribute('data-theme', themeYear);
                 document.documentElement.style.backgroundImage = "url(" + state.theme.backgroundImage + ")";
-                document.documentElement.setAttribute('data-font', 'montserrat');
               }
+
+              document.documentElement.setAttribute('data-font', fa);
 
               document.documentElement.style.backgroundSize = 'cover';
               document.documentElement.style.backgroundPosition = 'center';

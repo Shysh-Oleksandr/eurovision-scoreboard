@@ -9,7 +9,9 @@ import { BgImageSelect } from './BgImageSelect';
 import { LanguageSelector } from './LanguageSelector';
 
 import { InfoIcon } from '@/assets/icons/InfoIcon';
+import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import { customThemeHasSimulationBackground } from '@/theme/customThemeHasAudio';
+import { getInterfaceFontSelectOptions } from '@/theme/fontAliases';
 
 export const UIPreferencesSettings: React.FC = () => {
   const t = useTranslations('settings.ui');
@@ -19,6 +21,10 @@ export const UIPreferencesSettings: React.FC = () => {
 
   const isFullScreenSupported = document.fullscreenEnabled;
   const hasSimBg = customThemeHasSimulationBackground(customTheme);
+  const interfaceFontOptions = React.useMemo(
+    () => getInterfaceFontSelectOptions(),
+    [],
+  );
 
   return (
     <>
@@ -115,6 +121,13 @@ export const UIPreferencesSettings: React.FC = () => {
           setSettings({ enableMinimalisticFlags: e.target.checked })
         }
       />
+      <Checkbox
+        id="hide-voting-hints"
+        labelClassName="w-full"
+        label={t('hideVotingHints')}
+        checked={settings.hideVotingHints}
+        onChange={(e) => setSettings({ hideVotingHints: e.target.checked })}
+      />
 
       <Checkbox
         id="enable-winter-effects"
@@ -139,6 +152,33 @@ export const UIPreferencesSettings: React.FC = () => {
           displayValue={false}
           minLabel={t('low')}
           maxLabel={t('high')}
+        />
+      )}
+
+      <Checkbox
+        id="override-theme-font"
+        labelClassName="w-full"
+        label={t('overrideThemeFont')}
+        checked={settings.overrideThemeFont}
+        onChange={(e) =>
+          setSettings({
+            overrideThemeFont: e.target.checked,
+          })
+        }
+      />
+      {settings.overrideThemeFont && (
+        <CustomSelect
+          options={interfaceFontOptions}
+          value={settings.overrideThemeFontAlias}
+          onChange={(value) =>
+            setSettings({
+              overrideThemeFontAlias: value,
+            })
+          }
+          id="ui-preferences-font-select"
+          label={t('interfaceFont')}
+          className="w-full sm:max-w-[280px]"
+          withIndicator={false}
         />
       )}
 
