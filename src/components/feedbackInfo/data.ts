@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-05-17',
+    title:
+      "Added the ESC 2026 data",
+  },
+  {
     date: '2026-05-16',
     title:
       "Added the ability to have different points system for jury and televote. Added the country leaderboard based on user's own completed contests. Added more font options. Added a setting to use the same font regardless of the theme. Added a setting to hide voting hints. Small fixes.",

@@ -73,7 +73,7 @@ Array.from(document.querySelectorAll('.national_table tbody tr'))
 
 */
 
-const IS_JESC = true;
+const IS_JESC = false;
 
 const finalists: (
   | {
@@ -87,29 +87,64 @@ const finalists: (
     }
 )[] = [
   {
-    name: 'France',
-    juryPoints: 152,
-    televotePoints: 96,
+    name: 'Bulgaria',
+    juryPoints: 204,
+    televotePoints: 312,
+  },
+  {
+    name: 'Israel',
+    juryPoints: 123,
+    televotePoints: 220,
+  },
+  {
+    name: 'Romania',
+    juryPoints: 64,
+    televotePoints: 232,
+  },
+  {
+    name: 'Australia',
+    juryPoints: 165,
+    televotePoints: 122,
+  },
+  {
+    name: 'Italy',
+    juryPoints: 134,
+    televotePoints: 147,
+  },
+  {
+    name: 'Finland',
+    juryPoints: 141,
+    televotePoints: 138,
+  },
+  {
+    name: 'Denmark',
+    juryPoints: 165,
+    televotePoints: 78,
+  },
+  {
+    name: 'Moldova',
+    juryPoints: 43,
+    televotePoints: 183,
   },
   {
     name: 'Ukraine',
-    juryPoints: 79,
-    televotePoints: 98,
+    juryPoints: 54,
+    televotePoints: 167,
   },
   {
-    name: 'Georgia',
-    juryPoints: 121,
-    televotePoints: 55,
+    name: 'Greece',
+    juryPoints: 73,
+    televotePoints: 147,
   },
   {
-    name: 'Armenia',
-    juryPoints: 117,
-    televotePoints: 58,
+    name: 'France',
+    juryPoints: 144,
+    televotePoints: 14,
   },
   {
-    name: 'Spain',
-    juryPoints: 98,
-    televotePoints: 54,
+    name: 'Poland',
+    juryPoints: 133,
+    televotePoints: 17,
   },
   {
     name: 'Albania',
@@ -117,64 +152,64 @@ const finalists: (
     televotePoints: 85,
   },
   {
-    name: 'North MacedoniaN.Macedonia',
-    juryPoints: 92,
-    televotePoints: 49,
-  },
-  {
-    name: 'Poland',
-    juryPoints: 72,
-    televotePoints: 67,
-  },
-  {
-    name: 'San Marino',
-    juryPoints: 38,
-    televotePoints: 87,
-  },
-  {
-    name: 'Netherlands',
-    juryPoints: 47,
-    televotePoints: 46,
-  },
-  {
-    name: 'Malta',
-    juryPoints: 54,
-    televotePoints: 38,
-  },
-  {
-    name: 'Italy',
-    juryPoints: 26,
-    televotePoints: 47,
-  },
-  {
-    name: 'Portugal',
-    juryPoints: 32,
-    televotePoints: 41,
+    name: 'Norway',
+    juryPoints: 115,
+    televotePoints: 19,
   },
   {
     name: 'Croatia',
-    juryPoints: 28,
-    televotePoints: 42,
+    juryPoints: 53,
+    televotePoints: 71,
   },
   {
-    name: 'Azerbaijan',
-    juryPoints: 12,
-    televotePoints: 54,
+    name: 'Czechia',
+    juryPoints: 104,
+    televotePoints: 9,
+  },
+  {
+    name: 'Serbia',
+    juryPoints: 38,
+    televotePoints: 52,
+  },
+  {
+    name: 'Malta',
+    juryPoints: 81,
+    televotePoints: 8,
   },
   {
     name: 'Cyprus',
-    juryPoints: 3,
-    televotePoints: 47,
+    juryPoints: 41,
+    televotePoints: 34,
   },
   {
-    name: 'Montenegro',
+    name: 'Sweden',
+    juryPoints: 35,
+    televotePoints: 16,
+  },
+  {
+    name: 'Belgium',
+    juryPoints: 36,
+    televotePoints: 0,
+  },
+  {
+    name: 'Lithuania',
     juryPoints: 10,
-    televotePoints: 39,
+    televotePoints: 12,
   },
   {
-    name: 'Ireland',
-    juryPoints: 3,
-    televotePoints: 41,
+    name: 'Germany',
+    juryPoints: 12,
+    televotePoints: 0,
+  },
+  {
+    name: 'Austria',
+    juryPoints: 1,
+    televotePoints: 5,
+  },
+  {
+    name: 'United KingdomUK',
+    juryPoints: 1,
+    televotePoints: 0,
   },
 ];
 
@@ -182,52 +217,44 @@ const nonFinalists: { name: string; points: number }[] = IS_JESC
   ? []
   : [
       {
+        name: 'Switzerland',
+        points: 108,
+      },
+      {
         name: 'Estonia',
-        points: 57,
-      },
-      {
-        name: 'Israel',
-        points: 57,
-      },
-      {
-        name: 'Denmark',
-        points: 56,
-      },
-      {
-        name: 'Finland',
-        points: 51,
+        points: 79,
       },
       {
         name: 'Portugal',
-        points: 38,
+        points: 74,
       },
       {
-        name: 'Lithuania',
-        points: 26,
+        name: 'Montenegro',
+        points: 71,
+      },
+      {
+        name: 'Luxembourg',
+        points: 60,
       },
       {
         name: 'Latvia',
-        points: 23,
+        points: 49,
       },
       {
-        name: 'Andorra',
-        points: 12,
+        name: 'Armenia',
+        points: 49,
       },
       {
-        name: 'Belarus',
-        points: 10,
+        name: 'San Marino',
+        points: 41,
       },
       {
-        name: 'Monaco',
-        points: 10,
-      },
-      {
-        name: 'Slovenia',
+        name: 'Georgia',
         points: 5,
       },
       {
-        name: 'Switzerland',
-        points: 0,
+        name: 'Azerbaijan',
+        points: 2,
       },
     ];
 

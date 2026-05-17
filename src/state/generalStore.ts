@@ -49,7 +49,8 @@ export enum PresentationPointsGrouping {
   GROUPED = 'grouped',
 }
 
-export const INITIAL_YEAR = '2025' as Year;
+export const INITIAL_YEAR = '2026' as Year;
+export const INITIAL_THEME_YEAR = '2025' as Year;
 
 const DEFAULT_SETTINGS: Settings = {
   alwaysShowRankings: true,
@@ -318,8 +319,8 @@ export const useGeneralStore = create<GeneralState>()(
         shouldShowNewChangesIndicator: false,
         year: INITIAL_YEAR,
         isGfOnly: false,
-        themeYear: INITIAL_YEAR,
-        theme: getThemeForYear(INITIAL_YEAR),
+        themeYear: INITIAL_THEME_YEAR,
+        theme: getThemeForYear(INITIAL_THEME_YEAR),
         customTheme: null,
         activeContest: null,
         importedCustomEntries: [],
@@ -595,8 +596,8 @@ export const useGeneralStore = create<GeneralState>()(
           get().setYear(INITIAL_YEAR);
 
           set({
-            themeYear: INITIAL_YEAR,
-            theme: getThemeForYear(INITIAL_YEAR),
+            themeYear: INITIAL_THEME_YEAR,
+            theme: getThemeForYear(INITIAL_THEME_YEAR),
             settings: DEFAULT_SETTINGS,
             pointsSystem: initialPointsSystem,
             settingsPointsSystem: initialPointsSystem,
@@ -691,7 +692,7 @@ export const useGeneralStore = create<GeneralState>()(
           const state = persistedState as Partial<GeneralState>;
 
           const year = state.year ?? INITIAL_YEAR;
-          const themeYear = state.themeYear ?? INITIAL_YEAR;
+          const themeYear = state.themeYear ?? INITIAL_THEME_YEAR;
 
           const pointsSystem: PointsItem[] =
             state.pointsSystem || initialPointsSystem;

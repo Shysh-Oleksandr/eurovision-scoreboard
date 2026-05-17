@@ -72,10 +72,17 @@ export const useCountriesStore = create<CountriesState>()(
     persist(
       (set, get) => {
         // Helpers (internal to store factory)
-        const buildCountriesUrl = (year: Year, isJunior: boolean) =>
-          isJunior
+        const COUNTRIES_DATA_VERSION = '2026-05-17'; // bump when odds JSON changes
+
+        const buildCountriesUrl = (year: Year, isJunior: boolean) => {
+          const base = isJunior
             ? `/data/countries/junior-countries-${year}.json`
             : `/data/countries/countries-${year}.json`;
+          if (year === '2026' && !isJunior) {
+            return `${base}?v=${COUNTRIES_DATA_VERSION}`;
+          }
+          return base;
+        };
 
         const loadCountriesByPreset = async (year: Year, isJunior: boolean) => {
           const url = buildCountriesUrl(year, isJunior);

@@ -5,7 +5,7 @@ Experience the excitement of Eurovision with DouzePoints, the interactive scoreb
 ## Features
 
 - Interactive Eurovision scoreboard simulation
-- Support for Eurovision contests from 2004-2025
+- Support for Eurovision contests from 2004-2026
 - Semi-finals and Grand Final modes
 - Realistic voting animations
 - Beautiful, responsive UI

@@ -37,7 +37,7 @@ export default function AppBootstrap() {
 
     if (!hasBeenInitialized) {
       localStorage.setItem(initKey, 'true');
-      setInitialCountriesForYear('2025', {
+      setInitialCountriesForYear('2026', {
         force: true,
         isJuniorContest: false,
       });

@@ -5,8 +5,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 43,
+    "televoteOdds": 41.5,
+    "spokespersonOrder": 14
   },
   {
     "name": "Armenia",
@@ -14,8 +15,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 9.5,
+    "televoteOdds": 9.5,
+    "spokespersonOrder": 18
   },
   {
     "name": "Australia",
@@ -23,8 +25,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 84,
+    "televoteOdds": 51,
+    "spokespersonOrder": 9
   },
   {
     "name": "Austria",
@@ -33,8 +36,9 @@
     "isQualified": true,
     "isAutoQualified": true,
     "aqSemiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 20,
+    "televoteOdds": 21.5,
+    "spokespersonOrder": 34
   },
   {
     "name": "Azerbaijan",
@@ -42,8 +46,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 1,
+    "televoteOdds": 1,
+    "spokespersonOrder": 5
   },
   {
     "name": "Belgium",
@@ -51,8 +56,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 33.5,
+    "televoteOdds": 20,
+    "spokespersonOrder": 11
   },
   {
     "name": "Bulgaria",
@@ -60,8 +66,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 99,
+    "televoteOdds": 99,
+    "spokespersonOrder": 4
   },
   {
     "name": "Croatia",
@@ -69,8 +76,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 40,
+    "televoteOdds": 38,
+    "spokespersonOrder": 31
   },
   {
     "name": "Cyprus",
@@ -78,8 +86,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 35.5,
+    "televoteOdds": 28.5,
+    "spokespersonOrder": 15
   },
   {
     "name": "Czechia",
@@ -87,8 +96,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 60,
+    "televoteOdds": 22.5,
+    "spokespersonOrder": 21
   },
   {
     "name": "Denmark",
@@ -96,8 +106,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 84,
+    "televoteOdds": 40,
+    "spokespersonOrder": 22
   },
   {
     "name": "Estonia",
@@ -105,8 +116,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 15,
+    "televoteOdds": 15,
+    "spokespersonOrder": 7
   },
   {
     "name": "Finland",
@@ -114,8 +126,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 74.5,
+    "televoteOdds": 55,
+    "spokespersonOrder": 26
   },
   {
     "name": "France",
@@ -123,10 +136,10 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "isAutoQualified": true,
-    "juryOdds": 50,
-    "televoteOdds": 50,
-
-    "aqSemiFinalGroup": "SF2"
+    "juryOdds": 75.5,
+    "televoteOdds": 23.5,
+    "aqSemiFinalGroup": "SF2",
+    "spokespersonOrder": 23
   },
   {
     "name": "Georgia",
@@ -134,8 +147,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 1.5,
+    "televoteOdds": 1.5,
+    "spokespersonOrder": 16
   },
   {
     "name": "Germany",
@@ -143,10 +157,10 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "isAutoQualified": true,
-    "juryOdds": 50,
-    "televoteOdds": 50,
-
-    "aqSemiFinalGroup": "SF1"
+    "juryOdds": 24.5,
+    "televoteOdds": 20,
+    "aqSemiFinalGroup": "SF1",
+    "spokespersonOrder": 10
   },
   {
     "name": "Greece",
@@ -154,8 +168,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 48,
+    "televoteOdds": 57,
+    "spokespersonOrder": 20
   },
   {
     "name": "Israel",
@@ -163,8 +178,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 67.5,
+    "televoteOdds": 75.5,
+    "spokespersonOrder": 8
   },
   {
     "name": "Italy",
@@ -172,10 +188,10 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "isAutoQualified": true,
-    "juryOdds": 50,
-    "televoteOdds": 50,
-
-    "aqSemiFinalGroup": "SF1"
+    "juryOdds": 72,
+    "televoteOdds": 57,
+    "aqSemiFinalGroup": "SF1",
+    "spokespersonOrder": 25
   },
   {
     "name": "Latvia",
@@ -183,8 +199,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 9.5,
+    "televoteOdds": 9.5,
+    "spokespersonOrder": 28
   },
   {
     "name": "Lithuania",
@@ -192,8 +209,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 23.5,
+    "televoteOdds": 23,
+    "spokespersonOrder": 32
   },
   {
     "name": "Luxembourg",
@@ -201,8 +219,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 11.5,
+    "televoteOdds": 11.5,
+    "spokespersonOrder": 3
   },
   {
     "name": "Malta",
@@ -210,8 +229,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 51,
+    "televoteOdds": 22,
+    "spokespersonOrder": 1
   },
   {
     "name": "Moldova",
@@ -219,8 +239,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 36.5,
+    "televoteOdds": 66.5,
+    "spokespersonOrder": 30
   },
   {
     "name": "Montenegro",
@@ -228,8 +249,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 13.5,
+    "televoteOdds": 13.5,
+    "spokespersonOrder": 17
   },
   {
     "name": "Norway",
@@ -237,8 +259,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 64.5,
+    "televoteOdds": 25,
+    "spokespersonOrder": 24
   },
   {
     "name": "Poland",
@@ -246,8 +269,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 71.5,
+    "televoteOdds": 24.5,
+    "spokespersonOrder": 19
   },
   {
     "name": "Portugal",
@@ -255,8 +279,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 14,
+    "televoteOdds": 14,
+    "spokespersonOrder": 12
   },
   {
     "name": "Romania",
@@ -264,8 +289,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 44.5,
+    "televoteOdds": 78.5,
+    "spokespersonOrder": 33
   },
   {
     "name": "San Marino",
@@ -273,8 +299,9 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 8,
+    "televoteOdds": 8,
+    "spokespersonOrder": 6
   },
   {
     "name": "Serbia",
@@ -282,8 +309,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 34.5,
+    "televoteOdds": 33,
+    "spokespersonOrder": 29
   },
   {
     "name": "Sweden",
@@ -291,8 +319,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF1",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 33,
+    "televoteOdds": 24,
+    "spokespersonOrder": 13
   },
   {
     "name": "Switzerland",
@@ -300,9 +329,10 @@
     "category": "All-Time Participants",
     "isQualified": false,
     "isAutoQualified": true,
-    "juryOdds": 50,
-    "televoteOdds": 50,
-    "semiFinalGroup": "SF2"
+    "juryOdds": 20,
+    "televoteOdds": 20,
+    "semiFinalGroup": "SF2",
+    "spokespersonOrder": 0
   },
   {
     "name": "Ukraine",
@@ -310,8 +340,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "semiFinalGroup": "SF2",
-    "juryOdds": 50,
-    "televoteOdds": 50
+    "juryOdds": 40.5,
+    "televoteOdds": 62.5,
+    "spokespersonOrder": 2
   },
   {
     "name": "United Kingdom",
@@ -319,9 +350,9 @@
     "category": "All-Time Participants",
     "isQualified": true,
     "isAutoQualified": true,
-    "juryOdds": 50,
-    "televoteOdds": 50,
-
-    "aqSemiFinalGroup": "SF2"
+    "juryOdds": 20,
+    "televoteOdds": 20,
+    "aqSemiFinalGroup": "SF2",
+    "spokespersonOrder": 27
   }
 ]

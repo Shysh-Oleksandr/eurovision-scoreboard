@@ -8,7 +8,7 @@ export type HostingCountryData = {
   logo: string;
 };
 
-// Hosting country logos by year (2004-2025)
+// Hosting country logos by year (2004-2026)
 const hostingLogosByYear: Record<Year, HostingCountryData> = {
   '2004': { code: 'TR', logo: '/hostingCountryLogos/Turkey2004.svg' },
   '2005': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
@@ -46,7 +46,7 @@ const juniorHostingLogosByYear: Record<string, HostingCountryData> = {
   '2023': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
   '2024': { code: 'ES', logo: '/hostingCountryLogos/EuroEspana.png' },
   '2025': { code: 'GE', logo: '/hostingCountryLogos/EuroGeorgia.svg' },
-  '2026': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
+  '2026': { code: 'FR', logo: '/hostingCountryLogos/EuroMalta.svg' },
 };
 
 // Optional per-country overrides for a default hosting logo not tied to a specific year
@@ -101,7 +101,7 @@ export function getHostingCountryByYear(
     return juniorHostingLogosByYear[year] || juniorHostingLogosByYear['2024'];
   }
 
-  return hostingLogosByYear[year] || hostingLogosByYear['2025'];
+  return hostingLogosByYear[year] || hostingLogosByYear['2026'];
 }
 
 export function getHostingLogoByCountryCode(
