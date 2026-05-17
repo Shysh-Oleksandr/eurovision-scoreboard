@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 
 import FollowButton from '@/components/common/FollowButton';
+import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
@@ -79,6 +80,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
           className={`${s.avatar} rounded-full object-cover`}
           width={24}
           height={24}
+          unoptimized={isGoogleAvatarUrl(user.avatarUrl)}
           onError={(e) => {
             e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
           }}

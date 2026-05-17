@@ -18,6 +18,7 @@ import { InputField } from '@/components/common/InputField';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { DEFAULT_HOSTING_COUNTRY_CODE } from '@/data/data';
+import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -198,6 +199,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             className="w-20 h-20 rounded-full object-cover"
             width={80}
             height={80}
+            unoptimized={isGoogleAvatarUrl(displayAvatarUrl)}
             onError={(e) => {
               e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
             }}

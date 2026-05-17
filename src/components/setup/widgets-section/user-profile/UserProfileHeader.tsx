@@ -11,6 +11,7 @@ import FollowersModal from './FollowersModal';
 import { useFollowingStatusQuery } from '@/api/follows';
 import Button from '@/components/common/Button';
 import FollowButton from '@/components/common/FollowButton';
+import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
 
@@ -50,6 +51,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           className="sm:w-[64px] sm:h-[64px] w-[56px] h-[56px] rounded-full object-cover flex-none"
           width={64}
           height={64}
+          unoptimized={isGoogleAvatarUrl(user.avatarUrl)}
           onError={(e) => {
             e.currentTarget.src = '/img/ProfileAvatarPlaceholder.png';
           }}
