@@ -72,7 +72,7 @@ export const useCountriesStore = create<CountriesState>()(
     persist(
       (set, get) => {
         // Helpers (internal to store factory)
-        const COUNTRIES_DATA_VERSION = '2026-05-17'; // bump when odds JSON changes
+        const COUNTRIES_DATA_VERSION = '2026-05-18'; // bump when odds JSON changes
 
         const buildCountriesUrl = (year: Year, isJunior: boolean) => {
           const base = isJunior
