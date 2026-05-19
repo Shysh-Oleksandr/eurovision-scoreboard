@@ -448,7 +448,9 @@
         "load": "Ładowanie",
         "failedToLoadStats": "Błąd podczas ładowania statystyk",
         "noEntriesMatch": "Nie znaleziono wkładów pasujących do wyszukiwania.",
-        "customEntryName": "Niestandardowy wpis"
+        "customEntryName": "Niestandardowy wpis",
+        "qualRate": "Ws. kwalif.",
+        "qualStreak": "Seria kwalif."
       },
       "leaderboard": {
         "title": "Ranking krajów",
@@ -466,6 +468,8 @@
         "top10": "Top 10",
         "avgGfPoints": "Śr. pkt finału",
         "totalGfPoints": "Suma pkt finału",
+        "qualRate": "Ws. kwalif.",
+        "qualStreak": "Seria",
         "computedAt": "Ostatnia aktualizacja: {time}",
         "failedToLoad": "Nie udało się wczytać rankingu",
         "useYearButton": "Użyj roku {year}",

@@ -448,7 +448,9 @@
         "load": "Carica",
         "failedToLoadStats": "Errore durante il caricamento delle statistiche",
         "noEntriesMatch": "Nessuna voce corrisponde alla tua ricerca.",
-        "customEntryName": "Voce personalizzata"
+        "customEntryName": "Voce personalizzata",
+        "qualRate": "Tasso qualif.",
+        "qualStreak": "Serie qualif."
       },
       "leaderboard": {
         "title": "Classifica paesi",
@@ -466,6 +468,8 @@
         "top10": "Top 10",
         "avgGfPoints": "Media pt GF",
         "totalGfPoints": "Totale pt GF",
+        "qualRate": "Tasso qualif.",
+        "qualStreak": "Serie",
         "computedAt": "Ultimo aggiornamento: {time}",
         "failedToLoad": "Impossibile caricare la classifica",
         "useYearButton": "Usa anno {year}",

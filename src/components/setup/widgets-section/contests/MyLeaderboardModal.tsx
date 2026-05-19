@@ -14,9 +14,9 @@ import { getFlagPath } from '@/helpers/getFlagPath';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
-import type { PublicLeaderboardRow } from '@/types/publicLeaderboard';
+import type { MyLeaderboardRow } from '@/types/publicLeaderboard';
 
-type SortKey = keyof PublicLeaderboardRow | 'country';
+type SortKey = keyof MyLeaderboardRow | 'country' | 'qualRate';
 
 /** Null/undefined always sort last; then apply asc/desc to defined values. */
 function compareMetricValue(
@@ -136,6 +136,13 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
         return sortDir === 'asc' ? cmp : -cmp;
       }
 
+      if (sortKey === 'qualRate') {
+        const ra = a.participations > 0 ? a.finals / a.participations : 0;
+        const rb = b.participations > 0 ? b.finals / b.participations : 0;
+
+        return compareMetricValue(ra, rb, sortDir);
+      }
+
       return compareMetricValue(a[sortKey], b[sortKey], sortDir);
     });
 
@@ -175,6 +182,12 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
     if (v === null) return '—';
 
     return v.toFixed(1);
+  };
+
+  const formatQualRate = (row: MyLeaderboardRow) => {
+    if (row.participations === 0) return '—';
+
+    return `${((row.finals / row.participations) * 100).toFixed(1)}%`;
   };
 
   return (
@@ -281,6 +294,8 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
                           ['top10', tLb('top10')],
                           ['avgGrandFinalPoints', tLb('avgGfPoints')],
                           ['totalGrandFinalPoints', tLb('totalGfPoints')],
+                          ['qualRate', tLb('qualRate')],
+                          ['qualifyingStreak', tLb('qualStreak')],
                         ] as const
                       ).map(([key, label]) => (
                         <th
@@ -352,6 +367,12 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
                           </td>
                           <td className="py-2 px-2 tabular-nums">
                             {row.totalGrandFinalPoints}
+                          </td>
+                          <td className="py-2 px-2 tabular-nums">
+                            {formatQualRate(row)}
+                          </td>
+                          <td className="py-2 px-2 tabular-nums">
+                            {row.qualifyingStreak}
                           </td>
                         </tr>
                       );

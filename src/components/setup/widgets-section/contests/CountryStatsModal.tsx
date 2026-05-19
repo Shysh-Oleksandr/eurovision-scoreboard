@@ -91,6 +91,38 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
     isExisting: entryIsExisting,
   } = resolveEntry(entryCode);
 
+  const sortedParticipations = useMemo(() => {
+    if (!data?.participations) return [];
+
+    return [...data.participations].sort((a, b) => {
+      const yearCmp = (b.year ?? -Infinity) - (a.year ?? -Infinity);
+
+      if (yearCmp !== 0) return yearCmp;
+
+      const aTs = a.contestCreatedAt
+        ? new Date(a.contestCreatedAt).getTime()
+        : -Infinity;
+      const bTs = b.contestCreatedAt
+        ? new Date(b.contestCreatedAt).getTime()
+        : -Infinity;
+
+      if (bTs !== aTs) return bTs - aTs;
+
+      return a.contestName.localeCompare(b.contestName);
+    });
+  }, [data?.participations]);
+
+  const qualifyingStreak = useMemo(() => {
+    let streak = 0;
+
+    for (const p of sortedParticipations) {
+      if (p.status === 'FINAL') streak += 1;
+      else break;
+    }
+
+    return streak;
+  }, [sortedParticipations]);
+
   const handleLoadContest = async (contestId: string) => {
     try {
       const [{ data: contest }, { data: snapshot }] = await Promise.all([
@@ -150,7 +182,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
 
         {data && !isLoading && (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
               <Stat
                 label={t('participations')}
                 value={data.summary.participations}
@@ -167,13 +199,25 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
                     : '—'
                 }
               />
+              <Stat
+                label={t('qualRate')}
+                value={
+                  data.summary.participations > 0
+                    ? `${(
+                        (data.summary.finals / data.summary.participations) *
+                        100
+                      ).toFixed(1)}%`
+                    : '—'
+                }
+              />
+              <Stat label={t('qualStreak')} value={qualifyingStreak} />
             </div>
 
-            {data.participations.length === 0 && (
+            {sortedParticipations.length === 0 && (
               <p className="text-white/60 text-sm">{t('noParticipations')}</p>
             )}
 
-            {data.participations.length > 0 && (
+            {sortedParticipations.length > 0 && (
               <div className="overflow-x-auto -mx-1">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -186,7 +230,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {data.participations.map((row) => {
+                    {sortedParticipations.map((row) => {
                       const { name: winnerName, logo: wLogo } = resolveEntry(
                         row.winnerCode,
                       );

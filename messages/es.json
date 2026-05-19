@@ -446,7 +446,9 @@
         "load": "Cargar",
         "failedToLoadStats": "Error al cargar las estadísticas",
         "noEntriesMatch": "No hay entradas que coincidan con tu búsqueda.",
-        "customEntryName": "Entrada personalizada"
+        "customEntryName": "Entrada personalizada",
+        "qualRate": "Tasa clasif.",
+        "qualStreak": "Racha de clasif."
       },
       "leaderboard": {
         "title": "Clasificación por países",
@@ -464,6 +466,8 @@
         "top10": "Top 10",
         "avgGfPoints": "Pts. GF med.",
         "totalGfPoints": "Pts. GF total",
+        "qualRate": "Tasa clasif.",
+        "qualStreak": "Racha",
         "computedAt": "Última actualización: {time}",
         "failedToLoad": "No se pudo cargar la clasificación",
         "useYearButton": "Usar año {year}",

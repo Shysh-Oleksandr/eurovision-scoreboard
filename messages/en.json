@@ -443,7 +443,9 @@
         "load": "Load",
         "failedToLoadStats": "Failed to load stats",
         "noEntriesMatch": "No entries match your search.",
-        "customEntryName": "Custom entry"
+        "customEntryName": "Custom entry",
+        "qualRate": "Qual. rate",
+        "qualStreak": "Qualifying streak"
       },
       "leaderboard": {
         "title": "Country leaderboard",
@@ -461,6 +463,8 @@
         "top10": "Top 10",
         "avgGfPoints": "Avg GF pts",
         "totalGfPoints": "Total GF pts",
+        "qualRate": "Qual. rate",
+        "qualStreak": "Streak",
         "computedAt": "Last updated: {time}",
         "failedToLoad": "Failed to load leaderboard",
         "useYearButton": "Use year {year}",

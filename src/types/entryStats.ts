@@ -4,6 +4,7 @@ export interface EntryStatsParticipation {
   contestId: string;
   contestName: string;
   year?: number;
+  contestCreatedAt?: string;
   winnerCode?: string;
   status: EntryStatsParticipationStatus;
   gfRank?: number;

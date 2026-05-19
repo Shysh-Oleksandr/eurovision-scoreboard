@@ -448,7 +448,9 @@
         "load": "Завантажити",
         "failedToLoadStats": "Не вдалося завантажити статистику",
         "noEntriesMatch": "Немає збігів за запитом.",
-        "customEntryName": "Власний учасник"
+        "customEntryName": "Власний учасник",
+        "qualRate": "% кваліфікацій",
+        "qualStreak": "Серія кваліфікацій"
       },
       "leaderboard": {
         "title": "Рейтинг країн",
@@ -466,6 +468,8 @@
         "top10": "Топ 10",
         "avgGfPoints": "Сер. бали Ф",
         "totalGfPoints": "Усього балів Ф",
+        "qualRate": "% кваліф.",
+        "qualStreak": "Серія",
         "computedAt": "Оновлено: {time}",
         "failedToLoad": "Не вдалося завантажити рейтинг",
         "useYearButton": "Використати рік {year}",

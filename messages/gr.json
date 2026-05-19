@@ -448,7 +448,9 @@
         "load": "Φόρτωση",
         "failedToLoadStats": "Αποτυχία φόρτωσης των στατιστικών",
         "noEntriesMatch": "Κανένα στοιχείο δεν ταιριάζει με την αναζήτησή σας.",
-        "customEntryName": "Προσαρμοσμένη συμμετοχή"
+        "customEntryName": "Προσαρμοσμένη συμμετοχή",
+        "qualRate": "Ποσ. πρόκρισης",
+        "qualStreak": "Σερί πρόκρισης"
       },
       "leaderboard": {
         "title": "Κατάταξη χωρών",
@@ -466,6 +468,8 @@
         "top10": "Top 10",
         "avgGfPoints": "Μέσος όρος βαθμών τελ.",
         "totalGfPoints": "Σύνολο βαθμών τελ.",
+        "qualRate": "Ποσ. πρόκρ.",
+        "qualStreak": "Σερί",
         "computedAt": "Τελευταία ενημέρωση: {time}",
         "failedToLoad": "Αποτυχία φόρτωσης κατάταξης",
         "useYearButton": "Χρήση έτους {year}",

@@ -448,7 +448,9 @@
         "load": "Charger",
         "failedToLoadStats": "Erreur lors du chargement des statistiques",
         "noEntriesMatch": "Aucune entrée ne correspond à votre recherche.",
-        "customEntryName": "Entrée personnalisée"
+        "customEntryName": "Entrée personnalisée",
+        "qualRate": "Taux de qual.",
+        "qualStreak": "Série de qual."
       },
       "leaderboard": {
         "title": "Classement des pays",
@@ -466,6 +468,8 @@
         "top10": "Top 10",
         "avgGfPoints": "Pts GF moy.",
         "totalGfPoints": "Pts GF tot.",
+        "qualRate": "Taux qual.",
+        "qualStreak": "Série",
         "computedAt": "Dernière mise à jour : {time}",
         "failedToLoad": "Échec du chargement du classement",
         "useYearButton": "Utiliser l’année {year}",

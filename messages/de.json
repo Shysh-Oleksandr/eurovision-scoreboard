@@ -446,7 +446,9 @@
         "load": "Laden",
         "failedToLoadStats": "Fehler beim Laden der Statistiken",
         "noEntriesMatch": "Keine Einträge entsprechen Ihrer Suche.",
-        "customEntryName": "Benutzerdefinierter Eintrag"
+        "customEntryName": "Benutzerdefinierter Eintrag",
+        "qualRate": "Qual.-Quote",
+        "qualStreak": "Qualifikationsserie"
       },
       "leaderboard": {
         "title": "Länder-Rangliste",
@@ -464,6 +466,8 @@
         "top10": "Top 10",
         "avgGfPoints": "Ø GF-Pkt.",
         "totalGfPoints": "GF-Pkt. gesamt",
+        "qualRate": "Qual.-Quote",
+        "qualStreak": "Serie",
         "computedAt": "Zuletzt aktualisiert: {time}",
         "failedToLoad": "Rangliste konnte nicht geladen werden",
         "useYearButton": "Jahr {year} verwenden",
