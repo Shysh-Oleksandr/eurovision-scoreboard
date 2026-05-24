@@ -10,7 +10,11 @@ import { useScoreboardStore } from '../../../state/scoreboardStore';
 import { CountryQualificationItem } from './CountryQualificationItem';
 
 import Button from '@/components/common/Button';
+import { cn } from '@/helpers/utils';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useReorderCountries } from '@/hooks/useReorderCountries';
 import { useGeneralStore } from '@/state/generalStore';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const QualificationBoard = ({
   canUseSplitScreenForThisStep,
@@ -33,10 +37,13 @@ const QualificationBoard = ({
   const hideVotingHints = useGeneralStore(
     (state) => state.settings.hideVotingHints,
   );
+  const { roundedCountryContainer } = useThemeSpecifics();
 
   const currentStage = getCurrentStage();
   const countries = currentStage?.countries ?? [];
   const isOver = !!currentStage?.isOver;
+  const is2cols = useMediaQuery('(min-width: 36rem)');
+  const reorderedCountries = useReorderCountries(countries, is2cols ? 2 : 1);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -95,9 +102,12 @@ const QualificationBoard = ({
 
         <div
           ref={containerRef}
-          className="grid grid-cols-1 2cols:grid-cols-2 gap-x-3 xs:gap-y-1.5 gap-y-1"
+          className={cn(
+            'grid grid-cols-1 2cols:grid-cols-2 gap-x-3 gap-y-1',
+            roundedCountryContainer ? 'xs:gap-y-2' : 'xs:gap-y-1.5',
+          )}
         >
-          {countries.map((country) => (
+          {reorderedCountries.map((country) => (
             <CountryQualificationItem
               key={country.code}
               country={country}

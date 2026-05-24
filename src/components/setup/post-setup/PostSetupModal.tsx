@@ -17,6 +17,7 @@ import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { EventStage } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
+import { createCountriesComparator } from '@/state/scoreboard/helpers';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 enum PostSetupModalTab {
@@ -115,6 +116,9 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
                 ...s,
                 votingCountries: data.votingCountries,
                 runningOrder,
+                countries: s.countries
+                  .slice()
+                  .sort(createCountriesComparator(runningOrder)),
               }
             : s,
         );

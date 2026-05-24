@@ -26,6 +26,7 @@ const TELEPORT_FLIP_PHASE_DURATION_MS = 380;
 const TELEPORT_IN_START_DELAY_MS = 40;
 const TELEPORT_OUT_START_DELAY_MS = 16;
 const TELEPORT_START_DELAY_MS = 0;
+const COUNT_UP_DURATION_MS = 600; // must match CountUp duration in PointsSection
 const PHASE_OVERLAP_RATIO = 0.7;
 const TELEPORT_OUT_PREFERRED_STAGGER_MS = 70;
 const TELEPORT_IN_PREFERRED_STAGGER_MS = 70;
@@ -121,6 +122,7 @@ export const useBoardAnimations = (
     order: string[];
     hasDouzePointsAnimation: boolean;
     shouldAnimateByCode: Record<string, boolean>;
+    pointsAwardedAt: number;
   } | null>(null);
 
   const { id: currentStageId, isOver: isVotingOver } = getCurrentStage() || {};
@@ -179,6 +181,9 @@ export const useBoardAnimations = (
           if (!areOrdersEqual(queuedUpdate.order, completedOrder)) {
             animationRunIdRef.current += 1;
             const nextRunId = animationRunIdRef.current;
+            const elapsed = Date.now() - queuedUpdate.pointsAwardedAt;
+            const countUpRemaining = Math.max(0, COUNT_UP_DURATION_MS - elapsed);
+            const queuedDelay = Math.max(TELEPORT_START_DELAY_MS, countUpRemaining);
             timeoutRef.current = setTimeout(() => {
               runTeleportSequence(
                 queuedUpdate.order,
@@ -187,7 +192,7 @@ export const useBoardAnimations = (
                 queuedUpdate.hasDouzePointsAnimation,
                 queuedUpdate.shouldAnimateByCode,
               );
-            }, TELEPORT_START_DELAY_MS);
+            }, queuedDelay);
 
             return;
           }
@@ -423,6 +428,7 @@ export const useBoardAnimations = (
         order: newOrder,
         hasDouzePointsAnimation: isDouzePointsAwarded,
         shouldAnimateByCode,
+        pointsAwardedAt: Date.now(),
       };
       return;
     }

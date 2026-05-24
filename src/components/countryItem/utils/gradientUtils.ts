@@ -1,4 +1,6 @@
 import { hslStringToHex } from '@/helpers/colorConversion';
+import { getThemeForYear } from '@/theme/themes';
+import { ThemeColors } from '@/theme/types';
 import React from 'react';
 
 /**
@@ -12,24 +14,85 @@ const BG_CLASS_TO_OVERRIDE_KEY: Record<string, string> = {
   'bg-countryItem-unqualifiedBg': 'countryItem.unqualifiedBg',
   'bg-countryItem-douzePointsBg': 'countryItem.douzePointsBg',
   'bg-countryItem-juryPlaceContainerBg': 'countryItem.juryPlaceContainerBg',
-  'bg-countryItem-televoteUnfinishedPlaceContainerBg': 'countryItem.televoteUnfinishedPlaceContainerBg',
-  'bg-countryItem-televoteActivePlaceContainerBg': 'countryItem.televoteActivePlaceContainerBg',
-  'bg-countryItem-televoteFinishedPlaceContainerBg': 'countryItem.televoteFinishedPlaceContainerBg',
-  'bg-countryItem-unqualifiedPlaceContainerBg': 'countryItem.unqualifiedPlaceContainerBg',
+  'bg-countryItem-televoteUnfinishedPlaceContainerBg':
+    'countryItem.televoteUnfinishedPlaceContainerBg',
+  'bg-countryItem-televoteActivePlaceContainerBg':
+    'countryItem.televoteActivePlaceContainerBg',
+  'bg-countryItem-televoteFinishedPlaceContainerBg':
+    'countryItem.televoteFinishedPlaceContainerBg',
+  'bg-countryItem-unqualifiedPlaceContainerBg':
+    'countryItem.unqualifiedPlaceContainerBg',
   'bg-panelInfo-activeBg': 'panelInfo.activeBg',
   'bg-panelInfo-inactiveBg': 'panelInfo.inactiveBg',
 };
 
+function flattenThemeBackgroundColors(
+  colors: ThemeColors,
+): Record<string, string> {
+  const lookup: Record<string, string> = {};
+
+  Object.entries(colors.countryItem).forEach(([key, value]) => {
+    lookup[`countryItem.${key}`] = value;
+  });
+  Object.entries(colors.panelInfo).forEach(([key, value]) => {
+    lookup[`panelInfo.${key}`] = value;
+  });
+
+  return lookup;
+}
+
+function isSpecialBackgroundValue(value: string): boolean {
+  return (
+    /gradient\(/i.test(value) ||
+    /rgba?\(/.test(value) ||
+    /^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?$/.test(
+      value.trim(),
+    )
+  );
+}
+
+function toSpecialBackgroundStyle(value: string): React.CSSProperties {
+  if (/gradient\(/i.test(value)) {
+    return { background: value };
+  }
+
+  return { background: hslStringToHex(value) };
+}
+
 /**
- * Given a className that contains bg-countryItem-* classes and the current overrides,
- * returns an inline style if the corresponding override contains a special color format
- * (gradient, rgba, or HSL with alpha) that can't be handled by CSS variables.
+ * Merge default theme colors with custom overrides (overrides win).
+ * Used for gradients/rgba/HSL-alpha values that tw-colors cannot express as CSS variables.
+ */
+export function buildBackgroundColorLookup(
+  overrides?: Record<string, string> | null,
+  themeYear?: string | null,
+): Record<string, string> | null {
+  let lookup: Record<string, string> = {};
+
+  if (themeYear) {
+    lookup = flattenThemeBackgroundColors(getThemeForYear(themeYear).colors);
+  }
+
+  if (overrides) {
+    lookup = { ...lookup, ...overrides };
+  }
+
+  return Object.keys(lookup).length > 0 ? lookup : null;
+}
+
+/**
+ * Given a className that contains bg-countryItem-* / bg-panelInfo-* classes,
+ * returns an inline style when the color is a gradient, rgba, or HSL with alpha.
+ * Resolves from custom overrides and/or the active default theme year.
  */
 export function getSpecialBackgroundStyle(
   className: string,
   overrides?: Record<string, string> | null,
+  themeYear?: string | null,
 ): React.CSSProperties | undefined {
-  if (!className || !overrides) return undefined;
+  const lookup = buildBackgroundColorLookup(overrides, themeYear);
+
+  if (!className || !lookup) return undefined;
 
   const classes = className.split(/\s+/).filter(Boolean);
 
@@ -37,16 +100,9 @@ export function getSpecialBackgroundStyle(
     const key = BG_CLASS_TO_OVERRIDE_KEY[cls];
     if (!key) continue;
 
-    const value = overrides[key];
-    if (typeof value === 'string') {
-      // Check for special color formats that need inline styles
-      if (
-        /gradient\(/i.test(value) ||
-        /rgba?\(/.test(value) ||
-        /^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?$/.test(value.trim())
-      ) {
-        return { background: hslStringToHex(value) } as React.CSSProperties;
-      }
+    const value = lookup[key];
+    if (typeof value === 'string' && isSpecialBackgroundValue(value)) {
+      return toSpecialBackgroundStyle(value);
     }
   }
 

@@ -1096,9 +1096,88 @@ export const escThemes: Partial<ThemeRecord> = {
       uppercaseEntryName: false,
     },
   },
+  '2026': {
+    colors: {
+      primary: {
+        700: 'hsl(43, 86%, 45%)',
+        750: 'hsl(43, 62%, 35%)',
+        800: 'hsl(43, 61%, 28%)',
+        900: 'hsl(43, 64%, 20%)',
+        950: 'hsl(43, 67%, 15%)',
+      },
+      gray: {
+        500: 'hsl(43, 26%, 46%)',
+        600: 'hsl(43, 21%, 32%)',
+        900: 'hsl(43, 31%, 20%)',
+      },
+      appBgColor: 'hsl(43, 61%, 28%)',
+      animatedBorder: 'hsl(0, 0%, 100%)',
+      countryItem: {
+        juryBg: 'hsl(0, 0%, 100%)',
+        juryCountryText: 'hsl(0, 0%, 0%)',
+        juryPointsBg: 'hsl(245, 50%, 21%)',
+        juryPointsText: 'hsl(0, 0%, 100%)',
+        juryLastPointsBg: 'hsl(236, 42%, 37%)',
+        juryLastPointsText: 'hsl(0, 0%, 100%)',
+        televoteUnfinishedBg: 'hsl(0, 0%, 100%)',
+        televoteUnfinishedText: 'hsl(0, 0%, 0%)',
+        televoteUnfinishedPointsBg: 'hsl(245, 50%, 21%)',
+        televoteUnfinishedPointsText: 'hsl(0, 0%, 100%)',
+        televoteActiveBg: 'hsl(0, 0%, 100%)',
+        televoteActiveText: 'hsl(0, 0%, 0%)',
+        televoteActivePointsBg: 'hsl(214, 64%, 72%)',
+        televoteActivePointsText: 'hsl(218, 39%, 12%)',
+        televoteOutline: 'hsl(0, 0%, 100%)',
+        televoteFinishedBg: 'hsl(236, 38%, 70%)',
+        televoteFinishedText: 'hsl(0, 0%, 0%)',
+        televoteFinishedPointsBg: 'hsl(0, 0%, 100%)',
+        televoteFinishedPointsText: 'hsl(0, 0%, 0%)',
+        unqualifiedPointsBg: 'hsl(265, 9%, 14%)',
+        unqualifiedPointsText: 'hsl(0, 0%, 100%)',
+        televoteLastPointsBg: 'hsl(247, 41%, 49%)',
+        televoteLastPointsText: 'hsl(0, 0%, 100%)',
+        unqualifiedLastPointsBg: 'hsl(247, 41%, 49%)',
+        unqualifiedLastPointsText: 'hsl(0, 0%, 100%)',
+        televoteFinishedLastPointsBg: 'hsl(247, 41%, 49%)',
+        televoteFinishedLastPointsText: 'hsl(0, 0%, 100%)',
+        televoteActiveLastPointsBg: 'hsl(247, 41%, 49%)',
+        televoteActiveLastPointsText: 'hsl(0, 0%, 100%)',
+        douzePointsBg: 'hsl(40, 81%, 54%)',
+        douzePointsText: 'hsl(0, 0%, 0%)',
+        douzePointsBlock1: 'hsl(60, 75%, 58%)',
+        douzePointsBlock2: 'hsl(32, 80%, 50%)',
+        juryPlaceContainerBg: 'hsl(0, 0%, 100%)',
+        juryPlaceText: 'hsl(0, 0%, 0%)',
+        televoteUnfinishedPlaceContainerBg: 'hsl(0, 0%, 100%)',
+        televoteUnfinishedPlaceText: 'hsl(0, 0%, 0%)',
+        televoteActivePlaceContainerBg: 'hsl(0, 0%, 100%)',
+        televoteActivePlaceText: 'hsl(0, 0%, 0%)',
+        televoteFinishedPlaceContainerBg: 'hsl(245, 50%, 21%)',
+        televoteFinishedPlaceText: 'hsl(330, 100%, 99%)',
+        unqualifiedPlaceContainerBg: 'hsl(265, 9%, 14%)',
+        unqualifiedPlaceText: 'hsl(223, 6%, 72%)',
+        unqualifiedBg: 'hsl(233, 15%, 35%)',
+        unqualifiedText: 'hsl(240, 10%, 67%)',
+      },
+      panelInfo: {
+        activeBg: 'hsl(265, 9%, 14%)',
+        activeText: 'hsl(37, 51%, 49%)',
+        inactiveText: 'hsl(0, 0%, 0%)',
+        inactiveBg:
+          'radial-gradient(circle, RGBA(189, 142, 61, 1) 0%, rgba(168,133,66,1) 36%, rgba(0,0,0,1) 94%)',
+      },
+    },
+    backgroundImage: '/bgImages/GoldBg2026.webp',
+    themeSpecifics: {
+      pointsContainerShape: 'square',
+      roundedCountryContainer: true,
+      isJuryPointsPanelRounded: true,
+      fontAlias: "gotham"
+    },
+  },
 };
 
-// We only support several themes, with 2025 as fallback
+// We only support several themes, with 2026 as fallback
 export const themes = {
   ...escThemes,
   ...juniorThemes,
@@ -1114,7 +1193,7 @@ export function getThemeForYear(year: string) {
     return themes[year];
   }
 
-  return themes['2025']; // Fallback to 2025 theme
+  return themes['2026']; // Fallback to 2026 theme
 }
 
 // Helper function to get background image for a specific year
@@ -1133,7 +1212,7 @@ export function getThemeBackground(themeYear: string): string {
 
   const bg =
     escThemes[themeYear]?.backgroundImage ??
-    escThemes['2025']?.backgroundImage ??
+    escThemes['2026']?.backgroundImage ??
     '/bgImages/PurpleBg2025.webp';
 
   return bg;

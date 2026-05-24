@@ -244,9 +244,12 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-05-24',
+    title: 'The ESC 2026 theme. Small UI improvements',
+  },
+  {
     date: '2026-05-17',
-    title:
-      "Added the ESC 2026 data",
+    title: 'Added the ESC 2026 data',
   },
   {
     date: '2026-05-16',

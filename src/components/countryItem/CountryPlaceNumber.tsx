@@ -51,6 +51,9 @@ const CountryPlaceNumber = ({
   const globalOverrides = useGeneralStore(
     (s) => s.customTheme?.overrides || null,
   );
+  const themeYear = useGeneralStore(
+    (s) => s.customTheme?.baseThemeYear ?? s.themeYear,
+  );
   const overrides = propOverrides || globalOverrides;
   const { roundedCountryContainer: themeRoundedCountryContainer } =
     useThemeSpecifics();
@@ -93,12 +96,15 @@ const CountryPlaceNumber = ({
   const rankContainerSpecialStyle = getSpecialBackgroundStyle(
     rankColorClasses[rankState],
     overrides,
+    themeYear,
   );
 
   // Size-based styles
   const sizeStyles = {
     scoreboard: {
-      container: 'lg:h-10 md:h-9 h-8',
+      container: roundedCountryContainer
+        ? 'lg:h-9 md:h-9 h-8'
+        : 'lg:h-10 md:h-9 h-8',
       text: 'md:text-lg xs:text-base text-sm',
     },
     sm: {
@@ -178,7 +184,7 @@ const CountryPlaceNumber = ({
 
       <h4
         ref={textRef}
-        className={`font-semibold ${currentSize.text} ${
+        className={`font-semibold tabular-nums ${currentSize.text} ${
           displayArrow ? '!opacity-0' : ''
         } ${previousDisplayArrow && !displayArrow ? 'blinker' : ''}`}
       >

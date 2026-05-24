@@ -65,7 +65,7 @@ import {
   resolveThemeSpecificsForCustomTheme,
 } from '@/theme/themeSpecifics';
 import { applyCustomTheme, getDefaultThemeColors } from '@/theme/themeUtils';
-import { FlagShape, PointsContainerShape } from '@/theme/types';
+import { FlagShape, PointsContainerShape, ThemeSpecifics } from '@/theme/types';
 import { useThemeColor } from '@/theme/useThemeColor';
 import {
   BoardAnimationMode,
@@ -112,7 +112,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [overrides, setOverrides] = useState<Record<string, string>>({});
   const [fontAlias, setFontAlias] = useState('montserrat');
 
-  const interfaceFontOptions = useMemo(() => getInterfaceFontSelectOptions(), []);
+  const interfaceFontOptions = useMemo(
+    () => getInterfaceFontSelectOptions(),
+    [],
+  );
 
   // Theme-specific UI options
   const [uppercaseEntryName, setUppercaseEntryName] = useState(true);
@@ -199,6 +202,30 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     [baseThemeYear, debouncedHsva],
   );
 
+  const applyThemeSpecificsFormState = useCallback(
+    (specifics: ThemeSpecifics) => {
+      setPointsContainerShape(specifics.pointsContainerShape);
+      setUppercaseEntryName(specifics.uppercaseEntryName);
+      setJuryActivePointsUnderline(specifics.juryActivePointsUnderline);
+      setIsJuryPointsPanelRounded(specifics.isJuryPointsPanelRounded);
+      setFlagShape(specifics.flagShape);
+      setUsePointsCountUpAnimation(specifics.usePointsCountUpAnimation);
+      setRoundedCountryContainer(specifics.roundedCountryContainer);
+      setBoardAnimationMode(specifics.boardAnimationMode);
+      setDouzePointsAnimationMode(specifics.douzePointsAnimationMode);
+      setFontAlias(normalizeFontAlias(specifics.fontAlias));
+    },
+    [],
+  );
+
+  const handleBaseThemeYearChange = useCallback(
+    (year: string) => {
+      setBaseThemeYear(year);
+      applyThemeSpecificsFormState(resolveThemeSpecificsForBaseThemeYear(year));
+    },
+    [applyThemeSpecificsFormState],
+  );
+
   // Initialize form with theme to edit
   useEffect(() => {
     if (initialTheme) {
@@ -219,29 +246,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setThemeGroupId(initialTheme.groupId || '');
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
-      setFontAlias(normalizeFontAlias(initialTheme.fontAlias));
       setUploadedFile(null);
-      setPointsContainerShape(
-        resolvedInitialThemeSpecifics.pointsContainerShape,
-      );
-      setUppercaseEntryName(resolvedInitialThemeSpecifics.uppercaseEntryName);
-      setJuryActivePointsUnderline(
-        resolvedInitialThemeSpecifics.juryActivePointsUnderline,
-      );
-      setIsJuryPointsPanelRounded(
-        resolvedInitialThemeSpecifics.isJuryPointsPanelRounded,
-      );
-      setFlagShape(resolvedInitialThemeSpecifics.flagShape);
-      setUsePointsCountUpAnimation(
-        resolvedInitialThemeSpecifics.usePointsCountUpAnimation,
-      );
-      setRoundedCountryContainer(
-        resolvedInitialThemeSpecifics.roundedCountryContainer,
-      );
-      setBoardAnimationMode(resolvedInitialThemeSpecifics.boardAnimationMode);
-      setDouzePointsAnimationMode(
-        resolvedInitialThemeSpecifics.douzePointsAnimationMode,
-      );
+      applyThemeSpecificsFormState(resolvedInitialThemeSpecifics);
       setSoundUrls(() => {
         const next = emptySoundUrlState();
 
@@ -281,22 +287,15 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setBackgroundImageUrl('');
       setOverrides({});
       setUploadedFile(null);
-      setPointsContainerShape('triangle');
-      setUppercaseEntryName(true);
-      setJuryActivePointsUnderline(true);
-      setIsJuryPointsPanelRounded(false);
-      setFlagShape('big-rectangle');
-      setUsePointsCountUpAnimation(true);
-      setRoundedCountryContainer(false);
-      setBoardAnimationMode('flip');
-      setDouzePointsAnimationMode('heartsGrid');
+      applyThemeSpecificsFormState(
+        resolveThemeSpecificsForBaseThemeYear(themeYear),
+      );
       setSoundUrls(emptySoundUrlState());
       setSoundFiles(emptySoundFileState());
       setSoundDelaySecText(emptySoundDelaySecTextState());
       setThemeGroupId('');
-      setFontAlias('montserrat');
     }
-  }, [initialTheme, isOpen, themeYear, themeHue]);
+  }, [initialTheme, isOpen, themeYear, themeHue, applyThemeSpecificsFormState]);
 
   // Live preview effect
   useEffect(() => {
@@ -330,7 +329,13 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       backgroundImageUrl,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      pointsContainerShape,
+      uppercaseEntryName,
+      juryActivePointsUnderline,
+      isJuryPointsPanelRounded,
+      flagShape,
       usePointsCountUpAnimation,
+      roundedCountryContainer,
       boardAnimationMode,
       douzePointsAnimationMode,
       themeSounds:
@@ -347,7 +352,13 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     baseThemeYear,
     backgroundImageUrl,
     overrides,
+    pointsContainerShape,
+    uppercaseEntryName,
+    juryActivePointsUnderline,
+    isJuryPointsPanelRounded,
+    flagShape,
     usePointsCountUpAnimation,
+    roundedCountryContainer,
     boardAnimationMode,
     douzePointsAnimationMode,
     soundUrls,
@@ -1003,7 +1014,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                   ]}
                   value={baseThemeYear}
                   labelClassName="!text-base !font-medium mb-1"
-                  onChange={(value) => setBaseThemeYear(value)}
+                  onChange={handleBaseThemeYearChange}
                   id="baseTheme-select-box"
                   label={t('widgets.themes.baseTheme')}
                   className="sm:w-[130px] w-[110px]"

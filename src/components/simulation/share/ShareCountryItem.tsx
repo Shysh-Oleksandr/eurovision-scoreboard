@@ -6,6 +6,7 @@ import { useCountryItemColors } from '@/components/countryItem/hooks/useCountryI
 import { useQualificationStatus } from '@/components/countryItem/hooks/useQualificationStatus';
 import PointsSection from '@/components/countryItem/PointsSection';
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { splitRoundedCountryItemSurfaceClasses } from '@/components/countryItem/utils/roundedCountryItemGlow';
 import {
   getFlagPathForImageGeneration,
   handleFlagError,
@@ -74,12 +75,28 @@ const ShareCountryItem: React.FC<Props> = ({
     country.isVotingFinished,
   ]);
 
+  const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
+  const themeYear = useGeneralStore(
+    (s) => s.customTheme?.baseThemeYear ?? s.themeYear,
+  );
+  const {
+    uppercaseEntryName,
+    pointsContainerShape,
+    flagShape,
+    roundedCountryContainer,
+  } = useThemeSpecifics();
+
+  const enableMinimalisticFlags = useGeneralStore(
+    (s) => s.settings.enableMinimalisticFlags,
+  );
+
   // Size-based styles
   const sizeStyles = {
     sm: {
       button: 'mb-1 h-7',
       flag: 'w-8 h-7',
       name: 'text-sm mr-8',
+      nameRounded: 'text-sm mr-2',
       points: '!w-8',
       pointsText: '!text-sm',
       margin: 'mb-1',
@@ -88,30 +105,34 @@ const ShareCountryItem: React.FC<Props> = ({
       button: 'mb-1 h-8',
       flag: 'w-10 h-8',
       name: 'text-sm mr-9',
+      nameRounded: 'text-sm mr-2',
       points: '!w-9',
       pointsText: '!text-base',
       margin: 'mb-1',
     },
     lg: {
       button: 'mb-[6px] h-10',
-      flag: 'w-[50px] h-10',
+      flag: roundedCountryContainer ? 'w-[42px] h-10' : 'w-[50px] h-10',
       name: 'text-lg mr-[2.57rem]',
+      nameRounded: 'text-lg mr-2',
       points: '!w-[2.57rem]',
       pointsText: '!text-[16px]',
       margin: 'mb-[6px]',
     },
     xl: {
       button: 'mb-[6px] h-12',
-      flag: 'w-[56px] h-12',
+      flag: roundedCountryContainer ? 'w-[48px] h-12' : 'w-[56px] h-12',
       name: 'text-xl mr-[3rem]',
+      nameRounded: 'text-xl mr-2',
       points: '!w-[3rem]',
       pointsText: '!text-[18px]',
       margin: 'mb-[6px]',
     },
     '2xl': {
       button: 'mb-2 h-14',
-      flag: 'w-[64px] h-14',
+      flag: roundedCountryContainer ? 'w-[58px] h-14' : 'w-[64px] h-14',
       name: 'text-2xl mr-[3.5rem]',
+      nameRounded: 'text-2xl mr-2',
       points: '!w-[3.5rem]',
       pointsText: '!text-2xl',
       margin: 'mb-[6px]',
@@ -119,23 +140,14 @@ const ShareCountryItem: React.FC<Props> = ({
   };
 
   const currentSize = sizeStyles[size];
-
-  const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const {
-    uppercaseEntryName,
-    pointsContainerShape,
-    flagShape,
-    roundedCountryContainer,
-  } = useThemeSpecifics();
   const buttonClassName = `relative flex justify-between shadow-md w-full overflow-hidden rounded-[1px] ${
     roundedCountryContainer ? 'rounded-full' : ''
   } ${currentSize.button} ${buttonColors}`;
-  const enableMinimalisticFlags = useGeneralStore(
-    (s) => s.settings.enableMinimalisticFlags,
-  );
+
   const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
     overrides,
+    themeYear,
   );
 
   // Helper function to convert Tailwind class to pixels
@@ -228,20 +240,42 @@ const ShareCountryItem: React.FC<Props> = ({
     }
   }, [flagShape, currentSize.flag, size]);
 
-  const { pointsBgClass, pointsTextClass } = useCountryItemColors({
+  const {
+    pointsBgClass,
+    pointsTextClass,
+    lastPointsBgClass,
+    lastPointsTextClass,
+  } = useCountryItemColors({
     isJuryVoting,
     isCountryVotingFinished: !!country.isVotingFinished,
     isActive: false,
     isUnqualified: shouldShowAsNonQualified,
   });
 
+  const showRoundedShareLayout = roundedCountryContainer && showPoints;
+
+  const shareNameStripSurfaceClasses = showRoundedShareLayout
+    ? splitRoundedCountryItemSurfaceClasses(buttonColors).nameStripSurface
+    : '';
+
   return (
     <CountryItemBase
       country={country}
       index={index}
       className="flex relative"
-      containerClassName={buttonClassName}
-      style={buttonSpecialStyle}
+      containerClassName={`${buttonClassName}${
+        showRoundedShareLayout
+          ? ' !bg-transparent flex-1 min-w-0 overflow-hidden'
+          : ''
+      }`}
+      style={showRoundedShareLayout ? undefined : buttonSpecialStyle}
+      useInlineContentLayout={showRoundedShareLayout}
+      contentStyle={showRoundedShareLayout ? buttonSpecialStyle : undefined}
+      contentClassName={
+        showRoundedShareLayout
+          ? `rounded-r-full z-[21] shadow-[4px_0_10px_rgba(0,0,0,0.12)] dark:shadow-[4px_0_10px_rgba(0,0,0,0.35)] ${shareNameStripSurfaceClasses} !opacity-100`
+          : undefined
+      }
       as="div"
       showPlaceNumber={showRankings}
       renderPlaceNumber={(country, index) => {
@@ -295,9 +329,11 @@ const ShareCountryItem: React.FC<Props> = ({
       }
       renderName={() => (
         <h4
-          className={`${currentSize.name} ${
+          className={`${
+            showRoundedShareLayout ? currentSize.nameRounded : currentSize.name
+          } ${
             uppercaseEntryName ? 'uppercase' : ''
-          } text-left ml-2 font-bold truncate flex-1 pr-2 m`}
+          } text-left ml-2 font-bold truncate flex-1 pr-2`}
         >
           {shortCountryNames ? country.name.slice(0, 3) : country.name}
         </h4>
@@ -306,12 +342,22 @@ const ShareCountryItem: React.FC<Props> = ({
         showPoints ? (
           <PointsSection
             country={country}
-            pointsContainerClassName={`!absolute right-0 top-0 ${currentSize.points}`}
+            pointsContainerClassName={
+              showRoundedShareLayout
+                ? undefined
+                : `!absolute right-0 top-0 ${currentSize.points}`
+            }
             pointsBgClass={pointsBgClass}
             pointsTextClass={`${currentSize.pointsText} ${pointsTextClass}`}
             shouldShowNQLabel={shouldShowNQLabel}
             showLastPoints={false}
+            isFinished={
+              !!('isVotingFinished' in country && country.isVotingFinished)
+            }
+            lastPointsBgClass={lastPointsBgClass}
+            lastPointsTextClass={lastPointsTextClass}
             pointsContainerShape={pointsContainerShape}
+            roundedCountryLayout={showRoundedShareLayout}
           />
         ) : null
       }

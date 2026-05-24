@@ -12,6 +12,8 @@ export interface CountryItemBaseProps {
   style?: React.CSSProperties;
   disabled?: boolean;
   onClick?: (countryCode: string) => void;
+  onMouseEnter?: React.MouseEventHandler;
+  onMouseLeave?: React.MouseEventHandler;
 
   // Render props for customization
   renderPlaceNumber?: (
@@ -28,6 +30,10 @@ export interface CountryItemBaseProps {
   // Container options
   as?: 'button' | 'div';
   showPlaceNumber?: boolean;
+  /** When true, flag/name sit in normal flex flow so points reserve width on the right (rounded pill layout). */
+  useInlineContentLayout?: boolean;
+  /** Applied to the flag/name wrapper; use with `useInlineContentLayout` for theme backgrounds on the name pill. */
+  contentStyle?: React.CSSProperties;
 }
 
 const CountryItemBase: React.FC<CountryItemBaseProps> = ({
@@ -39,6 +45,8 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   style,
   disabled = false,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
   renderPlaceNumber,
   renderFlag,
   renderName,
@@ -46,6 +54,8 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   renderDouzePointsAnimation,
   as = 'div',
   showPlaceNumber = false,
+  useInlineContentLayout = false,
+  contentStyle,
   ...props
 }) => {
   const Container = as;
@@ -57,7 +67,7 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   };
 
   return (
-    <div className={`flex relative ${className || ''}`} {...props}>
+    <div className={`flex relative min-w-0 ${className || ''}`} {...props}>
       {/* Place Number */}
       {showPlaceNumber &&
         renderPlaceNumber &&
@@ -65,19 +75,30 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
 
       {/* Main Container */}
       <Container
-        className={`relative ${containerClassName}`}
+        className={`relative ${
+          useInlineContentLayout ? 'flex flex-row items-stretch min-h-0 ' : ''
+        }${containerClassName}`}
         style={style}
         disabled={disabled}
         onClick={handleClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         {/* Douze Points Animation */}
         {renderDouzePointsAnimation && renderDouzePointsAnimation(country)}
 
         {/* Content */}
         <div
-          className={`flex items-center overflow-hidden flex-1 absolute w-full h-full ${
-            contentClassName || ''
-          }`}
+          className={
+            useInlineContentLayout
+              ? `flex items-center overflow-hidden flex-1 min-w-0 h-full relative ${
+                  contentClassName || ''
+                }`
+              : `flex items-center overflow-hidden flex-1 absolute w-full h-full ${
+                  contentClassName || ''
+                }`
+          }
+          style={useInlineContentLayout ? contentStyle : undefined}
         >
           {/* Flag */}
           {renderFlag && renderFlag(country)}
@@ -87,7 +108,11 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
         </div>
 
         {/* Points */}
-        <div className="flex h-full flex-shrink-0 ml-auto">
+        <div
+          className={`flex h-full flex-shrink-0 ${
+            useInlineContentLayout ? '' : 'ml-auto'
+          }`}
+        >
           {renderPoints && renderPoints(country)}
         </div>
       </Container>

@@ -6,6 +6,13 @@ import DouzePointsAnimation from '@/components/countryItem/DouzePointsAnimation'
 import useDouzePointsAnimation from '@/components/countryItem/hooks/useDouzePointsAnimation';
 import useFlagClassName from '@/components/countryItem/hooks/useFlagClassName';
 import PointsSection from '@/components/countryItem/PointsSection';
+import {
+  buildActiveTelevoteDropShadowFilter,
+  resolveTelevoteOutlineColor,
+  ROUNDED_GLOW_TRANSITION,
+  ROUNDED_SUBTLE_GLOW,
+  splitRoundedCountryItemSurfaceClasses,
+} from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
 import { getSpecialColorStyle } from '@/helpers/colorConversion';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
@@ -33,6 +40,7 @@ type DerivedColors = {
 };
 
 type ThemePreviewCountryItemUIProps = {
+  baseThemeYear: string;
   state: ItemState;
   overrides?: Record<string, string>;
   points: number;
@@ -48,6 +56,7 @@ type ThemePreviewCountryItemUIProps = {
 };
 
 const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
+  baseThemeYear,
   state,
   overrides = {},
   points,
@@ -79,7 +88,11 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   const douzePointsParallelogramYellowRef = useRef<HTMLDivElement>(null);
 
   // Use lg+ styles only for consistent preview sizing
-  const flagClassName = useFlagClassName(flagShape, true);
+  const flagClassName = useFlagClassName(
+    flagShape,
+    true,
+    roundedCountryContainer,
+  );
 
   const { shouldRender: showDouzePointsAnimationHook } =
     useDouzePointsAnimation(
@@ -97,27 +110,41 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       }
     : null;
 
-  useAnimatePoints({
-    shouldShowLastPoints: false,
+  const mockCountry: Country = useMemo(
+    () => ({
+      code: previewCountry.code,
+      name: previewCountry.name,
+      flag: getFlagPath(previewCountry, flagShape, enableMinimalisticFlags),
+      points,
+      juryPoints: 0,
+      televotePoints: 0,
+      lastReceivedPoints: lastPoints === null ? null : lastPoints,
+      isVotingFinished: false,
+      showDouzePointsAnimation,
+      qualifiedFromStageIds: [],
+    }),
+    [
+      previewCountry,
+      flagShape,
+      enableMinimalisticFlags,
+      points,
+      lastPoints,
+      showDouzePointsAnimation,
+    ],
+  );
+
+  const { lastPointsContainerRef, lastPointsTextRef } = useAnimatePoints({
+    shouldShowLastPoints:
+      mockCountry.lastReceivedPoints !== null &&
+      mockCountry.lastReceivedPoints > 0,
     isDouzePoints: showDouzePointsAnimation,
     douzePointsRefs,
     douzePointsAnimationModeOverride: douzePointsAnimationMode,
     isThemePreview: true,
+    lastPointsAnimationDirection: roundedCountryContainer
+      ? 'left-to-right'
+      : 'right-to-left',
   });
-
-  // Mock country
-  const mockCountry: Country = {
-    code: previewCountry.code,
-    name: previewCountry.name,
-    flag: getFlagPath(previewCountry, flagShape, enableMinimalisticFlags),
-    points,
-    juryPoints: 0,
-    televotePoints: 0,
-    lastReceivedPoints: lastPoints || null,
-    isVotingFinished: false,
-    showDouzePointsAnimation: showDouzePointsAnimation,
-    qualifiedFromStageIds: [],
-  };
 
   const {
     buttonBg,
@@ -140,7 +167,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     let bgOverride: string | undefined;
 
     if (state === 'unqualified') {
-      buttonBg = 'bg-countryItem-unqualifiedBg opacity-70';
+      buttonBg = 'bg-countryItem-unqualifiedBg opacity-70 !opacity-70';
       buttonText = 'text-countryItem-unqualifiedText';
       pointsBg =
         'bg-countryItem-unqualifiedPointsBg text-countryItem-unqualifiedPointsBg';
@@ -179,8 +206,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     }
 
     if (state === 'televoteActive') {
-      buttonBg =
-        'bg-countryItem-televoteActiveBg outline outline-2 outline-countryItem-televoteOutline';
+      buttonBg = roundedCountryContainer
+        ? 'bg-countryItem-televoteActiveBg'
+        : 'bg-countryItem-televoteActiveBg outline outline-2 outline-countryItem-televoteOutline';
       buttonText = 'text-countryItem-televoteActiveText';
       pointsBg =
         'bg-countryItem-televoteActivePointsBg text-countryItem-televoteActivePointsBg';
@@ -225,7 +253,39 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       lastPointsText,
       buttonBgStyle,
     };
-  }, [state, overrides]);
+  }, [state, overrides, roundedCountryContainer]);
+
+  const televoteOutlineColor = useMemo(
+    () => resolveTelevoteOutlineColor(baseThemeYear, overrides),
+    [baseThemeYear, overrides],
+  );
+
+  const roundedContainerStyle = useMemo((): React.CSSProperties | undefined => {
+    if (!roundedCountryContainer) return undefined;
+
+    if (state === 'televoteActive') {
+      return {
+        filter: buildActiveTelevoteDropShadowFilter(televoteOutlineColor),
+        transition: ROUNDED_GLOW_TRANSITION,
+      };
+    }
+
+    return {
+      filter: ROUNDED_SUBTLE_GLOW,
+      transition: ROUNDED_GLOW_TRANSITION,
+    };
+  }, [roundedCountryContainer, state, televoteOutlineColor]);
+
+  const {
+    containerOpacity: containerOpacityClass,
+    nameStripSurface: roundedNameStripSurfaceClasses,
+  } = useMemo(
+    () =>
+      roundedCountryContainer
+        ? splitRoundedCountryItemSurfaceClasses(buttonBg)
+        : { containerOpacity: '', nameStripSurface: '' },
+    [roundedCountryContainer, buttonBg],
+  );
 
   return (
     <CountryItemBase
@@ -233,9 +293,20 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       index={0}
       className="flex items-center"
       containerClassName={`relative flex justify-between shadow-md w-full overflow-hidden rounded-sm ${
-        roundedCountryContainer ? '!rounded-full' : ''
-      } h-10 ${buttonBg} ${buttonText}`}
-      style={buttonBgStyle}
+        roundedCountryContainer ? '!rounded-full !bg-transparent' : ''
+      } h-10 ${
+        roundedCountryContainer
+          ? `${buttonText} ${containerOpacityClass}`
+          : `${buttonBg} ${buttonText}`
+      }`}
+      style={roundedCountryContainer ? roundedContainerStyle : buttonBgStyle}
+      useInlineContentLayout={roundedCountryContainer}
+      contentStyle={roundedCountryContainer ? buttonBgStyle : undefined}
+      contentClassName={
+        roundedCountryContainer
+          ? `rounded-r-full z-[21] shadow-[4px_0_10px_rgba(0,0,0,0.12)] dark:shadow-[4px_0_10px_rgba(0,0,0,0.35)] ${roundedNameStripSurfaceClasses} !opacity-100`
+          : undefined
+      }
       as="div"
       showPlaceNumber
       renderPlaceNumber={(_country, index) => (
@@ -290,7 +361,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
         <h4
           className={`${
             uppercaseEntryName ? 'uppercase' : ''
-          } text-left ml-2 font-bold text-sm truncate flex-1`}
+          } text-left ml-2 font-bold text-sm truncate flex-1 ${
+            roundedCountryContainer ? 'mr-2' : ''
+          }`}
         >
           {mockCountry.name}
         </h4>
@@ -301,12 +374,20 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
           pointsBgClass={pointsBg}
           pointsTextClass={pointsText}
           shouldShowNQLabel={state === 'unqualified'}
-          showLastPoints={lastPoints !== null && lastPoints > 0}
+          showLastPoints={
+            roundedCountryContainer || (lastPoints !== null && lastPoints > 0)
+          }
           lastPointsBgClass={lastPointsBg}
           lastPointsTextClass={lastPointsText}
+          lastPointsRef={lastPointsTextRef}
+          lastPointsContainerRef={lastPointsContainerRef}
           pointsContainerShape={pointsContainerShape}
-          pointsContainerClassName="ml-auto"
+          pointsContainerClassName={
+            roundedCountryContainer ? undefined : 'ml-auto'
+          }
           usePointsCountUpAnimationOverride={usePointsCountUpAnimation}
+          roundedCountryLayout={roundedCountryContainer}
+          lastReceivedPointsActive={lastPoints !== null && lastPoints > 0}
         />
       )}
     />

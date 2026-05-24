@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { Country } from '../../../models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 type useItemStateProps = {
   country: Country;
@@ -28,6 +29,8 @@ export const useItemState = ({
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
   );
+
+  const { roundedCountryContainer } = useThemeSpecifics();
 
   const isVotingCountry = country.code === votingCountryCode && isJuryVoting;
   const isActive =
@@ -83,12 +86,18 @@ export const useItemState = ({
 
     if (isJuryVoting) {
       return `bg-countryItem-juryBg text-countryItem-juryCountryText ${
-        isDisabled ? '' : 'brighten-on-hover cursor-pointer'
+        isDisabled
+          ? ''
+          : roundedCountryContainer
+            ? 'cursor-pointer'
+            : 'brighten-on-hover cursor-pointer'
       }`;
     }
 
     if (isActive) {
-      return 'bg-countryItem-televoteActiveBg text-countryItem-televoteActiveText outline outline-2';
+      return roundedCountryContainer
+        ? 'bg-countryItem-televoteActiveBg text-countryItem-televoteActiveText'
+        : 'bg-countryItem-televoteActiveBg text-countryItem-televoteActiveText outline outline-2';
     }
 
     if (isCountryVotingFinished || isVotingOver) {
@@ -97,7 +106,9 @@ export const useItemState = ({
 
     return `bg-countryItem-televoteUnfinishedBg text-countryItem-televoteUnfinishedText ${
       revealTelevoteLowestToHighest
-        ? 'brighten-on-hover cursor-pointer'
+        ? roundedCountryContainer
+          ? 'cursor-pointer'
+          : 'brighten-on-hover cursor-pointer'
         : ''
     }`;
   }, [
@@ -108,18 +119,28 @@ export const useItemState = ({
     isVotingOver,
     showPlaceAnimation,
     isDisabled,
+    roundedCountryContainer,
   ]);
 
   const buttonClassName = useMemo(
     () =>
-      `relative will-change-colors outline-countryItem-televoteOutline flex justify-between shadow-md rounded-[1px] lg:mb-[6px] mb-1 lg:h-10 md:h-9 h-8 w-full transition-all !duration-500 ${
+      `relative will-change-colors outline-countryItem-televoteOutline flex justify-between rounded-[1px] lg:mb-[6px] mb-1 ${
+        roundedCountryContainer ? 'lg:h-9' : 'lg:h-10 shadow-md'
+      } md:h-9 h-8 w-full transition-all !duration-500 ${
         isActive ? 'rounded-sm' : ''
       } ${showPlaceAnimation ? 'lg:ml-2 xs:ml-1.5 ml-1' : ''}
       ${isVotingCountry ? 'opacity-70 cursor-not-allowed' : ''}
       ${buttonColors}
       ${isVotingOver ? 'pointer-events-none' : ''}
       `,
-    [isActive, showPlaceAnimation, isVotingCountry, buttonColors, isVotingOver],
+    [
+      isActive,
+      showPlaceAnimation,
+      isVotingCountry,
+      buttonColors,
+      isVotingOver,
+      roundedCountryContainer,
+    ],
   );
 
   return { isDisabled, buttonClassName, isActive, isVotingCountry };

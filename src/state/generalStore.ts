@@ -21,11 +21,8 @@ import { api } from '@/api/client';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
 import { BaseCountry } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
-import {
-  applyDocumentFontAlias,
-  normalizeFontAlias,
-  resolveActiveFontAlias,
-} from '@/theme/fontAliases';
+import { applyDocumentFontAlias, normalizeFontAlias } from '@/theme/fontAliases';
+import { resolveActiveFontAliasForGeneralState } from '@/theme/themeSpecifics';
 import {
   applyCustomTheme as applyCustomThemeUtil,
   clearCustomTheme as clearCustomThemeUtil,
@@ -50,7 +47,7 @@ export enum PresentationPointsGrouping {
 }
 
 export const INITIAL_YEAR = '2026' as Year;
-export const INITIAL_THEME_YEAR = '2025' as Year;
+export const INITIAL_THEME_YEAR = '2026' as Year;
 
 const DEFAULT_SETTINGS: Settings = {
   alwaysShowRankings: true,
@@ -752,11 +749,12 @@ export const useGeneralStore = create<GeneralState>()(
 export function syncDocumentFont() {
   if (typeof document === 'undefined') return;
 
-  const { settings, customTheme } = useGeneralStore.getState();
-  const alias = resolveActiveFontAlias({
-    overrideEnabled: settings.overrideThemeFont,
-    overrideAlias: settings.overrideThemeFontAlias,
-    themeAlias: customTheme?.fontAlias,
+  const { settings, customTheme, themeYear } = useGeneralStore.getState();
+  const alias = resolveActiveFontAliasForGeneralState({
+    themeYear,
+    customTheme,
+    overrideThemeFont: settings.overrideThemeFont,
+    overrideThemeFontAlias: settings.overrideThemeFontAlias,
   });
 
   applyDocumentFontAlias(alias);

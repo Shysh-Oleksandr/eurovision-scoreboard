@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { getFlagPath, handleFlagError } from '../../helpers/getFlagPath';
 import useAnimatePoints from '../../hooks/useAnimatePoints';
@@ -18,6 +18,14 @@ import useVotingFinished from './hooks/useVotingFinished';
 import PointsSection from './PointsSection';
 
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import {
+  buildActiveTelevoteDropShadowFilter,
+  resolveTelevoteOutlineColor,
+  ROUNDED_GLOW_TRANSITION,
+  ROUNDED_SUBTLE_GLOW,
+  ROUNDED_SUBTLE_GLOW_HOVER,
+  splitRoundedCountryItemSurfaceClasses,
+} from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 import { ItemState } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -30,6 +38,7 @@ type Props = {
   showPlaceAnimation: boolean;
   hasCountryFinishedVoting: boolean;
   boardAnimationClassName?: string;
+  themeLayoutKey?: string;
 };
 
 const CountryItem = ({
@@ -40,6 +49,7 @@ const CountryItem = ({
   showPlaceAnimation,
   hasCountryFinishedVoting,
   boardAnimationClassName,
+  themeLayoutKey = '',
   ...props
 }: Props) => {
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
@@ -50,6 +60,9 @@ const CountryItem = ({
     (s) => s.settings.enableMinimalisticFlags,
   );
 
+  const revealTelevoteLowestToHighest = useGeneralStore(
+    (state) => state.settings.revealTelevoteLowestToHighest,
+  );
   const scoreboardMobileLayout = useGeneralStore(
     (s) => s.presentationSettings.scoreboardMobileLayout,
   );
@@ -111,14 +124,10 @@ const CountryItem = ({
     isUnqualified: shouldShowAsNonQualified,
   });
 
-  const { lastPointsContainerRef, lastPointsTextRef } = useAnimatePoints({
-    shouldShowLastPoints:
-      country.lastReceivedPoints !== null && !isVotingFinished,
-    isDouzePoints: !!country.showDouzePointsAnimation,
-    douzePointsRefs,
-  });
-
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
+  const themeYear = useGeneralStore(
+    (s) => s.customTheme?.baseThemeYear ?? s.themeYear,
+  );
   const {
     uppercaseEntryName,
     flagShape,
@@ -126,12 +135,72 @@ const CountryItem = ({
     roundedCountryContainer,
   } = useThemeSpecifics();
 
+  const { lastPointsContainerRef, lastPointsTextRef } = useAnimatePoints({
+    shouldShowLastPoints:
+      country.lastReceivedPoints !== null && !isVotingFinished,
+    isDouzePoints: !!country.showDouzePointsAnimation,
+    douzePointsRefs,
+    lastPointsAnimationDirection: roundedCountryContainer
+      ? 'left-to-right'
+      : 'right-to-left',
+    pointsLayoutKey: themeLayoutKey,
+  });
+
   const buttonSpecialStyle = getSpecialBackgroundStyle(
     buttonClassName,
     overrides,
+    themeYear,
   );
 
-  const flagClassName = useFlagClassName(flagShape);
+  const flagClassName = useFlagClassName(
+    flagShape,
+    false,
+    roundedCountryContainer,
+  );
+
+  /** Paints only the flag/name strip; outer row stays transparent under the last-points gutter. */
+  const roundedNameStripSurfaceClasses = roundedCountryContainer
+    ? splitRoundedCountryItemSurfaceClasses(buttonClassName).nameStripSurface
+    : '';
+
+  const televoteOutlineColor = useMemo(
+    () => resolveTelevoteOutlineColor(themeYear, overrides),
+    [themeYear, overrides],
+  );
+
+  const [isRoundedGlowHovered, setIsRoundedGlowHovered] = useState(false);
+
+  const isRoundedGlowHoverable =
+    roundedCountryContainer &&
+    !isDisabled &&
+    (isJuryVoting ||
+      (!isJuryVoting && !isActive && revealTelevoteLowestToHighest));
+
+  const roundedContainerStyle = useMemo((): React.CSSProperties | undefined => {
+    if (!roundedCountryContainer) return undefined;
+
+    const glowHovered = isRoundedGlowHovered && isRoundedGlowHoverable;
+
+    if (isActive) {
+      return {
+        filter: buildActiveTelevoteDropShadowFilter(
+          televoteOutlineColor,
+          glowHovered,
+        ),
+      };
+    }
+
+    return {
+      filter: glowHovered ? ROUNDED_SUBTLE_GLOW_HOVER : ROUNDED_SUBTLE_GLOW,
+      transition: ROUNDED_GLOW_TRANSITION,
+    };
+  }, [
+    roundedCountryContainer,
+    isActive,
+    televoteOutlineColor,
+    isRoundedGlowHovered,
+    isRoundedGlowHoverable,
+  ]);
 
   return (
     <CountryItemBase
@@ -141,11 +210,28 @@ const CountryItem = ({
         boardAnimationClassName || ''
       }`}
       containerClassName={`${buttonClassName} flex-1 min-w-0 overflow-hidden ${
-        roundedCountryContainer ? '!rounded-full' : ''
+        roundedCountryContainer ? '!rounded-full !bg-transparent' : ''
       }`}
-      style={buttonSpecialStyle}
+      style={
+        roundedCountryContainer ? roundedContainerStyle : buttonSpecialStyle
+      }
+      useInlineContentLayout={roundedCountryContainer}
+      contentStyle={roundedCountryContainer ? buttonSpecialStyle : undefined}
+      contentClassName={
+        roundedCountryContainer
+          ? `rounded-r-full z-[21] shadow-[6px_0_10px_2px_rgba(0,0,0,0.15)] ${roundedNameStripSurfaceClasses} !opacity-100`
+          : undefined
+      }
       disabled={isDisabled}
       onClick={onClick}
+      onMouseEnter={
+        isRoundedGlowHoverable ? () => setIsRoundedGlowHovered(true) : undefined
+      }
+      onMouseLeave={
+        isRoundedGlowHoverable
+          ? () => setIsRoundedGlowHovered(false)
+          : undefined
+      }
       as="button"
       showPlaceNumber={shouldShowPlaceNumber}
       renderPlaceNumber={(country, index) => {
@@ -216,7 +302,11 @@ const CountryItem = ({
             isTwoColumnLayout
               ? 'xs:ml-2 ml-1.5 text-[0.8rem]'
               : 'ml-2 text-[0.9rem]'
-          } font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm truncate flex-1 lg:mr-[2.57rem] md:mr-9 mr-8`}
+          } font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm truncate flex-1 ${
+            roundedCountryContainer
+              ? 'mr-2 md:mr-2 lg:mr-2'
+              : 'lg:mr-[2.57rem] md:mr-9 mr-8'
+          }`}
         >
           {country.name}
         </h4>
@@ -227,13 +317,23 @@ const CountryItem = ({
           pointsBgClass={pointsBgClass}
           pointsTextClass={pointsTextClass}
           shouldShowNQLabel={shouldShowNQLabel}
-          showLastPoints={true}
+          showLastPoints
+          isFinished={
+            !!('isVotingFinished' in country && country.isVotingFinished)
+          }
           lastPointsBgClass={lastPointsBgClass}
           lastPointsTextClass={lastPointsTextClass}
           lastPointsRef={lastPointsTextRef}
           isTwoColumnLayout={isTwoColumnLayout}
           lastPointsContainerRef={lastPointsContainerRef}
           pointsContainerShape={pointsContainerShape}
+          roundedCountryLayout={roundedCountryContainer}
+          lastReceivedPointsActive={
+            'lastReceivedPoints' in country &&
+            country.lastReceivedPoints !== null &&
+            !isVotingFinished
+          }
+          pointsLayoutKey={themeLayoutKey}
         />
       )}
       {...props}

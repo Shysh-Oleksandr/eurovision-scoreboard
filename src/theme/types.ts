@@ -21,6 +21,8 @@ export interface ThemeSpecifics {
   isJuryPointsPanelRounded: boolean;
   usePointsCountUpAnimation: boolean;
   roundedCountryContainer: boolean;
+  /** Default UI font for built-in themes; see `normalizeFontAlias` in fontAliases.ts */
+  fontAlias?: string;
 }
 
 export type ItemState =

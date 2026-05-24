@@ -111,6 +111,7 @@ const ThemePreviewCountryItemCompact: React.FC<
         }}
       >
         <ThemePreviewCountryItemUI
+          baseThemeYear={baseThemeYear}
           state={state}
           overrides={overrides}
           points={points}
@@ -128,6 +129,7 @@ const ThemePreviewCountryItemCompact: React.FC<
         <VotingPointsInfo
           customVotingPointsIndex={isListItem ? 9 : 0}
           overrides={overrides}
+          themeYear={baseThemeYear}
           juryActivePointsUnderline={juryActivePointsUnderline}
           isRounded={isJuryPointsPanelRounded}
         />

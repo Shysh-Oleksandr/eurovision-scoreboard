@@ -6,6 +6,11 @@ import { useScoreboardStore } from '../../../state/scoreboardStore';
 import { CountryQualificationItem } from './CountryQualificationItem';
 
 import SnowPileEffect from '@/components/effects/SnowPileEffect';
+import { useQualifiedCountriesPanelGlowStyle } from '@/theme/useQualifiedCountriesPanelGlowStyle';
+import useThemeSpecifics from '@/theme/useThemeSpecifics';
+
+const PANEL_INNER_CLASSNAME =
+  'overflow-hidden lg:px-6 sm:px-4 xs:px-3 px-2 py-4 bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/50 relative';
 
 const QualifiedCountriesList = () => {
   const t = useTranslations('simulation');
@@ -46,9 +51,13 @@ const QualifiedCountriesList = () => {
   }, [qualifiedCountries, qualificationOrder, stageId]);
 
   const countriesContainerRef = useRef<HTMLDivElement>(null);
+  const { roundedCountryContainer } = useThemeSpecifics();
+  const roundedPanelGlowStyle = useQualifiedCountriesPanelGlowStyle(
+    roundedCountryContainer,
+  );
 
-  return (
-    <div className="lg:px-6 sm:px-4 xs:px-3 px-2 py-4 bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/50 rounded-sm shadow-md relative">
+  const panelContent = (
+    <>
       <SnowPileEffect snowEffect="middle" className="!w-full" />
       <h2 className="lg:text-2xl xs:text-xl text-lg text-center font-semibold uppercase break-words mb-4 tracking-wid text-white">
         {t.rich('qualifiedForTheGrandFinal', {
@@ -61,10 +70,7 @@ const QualifiedCountriesList = () => {
         })}
       </h2>
 
-      <div
-        ref={countriesContainerRef}
-        className="overflow-hidden flex flex-col gap-1.5"
-      >
+      <div ref={countriesContainerRef} className=" flex flex-col gap-1.5">
         {Array.from({ length: qualifiersAmount ?? 0 }).map((_, index) => (
           <CountryQualificationItem
             key={sortedQualifiedCountries[index]?.code ?? index}
@@ -73,6 +79,19 @@ const QualifiedCountriesList = () => {
           />
         ))}
       </div>
+    </>
+  );
+
+  return (
+    <div
+      className={`${PANEL_INNER_CLASSNAME} ${
+        roundedCountryContainer
+          ? 'qualified-countries-panel--rounded'
+          : 'rounded-sm shadow-md'
+      }`}
+      style={roundedPanelGlowStyle}
+    >
+      {panelContent}
     </div>
   );
 };

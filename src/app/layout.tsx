@@ -116,7 +116,7 @@ export default async function RootLayout({
               var parsed = JSON.parse(stored);
               var state = parsed.state || parsed;
               var customTheme = state?.customTheme;
-              var themeYear = state?.themeYear || '2025';
+              var themeYear = state?.themeYear || '2026';
 
               var settings = state?.settings || {};
               var allowedFont = ${FOUC_FONT_ALLOWED_LITERAL};
@@ -127,6 +127,9 @@ export default async function RootLayout({
                 if (!allowedFont[fa]) fa = 'montserrat';
               } else if (customTheme) {
                 fa = (customTheme.fontAlias || 'montserrat').toLowerCase();
+                if (!allowedFont[fa]) fa = 'montserrat';
+              } else if (state.theme && state.theme.themeSpecifics && state.theme.themeSpecifics.fontAlias) {
+                fa = String(state.theme.themeSpecifics.fontAlias).toLowerCase();
                 if (!allowedFont[fa]) fa = 'montserrat';
               }
 

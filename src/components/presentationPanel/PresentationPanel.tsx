@@ -20,6 +20,7 @@ import {
   useGeneralStore,
 } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import { useQualifiedCountriesPanelGlowStyle } from '@/theme/useQualifiedCountriesPanelGlowStyle';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const MIN_SPEED_SECONDS = 0.5;
@@ -38,7 +39,10 @@ const layoutTabs = [
 
 const PresentationPanel = (): JSX.Element | null => {
   const t = useTranslations();
-  const { boardAnimationMode } = useThemeSpecifics();
+  const { boardAnimationMode, roundedCountryContainer } = useThemeSpecifics();
+  const roundedPanelGlowStyle = useQualifiedCountriesPanelGlowStyle(
+    roundedCountryContainer,
+  );
 
   const tabs = useMemo(
     () => [
@@ -233,9 +237,14 @@ const PresentationPanel = (): JSX.Element | null => {
   return (
     <div className="w-full">
       <div
-        className={`min-h-[120px] relative bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md lg:pb-4 pb-3 lg:pt-3 md:pt-2 ${
+        className={`min-h-[120px] relative bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 ${
+          roundedCountryContainer
+            ? 'qualified-countries-panel--rounded'
+            : 'rounded-md'
+        } lg:pb-4 pb-3 lg:pt-3 md:pt-2 ${
           withPointsGrouping ? 'pt-2' : 'xs:pt-3 pt-2'
         } lg:px-4 px-3 gap-2 flex flex-col`}
+        style={roundedPanelGlowStyle}
       >
         <SnowPileEffect snowEffect="middle" className="!w-full" />
 

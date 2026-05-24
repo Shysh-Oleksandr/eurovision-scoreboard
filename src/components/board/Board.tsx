@@ -34,7 +34,17 @@ const Board = (): JSX.Element => {
   const isLastSimulationAnimationFinished = useScoreboardStore(
     (state) => state.isLastSimulationAnimationFinished,
   );
-  const { boardAnimationMode: defaultBoardAnimationMode } = useThemeSpecifics();
+  const themeYear = useGeneralStore((state) => state.themeYear);
+  const customThemeId = useGeneralStore(
+    (state) => state.customTheme?._id ?? '',
+  );
+  const {
+    boardAnimationMode: defaultBoardAnimationMode,
+    roundedCountryContainer,
+    pointsContainerShape,
+  } = useThemeSpecifics();
+
+  const countryItemLayoutKey = `${themeYear}:${customThemeId}:${roundedCountryContainer}:${pointsContainerShape}`;
 
   const { isOver: isVotingOver, id: currentStageId } = getCurrentStage() || {};
 
@@ -103,6 +113,7 @@ const Board = (): JSX.Element => {
               showPlaceAnimation={showPlace}
               hasCountryFinishedVoting={!!hasCountryFinishedVoting}
               boardAnimationClassName={boardAnimationClassName}
+              themeLayoutKey={countryItemLayoutKey}
             />
           )}
         </Flipped>
@@ -116,6 +127,7 @@ const Board = (): JSX.Element => {
       hasCountryFinishedVoting,
       getCountryAnimationClassName,
       shouldUseFlipAnimationForCountry,
+      countryItemLayoutKey,
     ],
   );
 
@@ -124,7 +136,9 @@ const Board = (): JSX.Element => {
       <BoardHeader />
       <div
         ref={containerRef}
-        className={`container-wrapping-flipper will-change-all ${
+        className={`container-wrapping-flipper ${
+          roundedCountryContainer ? 'rounded-design' : ''
+        } will-change-all ${
           scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN
             ? 'two-column'
             : ''
@@ -138,6 +152,7 @@ const Board = (): JSX.Element => {
           key={`${currentStageId}-${showAllParticipants}`}
           flipKey={flipKey}
           spring={FLIP_SPRING}
+          className={roundedCountryContainer ? 'gap-y-[1px]' : ''}
         >
           {finalCountries.map(renderItem)}
         </Flipper>

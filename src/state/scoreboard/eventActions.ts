@@ -203,16 +203,22 @@ export const createEventActions: StateCreator<
 
           // Add qualifiers to target stage
           const existingCountries = targetStage.countries || [];
+          const existingRunningOrder = targetStage.runningOrder ?? [];
+          const newQualifierCodes = qualifiersForTarget
+            .map((c) => c.code)
+            .filter((code) => !existingRunningOrder.includes(code));
+          const updatedRunningOrder = [...existingRunningOrder, ...newQualifierCodes];
 
           const updatedTargetStage = {
             ...targetStage,
+            runningOrder: updatedRunningOrder,
             countries: [...existingCountries, ...qualifiersForTarget]
               // Remove duplicates just in case
               .filter(
                 (country, index, self) =>
                   index === self.findIndex((t) => t.code === country.code),
               )
-              .sort(createCountriesComparator(targetStage.runningOrder)),
+              .sort(createCountriesComparator(updatedRunningOrder)),
           };
 
           updatedEventStages[targetStageIndex] = updatedTargetStage;
@@ -241,16 +247,22 @@ export const createEventActions: StateCreator<
 
           // Add qualifiers to target stage
           const existingCountries = targetStage.countries || [];
+          const existingRunningOrder = targetStage.runningOrder ?? [];
+          const newQualifierCodes = qualifiersForTarget
+            .map((c) => c.code)
+            .filter((code) => !existingRunningOrder.includes(code));
+          const updatedRunningOrder = [...existingRunningOrder, ...newQualifierCodes];
 
           const updatedTargetStage = {
             ...targetStage,
+            runningOrder: updatedRunningOrder,
             countries: [...existingCountries, ...qualifiersForTarget]
               // Remove duplicates just in case
               .filter(
                 (country, index, self) =>
                   index === self.findIndex((t) => t.code === country.code),
               )
-              .sort(createCountriesComparator(targetStage.runningOrder)),
+              .sort(createCountriesComparator(updatedRunningOrder)),
           };
 
           updatedEventStages[targetStageIndex] = updatedTargetStage;

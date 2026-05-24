@@ -9,6 +9,7 @@ import CountryInfo from './CountryInfo';
 import VotingButtons from './VotingButtons';
 import VotingPointsInfo from './VotingPointsInfo';
 
+import { useQualifiedCountriesPanelGlowStyle } from '@/theme/useQualifiedCountriesPanelGlowStyle';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const ControlsPanel = (): JSX.Element | null => {
@@ -18,8 +19,14 @@ const ControlsPanel = (): JSX.Element | null => {
     (state) => state.votingCountryIndex,
   );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const { isJuryPointsPanelRounded, juryActivePointsUnderline } =
-    useThemeSpecifics();
+  const {
+    isJuryPointsPanelRounded,
+    juryActivePointsUnderline,
+    roundedCountryContainer,
+  } = useThemeSpecifics();
+  const roundedPanelGlowStyle = useQualifiedCountriesPanelGlowStyle(
+    roundedCountryContainer,
+  );
 
   const {
     isJuryVoting,
@@ -49,7 +56,14 @@ const ControlsPanel = (): JSX.Element | null => {
           {votingTitle}
         </h3>
       </div>
-      <div className="bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-md relative">
+      <div
+        className={`bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 ${
+          roundedCountryContainer
+            ? 'qualified-countries-panel--rounded'
+            : 'rounded-md'
+        } relative`}
+        style={roundedPanelGlowStyle}
+      >
         <SnowPileEffect snowEffect="middle" className="!w-full" />
         {isJuryVoting && (
           <CountryInfo votingCountryIndex={votingCountryIndex} />

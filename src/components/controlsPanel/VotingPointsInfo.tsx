@@ -11,6 +11,7 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 type VotingPointsInfoProps = {
   customVotingPointsIndex?: number; // used for custom theme preview
   overrides?: Record<string, string>; // theme overrides for preview
+  themeYear?: string; // base theme year for preview (falls back to store)
   juryActivePointsUnderline?: boolean;
   isRounded?: boolean;
 };
@@ -18,6 +19,7 @@ type VotingPointsInfoProps = {
 const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
   customVotingPointsIndex,
   overrides: propOverrides,
+  themeYear: propThemeYear,
   juryActivePointsUnderline = true,
   isRounded = false,
 }) => {
@@ -31,6 +33,10 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
   const globalOverrides = useGeneralStore(
     (s) => s.customTheme?.overrides || null,
   );
+  const effectiveThemeYear = useGeneralStore(
+    (s) => s.customTheme?.baseThemeYear ?? s.themeYear,
+  );
+  const themeYear = propThemeYear ?? effectiveThemeYear;
   const overrides = propOverrides || globalOverrides;
 
   const pointsSystem = customVotingPointsIndex
@@ -83,6 +89,7 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
         const specialBgStyle = getSpecialBackgroundStyle(
           bgClassName,
           overrides,
+          themeYear,
         );
 
         return (

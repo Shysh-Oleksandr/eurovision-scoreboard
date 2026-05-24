@@ -1,5 +1,5 @@
 import gsap from 'gsap';
-import { useMemo, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
@@ -12,12 +12,25 @@ type ReturnType = {
   lastPointsTextRef: React.RefObject<HTMLDivElement | null>;
 };
 
+function clearLastPointsGsapStyles(
+  ...elements: (HTMLElement | null | undefined)[]
+) {
+  const targets = elements.filter(Boolean) as HTMLElement[];
+
+  if (targets.length === 0) return;
+
+  gsap.killTweensOf(targets);
+  gsap.set(targets, { clearProps: 'all' });
+}
+
 const useAnimatePoints = ({
   shouldShowLastPoints,
   isDouzePoints,
   douzePointsRefs,
   douzePointsAnimationModeOverride,
   isThemePreview = false,
+  lastPointsAnimationDirection = 'right-to-left',
+  pointsLayoutKey = '',
 }: {
   shouldShowLastPoints: boolean;
   isDouzePoints: boolean;
@@ -29,6 +42,13 @@ const useAnimatePoints = ({
   douzePointsAnimationModeOverride?: DouzePointsAnimationMode;
   /** When true, skip custom theme sounds (e.g. customize-theme modal preview). */
   isThemePreview?: boolean;
+  /**
+   * `right-to-left`: last-points block enters from the right (legacy).
+   * `left-to-right`: enters from the left (rounded pill layout).
+   */
+  lastPointsAnimationDirection?: 'right-to-left' | 'left-to-right';
+  /** Changes when theme/layout specifics change (clears stale GSAP inline styles). */
+  pointsLayoutKey?: string;
 }): ReturnType => {
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
@@ -121,38 +141,64 @@ const useAnimatePoints = ({
     },
   );
 
+  useLayoutEffect(() => {
+    if (!pointsLayoutKey) return;
+
+    clearLastPointsGsapStyles(
+      lastPointsContainerRef.current,
+      lastPointsTextRef.current,
+    );
+  }, [pointsLayoutKey]);
+
   useGSAP(
     () => {
       if (!lastPointsContainerRef.current || !lastPointsTextRef.current) return;
 
+      clearLastPointsGsapStyles(
+        lastPointsContainerRef.current,
+        lastPointsTextRef.current,
+      );
+
+      const enterFrom =
+        lastPointsAnimationDirection === 'left-to-right'
+          ? { containerX: -36, textX: -15 }
+          : { containerX: 36, textX: 15 };
+      const exitTo =
+        lastPointsAnimationDirection === 'left-to-right'
+          ? { containerX: -36, textX: -15 }
+          : { containerX: 36, textX: 15 };
+
       if (shouldShowLastPoints) {
         gsap.fromTo(
           lastPointsContainerRef.current,
-          { opacity: 0, x: 36 },
+          { opacity: 0, x: enterFrom.containerX },
           { opacity: 1, x: 0, duration: 0.3, ease: 'power1.out' },
         );
         gsap.fromTo(
           lastPointsTextRef.current,
-          { opacity: 0, x: 15 },
+          { opacity: 0, x: enterFrom.textX },
           { opacity: 1, x: 0, duration: 0.35, ease: 'power1.out' },
         );
       } else {
         gsap.to(lastPointsContainerRef.current, {
           opacity: 0,
-          x: 36,
+          x: exitTo.containerX,
           duration: 0.3,
           ease: 'power2.in',
         });
         gsap.to(lastPointsTextRef.current, {
           opacity: 0,
-          x: 15,
+          x: exitTo.textX,
           duration: 0,
         });
       }
     },
     {
-      dependencies: [shouldShowLastPoints],
-      scope: lastPointsContainerRef,
+      dependencies: [
+        shouldShowLastPoints,
+        lastPointsAnimationDirection,
+        pointsLayoutKey,
+      ],
     },
   );
 

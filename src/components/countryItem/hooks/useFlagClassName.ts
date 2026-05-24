@@ -5,6 +5,7 @@ import { FlagShape } from '@/theme/types';
 export const getFlagOverlayOffsetClassName = (
   flagShape: FlagShape,
   lgOnly: boolean = false,
+  roundedCountryContainer: boolean = false,
 ) => {
   switch (flagShape) {
     case 'round':
@@ -26,17 +27,25 @@ export const getFlagOverlayOffsetClassName = (
     case 'none':
       return 'left-0';
     default:
+      const lgWidthClass = roundedCountryContainer
+        ? 'lg:left-[42px]'
+        : 'lg:left-[50px]';
       if (lgOnly) {
-        return 'left-[50px]';
+        return roundedCountryContainer ? 'left-[42px]' : 'left-[50px]';
       }
-      return 'lg:left-[50px] md:left-12 left-10';
+      return `${lgWidthClass} md:left-12 left-10`;
   }
 };
 
 const useFlagClassName = (
   flagShape: FlagShape,
   lgOnly: boolean = false,
+  roundedCountryContainer: boolean = false,
 ) => {
+  let baseClassName = roundedCountryContainer
+    ? 'shadow-[4px_0_8px_rgba(0,0,0,0.15)]'
+    : '';
+
   const flagClassName = useMemo(() => {
     switch (flagShape) {
       case 'round':
@@ -59,15 +68,20 @@ const useFlagClassName = (
           return 'w-[36px] h-[36px] aspect-square';
         }
         return 'lg:w-[36px] md:w-[32px] w-[30px] lg:h-[36px] md:h-[32px] h-[30px] aspect-square';
+      // 'big-rectangle'
       default:
-        if (lgOnly) {
-          return 'w-[50px] h-10';
-        }
-        return 'lg:w-[50px] md:w-12 w-10 lg:h-10 md:h-9 h-8';
-    }
-  }, [flagShape, lgOnly]);
+        const lgWidthClass = roundedCountryContainer
+          ? 'lg:w-[42px] md:w-[36px] w-[34px]'
+          : 'lg:w-[50px] md:w-12 w-10';
 
-  return flagClassName;
+        if (lgOnly) {
+          return `${roundedCountryContainer ? 'w-[42px]' : 'w-[50px]'} h-10`;
+        }
+        return `${lgWidthClass}  lg:h-10 md:h-9 h-8`;
+    }
+  }, [flagShape, lgOnly, roundedCountryContainer]);
+
+  return `${baseClassName} ${flagClassName}`;
 };
 
 export default useFlagClassName;

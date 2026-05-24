@@ -7,6 +7,7 @@ import { HeartIcon } from '@/assets/icons/HeartIcon';
 import { getFlagOverlayOffsetClassName } from '@/components/countryItem/hooks/useFlagClassName';
 import {
   extractSolidColorFromColorValue,
+  buildBackgroundColorLookup,
   getSpecialBackgroundStyle,
 } from '@/components/countryItem/utils/gradientUtils';
 import { useGeneralStore } from '@/state/generalStore';
@@ -313,7 +314,11 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   douzePointsAnimationModeOverride,
 }) => {
   const pointsSystem = useGeneralStore((state) => state.pointsSystem);
-  const { douzePointsAnimationMode } = useThemeSpecifics();
+  const themeYear = useGeneralStore(
+    (state) => state.customTheme?.baseThemeYear ?? state.themeYear,
+  );
+  const { douzePointsAnimationMode, roundedCountryContainer } =
+    useThemeSpecifics();
 
   const resolvedDouzePointsAnimationMode =
     douzePointsAnimationModeOverride ?? douzePointsAnimationMode;
@@ -326,15 +331,22 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   const flagOverlayOffsetClassName = getFlagOverlayOffsetClassName(
     flagShape,
     isThemePreview,
+    roundedCountryContainer,
   );
   const containerClass = `absolute overflow-hidden ${
     activeDouzePointsAnimationMode === 'heartsGrid'
       ? flagOverlayOffsetClassName
       : 'left-0'
   } right-0 top-0 bottom-0 z-40 flex justify-center items-center opacity-0`;
-  const specialStyle = getSpecialBackgroundStyle(containerClass, overrides);
+  const specialStyle = getSpecialBackgroundStyle(
+    containerClass,
+    overrides,
+    themeYear,
+  );
   const heartsFillColor = extractSolidColorFromColorValue(
-    overrides?.['countryItem.douzePointsBg'],
+    buildBackgroundColorLookup(overrides, themeYear)?.[
+      'countryItem.douzePointsBg'
+    ],
   );
 
   const isDouzePoints =

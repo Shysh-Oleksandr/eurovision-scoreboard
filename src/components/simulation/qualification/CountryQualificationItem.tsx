@@ -1,11 +1,12 @@
 import { gsap } from 'gsap';
-import React, { useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
 import CountryItemBase from '@/components/countryItem/CountryItemBase';
 import useFlagClassName from '@/components/countryItem/hooks/useFlagClassName';
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
+import { getRoundedSubtleGlowStyle } from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
@@ -30,6 +31,9 @@ export const CountryQualificationItem: React.FC<
   isModal = false,
 }) => {
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
+  const themeYear = useGeneralStore(
+    (s) => s.customTheme?.baseThemeYear ?? s.themeYear,
+  );
   const { uppercaseEntryName, flagShape, roundedCountryContainer } =
     useThemeSpecifics();
   const getCurrentStage = useScoreboardStore((s) => s.getCurrentStage);
@@ -38,12 +42,21 @@ export const CountryQualificationItem: React.FC<
   );
   const itemRef = useRef<HTMLDivElement>(null);
 
-  const itemClassName =
-    'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
+  const itemClassName = roundedCountryContainer
+    ? 'bg-countryItem-juryBg text-countryItem-juryCountryText'
+    : 'bg-countryItem-televoteFinishedBg text-countryItem-televoteFinishedText';
 
-  const itemSpecialStyle = getSpecialBackgroundStyle(itemClassName, overrides);
+  const itemSpecialStyle = getSpecialBackgroundStyle(
+    itemClassName,
+    overrides,
+    themeYear,
+  );
 
-  const flagClassName = useFlagClassName(flagShape);
+  const flagClassName = useFlagClassName(
+    flagShape,
+    false,
+    roundedCountryContainer,
+  );
 
   useGSAP(
     () => {
@@ -59,6 +72,39 @@ export const CountryQualificationItem: React.FC<
     { dependencies: [shouldAnimate], scope: itemRef },
   );
 
+  const currentStageId = getCurrentStage()?.id;
+  const isQualifiedInCurrentStage =
+    !!country &&
+    !!currentStageId &&
+    country.qualifiedFromStageIds?.includes(currentStageId);
+  const isDisabled = isQualifiedInCurrentStage && hideIfQualified;
+
+  const [isRoundedGlowHovered, setIsRoundedGlowHovered] = useState(false);
+  const isRoundedGlowHoverable =
+    roundedCountryContainer && !!onClick && !isDisabled && !!country;
+
+  const roundedContainerStyle = useMemo(() => {
+    if (!roundedCountryContainer) return undefined;
+
+    return getRoundedSubtleGlowStyle(
+      isRoundedGlowHovered && isRoundedGlowHoverable,
+    );
+  }, [roundedCountryContainer, isRoundedGlowHovered, isRoundedGlowHoverable]);
+
+  const roundedNameStripSurfaceClasses = roundedCountryContainer
+    ? itemClassName
+        .split(/\s+/)
+        .filter((c) => c.startsWith('bg-') || c.startsWith('opacity-'))
+        .join(' ')
+    : '';
+
+  const roundedTextClasses = roundedCountryContainer
+    ? itemClassName
+        .split(/\s+/)
+        .filter((c) => c.startsWith('text-'))
+        .join(' ')
+    : '';
+
   if (!country) {
     return (
       <div
@@ -68,14 +114,6 @@ export const CountryQualificationItem: React.FC<
       ></div>
     );
   }
-
-  const currentStageId = getCurrentStage()?.id;
-  const isQualifiedInCurrentStage =
-    !!country &&
-    !!currentStageId &&
-    country.qualifiedFromStageIds?.includes(currentStageId);
-
-  const isDisabled = isQualifiedInCurrentStage && hideIfQualified;
 
   return (
     <div
@@ -89,13 +127,37 @@ export const CountryQualificationItem: React.FC<
       <CountryItemBase
         country={country}
         containerClassName={`flex items-center rounded-[1px] ${
-          roundedCountryContainer ? '!rounded-full' : ''
+          roundedCountryContainer ? '!rounded-full !bg-transparent' : ''
         } duration-300 lg:h-10 md:h-9 h-8 relative shadow-md w-full ${
-          onClick && !isDisabled ? 'brighten-on-hover' : ''
-        } ${itemClassName}`}
-        contentClassName={roundedCountryContainer ? 'rounded-full' : ''}
-        style={itemSpecialStyle}
+          onClick && !isDisabled
+            ? roundedCountryContainer
+              ? 'cursor-pointer'
+              : 'brighten-on-hover'
+            : ''
+        } ${roundedCountryContainer ? roundedTextClasses : itemClassName} ${
+          roundedCountryContainer ? 'flex-1 min-w-0 overflow-hidden' : ''
+        }`}
+        contentClassName={
+          roundedCountryContainer
+            ? `rounded-full ${roundedNameStripSurfaceClasses} !opacity-100`
+            : ''
+        }
+        useInlineContentLayout={roundedCountryContainer}
+        contentStyle={roundedCountryContainer ? itemSpecialStyle : undefined}
+        style={
+          roundedCountryContainer ? roundedContainerStyle : itemSpecialStyle
+        }
         onClick={onClick ? () => onClick() : undefined}
+        onMouseEnter={
+          isRoundedGlowHoverable
+            ? () => setIsRoundedGlowHovered(true)
+            : undefined
+        }
+        onMouseLeave={
+          isRoundedGlowHoverable
+            ? () => setIsRoundedGlowHovered(false)
+            : undefined
+        }
         as="div"
         disabled={isDisabled}
         renderFlag={
