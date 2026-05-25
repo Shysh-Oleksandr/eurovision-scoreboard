@@ -15,6 +15,7 @@ type Props = {
   isLoading?: boolean;
   snowEffect?: 'left' | 'right' | 'middle' | 'none';
   snowEffectClassName?: string;
+  style?: React.CSSProperties;
 };
 
 const Button = ({
@@ -29,6 +30,7 @@ const Button = ({
   isLoading,
   snowEffect = 'none',
   snowEffectClassName = '',
+  style,
 }: Props) => {
   const baseClasses =
     'lg:text-base md:text-base text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] font-medium uppercase rounded-md shadow-lg transition-colors lg:leading-5 duration-300 bg-gradient-to-tr from-[20%] relative';
@@ -58,6 +60,7 @@ const Button = ({
       onClick={onClick}
       title={title}
       disabled={disabled || isLoading}
+      style={style}
     >
       <SnowPileEffect snowEffect={snowEffect} className={snowEffectClassName} />
       {isLoading ? (

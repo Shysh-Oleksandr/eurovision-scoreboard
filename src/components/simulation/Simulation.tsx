@@ -1,7 +1,8 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
+
+import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/shallow';
 
 import { usePhaseTitle } from '../../hooks/usePhaseTitle';

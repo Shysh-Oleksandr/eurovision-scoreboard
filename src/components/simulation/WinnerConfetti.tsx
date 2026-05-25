@@ -88,6 +88,7 @@ const WinnerConfetti: React.FC = () => {
       numberOfPieces={PIECES}
       gravity={0.1}
       colors={CONFETTI_COLORS}
+      style={{ zIndex: 1000 }}
     />
   );
 };

@@ -244,6 +244,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-05-25',
+    title: 'Improved the winner modal UI. Corrected the default semi-final voting mode for each ESC edition',
+  },
+  {
     date: '2026-05-24',
     title: 'The ESC 2026 theme. Small UI improvements',
   },
