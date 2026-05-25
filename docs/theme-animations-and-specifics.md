@@ -17,6 +17,8 @@ Shared type in `src/theme/types.ts`:
   - `juryActivePointsUnderline: boolean`
   - `isJuryPointsPanelRounded: boolean`
   - `usePointsCountUpAnimation: boolean`
+  - `roundedCountryContainer: boolean` — pill country row, points track, panel glow (see [rounded-country-layout-and-2026-theme.md](./rounded-country-layout-and-2026-theme.md))
+  - `fontAlias?: string` — interface font (e.g. Gotham on 2026)
 
 `Theme` now has:
 
@@ -32,6 +34,9 @@ Shared type in `src/theme/types.ts`:
 - `juryActivePointsUnderline: true`
 - `isJuryPointsPanelRounded: false`
 - `usePointsCountUpAnimation: true`
+- `roundedCountryContainer: false`
+
+**Rounded pill layout (2026+):** See [rounded-country-layout-and-2026-theme.md](./rounded-country-layout-and-2026-theme.md) for country row structure, points section breakpoints, televote glow, side panels, qualification UI, and a year-cloning checklist.
 
 ---
 

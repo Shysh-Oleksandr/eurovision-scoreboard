@@ -18,6 +18,9 @@ export const useInitialLineup = () => {
   const setConfiguredEventStages = useCountriesStore(
     (state) => state.setConfiguredEventStages,
   );
+  const semiFinalVotingMode = useCountriesStore(
+    (state) => state.semiFinalVotingMode,
+  );
 
   useEffect(() => {
     if (!eventSetupModalOpen) return;
@@ -43,7 +46,7 @@ export const useInitialLineup = () => {
         id: sf1Id,
         name: `Semi-Final${hasSf2 ? ' 1' : ''}`,
         order: order++,
-        votingMode: StageVotingMode.TELEVOTE_ONLY,
+        votingMode: semiFinalVotingMode,
         qualifiesTo: [{ targetStageId: gfId, amount: 10 }],
         countries: [],
         isOver: false,
@@ -55,7 +58,7 @@ export const useInitialLineup = () => {
         id: sf2Id,
         name: 'Semi-Final 2',
         order: order++,
-        votingMode: StageVotingMode.TELEVOTE_ONLY,
+        votingMode: semiFinalVotingMode,
         qualifiesTo: [{ targetStageId: gfId, amount: 10 }],
         countries: [],
         isOver: false,
@@ -78,5 +81,6 @@ export const useInitialLineup = () => {
     configuredEventStages.length,
     setConfiguredEventStages,
     isGfOnly,
+    semiFinalVotingMode,
   ]);
 };

@@ -7,6 +7,7 @@ import { Year } from '../config';
 import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import {
   BaseCountry,
+  CountriesPreset,
   CountryAssignmentGroup,
   EventStage,
   StageId,
@@ -34,6 +35,7 @@ export interface CountriesState {
   eventAssignments: Record<string, string>; // countryCode -> stageId | NOT_PARTICIPATING
   configuredEventStages: EventStage[];
   countryOdds: CountryOdds;
+  semiFinalVotingMode: StageVotingMode;
 
   // Actions
   setEventSetupModalOpen: (open: boolean) => void;
@@ -72,19 +74,30 @@ export const useCountriesStore = create<CountriesState>()(
     persist(
       (set, get) => {
         // Helpers (internal to store factory)
-        const COUNTRIES_DATA_VERSION = '2026-05-18'; // bump when odds JSON changes
+        const COUNTRIES_DATA_VERSION = '2026-05-25'; // bump when any data in countries JSON changes
 
         const buildCountriesUrl = (year: Year, isJunior: boolean) => {
           const base = isJunior
             ? `/data/countries/junior-countries-${year}.json`
             : `/data/countries/countries-${year}.json`;
-          if (year === '2026' && !isJunior) {
-            return `${base}?v=${COUNTRIES_DATA_VERSION}`;
-          }
-          return base;
+          return `${base}?v=${COUNTRIES_DATA_VERSION}`;
         };
 
-        const loadCountriesByPreset = async (year: Year, isJunior: boolean) => {
+        const parseCountriesJson = (json: unknown): CountriesPreset => {
+          if (Array.isArray(json)) {
+            return { countries: json };
+          }
+          const preset = json as CountriesPreset;
+          return {
+            semiFinalVotingMode: preset.semiFinalVotingMode,
+            countries: preset.countries,
+          };
+        };
+
+        const loadCountriesByPreset = async (
+          year: Year,
+          isJunior: boolean,
+        ): Promise<CountriesPreset> => {
           const url = buildCountriesUrl(year, isJunior);
 
           const toAbsolute = (path: string) => {
@@ -99,7 +112,7 @@ export const useCountriesStore = create<CountriesState>()(
           };
 
           const res = await fetch(toAbsolute(url), { cache: 'force-cache' });
-          if (res.ok) return (await res.json()) as BaseCountry[];
+          if (res.ok) return parseCountriesJson(await res.json());
 
           if (isJunior && res.status === 404) {
             const escRes = await fetch(
@@ -108,7 +121,7 @@ export const useCountriesStore = create<CountriesState>()(
                 cache: 'force-cache',
               },
             );
-            if (escRes.ok) return (await escRes.json()) as BaseCountry[];
+            if (escRes.ok) return parseCountriesJson(await escRes.json());
           }
 
           throw new Error(
@@ -128,6 +141,7 @@ export const useCountriesStore = create<CountriesState>()(
           eventAssignments: {},
           configuredEventStages: [],
           countryOdds: {},
+          semiFinalVotingMode: StageVotingMode.TELEVOTE_ONLY,
           currentSetupStageType: 'initial',
           // Actions
           setEventSetupModalOpen: (open: boolean) => {
@@ -298,7 +312,7 @@ export const useCountriesStore = create<CountriesState>()(
 
           updateCountriesForYear: async (year: Year) => {
             const { settings } = useGeneralStore.getState();
-            const countries = await loadCountriesByPreset(
+            const preset = await loadCountriesByPreset(
               year,
               settings.isJuniorContest,
             );
@@ -308,7 +322,7 @@ export const useCountriesStore = create<CountriesState>()(
               { juryOdds?: number; televoteOdds?: number }
             > = {};
 
-            countries.forEach((country) => {
+            preset.countries.forEach((country) => {
               initialOdds[country.code] = {
                 juryOdds: country.juryOdds ?? 50,
                 televoteOdds: country.televoteOdds ?? 50,
@@ -316,7 +330,9 @@ export const useCountriesStore = create<CountriesState>()(
             });
 
             set({
-              allCountriesForYear: countries,
+              allCountriesForYear: preset.countries,
+              semiFinalVotingMode:
+                preset.semiFinalVotingMode ?? StageVotingMode.TELEVOTE_ONLY,
               configuredEventStages: [],
               eventAssignments: {},
               countryOdds: initialOdds,
@@ -360,10 +376,7 @@ export const useCountriesStore = create<CountriesState>()(
             const effectiveIsJunior =
               typeof isJuniorContest === 'boolean' ? isJuniorContest : false;
 
-            const countries = await loadCountriesByPreset(
-              year,
-              effectiveIsJunior,
-            );
+            const preset = await loadCountriesByPreset(year, effectiveIsJunior);
 
             let initialOdds: Record<
               string,
@@ -373,7 +386,7 @@ export const useCountriesStore = create<CountriesState>()(
             if (shouldLoadOdds) {
               initialOdds = {};
 
-              countries.forEach((country) => {
+              preset.countries.forEach((country) => {
                 initialOdds[country.code] = {
                   juryOdds: country.juryOdds ?? 50,
                   televoteOdds: country.televoteOdds ?? 50,
@@ -382,7 +395,9 @@ export const useCountriesStore = create<CountriesState>()(
             }
 
             set({
-              allCountriesForYear: countries,
+              allCountriesForYear: preset.countries,
+              semiFinalVotingMode:
+                preset.semiFinalVotingMode ?? StageVotingMode.TELEVOTE_ONLY,
               countryOdds: initialOdds,
             });
           },

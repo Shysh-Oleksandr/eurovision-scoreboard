@@ -129,6 +129,9 @@ export const useEventStageForm = ({
   const configuredEventStages = useCountriesStore(
     (state) => state.configuredEventStages,
   );
+  const semiFinalVotingMode = useCountriesStore(
+    (state) => state.semiFinalVotingMode,
+  );
 
   // Determine if this is the last stage (highest order)
   const isLastStage: boolean = useMemo(() => {
@@ -158,7 +161,7 @@ export const useEventStageForm = ({
       id: new Date().toISOString(),
       name: '',
       order: getDefaultOrder(),
-      votingMode: StageVotingMode.TELEVOTE_ONLY,
+      votingMode: semiFinalVotingMode,
       qualifiesTo: [],
       eventsOrder: [],
     },
@@ -206,7 +209,7 @@ export const useEventStageForm = ({
           id: new Date().toISOString(),
           name: `Stage ${localEventStagesLength + 1}`,
           order: getDefaultOrder(),
-          votingMode: StageVotingMode.TELEVOTE_ONLY,
+          votingMode: semiFinalVotingMode,
           qualifiesTo: defaultQualifiesTo,
           eventsOrder: sortedStagesIds,
         },

@@ -7,7 +7,7 @@ type Props = {
   label?: string;
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'winner';
   title?: string;
   children?: ReactNode;
   disabled?: boolean;
@@ -42,6 +42,8 @@ const Button = ({
       'bg-primary-800 from-primary-800 to-gray-600/70 text-white hover:bg-gray-500',
     destructive:
       'bg-red-900 from-red-900 to-red-600/40 text-white hover:bg-red-700',
+    winner:
+      'bg-white/10 from-transparent to-transparent border border-white/[0.22] text-white hover:bg-white/[0.18] !font-bold !tracking-[0.10em] !shadow-none',
   };
 
   const childrenContent = children || label;

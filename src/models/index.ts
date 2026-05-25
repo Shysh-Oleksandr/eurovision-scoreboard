@@ -59,6 +59,11 @@ export interface QualifierTarget {
   maxRank?: number;
 }
 
+export interface CountriesPreset {
+  semiFinalVotingMode?: StageVotingMode;
+  countries: BaseCountry[];
+}
+
 export type VotingCountry = Pick<BaseCountry, 'code' | 'name' | 'flag'>;
 
 export interface EventStage {
