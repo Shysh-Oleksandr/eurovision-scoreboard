@@ -21,6 +21,7 @@ import CustomSelect, {
   OptionGroup,
 } from '../common/customSelect/CustomSelect';
 import FeedbackInfoButton from '../feedbackInfo/FeedbackInfoButton';
+import GuideButton from '../guide/GuideButton';
 
 import { useApplyCustomTheme } from './widgets-section/custom-themes/hooks/useApplyCustomTheme';
 
@@ -385,7 +386,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
           )}
         </div>
       </div>
-      <div className="flex items-end md:gap-4 gap-3">
+      <div className="flex items-end md:gap-3 gap-2">
         <Button
           onClick={(e) => {
             e.stopPropagation();
@@ -398,6 +399,7 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
         >
           <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
         </Button>
+        <GuideButton />
         <FeedbackInfoButton className={`${isTouchDevice ? 'mr-1' : ''}`} />
       </div>
     </div>

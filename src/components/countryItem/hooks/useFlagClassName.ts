@@ -77,7 +77,7 @@ const useFlagClassName = (
         if (lgOnly) {
           return `${roundedCountryContainer ? 'w-[42px]' : 'w-[50px]'} h-10`;
         }
-        return `${lgWidthClass}  lg:h-10 md:h-9 h-8`;
+        return `${lgWidthClass} lg:h-10 md:h-9 h-8`;
     }
   }, [flagShape, lgOnly, roundedCountryContainer]);
 

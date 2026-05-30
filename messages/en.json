@@ -253,7 +253,7 @@
     },
     "winnerModal": {
       "title": "We have a winner!",
-      "points": "<span>{country}</span> won with <span>{points}</span> points!",
+      "points": "<span1>{country}</span1> won with <span2>{points}</span2> points!",
       "startOver": "Start over"
     },
     "header": {
@@ -271,6 +271,10 @@
       "finalistsOnly": "Finalists only",
       "selectEventStage": "Select event stage",
       "continueTo": "Continue to {nextPhase}"
+    },
+    "finalReveal": {
+      "currentLeader": "Current Leader",
+      "needsPointsToWin": "Needs <span>{count, plural, =1 {# point} other {# points}}</span> to win"
     },
     "finalStats": {
       "breakdown": "Breakdown",
@@ -719,6 +723,158 @@
     "backgroundOpacity": "Background Opacity",
     "showVotingCountriesNames": "Show Voting Countries Names",
     "generateOnOpen": "Generate Image Automatically on Open"
+  },
+  "guide": {
+    "title": "Feature Guide",
+    "tabs": {
+      "start": "Start",
+      "setup": "Setup",
+      "voting": "Voting",
+      "themes": "Themes",
+      "more": "More"
+    },
+    "start": {
+      "gettingStarted": {
+        "title": "Quick Start Guide",
+        "content": "<list><item>Select a year from the top-left dropdown to load the official Eurovision lineup, then press Start to launch the simulation.</item><item>During voting, click any country on the scoreboard to award it the current points, or use 'Vote randomly' to let the app decide.</item><item>Progress through each stage by awarding all votes and clicking Continue</item><item>After all stages are done, view the detailed stats or generate a shareable scoreboard image.</item></list>"
+      },
+      "signIn": {
+        "title": "Unlocking More Features with an Account",
+        "content": "<list><item>Click the profile icon in the widgets section to sign in with Google.</item><item>Signing in unlocks cloud saving for your contests, creating and publishing custom themes, adding custom entries, and social features.</item><item>Without an account you can still browse and apply public themes and contests, but you cannot save, copy, like, or create your own.</item><item>Your existing local data is preserved when you sign in.</item></list>"
+      },
+      "savingContests": {
+        "title": "Saving & Loading Contests",
+        "content": "Click the save icon on the right side of the current contest card or open the Contests widget and click 'Create Contest' to save your current setup and simulation results to the cloud. You can reload any saved contest later, reset it to the last saved version, or share it with anyone via a link. Public contests can be browsed and loaded by other users."
+      },
+      "customEntries": {
+        "title": "Custom Entries",
+        "content": "Signed-in users can create fictional or non-standard entries — for example, a country that never participated in Eurovision, or a made-up one — with a custom name and flag (upload or URL). Custom entries can be organized into groups and imported from other users' contests."
+      }
+    },
+    "setup": {
+      "yearData": {
+        "title": "Year Selection & Official Data",
+        "content": "Use the top-left dropdown to pick an ESC edition (2004–2026) or a JESC edition (2016–2025). Selecting a year automatically loads the official lineup for that edition. The same dropdown also lets you quickly load one of your saved contests."
+      },
+      "countryAssignment": {
+        "title": "Country Assignment",
+        "content": "The countries shown when you pick a year are a starting point, not a locked list. In the Setup modal, click any country to move it between stages (Semi-Final 1, Semi-Final 2, Grand Final) or mark it as Not Participating. You can also add countries from other years, other continents, or your own custom entries."
+      },
+      "grandFinalOnly": {
+        "title": "Grand Final Only Mode",
+        "content": "Toggle the 'GF only' switch in the setup to skip the Semi-Finals and run a standalone Grand Final, with all entries placed directly into it. Toggling it back restores the full three-show structure (Semi-Final 1, Semi-Final 2, Grand Final)."
+      },
+      "customStages": {
+        "title": "Custom Stages",
+        "content": "Beyond the standard Semi-Finals and Grand Final, you can create any number of additional stages — Heats, Quarter-Finals, and more. Each stage has its own name, voting mode (Jury + Televote, Televote-only, or Combined), and qualification rules specifying how many entries advance and to which stage. Advanced: rank-based qualification lets you send different rank ranges to different follow-up stages."
+      },
+      "votingModes": {
+        "title": "Voting Mode per Stage",
+        "content": "Each stage can use a different voting system, configured in the stage editor's Settings tab:<list><item><strong>Jury and Televote</strong> — two separate rounds: first all jury votes are given out country by country, then all televote points are revealed together</item><item><strong>Televote only</strong> — skip jury voting; only televote points are awarded</item><item><strong>Jury only</strong> — skip televote; only jury points are awarded</item><item><strong>Combined</strong> — jury and televote points are awarded in a single round per voting country (currently it may work inaccurately)</item></list>The default for the Grand Final is Jury and Televote, matching the standard Eurovision format."
+      },
+      "votingCountries": {
+        "title": "Voting Countries",
+        "content": "In each stage's 'Voters' tab, choose exactly which countries cast votes during that stage. You can include or exclude any participating country and optionally add 'Rest of the World' as an additional voter. Voter sets are configured per stage, so Semi-Finals and the Grand Final can have completely different voters. If you want to use the original voting countries from the year, you click on the 'Load year data' button."
+      },
+      "runningOrder": {
+        "title": "Running Order",
+        "content": "Before starting a stage, open the Running Order tab to drag and drop entries into your preferred performance order. The running order is also used as a tiebreaker: if two entries have identical total points and televote points, the one that performed earlier ranks higher."
+      }
+    },
+    "voting": {
+      "customPointsSystem": {
+        "title": "Custom Points System",
+        "content": "Go to 'Settings → Voting' to configure the points awarded at each position. You can add, remove, or reorder values. Enable 'Separate jury / televote points system' to use a completely different scale for jury votes and televote. Click on the sparkles icon to toggle the Douze Points animation for a specific point value."
+      },
+      "predefinedVoting": {
+        "title": "Predefined Voting & Presets",
+        "content": "Enable 'Predefined voting' in 'Settings → Voting' to fill in every country's votes before the simulation starts. A full voting matrix lets you assign specific points from each voter to each entry. Save the configuration locally as a named preset to reload it anytime — perfect for replaying official Eurovision results or sharing a specific scenario."
+      },
+      "oddsRandomness": {
+        "title": "Odds & Randomness",
+        "content": "In 'Settings → Odds', assign jury and televote odds (0–100) to each country to influence how random votes are distributed. Higher odds mean a better chance of receiving more points. The Randomness Level slider controls how closely the simulation follows those odds: slide left for predictable results that mirror the odds, slide right for a chaotic, anything-can-happen simulation."
+      },
+      "presentationMode": {
+        "title": "Presentation Mode",
+        "content": "Enable 'Presentation mode' in 'Settings → Voting' to add an auto-play panel below the scoreboard. Set the speed (0.5–7.5 seconds per action) and press Play to let the simulation run hands-free — ideal for streaming or recording. Enable 'Auto start presentation' to have it begin automatically as soon as voting starts."
+      },
+      "pickQualifiers": {
+        "title": "Pick Qualifiers Without Awarding Points",
+        "content": "Enable 'Pick qualifiers without awarding points' in 'Settings → Voting' to select which entries advance to the next stage without running the full voting process. During a Semi-Final, click any entry on the board to qualify it directly, or press 'Choose randomly'. This is ideal when you only care about who advances, not the detailed scores. Note: the stage's voting mode still affects how random qualifiers are selected."
+      },
+      "moreOptions": {
+        "title": "More Voting Options",
+        "content": "Additional options in Settings → Voting and the simulation header:<list><item><strong>Split screen qualifier reveal</strong> — an ESC 2025-style moment where several candidates appear side-by-side and you click one to qualify them. Configure 2–6 candidates per reveal, and whether the last qualifier also uses the split screen.</item><item><strong>Televote reveal order</strong> — set to lowest-to-highest to announce televote results from fewest to most points, as in ESC 2016–2018.</item><item><strong>Group random jury voting</strong> — the 'Vote randomly' button awards points in realistic batches (1–8+10 together, or just 12) instead of one value at a time.</item><item><strong>Undo and Restart</strong> — Undo steps back up to 100 actions; Restart resets the full simulation.</item></list>"
+      }
+    },
+    "themes": {
+      "yearThemes": {
+        "title": "Year Themes & Auto-Sync",
+        "content": "Many ESC and JESC editions have a built-in theme inspired by that year's visual identity — colors, fonts, flag styles, and animations. Selecting a year from the dropdown automatically suggests the matching theme. If you switch the year after a theme is already active, a Sync button appears in the header to apply the correct year theme."
+      },
+      "browseThemes": {
+        "title": "Browsing Community Themes",
+        "content": "Open the Themes widget to browse public themes created by other users — no account needed to browse or apply them. Sign in to like a theme, save it to your collection for quick access, copy it as a starting point for your own, or create one from scratch."
+      },
+      "customThemeBuilder": {
+        "title": "Custom Theme Builder",
+        "content": "Signed-in users can build a fully custom theme: choose a primary color, upload a background image, select a font, and override the colors for every scoreboard state independently (jury active, televote unfinished/active/finished, unqualified entries, and rank badges). Flag shapes, points container shapes, and board animation styles are all configurable. A live preview panel shows exactly how each change will look on a real country item."
+      },
+      "soundEffects": {
+        "title": "Sound Effects & Background Audio",
+        "content": "Inside the theme builder's Sound Effects section, attach audio clips to specific moments: the 12-point award, stage start, jury reveal, televote reveal, winner announcement, and a looped background track. Paste an https:// URL or upload a file directly (max 7 MB per file). Each sound supports an optional delay in seconds."
+      },
+      "visualDetails": {
+        "title": "Visual Details & Animations",
+        "content": "The 'Visual Details' section of the theme builder lets you fine-tune animations and layout: board movement style (classic Flip or the ESC 2025 Teleport), the douze points animation (Parallelograms from ESC 2023 or Hearts Grid from ESC 2025), flag shape (large or small rectangle, square, circle, circle with border, or hidden), points container shape, uppercase entry names, and more."
+      }
+    },
+    "more": {
+      "finalStats": {
+        "title": "Final Stats & Voting Breakdown",
+        "content": "After any stage finishes, tap 'Stats' in the phase actions bar to open the detailed results. The Breakdown tab shows a full voting matrix — every voter's exact point allocations to every entry, split into Jury, Televote, and Total columns. Use it to see exactly who gave (or didn't give) points to any entry."
+      },
+      "splitStats": {
+        "title": "Jury vs. Televote Split",
+        "content": "The Split tab in the stats modal places each entry's jury ranking next to its televote ranking side by side, making it easy to spot the biggest discrepancies between expert opinion and the public vote. Entries with a large gap between the two are where the drama happens."
+      },
+      "shareScoreboard": {
+        "title": "Share Scoreboard as Image",
+        "content": "Hit 'Share' in the simulation header to open the image generator. Customise the layout (1–4 columns), aspect ratio (Landscape 16:9, Square 1:1, or Portrait 3:4), title, subtitle, and whether to show rankings and points. Download the result as a PNG or use native sharing on mobile."
+      },
+      "shareStats": {
+        "title": "Share Stats as Image",
+        "content": "Inside the Stats modal, a share button lets you export the full results table (breakdown, split, or summary) as a downloadable PNG. Great for sharing detailed scoreboard breakdowns on social media or in Eurovision fan communities."
+      },
+      "leaderboard": {
+        "title": "Global Country Leaderboard",
+        "content": "The country leaderboard (accessible from the 'Contests → Public Contests') aggregates results across all completed public contests. It tracks wins, top-3/5/10 finishes, average Grand Final points, and qualifying streaks. Use the year filter to narrow it down to a specific edition or range, or toggle 'Only Eurovision countries' to exclude non-standard entries."
+      },
+      "myStats": {
+        "title": "My Entry Leaderboard & Stats",
+        "content": "The 'My entry leaderboard' in the 'Contests → Your Contests' widget shows personal stats from all your completed contests: wins, nul points, best result, and current qualifying streak for every country and custom entry you've used. Click any row to see a full contest-by-contest breakdown with placements and points."
+      },
+      "communityFollowing": {
+        "title": "Following Other Users",
+        "content": "On any user's public profile (accessible by clicking their username on a public theme or contest), you can follow them. Followed users' new themes and contests appear in a combined 'Following' feed on your own profile page. Without an account you can still browse the Public tabs in the Themes and Contests widgets."
+      },
+      "uiPreferences": {
+        "title": "UI Preferences",
+        "content": "Customize the look and feel in Settings → UI Preferences:<list><item><strong>Flag styles</strong> — switch to heart icons, minimalistic round/square flags, or keep default rectangular ones</item><item><strong>Always show rankings</strong> — keep position numbers visible at all times, plus a rank-change indicator showing movement up or down</item><item><strong>Popups</strong> — toggle the qualifiers popup, winner announcement, and confetti independently</item><item><strong>Fullscreen mode</strong> — enter fullscreen for a fully immersive scoreboard view</item><item><strong>Jury voting progress bar</strong> — shows how many countries have voted so far in the current jury round</item><item><strong>Custom background image</strong> — upload your own image to replace the theme's background</item><item><strong>Override theme font</strong> — lock in a specific font regardless of which theme is active</item><item><strong>Audio</strong> — set separate volume levels for sound effects and background music, or disable all theme audio at once</item><item><strong>Winter effects</strong> — enable falling snow with an adjustable intensity slider</item></list>"
+      },
+      "confirmations": {
+        "title": "Confirmation Popups",
+        "content": "In Settings → Confirmations you can toggle individual confirmation dialogs on or off — for example, the prompts for cancelling a simulation, deleting a contest, or logging out. Disable the ones you find disruptive; they can be re-enabled at any time. 'Reset All Confirmations' restores every disabled prompt at once."
+      },
+      "language": {
+        "title": "Language Support",
+        "content": "DouzePoints supports 8 languages: English, French,Spanish, German, Italian, Greek, Polish, and Ukrainian. Change the active language in 'Settings → UI Preferences → Language'. All languages other than English are currently produced by machine translation, so occasional inaccuracies may appear."
+      },
+      "feedback": {
+        "title": "Feedback & What's New",
+        "content": "Found a bug, have a feature idea, or just want to leave a comment? Click the info icon in the header (next to this guide button) to open the Feedback panel. It also shows a full changelog ('What's New') and a roadmap of upcoming features. You can file a report on GitHub Issues or send an email directly to the developer."
+      }
+    }
   },
   "settings": {
     "general": {

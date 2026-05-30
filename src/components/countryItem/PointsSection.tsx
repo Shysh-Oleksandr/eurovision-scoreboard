@@ -11,12 +11,6 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 import { PointsContainerShape } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
-/* 
-box-shadow: 1px 0px 7px 3px #8ba8d4b8;
-box-shadow: 6px 0px 7px 3px #0a0a0aa1;
-box-shadow: inset 0 -0.1px 1px 0.3px #dfe2ebc9, var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow), 0 0 10px 5px #48abe0;
-*/
-
 export interface PointsSectionProps {
   country: Country | BaseCountry;
   pointsContainerShape?: PointsContainerShape;

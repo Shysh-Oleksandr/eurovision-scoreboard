@@ -290,17 +290,21 @@ const WinnerModal = () => {
             animation: 'winner-slide-up 0.45s ease 1.1s both',
           }}
         >
-          <span style={{ color: '#fff', fontWeight: 700 }}>
-            {winnerCountry.name}
-          </span>{' '}
-          won with{' '}
-          <span
-            ref={scoreRef}
-            style={{ color: '#ffe87a', fontWeight: 800, fontSize: '22px' }}
-          >
-            0
-          </span>{' '}
-          points!
+          {t.rich('points', {
+            country: winnerCountry.name,
+            points: 0,
+            span1: (chunks) => (
+              <span style={{ color: '#fff', fontWeight: 700 }}>{chunks}</span>
+            ),
+            span2: (chunks) => (
+              <span
+                ref={scoreRef}
+                style={{ color: '#ffe87a', fontWeight: 800, fontSize: '22px' }}
+              >
+                {chunks}
+              </span>
+            ),
+          })}
         </p>
 
         {/* Start Over button */}
