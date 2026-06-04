@@ -4,7 +4,11 @@ import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { StageId, type EventStage, type VotingCountry } from '../../../../models';
+import {
+  StageId,
+  type EventStage,
+  type VotingCountry,
+} from '../../../../models';
 import { useCountriesStore } from '../../../../state/countriesStore';
 
 // Base schema for common fields

@@ -78,6 +78,7 @@ export const UIPreferencesSettings: React.FC = () => {
         checked={settings.showWinnerConfetti}
         onChange={(e) => setSettings({ showWinnerConfetti: e.target.checked })}
       />
+
       {isFullScreenSupported && (
         <Checkbox
           id="enable-fullscreen"
@@ -180,6 +181,41 @@ export const UIPreferencesSettings: React.FC = () => {
           className="w-full sm:max-w-[280px]"
           withIndicator={false}
         />
+      )}
+
+      <Checkbox
+        id="enable-final-reveal"
+        labelClassName="w-full"
+        label={t('enableFinalReveal')}
+        checked={settings.enableFinalReveal}
+        onChange={(e) => setSettings({ enableFinalReveal: e.target.checked })}
+      />
+      {settings.enableFinalReveal && (
+        <>
+          <RangeSlider
+            id="final-reveal-animation-speed"
+            label={t('finalRevealAnimationSpeed')}
+            value={settings.finalRevealAnimationSpeed}
+            onChange={(value) =>
+              setSettings({ finalRevealAnimationSpeed: value })
+            }
+            min={0.5}
+            max={1.5}
+            step={0.1}
+            displayValue={false}
+            minLabel={t('slow')}
+            maxLabel={t('fast')}
+          />
+          <Checkbox
+            id="final-reveal-linear-animation"
+            labelClassName="w-full"
+            label={t('finalRevealLinearAnimation')}
+            checked={settings.finalRevealLinearAnimation}
+            onChange={(e) =>
+              setSettings({ finalRevealLinearAnimation: e.target.checked })
+            }
+          />
+        </>
       )}
 
       <div className="sm:col-span-2">

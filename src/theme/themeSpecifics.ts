@@ -22,7 +22,9 @@ const DOUZE_POINTS_ANIMATION_MODES = ['parallelograms', 'heartsGrid'] as const;
 const isBoardAnimationMode = (
   value: unknown,
 ): value is (typeof BOARD_ANIMATION_MODES)[number] => {
-  return typeof value === 'string' && BOARD_ANIMATION_MODES.includes(value as any);
+  return (
+    typeof value === 'string' && BOARD_ANIMATION_MODES.includes(value as any)
+  );
 };
 
 const isDouzePointsAnimationMode = (

@@ -6,7 +6,6 @@ import { Country } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import CountryItem from '../countryItem/CountryItem';
 
-import BoardHeader from './BoardHeader';
 import { useBoardAnimations } from './hooks/useBoardAnimations';
 import { useCountryDisplay } from './hooks/useCountryDisplay';
 import { useCountrySorter } from './hooks/useCountrySorter';
@@ -133,7 +132,6 @@ const Board = (): JSX.Element => {
 
   return (
     <div className="w-full h-full">
-      <BoardHeader />
       <div
         ref={containerRef}
         className={`container-wrapping-flipper ${

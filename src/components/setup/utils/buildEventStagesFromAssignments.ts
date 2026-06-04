@@ -67,7 +67,9 @@ export const buildEventStagesFromAssignments = (
       );
       const inOrder = group.filter((c) => orderMap.has(c.code));
       const notInOrder = group.filter((c) => !orderMap.has(c.code));
-      inOrder.sort((a, b) => (orderMap.get(a.code) ?? 0) - (orderMap.get(b.code) ?? 0));
+      inOrder.sort(
+        (a, b) => (orderMap.get(a.code) ?? 0) - (orderMap.get(b.code) ?? 0),
+      );
       notInOrder.sort((a, b) => a.name.localeCompare(b.name));
       initialGroups[stage.id] = [...inOrder, ...notInOrder];
     } else {
@@ -75,12 +77,13 @@ export const buildEventStagesFromAssignments = (
     }
   }
 
-  [CountryAssignmentGroup.NOT_PARTICIPATING, CountryAssignmentGroup.NOT_QUALIFIED].forEach(
-    (key) => {
-      const group = initialGroups[key];
-      if (group) group.sort((a, b) => a.name.localeCompare(b.name));
-    },
-  );
+  [
+    CountryAssignmentGroup.NOT_PARTICIPATING,
+    CountryAssignmentGroup.NOT_QUALIFIED,
+  ].forEach((key) => {
+    const group = initialGroups[key];
+    if (group) group.sort((a, b) => a.name.localeCompare(b.name));
+  });
 
   const eventStagesWithCountries: EventStage[] = sortedStages.map((stage) => ({
     ...stage,

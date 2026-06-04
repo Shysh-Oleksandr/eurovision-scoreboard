@@ -79,7 +79,11 @@ export function parseColor(value: string): string {
   }
 
   // Already in "h s% l%" or "h s% l% a" format
-  if (/^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%(?:\s+\d+(?:\.\d+)?)?$/.test(value.trim())) {
+  if (
+    /^\d+(?:\.\d+)?\s+\d+(?:\.\d+)?%\s+\d+(?:\.\d+)?%(?:\s+\d+(?:\.\d+)?)?$/.test(
+      value.trim(),
+    )
+  ) {
     return value.trim();
   }
 
@@ -207,7 +211,12 @@ function hslToHex(hue: number, sat: number, light: number): string {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-function hslaToRgba(hue: number, sat: number, light: number, alpha: number): string {
+function hslaToRgba(
+  hue: number,
+  sat: number,
+  light: number,
+  alpha: number,
+): string {
   const c = (1 - Math.abs(2 * light - 1)) * sat;
   const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
   const m = light - c / 2;
@@ -223,7 +232,9 @@ function hslaToRgba(hue: number, sat: number, light: number, alpha: number): str
 
   const toRgb = (n: number) => Math.round((n + m) * 255);
 
-  return `rgba(${toRgb(r)}, ${toRgb(g)}, ${toRgb(b)}, ${toFixedIfDecimal(alpha)})`;
+  return `rgba(${toRgb(r)}, ${toRgb(g)}, ${toRgb(b)}, ${toFixedIfDecimal(
+    alpha,
+  )})`;
 }
 
 /**

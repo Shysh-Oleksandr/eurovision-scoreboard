@@ -304,9 +304,8 @@ export function buildContestSnapshotFromStores() {
       !isDeepEqual(televotePointsSystem, settingsTelevotePointsSystem) &&
       !isDefaultPointsSystem(televotePointsSystem)
     ) {
-      simulationTelevotePointsPayload = createPointsPayload(
-        televotePointsSystem,
-      );
+      simulationTelevotePointsPayload =
+        createPointsPayload(televotePointsSystem);
     }
   } else {
     // Determine what to save based on setup vs simulation points systems
@@ -387,25 +386,25 @@ export function buildContestSnapshotFromStores() {
         .map((code) => byCode.get(code))
         .filter((c): c is Country => !!c)
         .map((c) => {
-        const countryState: CountriesStateItem = {
-          code: c.code,
-          qualifiedFromStageIds: c.qualifiedFromStageIds,
-        };
-        // Only save points if they are non-zero (0 is default)
-        const juryPoints = c.juryPoints ?? 0;
-        const televotePoints = c.televotePoints ?? 0;
-        if (juryPoints !== 0) {
-          countryState.juryPoints = juryPoints;
-        }
-        if (televotePoints !== 0) {
-          countryState.televotePoints = televotePoints;
-        }
-        // Only save isVotingFinished if it's true (false is default)
-        if (c.isVotingFinished) {
-          countryState.isVotingFinished = true;
-        }
-        return countryState;
-      });
+          const countryState: CountriesStateItem = {
+            code: c.code,
+            qualifiedFromStageIds: c.qualifiedFromStageIds,
+          };
+          // Only save points if they are non-zero (0 is default)
+          const juryPoints = c.juryPoints ?? 0;
+          const televotePoints = c.televotePoints ?? 0;
+          if (juryPoints !== 0) {
+            countryState.juryPoints = juryPoints;
+          }
+          if (televotePoints !== 0) {
+            countryState.televotePoints = televotePoints;
+          }
+          // Only save isVotingFinished if it's true (false is default)
+          if (c.isVotingFinished) {
+            countryState.isVotingFinished = true;
+          }
+          return countryState;
+        });
     }
 
     // Create lookup map for setup stages
@@ -493,7 +492,7 @@ export enum SimulationLoadOptions {
 
 export interface LoadContestOptions {
   generalInfo: boolean;
-  theme?: boolean
+  theme?: boolean;
   setup: boolean;
   simulation: boolean;
   simulationLoadOption?: SimulationLoadOptions;
@@ -609,7 +608,8 @@ export async function applyContestSnapshotToStores(
   if (loadOptions.simulation) {
     if (snapshot.setup.splitPointsSystem) {
       const simJurySystem = getPointsSystem(
-        snapshot.simulation?.juryPointsSystem || snapshot.setup.juryPointsSystem,
+        snapshot.simulation?.juryPointsSystem ||
+          snapshot.setup.juryPointsSystem,
       );
       const simTelevoteSystem = getPointsSystem(
         snapshot.simulation?.televotePointsSystem ||
@@ -763,7 +763,8 @@ export async function applyContestSnapshotToStores(
 
     if (snapshot.setup.splitPointsSystem) {
       decodeJurySystem = getPointsSystem(
-        snapshot.simulation!.juryPointsSystem || snapshot.setup.juryPointsSystem,
+        snapshot.simulation!.juryPointsSystem ||
+          snapshot.setup.juryPointsSystem,
       );
       decodeTelevoteSystem = getPointsSystem(
         snapshot.simulation!.televotePointsSystem ||

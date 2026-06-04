@@ -217,6 +217,8 @@
     "enterTelevotePointsFor": "Enter televote points for <span>{country}</span>",
     "winnerOf": "<span>{country}</span> is the winner of <span2>{event}</span2>!",
     "random": "Random",
+    "winnerRevealTeaser": "The winner of <span>{event}</span> is...",
+    "backToScoreboard": "View Scoreboard",
     "televote": "Televote",
     "juryVoting": "Jury voting",
     "voting": "Voting",
@@ -274,7 +276,8 @@
     },
     "finalReveal": {
       "currentLeader": "Current Leader",
-      "needsPointsToWin": "Needs <span>{count, plural, =1 {# point} other {# points}}</span> to win"
+      "needsPointsToWin": "Needs <span>{count, plural, =1 {# point} other {# points}}</span> to win",
+      "receivedPointsFromPublic": "Received <span>{count, plural, =1 {# point} other {# points}}</span> from the public"
     },
     "finalStats": {
       "breakdown": "Breakdown",
@@ -860,7 +863,7 @@
       },
       "uiPreferences": {
         "title": "UI Preferences",
-        "content": "Customize the look and feel in Settings → UI Preferences:<list><item><strong>Flag styles</strong> — switch to heart icons, minimalistic round/square flags, or keep default rectangular ones</item><item><strong>Always show rankings</strong> — keep position numbers visible at all times, plus a rank-change indicator showing movement up or down</item><item><strong>Popups</strong> — toggle the qualifiers popup, winner announcement, and confetti independently</item><item><strong>Fullscreen mode</strong> — enter fullscreen for a fully immersive scoreboard view</item><item><strong>Jury voting progress bar</strong> — shows how many countries have voted so far in the current jury round</item><item><strong>Custom background image</strong> — upload your own image to replace the theme's background</item><item><strong>Override theme font</strong> — lock in a specific font regardless of which theme is active</item><item><strong>Audio</strong> — set separate volume levels for sound effects and background music, or disable all theme audio at once</item><item><strong>Winter effects</strong> — enable falling snow with an adjustable intensity slider</item></list>"
+        "content": "Customize the look and feel in Settings → UI Preferences:<list><item><strong>Flag styles</strong> — switch to heart icons, minimalistic round/square flags, or keep default rectangular ones</item><item><strong>Always show rankings</strong> — keep position numbers visible at all times, plus a rank-change indicator showing movement up or down</item><item><strong>Popups</strong> — toggle the qualifiers popup, winner announcement, and confetti independently</item><item><strong>Fullscreen mode</strong> — enter fullscreen for a fully immersive scoreboard view</item><item><strong>Jury voting progress bar</strong> — shows how many countries have voted so far in the current jury round</item><item><strong>Custom background image</strong> — upload your own image to replace the theme's background</item><item><strong>Override theme font</strong> — lock in a specific font regardless of which theme is active</item><item><strong>Audio</strong> — set separate volume levels for sound effects and background music, or disable all theme audio at once</item><item><strong>Winter effects</strong> — enable falling snow with an adjustable intensity slider</item><item><strong>Enable winner reveal</strong> — the last televote is revealed with special animation (ESC 2026 style)</item></list>"
       },
       "confirmations": {
         "title": "Confirmation Popups",
@@ -932,6 +935,11 @@
       "showQualifiersPopup": "Show qualifiers popup",
       "showWinnerPopup": "Show winner popup",
       "showWinnerConfetti": "Show winner confetti",
+      "enableFinalReveal": "Enable final televote reveal",
+      "finalRevealAnimationSpeed": "Reveal animation speed",
+      "slow": "Slow",
+      "fast": "Fast",
+      "finalRevealLinearAnimation": "Smooth, predictable reveal animation (no randomness)",
       "enableFullscreenMode": "Enable fullscreen mode",
       "warnBeforeManuallyAssigningTelevotePoints": "Warn before manually assigning televote points",
       "showJuryVotingProgressBar": "Show jury voting progress bar",

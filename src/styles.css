@@ -43,11 +43,11 @@ html[data-font='montserrat'] {
 }
 
 html[data-font='geist'] {
-  --dp-font-family: "Geist Sans", sans-serif;
+  --dp-font-family: 'Geist Sans', sans-serif;
 }
 
 html[data-font='dm-sans'] {
-  --dp-font-family: "DM Sans", sans-serif;
+  --dp-font-family: 'DM Sans', sans-serif;
 }
 
 html[data-font='gotham'] {
@@ -55,7 +55,7 @@ html[data-font='gotham'] {
 }
 
 html[data-font='plus-jakarta-sans'] {
-  --dp-font-family: "Plus Jakarta Sans", sans-serif;
+  --dp-font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 html[data-font='unbounded'] {
@@ -67,11 +67,11 @@ html[data-font='antonio'] {
 }
 
 html[data-font='brygada-1918'] {
-  --dp-font-family: "Brygada 1918", serif;
+  --dp-font-family: 'Brygada 1918', serif;
 }
 
 html[data-font='cabinet-grotesk'] {
-  --dp-font-family: "Cabinet Grotesk", sans-serif;
+  --dp-font-family: 'Cabinet Grotesk', sans-serif;
 }
 
 html[data-font='orbitron'] {
@@ -226,7 +226,7 @@ h6 {
 /* geist sans - latin */
 @font-face {
   font-display: swap;
-  font-family: "Geist Sans";
+  font-family: 'Geist Sans';
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/geist-regular.woff2') format('woff2');
@@ -234,7 +234,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Geist Sans";
+  font-family: 'Geist Sans';
   font-style: normal;
   font-weight: 500;
   src: url('/fonts/geist-500.woff2') format('woff2');
@@ -242,7 +242,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Geist Sans";
+  font-family: 'Geist Sans';
   font-style: normal;
   font-weight: 600;
   src: url('/fonts/geist-600.woff2') format('woff2');
@@ -250,7 +250,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Geist Sans";
+  font-family: 'Geist Sans';
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/geist-700.woff2') format('woff2');
@@ -259,7 +259,7 @@ h6 {
 /* dm sans - latin */
 @font-face {
   font-display: swap;
-  font-family: "DM Sans";
+  font-family: 'DM Sans';
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/dm-sans-regular.woff2') format('woff2');
@@ -267,7 +267,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "DM Sans";
+  font-family: 'DM Sans';
   font-style: normal;
   font-weight: 500;
   src: url('/fonts/dm-sans-500.woff2') format('woff2');
@@ -275,7 +275,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "DM Sans";
+  font-family: 'DM Sans';
   font-style: normal;
   font-weight: 600;
   src: url('/fonts/dm-sans-600.woff2') format('woff2');
@@ -283,7 +283,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "DM Sans";
+  font-family: 'DM Sans';
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/dm-sans-700.woff2') format('woff2');
@@ -325,7 +325,7 @@ h6 {
 /* Plus Jakarta Sans */
 @font-face {
   font-display: swap;
-  font-family: "Plus Jakarta Sans";
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/plus-jakarta-sans-regular.woff2') format('woff2');
@@ -333,7 +333,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Plus Jakarta Sans";
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
   font-weight: 500;
   src: url('/fonts/plus-jakarta-sans-500.woff2') format('woff2');
@@ -341,7 +341,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Plus Jakarta Sans";
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
   font-weight: 600;
   src: url('/fonts/plus-jakarta-sans-600.woff2') format('woff2');
@@ -349,7 +349,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Plus Jakarta Sans";
+  font-family: 'Plus Jakarta Sans';
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/plus-jakarta-sans-700.woff2') format('woff2');
@@ -424,7 +424,7 @@ h6 {
 /* Brygada 1918 */
 @font-face {
   font-display: swap;
-  font-family: "Brygada 1918";
+  font-family: 'Brygada 1918';
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/brygada-1918-regular.woff2') format('woff2');
@@ -432,7 +432,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Brygada 1918";
+  font-family: 'Brygada 1918';
   font-style: normal;
   font-weight: 500;
   src: url('/fonts/brygada-1918-500.woff2') format('woff2');
@@ -440,7 +440,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Brygada 1918";
+  font-family: 'Brygada 1918';
   font-style: normal;
   font-weight: 600;
   src: url('/fonts/brygada-1918-600.woff2') format('woff2');
@@ -448,7 +448,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Brygada 1918";
+  font-family: 'Brygada 1918';
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/brygada-1918-700.woff2') format('woff2');
@@ -457,7 +457,7 @@ h6 {
 /* Cabinet Grotesk */
 @font-face {
   font-display: swap;
-  font-family: "Cabinet Grotesk";
+  font-family: 'Cabinet Grotesk';
   font-style: normal;
   font-weight: 400;
   src: url('/fonts/cabinet-grotesk-regular.woff2') format('woff2');
@@ -465,7 +465,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Cabinet Grotesk";
+  font-family: 'Cabinet Grotesk';
   font-style: normal;
   font-weight: 500;
   src: url('/fonts/cabinet-grotesk-500.woff2') format('woff2');
@@ -473,7 +473,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Cabinet Grotesk";
+  font-family: 'Cabinet Grotesk';
   font-style: normal;
   font-weight: 600;
   src: url('/fonts/cabinet-grotesk-700.woff2') format('woff2');
@@ -481,7 +481,7 @@ h6 {
 
 @font-face {
   font-display: swap;
-  font-family: "Cabinet Grotesk";
+  font-family: 'Cabinet Grotesk';
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/cabinet-grotesk-700.woff2') format('woff2');
@@ -646,7 +646,6 @@ h6 {
   grid-template-columns: 1fr;
   column-gap: 0.5rem;
 }
-
 
 @media (max-width: 1023px) {
   .container-wrapping-flipper.rounded-design > div {
@@ -1059,7 +1058,7 @@ h6 {
 }
 
 .loader {
-  font-size: 60px;          /* change this to 20px, 32px, etc */
+  font-size: 60px; /* change this to 20px, 32px, etc */
   width: 1em;
   height: 1em;
   border-radius: 50%;
@@ -1070,8 +1069,12 @@ h6 {
   animation: rotation 1s linear infinite;
 }
 
-.loader.small { font-size: 20px; }
-.loader.large { font-size: 64px; }
+.loader.small {
+  font-size: 20px;
+}
+.loader.large {
+  font-size: 64px;
+}
 
 @keyframes rotation {
   0% {
@@ -1118,8 +1121,7 @@ h6 {
 .qualified-countries-panel--rounded {
   --qualified-panel-glow-hue: 210;
   border-radius: 1.6rem;
-  box-shadow:
-    0 0 18px 0.5px hsl(var(--qualified-panel-glow-hue) 34% 35% / 38%),
+  box-shadow: 0 0 18px 0.5px hsl(var(--qualified-panel-glow-hue) 34% 35% / 38%),
     0 0 24px 6px hsl(var(--qualified-panel-glow-hue) 28% 25% / 22%),
     inset 0 6px 14px -5px rgb(0 0 0 / 22%),
     inset 6px 0 14px -8px rgb(0 0 0 / 12%);
@@ -1145,28 +1147,65 @@ h6 {
 /* ── Winner Modal animations ────────────────────────── */
 
 @keyframes winner-modal-in {
-  from { opacity: 0; transform: scale(0.82) translateY(22px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.82) translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes winner-flag-in {
-  0%   { opacity: 0; transform: scale(0.08) rotate(-22deg); }
-  58%  {             transform: scale(1.20) rotate(  5deg); }
-  76%  {             transform: scale(0.93) rotate( -2deg); }
-  100% { opacity: 1; transform: scale(1)    rotate(  0deg); }
+  0% {
+    opacity: 0;
+    transform: scale(0.08) rotate(-22deg);
+  }
+  58% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  76% {
+    transform: scale(0.93) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 @keyframes winner-slide-up {
-  from { opacity: 0; transform: translateY(13px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(13px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes winner-sparkle {
-  0%, 100% { opacity: 0; transform: scale(0)   rotate(  0deg); }
-  40%,  60% { opacity: 1; transform: scale(1)   rotate(200deg); }
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  40%,
+  60% {
+    opacity: 1;
+    transform: scale(1) rotate(200deg);
+  }
 }
 
 @keyframes winner-glow {
-  0%, 100% { opacity: 0.35; transform: scale(1);    }
-  50%       { opacity: 0.65; transform: scale(1.08); }
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.08);
+  }
 }

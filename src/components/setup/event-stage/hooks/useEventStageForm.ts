@@ -29,9 +29,7 @@ const qualifierTargetSchema = z
     if (rankComplete) {
       return;
     }
-    const rankPartial =
-      data.minRank != null ||
-      data.maxRank != null;
+    const rankPartial = data.minRank != null || data.maxRank != null;
     if (rankPartial) {
       return;
     }
@@ -45,72 +43,93 @@ const qualifierTargetSchema = z
   });
 
 // Base schema for common fields
-const eventStageSchema = z.object({
-  id: z.string().min(1, 'Id is required'),
-  name: z.string().min(1, 'Name is required'),
-  order: z.number().int(),
-  votingMode: z.enum(Object.values(StageVotingMode)),
-  qualifiesTo: z.array(qualifierTargetSchema).optional(),
-  eventsOrder: z.array(z.string()),
-}).refine((data) => {
-  const qualifiesTo = data.qualifiesTo || [];
+const eventStageSchema = z
+  .object({
+    id: z.string().min(1, 'Id is required'),
+    name: z.string().min(1, 'Name is required'),
+    order: z.number().int(),
+    votingMode: z.enum(Object.values(StageVotingMode)),
+    qualifiesTo: z.array(qualifierTargetSchema).optional(),
+    eventsOrder: z.array(z.string()),
+  })
+  .refine(
+    (data) => {
+      const qualifiesTo = data.qualifiesTo || [];
 
-  // Check for incomplete rank ranges (one rank provided but not the other)
-  const hasIncompleteRanks = qualifiesTo.some(target => (target.minRank && !target.maxRank) || (!target.minRank && target.maxRank));
+      // Check for incomplete rank ranges (one rank provided but not the other)
+      const hasIncompleteRanks = qualifiesTo.some(
+        (target) =>
+          (target.minRank && !target.maxRank) ||
+          (!target.minRank && target.maxRank),
+      );
 
-  // Check for invalid rank ranges (min > max or min < 1)
-  const hasInvalidRanges = qualifiesTo.some(target =>
-    target.minRank && target.maxRank && (target.minRank < 1 || target.maxRank < target.minRank)
+      // Check for invalid rank ranges (min > max or min < 1)
+      const hasInvalidRanges = qualifiesTo.some(
+        (target) =>
+          target.minRank &&
+          target.maxRank &&
+          (target.minRank < 1 || target.maxRank < target.minRank),
+      );
+
+      // Check if using rank-based qualification
+      const hasRankBased = qualifiesTo.some(
+        (target) => target.minRank && target.maxRank,
+      );
+      const hasAmountBased = qualifiesTo.some(
+        (target) => !target.minRank && !target.maxRank,
+      );
+
+      // If there's any incomplete ranks, invalid ranges, or mixed qualification modes, it's invalid
+      if (
+        hasIncompleteRanks ||
+        hasInvalidRanges ||
+        (hasRankBased && hasAmountBased)
+      ) {
+        return false;
+      }
+
+      // If not using rank-based qualification, skip range validation
+      if (!hasRankBased) {
+        return true;
+      }
+
+      // Validate rank-based qualification
+      const ranges = qualifiesTo
+        .filter((target) => target.minRank && target.maxRank)
+        .map((target) => ({
+          minRank: target.minRank!,
+          maxRank: target.maxRank!,
+          targetStageId: target.targetStageId,
+        }))
+        .sort((a, b) => a.minRank - b.minRank);
+
+      // Check for overlapping ranges
+      for (let i = 0; i < ranges.length - 1; i++) {
+        const current = ranges[i];
+        const next = ranges[i + 1];
+
+        if (current.maxRank >= next.minRank) {
+          return false; // Overlapping ranges
+        }
+      }
+
+      // Check for gaps (non-consecutive ranges)
+      let expectedMinRank = 1;
+      for (const range of ranges) {
+        if (range.minRank !== expectedMinRank) {
+          return false; // Gap in ranges
+        }
+        expectedMinRank = range.maxRank + 1;
+      }
+
+      return true;
+    },
+    {
+      message:
+        'Rank ranges must not overlap, must cover consecutive positions starting from rank 1, cannot be mixed with amount-based qualification, and both min and max ranks must be provided.',
+      path: ['qualifiesTo'],
+    },
   );
-
-  // Check if using rank-based qualification
-  const hasRankBased = qualifiesTo.some(target => target.minRank && target.maxRank);
-  const hasAmountBased = qualifiesTo.some(target => !target.minRank && !target.maxRank);
-
-  // If there's any incomplete ranks, invalid ranges, or mixed qualification modes, it's invalid
-  if (hasIncompleteRanks || hasInvalidRanges || (hasRankBased && hasAmountBased)) {
-    return false;
-  }
-
-  // If not using rank-based qualification, skip range validation
-  if (!hasRankBased) {
-    return true;
-  }
-
-  // Validate rank-based qualification
-  const ranges = qualifiesTo
-    .filter(target => target.minRank && target.maxRank)
-    .map(target => ({
-      minRank: target.minRank!,
-      maxRank: target.maxRank!,
-      targetStageId: target.targetStageId,
-    }))
-    .sort((a, b) => a.minRank - b.minRank);
-
-  // Check for overlapping ranges
-  for (let i = 0; i < ranges.length - 1; i++) {
-    const current = ranges[i];
-    const next = ranges[i + 1];
-
-    if (current.maxRank >= next.minRank) {
-      return false; // Overlapping ranges
-    }
-  }
-
-  // Check for gaps (non-consecutive ranges)
-  let expectedMinRank = 1;
-  for (const range of ranges) {
-    if (range.minRank !== expectedMinRank) {
-      return false; // Gap in ranges
-    }
-    expectedMinRank = range.maxRank + 1;
-  }
-
-  return true;
-}, {
-  message: 'Rank ranges must not overlap, must cover consecutive positions starting from rank 1, cannot be mixed with amount-based qualification, and both min and max ranks must be provided.',
-  path: ['qualifiesTo'],
-});
 
 export type EventStageFormData = z.infer<typeof eventStageSchema>;
 

@@ -56,6 +56,9 @@ export const useConfirmationStore = create<ConfirmationStore>()(
         name: 'confirmation-store',
       },
     ),
-    { name: 'confirmation-store', enabled: process.env.NODE_ENV === 'development' },
+    {
+      name: 'confirmation-store',
+      enabled: process.env.NODE_ENV === 'development',
+    },
   ),
 );

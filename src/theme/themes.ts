@@ -1172,7 +1172,7 @@ export const escThemes: Partial<ThemeRecord> = {
       pointsContainerShape: 'square',
       roundedCountryContainer: true,
       isJuryPointsPanelRounded: true,
-      fontAlias: "gotham"
+      fontAlias: 'gotham',
     },
   },
 };

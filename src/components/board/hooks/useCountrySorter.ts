@@ -37,11 +37,7 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
               if (orderMap) {
                 const aIdx = orderMap.get(a.code);
                 const bIdx = orderMap.get(b.code);
-                if (
-                  aIdx !== undefined &&
-                  bIdx !== undefined &&
-                  aIdx !== bIdx
-                ) {
+                if (aIdx !== undefined && bIdx !== undefined && aIdx !== bIdx) {
                   return aIdx - bIdx;
                 }
               }
@@ -75,11 +71,7 @@ export const useCountrySorter = (countriesToDisplay: Country[]) => {
             if (orderMap) {
               const aIdx = orderMap.get(a.code);
               const bIdx = orderMap.get(b.code);
-              if (
-                aIdx !== undefined &&
-                bIdx !== undefined &&
-                aIdx !== bIdx
-              ) {
+              if (aIdx !== undefined && bIdx !== undefined && aIdx !== bIdx) {
                 return aIdx - bIdx;
               }
             }

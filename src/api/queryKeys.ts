@@ -82,10 +82,8 @@ export const queryKeys = {
   // Follows
   follows: {
     status: (userId: string) => ['follows', 'status', userId] as const,
-    followers: (
-      userId: string,
-      filters: { page?: number; search?: string },
-    ) => ['follows', 'followers', userId, filters] as const,
+    followers: (userId: string, filters: { page?: number; search?: string }) =>
+      ['follows', 'followers', userId, filters] as const,
     followingFeed: (filters: {
       page?: number;
       type?: string;
@@ -118,15 +116,18 @@ export const queryKeys = {
     }) => ['public', 'contests', filters] as const,
     leaderboard: (year: number | 'global') =>
       ['public', 'leaderboard', year] as const,
-    userContent: (userId: string, filters: {
-      page?: number;
-      type?: string;
-      search?: string;
-      sortBy?: string;
-      sortOrder?: string;
-      startDate?: string;
-      endDate?: string;
-    }) => ['public', 'user-content', userId, filters] as const,
+    userContent: (
+      userId: string,
+      filters: {
+        page?: number;
+        type?: string;
+        search?: string;
+        sortBy?: string;
+        sortOrder?: string;
+        startDate?: string;
+        endDate?: string;
+      },
+    ) => ['public', 'user-content', userId, filters] as const,
   },
 
   // Errors queries (admin only)

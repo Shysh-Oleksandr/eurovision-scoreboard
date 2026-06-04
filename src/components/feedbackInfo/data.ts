@@ -244,8 +244,14 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-06-04',
+    title:
+      'Added the winner reveal animation (ESC 2026 style). Added a guidebook for the app. Small improvements',
+  },
+  {
     date: '2026-05-25',
-    title: 'Improved the winner modal UI. Corrected the default semi-final voting mode for each ESC edition',
+    title:
+      'Improved the winner modal UI. Corrected the default semi-final voting mode for each ESC edition',
   },
   {
     date: '2026-05-24',
@@ -390,10 +396,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-05-17', end: '2026-05-18' },
-    title: 'Eurovision 2026 theme',
-  },
-  {
+    approximateDates: { start: '2026-06-05', end: '2026-06-07' },
     title: 'Pre-1975 points system support',
   },
   {
@@ -404,9 +407,6 @@ export const UPCOMING_FEATURES = [
   },
   {
     title: 'Updated default themes (2016-2025)',
-  },
-  {
-    title: 'Separate points system for jury and televote',
   },
   {
     title: 'Allocation draw',

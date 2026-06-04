@@ -222,6 +222,8 @@
     "enterTelevotePointsFor": "Entrez les points du télévote pour <span>{country}</span>",
     "winnerOf": "<span>{country}</span> est le gagnant de <span2>{event}</span2> !",
     "random": "Aléatoire",
+    "winnerRevealTeaser": "Le gagnant de <span>{event}</span> est...",
+    "backToScoreboard": "Voir le classement",
     "televote": "Télévote",
     "juryVoting": "Vote du jury",
     "voting": "Vote",
@@ -258,7 +260,7 @@
     },
     "winnerModal": {
       "title": "Nous avons un gagnant !",
-      "points": "<span>{country}</span> a gagné avec <span>{points}</span> points !",
+      "points": "<span1>{country}</span1> a gagné avec <span2>{points}</span2> points !",
       "startOver": "Recommencer"
     },
     "header": {
@@ -276,6 +278,11 @@
       "finalistsOnly": "Finalistes seulement",
       "selectEventStage": "Sélectionner l’étape de l’événement",
       "continueTo": "Continuer vers {nextPhase}"
+    },
+    "finalReveal": {
+      "currentLeader": "Leader actuel",
+      "needsPointsToWin": "Besoin de <span>{count, plural, =1 {# pt} other {# pts}}</span> pour gagner",
+      "receivedPointsFromPublic": "A reçu <span>{count, plural, =1 {# point} other {# points}}</span> du public"
     },
     "finalStats": {
       "breakdown": "Détail",
@@ -725,6 +732,158 @@
     "showVotingCountriesNames": "Afficher les pays votants",
     "generateOnOpen": "Générer automatiquement à l’ouverture"
   },
+  "guide": {
+    "title": "Guide des fonctionnalités",
+    "tabs": {
+      "start": "Démarrage",
+      "setup": "Configuration",
+      "voting": "Vote",
+      "themes": "Thèmes",
+      "more": "Plus"
+    },
+    "start": {
+      "gettingStarted": {
+        "title": "Guide de démarrage rapide",
+        "content": "<list><item>Sélectionnez une année dans le menu déroulant en haut à gauche pour charger la lineup officielle de l’Eurovision, puis appuyez sur Commencer pour lancer la simulation.</item><item>Pendant le vote, cliquez sur un pays du scoreboard pour lui attribuer les points en cours, ou utilisez « Voter aléatoirement » pour laisser l’application décider.</item><item>Progressez à travers chaque étape en attribuant tous les votes et en cliquant sur Continuer</item><item>Une fois toutes les étapes terminées, consultez les statistiques détaillées ou générez une image de scoreboard partageable.</item></list>"
+      },
+      "signIn": {
+        "title": "Débloquer plus de fonctionnalités avec un compte",
+        "content": "<list><item>Cliquez sur l’icône de profil dans la section widgets pour vous connecter avec Google.</item><item>La connexion débloque la sauvegarde cloud de vos concours, la création et la publication de thèmes personnalisés, l’ajout d’entrées personnalisées et les fonctionnalités sociales.</item><item>Sans compte, vous pouvez toujours parcourir et appliquer des thèmes et concours publics, mais vous ne pouvez pas enregistrer, copier, aimer ou créer les vôtres.</item><item>Vos données locales existantes sont conservées lorsque vous vous connectez.</item></list>"
+      },
+      "savingContests": {
+        "title": "Enregistrer et charger des concours",
+        "content": "Cliquez sur l’icône d’enregistrement à droite de la carte du concours en cours ou ouvrez le widget Concours et cliquez sur « Créer un concours » pour enregistrer votre configuration actuelle et les résultats de simulation dans le cloud. Vous pouvez recharger un concours enregistré plus tard, le réinitialiser à la dernière version sauvegardée ou le partager via un lien. Les concours publics peuvent être parcourus et chargés par d’autres utilisateurs."
+      },
+      "customEntries": {
+        "title": "Entrées personnalisées",
+        "content": "Les utilisateurs connectés peuvent créer des entrées fictives ou non standard — par exemple, un pays qui n’a jamais participé à l’Eurovision, ou un pays inventé — avec un nom et un drapeau personnalisés (téléversement ou URL). Les entrées personnalisées peuvent être organisées en groupes et importées depuis les concours d’autres utilisateurs."
+      }
+    },
+    "setup": {
+      "yearData": {
+        "title": "Sélection de l’année et données officielles",
+        "content": "Utilisez le menu déroulant en haut à gauche pour choisir une édition ESC (2004–2026) ou JESC (2016–2025). La sélection d’une année charge automatiquement la lineup officielle de cette édition. Le même menu permet aussi de charger rapidement l’un de vos concours enregistrés."
+      },
+      "countryAssignment": {
+        "title": "Attribution des pays",
+        "content": "Les pays affichés lorsque vous choisissez une année sont un point de départ, pas une liste figée. Dans la modale Configuration, cliquez sur un pays pour le déplacer entre les étapes (Demi-finale 1, Demi-finale 2, Grande Finale) ou le marquer comme Ne participe pas. Vous pouvez aussi ajouter des pays d’autres années, d’autres continents ou vos propres entrées personnalisées."
+      },
+      "grandFinalOnly": {
+        "title": "Mode Finale seule",
+        "content": "Activez l’interrupteur « Finale seule » dans la configuration pour ignorer les Demi-finales et lancer une Grande Finale autonome, avec toutes les entrées placées directement dedans. Le désactiver restaure la structure complète en trois shows (Demi-finale 1, Demi-finale 2, Grande Finale)."
+      },
+      "customStages": {
+        "title": "Étapes personnalisées",
+        "content": "Au-delà des Demi-finales et de la Grande Finale standard, vous pouvez créer autant d’étapes supplémentaires que vous le souhaitez — Heats, Quart-finales, et plus encore. Chaque étape a son propre nom, mode de vote (Jury + Télévote, Télévote uniquement ou Combiné) et règles de qualification précisant combien d’entrées avancent et vers quelle étape. Avancé : la qualification par rang permet d’envoyer différentes plages de rangs vers différentes étapes suivantes."
+      },
+      "votingModes": {
+        "title": "Mode de vote par étape",
+        "content": "Chaque étape peut utiliser un système de vote différent, configuré dans l’onglet Paramètres de l’éditeur d’étape :<list><item><strong>Jury et Télévote</strong> — deux tours distincts : d’abord tous les votes du jury sont attribués pays par pays, puis tous les points du télévote sont révélés ensemble</item><item><strong>Télévote uniquement</strong> — ignorer le vote du jury ; seuls les points du télévote sont attribués</item><item><strong>Jury uniquement</strong> — ignorer le télévote ; seuls les points du jury sont attribués</item><item><strong>Combiné</strong> — les points du jury et du télévote sont attribués en un seul tour par pays votant (peut actuellement fonctionner de manière imprécise)</item></list>Le mode par défaut pour la Grande Finale est Jury et Télévote, conformément au format Eurovision standard."
+      },
+      "votingCountries": {
+        "title": "Pays votants",
+        "content": "Dans l’onglet « Votants » de chaque étape, choisissez exactement quels pays votent pendant cette étape. Vous pouvez inclure ou exclure tout pays participant et éventuellement ajouter « Rest of the World » comme votant supplémentaire. Les ensembles de votants sont configurés par étape, donc les Demi-finales et la Grande Finale peuvent avoir des votants complètement différents. Si vous souhaitez utiliser les pays votants d’origine de l’année, cliquez sur le bouton « Charger les données de l’année »."
+      },
+      "runningOrder": {
+        "title": "Ordre de départ",
+        "content": "Avant de démarrer une étape, ouvrez l’onglet Ordre de départ pour glisser-déposer les entrées dans l’ordre de passage souhaité. L’ordre de départ sert aussi de critère de départage : si deux entrées ont le même total de points et les mêmes points de télévote, celle qui est passée plus tôt est mieux classée."
+      }
+    },
+    "voting": {
+      "customPointsSystem": {
+        "title": "Système de points personnalisé",
+        "content": "Allez dans « Paramètres → Vote » pour configurer les points attribués à chaque position. Vous pouvez ajouter, supprimer ou réorganiser les valeurs. Activez « Système de points jury/télévote séparé » pour utiliser une échelle complètement différente pour le jury et le télévote. Cliquez sur l’icône d’étincelles pour activer/désactiver l’animation Douze Points pour une valeur de points spécifique."
+      },
+      "predefinedVoting": {
+        "title": "Vote prédéfini et préréglages",
+        "content": "Activez « Activer le vote prédéfini » dans « Paramètres → Vote » pour remplir les votes de chaque pays avant le début de la simulation. Une matrice de vote complète vous permet d’attribuer des points spécifiques de chaque votant à chaque entrée. Enregistrez la configuration localement sous forme de préréglage nommé pour la recharger à tout moment — parfait pour rejouer les résultats officiels de l’Eurovision ou partager un scénario précis."
+      },
+      "oddsRandomness": {
+        "title": "Cotes et aléatoire",
+        "content": "Dans « Paramètres → Cotes », attribuez des cotes jury et télévote (0–100) à chaque pays pour influencer la distribution des votes aléatoires. Des cotes plus élevées signifient une meilleure chance de recevoir plus de points. Le curseur Niveau d’aléatoire contrôle à quel point la simulation suit ces cotes : glissez vers la gauche pour des résultats prévisibles qui reflètent les cotes, vers la droite pour une simulation chaotique où tout peut arriver."
+      },
+      "presentationMode": {
+        "title": "Mode présentation",
+        "content": "Activez « Activer le mode présentation » dans « Paramètres → Vote » pour ajouter un panneau de lecture automatique sous le scoreboard. Réglez la vitesse (0,5–7,5 secondes par action) et appuyez sur Lecture pour laisser la simulation se dérouler sans intervention — idéal pour le streaming ou l’enregistrement. Activez « Démarrage auto de la présentation » pour qu’elle démarre automatiquement dès le début du vote."
+      },
+      "pickQualifiers": {
+        "title": "Choisir des qualifiés sans attribuer de points",
+        "content": "Activez « Choisir des qualifiés sans attribuer de points » dans « Paramètres → Vote » pour sélectionner quelles entrées avancent à l’étape suivante sans lancer le processus de vote complet. Pendant une Demi-finale, cliquez sur une entrée du tableau pour la qualifier directement, ou appuyez sur « Aléatoire ». Idéal lorsque seule l’identité des qualifiés compte, pas les scores détaillés. Note : le mode de vote de l’étape influence toujours la sélection aléatoire des qualifiés."
+      },
+      "moreOptions": {
+        "title": "Plus d’options de vote",
+        "content": "Options supplémentaires dans Paramètres → Vote et l’en-tête de simulation :<list><item><strong>Dévoilement de la qualification en split-screen</strong> — un moment de style ESC 2025 où plusieurs candidats apparaissent côte à côte et vous en choisissez un pour le qualifier. Configurez 2–6 candidats par révélation, et si le dernier qualifié utilise aussi le split-screen.</item><item><strong>Ordre d’annonce du télévote</strong> — réglez sur du plus bas au plus haut pour annoncer les résultats du télévote du moins au plus de points, comme à l’ESC 2016–2018.</item><item><strong>Grouper le vote aléatoire du jury</strong> — le bouton « Voter aléatoirement » attribue les points par lots réalistes (1–8+10 ensemble, ou juste 12) au lieu d’une valeur à la fois.</item><item><strong>Annuler et Redémarrer</strong> — Annuler revient en arrière jusqu’à 100 actions ; Redémarrer réinitialise toute la simulation.</item></list>"
+      }
+    },
+    "themes": {
+      "yearThemes": {
+        "title": "Thèmes par année et synchronisation auto",
+        "content": "De nombreuses éditions ESC et JESC disposent d’un thème intégré inspiré de l’identité visuelle de cette année — couleurs, polices, styles de drapeaux et animations. La sélection d’une année dans le menu déroulant suggère automatiquement le thème correspondant. Si vous changez d’année alors qu’un thème est déjà actif, un bouton Sync apparaît dans l’en-tête pour appliquer le thème de la bonne année."
+      },
+      "browseThemes": {
+        "title": "Parcourir les thèmes de la communauté",
+        "content": "Ouvrez le widget Thèmes pour parcourir les thèmes publics créés par d’autres utilisateurs — aucun compte requis pour les parcourir ou les appliquer. Connectez-vous pour aimer un thème, l’enregistrer dans votre collection pour un accès rapide, le copier comme point de départ pour le vôtre, ou en créer un from scratch."
+      },
+      "customThemeBuilder": {
+        "title": "Créateur de thème personnalisé",
+        "content": "Les utilisateurs connectés peuvent créer un thème entièrement personnalisé : choisir une couleur principale, téléverser une image de fond, sélectionner une police et remplacer les couleurs de chaque état du scoreboard indépendamment (jury actif, télévote non terminé/actif/terminé, entrées non qualifiées et badges de rang). Les formes de drapeaux, les formes des conteneurs de points et les styles d’animation du tableau sont tous configurables. Un panneau d’aperçu en direct montre exactement l’effet de chaque modification sur un vrai élément pays."
+      },
+      "soundEffects": {
+        "title": "Effets sonores et audio de fond",
+        "content": "Dans la section Effets sonores du créateur de thème, attachez des clips audio à des moments précis : l’attribution des 12 points, le début d’étape, la révélation du jury, la révélation du télévote, l’annonce du gagnant et une piste de fond en boucle. Collez une URL https:// ou téléversez un fichier directement (max 7 Mo par fichier). Chaque son prend en charge un délai optionnel en secondes."
+      },
+      "visualDetails": {
+        "title": "Détails visuels et animations",
+        "content": "La section « Détails visuels » du créateur de thème permet d’affiner les animations et la mise en page : style de mouvement du tableau (Flip classique ou Teleport ESC 2025), l’animation des points douze (Parallelogrammes de l’ESC 2023 ou Grille de cœurs de l’ESC 2025), forme du drapeau (grand ou petit rectangle, carré, cercle, cercle avec bordure ou masqué), forme du conteneur de points, noms d’entrées en majuscules, et plus encore."
+      }
+    },
+    "more": {
+      "finalStats": {
+        "title": "Statistiques finales et détail du vote",
+        "content": "Une fois une étape terminée, appuyez sur « Statistiques » dans la barre d’actions de phase pour ouvrir les résultats détaillés. L’onglet Détail affiche une matrice de vote complète — l’attribution exacte des points de chaque votant à chaque entrée, répartie en colonnes Jury, Télévote et Total. Utilisez-le pour voir exactement qui a (ou n’a pas) donné des points à une entrée."
+      },
+      "splitStats": {
+        "title": "Répartition Jury vs. Télévote",
+        "content": "L’onglet Répartition dans la modale de statistiques place le classement jury de chaque entrée à côté de son classement télévote, facilitant la détection des plus grands écarts entre l’avis des experts et le vote du public. Les entrées avec un grand écart entre les deux sont là où le drame se joue."
+      },
+      "shareScoreboard": {
+        "title": "Partager le scoreboard en image",
+        "content": "Appuyez sur « Partager » dans l’en-tête de simulation pour ouvrir le générateur d’images. Personnalisez la mise en page (1–4 colonnes), le ratio (Paysage 16:9, Carré 1:1 ou Portrait 3:4), le titre, le sous-titre, et l’affichage des classements et points. Téléchargez le résultat en PNG ou utilisez le partage natif sur mobile."
+      },
+      "shareStats": {
+        "title": "Partager les statistiques en image",
+        "content": "Dans la modale Statistiques, un bouton de partage permet d’exporter le tableau complet des résultats (détail, répartition ou résumé) en PNG téléchargeable. Idéal pour partager des décomptes détaillés sur les réseaux sociaux ou dans les communautés de fans Eurovision."
+      },
+      "leaderboard": {
+        "title": "Classement mondial des pays",
+        "content": "Le classement des pays (accessible depuis « Concours → Concours publics ») agrège les résultats de tous les concours publics terminés. Il suit les victoires, les top 3/5/10, la moyenne de points en Grande Finale et les séries de qualifications. Utilisez le filtre par année pour restreindre à une édition ou une plage, ou activez « Seuls les pays de l’Eurovision » pour exclure les entrées non standard."
+      },
+      "myStats": {
+        "title": "Mon classement de participations et statistiques",
+        "content": "Le « Mon classement de participations » dans le widget « Concours → Vos concours » affiche les statistiques personnelles de tous vos concours terminés : victoires, zéro points, meilleur résultat et série de qualifications en cours pour chaque pays et entrée personnalisée que vous avez utilisés. Cliquez sur une ligne pour voir le détail concours par concours avec classements et points."
+      },
+      "communityFollowing": {
+        "title": "Suivre d’autres utilisateurs",
+        "content": "Sur le profil public de tout utilisateur (accessible en cliquant sur son nom sur un thème ou un concours public), vous pouvez le suivre. Les nouveaux thèmes et concours des utilisateurs suivis apparaissent dans un fil « Suivant » combiné sur votre propre page de profil. Sans compte, vous pouvez toujours parcourir les onglets Public des widgets Thèmes et Concours."
+      },
+      "uiPreferences": {
+        "title": "Préférences d’interface",
+        "content": "Personnalisez l’apparence dans Paramètres → Préférences d’interface :<list><item><strong>Styles de drapeaux</strong> — passez aux icônes cœur, drapeaux minimistes ronds/carrés, ou gardez les rectangles par défaut</item><item><strong>Toujours afficher le classement</strong> — gardez les numéros de position visibles en permanence, plus un indicateur de changement de rang montrant les montées ou descentes</item><item><strong>Popups</strong> — activez/désactivez indépendamment la popup des qualifiés, l’annonce du gagnant et les confettis</item><item><strong>Mode plein écran</strong> — passez en plein écran pour une vue scoreboard immersive</item><item><strong>Barre de progression du vote du jury</strong> — affiche combien de pays ont déjà voté dans le tour de jury en cours</item><item><strong>Image de fond personnalisée</strong> — téléversez votre propre image pour remplacer le fond du thème</item><item><strong>Toujours utiliser la même police</strong> — verrouillez une police spécifique quel que soit le thème actif</item><item><strong>Audio</strong> — définissez des niveaux de volume séparés pour les effets sonores et la musique de fond, ou désactivez tout l’audio du thème d’un coup</item><item><strong>Effets de l’hiver</strong> — activez la chute de neige avec un curseur d’intensité réglable</item></list>"
+      },
+      "confirmations": {
+        "title": "Popups de confirmation",
+        "content": "Dans Paramètres → Popups de confirmation, vous pouvez activer ou désactiver individuellement les dialogues de confirmation — par exemple, les invites pour annuler une simulation, supprimer un concours ou se déconnecter. Désactivez celles que vous trouvez gênantes ; elles peuvent être réactivées à tout moment. « Réinitialiser toutes les confirmations » restaure toutes les invites désactivées d’un coup."
+      },
+      "language": {
+        "title": "Prise en charge des langues",
+        "content": "DouzePoints prend en charge 8 langues : anglais, français, espagnol, allemand, italien, grec, polonais et ukrainien. Changez la langue active dans « Paramètres → Préférences d’interface → Langue ». Toutes les langues autres que l’anglais sont actuellement produites par traduction automatique, des imprécisions peuvent donc apparaître."
+      },
+      "feedback": {
+        "title": "Retour et nouveautés",
+        "content": "Vous avez trouvé un bug, une idée de fonctionnalité ou vous souhaitez simplement laisser un commentaire ? Cliquez sur l’icône info dans l’en-tête (à côté de ce bouton guide) pour ouvrir le panneau Retour. Il affiche aussi un changelog complet (« Nouveautés ») et une feuille de route des fonctionnalités à venir. Vous pouvez déposer un signalement sur GitHub Issues ou envoyer un e-mail directement au développeur."
+      }
+    }
+  },
   "settings": {
     "general": {
       "confirmations": "Popups de confirmation",
@@ -781,6 +940,11 @@
       "showQualifiersPopup": "Afficher la fenêtre des qualifiés",
       "showWinnerPopup": "Afficher la fenêtre du gagnant",
       "showWinnerConfetti": "Afficher les confettis du gagnant",
+      "enableFinalReveal": "Activer la révélation finale du télévote",
+      "finalRevealAnimationSpeed": "Vitesse d'animation de la révélation",
+      "slow": "Lent",
+      "fast": "Rapide",
+      "finalRevealLinearAnimation": "Animation fluide et prévisible (sans aléatoire)",
       "enableFullscreenMode": "Activer le mode plein écran",
       "warnBeforeManuallyAssigningTelevotePoints": "Avertir avant d’attribuer manuellement des points de télévote",
       "showJuryVotingProgressBar": "Afficher la barre de progression du jury",

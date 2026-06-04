@@ -10,7 +10,7 @@ import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const OPEN_DELAY_MS = 3400;
+const OPEN_DELAY_MS = 1400;
 const CLOSE_DURATION_MS = 280;
 const SPARKLE_COUNT = 22;
 
@@ -152,7 +152,16 @@ const WinnerModal = () => {
 
   if (!shouldShowWinnerModal || !winnerCountry) return null;
 
+  const targetScore = toFixedIfDecimalFloat(winnerCountry.points);
+  const scoreFinalText = String(Math.round(targetScore));
   const flagSrc = getFlagPath(winnerCountry, 'big-rectangle');
+
+  const scoreTextStyle: React.CSSProperties = {
+    color: '#ffe87a',
+    fontWeight: 800,
+    fontSize: '22px',
+    fontVariantNumeric: 'tabular-nums',
+  };
 
   return createPortal(
     <div
@@ -212,7 +221,7 @@ const WinnerModal = () => {
           border: '1.5px solid rgba(255,255,255,0.14)',
           borderRadius: '22px',
           padding: '40px 48px 34px',
-          width: '440px',
+          width: '460px',
           maxWidth: 'calc(100vw - 32px)',
           textAlign: 'center',
           position: 'relative',
@@ -298,10 +307,27 @@ const WinnerModal = () => {
             ),
             span2: (chunks) => (
               <span
-                ref={scoreRef}
-                style={{ color: '#ffe87a', fontWeight: 800, fontSize: '22px' }}
+                style={{
+                  display: 'inline-grid',
+                  verticalAlign: 'baseline',
+                }}
               >
-                {chunks}
+                <span
+                  aria-hidden
+                  style={{
+                    ...scoreTextStyle,
+                    gridArea: '1 / 1',
+                    visibility: 'hidden',
+                  }}
+                >
+                  {scoreFinalText}
+                </span>
+                <span
+                  ref={scoreRef}
+                  style={{ ...scoreTextStyle, gridArea: '1 / 1' }}
+                >
+                  {chunks}
+                </span>
               </span>
             ),
           })}

@@ -182,8 +182,14 @@ export const useBoardAnimations = (
             animationRunIdRef.current += 1;
             const nextRunId = animationRunIdRef.current;
             const elapsed = Date.now() - queuedUpdate.pointsAwardedAt;
-            const countUpRemaining = Math.max(0, COUNT_UP_DURATION_MS - elapsed);
-            const queuedDelay = Math.max(TELEPORT_START_DELAY_MS, countUpRemaining);
+            const countUpRemaining = Math.max(
+              0,
+              COUNT_UP_DURATION_MS - elapsed,
+            );
+            const queuedDelay = Math.max(
+              TELEPORT_START_DELAY_MS,
+              countUpRemaining,
+            );
             timeoutRef.current = setTimeout(() => {
               runTeleportSequence(
                 queuedUpdate.order,

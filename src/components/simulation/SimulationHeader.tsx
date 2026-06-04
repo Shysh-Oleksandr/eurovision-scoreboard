@@ -118,7 +118,10 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
             <LogoutIcon className="w-6 h-6" />
           </Button>
           <Button
-            onClick={() => undo()}
+            onClick={() => {
+              undo();
+              useScoreboardStore.getState().clearReveal();
+            }}
             className={buttonClassName}
             aria-label={t('undo')}
             title={t('undo')}

@@ -13,10 +13,13 @@ export const useReorderCountries = (
   const isTablet = useMediaQuery('(min-width: 480px)');
   const isDesktop = useMediaQuery('(min-width: 1280px)');
 
-  const scoreboardMobileLayout = useGeneralStore((state) => state.presentationSettings.scoreboardMobileLayout);
+  const scoreboardMobileLayout = useGeneralStore(
+    (state) => state.presentationSettings.scoreboardMobileLayout,
+  );
 
   const reorderedCountries = useMemo(() => {
-    let columnCount = scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN ? 2 : 1;
+    let columnCount =
+      scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN ? 2 : 1;
 
     if (customColumnCount) {
       columnCount = customColumnCount;
@@ -63,7 +66,14 @@ export const useReorderCountries = (
     }
 
     return reordered;
-  }, [countries, isTablet, isDesktop, customColumnCount, isVotingOver, scoreboardMobileLayout]);
+  }, [
+    countries,
+    isTablet,
+    isDesktop,
+    customColumnCount,
+    isVotingOver,
+    scoreboardMobileLayout,
+  ]);
 
   return reorderedCountries;
 };

@@ -1,7 +1,10 @@
 import { years, Year } from '../config';
 
 import { BaseCountry } from '@/models';
-import { getFlagPath, getFlagPathForImageGeneration } from '@/helpers/getFlagPath';
+import {
+  getFlagPath,
+  getFlagPathForImageGeneration,
+} from '@/helpers/getFlagPath';
 
 export type HostingCountryData = {
   code: string;

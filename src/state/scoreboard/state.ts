@@ -37,6 +37,8 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   shouldResetLastPointsAfterTeleport: false,
   currentRevealTelevotePoints: undefined,
   isWinnerAnimationAlreadyDisplayed: false,
+  revealData: null,
+  isRevealAnimationComplete: false,
   isLastSimulationAnimationFinished: true,
   splitScreenQualifierModalOpen: false,
   splitScreenQualifierCandidates: [],

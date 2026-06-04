@@ -1,6 +1,6 @@
 import { StateCreator } from 'zustand';
 
-import { ScoreboardState } from './types';
+import { RevealData, ScoreboardState } from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
 
@@ -13,10 +13,15 @@ type MiscActions = {
   hideDouzePointsAnimation: (countryCode: string) => void;
   setBoardTeleportAnimationRunning: (isRunning: boolean) => void;
   setShouldResetLastPointsAfterTeleport: (shouldReset: boolean) => void;
-  handleBoardTeleportAnimationComplete: (hasDouzePointsAnimation: boolean) => void;
+  handleBoardTeleportAnimationComplete: (
+    hasDouzePointsAnimation: boolean,
+  ) => void;
   setIsLastSimulationAnimationFinished: (isFinished: boolean) => void;
   setCurrentRevealTelevotePoints: (points: number) => void;
   setIsWinnerAnimationAlreadyDisplayed: (hasShown: boolean) => void;
+  setRevealData: (data: RevealData | null) => void;
+  setIsRevealAnimationComplete: (complete: boolean) => void;
+  clearReveal: () => void;
 };
 
 const FINAL_SIMULATION_ANIMATION_FINISH_DELAY_MS = 500;
@@ -169,5 +174,17 @@ export const createMiscActions: StateCreator<
     set({
       currentRevealTelevotePoints: points,
     });
+  },
+
+  setRevealData: (data: RevealData | null) => {
+    set({ revealData: data });
+  },
+
+  setIsRevealAnimationComplete: (complete: boolean) => {
+    set({ isRevealAnimationComplete: complete });
+  },
+
+  clearReveal: () => {
+    set({ revealData: null, isRevealAnimationComplete: false });
   },
 });

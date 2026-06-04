@@ -7,7 +7,8 @@ export const ROUNDED_SUBTLE_GLOW =
   'drop-shadow(rgb(248 225 196 / 40%) 1px 0px 7px)';
 export const ROUNDED_SUBTLE_GLOW_HOVER =
   'drop-shadow(rgb(248 225 196 / 65%) 1px 0px 14px)';
-export const ROUNDED_GLOW_TRANSITION = 'filter 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+export const ROUNDED_GLOW_TRANSITION =
+  'filter 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
 const ROUNDED_GLOW_HOVER_BOOST = 1.4;
 
 /** Split button surface classes for rounded pill layout (opacity on container, bg on name strip). */

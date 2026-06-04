@@ -85,10 +85,10 @@ export const buildRankedCountriesForManualTotals = (
       stage.votingMode === StageVotingMode.JURY_AND_TELEVOTE
         ? jury + televote
         : stage.votingMode === StageVotingMode.COMBINED
-          ? combined
-          : stage.votingMode === StageVotingMode.JURY_ONLY
-            ? jury
-            : televote;
+        ? combined
+        : stage.votingMode === StageVotingMode.JURY_ONLY
+        ? jury
+        : televote;
 
     return {
       ...c,
@@ -122,10 +122,7 @@ export const buildCountriesOverrideForPodium = (
   stage: EventStage,
   manualRowByCode: Record<string, ManualShareTotalsRow>,
 ): Country[] => {
-  const ranked = buildRankedCountriesForManualTotals(
-    stage,
-    manualRowByCode,
-  );
+  const ranked = buildRankedCountriesForManualTotals(stage, manualRowByCode);
 
   return ranked.map((c) => ({
     ...c,

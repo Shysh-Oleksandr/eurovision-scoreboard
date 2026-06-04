@@ -108,6 +108,8 @@ export const createEventActions: StateCreator<
       splitScreenQualifierCandidatesQualifiedCount: null,
       splitScreenQualifierShownCountByStage: {},
       splitScreenQualifierLastShownByStage: {},
+      revealData: null,
+      isRevealAnimationComplete: false,
     });
 
     playThemeSound('stageStart');
@@ -207,7 +209,10 @@ export const createEventActions: StateCreator<
           const newQualifierCodes = qualifiersForTarget
             .map((c) => c.code)
             .filter((code) => !existingRunningOrder.includes(code));
-          const updatedRunningOrder = [...existingRunningOrder, ...newQualifierCodes];
+          const updatedRunningOrder = [
+            ...existingRunningOrder,
+            ...newQualifierCodes,
+          ];
 
           const updatedTargetStage = {
             ...targetStage,
@@ -251,7 +256,10 @@ export const createEventActions: StateCreator<
           const newQualifierCodes = qualifiersForTarget
             .map((c) => c.code)
             .filter((code) => !existingRunningOrder.includes(code));
-          const updatedRunningOrder = [...existingRunningOrder, ...newQualifierCodes];
+          const updatedRunningOrder = [
+            ...existingRunningOrder,
+            ...newQualifierCodes,
+          ];
 
           const updatedTargetStage = {
             ...targetStage,
@@ -335,6 +343,8 @@ export const createEventActions: StateCreator<
       splitScreenQualifierCandidatesQualifiedCount: null,
       splitScreenQualifierShownCountByStage: {},
       splitScreenQualifierLastShownByStage: {},
+      revealData: null,
+      isRevealAnimationComplete: false,
     });
 
     playThemeSound('stageStart');
@@ -348,6 +358,8 @@ export const createEventActions: StateCreator<
   triggerRestartEvent: () => {
     set({
       restartCounter: get().restartCounter + 1,
+      // revealData: null,
+      // isRevealAnimationComplete: false,
     });
   },
 
@@ -364,6 +376,8 @@ export const createEventActions: StateCreator<
       splitScreenQualifierCandidatesQualifiedCount: null,
       splitScreenQualifierShownCountByStage: {},
       splitScreenQualifierLastShownByStage: {},
+      revealData: null,
+      isRevealAnimationComplete: false,
     });
   },
 });

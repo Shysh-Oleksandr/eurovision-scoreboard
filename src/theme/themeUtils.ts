@@ -247,9 +247,7 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     document.head.appendChild(style);
   }
 
-  const fontStack = getFontFamilyStackCss(
-    normalizeFontAlias(theme.fontAlias),
-  );
+  const fontStack = getFontFamilyStackCss(normalizeFontAlias(theme.fontAlias));
   const fontVarLine = `  --dp-font-family: ${fontStack};`;
 
   const cssText = [fontVarLine]

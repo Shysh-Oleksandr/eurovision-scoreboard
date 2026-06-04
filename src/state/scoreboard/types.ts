@@ -15,6 +15,12 @@ export type CountryPoints = {
 
 export type QualificationOrder = Record<string, Record<string, number>>; // stageId -> countryCode -> qualificationOrder
 
+export type RevealData = {
+  leaderCode: string;
+  lastCode: string;
+  pointsNeeded: number;
+};
+
 export type ManualShareTotalsRow = {
   jury?: number;
   televote?: number;
@@ -32,7 +38,10 @@ export type StageVotes = {
   combined?: Record<string, Vote[]>;
 };
 
-export type SplitScreenQualifierCandidate = Pick<BaseCountry, 'code' | 'name' | 'flag'>;
+export type SplitScreenQualifierCandidate = Pick<
+  BaseCountry,
+  'code' | 'name' | 'flag'
+>;
 
 export type ScoreboardState = {
   // State
@@ -58,6 +67,8 @@ export type ScoreboardState = {
   qualificationOrder: QualificationOrder;
   currentRevealTelevotePoints: number; // Current points to give in reveal mode
   isWinnerAnimationAlreadyDisplayed: boolean;
+  revealData: RevealData | null;
+  isRevealAnimationComplete: boolean;
   isLastSimulationAnimationFinished: boolean;
   splitScreenQualifierModalOpen: boolean;
   splitScreenQualifierCandidates: SplitScreenQualifierCandidate[];
@@ -110,6 +121,9 @@ export type ScoreboardState = {
   setIsLastSimulationAnimationFinished: (isFinished: boolean) => void;
   setCurrentRevealTelevotePoints: (points: number) => void; // Set current points to give in reveal mode
   setIsWinnerAnimationAlreadyDisplayed: (hasShown: boolean) => void;
+  setRevealData: (data: RevealData | null) => void;
+  setIsRevealAnimationComplete: (complete: boolean) => void;
+  clearReveal: () => void;
   predefineVotesForStage: (
     stage: EventStage,
     resetOtherStages?: boolean,

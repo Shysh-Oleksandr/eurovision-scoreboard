@@ -51,10 +51,9 @@ export const getLastCountryCodeByPoints = (
   runningOrder?: string[],
 ) =>
   remainingCountries.length
-    ? remainingCountries
-        .slice()
-        .sort(createCountriesComparator(runningOrder))[remainingCountries.length - 1]
-        ?.code
+    ? remainingCountries.slice().sort(createCountriesComparator(runningOrder))[
+        remainingCountries.length - 1
+      ]?.code
     : '';
 
 export const getLastCountryIndexByPoints = (
@@ -65,7 +64,10 @@ export const getLastCountryIndexByPoints = (
 export const isVotingOver = (lastCountryIndexByPoints: number) =>
   lastCountryIndexByPoints === -1;
 
-export const getWinnerCountry = (countries: Country[], runningOrder?: string[]) => {
+export const getWinnerCountry = (
+  countries: Country[],
+  runningOrder?: string[],
+) => {
   if (countries.length === 0) {
     return null;
   }
@@ -98,7 +100,10 @@ export const handleStageEnd = (
           ? false
           : country.showDouzePointsAnimation,
     }));
-    winnerCountry = getWinnerCountry(updatedCountries, currentStage.runningOrder);
+    winnerCountry = getWinnerCountry(
+      updatedCountries,
+      currentStage.runningOrder,
+    );
   }
 
   if (showQualificationResults) {
@@ -107,12 +112,12 @@ export const handleStageEnd = (
     );
     const qualifiersAmount =
       currentStage.qualifiesTo?.reduce((sum, target) => {
-      // If using rank ranges, calculate based on ranges
-      if (target.minRank && target.maxRank) {
-        return sum + (target.maxRank - target.minRank + 1);
-      }
-      // Amount-based (backward compatibility)
-      return sum + target.amount;
+        // If using rank ranges, calculate based on ranges
+        if (target.minRank && target.maxRank) {
+          return sum + (target.maxRank - target.minRank + 1);
+        }
+        // Amount-based (backward compatibility)
+        return sum + target.amount;
       }, 0) || 0;
     const qualifiedCountries = sortedCountries.slice(0, qualifiersAmount);
 

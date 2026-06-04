@@ -45,7 +45,9 @@ export function resolveThemeBaseHue(
 
 export function getPanelGlowHue(baseHue: number): number {
   const isWarm = baseHue < WARM_HUE_MAX || baseHue > WARM_HUE_MIN_WRAP;
-  const offset = isWarm ? PANEL_GLOW_HUE_OFFSET_WARM : PANEL_GLOW_HUE_OFFSET_COOL;
+  const offset = isWarm
+    ? PANEL_GLOW_HUE_OFFSET_WARM
+    : PANEL_GLOW_HUE_OFFSET_COOL;
 
   return normalizeHue(baseHue + offset);
 }

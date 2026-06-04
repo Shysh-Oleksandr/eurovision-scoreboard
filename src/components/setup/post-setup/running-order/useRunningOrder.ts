@@ -36,7 +36,8 @@ export const useRunningOrder = ({
     return [...baseOrder.filter((c) => currentCodes.includes(c)), ...newCodes];
   }, [savedRunningOrder, stageCountries]);
 
-  const [orderedCodes, setOrderedCodes] = useState<string[]>(initialOrderedCodes);
+  const [orderedCodes, setOrderedCodes] =
+    useState<string[]>(initialOrderedCodes);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -113,4 +114,3 @@ export const useRunningOrder = ({
     handleQuickSort,
   };
 };
-

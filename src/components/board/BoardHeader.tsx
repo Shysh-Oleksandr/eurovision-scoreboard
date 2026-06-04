@@ -1,3 +1,4 @@
+'use client';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, type JSX } from 'react';
 
@@ -10,7 +11,17 @@ import Button from '../common/Button';
 
 import { getWinnerCountry } from '@/state/scoreboard/helpers';
 
-const BoardHeader = (): JSX.Element | null => {
+type Props = {
+  revealActive?: boolean;
+  revealAnimationComplete?: boolean;
+  onBackToScoreboard?: () => void;
+};
+
+const BoardHeader = ({
+  revealActive,
+  revealAnimationComplete,
+  onBackToScoreboard,
+}: Props): JSX.Element | null => {
   const t = useTranslations('simulation');
 
   const {
@@ -42,6 +53,9 @@ const BoardHeader = (): JSX.Element | null => {
   const hideVotingHints = useGeneralStore(
     (state) => state.settings.hideVotingHints,
   );
+  const enableFinalReveal = useGeneralStore(
+    (state) => state.settings.enableFinalReveal,
+  );
 
   const viewedStage = eventStages.find((s) => s.id === viewedStageId);
   const winnerCountryFromStage = getWinnerCountry(
@@ -51,26 +65,55 @@ const BoardHeader = (): JSX.Element | null => {
 
   const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
 
+  const currentStage = getCurrentStage();
   const {
     isJuryVoting,
     isOver: isVotingOver,
     id: currentStageId,
-  } = getCurrentStage() || {};
+  } = currentStage || {};
 
   const votingCountry = getVotingCountry();
 
   const isAnotherStageDisplayed = currentStageId !== viewedStageId;
 
+  // Suppress "X points go to..." immediately when the final reveal is about to
+  // trigger: last stage, one country still unfinished, and it isn't already winning.
+  const suppressRevealLabel = useMemo(() => {
+    const unfinished =
+      currentStage?.countries.filter((c) => !c.isVotingFinished) ?? [];
+
+    if (unfinished.length !== 1) return false;
+    const [lastCountry] = unfinished;
+
+    if (!lastCountry) return false;
+    const maxOtherPoints = currentStage?.countries
+      .filter((c) => c.code !== lastCountry.code)
+      .reduce((max, c) => Math.max(max, c.points), 0);
+
+    return (
+      enableFinalReveal &&
+      revealTelevoteLowestToHighest &&
+      !isJuryVoting &&
+      !!currentStage?.isLastStage &&
+      lastCountry.points < (maxOtherPoints ?? 0)
+    );
+  }, [
+    enableFinalReveal,
+    revealTelevoteLowestToHighest,
+    isJuryVoting,
+    currentStage,
+  ]);
+
   const votingText = useMemo(() => {
     if (isVotingOver) return null;
 
     if (revealTelevoteLowestToHighest && !isJuryVoting) {
-      const pointsToShow = currentRevealTelevotePoints;
+      if (suppressRevealLabel) return null;
 
       return (
         <>
           <span className="font-medium">
-            {t('pointsGoTo', { count: pointsToShow })}
+            {t('pointsGoTo', { count: currentRevealTelevotePoints })}
           </span>
         </>
       );
@@ -99,6 +142,7 @@ const BoardHeader = (): JSX.Element | null => {
     votingPoints,
     votingCountry?.name,
     hideVotingHints,
+    suppressRevealLabel,
   ]);
 
   const winnerText = useMemo(() => {
@@ -129,6 +173,19 @@ const BoardHeader = (): JSX.Element | null => {
     viewedStage?.name,
   ]);
 
+  const eventLabel = `${contestName || 'Eurovision'} ${
+    contestYear || ''
+  }`.trim();
+
+  const teaserText = useMemo(
+    () =>
+      t.rich('winnerRevealTeaser', {
+        event: eventLabel,
+        span: (chunks) => <span className="font-semibold">{chunks}</span>,
+      }),
+    [t, eventLabel],
+  );
+
   const chooseRandomly = () => {
     if (isJuryVoting) {
       givePredefinedJuryPoint();
@@ -137,7 +194,13 @@ const BoardHeader = (): JSX.Element | null => {
     }
   };
 
-  const hasContent = winnerCountry || !isVotingOver;
+  const displayText =
+    revealActive && isVotingOver && !revealAnimationComplete
+      ? teaserText
+      : winnerText || votingText;
+
+  const hasContent =
+    winnerCountry || !isVotingOver || revealActive || revealAnimationComplete;
 
   return (
     <div
@@ -149,16 +212,18 @@ const BoardHeader = (): JSX.Element | null => {
         className="lg:text-2xl xs:text-xl text-lg text-white"
         style={{ textShadow: '0 0 10px rgba(0, 0, 0, 0.2)' }}
       >
-        {winnerText || votingText}
+        {displayText}
       </h3>
-      {!isVotingOver && (
+      {revealAnimationComplete ? (
+        <Button label={t('backToScoreboard')} onClick={onBackToScoreboard} />
+      ) : !isVotingOver ? (
         <Button
           variant="tertiary"
           label={t('random')}
           onClick={chooseRandomly}
           snowEffect="middle"
         />
-      )}
+      ) : null}
     </div>
   );
 };

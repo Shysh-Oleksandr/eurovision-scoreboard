@@ -58,7 +58,9 @@ function assignPointIdsForVoter(
   return result;
 }
 
-function sourcesForMode(mode: StageVotingMode): Array<'jury' | 'televote' | 'combined'> {
+function sourcesForMode(
+  mode: StageVotingMode,
+): Array<'jury' | 'televote' | 'combined'> {
   switch (mode) {
     case VM.JURY_AND_TELEVOTE:
       return ['jury', 'televote'];
@@ -79,13 +81,12 @@ function filterVotesForVoter(
   participantSet: Set<string>,
   voterCode: string,
 ): { countryCode: string; points: number }[] {
-  return decodeTuplesToPointValues(tuples, savedPoints)
-    .filter(
-      (x) =>
-        x.points > 0 &&
-        participantSet.has(x.countryCode) &&
-        x.countryCode !== voterCode,
-    );
+  return decodeTuplesToPointValues(tuples, savedPoints).filter(
+    (x) =>
+      x.points > 0 &&
+      participantSet.has(x.countryCode) &&
+      x.countryCode !== voterCode,
+  );
 }
 
 /**
@@ -97,9 +98,7 @@ export function applyDetailedPresetToStageVotes(
   currentPointsSystem: PointsItem[],
 ): Partial<StageVotes> {
   const participantSet = new Set(stage.countries.map((c) => c.code));
-  const voterSet = new Set(
-    (stage.votingCountries || []).map((v) => v.code),
-  );
+  const voterSet = new Set((stage.votingCountries || []).map((v) => v.code));
   const activeSources = new Set(sourcesForMode(stage.votingMode));
   const savedSources = new Set(sourcesForMode(payload.votingMode));
 
@@ -154,7 +153,9 @@ function fieldsForTotalsMode(
 /**
  * Clear-then-apply manual totals rows for current participants and voting mode.
  */
-export function hasAnyStageVotes(v: Partial<StageVotes> | null | undefined): boolean {
+export function hasAnyStageVotes(
+  v: Partial<StageVotes> | null | undefined,
+): boolean {
   if (!v) return false;
   for (const source of ['jury', 'televote', 'combined'] as const) {
     const byVoter = v[source];

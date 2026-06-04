@@ -21,7 +21,10 @@ import { api } from '@/api/client';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
 import { BaseCountry } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
-import { applyDocumentFontAlias, normalizeFontAlias } from '@/theme/fontAliases';
+import {
+  applyDocumentFontAlias,
+  normalizeFontAlias,
+} from '@/theme/fontAliases';
 import { resolveActiveFontAliasForGeneralState } from '@/theme/themeSpecifics';
 import {
   applyCustomTheme as applyCustomThemeUtil,
@@ -87,6 +90,9 @@ const DEFAULT_SETTINGS: Settings = {
   enableMinimalisticFlags: false,
   splitPointsSystem: false,
   hideVotingHints: false,
+  enableFinalReveal: true,
+  finalRevealAnimationSpeed: 1.0,
+  finalRevealLinearAnimation: false,
   overrideThemeFont: false,
   overrideThemeFontAlias: 'montserrat',
 };
@@ -173,6 +179,9 @@ interface Settings {
   enableMinimalisticFlags: boolean;
   hideVotingHints: boolean;
   splitPointsSystem: boolean;
+  enableFinalReveal: boolean;
+  finalRevealAnimationSpeed: number; // 0.5–1.5, default 1.0; divides phaseADuration
+  finalRevealLinearAnimation: boolean;
   /** When true, ignore the active theme's font and use `overrideThemeFontAlias`. */
   overrideThemeFont: boolean;
   overrideThemeFontAlias: string;

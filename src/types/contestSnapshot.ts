@@ -27,10 +27,22 @@ export interface ContestSnapshot {
     baseYear: number;
     isJuniorContest?: boolean;
     randomnessLevel?: number;
-    pointsSystem?: Array<{ id: number; value: number; showDouzePoints?: boolean }>;
+    pointsSystem?: Array<{
+      id: number;
+      value: number;
+      showDouzePoints?: boolean;
+    }>;
     splitPointsSystem?: boolean;
-    juryPointsSystem?: Array<{ id: number; value: number; showDouzePoints?: boolean }>;
-    televotePointsSystem?: Array<{ id: number; value: number; showDouzePoints?: boolean }>;
+    juryPointsSystem?: Array<{
+      id: number;
+      value: number;
+      showDouzePoints?: boolean;
+    }>;
+    televotePointsSystem?: Array<{
+      id: number;
+      value: number;
+      showDouzePoints?: boolean;
+    }>;
     countryOdds?: Array<[code: string, juryOdds: number, televoteOdds: number]>;
     stages: Array<{
       id: string;
@@ -43,9 +55,21 @@ export interface ContestSnapshot {
     }>;
   };
   simulation?: {
-    pointsSystem?: Array<{ id: number; value: number; showDouzePoints?: boolean }>;
-    juryPointsSystem?: Array<{ id: number; value: number; showDouzePoints?: boolean }>;
-    televotePointsSystem?: Array<{ id: number; value: number; showDouzePoints?: boolean }>;
+    pointsSystem?: Array<{
+      id: number;
+      value: number;
+      showDouzePoints?: boolean;
+    }>;
+    juryPointsSystem?: Array<{
+      id: number;
+      value: number;
+      showDouzePoints?: boolean;
+    }>;
+    televotePointsSystem?: Array<{
+      id: number;
+      value: number;
+      showDouzePoints?: boolean;
+    }>;
     stages: Array<{
       id: string;
       name: string;

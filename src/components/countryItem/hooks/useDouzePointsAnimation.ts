@@ -29,7 +29,8 @@ const useDouzePointsAnimation = (
 
     const shouldDelayForTeleport =
       !ignoreBoardTeleportDelay &&
-      boardAnimationMode === 'teleport' && isBoardTeleportAnimationRunning;
+      boardAnimationMode === 'teleport' &&
+      isBoardTeleportAnimationRunning;
 
     if (isDouzePoints && !shouldDelayForTeleport) {
       setShouldRender(true);

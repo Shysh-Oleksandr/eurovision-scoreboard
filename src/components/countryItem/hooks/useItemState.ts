@@ -89,8 +89,8 @@ export const useItemState = ({
         isDisabled
           ? ''
           : roundedCountryContainer
-            ? 'cursor-pointer'
-            : 'brighten-on-hover cursor-pointer'
+          ? 'cursor-pointer'
+          : 'brighten-on-hover cursor-pointer'
       }`;
     }
 
