@@ -33,6 +33,7 @@ export interface ContestSnapshot {
       showDouzePoints?: boolean;
     }>;
     splitPointsSystem?: boolean;
+    allowMultiplePointsToSameEntry?: boolean;
     juryPointsSystem?: Array<{
       id: number;
       value: number;

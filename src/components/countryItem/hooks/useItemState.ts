@@ -29,6 +29,9 @@ export const useItemState = ({
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
   );
+  const allowMultiplePointsToSameEntry = useGeneralStore(
+    (state) => state.settings.allowMultiplePointsToSameEntry,
+  );
 
   const { roundedCountryContainer } = useThemeSpecifics();
 
@@ -44,8 +47,16 @@ export const useItemState = ({
   );
 
   const isDisabled = useMemo(() => {
-    // Countries that have voted and voting hasn't finished yet are disabled
-    if (isVoted && !hasCountryFinishedVoting) return true;
+    // Countries that have voted and voting hasn't finished yet are disabled.
+    // Exception: when allowMultiplePointsToSameEntry is on during jury voting,
+    // already-scored entries must remain clickable so the user can award them again.
+    if (isVoted && !hasCountryFinishedVoting) {
+      if (
+        !(allowMultiplePointsToSameEntry && isJuryVoting && !isVotingCountry)
+      ) {
+        return true;
+      }
+    }
 
     // Current voting country during jury voting is disabled
     if (isVotingCountry) return true;
@@ -58,10 +69,10 @@ export const useItemState = ({
       if (revealTelevoteLowestToHighest) {
         // In reveal mode, all unfinished countries are clickable
         return isVoted;
-      } else {
-        // In normal televoting mode, all countries are disabled
-        return true;
       }
+
+      // In normal televoting mode, all countries are disabled
+      return true;
     }
 
     // During jury voting, all other countries are clickable
@@ -72,6 +83,7 @@ export const useItemState = ({
     isVotingCountry,
     isJuryVoting,
     revealTelevoteLowestToHighest,
+    allowMultiplePointsToSameEntry,
     country.code,
     votingCountryCode,
     isVotingOver,

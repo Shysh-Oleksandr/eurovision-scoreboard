@@ -907,6 +907,8 @@
       "pointsSystem": "System punktacji",
       "dragAndDropToReorder": "Przeciągnij i upuść, aby zmienić kolejność",
       "splitPointsSystem": "Oddzielny system punktacji jury / telewizji",
+      "allowMultiplePointsToSameEntry": "Pozwól na przyznanie punktów tym samym kraju wielokrotnie",
+      "allowMultiplePointsToSameEntryTooltip": "Kiedy włączone, kraj głosujący może przyznać wiele tokenów punktów do tego samego kraju. To symuluje system głosowania Eurovision przed 1975 (używany w 1957–1961, 1967–1970 i 1974), gdzie każda jury rozdawała dziesięć równych tokenów swobodnie.",
       "juryPointsSystem": "System punktacji jury",
       "televotePointsSystem": "System punktacji telewizji",
       "sparklesIconTooltip": "Ikona <span></span> wskazuje, że punkty będą animowane po przyznaniu krajowi. Kliknij, aby włączyć/wyłączyć.",

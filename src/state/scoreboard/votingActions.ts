@@ -472,6 +472,8 @@ export const createVotingActions: StateCreator<
     const state = get();
     const countriesStore = useCountriesStore.getState();
     const { pointsSystem } = useGeneralStore.getState();
+    const allowMultiple =
+      useGeneralStore.getState().settings.allowMultiplePointsToSameEntry;
     const currentStage = state.getCurrentStage();
     const votingPointsItem = pointsSystem[state.votingPointsIndex];
     const votingPoints = votingPointsItem.value;
@@ -503,19 +505,33 @@ export const createVotingActions: StateCreator<
         const voteToUpdate = allMatchingVotes[occurrences];
 
         if (voteToUpdate && voteToUpdate.countryCode !== countryCode) {
-          const originalCountryCode = voteToUpdate.countryCode;
           const voteForPointsIndex = votesForCountry.indexOf(voteToUpdate);
-
           const updatedVotes = [...votesForCountry];
-          const voteForNewCountryIndex = updatedVotes.findIndex(
-            (v) => v.countryCode === countryCode,
-          );
 
-          updatedVotes[voteForPointsIndex].countryCode = countryCode;
+          if (allowMultiple) {
+            // Duplicates allowed: reassign only this step's vote.
+            // Do NOT swap back — the clicked country may legitimately hold other votes.
+            updatedVotes[voteForPointsIndex] = {
+              ...updatedVotes[voteForPointsIndex],
+              countryCode,
+            };
+          } else {
+            const originalCountryCode = voteToUpdate.countryCode;
+            const voteForNewCountryIndex = updatedVotes.findIndex(
+              (v) => v.countryCode === countryCode,
+            );
 
-          if (voteForNewCountryIndex !== -1) {
-            updatedVotes[voteForNewCountryIndex].countryCode =
-              originalCountryCode;
+            updatedVotes[voteForPointsIndex] = {
+              ...updatedVotes[voteForPointsIndex],
+              countryCode,
+            };
+
+            if (voteForNewCountryIndex !== -1) {
+              updatedVotes[voteForNewCountryIndex] = {
+                ...updatedVotes[voteForNewCountryIndex],
+                countryCode: originalCountryCode,
+              };
+            }
           }
 
           newPredefinedJuryVotes = {
@@ -526,13 +542,16 @@ export const createVotingActions: StateCreator<
       }
     }
 
+    const isNextVotingCountry =
+      state.votingPointsIndex === pointsSystem.length - 1;
+
     const countriesWithPoints = currentStage.countries.filter(
       (country: Country) => country.lastReceivedPoints !== null,
     );
-    const shouldReset = countriesWithPoints.length === pointsSystem.length;
+    const shouldReset = allowMultiple
+      ? isNextVotingCountry
+      : countriesWithPoints.length === pointsSystem.length;
 
-    const isNextVotingCountry =
-      state.votingPointsIndex === pointsSystem.length - 1;
     const nextVotingCountryIndex =
       state.votingCountryIndex + (isNextVotingCountry ? 1 : 0);
     const isJuryVotingOver =
@@ -574,7 +593,8 @@ export const createVotingActions: StateCreator<
           ...baseCountry,
           juryPoints: baseCountry.juryPoints + votingPoints,
           points: baseCountry.points + votingPoints,
-          lastReceivedPoints: votingPoints,
+          lastReceivedPoints:
+            (baseCountry.lastReceivedPoints ?? 0) + votingPoints,
           showDouzePointsAnimation: votingPointsItem.showDouzePoints,
         };
       }

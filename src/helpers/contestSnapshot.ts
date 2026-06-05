@@ -267,6 +267,8 @@ export function buildContestSnapshotFromStores() {
   const settingsTelevotePointsSystem =
     general.settingsTelevotePointsSystem as unknown as PointsItem[];
   const splitPointsSystem = general.settings.splitPointsSystem;
+  const allowMultiplePointsToSameEntry =
+    general.settings.allowMultiplePointsToSameEntry;
 
   // Helper to create optimized points payload
   const createPointsPayload = (points: PointsItem[]) => {
@@ -360,6 +362,9 @@ export function buildContestSnapshotFromStores() {
         : {}),
       ...(setupPointsPayload ? { pointsSystem: setupPointsPayload } : {}),
       ...(splitPointsSystem ? { splitPointsSystem: true } : {}),
+      ...(allowMultiplePointsToSameEntry
+        ? { allowMultiplePointsToSameEntry: true }
+        : {}),
       ...(setupJuryPointsPayload
         ? { juryPointsSystem: setupJuryPointsPayload }
         : {}),
@@ -600,6 +605,8 @@ export async function applyContestSnapshotToStores(
       generalSettingsUpdate.settingsTelevotePointsSystem = settingsPointsSystem;
       generalSettingsUpdateSettings.splitPointsSystem = false;
     }
+    generalSettingsUpdateSettings.allowMultiplePointsToSameEntry =
+      !!snapshot.setup.allowMultiplePointsToSameEntry;
     generalSettingsUpdateSettings.randomnessLevel =
       snapshot.setup.randomnessLevel ?? DEFAULT_RANDOMNESS_LEVEL;
   }
@@ -638,6 +645,9 @@ export async function applyContestSnapshotToStores(
       );
       generalSettingsUpdateSettings.splitPointsSystem = false;
     }
+
+    generalSettingsUpdateSettings.allowMultiplePointsToSameEntry =
+      !!snapshot.setup.allowMultiplePointsToSameEntry;
 
     // Enable presentation mode if selected
     if (isPresentationMode) {

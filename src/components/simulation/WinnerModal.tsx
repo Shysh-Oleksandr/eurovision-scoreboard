@@ -10,7 +10,7 @@ import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const OPEN_DELAY_MS = 1400;
+const OPEN_DELAY_MS = 3000;
 const CLOSE_DURATION_MS = 280;
 const SPARKLE_COUNT = 22;
 
@@ -94,7 +94,7 @@ const WinnerModal = () => {
     const el = scoreRef.current;
     const target = toFixedIfDecimalFloat(winnerCountry.points);
     const startDelay = 1300;
-    const duration = 1800;
+    const duration = 3000;
 
     const timeoutId = setTimeout(() => {
       let start: number | null = null;

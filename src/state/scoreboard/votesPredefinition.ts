@@ -135,6 +135,7 @@ const generateVotesForSource = (
   oddsType: 'juryOdds' | 'televoteOdds',
   temperature: number,
   pointsSystem: PointsItem[],
+  allowMultiplePointsToSameEntry = false,
 ): Vote[] => {
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
@@ -147,19 +148,25 @@ const generateVotesForSource = (
     return [];
   }
 
-  const numPointsToAward = Math.min(pointsSystem.length, choices.length);
   const winners: string[] = [];
-  let remainingChoices = [...choices];
 
-  if (remainingChoices.length === 0) {
-    return [];
-  }
+  if (allowMultiplePointsToSameEntry) {
+    // Sample WITH replacement: the same country can receive multiple tokens.
+    for (let i = 0; i < pointsSystem.length; i += 1) {
+      const winnerId = rw(choices, temperature);
+      if (!winnerId) break;
+      winners.push(winnerId);
+    }
+  } else {
+    const numPointsToAward = Math.min(pointsSystem.length, choices.length);
+    let remainingChoices = [...choices];
 
-  while (winners.length < numPointsToAward && remainingChoices.length > 0) {
-    const winnerId = rw(remainingChoices, temperature);
+    while (winners.length < numPointsToAward && remainingChoices.length > 0) {
+      const winnerId = rw(remainingChoices, temperature);
 
-    winners.push(winnerId);
-    remainingChoices = remainingChoices.filter((c) => c.id !== winnerId);
+      winners.push(winnerId);
+      remainingChoices = remainingChoices.filter((c) => c.id !== winnerId);
+    }
   }
 
   const sortedPoints = [...pointsSystem].sort((a, b) => b.value - a.value);
@@ -180,6 +187,7 @@ export const predefineStageVotes = (
   randomnessLevel: number,
   juryPointsSystem: PointsItem[],
   televotePointsSystem: PointsItem[],
+  allowMultiplePointsToSameEntry = false,
 ): Partial<StageVotes> => {
   // Create a new set of odds with randomness "baked in" for this simulation.
   // This ensures that a country's "luck" is consistent across all voters.
@@ -248,6 +256,7 @@ export const predefineStageVotes = (
         'juryOdds',
         temperature,
         juryPointsSystem,
+        allowMultiplePointsToSameEntry,
       );
     }
   }

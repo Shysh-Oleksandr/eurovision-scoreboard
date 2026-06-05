@@ -902,6 +902,8 @@
       "pointsSystem": "Points System",
       "dragAndDropToReorder": "Drag and drop to reorder",
       "splitPointsSystem": "Separate jury / televote points system",
+      "allowMultiplePointsToSameEntry": "Allow points to the same entry multiple times",
+      "allowMultiplePointsToSameEntryTooltip": "When enabled, a voting country can award multiple point tokens to the same entry. This simulates the pre-1975 Eurovision voting system (used in 1957–1961, 1967–1970, and 1974), where each jury distributed ten equal tokens freely.",
       "juryPointsSystem": "Jury points system",
       "televotePointsSystem": "Televote points system",
       "sparklesIconTooltip": "The <span></span> icon indicates that the points will be animated when the country receives them. Click to toggle.",

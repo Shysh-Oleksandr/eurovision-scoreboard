@@ -193,9 +193,11 @@ export const useFinalStats = () => {
     const votes = votesForStage?.[type]?.[voterCode];
 
     if (!votes) return 0;
-    const vote = votes.find((v) => v.countryCode === participantCode);
+    const total = votes
+      .filter((v) => v.countryCode === participantCode)
+      .reduce((sum, v) => sum + v.points, 0);
 
-    return vote ? toFixedIfDecimalFloat(vote.points) : 0;
+    return total ? toFixedIfDecimalFloat(total) : 0;
   };
 
   const getCellPoints = (participantCode: string, voterCode: string) => {

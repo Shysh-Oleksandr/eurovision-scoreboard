@@ -22,6 +22,9 @@ export const useVoting = () => {
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
   );
+  const allowMultiplePointsToSameEntry = useGeneralStore(
+    (state) => state.settings.allowMultiplePointsToSameEntry,
+  );
 
   const MAX_COUNTRY_WITH_POINTS = pointsSystem.length;
 
@@ -48,8 +51,16 @@ export const useVoting = () => {
     }, [countries]);
 
   const hasCountryFinishedVoting = useMemo(
-    () => countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS && isJuryVoting,
-    [MAX_COUNTRY_WITH_POINTS, countriesWithPointsLength, isJuryVoting],
+    () =>
+      !allowMultiplePointsToSameEntry &&
+      countriesWithPointsLength === MAX_COUNTRY_WITH_POINTS &&
+      isJuryVoting,
+    [
+      allowMultiplePointsToSameEntry,
+      MAX_COUNTRY_WITH_POINTS,
+      countriesWithPointsLength,
+      isJuryVoting,
+    ],
   );
 
   const onClick = useCallback(

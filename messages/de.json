@@ -905,6 +905,8 @@
       "pointsSystem": "Punktesystem",
       "dragAndDropToReorder": "Ziehen und ablegen zum Neuordnen",
       "splitPointsSystem": "Separates Jury-/Televote-Punktesystem",
+      "allowMultiplePointsToSameEntry": "Punkte für dasselbe Land mehrmals vergeben",
+      "allowMultiplePointsToSameEntryTooltip": "Wenn aktiviert, kann ein Wählerland mehrere Punkte-Token für dasselbe Land vergeben. Dies simuliert das vor-1975-Eurovision-Wahlverfahren (verwendet in 1957–1961, 1967–1970 und 1974), bei dem jeder Jury zehn freie Token verteilte.",
       "juryPointsSystem": "Jury-Punktesystem",
       "televotePointsSystem": "Televote-Punktesystem",
       "sparklesIconTooltip": "Das <span></span>-Symbol zeigt an, dass die Punkte animiert werden. Klick zum Umschalten.",

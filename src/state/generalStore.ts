@@ -89,6 +89,7 @@ const DEFAULT_SETTINGS: Settings = {
   disableAllThemeAudio: false,
   enableMinimalisticFlags: false,
   splitPointsSystem: false,
+  allowMultiplePointsToSameEntry: false,
   hideVotingHints: false,
   enableFinalReveal: true,
   finalRevealAnimationSpeed: 1.0,
@@ -179,6 +180,7 @@ interface Settings {
   enableMinimalisticFlags: boolean;
   hideVotingHints: boolean;
   splitPointsSystem: boolean;
+  allowMultiplePointsToSameEntry: boolean;
   enableFinalReveal: boolean;
   finalRevealAnimationSpeed: number; // 0.5–1.5, default 1.0; divides phaseADuration
   finalRevealLinearAnimation: boolean;

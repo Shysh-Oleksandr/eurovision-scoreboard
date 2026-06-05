@@ -12,7 +12,9 @@ import {
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import Button from '@/components/common/Button';
+import { Checkbox } from '@/components/common/Checkbox';
 import Select from '@/components/common/Select';
+import { Tooltip } from '@/components/common/Tooltip';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 
 const SplitSectionHeader: React.FC<{
@@ -83,6 +85,9 @@ export const PointsSystemSelection = () => {
   const splitPointsSystem = useGeneralStore(
     (state) => state.settings.splitPointsSystem,
   );
+  const allowMultiplePointsToSameEntry = useGeneralStore(
+    (state) => state.settings.allowMultiplePointsToSameEntry,
+  );
   const setSettings = useGeneralStore((state) => state.setSettings);
 
   const t = useTranslations('settings.voting');
@@ -136,12 +141,22 @@ export const PointsSystemSelection = () => {
     setSettingsPointsSystem(newPoints);
   };
 
+  const handleAllowMultipleToggle = () => {
+    setSettings({
+      allowMultiplePointsToSameEntry: !allowMultiplePointsToSameEntry,
+    });
+  };
+
   const handlePredefinedSystemChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const { value } = e.target;
 
     if (value === 'custom') return;
+
+    setSettings({
+      allowMultiplePointsToSameEntry: value === 'old',
+    });
     setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
   };
 
@@ -236,12 +251,19 @@ export const PointsSystemSelection = () => {
     setSettings({ splitPointsSystem: !splitPointsSystem });
   };
 
+  const handleResetPredefinedSystem = () => {
+    setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP.default);
+    setSettings({
+      allowMultiplePointsToSameEntry: false,
+    });
+  };
+
   return (
     <div>
       <PointsSystemHeader
         currentSystem={currentSystem}
         onSystemChange={handlePredefinedSystemChange}
-        onReset={() => setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP.default)}
+        onReset={handleResetPredefinedSystem}
         splitPointsSystem={splitPointsSystem}
         onSplitToggle={handleSplitToggle}
       />
@@ -297,6 +319,23 @@ export const PointsSystemSelection = () => {
           onDouzePointsToggle={handleDouzePointsToggle}
         />
       )}
+      <div className="flex items-start gap-2 text-white mt-2">
+        <Tooltip
+          content={
+            <div className="font-medium">
+              <p>{t('allowMultiplePointsToSameEntryTooltip')}</p>
+            </div>
+          }
+          position="left"
+        />
+        <Checkbox
+          id="allow-multiple-points"
+          label={t('allowMultiplePointsToSameEntry')}
+          labelClassName="w-full !px-0 !pt-1 !items-start"
+          checked={allowMultiplePointsToSameEntry}
+          onChange={handleAllowMultipleToggle}
+        />
+      </div>
     </div>
   );
 };

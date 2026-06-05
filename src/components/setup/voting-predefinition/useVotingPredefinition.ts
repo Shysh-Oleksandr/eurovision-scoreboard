@@ -25,6 +25,9 @@ export const useVotingPredefinition = ({
   const splitPointsSystem = useGeneralStore(
     (s) => s.settings.splitPointsSystem,
   );
+  const allowMultiplePointsToSameEntry = useGeneralStore(
+    (s) => s.settings.allowMultiplePointsToSameEntry,
+  );
   const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
   const getStageVotingCountries = useCountriesStore(
     (s) => s.getStageVotingCountries,
@@ -103,6 +106,7 @@ export const useVotingPredefinition = ({
       randomnessLevel,
       pointsSystem,
       effectiveTelevoteSystem,
+      allowMultiplePointsToSameEntry,
     );
 
     setVotes(generated);
@@ -127,9 +131,58 @@ export const useVotingPredefinition = ({
       const nextVotes: Partial<StageVotes> = prev ? { ...prev } : {};
       const sourceMap: Record<string, any[]> = (nextVotes as any)[source] || {};
       const arr: any[] = [...(sourceMap[voterCode] || [])];
-      const idx = arr.findIndex((v) => v.countryCode === participantCode);
 
       const parsed = Number(rawValue);
+
+      // When multiple tokens per entry is enabled (jury only), the cell represents
+      // the total points to award to this participant. We clear all existing tokens
+      // for them and use a greedy subset-sum on the remaining pool to reach the total.
+      if (allowMultiplePointsToSameEntry && source === 'jury') {
+        const retained = arr.filter((v) => v.countryCode !== participantCode);
+
+        if (!rawValue || !Number.isFinite(parsed) || parsed <= 0) {
+          (nextVotes as any)[source] = {
+            ...sourceMap,
+            [voterCode]: retained,
+          };
+          return nextVotes;
+        }
+
+        const usedIds = new Set(retained.map((v) => v.pointsId as number));
+        const available = [...pointsSystem]
+          .filter((p) => !usedIds.has(p.id))
+          .sort((a, b) => b.value - a.value);
+
+        const chosen: typeof pointsSystem = [];
+        let remaining = parsed;
+        for (const p of available) {
+          if (p.value <= remaining) {
+            chosen.push(p);
+            remaining -= p.value;
+          }
+          if (remaining === 0) break;
+        }
+
+        if (remaining !== 0) {
+          // Exact total not achievable from the available pool — reject
+          return prev;
+        }
+
+        const newEntries = chosen.map((p) => ({
+          countryCode: participantCode,
+          points: p.value,
+          pointsId: p.id,
+          showDouzePointsAnimation: p.value === 12,
+        }));
+
+        (nextVotes as any)[source] = {
+          ...sourceMap,
+          [voterCode]: [...retained, ...newEntries],
+        };
+        return nextVotes;
+      }
+
+      const idx = arr.findIndex((v) => v.countryCode === participantCode);
 
       if (!rawValue || !Number.isFinite(parsed)) {
         if (idx !== -1) {
@@ -275,8 +328,10 @@ export const useVotingPredefinition = ({
     }
     const source = getActiveSource() || 'televote';
     const arr = votes?.[source]?.[voterCode] || [];
-    const found = arr.find((v: any) => v.countryCode === participantCode);
-    return found?.points || 0;
+    const total = arr
+      .filter((v: any) => v.countryCode === participantCode)
+      .reduce((acc: number, v: any) => acc + v.points, 0);
+    return total || 0;
   };
 
   const rankedCountries = (() => {

@@ -94,7 +94,11 @@ export const createPredefinitionActions: StateCreator<
     const {
       pointsSystem,
       televotePointsSystem,
-      settings: { randomnessLevel, splitPointsSystem },
+      settings: {
+        randomnessLevel,
+        splitPointsSystem,
+        allowMultiplePointsToSameEntry,
+      },
     } = useGeneralStore.getState();
 
     const votingCountries = getStageVotingCountries(stage.id);
@@ -110,6 +114,7 @@ export const createPredefinitionActions: StateCreator<
       randomnessLevel,
       pointsSystem,
       effectiveTelevoteSystem,
+      allowMultiplePointsToSameEntry,
     );
 
     set((state) => ({

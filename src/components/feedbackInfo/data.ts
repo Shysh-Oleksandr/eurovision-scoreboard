@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-06-05',
+    title:
+      'Added the Pre-1975 points system support',
+  },
+  {
     date: '2026-06-04',
     title:
       'Added the winner reveal animation (ESC 2026 style). Added a guidebook for the app. Small improvements',
@@ -397,9 +402,6 @@ export const WHATS_NEW = [
 export const UPCOMING_FEATURES = [
   {
     approximateDates: { start: '2026-06-05', end: '2026-06-07' },
-    title: 'Pre-1975 points system support',
-  },
-  {
     title: 'Different points system per stage',
   },
   {
