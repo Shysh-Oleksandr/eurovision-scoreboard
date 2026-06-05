@@ -246,7 +246,7 @@ export const WHATS_NEW = [
   {
     date: '2026-06-05',
     title:
-      'Added the Pre-1975 points system support',
+      'Added the Pre-1975 points system support. Added the heart flag icons for all world countries',
   },
   {
     date: '2026-06-04',

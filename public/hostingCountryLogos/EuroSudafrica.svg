@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="125.33"
+   height="131.45125"
+   viewBox="0 0 33.160229 34.77981"
+   version="1.1"
+   id="svg5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2">
+    <g
+       id="petal">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="#ffd700"
+         stroke-width="2"
+         id="line7" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="#ffd700"
+         id="circle9" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern" />
+    <g
+       id="petal-7">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="gold"
+         stroke-width="2"
+         id="line7-2" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="gold"
+         id="circle9-9" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-6" />
+    <clipPath
+       id="t">
+      <path
+         d="m0 0h63v63H0z"
+         id="path2988" />
+    </clipPath>
+    <g
+       id="petal-1">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="gold"
+         stroke-width="2"
+         id="line7-4" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="gold"
+         id="circle9-5" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-9" />
+    <g
+       id="petal-74">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="gold"
+         stroke-width="2"
+         id="line7-8" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="gold"
+         id="circle9-0" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-0" />
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-5" />
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-54" />
+  </defs>
+  <g
+     id="layer1">
+    <path
+       d="M 4.7682094,22.438631 25.103218,20.475251 15.146076,33.377463 Z"
+       id="path23"
+       style="fill:#001489;fill-opacity:1;stroke-width:0.140241" />
+    <path
+       d="M 30.743028,10.225144 26.22515,20.615492 4.3474851,22.578872 1.9633804,12.761971 Z"
+       id="path25"
+       style="fill:#f9f9f9;fill-opacity:1;stroke-width:0.140241" />
+    <path
+       d="M 3.9267608,7.4327967 9.9571427,4.4877264 15.005835,7.9937623 20.755733,2.3841047 28.889737,1.6828968 31.554325,10.377866 1.6828973,13.042454 Z"
+       id="path27"
+       style="fill:#e03c31;fill-opacity:1;stroke-width:0.140241" />
+    <path
+       id="path4276"
+       d="M 7.3485299,4.4465566 2.3378666,10.300448 0.56183116,17.365586 3.6423209,23.756822 8.5576543,29.537368 26.928546,15.799873 Z"
+       style="fill:#f9f9f9;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.0140241;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="fill:#007749;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.0140241;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 5.3203211,5.6771107 2.317488,10.34983 1.3809156,17.254922 3.4540437,22.563575 7.5825539,27.945505 23.301173,16.117227 Z"
+       id="path4272" />
+    <path
+       style="fill:#ffb81c;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.140241px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 1.4589236,10.422393 0.91286711,17.802922 3.2921124,24.186443 12.8871,17.028341 Z"
+       id="path4268" />
+    <path
+       style="fill:#0b0e0e;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.140241px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1.4589236,12.762634 -0.2730285,4.821381 1.0531089,5.01739 7.0207227,-5.333719 z"
+       id="path4264" />
+    <rect
+       style="fill:#007749;fill-opacity:1;stroke:none;stroke-width:0.0140241;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect4280"
+       width="16.203051"
+       height="5.8506021"
+       x="13.45161"
+       y="15.191699"
+       transform="matrix(0.9961947,-0.08715576,0,1,0,0)" />
+    <path
+       d="M 3.3664959,15.492612 C 3.4506408,7.9487449 7.3765598,5.58764 9.5145407,5.58764 c 2.9857403,0 4.2188833,2.2793442 4.4204103,3.2885213 0.201387,1.0083364 1.331452,1.8148647 1.694537,0.1608569 0.363366,-1.6540072 3.875853,-6.6976505 8.192905,-6.6976505 3.953687,0 5.323004,4.0772394 5.2045,7.54513 C 28.703356,19.325271 16.541478,26.860023 14.940622,31.617714 13.515208,28.736173 3.2659429,24.570862 3.3664959,15.492612 Z M 25.234765,0 C 21.684272,0 17.485303,2.6222344 14.943707,6.9799568 14.257927,5.4061675 11.8145,3.6911551 8.9099597,3.6911551 6.5694704,3.6911551 0,6.6163111 0,16.057365 0,28.241541 12.327363,30.74415 14.819453,34.53123 14.990689,34.791658 15.542258,34.988417 15.75276,34.366165 17.741244,28.497762 33.160229,21.867147 33.160229,9.9250272 33.160089,3.2276571 28.785117,0 25.234765,0 Z"
+       id="path29"
+       style="stroke-width:0.140241" />
+  </g>
+</svg>

@@ -59,13 +59,13 @@ export async function generateMetadata({
       description: t('description'),
       siteName: 'DouzePoints',
       locale: 'en_US',
-      images: ['https://cdn.douzepoints.app/general/new-og-image.png'],
+      images: ['https://cdn.douzepoints.app/general/og-image-2026.jpeg'],
     },
     twitter: {
       card: 'summary_large_image',
       title: t('title'),
       description: t('description'),
-      images: ['https://cdn.douzepoints.app/general/new-og-image.png'],
+      images: ['https://cdn.douzepoints.app/general/og-image-2026.jpeg'],
     },
     icons: {
       icon: [

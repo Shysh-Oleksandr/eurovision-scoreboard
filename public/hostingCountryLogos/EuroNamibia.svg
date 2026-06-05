@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="125.33"
+   height="131.45125"
+   viewBox="0 0 33.160229 34.77981"
+   version="1.1"
+   id="svg5"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2">
+    <g
+       id="petal">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="#ffd700"
+         stroke-width="2"
+         id="line7" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="#ffd700"
+         id="circle9" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern" />
+    <g
+       id="petal-7">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="gold"
+         stroke-width="2"
+         id="line7-2" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="gold"
+         id="circle9-9" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-6" />
+    <clipPath
+       id="t">
+      <path
+         d="m0 0h63v63H0z"
+         id="path2988" />
+    </clipPath>
+    <g
+       id="petal-1">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="gold"
+         stroke-width="2"
+         id="line7-4" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="gold"
+         id="circle9-5" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-9" />
+    <g
+       id="petal-74">
+      <line
+         x1="0"
+         y1="0"
+         x2="25"
+         y2="0"
+         stroke="gold"
+         stroke-width="2"
+         id="line7-8" />
+      <circle
+         cx="25"
+         cy="0"
+         r="5"
+         fill="gold"
+         id="circle9-0" />
+    </g>
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-0" />
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-5" />
+    <pattern
+       y="0"
+       x="0"
+       height="6"
+       width="6"
+       patternUnits="userSpaceOnUse"
+       id="EMFhbasepattern-54" />
+  </defs>
+  <g
+     id="layer1">
+    <path
+       d="M 0.6331901,18.853078 C 5.4708186,23.694633 10.314758,28.536048 15.146076,33.377463 20.615492,27.347081 26.084908,21.316699 31.554324,15.286317 30.853117,11.032373 30.15191,6.7782895 29.450702,2.5243459 26.599173,2.2905634 23.747504,2.0569212 20.895975,1.8231387 18.839053,3.9267603 16.782272,6.0303819 14.725351,8.1340035 13.416478,6.9653716 12.107464,5.7965994 10.798591,4.6279675 8.3903649,5.4959218 5.9822791,6.3638761 3.5740531,7.2318303 2.5937654,11.105579 1.6134778,14.979328 0.6331901,18.853078 Z"
+       id="path4"
+       style="fill:#002f6c;fill-opacity:1;stroke-width:0.140241" />
+    <path
+       style="fill:#009a44;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.140241px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 3.7751777,24.01288 15.148538,32.962408 23.352274,23.733206 32.488252,8.3512027 Z"
+       id="path4138" />
+    <path
+       d="M 4.8975729,24.590213 30.539803,6.5860703"
+       style="fill:none;fill-opacity:1;stroke:#f9f9f9;stroke-width:7.85352;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path4184" />
+    <path
+       id="path4164"
+       style="fill:none;fill-opacity:1;stroke:#c8102e;stroke-width:6.31086;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 4.8975729,24.590213 30.539803,6.5860703" />
+    <g
+       transform="matrix(0.39924571,-0.03492947,0,0.39924571,9.2259154,11.015293)"
+       id="g12"
+       style="fill:#ffcd00">
+      <!-- ty=(87*sqrt(13)-281)/2 -->
+      <g
+         id="r4">
+        <path
+           id="r"
+           d="M 0,10 1.552914,5.795555 h -3.105828 z" />
+        <!-- x2=6*sin(15deg); y2=6*cos(15deg) -->
+        <use
+           xlink:href="#r"
+           transform="rotate(90)"
+           id="use16"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%" />
+        <use
+           xlink:href="#r"
+           transform="scale(-1)"
+           id="use18"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%" />
+        <use
+           xlink:href="#r"
+           transform="rotate(-90)"
+           id="use20"
+           x="0"
+           y="0"
+           width="100%"
+           height="100%" />
+      </g>
+      <use
+         xlink:href="#r4"
+         transform="rotate(30)"
+         id="use22"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%" />
+      <use
+         xlink:href="#r4"
+         transform="rotate(60)"
+         id="use24"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%" />
+      <circle
+         r="5.5"
+         id="circle26"
+         cx="0"
+         cy="0"
+         style="stroke:#002f6c" />
+    </g>
+    <path
+       d="m 3.3728066,15.492612 c 0.084145,-7.5438674 4.0100638,-9.9049723 6.1480445,-9.9049723 2.9857399,0 4.2188829,2.2793441 4.4204099,3.2885215 0.201387,1.008336 1.331453,1.8148648 1.694538,0.160857 0.363365,-1.6540076 3.875852,-6.6976507 8.192905,-6.6976507 3.953686,0 5.323004,4.0772393 5.2045,7.5463918 C 28.703356,19.32527 16.541478,26.860022 14.940622,31.617713 13.515208,28.742483 3.2659427,24.57591 3.3728066,15.492612 Z M 25.234764,0 C 21.684272,0 17.485303,2.6222344 14.943707,6.9799567 14.257926,5.4061673 11.8145,3.6911547 8.9099594,3.6911547 6.56947,3.6911547 0,6.6163107 0,16.057364 0,28.241541 12.328625,30.744149 14.819453,34.531229 14.990688,34.791657 15.542258,34.988416 15.75276,34.366165 17.747554,28.504073 33.160229,21.867147 33.160229,9.925027 33.160088,3.2276567 28.785117,0 25.234764,0 Z"
+       id="path8"
+       style="stroke-width:0.140241" />
+  </g>
+</svg>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="LOGO_LAYER"
+   viewBox="232.76 97.88 125.33 131.4429"
+   width="125.33"
+   height="131.4429"
+   version="1.1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1762">
+    <style
+       id="style1757">.cls-1{stroke:#fff;}.cls-1,.cls-2,.cls-3,.cls-4{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:0px;}.cls-2{stroke:#edb92e;}.cls-5{fill:#f9f9f9;}.cls-6{fill:#fff;}.cls-7{fill:#edb92e;}.cls-8{fill:#c6363c;}.cls-9{fill:#0c4076;}.cls-3{stroke:#c6363c;}.cls-4{stroke:#1d1d1b;}.cls-4,.cls-10{opacity:1;}.cls-10{fill:#1d1d1b;}</style>
+    <filter
+       id="null"
+       x="0"
+       y="0"
+       width="1"
+       height="1">
+      <feBlend
+         mode="normal"
+         in="SourceGraphic"
+         in2="SourceGraphic"
+         id="feBlend1759" />
+    </filter>
+  </defs>
+  <g
+     id="g4373">
+    <path
+       class="cls-8"
+       d="m 344.286,141.67 c 1.067,-57.174 -43.899,-34.549 -55.248,-14.045 -4.793,-4.724 -9.99,-10.398 -21.28,-10.398 -8.03,0 -22.653,7.893 -23.153,35.973 0,0 99.614,-7.919 99.681,-11.53 z"
+       id="path1764"
+       style="fill:#fecb00;fill-opacity:1;filter:url(#null)"
+       transform="matrix(1.0557948,0,0,1.2437441,-17.260717,-29.173632)" />
+    <path
+       class="cls-9"
+       d="m 328.87,170.252 -78.579,9.102 c -4.015,0.905 36.512,40.725 39.135,39.414 1.587,0.317 33.678,-35.21 39.444,-48.516 z"
+       style="fill:#ea2839;fill-opacity:1;filter:url(#null)"
+       id="path1766"
+       transform="matrix(1.194611,0,0,1.0414375,-57.428672,-7.9291631)" />
+    <path
+       d="m 251.425,179.622 c -3.075,-1.072 -9.113,-23.443 -6.309,-27.419 l 97.788,-10.24 c 2.323,0.137 -12.612,29.056 -14.381,28.952 z"
+       style="fill:#34b233;fill-opacity:1;filter:url(#null)"
+       id="path1768"
+       transform="matrix(1.0622397,0,0,0.88984993,-18.611346,19.536654)" />
+    <g
+       transform="matrix(30.290121,-2.650042,0,30.290121,289.00162,167.62212)"
+       id="g2808"
+       style="fill:#f9f9f9;fill-opacity:1">
+      <polygon
+         id="pt"
+         points="-0.3249197,0 0,-1 0.3249197,0 "
+         fill="#ffffff"
+         style="fill:#f9f9f9;fill-opacity:1" />
+      <use
+         xlink:href="#pt"
+         transform="rotate(-144)"
+         id="use2800"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%"
+         style="fill:#f9f9f9;fill-opacity:1" />
+      <use
+         xlink:href="#pt"
+         transform="rotate(-72)"
+         id="use2802"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%"
+         style="fill:#f9f9f9;fill-opacity:1" />
+      <use
+         xlink:href="#pt"
+         transform="rotate(72)"
+         id="use2804"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%"
+         style="fill:#f9f9f9;fill-opacity:1" />
+      <use
+         xlink:href="#pt"
+         transform="rotate(144)"
+         id="use2806"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%"
+         style="fill:#f9f9f9;fill-opacity:1" />
+    </g>
+    <path
+       d="m328.12,97.88c-13.42,0-29.29,9.91-38.89,26.38-2.59-5.95-11.83-12.43-22.8-12.43-8.84,0-33.67,11.05-33.67,46.73,0,46.05,46.59,55.51,56.01,69.82.65.99,2.73,1.73,3.53-.62,7.51-22.18,65.79-47.24,65.79-92.37,0-25.31-16.53-37.51-29.95-37.51Zm14.33,37.36c-.12,3.61-.71,7.15-1.66,10.61-3.84,13.95-13.7,26.65-23.84,37.87-12.19,13.49-24.77,24.84-27.74,33.66-3.21-6.5-18.3-14.72-29.86-27.59-7.82-8.7-14.03-19.51-13.88-33.35,0-.18.01-.35.01-.54.5-28.08,15.19-36.9,23.22-36.9,11.28,0,15.94,8.61,16.71,12.43.76,3.81,5.03,6.86,6.4.61,1.37-6.25,14.65-25.31,30.96-25.31,14.94,0,20.12,15.41,19.67,28.52Z"
+       style=""
+       id="path2685" />
+  </g>
+</svg>
