@@ -699,7 +699,11 @@
     "bugReportDetailsItem4": "y cualquier detalle útil como capturas de pantalla o vídeos",
     "thankYou": "¡Gracias!",
     "datesAreApproximate": "Las fechas son aproximadas y pueden cambiar",
-    "translationIssueDescription": "Si has notado algún problema de traducción, por favor envíame un correo a"
+    "translationIssueDescription": "Si has notado algún problema de traducción, por favor envíame un correo a",
+    "donationCardTitle": "¿Te gusta DouzePoints?",
+    "donationCardIntro": "Hola, soy Oleksandr — un fan de Eurovisión y desarrollador de Ucrania. DouzePoints es un proyecto gratuito utilizado por miles de fans de Eurovisión de todo el mundo y lo construyo y mantengo enteramente yo.",
+    "donationCardSupport": "Si quieres apoyar el desarrollo futuro y ayudarme a seguir mejorando la plataforma, tu contribución significaría mucho para mí.",
+    "supportOnKoFi": "Apoyar en Ko-Fi"
   },
   "share": {
     "generating": "Generando...",
@@ -810,7 +814,7 @@
       },
       "moreOptions": {
         "title": "Más opciones de votación",
-        "content": "Opciones adicionales en Ajustes → Votación y la cabecera de simulación:<list><item><strong>Modo de pantalla dividida para la clasificación</strong> — un momento estilo ESC 2025 donde varios candidatos aparecen lado a lado y eliges uno para clasificarlo. Configura 2–6 candidatos por revelación y si el último clasificado también usa la pantalla dividida.</item><item><strong>Orden del televoto</strong> — configúralo de menor a mayor para anunciar resultados del televoto de menos a más puntos, como en ESC 2016–2018.</item><item><strong>Agrupar votación aleatoria del jurado</strong> — el botón « Votar aleatoriamente » otorga puntos en lotes realistas (1–8+10 juntos, o solo 12) en lugar de un valor a la vez.</item><item><strong>Deshacer y Reiniciar</strong> — Deshacer retrocede hasta 100 acciones; Reiniciar restablece toda la simulación.</item></list>"
+        "content": "Opciones adicionales en Ajustes → Votación y la cabecera de simulación:<list><item><strong>Modo de pantalla dividida para la clasificación</strong> — un momento estilo ESC 2025 donde varios candidatos aparecen lado a lado y eliges uno para clasificarlo. Configura 2–6 candidatos por revelación y si el último clasificado también usa la pantalla dividida.</item><item><strong>Orden del televoto</strong> — configúralo de menor a mayor para anunciar resultados del televoto de menos a más puntos, como en ESC 2016–2018.</item><item><strong>Agrupar votación aleatoria del jurado</strong> — el botón « Votar aleatoriamente » otorga puntos en lotes realistas (1–8+10 juntos, o solo 12) en lugar de un valor a la vez.</item><item><strong>Deshacer y Reiniciar</strong> — Deshacer retrocede hasta 100 acciones; Reiniciar restablece toda la simulación.</item><item><strong>Puntos para la misma entrada múltiples veces</strong> — permite a un país votante otorgar múltiples tokens de puntos a la misma entrada. Esto simula el sistema de votación de Eurovisión antes de 1975, donde cada jurado distribuía diez tokens iguales libremente.</item></list>"
       }
     },
     "themes": {

@@ -701,7 +701,11 @@
     "bugReportDetailsItem4": "et tout détail utile comme des captures d’écran ou vidéos",
     "thankYou": "Merci !",
     "datesAreApproximate": "Les dates sont approximatives et peuvent changer",
-    "translationIssueDescription": "Si vous avez remarqué un problème de traduction, contactez-moi à"
+    "translationIssueDescription": "Si vous avez remarqué un problème de traduction, contactez-moi à",
+    "donationCardTitle": "Vous appréciez DouzePoints ?",
+    "donationCardIntro": "Bonjour, je suis Oleksandr — un fan d'Eurovision et développeur originaire d'Ukraine. DouzePoints est un projet gratuit utilisé par des milliers de fans d'Eurovision dans le monde entier, entièrement conçu et maintenu par moi.",
+    "donationCardSupport": "Si vous souhaitez soutenir le développement futur et m'aider à continuer d'améliorer la plateforme, votre contribution compterait énormément pour moi.",
+    "supportOnKoFi": "Soutenir sur Ko-Fi"
   },
   "share": {
     "generating": "Génération...",
@@ -812,7 +816,7 @@
       },
       "moreOptions": {
         "title": "Plus d’options de vote",
-        "content": "Options supplémentaires dans Paramètres → Vote et l’en-tête de simulation :<list><item><strong>Dévoilement de la qualification en split-screen</strong> — un moment de style ESC 2025 où plusieurs candidats apparaissent côte à côte et vous en choisissez un pour le qualifier. Configurez 2–6 candidats par révélation, et si le dernier qualifié utilise aussi le split-screen.</item><item><strong>Ordre d’annonce du télévote</strong> — réglez sur du plus bas au plus haut pour annoncer les résultats du télévote du moins au plus de points, comme à l’ESC 2016–2018.</item><item><strong>Grouper le vote aléatoire du jury</strong> — le bouton « Voter aléatoirement » attribue les points par lots réalistes (1–8+10 ensemble, ou juste 12) au lieu d’une valeur à la fois.</item><item><strong>Annuler et Redémarrer</strong> — Annuler revient en arrière jusqu’à 100 actions ; Redémarrer réinitialise toute la simulation.</item></list>"
+        "content": "Options supplémentaires dans Paramètres → Vote et l’en-tête de simulation :<list><item><strong>Dévoilement de la qualification en split-screen</strong> — un moment de style ESC 2025 où plusieurs candidats apparaissent côte à côte et vous en choisissez un pour le qualifier. Configurez 2–6 candidats par révélation, et si le dernier qualifié utilise aussi le split-screen.</item><item><strong>Points pour la même entrée multiple fois</strong> — permet à un pays votant d’attribuer plusieurs jetons de points à la même entrée. Cela simule le système de vote de l’Eurovision avant 1975, où chaque jury distribuait dix jetons égaux librement.</item><item><strong>Ordre d’annonce du télévote</strong> — réglez sur du plus bas au plus haut pour annoncer les résultats du télévote du moins au plus de points, comme à l’ESC 2016–2018.</item><item><strong>Grouper le vote aléatoire du jury</strong> — le bouton « Voter aléatoirement » attribue les points par lots réalistes (1–8+10 ensemble, ou juste 12) au lieu d’une valeur à la fois.</item><item><strong>Annuler et Redémarrer</strong> — Annuler revient en arrière jusqu’à 100 actions ; Redémarrer réinitialise toute la simulation.</item></list>"
       }
     },
     "themes": {

@@ -336,7 +336,7 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   const containerClass = `absolute overflow-hidden ${
     activeDouzePointsAnimationMode === 'heartsGrid'
       ? flagOverlayOffsetClassName
-      : 'left-0'
+      : 'left-0 bg-countryItem-douzePointsBg'
   } right-0 top-0 bottom-0 z-40 flex justify-center items-center opacity-0`;
   const specialStyle = getSpecialBackgroundStyle(
     containerClass,

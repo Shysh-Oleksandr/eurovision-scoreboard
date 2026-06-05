@@ -701,7 +701,11 @@
     "bugReportDetailsItem4": "e eventuali dettagli utili come screenshot o video",
     "thankYou": "Grazie!",
     "datesAreApproximate": "Le date sono indicative e potrebbero cambiare",
-    "translationIssueDescription": "Se noti problemi di traduzione, comunicamelo via email a"
+    "translationIssueDescription": "Se noti problemi di traduzione, comunicamelo via email a",
+    "donationCardTitle": "Ti piace DouzePoints?",
+    "donationCardIntro": "Ciao, sono Oleksandr — un fan dell'Eurovision e sviluppatore dall'Ucraina. DouzePoints è un progetto gratuito usato da migliaia di fan dell'Eurovision in tutto il mondo, interamente creato e mantenuto da me.",
+    "donationCardSupport": "Se vorresti sostenere lo sviluppo futuro e aiutarmi a continuare a migliorare la piattaforma, il tuo contributo significherebbe molto per me.",
+    "supportOnKoFi": "Sostieni su Ko-Fi"
   },
   "share": {
     "generating": "Generazione in corso...",
@@ -812,7 +816,7 @@
       },
       "moreOptions": {
         "title": "Altre opzioni di votazione",
-        "content": "Opzioni aggiuntive in Impostazioni → Votazione e nell'intestazione simulazione:<list><item><strong>Rivelazione qualificati in split-screen</strong> — un momento stile ESC 2025 in cui diversi candidati compaiono affiancati e ne scegli uno da qualificare. Configura 2–6 candidati per rivelazione e se l'ultimo qualificato usa anche lo split-screen.</item><item><strong>Ordine rivelazione televoto</strong> — imposta dal più basso al più alto per annunciare i risultati del televoto dal minor numero di punti al maggiore, come in ESC 2016–2018.</item><item><strong>Raggruppa votazioni giuria casuali</strong> — il pulsante « Vota casualmente » assegna punti in batch realistici (1–8+10 insieme, o solo 12) invece che un valore alla volta.</item><item><strong>Annulla e Riavvia</strong> — Annulla torna indietro fino a 100 azioni; Riavvia resetta l'intera simulazione.</item></list>"
+        "content": "Opzioni aggiuntive in Impostazioni → Votazione e nell'intestazione simulazione:<list><item><strong>Rivelazione qualificati in split-screen</strong> — un momento stile ESC 2025 in cui diversi candidati compaiono affiancati e ne scegli uno da qualificare. Configura 2–6 candidati per rivelazione e se l'ultimo qualificato usa anche lo split-screen.</item><item><strong>Punti per la stessa voce multiple volte</strong> — permette a un paese votante di assegnare più token di punti alla stessa voce. Questo simula il sistema di voto di Eurovisione prima del 1975, dove ogni giuria distribuiva dieci token uguali liberamente.</item><item><strong>Ordine rivelazione televoto</strong> — imposta dal più basso al più alto per annunciare i risultati del televoto dal minor numero di punti al maggiore, come in ESC 2016–2018.</item><item><strong>Raggruppa votazioni giuria casuali</strong> — il pulsante « Vota casualmente » assegna punti in batch realistici (1–8+10 insieme, o solo 12) invece che un valore alla volta.</item><item><strong>Annulla e Riavvia</strong> — Annulla torna indietro fino a 100 azioni; Riavvia resetta l'intera simulazione.</item></list>"
       }
     },
     "themes": {

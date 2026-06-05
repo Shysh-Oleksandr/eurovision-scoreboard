@@ -701,7 +701,11 @@
     "bugReportDetailsItem4": "oraz wszelkie przydatne informacje, jak zrzuty ekranu czy wideo",
     "thankYou": "Dziękujemy!",
     "datesAreApproximate": "Daty są przybliżone i mogą ulec zmianie",
-    "translationIssueDescription": "Jeśli zauważyłeś problemy z tłumaczeniem, proszę daj znać, wysyłając e-mail na"
+    "translationIssueDescription": "Jeśli zauważyłeś problemy z tłumaczeniem, proszę daj znać, wysyłając e-mail na",
+    "donationCardTitle": "Podoba Ci się DouzePoints?",
+    "donationCardIntro": "Cześć, jestem Oleksandr — fan Eurowizji i programista z Ukrainy. DouzePoints to darmowy projekt, z którego korzystają tysiące fanów Eurowizji na całym świecie, a ja go w całości tworzę i utrzymuję.",
+    "donationCardSupport": "Jeśli chcesz wesprzeć dalszy rozwój i pomóc mi w dalszym ulepszaniu platformy, Twoja wpłata wiele dla mnie znaczy.",
+    "supportOnKoFi": "Wesprzyj na Ko-Fi"
   },
   "share": {
     "generating": "Generowanie...",
@@ -812,7 +816,7 @@
       },
       "moreOptions": {
         "title": "Więcej opcji głosowania",
-        "content": "Dodatkowe opcje w Ustawienia → Głosowanie i nagłówku symulacji:<list><item><strong>Tryb ujawniania kwalifikantów w split-screen</strong> — moment w stylu ESC 2025, gdy kilku kandydatów pojawia się obok siebie i wybierasz jednego do kwalifikacji. Skonfiguruj 2–6 kandydatów na ujawnienie i czy ostatni kwalifikant też używa split-screen.</item><item><strong>Kolejność ujawniania televote</strong> — ustaw od najmniejszych do największych, aby ogłaszać wyniki televote od najmniejszej do największej liczby punktów, jak w ESC 2016–2018.</item><item><strong>Grupuj losowe głosowanie jury</strong> — « Głosuj losowo » przyznaje punkty w realistycznych partiach (1–8+10 razem lub tylko 12) zamiast pojedynczo.</item><item><strong>Cofnij i Restart</strong> — Cofnij cofa do 100 akcji; Restart resetuje całą symulację.</item></list>"
+        "content": "Dodatkowe opcje w Ustawienia → Głosowanie i nagłówku symulacji:<list><item><strong>Tryb ujawniania kwalifikantów w split-screen</strong> — moment w stylu ESC 2025, gdy kilku kandydatów pojawia się obok siebie i wybierasz jednego do kwalifikacji. Skonfiguruj 2–6 kandydatów na ujawnienie i czy ostatni kwalifikant też używa split-screen.</item><item><strong>Punkty dla tej samej wpisu wiele razy</strong> — umożliwia państwu głosującemu przyznawanie wielu tokenów punktów do tej samej wpisu. To symuluje system głosowania Eurovision przed 1975 rokiem, w którym każda jury rozdawała dziesięć równych tokenów całkowicie swobodnie.</item><item><strong>Kolejność ujawniania televote</strong> — ustaw od najmniejszych do największych, aby ogłaszać wyniki televote od najmniejszej do największej liczby punktów, jak w ESC 2016–2018.</item><item><strong>Grupuj losowe głosowanie jury</strong> — « Głosuj losowo » przyznaje punkty w realistycznych partiach (1–8+10 razem lub tylko 12) zamiast pojedynczo.</item><item><strong>Cofnij i Restart</strong> — Cofnij cofa do 100 akcji; Restart resetuje całą symulację.</item></list>"
       }
     },
     "themes": {

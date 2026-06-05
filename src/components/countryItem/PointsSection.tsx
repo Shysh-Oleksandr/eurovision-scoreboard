@@ -68,6 +68,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
   const isTransparent = pointsContainerShape === 'transparent';
   const pointsRef = useRef<HTMLHeadingElement | null>(null);
   const previousPointsRef = useRef<number | null>(null);
+  const previousPointsLayoutKeyRef = useRef(pointsLayoutKey);
   const roundedPointsRowRef = useRef<HTMLDivElement | null>(null);
   const roundedPointsTrackRef = useRef<HTMLDivElement | null>(null);
   const currentPoints = useMemo(() => {
@@ -145,7 +146,9 @@ const PointsSection: React.FC<PointsSectionProps> = ({
 
   useLayoutEffect(() => {
     if (!pointsRef.current || shouldShowNQLabel || !pointsLayoutKey) return;
+    if (previousPointsLayoutKeyRef.current === pointsLayoutKey) return;
 
+    previousPointsLayoutKeyRef.current = pointsLayoutKey;
     pointsRef.current.textContent = String(currentPoints);
     previousPointsRef.current = currentPoints;
   }, [pointsLayoutKey, currentPoints, shouldShowNQLabel]);

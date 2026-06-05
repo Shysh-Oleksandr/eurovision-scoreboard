@@ -696,7 +696,11 @@
     "bugReportDetailsItem4": "and any helpful details like screenshots or videos",
     "thankYou": "Thank you!",
     "datesAreApproximate": "The dates are approximate and may change",
-    "translationIssueDescription": "If you noticed some translation issues, please let me know by sending an email to"
+    "translationIssueDescription": "If you noticed some translation issues, please let me know by sending an email to",
+    "donationCardTitle": "Enjoying DouzePoints?",
+    "donationCardIntro": "Hi, I'm Oleksandr — a Eurovision fan and developer from Ukraine. DouzePoints is a free project used by thousands of Eurovision fans around the world and is built and maintained entirely by me.",
+    "donationCardSupport": "If you'd like to support future development and help me continue improving the platform, your contribution would mean a lot to me.",
+    "supportOnKoFi": "Support on Ko-Fi"
   },
   "share": {
     "generating": "Generating...",
@@ -807,7 +811,7 @@
       },
       "moreOptions": {
         "title": "More Voting Options",
-        "content": "Additional options in Settings → Voting and the simulation header:<list><item><strong>Split screen qualifier reveal</strong> — an ESC 2025-style moment where several candidates appear side-by-side and you click one to qualify them. Configure 2–6 candidates per reveal, and whether the last qualifier also uses the split screen.</item><item><strong>Televote reveal order</strong> — set to lowest-to-highest to announce televote results from fewest to most points, as in ESC 2016–2018.</item><item><strong>Group random jury voting</strong> — the 'Vote randomly' button awards points in realistic batches (1–8+10 together, or just 12) instead of one value at a time.</item><item><strong>Undo and Restart</strong> — Undo steps back up to 100 actions; Restart resets the full simulation.</item></list>"
+        "content": "Additional options in Settings → Voting and the simulation header:<list><item><strong>Split screen qualifier reveal</strong> — an ESC 2025-style moment where several candidates appear side-by-side and you click one to qualify them. Configure 2–6 candidates per reveal, and whether the last qualifier also uses the split screen.</item><item><strong>Televote reveal order</strong> — set to lowest-to-highest to announce televote results from fewest to most points, as in ESC 2016–2018.</item><item><strong>Allow points to the same entry multiple times</strong> — enables a voting country to award multiple point tokens to the same entry. This simulates the pre-1975 Eurovision voting system where each jury distributed ten equal tokens freely.</item><item><strong>Group random jury voting</strong> — the 'Vote randomly' button awards points in realistic batches (1–8+10 together, or just 12) instead of one value at a time.</item><item><strong>Undo and Restart</strong> — Undo steps back up to 100 actions; Restart resets the full simulation.</item></list>"
       }
     },
     "themes": {

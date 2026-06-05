@@ -246,7 +246,7 @@ export const WHATS_NEW = [
   {
     date: '2026-06-05',
     title:
-      'Added the Pre-1975 points system support. Added the heart flag icons for all world countries',
+      'Added the Pre-1975 points system support. Added the heart flag icons for all world countries. Added a donation option. Bug fixes',
   },
   {
     date: '2026-06-04',
@@ -401,7 +401,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-06-05', end: '2026-06-07' },
+    approximateDates: { start: '2026-06-06', end: '2026-06-07' },
     title: 'Different points system per stage',
   },
   {

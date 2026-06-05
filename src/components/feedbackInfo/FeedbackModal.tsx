@@ -1,4 +1,5 @@
-import { useLocale, useTranslations } from 'next-intl';
+import { Coffee } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
@@ -9,6 +10,7 @@ import Tabs from '../common/tabs/Tabs';
 import { UPCOMING_FEATURES, WHATS_NEW } from './data';
 import UpdateList from './UpdateList';
 
+import { FilledHeartIcon } from '@/assets/icons/FilledHeartIcon';
 import GitHubIcon from '@/assets/icons/GitHubIcon';
 
 const FeedbackModal = ({
@@ -20,7 +22,7 @@ const FeedbackModal = ({
   setShowModal: (show: boolean) => void;
   onLoaded: () => void;
 }) => {
-  const locale = useLocale();
+  // const locale = useLocale();
   const t = useTranslations('feedbackInfo');
   const [activeTab, setActiveTab] = useState('feedback');
   const setLastSeenUpdate = useGeneralStore((state) => state.setLastSeenUpdate);
@@ -58,25 +60,25 @@ const FeedbackModal = ({
 
   const tabs = getTabs(shouldShowNewChangesIndicator);
 
-  const translationIssueTemplate = `
-    Language: ${locale}
+  // const translationIssueTemplate = `
+  //   Language: ${locale}
 
-    Wrong translation:
-    - 
+  //   Wrong translation:
+  //   -
 
-    Correct translation:
-    - 
+  //   Correct translation:
+  //   -
 
-    Reason:
-    - 
-  `;
+  //   Reason:
+  //   -
+  // `;
 
   return (
     <Modal
       isOpen={showModal}
       onClose={() => setShowModal(false)}
       containerClassName="!w-[min(100%,650px)]"
-      contentClassName="pb-2 xs:!pt-6 !pt-4 sm:!px-12 xs:!px-8 !px-6 text-white sm:h-[50vh] h-[55vh] narrow-scrollbar"
+      contentClassName="pb-2 !pt-4 xs:!px-8 !px-6 text-white sm:h-[51vh] h-[55vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       withBlur
       topContent={
@@ -91,10 +93,10 @@ const FeedbackModal = ({
         <ModalBottomCloseButton onClose={() => setShowModal(false)} />
       }
     >
-      <div className="lg:text-lg sm:text-base text-base font-medium">
+      <div className="lg:text-lg sm:text-base text-base">
         {activeTab === 'feedback' && (
           <div className="lg:pt-2">
-            <p className="mb-2 font-semibold">{t('foundBug')}</p>
+            <p className="mb-2 font-medium">{t('foundBug')}</p>
 
             <p className="mb-3">
               {t('openIssueOnGitHub')}{' '}
@@ -102,7 +104,7 @@ const FeedbackModal = ({
                 href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                className="text-primary-300 hover:text-primary-400 underline font-medium"
               >
                 <GitHubIcon className="w-5 h-5 inline-block mr-1 mb-1" />
                 GitHub
@@ -110,15 +112,12 @@ const FeedbackModal = ({
               {t('orEmailMe')}{' '}
               <a
                 href="mailto:sasha.shysh23@gmail.com"
-                className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                className="text-primary-300 hover:text-primary-400 underline font-medium"
               >
                 sasha.shysh23@gmail.com
               </a>
             </p>
-            <div className="mb-3 sm:gap-3 gap-2 flex items-center">
-              {/* <div className="text-primary-300 font-semibold tracking-wide bg-primary-800 px-2 py-1 rounded-md text-sm">
-                NEW
-              </div> */}
+            {/* <div className="mb-3 sm:gap-3 gap-2 flex items-center">
               <p>
                 {t.rich('gitHubDiscussions', {
                   a: (chunks) => (
@@ -126,34 +125,39 @@ const FeedbackModal = ({
                       href="https://github.com/Shysh-Oleksandr/eurovision-scoreboard/discussions"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                      className="text-primary-300 hover:text-primary-400 underline font-medium"
                     >
                       {chunks}
                     </a>
                   ),
                 })}
               </p>
-            </div>
-            <div className="mb-4">
-              {t('bugReportDetails')}
-              <br />
-              <ul className="list-disc list-inside">
-                <li>{t('bugReportDetailsItem1')}</li>
-                <li>{t('bugReportDetailsItem2')}</li>
-                <li>{t('bugReportDetailsItem3')}</li>
-                <li>{t('bugReportDetailsItem4')}</li>
-              </ul>
-            </div>
-            <p className="mb-2 font-semibold">
-              {t('translationIssueDescription')}{' '}
+            </div> */}
+            {/* Divider */}
+            <div className="h-px bg-white/10 my-5" />
+
+            <div className="border border-white/10 border-solid rounded-xl bg-primary-800/60 pt-[18px] px-5 pb-5">
+              <div className="flex items-center gap-2 mb-[11px]">
+                <FilledHeartIcon className="w-6 h-6 flex-shrink-0 text-[#FF5E5B]" />
+                <span className="font-bold">{t('donationCardTitle')}</span>
+              </div>
+              <p className="text-white/70 text-base leading-[1.70] mb-[7px]">
+                {t('donationCardIntro')}
+              </p>
+              <p className="text-white/70 text-base leading-[1.70] mb-[17px]">
+                {t('donationCardSupport')}
+              </p>
               <a
-                href={`mailto:sasha.shysh23@gmail.com?subject=Translation Issue&body=${translationIssueTemplate}`}
-                className="text-primary-300 hover:text-primary-400 underline font-semibold"
+                href="https://ko-fi.com/douzepoints"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-[9px] rounded-[9px] px-5 py-[10px] text-white text-[13px] font-bold tracking-[0.09em] uppercase whitespace-nowrap hover:opacity-[0.88] transition-opacity"
+                style={{ backgroundColor: '#FF5E5B' }}
               >
-                sasha.shysh23@gmail.com
+                <Coffee className="w-5 h-5" />
+                {t('supportOnKoFi')}
               </a>
-            </p>
-            <p>{t('thankYou')}</p>
+            </div>
           </div>
         )}
 
