@@ -7,6 +7,7 @@ interface CollapsibleSectionProps {
   children?: React.ReactNode;
   isExpanded?: boolean;
   onToggle?: () => void;
+  onExpand?: () => void;
   defaultExpanded?: boolean;
   extraContent?: React.ReactNode;
   headerClassName?: string;
@@ -17,12 +18,16 @@ interface CollapsibleSectionProps {
   isChildSection?: boolean;
 }
 
-export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
+export const CollapsibleSection: React.FC<
+  CollapsibleSectionProps & { ref?: React.Ref<HTMLDivElement> }
+> = ({
   children,
   title,
   isExpanded: controlledIsExpanded,
   onToggle,
+  onExpand,
   defaultExpanded = false,
+  ref,
   extraContent,
   headerClassName = '',
   titleClassName = '',
@@ -46,13 +51,21 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   const handleToggle = () => {
     if (onToggle) {
       onToggle();
-    } else {
-      setInternalIsExpanded((prev) => !prev);
+
+      return;
+    }
+
+    const nextExpanded = !isExpanded;
+
+    setInternalIsExpanded(nextExpanded);
+    if (nextExpanded) {
+      onExpand?.();
     }
   };
 
   return (
     <div
+      ref={ref}
       className={`rounded-lg ${
         isChildSection
           ? 'bg-gradient-to-bl bg-primary-900 from-primary-800 to-primary-700/50'

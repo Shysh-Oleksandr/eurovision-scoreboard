@@ -55,9 +55,12 @@ Next.js App Router. Main app lives under `app/(main)/`. Page-level React compone
 ### Docs
 
 Read `docs/` before touching non-obvious subsystems:
+- `general-app-features-overview.md`
+- `final-televote-reveal.md`
 - `running-order-and-tiebreaking.md`
 - `contests-leaderboard-and-entry-stats.md`
 - `theme-animations-and-specifics.md`
+- `rounded-country-layout-and-2026-theme.md`
 - `USER_DATA_CLEARING.md`
 
 ## Code Style

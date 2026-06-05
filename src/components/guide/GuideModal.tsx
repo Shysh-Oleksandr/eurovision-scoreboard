@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { CollapsibleSection } from '../common/CollapsibleSection';
 import Modal from '../common/Modal/Modal';
@@ -70,6 +70,16 @@ const GuideModal = ({
 }) => {
   const t = useTranslations('guide');
   const [activeTab, setActiveTab] = useState('start');
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const scrollToSection = (key: string) => {
+    setTimeout(() => {
+      sectionRefs.current[key]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }, 400);
+  };
 
   useEffect(() => {
     onLoaded();
@@ -108,7 +118,11 @@ const GuideModal = ({
         {TAB_SECTIONS[activeTab]?.map((key) => (
           <CollapsibleSection
             key={key}
+            ref={(element) => {
+              sectionRefs.current[key] = element;
+            }}
             defaultExpanded={activeTab === 'start' && key === 'gettingStarted'}
+            onExpand={() => scrollToSection(key)}
             title={t(`${activeTab}.${key}.title` as Parameters<typeof t>[0])}
           >
             <div className="text-sm sm:text-base text-white/90 leading-relaxed">
