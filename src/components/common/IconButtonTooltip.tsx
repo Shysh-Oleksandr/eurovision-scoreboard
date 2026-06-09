@@ -1,6 +1,12 @@
 'use client';
 
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, {
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 
 import { useTouchDevice } from '@/hooks/useTouchDevice';
@@ -14,6 +20,20 @@ type Props = {
 const TOOLTIP_GAP = 6;
 const VIEWPORT_MARGIN = 8;
 
+const mergeRefs = <T,>(
+  ...refs: Array<React.Ref<T> | undefined>
+): React.RefCallback<T> => {
+  return (value) => {
+    refs.forEach((ref) => {
+      if (typeof ref === 'function') {
+        ref(value);
+      } else if (ref && typeof ref === 'object') {
+        (ref as React.MutableRefObject<T | null>).current = value;
+      }
+    });
+  };
+};
+
 const IconButtonTooltip = ({ content, children, className = '' }: Props) => {
   const isTouchDevice = useTouchDevice();
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +41,7 @@ const IconButtonTooltip = ({ content, children, className = '' }: Props) => {
   const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({
     visibility: 'hidden',
   });
-  const triggerRef = useRef<HTMLSpanElement>(null);
+  const triggerRef = useRef<HTMLElement>(null);
   const tooltipRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -80,16 +100,29 @@ const IconButtonTooltip = ({ content, children, className = '' }: Props) => {
     }
   };
 
+  const child = React.Children.only(children) as ReactElement<{
+    className?: string;
+    onMouseEnter?: React.MouseEventHandler<HTMLElement>;
+    onMouseLeave?: React.MouseEventHandler<HTMLElement>;
+    ref?: React.Ref<HTMLElement>;
+  }>;
+
+  const trigger = React.cloneElement(child, {
+    ref: mergeRefs(triggerRef, (child as any).ref),
+    className: [child.props.className, className].filter(Boolean).join(' '),
+    onMouseEnter: (event: React.MouseEvent<HTMLElement>) => {
+      child.props.onMouseEnter?.(event);
+      handleMouseEnter();
+    },
+    onMouseLeave: (event: React.MouseEvent<HTMLElement>) => {
+      child.props.onMouseLeave?.(event);
+      handleMouseLeave();
+    },
+  });
+
   return (
     <>
-      <span
-        ref={triggerRef}
-        className={`relative inline-flex ${className}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {children}
-      </span>
+      {trigger}
       {isOpen &&
         createPortal(
           <span
