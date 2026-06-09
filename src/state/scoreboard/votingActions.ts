@@ -17,6 +17,7 @@ import {
   handleStageEnd,
   isVotingOver,
 } from './helpers';
+import { resolveStagePointsSystem } from './stageOverrides';
 import { ScoreboardState, SplitScreenQualifierCandidate, Vote } from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
@@ -471,10 +472,9 @@ export const createVotingActions: StateCreator<
   giveJuryPoints: (countryCode: string) => {
     const state = get();
     const countriesStore = useCountriesStore.getState();
-    const { pointsSystem } = useGeneralStore.getState();
-    const allowMultiple =
-      useGeneralStore.getState().settings.allowMultiplePointsToSameEntry;
     const currentStage = state.getCurrentStage();
+    const { pointsSystem, allowMultiplePointsToSameEntry: allowMultiple } =
+      resolveStagePointsSystem(currentStage, useGeneralStore.getState());
     const votingPointsItem = pointsSystem[state.votingPointsIndex];
     const votingPoints = votingPointsItem.value;
 
@@ -690,7 +690,10 @@ export const createVotingActions: StateCreator<
     const state = get();
     const countriesStore = useCountriesStore.getState();
     const currentStage = state.getCurrentStage();
-    const { pointsSystem } = useGeneralStore.getState();
+    const { pointsSystem } = resolveStagePointsSystem(
+      currentStage,
+      useGeneralStore.getState(),
+    );
 
     if (!currentStage) return;
 
@@ -947,7 +950,10 @@ export const createVotingActions: StateCreator<
   givePredefinedJuryPoint: () => {
     const state = get();
     const currentStage = state.getCurrentStage();
-    const { pointsSystem } = useGeneralStore.getState();
+    const { pointsSystem } = resolveStagePointsSystem(
+      currentStage,
+      useGeneralStore.getState(),
+    );
 
     if (!currentStage) return;
 
@@ -1017,13 +1023,10 @@ export const createVotingActions: StateCreator<
       const votesFromVoter = predefinedTelevoteVotes[vc.code];
 
       if (votesFromVoter) {
-        const voteForCountry = votesFromVoter.find(
-          (v) => v.countryCode === votingCountry.code,
-        );
-
-        if (voteForCountry) {
-          totalPoints += voteForCountry.points;
-        }
+        const pointsFromVoter = votesFromVoter
+          .filter((v) => v.countryCode === votingCountry.code)
+          .reduce((sum, v) => sum + v.points, 0);
+        totalPoints += pointsFromVoter;
       }
     }
 
@@ -1092,7 +1095,10 @@ export const createVotingActions: StateCreator<
     const state = get();
     const countriesStore = useCountriesStore.getState();
     const currentStage = state.getCurrentStage();
-    const { pointsSystem } = useGeneralStore.getState();
+    const { pointsSystem } = resolveStagePointsSystem(
+      currentStage,
+      useGeneralStore.getState(),
+    );
 
     if (!currentStage) return;
     const votingCountries = countriesStore.getStageVotingCountries();
@@ -1250,7 +1256,10 @@ export const createVotingActions: StateCreator<
     const state = get();
     const countriesStore = useCountriesStore.getState();
     const currentStage = state.getCurrentStage();
-    const { pointsSystem } = useGeneralStore.getState();
+    const { pointsSystem } = resolveStagePointsSystem(
+      currentStage,
+      useGeneralStore.getState(),
+    );
 
     if (!currentStage) return;
 

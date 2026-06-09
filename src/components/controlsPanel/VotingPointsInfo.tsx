@@ -27,6 +27,11 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
   const underlinesRef = useRef<Record<number, HTMLDivElement | null>>({});
 
   const _pointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const stageJuryOverride = useScoreboardStore((state) => {
+    if (customVotingPointsIndex) return undefined;
+
+    return state.getCurrentStage()?.overrides?.pointsSystem?.pointsSystem;
+  });
   const _votingPointsIndex = useScoreboardStore(
     (state) => state.votingPointsIndex,
   );
@@ -41,7 +46,7 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
 
   const pointsSystem = customVotingPointsIndex
     ? PREDEFINED_SYSTEMS_MAP.default
-    : _pointsSystem;
+    : stageJuryOverride ?? _pointsSystem;
   const votingPointsIndex = customVotingPointsIndex ?? _votingPointsIndex;
 
   useGSAP(

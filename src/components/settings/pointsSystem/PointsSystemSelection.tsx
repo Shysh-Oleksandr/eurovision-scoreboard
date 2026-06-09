@@ -2,13 +2,12 @@ import { arrayMoveImmutable } from 'array-move';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 
-import { PointsItem, useGeneralStore } from '../../../state/generalStore';
-
 import { PointsList } from './PointsList';
 import {
   predefinedSystemsOptions,
   PointsSystemHeader,
 } from './PointsSystemHeader';
+import { PointsSystemController } from './useGlobalPointsSystemController';
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import Button from '@/components/common/Button';
@@ -16,6 +15,18 @@ import { Checkbox } from '@/components/common/Checkbox';
 import Select from '@/components/common/Select';
 import { Tooltip } from '@/components/common/Tooltip';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
+import { PointsItem } from '@/models';
+
+const resolveCurrentSystem = (points: PointsItem[]): string =>
+  Object.entries(PREDEFINED_SYSTEMS_MAP).find(
+    ([, value]) =>
+      value.length === points.length &&
+      value.every(
+        (v, i) =>
+          v.value === points[i]?.value &&
+          v.showDouzePoints === points[i]?.showDouzePoints,
+      ),
+  )?.[0] ?? 'custom';
 
 const SplitSectionHeader: React.FC<{
   label: string;
@@ -23,6 +34,7 @@ const SplitSectionHeader: React.FC<{
   onSystemChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   onReset: () => void;
 }> = ({ label, currentSystem, onSystemChange, onReset }) => {
+  const t = useTranslations('common');
   const currentSystemOption = predefinedSystemsOptions.find(
     (o) => o.value === currentSystem,
   ) || { value: 'custom', label: 'Custom' };
@@ -36,8 +48,8 @@ const SplitSectionHeader: React.FC<{
           <Button
             onClick={onReset}
             className="!p-2.5"
-            aria-label="Restart"
-            title="Restart"
+            aria-label={t('restart')}
+            title={t('restart')}
           >
             <RestartIcon className="w-5 h-5" />
           </Button>
@@ -58,69 +70,53 @@ const SplitSectionHeader: React.FC<{
   );
 };
 
-const resolveCurrentSystem = (points: PointsItem[]): string =>
-  Object.entries(PREDEFINED_SYSTEMS_MAP).find(
-    ([, value]) =>
-      value.length === points.length &&
-      value.every(
-        (v, i) =>
-          v.value === points[i]?.value &&
-          v.showDouzePoints === points[i]?.showDouzePoints,
-      ),
-  )?.[0] ?? 'custom';
+interface PointsSystemSelectionProps {
+  controller: PointsSystemController;
+}
 
-export const PointsSystemSelection = () => {
-  const settingsPointsSystem = useGeneralStore(
-    (state) => state.settingsPointsSystem,
-  );
-  const setSettingsPointsSystem = useGeneralStore(
-    (state) => state.setSettingsPointsSystem,
-  );
-  const settingsTelevotePointsSystem = useGeneralStore(
-    (state) => state.settingsTelevotePointsSystem,
-  );
-  const setSettingsTelevotePointsSystem = useGeneralStore(
-    (state) => state.setSettingsTelevotePointsSystem,
-  );
-  const splitPointsSystem = useGeneralStore(
-    (state) => state.settings.splitPointsSystem,
-  );
-  const allowMultiplePointsToSameEntry = useGeneralStore(
-    (state) => state.settings.allowMultiplePointsToSameEntry,
-  );
-  const setSettings = useGeneralStore((state) => state.setSettings);
+export const PointsSystemSelection: React.FC<PointsSystemSelectionProps> = ({
+  controller,
+}) => {
+  const {
+    pointsSystem,
+    televotePointsSystem,
+    splitPointsSystem,
+    allowMultiplePointsToSameEntry,
+    setPointsSystem,
+    setTelevotePointsSystem,
+    setSplitPointsSystem,
+    setAllowMultiplePointsToSameEntry,
+  } = controller;
 
   const t = useTranslations('settings.voting');
 
   const [internalPoints, setInternalPoints] = useState<PointsItem[]>(
-    () => settingsPointsSystem,
+    () => pointsSystem,
   );
   const [internalTelevotePoints, setInternalTelevotePoints] = useState<
     PointsItem[]
-  >(() => settingsTelevotePointsSystem);
+  >(() => televotePointsSystem);
 
   useEffect(() => {
-    setInternalPoints(settingsPointsSystem);
-  }, [settingsPointsSystem]);
+    setInternalPoints(pointsSystem);
+  }, [pointsSystem]);
 
   useEffect(() => {
-    setInternalTelevotePoints(settingsTelevotePointsSystem);
-  }, [settingsTelevotePointsSystem]);
+    setInternalTelevotePoints(televotePointsSystem);
+  }, [televotePointsSystem]);
 
-  const currentSystem = resolveCurrentSystem(settingsPointsSystem);
-  const currentTelevoteSystem = resolveCurrentSystem(
-    settingsTelevotePointsSystem,
-  );
+  const currentSystem = resolveCurrentSystem(pointsSystem);
+  const currentTelevoteSystem = resolveCurrentSystem(televotePointsSystem);
 
   const onSortEnd = (oldIndex: number, newIndex: number) => {
     const moved = arrayMoveImmutable(internalPoints, oldIndex, newIndex);
 
     setInternalPoints(moved);
-    setSettingsPointsSystem(moved);
+    setPointsSystem(moved);
   };
 
   const handleRemovePoint = (index: number) => {
-    setSettingsPointsSystem(settingsPointsSystem.filter((_, i) => i !== index));
+    setPointsSystem(pointsSystem.filter((_, i) => i !== index));
   };
 
   const handlePointChange = (index: number, value: string) => {
@@ -138,13 +134,11 @@ export const PointsSystemSelection = () => {
       value: internalPoints[index].value,
     };
     setInternalPoints(newPoints);
-    setSettingsPointsSystem(newPoints);
+    setPointsSystem(newPoints);
   };
 
   const handleAllowMultipleToggle = () => {
-    setSettings({
-      allowMultiplePointsToSameEntry: !allowMultiplePointsToSameEntry,
-    });
+    setAllowMultiplePointsToSameEntry(!allowMultiplePointsToSameEntry);
   };
 
   const handlePredefinedSystemChange = (
@@ -154,10 +148,8 @@ export const PointsSystemSelection = () => {
 
     if (value === 'custom') return;
 
-    setSettings({
-      allowMultiplePointsToSameEntry: value === 'old',
-    });
-    setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
+    setAllowMultiplePointsToSameEntry(value === 'old');
+    setPointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
   };
 
   const handleAddPoint = (value: string) => {
@@ -167,17 +159,17 @@ export const PointsSystemSelection = () => {
       id: Math.random(),
     };
 
-    setSettingsPointsSystem([...settingsPointsSystem, newPoint]);
+    setPointsSystem([...pointsSystem, newPoint]);
   };
 
   const handleDouzePointsToggle = (index: number) => {
-    const newPoints = [...settingsPointsSystem];
+    const newPoints = [...pointsSystem];
 
     newPoints[index] = {
       ...newPoints[index],
       showDouzePoints: !newPoints[index].showDouzePoints,
     };
-    setSettingsPointsSystem(newPoints);
+    setPointsSystem(newPoints);
   };
 
   const onTelevoreSortEnd = (oldIndex: number, newIndex: number) => {
@@ -188,13 +180,11 @@ export const PointsSystemSelection = () => {
     );
 
     setInternalTelevotePoints(moved);
-    setSettingsTelevotePointsSystem(moved);
+    setTelevotePointsSystem(moved);
   };
 
   const handleTelevoteRemovePoint = (index: number) => {
-    setSettingsTelevotePointsSystem(
-      settingsTelevotePointsSystem.filter((_, i) => i !== index),
-    );
+    setTelevotePointsSystem(televotePointsSystem.filter((_, i) => i !== index));
   };
 
   const handleTelevotePointChange = (index: number, value: string) => {
@@ -212,7 +202,7 @@ export const PointsSystemSelection = () => {
       value: internalTelevotePoints[index].value,
     };
     setInternalTelevotePoints(newPoints);
-    setSettingsTelevotePointsSystem(newPoints);
+    setTelevotePointsSystem(newPoints);
   };
 
   const handleTelevorePredefinedSystemChange = (
@@ -221,7 +211,7 @@ export const PointsSystemSelection = () => {
     const { value } = e.target;
 
     if (value === 'custom') return;
-    setSettingsTelevotePointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
+    setTelevotePointsSystem(PREDEFINED_SYSTEMS_MAP[value]);
   };
 
   const handleTelevoteAddPoint = (value: string) => {
@@ -231,31 +221,26 @@ export const PointsSystemSelection = () => {
       id: Math.random(),
     };
 
-    setSettingsTelevotePointsSystem([
-      ...settingsTelevotePointsSystem,
-      newPoint,
-    ]);
+    setTelevotePointsSystem([...televotePointsSystem, newPoint]);
   };
 
   const handleTelevoteDouzePointsToggle = (index: number) => {
-    const newPoints = [...settingsTelevotePointsSystem];
+    const newPoints = [...televotePointsSystem];
 
     newPoints[index] = {
       ...newPoints[index],
       showDouzePoints: !newPoints[index].showDouzePoints,
     };
-    setSettingsTelevotePointsSystem(newPoints);
+    setTelevotePointsSystem(newPoints);
   };
 
   const handleSplitToggle = () => {
-    setSettings({ splitPointsSystem: !splitPointsSystem });
+    setSplitPointsSystem(!splitPointsSystem);
   };
 
   const handleResetPredefinedSystem = () => {
-    setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP.default);
-    setSettings({
-      allowMultiplePointsToSameEntry: false,
-    });
+    setPointsSystem(PREDEFINED_SYSTEMS_MAP.default);
+    setAllowMultiplePointsToSameEntry(false);
   };
 
   return (
@@ -274,9 +259,7 @@ export const PointsSystemSelection = () => {
               label={t('juryPointsSystem')}
               currentSystem={currentSystem}
               onSystemChange={handlePredefinedSystemChange}
-              onReset={() =>
-                setSettingsPointsSystem(PREDEFINED_SYSTEMS_MAP.default)
-              }
+              onReset={() => setPointsSystem(PREDEFINED_SYSTEMS_MAP.default)}
             />
             <PointsList
               points={internalPoints}
@@ -294,7 +277,7 @@ export const PointsSystemSelection = () => {
               currentSystem={currentTelevoteSystem}
               onSystemChange={handleTelevorePredefinedSystemChange}
               onReset={() =>
-                setSettingsTelevotePointsSystem(PREDEFINED_SYSTEMS_MAP.default)
+                setTelevotePointsSystem(PREDEFINED_SYSTEMS_MAP.default)
               }
             />
             <PointsList

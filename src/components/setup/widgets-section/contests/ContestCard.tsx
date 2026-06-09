@@ -156,22 +156,22 @@ const ContestCard: React.FC<ContestCardProps> = ({
               <Button
                 onClick={onResetClick}
                 variant="tertiary"
-                title="Reset"
-                aria-label="Reset"
+                title={t('common.reset')}
+                aria-label={t('common.reset')}
                 Icon={<RestartIcon className="w-5 h-5" />}
               />
             )}
             <Button
               onClick={onReorderClick}
               variant="tertiary"
-              title="Reorder"
-              aria-label="Reorder"
+              title={t('common.reorder')}
+              aria-label={t('common.reorder')}
               Icon={<ArrowDownAndUpIcon className="w-5 h-5" />}
             />
             <Button
               onClick={onAddStageClick}
-              title="Add Stage"
-              aria-label="Add Stage"
+              title={t('setup.eventStageModal.addStage')}
+              aria-label={t('setup.eventStageModal.addStage')}
               Icon={<ListPlusIcon className="w-5 h-5" />}
               className="!pr-1.5"
               variant="tertiary"

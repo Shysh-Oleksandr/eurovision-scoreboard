@@ -54,6 +54,7 @@ const NotParticipatingSection = ({
   availableGroups,
 }: NotParticipatingSectionProps) => {
   const t = useTranslations('setup');
+  const tCommon = useTranslations('common');
   const { user } = useAuthStore();
   const { importedCustomEntries, setImportedCustomEntries } = useGeneralStore();
   const bulkCreateMutation = useBulkCreateCustomEntriesMutation();
@@ -200,8 +201,8 @@ const NotParticipatingSection = ({
               handleOpenCreateModal();
             }}
             className="!py-1 !px-4 h-[30px]"
-            title="Add Custom Country"
-            aria-label="Add Custom Country"
+            title={tCommon('addCustomCountry')}
+            aria-label={tCommon('addCustomCountry')}
             variant="tertiary"
           >
             <PlusIcon className="w-6 h-6" />
@@ -213,8 +214,8 @@ const NotParticipatingSection = ({
               setGroupModalOpen(true);
             }}
             className="!py-1 !px-4 h-[30px]"
-            title="Add Group"
-            aria-label="Add Group"
+            title={tCommon('addGroup')}
+            aria-label={tCommon('addGroup')}
           >
             <FolderPlus className="w-6 h-6" />
           </Button>

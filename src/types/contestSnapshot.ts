@@ -53,6 +53,22 @@ export interface ContestSnapshot {
       qualifiesTo?: Array<{ targetStageId: string; amount: number }>;
       participants: string[];
       voters?: string[];
+      overrides?: {
+        pointsSystem?: {
+          pointsSystem: Array<{
+            id: number;
+            value: number;
+            showDouzePoints?: boolean;
+          }>;
+          televotePointsSystem?: Array<{
+            id: number;
+            value: number;
+            showDouzePoints?: boolean;
+          }>;
+          splitPointsSystem?: boolean;
+          allowMultiplePointsToSameEntry?: boolean;
+        };
+      };
     }>;
   };
   simulation?: {

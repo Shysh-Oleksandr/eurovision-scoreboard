@@ -60,8 +60,8 @@ const UnifiedStageSetup: React.FC<UnifiedStageSetupProps> = ({
                   onEditStage(stage as EventStage);
                 }}
                 className="!p-2"
-                aria-label={`Edit ${stage.name}`}
-                title={`Edit ${stage.name}`}
+                aria-label={t('common.editSection', { section: stage.name })}
+                title={t('common.editSection', { section: stage.name })}
               >
                 <PencilIcon className="w-5 h-5" />
               </Button>

@@ -284,6 +284,7 @@ export const predefineStageVotes = (
         'televoteOdds',
         temperature,
         televotePointsSystem,
+        allowMultiplePointsToSameEntry,
       );
     }
   }

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { Country } from '../../../models';
+
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -29,9 +30,16 @@ export const useItemState = ({
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
   );
-  const allowMultiplePointsToSameEntry = useGeneralStore(
+  const globalAllowMultiple = useGeneralStore(
     (state) => state.settings.allowMultiplePointsToSameEntry,
   );
+  const stageAllowMultiple = useScoreboardStore(
+    (state) =>
+      state.getCurrentStage()?.overrides?.pointsSystem
+        ?.allowMultiplePointsToSameEntry,
+  );
+  const allowMultiplePointsToSameEntry =
+    stageAllowMultiple ?? globalAllowMultiple;
 
   const { roundedCountryContainer } = useThemeSpecifics();
 

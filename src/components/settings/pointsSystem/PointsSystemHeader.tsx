@@ -34,6 +34,7 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
   onSplitToggle,
 }) => {
   const t = useTranslations('settings.voting');
+  const tCommon = useTranslations('common');
   const currentSystemOption = predefinedSystemsOptions.find(
     (option) => option.value === currentSystem,
   ) || { value: 'custom', label: 'Custom' };
@@ -71,8 +72,8 @@ export const PointsSystemHeader: React.FC<PointsSystemHeaderProps> = ({
               <Button
                 onClick={onReset}
                 className="!p-2.5"
-                aria-label="Restart"
-                title="Restart"
+                aria-label={tCommon('restart')}
+                title={tCommon('restart')}
               >
                 <RestartIcon className="w-5 h-5" />
               </Button>

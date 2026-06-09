@@ -275,8 +275,14 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
               onClick={handleBulkDelete}
               variant="tertiary"
               className="!p-2 mx-2"
-              aria-label={`Delete ${selectedCount} selected custom entries in ${title}`}
-              title={`Delete ${selectedCount} selected custom entries in ${title}`}
+              aria-label={t('common.deleteSelectedCustomEntries', {
+                count: selectedCount,
+                section: title,
+              })}
+              title={t('common.deleteSelectedCustomEntries', {
+                count: selectedCount,
+                section: title,
+              })}
               disabled={selectedCount === 0}
             >
               <Trash2 className="w-5 h-5" />
@@ -291,13 +297,13 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
             }`}
             aria-label={
               isMultiselectEnabled
-                ? `Disable multiselect for ${title}`
-                : `Enable multiselect for ${title}`
+                ? t('common.disableMultiselect')
+                : t('common.enableMultiselect')
             }
             title={
               isMultiselectEnabled
-                ? `Disable multiselect for ${title}`
-                : `Enable multiselect for ${title}`
+                ? t('common.disableMultiselect')
+                : t('common.enableMultiselect')
             }
           >
             <CopyCheck className="w-5 h-5" />
@@ -309,8 +315,8 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
                 onEditGroup();
               }}
               className="!p-2"
-              aria-label={`Edit ${title}`}
-              title={`Edit ${title}`}
+              aria-label={t('common.editSection', { section: title })}
+              title={t('common.editSection', { section: title })}
             >
               <FolderEdit className="w-5 h-5" />
             </Button>
@@ -359,8 +365,14 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
               onClick={handleBulkDelete}
               variant="tertiary"
               className={`!p-2 mx-2`}
-              aria-label={`Delete ${selectedCount} selected custom entries in ${title}`}
-              title={`Delete ${selectedCount} selected custom entries in ${title}`}
+              aria-label={t('common.deleteSelectedCustomEntries', {
+                count: selectedCount,
+                section: title,
+              })}
+              title={t('common.deleteSelectedCustomEntries', {
+                count: selectedCount,
+                section: title,
+              })}
             >
               <Trash2 className="w-5 h-5" />
             </Button>
@@ -374,13 +386,13 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({
             }`}
             aria-label={
               isMultiselectEnabled
-                ? `Disable multiselect for ${title}`
-                : `Enable multiselect for ${title}`
+                ? t('common.disableMultiselect')
+                : t('common.enableMultiselect')
             }
             title={
               isMultiselectEnabled
-                ? `Disable multiselect for ${title}`
-                : `Enable multiselect for ${title}`
+                ? t('common.disableMultiselect')
+                : t('common.enableMultiselect')
             }
           >
             <CopyCheck className="w-5 h-5" />

@@ -11,6 +11,7 @@ import {
   getSpecialBackgroundStyle,
 } from '@/components/countryItem/utils/gradientUtils';
 import { useGeneralStore } from '@/state/generalStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 import { playThemeSound } from '@/theme/playThemeSound';
 import { DEFAULT_THEME_SPECIFICS } from '@/theme/themeSpecifics';
 import { DouzePointsAnimationMode, FlagShape } from '@/theme/types';
@@ -313,7 +314,13 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   isThemePreview = false,
   douzePointsAnimationModeOverride,
 }) => {
-  const pointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const globalPointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const stageJuryOverride = useScoreboardStore((state) => {
+    if (isThemePreview) return undefined;
+
+    return state.getCurrentStage()?.overrides?.pointsSystem?.pointsSystem;
+  });
+  const pointsSystem = stageJuryOverride ?? globalPointsSystem;
   const themeYear = useGeneralStore(
     (state) => state.customTheme?.baseThemeYear ?? state.themeYear,
   );

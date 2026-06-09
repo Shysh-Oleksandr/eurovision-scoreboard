@@ -1,25 +1,28 @@
-import { POINTS_ARRAY } from '@/data/data';
 import isDeepEqual from 'fast-deep-equal';
 
+import { buildEventStagesFromAssignments } from '@/components/setup/utils/buildEventStagesFromAssignments';
+import { Year } from '@/config';
+import { POINTS_ARRAY } from '@/data/data';
 import {
   BaseCountry,
   Country,
   CountryAssignmentGroup,
   EventStage,
+  PointsItem,
+  StageOverrides,
   StageVotingMode,
   VotingCountry,
 } from '@/models';
-import { buildEventStagesFromAssignments } from '@/components/setup/utils/buildEventStagesFromAssignments';
-import { Year } from '@/config';
 import { useCountriesStore } from '@/state/countriesStore';
-import { PointsItem, useGeneralStore } from '@/state/generalStore';
+import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import { Contest } from '@/types/contest';
 import type {
   ContestSnapshot,
   CompactVote,
   CountriesStateItem,
 } from '@/types/contestSnapshot';
-import { Contest } from '@/types/contest';
+
 import { isDefaultPointsSystem } from './pointsSystem';
 
 const DEFAULT_VOTING_MODE = 'JURY_AND_TELEVOTE';
@@ -53,21 +56,35 @@ const decodePredefinedVotes = (
   encoded: Record<string, any>,
   juryPointsSystem: PointsItem[],
   televotePointsSystem: PointsItem[],
+  stagePointsMaps?: Map<
+    string,
+    { juryById: Map<number, PointsItem>; televoteById: Map<number, PointsItem> }
+  >,
 ) => {
-  const juryById = new Map(juryPointsSystem.map((p) => [p.id, p]));
-  const televoteById = new Map(televotePointsSystem.map((p) => [p.id, p]));
+  const globalJuryById = new Map(juryPointsSystem.map((p) => [p.id, p]));
+  const globalTelevoteById = new Map(
+    televotePointsSystem.map((p) => [p.id, p]),
+  );
   const out: Record<string, any> = {};
+
   for (const [stageId, stageVotes] of Object.entries(encoded || {})) {
+    const stageMaps = stagePointsMaps?.get(stageId);
+    const juryById = stageMaps?.juryById ?? globalJuryById;
+    const televoteById = stageMaps?.televoteById ?? globalTelevoteById;
+
     const decodedStage: any = {};
+
     for (const source of ['jury', 'televote', 'combined'] as const) {
       const byVoter = (stageVotes as any)?.[source];
       if (!byVoter) continue;
       const byId = source === 'televote' ? televoteById : juryById;
       const decodedByVoter: Record<string, any[]> = {};
+
       for (const [voterCode, votes] of Object.entries(byVoter)) {
         decodedByVoter[voterCode] = (votes as any[]).map((tuple) => {
           const [countryCode, pointsId] = tuple as [string, number];
           const p = byId.get(pointsId);
+
           return {
             countryCode,
             pointsId,
@@ -154,6 +171,25 @@ const getPointsSystem = (
         showDouzePoints: p.showDouzePoints ?? p.value === 12, // Use saved value or default to value === 12
       }))
     : defaultPointsSystem;
+};
+
+const buildStageOverridesFromSnapshot = (
+  raw: ContestSnapshot['setup']['stages'][number]['overrides'],
+): StageOverrides | undefined => {
+  if (!raw?.pointsSystem) return undefined;
+  const o = raw.pointsSystem;
+  const splitPointsSystem = o.splitPointsSystem ?? false;
+
+  return {
+    pointsSystem: {
+      pointsSystem: getPointsSystem(o.pointsSystem),
+      televotePointsSystem: splitPointsSystem
+        ? getPointsSystem(o.televotePointsSystem)
+        : getPointsSystem(o.pointsSystem),
+      splitPointsSystem,
+      allowMultiplePointsToSameEntry: o.allowMultiplePointsToSameEntry ?? false,
+    },
+  };
 };
 
 export function buildContestSnapshotFromStores() {
@@ -334,6 +370,27 @@ export function buildContestSnapshotFromStores() {
   // setup.stages: stable config with participants/voters by code
   const setupStagesPayload = setupStages.map((stage) => {
     const participants = getOrderedStageParticipantCodes(stage);
+    const o = stage.overrides?.pointsSystem;
+    const stageOverridesPayload = o
+      ? {
+          overrides: {
+            pointsSystem: {
+              pointsSystem: createPointsPayload(o.pointsSystem),
+              ...(o.splitPointsSystem
+                ? {
+                    televotePointsSystem: createPointsPayload(
+                      o.televotePointsSystem,
+                    ),
+                  }
+                : {}),
+              ...(o.splitPointsSystem ? { splitPointsSystem: true } : {}),
+              ...(o.allowMultiplePointsToSameEntry
+                ? { allowMultiplePointsToSameEntry: true }
+                : {}),
+            },
+          },
+        }
+      : {};
     const stageData: any = {
       id: stage.id,
       name: stage.name,
@@ -346,7 +403,9 @@ export function buildContestSnapshotFromStores() {
       ...(stage.votingCountries && stage.votingCountries.length > 0
         ? { voters: stage.votingCountries.map((v) => v.code) }
         : {}),
+      ...stageOverridesPayload,
     };
+
     return stageData;
   });
 
@@ -745,6 +804,8 @@ export async function applyContestSnapshotToStores(
           ? simStage.participants
           : s.participants) || [];
 
+      const stageOverrides = buildStageOverridesFromSnapshot(s.overrides);
+
       return {
         id: s.id,
         name: s.name,
@@ -756,6 +817,7 @@ export async function applyContestSnapshotToStores(
         isOver: false, // Setup stages are never "over"
         isJuryVoting: (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY',
         runningOrder,
+        ...(stageOverrides ? { overrides: stageOverrides } : {}),
       };
     });
 
@@ -788,10 +850,34 @@ export async function applyContestSnapshotToStores(
       decodeTelevoteSystem = sharedSystem;
     }
 
+    // Build per-stage decode maps for stages that have points system overrides
+    const stagePointsMaps = new Map<
+      string,
+      {
+        juryById: Map<number, PointsItem>;
+        televoteById: Map<number, PointsItem>;
+      }
+    >();
+    for (const setupStage of snapshot.setup.stages) {
+      const o = setupStage.overrides?.pointsSystem;
+      if (!o) continue;
+      const splitInOverride = o.splitPointsSystem ?? false;
+      const jurySystem = getPointsSystem(o.pointsSystem);
+      const televoteSystem = splitInOverride
+        ? getPointsSystem(o.televotePointsSystem)
+        : jurySystem;
+
+      stagePointsMaps.set(setupStage.id, {
+        juryById: new Map(jurySystem.map((p) => [p.id, p])),
+        televoteById: new Map(televoteSystem.map((p) => [p.id, p])),
+      });
+    }
+
     const decodedPredefinedVotes = decodePredefinedVotes(
       snapshot.simulation!.results.predefinedVotes as any,
       decodeJurySystem,
       decodeTelevoteSystem,
+      stagePointsMaps.size > 0 ? stagePointsMaps : undefined,
     );
 
     // Create lookup map for setup stages
@@ -887,6 +973,10 @@ export async function applyContestSnapshotToStores(
             setupStage.participants,
           );
 
+          const stageOverrides = buildStageOverridesFromSnapshot(
+            setupStage.overrides,
+          );
+
           return {
             id: s.id,
             name: setupStage.name,
@@ -899,6 +989,7 @@ export async function applyContestSnapshotToStores(
             isLastStage: idx === arr.length - 1,
             countries,
             runningOrder: participantsOrder ?? setupStage.participants,
+            ...(stageOverrides ? { overrides: stageOverrides } : {}),
           } as EventStage;
         } else {
           // Use full stage data from simulation
@@ -907,6 +998,12 @@ export async function applyContestSnapshotToStores(
           const countries = reorderCountries(
             simStage.participants as string[] | undefined,
             undefined,
+          );
+
+          // Overrides live in setup.stages, not simulation.stages
+          const setupStageForOverrides = setupStagesMap.get(s.id);
+          const stageOverrides = buildStageOverridesFromSnapshot(
+            setupStageForOverrides?.overrides,
           );
 
           return {
@@ -924,6 +1021,7 @@ export async function applyContestSnapshotToStores(
             isLastStage: idx === arr.length - 1,
             countries,
             runningOrder: simStage.participants ?? countries.map((c) => c.code),
+            ...(stageOverrides ? { overrides: stageOverrides } : {}),
           } as EventStage;
         }
       });

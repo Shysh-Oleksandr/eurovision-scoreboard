@@ -472,8 +472,10 @@ const QualifierTargetsSection: React.FC<{
                                 !getQualifierMaxRank(stage.id)
                               }
                               className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Clear"
-                              aria-label={`Clear qualifiers for ${stage.name}`}
+                              title={t('common.clear')}
+                              aria-label={t('common.clearQualifiersFor', {
+                                stage: stage.name,
+                              })}
                             >
                               <RestartIcon className="w-5 h-5" />
                             </Button>
@@ -534,8 +536,10 @@ const QualifierTargetsSection: React.FC<{
                               onClick={() => updateQualifierAmount(stage.id, 0)}
                               disabled={amount === 0}
                               className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Clear"
-                              aria-label={`Clear qualifiers for ${stage.name}`}
+                              title={t('common.clear')}
+                              aria-label={t('common.clearQualifiersFor', {
+                                stage: stage.name,
+                              })}
                             >
                               <RestartIcon className="w-5 h-5" />
                             </Button>
@@ -543,8 +547,10 @@ const QualifierTargetsSection: React.FC<{
                               onClick={() => decrementQualifier(stage.id)}
                               disabled={amount === 0 || isPrecedingStage}
                               className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Decrease"
-                              aria-label={`Decrease qualifiers for ${stage.name}`}
+                              title={t('common.decrease')}
+                              aria-label={t('common.decreaseQualifiersFor', {
+                                stage: stage.name,
+                              })}
                             >
                               <MinusIcon className="w-5 h-5" />
                             </Button>
@@ -563,8 +569,10 @@ const QualifierTargetsSection: React.FC<{
                               onClick={() => incrementQualifier(stage.id)}
                               disabled={isPrecedingStage}
                               className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title="Increase"
-                              aria-label={`Increase qualifiers for ${stage.name}`}
+                              title={t('common.increase')}
+                              aria-label={t('common.increaseQualifiersFor', {
+                                stage: stage.name,
+                              })}
                             >
                               <PlusIcon className="w-5 h-5" />
                             </Button>
@@ -601,8 +609,10 @@ const QualifierTargetsSection: React.FC<{
                         !getQualifierMaxRank(grandFinalStage.id)
                       }
                       className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Clear"
-                      aria-label={`Clear qualifiers for ${grandFinalStage.name}`}
+                      title={t('common.clear')}
+                      aria-label={t('common.clearQualifiersFor', {
+                        stage: grandFinalStage.name,
+                      })}
                     >
                       <RestartIcon className="w-5 h-5" />
                     </Button>
@@ -659,8 +669,10 @@ const QualifierTargetsSection: React.FC<{
                       }
                       disabled={getQualifierAmount(grandFinalStage.id) === 0}
                       className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Clear"
-                      aria-label={`Clear qualifiers for ${grandFinalStage.name}`}
+                      title={t('common.clear')}
+                      aria-label={t('common.clearQualifiersFor', {
+                        stage: grandFinalStage.name,
+                      })}
                     >
                       <RestartIcon className="w-5 h-5" />
                     </Button>
@@ -671,8 +683,10 @@ const QualifierTargetsSection: React.FC<{
                         (grandFinalStage.order ?? 0) < currentOrder
                       }
                       className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Decrease"
-                      aria-label={`Decrease qualifiers for ${grandFinalStage.name}`}
+                      title={t('common.decrease')}
+                      aria-label={t('common.decreaseQualifiersFor', {
+                        stage: grandFinalStage.name,
+                      })}
                     >
                       <MinusIcon className="w-5 h-5" />
                     </Button>
@@ -691,8 +705,10 @@ const QualifierTargetsSection: React.FC<{
                       onClick={() => incrementQualifier(grandFinalStage.id)}
                       disabled={(grandFinalStage.order ?? 0) < currentOrder}
                       className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title="Increase"
-                      aria-label={`Increase qualifiers for ${grandFinalStage.name}`}
+                      title={t('common.increase')}
+                      aria-label={t('common.increaseQualifiersFor', {
+                        stage: grandFinalStage.name,
+                      })}
                     >
                       <PlusIcon className="w-5 h-5" />
                     </Button>

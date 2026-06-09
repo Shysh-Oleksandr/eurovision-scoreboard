@@ -1,9 +1,10 @@
 # Multiple Points to the Same Entry (pre-1975 voting)
 
-This document describes the `allowMultiplePointsToSameEntry` feature — an opt-in jury voting
+This document describes the `allowMultiplePointsToSameEntry` feature — an opt-in voting
 mode that lets a single voting country award more than one point token to the same entry.
 It exists to simulate early Eurovision editions (1957–1961, 1967–1970, 1974) where juries
-distributed ten equal tokens completely freely, including multiple tokens to the same country.
+(and televotes, where applicable) distributed ten equal tokens completely freely, including
+multiple tokens to the same country.
 
 ---
 
@@ -46,7 +47,7 @@ clicking the reset button sets it back to `false`.
 
 Translation keys live under `settings.voting` in all `messages/*.json` locale files:
 - `allowMultiplePointsToSameEntry` — checkbox label
-- `allowMultiplePointsToSameEntryTooltip` — tooltip body
+- `allowMultiplePointsToSameEntryTooltip` — tooltip body (mentions both jury and televote)
 
 ---
 
@@ -66,8 +67,8 @@ flag off → while winners.length < min(pointsSystem.length, choices.length): pi
 `numPointsToAward` is always `pointsSystem.length` when the flag is on (no cap by candidate
 count), so every token is always distributed.
 
-The flag is forwarded **only to the jury call** inside `predefineStageVotes`. The televote
-call always passes `false` (without-replacement). `generateCombinedVotes` is untouched.
+The flag is forwarded to **both the jury and televote calls** inside `predefineStageVotes`.
+`generateCombinedVotes` is untouched (combined mode does not support with-replacement).
 
 **Call sites** that must pass the flag:
 - `src/state/scoreboard/predefinitionActions.ts` — destructures it from `useGeneralStore`
@@ -132,6 +133,52 @@ const shouldReset = allowMultiple
 
 With duplicates the distinct count of countries that have `lastReceivedPoints !== null` can
 never reach `pointsSystem.length`, so the original comparison must not be used.
+
+---
+
+## Televote
+
+### Predefinition
+
+`generateVotesForSource` is called with the flag for the televote branch just as for jury.
+Predefined televote votes may therefore contain duplicate `countryCode` values with distinct
+`pointsId`s.
+
+### Non-reveal automated mode (`givePredefinedTelevotePoints`)
+
+**File:** `src/state/scoreboard/votingActions.ts`
+
+The non-reveal path iterates over all voting countries and totals their contributions for
+each participant. Previously it used `.find()` which returned only the first token per
+`(participant, voter)` pair. It now uses `.filter().reduce()` to sum **all** tokens:
+
+```ts
+const pointsFromVoter = votesFromVoter
+  .filter((v) => v.countryCode === votingCountry.code)
+  .reduce((sum, v) => sum + v.points, 0);
+totalPoints += pointsFromVoter;
+```
+
+Backward-compatible: a single match reduces to the same value as `.find().points`.
+
+### Reveal mode (`giveManualTelevotePointsInRevealMode`)
+
+No changes needed. The reveal operates at the **participant level** — each click reveals one
+participating country's pre-computed **total** televote score:
+
+- `recalculateCountryPoints` (called after every swap) iterates over all Vote entries with
+  `forEach`, so duplicate `countryCode` entries are summed correctly regardless of the flag.
+- `swapVotesBetweenCountries` maps over every vote entry and swaps A↔B for all entries
+  (including duplicates), so the totals remain consistent after a user override.
+- `getNextLowestTelevoteCountry` reads from the pre-computed totals in `countryPoints`, so
+  it already sees the correct sum.
+- `giveTelevotePoints` is called once per participant with the correct total.
+
+### Clickability during televote reveal
+
+`useItemState.ts` — `isDisabled` is unchanged. In reveal mode each participating country is
+revealed exactly once with its full total, then `isVotingFinished = true`. Re-clicking an
+already-revealed country is correctly prevented regardless of the flag.
 
 ---
 
@@ -214,7 +261,6 @@ values with distinct `pointsId`s, so the encoder/decoder requires no changes.
 
 ## What is intentionally NOT affected
 
-- **Televote** — always sampled without replacement; totals and clickability unchanged.
 - **`StageVotingMode.COMBINED`** — `generateCombinedVotes` is untouched; the combined
   ranking logic (sum of jury rank + televote rank) does not support with-replacement.
 - **`givePredefinedJuryPointsGrouped` / `giveRandomJuryPoints` / `finishJuryVotingRandomly`**

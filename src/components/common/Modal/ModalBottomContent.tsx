@@ -10,6 +10,7 @@ interface ModalBottomContentProps {
   onDelete?: () => void;
   isSaving?: boolean;
   saveButtonLabel?: string;
+  saveButtonText?: string;
   saveButtonIcon?: React.ReactNode;
   saveButtonDisabled?: boolean;
 }
@@ -20,6 +21,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
   onDelete,
   isSaving,
   saveButtonLabel = 'save',
+  saveButtonText,
   saveButtonIcon,
   saveButtonDisabled,
 }) => {
@@ -63,7 +65,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           snowEffect="right"
           Icon={saveButtonIcon}
         >
-          {t(saveButtonLabel)}
+          {saveButtonText ?? t(saveButtonLabel)}
         </Button>
       </div>
     </div>

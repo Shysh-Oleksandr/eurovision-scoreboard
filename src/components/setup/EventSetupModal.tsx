@@ -41,6 +41,7 @@ import {
   applyContestSnapshotToStores,
   LoadContestOptions,
 } from '@/helpers/contestSnapshot';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
@@ -135,9 +136,8 @@ const EventSetupModal = () => {
   const settingsTelevotePointsSystem = useGeneralStore(
     (state) => state.settingsTelevotePointsSystem,
   );
-  const splitPointsSystem = useGeneralStore(
-    (state) => state.settings.splitPointsSystem,
-  );
+  const settings = useGeneralStore((state) => state.settings);
+  const { splitPointsSystem } = settings;
   const isGfOnly = useGeneralStore((state) => state.isGfOnly);
   const setPointsSystem = useGeneralStore((state) => state.setPointsSystem);
   const setTelevotePointsSystem = useGeneralStore(
@@ -261,6 +261,7 @@ const EventSetupModal = () => {
   useInitialLineup();
 
   const { onSaveContinue, nextSetupStage } = useContinueToNextPhase();
+  const { confirm } = useConfirmation();
   const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
   const user = useAuthStore((state) => state.user);
   const applyTheme = useApplyContestTheme();
@@ -338,24 +339,8 @@ const EventSetupModal = () => {
     clear();
   };
 
-  const handleStartEvent = () => {
+  const proceedToPostSetup = useCallback(() => {
     setCurrentSetupStageType('initial');
-
-    const validationError = validateEventSetup(
-      settingsPointsSystem.length,
-      {
-        stages: eventStagesWithCountries,
-      },
-      t,
-    );
-
-    if (validationError) {
-      toast(validationError, {
-        type: 'error',
-      });
-
-      return;
-    }
 
     const resolvedPointsSystem =
       settingsPointsSystem.length > 0
@@ -368,9 +353,9 @@ const EventSetupModal = () => {
       splitPointsSystem && settingsTelevotePointsSystem.length > 0
         ? settingsTelevotePointsSystem
         : resolvedPointsSystem;
+
     setTelevotePointsSystem(resolvedTelevotePointsSystem);
 
-    // Compute first stage locally (sorted by order)
     const sortedStages = [...eventStagesWithCountries].sort(
       (a, b) => (a.order ?? 0) - (b.order ?? 0),
     );
@@ -391,12 +376,64 @@ const EventSetupModal = () => {
     }
 
     setPostSetupModalOpen(true);
+  }, [
+    eventStagesWithCountries,
+    setCurrentSetupStageType,
+    setPointsSystem,
+    setPostSetupModalOpen,
+    setTelevotePointsSystem,
+    settingsPointsSystem,
+    settingsTelevotePointsSystem,
+    splitPointsSystem,
+  ]);
 
-    return;
+  const handleStartEvent = () => {
+    const validationResult = validateEventSetup(
+      {
+        settings,
+        settingsPointsSystem,
+        settingsTelevotePointsSystem,
+      },
+      {
+        stages: eventStagesWithCountries,
+      },
+      t,
+    );
+
+    if (validationResult?.kind === 'error') {
+      toast(validationResult.message, {
+        type: 'error',
+      });
+
+      return;
+    }
+
+    if (validationResult?.kind === 'warning') {
+      confirm({
+        key: 'setup-low-participants-warning',
+        type: 'alert',
+        title: validationResult.title,
+        description: validationResult.description,
+        onConfirm: proceedToPostSetup,
+      });
+
+      return;
+    }
+
+    proceedToPostSetup();
   };
 
   const onPostSetupSave = () => {
-    if (enablePredefined) {
+    const stageId = currentSetupStage?.id;
+    const stageOverrides = stageId
+      ? useCountriesStore
+          .getState()
+          .configuredEventStages.find((s) => s.id === stageId)?.overrides
+      : undefined;
+    const effectiveEnablePredefined =
+      stageOverrides?.enablePredefinedVotes ?? enablePredefined;
+
+    if (effectiveEnablePredefined) {
       setPredefModalOpen(true);
 
       return;

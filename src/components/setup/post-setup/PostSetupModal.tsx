@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -10,11 +10,14 @@ import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
 import EventStageVoters from './EventStageVoters';
 import { usePostSetupStageForm } from './hooks/usePostSetupStageForm';
+import { useStagePointsOverrideDraft } from './hooks/useStagePointsOverrideDraft';
 import { RunningOrderTab, useRunningOrder } from './running-order';
+import StageGeneralTab from './StageGeneralTab';
 
+import { PlayIcon } from '@/assets/icons/PlayIcon';
 import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
-import { EventStage } from '@/models';
+import { EventStage, StageOverrides, StageVotingMode } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { createCountriesComparator } from '@/state/scoreboard/helpers';
@@ -23,6 +26,7 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 enum PostSetupModalTab {
   RUNNING_ORDER = 'Running Order',
   VOTERS = 'Voters',
+  GENERAL = 'General',
 }
 
 interface PostSetupModalProps {
@@ -48,6 +52,19 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
 
   const [selectedLayout, setSelectedLayout] = useState<'list' | 'grid'>('grid');
 
+  const [localVotingMode, setLocalVotingMode] = useState<StageVotingMode>(
+    stage.votingMode,
+  );
+  const [localEnablePredefined, setLocalEnablePredefined] = useState<
+    boolean | undefined
+  >(stage.overrides?.enablePredefinedVotes);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setLocalVotingMode(stage.votingMode);
+    setLocalEnablePredefined(stage.overrides?.enablePredefinedVotes);
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const configuredEventStages = useCountriesStore(
     (state) => state.configuredEventStages,
   );
@@ -58,6 +75,9 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const contestName = useGeneralStore((state) => state.settings.contestName);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
+  const globalEnablePredefined = useGeneralStore(
+    (state) => state.settings.enablePredefinedVotes,
+  );
 
   const configuredStage = useMemo(
     () => configuredEventStages.find((s) => s.id === stage.id),
@@ -81,10 +101,16 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     isOpen,
   });
 
+  const { controller, getOverride } = useStagePointsOverrideDraft(
+    stage,
+    isOpen,
+  );
+
   const tabs = useMemo(
     () => [
       { value: PostSetupModalTab.RUNNING_ORDER, label: t('runningOrder') },
       { value: PostSetupModalTab.VOTERS, label: t('voters') },
+      { value: PostSetupModalTab.GENERAL, label: t('general') },
     ],
     [t],
   );
@@ -101,12 +127,34 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
 
       setTimeout(() => {
         const runningOrder = orderedCodes;
+        const pointsOverride = getOverride();
+
+        const enablePredefinedOverride =
+          localEnablePredefined !== undefined &&
+          localEnablePredefined !== globalEnablePredefined
+            ? localEnablePredefined
+            : undefined;
+
+        const buildOverrides = (): StageOverrides | undefined => {
+          const result: StageOverrides = {};
+
+          if (pointsOverride) result.pointsSystem = pointsOverride;
+
+          if (enablePredefinedOverride !== undefined)
+            result.enablePredefinedVotes = enablePredefinedOverride;
+
+          return Object.keys(result).length > 0 ? result : undefined;
+        };
+        const stageOverrides = buildOverrides();
+
         const updatedStages = configuredEventStages.map((s) =>
           s.id === stage.id
             ? {
                 ...s,
                 votingCountries: data.votingCountries,
                 runningOrder,
+                votingMode: localVotingMode,
+                overrides: stageOverrides,
               }
             : s,
         );
@@ -116,9 +164,12 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
                 ...s,
                 votingCountries: data.votingCountries,
                 runningOrder,
+                votingMode: localVotingMode,
+                isJuryVoting: localVotingMode !== StageVotingMode.TELEVOTE_ONLY,
                 countries: s.countries
                   .slice()
                   .sort(createCountriesComparator(runningOrder)),
+                overrides: stageOverrides,
               }
             : s,
         );
@@ -163,6 +214,19 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
           </>
         ),
       },
+      {
+        ...tabs[2],
+        content: (
+          <StageGeneralTab
+            controller={controller}
+            votingMode={localVotingMode}
+            onVotingModeChange={setLocalVotingMode}
+            enablePredefinedVotes={localEnablePredefined}
+            globalEnablePredefinedVotes={globalEnablePredefined}
+            onEnablePredefinedVotesChange={setLocalEnablePredefined}
+          />
+        ),
+      },
     ];
 
     return (
@@ -193,7 +257,12 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
         />
       }
       bottomContent={
-        <ModalBottomContent onClose={onClose} onSave={handleSave} />
+        <ModalBottomContent
+          onClose={onClose}
+          onSave={handleSave}
+          saveButtonIcon={<PlayIcon className="size-4" />}
+          saveButtonText={t('startStage', { stageName: stage.name })}
+        />
       }
     >
       <h3 className="text-xl font-semibold text-white middle-line after:bg-primary-800 before:bg-primary-800">

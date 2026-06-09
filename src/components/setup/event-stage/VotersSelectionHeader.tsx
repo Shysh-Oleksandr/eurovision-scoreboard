@@ -28,6 +28,7 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
   disableLoadYearData,
 }) => {
   const t = useTranslations();
+  const tCommon = useTranslations('common');
 
   return (
     <div className="flex flex-col sm:gap-0 gap-1">
@@ -46,27 +47,27 @@ const VotersSelectionHeader: React.FC<VotersSelectionHeaderProps> = ({
         <div className="flex items-center sm:gap-2 gap-1">
           <ActionButton
             onClick={() => onSort('az')}
-            title="Sort A-Z"
+            title={tCommon('sortAZ')}
             icon={<SortAZIcon className="w-5 h-5" />}
           />
           <ActionButton
             onClick={() => onSort('za')}
-            title="Sort Z-A"
+            title={tCommon('sortZA')}
             icon={<SortZAIcon className="w-5 h-5" />}
           />
           <ActionButton
             onClick={() => onSort('shuffle')}
-            title="Shuffle"
+            title={tCommon('shuffle')}
             icon={<ShuffleIcon className="w-5 h-5" />}
           />
           <ActionButton
             onClick={onReset}
-            title="Reset list"
+            title={tCommon('resetList')}
             icon={<ListRestartIcon className="w-5 h-5" />}
           />
           <ActionButton
             onClick={onClearAll}
-            title="Clear all"
+            title={tCommon('clearAll')}
             icon={<RestartIcon className="w-5 h-5" />}
           />
         </div>

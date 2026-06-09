@@ -246,6 +246,11 @@ export const WHATS_NEW = [
   {
     date: '2026-06-05',
     title:
+      'Added the ability to have different points system for each stage. Made the final reveal animation less predictable. The "Allow points to the same entry multiple times" option now also works for televote. Small UI improvements',
+  },
+  {
+    date: '2026-06-05',
+    title:
       'Added the Pre-1975 points system support. Added the heart flag icons for all world countries. Added a donation option. Bug fixes',
   },
   {
@@ -401,10 +406,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-06-06', end: '2026-06-07' },
-    title: 'Different points system per stage',
-  },
-  {
+    approximateDates: { start: '2026-06-11', end: '2026-06-14' },
     title: 'Odds system improvements',
   },
   {

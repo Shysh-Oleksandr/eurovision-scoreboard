@@ -66,6 +66,24 @@ export interface CountriesPreset {
 
 export type VotingCountry = Pick<BaseCountry, 'code' | 'name' | 'flag'>;
 
+export interface PointsItem {
+  value: number;
+  showDouzePoints: boolean;
+  id: number;
+}
+
+export interface StagePointsSystemOverride {
+  pointsSystem: PointsItem[];
+  televotePointsSystem: PointsItem[];
+  splitPointsSystem: boolean;
+  allowMultiplePointsToSameEntry: boolean;
+}
+
+export interface StageOverrides {
+  pointsSystem?: StagePointsSystemOverride;
+  enablePredefinedVotes?: boolean;
+}
+
 export interface EventStage {
   id: string;
   name: string;
@@ -80,6 +98,7 @@ export interface EventStage {
   isPreparedForNextStage?: boolean; // is set to true when user opens predefinition modal; needed to call prepareForNextStage only once
   /** User-defined running order (country codes). Used for initial display before points exist. */
   runningOrder?: string[];
+  overrides?: StageOverrides;
 }
 
 export enum StageId {

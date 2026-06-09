@@ -19,7 +19,7 @@ import { useScoreboardStore } from './scoreboardStore';
 
 import { api } from '@/api/client';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
-import { BaseCountry } from '@/models';
+import { BaseCountry, PointsItem } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
 import {
   applyDocumentFontAlias,
@@ -91,6 +91,7 @@ const DEFAULT_SETTINGS: Settings = {
   splitPointsSystem: false,
   allowMultiplePointsToSameEntry: false,
   hideVotingHints: false,
+  enableIconButtonTooltips: true,
   enableFinalReveal: true,
   finalRevealAnimationSpeed: 1.0,
   finalRevealLinearAnimation: false,
@@ -179,6 +180,7 @@ interface Settings {
   disableAllThemeAudio: boolean;
   enableMinimalisticFlags: boolean;
   hideVotingHints: boolean;
+  enableIconButtonTooltips: boolean;
   splitPointsSystem: boolean;
   allowMultiplePointsToSameEntry: boolean;
   enableFinalReveal: boolean;
@@ -217,11 +219,7 @@ export interface ImageCustomizationSettings {
   highQuality: boolean;
 }
 
-export interface PointsItem {
-  value: number;
-  showDouzePoints: boolean;
-  id: number;
-}
+export type { PointsItem };
 
 export interface GeneralState {
   lastSeenUpdate: string | null;

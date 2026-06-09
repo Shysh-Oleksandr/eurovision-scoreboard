@@ -3,6 +3,7 @@ import { StateCreator } from 'zustand';
 import { Country, EventStage, StageId } from '../../models';
 import { useGeneralStore } from '../generalStore';
 
+import { resolveStagePointsSystem } from './stageOverrides';
 import { ScoreboardState } from './types';
 
 type Getters = {
@@ -20,7 +21,11 @@ export const createGetters: StateCreator<
 > = (_set, get) => ({
   getVotingPoints: () => {
     const { votingPointsIndex } = get();
-    const { pointsSystem } = useGeneralStore.getState();
+    const currentStage = get().getCurrentStage();
+    const { pointsSystem } = resolveStagePointsSystem(
+      currentStage,
+      useGeneralStore.getState(),
+    );
 
     if (votingPointsIndex > pointsSystem.length - 1)
       return pointsSystem[pointsSystem.length - 1]?.value ?? 0;

@@ -1,7 +1,10 @@
 'use client';
 import React, { ReactNode } from 'react';
 
+import { useGeneralStore } from '../../state/generalStore';
 import SnowPileEffect from '../effects/SnowPileEffect';
+
+import IconButtonTooltip from './IconButtonTooltip';
 
 type Props = {
   label?: string;
@@ -49,8 +52,18 @@ const Button = ({
   };
 
   const childrenContent = children || label;
+  const hasIconOnlyContent =
+    (Icon !== null && Icon !== undefined) ||
+    (children !== null &&
+      children !== undefined &&
+      typeof children !== 'string');
+  const enableIconButtonTooltips = useGeneralStore(
+    (state) => state.settings.enableIconButtonTooltips,
+  );
+  const isIconOnly = !label && hasIconOnlyContent;
+  const showTooltip = Boolean(title && isIconOnly && enableIconButtonTooltips);
 
-  return (
+  const button = (
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${
         Icon ? 'flex items-center gap-2' : ''
@@ -58,7 +71,7 @@ const Button = ({
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } ${isLoading ? 'flex justify-center' : ''}`}
       onClick={onClick}
-      title={title}
+      title={showTooltip ? undefined : title}
       disabled={disabled || isLoading}
       style={style}
     >
@@ -73,6 +86,19 @@ const Button = ({
       )}
     </button>
   );
+
+  if (showTooltip) {
+    return (
+      <IconButtonTooltip
+        content={title!}
+        className={disabled ? 'cursor-not-allowed' : undefined}
+      >
+        {button}
+      </IconButtonTooltip>
+    );
+  }
+
+  return button;
 };
 
 export default Button;

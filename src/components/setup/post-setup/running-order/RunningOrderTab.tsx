@@ -49,6 +49,7 @@ export const RunningOrderTab = ({
   onShare: () => void;
 }) => {
   const t = useTranslations('setup.eventStageModal');
+  const tCommon = useTranslations('common');
 
   const layoutValue = useMemo(
     () => selectedLayout || ScoreboardMobileLayout.ONE_COLUMN,
@@ -68,22 +69,22 @@ export const RunningOrderTab = ({
           <div className="flex items-center sm:gap-2 gap-1">
             <ActionButton
               onClick={() => onQuickSort('az')}
-              title="Sort A-Z"
+              title={tCommon('sortAZ')}
               icon={<SortAZIcon className="w-5 h-5" />}
             />
             <ActionButton
               onClick={() => onQuickSort('za')}
-              title="Sort Z-A"
+              title={tCommon('sortZA')}
               icon={<SortZAIcon className="w-5 h-5" />}
             />
             <ActionButton
               onClick={() => onQuickSort('shuffle')}
-              title="Shuffle"
+              title={tCommon('shuffle')}
               icon={<ShuffleIcon className="w-5 h-5" />}
             />
             <ActionButton
               onClick={() => onQuickSort('reset')}
-              title="Reset list"
+              title={tCommon('resetList')}
               icon={<ListRestartIcon className="w-5 h-5" />}
             />
           </div>

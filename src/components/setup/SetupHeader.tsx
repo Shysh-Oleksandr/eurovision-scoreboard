@@ -378,8 +378,8 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
             <Button
               onClick={handleSyncTheme}
               className="!p-3 group"
-              title="Sync Theme"
-              aria-label="Sync Theme"
+              title={t('common.syncTheme')}
+              aria-label={t('common.syncTheme')}
             >
               <SyncIcon className="group-hover:rotate-90 transition-transform duration-500 ease-in-out" />
             </Button>
@@ -393,8 +393,8 @@ export const SetupHeader: React.FC<SetupHeaderProps> = ({
             openSettingsModal();
           }}
           className="!p-3 group"
-          aria-label="Settings"
-          title="Settings"
+          aria-label={t('common.settings')}
+          title={t('common.settings')}
           snowEffect="right"
         >
           <SettingsIcon className="w-6 h-6 group-hover:rotate-90 transition-transform duration-500 ease-in-out" />

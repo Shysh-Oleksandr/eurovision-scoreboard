@@ -18,15 +18,21 @@ export const useVoting = () => {
   const currentRevealTelevotePoints = useScoreboardStore(
     (state) => state.currentRevealTelevotePoints,
   );
-  const pointsSystem = useGeneralStore((state) => state.pointsSystem);
+  const globalPointsSystem = useGeneralStore((state) => state.pointsSystem);
   const revealTelevoteLowestToHighest = useGeneralStore(
     (state) => state.settings.revealTelevoteLowestToHighest,
   );
-  const allowMultiplePointsToSameEntry = useGeneralStore(
+  const globalAllowMultiple = useGeneralStore(
     (state) => state.settings.allowMultiplePointsToSameEntry,
   );
+  const stagePointsOverride = useScoreboardStore(
+    (state) => state.getCurrentStage()?.overrides?.pointsSystem ?? null,
+  );
 
-  const MAX_COUNTRY_WITH_POINTS = pointsSystem.length;
+  const allowMultiplePointsToSameEntry =
+    stagePointsOverride?.allowMultiplePointsToSameEntry ?? globalAllowMultiple;
+  const MAX_COUNTRY_WITH_POINTS =
+    stagePointsOverride?.pointsSystem.length ?? globalPointsSystem.length;
 
   const { countries, isJuryVoting } = getCurrentStage() || {};
 

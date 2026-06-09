@@ -7,6 +7,7 @@ import { Tooltip } from '../common/Tooltip';
 import { Input } from '../Input';
 
 import { PointsSystemSelection } from './pointsSystem/PointsSystemSelection';
+import { useGlobalPointsSystemController } from './pointsSystem/useGlobalPointsSystemController';
 
 const SPLIT_SCREEN_CANDIDATES_MIN = 2;
 const SPLIT_SCREEN_CANDIDATES_MAX = 6;
@@ -54,10 +55,11 @@ export const VotingSettings: React.FC = () => {
   const t = useTranslations('settings.voting');
   const settings = useGeneralStore((state) => state.settings);
   const setSettings = useGeneralStore((state) => state.setSettings);
+  const controller = useGlobalPointsSystemController();
 
   return (
     <>
-      <PointsSystemSelection />
+      <PointsSystemSelection controller={controller} />
       <div className="h-px bg-primary-800 w-full my-4" />
 
       <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
@@ -87,7 +89,7 @@ export const VotingSettings: React.FC = () => {
             <Tooltip
               content={
                 <div className="font-medium">
-                  {t('splitScreenCandidatesCountTooltipDescription')}
+                  {t('enableSplitScreenQualifierRevealModeTooltip')}
                 </div>
               }
               position="left"
@@ -111,7 +113,7 @@ export const VotingSettings: React.FC = () => {
               <Tooltip
                 content={
                   <div className="font-medium">
-                    {t.rich('enableSplitScreenQualifierRevealModeTooltip', {
+                    {t.rich('splitScreenCandidatesCountTooltipDescription', {
                       br: () => <br />,
                     })}
                   </div>

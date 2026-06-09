@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import { PlusIcon } from '@/assets/icons/PlusIcon';
@@ -9,6 +10,7 @@ interface AddPointButtonProps {
 }
 
 export const AddPointButton: React.FC<AddPointButtonProps> = ({ onAdd }) => {
+  const t = useTranslations('common');
   const [isAdding, setIsAdding] = useState(false);
   const [newPoint, setNewPoint] = useState('');
 
@@ -44,8 +46,8 @@ export const AddPointButton: React.FC<AddPointButtonProps> = ({ onAdd }) => {
         <Button
           onClick={() => setIsAdding(true)}
           className="h-full !py-1 !px-4 lg:!px-5 w-full flex justify-center"
-          title="Add Point"
-          aria-label="Add Point"
+          title={t('addPoint')}
+          aria-label={t('addPoint')}
         >
           <PlusIcon className="w-7 h-7" />
         </Button>

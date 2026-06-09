@@ -344,10 +344,14 @@ const VotingPredefinitionModal = ({
                     onClick={() => setIsTotalsSortByName(!isTotalsSortByName)}
                     className="!p-3"
                     aria-label={
-                      isTotalsSortByName ? 'Sort by points' : 'Sort by name'
+                      isTotalsSortByName
+                        ? t('common.sortByPoints')
+                        : t('common.sortByName')
                     }
                     title={
-                      isTotalsSortByName ? 'Sort by points' : 'Sort by name'
+                      isTotalsSortByName
+                        ? t('common.sortByPoints')
+                        : t('common.sortByName')
                     }
                     Icon={
                       isTotalsSortByName ? (
@@ -361,8 +365,8 @@ const VotingPredefinitionModal = ({
                     variant="primary"
                     onClick={() => setLocalTotals({})}
                     className="!p-3"
-                    aria-label="Reset"
-                    title="Reset"
+                    aria-label={t('common.reset')}
+                    title={t('common.reset')}
                     Icon={<RestartIcon className="w-5 h-5" />}
                   />
                 </div>

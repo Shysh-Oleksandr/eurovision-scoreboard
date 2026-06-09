@@ -129,6 +129,15 @@ export const UIPreferencesSettings: React.FC = () => {
         checked={settings.hideVotingHints}
         onChange={(e) => setSettings({ hideVotingHints: e.target.checked })}
       />
+      <Checkbox
+        id="enable-icon-button-tooltips"
+        labelClassName="w-full"
+        label={t('enableIconButtonTooltips')}
+        checked={settings.enableIconButtonTooltips}
+        onChange={(e) =>
+          setSettings({ enableIconButtonTooltips: e.target.checked })
+        }
+      />
 
       <Checkbox
         id="enable-winter-effects"

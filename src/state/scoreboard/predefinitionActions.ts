@@ -4,6 +4,7 @@ import { EventStage } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
+import { resolveStagePointsSystem } from './stageOverrides';
 import { ManualShareTotalsRow, ScoreboardState } from './types';
 import { predefineStageVotes } from './votesPredefinition';
 
@@ -91,20 +92,16 @@ export const createPredefinitionActions: StateCreator<
   predefineVotesForStage: (stage: EventStage, resetOtherStages = false) => {
     const { countryOdds, getStageVotingCountries } =
       useCountriesStore.getState();
+    const generalState = useGeneralStore.getState();
+    const { randomnessLevel } = generalState.settings;
+
     const {
       pointsSystem,
       televotePointsSystem,
-      settings: {
-        randomnessLevel,
-        splitPointsSystem,
-        allowMultiplePointsToSameEntry,
-      },
-    } = useGeneralStore.getState();
+      allowMultiplePointsToSameEntry,
+    } = resolveStagePointsSystem(stage, generalState);
 
     const votingCountries = getStageVotingCountries(stage.id);
-    const effectiveTelevoteSystem = splitPointsSystem
-      ? televotePointsSystem
-      : pointsSystem;
 
     const predefinedVotes = predefineStageVotes(
       stage.countries,
@@ -113,7 +110,7 @@ export const createPredefinitionActions: StateCreator<
       countryOdds,
       randomnessLevel,
       pointsSystem,
-      effectiveTelevoteSystem,
+      televotePointsSystem,
       allowMultiplePointsToSameEntry,
     );
 

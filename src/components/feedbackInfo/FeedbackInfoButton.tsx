@@ -1,9 +1,11 @@
 'use client';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
 import { useGeneralStore } from '../../state/generalStore';
+import IconButtonTooltip from '../common/IconButtonTooltip';
 
 import FeedbackIcon from './FeedbackIcon';
 
@@ -12,6 +14,7 @@ const FeedbackModal = dynamic(() => import('./FeedbackModal'), {
 });
 
 const FeedbackInfoButton = ({ className }: { className?: string }) => {
+  const t = useTranslations('feedbackInfo');
   const [showModal, setShowModal] = useState(false);
   const [isFeedbackModalLoaded, setIsFeedbackModalLoaded] = useState(false);
   const shouldShowNewChangesIndicator = useGeneralStore(
@@ -27,17 +30,18 @@ const FeedbackInfoButton = ({ className }: { className?: string }) => {
 
   return (
     <>
-      <button
-        onClick={() => setShowModal(true)}
-        className={`text-white p-2 mb-1 relative focus:outline-none z-50 hover:scale-110 transition-transform duration-300 ${className}`}
-        aria-label="Open feedback modal"
-        title="Open feedback modal"
-      >
-        <FeedbackIcon />
-        {shouldShowNewChangesIndicator && (
-          <div className="absolute -top-[0.1rem] -right-[0.2rem] w-3.5 h-3.5 bg-primary-700 rounded-full animate-pulse" />
-        )}
-      </button>
+      <IconButtonTooltip content={t('buttonTooltip')}>
+        <button
+          onClick={() => setShowModal(true)}
+          className={`text-white p-2 mb-1 relative focus:outline-none z-50 hover:scale-110 transition-transform duration-300 ${className}`}
+          aria-label="Open feedback modal"
+        >
+          <FeedbackIcon />
+          {shouldShowNewChangesIndicator && (
+            <div className="absolute -top-[0.1rem] -right-[0.2rem] w-3.5 h-3.5 bg-primary-700 rounded-full animate-pulse" />
+          )}
+        </button>
+      </IconButtonTooltip>
       {(showModal || isFeedbackModalLoaded) && (
         <FeedbackModal
           showModal={showModal}

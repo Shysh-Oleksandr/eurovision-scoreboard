@@ -41,7 +41,23 @@ export const createEventActions: StateCreator<
     const enablePredefined =
       useGeneralStore.getState().settings.enablePredefinedVotes;
 
-    if (!enablePredefined) {
+    // Compute stages first so we can check the first stage's per-stage override
+    const allStagesFromSetup = get().eventStages;
+    // Sort stages by order property
+    const newEventStages: EventStage[] = [...allStagesFromSetup].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0),
+    );
+
+    const finalEventStages = newEventStages.map((stage, index) => ({
+      ...stage,
+      isLastStage: index === newEventStages.length - 1,
+    }));
+
+    const firstStage = finalEventStages[0] ?? null;
+    const effectiveEnablePredefined =
+      firstStage?.overrides?.enablePredefinedVotes ?? enablePredefined;
+
+    if (!effectiveEnablePredefined) {
       set({
         predefinedVotes: {},
         countryPoints: {},
@@ -52,23 +68,10 @@ export const createEventActions: StateCreator<
       qualificationOrder: {},
     });
 
-    const allStagesFromSetup = get().eventStages;
-    // Sort stages by order property
-    const newEventStages: EventStage[] = allStagesFromSetup.sort(
-      (a, b) => (a.order ?? 0) - (b.order ?? 0),
-    );
-
-    const finalEventStages = newEventStages.map((stage, index) => ({
-      ...stage,
-      isLastStage: index === newEventStages.length - 1,
-    }));
-
-    const firstStage = finalEventStages[0] ?? null;
-
     let firstVotingCountryIndex = 0;
 
     if (firstStage) {
-      if (!enablePredefined) {
+      if (!effectiveEnablePredefined) {
         get().predefineVotesForStage(firstStage, true);
       }
       if (firstStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
@@ -313,8 +316,12 @@ export const createEventActions: StateCreator<
 
     const enablePredefined =
       useGeneralStore.getState().settings.enablePredefinedVotes;
-    if (!enablePredefined) {
-      get().predefineVotesForStage(updatedEventStages[currentStageIndex + 1]);
+    const nextStageFull = updatedEventStages[currentStageIndex + 1];
+    const effectiveEnablePredefined =
+      nextStageFull?.overrides?.enablePredefinedVotes ?? enablePredefined;
+
+    if (!effectiveEnablePredefined) {
+      get().predefineVotesForStage(nextStageFull);
     }
 
     const generalStore = useGeneralStore.getState();
@@ -323,7 +330,7 @@ export const createEventActions: StateCreator<
     });
 
     set({
-      eventStages: enablePredefined
+      eventStages: effectiveEnablePredefined
         ? [...get().eventStages]
         : updatedEventStages,
       currentStageId: nextStage.id,

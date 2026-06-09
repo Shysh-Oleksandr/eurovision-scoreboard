@@ -126,37 +126,88 @@ export const useRevealAnimation = ({
       const phaseADuration = 9 / speed;
       const phaseBDuration = isWinner ? 0.9 / speed : 0;
 
-      // --- Segment timing: equal thirds when linear, randomised otherwise
-      const r1 = isLinear ? 1 / 3 : 0.2 + Math.random() * 0.1;
-      const r2 = isLinear ? 1 / 3 : 0.4 + Math.random() * 0.2;
-      const segDur1 = phaseADuration * r1;
-      const segDur2 = phaseADuration * r2;
-      const segDur3 = phaseADuration * (1 - r1 - r2);
-
-      // --- Waypoints: evenly spaced when linear, randomised otherwise
-      const pct1Ratio = isLinear ? 1 / 3 : 0.35 + Math.random() * 0.2;
-      const pct2Ratio = isLinear ? 2 / 3 : 0.65 + Math.random() * 0.2;
-      const segPct1 = cappedFillPct * pct1Ratio;
-      const segPct2 = cappedFillPct * pct2Ratio;
-
-      // --- Easing: constant speed when linear, randomised rhythm otherwise
-      const pickEase = (arr: string[]) =>
-        arr[Math.floor(Math.random() * arr.length)] ?? arr[0];
-      const ease1 = isLinear
-        ? 'none'
-        : pickEase(['power3.out', 'power4.out', 'expo.out', 'circ.out']);
-      const ease2 = isLinear
-        ? 'none'
-        : pickEase(['none', 'power1.inOut', 'power1.out', 'sine.inOut']);
-      const ease3 = isLinear
-        ? 'none'
-        : pickEase(['power2.in', 'power3.in', 'sine.in', 'power1.in']);
-
-      // --- Count-up: waypoints mirror bar fill ratios exactly so they stay in sync
+      // --- Segment plan: equal thirds when linear, fully randomised otherwise
       const countEndA = isWinner ? leaderPts : finalLastPts;
-      const countRange = countEndA - initialLastPts;
-      const countWp1 = initialLastPts + countRange * pct1Ratio;
-      const countWp2 = initialLastPts + countRange * pct2Ratio;
+      const targetNeeds = Math.max(0, pointsNeeded - receivedPoints);
+
+      type SegmentPlan = {
+        duration: number;
+        fillEnd: number;
+        countEnd: number;
+        needsEnd: number;
+        ease: string;
+      };
+
+      let segments: SegmentPlan[];
+
+      if (isLinear) {
+        const dur = phaseADuration / 3;
+        segments = [1 / 3, 2 / 3, 1].map((ratio) => ({
+          duration: dur,
+          fillEnd: cappedFillPct * ratio,
+          countEnd: initialLastPts + (countEndA - initialLastPts) * ratio,
+          needsEnd: pointsNeeded - (pointsNeeded - targetNeeds) * ratio,
+          ease: 'none',
+        }));
+      } else {
+        const EASING_POOL = [
+          'power1.in',
+          'power1.out',
+          'power1.inOut',
+          'power2.in',
+          'power2.out',
+          'power2.inOut',
+          'power3.in',
+          'power3.out',
+          'power3.inOut',
+          'power4.in',
+          'power4.out',
+          'expo.in',
+          'expo.out',
+          'sine.in',
+          'sine.out',
+          'sine.inOut',
+          'circ.out',
+          'none',
+        ];
+        const SEG_COUNT_WEIGHTS = [2, 3, 3, 4, 4, 5];
+        const segCount =
+          SEG_COUNT_WEIGHTS[
+            Math.floor(Math.random() * SEG_COUNT_WEIGHTS.length)
+          ]!;
+
+        // Durations: random values normalised to phaseADuration, with 8% minimum floor
+        const rawDurs = Array.from(
+          { length: segCount },
+          () => 0.2 + Math.random() * 0.8,
+        );
+        const rawTotal = rawDurs.reduce((s, v) => s + v, 0);
+        const minDur = phaseADuration * 0.08;
+        const floored = rawDurs.map((d) =>
+          Math.max((d / rawTotal) * phaseADuration, minDur),
+        );
+        const floeredTotal = floored.reduce((s, v) => s + v, 0);
+        const finalDurations = floored.map(
+          (d) => (d / floeredTotal) * phaseADuration,
+        );
+
+        // Waypoints: segCount-1 random ratios sorted ascending, then append 1.0
+        const midRatios = Array.from({ length: segCount - 1 }, () =>
+          Math.random(),
+        ).sort((a, b) => a - b);
+        const ratios = [...midRatios, 1.0];
+
+        segments = ratios.map((ratio, i) => ({
+          duration: finalDurations[i]!,
+          fillEnd: cappedFillPct * ratio,
+          countEnd: initialLastPts + (countEndA - initialLastPts) * ratio,
+          needsEnd: pointsNeeded - (pointsNeeded - targetNeeds) * ratio,
+          ease:
+            EASING_POOL[Math.floor(Math.random() * EASING_POOL.length)] ??
+            'none',
+        }));
+      }
+
       const countObjA = { value: initialLastPts };
       const updateCountA = () => {
         if (lastBadgePointsRef.current) {
@@ -166,11 +217,6 @@ export const useRevealAnimation = ({
         }
       };
 
-      // --- Needs countdown: label counts down with the same easing
-      const targetNeeds = Math.max(0, pointsNeeded - receivedPoints);
-      const needsRange = pointsNeeded - targetNeeds;
-      const needsWp1 = pointsNeeded - needsRange * pct1Ratio;
-      const needsWp2 = pointsNeeded - needsRange * pct2Ratio;
       const needsCountObj = { value: pointsNeeded };
       const updateNeedsCount = () => {
         if (needsCountdownRef.current) {
@@ -194,97 +240,39 @@ export const useRevealAnimation = ({
         },
       });
 
-      // Phase 2a — fill + badge + count-up + needs-countdown, three segments
-      tl.to(fillBarRef.current, {
-        height: `${segPct1}%`,
-        duration: segDur1,
-        ease: ease1,
-      })
-        .to(
-          lastBadgeRef.current,
-          { bottom: `${segPct1}%`, duration: segDur1, ease: ease1 },
-          '<',
-        )
-        .to(
-          countObjA,
-          {
-            value: countWp1,
-            duration: segDur1,
-            ease: ease1,
-            onUpdate: updateCountA,
-          },
-          '<',
-        )
-        .to(
-          needsCountObj,
-          {
-            value: needsWp1,
-            duration: segDur1,
-            ease: ease1,
-            onUpdate: updateNeedsCount,
-          },
-          '<',
-        )
-        .to(fillBarRef.current, {
-          height: `${segPct2}%`,
-          duration: segDur2,
-          ease: ease2,
+      // Phase 2a — fill + badge + count-up + needs-countdown, N randomised segments
+      for (const seg of segments) {
+        tl.to(fillBarRef.current, {
+          height: `${seg.fillEnd}%`,
+          duration: seg.duration,
+          ease: seg.ease,
         })
-        .to(
-          lastBadgeRef.current,
-          { bottom: `${segPct2}%`, duration: segDur2, ease: ease2 },
-          '<',
-        )
-        .to(
-          countObjA,
-          {
-            value: countWp2,
-            duration: segDur2,
-            ease: ease2,
-            onUpdate: updateCountA,
-          },
-          '<',
-        )
-        .to(
-          needsCountObj,
-          {
-            value: needsWp2,
-            duration: segDur2,
-            ease: ease2,
-            onUpdate: updateNeedsCount,
-          },
-          '<',
-        )
-        .to(fillBarRef.current, {
-          height: `${cappedFillPct}%`,
-          duration: segDur3,
-          ease: ease3,
-        })
-        .to(
-          lastBadgeRef.current,
-          { bottom: `${cappedFillPct}%`, duration: segDur3, ease: ease3 },
-          '<',
-        )
-        .to(
-          countObjA,
-          {
-            value: countEndA,
-            duration: segDur3,
-            ease: ease3,
-            onUpdate: updateCountA,
-          },
-          '<',
-        )
-        .to(
-          needsCountObj,
-          {
-            value: targetNeeds,
-            duration: segDur3,
-            ease: ease3,
-            onUpdate: updateNeedsCount,
-          },
-          '<',
-        );
+          .to(
+            lastBadgeRef.current,
+            { bottom: `${seg.fillEnd}%`, duration: seg.duration, ease: seg.ease },
+            '<',
+          )
+          .to(
+            countObjA,
+            {
+              value: seg.countEnd,
+              duration: seg.duration,
+              ease: seg.ease,
+              onUpdate: updateCountA,
+            },
+            '<',
+          )
+          .to(
+            needsCountObj,
+            {
+              value: seg.needsEnd,
+              duration: seg.duration,
+              ease: seg.ease,
+              onUpdate: updateNeedsCount,
+            },
+            '<',
+          );
+      }
 
       if (!isWinner) {
         // Leader holds on — gold flash on the leader badge

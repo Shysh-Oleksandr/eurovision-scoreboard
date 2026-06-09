@@ -95,8 +95,12 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
               <Button
                 onClick={() => setIsSorting(!isSorting)}
                 className="!p-3"
-                aria-label={isSorting ? 'Sort by name' : 'Sort by points'}
-                title={isSorting ? 'Sort by name' : 'Sort by points'}
+                aria-label={
+                  isSorting ? t('common.sortByName') : t('common.sortByPoints')
+                }
+                title={
+                  isSorting ? t('common.sortByName') : t('common.sortByPoints')
+                }
                 Icon={
                   isSorting ? (
                     <SortAZIcon className="w-5 h-5" />
@@ -109,8 +113,8 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
                 variant="primary"
                 onClick={onReset}
                 className="!p-3"
-                aria-label="Restart"
-                title="Restart"
+                aria-label={t('common.restart')}
+                title={t('common.restart')}
                 Icon={<RestartIcon className="w-5 h-5" />}
               />
               <Button variant="primary" onClick={onRandomize} className="!px-4">

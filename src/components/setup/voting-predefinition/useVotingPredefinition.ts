@@ -12,7 +12,7 @@ import { StageVotes } from '@/state/scoreboard/types';
 import { predefineStageVotes } from '@/state/scoreboard/votesPredefinition';
 
 type UseVotingPredefinitionArgs = {
-  stage: Pick<EventStage, 'id' | 'name' | 'votingMode'> & {
+  stage: Pick<EventStage, 'id' | 'name' | 'votingMode' | 'overrides'> & {
     countries: (BaseCountry | any)[];
   };
 };
@@ -20,14 +20,33 @@ type UseVotingPredefinitionArgs = {
 export const useVotingPredefinition = ({
   stage,
 }: UseVotingPredefinitionArgs) => {
-  const pointsSystem = useGeneralStore((s) => s.pointsSystem);
-  const televotePointsSystem = useGeneralStore((s) => s.televotePointsSystem);
-  const splitPointsSystem = useGeneralStore(
+  const globalPointsSystem = useGeneralStore((s) => s.pointsSystem);
+  const globalTelevotePointsSystem = useGeneralStore(
+    (s) => s.televotePointsSystem,
+  );
+  const globalSplitPointsSystem = useGeneralStore(
     (s) => s.settings.splitPointsSystem,
   );
-  const allowMultiplePointsToSameEntry = useGeneralStore(
+  const globalAllowMultiple = useGeneralStore(
     (s) => s.settings.allowMultiplePointsToSameEntry,
   );
+
+  // configuredEventStages is updated before onSave(), so it's always fresher
+  // than the `stage` prop (which may be stale, e.g. initialSetupStage).
+  const configuredStage = useCountriesStore((state) =>
+    state.configuredEventStages.find((s) => s.id === stage.id),
+  );
+  const effectiveVotingMode = configuredStage?.votingMode ?? stage.votingMode;
+  const stageOverride =
+    configuredStage?.overrides?.pointsSystem ?? stage.overrides?.pointsSystem;
+
+  const pointsSystem = stageOverride?.pointsSystem ?? globalPointsSystem;
+  const televotePointsSystem =
+    stageOverride?.televotePointsSystem ?? globalTelevotePointsSystem;
+  const splitPointsSystem =
+    stageOverride?.splitPointsSystem ?? globalSplitPointsSystem;
+  const allowMultiplePointsToSameEntry =
+    stageOverride?.allowMultiplePointsToSameEntry ?? globalAllowMultiple;
   const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
   const getStageVotingCountries = useCountriesStore(
     (s) => s.getStageVotingCountries,
@@ -42,7 +61,7 @@ export const useVotingPredefinition = ({
 
   const [lastStageId, setLastStageId] = useState<string | null>(stage.id);
   const [lastStageVotingMode, setLastStageVotingMode] =
-    useState<StageVotingMode | null>(stage.votingMode);
+    useState<StageVotingMode | null>(effectiveVotingMode);
 
   const votingCountries = getStageVotingCountries(
     stage.id,
@@ -50,16 +69,16 @@ export const useVotingPredefinition = ({
     selectedType !== StageVotingType.JURY,
   );
 
-  const isCombinedVoting = stage.votingMode === StageVotingMode.COMBINED;
+  const isCombinedVoting = effectiveVotingMode === StageVotingMode.COMBINED;
 
   const totalBadgeLabel = useMemo(() => {
-    const { votingMode } = stage;
+    if (effectiveVotingMode === StageVotingMode.JURY_ONLY) return 'Jury';
+    if (effectiveVotingMode === StageVotingMode.TELEVOTE_ONLY)
+      return 'Televote';
+    if (effectiveVotingMode === StageVotingMode.COMBINED) return 'Combined';
 
-    if (votingMode === StageVotingMode.JURY_ONLY) return 'Jury';
-    if (votingMode === StageVotingMode.TELEVOTE_ONLY) return 'Televote';
-    if (votingMode === StageVotingMode.COMBINED) return 'Combined';
     return 'Total';
-  }, [stage]);
+  }, [effectiveVotingMode]);
 
   const isTotalVoteType =
     selectedType === 'Total' && totalBadgeLabel === 'Total';
@@ -68,29 +87,29 @@ export const useVotingPredefinition = ({
     (totalBadgeLabel === 'Combined' || totalBadgeLabel === 'Total');
 
   const voteTypeOptions = useMemo(() => {
-    if (!stage) return [] as StageVotingType[];
-    const { votingMode } = stage;
     if (
       [StageVotingMode.JURY_AND_TELEVOTE, StageVotingMode.COMBINED].includes(
-        votingMode,
+        effectiveVotingMode,
       )
     ) {
       return [StageVotingType.JURY, StageVotingType.TELEVOTE];
     }
+
     return [] as StageVotingType[];
-  }, [stage]);
+  }, [effectiveVotingMode]);
 
   const getActiveSource = (): 'jury' | 'televote' | null => {
     if (
       selectedType === StageVotingType.JURY ||
-      stage.votingMode === StageVotingMode.JURY_ONLY
+      effectiveVotingMode === StageVotingMode.JURY_ONLY
     )
       return 'jury';
     if (
       selectedType === StageVotingType.TELEVOTE ||
-      stage.votingMode === StageVotingMode.TELEVOTE_ONLY
+      effectiveVotingMode === StageVotingMode.TELEVOTE_ONLY
     )
       return 'televote';
+
     return null;
   };
 
@@ -98,10 +117,22 @@ export const useVotingPredefinition = ({
     const effectiveTelevoteSystem = splitPointsSystem
       ? televotePointsSystem
       : pointsSystem;
+
+    const isJuryOnly =
+      selectedType === StageVotingType.JURY && totalBadgeLabel === 'Total';
+    const isTelevoteOnly =
+      selectedType === StageVotingType.TELEVOTE && totalBadgeLabel === 'Total';
+
+    const modeToGenerate = isJuryOnly
+      ? StageVotingMode.JURY_ONLY
+      : isTelevoteOnly
+      ? StageVotingMode.TELEVOTE_ONLY
+      : effectiveVotingMode;
+
     const generated = predefineStageVotes(
       stage.countries,
       votingCountries,
-      stage.votingMode,
+      modeToGenerate,
       countryOdds,
       randomnessLevel,
       pointsSystem,
@@ -109,7 +140,20 @@ export const useVotingPredefinition = ({
       allowMultiplePointsToSameEntry,
     );
 
-    setVotes(generated);
+    if (isJuryOnly) {
+      setVotes((prev) => ({
+        ...prev,
+        ...(generated.jury ? { jury: generated.jury } : {}),
+      }));
+    } else if (isTelevoteOnly) {
+      setVotes((prev) => ({
+        ...prev,
+        ...(generated.televote ? { televote: generated.televote } : {}),
+      }));
+    } else {
+      setVotes(generated);
+    }
+
     setIsSorting(true);
   };
 
@@ -125,6 +169,7 @@ export const useVotingPredefinition = ({
     rawValue: string,
   ) => {
     const source = getActiveSource();
+
     if (!source) return; // Total tab is non-editable
 
     setVotes((prev) => {
@@ -145,6 +190,7 @@ export const useVotingPredefinition = ({
             ...sourceMap,
             [voterCode]: retained,
           };
+
           return nextVotes;
         }
 
@@ -155,6 +201,7 @@ export const useVotingPredefinition = ({
 
         const chosen: typeof pointsSystem = [];
         let remaining = parsed;
+
         for (const p of available) {
           if (p.value <= remaining) {
             chosen.push(p);
@@ -172,13 +219,14 @@ export const useVotingPredefinition = ({
           countryCode: participantCode,
           points: p.value,
           pointsId: p.id,
-          showDouzePointsAnimation: p.value === 12,
+          showDouzePointsAnimation: !!p.showDouzePoints,
         }));
 
         (nextVotes as any)[source] = {
           ...sourceMap,
           [voterCode]: [...retained, ...newEntries],
         };
+
         return nextVotes;
       }
 
@@ -190,6 +238,7 @@ export const useVotingPredefinition = ({
         }
       } else {
         const matchingPoints = pointsSystem.filter((p) => p.value === parsed);
+
         if (matchingPoints.length === 0) {
           if (idx !== -1) {
             arr.splice(idx, 1);
@@ -214,6 +263,7 @@ export const useVotingPredefinition = ({
               : undefined;
 
           let chosenId: number | undefined;
+
           if (
             currentIdIfSameValue !== undefined &&
             !usedSet.has(currentIdIfSameValue)
@@ -238,11 +288,12 @@ export const useVotingPredefinition = ({
           }
 
           if (chosenId !== undefined) {
+            const chosenPoint = pointsSystem.find((p) => p.id === chosenId);
             const entry = {
               countryCode: participantCode,
               points: parsed,
               pointsId: chosenId,
-              showDouzePointsAnimation: parsed === 12,
+              showDouzePointsAnimation: !!chosenPoint?.showDouzePoints,
             };
 
             if (idx !== -1) {
@@ -255,15 +306,20 @@ export const useVotingPredefinition = ({
       }
 
       (nextVotes as any)[source] = { ...sourceMap, [voterCode]: arr };
+
       return nextVotes;
     });
   };
 
   const getVoterValidity = (voterCode: string) => {
     const source = getActiveSource();
+
     if (!source || !votes) return null;
+
     const used = (votes as any)[source]?.[voterCode] || [];
+
     if (!used || used.length === 0) return 'incomplete';
+
     const expectedIds = pointsSystem.map((p) => p.id);
 
     const usedIds = used.map((v: any) => v.pointsId);
@@ -273,6 +329,7 @@ export const useVotingPredefinition = ({
 
     if (!noDuplicates) return 'invalid';
     if (hasAll && usedIds.length === expectedIds.length) return 'valid';
+
     return hasAll ? 'invalid' : 'incomplete';
   };
 
@@ -281,41 +338,50 @@ export const useVotingPredefinition = ({
 
     const addFrom = (arr: any[] | undefined, acc: number) => {
       if (!arr) return acc;
+
       for (const v of arr) {
         if (v.countryCode === countryCode) acc += v.points || 0;
       }
+
       return acc;
     };
 
     if (isTotalOrCombinedVoteType) {
       if (isCombinedVoting) {
         let sum = 0;
+
         Object.values(votes.combined || {}).forEach((a: any) => {
           sum = addFrom(a as any[], sum);
         });
+
         return sum;
       }
 
       let sum = 0;
+
       Object.values(votes.jury || {}).forEach((a: any) => {
         sum = addFrom(a as any[], sum);
       });
       Object.values(votes.televote || {}).forEach((a: any) => {
         sum = addFrom(a as any[], sum);
       });
+
       return sum;
     }
 
     const source = getActiveSource() || 'televote';
     let sum = 0;
+
     Object.values(votes[source] || {}).forEach((a: any) => {
       sum = addFrom(a as any[], sum);
     });
+
     return sum;
   };
 
   const getCellValue = (participantCode: string, voterCode: string): number => {
     if (!votes) return 0;
+
     if (isTotalOrCombinedVoteType) {
       const juryArr = votes.jury?.[voterCode] || [];
       const televoteArr = votes.televote?.[voterCode] || [];
@@ -324,18 +390,22 @@ export const useVotingPredefinition = ({
       const found = arr
         .filter((v: any) => v.countryCode === participantCode)
         .reduce((acc, v) => acc + v.points, 0);
+
       return found || 0;
     }
+
     const source = getActiveSource() || 'televote';
     const arr = votes?.[source]?.[voterCode] || [];
     const total = arr
       .filter((v: any) => v.countryCode === participantCode)
       .reduce((acc: number, v: any) => acc + v.points, 0);
+
     return total || 0;
   };
 
   const rankedCountries = (() => {
     const totals: Record<string, number> = {};
+
     stage.countries.forEach((c) => {
       totals[c.code] = 0;
     });
@@ -375,19 +445,21 @@ export const useVotingPredefinition = ({
     const finalCountries = isSorting
       ? withRank
       : withRank.sort((a, b) => a.name.localeCompare(b.name));
+
     return finalCountries as Array<BaseCountry & { rank: number }>;
   })();
 
   const validateAllBeforeSave = () => {
     const modesToValidate: Array<'jury' | 'televote'> = [];
+
     if (
-      stage.votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
-      stage.votingMode === StageVotingMode.COMBINED
+      effectiveVotingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+      effectiveVotingMode === StageVotingMode.COMBINED
     ) {
       modesToValidate.push('jury', 'televote');
-    } else if (stage.votingMode === StageVotingMode.JURY_ONLY) {
+    } else if (effectiveVotingMode === StageVotingMode.JURY_ONLY) {
       modesToValidate.push('jury');
-    } else if (stage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
+    } else if (effectiveVotingMode === StageVotingMode.TELEVOTE_ONLY) {
       modesToValidate.push('televote');
     }
 
@@ -397,6 +469,7 @@ export const useVotingPredefinition = ({
     for (const mode of modesToValidate) {
       for (const voter of votingCountries) {
         if (mode === 'jury' && voter.code === 'WW') continue;
+
         const arr: any[] = (votes as any)?.[mode]?.[voter.code] || [];
         const usedIds: number[] = arr.map((v) => v.pointsId as number);
         const reasons: string[] = [];
@@ -404,6 +477,7 @@ export const useVotingPredefinition = ({
         const missingValues = expected
           .filter((p) => !usedIds.includes(p.id))
           .map((p) => p.value);
+
         if (missingValues.length > 0) {
           reasons.push(
             `not all points are used (missing: ${missingValues.join(', ')})`,
@@ -411,15 +485,19 @@ export const useVotingPredefinition = ({
         }
 
         const countsById = new Map<number, number>();
+
         for (const id of usedIds)
           countsById.set(id, (countsById.get(id) || 0) + 1);
+
         const duplicateIds: number[] = Array.from(countsById.entries())
           .filter(([, count]) => count > 1)
           .map(([id]) => id);
+
         if (duplicateIds.length > 0) {
           const duplicateValues = expected
             .filter((p) => duplicateIds.includes(p.id))
             .map((p) => p.value);
+
           reasons.push(`duplicate points (${duplicateValues.join(', ')})`);
         }
 
@@ -431,10 +509,12 @@ export const useVotingPredefinition = ({
         }
         if (reasons.length > 0) {
           const label = `${voter.name} (${mode})`;
+
           errors.push({ label, reasons });
         }
       }
     }
+
     return { ok: errors.length === 0, errors } as const;
   };
 
@@ -446,11 +526,11 @@ export const useVotingPredefinition = ({
   }, [stage.id, lastStageId]);
 
   useEffect(() => {
-    if (stage.votingMode !== lastStageVotingMode) {
+    if (effectiveVotingMode !== lastStageVotingMode) {
       resetVotes();
     }
-    setLastStageVotingMode(stage.votingMode);
-  }, [stage.votingMode, lastStageVotingMode]);
+    setLastStageVotingMode(effectiveVotingMode);
+  }, [effectiveVotingMode, lastStageVotingMode]);
 
   return {
     // stores & config
