@@ -400,6 +400,20 @@ export const useRevealAnimation = ({
         bottom: '70%',
       });
 
+      // Badge points are updated imperatively (GSAP onUpdate + triggerRevealAnimation)
+      // so store-driven re-renders never flash the post-televote total before the
+      // reveal animation starts.
+      if (leaderBadgePointsRef.current) {
+        leaderBadgePointsRef.current.textContent = String(
+          initialLeaderPointsRef.current,
+        );
+      }
+      if (lastBadgePointsRef.current) {
+        lastBadgePointsRef.current.textContent = String(
+          initialLastCountryPointsRef.current,
+        );
+      }
+
       const tl = gsap.timeline({
         onComplete: () => {
           entranceDoneRef.current = true;

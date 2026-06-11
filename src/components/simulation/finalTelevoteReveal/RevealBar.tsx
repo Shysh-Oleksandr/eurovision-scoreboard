@@ -86,9 +86,7 @@ const RevealBar = ({
         <span
           ref={leaderBadgePointsRef}
           className="font-bold text-countryItem-juryPointsText lg:text-lg text-base tabular-nums !leading-none relative z-10"
-        >
-          {leaderCountry.points}
-        </span>
+        />
         <img
           ref={leaderFlagRef}
           src={leaderLogo}
@@ -131,9 +129,7 @@ const RevealBar = ({
         <span
           ref={lastBadgePointsRef}
           className="font-bold text-countryItem-juryPointsText lg:text-lg text-base tabular-nums !leading-none relative z-10"
-        >
-          {lastCountry.points}
-        </span>
+        />
       </div>
 
       {/* Leader mark line */}
