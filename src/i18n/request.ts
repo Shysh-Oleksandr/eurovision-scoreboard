@@ -10,6 +10,7 @@ const SUPPORTED_LOCALES = [
   'pl',
   'it',
   'gr',
+  'pt',
 ] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 

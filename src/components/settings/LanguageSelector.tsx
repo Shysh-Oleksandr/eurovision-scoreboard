@@ -26,6 +26,7 @@ const options: LocaleOption[] = [
   { label: 'Ελληνικά', value: 'gr', imageUrl: getFlagPath('gr') },
   { label: 'Українська', value: 'uk', imageUrl: getFlagPath('ua') },
   { label: 'Polski', value: 'pl', imageUrl: getFlagPath('pl') },
+  { label: 'Português', value: 'pt', imageUrl: getFlagPath('pt') },
 ];
 
 export const LanguageSelector: React.FC = () => {

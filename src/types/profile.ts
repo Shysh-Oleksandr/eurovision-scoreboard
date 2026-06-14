@@ -20,4 +20,5 @@ export type PreferredLocale =
   | 'de'
   | 'pl'
   | 'it'
-  | 'gr';
+  | 'gr'
+  | 'pt';

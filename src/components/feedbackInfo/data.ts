@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-06-14',
+    title:
+      'Added Portuguese localization',
+  },
+  {
     date: '2026-06-05',
     title:
       'Added the ability to have different points system for each stage. Made the final reveal animation less predictable. The "Allow points to the same entry multiple times" option now also works for televote. Small UI improvements',
@@ -406,7 +411,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-06-11', end: '2026-06-14' },
+    approximateDates: { start: '2026-06-15', end: '2026-06-20' },
     title: 'Odds system improvements',
   },
   {
