@@ -306,8 +306,8 @@ const PresentationPanel = (): JSX.Element | null => {
 
                 setPresentationSettings({ presentationJuryGrouping: grouping });
               }}
-              containerClassName="!px-0 !py-0 !overflow-hidden"
-              overlayClassName="!top-0"
+              containerClassName="!p-[3px] !overflow-hidden"
+              overlayClassName="!inset-y-[2px]"
             />
             <Checkbox
               id="pause-after-animated-points"

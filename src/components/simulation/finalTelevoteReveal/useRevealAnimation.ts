@@ -249,7 +249,11 @@ export const useRevealAnimation = ({
         })
           .to(
             lastBadgeRef.current,
-            { bottom: `${seg.fillEnd}%`, duration: seg.duration, ease: seg.ease },
+            {
+              bottom: `${seg.fillEnd}%`,
+              duration: seg.duration,
+              ease: seg.ease,
+            },
             '<',
           )
           .to(

@@ -1,4 +1,5 @@
-import { Folder, Share2 } from 'lucide-react';
+import { isSameYear } from 'date-fns';
+import { Link2, Share2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import { toast } from 'react-toastify';
@@ -26,7 +27,9 @@ import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import { UserCogIcon } from '@/assets/icons/UserCogIcon';
 import { UsersIcon } from '@/assets/icons/UsersIcon';
 import { UserStarIcon } from '@/assets/icons/UserStarIcon';
-import Button from '@/components/common/Button';
+import OverflowMenu, {
+  type OverflowMenuEntry,
+} from '@/components/common/OverflowMenu';
 import UserInfo from '@/components/common/UserInfo';
 import { POINTS_ARRAY } from '@/data/data';
 import { getFlagPath } from '@/helpers/getFlagPath';
@@ -64,10 +67,17 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   isActive,
 }) => {
   const locale = useLocale();
-
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
-
   const handleShare = useHandleShare();
+  const t = useTranslations();
+  const { confirm } = useConfirmation();
+  const user = useAuthStore((state) => state.user);
+
+  const { mutateAsync: toggleQuickSelect } =
+    useToggleContestQuickSelectMutation();
+
+  const isMyContest =
+    variant === 'user' || contest.userId.toString() === user?._id;
 
   const { winnerName, winnerFlag } = useMemo(() => {
     if (!contest.winner)
@@ -93,33 +103,6 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     };
   }, [contest.winner, getAllCountries]);
 
-  const t = useTranslations();
-
-  const { confirm } = useConfirmation();
-
-  const user = useAuthStore((state) => state.user);
-
-  const { mutateAsync: toggleQuickSelect } =
-    useToggleContestQuickSelectMutation();
-
-  const handleQuickSelect = async () => {
-    if (!user) return;
-
-    try {
-      await toggleQuickSelect(contest._id);
-
-      if (quickSelectedByMe) {
-        toast.success(t('widgets.quickSelectRemoved'));
-      } else {
-        toast.success(t('widgets.quickSelectAdded'));
-      }
-    } catch (error: any) {
-      console.error('Failed to toggle quick select:', error);
-    }
-  };
-  const isMyContest =
-    variant === 'user' || contest.userId.toString() === user?._id;
-
   const hasSplitPointsSystem = !!(
     contest.juryPointsSystem?.length || contest.televotePointsSystem?.length
   );
@@ -128,9 +111,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     if (hasSplitPointsSystem) return false;
     if (!contest.customPointsSystem || contest.customPointsSystem.length === 0)
       return false;
-
     if (contest.customPointsSystem.length !== POINTS_ARRAY.length) return true;
-
     for (let i = 0; i < contest.customPointsSystem.length; i += 1) {
       if (contest.customPointsSystem[i] !== POINTS_ARRAY[i]) return true;
     }
@@ -142,93 +123,222 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     contest.hostingCountryCode,
   );
 
+  const handleQuickSelect = async () => {
+    if (!user) return;
+    try {
+      await toggleQuickSelect(contest._id);
+      toast.success(
+        quickSelectedByMe
+          ? t('widgets.quickSelectRemoved')
+          : t('widgets.quickSelectAdded'),
+      );
+    } catch (error: any) {
+      console.error('Failed to toggle quick select:', error);
+    }
+  };
+
+  const handleCopyLink = () => {
+    const url = window.location.href.split('?')[0] + `?contest=${contest._id}`;
+
+    navigator.clipboard.writeText(url);
+    toast.success('Link copied to clipboard!');
+  };
+
+  const overflowItems: OverflowMenuEntry[] = [
+    {
+      icon: <Link2 className="size-4" />,
+      label: t('widgets.copyLink'),
+      onClick: handleCopyLink,
+    },
+    {
+      icon: <Share2 className="size-4" />,
+      label: t('simulation.header.share'),
+      onClick: () => handleShare('contest', contest._id, contest.name),
+    },
+    'hr',
+    {
+      icon: quickSelectedByMe ? (
+        <PinSolidIcon className="size-4" />
+      ) : (
+        <PinIcon className="size-4" />
+      ),
+      label: t('widgets.quickSelect'),
+      onClick: handleQuickSelect,
+    },
+    ...(isMyContest
+      ? ([
+          'hr',
+          {
+            variant: 'stats' as const,
+            stats: [
+              {
+                id: 'likes',
+                icon: <ThumbsUpIcon className="size-4" />,
+                value: contest.likes,
+              },
+              {
+                id: 'saves',
+                icon: <BookmarkIcon className="size-4" />,
+                value: contest.saves,
+              },
+            ],
+          },
+        ] as OverflowMenuEntry[])
+      : []),
+    ...(isMyContest && onDelete
+      ? ([
+          'hr',
+          {
+            icon: <TrashIcon className="size-4" />,
+            label: t('common.delete'),
+            onClick: () => {
+              confirm({
+                key: 'delete-contest',
+                title: t('settings.confirmations.deleteItem', {
+                  name: `${contest.name} ${contest.year}`,
+                }),
+                description: t('settings.confirmations.actionCannotBeUndone'),
+                type: 'danger',
+                onConfirm: () => onDelete(contest._id),
+              });
+            },
+            variant: 'danger' as const,
+          },
+        ] as OverflowMenuEntry[])
+      : []),
+  ];
+
+  const secondaryActionClassName =
+    'inline-flex items-center justify-center h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]';
+
   return (
-    <div className="bg-primary-950 bg-gradient-to-bl from-primary-900 to-primary-800/60 shadow-lg rounded-lg overflow-hidden p-4 border border-white/20 hover:border-white/40 transition-colors">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-            {!contest.isPublic && (
-              <div className="text-xs text-white/60 bg-primary-800 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit">
-                {t('widgets.private')}
-              </div>
-            )}
-            {contest.group && (
-              <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
-                <Folder className="size-3 shrink-0" aria-hidden />
-                <span className="truncate">{contest.group.name}</span>
-              </div>
-            )}
+    <div className="relative rounded-[18px] border shadow-xl transition-colors border-white/10 bg-gradient-to-bl from-primary-900 to-primary-800 overflow-hidden">
+      {/* Accent top bar — wrapped to clip at card radius */}
+      <div className="overflow-hidden rounded-t-[18px]">
+        <div className="h-[5px] bg-gradient-to-r from-primary-700 to-transparent" />
+      </div>
+
+      <div className="grid gap-4 p-4 sm:[grid-template-columns:minmax(0,230px)_1fr] grid-cols-1">
+        {/* Left: status panel */}
+        <div className="flex sm:flex-col items-center sm:justify-center justify-between gap-2.5 rounded-[12px] text-center sm:border-b sm:border-r border-white/10 sm:py-[18px] sm:px-[14px] sm:bg-black/25 sm:shadow-[inset 0 0 0 1px rgba(255,255,255,0.06)] sm:flex-nowrap flex-wrap">
+          <div className="flex sm:flex-col items-center sm:gap-2.5 gap-2">
+            {/* Host flag/logo */}
+            <Image
+              src={logo}
+              alt={t('simulation.header.hostingCountryLogo')}
+              className={`flex-none rounded-sm ${
+                isExisting
+                  ? 'sm:w-[52px] w-[36px] sm:h-[52px] h-[36px] object-cover'
+                  : 'w-[52px] h-[40px] object-cover'
+              }`}
+              width={52}
+              height={52}
+              onError={(e) => {
+                e.currentTarget.src = getFlagPath('ww');
+              }}
+              unoptimized
+            />
+
+            {/* Contest name + year */}
+            <div
+              className="text-white font-[800] leading-tight sm:text-[17px] text-[16px]"
+              style={{ letterSpacing: '-0.02em' }}
+            >
+              {contest.name} {contest.year}
+            </div>
           </div>
 
-          <h3 className="text-white font-semibold text-l mb-1">
-            <div className="flex items-center justify-between flex-wrap gap-1.5">
-              <div className="flex items-center gap-1.5">
+          {/* Status badge */}
+          {contest.winner ? (
+            <ContestBadge variant="gold">
+              {winnerFlag && (
                 <Image
-                  src={logo}
-                  alt={t('simulation.header.hostingCountryLogo')}
-                  className={`flex-none rounded-sm ${
-                    isExisting
-                      ? 'w-8 h-8 overflow-visible'
-                      : 'w-8 h-6 object-cover mr-1'
-                  }`}
-                  width={32}
-                  height={32}
+                  src={winnerFlag}
+                  alt={winnerName ?? 'Winner flag'}
+                  className="w-[18px] h-[13px] rounded-sm object-cover flex-none"
+                  width={18}
+                  height={13}
                   onError={(e) => {
                     e.currentTarget.src = getFlagPath('ww');
                   }}
                   unoptimized
                 />
-                <span>
-                  {contest.name} {contest.year}
-                </span>
-              </div>
+              )}
+              {winnerName} 🏆
+            </ContestBadge>
+          ) : contest.isSimulationStarted ? (
+            <ContestBadge variant="green">
+              <LoaderCircleIcon className="size-3.5 flex-none" />
+              {t('widgets.contests.inProgress')}
+            </ContestBadge>
+          ) : (
+            <ContestBadge variant="red">
+              <CircleDashedIcon className="size-3.5 flex-none" />
+              {t('widgets.contests.notStarted')}
+            </ContestBadge>
+          )}
+        </div>
 
-              <span className="text-xs text-white/60">
-                {new Date(contest.createdAt).toLocaleDateString(locale, {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </span>
-            </div>
-          </h3>
+        {/* Right: info + actions */}
+        <div className="flex flex-col min-w-0">
+          <div className="flex justify-between items-start gap-2">
+            <span className="text-[11px] font-[800] tracking-[0.16em] uppercase whitespace-nowrap text-white/40">
+              {isMyContest && !contest.isPublic
+                ? t('widgets.private')
+                : t('widgets.public')}{' '}
+              {t('common.contest').toLowerCase()}
+            </span>
+            <span className="sm:text-[12.5px] text-[11px] text-white/40 whitespace-nowrap flex-shrink-0">
+              {new Date(contest.createdAt).toLocaleDateString(locale, {
+                year: isSameYear(new Date(contest.createdAt), new Date())
+                  ? undefined
+                  : 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
+          </div>
+
+          {/* Description */}
           {contest.description && (
             <p
-              className="text-white/70 text-sm line-clamp-3"
+              className="text-white/70 line-clamp-2 mt-1.5 leading-[1.5]"
+              style={{ fontSize: '13.5px' }}
               title={contest.description}
             >
               {contest.description}
             </p>
           )}
 
-          {/* Contest metadata */}
-          <div className="flex flex-wrap gap-1.5 mt-2">
+          {/* Metadata badges */}
+          <div className="flex flex-wrap gap-[7px] mt-2.5">
             {contest.venue && (
-              <ContestMetadataBadge>
-                <MapPinIcon className="size-4" />
+              <ContestBadge>
+                <MapPinIcon className="size-3.5 flex-none" />
                 {contest.venue}
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
-
             {contest.hosts && (
-              <ContestMetadataBadge>
-                <MicIcon className="size-4" />
+              <ContestBadge>
+                <MicIcon className="size-3.5 flex-none" />
                 {contest.hosts}
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
-
             {contest.stageNames.length > 0 && (
-              <ContestMetadataBadge>
-                <ListIcon className="size-4" />
-                {contest.stageNames.join(' → ')}
-              </ContestMetadataBadge>
+              <ContestBadge>
+                <ListIcon className="size-3.5 flex-none" />
+                {contest.stageNames.length <= 3
+                  ? contest.stageNames.join(' → ')
+                  : `${contest.stageNames[0]} → … → ${
+                      contest.stageNames[contest.stageNames.length - 1]
+                    } (${contest.stageNames.length})`}
+              </ContestBadge>
             )}
-
             {contest.totalParticipants > 0 && (
-              <ContestMetadataBadge>
-                <UsersIcon className="size-4" />
+              <ContestBadge>
+                <UsersIcon className="size-3.5 flex-none" />
                 {contest.stageNames.length > 1 ||
                 contest.grandFinalParticipants !== contest.totalParticipants
                   ? t('widgets.contests.nParticipants', {
@@ -238,196 +348,152 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                 {t('widgets.contests.nGrandFinalParticipants', {
                   count: contest.grandFinalParticipants,
                 })}
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
-
             {contest.customEntriesCount > 0 && (
-              <ContestMetadataBadge className="!bg-amber-900/60 !text-amber-200">
-                <UserCogIcon className="size-4" />
+              <ContestBadge variant="amber">
+                <UserCogIcon className="size-3.5 flex-none" />
                 {t('widgets.contests.nCustom', {
                   count: contest.customEntriesCount,
                 })}
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
-
             {isCustomPointsSystem && (
-              <ContestMetadataBadge className="!bg-purple-900/60 !text-purple-200">
-                <UserStarIcon className="size-4" />
+              <ContestBadge variant="purple">
+                <UserStarIcon className="size-3.5 flex-none" />
                 {t('widgets.contests.pointsSystem')}:{' '}
                 {contest.customPointsSystem?.join(', ')}
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
             {hasSplitPointsSystem && contest.juryPointsSystem && (
-              <ContestMetadataBadge className="!bg-purple-900/60 !text-purple-200">
-                <UserStarIcon className="size-4" />
+              <ContestBadge variant="purple">
+                <UserStarIcon className="size-3.5 flex-none" />
                 {t('widgets.contests.juryPointsSystem')}:{' '}
                 {contest.juryPointsSystem.join(', ')}
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
             {hasSplitPointsSystem && contest.televotePointsSystem && (
-              <ContestMetadataBadge className="!bg-violet-900/60 !text-violet-200">
-                <UserStarIcon className="size-4" />
+              <ContestBadge variant="violet">
+                <UserStarIcon className="size-3.5 flex-none" />
                 {t('widgets.contests.televotePointsSystem')}:{' '}
                 {contest.televotePointsSystem.join(', ')}
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
-
             {(contest.themeId || contest.standardThemeId) && (
-              <ContestMetadataBadge
-                className="!bg-pink-900/60 !text-pink-200"
-                icon={<ThemeIcon className="size-4" />}
-              >
+              <ContestBadge variant="pink">
+                <ThemeIcon className="size-3.5 flex-none" />
                 {t('common.theme')}:{' '}
                 {contest.themeId
                   ? t('common.custom')
                   : contest.standardThemeId?.replace('-', ' ')}
-              </ContestMetadataBadge>
-            )}
-
-            {contest.isSimulationStarted && !contest.winner && (
-              <ContestMetadataBadge className="!bg-green-900/60 !text-green-200">
-                <LoaderCircleIcon className="size-4" />
-                {t('widgets.contests.inProgress')}
-              </ContestMetadataBadge>
-            )}
-            {!contest.isSimulationStarted && !contest.winner && (
-              <ContestMetadataBadge className="!bg-red-900/60 !text-red-200">
-                <CircleDashedIcon className="size-4" />
-                {t('widgets.contests.notStarted')}
-              </ContestMetadataBadge>
-            )}
-
-            {contest.winner && (
-              <ContestMetadataBadge className="!bg-yellow-900/60 !text-yellow-200">
-                {winnerFlag && (
-                  <Image
-                    src={winnerFlag}
-                    alt={winnerName ?? 'Winner flag'}
-                    className="w-5 h-4 rounded-sm"
-                    width={20}
-                    height={16}
-                    onError={(e) => {
-                      e.currentTarget.src = getFlagPath('ww');
-                    }}
-                    unoptimized
-                  />
-                )}{' '}
-                {winnerName} 🏆
-              </ContestMetadataBadge>
+              </ContestBadge>
             )}
           </div>
+
+          {/* Spacer */}
+          <div className="flex-1 min-h-[12px]" />
+
+          {/* Creator */}
+          {contest.creator && <UserInfo user={contest.creator} size="sm" />}
+
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            {/* Load */}
+            <button
+              type="button"
+              onClick={() => onLoad(contest)}
+              className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] text-white transition-[filter] hover:brightness-110 disabled:cursor-not-allowed"
+              style={{
+                background:
+                  'linear-gradient(180deg, hsl(var(--twc-primary-700)), hsl(var(--twc-primary-750)))',
+                boxShadow:
+                  '0 6px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.25)',
+                filter: isActive ? 'grayscale(0.3) brightness(0.8)' : undefined,
+              }}
+            >
+              <TrophyIcon className="size-5 flex-none" />
+              {isActive ? t('common.loaded') : t('common.load')}
+            </button>
+
+            {/* Secondary actions — grouped so they wrap as a unit */}
+            <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+              {/* Edit (user contests only) */}
+              {isMyContest && onEdit && (
+                <button
+                  type="button"
+                  onClick={() => onEdit(contest)}
+                  className={secondaryActionClassName}
+                  aria-label={t('common.edit')}
+                >
+                  <PencilIcon className="size-[19px]" />
+                </button>
+              )}
+
+              {/* Like / Save (public contests only) */}
+              {!isMyContest && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onLike?.(contest._id)}
+                    disabled={!user}
+                    className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                      likedByMe
+                        ? 'text-white border-transparent'
+                        : 'text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]'
+                    }`}
+                    style={
+                      likedByMe
+                        ? {
+                            background: 'hsl(var(--twc-primary-700))',
+                            borderColor: 'transparent',
+                          }
+                        : {}
+                    }
+                  >
+                    {likedByMe ? (
+                      <ThumbsUpSolidIcon className="size-[19px]" />
+                    ) : (
+                      <ThumbsUpIcon className="size-[19px]" />
+                    )}
+                    {contest.likes > 0 && (
+                      <span className="tabular-nums">{contest.likes}</span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => onSave?.(contest._id, savedByMe ?? false)}
+                    disabled={!user}
+                    className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                      savedByMe
+                        ? 'text-white border-transparent'
+                        : 'text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]'
+                    }`}
+                    style={
+                      savedByMe
+                        ? {
+                            background: 'hsl(var(--twc-primary-700))',
+                            borderColor: 'transparent',
+                          }
+                        : {}
+                    }
+                  >
+                    {savedByMe ? (
+                      <BookmarkCheckIcon className="size-[19px]" />
+                    ) : (
+                      <BookmarkIcon className="size-[19px]" />
+                    )}
+                    {contest.saves > 0 && (
+                      <span className="tabular-nums">{contest.saves}</span>
+                    )}
+                  </button>
+                </>
+              )}
+
+              <OverflowMenu items={overflowItems} />
+            </div>
+          </div>
         </div>
-      </div>
-
-      {contest.creator && (
-        <div className="mb-3">
-          <UserInfo user={contest.creator} size="sm" />
-        </div>
-      )}
-
-      <div className="flex gap-2 flex-wrap">
-        <Button
-          variant="primary"
-          onClick={() => onLoad(contest)}
-          className="!py-2 !px-4 !text-base"
-          Icon={<TrophyIcon className="sm:size-6 size-5" />}
-        >
-          {isActive ? t('common.loaded') : t('common.load')}
-        </Button>
-
-        {isMyContest && onEdit && (
-          <Button
-            variant="tertiary"
-            onClick={() => onEdit(contest)}
-            className="!py-2 !px-4 !text-base"
-            Icon={<PencilIcon className="sm:size-6 size-5" />}
-          >
-            {t('common.edit')}
-          </Button>
-        )}
-
-        {isMyContest && onDelete && (
-          <Button
-            variant="destructive"
-            onClick={() => {
-              confirm({
-                key: 'delete-contest',
-                title: t('settings.confirmations.deleteItem', {
-                  name: `${contest.name} ${contest.year}`,
-                }),
-                description: t('settings.confirmations.actionCannotBeUndone'),
-                type: 'danger',
-                onConfirm: () => {
-                  onDelete(contest._id);
-                },
-              });
-            }}
-            className="!py-2 !px-4 !text-base text-red-300 hover:text-red-200"
-            Icon={<TrashIcon className="sm:size-6 size-5" />}
-          >
-            {t('common.delete')}
-          </Button>
-        )}
-
-        <Button
-          variant="tertiary"
-          onClick={() => onLike?.(contest._id)}
-          className="!py-2 !px-4 !text-base"
-          disabled={!user || isMyContest}
-          Icon={
-            likedByMe ? (
-              <ThumbsUpSolidIcon className="sm:size-6 size-5" />
-            ) : (
-              <ThumbsUpIcon className="sm:size-6 size-5" />
-            )
-          }
-        >
-          {contest.likes > 0
-            ? t('widgets.nLikes', { count: contest.likes })
-            : t('widgets.like')}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={() => onSave?.(contest._id, savedByMe ?? false)}
-          className="!py-2 !px-4 !text-base"
-          disabled={!user || isMyContest}
-          Icon={
-            savedByMe ? (
-              <BookmarkCheckIcon className="sm:size-6 size-5" />
-            ) : (
-              <BookmarkIcon className="sm:size-6 size-5" />
-            )
-          }
-        >
-          {contest.saves > 0
-            ? t('widgets.nSaves', { count: contest.saves })
-            : t('widgets.save')}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={handleQuickSelect}
-          className={`!py-2 !px-4 !text-base ${
-            quickSelectedByMe ? 'bg-primary-700/50' : ''
-          }`}
-          disabled={!user}
-          Icon={
-            quickSelectedByMe ? (
-              <PinSolidIcon className="sm:size-6 size-5" />
-            ) : (
-              <PinIcon className="sm:size-6 size-5" />
-            )
-          }
-        >
-          {t('widgets.quickSelect')}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={() => handleShare('contest', contest._id, contest.name)}
-          className={`!py-2 !px-4 !text-base`}
-          Icon={<Share2 className="sm:size-6 size-5" />}
-        >
-          {t('simulation.header.share')}
-        </Button>
       </div>
     </div>
   );
@@ -435,20 +501,82 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 
 export default ContestListItem;
 
-const ContestMetadataBadge = ({
-  icon,
-  className,
+type BadgeVariant =
+  | 'default'
+  | 'purple'
+  | 'violet'
+  | 'pink'
+  | 'amber'
+  | 'gold'
+  | 'green'
+  | 'red';
+
+const badgeVariantStyles: Record<
+  BadgeVariant,
+  { background: string; border: string; color: string }
+> = {
+  default: {
+    background: 'rgba(255,255,255,0.06)',
+    border: 'rgba(255,255,255,0.10)',
+    color: 'rgba(255,255,255,0.72)',
+  },
+  purple: {
+    background: 'rgba(150,108,255,0.16)',
+    border: 'rgba(150,108,255,0.32)',
+    color: '#c3acff',
+  },
+  violet: {
+    background: 'rgba(124,92,255,0.14)',
+    border: 'rgba(124,92,255,0.30)',
+    color: '#b9a4ff',
+  },
+  pink: {
+    background: 'rgba(255,61,132,0.14)',
+    border: 'rgba(255,61,132,0.32)',
+    color: '#ff9bbe',
+  },
+  amber: {
+    background: 'rgba(217,160,40,0.14)',
+    border: 'rgba(217,160,40,0.30)',
+    color: '#f0cd78',
+  },
+  gold: {
+    background: 'rgba(245,200,60,0.16)',
+    border: 'rgba(245,200,60,0.36)',
+    color: '#ffe08a',
+  },
+  green: {
+    background: 'rgba(46,196,138,0.14)',
+    border: 'rgba(46,196,138,0.30)',
+    color: '#8ff0c8',
+  },
+  red: {
+    background: 'rgba(255,84,104,0.14)',
+    border: 'rgba(255,84,104,0.32)',
+    color: '#ffa6b1',
+  },
+};
+
+const ContestBadge = ({
+  variant = 'default',
   children,
 }: {
   children: React.ReactNode;
-  icon?: React.ReactNode;
-  className?: string;
+  variant?: BadgeVariant;
 }) => {
+  const styles = badgeVariantStyles[variant];
+
   return (
     <span
-      className={`text-xs bg-primary-800/60 text-white/80 px-2 py-1 rounded-full flex items-center gap-1 ${className}`}
+      className="inline-flex items-center gap-1.5 font-semibold leading-none rounded-full"
+      style={{
+        fontSize: '12.5px',
+        padding: '7px 11px',
+        background: styles.background,
+        border: `1px solid ${styles.border}`,
+        color: styles.color,
+      }}
     >
-      {icon && icon}
       {children}
     </span>
   );

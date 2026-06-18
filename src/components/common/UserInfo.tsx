@@ -65,15 +65,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
 
   return (
     <div
-      className={`flex items-center flex-wrap justify-between gap-2.5 rounded-md p-1 ${
+      className={`flex items-center flex-wrap justify-between gap-2.5 rounded-xl p-1 ${
         isViewedUser
           ? ''
-          : 'transition-colors duration-300 cursor-pointer hover:bg-primary-800/60'
+          : 'transition-colors duration-300 cursor-pointer hover:bg-primary-900/40'
       }`}
       onClick={() => !isViewedUser && setSelectedProfileUser?.(user)}
       role={isViewedUser ? undefined : 'button'}
     >
-      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+      <div className="flex items-center gap-2.5 flex-1 min-w-[100px]">
         <Image
           src={user.avatarUrl || '/img/ProfileAvatarPlaceholder.png'}
           alt={user.username || 'avatar'}
@@ -103,7 +103,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
               />
             )}
           </div>
-          <span className={`${s.username} text-white/70`}>
+          <span className={`${s.username} text-white/70 break-all`}>
             @{user.username}
           </span>
         </div>
@@ -112,7 +112,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
         onClick={(e) => e.stopPropagation()}
         className="flex-shrink-0 ml-auto"
       >
-        <FollowButton userId={user._id} variant={size === 'sm' ? 'sm' : 'md'} />
+        <FollowButton
+          userId={user._id}
+          variant={size === 'sm' ? 'sm' : 'md'}
+          pill={size === 'sm'}
+        />
       </div>
     </div>
   );

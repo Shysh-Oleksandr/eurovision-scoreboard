@@ -1,4 +1,5 @@
-import { Folder, Share2, Volume1 } from 'lucide-react';
+import { isSameYear } from 'date-fns';
+import { Link2, Share2, Volume1 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -18,12 +19,15 @@ import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
 import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
 import { TrashIcon } from '@/assets/icons/TrashIcon';
-import Button from '@/components/common/Button';
+import OverflowMenu, {
+  type OverflowMenuEntry,
+} from '@/components/common/OverflowMenu';
 import UserInfo from '@/components/common/UserInfo';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAuthStore } from '@/state/useAuthStore';
 import { resolveThemeSpecificsForCustomTheme } from '@/theme/themeSpecifics';
-import { getCssVarsForCustomTheme } from '@/theme/themeUtils';
+import { getCssVarsForCustomTheme, getCardThemeVars } from '@/theme/themeUtils';
 import { CustomTheme } from '@/types/customTheme';
 
 interface ThemeListItemProps {
@@ -56,33 +60,17 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   quickSelectedByMe,
 }) => {
   const locale = useLocale();
-
   const t = useTranslations();
 
   const user = useAuthStore((state) => state.user);
   const isMyTheme = variant === 'user' || theme.userId.toString() === user?._id;
+  const isBelowXs = useMediaQuery('(max-width: 479px)');
 
   const { mutateAsync: toggleQuickSelect } =
     useToggleThemeQuickSelectMutation();
-
   const { confirm } = useConfirmation();
-
-  const handleQuickSelect = async () => {
-    if (!user) return;
-
-    try {
-      await toggleQuickSelect(theme._id);
-
-      if (quickSelectedByMe) {
-        toast.success(t('widgets.quickSelectRemoved'));
-      } else {
-        toast.success(t('widgets.quickSelectAdded'));
-      }
-    } catch (error: any) {
-      console.error('Failed to toggle quick select:', error);
-    }
-  };
   const handleShare = useHandleShare();
+
   const [points, setPoints] = useState(42);
   const [lastPoints, setLastPoints] = useState<number | null>(12);
   const [showDouzePointsAnimation, setShowDouzePointsAnimation] =
@@ -91,132 +79,99 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   const handleAwardPoints = (value: number) => {
     setLastPoints(value);
     setPoints((prev) => prev + value);
-
     setShowDouzePointsAnimation(true);
-    // Reset animation state after animation completes
-    setTimeout(() => {
-      setShowDouzePointsAnimation(false);
-    }, 3000); // Animation duration
+    setTimeout(() => setShowDouzePointsAnimation(false), 3000);
+  };
+
+  const handleQuickSelect = async () => {
+    if (!user) return;
+    try {
+      await toggleQuickSelect(theme._id);
+      toast.success(
+        quickSelectedByMe
+          ? t('widgets.quickSelectRemoved')
+          : t('widgets.quickSelectAdded'),
+      );
+    } catch (error: any) {
+      console.error('Failed to toggle quick select:', error);
+    }
+  };
+
+  const handleCopyLink = () => {
+    const url = window.location.href.split('?')[0] + `?theme=${theme._id}`;
+
+    navigator.clipboard.writeText(url);
+    toast.success('Link copied to clipboard!');
   };
 
   const cssVars = useMemo(() => getCssVarsForCustomTheme(theme), [theme]);
+  const cardThemeVars = useMemo(() => getCardThemeVars(theme), [theme]);
   const themeSpecifics = useMemo(
     () => resolveThemeSpecificsForCustomTheme(theme),
     [theme],
   );
 
-  return (
-    <div
-      className="bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-800/60 shadow-lg rounded-lg overflow-hidden p-4 border border-white/20 hover:border-white/40 transition-colors"
-      style={cssVars as React.CSSProperties}
-    >
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-            {!theme.isPublic && (
-              <div className="text-xs text-white/60 bg-primary-800 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit">
-                {t('widgets.private')}
-              </div>
-            )}
-            {theme.group && (
-              <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
-                <Folder className="size-3 shrink-0" aria-hidden />
-                <span className="truncate">{theme.group.name}</span>
-              </div>
-            )}
-          </div>
-          <h3 className="text-white font-semibold text-l mb-1">
-            <div className="flex items-center justify-between flex-wrap gap-1.5">
-              <span className="flex items-center gap-1.5">
-                {theme.name}
-                <span className="text-xs text-white/60">
-                  {theme.hasCustomAudio ? <Volume1 className="size-4" /> : null}
-                </span>
-              </span>
-
-              <span className="text-xs text-white/60">
-                {new Date(theme.createdAt).toLocaleDateString(locale, {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </span>
-            </div>
-          </h3>
-          {theme.description && (
-            <p className="text-white/70 text-sm line-clamp-2">
-              {theme.description}
-            </p>
-          )}
-        </div>
-      </div>
-
-      <div className="mb-2 md:gap-4 gap-2 flex justify-center sm:items-center items-start sm:flex-row-reverse flex-col">
-        <ThemePreviewCountryItemCompact
-          backgroundImage={theme.backgroundImageUrl || null}
-          overrides={theme.overrides || {}}
-          baseThemeYear={theme.baseThemeYear}
-          points={points}
-          lastPoints={lastPoints}
-          showDouzePointsAnimation={showDouzePointsAnimation}
-          isListItem
-          onClick={() => handleAwardPoints(12)}
-          previewCountryCode={theme.creator?.country}
-          uppercaseEntryName={themeSpecifics.uppercaseEntryName}
-          pointsContainerShape={themeSpecifics.pointsContainerShape}
-          flagShape={themeSpecifics.flagShape}
-          isJuryPointsPanelRounded={themeSpecifics.isJuryPointsPanelRounded}
-          juryActivePointsUnderline={themeSpecifics.juryActivePointsUnderline}
-          usePointsCountUpAnimation={themeSpecifics.usePointsCountUpAnimation}
-          roundedCountryContainer={themeSpecifics.roundedCountryContainer}
-          douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
-        />
-      </div>
-      {theme.creator && (
-        <div className="mb-3">
-          <UserInfo user={theme.creator} size="sm" />
-        </div>
-      )}
-
-      <div className="flex gap-2 flex-wrap">
-        <Button
-          variant="primary"
-          onClick={() => onApply(theme)}
-          className="!py-2 !px-4 !text-base"
-          disabled={isApplied}
-          Icon={<ThemeIcon className="sm:size-6 size-5" />}
-        >
-          {isApplied ? t('widgets.applied') : t('widgets.apply')}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={() => onDuplicate(theme)}
-          className="!py-2 !px-4 !text-base"
-          disabled={!user}
-          Icon={<CopyIcon className="sm:size-6 size-5" />}
-        >
-          {theme.duplicatesCount
-            ? t('widgets.nCopies', { count: theme.duplicatesCount })
-            : t('widgets.copy')}
-        </Button>
-
-        {isMyTheme && onEdit && (
-          <Button
-            variant="tertiary"
-            onClick={() => onEdit(theme)}
-            className="!py-2 !px-4 !text-base"
-            Icon={<PencilIcon className="sm:size-6 size-5" />}
-          >
-            {t('common.edit')}
-          </Button>
-        )}
-
-        {isMyTheme && onDelete && (
-          <Button
-            variant="destructive"
-            onClick={() => {
+  const overflowItems: OverflowMenuEntry[] = [
+    ...(isBelowXs
+      ? ([
+          {
+            icon: <CopyIcon className="size-4" />,
+            label:
+              (theme.duplicatesCount ?? 0) > 0
+                ? `${t('widgets.copy')} (${theme.duplicatesCount})`
+                : t('widgets.copy'),
+            onClick: () => onDuplicate(theme),
+          },
+          'hr',
+        ] as OverflowMenuEntry[])
+      : []),
+    {
+      icon: <Link2 className="size-4" />,
+      label: t('widgets.copyLink'),
+      onClick: handleCopyLink,
+    },
+    {
+      icon: <Share2 className="size-4" />,
+      label: t('simulation.header.share'),
+      onClick: () => handleShare('theme', theme._id, theme.name),
+    },
+    'hr',
+    {
+      icon: quickSelectedByMe ? (
+        <PinSolidIcon className="size-4" />
+      ) : (
+        <PinIcon className="size-4" />
+      ),
+      label: t('widgets.quickSelect'),
+      onClick: handleQuickSelect,
+    },
+    ...(isMyTheme
+      ? ([
+          'hr',
+          {
+            variant: 'stats' as const,
+            stats: [
+              {
+                id: 'likes',
+                icon: <ThumbsUpIcon className="size-4" />,
+                value: theme.likes,
+              },
+              {
+                id: 'saves',
+                icon: <BookmarkIcon className="size-4" />,
+                value: theme.saves,
+              },
+            ],
+          },
+        ] as OverflowMenuEntry[])
+      : []),
+    ...(isMyTheme && onDelete
+      ? ([
+          'hr',
+          {
+            icon: <TrashIcon className="size-4" />,
+            label: t('common.delete'),
+            onClick: () => {
               confirm({
                 key: 'delete-theme',
                 title: t('settings.confirmations.deleteItem', {
@@ -224,77 +179,234 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                 }),
                 description: t('settings.confirmations.actionCannotBeUndone'),
                 type: 'danger',
-                onConfirm: () => {
-                  onDelete(theme._id);
-                },
+                onConfirm: () => onDelete(theme._id),
               });
-            }}
-            className="!py-2 !px-4 !text-base text-red-300 hover:text-red-200"
-            Icon={<TrashIcon className="sm:size-6 size-5" />}
-          >
-            {t('common.delete')}
-          </Button>
-        )}
+            },
+            variant: 'danger' as const,
+          },
+        ] as OverflowMenuEntry[])
+      : []),
+  ];
 
-        <Button
-          variant="tertiary"
-          onClick={() => onLike?.(theme._id)}
-          className="!py-2 !px-4 !text-base"
-          disabled={!user || isMyTheme}
-          Icon={
-            likedByMe ? (
-              <ThumbsUpSolidIcon className="sm:size-6 size-5" />
-            ) : (
-              <ThumbsUpIcon className="sm:size-6 size-5" />
-            )
-          }
-        >
-          {theme.likes > 0
-            ? t('widgets.nLikes', { count: theme.likes })
-            : t('widgets.like')}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={() => onSave?.(theme._id, savedByMe ?? false)}
-          className="!py-2 !px-4 !text-base"
-          disabled={!user || isMyTheme}
-          Icon={
-            savedByMe ? (
-              <BookmarkCheckIcon className="sm:size-6 size-5" />
-            ) : (
-              <BookmarkIcon className="sm:size-6 size-5" />
-            )
-          }
-        >
-          {theme.saves > 0
-            ? t('widgets.nSaves', { count: theme.saves })
-            : t('widgets.save')}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={handleQuickSelect}
-          className={`!py-2 !px-4 !text-base ${
-            quickSelectedByMe ? 'bg-primary-700/50' : ''
-          } `}
-          disabled={!user}
-          Icon={
-            quickSelectedByMe ? (
-              <PinSolidIcon className="sm:size-6 size-5" />
-            ) : (
-              <PinIcon className="sm:size-6 size-5" />
-            )
-          }
-        >
-          {t('widgets.quickSelect')}
-        </Button>
-        <Button
-          variant="tertiary"
-          onClick={() => handleShare('theme', theme._id, theme.name)}
-          className={`!py-2 !px-4 !text-base`}
-          Icon={<Share2 className="sm:size-6 size-5" />}
-        >
-          {t('simulation.header.share')}
-        </Button>
+  const secondaryActionClassName =
+    'inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]';
+
+  return (
+    <div
+      className="relative rounded-[18px] border shadow-xl transition-colors hover:brightness-105 overflow-hidden"
+      style={{
+        ...(cssVars as React.CSSProperties),
+        ...(cardThemeVars as React.CSSProperties),
+        background: 'linear-gradient(155deg, var(--t-a), var(--t-b))',
+        borderColor: 'var(--t-bd)',
+      }}
+    >
+      {/* Accent top bar — wrapped to clip at card radius */}
+      <div className="overflow-hidden rounded-t-[18px]">
+        <div
+          style={{
+            height: 5,
+            background: 'linear-gradient(90deg, var(--t-acc), transparent)',
+          }}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+        {/* Left: scoreboard preview */}
+        <div className="flex flex-col gap-2 min-w-0">
+          <ThemePreviewCountryItemCompact
+            backgroundImage={theme.backgroundImageUrl || null}
+            overrides={theme.overrides || {}}
+            baseThemeYear={theme.baseThemeYear}
+            points={points}
+            lastPoints={lastPoints}
+            showDouzePointsAnimation={showDouzePointsAnimation}
+            isListItem
+            onClick={() => handleAwardPoints(12)}
+            previewCountryCode={theme.creator?.country}
+            uppercaseEntryName={themeSpecifics.uppercaseEntryName}
+            pointsContainerShape={themeSpecifics.pointsContainerShape}
+            flagShape={themeSpecifics.flagShape}
+            isJuryPointsPanelRounded={themeSpecifics.isJuryPointsPanelRounded}
+            juryActivePointsUnderline={themeSpecifics.juryActivePointsUnderline}
+            usePointsCountUpAnimation={themeSpecifics.usePointsCountUpAnimation}
+            roundedCountryContainer={themeSpecifics.roundedCountryContainer}
+            douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
+            togglesBelow
+          />
+        </div>
+
+        {/* Right: info + actions */}
+        <div className="flex flex-col min-w-0">
+          {/* Header row */}
+          <div className="flex justify-between items-start gap-2">
+            <div className="min-w-0 flex-1">
+              {/* Kicker + audio pill */}
+              <div className="flex items-center gap-1.5 mb-[5px] flex-wrap">
+                <span
+                  className="text-[11px] font-[800] tracking-[0.16em] uppercase whitespace-nowrap"
+                  style={{ color: 'var(--t-acc)' }}
+                >
+                  {isMyTheme && !theme.isPublic
+                    ? t('widgets.private')
+                    : t('widgets.public')}{' '}
+                  {t('common.theme').toLowerCase()}
+                </span>
+                {theme.hasCustomAudio && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
+                    <Volume1 className="size-[11px]" />
+                    Audio
+                  </span>
+                )}
+              </div>
+
+              {/* Theme name */}
+              <h3 className="text-white font-[800] sm:text-[19px] text-[17px] tracking-[-0.02em] leading-tight m-0">
+                {theme.name}
+              </h3>
+
+              {/* Description */}
+              {theme.description && (
+                <p className="text-white/70 text-[13.5px] line-clamp-2 mt-1 leading-[1.5]">
+                  {theme.description}
+                </p>
+              )}
+            </div>
+
+            {/* Date + overflow */}
+            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+              <span className="sm:text-[12.5px] text-[11px] font-semibold text-white/40 whitespace-nowrap">
+                {new Date(theme.createdAt).toLocaleDateString(locale, {
+                  year: isSameYear(new Date(theme.createdAt), new Date())
+                    ? undefined
+                    : 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </span>
+              <OverflowMenu items={overflowItems} />
+            </div>
+          </div>
+
+          <div className="mt-auto md:pt-2">
+            {/* Creator */}
+            {theme.creator && <UserInfo user={theme.creator} size="sm" />}
+
+            {/* Actions */}
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              {/* Apply */}
+              <button
+                type="button"
+                onClick={() => onApply(theme)}
+                disabled={isApplied}
+                className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] text-white transition-[filter] hover:brightness-110 disabled:cursor-not-allowed"
+                style={{
+                  background:
+                    'linear-gradient(180deg, var(--t-acc), var(--t-acc-d))',
+                  boxShadow:
+                    '0 6px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.25)',
+                  filter: isApplied
+                    ? 'grayscale(0.3) brightness(0.8)'
+                    : undefined,
+                }}
+              >
+                <ThemeIcon className="size-5 flex-none" />
+                {isApplied ? t('widgets.applied') : t('widgets.apply')}
+              </button>
+
+              {/* Secondary actions — grouped so they wrap as a unit */}
+              <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
+                {/* Edit (user themes only) */}
+                {isMyTheme && onEdit && (
+                  <button
+                    type="button"
+                    onClick={() => onEdit(theme)}
+                    className={secondaryActionClassName}
+                    aria-label={t('common.edit')}
+                  >
+                    <PencilIcon className="size-[19px]" />
+                  </button>
+                )}
+
+                {/* Like / Save (public themes only) */}
+                {!isMyTheme && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => onLike?.(theme._id)}
+                      disabled={!user}
+                      className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                        likedByMe
+                          ? 'text-white border-transparent'
+                          : 'text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]'
+                      }`}
+                      style={
+                        likedByMe
+                          ? {
+                              background: 'var(--t-acc)',
+                              borderColor: 'transparent',
+                            }
+                          : {}
+                      }
+                    >
+                      {likedByMe ? (
+                        <ThumbsUpSolidIcon className="size-[19px]" />
+                      ) : (
+                        <ThumbsUpIcon className="size-[19px]" />
+                      )}
+                      {theme.likes > 0 && (
+                        <span className="tabular-nums">{theme.likes}</span>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => onSave?.(theme._id, savedByMe ?? false)}
+                      disabled={!user}
+                      className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                        savedByMe
+                          ? 'text-white border-transparent'
+                          : 'text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]'
+                      }`}
+                      style={
+                        savedByMe
+                          ? {
+                              background: 'var(--t-acc)',
+                              borderColor: 'transparent',
+                            }
+                          : {}
+                      }
+                    >
+                      {savedByMe ? (
+                        <BookmarkCheckIcon className="size-[19px]" />
+                      ) : (
+                        <BookmarkIcon className="size-[19px]" />
+                      )}
+                      {theme.saves > 0 && (
+                        <span className="tabular-nums">{theme.saves}</span>
+                      )}
+                    </button>
+                  </>
+                )}
+                {/* Copy — visible from xs up; below xs lives in overflow menu */}
+                <button
+                  type="button"
+                  onClick={() => onDuplicate(theme)}
+                  className={`${secondaryActionClassName} hidden xs:inline-flex`}
+                >
+                  <CopyIcon className="size-[19px]" />
+                  {(theme.duplicatesCount ?? 0) > 0 && (
+                    <span className="tabular-nums">
+                      {theme.duplicatesCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

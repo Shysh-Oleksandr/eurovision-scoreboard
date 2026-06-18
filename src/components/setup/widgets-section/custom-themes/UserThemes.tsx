@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import WidgetPager from '../WidgetPager';
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
@@ -314,25 +315,12 @@ const UserThemes: React.FC<UserThemesProps> = ({
         </div>
 
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 pt-2">
-            <Button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
-            >
-              {t('widgets.previous')}
-            </Button>
-            <span className="px-3 py-1 text-white text-sm font-medium">
-              {t('widgets.pageNOfM', { page, totalPages })}
-            </span>
-            <Button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
-            >
-              {t('widgets.next')}
-            </Button>
-          </div>
+          <WidgetPager
+            page={page}
+            totalPages={totalPages}
+            onPrev={() => setPage((p) => Math.max(1, p - 1))}
+            onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          />
         )}
       </>
     );

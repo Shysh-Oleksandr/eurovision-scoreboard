@@ -35,6 +35,7 @@
     "reset": "Zurücksetzen",
     "clear": "Leeren",
     "theme": "Theme",
+    "contest": "Wettbewerb",
     "image": "Bild",
     "pasteImageUrl": "Bild-URL einfügen",
     "or": "Oder",
@@ -358,6 +359,7 @@
     "quickSelect": "Schnell auswählen",
     "quickSelectAdded": "Zu schnell auswählen hinzugefügt!",
     "quickSelectRemoved": "Von schnell auswählen entfernt!",
+    "copyLink": "Link kopieren",
     "profile": {
       "title": "Profil",
       "description": "Verwalte dein Profil und deine Einstellungen",

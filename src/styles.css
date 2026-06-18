@@ -169,6 +169,11 @@ h6 {
   font-weight: 400;
 }
 
+.border {
+  border-width: 1px;
+  border-style: solid;
+}
+
 /* Fonts */
 
 /* montserrat-regular - latin */

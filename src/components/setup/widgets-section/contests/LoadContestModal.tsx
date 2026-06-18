@@ -163,8 +163,8 @@ const LoadContestModal: React.FC<LoadContestModalProps> = ({
                       simulationLoadOption: tab as SimulationLoadOptions,
                     }))
                   }
-                  containerClassName="!px-0 !py-0 mt-2 !overflow-hidden"
-                  overlayClassName="!top-0"
+                  containerClassName="!py-1 mt-2 !overflow-hidden"
+                  overlayClassName="!inset-y-[2px]"
                 />
               )}
             </div>

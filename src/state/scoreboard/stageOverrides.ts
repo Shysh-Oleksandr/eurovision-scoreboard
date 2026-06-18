@@ -10,7 +10,10 @@ export interface ResolvedPointsSystem {
 
 export const resolveStagePointsSystem = (
   stage: EventStage | undefined,
-  general: Pick<GeneralState, 'pointsSystem' | 'televotePointsSystem' | 'settings'>,
+  general: Pick<
+    GeneralState,
+    'pointsSystem' | 'televotePointsSystem' | 'settings'
+  >,
 ): ResolvedPointsSystem => {
   const o = stage?.overrides?.pointsSystem;
 

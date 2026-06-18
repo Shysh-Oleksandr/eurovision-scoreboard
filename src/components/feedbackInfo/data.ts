@@ -244,9 +244,12 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-06-18',
+    title: 'Improved the UI for the themes and contests modals',
+  },
+  {
     date: '2026-06-14',
-    title:
-      'Added Portuguese localization',
+    title: 'Added Portuguese localization',
   },
   {
     date: '2026-06-05',
@@ -411,7 +414,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-06-15', end: '2026-06-20' },
+    approximateDates: { start: '2026-06-20', end: '2026-06-21' },
     title: 'Odds system improvements',
   },
   {

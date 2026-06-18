@@ -92,8 +92,9 @@ export const RunningOrderTab = ({
             tabs={layoutTabs}
             activeTab={layoutValue}
             setActiveTab={(tab) => setSelectedLayout(tab as 'list' | 'grid')}
-            containerClassName="!px-0 !py-0 ml-auto !overflow-hidden !h-10 !w-32"
-            overlayClassName="!top-0 !h-10"
+            containerClassName="!p-[3px] ml-auto !overflow-hidden !h-11 !w-[112px]"
+            overlayClassName="!inset-y-[2px]"
+            buttonClassName="!py-0 !px-0 h-full"
           />
         </div>
       </div>

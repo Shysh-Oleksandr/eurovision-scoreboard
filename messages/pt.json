@@ -35,6 +35,7 @@
     "reset": "Repor",
     "clear": "Limpar",
     "theme": "Tema",
+    "contest": "Concurso",
     "image": "Imagem",
     "pasteImageUrl": "Cole um URL de imagem",
     "or": "Ou",
@@ -355,6 +356,7 @@
     "quickSelect": "Seleção Rápida",
     "quickSelectAdded": "Adicionado à seleção rápida!",
     "quickSelectRemoved": "Removido da seleção rápida!",
+    "copyLink": "Copiar link",
     "profile": {
       "title": "Perfil",
       "description": "Gerir o seu perfil e seguidores",

@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
+import WidgetPager from '../WidgetPager';
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
@@ -328,25 +329,12 @@ const UserContests: React.FC<UserContestsProps> = ({
         </div>
 
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 pt-2">
-            <Button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
-            >
-              {t('widgets.previous')}
-            </Button>
-            <span className="px-3 py-1 text-white text-sm font-medium">
-              {t('widgets.pageNOfM', { page, totalPages })}
-            </span>
-            <Button
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-              className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
-            >
-              {t('widgets.next')}
-            </Button>
-          </div>
+          <WidgetPager
+            page={page}
+            totalPages={totalPages}
+            onPrev={() => setPage((p) => Math.max(1, p - 1))}
+            onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          />
         )}
       </>
     );
@@ -406,7 +394,7 @@ const UserContests: React.FC<UserContestsProps> = ({
             <Button
               onClick={() => setMyLeaderboardOpen(true)}
               Icon={<ChartColumn className="w-6 h-6" />}
-              className="justify-center whitespace-nowrap !p-3"
+              className="justify-center whitespace-nowrap !p-[12.5px]"
               title={t('widgets.contests.entryStats.pickerTitle')}
             />
           }

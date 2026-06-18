@@ -1,6 +1,6 @@
 'use client';
 
-import { UserPlus } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 import { toast } from 'react-toastify';
@@ -10,7 +10,6 @@ import {
   useFollowMutation,
   useUnfollowMutation,
 } from '@/api/follows';
-import { UserCheckIcon } from '@/assets/icons/UserCheckIcon';
 import Button from '@/components/common/Button';
 import { cn } from '@/helpers/utils';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -18,12 +17,14 @@ import { useAuthStore } from '@/state/useAuthStore';
 interface FollowButtonProps {
   userId: string;
   variant?: 'sm' | 'md';
+  pill?: boolean;
   onFollowChange?: () => void;
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({
   userId,
   variant = 'md',
+  pill = false,
   onFollowChange,
 }) => {
   const t = useTranslations();
@@ -39,6 +40,20 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   if (isOwnProfile) return null;
 
   if (!isAuthenticated) {
+    if (pill) {
+      return (
+        <button
+          type="button"
+          disabled
+          className="inline-flex items-center gap-2 rounded-full bg-white/[0.08] border border-white/[0.12] text-white/40 text-[12.5px] font-bold uppercase tracking-wide px-4 py-2 cursor-not-allowed"
+          title={t('widgets.profile.signInToFollow')}
+        >
+          <Plus className="w-5 h-5  flex-none" />
+          {t('widgets.profile.follow')}
+        </button>
+      );
+    }
+
     return (
       <Button
         label={t('widgets.profile.follow')}
@@ -67,6 +82,32 @@ const FollowButton: React.FC<FollowButtonProps> = ({
     }
   };
 
+  if (pill) {
+    return (
+      <div onClick={(e) => e.stopPropagation()} role="presentation">
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={isLoading || isMutating}
+          className={`inline-flex items-center gap-2 rounded-full text-[12.5px] font-bold uppercase tracking-wide px-4 py-2 border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+            isFollowing
+              ? 'bg-transparent border-white/[0.12] text-white/40 hover:text-white/60'
+              : 'bg-white/[0.08] border-white/[0.12] text-white/80 hover:bg-white/[0.14] hover:text-white'
+          }`}
+        >
+          {isFollowing ? (
+            <Check className="w-5 h-5 flex-none" />
+          ) : (
+            <Plus className="w-5 h-5  flex-none" />
+          )}
+          {isFollowing
+            ? t('widgets.profile.following')
+            : t('widgets.profile.follow')}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div onClick={(e) => e.stopPropagation()} role="presentation">
       <Button
@@ -80,18 +121,18 @@ const FollowButton: React.FC<FollowButtonProps> = ({
         disabled={isLoading || isMutating}
         isLoading={isMutating}
         className={cn(
-          '!gap-1.5 min-w-[80px] !py-2.5 !px-3',
+          '!gap-2 min-w-[80px] !py-2.5 !px-3',
           variant === 'sm' ? '!text-xs' : '!text-sm',
         )}
         Icon={
           isFollowing ? (
-            <UserCheckIcon
+            <Check
               className={`${
                 variant === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
               } flex-none`}
             />
           ) : (
-            <UserPlus
+            <Plus
               className={`${
                 variant === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
               } flex-none`}

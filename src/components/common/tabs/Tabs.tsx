@@ -36,13 +36,11 @@ const TabContent: React.FC<TabContentProps> = ({
   preserveContent = false,
 }) => {
   if (!preserveContent) {
-    // Return only the active tab content
     const activeTabItem = tabs.find((tab) => tab.value === activeTab);
 
     return activeTabItem?.content || null;
   }
 
-  // Preserve all tab content, only hide inactive ones
   return (
     <>
       {tabs.map((tab) => (
@@ -67,8 +65,6 @@ const Tabs: React.FC<TabsProps> = ({
   alwaysHorizontal = true,
 }) => {
   const isSmallScreen = false;
-  // Commented out because we don't use vertical tabs anymore
-  // useMediaQuery('(max-width: 479px)') && !alwaysHorizontal;
 
   const containerRef = useRef<HTMLElement | null>(null);
   const [tabDimensions, setTabDimensions] = useState<
@@ -79,15 +75,13 @@ const Tabs: React.FC<TabsProps> = ({
 
   const activeTabStyle = useMemo(() => {
     const activeTabIndex = tabs.findIndex((tab) => tab.value === activeTab);
-
     const { width: activeTabWidth, left: activeTabLeft } = tabDimensions[
       activeTabIndex
     ] || { width: 0, left: 0 };
 
     return {
-      width: isSmallScreen ? 'calc(100% - 14px)' : activeTabWidth || 0,
-      left: isSmallScreen ? '6px' : `${activeTabLeft}px`,
-      // transform: isSmallScreen ? `translateY(${activeTabLeft}px)` : 'none',
+      width: isSmallScreen ? 'calc(100% - 10px)' : activeTabWidth || 0,
+      left: isSmallScreen ? '5px' : `${activeTabLeft}px`,
     };
   }, [tabs, tabDimensions, isSmallScreen, activeTab]);
 
@@ -103,7 +97,6 @@ const Tabs: React.FC<TabsProps> = ({
   }, []);
 
   useEffect(() => {
-    // Measure immediately and again after fonts are ready (helps avoid width drift on custom font load)
     measureTabs();
 
     let cancelled = false;
@@ -111,7 +104,6 @@ const Tabs: React.FC<TabsProps> = ({
     if (document.fonts && typeof document.fonts.ready?.then === 'function') {
       document.fonts.ready.then(() => {
         if (!cancelled) {
-          // Next frame to ensure layout has settled after font swap
           requestAnimationFrame(() => measureTabs());
         }
       });
@@ -138,7 +130,6 @@ const Tabs: React.FC<TabsProps> = ({
   }, [measureTabs]);
 
   useEffect(() => {
-    // Observe container and tab size changes for more reliable measurements
     const containerEl = containerRef.current;
 
     if (!containerEl || typeof ResizeObserver === 'undefined') return;
@@ -159,12 +150,16 @@ const Tabs: React.FC<TabsProps> = ({
       ref={containerRef}
       className={`flex ${
         alwaysHorizontal ? 'flex-row' : 'xs:flex-row flex-col'
-      } overflow-x-auto items-center p-1 px-2 gap-1 md:text-lg text-base text-white/70 bg-primary-900 rounded-xl w-full relative ${containerClassName}`}
+      } overflow-x-auto items-center py-[7px] px-[5px] gap-[6px] bg-black/25 border border-white/[0.10] rounded-[14px] w-full relative ${containerClassName}`}
     >
       {isInitialized && (
         <div
-          className={`absolute top-1 md:h-12 h-10 bg-gradient-to-tr from-[20%] from-primary-800 to-primary-700/70 rounded-lg shadow transition-all duration-[400ms] ease-in-out ${overlayClassName}`}
-          style={activeTabStyle}
+          className={`absolute inset-y-[4px] bg-gradient-to-b from-primary-700 to-primary-800 rounded-[10px] transition-all duration-[350ms] ease-in-out ${overlayClassName}`}
+          style={{
+            ...activeTabStyle,
+            boxShadow:
+              '0 1px 0 rgba(255,255,255,0.10) inset, 0 6px 16px rgba(0,0,0,0.30)',
+          }}
         />
       )}
       {tabs.map((tab, index) => (
@@ -175,10 +170,10 @@ const Tabs: React.FC<TabsProps> = ({
           }}
           role="tab"
           type="button"
-          className={`flex whitespace-nowrap items-center justify-center md:h-12 h-10 px-3 w-full font-medium rounded-lg outline-none transition-colors duration-300 relative z-10 ${
+          className={`flex flex-1 whitespace-nowrap items-center justify-center px-[18px] py-[11px] text-[15px] font-bold rounded-[10px] outline-none transition-colors duration-200 relative z-10 ${
             activeTab === tab.value
               ? 'text-white'
-              : 'text-white/60 hover:text-white'
+              : 'text-white/55 hover:text-white/80'
           } ${buttonClassName}`}
           aria-selected={activeTab === tab.value}
           onClick={() => setActiveTab(tab.value)}

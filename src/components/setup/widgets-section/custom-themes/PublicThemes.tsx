@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
 import { DateRangeFilter } from '../utils/getFilterDateRange';
+import WidgetPager from '../WidgetPager';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
 
@@ -9,7 +10,6 @@ import { usePublicThemeActions } from './hooks/usePublicThemeActions';
 import ThemeListItem from './ThemeListItem';
 
 import { usePublicThemesQuery, useThemesStateQuery } from '@/api/themes';
-import Button from '@/components/common/Button';
 import { Checkbox } from '@/components/common/Checkbox';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
@@ -136,27 +136,13 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
             ))}
           </div>
 
-          {/* Pagination */}
           {data.totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 pt-2">
-              <Button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
-              >
-                {t('widgets.previous')}
-              </Button>
-              <span className="px-3 py-1 text-white text-sm font-medium">
-                {t('widgets.pageNOfM', { page, totalPages: data.totalPages })}
-              </span>
-              <Button
-                onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
-                disabled={page === data.totalPages}
-                className="!py-1.5 !text-base sm:w-[120px] w-[100px]"
-              >
-                {t('widgets.next')}
-              </Button>
-            </div>
+            <WidgetPager
+              page={page}
+              totalPages={data.totalPages}
+              onPrev={() => setPage((p) => Math.max(1, p - 1))}
+              onNext={() => setPage((p) => Math.min(data.totalPages, p + 1))}
+            />
           )}
         </>
       ) : (

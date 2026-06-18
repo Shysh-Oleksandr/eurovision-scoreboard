@@ -260,6 +260,9 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     // Set theme attribute
     document.documentElement.setAttribute('data-theme', 'custom');
 
+    // Dynamic accent color — set --prim-hue so the global palette can derive from theme hue
+    document.documentElement.style.setProperty('--prim-hue', String(theme.hue));
+
     // Apply background image if present
     if (theme.backgroundImageUrl) {
       document.body.style.backgroundImage = `url(${theme.backgroundImageUrl})`;
@@ -325,5 +328,25 @@ export function getDefaultThemeColors(
     ...base,
     primary: { ...base.primary, ...primary },
     gray: { ...base.gray, ...gray },
+  };
+}
+
+/**
+ * Compute per-card CSS variables for custom theme cards.
+ * Returns --t-a/--t-b (background surfaces), --t-bd (border), --t-acc/--t-acc-d (accent).
+ */
+export function getCardThemeVars(theme: CustomTheme): Record<string, string> {
+  const h = theme.hue;
+  // Scale saturation/lightness relative to DEFAULT_V=60 baseline
+  const sf =
+    Math.max(typeof theme.shadeValue === 'number' ? theme.shadeValue : 60, 1) /
+    60;
+
+  return {
+    '--t-a': `hsl(${h}, ${Math.round(67 * sf)}%, ${Math.round(12 * sf)}%)`,
+    '--t-b': `hsl(${h}, ${Math.round(55 * sf)}%, ${Math.round(20 * sf)}%)`,
+    '--t-bd': `hsla(${h}, 80%, 60%, 0.30)`,
+    '--t-acc': `hsl(${h}, 88%, 62%)`,
+    '--t-acc-d': `hsl(${h}, 88%, 50%)`,
   };
 }
