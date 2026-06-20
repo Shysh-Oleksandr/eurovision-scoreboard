@@ -515,7 +515,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               <div
                 ref={dropdownRef}
                 style={dropdownStyle}
-                className={`bg-primary-900/60 backdrop-blur-sm rounded-md shadow-lg ${
+                className={`bg-[var(--p-800)]/95 backdrop-blur-sm rounded-[12px] border border-[var(--hair)] shadow-[var(--shadow-menu)] bg-primary-800/30 ${
                   dropdownFooter
                     ? 'flex flex-col max-h-[min(300px,calc(100vh-120px))] overflow-hidden'
                     : 'max-h-[300px] overflow-y-auto'

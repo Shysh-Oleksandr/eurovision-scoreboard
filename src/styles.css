@@ -760,7 +760,7 @@ h6 {
     theme('colors.primary-900') 3em
   );
   color: #fff;
-  border-radius: 0.25em;
+  border-radius: 10px;
   box-shadow: 0 0 1em 0 rgb(0 0 0 / 20%);
   cursor: pointer;
 

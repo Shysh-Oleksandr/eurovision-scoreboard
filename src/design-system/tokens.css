@@ -20,16 +20,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap');
 
 :root {
+
   /* ---- Primary hue (degrees, 0–360) ---- */
   --prim-hue: 300;
 
   /* ---- Interface palette (derived from hue via OKLCH) ----
      Override these with hex for environments without OKLCH support. */
-  --p-950: oklch(8% 0.06 var(--prim-hue)); /* deepest bg, behind modal */
-  --p-900: oklch(12% 0.09 var(--prim-hue)); /* modal background */
-  --p-800: oklch(17% 0.11 var(--prim-hue)); /* card surface */
-  --p-750: oklch(21% 0.13 var(--prim-hue)); /* elevated surface, active tab */
-  --p-700: oklch(25% 0.14 var(--prim-hue)); /* avatar bg, pill tab active */
+  --p-950: oklch( 8%  0.06  var(--prim-hue));   /* deepest bg, behind modal */
+  --p-900: oklch(12%  0.09  var(--prim-hue));   /* modal background */
+  --p-800: oklch(17%  0.11  var(--prim-hue));   /* card surface */
+  --p-750: oklch(21%  0.13  var(--prim-hue));   /* elevated surface, active tab */
+  --p-700: oklch(25%  0.14  var(--prim-hue));   /* avatar bg, pill tab active */
 
   /* Static hex fallbacks (hue 300, deep purple) */
   --p-950-fb: #130a20;
@@ -40,111 +41,106 @@
 
   /* ---- Accent colors (also derived from hue) ---- */
   /* +55° hue shift at fixed chroma/lightness — vivid, readable at any primary hue */
-  --accent: oklch(65% 0.28 calc(var(--prim-hue) + 55)); /* primary accent */
-  --accent-2: oklch(60% 0.22 calc(var(--prim-hue) - 40)); /* secondary accent */
+  --accent:   oklch(65%  0.28  calc(var(--prim-hue) + 55));   /* primary accent */
+  --accent-2: oklch(60%  0.22  calc(var(--prim-hue) - 40));   /* secondary accent */
   --accent-ink: #ffffff;
 
   /* Static hex fallbacks */
-  --accent-fb: #ff3d84;
+  --accent-fb:   #ff3d84;
   --accent-2-fb: #6c8cff;
 
   /* ---- Ink (text) ---- */
-  --ink: #ffffff;
+  --ink:    #ffffff;
   --ink-70: rgba(255, 255, 255, 0.72);
   --ink-55: rgba(255, 255, 255, 0.55);
-  --ink-40: rgba(255, 255, 255, 0.4);
+  --ink-40: rgba(255, 255, 255, 0.40);
   --ink-25: rgba(255, 255, 255, 0.25);
 
   /* ---- Dividers / borders ---- */
-  --hair: rgba(255, 255, 255, 0.1); /* subtle border */
-  --hair-2: rgba(255, 255, 255, 0.16); /* slightly more visible border */
+  --hair:   rgba(255, 255, 255, 0.10);   /* subtle border */
+  --hair-2: rgba(255, 255, 255, 0.16);   /* slightly more visible border */
 
   /* ---- Semantic badge colors ---- */
-  --badge-purple-bg: rgba(150, 108, 255, 0.16);
-  --badge-purple-bd: rgba(150, 108, 255, 0.32);
+  --badge-purple-bg:  rgba(150, 108, 255, 0.16);
+  --badge-purple-bd:  rgba(150, 108, 255, 0.32);
   --badge-purple-ink: #c3acff;
 
-  --badge-pink-bg: rgba(255, 61, 132, 0.14);
-  --badge-pink-bd: rgba(255, 61, 132, 0.32);
-  --badge-pink-ink: #ff9bbe;
+  --badge-pink-bg:    rgba(255, 61, 132, 0.14);
+  --badge-pink-bd:    rgba(255, 61, 132, 0.32);
+  --badge-pink-ink:   #ff9bbe;
 
-  --badge-amber-bg: rgba(217, 160, 40, 0.14);
-  --badge-amber-bd: rgba(217, 160, 40, 0.3);
-  --badge-amber-ink: #f0cd78;
+  --badge-amber-bg:   rgba(217, 160, 40, 0.14);
+  --badge-amber-bd:   rgba(217, 160, 40, 0.30);
+  --badge-amber-ink:  #f0cd78;
 
-  --badge-green-bg: rgba(46, 196, 138, 0.14);
-  --badge-green-bd: rgba(46, 196, 138, 0.3);
-  --badge-green-ink: #8ff0c8;
+  --badge-green-bg:   rgba(46, 196, 138, 0.14);
+  --badge-green-bd:   rgba(46, 196, 138, 0.30);
+  --badge-green-ink:  #8ff0c8;
 
-  --badge-red-bg: rgba(255, 84, 104, 0.14);
-  --badge-red-bd: rgba(255, 84, 104, 0.32);
-  --badge-red-ink: #ffa6b1;
+  --badge-red-bg:     rgba(255, 84, 104, 0.14);
+  --badge-red-bd:     rgba(255, 84, 104, 0.32);
+  --badge-red-ink:    #ffa6b1;
 
-  --badge-gold-bg: rgba(245, 200, 60, 0.16);
-  --badge-gold-bd: rgba(245, 200, 60, 0.36);
-  --badge-gold-ink: #ffe08a;
+  --badge-gold-bg:    rgba(245, 200, 60, 0.16);
+  --badge-gold-bd:    rgba(245, 200, 60, 0.36);
+  --badge-gold-ink:   #ffe08a;
 
   /* ---- Border radius ---- */
-  --r-full: 999px; /* pill */
-  --r-card: 18px; /* list card */
-  --r-lg: 14px; /* modal, tab container */
-  --r-md: 12px; /* input, button group, inner panel */
-  --r-sm: 9px; /* small chip */
-  --r-xs: 7px; /* inner item (menu row, toggle) */
+  --r-full: 999px;    /* pill */
+  --r-card: 18px;     /* list card */
+  --r-lg:   14px;     /* modal, tab container */
+  --r-md:   12px;     /* input, button group, inner panel */
+  --r-sm:   9px;      /* small chip */
+  --r-xs:   7px;      /* inner item (menu row, toggle) */
 
   /* ---- Spacing scale (base 4px) ---- */
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 20px;
-  --sp-6: 24px;
-  --sp-7: 28px;
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-7:  28px;
 
   /* ---- Typography ---- */
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 
   /* sizes */
   --text-2xs: 10px;
-  --text-xs: 11px;
-  --text-sm: 12.5px;
-  --text-md: 13.5px;
+  --text-xs:  11px;
+  --text-sm:  12.5px;
+  --text-md:  13.5px;
   --text-base: 14.5px;
-  --text-lg: 15px;
-  --text-xl: 18px;
+  --text-lg:  15px;
+  --text-xl:  18px;
   --text-2xl: 21px;
   --text-3xl: 27px;
   --text-4xl: 32px;
 
   /* weights */
   --fw-regular: 400;
-  --fw-medium: 500;
+  --fw-medium:  500;
   --fw-semibold: 600;
   --fw-bold: 700;
   --fw-extrabold: 800;
 
   /* ---- Shadows ---- */
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.32);
-  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.5);
-  --shadow-menu: 0 16px 40px rgba(0, 0, 0, 0.55);
-  --shadow-btn: 0 6px 18px rgba(0, 0, 0, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  --shadow-preview: 0 6px 18px rgba(0, 0, 0, 0.3);
+  --shadow-card:   0 10px 30px rgba(0, 0, 0, 0.32);
+  --shadow-modal:  0 20px 60px rgba(0, 0, 0, 0.50);
+  --shadow-menu:   0 16px 40px rgba(0, 0, 0, 0.55);
+  --shadow-btn:    0 6px 18px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --shadow-preview: 0 6px 18px rgba(0, 0, 0, 0.30);
 
   /* ---- Transitions ---- */
   --transition-fast: 0.16s ease;
-  --transition-base: 0.2s ease;
+  --transition-base: 0.20s ease;
 
   /* ---- Z-index scale ---- */
-  --z-dropdown: 10;
-  --z-menu: 20;
-  --z-modal: 50;
-  --z-tooltip: 60;
+  --z-dropdown:  10;
+  --z-menu:      20;
+  --z-modal:     50;
+  --z-tooltip:   60;
 }
 
 /* ---- Base reset ---- */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }

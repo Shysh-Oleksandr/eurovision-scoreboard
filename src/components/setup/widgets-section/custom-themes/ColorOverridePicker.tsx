@@ -16,8 +16,9 @@ import Button from '@/components/common/Button';
 import { Checkbox } from '@/components/common/Checkbox';
 import { Input } from '@/components/Input';
 import { hslStringToHex, parseColor } from '@/helpers/colorConversion';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
-const sanitizeGradient = (input: string): string => {
+export const sanitizeGradient = (input: string): string => {
   if (!/linear-gradient\s*\(/i.test(input)) return input;
   let out = input;
 
@@ -32,6 +33,70 @@ const sanitizeGradient = (input: string): string => {
   out = out.replace(/NaN%/gi, '0%');
 
   return out;
+};
+
+// Normalize any stored color to a readable hsl(...)/hsla(...) (or raw gradient) string.
+export const getColorDisplayValue = (colorValue: string): string => {
+  if (/gradient\(/i.test(colorValue)) {
+    return colorValue;
+  }
+  if (colorValue.startsWith('hsl(') || colorValue.startsWith('hsla(')) {
+    return colorValue;
+  }
+  if (
+    colorValue.startsWith('#') ||
+    colorValue.startsWith('rgba(') ||
+    colorValue.startsWith('rgb(')
+  ) {
+    // Convert to hsl format for display
+    const hsl = parseColor(colorValue);
+    const parts = hsl.split(/\s+/);
+
+    if (parts.length === 4) {
+      // Has alpha: "h s% l% a"
+      const [h, s, l, a] = parts;
+
+      return `hsla(${h}, ${s}, ${l}, ${a})`;
+    }
+
+    // No alpha: "h s% l%"
+    return `hsl(${hsl})`;
+  }
+
+  // Handle our custom "h s% l%" or "h s% l% a" format
+  const parts = colorValue.split(/\s+/);
+
+  if (parts.length === 4) {
+    // Has alpha: "h s% l% a"
+    const [h, s, l, a] = parts;
+
+    return `hsla(${h}, ${s}, ${l}, ${a})`;
+  }
+
+  // No alpha: "h s% l%"
+  return `hsl(${colorValue})`;
+};
+
+// Resolve a stored color to a value the gradient picker / CSS can render directly.
+export const getColorPickerValue = (currentValue: string): string => {
+  if (/gradient\(/i.test(currentValue)) {
+    return sanitizeGradient(currentValue);
+  }
+  if (currentValue.startsWith('#')) {
+    return currentValue;
+  }
+  if (
+    /^hsl\(/i.test(currentValue) ||
+    /^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%$/.test(currentValue) ||
+    /^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%\s+(\d+(?:\.\d+)?)$/.test(
+      currentValue,
+    )
+  ) {
+    return hslStringToHex(currentValue);
+  }
+
+  // rgb/rgba or other formats supported by the picker
+  return currentValue;
 };
 
 export interface ColorFieldDefinition {
@@ -52,6 +117,13 @@ interface ColorOverridePickerProps {
   allColorFields?: ColorFieldDefinition[];
   currentFieldKey?: string;
   onBulkChange?: (updates: Record<string, string>) => void;
+  /**
+   * When true, clicking the swatch does not open the inline popover picker and
+   * instead calls `onRequestEdit` (used on mobile, where the parent swaps the
+   * whole card for a full-screen ColorEditorPanel).
+   */
+  externalEdit?: boolean;
+  onRequestEdit?: () => void;
 }
 
 const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
@@ -64,8 +136,11 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   allColorFields = [],
   currentFieldKey,
   onBulkChange,
+  externalEdit = false,
+  onRequestEdit,
 }) => {
   const t = useTranslations('widgets.themes');
+  const isDesktop = useMediaQuery('(min-width: 640px)');
 
   const [showPicker, setShowPicker] = useState(false);
   const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
@@ -82,66 +157,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   const currentValue = value || defaultValue || '#000000';
 
   const isGradient = /gradient\(/i.test(currentValue);
-  let displayColor: string;
-
-  if (isGradient) {
-    displayColor = sanitizeGradient(currentValue);
-  } else if (currentValue.startsWith('#')) {
-    displayColor = currentValue;
-  } else if (
-    /^hsl\(/i.test(currentValue) ||
-    /^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%$/.test(currentValue) ||
-    /^(\d+\.?\d*)\s+(\d+\.?\d*)%\s+(\d+\.?\d*)%\s+(\d+(?:\.\d+)?)$/.test(
-      currentValue,
-    )
-  ) {
-    displayColor = hslStringToHex(currentValue);
-  } else {
-    // rgb/rgba or other formats supported by the picker
-    displayColor = currentValue;
-  }
-
-  // Normalize display format to always show as hsl(...) or hsla(...)
-  const getDisplayValue = (colorValue: string) => {
-    if (/gradient\(/i.test(colorValue)) {
-      return colorValue;
-    }
-    if (colorValue.startsWith('hsl(') || colorValue.startsWith('hsla(')) {
-      return colorValue;
-    }
-    if (
-      colorValue.startsWith('#') ||
-      colorValue.startsWith('rgba(') ||
-      colorValue.startsWith('rgb(')
-    ) {
-      // Convert to hsl format for display
-      const hsl = parseColor(colorValue);
-      const parts = hsl.split(/\s+/);
-
-      if (parts.length === 4) {
-        // Has alpha: "h s% l% a"
-        const [h, s, l, a] = parts;
-
-        return `hsla(${h}, ${s}, ${l}, ${a})`;
-      }
-
-      // No alpha: "h s% l%"
-      return `hsl(${hsl})`;
-    }
-
-    // Handle our custom "h s% l%" or "h s% l% a" format
-    const parts = colorValue.split(/\s+/);
-
-    if (parts.length === 4) {
-      // Has alpha: "h s% l% a"
-      const [h, s, l, a] = parts;
-
-      return `hsla(${h}, ${s}, ${l}, ${a})`;
-    }
-
-    // No alpha: "h s% l%"
-    return `hsl(${colorValue})`;
-  };
+  const displayColor = getColorPickerValue(currentValue);
 
   // Filter available fields for copying
   const availableFields = useMemo(() => {
@@ -361,8 +377,13 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
       </div>
 
       <div
-        className="flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded-md p-1 transition-colors"
+        className="flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded-[10px] p-1 transition-colors"
         onClick={() => {
+          if (externalEdit) {
+            onRequestEdit?.();
+
+            return;
+          }
           if (!showPicker) {
             // Calculate position before opening to prevent flash
             const position = calculatePickerPosition();
@@ -378,7 +399,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
           style={{ background: displayColor }}
         />
         <span className="text-white/70 text-xs font-mono flex-1 truncate">
-          {getDisplayValue(currentValue)}
+          {getColorDisplayValue(currentValue)}
         </span>
 
         {isCustom && (
@@ -430,70 +451,107 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
 
       {showCopyPopup &&
         createPortal(
-          <>
-            <div
-              className="fixed inset-0 z-[9998]"
-              onClick={() => {
-                setShowCopyPopup(false);
-                setSelectedFields(new Set());
-                setSearchText('');
-              }}
-            />
-            <div
-              className="fixed z-[9999] bg-primary-900 rounded-lg shadow-xl border border-white/20 p-4 flex flex-col"
-              style={{
-                top: `${copyPopupPosition.top}px`,
-                left: `${copyPopupPosition.left}px`,
-                width: '320px',
-                maxHeight: '400px',
-              }}
-              data-theme="custom-preview"
-            >
-              <h3 className="text-white text-sm font-semibold mb-3">
-                {t('copyToFields')}
-              </h3>
+          (() => {
+            const closeCopyPopup = () => {
+              setShowCopyPopup(false);
+              setSelectedFields(new Set());
+              setSearchText('');
+            };
 
-              <Input
-                placeholder={t('searchFields')}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                className="mb-3 !py-2 !h-auto"
-              />
+            const inner = (
+              <>
+                <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[var(--hair)]">
+                  <h3 className="text-white text-[15px] font-extrabold">
+                    {t('copyToFields')}
+                  </h3>
+                </div>
 
-              <div className="flex-1 overflow-y-auto mb-3 space-y-2">
-                {filteredFields.length === 0 ? (
-                  <div className="text-white/50 text-sm text-center py-4">
-                    {t('noFieldsFound')}
+                <div className="px-4 pt-3 pb-2">
+                  <Input
+                    placeholder={t('searchFields')}
+                    value={searchText}
+                    onChange={(e) => setSearchText(e.target.value)}
+                    className="!py-2 !h-auto"
+                  />
+                </div>
+
+                <div className="flex-1 overflow-y-auto px-4 min-h-0">
+                  {filteredFields.length === 0 ? (
+                    <div className="text-white/50 text-sm text-center py-4">
+                      {t('noFieldsFound')}
+                    </div>
+                  ) : (
+                    filteredFields.map((field) => {
+                      const fullKey = `${field.groupKey}.${field.key}`;
+
+                      return (
+                        <div key={fullKey}>
+                          <Checkbox
+                            id={`copy-${fullKey}`}
+                            label={field.label}
+                            checked={selectedFields.has(fullKey)}
+                            onChange={() => handleFieldToggle(fullKey)}
+                            labelClassName="text-white text-sm"
+                          />
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                <div className="p-4 border-t border-[var(--hair)]">
+                  <Button
+                    variant="primary"
+                    onClick={handleCopy}
+                    disabled={selectedFields.size === 0}
+                    className="w-full justify-center"
+                  >
+                    {t('copyToNFields', { count: selectedFields.size })}
+                  </Button>
+                </div>
+              </>
+            );
+
+            if (!isDesktop) {
+              // Mobile: bottom sheet
+              return (
+                <div
+                  className="fixed inset-0 z-[9999] flex items-end bg-black/55"
+                  onClick={closeCopyPopup}
+                  data-theme="custom-preview"
+                >
+                  <div
+                    className="w-full max-h-[80vh] flex flex-col bg-primary-900 border border-[var(--hair-2)] rounded-t-[14px] shadow-[0_-8px_30px_rgba(0,0,0,0.4)] overflow-hidden"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {inner}
                   </div>
-                ) : (
-                  filteredFields.map((field) => {
-                    const fullKey = `${field.groupKey}.${field.key}`;
+                </div>
+              );
+            }
 
-                    return (
-                      <div key={fullKey}>
-                        <Checkbox
-                          id={`copy-${fullKey}`}
-                          label={field.label}
-                          checked={selectedFields.has(fullKey)}
-                          onChange={() => handleFieldToggle(fullKey)}
-                          labelClassName="text-white text-sm"
-                        />
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              <Button
-                variant="primary"
-                onClick={handleCopy}
-                disabled={selectedFields.size === 0}
-                className="w-full"
-              >
-                {t('copyToNFields', { count: selectedFields.size })}
-              </Button>
-            </div>
-          </>,
+            // Desktop: floating card
+            return (
+              <>
+                <div
+                  className="fixed inset-0 z-[9998]"
+                  onClick={closeCopyPopup}
+                />
+                <div
+                  className="fixed z-[9999] flex flex-col bg-primary-900 border border-[var(--hair-2)] rounded-[14px] shadow-[0_16px_44px_rgba(0,0,0,0.65)] overflow-hidden"
+                  style={{
+                    top: `${copyPopupPosition.top}px`,
+                    left: `${copyPopupPosition.left}px`,
+                    width: '306px',
+                    maxHeight: '400px',
+                  }}
+                  data-theme="custom-preview"
+                >
+                  {inner}
+                </div>
+              </>
+            );
+          })(),
           document.body,
         )}
     </div>

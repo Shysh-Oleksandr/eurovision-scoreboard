@@ -170,7 +170,7 @@ const SplitScreenQualifierModal = () => {
           <div
             key={country.code}
             data-split-candidate="true"
-            className="w-full py-6 sm:px-4 xs:px-3 px-2 bg-primary-800 bg-gradient-to-br from-primary-800 to-primary-900/50 rounded shadow-md relative hover:bg-primary-700 transition-colors duration-300 cursor-pointer sm:space-y-3 space-y-2"
+            className="w-full py-6 sm:px-4 xs:px-3 px-2 bg-primary-800 bg-gradient-to-br from-primary-800 to-primary-900/50 rounded-[10px] shadow-md relative hover:bg-primary-700 transition-colors duration-300 cursor-pointer sm:space-y-3 space-y-2"
             onClick={() => {
               closeSplitScreenQualifierModal();
               setTimeout(() => {
@@ -183,7 +183,7 @@ const SplitScreenQualifierModal = () => {
                 src={getFlagPath(country)}
                 onError={(e) => (e.currentTarget.src = getFlagPath('ww'))}
                 alt={country.name}
-                className="w-full aspect-[13/9] object-cover rounded"
+                className="w-full aspect-[13/9] object-cover rounded-[6px]"
                 width={48}
                 height={36}
               />

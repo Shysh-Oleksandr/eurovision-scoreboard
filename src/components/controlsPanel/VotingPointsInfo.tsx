@@ -78,7 +78,7 @@ const VotingPointsInfo: React.FC<VotingPointsInfoProps> = ({
   return (
     <div
       ref={containerRef}
-      className="grid w-full gap-y-1 sm:mt-2 mt-1.5 overflow-hidden rounded-sm"
+      className="grid w-full gap-y-1 sm:mt-2 mt-1.5 overflow-hidden rounded-[6px]"
       style={{
         gridTemplateColumns: `repeat(${Math.min(
           pointsSystem.length,
