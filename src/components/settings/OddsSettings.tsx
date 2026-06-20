@@ -64,9 +64,9 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
   const pointsSpread = useGeneralStore((state) => state.settings.pointsSpread);
   const setSettings = useGeneralStore((state) => state.setSettings);
 
-  const [viewMode, setViewMode] = useState<OddsViewMode>('numbers');
+  const viewMode = useGeneralStore((state) => state.settings.oddsViewMode);
+  const rankLayout = useGeneralStore((state) => state.settings.oddsRankLayout);
   const [rankDimension, setRankDimension] = useState<RankDimension>('jury');
-  const [rankLayout, setRankLayout] = useState<RankLayout>('grid');
 
   const handleCopyRanks = () => {
     const fromKey = rankDimension === 'jury' ? 'juryOdds' : 'televoteOdds';
@@ -204,7 +204,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
           <button
             key={mode}
             type="button"
-            onClick={() => setViewMode(mode)}
+            onClick={() => setSettings({ oddsViewMode: mode })}
             className="relative pb-3 pt-1.5 text-[14px] font-bold bg-transparent border-none cursor-pointer transition-colors duration-150"
             style={{
               color: viewMode === mode ? '#fff' : 'rgba(255,255,255,.46)',
@@ -358,7 +358,9 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
               <Tabs
                 tabs={layoutTabs}
                 activeTab={rankLayout}
-                setActiveTab={(tab) => setRankLayout(tab as RankLayout)}
+                setActiveTab={(tab) =>
+                  setSettings({ oddsRankLayout: tab as RankLayout })
+                }
                 containerClassName="!p-[3px] !overflow-hidden !h-11 !w-[112px]"
                 overlayClassName="!inset-y-[2px]"
                 buttonClassName="!py-0 !px-0 h-full"

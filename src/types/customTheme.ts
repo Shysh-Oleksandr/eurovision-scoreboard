@@ -1,3 +1,4 @@
+import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 import {
   BoardAnimationMode,
   DouzePointsAnimationMode,
@@ -5,7 +6,6 @@ import {
   PointsContainerShape,
   ThemeSpecifics,
 } from '@/theme/types';
-import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 
 export type { BoardAnimationMode, DouzePointsAnimationMode };
 
@@ -25,6 +25,10 @@ export interface CustomTheme {
   likes: number;
   saves: number;
   duplicatesCount?: number;
+  /** Provenance: set when this theme was created by remixing another. */
+  remixedFrom?: string;
+  remixedFromName?: string;
+  remixedFromUserId?: string;
   baseThemeYear: string;
   hue: number;
   shadeValue?: number;

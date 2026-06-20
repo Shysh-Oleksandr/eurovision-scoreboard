@@ -7,6 +7,9 @@ import {
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
+
+import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
+import { FlagShape, PointsContainerShape } from '@/theme/types';
 import type {
   BoardAnimationMode,
   CustomTheme,
@@ -15,8 +18,6 @@ import type {
   ThemeListResponse,
   ThemeState,
 } from '@/types/customTheme';
-import { FlagShape, PointsContainerShape } from '@/theme/types';
-import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 
 export type CreateThemeInput = {
   name: string;
@@ -39,6 +40,8 @@ export type CreateThemeInput = {
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
   groupId?: string;
   fontAlias?: string;
+  /** Source theme _id when creating a remix; denormalized fields derived server-side. */
+  remixedFrom?: string;
 };
 
 export type UpdateThemeInput = {
@@ -99,6 +102,7 @@ function buildThemesListQueryParams(
   params: Omit<MyThemesListQueryParams, 'enabled'>,
 ) {
   const searchParams = new URLSearchParams();
+
   searchParams.append('page', (params.page ?? 1).toString());
   searchParams.append('limit', (params.limit ?? 10).toString());
   if (params.search) searchParams.append('search', params.search);
@@ -110,6 +114,7 @@ function buildThemesListQueryParams(
     searchParams.append('hasCustomAudio', 'true');
   }
   if (params.groupId) searchParams.append('groupId', params.groupId);
+
   return searchParams.toString();
 }
 
@@ -136,11 +141,13 @@ export function useMyThemesListQuery({
     hasCustomAudio,
     groupId,
   };
+
   return useQuery<ThemeListResponse>({
     queryKey: queryKeys.user.themesMeList(filters),
     queryFn: async () => {
       const qs = buildThemesListQueryParams(filters);
       const { data } = await api.get(`/themes/me?${qs}`);
+
       return data as ThemeListResponse;
     },
     enabled,
@@ -169,11 +176,13 @@ export function useSavedThemesListQuery({
     endDate,
     hasCustomAudio,
   };
+
   return useQuery<ThemeListResponse>({
     queryKey: queryKeys.user.savedThemesList(filters),
     queryFn: async () => {
       const qs = buildThemesListQueryParams(filters);
       const { data } = await api.get(`/themes/me/saved?${qs}`);
+
       return data as ThemeListResponse;
     },
     enabled,
@@ -203,6 +212,7 @@ export function usePublicThemesQuery({
     }),
     queryFn: async () => {
       const params = new URLSearchParams();
+
       params.append('page', page.toString());
       params.append('limit', '10');
       if (search) params.append('search', search);
@@ -213,17 +223,19 @@ export function usePublicThemesQuery({
       if (hasCustomAudio === true) params.append('hasCustomAudio', 'true');
 
       const { data } = await api.get(`/themes/public?${params.toString()}`);
+
       return data as ThemeListResponse;
     },
     enabled,
   });
 }
 
-export function useThemeByIdQuery(id: string, enabled: boolean = true) {
+export function useThemeByIdQuery(id: string, enabled = true) {
   return useQuery<CustomTheme>({
     queryKey: queryKeys.user.themeById(id),
     queryFn: async () => {
       const { data } = await api.get(`/themes/${id}`);
+
       return data as CustomTheme;
     },
     enabled: !!id && enabled,
@@ -235,6 +247,7 @@ export function useThemeGroupsQuery(enabled = true) {
     queryKey: queryKeys.user.themeGroups(),
     queryFn: async () => {
       const { data } = await api.get('/themes/groups');
+
       return data as ThemeGroup[];
     },
     enabled,
@@ -243,9 +256,11 @@ export function useThemeGroupsQuery(enabled = true) {
 
 export function useCreateThemeGroupMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (input: { name: string }) => {
       const { data } = await api.post('/themes/groups', input);
+
       return data as ThemeGroup;
     },
     onSuccess: () => {
@@ -256,9 +271,11 @@ export function useCreateThemeGroupMutation() {
 
 export function useUpdateThemeGroupMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async ({ id, name }: { id: string; name: string }) => {
       const { data } = await api.patch(`/themes/groups/${id}`, { name });
+
       return data as ThemeGroup;
     },
     onSuccess: () => {
@@ -271,6 +288,7 @@ export function useUpdateThemeGroupMutation() {
 
 export function useDeleteThemeGroupMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/themes/groups/${id}`);
@@ -285,9 +303,11 @@ export function useDeleteThemeGroupMutation() {
 
 export function useCreateThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (input: CreateThemeInput) => {
       const { data } = await api.post('/themes', input);
+
       return data as CustomTheme;
     },
     onSuccess: () => {
@@ -298,9 +318,11 @@ export function useCreateThemeMutation() {
 
 export function useUpdateThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async ({ id, ...input }: UpdateThemeInput & { id: string }) => {
       const { data } = await api.patch(`/themes/${id}`, input);
+
       return data as CustomTheme;
     },
     onSuccess: (data, variables) => {
@@ -316,6 +338,7 @@ export function useUpdateThemeMutation() {
 
 export function useDeleteThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       await api.delete(`/themes/${id}`);
@@ -329,13 +352,16 @@ export function useDeleteThemeMutation() {
 
 export function useUploadThemeBackgroundMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async ({ id, file }: { id: string; file: File }) => {
       const formData = new FormData();
+
       formData.append('file', file);
       const { data } = await api.post(`/themes/${id}/background`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
+
       return data as CustomTheme;
     },
     onSuccess: () => {
@@ -347,6 +373,7 @@ export function useUploadThemeBackgroundMutation() {
 
 export function useUploadThemeSoundMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async ({
       id,
@@ -358,6 +385,7 @@ export function useUploadThemeSoundMutation() {
       file: File;
     }) => {
       const formData = new FormData();
+
       formData.append('file', file);
       const { data } = await api.post(
         `/themes/${id}/sounds/${eventId}`,
@@ -366,6 +394,7 @@ export function useUploadThemeSoundMutation() {
           headers: { 'Content-Type': 'multipart/form-data' },
         },
       );
+
       return data as CustomTheme;
     },
     onSuccess: () => {
@@ -377,9 +406,11 @@ export function useUploadThemeSoundMutation() {
 
 export function useLikeThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/themes/${id}/like`);
+
       return data as { liked: boolean; likes: number };
     },
     onSuccess: () => {
@@ -390,9 +421,11 @@ export function useLikeThemeMutation() {
 
 export function useToggleLikeThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/themes/${id}/like`);
+
       return data as { liked: boolean; likes: number };
     },
     onSuccess: (res, id) => {
@@ -400,6 +433,7 @@ export function useToggleLikeThemeMutation() {
       const queries = qc.getQueriesData<ThemeListResponse>({
         queryKey: ['public', 'themes'],
       });
+
       for (const [key, data] of queries) {
         if (!data) continue;
         const updated = {
@@ -408,6 +442,7 @@ export function useToggleLikeThemeMutation() {
             t._id === id ? { ...t, likes: res.likes } : t,
           ),
         };
+
         qc.setQueryData(key, updated);
       }
 
@@ -421,9 +456,11 @@ export function useToggleLikeThemeMutation() {
 
 export function useToggleSaveThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/themes/${id}/save`);
+
       return data as { saved: boolean; saves: number };
     },
     onSuccess: (res, id) => {
@@ -431,6 +468,7 @@ export function useToggleSaveThemeMutation() {
       const queries = qc.getQueriesData<ThemeListResponse>({
         queryKey: ['public', 'themes'],
       });
+
       for (const [key, data] of queries) {
         if (!data) continue;
         const updated = {
@@ -439,6 +477,7 @@ export function useToggleSaveThemeMutation() {
             t._id === id ? { ...t, saves: res.saves } : t,
           ),
         };
+
         qc.setQueryData(key, updated);
       }
 
@@ -449,13 +488,15 @@ export function useToggleSaveThemeMutation() {
   });
 }
 
-export function useThemesStateQuery(ids: string[], enabled: boolean = true) {
+export function useThemesStateQuery(ids: string[], enabled = true) {
   return useQuery<ThemeState>({
     queryKey: queryKeys.user.themesState(ids),
     queryFn: async () => {
       const params = new URLSearchParams();
+
       params.append('ids', ids.join(','));
       const { data } = await api.get(`/themes/state?${params.toString()}`);
+
       return data as ThemeState;
     },
     enabled: enabled && ids.length > 0,
@@ -464,15 +505,18 @@ export function useThemesStateQuery(ids: string[], enabled: boolean = true) {
 
 export function useReportThemeDuplicateMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (originalId: string) => {
       const { data } = await api.post(`/themes/${originalId}/duplicate`);
+
       return data as { duplicatesCount: number };
     },
     onSuccess: (res, id) => {
       const queries = qc.getQueriesData<ThemeListResponse>({
         queryKey: ['public', 'themes'],
       });
+
       for (const [key, data] of queries) {
         if (!data) continue;
         const updated = {
@@ -481,12 +525,14 @@ export function useReportThemeDuplicateMutation() {
             t._id === id ? { ...t, duplicatesCount: res.duplicatesCount } : t,
           ),
         };
+
         qc.setQueryData(key, updated);
       }
 
       const userListQueries = qc.getQueriesData<ThemeListResponse>({
         queryKey: queryKeys.user.themes(),
       });
+
       for (const [key, data] of userListQueries) {
         if (!data?.themes) continue;
         const updated = {
@@ -495,12 +541,14 @@ export function useReportThemeDuplicateMutation() {
             t._id === id ? { ...t, duplicatesCount: res.duplicatesCount } : t,
           ),
         };
+
         qc.setQueryData(key, updated);
       }
 
       const savedListQueries = qc.getQueriesData<ThemeListResponse>({
         queryKey: queryKeys.user.savedThemes(),
       });
+
       for (const [key, data] of savedListQueries) {
         if (!data?.themes) continue;
         const updated = {
@@ -509,6 +557,7 @@ export function useReportThemeDuplicateMutation() {
             t._id === id ? { ...t, duplicatesCount: res.duplicatesCount } : t,
           ),
         };
+
         qc.setQueryData(key, updated);
       }
     },
@@ -517,9 +566,11 @@ export function useReportThemeDuplicateMutation() {
 
 export function useApplyThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async (id: string) => {
       const { data } = await api.post(`/themes/${id}/apply`);
+
       return data;
     },
     onSuccess: () => {
@@ -530,9 +581,11 @@ export function useApplyThemeMutation() {
 
 export function useClearActiveThemeMutation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: async () => {
       const { data } = await api.post('/themes/clear-active');
+
       return data;
     },
     onSuccess: () => {

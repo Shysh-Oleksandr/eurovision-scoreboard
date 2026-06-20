@@ -59,6 +59,7 @@ import {
   getInterfaceFontSelectOptions,
   normalizeFontAlias,
 } from '@/theme/fontAliases';
+import { themeContentFingerprint } from '@/theme/themeFingerprint';
 import {
   THEME_SOUND_EVENTS,
   type ThemeSoundEventId,
@@ -246,7 +247,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         v: initialTheme.shadeValue || 60,
         a: 1,
       });
-      setIsPublic(initialTheme.isPublic);
+      // Remixing someone's theme starts as a private draft — discourages using
+      // "Remix" as a public re-save. Editing keeps the theme's own visibility.
+      setIsPublic(isEditMode ? initialTheme.isPublic : false);
       setThemeGroupId(initialTheme.groupId || '');
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
@@ -299,7 +302,14 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setSoundDelaySecText(emptySoundDelaySecTextState());
       setThemeGroupId('');
     }
-  }, [initialTheme, isOpen, themeYear, themeHue, applyThemeSpecificsFormState]);
+  }, [
+    initialTheme,
+    isEditMode,
+    isOpen,
+    themeYear,
+    themeHue,
+    applyThemeSpecificsFormState,
+  ]);
 
   // Live preview effect
   useEffect(() => {
@@ -502,6 +512,78 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
       if (!soundFiles[event] && u && !u.startsWith('https://')) {
         toast.error(t('widgets.themes.soundUrlHttpsOnly'));
+
+        return;
+      }
+    }
+
+    // A "remix" is a brand-new theme created from someone else's theme.
+    const isRemix =
+      !!initialTheme &&
+      !isEditMode &&
+      !!user &&
+      initialTheme.userId !== user._id;
+
+    // Block publishing a remix that wasn't actually changed — it just clutters
+    // the public gallery with duplicates. Saving privately is still allowed.
+    if (isRemix && isPublic) {
+      const formSounds: Record<string, { url: string; delayMs?: number }> = {};
+
+      for (const event of THEME_SOUND_EVENTS) {
+        if (soundFiles[event]) {
+          // A freshly picked file is always a change.
+          formSounds[event] = { url: '__file__' };
+          continue;
+        }
+        const u = soundUrls[event].trim();
+
+        if (u) {
+          const d = soundDelaySecondsInputToMs(soundDelaySecText[event]);
+
+          formSounds[event] = d > 0 ? { url: u, delayMs: d } : { url: u };
+        }
+      }
+
+      const srcSpecifics = resolveThemeSpecificsForCustomTheme(initialTheme);
+      const formFingerprint = themeContentFingerprint({
+        baseThemeYear,
+        hue,
+        shadeValue: hsva.v,
+        overrides,
+        background: uploadedFile ? '__file__' : backgroundImageUrl,
+        pointsContainerShape,
+        uppercaseEntryName,
+        juryActivePointsUnderline,
+        isJuryPointsPanelRounded,
+        flagShape,
+        usePointsCountUpAnimation,
+        roundedCountryContainer,
+        boardAnimationMode,
+        douzePointsAnimationMode,
+        themeSounds: formSounds,
+        fontAlias: normalizeFontAlias(fontAlias),
+      });
+      const sourceFingerprint = themeContentFingerprint({
+        baseThemeYear: initialTheme.baseThemeYear,
+        hue: initialTheme.hue,
+        shadeValue: initialTheme.shadeValue ?? 60,
+        overrides: initialTheme.overrides,
+        background: initialTheme.backgroundImageUrl || '',
+        pointsContainerShape: srcSpecifics.pointsContainerShape,
+        uppercaseEntryName: srcSpecifics.uppercaseEntryName,
+        juryActivePointsUnderline: srcSpecifics.juryActivePointsUnderline,
+        isJuryPointsPanelRounded: srcSpecifics.isJuryPointsPanelRounded,
+        flagShape: srcSpecifics.flagShape,
+        usePointsCountUpAnimation: srcSpecifics.usePointsCountUpAnimation,
+        roundedCountryContainer: srcSpecifics.roundedCountryContainer,
+        boardAnimationMode: srcSpecifics.boardAnimationMode,
+        douzePointsAnimationMode: srcSpecifics.douzePointsAnimationMode,
+        themeSounds: initialTheme.themeSounds,
+        fontAlias: normalizeFontAlias(srcSpecifics.fontAlias),
+      });
+
+      if (formFingerprint === sourceFingerprint) {
+        toast.error(t('widgets.themes.remixNeedsChange'));
 
         return;
       }
@@ -823,8 +905,11 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
         toast.success(t('widgets.themes.themeUpdatedSuccessfully'));
       } else {
-        // Create new theme
-        let created = await createTheme(buildThemePayload());
+        // Create new theme — record remix provenance when copying another's theme.
+        let created = await createTheme({
+          ...buildThemePayload(),
+          ...(isRemix ? { remixedFrom: initialTheme!._id } : {}),
+        });
 
         // Upload background if provided
         if (uploadedFile) {
@@ -868,9 +953,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         }
 
         // If created from someone else's theme, record duplicate
-        if (initialTheme && user && initialTheme.userId !== user._id) {
+        if (isRemix) {
           try {
-            await reportDuplicate(initialTheme._id);
+            await reportDuplicate(initialTheme!._id);
           } catch (e) {
             // non-blocking
             console.error(e);

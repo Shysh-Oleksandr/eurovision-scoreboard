@@ -12,6 +12,7 @@ import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseBu
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
+import { stripCopySuffix } from '@/theme/themeFingerprint';
 import { CustomTheme } from '@/types/customTheme';
 
 const CustomizeThemeModal = dynamic(() => import('./CustomizeThemeModal'), {
@@ -90,7 +91,7 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
   };
 
   const handleDuplicate = (theme: CustomTheme) => {
-    setInitialTheme({ ...theme, name: `${theme.name} (Copy)` });
+    setInitialTheme({ ...theme, name: stripCopySuffix(theme.name) });
     setIsEditMode(false);
     setIsCustomizeModalOpen(true);
   };

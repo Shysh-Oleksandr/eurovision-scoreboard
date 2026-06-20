@@ -46,6 +46,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
 import { useAuthStore } from '@/state/useAuthStore';
+import { stripCopySuffix } from '@/theme/themeFingerprint';
 
 const EventStageModal = dynamic(() => import('./event-stage/EventStageModal'), {
   ssr: false,
@@ -669,7 +670,10 @@ const EventSetupModal = () => {
           user={selectedProfileUser}
           onDuplicate={(theme) => {
             setSelectedProfileUser(null);
-            setThemeToDuplicate({ ...theme, name: `${theme.name} (Copy)` });
+            setThemeToDuplicate({
+              ...theme,
+              name: stripCopySuffix(theme.name),
+            });
             setIsThemesModalOpen(true);
           }}
           onEditTheme={(theme) => {
@@ -693,7 +697,10 @@ const EventSetupModal = () => {
           onClose={() => setSelectedShareTheme(null)}
           onDuplicate={(theme) => {
             setSelectedShareTheme(null);
-            setThemeToDuplicate({ ...theme, name: `${theme.name} (Copy)` });
+            setThemeToDuplicate({
+              ...theme,
+              name: stripCopySuffix(theme.name),
+            });
             setIsThemesModalOpen(true);
           }}
           onEdit={(theme) => {
