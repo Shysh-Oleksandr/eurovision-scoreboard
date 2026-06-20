@@ -23,7 +23,7 @@ const Badge: React.FC<BadgeProps> = ({
     type="button"
     onClick={onClick}
     className={cn(
-      'text-[13.5px] font-semibold px-[14px] py-[7px] rounded-full border whitespace-nowrap transition-all',
+      'text-[13.5px] font-semibold px-[14px] py-[7px] rounded-full border whitespace-nowrap transition-[color,border-color]',
       isActive
         ? 'text-white !border-primary-700'
         : 'bg-white/[0.04] border-white/[0.10] text-white/70 hover:text-white hover:border-white/[0.16]',

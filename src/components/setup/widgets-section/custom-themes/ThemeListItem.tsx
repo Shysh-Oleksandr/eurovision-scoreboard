@@ -1,5 +1,5 @@
 import { isSameYear } from 'date-fns';
-import { Link2, Share2, Volume1 } from 'lucide-react';
+import { Folder, Link2, Share2, Volume1 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -257,6 +257,12 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                     <Volume1 className="size-[11px]" />
                     Audio
                   </span>
+                )}
+                {theme.group && (
+                  <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
+                    <Folder className="size-3 shrink-0" aria-hidden />
+                    <span className="truncate">{theme.group.name}</span>
+                  </div>
                 )}
               </div>
 
