@@ -1062,6 +1062,18 @@ h6 {
   @apply !z-[9999999] !bg-primary-900 !shadow-lg !border-b-2 !border-solid !border-white;
 }
 
+/* Scoped drag state for the Odds rank list — intentionally separate from
+   .dragged so it doesn't affect the other sortable lists in the app. */
+/* No `transform` here: react-easy-sort drives the dragged item's position via
+   an inline translate3d, so overriding transform would break drag-follow. */
+.dragged-rank-row {
+  background: theme('colors.primary-900') !important;
+  border-color: rgb(255 255 255 / 22%) !important;
+  box-shadow: 0 6px 22px rgb(0 0 0 / 48%) !important;
+  cursor: grabbing !important;
+  z-index: 9999999 !important;
+}
+
 .loader {
   font-size: 60px; /* change this to 20px, 32px, etc */
   width: 1em;

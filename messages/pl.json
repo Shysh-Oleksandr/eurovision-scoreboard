@@ -957,7 +957,12 @@
       "pointsSpread": "Rozrzut punktów",
       "pointsSpreadTooltip": "Suwak „Rozrzut punktów” kontroluje różnicę między zwycięzcami a przegranymi:<br></br><span>Niski =</span> bardziej wyrównane wyniki, mniejsze różnice punktowe.<br></br><span>Wysoki =</span> większa różnica między górą a dołem.",
       "tight": "Wąski",
-      "wide": "Szeroki"
+      "wide": "Szeroki",
+      "numbersView": "Liczby",
+      "rankView": "Ranking",
+      "dragToRankHint": "Przeciągnij kraje, aby je uszeregować",
+      "copyRanksToTelevote": "Kopiuj do głosowania widzów",
+      "copyRanksToJury": "Kopiuj do jury"
     },
     "voting": {
       "pointsSystem": "System punktacji",

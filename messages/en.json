@@ -954,7 +954,12 @@
       "pointsSpread": "Points Spread",
       "pointsSpreadTooltip": "The Points Spread slider controls the gap between winners and losers:<br></br><span>Low =</span> tighter scores, smaller point differences.<br></br><span>High =</span> a bigger gap between the top and bottom.",
       "tight": "Tight",
-      "wide": "Wide"
+      "wide": "Wide",
+      "numbersView": "Numbers",
+      "rankView": "Rank",
+      "dragToRankHint": "Drag countries to rank them",
+      "copyRanksToTelevote": "Copy to Televote",
+      "copyRanksToJury": "Copy to Jury"
     },
     "voting": {
       "pointsSystem": "Points System",

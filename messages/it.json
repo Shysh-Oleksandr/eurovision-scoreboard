@@ -957,7 +957,12 @@
       "pointsSpread": "Distribuzione dei punti",
       "pointsSpreadTooltip": "Il cursore «Distribuzione dei punti» controlla il divario tra vincitori e perdenti:<br></br><span>Basso =</span> punteggi più ravvicinati, differenze di punti minori.<br></br><span>Alto =</span> divario maggiore tra i primi e gli ultimi.",
       "tight": "Stretto",
-      "wide": "Ampio"
+      "wide": "Ampio",
+      "numbersView": "Numeri",
+      "rankView": "Classifica",
+      "dragToRankHint": "Trascina i paesi per ordinarli",
+      "copyRanksToTelevote": "Copia nel televoto",
+      "copyRanksToJury": "Copia nella giuria"
     },
     "voting": {
       "pointsSystem": "Sistema di Punti",

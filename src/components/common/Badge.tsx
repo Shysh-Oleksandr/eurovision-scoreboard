@@ -35,7 +35,7 @@ const Badge: React.FC<BadgeProps> = ({
         ? {
             background:
               'linear-gradient(180deg, hsl(var(--twc-primary-700)), hsl(var(--twc-primary-750)))',
-            boxShadow: '0 4px 14px rgba(0,0,0,0.28)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
           }
         : {}
     }

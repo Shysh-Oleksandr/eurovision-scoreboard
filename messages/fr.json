@@ -957,7 +957,12 @@
       "pointsSpread": "Écart des points",
       "pointsSpreadTooltip": "Le curseur « Écart des points » contrôle l'écart entre les gagnants et les perdants :<br></br><span>Faible =</span> scores plus resserrés, différences de points plus petites.<br></br><span>Élevé =</span> écart plus grand entre le haut et le bas.",
       "tight": "Serré",
-      "wide": "Large"
+      "wide": "Large",
+      "numbersView": "Chiffres",
+      "rankView": "Classement",
+      "dragToRankHint": "Glissez les pays pour les classer",
+      "copyRanksToTelevote": "Copier vers le télévote",
+      "copyRanksToJury": "Copier vers le jury"
     },
     "voting": {
       "pointsSystem": "Système de points",

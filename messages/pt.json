@@ -952,7 +952,12 @@
       "pointsSpread": "Distribuição de pontos",
       "pointsSpreadTooltip": "O controlo «Distribuição de pontos» ajusta a diferença entre vencedores e perdedores:<br></br><span>Baixo =</span> pontuações mais próximas, menores diferenças de pontos.<br></br><span>Alto =</span> maior diferença entre os primeiros e os últimos.",
       "tight": "Apertado",
-      "wide": "Amplo"
+      "wide": "Amplo",
+      "numbersView": "Números",
+      "rankView": "Classificação",
+      "dragToRankHint": "Arraste os países para ordená-los",
+      "copyRanksToTelevote": "Copiar para o televoto",
+      "copyRanksToJury": "Copiar para o júri"
     },
     "voting": {
       "pointsSystem": "Sistema de Pontos",

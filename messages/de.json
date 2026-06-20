@@ -955,7 +955,12 @@
       "pointsSpread": "Punkteverteilung",
       "pointsSpreadTooltip": "Der Schieberegler „Punkteverteilung“ steuert den Abstand zwischen Gewinnern und Verlierern:<br></br><span>Niedrig =</span> engere Ergebnisse, kleinere Punktunterschiede.<br></br><span>Hoch =</span> größerer Abstand zwischen oben und unten.",
       "tight": "Eng",
-      "wide": "Weit"
+      "wide": "Weit",
+      "numbersView": "Zahlen",
+      "rankView": "Rang",
+      "dragToRankHint": "Länder ziehen, um sie zu ordnen",
+      "copyRanksToTelevote": "Zum Televoting kopieren",
+      "copyRanksToJury": "Zur Jury kopieren"
     },
     "voting": {
       "pointsSystem": "Punktesystem",
