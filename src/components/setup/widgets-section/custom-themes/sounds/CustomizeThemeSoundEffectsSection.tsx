@@ -9,7 +9,6 @@ import {
 } from './customizeThemeSoundConstants';
 import CustomizeThemeSoundEffectRow from './CustomizeThemeSoundEffectRow';
 
-import { CollapsibleSection } from '@/components/common/CollapsibleSection';
 import {
   THEME_SOUND_EVENTS,
   type ThemeSoundEventId,
@@ -67,64 +66,59 @@ const CustomizeThemeSoundEffectsSection: React.FC<
   const t = useTranslations();
 
   return (
-    <CollapsibleSection
-      title={t('widgets.themes.soundEffects')}
-      defaultExpanded
-    >
-      <div className="space-y-3">
-        <p className="text-sm font-medium text-white/60">
-          {t('widgets.themes.soundEffectsHint')}
-        </p>
-        <div className="space-y-3">
-          {THEME_SOUND_EVENTS.map((event) => {
-            const canPreviewSound =
-              !!soundFiles[event] || isValidHttpsSoundUrl(soundUrls[event]);
+    <div className="space-y-3">
+      <p className="text-sm font-medium text-white/60">
+        {t('widgets.themes.soundEffectsHint')}
+      </p>
+      <div className="space-y-2">
+        {THEME_SOUND_EVENTS.map((event) => {
+          const canPreviewSound =
+            !!soundFiles[event] || isValidHttpsSoundUrl(soundUrls[event]);
 
-            return (
-              <CustomizeThemeSoundEffectRow
-                key={event}
-                event={event}
-                title={t(`widgets.themes.${THEME_SOUND_LABEL_KEYS[event]}`)}
-                soundUrl={soundUrls[event]}
-                soundFile={soundFiles[event]}
-                delaySecText={soundDelaySecText[event]}
-                canPreviewSound={canPreviewSound}
-                soundDragOver={soundDragOver === event}
-                isPreviewActive={soundPreviewState?.event === event}
-                previewPaused={!!soundPreviewState?.paused}
-                onUrlChange={(value) => {
-                  if (soundPreviewState?.event === event) {
-                    stopSoundPreview();
-                  }
-                  setSoundUrls((p) => ({ ...p, [event]: value }));
-                  setSoundFiles((p) => ({ ...p, [event]: null }));
-                }}
-                onDelaySecTextChange={(value) =>
-                  setSoundDelaySecText((p) => ({ ...p, [event]: value }))
+          return (
+            <CustomizeThemeSoundEffectRow
+              key={event}
+              event={event}
+              title={t(`widgets.themes.${THEME_SOUND_LABEL_KEYS[event]}`)}
+              soundUrl={soundUrls[event]}
+              soundFile={soundFiles[event]}
+              delaySecText={soundDelaySecText[event]}
+              canPreviewSound={canPreviewSound}
+              soundDragOver={soundDragOver === event}
+              isPreviewActive={soundPreviewState?.event === event}
+              previewPaused={!!soundPreviewState?.paused}
+              onUrlChange={(value) => {
+                if (soundPreviewState?.event === event) {
+                  stopSoundPreview();
                 }
-                onPickFile={(file) => handleSoundFilePick(event, file)}
-                onUploadButtonClick={() =>
-                  document.getElementById(`theme-sound-file-${event}`)?.click()
+                setSoundUrls((p) => ({ ...p, [event]: value }));
+                setSoundFiles((p) => ({ ...p, [event]: null }));
+              }}
+              onDelaySecTextChange={(value) =>
+                setSoundDelaySecText((p) => ({ ...p, [event]: value }))
+              }
+              onPickFile={(file) => handleSoundFilePick(event, file)}
+              onUploadButtonClick={() =>
+                document.getElementById(`theme-sound-file-${event}`)?.click()
+              }
+              onTogglePreview={() => toggleSoundPreview(event)}
+              onClear={() => {
+                if (soundPreviewState?.event === event) {
+                  stopSoundPreview();
                 }
-                onTogglePreview={() => toggleSoundPreview(event)}
-                onClear={() => {
-                  if (soundPreviewState?.event === event) {
-                    stopSoundPreview();
-                  }
-                  setSoundUrls((p) => ({ ...p, [event]: '' }));
-                  setSoundFiles((p) => ({ ...p, [event]: null }));
-                  setSoundDelaySecText((p) => ({ ...p, [event]: '' }));
-                }}
-                onDragEnter={handleSoundRowDragEnter(event)}
-                onDragLeave={handleSoundRowDragLeave(event)}
-                onDragOver={handleSoundDrag}
-                onDrop={handleSoundRowDrop(event)}
-              />
-            );
-          })}
-        </div>
+                setSoundUrls((p) => ({ ...p, [event]: '' }));
+                setSoundFiles((p) => ({ ...p, [event]: null }));
+                setSoundDelaySecText((p) => ({ ...p, [event]: '' }));
+              }}
+              onDragEnter={handleSoundRowDragEnter(event)}
+              onDragLeave={handleSoundRowDragLeave(event)}
+              onDragOver={handleSoundDrag}
+              onDrop={handleSoundRowDrop(event)}
+            />
+          );
+        })}
       </div>
-    </CollapsibleSection>
+    </div>
   );
 };
 

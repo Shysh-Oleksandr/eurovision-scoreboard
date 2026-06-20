@@ -60,7 +60,7 @@ const ControlsPanel = (): JSX.Element | null => {
         className={`bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 ${
           roundedCountryContainer
             ? 'qualified-countries-panel--rounded'
-            : 'rounded-md'
+            : 'rounded-[10px]'
         } relative`}
         style={roundedPanelGlowStyle}
       >

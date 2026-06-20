@@ -1,10 +1,12 @@
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
+import ColorEditorPanel from './ColorEditorPanel';
 import ColorOverridePicker, {
   ColorFieldDefinition,
 } from './ColorOverridePicker';
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ThemeColors } from '@/theme/types';
 import { DouzePointsAnimationMode } from '@/types/customTheme';
 
@@ -17,6 +19,14 @@ interface ColorOverridesSectionProps {
   douzePointsAnimationMode: DouzePointsAnimationMode;
 }
 
+type EditingColor = {
+  fullKey: string;
+  label: string;
+  defaultValue: string;
+  enableGradient?: boolean;
+  enableOpacity?: boolean;
+};
+
 const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
   defaultColors,
   overrides,
@@ -24,6 +34,17 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
   douzePointsAnimationMode,
 }) => {
   const t = useTranslations('widgets.themes.colorOverrides');
+
+  // On desktop the inline popover picker has room; on narrow screens we swap the
+  // whole grid for a full-card ColorEditorPanel instead.
+  const isDesktop = useMediaQuery('(min-width: 640px)');
+  const [activeCategory, setActiveCategory] = useState('jury');
+  const [editingColor, setEditingColor] = useState<EditingColor | null>(null);
+
+  // Close the mobile editor when widening to desktop (popover takes over there).
+  useEffect(() => {
+    if (isDesktop) setEditingColor(null);
+  }, [isDesktop]);
 
   const setOverride = (key: string, value: string | undefined) => {
     const next = { ...overrides };
@@ -277,71 +298,134 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
     return fields;
   })();
 
-  const renderColorGroup = (
-    colors: typeof juryColors,
-    title: string,
-    groupKey: keyof ThemeColors = 'countryItem',
-  ) => (
-    <div className="space-y-2">
-      <h5 className="text-xs font-medium text-white/70 uppercase tracking-wide">
-        {title}
-      </h5>
+  // One entry per color category. Pills switch between them; only the active
+  // category's grid is rendered at a time.
+  const categories: {
+    id: string;
+    label: string;
+    colors: ColorField[];
+    groupKey: keyof ThemeColors;
+  }[] = [
+    {
+      id: 'jury',
+      label: t('juryColors'),
+      colors: juryColors,
+      groupKey: 'countryItem',
+    },
+    {
+      id: 'douze',
+      label: t('douzePointsAnimationColors'),
+      colors: allDouzePointsColors,
+      groupKey: 'countryItem',
+    },
+    {
+      id: 'televote',
+      label: t('televoteColors'),
+      colors: televoteColors,
+      groupKey: 'countryItem',
+    },
+    {
+      id: 'tvactive',
+      label: t('televoteActiveColors'),
+      colors: televoteActiveColors,
+      groupKey: 'countryItem',
+    },
+    {
+      id: 'finished',
+      label: t('finishedColors'),
+      colors: finishedColors,
+      groupKey: 'countryItem',
+    },
+    {
+      id: 'unqual',
+      label: t('unqualifiedColors'),
+      colors: unqualifiedColors,
+      groupKey: 'countryItem',
+    },
+    {
+      id: 'jurypanel',
+      label: t('juryPointsPanelColors'),
+      colors: panelInfoColors,
+      groupKey: 'panelInfo',
+    },
+  ];
+
+  const current =
+    categories.find((c) => c.id === activeCategory) ?? categories[0];
+
+  // Mobile: editing a single swatch replaces the whole grid with a full editor.
+  if (editingColor && !isDesktop) {
+    return (
+      <ColorEditorPanel
+        label={editingColor.label}
+        value={overrides[editingColor.fullKey]}
+        defaultValue={editingColor.defaultValue}
+        onChange={(val) => setOverride(editingColor.fullKey, val)}
+        onBack={() => setEditingColor(null)}
+        enableGradient={editingColor.enableGradient}
+        enableOpacity={editingColor.enableOpacity}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap gap-1.5">
+        {categories.map((c) => {
+          const isActive = c.id === activeCategory;
+
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => {
+                setActiveCategory(c.id);
+                setEditingColor(null);
+              }}
+              className={`rounded-full px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                isActive
+                  ? 'bg-primary-700 text-white border border-transparent'
+                  : 'bg-white/[0.06] text-white/70 border border-white/10 hover:text-white'
+              }`}
+            >
+              {c.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="border-t border-white/20 border-solid"></div>
+
       <div className="grid grid-cols-2 gap-2">
-        {colors.map(({ key, label, enableGradient, enableOpacity }) => {
-          const fullKey = `${groupKey}.${key}`;
+        {current.colors.map(({ key, label, enableGradient, enableOpacity }) => {
+          const fullKey = `${current.groupKey}.${key}`;
 
           return (
             <ColorOverridePicker
               key={key}
               label={label}
               value={overrides[fullKey]}
-              defaultValue={
-                (defaultColors[groupKey as keyof ThemeColors] as any)[key]
-              }
+              defaultValue={(defaultColors[current.groupKey] as any)[key]}
               onChange={(val) => setOverride(fullKey, val)}
               enableGradient={enableGradient}
               enableOpacity={enableOpacity}
               allColorFields={allColorFields}
               currentFieldKey={fullKey}
               onBulkChange={handleBulkChange}
+              externalEdit={!isDesktop}
+              onRequestEdit={() =>
+                setEditingColor({
+                  fullKey,
+                  label: `${current.label} — ${label}`,
+                  defaultValue: (defaultColors[current.groupKey] as any)[key],
+                  enableGradient,
+                  enableOpacity,
+                })
+              }
             />
           );
         })}
       </div>
-    </div>
-  );
-
-  return (
-    <div className="space-y-4">
-      {renderColorGroup(juryColors, t('juryColors'))}
-
-      <div className="border-t border-white/20 border-solid"></div>
-
-      {renderColorGroup(allDouzePointsColors, t('douzePointsAnimationColors'))}
-
-      <div className="border-t border-white/20 border-solid"></div>
-
-      {renderColorGroup(televoteColors, t('televoteColors'))}
-
-      <div className="border-t border-white/20 border-solid"></div>
-
-      {renderColorGroup(televoteActiveColors, t('televoteActiveColors'))}
-
-      <div className="border-t border-white/20 border-solid"></div>
-
-      {renderColorGroup(finishedColors, t('finishedColors'))}
-
-      <div className="border-t border-white/20 border-solid"></div>
-
-      {renderColorGroup(unqualifiedColors, t('unqualifiedColors'))}
-
-      <div className="border-t border-white/20 border-solid"></div>
-
-      {renderColorGroup(
-        panelInfoColors,
-        t('juryPointsPanelColors'),
-        'panelInfo',
-      )}
     </div>
   );
 };

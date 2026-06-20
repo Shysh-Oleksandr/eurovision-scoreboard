@@ -71,6 +71,9 @@ const DEFAULT_SETTINGS: Settings = {
   shouldLimitManualTelevotePoints: true,
   shouldShowJuryVotingProgress: true,
   randomnessLevel: 50, // 0-100
+  pointsSpread: 50, // 0-100; controls the points gap between winners and losers
+  oddsViewMode: 'numbers',
+  oddsRankLayout: 'grid',
   isPickQualifiersMode: false,
   enableSplitScreenQualifierRevealMode: false,
   enableSplitScreenForLastQualifier: false,
@@ -162,6 +165,11 @@ interface Settings {
   shouldLimitManualTelevotePoints: boolean;
   shouldShowJuryVotingProgress: boolean;
   randomnessLevel: number;
+  pointsSpread: number;
+  /** Odds settings panel: which view is active (number grid vs drag-to-rank). */
+  oddsViewMode: 'numbers' | 'rank';
+  /** Odds rank view: list vs grid layout. */
+  oddsRankLayout: 'list' | 'grid';
   isPickQualifiersMode: boolean;
   enableSplitScreenQualifierRevealMode: boolean;
   enableSplitScreenForLastQualifier: boolean;

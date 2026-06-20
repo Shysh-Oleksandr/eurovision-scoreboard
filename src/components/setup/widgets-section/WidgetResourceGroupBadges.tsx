@@ -58,6 +58,7 @@ const WidgetResourceGroupBadges: React.FC<WidgetResourceGroupBadgesProps> = ({
               onClick={() => onSelectGroup(g._id)}
               isActive={isActive}
               Icon
+              className={cn(isActive && 'py-1')}
             >
               {isActive && (
                 <div

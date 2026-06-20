@@ -93,7 +93,7 @@ export const createPredefinitionActions: StateCreator<
     const { countryOdds, getStageVotingCountries } =
       useCountriesStore.getState();
     const generalState = useGeneralStore.getState();
-    const { randomnessLevel } = generalState.settings;
+    const { randomnessLevel, pointsSpread } = generalState.settings;
 
     const {
       pointsSystem,
@@ -109,6 +109,7 @@ export const createPredefinitionActions: StateCreator<
       stage.votingMode,
       countryOdds,
       randomnessLevel,
+      pointsSpread,
       pointsSystem,
       televotePointsSystem,
       allowMultiplePointsToSameEntry,

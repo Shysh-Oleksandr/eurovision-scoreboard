@@ -331,6 +331,77 @@ export function getDefaultThemeColors(
   };
 }
 
+// Accent surface is always hsl(hue, 88%, 62%) — only the hue varies, so its
+// perceived brightness swings wildly (yellow/green/cyan read far lighter than
+// blue). These mirror the --t-acc values in getCardThemeVars below.
+const ACCENT_S = 88;
+const ACCENT_L = 62;
+
+/** HSL (s/l in 0–100) → sRGB channels in 0–1. */
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+  const sN = s / 100;
+  const lN = l / 100;
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = sN * Math.min(lN, 1 - lN);
+  const f = (n: number) =>
+    lN - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+
+  return [f(0), f(8), f(4)];
+}
+
+/** WCAG relative luminance (0–1) of an sRGB color. */
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  const lin = (x: number) =>
+    x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+/** Luminance above this reads as "light" → needs a dark foreground instead of white. */
+export const READABLE_FG_LUMINANCE_CUTOFF = 0.55;
+
+/**
+ * Pick a readable label/icon color for the accent-filled "Apply" button.
+ * White looks washed out on light accents (yellow/green/cyan), so flip to a
+ * dark, on-hue color once the accent's luminance crosses a readability cutoff.
+ */
+export function getAccentForegroundColor(theme: CustomTheme): string {
+  const luminance = relativeLuminance(hslToRgb(theme.hue, ACCENT_S, ACCENT_L));
+
+  return luminance > READABLE_FG_LUMINANCE_CUTOFF
+    ? `hsl(${theme.hue}, 90%, 14%)`
+    : '#ffffff';
+}
+
+/** Parse "h s% l%" or "hsl(h, s%, l%)" (commas optional) into [h, s, l]. */
+function parseHsl(color: string): [number, number, number] | null {
+  const nums = color.match(/-?\d*\.?\d+/g);
+
+  if (!nums || nums.length < 3) return null;
+
+  return [Number(nums[0]), Number(nums[1]), Number(nums[2])];
+}
+
+/**
+ * Pick a readable foreground for an arbitrary HSL surface color (e.g. a theme's
+ * primary-700 fill). White for dark surfaces; a dark, on-hue color for light
+ * ones. Falls back to white if the color can't be parsed.
+ */
+export function getReadableForegroundColor(
+  color: string,
+  cutoff = READABLE_FG_LUMINANCE_CUTOFF,
+): string {
+  const hsl = parseHsl(color);
+
+  if (!hsl) return '#ffffff';
+
+  const [h, s, l] = hsl;
+
+  return relativeLuminance(hslToRgb(h, s, l)) > cutoff
+    ? `hsl(${h}, ${Math.max(s, 60)}%, 14%)`
+    : '#ffffff';
+}
+
 /**
  * Compute per-card CSS variables for custom theme cards.
  * Returns --t-a/--t-b (background surfaces), --t-bd (border), --t-acc/--t-acc-d (accent).
@@ -346,7 +417,7 @@ export function getCardThemeVars(theme: CustomTheme): Record<string, string> {
     '--t-a': `hsl(${h}, ${Math.round(67 * sf)}%, ${Math.round(12 * sf)}%)`,
     '--t-b': `hsl(${h}, ${Math.round(55 * sf)}%, ${Math.round(20 * sf)}%)`,
     '--t-bd': `hsla(${h}, 80%, 60%, 0.30)`,
-    '--t-acc': `hsl(${h}, 88%, 62%)`,
-    '--t-acc-d': `hsl(${h}, 88%, 50%)`,
+    '--t-acc': `hsl(${h}, ${ACCENT_S}%, ${ACCENT_L}%)`,
+    '--t-acc-d': `hsl(${h}, ${ACCENT_S}%, 50%)`,
   };
 }

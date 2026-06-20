@@ -87,7 +87,7 @@ const QualifiedCountriesList = () => {
       className={`${PANEL_INNER_CLASSNAME} ${
         roundedCountryContainer
           ? 'qualified-countries-panel--rounded'
-          : 'rounded-sm shadow-md'
+          : 'rounded-[10px] shadow-md'
       }`}
       style={roundedPanelGlowStyle}
     >

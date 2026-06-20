@@ -58,8 +58,8 @@ const CustomizeThemeSoundEffectRow: React.FC<
 
   return (
     <div
-      className={`space-y-1 rounded-md py-1.5 px-2 transition-colors bg-primary-700/20 ${
-        soundDragOver ? 'ring-1 ring-white/60 bg-primary-700/25' : ''
+      className={`space-y-1.5 rounded-[10px] py-2.5 px-3 transition-colors bg-primary-700/20 border border-[var(--hair)] ${
+        soundDragOver ? 'ring-1 ring-white/60 border-[var(--hair-2)]' : ''
       }`}
       onDragEnter={onDragEnter}
       onDragLeave={onDragLeave}
@@ -67,7 +67,7 @@ const CustomizeThemeSoundEffectRow: React.FC<
       onDrop={onDrop}
     >
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h5 className="text-sm font-medium text-white">{title}</h5>
+        <h5 className="text-sm font-bold text-white">{title}</h5>
         {event !== 'simulationBackground' && (
           <div className="flex flex-wrap items-center gap-2 pt-0.5">
             <label
@@ -84,7 +84,7 @@ const CustomizeThemeSoundEffectRow: React.FC<
               value={delaySecText}
               onChange={(e) => onDelaySecTextChange(e.target.value)}
               placeholder="0"
-              className="w-[100px] md:w-[120px] !py-1"
+              className="w-[100px] md:w-[120px] max-w-[100px] md:max-w-[120px] !py-1 placeholder:text-sm"
               aria-describedby={`theme-sound-delay-hint-${event}`}
             />
           </div>
@@ -104,7 +104,7 @@ const CustomizeThemeSoundEffectRow: React.FC<
           onChange={(e) => onUrlChange(e.target.value)}
           placeholder={t('widgets.themes.soundUrl')}
           disabled={!!soundFile}
-          className="w-full md:w-auto md:flex-1"
+          className="w-full md:w-auto md:flex-1 placeholder:text-sm"
         />
         <span className="text-sm text-white/90 font-medium lowercase">
           {t('common.or')}

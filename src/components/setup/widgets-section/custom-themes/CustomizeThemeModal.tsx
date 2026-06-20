@@ -33,21 +33,24 @@ import {
   useUploadThemeBackgroundMutation,
   useUploadThemeSoundMutation,
 } from '@/api/themes';
+import { ArrowIcon } from '@/assets/icons/ArrowIcon';
+import { CheckIcon } from '@/assets/icons/CheckIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { UploadIcon } from '@/assets/icons/UploadIcon';
 import Button from '@/components/common/Button';
 import { Checkbox } from '@/components/common/Checkbox';
-import { CollapsibleSection } from '@/components/common/CollapsibleSection';
 import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import { InputField } from '@/components/common/InputField';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
+import Tabs from '@/components/common/tabs/Tabs';
 import { TextareaField } from '@/components/common/TextareaField';
 import { Tooltip } from '@/components/common/Tooltip';
 import { Input } from '@/components/Input';
 import { JESC_THEME_OPTIONS, THEME_OPTIONS } from '@/data/data';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
@@ -56,6 +59,7 @@ import {
   getInterfaceFontSelectOptions,
   normalizeFontAlias,
 } from '@/theme/fontAliases';
+import { themeContentFingerprint } from '@/theme/themeFingerprint';
 import {
   THEME_SOUND_EVENTS,
   type ThemeSoundEventId,
@@ -89,6 +93,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   isEditMode = false,
 }) => {
   const t = useTranslations();
+  const { confirm } = useConfirmation();
 
   const themeYear = useGeneralStore((state) => state.themeYear);
   const applyCustomThemeToStore = useGeneralStore((s) => s.applyCustomTheme);
@@ -242,7 +247,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         v: initialTheme.shadeValue || 60,
         a: 1,
       });
-      setIsPublic(initialTheme.isPublic);
+      // Remixing someone's theme starts as a private draft — discourages using
+      // "Remix" as a public re-save. Editing keeps the theme's own visibility.
+      setIsPublic(isEditMode ? initialTheme.isPublic : false);
       setThemeGroupId(initialTheme.groupId || '');
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
       setOverrides(initialTheme.overrides || {});
@@ -295,7 +302,14 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setSoundDelaySecText(emptySoundDelaySecTextState());
       setThemeGroupId('');
     }
-  }, [initialTheme, isOpen, themeYear, themeHue, applyThemeSpecificsFormState]);
+  }, [
+    initialTheme,
+    isEditMode,
+    isOpen,
+    themeYear,
+    themeHue,
+    applyThemeSpecificsFormState,
+  ]);
 
   // Live preview effect
   useEffect(() => {
@@ -498,6 +512,78 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
       if (!soundFiles[event] && u && !u.startsWith('https://')) {
         toast.error(t('widgets.themes.soundUrlHttpsOnly'));
+
+        return;
+      }
+    }
+
+    // A "remix" is a brand-new theme created from someone else's theme.
+    const isRemix =
+      !!initialTheme &&
+      !isEditMode &&
+      !!user &&
+      initialTheme.userId !== user._id;
+
+    // Block publishing a remix that wasn't actually changed — it just clutters
+    // the public gallery with duplicates. Saving privately is still allowed.
+    if (isRemix && isPublic) {
+      const formSounds: Record<string, { url: string; delayMs?: number }> = {};
+
+      for (const event of THEME_SOUND_EVENTS) {
+        if (soundFiles[event]) {
+          // A freshly picked file is always a change.
+          formSounds[event] = { url: '__file__' };
+          continue;
+        }
+        const u = soundUrls[event].trim();
+
+        if (u) {
+          const d = soundDelaySecondsInputToMs(soundDelaySecText[event]);
+
+          formSounds[event] = d > 0 ? { url: u, delayMs: d } : { url: u };
+        }
+      }
+
+      const srcSpecifics = resolveThemeSpecificsForCustomTheme(initialTheme);
+      const formFingerprint = themeContentFingerprint({
+        baseThemeYear,
+        hue,
+        shadeValue: hsva.v,
+        overrides,
+        background: uploadedFile ? '__file__' : backgroundImageUrl,
+        pointsContainerShape,
+        uppercaseEntryName,
+        juryActivePointsUnderline,
+        isJuryPointsPanelRounded,
+        flagShape,
+        usePointsCountUpAnimation,
+        roundedCountryContainer,
+        boardAnimationMode,
+        douzePointsAnimationMode,
+        themeSounds: formSounds,
+        fontAlias: normalizeFontAlias(fontAlias),
+      });
+      const sourceFingerprint = themeContentFingerprint({
+        baseThemeYear: initialTheme.baseThemeYear,
+        hue: initialTheme.hue,
+        shadeValue: initialTheme.shadeValue ?? 60,
+        overrides: initialTheme.overrides,
+        background: initialTheme.backgroundImageUrl || '',
+        pointsContainerShape: srcSpecifics.pointsContainerShape,
+        uppercaseEntryName: srcSpecifics.uppercaseEntryName,
+        juryActivePointsUnderline: srcSpecifics.juryActivePointsUnderline,
+        isJuryPointsPanelRounded: srcSpecifics.isJuryPointsPanelRounded,
+        flagShape: srcSpecifics.flagShape,
+        usePointsCountUpAnimation: srcSpecifics.usePointsCountUpAnimation,
+        roundedCountryContainer: srcSpecifics.roundedCountryContainer,
+        boardAnimationMode: srcSpecifics.boardAnimationMode,
+        douzePointsAnimationMode: srcSpecifics.douzePointsAnimationMode,
+        themeSounds: initialTheme.themeSounds,
+        fontAlias: normalizeFontAlias(srcSpecifics.fontAlias),
+      });
+
+      if (formFingerprint === sourceFingerprint) {
+        toast.error(t('widgets.themes.remixNeedsChange'));
 
         return;
       }
@@ -819,8 +905,11 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
         toast.success(t('widgets.themes.themeUpdatedSuccessfully'));
       } else {
-        // Create new theme
-        let created = await createTheme(buildThemePayload());
+        // Create new theme — record remix provenance when copying another's theme.
+        let created = await createTheme({
+          ...buildThemePayload(),
+          ...(isRemix ? { remixedFrom: initialTheme!._id } : {}),
+        });
 
         // Upload background if provided
         if (uploadedFile) {
@@ -864,9 +953,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         }
 
         // If created from someone else's theme, record duplicate
-        if (initialTheme && user && initialTheme.userId !== user._id) {
+        if (isRemix) {
           try {
-            await reportDuplicate(initialTheme._id);
+            await reportDuplicate(initialTheme!._id);
           } catch (e) {
             // non-blocking
             console.error(e);
@@ -921,17 +1010,78 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     }
   };
 
+  const onClickOutside = () => {
+    confirm({
+      key: 'close-customize-theme',
+      type: 'alert',
+      title: t('widgets.themes.confirmCloseCustomizeThemeTitle'),
+      description: t('widgets.themes.confirmCloseCustomizeThemeDescription'),
+      onConfirm: onClose,
+    });
+  };
+
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const isSaving =
     isCreating || isUpdating || isUploadingBg || isUploadingSounds;
 
   const displayBg = uploadedFile ? imageUpload.base64 : backgroundImageUrl;
 
+  const TAB_ORDER = ['identity', 'look', 'visuals', 'colors', 'sound'] as const;
+
+  type ThemeTab = (typeof TAB_ORDER)[number];
+
+  const [activeTab, setActiveTab] = useState<ThemeTab>('identity');
+  const [isMobilePreviewOpen, setIsMobilePreviewOpen] = useState(true);
+  const activeTabIndex = TAB_ORDER.indexOf(activeTab);
+
+  // Reset the tab to the start whenever the modal (re)opens.
+  useEffect(() => {
+    if (isOpen) setActiveTab('identity');
+  }, [isOpen]);
+
+  const changeTab = (value: string) => {
+    if (value === activeTab) return;
+    // Stop any in-flight sound preview when leaving the Sound tab (its controls
+    // unmount, so the audio would otherwise keep playing with no way to pause).
+    if (activeTab === 'sound') stopSoundPreview();
+    setActiveTab(value as ThemeTab);
+  };
+
+  const tabItems = TAB_ORDER.map((value, index) => ({
+    value,
+    label: (
+      <span className="flex items-center gap-1">
+        {index < activeTabIndex && (
+          <span className="text-[8px] opacity-70 hidden sm:block">
+            <CheckIcon className="w-4 h-4" />
+          </span>
+        )}
+        {t(`widgets.themes.tabs.${value}`)}
+      </span>
+    ),
+  }));
+
+  const previewItem = (
+    <ThemePreviewCountryItem
+      backgroundImage={displayBg}
+      overrides={overrides}
+      baseThemeYear={baseThemeYear}
+      uppercaseEntryName={uppercaseEntryName}
+      juryActivePointsUnderline={juryActivePointsUnderline}
+      pointsContainerShape={pointsContainerShape}
+      flagShape={flagShape}
+      isJuryPointsPanelRounded={isJuryPointsPanelRounded}
+      usePointsCountUpAnimation={usePointsCountUpAnimation}
+      roundedCountryContainer={roundedCountryContainer}
+      douzePointsAnimationMode={douzePointsAnimationMode}
+    />
+  );
+
   return (
     <Modal
       dataTheme="custom-preview"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={onClickOutside}
       containerClassName="!w-[min(100%,950px)]"
       contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh] sm:!pb-0 !pb-3"
       overlayClassName="!z-[1002]"
@@ -943,457 +1093,485 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         />
       }
     >
-      <div className="flex flex-col sm:flex-row sm:gap-6 gap-2 h-full">
-        {/* Left Column - Controls */}
-        <div className="space-y-2.5 overflow-y-auto narrow-scrollbar md:pr-2 w-full sm:pb-4">
-          <h2 className="text-xl font-bold text-white">
-            {isEditMode
-              ? t('widgets.themes.editTheme')
-              : t('widgets.themes.createTheme')}
-          </h2>
-          {/* Basic Info */}
-          <CollapsibleSection
-            title={t('widgets.themes.basicInfo')}
-            defaultExpanded
-          >
-            <div className="space-y-3">
-              <InputField
-                label={t('common.name')}
-                id="themeName"
-                inputProps={{
-                  value: name,
-                  onChange: (e) => setName(e.target.value),
-                }}
-                placeholder="Eurovision 2026"
-              />
-
-              {!!user && (
-                <div className="flex flex-col gap-1">
-                  <CustomSelect
-                    options={themeGroupOptions}
-                    value={themeGroupId}
-                    onChange={setThemeGroupId}
-                    label={t('widgets.themes.groups.groupLabel')}
-                    id="theme-group-select"
-                    withIndicator={false}
-                    selectClassName="!shadow-none"
-                    labelClassName="!text-base mb-1"
-                    dataTheme="custom-preview"
-                  />
-                </div>
-              )}
-
-              <TextareaField
-                id="themeDesc"
-                label={t('common.description')}
-                placeholder={t('common.optionalDescription')}
-                textareaProps={{
-                  value: description,
-                  onChange: (e) => setDescription(e.target.value),
-                }}
-              />
-
-              <Checkbox
-                id="isPublic"
-                label={t('widgets.themes.makeThemePublic')}
-                labelClassName="w-full !px-0 !pt-1 !items-start"
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-              />
-            </div>
-          </CollapsibleSection>
-          {/* Main */}
-          <CollapsibleSection title={t('widgets.themes.main')} defaultExpanded>
-            <div className="space-y-4">
-              <div className="flex gap-3 items-end flex-wrap">
-                <CustomSelect
-                  options={ALL_THEME_OPTIONS}
-                  groups={[
-                    { label: 'ESC', options: THEME_OPTIONS },
-                    { label: 'JESC', options: JESC_THEME_OPTIONS },
-                  ]}
-                  value={baseThemeYear}
-                  labelClassName="!text-base !font-medium mb-1"
-                  onChange={handleBaseThemeYearChange}
-                  id="baseTheme-select-box"
-                  label={t('widgets.themes.baseTheme')}
-                  className="sm:w-[130px] w-[110px]"
-                  dataTheme="custom-preview"
-                />
-
-                <CustomSelect
-                  options={interfaceFontOptions}
-                  value={fontAlias}
-                  labelClassName="!text-base !font-medium mb-1"
-                  onChange={(value) => setFontAlias(value)}
-                  id="interface-font-select"
-                  label={t('widgets.themes.interfaceFont')}
-                  className="sm:w-[200px] w-full"
-                  dataTheme="custom-preview"
-                  withIndicator={false}
-                />
-              </div>
-
-              <div>
-                <h4 className="text-sm font-medium text-white mb-2">
-                  {t('widgets.themes.interfaceColor')}
-                </h4>
-                <Hue
-                  hue={hue}
-                  onChange={(newHue) => {
-                    setHue(toFixedIfDecimalFloat(newHue.h));
-                    setHsva({ ...hsva, h: newHue.h });
-                  }}
-                />
-                <ShadeSlider
-                  className="mt-1"
-                  hsva={hsva}
-                  onChange={(newShade) => {
-                    setHsva({
-                      ...hsva,
-                      v: Math.max(15, Math.min(100, newShade.v)),
-                    });
-                  }}
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <h4 className="text-sm font-medium text-white">
-                    {t('widgets.themes.backgroundImage')}
-                  </h4>
-                  {!!uploadedFile && (
-                    <Button
-                      variant="secondary"
-                      className="w-fit pointer-events-auto text-sm !py-1.5 !px-4"
-                      Icon={<UndoIcon className="w-4 h-4" />}
-                      onClick={() => {
-                        setBackgroundImageUrl('');
-                        setUploadedFile(null);
-                        imageUpload.clear();
-                      }}
-                    ></Button>
-                  )}
-                </div>
-                <div className="space-y-3">
-                  <div
-                    onDragEnter={handleDragIn}
-                    onDragLeave={handleDragOut}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                    className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-md p-3 cursor-pointer transition-colors ${
-                      isDragOver
-                        ? 'border-white bg-primary-700/50'
-                        : 'border-white/40'
-                    }`}
-                  >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/png, image/jpeg, image/webp"
-                      onChange={(e) =>
-                        handleFileChange(e.target.files?.[0] ?? null)
-                      }
-                      className="hidden"
-                    />
-                    <UploadIcon className="w-8 h-8 text-white pointer-events-none" />
-                    <p className="text-white text-xs pointer-events-none">
-                      {t('common.dragAndDropOrClickToUpload')}
-                    </p>
-                    <Button
-                      variant="tertiary"
-                      className="w-fit pointer-events-auto text-sm !py-1.5"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      {t('common.browse')}
-                    </Button>
-                  </div>
-
-                  <Input
-                    type="text"
-                    value={uploadedFile ? '' : backgroundImageUrl}
-                    onChange={(e) => {
-                      setBackgroundImageUrl(e.target.value);
-                      setUploadedFile(null);
-                      imageUpload.clear();
-                    }}
-                    placeholder={t('common.pasteImageUrl')}
-                    disabled={!!uploadedFile}
-                  />
-                </div>
-              </div>
-            </div>
-          </CollapsibleSection>
-          {/* Theme Specifics */}
-          <CollapsibleSection
-            title={t('widgets.themes.visualDetails.title')}
-            defaultExpanded
-          >
-            <div className="space-y-3">
-              <Checkbox
-                id="uppercase-entry-name"
-                label={t('widgets.themes.visualDetails.uppercaseEntryName')}
-                labelClassName="w-full !px-0 !pt-1 !items-start"
-                checked={uppercaseEntryName}
-                onChange={(e) => setUppercaseEntryName(e.target.checked)}
-              />
-              <Checkbox
-                id="jury-active-points-underline"
-                label={t(
-                  'widgets.themes.visualDetails.juryActivePointsUnderline',
-                )}
-                labelClassName="w-full !px-0 !pt-1 !items-start"
-                checked={juryActivePointsUnderline}
-                onChange={(e) => setJuryActivePointsUnderline(e.target.checked)}
-              />
-              <Checkbox
-                id="jury-points-panel-rounded"
-                label={t('widgets.themes.visualDetails.juryPointsPanelRounded')}
-                labelClassName="w-full !px-0 !pt-1 !items-start"
-                checked={isJuryPointsPanelRounded}
-                onChange={(e) => setIsJuryPointsPanelRounded(e.target.checked)}
-              />
-              <Checkbox
-                id="use-points-count-up-animation"
-                label={t(
-                  'widgets.themes.visualDetails.usePointsCountUpAnimation',
-                )}
-                labelClassName="w-full !px-0 !pt-1 !items-start"
-                checked={usePointsCountUpAnimation}
-                onChange={(e) => setUsePointsCountUpAnimation(e.target.checked)}
-              />
-              <Checkbox
-                id="rounded-country-container"
-                label={t(
-                  'widgets.themes.visualDetails.roundedCountryContainer',
-                )}
-                labelClassName="w-full !px-0 !pt-1 !items-start"
-                checked={roundedCountryContainer}
-                onChange={(e) => setRoundedCountryContainer(e.target.checked)}
-              />
-
-              <div className="grid xs:grid-cols-2 grid-cols-1 items-center xs:gap-3 gap-2">
-                <CustomSelect
-                  options={[
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.boardAnimations.flip',
-                      ),
-                      value: 'flip',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.boardAnimations.teleport',
-                      ),
-                      value: 'teleport',
-                    },
-                  ]}
-                  value={boardAnimationMode}
-                  labelClassName="!text-base !font-medium mb-1"
-                  onChange={(value) =>
-                    setBoardAnimationMode(value as BoardAnimationMode)
-                  }
-                  id="board-animation-mode-select"
-                  label={t('widgets.themes.visualDetails.boardAnimation')}
-                  dataTheme="custom-preview"
-                  withIndicator={false}
-                />
-                <CustomSelect
-                  options={[
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.douzePointsAnimations.parallelograms',
-                      ),
-                      value: 'parallelograms',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.douzePointsAnimations.heartsGrid',
-                      ),
-                      value: 'heartsGrid',
-                    },
-                  ]}
-                  value={douzePointsAnimationMode}
-                  labelClassName="!text-base !font-medium mb-1"
-                  onChange={(value) =>
-                    setDouzePointsAnimationMode(
-                      value as DouzePointsAnimationMode,
-                    )
-                  }
-                  id="douze-points-animation-mode-select"
-                  label={t('widgets.themes.visualDetails.douzePointsAnimation')}
-                  dataTheme="custom-preview"
-                  withIndicator={false}
-                />
-                <CustomSelect
-                  options={[
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.pointsContainerShapes.curvedEdge',
-                      ),
-                      value: 'triangle',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.pointsContainerShapes.square',
-                      ),
-                      value: 'square',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.pointsContainerShapes.transparent',
-                      ),
-                      value: 'transparent',
-                    },
-                  ]}
-                  value={pointsContainerShape}
-                  labelClassName="!text-base !font-medium mb-1"
-                  onChange={(value) =>
-                    setPointsContainerShape(
-                      value as 'triangle' | 'square' | 'transparent',
-                    )
-                  }
-                  id="points-container-shape-select"
-                  label={t(
-                    'widgets.themes.visualDetails.pointsContainerShapes.title',
-                  )}
-                  dataTheme="custom-preview"
-                  withIndicator={false}
-                />
-                <CustomSelect
-                  options={[
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.flagShapes.largeRectangle',
-                      ),
-                      value: 'big-rectangle',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.flagShapes.smallRectangle',
-                      ),
-                      value: 'small-rectangle',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.flagShapes.square',
-                      ),
-                      value: 'square',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.flagShapes.circle',
-                      ),
-                      value: 'round',
-                    },
-                    {
-                      label: t(
-                        'widgets.themes.visualDetails.flagShapes.circleWithBorder',
-                      ),
-                      value: 'round-border',
-                    },
-                    {
-                      label: t('widgets.themes.visualDetails.flagShapes.none'),
-                      value: 'none',
-                    },
-                  ]}
-                  value={flagShape}
-                  labelClassName="!text-base !font-medium mb-1"
-                  onChange={(value) => setFlagShape(value as FlagShape)}
-                  id="flag-shape-select"
-                  label={t('widgets.themes.visualDetails.flagShapes.title')}
-                  dataTheme="custom-preview"
-                  withIndicator={false}
-                />
-              </div>
-            </div>
-          </CollapsibleSection>
-          {/* Country Item Colors */}
-          <CollapsibleSection
-            title={t('widgets.themes.countryItemColors')}
-            defaultExpanded
-          >
-            <ColorOverridesSection
-              defaultColors={defaultColors}
-              overrides={overrides}
-              onChange={setOverrides}
-              douzePointsAnimationMode={douzePointsAnimationMode}
-            />
-          </CollapsibleSection>
-
-          <CustomizeThemeSoundEffectsSection
-            soundUrls={soundUrls}
-            setSoundUrls={setSoundUrls}
-            soundFiles={soundFiles}
-            setSoundFiles={setSoundFiles}
-            soundDelaySecText={soundDelaySecText}
-            setSoundDelaySecText={setSoundDelaySecText}
-            soundDragOver={soundDragOver}
-            handleSoundDrag={handleSoundDrag}
-            handleSoundRowDragEnter={handleSoundRowDragEnter}
-            handleSoundRowDragLeave={handleSoundRowDragLeave}
-            handleSoundRowDrop={handleSoundRowDrop}
-            soundPreviewState={soundPreviewState}
-            stopSoundPreview={stopSoundPreview}
-            toggleSoundPreview={toggleSoundPreview}
-            handleSoundFilePick={handleSoundFilePick}
+      <div className="flex flex-col h-full">
+        {/* Header: title + step counter + tab strip */}
+        <div className="flex-shrink-0 mb-3">
+          <div className="flex items-baseline justify-between gap-2 mb-3">
+            <h2 className="text-xl font-bold text-white">
+              {isEditMode
+                ? t('widgets.themes.editTheme')
+                : t('widgets.themes.createTheme')}
+            </h2>
+            <span className="text-sm font-medium text-white/40 shrink-0">
+              {t('widgets.themes.stepOf', {
+                current: activeTabIndex + 1,
+                total: TAB_ORDER.length,
+              })}
+            </span>
+          </div>
+          <Tabs
+            tabs={tabItems}
+            activeTab={activeTab}
+            setActiveTab={changeTab}
+            buttonClassName="!px-2 !py-2 !text-[13px]"
           />
         </div>
 
-        {/* Right Column - Preview */}
-        <div className="sm:space-y-4 space-y-2 sm:h-full flex flex-col">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold text-white">
-              {t('common.preview')}
-            </h3>
-
-            <Tooltip
-              dataTheme="custom-preview"
-              content={
-                <div className="font-medium">
-                  <p>
-                    Select a state from the badges below to preview how an entry
-                    looks in that state.
-                  </p>
-                  <ul className="list-disc list-inside">
-                    <li>
-                      <strong>Jury</strong> – during the jury voting
-                    </li>
-                    <li>
-                      <strong>Televote</strong> – before receiving televote
-                      points
-                    </li>
-                    <li>
-                      <strong>Active</strong> – when the entry is next to
-                      receive televote points
-                    </li>
-                    <li>
-                      <strong>Finished</strong> – after the voting is completed
-                    </li>
-                    <li>
-                      <strong>Unqualified</strong> – when the entry did not
-                      qualify
-                    </li>
-                  </ul>
+        {/* Body */}
+        <div className="flex flex-col sm:flex-row sm:gap-6 gap-2 flex-1 min-h-0">
+          {/* Mobile preview strip (collapsible) */}
+          <div className="sm:hidden flex-shrink-0">
+            <div className="bg-primary-800/80 border border-white/10 rounded-xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setIsMobilePreviewOpen((o) => !o)}
+                className="w-full px-3 py-2 flex items-center justify-between"
+              >
+                <span className="text-xs font-bold text-white/70 uppercase tracking-wider">
+                  {t('common.preview')}
+                </span>
+                <span
+                  className={`text-white/70 transition-transform duration-[400ms] text-xs ${
+                    isMobilePreviewOpen ? 'rotate-90' : ''
+                  }`}
+                >
+                  <ArrowIcon className="w-5 h-5" />
+                </span>
+              </button>
+              <div
+                className={`grid transition-all duration-[400ms] ${
+                  isMobilePreviewOpen
+                    ? 'grid-rows-[1fr] opacity-100'
+                    : 'grid-rows-[0fr] opacity-0'
+                }`}
+              >
+                <div className="overflow-hidden">
+                  <div className="px-3 pb-3">{previewItem}</div>
                 </div>
-              }
-              position="right"
-            />
+              </div>
+            </div>
           </div>
-          <div className="flex-1 sm:min-h-[400px]">
-            <ThemePreviewCountryItem
-              backgroundImage={displayBg}
-              overrides={overrides}
-              baseThemeYear={baseThemeYear}
-              uppercaseEntryName={uppercaseEntryName}
-              juryActivePointsUnderline={juryActivePointsUnderline}
-              pointsContainerShape={pointsContainerShape}
-              flagShape={flagShape}
-              isJuryPointsPanelRounded={isJuryPointsPanelRounded}
-              usePointsCountUpAnimation={usePointsCountUpAnimation}
-              roundedCountryContainer={roundedCountryContainer}
-              douzePointsAnimationMode={douzePointsAnimationMode}
-            />
+
+          {/* Left Column - active tab content */}
+          <div className="space-y-2.5 overflow-y-auto narrow-scrollbar md:pr-2 sm:pb-4 flex-1 min-w-0 min-h-0">
+            {activeTab === 'identity' && (
+              <div className="space-y-3">
+                <InputField
+                  label={t('common.name')}
+                  id="themeName"
+                  inputProps={{
+                    value: name,
+                    onChange: (e) => setName(e.target.value),
+                  }}
+                  placeholder="Eurovision 2026"
+                />
+
+                {!!user && (
+                  <div className="flex flex-col gap-1">
+                    <CustomSelect
+                      options={themeGroupOptions}
+                      value={themeGroupId}
+                      onChange={setThemeGroupId}
+                      label={t('widgets.themes.groups.groupLabel')}
+                      id="theme-group-select"
+                      withIndicator={false}
+                      selectClassName="!shadow-none"
+                      labelClassName="!text-base mb-1"
+                      dataTheme="custom-preview"
+                    />
+                  </div>
+                )}
+
+                <TextareaField
+                  id="themeDesc"
+                  label={t('common.description')}
+                  placeholder={t('common.optionalDescription')}
+                  textareaProps={{
+                    value: description,
+                    onChange: (e) => setDescription(e.target.value),
+                  }}
+                />
+
+                <Checkbox
+                  id="isPublic"
+                  label={t('widgets.themes.makeThemePublic')}
+                  labelClassName="w-full !px-0 !pt-1 !items-start"
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                />
+              </div>
+            )}
+            {activeTab === 'look' && (
+              <div className="space-y-4">
+                <div className="flex gap-3 items-end flex-wrap">
+                  <CustomSelect
+                    options={ALL_THEME_OPTIONS}
+                    groups={[
+                      { label: 'ESC', options: THEME_OPTIONS },
+                      { label: 'JESC', options: JESC_THEME_OPTIONS },
+                    ]}
+                    value={baseThemeYear}
+                    labelClassName="!text-base !font-medium mb-1"
+                    onChange={handleBaseThemeYearChange}
+                    id="baseTheme-select-box"
+                    label={t('widgets.themes.baseTheme')}
+                    className="sm:w-[130px] w-[110px]"
+                    dataTheme="custom-preview"
+                  />
+
+                  <CustomSelect
+                    options={interfaceFontOptions}
+                    value={fontAlias}
+                    labelClassName="!text-base !font-medium mb-1"
+                    onChange={(value) => setFontAlias(value)}
+                    id="interface-font-select"
+                    label={t('widgets.themes.interfaceFont')}
+                    className="sm:w-[200px] w-full"
+                    dataTheme="custom-preview"
+                    withIndicator={false}
+                  />
+                  <p className="text-white/50 text-xs basis-full mt-0.5">
+                    {t('widgets.themes.baseThemeCascadeHint')}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-medium text-white mb-2">
+                    {t('widgets.themes.interfaceColor')}
+                  </h4>
+                  <Hue
+                    hue={hue}
+                    className="[&>:first-child]:!rounded-[10px] !rounded-[10px]"
+                    onChange={(newHue) => {
+                      setHue(toFixedIfDecimalFloat(newHue.h));
+                      setHsva({ ...hsva, h: newHue.h });
+                    }}
+                  />
+                  <ShadeSlider
+                    className="mt-1 [&>:first-child]:!rounded-[10px] !rounded-[10px]"
+                    hsva={hsva}
+                    onChange={(newShade) => {
+                      setHsva({
+                        ...hsva,
+                        v: Math.max(15, Math.min(100, newShade.v)),
+                      });
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <h4 className="text-sm font-medium text-white">
+                      {t('widgets.themes.backgroundImage')}
+                    </h4>
+                    {!!uploadedFile && (
+                      <Button
+                        variant="secondary"
+                        className="w-fit pointer-events-auto text-sm !py-1.5 !px-4"
+                        Icon={<UndoIcon className="w-4 h-4" />}
+                        onClick={() => {
+                          setBackgroundImageUrl('');
+                          setUploadedFile(null);
+                          imageUpload.clear();
+                        }}
+                      ></Button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    <div
+                      onDragEnter={handleDragIn}
+                      onDragLeave={handleDragOut}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                      className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-[10px] p-3 cursor-pointer transition-colors ${
+                        isDragOver
+                          ? 'border-white bg-primary-700/50'
+                          : 'border-white/40'
+                      }`}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/png, image/jpeg, image/webp"
+                        onChange={(e) =>
+                          handleFileChange(e.target.files?.[0] ?? null)
+                        }
+                        className="hidden"
+                      />
+                      <UploadIcon className="w-8 h-8 text-white pointer-events-none" />
+                      <p className="text-white text-xs pointer-events-none">
+                        {t('common.dragAndDropOrClickToUpload')}
+                      </p>
+                      <Button
+                        variant="tertiary"
+                        className="w-fit pointer-events-auto text-sm !py-1.5"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {t('common.browse')}
+                      </Button>
+                    </div>
+
+                    <Input
+                      type="text"
+                      value={uploadedFile ? '' : backgroundImageUrl}
+                      onChange={(e) => {
+                        setBackgroundImageUrl(e.target.value);
+                        setUploadedFile(null);
+                        imageUpload.clear();
+                      }}
+                      placeholder={t('common.pasteImageUrl')}
+                      disabled={!!uploadedFile}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+            {activeTab === 'visuals' && (
+              <div className="space-y-3">
+                <Checkbox
+                  id="uppercase-entry-name"
+                  label={t('widgets.themes.visualDetails.uppercaseEntryName')}
+                  labelClassName="w-full !px-0 !pt-1 !items-start"
+                  checked={uppercaseEntryName}
+                  onChange={(e) => setUppercaseEntryName(e.target.checked)}
+                />
+                <Checkbox
+                  id="jury-active-points-underline"
+                  label={t(
+                    'widgets.themes.visualDetails.juryActivePointsUnderline',
+                  )}
+                  labelClassName="w-full !px-0 !pt-1 !items-start"
+                  checked={juryActivePointsUnderline}
+                  onChange={(e) =>
+                    setJuryActivePointsUnderline(e.target.checked)
+                  }
+                />
+                <Checkbox
+                  id="jury-points-panel-rounded"
+                  label={t(
+                    'widgets.themes.visualDetails.juryPointsPanelRounded',
+                  )}
+                  labelClassName="w-full !px-0 !pt-1 !items-start"
+                  checked={isJuryPointsPanelRounded}
+                  onChange={(e) =>
+                    setIsJuryPointsPanelRounded(e.target.checked)
+                  }
+                />
+                <Checkbox
+                  id="use-points-count-up-animation"
+                  label={t(
+                    'widgets.themes.visualDetails.usePointsCountUpAnimation',
+                  )}
+                  labelClassName="w-full !px-0 !pt-1 !items-start"
+                  checked={usePointsCountUpAnimation}
+                  onChange={(e) =>
+                    setUsePointsCountUpAnimation(e.target.checked)
+                  }
+                />
+                <Checkbox
+                  id="rounded-country-container"
+                  label={t(
+                    'widgets.themes.visualDetails.roundedCountryContainer',
+                  )}
+                  labelClassName="w-full !px-0 !pt-1 !items-start"
+                  checked={roundedCountryContainer}
+                  onChange={(e) => setRoundedCountryContainer(e.target.checked)}
+                />
+
+                <div className="grid xs:grid-cols-2 grid-cols-1 items-center xs:gap-3 gap-2">
+                  <CustomSelect
+                    options={[
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.boardAnimations.flip',
+                        ),
+                        value: 'flip',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.boardAnimations.teleport',
+                        ),
+                        value: 'teleport',
+                      },
+                    ]}
+                    value={boardAnimationMode}
+                    labelClassName="!text-base !font-medium mb-1"
+                    onChange={(value) =>
+                      setBoardAnimationMode(value as BoardAnimationMode)
+                    }
+                    id="board-animation-mode-select"
+                    label={t('widgets.themes.visualDetails.boardAnimation')}
+                    dataTheme="custom-preview"
+                    withIndicator={false}
+                  />
+                  <CustomSelect
+                    options={[
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.douzePointsAnimations.parallelograms',
+                        ),
+                        value: 'parallelograms',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.douzePointsAnimations.heartsGrid',
+                        ),
+                        value: 'heartsGrid',
+                      },
+                    ]}
+                    value={douzePointsAnimationMode}
+                    labelClassName="!text-base !font-medium mb-1"
+                    onChange={(value) =>
+                      setDouzePointsAnimationMode(
+                        value as DouzePointsAnimationMode,
+                      )
+                    }
+                    id="douze-points-animation-mode-select"
+                    label={t(
+                      'widgets.themes.visualDetails.douzePointsAnimation',
+                    )}
+                    dataTheme="custom-preview"
+                    withIndicator={false}
+                  />
+                  <CustomSelect
+                    options={[
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.pointsContainerShapes.curvedEdge',
+                        ),
+                        value: 'triangle',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.pointsContainerShapes.square',
+                        ),
+                        value: 'square',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.pointsContainerShapes.transparent',
+                        ),
+                        value: 'transparent',
+                      },
+                    ]}
+                    value={pointsContainerShape}
+                    labelClassName="!text-base !font-medium mb-1"
+                    onChange={(value) =>
+                      setPointsContainerShape(
+                        value as 'triangle' | 'square' | 'transparent',
+                      )
+                    }
+                    id="points-container-shape-select"
+                    label={t(
+                      'widgets.themes.visualDetails.pointsContainerShapes.title',
+                    )}
+                    dataTheme="custom-preview"
+                    withIndicator={false}
+                  />
+                  <CustomSelect
+                    options={[
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.flagShapes.largeRectangle',
+                        ),
+                        value: 'big-rectangle',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.flagShapes.smallRectangle',
+                        ),
+                        value: 'small-rectangle',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.flagShapes.square',
+                        ),
+                        value: 'square',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.flagShapes.circle',
+                        ),
+                        value: 'round',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.flagShapes.circleWithBorder',
+                        ),
+                        value: 'round-border',
+                      },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.flagShapes.none',
+                        ),
+                        value: 'none',
+                      },
+                    ]}
+                    value={flagShape}
+                    labelClassName="!text-base !font-medium mb-1"
+                    onChange={(value) => setFlagShape(value as FlagShape)}
+                    id="flag-shape-select"
+                    label={t('widgets.themes.visualDetails.flagShapes.title')}
+                    dataTheme="custom-preview"
+                    withIndicator={false}
+                  />
+                </div>
+              </div>
+            )}
+            {activeTab === 'colors' && (
+              <ColorOverridesSection
+                defaultColors={defaultColors}
+                overrides={overrides}
+                onChange={setOverrides}
+                douzePointsAnimationMode={douzePointsAnimationMode}
+              />
+            )}
+            {activeTab === 'sound' && (
+              <CustomizeThemeSoundEffectsSection
+                soundUrls={soundUrls}
+                setSoundUrls={setSoundUrls}
+                soundFiles={soundFiles}
+                setSoundFiles={setSoundFiles}
+                soundDelaySecText={soundDelaySecText}
+                setSoundDelaySecText={setSoundDelaySecText}
+                soundDragOver={soundDragOver}
+                handleSoundDrag={handleSoundDrag}
+                handleSoundRowDragEnter={handleSoundRowDragEnter}
+                handleSoundRowDragLeave={handleSoundRowDragLeave}
+                handleSoundRowDrop={handleSoundRowDrop}
+                soundPreviewState={soundPreviewState}
+                stopSoundPreview={stopSoundPreview}
+                toggleSoundPreview={toggleSoundPreview}
+                handleSoundFilePick={handleSoundFilePick}
+              />
+            )}
+          </div>
+
+          {/* Right Column - Preview (desktop only) */}
+          <div className="hidden sm:flex sm:space-y-4 space-y-2 sm:h-full flex-col lg:basis-[38%] md:basis-[45%] sm:basis-[46%] sm:shrink-0 sm:grow-0 min-w-0">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-white">
+                {t('common.preview')}
+              </h3>
+
+              <Tooltip
+                dataTheme="custom-preview"
+                content={
+                  <div className="font-medium">
+                    <p>{t('widgets.themes.previewStatesTooltipIntro')}</p>
+                    {t.rich('widgets.themes.previewStatesTooltipStates', {
+                      list: (chunks) => (
+                        <ul className="list-disc list-inside">{chunks}</ul>
+                      ),
+                      item: (chunks) => <li>{chunks}</li>,
+                      strong: (chunks) => <strong>{chunks}</strong>,
+                    })}
+                  </div>
+                }
+                position="right"
+              />
+            </div>
+            <div className="flex-1 sm:min-h-[400px]">{previewItem}</div>
           </div>
         </div>
       </div>

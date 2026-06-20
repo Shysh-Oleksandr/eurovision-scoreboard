@@ -240,7 +240,7 @@ const PresentationPanel = (): JSX.Element | null => {
         className={`min-h-[120px] relative bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 ${
           roundedCountryContainer
             ? 'qualified-countries-panel--rounded'
-            : 'rounded-md'
+            : 'rounded-[10px]'
         } lg:pb-4 pb-3 lg:pt-3 md:pt-2 ${
           withPointsGrouping ? 'pt-2' : 'xs:pt-3 pt-2'
         } lg:px-4 px-3 gap-2 flex flex-col`}

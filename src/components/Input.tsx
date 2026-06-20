@@ -9,8 +9,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const baseClasses = [
       'w-full',
       'py-3',
-      'pl-3',
-      'rounded-md',
+      'px-3',
+      'rounded-[10px]',
       '!text-[1.145rem] md:!text-sm',
       'bg-primary-900',
       'bg-gradient-to-bl',

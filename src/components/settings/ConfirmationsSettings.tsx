@@ -24,6 +24,7 @@ export const ConfirmationsSettings: React.FC = () => {
       'change-contest-year': t('changeContestYear'),
       'grand-final-only-change': t('grandFinalOnlyChange'),
       'delete-theme': t('deleteTheme'),
+      'close-customize-theme': t('closeCustomizeTheme'),
       'delete-stage': t('deleteStage'),
       'delete-contest': t('deleteContest'),
       'remove-saved-contest': t('removeSavedContest'),

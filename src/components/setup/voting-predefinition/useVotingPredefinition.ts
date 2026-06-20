@@ -48,6 +48,7 @@ export const useVotingPredefinition = ({
   const allowMultiplePointsToSameEntry =
     stageOverride?.allowMultiplePointsToSameEntry ?? globalAllowMultiple;
   const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
+  const pointsSpread = useGeneralStore((s) => s.settings.pointsSpread);
   const getStageVotingCountries = useCountriesStore(
     (s) => s.getStageVotingCountries,
   );
@@ -135,6 +136,7 @@ export const useVotingPredefinition = ({
       modeToGenerate,
       countryOdds,
       randomnessLevel,
+      pointsSpread,
       pointsSystem,
       effectiveTelevoteSystem,
       allowMultiplePointsToSameEntry,

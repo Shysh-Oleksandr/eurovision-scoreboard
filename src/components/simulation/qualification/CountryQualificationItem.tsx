@@ -108,7 +108,7 @@ export const CountryQualificationItem: React.FC<
   if (!country) {
     return (
       <div
-        className={`bg-primary-800 bg-gradient-to-r from-[10%] from-primary-700 to-primary-900 rounded-[1px] ${
+        className={`bg-primary-800 bg-gradient-to-r from-[10%] from-primary-700 to-primary-900 rounded-[6px] ${
           roundedCountryContainer ? '!rounded-full' : ''
         } w-full lg:h-10 md:h-9 h-8 shadow-md`}
       ></div>
@@ -126,7 +126,7 @@ export const CountryQualificationItem: React.FC<
     >
       <CountryItemBase
         country={country}
-        containerClassName={`flex items-center rounded-[1px] ${
+        containerClassName={`flex items-center rounded-[6px] overflow-hidden ${
           roundedCountryContainer ? '!rounded-full !bg-transparent' : ''
         } duration-300 lg:h-10 md:h-9 h-8 relative shadow-md w-full ${
           onClick && !isDisabled

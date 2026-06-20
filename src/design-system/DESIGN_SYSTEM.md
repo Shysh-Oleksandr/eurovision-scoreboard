@@ -19,7 +19,6 @@ Three principles guide every decision:
 ## 2. Color
 
 ### Dynamic palette (OKLCH)
-
 The full dark palette and accent color are derived from a single CSS variable `--prim-hue` (0–360°) that is updated via JS when a theme is applied. This ensures every hue looks equally vivid at every background lightness — something HSL cannot guarantee.
 
 ```
@@ -36,40 +35,32 @@ The full dark palette and accent color are derived from a single CSS variable `-
 Default hue: **300** (deep purple, the DouzePoints brand hue).
 
 ### Applying a theme color from JS
-
 ```ts
-import { oklch } from 'culori'; // or any OKLCH-capable library
+import { oklch } from 'culori';  // or any OKLCH-capable library
 
 function applyThemeColors(interfaceColorHex: string) {
   const { h = 300 } = oklch(interfaceColorHex) ?? {};
-  document.documentElement.style.setProperty(
-    '--prim-hue',
-    String(Math.round(h)),
-  );
+  document.documentElement.style.setProperty('--prim-hue', String(Math.round(h)));
 }
 ```
 
 ### Ink (text on dark surfaces)
-
-| Token      | Alpha | Use                                       |
-| ---------- | ----- | ----------------------------------------- |
-| `--ink`    | 100%  | Headlines, primary labels, active icons   |
-| `--ink-70` | 72%   | Body text, badge labels                   |
-| `--ink-55` | 55%   | Secondary labels, handles, inactive tabs  |
-| `--ink-40` | 40%   | Dates, placeholder text, decorative icons |
-| `--ink-25` | 25%   | Disabled states, very subtle dividers     |
+| Token | Alpha | Use |
+|---|---|---|
+| `--ink` | 100% | Headlines, primary labels, active icons |
+| `--ink-70` | 72% | Body text, badge labels |
+| `--ink-55` | 55% | Secondary labels, handles, inactive tabs |
+| `--ink-40` | 40% | Dates, placeholder text, decorative icons |
+| `--ink-25` | 25% | Disabled states, very subtle dividers |
 
 ### Borders
-
 - `--hair` (10% white) — standard card/input border
 - `--hair-2` (16% white) — slightly elevated borders (active inputs, follow button)
 
 ### Semantic badge colors
-
 Eight pre-defined tint sets (bg / border / ink): **purple** (points system), **pink** (theme), **amber** (custom entries), **green** (in progress), **red** (not started), **gold** (winner trophy), **violet** (special), **default** (neutral metadata). See `tokens.css`.
 
 ### Per-theme card tint
-
 Each custom theme card carries its own CSS variables (`--t-a`, `--t-b`, `--t-bd`, `--t-acc`, `--t-acc-d`, `--t-acc-ink`) set inline. The gradient from `--t-a` → `--t-b` is the card background; `--t-acc` is the accent and the active state color on that card. Contest cards always use the default night palette.
 
 ---
@@ -84,18 +75,17 @@ font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 ```
 
 ### Scale
-
-| Token         | Size      | Weight  | Use                                            |
-| ------------- | --------- | ------- | ---------------------------------------------- |
-| `--text-2xs`  | 10px      | 800     | Section labels, code captions                  |
-| `--text-xs`   | 11px      | 700–800 | Kickers, badge labels, toggle text             |
-| `--text-sm`   | 12–12.5px | 600–700 | Date, handle, tooltip, small count             |
-| `--text-md`   | 13.5px    | 600     | Body text, badge text, description             |
-| `--text-base` | 14–14.5px | 700–800 | Buttons, creator name, action labels           |
-| `--text-lg`   | 15px      | 700     | Tab labels, search input, filter section heads |
-| `--text-xl`   | 18px      | 800     | Found-count heading                            |
-| `--text-2xl`  | 19–21px   | 800     | Card title                                     |
-| `--text-3xl`  | 27–32px   | 800     | Modal-level headings                           |
+| Token | Size | Weight | Use |
+|---|---|---|---|
+| `--text-2xs` | 10px | 800 | Section labels, code captions |
+| `--text-xs` | 11px | 700–800 | Kickers, badge labels, toggle text |
+| `--text-sm` | 12–12.5px | 600–700 | Date, handle, tooltip, small count |
+| `--text-md` | 13.5px | 600 | Body text, badge text, description |
+| `--text-base` | 14–14.5px | 700–800 | Buttons, creator name, action labels |
+| `--text-lg` | 15px | 700 | Tab labels, search input, filter section heads |
+| `--text-xl` | 18px | 800 | Found-count heading |
+| `--text-2xl` | 19–21px | 800 | Card title |
+| `--text-3xl` | 27–32px | 800 | Modal-level headings |
 
 Always use `letter-spacing: -.01em` to `-.025em` on extrabold headings. Use `text-wrap: pretty` on multiline body text.
 
@@ -109,26 +99,26 @@ Always use `letter-spacing: -.01em` to `-.025em` on extrabold headings. Use `tex
 
 ## 5. Border Radius
 
-| Token      | Value | Use                                         |
-| ---------- | ----- | ------------------------------------------- |
+| Token | Value | Use |
+|---|---|---|
 | `--r-full` | 999px | Pills (badges, Follow button, filter chips) |
-| `--r-card` | 18px  | List cards (ThemeCard, ContestCard)         |
-| `--r-lg`   | 14px  | Modal container, tab strip                  |
-| `--r-md`   | 12px  | Inputs, Create button, status panels        |
-| `--r-sm`   | 9px   | Small icon chips                            |
-| `--r-xs`   | 7px   | Toggle items, menu rows                     |
+| `--r-card` | 18px | List cards (ThemeCard, ContestCard) |
+| `--r-lg` | 14px | Modal container, tab strip |
+| `--r-md` | 12px | Inputs, Create button, status panels |
+| `--r-sm` | 9px | Small icon chips |
+| `--r-xs` | 7px | Toggle items, menu rows |
 
 ---
 
 ## 6. Elevation / Shadows
 
-| Token              | Use                                           |
-| ------------------ | --------------------------------------------- |
-| `--shadow-card`    | `0 10px 30px rgba(0,0,0,.32)` — list cards    |
-| `--shadow-modal`   | `0 20px 60px rgba(0,0,0,.50)` — modal window  |
-| `--shadow-menu`    | `0 16px 40px rgba(0,0,0,.55)` — overflow menu |
-| `--shadow-btn`     | primary button (fill + top highlight inset)   |
-| `--shadow-preview` | scoreboard preview panel                      |
+| Token | Use |
+|---|---|
+| `--shadow-card` | `0 10px 30px rgba(0,0,0,.32)` — list cards |
+| `--shadow-modal` | `0 20px 60px rgba(0,0,0,.50)` — modal window |
+| `--shadow-menu` | `0 16px 40px rgba(0,0,0,.55)` — overflow menu |
+| `--shadow-btn` | primary button (fill + top highlight inset) |
+| `--shadow-preview` | scoreboard preview panel |
 
 Inset highlights: cards and elevated surfaces use `inset 0 1px 0 rgba(255,255,255,.08)` as a top-edge shimmer.
 
@@ -137,7 +127,6 @@ Inset highlights: cards and elevated surfaces use `inset 0 1px 0 rgba(255,255,25
 ## 7. Components
 
 ### Button hierarchy
-
 1. **Primary** — filled with `linear-gradient(180deg, var(--t-acc), var(--t-acc-d))`. One per action group. `font-weight: 800; text-transform: uppercase; letter-spacing: .02em`. Height 44px, `border-radius: var(--r-xs)`.
 2. **Icon button** — `44×44px` (or `44px × auto` with padding for count). `background: rgba(255,255,255,.06); border: 1px solid var(--hair)`. Always paired with a **hover tooltip** for icon-only variants.
 3. **⋯ Overflow menu** — `44×44px`, same surface as icon button. Consolidates rare actions: Duplicate · Copy link · Share · Quick select · Report / Delete. Opens above the trigger.
@@ -145,35 +134,27 @@ Inset highlights: cards and elevated surfaces use `inset 0 1px 0 rgba(255,255,25
 5. **Create** — `height: 46px; padding: 0 18px; font-weight: 700; background: gradient(p-750→p-800)`.
 
 ### Tooltip
-
 Appears **above** the trigger, centred. 100ms delay on hover. `background: #0c0714; border: 1px solid var(--hair-2); border-radius: 7px; padding: 6px 10px; font-size: 12px; font-weight: 600`. Down-pointing caret via CSS border trick.
 
 ### Modal shell
-
 Three-zone layout: chrome (tabs + search + filters) / scrollable body / footer (pagination or close). Background is a two-radial-gradient + linear dark base. Body scrolls independently; chrome and footer are `position: sticky`.
 
 ### Pill tab strip
-
 Container: `background: rgba(0,0,0,.25); border: 1px solid var(--hair); padding: 5px; border-radius: 14px`. Active tab: gradient `p-700→p-800` with inset top highlight.
 
 ### Filter chip row
-
 Each row prefixed by a faint icon (filter / calendar). Pills: `padding: 7px 14px; border-radius: 999px`. Active: hot-pink gradient with glow. Single-select per row.
 
 ### Badges
-
 Pill-shaped. Semantic colour sets (purple/pink/amber/green/red/gold). Always `display: inline-flex; align-items: center; gap: 6px` with a leading icon.
 
 ### Scoreboard preview
-
 A standalone component that renders a single scoreboard entry + jury points row in the theme's own colours. It reads the theme's CSS variables from its parent card. State (Jury/Televote/Active/Finished/Unqualified) is controlled by the state toggles below it.
 
 ### State toggles
-
 Segmented control (`flex-wrap: nowrap` inside a card column). Active segment filled with `var(--t-acc)`.
 
 ### Compact creator row
-
 `Avatar (30px) + name/handle block + Follow button`. Max-width constrained to prevent stretching; name truncates with ellipsis.
 
 ---

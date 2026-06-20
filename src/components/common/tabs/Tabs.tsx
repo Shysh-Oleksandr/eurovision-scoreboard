@@ -7,6 +7,8 @@ import React, {
   useMemo,
 } from 'react';
 
+import { useReadableForegroundFromCssVar } from '@/theme/useReadableForegroundFromCssVar';
+
 interface TabItem {
   label: string | ReactNode;
   value: string;
@@ -67,6 +69,11 @@ const Tabs: React.FC<TabsProps> = ({
   const isSmallScreen = false;
 
   const containerRef = useRef<HTMLElement | null>(null);
+  // Active tab fill is primary-700 → primary-800; flip the label dark on light themes.
+  const activeTabColor = useReadableForegroundFromCssVar(
+    containerRef,
+    '--twc-primary-700',
+  );
   const [tabDimensions, setTabDimensions] = useState<
     { width: number; left: number }[]
   >([]);
@@ -171,10 +178,11 @@ const Tabs: React.FC<TabsProps> = ({
           role="tab"
           type="button"
           className={`flex flex-1 whitespace-nowrap items-center justify-center px-[18px] py-[11px] text-[15px] font-bold rounded-[10px] outline-none transition-colors duration-200 relative z-10 ${
-            activeTab === tab.value
-              ? 'text-white'
-              : 'text-white/55 hover:text-white/80'
+            activeTab === tab.value ? '' : 'text-white/55 hover:text-white/80'
           } ${buttonClassName}`}
+          style={
+            activeTab === tab.value ? { color: activeTabColor } : undefined
+          }
           aria-selected={activeTab === tab.value}
           onClick={() => setActiveTab(tab.value)}
         >

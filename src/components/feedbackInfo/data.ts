@@ -244,6 +244,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-06-20',
+    title:
+      'Added the rank-based odds system. Added the points spread slider (controls the gap between winners and losers). Redesigned the theme creation UI. Small UI improvements',
+  },
+  {
     date: '2026-06-18',
     title: 'Improved the UI for the themes and contests modals',
   },
@@ -414,13 +419,22 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-06-20', end: '2026-06-21' },
-    title: 'Odds system improvements',
+    approximateDates: { start: '2026-06-21', end: '2026-06-25' },
+    title: 'Separate odds per stage. Diaspora/neighbour voting factor',
   },
   {
-    title: 'Updated default themes (2016-2025)',
+    title: 'Upload custom fonts',
+  },
+  {
+    title: 'Save settings in the user profile',
+  },
+  {
+    title: 'Rank-based predefined voting generator',
   },
   {
     title: 'Allocation draw',
+  },
+  {
+    title: 'Updated default themes (2016-2025)',
   },
 ];

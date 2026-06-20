@@ -1,5 +1,5 @@
 import { isSameYear } from 'date-fns';
-import { Link2, Share2, Volume1 } from 'lucide-react';
+import { Folder, Link2, Share2, Volume1 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import { useHandleShare } from '../../hooks/useHandleShare';
 
 import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
 
+import { api } from '@/api/client';
 import { useToggleThemeQuickSelectMutation } from '@/api/quickSelect';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
@@ -24,10 +25,14 @@ import OverflowMenu, {
 } from '@/components/common/OverflowMenu';
 import UserInfo from '@/components/common/UserInfo';
 import { useConfirmation } from '@/hooks/useConfirmation';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { resolveThemeSpecificsForCustomTheme } from '@/theme/themeSpecifics';
-import { getCssVarsForCustomTheme, getCardThemeVars } from '@/theme/themeUtils';
+import {
+  getCssVarsForCustomTheme,
+  getCardThemeVars,
+  getAccentForegroundColor,
+} from '@/theme/themeUtils';
 import { CustomTheme } from '@/types/customTheme';
 
 interface ThemeListItemProps {
@@ -63,8 +68,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   const t = useTranslations();
 
   const user = useAuthStore((state) => state.user);
+  const setSelectedShareTheme = useGeneralStore(
+    (state) => state.setSelectedShareTheme,
+  );
   const isMyTheme = variant === 'user' || theme.userId.toString() === user?._id;
-  const isBelowXs = useMediaQuery('(max-width: 479px)');
 
   const { mutateAsync: toggleQuickSelect } =
     useToggleThemeQuickSelectMutation();
@@ -104,27 +111,41 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
     toast.success('Link copied to clipboard!');
   };
 
+  // Open the source theme this one was remixed from (same flow as share links).
+  const handleOpenRemixSource = async () => {
+    if (!theme.remixedFrom) return;
+    try {
+      const { data } = await api.get(`/themes/${theme.remixedFrom}`);
+
+      setSelectedShareTheme(data);
+    } catch (error: any) {
+      // Source was deleted or made private — leave the label as plain text.
+      console.error('Failed to open remix source:', error);
+    }
+  };
+
   const cssVars = useMemo(() => getCssVarsForCustomTheme(theme), [theme]);
   const cardThemeVars = useMemo(() => getCardThemeVars(theme), [theme]);
+  // White washes out on light accents (yellow/green/cyan); flip to dark on-hue.
+  const applyForeground = useMemo(
+    () => getAccentForegroundColor(theme),
+    [theme],
+  );
   const themeSpecifics = useMemo(
     () => resolveThemeSpecificsForCustomTheme(theme),
     [theme],
   );
 
   const overflowItems: OverflowMenuEntry[] = [
-    ...(isBelowXs
-      ? ([
-          {
-            icon: <CopyIcon className="size-4" />,
-            label:
-              (theme.duplicatesCount ?? 0) > 0
-                ? `${t('widgets.copy')} (${theme.duplicatesCount})`
-                : t('widgets.copy'),
-            onClick: () => onDuplicate(theme),
-          },
-          'hr',
-        ] as OverflowMenuEntry[])
-      : []),
+    {
+      icon: <CopyIcon className="size-4" />,
+      label:
+        (theme.duplicatesCount ?? 0) > 0
+          ? `${t('widgets.remix')} (${theme.duplicatesCount})`
+          : t('widgets.remix'),
+      onClick: () => onDuplicate(theme),
+    },
+    'hr',
     {
       icon: <Link2 className="size-4" />,
       label: t('widgets.copyLink'),
@@ -233,6 +254,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             roundedCountryContainer={themeSpecifics.roundedCountryContainer}
             douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
             togglesBelow
+            activeToggleTextColor={applyForeground}
           />
         </div>
 
@@ -258,12 +280,36 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                     Audio
                   </span>
                 )}
+                {theme.group && (
+                  <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
+                    <Folder className="size-3 shrink-0" aria-hidden />
+                    <span className="truncate">{theme.group.name}</span>
+                  </div>
+                )}
               </div>
 
               {/* Theme name */}
               <h3 className="text-white font-[800] sm:text-[19px] text-[17px] tracking-[-0.02em] leading-tight m-0">
                 {theme.name}
               </h3>
+
+              {/* Remixed-from provenance */}
+              {theme.remixedFrom && theme.remixedFromName && (
+                <p className="text-white/50 text-[12px] mt-0.5 leading-tight">
+                  {t.rich('widgets.themes.remixedFrom', {
+                    name: theme.remixedFromName,
+                    span: (chunks) => (
+                      <button
+                        type="button"
+                        onClick={handleOpenRemixSource}
+                        className="text-white/70 font-semibold hover:text-white underline underline-offset-2 transition-colors"
+                      >
+                        {chunks}
+                      </button>
+                    ),
+                  })}
+                </p>
+              )}
 
               {/* Description */}
               {theme.description && (
@@ -301,8 +347,9 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                 type="button"
                 onClick={() => onApply(theme)}
                 disabled={isApplied}
-                className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] text-white transition-[filter] hover:brightness-110 disabled:cursor-not-allowed"
+                className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] transition-[filter] hover:brightness-110 disabled:cursor-not-allowed"
                 style={{
+                  color: applyForeground,
                   background:
                     'linear-gradient(180deg, var(--t-acc), var(--t-acc-d))',
                   boxShadow:
@@ -390,19 +437,6 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                     </button>
                   </>
                 )}
-                {/* Copy — visible from xs up; below xs lives in overflow menu */}
-                <button
-                  type="button"
-                  onClick={() => onDuplicate(theme)}
-                  className={`${secondaryActionClassName} hidden xs:inline-flex`}
-                >
-                  <CopyIcon className="size-[19px]" />
-                  {(theme.duplicatesCount ?? 0) > 0 && (
-                    <span className="tabular-nums">
-                      {theme.duplicatesCount}
-                    </span>
-                  )}
-                </button>
               </div>
             </div>
           </div>

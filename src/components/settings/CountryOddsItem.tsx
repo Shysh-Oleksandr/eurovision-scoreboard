@@ -98,7 +98,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
   );
 
   return (
-    <div className="bg-primary-800 bg-gradient-to-tr from-[10%] from-primary-900/80 to-primary-700/50 rounded-lg p-3 text-white">
+    <div className="bg-primary-800 bg-gradient-to-tr from-[10%] from-primary-900/80 to-primary-700/50 rounded-[10px] p-3 text-white">
       <div className="flex items-center gap-3">
         <img
           src={logo}
