@@ -28,6 +28,7 @@ import { isDefaultPointsSystem } from './pointsSystem';
 const DEFAULT_VOTING_MODE = 'JURY_AND_TELEVOTE';
 const DEFAULT_ODDS = { juryOdds: 50, televoteOdds: 50 };
 const DEFAULT_RANDOMNESS_LEVEL = 50;
+const DEFAULT_POINTS_SPREAD = 50;
 
 const encodePredefinedVotes = (
   predefinedVotes: Record<string, any>,
@@ -419,6 +420,9 @@ export function buildContestSnapshotFromStores() {
       ...(general.settings.randomnessLevel !== DEFAULT_RANDOMNESS_LEVEL
         ? { randomnessLevel: general.settings.randomnessLevel }
         : {}),
+      ...(general.settings.pointsSpread !== DEFAULT_POINTS_SPREAD
+        ? { pointsSpread: general.settings.pointsSpread }
+        : {}),
       ...(setupPointsPayload ? { pointsSystem: setupPointsPayload } : {}),
       ...(splitPointsSystem ? { splitPointsSystem: true } : {}),
       ...(allowMultiplePointsToSameEntry
@@ -668,6 +672,8 @@ export async function applyContestSnapshotToStores(
       !!snapshot.setup.allowMultiplePointsToSameEntry;
     generalSettingsUpdateSettings.randomnessLevel =
       snapshot.setup.randomnessLevel ?? DEFAULT_RANDOMNESS_LEVEL;
+    generalSettingsUpdateSettings.pointsSpread =
+      snapshot.setup.pointsSpread ?? DEFAULT_POINTS_SPREAD;
   }
 
   // Apply simulation settings

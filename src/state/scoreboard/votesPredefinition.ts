@@ -32,12 +32,27 @@ const calculateTemperature = (randomnessLevel: number): number => {
   return temperature;
 };
 
-const calculateWeightFromOdds = (odds: number): number => {
+// Default exponent used when no points-spread preference is provided. Kept as
+// the historical value so existing behaviour is preserved at the slider midpoint.
+const DEFAULT_DISTRIBUTION_EXPONENT = 2.5;
+
+const calculateDistributionExponent = (pointsSpread: number): number => {
+  // Map the 0-100 "points spread" slider to a distribution exponent.
+  // A higher exponent creates a more "spiky" distribution of points, making the
+  // difference between winners and losers more pronounced. The midpoint (50)
+  // maps to the historical default of 2.5.
+  const clamped = Math.max(0, Math.min(pointsSpread, 100));
+
+  return 1 + (clamped / 100) * 3; // 1 (tight) .. 2.5 (default) .. 4 (wide)
+};
+
+const calculateWeightFromOdds = (
+  odds: number,
+  exponent: number = DEFAULT_DISTRIBUTION_EXPONENT,
+): number => {
   // A higher exponent creates a more "spiky" distribution of points,
   // making the difference between winners and losers more pronounced.
-  const DISTRIBUTION_EXPONENT = 2.5;
-
-  return Math.pow(Math.max(1, odds), DISTRIBUTION_EXPONENT);
+  return Math.pow(Math.max(1, odds), exponent);
 };
 
 const generateFullRanking = (
@@ -46,12 +61,16 @@ const generateFullRanking = (
   countryOdds: CountryOdds,
   oddsType: 'juryOdds' | 'televoteOdds',
   temperature: number,
+  distributionExponent: number,
 ): { code: string; rank: number }[] => {
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
     .map((c) => ({
       id: c.code,
-      weight: calculateWeightFromOdds(countryOdds[c.code]?.[oddsType] ?? 50),
+      weight: calculateWeightFromOdds(
+        countryOdds[c.code]?.[oddsType] ?? 50,
+        distributionExponent,
+      ),
     }));
 
   const rankedWinners: { code: string; rank: number }[] = [];
@@ -75,6 +94,7 @@ const generateCombinedVotes = (
   countryOdds: CountryOdds,
   temperature: number,
   pointsSystem: PointsItem[],
+  distributionExponent: number,
 ): Vote[] => {
   const juryRanking = generateFullRanking(
     votingCountry,
@@ -82,6 +102,7 @@ const generateCombinedVotes = (
     countryOdds,
     'juryOdds',
     temperature,
+    distributionExponent,
   );
 
   const televoteRanking = generateFullRanking(
@@ -90,6 +111,7 @@ const generateCombinedVotes = (
     countryOdds,
     'televoteOdds',
     temperature,
+    distributionExponent,
   );
 
   const combinedRanking: CountryWithRank[] = juryRanking
@@ -135,13 +157,17 @@ const generateVotesForSource = (
   oddsType: 'juryOdds' | 'televoteOdds',
   temperature: number,
   pointsSystem: PointsItem[],
+  distributionExponent: number,
   allowMultiplePointsToSameEntry = false,
 ): Vote[] => {
   const choices: CountryWithOdds[] = stageCountries
     .filter((c) => c.code !== votingCountry.code)
     .map((c) => ({
       id: c.code,
-      weight: calculateWeightFromOdds(countryOdds[c.code]?.[oddsType] ?? 50),
+      weight: calculateWeightFromOdds(
+        countryOdds[c.code]?.[oddsType] ?? 50,
+        distributionExponent,
+      ),
     }));
 
   if (choices.length === 0) {
@@ -185,6 +211,7 @@ export const predefineStageVotes = (
   votingMode: StageVotingMode,
   countryOdds: CountryOdds,
   randomnessLevel: number,
+  pointsSpread: number,
   juryPointsSystem: PointsItem[],
   televotePointsSystem: PointsItem[],
   allowMultiplePointsToSameEntry = false,
@@ -194,6 +221,7 @@ export const predefineStageVotes = (
   const perturbedOdds: CountryOdds = {};
   const randomnessFactor = randomnessLevel / 100;
   const temperature = calculateTemperature(randomnessLevel);
+  const distributionExponent = calculateDistributionExponent(pointsSpread);
 
   for (const country of stageCountries) {
     const originalJuryOdds = countryOdds[country.code]?.juryOdds ?? 50;
@@ -256,6 +284,7 @@ export const predefineStageVotes = (
         'juryOdds',
         temperature,
         juryPointsSystem,
+        distributionExponent,
         allowMultiplePointsToSameEntry,
       );
     }
@@ -270,6 +299,7 @@ export const predefineStageVotes = (
         perturbedOdds,
         temperature,
         juryPointsSystem,
+        distributionExponent,
       );
     }
   }
@@ -284,6 +314,7 @@ export const predefineStageVotes = (
         'televoteOdds',
         temperature,
         televotePointsSystem,
+        distributionExponent,
         allowMultiplePointsToSameEntry,
       );
     }

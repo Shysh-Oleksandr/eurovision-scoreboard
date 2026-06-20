@@ -939,7 +939,11 @@
       "randomnessLevel": "Niveau d’aléatoire",
       "randomnessLevelTooltip": "Le curseur ajuste la prévisibilité :<br></br><span>Bas =</span> plus réaliste, suit davantage les cotes.<br></br><span>Élevé =</span> plus chaotique et imprévisible.",
       "predictable": "Prévisible",
-      "chaotic": "Chaotique"
+      "chaotic": "Chaotique",
+      "pointsSpread": "Écart des points",
+      "pointsSpreadTooltip": "Le curseur « Écart des points » contrôle l'écart entre les gagnants et les perdants :<br></br><span>Faible =</span> scores plus resserrés, différences de points plus petites.<br></br><span>Élevé =</span> écart plus grand entre le haut et le bas.",
+      "tight": "Serré",
+      "wide": "Large"
     },
     "voting": {
       "pointsSystem": "Système de points",

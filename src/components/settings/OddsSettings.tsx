@@ -41,6 +41,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
   const randomnessLevel = useGeneralStore(
     (state) => state.settings.randomnessLevel,
   );
+  const pointsSpread = useGeneralStore((state) => state.settings.pointsSpread);
   const setSettings = useGeneralStore((state) => state.setSettings);
 
   const handleOddsChange = (
@@ -151,6 +152,14 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
                     ),
                   })}
                 </p>
+                <p>
+                  {t.rich('settings.odds.pointsSpreadTooltip', {
+                    br: () => <br />,
+                    span: (chunks) => (
+                      <span className="font-bold">{chunks}</span>
+                    ),
+                  })}
+                </p>
               </div>
             }
           />
@@ -164,6 +173,17 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
           onChange={(value) => setSettings({ randomnessLevel: value })}
           minLabel={t('settings.odds.predictable')}
           maxLabel={t('settings.odds.chaotic')}
+        />
+        <RangeSlider
+          containerClassName="mt-3"
+          id="points-spread"
+          label={t('settings.odds.pointsSpread')}
+          min={0}
+          max={100}
+          value={pointsSpread}
+          onChange={(value) => setSettings({ pointsSpread: value })}
+          minLabel={t('settings.odds.tight')}
+          maxLabel={t('settings.odds.wide')}
         />
       </div>
       <div className="flex sm:items-end items-start gap-4 mb-4 justify-between flex-wrap sm:flex-row flex-col-reverse">

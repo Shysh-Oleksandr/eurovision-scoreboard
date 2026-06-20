@@ -934,7 +934,11 @@
       "randomnessLevel": "Nível de Aleatoriedade",
       "randomnessLevelTooltip": "O controlo deslizante de Nível de Aleatoriedade controla a previsibilidade:<br></br><span>Baixo =</span> mais realista, seguindo as odds de perto.<br></br><span>Alto =</span> mais caótico, imprevisível.",
       "predictable": "Previsível",
-      "chaotic": "Caótico"
+      "chaotic": "Caótico",
+      "pointsSpread": "Distribuição de pontos",
+      "pointsSpreadTooltip": "O controlo «Distribuição de pontos» ajusta a diferença entre vencedores e perdedores:<br></br><span>Baixo =</span> pontuações mais próximas, menores diferenças de pontos.<br></br><span>Alto =</span> maior diferença entre os primeiros e os últimos.",
+      "tight": "Apertado",
+      "wide": "Amplo"
     },
     "voting": {
       "pointsSystem": "Sistema de Pontos",

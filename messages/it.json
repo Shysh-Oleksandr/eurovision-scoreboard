@@ -939,7 +939,11 @@
       "randomnessLevel": "Livello di Casualità",
       "randomnessLevelTooltip": "Il cursore del livello di casualità controlla la prevedibilità:<br></br><span>Basso =</span> più realistico, seguendo attentamente le quote.<br></br><span>Alto =</span> più caotico, imprevedibile.",
       "predictable": "Prevedibile",
-      "chaotic": "Caotico"
+      "chaotic": "Caotico",
+      "pointsSpread": "Distribuzione dei punti",
+      "pointsSpreadTooltip": "Il cursore «Distribuzione dei punti» controlla il divario tra vincitori e perdenti:<br></br><span>Basso =</span> punteggi più ravvicinati, differenze di punti minori.<br></br><span>Alto =</span> divario maggiore tra i primi e gli ultimi.",
+      "tight": "Stretto",
+      "wide": "Ampio"
     },
     "voting": {
       "pointsSystem": "Sistema di Punti",

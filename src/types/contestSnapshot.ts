@@ -27,6 +27,7 @@ export interface ContestSnapshot {
     baseYear: number;
     isJuniorContest?: boolean;
     randomnessLevel?: number;
+    pointsSpread?: number;
     pointsSystem?: Array<{
       id: number;
       value: number;

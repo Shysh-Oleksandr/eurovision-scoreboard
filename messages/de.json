@@ -937,7 +937,11 @@
       "randomnessLevel": "Zufallsgrad",
       "randomnessLevelTooltip": "Der Zufallsgrad-Regler bestimmt die Vorhersehbarkeit:<br></br><span>Niedrig =</span> realistischer, folgt den Quoten.<br></br><span>Hoch =</span> chaotischer, unvorhersehbarer.",
       "predictable": "Vorhersehbar",
-      "chaotic": "Chaotisch"
+      "chaotic": "Chaotisch",
+      "pointsSpread": "Punkteverteilung",
+      "pointsSpreadTooltip": "Der Schieberegler „Punkteverteilung“ steuert den Abstand zwischen Gewinnern und Verlierern:<br></br><span>Niedrig =</span> engere Ergebnisse, kleinere Punktunterschiede.<br></br><span>Hoch =</span> größerer Abstand zwischen oben und unten.",
+      "tight": "Eng",
+      "wide": "Weit"
     },
     "voting": {
       "pointsSystem": "Punktesystem",

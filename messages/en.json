@@ -934,7 +934,11 @@
       "randomnessLevel": "Randomness Level",
       "randomnessLevelTooltip": "The Randomness Level slider controls predictability:<br></br><span>Low =</span> more realistic, following odds closely.<br></br><span>High =</span> more chaotic, unpredictable.",
       "predictable": "Predictable",
-      "chaotic": "Chaotic"
+      "chaotic": "Chaotic",
+      "pointsSpread": "Points Spread",
+      "pointsSpreadTooltip": "The Points Spread slider controls the gap between winners and losers:<br></br><span>Low =</span> tighter scores, smaller point differences.<br></br><span>High =</span> a bigger gap between the top and bottom.",
+      "tight": "Tight",
+      "wide": "Wide"
     },
     "voting": {
       "pointsSystem": "Points System",

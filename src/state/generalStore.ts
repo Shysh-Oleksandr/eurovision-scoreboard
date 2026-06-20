@@ -71,6 +71,7 @@ const DEFAULT_SETTINGS: Settings = {
   shouldLimitManualTelevotePoints: true,
   shouldShowJuryVotingProgress: true,
   randomnessLevel: 50, // 0-100
+  pointsSpread: 50, // 0-100; controls the points gap between winners and losers
   isPickQualifiersMode: false,
   enableSplitScreenQualifierRevealMode: false,
   enableSplitScreenForLastQualifier: false,
@@ -162,6 +163,7 @@ interface Settings {
   shouldLimitManualTelevotePoints: boolean;
   shouldShowJuryVotingProgress: boolean;
   randomnessLevel: number;
+  pointsSpread: number;
   isPickQualifiersMode: boolean;
   enableSplitScreenQualifierRevealMode: boolean;
   enableSplitScreenForLastQualifier: boolean;
