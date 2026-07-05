@@ -1,5 +1,6 @@
 'use client';
 
+import { UserSearch } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 
@@ -11,6 +12,8 @@ import ThemeListItem from '../custom-themes/ThemeListItem';
 import { DateRangeFilter } from '../utils/getFilterDateRange';
 import WidgetSearchHeader from '../WidgetSearchHeader';
 import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
+
+import SearchUsersModal from './SearchUsersModal';
 
 import { useContestsStateQuery } from '@/api/contests';
 import { useFollowingFeedQuery } from '@/api/follows';
@@ -42,6 +45,7 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
   const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
+  const [isSearchUsersOpen, setIsSearchUsersOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 400);
 
@@ -99,13 +103,20 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
   return (
     <div className="sm:space-y-4 space-y-2 w-full">
       <div className="sm:space-y-3 space-y-2">
-        <ContentTypeBadges
-          value={contentType}
-          onChange={(type) => {
-            setContentType(type);
-            setPage(1);
-          }}
-        />
+        <div className="flex items-center justify-between gap-2">
+          <ContentTypeBadges
+            value={contentType}
+            onChange={(type) => {
+              setContentType(type);
+              setPage(1);
+            }}
+          />
+          <Button
+            onClick={() => setIsSearchUsersOpen(true)}
+            Icon={<UserSearch className="w-5 h-5" />}
+            className="!p-3"
+          />
+        </div>
         <WidgetSearchHeader
           search={search}
           onSearchChange={(s) => {
@@ -210,6 +221,11 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
           </p>
         </div>
       )}
+
+      <SearchUsersModal
+        isOpen={isSearchUsersOpen}
+        onClose={() => setIsSearchUsersOpen(false)}
+      />
     </div>
   );
 };

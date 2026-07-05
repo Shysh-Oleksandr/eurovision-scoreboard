@@ -61,6 +61,7 @@ Read `docs/` before touching non-obvious subsystems:
 - `contests-leaderboard-and-entry-stats.md`
 - `theme-animations-and-specifics.md`
 - `rounded-country-layout-and-2026-theme.md`
+- `voting-simulation-engine-and-diaspora.md` — the random-vote (Plackett–Luce) engine, the diaspora/affinity layer, and the Phase 2 (v2) plan
 - `USER_DATA_CLEARING.md`
 
 ## Code Style

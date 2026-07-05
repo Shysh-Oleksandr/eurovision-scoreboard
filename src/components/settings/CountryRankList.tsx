@@ -28,7 +28,7 @@ interface CountryRankListProps {
 }
 
 // Renders the sortable rank list (list rows or grid cards) with a leaderboard
-// treatment: a proportional odds bar, top-3 medal accents, and a zebra stripe.
+// treatment: rank number, flag, name, generated odds, and top-3 medal accents.
 // Drag state is scoped via the `.dragged-rank-row` class (see styles.css).
 export const CountryRankList: React.FC<CountryRankListProps> = ({
   countries,
@@ -74,20 +74,6 @@ export const CountryRankList: React.FC<CountryRankListProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dimension, countryCodesKey]);
 
-  // Persist generated odds on drag and on spread change, but skip the initial
-  // seed so merely opening rank view doesn't overwrite existing odds.
-  const isInitialRef = useRef(true);
-
-  useEffect(() => {
-    if (isInitialRef.current) {
-      isInitialRef.current = false;
-
-      return;
-    }
-    onReorder(orderedCodes);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderedCodes, pointsSpread]);
-
   const countryByCode = useMemo(() => {
     const map: Record<string, BaseCountry> = {};
 
@@ -103,12 +89,16 @@ export const CountryRankList: React.FC<CountryRankListProps> = ({
     [orderedCodes, pointsSpread],
   );
 
+  // Persist odds ONLY on an actual drag — never on dimension switch or
+  // points-spread changes — so passively opening/exploring rank view can't
+  // overwrite the user's existing odds.
   const onSortEnd = (oldIndex: number, newIndex: number) => {
     const next = [...orderedCodes];
     const [removed] = next.splice(oldIndex, 1);
 
     next.splice(newIndex, 0, removed);
     setOrderedCodes(next);
+    onReorder(next);
   };
 
   const isGrid = layout === 'grid';

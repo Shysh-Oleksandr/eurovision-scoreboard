@@ -8,8 +8,10 @@ import {
 } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
+import { resolveDiaspora } from '@/state/scoreboard/diaspora';
 import { StageVotes } from '@/state/scoreboard/types';
 import { predefineStageVotes } from '@/state/scoreboard/votesPredefinition';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 type UseVotingPredefinitionArgs = {
   stage: Pick<EventStage, 'id' | 'name' | 'votingMode' | 'overrides'> & {
@@ -49,15 +51,37 @@ export const useVotingPredefinition = ({
     stageOverride?.allowMultiplePointsToSameEntry ?? globalAllowMultiple;
   const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
   const pointsSpread = useGeneralStore((s) => s.settings.pointsSpread);
+  const diasporaSettings = useGeneralStore((s) => s.settings.diaspora);
   const getStageVotingCountries = useCountriesStore(
     (s) => s.getStageVotingCountries,
   );
   const { countryOdds } = useCountriesStore();
 
+  const isReplayingSavedVotes = useScoreboardStore(
+    (s) => s.isReplayingSavedVotes,
+  );
+
+  // When replaying a saved contest (presentation mode), the authoritative votes
+  // for this stage already live in the scoreboard store. If the user has the
+  // per-stage predefinition modal enabled, seed it from those saved votes
+  // instead of showing an empty grid. Returns a deep clone so edits in the
+  // modal don't mutate the store before the user saves.
+  const getSeedVotes = (): Partial<StageVotes> | null => {
+    if (!isReplayingSavedVotes) return null;
+
+    const saved = useScoreboardStore.getState().predefinedVotes?.[stage.id];
+
+    if (!saved || Object.keys(saved).length === 0) return null;
+
+    return JSON.parse(JSON.stringify(saved)) as Partial<StageVotes>;
+  };
+
   const [selectedType, setSelectedType] = useState<'Total' | StageVotingType>(
     'Total',
   );
-  const [votes, setVotes] = useState<Partial<StageVotes> | null>(null);
+  const [votes, setVotes] = useState<Partial<StageVotes> | null>(() =>
+    getSeedVotes(),
+  );
   const [isSorting, setIsSorting] = useState(false);
 
   const [lastStageId, setLastStageId] = useState<string | null>(stage.id);
@@ -140,6 +164,7 @@ export const useVotingPredefinition = ({
       pointsSystem,
       effectiveTelevoteSystem,
       allowMultiplePointsToSameEntry,
+      resolveDiaspora(diasporaSettings),
     );
 
     if (isJuryOnly) {
@@ -163,6 +188,17 @@ export const useVotingPredefinition = ({
     setVotes(null);
     setSelectedType('Total');
     setIsSorting(false);
+  };
+
+  // Called when the modal's stage/voting-mode changes (e.g. advancing to the
+  // next stage while the modal stays mounted). During a saved-contest replay we
+  // reseed from the stored votes for the new stage rather than clearing.
+  const reseedVotesForStage = () => {
+    const seed = getSeedVotes();
+
+    setVotes(seed);
+    setSelectedType('Total');
+    setIsSorting(!!seed);
   };
 
   const applyInputValue = (
@@ -522,14 +558,14 @@ export const useVotingPredefinition = ({
 
   useEffect(() => {
     if (stage.id !== lastStageId) {
-      resetVotes();
+      reseedVotesForStage();
     }
     setLastStageId(stage.id);
   }, [stage.id, lastStageId]);
 
   useEffect(() => {
     if (effectiveVotingMode !== lastStageVotingMode) {
-      resetVotes();
+      reseedVotesForStage();
     }
     setLastStageVotingMode(effectiveVotingMode);
   }, [effectiveVotingMode, lastStageVotingMode]);

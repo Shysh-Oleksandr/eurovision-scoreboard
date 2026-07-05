@@ -65,6 +65,7 @@ export interface CountriesState {
   ) => void;
   setBulkCountryOdds: (
     odds: Record<string, { juryOdds?: number; televoteOdds?: number }>,
+    replace?: boolean,
   ) => void;
   loadYearOdds: (countries: BaseCountry[]) => void;
 }
@@ -430,12 +431,14 @@ export const useCountriesStore = create<CountriesState>()(
             }));
           },
 
-          setBulkCountryOdds: (odds) => {
+          setBulkCountryOdds: (odds, replace = false) => {
             set((state) => ({
-              countryOdds: {
-                ...state.countryOdds,
-                ...odds,
-              },
+              // `replace` fully swaps the odds map (used on contest load so stale
+              // odds — e.g. custom entries from a previously loaded contest — are
+              // cleared). Default merges, as the settings panel expects.
+              countryOdds: replace
+                ? { ...odds }
+                : { ...state.countryOdds, ...odds },
             }));
           },
         };

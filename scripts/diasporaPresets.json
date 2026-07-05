@@ -1,0 +1,2059 @@
+{
+  "meta": {
+    "source": "diasporaAffinities.json",
+    "scale": "-100..+100 directed; values are televote affinity, jury uses juryScale",
+    "groupDefaultFill": 40,
+    "broadMinAbs": 20,
+    "suggestedJuryScale": 0.35,
+    "note": "Default-ON = the 5 groups + positive special pairs. Rivalries and the broad preset are opt-in."
+  },
+  "groups": [
+    {
+      "id": "nordic",
+      "name": "Nordics",
+      "codes": [
+        "SE",
+        "NO",
+        "DK",
+        "FI",
+        "IS"
+      ],
+      "defaultOn": true,
+      "pairs": [
+        {
+          "from": "SE",
+          "to": "NO",
+          "affinity": 39,
+          "source": "data"
+        },
+        {
+          "from": "SE",
+          "to": "DK",
+          "affinity": 43,
+          "source": "data"
+        },
+        {
+          "from": "SE",
+          "to": "FI",
+          "affinity": 68,
+          "source": "data"
+        },
+        {
+          "from": "SE",
+          "to": "IS",
+          "affinity": 46,
+          "source": "data"
+        },
+        {
+          "from": "NO",
+          "to": "SE",
+          "affinity": 64,
+          "source": "data"
+        },
+        {
+          "from": "NO",
+          "to": "DK",
+          "affinity": 37,
+          "source": "data"
+        },
+        {
+          "from": "NO",
+          "to": "FI",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "NO",
+          "to": "IS",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "DK",
+          "to": "SE",
+          "affinity": 71,
+          "source": "data"
+        },
+        {
+          "from": "DK",
+          "to": "NO",
+          "affinity": 44,
+          "source": "data"
+        },
+        {
+          "from": "DK",
+          "to": "FI",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "DK",
+          "to": "IS",
+          "affinity": 60,
+          "source": "data"
+        },
+        {
+          "from": "FI",
+          "to": "SE",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "FI",
+          "to": "NO",
+          "affinity": 14,
+          "source": "data"
+        },
+        {
+          "from": "FI",
+          "to": "DK",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "FI",
+          "to": "IS",
+          "affinity": 42,
+          "source": "data"
+        },
+        {
+          "from": "IS",
+          "to": "SE",
+          "affinity": 55,
+          "source": "data"
+        },
+        {
+          "from": "IS",
+          "to": "NO",
+          "affinity": 35,
+          "source": "data"
+        },
+        {
+          "from": "IS",
+          "to": "DK",
+          "affinity": 51,
+          "source": "data"
+        },
+        {
+          "from": "IS",
+          "to": "FI",
+          "affinity": 24,
+          "source": "data"
+        }
+      ]
+    },
+    {
+      "id": "baltic",
+      "name": "Baltics",
+      "codes": [
+        "EE",
+        "LV",
+        "LT"
+      ],
+      "defaultOn": true,
+      "pairs": [
+        {
+          "from": "EE",
+          "to": "LV",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "EE",
+          "to": "LT",
+          "affinity": 59,
+          "source": "data"
+        },
+        {
+          "from": "LV",
+          "to": "EE",
+          "affinity": 94,
+          "source": "data"
+        },
+        {
+          "from": "LV",
+          "to": "LT",
+          "affinity": 100,
+          "source": "data"
+        },
+        {
+          "from": "LT",
+          "to": "EE",
+          "affinity": 64,
+          "source": "data"
+        },
+        {
+          "from": "LT",
+          "to": "LV",
+          "affinity": 100,
+          "source": "data"
+        }
+      ]
+    },
+    {
+      "id": "ex-yugoslav",
+      "name": "Ex-Yugoslavia",
+      "codes": [
+        "HR",
+        "RS",
+        "SI",
+        "ME",
+        "MK",
+        "BA"
+      ],
+      "defaultOn": true,
+      "pairs": [
+        {
+          "from": "HR",
+          "to": "RS",
+          "affinity": 100,
+          "source": "data"
+        },
+        {
+          "from": "HR",
+          "to": "SI",
+          "affinity": 100,
+          "source": "data"
+        },
+        {
+          "from": "HR",
+          "to": "ME",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "HR",
+          "to": "MK",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "HR",
+          "to": "BA",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "RS",
+          "to": "HR",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "RS",
+          "to": "SI",
+          "affinity": 77,
+          "source": "data"
+        },
+        {
+          "from": "RS",
+          "to": "ME",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "RS",
+          "to": "MK",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "RS",
+          "to": "BA",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "SI",
+          "to": "HR",
+          "affinity": 94,
+          "source": "data"
+        },
+        {
+          "from": "SI",
+          "to": "RS",
+          "affinity": 100,
+          "source": "data"
+        },
+        {
+          "from": "SI",
+          "to": "ME",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "SI",
+          "to": "MK",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "SI",
+          "to": "BA",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "ME",
+          "to": "HR",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "ME",
+          "to": "RS",
+          "affinity": 100,
+          "source": "data"
+        },
+        {
+          "from": "ME",
+          "to": "SI",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "ME",
+          "to": "MK",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "ME",
+          "to": "BA",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "MK",
+          "to": "HR",
+          "affinity": 100,
+          "source": "data"
+        },
+        {
+          "from": "MK",
+          "to": "RS",
+          "affinity": 100,
+          "source": "data"
+        },
+        {
+          "from": "MK",
+          "to": "SI",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "MK",
+          "to": "ME",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "MK",
+          "to": "BA",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "BA",
+          "to": "HR",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "BA",
+          "to": "RS",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "BA",
+          "to": "SI",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "BA",
+          "to": "ME",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "BA",
+          "to": "MK",
+          "affinity": 40,
+          "source": "default"
+        }
+      ]
+    },
+    {
+      "id": "benelux",
+      "name": "Benelux",
+      "codes": [
+        "BE",
+        "NL",
+        "LU"
+      ],
+      "defaultOn": true,
+      "pairs": [
+        {
+          "from": "BE",
+          "to": "NL",
+          "affinity": 83,
+          "source": "data"
+        },
+        {
+          "from": "BE",
+          "to": "LU",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "NL",
+          "to": "BE",
+          "affinity": 73,
+          "source": "data"
+        },
+        {
+          "from": "NL",
+          "to": "LU",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "LU",
+          "to": "BE",
+          "affinity": 40,
+          "source": "default"
+        },
+        {
+          "from": "LU",
+          "to": "NL",
+          "affinity": 40,
+          "source": "default"
+        }
+      ]
+    },
+    {
+      "id": "iberian",
+      "name": "Iberian",
+      "codes": [
+        "ES",
+        "PT"
+      ],
+      "defaultOn": true,
+      "pairs": [
+        {
+          "from": "ES",
+          "to": "PT",
+          "affinity": 29,
+          "source": "data"
+        },
+        {
+          "from": "PT",
+          "to": "ES",
+          "affinity": 64,
+          "source": "data"
+        }
+      ]
+    }
+  ],
+  "specialPairs": [
+    {
+      "from": "CY",
+      "to": "GR",
+      "label": "Cyprus → Greece",
+      "affinity": 100
+    },
+    {
+      "from": "GR",
+      "to": "CY",
+      "label": "Greece → Cyprus",
+      "affinity": 100
+    },
+    {
+      "from": "GR",
+      "to": "AL",
+      "label": "Greece → Albania",
+      "affinity": 89
+    },
+    {
+      "from": "AL",
+      "to": "GR",
+      "label": "Albania → Greece",
+      "affinity": 76
+    },
+    {
+      "from": "RO",
+      "to": "MD",
+      "label": "Romania → Moldova",
+      "affinity": 93
+    },
+    {
+      "from": "MT",
+      "to": "IT",
+      "label": "Malta → Italy",
+      "affinity": 67
+    },
+    {
+      "from": "IT",
+      "to": "AL",
+      "label": "Italy → Albania (diaspora)",
+      "affinity": 100
+    },
+    {
+      "from": "CH",
+      "to": "AL",
+      "label": "Switzerland → Albania (diaspora)",
+      "affinity": 100
+    },
+    {
+      "from": "GE",
+      "to": "AM",
+      "label": "Georgia → Armenia",
+      "affinity": 100
+    },
+    {
+      "from": "FR",
+      "to": "AM",
+      "label": "France → Armenia (diaspora)",
+      "affinity": 93
+    },
+    {
+      "from": "GB",
+      "to": "IE",
+      "label": "UK → Ireland",
+      "affinity": 88
+    },
+    {
+      "from": "GB",
+      "to": "LT",
+      "label": "UK → Lithuania (diaspora)",
+      "affinity": 100
+    },
+    {
+      "from": "IE",
+      "to": "LT",
+      "label": "Ireland → Lithuania (diaspora)",
+      "affinity": 100
+    },
+    {
+      "from": "GB",
+      "to": "PL",
+      "label": "UK → Poland (diaspora)",
+      "affinity": 77
+    },
+    {
+      "from": "EE",
+      "to": "FI",
+      "label": "Estonia → Finland",
+      "affinity": 79
+    },
+    {
+      "from": "FI",
+      "to": "EE",
+      "label": "Finland → Estonia",
+      "affinity": 78
+    }
+  ],
+  "rivalries": [
+    {
+      "from": "AM",
+      "to": "AZ",
+      "label": "Armenia ✗ Azerbaijan",
+      "affinity": -28
+    },
+    {
+      "from": "RS",
+      "to": "UA",
+      "label": "Serbia ✗ Ukraine",
+      "affinity": -59
+    }
+  ],
+  "broadPreset": {
+    "id": "historical-all",
+    "name": "All historical pairs",
+    "defaultOn": false,
+    "pairs": [
+      {
+        "from": "MK",
+        "to": "AL",
+        "affinity": 100
+      },
+      {
+        "from": "CY",
+        "to": "GR",
+        "affinity": 100
+      },
+      {
+        "from": "GE",
+        "to": "AM",
+        "affinity": 100
+      },
+      {
+        "from": "GR",
+        "to": "CY",
+        "affinity": 100
+      },
+      {
+        "from": "HR",
+        "to": "RS",
+        "affinity": 100
+      },
+      {
+        "from": "LT",
+        "to": "LV",
+        "affinity": 100
+      },
+      {
+        "from": "HR",
+        "to": "SI",
+        "affinity": 100
+      },
+      {
+        "from": "RS",
+        "to": "HU",
+        "affinity": 100
+      },
+      {
+        "from": "ME",
+        "to": "RS",
+        "affinity": 100
+      },
+      {
+        "from": "SI",
+        "to": "RS",
+        "affinity": 100
+      },
+      {
+        "from": "GB",
+        "to": "LT",
+        "affinity": 100
+      },
+      {
+        "from": "MK",
+        "to": "RS",
+        "affinity": 100
+      },
+      {
+        "from": "IE",
+        "to": "LT",
+        "affinity": 100
+      },
+      {
+        "from": "LV",
+        "to": "LT",
+        "affinity": 100
+      },
+      {
+        "from": "IT",
+        "to": "AL",
+        "affinity": 100
+      },
+      {
+        "from": "CH",
+        "to": "AL",
+        "affinity": 100
+      },
+      {
+        "from": "MK",
+        "to": "HR",
+        "affinity": 100
+      },
+      {
+        "from": "CH",
+        "to": "RS",
+        "affinity": 95
+      },
+      {
+        "from": "LV",
+        "to": "EE",
+        "affinity": 94
+      },
+      {
+        "from": "SI",
+        "to": "HR",
+        "affinity": 94
+      },
+      {
+        "from": "RO",
+        "to": "MD",
+        "affinity": 93
+      },
+      {
+        "from": "FR",
+        "to": "AM",
+        "affinity": 93
+      },
+      {
+        "from": "GR",
+        "to": "AL",
+        "affinity": 89
+      },
+      {
+        "from": "GB",
+        "to": "IE",
+        "affinity": 88
+      },
+      {
+        "from": "BE",
+        "to": "NL",
+        "affinity": 83
+      },
+      {
+        "from": "EE",
+        "to": "FI",
+        "affinity": 79
+      },
+      {
+        "from": "FI",
+        "to": "EE",
+        "affinity": 78
+      },
+      {
+        "from": "RS",
+        "to": "SI",
+        "affinity": 77
+      },
+      {
+        "from": "GB",
+        "to": "PL",
+        "affinity": 77
+      },
+      {
+        "from": "AL",
+        "to": "GR",
+        "affinity": 76
+      },
+      {
+        "from": "SM",
+        "to": "GR",
+        "affinity": 76
+      },
+      {
+        "from": "IE",
+        "to": "PL",
+        "affinity": 76
+      },
+      {
+        "from": "AM",
+        "to": "FR",
+        "affinity": 74
+      },
+      {
+        "from": "NL",
+        "to": "BE",
+        "affinity": 73
+      },
+      {
+        "from": "NO",
+        "to": "LT",
+        "affinity": 71
+      },
+      {
+        "from": "DK",
+        "to": "SE",
+        "affinity": 71
+      },
+      {
+        "from": "FR",
+        "to": "PT",
+        "affinity": 69
+      },
+      {
+        "from": "SE",
+        "to": "FI",
+        "affinity": 68
+      },
+      {
+        "from": "MT",
+        "to": "IT",
+        "affinity": 67
+      },
+      {
+        "from": "AT",
+        "to": "RS",
+        "affinity": 66
+      },
+      {
+        "from": "MD",
+        "to": "AZ",
+        "affinity": 64
+      },
+      {
+        "from": "PT",
+        "to": "ES",
+        "affinity": 64
+      },
+      {
+        "from": "LT",
+        "to": "EE",
+        "affinity": 64
+      },
+      {
+        "from": "RU",
+        "to": "AZ",
+        "affinity": 64
+      },
+      {
+        "from": "NO",
+        "to": "SE",
+        "affinity": 64
+      },
+      {
+        "from": "GE",
+        "to": "AZ",
+        "affinity": 64
+      },
+      {
+        "from": "ES",
+        "to": "BG",
+        "affinity": 62
+      },
+      {
+        "from": "AM",
+        "to": "CY",
+        "affinity": 62
+      },
+      {
+        "from": "UA",
+        "to": "LT",
+        "affinity": 61
+      },
+      {
+        "from": "AL",
+        "to": "IT",
+        "affinity": 61
+      },
+      {
+        "from": "CH",
+        "to": "PT",
+        "affinity": 60
+      },
+      {
+        "from": "DK",
+        "to": "IS",
+        "affinity": 60
+      },
+      {
+        "from": "EE",
+        "to": "LT",
+        "affinity": 59
+      },
+      {
+        "from": "UA",
+        "to": "LV",
+        "affinity": 58
+      },
+      {
+        "from": "GE",
+        "to": "SM",
+        "affinity": 58
+      },
+      {
+        "from": "BE",
+        "to": "FR",
+        "affinity": 57
+      },
+      {
+        "from": "BG",
+        "to": "GR",
+        "affinity": 56
+      },
+      {
+        "from": "AU",
+        "to": "MT",
+        "affinity": 56
+      },
+      {
+        "from": "IS",
+        "to": "SE",
+        "affinity": 55
+      },
+      {
+        "from": "MD",
+        "to": "RU",
+        "affinity": 55
+      },
+      {
+        "from": "AM",
+        "to": "GR",
+        "affinity": 55
+      },
+      {
+        "from": "GB",
+        "to": "BG",
+        "affinity": 55
+      },
+      {
+        "from": "CZ",
+        "to": "AZ",
+        "affinity": 54
+      },
+      {
+        "from": "CZ",
+        "to": "UA",
+        "affinity": 53
+      },
+      {
+        "from": "GE",
+        "to": "LT",
+        "affinity": 53
+      },
+      {
+        "from": "DE",
+        "to": "PL",
+        "affinity": 52
+      },
+      {
+        "from": "AL",
+        "to": "BG",
+        "affinity": 51
+      },
+      {
+        "from": "CH",
+        "to": "IT",
+        "affinity": 51
+      },
+      {
+        "from": "BE",
+        "to": "PL",
+        "affinity": 51
+      },
+      {
+        "from": "IS",
+        "to": "DK",
+        "affinity": 51
+      },
+      {
+        "from": "PL",
+        "to": "UA",
+        "affinity": 50
+      },
+      {
+        "from": "IS",
+        "to": "PL",
+        "affinity": 50
+      },
+      {
+        "from": "SE",
+        "to": "IS",
+        "affinity": 46
+      },
+      {
+        "from": "AT",
+        "to": "DE",
+        "affinity": 45
+      },
+      {
+        "from": "AZ",
+        "to": "IL",
+        "affinity": 45
+      },
+      {
+        "from": "DK",
+        "to": "NO",
+        "affinity": 44
+      },
+      {
+        "from": "FR",
+        "to": "IL",
+        "affinity": 44
+      },
+      {
+        "from": "IT",
+        "to": "MD",
+        "affinity": 43
+      },
+      {
+        "from": "SE",
+        "to": "DK",
+        "affinity": 43
+      },
+      {
+        "from": "SM",
+        "to": "CY",
+        "affinity": 43
+      },
+      {
+        "from": "BG",
+        "to": "RS",
+        "affinity": 43
+      },
+      {
+        "from": "AT",
+        "to": "HR",
+        "affinity": 42
+      },
+      {
+        "from": "FI",
+        "to": "IS",
+        "affinity": 42
+      },
+      {
+        "from": "MT",
+        "to": "SM",
+        "affinity": 40
+      },
+      {
+        "from": "GB",
+        "to": "LV",
+        "affinity": 40
+      },
+      {
+        "from": "SE",
+        "to": "NO",
+        "affinity": 39
+      },
+      {
+        "from": "HR",
+        "to": "AL",
+        "affinity": 39
+      },
+      {
+        "from": "NO",
+        "to": "PL",
+        "affinity": 38
+      },
+      {
+        "from": "PT",
+        "to": "MD",
+        "affinity": 37
+      },
+      {
+        "from": "NO",
+        "to": "DK",
+        "affinity": 37
+      },
+      {
+        "from": "SI",
+        "to": "IT",
+        "affinity": 35
+      },
+      {
+        "from": "IS",
+        "to": "NO",
+        "affinity": 35
+      },
+      {
+        "from": "NL",
+        "to": "PL",
+        "affinity": 35
+      },
+      {
+        "from": "MK",
+        "to": "BG",
+        "affinity": 34
+      },
+      {
+        "from": "SE",
+        "to": "BE",
+        "affinity": 34
+      },
+      {
+        "from": "GE",
+        "to": "LV",
+        "affinity": 33
+      },
+      {
+        "from": "FR",
+        "to": "MD",
+        "affinity": 32
+      },
+      {
+        "from": "CH",
+        "to": "HR",
+        "affinity": 32
+      },
+      {
+        "from": "AL",
+        "to": "HR",
+        "affinity": 32
+      },
+      {
+        "from": "AZ",
+        "to": "RU",
+        "affinity": 32
+      },
+      {
+        "from": "HR",
+        "to": "IT",
+        "affinity": 31
+      },
+      {
+        "from": "IS",
+        "to": "NL",
+        "affinity": 31
+      },
+      {
+        "from": "RS",
+        "to": "GR",
+        "affinity": 31
+      },
+      {
+        "from": "IL",
+        "to": "AM",
+        "affinity": 30
+      },
+      {
+        "from": "BE",
+        "to": "AM",
+        "affinity": 30
+      },
+      {
+        "from": "SI",
+        "to": "AL",
+        "affinity": 30
+      },
+      {
+        "from": "ES",
+        "to": "PT",
+        "affinity": 29
+      },
+      {
+        "from": "PT",
+        "to": "FR",
+        "affinity": 29
+      },
+      {
+        "from": "CZ",
+        "to": "AM",
+        "affinity": 28
+      },
+      {
+        "from": "ME",
+        "to": "AZ",
+        "affinity": 28
+      },
+      {
+        "from": "GR",
+        "to": "FR",
+        "affinity": 27
+      },
+      {
+        "from": "GE",
+        "to": "UA",
+        "affinity": 27
+      },
+      {
+        "from": "CY",
+        "to": "AM",
+        "affinity": 27
+      },
+      {
+        "from": "GR",
+        "to": "AM",
+        "affinity": 27
+      },
+      {
+        "from": "SE",
+        "to": "LT",
+        "affinity": 27
+      },
+      {
+        "from": "CH",
+        "to": "DE",
+        "affinity": 27
+      },
+      {
+        "from": "IE",
+        "to": "RO",
+        "affinity": 27
+      },
+      {
+        "from": "PT",
+        "to": "UA",
+        "affinity": 26
+      },
+      {
+        "from": "LV",
+        "to": "GE",
+        "affinity": 26
+      },
+      {
+        "from": "EE",
+        "to": "DK",
+        "affinity": 26
+      },
+      {
+        "from": "AT",
+        "to": "CH",
+        "affinity": 26
+      },
+      {
+        "from": "AZ",
+        "to": "MT",
+        "affinity": 25
+      },
+      {
+        "from": "IS",
+        "to": "FI",
+        "affinity": 24
+      },
+      {
+        "from": "MT",
+        "to": "AU",
+        "affinity": 23
+      },
+      {
+        "from": "MD",
+        "to": "UA",
+        "affinity": 23
+      },
+      {
+        "from": "MT",
+        "to": "GB",
+        "affinity": 23
+      },
+      {
+        "from": "CH",
+        "to": "AT",
+        "affinity": 23
+      },
+      {
+        "from": "EE",
+        "to": "SE",
+        "affinity": 23
+      },
+      {
+        "from": "ES",
+        "to": "FR",
+        "affinity": 23
+      },
+      {
+        "from": "IL",
+        "to": "BY",
+        "affinity": 23
+      },
+      {
+        "from": "IS",
+        "to": "BE",
+        "affinity": 22
+      },
+      {
+        "from": "EE",
+        "to": "BE",
+        "affinity": 22
+      },
+      {
+        "from": "PL",
+        "to": "SI",
+        "affinity": 22
+      },
+      {
+        "from": "CY",
+        "to": "FR",
+        "affinity": 21
+      },
+      {
+        "from": "FR",
+        "to": "BE",
+        "affinity": 21
+      },
+      {
+        "from": "GR",
+        "to": "BG",
+        "affinity": 20
+      },
+      {
+        "from": "RO",
+        "to": "AZ",
+        "affinity": 20
+      },
+      {
+        "from": "FR",
+        "to": "HU",
+        "affinity": -20
+      },
+      {
+        "from": "FI",
+        "to": "BG",
+        "affinity": -20
+      },
+      {
+        "from": "DK",
+        "to": "HR",
+        "affinity": -20
+      },
+      {
+        "from": "LV",
+        "to": "IL",
+        "affinity": -20
+      },
+      {
+        "from": "GB",
+        "to": "RS",
+        "affinity": -21
+      },
+      {
+        "from": "MD",
+        "to": "FI",
+        "affinity": -21
+      },
+      {
+        "from": "FI",
+        "to": "GR",
+        "affinity": -21
+      },
+      {
+        "from": "GB",
+        "to": "MD",
+        "affinity": -21
+      },
+      {
+        "from": "AM",
+        "to": "FI",
+        "affinity": -21
+      },
+      {
+        "from": "AT",
+        "to": "MD",
+        "affinity": -21
+      },
+      {
+        "from": "DK",
+        "to": "RS",
+        "affinity": -21
+      },
+      {
+        "from": "CH",
+        "to": "FI",
+        "affinity": -21
+      },
+      {
+        "from": "LT",
+        "to": "BG",
+        "affinity": -21
+      },
+      {
+        "from": "MK",
+        "to": "SE",
+        "affinity": -21
+      },
+      {
+        "from": "ES",
+        "to": "MD",
+        "affinity": -21
+      },
+      {
+        "from": "IE",
+        "to": "GR",
+        "affinity": -21
+      },
+      {
+        "from": "LV",
+        "to": "GR",
+        "affinity": -21
+      },
+      {
+        "from": "NO",
+        "to": "AL",
+        "affinity": -21
+      },
+      {
+        "from": "IS",
+        "to": "AM",
+        "affinity": -22
+      },
+      {
+        "from": "LT",
+        "to": "AL",
+        "affinity": -22
+      },
+      {
+        "from": "SM",
+        "to": "SE",
+        "affinity": -22
+      },
+      {
+        "from": "MD",
+        "to": "IT",
+        "affinity": -22
+      },
+      {
+        "from": "LV",
+        "to": "BG",
+        "affinity": -22
+      },
+      {
+        "from": "IS",
+        "to": "RS",
+        "affinity": -22
+      },
+      {
+        "from": "SM",
+        "to": "NO",
+        "affinity": -22
+      },
+      {
+        "from": "PL",
+        "to": "GR",
+        "affinity": -23
+      },
+      {
+        "from": "AM",
+        "to": "HR",
+        "affinity": -23
+      },
+      {
+        "from": "ES",
+        "to": "RS",
+        "affinity": -23
+      },
+      {
+        "from": "EE",
+        "to": "GR",
+        "affinity": -23
+      },
+      {
+        "from": "LT",
+        "to": "GR",
+        "affinity": -23
+      },
+      {
+        "from": "NO",
+        "to": "HR",
+        "affinity": -23
+      },
+      {
+        "from": "DE",
+        "to": "EE",
+        "affinity": -23
+      },
+      {
+        "from": "NL",
+        "to": "AL",
+        "affinity": -23
+      },
+      {
+        "from": "NO",
+        "to": "IL",
+        "affinity": -23
+      },
+      {
+        "from": "MK",
+        "to": "AU",
+        "affinity": -23
+      },
+      {
+        "from": "EE",
+        "to": "HR",
+        "affinity": -23
+      },
+      {
+        "from": "SI",
+        "to": "AM",
+        "affinity": -23
+      },
+      {
+        "from": "GR",
+        "to": "IL",
+        "affinity": -23
+      },
+      {
+        "from": "ME",
+        "to": "AU",
+        "affinity": -23
+      },
+      {
+        "from": "FI",
+        "to": "MD",
+        "affinity": -23
+      },
+      {
+        "from": "BE",
+        "to": "RS",
+        "affinity": -24
+      },
+      {
+        "from": "MT",
+        "to": "IL",
+        "affinity": -24
+      },
+      {
+        "from": "SM",
+        "to": "HR",
+        "affinity": -24
+      },
+      {
+        "from": "IS",
+        "to": "CY",
+        "affinity": -24
+      },
+      {
+        "from": "DE",
+        "to": "SE",
+        "affinity": -24
+      },
+      {
+        "from": "GE",
+        "to": "IS",
+        "affinity": -24
+      },
+      {
+        "from": "AT",
+        "to": "GR",
+        "affinity": -25
+      },
+      {
+        "from": "RS",
+        "to": "SE",
+        "affinity": -25
+      },
+      {
+        "from": "CY",
+        "to": "FI",
+        "affinity": -25
+      },
+      {
+        "from": "LT",
+        "to": "MD",
+        "affinity": -25
+      },
+      {
+        "from": "BG",
+        "to": "LT",
+        "affinity": -25
+      },
+      {
+        "from": "FI",
+        "to": "PL",
+        "affinity": -25
+      },
+      {
+        "from": "AT",
+        "to": "UA",
+        "affinity": -25
+      },
+      {
+        "from": "AT",
+        "to": "IL",
+        "affinity": -25
+      },
+      {
+        "from": "SM",
+        "to": "IS",
+        "affinity": -26
+      },
+      {
+        "from": "AM",
+        "to": "MD",
+        "affinity": -27
+      },
+      {
+        "from": "RO",
+        "to": "UA",
+        "affinity": -27
+      },
+      {
+        "from": "GR",
+        "to": "HR",
+        "affinity": -27
+      },
+      {
+        "from": "ES",
+        "to": "HR",
+        "affinity": -27
+      },
+      {
+        "from": "EE",
+        "to": "RS",
+        "affinity": -27
+      },
+      {
+        "from": "MT",
+        "to": "RU",
+        "affinity": -27
+      },
+      {
+        "from": "FI",
+        "to": "UA",
+        "affinity": -27
+      },
+      {
+        "from": "UA",
+        "to": "RS",
+        "affinity": -27
+      },
+      {
+        "from": "LV",
+        "to": "PL",
+        "affinity": -28
+      },
+      {
+        "from": "DK",
+        "to": "UA",
+        "affinity": -28
+      },
+      {
+        "from": "EE",
+        "to": "PL",
+        "affinity": -28
+      },
+      {
+        "from": "AM",
+        "to": "AZ",
+        "affinity": -28
+      },
+      {
+        "from": "CH",
+        "to": "NO",
+        "affinity": -28
+      },
+      {
+        "from": "GR",
+        "to": "SE",
+        "affinity": -28
+      },
+      {
+        "from": "DE",
+        "to": "UA",
+        "affinity": -28
+      },
+      {
+        "from": "CH",
+        "to": "EE",
+        "affinity": -28
+      },
+      {
+        "from": "MK",
+        "to": "LT",
+        "affinity": -28
+      },
+      {
+        "from": "IL",
+        "to": "SE",
+        "affinity": -28
+      },
+      {
+        "from": "RO",
+        "to": "NO",
+        "affinity": -29
+      },
+      {
+        "from": "UA",
+        "to": "BG",
+        "affinity": -29
+      },
+      {
+        "from": "MD",
+        "to": "HR",
+        "affinity": -29
+      },
+      {
+        "from": "HR",
+        "to": "UA",
+        "affinity": -29
+      },
+      {
+        "from": "CY",
+        "to": "SE",
+        "affinity": -29
+      },
+      {
+        "from": "GE",
+        "to": "PL",
+        "affinity": -29
+      },
+      {
+        "from": "IS",
+        "to": "BG",
+        "affinity": -29
+      },
+      {
+        "from": "GE",
+        "to": "IT",
+        "affinity": -29
+      },
+      {
+        "from": "UA",
+        "to": "GR",
+        "affinity": -30
+      },
+      {
+        "from": "IL",
+        "to": "PL",
+        "affinity": -30
+      },
+      {
+        "from": "GR",
+        "to": "IS",
+        "affinity": -30
+      },
+      {
+        "from": "MT",
+        "to": "PL",
+        "affinity": -30
+      },
+      {
+        "from": "NL",
+        "to": "UA",
+        "affinity": -30
+      },
+      {
+        "from": "IS",
+        "to": "MD",
+        "affinity": -30
+      },
+      {
+        "from": "FR",
+        "to": "NO",
+        "affinity": -30
+      },
+      {
+        "from": "PL",
+        "to": "MD",
+        "affinity": -30
+      },
+      {
+        "from": "HU",
+        "to": "AU",
+        "affinity": -30
+      },
+      {
+        "from": "GE",
+        "to": "AU",
+        "affinity": -30
+      },
+      {
+        "from": "SI",
+        "to": "MD",
+        "affinity": -31
+      },
+      {
+        "from": "EE",
+        "to": "BG",
+        "affinity": -31
+      },
+      {
+        "from": "GE",
+        "to": "SE",
+        "affinity": -31
+      },
+      {
+        "from": "MK",
+        "to": "NO",
+        "affinity": -31
+      },
+      {
+        "from": "MD",
+        "to": "IS",
+        "affinity": -32
+      },
+      {
+        "from": "CH",
+        "to": "BG",
+        "affinity": -32
+      },
+      {
+        "from": "FR",
+        "to": "HR",
+        "affinity": -32
+      },
+      {
+        "from": "PL",
+        "to": "IT",
+        "affinity": -32
+      },
+      {
+        "from": "RS",
+        "to": "IL",
+        "affinity": -32
+      },
+      {
+        "from": "PT",
+        "to": "PL",
+        "affinity": -32
+      },
+      {
+        "from": "BE",
+        "to": "HR",
+        "affinity": -32
+      },
+      {
+        "from": "AU",
+        "to": "PL",
+        "affinity": -33
+      },
+      {
+        "from": "CY",
+        "to": "IS",
+        "affinity": -33
+      },
+      {
+        "from": "MK",
+        "to": "RO",
+        "affinity": -33
+      },
+      {
+        "from": "ME",
+        "to": "SE",
+        "affinity": -33
+      },
+      {
+        "from": "SE",
+        "to": "UA",
+        "affinity": -33
+      },
+      {
+        "from": "DK",
+        "to": "MD",
+        "affinity": -33
+      },
+      {
+        "from": "SI",
+        "to": "UA",
+        "affinity": -34
+      },
+      {
+        "from": "IL",
+        "to": "IS",
+        "affinity": -34
+      },
+      {
+        "from": "IS",
+        "to": "IL",
+        "affinity": -34
+      },
+      {
+        "from": "AU",
+        "to": "UA",
+        "affinity": -35
+      },
+      {
+        "from": "FR",
+        "to": "FI",
+        "affinity": -35
+      },
+      {
+        "from": "AM",
+        "to": "UA",
+        "affinity": -35
+      },
+      {
+        "from": "DK",
+        "to": "IL",
+        "affinity": -35
+      },
+      {
+        "from": "GR",
+        "to": "PL",
+        "affinity": -36
+      },
+      {
+        "from": "NO",
+        "to": "IT",
+        "affinity": -36
+      },
+      {
+        "from": "LV",
+        "to": "IT",
+        "affinity": -37
+      },
+      {
+        "from": "AL",
+        "to": "PL",
+        "affinity": -37
+      },
+      {
+        "from": "CY",
+        "to": "HR",
+        "affinity": -37
+      },
+      {
+        "from": "CY",
+        "to": "MD",
+        "affinity": -37
+      },
+      {
+        "from": "IT",
+        "to": "SE",
+        "affinity": -37
+      },
+      {
+        "from": "FI",
+        "to": "IT",
+        "affinity": -37
+      },
+      {
+        "from": "BE",
+        "to": "UA",
+        "affinity": -38
+      },
+      {
+        "from": "SI",
+        "to": "PL",
+        "affinity": -38
+      },
+      {
+        "from": "ME",
+        "to": "PL",
+        "affinity": -38
+      },
+      {
+        "from": "NO",
+        "to": "MD",
+        "affinity": -39
+      },
+      {
+        "from": "IS",
+        "to": "IT",
+        "affinity": -39
+      },
+      {
+        "from": "SE",
+        "to": "MD",
+        "affinity": -40
+      },
+      {
+        "from": "AZ",
+        "to": "PL",
+        "affinity": -40
+      },
+      {
+        "from": "SI",
+        "to": "IL",
+        "affinity": -40
+      },
+      {
+        "from": "IS",
+        "to": "UA",
+        "affinity": -40
+      },
+      {
+        "from": "ME",
+        "to": "MD",
+        "affinity": -40
+      },
+      {
+        "from": "NO",
+        "to": "UA",
+        "affinity": -42
+      },
+      {
+        "from": "FR",
+        "to": "SE",
+        "affinity": -43
+      },
+      {
+        "from": "GB",
+        "to": "UA",
+        "affinity": -43
+      },
+      {
+        "from": "MT",
+        "to": "UA",
+        "affinity": -44
+      },
+      {
+        "from": "SE",
+        "to": "IT",
+        "affinity": -46
+      },
+      {
+        "from": "UA",
+        "to": "IL",
+        "affinity": -46
+      },
+      {
+        "from": "AL",
+        "to": "MD",
+        "affinity": -46
+      },
+      {
+        "from": "DK",
+        "to": "IT",
+        "affinity": -47
+      },
+      {
+        "from": "MT",
+        "to": "MD",
+        "affinity": -47
+      },
+      {
+        "from": "MK",
+        "to": "UA",
+        "affinity": -47
+      },
+      {
+        "from": "CH",
+        "to": "MD",
+        "affinity": -48
+      },
+      {
+        "from": "RS",
+        "to": "PL",
+        "affinity": -48
+      },
+      {
+        "from": "AU",
+        "to": "IT",
+        "affinity": -48
+      },
+      {
+        "from": "SE",
+        "to": "RU",
+        "affinity": -50
+      },
+      {
+        "from": "GR",
+        "to": "UA",
+        "affinity": -51
+      },
+      {
+        "from": "AL",
+        "to": "UA",
+        "affinity": -51
+      },
+      {
+        "from": "NO",
+        "to": "RU",
+        "affinity": -52
+      },
+      {
+        "from": "IE",
+        "to": "IT",
+        "affinity": -52
+      },
+      {
+        "from": "CZ",
+        "to": "IT",
+        "affinity": -52
+      },
+      {
+        "from": "EE",
+        "to": "IL",
+        "affinity": -52
+      },
+      {
+        "from": "LT",
+        "to": "IL",
+        "affinity": -53
+      },
+      {
+        "from": "CH",
+        "to": "UA",
+        "affinity": -53
+      },
+      {
+        "from": "HR",
+        "to": "IL",
+        "affinity": -58
+      },
+      {
+        "from": "RS",
+        "to": "UA",
+        "affinity": -59
+      },
+      {
+        "from": "GB",
+        "to": "IT",
+        "affinity": -61
+      },
+      {
+        "from": "NL",
+        "to": "RU",
+        "affinity": -62
+      }
+    ]
+  }
+}

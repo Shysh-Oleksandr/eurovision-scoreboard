@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-import { SUPPORTED_YEARS, JUNIOR_SUPPORTED_YEARS } from '../src/data/data';
 import * as countriesIndex from '../src/data/countries';
+import { SUPPORTED_YEARS, JUNIOR_SUPPORTED_YEARS } from '../src/data/data';
 
 const ensureDir = (dirPath: string) => {
   if (!fs.existsSync(dirPath)) {
@@ -29,12 +29,15 @@ const main = async () => {
 
     if (!Array.isArray(countries)) {
       // eslint-disable-next-line no-console
-      console.warn(`Warn: export ${exportName} not found or not an array; skipping`);
+      console.warn(
+        `Warn: export ${exportName} not found or not an array; skipping`,
+      );
       continue;
     }
 
     const fileName = `countries-${year}.json`;
     const filePath = path.join(outputDir, fileName);
+
     writeJson(filePath, countries);
     writtenFiles.push(fileName);
   }
@@ -46,18 +49,26 @@ const main = async () => {
 
     if (!Array.isArray(countries)) {
       // eslint-disable-next-line no-console
-      console.warn(`Warn: export ${exportName} not found or not an array; skipping`);
+      console.warn(
+        `Warn: export ${exportName} not found or not an array; skipping`,
+      );
       continue;
     }
 
     const fileName = `junior-countries-${year}.json`;
     const filePath = path.join(outputDir, fileName);
+
     writeJson(filePath, countries);
     writtenFiles.push(fileName);
   }
 
   // eslint-disable-next-line no-console
-  console.log(`Generated ${writtenFiles.length} files in ${path.relative(projectRoot, outputDir)}:`);
+  console.log(
+    `Generated ${writtenFiles.length} files in ${path.relative(
+      projectRoot,
+      outputDir,
+    )}:`,
+  );
   for (const f of writtenFiles) {
     // eslint-disable-next-line no-console
     console.log(` - ${f}`);

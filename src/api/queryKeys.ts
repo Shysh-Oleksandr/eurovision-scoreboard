@@ -79,6 +79,12 @@ export const queryKeys = {
     // preferences: () => ['user', 'preferences'] as const,
   },
 
+  // Users
+  users: {
+    search: (filters: { page?: number; search?: string }) =>
+      ['users', 'search', filters] as const,
+  },
+
   // Follows
   follows: {
     status: (userId: string) => ['follows', 'status', userId] as const,

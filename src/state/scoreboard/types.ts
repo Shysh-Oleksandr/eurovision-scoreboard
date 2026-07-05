@@ -56,6 +56,11 @@ export type ScoreboardState = {
   showQualificationResults: boolean;
   restartCounter: number; // It's needed to trigger restart event when clicking "Restart" button
   startCounter: number; // It's needed for board initial animation when clicking "Start" button
+  // True while replaying a saved contest in presentation mode. The predefined
+  // votes already in the store are authoritative and must be replayed as-is:
+  // stage transitions must not regenerate votes, and the predefinition modal
+  // (when the user has enablePredefinedVotes on) prefills from them.
+  isReplayingSavedVotes: boolean;
   showAllParticipants: boolean;
   televotingProgress: number;
   predefinedVotes: Record<string, Partial<StageVotes>>;

@@ -4,16 +4,22 @@ import path from 'path';
 function expandShorthandHex(hex: string): string {
   const shorthandMatch = /^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/;
   const matched = hex.match(shorthandMatch);
+
   if (!matched) return hex;
   const [, r, g, b] = matched;
+
   return `#${r}${r}${g}${g}${b}${b}`;
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const fullHex = expandShorthandHex(hex);
-  const match = fullHex.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);
+  const match = fullHex.match(
+    /^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
+  );
+
   if (!match) return null;
   const [, rHex, gHex, bHex] = match;
+
   return {
     r: parseInt(rHex, 16),
     g: parseInt(gHex, 16),
@@ -21,7 +27,11 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   };
 }
 
-function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+function rgbToHsl(
+  r: number,
+  g: number,
+  b: number,
+): { h: number; s: number; l: number } {
   const rn = r / 255;
   const gn = g / 255;
   const bn = b / 255;
@@ -64,19 +74,27 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
 
 function hexToHslString(hex: string): string {
   const rgb = hexToRgb(hex);
+
   if (!rgb) return hex; // Fallback: leave as-is if not valid
   const { h, s, l } = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
   return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
-function convertHexColorsToHsl(content: string): { converted: string; replacements: number } {
+function convertHexColorsToHsl(content: string): {
+  converted: string;
+  replacements: number;
+} {
   const hexRegex = /#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b/g;
   let count = 0;
   const converted = content.replace(hexRegex, (match) => {
     const hsl = hexToHslString(match);
+
     if (hsl !== match) count += 1;
+
     return hsl;
   });
+
   return { converted, replacements: count };
 }
 
@@ -88,12 +106,14 @@ function parseArgs(argv: string[]) {
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
+
     if (arg === '--write' || arg === '-w') {
       result.write = true;
       continue;
     }
     if (arg === '--file' || arg === '-f') {
       const next = argv[i + 1];
+
       if (next) {
         result.file = path.resolve(process.cwd(), next);
         i += 1;
@@ -105,6 +125,7 @@ function parseArgs(argv: string[]) {
       result.file = path.resolve(process.cwd(), arg);
     }
   }
+
   return result;
 }
 
@@ -121,10 +142,18 @@ function main() {
 
   if (write) {
     fs.writeFileSync(file, converted, 'utf8');
-    console.log(`Converted ${replacements} hex color${replacements === 1 ? '' : 's'} to HSL in ${file}`);
+    console.log(
+      `Converted ${replacements} hex color${
+        replacements === 1 ? '' : 's'
+      } to HSL in ${file}`,
+    );
   } else {
     process.stdout.write(converted);
-    console.error(`(dry-run) Would convert ${replacements} hex color${replacements === 1 ? '' : 's'} to HSL in ${file}`);
+    console.error(
+      `(dry-run) Would convert ${replacements} hex color${
+        replacements === 1 ? '' : 's'
+      } to HSL in ${file}`,
+    );
   }
 }
 

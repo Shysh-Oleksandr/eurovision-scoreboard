@@ -15,6 +15,12 @@ import { getThemeForYear } from '../theme/themes';
 import { Theme } from '../theme/types';
 
 import { useCountriesStore } from './countriesStore';
+import {
+  DEFAULT_DIASPORA_SETTINGS,
+  DiasporaSettings,
+  removeOverride,
+  upsertOverride,
+} from './scoreboard/diaspora';
 import { useScoreboardStore } from './scoreboardStore';
 
 import { api } from '@/api/client';
@@ -72,7 +78,7 @@ const DEFAULT_SETTINGS: Settings = {
   shouldShowJuryVotingProgress: true,
   randomnessLevel: 50, // 0-100
   pointsSpread: 50, // 0-100; controls the points gap between winners and losers
-  oddsViewMode: 'numbers',
+  diaspora: DEFAULT_DIASPORA_SETTINGS,
   oddsRankLayout: 'grid',
   isPickQualifiersMode: false,
   enableSplitScreenQualifierRevealMode: false,
@@ -166,8 +172,8 @@ interface Settings {
   shouldShowJuryVotingProgress: boolean;
   randomnessLevel: number;
   pointsSpread: number;
-  /** Odds settings panel: which view is active (number grid vs drag-to-rank). */
-  oddsViewMode: 'numbers' | 'rank';
+  /** Diaspora / country-affinity realism layer for random votes. */
+  diaspora: DiasporaSettings;
   /** Odds rank view: list vs grid layout. */
   oddsRankLayout: 'list' | 'grid';
   isPickQualifiersMode: boolean;
@@ -259,6 +265,9 @@ export interface GeneralState {
   applyCustomTheme: (theme: CustomTheme) => void;
   clearCustomTheme: () => void;
   setSettings: (settings: Partial<Settings>) => void;
+  setDiaspora: (diaspora: Partial<DiasporaSettings>) => void;
+  updateDiasporaOverride: (from: string, to: string, affinity: number) => void;
+  removeDiasporaOverride: (from: string, to: string) => void;
   setImageCustomization: (
     customization: Partial<ImageCustomizationSettings>,
   ) => void;
@@ -547,6 +556,51 @@ export const useGeneralStore = create<GeneralState>()(
           ) {
             syncDocumentFont();
           }
+        },
+        setDiaspora: (diaspora: Partial<DiasporaSettings>) => {
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              diaspora: { ...state.settings.diaspora, ...diaspora },
+            },
+          }));
+        },
+        // Override edits go through the updater (reading the latest overrides)
+        // so rapid concurrent edits can't clobber each other via stale closures.
+        updateDiasporaOverride: (
+          from: string,
+          to: string,
+          affinity: number,
+        ) => {
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              diaspora: {
+                ...state.settings.diaspora,
+                overrides: upsertOverride(
+                  state.settings.diaspora.overrides,
+                  from,
+                  to,
+                  affinity,
+                ),
+              },
+            },
+          }));
+        },
+        removeDiasporaOverride: (from: string, to: string) => {
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              diaspora: {
+                ...state.settings.diaspora,
+                overrides: removeOverride(
+                  state.settings.diaspora.overrides,
+                  from,
+                  to,
+                ),
+              },
+            },
+          }));
         },
         setImageCustomization: (
           customization: Partial<ImageCustomizationSettings>,

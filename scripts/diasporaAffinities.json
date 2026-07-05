@@ -1,0 +1,4013 @@
+{
+  "meta": {
+    "source": "eurovisionVotes.json (2004-2025, finals + semis)",
+    "method": "leave-one-out residual affinity, recency+round weighted",
+    "params": {
+      "YEAR_DECAY": 0.93,
+      "SF_WEIGHT": 0.7,
+      "MIN_OBS": 6,
+      "MIN_ABS_T": 2,
+      "R_MAX": 8,
+      "CLUSTER_THRESHOLD": 35
+    },
+    "suggestedJuryScale": 0.36
+  },
+  "groups": [
+    {
+      "id": "group-1",
+      "codes": [
+        "AL",
+        "AM",
+        "AT",
+        "BE",
+        "BG",
+        "CH",
+        "CY",
+        "ES",
+        "FR",
+        "GE",
+        "GR",
+        "HR",
+        "HU",
+        "IT",
+        "ME",
+        "MK",
+        "NL",
+        "PT",
+        "RS",
+        "SI",
+        "SM"
+      ]
+    },
+    {
+      "id": "group-2",
+      "codes": [
+        "DK",
+        "EE",
+        "FI",
+        "GB",
+        "IE",
+        "IS",
+        "LT",
+        "LV",
+        "NO",
+        "PL",
+        "SE",
+        "UA"
+      ]
+    },
+    {
+      "id": "group-3",
+      "codes": [
+        "AU",
+        "MT"
+      ]
+    },
+    {
+      "id": "group-4",
+      "codes": [
+        "AZ",
+        "RU"
+      ]
+    },
+    {
+      "id": "group-5",
+      "codes": [
+        "MD",
+        "RO"
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "from": "MK",
+      "to": "AL",
+      "affinity": 100,
+      "televoteResidual": 11.118,
+      "juryResidual": 3.912,
+      "totalResidual": 12.869,
+      "n": 6,
+      "t": 22.97
+    },
+    {
+      "from": "CY",
+      "to": "GR",
+      "affinity": 100,
+      "televoteResidual": 10.662,
+      "juryResidual": 8.956,
+      "totalResidual": 15.617,
+      "n": 10,
+      "t": 31.16
+    },
+    {
+      "from": "GE",
+      "to": "AM",
+      "affinity": 100,
+      "televoteResidual": 9.854,
+      "juryResidual": 3.52,
+      "totalResidual": 10.851,
+      "n": 7,
+      "t": 13.32
+    },
+    {
+      "from": "GR",
+      "to": "CY",
+      "affinity": 100,
+      "televoteResidual": 9.712,
+      "juryResidual": 7.821,
+      "totalResidual": 16.09,
+      "n": 11,
+      "t": 7.95
+    },
+    {
+      "from": "HR",
+      "to": "RS",
+      "affinity": 100,
+      "televoteResidual": 9.445,
+      "juryResidual": 4.496,
+      "totalResidual": 11.313,
+      "n": 8,
+      "t": 10.21
+    },
+    {
+      "from": "LT",
+      "to": "LV",
+      "affinity": 100,
+      "televoteResidual": 9.288,
+      "juryResidual": 4.56,
+      "totalResidual": 10.993,
+      "n": 6,
+      "t": 6.81
+    },
+    {
+      "from": "HR",
+      "to": "SI",
+      "affinity": 100,
+      "televoteResidual": 9.075,
+      "juryResidual": 3.98,
+      "totalResidual": 10.346,
+      "n": 6,
+      "t": 9.93
+    },
+    {
+      "from": "RS",
+      "to": "HU",
+      "affinity": 100,
+      "televoteResidual": 8.987,
+      "juryResidual": 3.709,
+      "totalResidual": 8.663,
+      "n": 6,
+      "t": 6.88
+    },
+    {
+      "from": "ME",
+      "to": "RS",
+      "affinity": 100,
+      "televoteResidual": 8.756,
+      "juryResidual": 8.997,
+      "totalResidual": 14.884,
+      "n": 7,
+      "t": 6.14
+    },
+    {
+      "from": "SI",
+      "to": "RS",
+      "affinity": 100,
+      "televoteResidual": 8.677,
+      "juryResidual": 1.71,
+      "totalResidual": 9.47,
+      "n": 10,
+      "t": 9.52
+    },
+    {
+      "from": "GB",
+      "to": "LT",
+      "affinity": 100,
+      "televoteResidual": 8.673,
+      "juryResidual": 2.282,
+      "totalResidual": 8.168,
+      "n": 10,
+      "t": 14.65
+    },
+    {
+      "from": "MK",
+      "to": "RS",
+      "affinity": 100,
+      "televoteResidual": 8.56,
+      "juryResidual": 7.32,
+      "totalResidual": 12.556,
+      "n": 8,
+      "t": 7.21
+    },
+    {
+      "from": "IE",
+      "to": "LT",
+      "affinity": 100,
+      "televoteResidual": 8.434,
+      "juryResidual": 0.389,
+      "totalResidual": 8.262,
+      "n": 12,
+      "t": 12.47
+    },
+    {
+      "from": "LV",
+      "to": "LT",
+      "affinity": 100,
+      "televoteResidual": 8.365,
+      "juryResidual": 4.423,
+      "totalResidual": 10.688,
+      "n": 10,
+      "t": 11.95
+    },
+    {
+      "from": "IT",
+      "to": "AL",
+      "affinity": 100,
+      "televoteResidual": 8.36,
+      "juryResidual": 1.018,
+      "totalResidual": 8.43,
+      "n": 9,
+      "t": 8.96
+    },
+    {
+      "from": "CH",
+      "to": "AL",
+      "affinity": 100,
+      "televoteResidual": 8.037,
+      "juryResidual": -1.058,
+      "totalResidual": 7.213,
+      "n": 10,
+      "t": 9.81
+    },
+    {
+      "from": "MK",
+      "to": "HR",
+      "affinity": 100,
+      "televoteResidual": 7.976,
+      "juryResidual": 3.246,
+      "totalResidual": 9.293,
+      "n": 6,
+      "t": 5.98
+    },
+    {
+      "from": "CH",
+      "to": "RS",
+      "affinity": 95,
+      "televoteResidual": 7.629,
+      "juryResidual": 0.527,
+      "totalResidual": 7.517,
+      "n": 10,
+      "t": 6.38
+    },
+    {
+      "from": "LV",
+      "to": "EE",
+      "affinity": 94,
+      "televoteResidual": 7.54,
+      "juryResidual": 1.824,
+      "totalResidual": 9.29,
+      "n": 7,
+      "t": 6.03
+    },
+    {
+      "from": "SI",
+      "to": "HR",
+      "affinity": 94,
+      "televoteResidual": 7.502,
+      "juryResidual": 1.461,
+      "totalResidual": 9.857,
+      "n": 6,
+      "t": 4.14
+    },
+    {
+      "from": "RO",
+      "to": "MD",
+      "affinity": 93,
+      "televoteResidual": 7.448,
+      "juryResidual": 5.842,
+      "totalResidual": 13.257,
+      "n": 7,
+      "t": 4.8
+    },
+    {
+      "from": "FR",
+      "to": "AM",
+      "affinity": 93,
+      "televoteResidual": 7.425,
+      "juryResidual": 4.241,
+      "totalResidual": 9.324,
+      "n": 8,
+      "t": 9.41
+    },
+    {
+      "from": "GR",
+      "to": "AL",
+      "affinity": 89,
+      "televoteResidual": 7.114,
+      "juryResidual": 3.391,
+      "totalResidual": 9.709,
+      "n": 9,
+      "t": 9.08
+    },
+    {
+      "from": "GB",
+      "to": "IE",
+      "affinity": 88,
+      "televoteResidual": 7.032,
+      "juryResidual": 1.192,
+      "totalResidual": 7.794,
+      "n": 6,
+      "t": 5.55
+    },
+    {
+      "from": "BE",
+      "to": "NL",
+      "affinity": 83,
+      "televoteResidual": 6.629,
+      "juryResidual": -0.509,
+      "totalResidual": 6.967,
+      "n": 7,
+      "t": 4.13
+    },
+    {
+      "from": "EE",
+      "to": "FI",
+      "affinity": 79,
+      "televoteResidual": 6.314,
+      "juryResidual": 4.068,
+      "totalResidual": 10.369,
+      "n": 11,
+      "t": 6.07
+    },
+    {
+      "from": "FI",
+      "to": "EE",
+      "affinity": 78,
+      "televoteResidual": 6.208,
+      "juryResidual": -1.167,
+      "totalResidual": 6.78,
+      "n": 11,
+      "t": 5.1
+    },
+    {
+      "from": "RS",
+      "to": "SI",
+      "affinity": 77,
+      "televoteResidual": 6.145,
+      "juryResidual": 3.081,
+      "totalResidual": 8.623,
+      "n": 7,
+      "t": 5.86
+    },
+    {
+      "from": "GB",
+      "to": "PL",
+      "affinity": 77,
+      "televoteResidual": 6.122,
+      "juryResidual": 1.772,
+      "totalResidual": 7.188,
+      "n": 9,
+      "t": 7.58
+    },
+    {
+      "from": "AL",
+      "to": "GR",
+      "affinity": 76,
+      "televoteResidual": 6.098,
+      "juryResidual": 2.462,
+      "totalResidual": 7.94,
+      "n": 10,
+      "t": 5.48
+    },
+    {
+      "from": "SM",
+      "to": "GR",
+      "affinity": 76,
+      "televoteResidual": 6.09,
+      "juryResidual": 2.527,
+      "totalResidual": 6.024,
+      "n": 9,
+      "t": 5.05
+    },
+    {
+      "from": "IE",
+      "to": "PL",
+      "affinity": 76,
+      "televoteResidual": 6.079,
+      "juryResidual": -0.482,
+      "totalResidual": 6.906,
+      "n": 7,
+      "t": 6.98
+    },
+    {
+      "from": "AM",
+      "to": "FR",
+      "affinity": 74,
+      "televoteResidual": 5.886,
+      "juryResidual": 3.696,
+      "totalResidual": 9.353,
+      "n": 8,
+      "t": 5.01
+    },
+    {
+      "from": "NL",
+      "to": "BE",
+      "affinity": 73,
+      "televoteResidual": 5.833,
+      "juryResidual": 3.089,
+      "totalResidual": 7.447,
+      "n": 6,
+      "t": 3.47
+    },
+    {
+      "from": "NO",
+      "to": "LT",
+      "affinity": 71,
+      "televoteResidual": 5.689,
+      "juryResidual": 0.61,
+      "totalResidual": 5.701,
+      "n": 12,
+      "t": 5.19
+    },
+    {
+      "from": "DK",
+      "to": "SE",
+      "affinity": 71,
+      "televoteResidual": 5.664,
+      "juryResidual": 0.697,
+      "totalResidual": 8.962,
+      "n": 11,
+      "t": 5.7
+    },
+    {
+      "from": "FR",
+      "to": "PT",
+      "affinity": 69,
+      "televoteResidual": 5.507,
+      "juryResidual": 1.428,
+      "totalResidual": 9.378,
+      "n": 10,
+      "t": 6.53
+    },
+    {
+      "from": "SE",
+      "to": "FI",
+      "affinity": 68,
+      "televoteResidual": 5.442,
+      "juryResidual": 2.535,
+      "totalResidual": 7.75,
+      "n": 9,
+      "t": 6.79
+    },
+    {
+      "from": "MT",
+      "to": "IT",
+      "affinity": 67,
+      "televoteResidual": 5.357,
+      "juryResidual": 2.094,
+      "totalResidual": 10.277,
+      "n": 9,
+      "t": 6.65
+    },
+    {
+      "from": "AT",
+      "to": "RS",
+      "affinity": 66,
+      "televoteResidual": 5.279,
+      "juryResidual": 0.389,
+      "totalResidual": 5.965,
+      "n": 9,
+      "t": 4.55
+    },
+    {
+      "from": "MD",
+      "to": "AZ",
+      "affinity": 64,
+      "televoteResidual": 5.131,
+      "juryResidual": 0.956,
+      "totalResidual": 5.079,
+      "n": 8,
+      "t": 3.67
+    },
+    {
+      "from": "PT",
+      "to": "ES",
+      "affinity": 64,
+      "televoteResidual": 5.13,
+      "juryResidual": 1.983,
+      "totalResidual": 7.691,
+      "n": 8,
+      "t": 3.77
+    },
+    {
+      "from": "LT",
+      "to": "EE",
+      "affinity": 64,
+      "televoteResidual": 5.121,
+      "juryResidual": 0.199,
+      "totalResidual": 6.357,
+      "n": 8,
+      "t": 5.06
+    },
+    {
+      "from": "RU",
+      "to": "AZ",
+      "affinity": 64,
+      "televoteResidual": 5.117,
+      "juryResidual": 5.141,
+      "totalResidual": 8.033,
+      "n": 6,
+      "t": 5.34
+    },
+    {
+      "from": "NO",
+      "to": "SE",
+      "affinity": 64,
+      "televoteResidual": 5.089,
+      "juryResidual": 1.012,
+      "totalResidual": 8.071,
+      "n": 12,
+      "t": 5.47
+    },
+    {
+      "from": "GE",
+      "to": "AZ",
+      "affinity": 64,
+      "televoteResidual": 5.083,
+      "juryResidual": 3.048,
+      "totalResidual": 7.094,
+      "n": 7,
+      "t": 3.57
+    },
+    {
+      "from": "ES",
+      "to": "BG",
+      "affinity": 62,
+      "televoteResidual": 4.99,
+      "juryResidual": -3.598,
+      "totalResidual": 6.667,
+      "n": 6,
+      "t": 4.87
+    },
+    {
+      "from": "AM",
+      "to": "CY",
+      "affinity": 62,
+      "televoteResidual": 4.967,
+      "juryResidual": 3.538,
+      "totalResidual": 8.191,
+      "n": 9,
+      "t": 4.23
+    },
+    {
+      "from": "UA",
+      "to": "LT",
+      "affinity": 61,
+      "televoteResidual": 4.905,
+      "juryResidual": 2.255,
+      "totalResidual": 5.598,
+      "n": 11,
+      "t": 4.27
+    },
+    {
+      "from": "AL",
+      "to": "IT",
+      "affinity": 61,
+      "televoteResidual": 4.888,
+      "juryResidual": 1.031,
+      "totalResidual": 9.546,
+      "n": 9,
+      "t": 4.16
+    },
+    {
+      "from": "CH",
+      "to": "PT",
+      "affinity": 60,
+      "televoteResidual": 4.795,
+      "juryResidual": 0.867,
+      "totalResidual": 8.474,
+      "n": 9,
+      "t": 4.06
+    },
+    {
+      "from": "DK",
+      "to": "IS",
+      "affinity": 60,
+      "televoteResidual": 4.769,
+      "juryResidual": 1.017,
+      "totalResidual": 7.426,
+      "n": 6,
+      "t": 3.05
+    },
+    {
+      "from": "EE",
+      "to": "LT",
+      "affinity": 59,
+      "televoteResidual": 4.758,
+      "juryResidual": 2.766,
+      "totalResidual": 5.5,
+      "n": 9,
+      "t": 4.91
+    },
+    {
+      "from": "UA",
+      "to": "LV",
+      "affinity": 58,
+      "televoteResidual": 4.675,
+      "juryResidual": 2.22,
+      "totalResidual": 5.136,
+      "n": 6,
+      "t": 3.87
+    },
+    {
+      "from": "GE",
+      "to": "SM",
+      "affinity": 58,
+      "televoteResidual": 4.65,
+      "juryResidual": -0.361,
+      "totalResidual": 3.673,
+      "n": 7,
+      "t": 2.65
+    },
+    {
+      "from": "BE",
+      "to": "FR",
+      "affinity": 57,
+      "televoteResidual": 4.565,
+      "juryResidual": -0.773,
+      "totalResidual": 5.049,
+      "n": 9,
+      "t": 4.19
+    },
+    {
+      "from": "BG",
+      "to": "GR",
+      "affinity": 56,
+      "televoteResidual": 4.471,
+      "juryResidual": 4.068,
+      "totalResidual": 8.125,
+      "n": 6,
+      "t": 3.8
+    },
+    {
+      "from": "AU",
+      "to": "MT",
+      "affinity": 56,
+      "televoteResidual": 4.441,
+      "juryResidual": 0.912,
+      "totalResidual": 8.43,
+      "n": 7,
+      "t": 4.16
+    },
+    {
+      "from": "IS",
+      "to": "SE",
+      "affinity": 55,
+      "televoteResidual": 4.438,
+      "juryResidual": 0.72,
+      "totalResidual": 6.631,
+      "n": 10,
+      "t": 4.65
+    },
+    {
+      "from": "MD",
+      "to": "RU",
+      "affinity": 55,
+      "televoteResidual": 4.429,
+      "juryResidual": 4.913,
+      "totalResidual": 6.277,
+      "n": 6,
+      "t": 2.8
+    },
+    {
+      "from": "AM",
+      "to": "GR",
+      "affinity": 55,
+      "televoteResidual": 4.393,
+      "juryResidual": 1.114,
+      "totalResidual": 5.484,
+      "n": 9,
+      "t": 5.14
+    },
+    {
+      "from": "GB",
+      "to": "BG",
+      "affinity": 55,
+      "televoteResidual": 4.377,
+      "juryResidual": 1.072,
+      "totalResidual": 7.591,
+      "n": 7,
+      "t": 4.94
+    },
+    {
+      "from": "CZ",
+      "to": "AZ",
+      "affinity": 54,
+      "televoteResidual": 4.307,
+      "juryResidual": -0.809,
+      "totalResidual": 5.57,
+      "n": 9,
+      "t": 3.12
+    },
+    {
+      "from": "CZ",
+      "to": "UA",
+      "affinity": 53,
+      "televoteResidual": 4.26,
+      "juryResidual": 1.444,
+      "totalResidual": 8.739,
+      "n": 8,
+      "t": 4.04
+    },
+    {
+      "from": "GE",
+      "to": "LT",
+      "affinity": 53,
+      "televoteResidual": 4.209,
+      "juryResidual": 1.677,
+      "totalResidual": 5.732,
+      "n": 8,
+      "t": 4.96
+    },
+    {
+      "from": "DE",
+      "to": "PL",
+      "affinity": 52,
+      "televoteResidual": 4.187,
+      "juryResidual": 0.116,
+      "totalResidual": 5.898,
+      "n": 8,
+      "t": 3.86
+    },
+    {
+      "from": "AL",
+      "to": "BG",
+      "affinity": 51,
+      "televoteResidual": 4.069,
+      "juryResidual": -1.404,
+      "totalResidual": 6.112,
+      "n": 8,
+      "t": 3.14
+    },
+    {
+      "from": "CH",
+      "to": "IT",
+      "affinity": 51,
+      "televoteResidual": 4.062,
+      "juryResidual": -0.33,
+      "totalResidual": 6.54,
+      "n": 9,
+      "t": 4.19
+    },
+    {
+      "from": "BE",
+      "to": "PL",
+      "affinity": 51,
+      "televoteResidual": 4.051,
+      "juryResidual": 0.979,
+      "totalResidual": 5.621,
+      "n": 9,
+      "t": 6.78
+    },
+    {
+      "from": "IS",
+      "to": "DK",
+      "affinity": 51,
+      "televoteResidual": 4.048,
+      "juryResidual": 0.71,
+      "totalResidual": 6.035,
+      "n": 6,
+      "t": 3.84
+    },
+    {
+      "from": "PL",
+      "to": "UA",
+      "affinity": 50,
+      "televoteResidual": 3.975,
+      "juryResidual": 1.42,
+      "totalResidual": 6.971,
+      "n": 10,
+      "t": 4.47
+    },
+    {
+      "from": "IS",
+      "to": "PL",
+      "affinity": 50,
+      "televoteResidual": 3.964,
+      "juryResidual": -0.177,
+      "totalResidual": 4.373,
+      "n": 8,
+      "t": 4.43
+    },
+    {
+      "from": "SE",
+      "to": "IS",
+      "affinity": 46,
+      "televoteResidual": 3.665,
+      "juryResidual": 0.387,
+      "totalResidual": 4.427,
+      "n": 6,
+      "t": 4.21
+    },
+    {
+      "from": "AT",
+      "to": "DE",
+      "affinity": 45,
+      "televoteResidual": 3.619,
+      "juryResidual": -0.024,
+      "totalResidual": 4.235,
+      "n": 9,
+      "t": 2.69
+    },
+    {
+      "from": "AZ",
+      "to": "IL",
+      "affinity": 45,
+      "televoteResidual": 3.575,
+      "juryResidual": 0.804,
+      "totalResidual": 6.565,
+      "n": 11,
+      "t": 2.5
+    },
+    {
+      "from": "DK",
+      "to": "NO",
+      "affinity": 44,
+      "televoteResidual": 3.559,
+      "juryResidual": 2.441,
+      "totalResidual": 6.742,
+      "n": 13,
+      "t": 3.68
+    },
+    {
+      "from": "FR",
+      "to": "IL",
+      "affinity": 44,
+      "televoteResidual": 3.529,
+      "juryResidual": 3.718,
+      "totalResidual": 7.01,
+      "n": 9,
+      "t": 3.11
+    },
+    {
+      "from": "IT",
+      "to": "MD",
+      "affinity": 43,
+      "televoteResidual": 3.465,
+      "juryResidual": 1.316,
+      "totalResidual": 7.321,
+      "n": 9,
+      "t": 3.21
+    },
+    {
+      "from": "SE",
+      "to": "DK",
+      "affinity": 43,
+      "televoteResidual": 3.44,
+      "juryResidual": 0.637,
+      "totalResidual": 4.212,
+      "n": 6,
+      "t": 2.18
+    },
+    {
+      "from": "SM",
+      "to": "CY",
+      "affinity": 43,
+      "televoteResidual": 3.439,
+      "juryResidual": 1.225,
+      "totalResidual": 4.029,
+      "n": 10,
+      "t": 3.06
+    },
+    {
+      "from": "BG",
+      "to": "RS",
+      "affinity": 43,
+      "televoteResidual": 3.405,
+      "juryResidual": 0.714,
+      "totalResidual": 3.505,
+      "n": 7,
+      "t": 3.13
+    },
+    {
+      "from": "AT",
+      "to": "HR",
+      "affinity": 42,
+      "televoteResidual": 3.389,
+      "juryResidual": 1.65,
+      "totalResidual": 7.842,
+      "n": 9,
+      "t": 3.7
+    },
+    {
+      "from": "FI",
+      "to": "IS",
+      "affinity": 42,
+      "televoteResidual": 3.372,
+      "juryResidual": 1.002,
+      "totalResidual": 5.623,
+      "n": 9,
+      "t": 3.51
+    },
+    {
+      "from": "MT",
+      "to": "SM",
+      "affinity": 40,
+      "televoteResidual": 3.233,
+      "juryResidual": 1.171,
+      "totalResidual": 3.676,
+      "n": 7,
+      "t": 2.09
+    },
+    {
+      "from": "GB",
+      "to": "LV",
+      "affinity": 40,
+      "televoteResidual": 3.223,
+      "juryResidual": 2.557,
+      "totalResidual": 4.41,
+      "n": 7,
+      "t": 4.83
+    },
+    {
+      "from": "SE",
+      "to": "NO",
+      "affinity": 39,
+      "televoteResidual": 3.142,
+      "juryResidual": 2.987,
+      "totalResidual": 6.297,
+      "n": 11,
+      "t": 2.92
+    },
+    {
+      "from": "HR",
+      "to": "AL",
+      "affinity": 39,
+      "televoteResidual": 3.112,
+      "juryResidual": -0.231,
+      "totalResidual": 4.652,
+      "n": 8,
+      "t": 4.44
+    },
+    {
+      "from": "NO",
+      "to": "PL",
+      "affinity": 38,
+      "televoteResidual": 3.021,
+      "juryResidual": 0.529,
+      "totalResidual": 4.337,
+      "n": 7,
+      "t": 10.28
+    },
+    {
+      "from": "PT",
+      "to": "MD",
+      "affinity": 37,
+      "televoteResidual": 2.987,
+      "juryResidual": -0.061,
+      "totalResidual": 6.462,
+      "n": 8,
+      "t": 2.5
+    },
+    {
+      "from": "NO",
+      "to": "DK",
+      "affinity": 37,
+      "televoteResidual": 2.98,
+      "juryResidual": 2.257,
+      "totalResidual": 5.598,
+      "n": 9,
+      "t": 3.39
+    },
+    {
+      "from": "SI",
+      "to": "IT",
+      "affinity": 35,
+      "televoteResidual": 2.832,
+      "juryResidual": 2.163,
+      "totalResidual": 6.934,
+      "n": 9,
+      "t": 2.1
+    },
+    {
+      "from": "IS",
+      "to": "NO",
+      "affinity": 35,
+      "televoteResidual": 2.797,
+      "juryResidual": 2.703,
+      "totalResidual": 5.935,
+      "n": 9,
+      "t": 2.8
+    },
+    {
+      "from": "NL",
+      "to": "PL",
+      "affinity": 35,
+      "televoteResidual": 2.791,
+      "juryResidual": 0.505,
+      "totalResidual": 4.401,
+      "n": 6,
+      "t": 2.7
+    },
+    {
+      "from": "MK",
+      "to": "BG",
+      "affinity": 34,
+      "televoteResidual": 2.725,
+      "juryResidual": 0.981,
+      "totalResidual": 7.199,
+      "n": 7,
+      "t": 2.56
+    },
+    {
+      "from": "SE",
+      "to": "BE",
+      "affinity": 34,
+      "televoteResidual": 2.697,
+      "juryResidual": -1.706,
+      "totalResidual": 2.081,
+      "n": 8,
+      "t": 2.87
+    },
+    {
+      "from": "GE",
+      "to": "LV",
+      "affinity": 33,
+      "televoteResidual": 2.668,
+      "juryResidual": 4.025,
+      "totalResidual": 5.187,
+      "n": 7,
+      "t": 2.64
+    },
+    {
+      "from": "FR",
+      "to": "MD",
+      "affinity": 32,
+      "televoteResidual": 2.6,
+      "juryResidual": -0.934,
+      "totalResidual": 3.229,
+      "n": 9,
+      "t": 2.39
+    },
+    {
+      "from": "CH",
+      "to": "HR",
+      "affinity": 32,
+      "televoteResidual": 2.577,
+      "juryResidual": -0.635,
+      "totalResidual": 3.98,
+      "n": 8,
+      "t": 2.48
+    },
+    {
+      "from": "AL",
+      "to": "HR",
+      "affinity": 32,
+      "televoteResidual": 2.55,
+      "juryResidual": -0.607,
+      "totalResidual": 3.337,
+      "n": 7,
+      "t": 2.85
+    },
+    {
+      "from": "AZ",
+      "to": "RU",
+      "affinity": 32,
+      "televoteResidual": 2.539,
+      "juryResidual": 6.973,
+      "totalResidual": 7.73,
+      "n": 6,
+      "t": 3.02
+    },
+    {
+      "from": "HR",
+      "to": "IT",
+      "affinity": 31,
+      "televoteResidual": 2.507,
+      "juryResidual": 1.932,
+      "totalResidual": 6.985,
+      "n": 9,
+      "t": 3.48
+    },
+    {
+      "from": "IS",
+      "to": "NL",
+      "affinity": 31,
+      "televoteResidual": 2.47,
+      "juryResidual": 1.076,
+      "totalResidual": 5.229,
+      "n": 9,
+      "t": 2.03
+    },
+    {
+      "from": "RS",
+      "to": "GR",
+      "affinity": 31,
+      "televoteResidual": 2.462,
+      "juryResidual": 0.122,
+      "totalResidual": 3.079,
+      "n": 8,
+      "t": 2.69
+    },
+    {
+      "from": "IL",
+      "to": "AM",
+      "affinity": 30,
+      "televoteResidual": 2.436,
+      "juryResidual": 1.131,
+      "totalResidual": 4.063,
+      "n": 7,
+      "t": 2.97
+    },
+    {
+      "from": "BE",
+      "to": "AM",
+      "affinity": 30,
+      "televoteResidual": 2.411,
+      "juryResidual": -0.496,
+      "totalResidual": 2.626,
+      "n": 8,
+      "t": 2.87
+    },
+    {
+      "from": "SI",
+      "to": "AL",
+      "affinity": 30,
+      "televoteResidual": 2.392,
+      "juryResidual": 0,
+      "totalResidual": 3.038,
+      "n": 8,
+      "t": 2.81
+    },
+    {
+      "from": "ES",
+      "to": "PT",
+      "affinity": 29,
+      "televoteResidual": 2.327,
+      "juryResidual": 0.003,
+      "totalResidual": 6.174,
+      "n": 10,
+      "t": 2.24
+    },
+    {
+      "from": "PT",
+      "to": "FR",
+      "affinity": 29,
+      "televoteResidual": 2.304,
+      "juryResidual": -2.737,
+      "totalResidual": 2.069,
+      "n": 8,
+      "t": 3.6
+    },
+    {
+      "from": "CZ",
+      "to": "AM",
+      "affinity": 28,
+      "televoteResidual": 2.272,
+      "juryResidual": 0.884,
+      "totalResidual": 3.877,
+      "n": 9,
+      "t": 3.08
+    },
+    {
+      "from": "ME",
+      "to": "AZ",
+      "affinity": 28,
+      "televoteResidual": 2.262,
+      "juryResidual": -0.906,
+      "totalResidual": 2.906,
+      "n": 7,
+      "t": 2.28
+    },
+    {
+      "from": "GR",
+      "to": "FR",
+      "affinity": 27,
+      "televoteResidual": 2.18,
+      "juryResidual": -0.355,
+      "totalResidual": 4.059,
+      "n": 9,
+      "t": 3.98
+    },
+    {
+      "from": "GE",
+      "to": "UA",
+      "affinity": 27,
+      "televoteResidual": 2.177,
+      "juryResidual": 2.159,
+      "totalResidual": 6.805,
+      "n": 10,
+      "t": 2.42
+    },
+    {
+      "from": "CY",
+      "to": "AM",
+      "affinity": 27,
+      "televoteResidual": 2.168,
+      "juryResidual": 1.108,
+      "totalResidual": 3.977,
+      "n": 9,
+      "t": 4.7
+    },
+    {
+      "from": "GR",
+      "to": "AM",
+      "affinity": 27,
+      "televoteResidual": 2.147,
+      "juryResidual": 2.397,
+      "totalResidual": 4.404,
+      "n": 10,
+      "t": 4.7
+    },
+    {
+      "from": "SE",
+      "to": "LT",
+      "affinity": 27,
+      "televoteResidual": 2.143,
+      "juryResidual": 0.388,
+      "totalResidual": 1.321,
+      "n": 9,
+      "t": 3.63
+    },
+    {
+      "from": "CH",
+      "to": "DE",
+      "affinity": 27,
+      "televoteResidual": 2.142,
+      "juryResidual": 0.614,
+      "totalResidual": 3.376,
+      "n": 9,
+      "t": 2.86
+    },
+    {
+      "from": "IE",
+      "to": "RO",
+      "affinity": 27,
+      "televoteResidual": 2.121,
+      "juryResidual": 1.379,
+      "totalResidual": 2.294,
+      "n": 6,
+      "t": 2.55
+    },
+    {
+      "from": "PT",
+      "to": "UA",
+      "affinity": 26,
+      "televoteResidual": 2.119,
+      "juryResidual": 1.111,
+      "totalResidual": 4.947,
+      "n": 8,
+      "t": 2.78
+    },
+    {
+      "from": "LV",
+      "to": "GE",
+      "affinity": 26,
+      "televoteResidual": 2.075,
+      "juryResidual": 0.126,
+      "totalResidual": 1.585,
+      "n": 6,
+      "t": 2.52
+    },
+    {
+      "from": "EE",
+      "to": "DK",
+      "affinity": 26,
+      "televoteResidual": 2.069,
+      "juryResidual": 1.309,
+      "totalResidual": 2.736,
+      "n": 6,
+      "t": 2.05
+    },
+    {
+      "from": "AT",
+      "to": "CH",
+      "affinity": 26,
+      "televoteResidual": 2.054,
+      "juryResidual": -0.276,
+      "totalResidual": 4.495,
+      "n": 11,
+      "t": 2.94
+    },
+    {
+      "from": "AZ",
+      "to": "MT",
+      "affinity": 25,
+      "televoteResidual": 2.03,
+      "juryResidual": 0.284,
+      "totalResidual": 4.832,
+      "n": 8,
+      "t": 2.04
+    },
+    {
+      "from": "IS",
+      "to": "FI",
+      "affinity": 24,
+      "televoteResidual": 1.942,
+      "juryResidual": 1.311,
+      "totalResidual": 5.558,
+      "n": 11,
+      "t": 2.91
+    },
+    {
+      "from": "MT",
+      "to": "AU",
+      "affinity": 23,
+      "televoteResidual": 1.879,
+      "juryResidual": -2.099,
+      "totalResidual": 3.228,
+      "n": 9,
+      "t": 2.09
+    },
+    {
+      "from": "MD",
+      "to": "UA",
+      "affinity": 23,
+      "televoteResidual": 1.868,
+      "juryResidual": 3.794,
+      "totalResidual": 7.221,
+      "n": 9,
+      "t": 2.24
+    },
+    {
+      "from": "MT",
+      "to": "GB",
+      "affinity": 23,
+      "televoteResidual": 1.865,
+      "juryResidual": 0.22,
+      "totalResidual": 3.28,
+      "n": 9,
+      "t": 2.28
+    },
+    {
+      "from": "CH",
+      "to": "AT",
+      "affinity": 23,
+      "televoteResidual": 1.861,
+      "juryResidual": -0.289,
+      "totalResidual": 3.527,
+      "n": 11,
+      "t": 2.36
+    },
+    {
+      "from": "EE",
+      "to": "SE",
+      "affinity": 23,
+      "televoteResidual": 1.861,
+      "juryResidual": 1.368,
+      "totalResidual": 5.407,
+      "n": 10,
+      "t": 2.79
+    },
+    {
+      "from": "ES",
+      "to": "FR",
+      "affinity": 23,
+      "televoteResidual": 1.859,
+      "juryResidual": 0.646,
+      "totalResidual": 4.343,
+      "n": 9,
+      "t": 2.06
+    },
+    {
+      "from": "IL",
+      "to": "BY",
+      "affinity": 23,
+      "televoteResidual": 1.842,
+      "juryResidual": -0.156,
+      "totalResidual": 2.618,
+      "n": 6,
+      "t": 2.76
+    },
+    {
+      "from": "IS",
+      "to": "BE",
+      "affinity": 22,
+      "televoteResidual": 1.783,
+      "juryResidual": 0.129,
+      "totalResidual": 2.514,
+      "n": 8,
+      "t": 2.13
+    },
+    {
+      "from": "EE",
+      "to": "BE",
+      "affinity": 22,
+      "televoteResidual": 1.761,
+      "juryResidual": -0.8,
+      "totalResidual": 1.7,
+      "n": 8,
+      "t": 2.27
+    },
+    {
+      "from": "PL",
+      "to": "SI",
+      "affinity": 22,
+      "televoteResidual": 1.73,
+      "juryResidual": 2.474,
+      "totalResidual": 3.099,
+      "n": 8,
+      "t": 3.06
+    },
+    {
+      "from": "CY",
+      "to": "FR",
+      "affinity": 21,
+      "televoteResidual": 1.698,
+      "juryResidual": 0.351,
+      "totalResidual": 3.958,
+      "n": 9,
+      "t": 3.46
+    },
+    {
+      "from": "FR",
+      "to": "BE",
+      "affinity": 21,
+      "televoteResidual": 1.68,
+      "juryResidual": 0.277,
+      "totalResidual": 3.054,
+      "n": 6,
+      "t": 2.31
+    },
+    {
+      "from": "GR",
+      "to": "BG",
+      "affinity": 20,
+      "televoteResidual": 1.6,
+      "juryResidual": -0.476,
+      "totalResidual": 5.469,
+      "n": 7,
+      "t": 2.3
+    },
+    {
+      "from": "RO",
+      "to": "AZ",
+      "affinity": 20,
+      "televoteResidual": 1.561,
+      "juryResidual": 0.137,
+      "totalResidual": 1.542,
+      "n": 7,
+      "t": 2.16
+    },
+    {
+      "from": "FR",
+      "to": "RS",
+      "affinity": 19,
+      "televoteResidual": 1.518,
+      "juryResidual": 0.069,
+      "totalResidual": 2.349,
+      "n": 11,
+      "t": 2.14
+    },
+    {
+      "from": "PL",
+      "to": "LV",
+      "affinity": 19,
+      "televoteResidual": 1.514,
+      "juryResidual": 0.703,
+      "totalResidual": 2.774,
+      "n": 7,
+      "t": 2.16
+    },
+    {
+      "from": "GB",
+      "to": "IS",
+      "affinity": 19,
+      "televoteResidual": 1.491,
+      "juryResidual": 1.121,
+      "totalResidual": 2.949,
+      "n": 7,
+      "t": 2.49
+    },
+    {
+      "from": "FR",
+      "to": "AL",
+      "affinity": 18,
+      "televoteResidual": 1.467,
+      "juryResidual": 1.515,
+      "totalResidual": 2.465,
+      "n": 7,
+      "t": 2.22
+    },
+    {
+      "from": "NL",
+      "to": "DK",
+      "affinity": 18,
+      "televoteResidual": 1.432,
+      "juryResidual": 2.195,
+      "totalResidual": 2.683,
+      "n": 8,
+      "t": 2.13
+    },
+    {
+      "from": "IT",
+      "to": "UA",
+      "affinity": 17,
+      "televoteResidual": 1.381,
+      "juryResidual": -0.941,
+      "totalResidual": 4.466,
+      "n": 12,
+      "t": 2.64
+    },
+    {
+      "from": "IL",
+      "to": "CZ",
+      "affinity": 17,
+      "televoteResidual": 1.345,
+      "juryResidual": -0.501,
+      "totalResidual": 3.668,
+      "n": 8,
+      "t": 2.86
+    },
+    {
+      "from": "EE",
+      "to": "NL",
+      "affinity": 17,
+      "televoteResidual": 1.327,
+      "juryResidual": -0.945,
+      "totalResidual": 2.814,
+      "n": 9,
+      "t": 2.14
+    },
+    {
+      "from": "NL",
+      "to": "AM",
+      "affinity": 16,
+      "televoteResidual": 1.264,
+      "juryResidual": -0.063,
+      "totalResidual": 2.851,
+      "n": 9,
+      "t": 2.06
+    },
+    {
+      "from": "IE",
+      "to": "MT",
+      "affinity": 16,
+      "televoteResidual": 1.246,
+      "juryResidual": 1.556,
+      "totalResidual": 3.619,
+      "n": 8,
+      "t": 2.11
+    },
+    {
+      "from": "RO",
+      "to": "FR",
+      "affinity": 15,
+      "televoteResidual": 1.222,
+      "juryResidual": -1.489,
+      "totalResidual": 0.83,
+      "n": 6,
+      "t": 2.71
+    },
+    {
+      "from": "FI",
+      "to": "AT",
+      "affinity": 15,
+      "televoteResidual": 1.202,
+      "juryResidual": 0.092,
+      "totalResidual": 3.286,
+      "n": 9,
+      "t": 2.91
+    },
+    {
+      "from": "IS",
+      "to": "CZ",
+      "affinity": 15,
+      "televoteResidual": 1.191,
+      "juryResidual": 1.763,
+      "totalResidual": 4.788,
+      "n": 10,
+      "t": 2.1
+    },
+    {
+      "from": "AZ",
+      "to": "CH",
+      "affinity": 14,
+      "televoteResidual": 1.156,
+      "juryResidual": -3.229,
+      "totalResidual": 1.591,
+      "n": 8,
+      "t": 2.26
+    },
+    {
+      "from": "FI",
+      "to": "NO",
+      "affinity": 14,
+      "televoteResidual": 1.151,
+      "juryResidual": 0.461,
+      "totalResidual": 3.411,
+      "n": 8,
+      "t": 2
+    },
+    {
+      "from": "SI",
+      "to": "AT",
+      "affinity": 14,
+      "televoteResidual": 1.144,
+      "juryResidual": -0.747,
+      "totalResidual": 2.46,
+      "n": 7,
+      "t": 2.2
+    },
+    {
+      "from": "IT",
+      "to": "RS",
+      "affinity": 14,
+      "televoteResidual": 1.088,
+      "juryResidual": 0.812,
+      "totalResidual": 2.193,
+      "n": 9,
+      "t": 2.09
+    },
+    {
+      "from": "IL",
+      "to": "AZ",
+      "affinity": 13,
+      "televoteResidual": 1.079,
+      "juryResidual": 0.344,
+      "totalResidual": 1.495,
+      "n": 8,
+      "t": 2.06
+    },
+    {
+      "from": "SE",
+      "to": "AU",
+      "affinity": 12,
+      "televoteResidual": 0.973,
+      "juryResidual": 1.466,
+      "totalResidual": 6.042,
+      "n": 10,
+      "t": 2.14
+    },
+    {
+      "from": "AM",
+      "to": "CH",
+      "affinity": 12,
+      "televoteResidual": 0.958,
+      "juryResidual": -0.688,
+      "totalResidual": 2.644,
+      "n": 8,
+      "t": 2.86
+    },
+    {
+      "from": "IL",
+      "to": "AT",
+      "affinity": 12,
+      "televoteResidual": 0.943,
+      "juryResidual": 0.816,
+      "totalResidual": 3.206,
+      "n": 8,
+      "t": 2.14
+    },
+    {
+      "from": "RS",
+      "to": "FR",
+      "affinity": 12,
+      "televoteResidual": 0.94,
+      "juryResidual": 0.266,
+      "totalResidual": 3.422,
+      "n": 9,
+      "t": 2.09
+    },
+    {
+      "from": "NL",
+      "to": "IS",
+      "affinity": 12,
+      "televoteResidual": 0.929,
+      "juryResidual": 0.862,
+      "totalResidual": 2.475,
+      "n": 6,
+      "t": 2.04
+    },
+    {
+      "from": "BE",
+      "to": "MT",
+      "affinity": 11,
+      "televoteResidual": 0.917,
+      "juryResidual": -1.969,
+      "totalResidual": 0.683,
+      "n": 6,
+      "t": 2.25
+    },
+    {
+      "from": "ES",
+      "to": "AM",
+      "affinity": 11,
+      "televoteResidual": 0.885,
+      "juryResidual": 1.039,
+      "totalResidual": 2.209,
+      "n": 9,
+      "t": 2.73
+    },
+    {
+      "from": "BE",
+      "to": "AL",
+      "affinity": 11,
+      "televoteResidual": 0.858,
+      "juryResidual": -0.74,
+      "totalResidual": 2.115,
+      "n": 8,
+      "t": 2.13
+    },
+    {
+      "from": "IS",
+      "to": "DE",
+      "affinity": 9,
+      "televoteResidual": 0.699,
+      "juryResidual": 0.169,
+      "totalResidual": 0.67,
+      "n": 9,
+      "t": 2.07
+    },
+    {
+      "from": "ES",
+      "to": "IL",
+      "affinity": 7,
+      "televoteResidual": 0.585,
+      "juryResidual": 0.345,
+      "totalResidual": 2.747,
+      "n": 10,
+      "t": 2.11
+    },
+    {
+      "from": "HR",
+      "to": "BE",
+      "affinity": -7,
+      "televoteResidual": -0.565,
+      "juryResidual": -1.923,
+      "totalResidual": -0.85,
+      "n": 7,
+      "t": -2.12
+    },
+    {
+      "from": "AT",
+      "to": "FR",
+      "affinity": -8,
+      "televoteResidual": -0.603,
+      "juryResidual": -1.474,
+      "totalResidual": 1.14,
+      "n": 9,
+      "t": -2.3
+    },
+    {
+      "from": "AU",
+      "to": "AL",
+      "affinity": -8,
+      "televoteResidual": -0.62,
+      "juryResidual": -0.521,
+      "totalResidual": 0.384,
+      "n": 7,
+      "t": -2.01
+    },
+    {
+      "from": "BE",
+      "to": "FI",
+      "affinity": -9,
+      "televoteResidual": -0.696,
+      "juryResidual": 1.512,
+      "totalResidual": 2.095,
+      "n": 10,
+      "t": -2.46
+    },
+    {
+      "from": "IE",
+      "to": "NO",
+      "affinity": -9,
+      "televoteResidual": -0.702,
+      "juryResidual": 1.495,
+      "totalResidual": 1.699,
+      "n": 12,
+      "t": -2.31
+    },
+    {
+      "from": "NL",
+      "to": "LT",
+      "affinity": -9,
+      "televoteResidual": -0.704,
+      "juryResidual": 1.465,
+      "totalResidual": 1.028,
+      "n": 11,
+      "t": -2.35
+    },
+    {
+      "from": "IE",
+      "to": "FR",
+      "affinity": -10,
+      "televoteResidual": -0.77,
+      "juryResidual": -0.403,
+      "totalResidual": 1.525,
+      "n": 9,
+      "t": -2.14
+    },
+    {
+      "from": "CY",
+      "to": "EE",
+      "affinity": -11,
+      "televoteResidual": -0.846,
+      "juryResidual": -2.041,
+      "totalResidual": -0.421,
+      "n": 10,
+      "t": -2.18
+    },
+    {
+      "from": "PT",
+      "to": "RS",
+      "affinity": -11,
+      "televoteResidual": -0.877,
+      "juryResidual": 1.102,
+      "totalResidual": -0.288,
+      "n": 8,
+      "t": -2.22
+    },
+    {
+      "from": "DE",
+      "to": "NO",
+      "affinity": -11,
+      "televoteResidual": -0.881,
+      "juryResidual": 2.007,
+      "totalResidual": 1.591,
+      "n": 13,
+      "t": -2.08
+    },
+    {
+      "from": "GR",
+      "to": "PT",
+      "affinity": -11,
+      "televoteResidual": -0.89,
+      "juryResidual": -0.577,
+      "totalResidual": 1.458,
+      "n": 11,
+      "t": -2.2
+    },
+    {
+      "from": "BE",
+      "to": "BG",
+      "affinity": -11,
+      "televoteResidual": -0.903,
+      "juryResidual": -0.442,
+      "totalResidual": 2.415,
+      "n": 6,
+      "t": -2
+    },
+    {
+      "from": "IL",
+      "to": "RS",
+      "affinity": -11,
+      "televoteResidual": -0.904,
+      "juryResidual": -0.887,
+      "totalResidual": -1.113,
+      "n": 11,
+      "t": -2.24
+    },
+    {
+      "from": "SM",
+      "to": "FI",
+      "affinity": -12,
+      "televoteResidual": -0.936,
+      "juryResidual": -0.448,
+      "totalResidual": 1.36,
+      "n": 10,
+      "t": -2.57
+    },
+    {
+      "from": "CZ",
+      "to": "CY",
+      "affinity": -12,
+      "televoteResidual": -0.95,
+      "juryResidual": -0.82,
+      "totalResidual": 0.11,
+      "n": 12,
+      "t": -2.35
+    },
+    {
+      "from": "FI",
+      "to": "HR",
+      "affinity": -12,
+      "televoteResidual": -0.951,
+      "juryResidual": 0.707,
+      "totalResidual": 2.205,
+      "n": 6,
+      "t": -2.26
+    },
+    {
+      "from": "SI",
+      "to": "FI",
+      "affinity": -12,
+      "televoteResidual": -0.964,
+      "juryResidual": -0.295,
+      "totalResidual": 0.059,
+      "n": 8,
+      "t": -2.16
+    },
+    {
+      "from": "DE",
+      "to": "CY",
+      "affinity": -13,
+      "televoteResidual": -1.002,
+      "juryResidual": 0.387,
+      "totalResidual": 0.3,
+      "n": 9,
+      "t": -2.17
+    },
+    {
+      "from": "ES",
+      "to": "GR",
+      "affinity": -13,
+      "televoteResidual": -1.023,
+      "juryResidual": -0.382,
+      "totalResidual": -0.828,
+      "n": 11,
+      "t": -2.72
+    },
+    {
+      "from": "RO",
+      "to": "LT",
+      "affinity": -13,
+      "televoteResidual": -1.027,
+      "juryResidual": 1.42,
+      "totalResidual": 0.14,
+      "n": 7,
+      "t": -2.51
+    },
+    {
+      "from": "ES",
+      "to": "CY",
+      "affinity": -13,
+      "televoteResidual": -1.047,
+      "juryResidual": 1.624,
+      "totalResidual": 1.511,
+      "n": 12,
+      "t": -2.22
+    },
+    {
+      "from": "AM",
+      "to": "SE",
+      "affinity": -13,
+      "televoteResidual": -1.049,
+      "juryResidual": -0.989,
+      "totalResidual": 1.537,
+      "n": 10,
+      "t": -2.09
+    },
+    {
+      "from": "SE",
+      "to": "GR",
+      "affinity": -13,
+      "televoteResidual": -1.049,
+      "juryResidual": -2.183,
+      "totalResidual": -1.687,
+      "n": 8,
+      "t": -2.5
+    },
+    {
+      "from": "AM",
+      "to": "AL",
+      "affinity": -13,
+      "televoteResidual": -1.069,
+      "juryResidual": -0.743,
+      "totalResidual": 0.571,
+      "n": 8,
+      "t": -2.63
+    },
+    {
+      "from": "NO",
+      "to": "RS",
+      "affinity": -13,
+      "televoteResidual": -1.07,
+      "juryResidual": 0.066,
+      "totalResidual": -0.14,
+      "n": 10,
+      "t": -2.34
+    },
+    {
+      "from": "MT",
+      "to": "GR",
+      "affinity": -13,
+      "televoteResidual": -1.074,
+      "juryResidual": 2.051,
+      "totalResidual": 1.089,
+      "n": 7,
+      "t": -2.4
+    },
+    {
+      "from": "FI",
+      "to": "RS",
+      "affinity": -14,
+      "televoteResidual": -1.116,
+      "juryResidual": 1.143,
+      "totalResidual": 0.508,
+      "n": 10,
+      "t": -2.26
+    },
+    {
+      "from": "IL",
+      "to": "LT",
+      "affinity": -14,
+      "televoteResidual": -1.155,
+      "juryResidual": 1.489,
+      "totalResidual": 0.351,
+      "n": 11,
+      "t": -3.43
+    },
+    {
+      "from": "IT",
+      "to": "AZ",
+      "affinity": -15,
+      "televoteResidual": -1.167,
+      "juryResidual": 1.675,
+      "totalResidual": 0.407,
+      "n": 8,
+      "t": -2.21
+    },
+    {
+      "from": "BE",
+      "to": "CY",
+      "affinity": -15,
+      "televoteResidual": -1.169,
+      "juryResidual": -0.023,
+      "totalResidual": 0.504,
+      "n": 12,
+      "t": -2.69
+    },
+    {
+      "from": "LT",
+      "to": "HR",
+      "affinity": -15,
+      "televoteResidual": -1.17,
+      "juryResidual": -0.06,
+      "totalResidual": 1.101,
+      "n": 9,
+      "t": -2.57
+    },
+    {
+      "from": "NL",
+      "to": "MD",
+      "affinity": -15,
+      "televoteResidual": -1.204,
+      "juryResidual": -0.217,
+      "totalResidual": 0.336,
+      "n": 9,
+      "t": -2.66
+    },
+    {
+      "from": "GR",
+      "to": "FI",
+      "affinity": -15,
+      "televoteResidual": -1.211,
+      "juryResidual": -1.427,
+      "totalResidual": -0.556,
+      "n": 11,
+      "t": -3.09
+    },
+    {
+      "from": "IT",
+      "to": "LT",
+      "affinity": -15,
+      "televoteResidual": -1.222,
+      "juryResidual": 1.489,
+      "totalResidual": 1.7,
+      "n": 11,
+      "t": -2.06
+    },
+    {
+      "from": "AT",
+      "to": "LT",
+      "affinity": -15,
+      "televoteResidual": -1.225,
+      "juryResidual": 0.686,
+      "totalResidual": -0.25,
+      "n": 11,
+      "t": -3.1
+    },
+    {
+      "from": "AT",
+      "to": "EE",
+      "affinity": -15,
+      "televoteResidual": -1.233,
+      "juryResidual": -0.961,
+      "totalResidual": 0.08,
+      "n": 10,
+      "t": -2.38
+    },
+    {
+      "from": "AZ",
+      "to": "HR",
+      "affinity": -15,
+      "televoteResidual": -1.238,
+      "juryResidual": -0.281,
+      "totalResidual": 1.12,
+      "n": 8,
+      "t": -2.07
+    },
+    {
+      "from": "PT",
+      "to": "IS",
+      "affinity": -16,
+      "televoteResidual": -1.247,
+      "juryResidual": 1.61,
+      "totalResidual": 1.741,
+      "n": 9,
+      "t": -2.48
+    },
+    {
+      "from": "PL",
+      "to": "RS",
+      "affinity": -16,
+      "televoteResidual": -1.253,
+      "juryResidual": 0.36,
+      "totalResidual": 0.317,
+      "n": 12,
+      "t": -2.89
+    },
+    {
+      "from": "GB",
+      "to": "FR",
+      "affinity": -16,
+      "televoteResidual": -1.272,
+      "juryResidual": -2.3,
+      "totalResidual": -0.084,
+      "n": 9,
+      "t": -2.11
+    },
+    {
+      "from": "SE",
+      "to": "CY",
+      "affinity": -16,
+      "televoteResidual": -1.301,
+      "juryResidual": 1.906,
+      "totalResidual": 1.619,
+      "n": 11,
+      "t": -2.34
+    },
+    {
+      "from": "IE",
+      "to": "BG",
+      "affinity": -16,
+      "televoteResidual": -1.317,
+      "juryResidual": 2.237,
+      "totalResidual": 4.257,
+      "n": 7,
+      "t": -2.53
+    },
+    {
+      "from": "IE",
+      "to": "IL",
+      "affinity": -17,
+      "televoteResidual": -1.325,
+      "juryResidual": 0.254,
+      "totalResidual": 1.147,
+      "n": 13,
+      "t": -2.34
+    },
+    {
+      "from": "CZ",
+      "to": "FR",
+      "affinity": -17,
+      "televoteResidual": -1.33,
+      "juryResidual": -1.146,
+      "totalResidual": 0.663,
+      "n": 9,
+      "t": -2.02
+    },
+    {
+      "from": "FR",
+      "to": "LT",
+      "affinity": -17,
+      "televoteResidual": -1.332,
+      "juryResidual": 0.051,
+      "totalResidual": -0.395,
+      "n": 9,
+      "t": -2.13
+    },
+    {
+      "from": "ME",
+      "to": "FI",
+      "affinity": -17,
+      "televoteResidual": -1.34,
+      "juryResidual": -0.105,
+      "totalResidual": -0.296,
+      "n": 7,
+      "t": -2.08
+    },
+    {
+      "from": "SI",
+      "to": "SE",
+      "affinity": -17,
+      "televoteResidual": -1.349,
+      "juryResidual": -2.635,
+      "totalResidual": 0.245,
+      "n": 12,
+      "t": -2.2
+    },
+    {
+      "from": "AU",
+      "to": "EE",
+      "affinity": -17,
+      "televoteResidual": -1.352,
+      "juryResidual": -0.049,
+      "totalResidual": 0.888,
+      "n": 8,
+      "t": -2.56
+    },
+    {
+      "from": "LV",
+      "to": "RS",
+      "affinity": -17,
+      "televoteResidual": -1.388,
+      "juryResidual": -0.115,
+      "totalResidual": -1.515,
+      "n": 10,
+      "t": -2.5
+    },
+    {
+      "from": "GB",
+      "to": "EE",
+      "affinity": -18,
+      "televoteResidual": -1.41,
+      "juryResidual": 0.828,
+      "totalResidual": 0.787,
+      "n": 9,
+      "t": -2.71
+    },
+    {
+      "from": "AZ",
+      "to": "EE",
+      "affinity": -18,
+      "televoteResidual": -1.414,
+      "juryResidual": -0.321,
+      "totalResidual": 0.413,
+      "n": 9,
+      "t": -2.03
+    },
+    {
+      "from": "AZ",
+      "to": "LT",
+      "affinity": -18,
+      "televoteResidual": -1.418,
+      "juryResidual": 0.155,
+      "totalResidual": -0.365,
+      "n": 10,
+      "t": -2.49
+    },
+    {
+      "from": "GR",
+      "to": "LT",
+      "affinity": -18,
+      "televoteResidual": -1.434,
+      "juryResidual": -0.262,
+      "totalResidual": -1.088,
+      "n": 9,
+      "t": -2.65
+    },
+    {
+      "from": "ES",
+      "to": "EE",
+      "affinity": -18,
+      "televoteResidual": -1.435,
+      "juryResidual": -0.931,
+      "totalResidual": -0.564,
+      "n": 11,
+      "t": -2.63
+    },
+    {
+      "from": "BE",
+      "to": "MD",
+      "affinity": -18,
+      "televoteResidual": -1.436,
+      "juryResidual": -1.166,
+      "totalResidual": 0.014,
+      "n": 6,
+      "t": -3.32
+    },
+    {
+      "from": "SM",
+      "to": "EE",
+      "affinity": -18,
+      "televoteResidual": -1.448,
+      "juryResidual": 0.915,
+      "totalResidual": 1.245,
+      "n": 11,
+      "t": -2.46
+    },
+    {
+      "from": "PL",
+      "to": "BG",
+      "affinity": -18,
+      "televoteResidual": -1.452,
+      "juryResidual": -2.748,
+      "totalResidual": 0.295,
+      "n": 6,
+      "t": -2.39
+    },
+    {
+      "from": "LV",
+      "to": "CH",
+      "affinity": -18,
+      "televoteResidual": -1.458,
+      "juryResidual": -1.024,
+      "totalResidual": 1.771,
+      "n": 10,
+      "t": -2.2
+    },
+    {
+      "from": "CH",
+      "to": "PL",
+      "affinity": -18,
+      "televoteResidual": -1.459,
+      "juryResidual": 0,
+      "totalResidual": 0.876,
+      "n": 7,
+      "t": -3.18
+    },
+    {
+      "from": "DK",
+      "to": "AL",
+      "affinity": -19,
+      "televoteResidual": -1.484,
+      "juryResidual": 1.048,
+      "totalResidual": 0.45,
+      "n": 9,
+      "t": -2.02
+    },
+    {
+      "from": "HR",
+      "to": "MD",
+      "affinity": -19,
+      "televoteResidual": -1.489,
+      "juryResidual": 0.89,
+      "totalResidual": 0.709,
+      "n": 8,
+      "t": -2.96
+    },
+    {
+      "from": "RS",
+      "to": "AU",
+      "affinity": -19,
+      "televoteResidual": -1.492,
+      "juryResidual": -3.375,
+      "totalResidual": -0.481,
+      "n": 10,
+      "t": -2.84
+    },
+    {
+      "from": "HR",
+      "to": "GR",
+      "affinity": -19,
+      "televoteResidual": -1.501,
+      "juryResidual": -0.388,
+      "totalResidual": -0.697,
+      "n": 9,
+      "t": -2.47
+    },
+    {
+      "from": "AZ",
+      "to": "SE",
+      "affinity": -19,
+      "televoteResidual": -1.505,
+      "juryResidual": -3.676,
+      "totalResidual": -1.014,
+      "n": 13,
+      "t": -2.62
+    },
+    {
+      "from": "DK",
+      "to": "GR",
+      "affinity": -19,
+      "televoteResidual": -1.515,
+      "juryResidual": -0.266,
+      "totalResidual": -1.322,
+      "n": 8,
+      "t": -3.19
+    },
+    {
+      "from": "IE",
+      "to": "SE",
+      "affinity": -19,
+      "televoteResidual": -1.517,
+      "juryResidual": 0.107,
+      "totalResidual": 2.16,
+      "n": 12,
+      "t": -2.12
+    },
+    {
+      "from": "CH",
+      "to": "LT",
+      "affinity": -19,
+      "televoteResidual": -1.525,
+      "juryResidual": 2.096,
+      "totalResidual": 0.673,
+      "n": 12,
+      "t": -3.36
+    },
+    {
+      "from": "DE",
+      "to": "MD",
+      "affinity": -19,
+      "televoteResidual": -1.528,
+      "juryResidual": -0.952,
+      "totalResidual": 0.182,
+      "n": 7,
+      "t": -2.3
+    },
+    {
+      "from": "IS",
+      "to": "GR",
+      "affinity": -19,
+      "televoteResidual": -1.558,
+      "juryResidual": -1.678,
+      "totalResidual": -1.545,
+      "n": 12,
+      "t": -4
+    },
+    {
+      "from": "FR",
+      "to": "HU",
+      "affinity": -20,
+      "televoteResidual": -1.566,
+      "juryResidual": 0.996,
+      "totalResidual": 0.016,
+      "n": 7,
+      "t": -2.08
+    },
+    {
+      "from": "FI",
+      "to": "BG",
+      "affinity": -20,
+      "televoteResidual": -1.615,
+      "juryResidual": 2.421,
+      "totalResidual": 3.999,
+      "n": 6,
+      "t": -2.72
+    },
+    {
+      "from": "DK",
+      "to": "HR",
+      "affinity": -20,
+      "televoteResidual": -1.618,
+      "juryResidual": 0.397,
+      "totalResidual": 1.023,
+      "n": 7,
+      "t": -2.03
+    },
+    {
+      "from": "LV",
+      "to": "IL",
+      "affinity": -20,
+      "televoteResidual": -1.635,
+      "juryResidual": -1.324,
+      "totalResidual": -0.514,
+      "n": 9,
+      "t": -2.39
+    },
+    {
+      "from": "GB",
+      "to": "RS",
+      "affinity": -21,
+      "televoteResidual": -1.643,
+      "juryResidual": 0.703,
+      "totalResidual": -1.205,
+      "n": 10,
+      "t": -2.21
+    },
+    {
+      "from": "MD",
+      "to": "FI",
+      "affinity": -21,
+      "televoteResidual": -1.664,
+      "juryResidual": -1.577,
+      "totalResidual": -0.928,
+      "n": 8,
+      "t": -2.4
+    },
+    {
+      "from": "FI",
+      "to": "GR",
+      "affinity": -21,
+      "televoteResidual": -1.664,
+      "juryResidual": -0.026,
+      "totalResidual": -1.546,
+      "n": 11,
+      "t": -4.32
+    },
+    {
+      "from": "GB",
+      "to": "MD",
+      "affinity": -21,
+      "televoteResidual": -1.679,
+      "juryResidual": 0.795,
+      "totalResidual": 1.291,
+      "n": 8,
+      "t": -2.21
+    },
+    {
+      "from": "AM",
+      "to": "FI",
+      "affinity": -21,
+      "televoteResidual": -1.683,
+      "juryResidual": 2.723,
+      "totalResidual": 0.747,
+      "n": 8,
+      "t": -2.12
+    },
+    {
+      "from": "AT",
+      "to": "MD",
+      "affinity": -21,
+      "televoteResidual": -1.691,
+      "juryResidual": -0.774,
+      "totalResidual": 0.633,
+      "n": 9,
+      "t": -3.07
+    },
+    {
+      "from": "DK",
+      "to": "RS",
+      "affinity": -21,
+      "televoteResidual": -1.691,
+      "juryResidual": 0.496,
+      "totalResidual": -1.044,
+      "n": 11,
+      "t": -2.43
+    },
+    {
+      "from": "CH",
+      "to": "FI",
+      "affinity": -21,
+      "televoteResidual": -1.697,
+      "juryResidual": -0.715,
+      "totalResidual": 0.452,
+      "n": 8,
+      "t": -2.2
+    },
+    {
+      "from": "LT",
+      "to": "BG",
+      "affinity": -21,
+      "televoteResidual": -1.702,
+      "juryResidual": -2.42,
+      "totalResidual": -0.022,
+      "n": 8,
+      "t": -2.39
+    },
+    {
+      "from": "MK",
+      "to": "SE",
+      "affinity": -21,
+      "televoteResidual": -1.707,
+      "juryResidual": -4.819,
+      "totalResidual": -1.93,
+      "n": 9,
+      "t": -2.33
+    },
+    {
+      "from": "ES",
+      "to": "MD",
+      "affinity": -21,
+      "televoteResidual": -1.708,
+      "juryResidual": 0.236,
+      "totalResidual": 1.675,
+      "n": 8,
+      "t": -3.37
+    },
+    {
+      "from": "IE",
+      "to": "GR",
+      "affinity": -21,
+      "televoteResidual": -1.709,
+      "juryResidual": -0.997,
+      "totalResidual": -2.197,
+      "n": 7,
+      "t": -2.78
+    },
+    {
+      "from": "LV",
+      "to": "GR",
+      "affinity": -21,
+      "televoteResidual": -1.716,
+      "juryResidual": -1.255,
+      "totalResidual": -2.729,
+      "n": 9,
+      "t": -3.8
+    },
+    {
+      "from": "NO",
+      "to": "AL",
+      "affinity": -21,
+      "televoteResidual": -1.718,
+      "juryResidual": -0.459,
+      "totalResidual": -0.702,
+      "n": 8,
+      "t": -2.15
+    },
+    {
+      "from": "IS",
+      "to": "AM",
+      "affinity": -22,
+      "televoteResidual": -1.722,
+      "juryResidual": -0.213,
+      "totalResidual": -1.582,
+      "n": 10,
+      "t": -2.49
+    },
+    {
+      "from": "LT",
+      "to": "AL",
+      "affinity": -22,
+      "televoteResidual": -1.736,
+      "juryResidual": -1.094,
+      "totalResidual": -1.204,
+      "n": 9,
+      "t": -2.31
+    },
+    {
+      "from": "SM",
+      "to": "SE",
+      "affinity": -22,
+      "televoteResidual": -1.752,
+      "juryResidual": -3.924,
+      "totalResidual": -1.407,
+      "n": 11,
+      "t": -2.59
+    },
+    {
+      "from": "MD",
+      "to": "IT",
+      "affinity": -22,
+      "televoteResidual": -1.786,
+      "juryResidual": -2.017,
+      "totalResidual": 0.236,
+      "n": 8,
+      "t": -3.04
+    },
+    {
+      "from": "LV",
+      "to": "BG",
+      "affinity": -22,
+      "televoteResidual": -1.79,
+      "juryResidual": -1.487,
+      "totalResidual": 0.517,
+      "n": 7,
+      "t": -2.53
+    },
+    {
+      "from": "IS",
+      "to": "RS",
+      "affinity": -22,
+      "televoteResidual": -1.79,
+      "juryResidual": 0.354,
+      "totalResidual": -0.924,
+      "n": 9,
+      "t": -2.34
+    },
+    {
+      "from": "SM",
+      "to": "NO",
+      "affinity": -22,
+      "televoteResidual": -1.792,
+      "juryResidual": 0.658,
+      "totalResidual": 0.469,
+      "n": 10,
+      "t": -2.09
+    },
+    {
+      "from": "PL",
+      "to": "GR",
+      "affinity": -23,
+      "televoteResidual": -1.804,
+      "juryResidual": -0.586,
+      "totalResidual": -1.435,
+      "n": 9,
+      "t": -3.33
+    },
+    {
+      "from": "AM",
+      "to": "HR",
+      "affinity": -23,
+      "televoteResidual": -1.81,
+      "juryResidual": -0.391,
+      "totalResidual": 1.47,
+      "n": 8,
+      "t": -2.14
+    },
+    {
+      "from": "ES",
+      "to": "RS",
+      "affinity": -23,
+      "televoteResidual": -1.814,
+      "juryResidual": 0.89,
+      "totalResidual": -0.492,
+      "n": 10,
+      "t": -2.21
+    },
+    {
+      "from": "EE",
+      "to": "GR",
+      "affinity": -23,
+      "televoteResidual": -1.829,
+      "juryResidual": -1.121,
+      "totalResidual": -2.283,
+      "n": 10,
+      "t": -3.51
+    },
+    {
+      "from": "LT",
+      "to": "GR",
+      "affinity": -23,
+      "televoteResidual": -1.83,
+      "juryResidual": -2.273,
+      "totalResidual": -2.611,
+      "n": 8,
+      "t": -3.55
+    },
+    {
+      "from": "NO",
+      "to": "HR",
+      "affinity": -23,
+      "televoteResidual": -1.853,
+      "juryResidual": -2.306,
+      "totalResidual": 0.027,
+      "n": 8,
+      "t": -2.67
+    },
+    {
+      "from": "DE",
+      "to": "EE",
+      "affinity": -23,
+      "televoteResidual": -1.854,
+      "juryResidual": -0.551,
+      "totalResidual": -0.262,
+      "n": 8,
+      "t": -2.44
+    },
+    {
+      "from": "NL",
+      "to": "AL",
+      "affinity": -23,
+      "televoteResidual": -1.855,
+      "juryResidual": -0.135,
+      "totalResidual": -1.125,
+      "n": 7,
+      "t": -2.04
+    },
+    {
+      "from": "NO",
+      "to": "IL",
+      "affinity": -23,
+      "televoteResidual": -1.857,
+      "juryResidual": 0.775,
+      "totalResidual": 1.765,
+      "n": 11,
+      "t": -2.89
+    },
+    {
+      "from": "MK",
+      "to": "AU",
+      "affinity": -23,
+      "televoteResidual": -1.864,
+      "juryResidual": -0.209,
+      "totalResidual": 1.036,
+      "n": 8,
+      "t": -2.47
+    },
+    {
+      "from": "EE",
+      "to": "HR",
+      "affinity": -23,
+      "televoteResidual": -1.865,
+      "juryResidual": 0.118,
+      "totalResidual": 1.208,
+      "n": 7,
+      "t": -3.62
+    },
+    {
+      "from": "SI",
+      "to": "AM",
+      "affinity": -23,
+      "televoteResidual": -1.87,
+      "juryResidual": 0.91,
+      "totalResidual": -1.122,
+      "n": 8,
+      "t": -2
+    },
+    {
+      "from": "GR",
+      "to": "IL",
+      "affinity": -23,
+      "televoteResidual": -1.871,
+      "juryResidual": -1.09,
+      "totalResidual": 0.019,
+      "n": 9,
+      "t": -2.05
+    },
+    {
+      "from": "ME",
+      "to": "AU",
+      "affinity": -23,
+      "televoteResidual": -1.875,
+      "juryResidual": -3.495,
+      "totalResidual": -1.015,
+      "n": 9,
+      "t": -2.17
+    },
+    {
+      "from": "FI",
+      "to": "MD",
+      "affinity": -23,
+      "televoteResidual": -1.876,
+      "juryResidual": -0.536,
+      "totalResidual": 0.255,
+      "n": 8,
+      "t": -2.58
+    },
+    {
+      "from": "BE",
+      "to": "RS",
+      "affinity": -24,
+      "televoteResidual": -1.884,
+      "juryResidual": 0.196,
+      "totalResidual": -0.853,
+      "n": 10,
+      "t": -2.47
+    },
+    {
+      "from": "MT",
+      "to": "IL",
+      "affinity": -24,
+      "televoteResidual": -1.895,
+      "juryResidual": -0.127,
+      "totalResidual": 1.06,
+      "n": 11,
+      "t": -2.18
+    },
+    {
+      "from": "SM",
+      "to": "HR",
+      "affinity": -24,
+      "televoteResidual": -1.924,
+      "juryResidual": -1.919,
+      "totalResidual": 1.02,
+      "n": 6,
+      "t": -2.23
+    },
+    {
+      "from": "IS",
+      "to": "CY",
+      "affinity": -24,
+      "televoteResidual": -1.935,
+      "juryResidual": -1.048,
+      "totalResidual": -0.049,
+      "n": 11,
+      "t": -2.17
+    },
+    {
+      "from": "DE",
+      "to": "SE",
+      "affinity": -24,
+      "televoteResidual": -1.952,
+      "juryResidual": 0.685,
+      "totalResidual": 1.377,
+      "n": 13,
+      "t": -2.22
+    },
+    {
+      "from": "GE",
+      "to": "IS",
+      "affinity": -24,
+      "televoteResidual": -1.955,
+      "juryResidual": -0.34,
+      "totalResidual": 0.41,
+      "n": 7,
+      "t": -2.2
+    },
+    {
+      "from": "AT",
+      "to": "GR",
+      "affinity": -25,
+      "televoteResidual": -1.968,
+      "juryResidual": -1.717,
+      "totalResidual": -1.572,
+      "n": 10,
+      "t": -3.86
+    },
+    {
+      "from": "RS",
+      "to": "SE",
+      "affinity": -25,
+      "televoteResidual": -1.974,
+      "juryResidual": -1.82,
+      "totalResidual": 0.7,
+      "n": 11,
+      "t": -2.02
+    },
+    {
+      "from": "CY",
+      "to": "FI",
+      "affinity": -25,
+      "televoteResidual": -1.974,
+      "juryResidual": -0.047,
+      "totalResidual": -0.109,
+      "n": 11,
+      "t": -3.33
+    },
+    {
+      "from": "LT",
+      "to": "MD",
+      "affinity": -25,
+      "televoteResidual": -1.987,
+      "juryResidual": -0.67,
+      "totalResidual": 0.506,
+      "n": 7,
+      "t": -3
+    },
+    {
+      "from": "BG",
+      "to": "LT",
+      "affinity": -25,
+      "televoteResidual": -2.008,
+      "juryResidual": 1.932,
+      "totalResidual": 0.808,
+      "n": 8,
+      "t": -3.32
+    },
+    {
+      "from": "FI",
+      "to": "PL",
+      "affinity": -25,
+      "televoteResidual": -2.016,
+      "juryResidual": 0.638,
+      "totalResidual": 0.649,
+      "n": 9,
+      "t": -2.34
+    },
+    {
+      "from": "AT",
+      "to": "UA",
+      "affinity": -25,
+      "televoteResidual": -2.019,
+      "juryResidual": -2.725,
+      "totalResidual": -1.244,
+      "n": 9,
+      "t": -2.85
+    },
+    {
+      "from": "AT",
+      "to": "IL",
+      "affinity": -25,
+      "televoteResidual": -2.025,
+      "juryResidual": -1.699,
+      "totalResidual": -0.146,
+      "n": 10,
+      "t": -2.75
+    },
+    {
+      "from": "SM",
+      "to": "IS",
+      "affinity": -26,
+      "televoteResidual": -2.065,
+      "juryResidual": 0.055,
+      "totalResidual": 0.732,
+      "n": 7,
+      "t": -2.23
+    },
+    {
+      "from": "AM",
+      "to": "MD",
+      "affinity": -27,
+      "televoteResidual": -2.136,
+      "juryResidual": 3.189,
+      "totalResidual": 3.494,
+      "n": 8,
+      "t": -2.61
+    },
+    {
+      "from": "RO",
+      "to": "UA",
+      "affinity": -27,
+      "televoteResidual": -2.144,
+      "juryResidual": 1.453,
+      "totalResidual": 0.787,
+      "n": 7,
+      "t": -4.2
+    },
+    {
+      "from": "GR",
+      "to": "HR",
+      "affinity": -27,
+      "televoteResidual": -2.147,
+      "juryResidual": -0.541,
+      "totalResidual": 0.339,
+      "n": 7,
+      "t": -2.02
+    },
+    {
+      "from": "ES",
+      "to": "HR",
+      "affinity": -27,
+      "televoteResidual": -2.168,
+      "juryResidual": -2.431,
+      "totalResidual": -0.444,
+      "n": 6,
+      "t": -2.7
+    },
+    {
+      "from": "EE",
+      "to": "RS",
+      "affinity": -27,
+      "televoteResidual": -2.176,
+      "juryResidual": 0.289,
+      "totalResidual": -1.968,
+      "n": 11,
+      "t": -2.5
+    },
+    {
+      "from": "MT",
+      "to": "RU",
+      "affinity": -27,
+      "televoteResidual": -2.178,
+      "juryResidual": -1.084,
+      "totalResidual": 0.008,
+      "n": 7,
+      "t": -2.38
+    },
+    {
+      "from": "FI",
+      "to": "UA",
+      "affinity": -27,
+      "televoteResidual": -2.18,
+      "juryResidual": -1.582,
+      "totalResidual": -0.838,
+      "n": 8,
+      "t": -2.12
+    },
+    {
+      "from": "UA",
+      "to": "RS",
+      "affinity": -27,
+      "televoteResidual": -2.19,
+      "juryResidual": -0.356,
+      "totalResidual": -1.724,
+      "n": 9,
+      "t": -2.41
+    },
+    {
+      "from": "LV",
+      "to": "PL",
+      "affinity": -28,
+      "televoteResidual": -2.213,
+      "juryResidual": 0.216,
+      "totalResidual": 0.647,
+      "n": 9,
+      "t": -4.84
+    },
+    {
+      "from": "DK",
+      "to": "UA",
+      "affinity": -28,
+      "televoteResidual": -2.214,
+      "juryResidual": -0.415,
+      "totalResidual": -0.007,
+      "n": 11,
+      "t": -2.09
+    },
+    {
+      "from": "EE",
+      "to": "PL",
+      "affinity": -28,
+      "televoteResidual": -2.216,
+      "juryResidual": 0.36,
+      "totalResidual": 0.359,
+      "n": 8,
+      "t": -2.63
+    },
+    {
+      "from": "AM",
+      "to": "AZ",
+      "affinity": -28,
+      "televoteResidual": -2.218,
+      "juryResidual": -2.978,
+      "totalResidual": -4.36,
+      "n": 8,
+      "t": -2.27
+    },
+    {
+      "from": "CH",
+      "to": "NO",
+      "affinity": -28,
+      "televoteResidual": -2.218,
+      "juryResidual": 1.855,
+      "totalResidual": 0.949,
+      "n": 12,
+      "t": -2.87
+    },
+    {
+      "from": "GR",
+      "to": "SE",
+      "affinity": -28,
+      "televoteResidual": -2.228,
+      "juryResidual": -4.125,
+      "totalResidual": -2.05,
+      "n": 10,
+      "t": -2.93
+    },
+    {
+      "from": "DE",
+      "to": "UA",
+      "affinity": -28,
+      "televoteResidual": -2.264,
+      "juryResidual": 0.152,
+      "totalResidual": 0.182,
+      "n": 11,
+      "t": -3.22
+    },
+    {
+      "from": "CH",
+      "to": "EE",
+      "affinity": -28,
+      "televoteResidual": -2.264,
+      "juryResidual": 2.236,
+      "totalResidual": 0.305,
+      "n": 9,
+      "t": -2.13
+    },
+    {
+      "from": "MK",
+      "to": "LT",
+      "affinity": -28,
+      "televoteResidual": -2.277,
+      "juryResidual": -0.076,
+      "totalResidual": -0.93,
+      "n": 9,
+      "t": -2.94
+    },
+    {
+      "from": "IL",
+      "to": "SE",
+      "affinity": -28,
+      "televoteResidual": -2.279,
+      "juryResidual": -1.389,
+      "totalResidual": 0.898,
+      "n": 11,
+      "t": -2.44
+    },
+    {
+      "from": "RO",
+      "to": "NO",
+      "affinity": -29,
+      "televoteResidual": -2.292,
+      "juryResidual": -1.584,
+      "totalResidual": -0.629,
+      "n": 10,
+      "t": -2.65
+    },
+    {
+      "from": "UA",
+      "to": "BG",
+      "affinity": -29,
+      "televoteResidual": -2.292,
+      "juryResidual": -4.604,
+      "totalResidual": -1.461,
+      "n": 7,
+      "t": -2.07
+    },
+    {
+      "from": "MD",
+      "to": "HR",
+      "affinity": -29,
+      "televoteResidual": -2.3,
+      "juryResidual": 0.076,
+      "totalResidual": 0.598,
+      "n": 7,
+      "t": -2.84
+    },
+    {
+      "from": "HR",
+      "to": "UA",
+      "affinity": -29,
+      "televoteResidual": -2.308,
+      "juryResidual": -0.847,
+      "totalResidual": 0.266,
+      "n": 10,
+      "t": -3.39
+    },
+    {
+      "from": "CY",
+      "to": "SE",
+      "affinity": -29,
+      "televoteResidual": -2.325,
+      "juryResidual": -1.394,
+      "totalResidual": 0.875,
+      "n": 12,
+      "t": -2.53
+    },
+    {
+      "from": "GE",
+      "to": "PL",
+      "affinity": -29,
+      "televoteResidual": -2.335,
+      "juryResidual": 0.636,
+      "totalResidual": 0.936,
+      "n": 11,
+      "t": -5.06
+    },
+    {
+      "from": "IS",
+      "to": "BG",
+      "affinity": -29,
+      "televoteResidual": -2.339,
+      "juryResidual": -2.011,
+      "totalResidual": -0.032,
+      "n": 7,
+      "t": -2.4
+    },
+    {
+      "from": "GE",
+      "to": "IT",
+      "affinity": -29,
+      "televoteResidual": -2.357,
+      "juryResidual": 1.102,
+      "totalResidual": 2.442,
+      "n": 9,
+      "t": -3.25
+    },
+    {
+      "from": "UA",
+      "to": "GR",
+      "affinity": -30,
+      "televoteResidual": -2.368,
+      "juryResidual": -1.238,
+      "totalResidual": -1.882,
+      "n": 6,
+      "t": -3.44
+    },
+    {
+      "from": "IL",
+      "to": "PL",
+      "affinity": -30,
+      "televoteResidual": -2.371,
+      "juryResidual": 2.354,
+      "totalResidual": 2.088,
+      "n": 8,
+      "t": -3.4
+    },
+    {
+      "from": "GR",
+      "to": "IS",
+      "affinity": -30,
+      "televoteResidual": -2.375,
+      "juryResidual": -1.381,
+      "totalResidual": -0.693,
+      "n": 10,
+      "t": -2.84
+    },
+    {
+      "from": "MT",
+      "to": "PL",
+      "affinity": -30,
+      "televoteResidual": -2.377,
+      "juryResidual": 0.918,
+      "totalResidual": 1.137,
+      "n": 7,
+      "t": -2.78
+    },
+    {
+      "from": "NL",
+      "to": "UA",
+      "affinity": -30,
+      "televoteResidual": -2.377,
+      "juryResidual": -1.69,
+      "totalResidual": -0.857,
+      "n": 11,
+      "t": -3.18
+    },
+    {
+      "from": "IS",
+      "to": "MD",
+      "affinity": -30,
+      "televoteResidual": -2.399,
+      "juryResidual": -1.216,
+      "totalResidual": -0.142,
+      "n": 9,
+      "t": -6.53
+    },
+    {
+      "from": "FR",
+      "to": "NO",
+      "affinity": -30,
+      "televoteResidual": -2.403,
+      "juryResidual": -0.634,
+      "totalResidual": -1.442,
+      "n": 11,
+      "t": -3.01
+    },
+    {
+      "from": "PL",
+      "to": "MD",
+      "affinity": -30,
+      "televoteResidual": -2.422,
+      "juryResidual": -0.619,
+      "totalResidual": 0.553,
+      "n": 8,
+      "t": -3.04
+    },
+    {
+      "from": "HU",
+      "to": "AU",
+      "affinity": -30,
+      "televoteResidual": -2.428,
+      "juryResidual": 0.144,
+      "totalResidual": 2.807,
+      "n": 6,
+      "t": -2.97
+    },
+    {
+      "from": "GE",
+      "to": "AU",
+      "affinity": -30,
+      "televoteResidual": -2.438,
+      "juryResidual": -3.632,
+      "totalResidual": -1.705,
+      "n": 11,
+      "t": -2.56
+    },
+    {
+      "from": "SI",
+      "to": "MD",
+      "affinity": -31,
+      "televoteResidual": -2.446,
+      "juryResidual": -0.079,
+      "totalResidual": 0.344,
+      "n": 8,
+      "t": -4.4
+    },
+    {
+      "from": "EE",
+      "to": "BG",
+      "affinity": -31,
+      "televoteResidual": -2.459,
+      "juryResidual": 0.742,
+      "totalResidual": 2.686,
+      "n": 7,
+      "t": -2.99
+    },
+    {
+      "from": "GE",
+      "to": "SE",
+      "affinity": -31,
+      "televoteResidual": -2.462,
+      "juryResidual": -2.261,
+      "totalResidual": -0.248,
+      "n": 12,
+      "t": -2.76
+    },
+    {
+      "from": "MK",
+      "to": "NO",
+      "affinity": -31,
+      "televoteResidual": -2.504,
+      "juryResidual": -0.828,
+      "totalResidual": -0.891,
+      "n": 9,
+      "t": -2.33
+    },
+    {
+      "from": "MD",
+      "to": "IS",
+      "affinity": -32,
+      "televoteResidual": -2.547,
+      "juryResidual": -0.25,
+      "totalResidual": -0.273,
+      "n": 7,
+      "t": -2.91
+    },
+    {
+      "from": "CH",
+      "to": "BG",
+      "affinity": -32,
+      "televoteResidual": -2.569,
+      "juryResidual": -0.481,
+      "totalResidual": 1.318,
+      "n": 9,
+      "t": -3.3
+    },
+    {
+      "from": "FR",
+      "to": "HR",
+      "affinity": -32,
+      "televoteResidual": -2.574,
+      "juryResidual": -1.735,
+      "totalResidual": -0.521,
+      "n": 7,
+      "t": -3.31
+    },
+    {
+      "from": "PL",
+      "to": "IT",
+      "affinity": -32,
+      "televoteResidual": -2.578,
+      "juryResidual": -1.69,
+      "totalResidual": 0.391,
+      "n": 9,
+      "t": -3.52
+    },
+    {
+      "from": "RS",
+      "to": "IL",
+      "affinity": -32,
+      "televoteResidual": -2.583,
+      "juryResidual": 0.417,
+      "totalResidual": 0.337,
+      "n": 11,
+      "t": -2.12
+    },
+    {
+      "from": "PT",
+      "to": "PL",
+      "affinity": -32,
+      "televoteResidual": -2.591,
+      "juryResidual": 0.296,
+      "totalResidual": 0.055,
+      "n": 7,
+      "t": -3.89
+    },
+    {
+      "from": "BE",
+      "to": "HR",
+      "affinity": -32,
+      "televoteResidual": -2.593,
+      "juryResidual": -2.709,
+      "totalResidual": -0.554,
+      "n": 6,
+      "t": -3.89
+    },
+    {
+      "from": "AU",
+      "to": "PL",
+      "affinity": -33,
+      "televoteResidual": -2.61,
+      "juryResidual": 1.881,
+      "totalResidual": 0.955,
+      "n": 10,
+      "t": -2.61
+    },
+    {
+      "from": "CY",
+      "to": "IS",
+      "affinity": -33,
+      "televoteResidual": -2.631,
+      "juryResidual": -0.601,
+      "totalResidual": -0.374,
+      "n": 8,
+      "t": -2.04
+    },
+    {
+      "from": "MK",
+      "to": "RO",
+      "affinity": -33,
+      "televoteResidual": -2.638,
+      "juryResidual": 1.413,
+      "totalResidual": -0.607,
+      "n": 6,
+      "t": -2.25
+    },
+    {
+      "from": "ME",
+      "to": "SE",
+      "affinity": -33,
+      "televoteResidual": -2.667,
+      "juryResidual": -5.044,
+      "totalResidual": -1.926,
+      "n": 9,
+      "t": -3.22
+    },
+    {
+      "from": "SE",
+      "to": "UA",
+      "affinity": -33,
+      "televoteResidual": -2.673,
+      "juryResidual": -0.706,
+      "totalResidual": -1.156,
+      "n": 10,
+      "t": -3.89
+    },
+    {
+      "from": "DK",
+      "to": "MD",
+      "affinity": -33,
+      "televoteResidual": -2.678,
+      "juryResidual": -0.695,
+      "totalResidual": -0.15,
+      "n": 9,
+      "t": -2.9
+    },
+    {
+      "from": "SI",
+      "to": "UA",
+      "affinity": -34,
+      "televoteResidual": -2.682,
+      "juryResidual": -0.819,
+      "totalResidual": -0.157,
+      "n": 12,
+      "t": -4.71
+    },
+    {
+      "from": "IL",
+      "to": "IS",
+      "affinity": -34,
+      "televoteResidual": -2.713,
+      "juryResidual": -1.435,
+      "totalResidual": -0.745,
+      "n": 6,
+      "t": -2.08
+    },
+    {
+      "from": "IS",
+      "to": "IL",
+      "affinity": -34,
+      "televoteResidual": -2.736,
+      "juryResidual": -1.839,
+      "totalResidual": -0.644,
+      "n": 9,
+      "t": -2.49
+    },
+    {
+      "from": "AU",
+      "to": "UA",
+      "affinity": -35,
+      "televoteResidual": -2.791,
+      "juryResidual": -1.631,
+      "totalResidual": 0.689,
+      "n": 11,
+      "t": -3.33
+    },
+    {
+      "from": "FR",
+      "to": "FI",
+      "affinity": -35,
+      "televoteResidual": -2.808,
+      "juryResidual": -0.114,
+      "totalResidual": -0.791,
+      "n": 9,
+      "t": -2.45
+    },
+    {
+      "from": "AM",
+      "to": "UA",
+      "affinity": -35,
+      "televoteResidual": -2.815,
+      "juryResidual": -0.951,
+      "totalResidual": 1.226,
+      "n": 8,
+      "t": -3.19
+    },
+    {
+      "from": "DK",
+      "to": "IL",
+      "affinity": -35,
+      "televoteResidual": -2.816,
+      "juryResidual": -1.519,
+      "totalResidual": -0.566,
+      "n": 10,
+      "t": -2.48
+    },
+    {
+      "from": "GR",
+      "to": "PL",
+      "affinity": -36,
+      "televoteResidual": -2.852,
+      "juryResidual": 1.611,
+      "totalResidual": 1.052,
+      "n": 8,
+      "t": -5.03
+    },
+    {
+      "from": "NO",
+      "to": "IT",
+      "affinity": -36,
+      "televoteResidual": -2.883,
+      "juryResidual": -1.809,
+      "totalResidual": -0.573,
+      "n": 9,
+      "t": -3.44
+    },
+    {
+      "from": "LV",
+      "to": "IT",
+      "affinity": -37,
+      "televoteResidual": -2.939,
+      "juryResidual": -4.325,
+      "totalResidual": -2.185,
+      "n": 9,
+      "t": -3.79
+    },
+    {
+      "from": "AL",
+      "to": "PL",
+      "affinity": -37,
+      "televoteResidual": -2.942,
+      "juryResidual": 0.301,
+      "totalResidual": 0.16,
+      "n": 8,
+      "t": -3.83
+    },
+    {
+      "from": "CY",
+      "to": "HR",
+      "affinity": -37,
+      "televoteResidual": -2.95,
+      "juryResidual": 1.928,
+      "totalResidual": 1.17,
+      "n": 7,
+      "t": -3.06
+    },
+    {
+      "from": "CY",
+      "to": "MD",
+      "affinity": -37,
+      "televoteResidual": -2.972,
+      "juryResidual": 0.368,
+      "totalResidual": 0.175,
+      "n": 7,
+      "t": -2.12
+    },
+    {
+      "from": "IT",
+      "to": "SE",
+      "affinity": -37,
+      "televoteResidual": -2.974,
+      "juryResidual": -4.091,
+      "totalResidual": -2.623,
+      "n": 13,
+      "t": -4.55
+    },
+    {
+      "from": "FI",
+      "to": "IT",
+      "affinity": -37,
+      "televoteResidual": -2.987,
+      "juryResidual": -2.182,
+      "totalResidual": -1.531,
+      "n": 9,
+      "t": -3.47
+    },
+    {
+      "from": "BE",
+      "to": "UA",
+      "affinity": -38,
+      "televoteResidual": -3.025,
+      "juryResidual": -0.378,
+      "totalResidual": -0.55,
+      "n": 10,
+      "t": -3.49
+    },
+    {
+      "from": "SI",
+      "to": "PL",
+      "affinity": -38,
+      "televoteResidual": -3.04,
+      "juryResidual": 1.079,
+      "totalResidual": 0.336,
+      "n": 9,
+      "t": -6.89
+    },
+    {
+      "from": "ME",
+      "to": "PL",
+      "affinity": -38,
+      "televoteResidual": -3.056,
+      "juryResidual": -0.188,
+      "totalResidual": 0.256,
+      "n": 8,
+      "t": -2.85
+    },
+    {
+      "from": "NO",
+      "to": "MD",
+      "affinity": -39,
+      "televoteResidual": -3.104,
+      "juryResidual": 0.75,
+      "totalResidual": 0.294,
+      "n": 8,
+      "t": -4.22
+    },
+    {
+      "from": "IS",
+      "to": "IT",
+      "affinity": -39,
+      "televoteResidual": -3.118,
+      "juryResidual": -2.823,
+      "totalResidual": -2.202,
+      "n": 9,
+      "t": -3.35
+    },
+    {
+      "from": "SE",
+      "to": "MD",
+      "affinity": -40,
+      "televoteResidual": -3.169,
+      "juryResidual": 0.388,
+      "totalResidual": -0.269,
+      "n": 9,
+      "t": -2.76
+    },
+    {
+      "from": "AZ",
+      "to": "PL",
+      "affinity": -40,
+      "televoteResidual": -3.177,
+      "juryResidual": 2.653,
+      "totalResidual": 1.453,
+      "n": 7,
+      "t": -4.47
+    },
+    {
+      "from": "SI",
+      "to": "IL",
+      "affinity": -40,
+      "televoteResidual": -3.188,
+      "juryResidual": -2.495,
+      "totalResidual": -1.326,
+      "n": 10,
+      "t": -2.57
+    },
+    {
+      "from": "IS",
+      "to": "UA",
+      "affinity": -40,
+      "televoteResidual": -3.219,
+      "juryResidual": -0.676,
+      "totalResidual": -0.873,
+      "n": 9,
+      "t": -3.46
+    },
+    {
+      "from": "ME",
+      "to": "MD",
+      "affinity": -40,
+      "televoteResidual": -3.228,
+      "juryResidual": 0.882,
+      "totalResidual": 1.551,
+      "n": 6,
+      "t": -3.85
+    },
+    {
+      "from": "NO",
+      "to": "UA",
+      "affinity": -42,
+      "televoteResidual": -3.375,
+      "juryResidual": -0.947,
+      "totalResidual": -0.98,
+      "n": 12,
+      "t": -4.48
+    },
+    {
+      "from": "FR",
+      "to": "SE",
+      "affinity": -43,
+      "televoteResidual": -3.449,
+      "juryResidual": -3.703,
+      "totalResidual": -1.881,
+      "n": 10,
+      "t": -3.67
+    },
+    {
+      "from": "GB",
+      "to": "UA",
+      "affinity": -43,
+      "televoteResidual": -3.477,
+      "juryResidual": -2.227,
+      "totalResidual": -1.828,
+      "n": 9,
+      "t": -4.26
+    },
+    {
+      "from": "MT",
+      "to": "UA",
+      "affinity": -44,
+      "televoteResidual": -3.554,
+      "juryResidual": -1.973,
+      "totalResidual": -0.718,
+      "n": 10,
+      "t": -2.95
+    },
+    {
+      "from": "SE",
+      "to": "IT",
+      "affinity": -46,
+      "televoteResidual": -3.652,
+      "juryResidual": -1.732,
+      "totalResidual": -1.278,
+      "n": 9,
+      "t": -3.83
+    },
+    {
+      "from": "UA",
+      "to": "IL",
+      "affinity": -46,
+      "televoteResidual": -3.674,
+      "juryResidual": -0.105,
+      "totalResidual": 0.534,
+      "n": 10,
+      "t": -2.42
+    },
+    {
+      "from": "AL",
+      "to": "MD",
+      "affinity": -46,
+      "televoteResidual": -3.718,
+      "juryResidual": 0.051,
+      "totalResidual": -0.402,
+      "n": 9,
+      "t": -2.1
+    },
+    {
+      "from": "DK",
+      "to": "IT",
+      "affinity": -47,
+      "televoteResidual": -3.737,
+      "juryResidual": -4.361,
+      "totalResidual": -3.758,
+      "n": 9,
+      "t": -4.66
+    },
+    {
+      "from": "MT",
+      "to": "MD",
+      "affinity": -47,
+      "televoteResidual": -3.742,
+      "juryResidual": -0.07,
+      "totalResidual": -1.173,
+      "n": 8,
+      "t": -2.89
+    },
+    {
+      "from": "MK",
+      "to": "UA",
+      "affinity": -47,
+      "televoteResidual": -3.794,
+      "juryResidual": -1.681,
+      "totalResidual": -0.909,
+      "n": 7,
+      "t": -3.88
+    },
+    {
+      "from": "CH",
+      "to": "MD",
+      "affinity": -48,
+      "televoteResidual": -3.803,
+      "juryResidual": -0.664,
+      "totalResidual": -0.965,
+      "n": 8,
+      "t": -3.9
+    },
+    {
+      "from": "RS",
+      "to": "PL",
+      "affinity": -48,
+      "televoteResidual": -3.836,
+      "juryResidual": 0.116,
+      "totalResidual": -0.496,
+      "n": 10,
+      "t": -4.73
+    },
+    {
+      "from": "AU",
+      "to": "IT",
+      "affinity": -48,
+      "televoteResidual": -3.879,
+      "juryResidual": -3.397,
+      "totalResidual": -2.7,
+      "n": 9,
+      "t": -4.61
+    },
+    {
+      "from": "SE",
+      "to": "RU",
+      "affinity": -50,
+      "televoteResidual": -3.981,
+      "juryResidual": 0.176,
+      "totalResidual": -1.022,
+      "n": 7,
+      "t": -6.27
+    },
+    {
+      "from": "GR",
+      "to": "UA",
+      "affinity": -51,
+      "televoteResidual": -4.045,
+      "juryResidual": -2.761,
+      "totalResidual": -1.745,
+      "n": 9,
+      "t": -6.25
+    },
+    {
+      "from": "AL",
+      "to": "UA",
+      "affinity": -51,
+      "televoteResidual": -4.079,
+      "juryResidual": -1.599,
+      "totalResidual": -2.062,
+      "n": 10,
+      "t": -5.48
+    },
+    {
+      "from": "NO",
+      "to": "RU",
+      "affinity": -52,
+      "televoteResidual": -4.135,
+      "juryResidual": -2.882,
+      "totalResidual": -2.448,
+      "n": 6,
+      "t": -5.13
+    },
+    {
+      "from": "IE",
+      "to": "IT",
+      "affinity": -52,
+      "televoteResidual": -4.142,
+      "juryResidual": -4.424,
+      "totalResidual": -3.501,
+      "n": 9,
+      "t": -4.73
+    },
+    {
+      "from": "CZ",
+      "to": "IT",
+      "affinity": -52,
+      "televoteResidual": -4.156,
+      "juryResidual": -3.045,
+      "totalResidual": -2.709,
+      "n": 9,
+      "t": -5.32
+    },
+    {
+      "from": "EE",
+      "to": "IL",
+      "affinity": -52,
+      "televoteResidual": -4.174,
+      "juryResidual": -1.999,
+      "totalResidual": -2.449,
+      "n": 11,
+      "t": -3.26
+    },
+    {
+      "from": "LT",
+      "to": "IL",
+      "affinity": -53,
+      "televoteResidual": -4.207,
+      "juryResidual": 0.28,
+      "totalResidual": -0.748,
+      "n": 12,
+      "t": -3.77
+    },
+    {
+      "from": "CH",
+      "to": "UA",
+      "affinity": -53,
+      "televoteResidual": -4.271,
+      "juryResidual": -1.766,
+      "totalResidual": -3.208,
+      "n": 10,
+      "t": -5.39
+    },
+    {
+      "from": "HR",
+      "to": "IL",
+      "affinity": -58,
+      "televoteResidual": -4.675,
+      "juryResidual": 1.614,
+      "totalResidual": 0.135,
+      "n": 11,
+      "t": -3.14
+    },
+    {
+      "from": "RS",
+      "to": "UA",
+      "affinity": -59,
+      "televoteResidual": -4.736,
+      "juryResidual": -0.943,
+      "totalResidual": -1.207,
+      "n": 10,
+      "t": -6.6
+    },
+    {
+      "from": "GB",
+      "to": "IT",
+      "affinity": -61,
+      "televoteResidual": -4.903,
+      "juryResidual": -4.885,
+      "totalResidual": -4.397,
+      "n": 9,
+      "t": -4.66
+    },
+    {
+      "from": "NL",
+      "to": "RU",
+      "affinity": -62,
+      "televoteResidual": -4.94,
+      "juryResidual": 0.159,
+      "totalResidual": -1.916,
+      "n": 7,
+      "t": -3.82
+    }
+  ]
+}

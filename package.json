@@ -21,6 +21,8 @@
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "generate-countries-json": "npx ts-node -P tsconfig.scripts.json scripts/generateCountriesJson.ts",
     "calculate-odds": "npx ts-node -P tsconfig.scripts.json scripts/calculateCountriesOdds.ts",
+    "analyze-history": "npx ts-node --files -P tsconfig.scripts.json scripts/analyzeHistoricalShape.ts",
+    "analyze-sim": "npx ts-node --files -P tsconfig.scripts.json scripts/analyzeSimShape.ts",
     "add-spokesperson-order": "npx ts-node -P tsconfig.scripts.json scripts/addSpokespersonOrder.ts",
     "convert-hex-to-hsl": "npx ts-node -P tsconfig.scripts.json scripts/convertHexToHsl.ts --write"
   },

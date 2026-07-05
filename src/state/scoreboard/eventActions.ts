@@ -71,7 +71,9 @@ export const createEventActions: StateCreator<
     let firstVotingCountryIndex = 0;
 
     if (firstStage) {
-      if (!effectiveEnablePredefined) {
+      // When replaying a saved contest, the loaded predefined votes are
+      // authoritative — never regenerate them.
+      if (!effectiveEnablePredefined && !get().isReplayingSavedVotes) {
         get().predefineVotesForStage(firstStage, true);
       }
       if (firstStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
@@ -320,7 +322,9 @@ export const createEventActions: StateCreator<
     const effectiveEnablePredefined =
       nextStageFull?.overrides?.enablePredefinedVotes ?? enablePredefined;
 
-    if (!effectiveEnablePredefined) {
+    // When replaying a saved contest, the loaded predefined votes for the next
+    // stage are authoritative — never regenerate them.
+    if (!effectiveEnablePredefined && !get().isReplayingSavedVotes) {
       get().predefineVotesForStage(nextStageFull);
     }
 
@@ -376,6 +380,9 @@ export const createEventActions: StateCreator<
     set({
       eventStages: [],
       currentStageId: null,
+      // Leaving the event ends any saved-contest replay; a subsequent fresh
+      // simulation must be free to generate its own votes.
+      isReplayingSavedVotes: false,
       isLastSimulationAnimationFinished: true,
       splitScreenQualifierModalOpen: false,
       splitScreenQualifierCandidates: [],

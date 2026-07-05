@@ -19,7 +19,7 @@ Experience the excitement of Eurovision with DouzePoints, the interactive scoreb
 - **Detailed stats** — full voting breakdown, jury vs. televote split, and summary statistics
 - **Shareable images** — generate and download custom scoreboard and stats PNGs
 - **Global leaderboard** — aggregated country rankings across all completed public contests
-- **8 languages** — English, French, German, Italian, Polish, Ukrainian, Greek, and Spanish
+- **9 languages** — English, French, German, Italian, Polish, Ukrainian, Greek, Portuguese, and Spanish
 - **Responsive** — works on mobile, tablet, and desktop
 
 ## Tech Stack

@@ -22,9 +22,19 @@ const OddsSettings = dynamic(() => import('./OddsSettings'), {
   ),
 });
 
+const RelationsSettings = dynamic(() => import('./RelationsSettings'), {
+  ssr: false,
+  loading: () => (
+    <div className="text-center py-2">
+      <span className="loader" />
+    </div>
+  ),
+});
+
 enum SettingsTab {
   GENERAL = 'General',
   ODDS = 'Odds',
+  RELATIONS = 'Relations',
 }
 
 interface SettingsModalProps {
@@ -44,11 +54,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [activeTab, setActiveTab] = useState(SettingsTab.GENERAL);
 
   const [isOddsLoaded, setIsOddsLoaded] = useState(false);
+  const [isRelationsLoaded, setIsRelationsLoaded] = useState(false);
 
   const tabs = useMemo(
     () => [
       { value: SettingsTab.GENERAL, label: t('general') },
       { value: SettingsTab.ODDS, label: t('odds') },
+      { value: SettingsTab.RELATIONS, label: t('relations') },
     ],
     [t],
   );
@@ -72,8 +84,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </>
         ),
       },
+      {
+        ...tabs[2],
+        content: (
+          <>
+            {(activeTab === SettingsTab.RELATIONS || isRelationsLoaded) && (
+              <RelationsSettings onLoaded={() => setIsRelationsLoaded(true)} />
+            )}
+          </>
+        ),
+      },
     ],
-    [activeTab, isOddsLoaded, participatingCountries, tabs],
+    [activeTab, isOddsLoaded, isRelationsLoaded, participatingCountries, tabs],
   );
 
   useEffectOnce(onLoaded);

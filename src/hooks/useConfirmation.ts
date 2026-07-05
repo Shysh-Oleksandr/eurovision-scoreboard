@@ -54,10 +54,13 @@ const useConfirmationStoreInternal = create<ConfirmationState>((set, get) => ({
         setDontShowAgain(key, true);
       }
 
-      // Execute the action
+      // Execute the action; onConfirm may queue another confirmation
       currentConfirmation.onConfirm();
 
-      get().closeModal();
+      // Only close if a chained confirm() did not replace the current dialog
+      if (get().currentConfirmation === currentConfirmation) {
+        get().closeModal();
+      }
     }
   },
 

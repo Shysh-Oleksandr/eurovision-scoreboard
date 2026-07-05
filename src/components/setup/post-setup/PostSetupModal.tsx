@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -17,6 +17,7 @@ import StageGeneralTab from './StageGeneralTab';
 import { PlayIcon } from '@/assets/icons/PlayIcon';
 import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { useHotKey } from '@/hooks/useHotKey';
 import { EventStage, StageOverrides, StageVotingMode } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
@@ -115,7 +116,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     [t],
   );
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     form.handleSubmit((data) => {
       if (data.votingCountries.length === 0) {
         toast.error('Please add at least one voter');
@@ -180,7 +181,21 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
         onSave();
       }, 300);
     })();
-  };
+  }, [
+    form,
+    onClose,
+    orderedCodes,
+    getOverride,
+    localEnablePredefined,
+    globalEnablePredefined,
+    configuredEventStages,
+    eventStages,
+    setConfiguredEventStages,
+    setEventStages,
+    onSave,
+    stage.id,
+    localVotingMode,
+  ]);
 
   const shareTitleOverride = `${contestName} ${contestYear} - ${stage.name}`;
   const shareSubtitleOverride = t('runningOrder');
@@ -239,6 +254,8 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   };
 
   useEffectOnce(onLoaded);
+
+  useHotKey('s', handleSave);
 
   return (
     <Modal

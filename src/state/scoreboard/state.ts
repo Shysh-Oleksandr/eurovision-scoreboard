@@ -14,6 +14,7 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   showQualificationResults: false,
   restartCounter: 0,
   startCounter: 0,
+  isReplayingSavedVotes: false,
   showAllParticipants: false,
   televotingProgress: 0,
   predefinedVotes: {

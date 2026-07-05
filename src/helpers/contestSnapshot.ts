@@ -775,7 +775,9 @@ export async function applyContestSnapshotToStores(
         oddsRecord[code] = { juryOdds, televoteOdds };
       },
     );
-    useCountriesStore.getState().setBulkCountryOdds(oddsRecord);
+    // Replace (not merge) so odds from a previously loaded contest — e.g. custom
+    // entries no longer present — don't linger and pollute this contest's results.
+    useCountriesStore.getState().setBulkCountryOdds(oddsRecord, true);
   }
 
   // Rebuild eventAssignments + configuredEventStages for setup UI
@@ -1075,6 +1077,10 @@ export async function applyContestSnapshotToStores(
         ? 0
         : snapshot.simulation!.results.currentRevealTelevotePoints ?? 0,
       predefinedVotes: decodedPredefinedVotes,
+      // In presentation mode these loaded votes are replayed as-is across every
+      // stage; flag it so stage transitions don't regenerate them (and so the
+      // predefinition modal prefills from them when the user has it enabled).
+      isReplayingSavedVotes: isPresentationMode,
       countryPoints: countryPoints, // TODO: we used to clear country points for fresh presentation(`isPresentationMode ? {} : countryPoints`), but it caused a bug when presenting a contest with no-points semis, so we keep the country points for now, but needs to check if it doesn't cause any other bugs later
       winnerCountry: isPresentationMode
         ? null
@@ -1099,6 +1105,7 @@ export async function applyContestSnapshotToStores(
       countryPoints: {},
       winnerCountry: null,
       showQualificationResults: false,
+      isReplayingSavedVotes: false,
     } as any);
   }
 

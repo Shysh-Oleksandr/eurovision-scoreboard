@@ -1,5 +1,170 @@
 const OLD_WHATS_NEW = [
   {
+    date: '2026-06-18',
+    title: 'Improved the UI for the themes and contests modals',
+  },
+  {
+    date: '2026-06-14',
+    title: 'Added Portuguese localization',
+  },
+  {
+    date: '2026-06-05',
+    title:
+      'Added the ability to have different points system for each stage. Made the final reveal animation less predictable. The "Allow points to the same entry multiple times" option now also works for televote. Small UI improvements',
+  },
+  {
+    date: '2026-06-05',
+    title:
+      'Added the Pre-1975 points system support. Added the heart flag icons for all world countries. Added a donation option. Bug fixes',
+  },
+  {
+    date: '2026-06-04',
+    title:
+      'Added the winner reveal animation (ESC 2026 style). Added a guidebook for the app. Small improvements',
+  },
+  {
+    date: '2026-05-25',
+    title:
+      'Improved the winner modal UI. Corrected the default semi-final voting mode for each ESC edition',
+  },
+  {
+    date: '2026-05-24',
+    title: 'The ESC 2026 theme. Small UI improvements',
+  },
+  {
+    date: '2026-05-17',
+    title: 'Added the ESC 2026 data',
+  },
+  {
+    date: '2026-05-16',
+    title:
+      "Added the ability to have different points system for jury and televote. Added the country leaderboard based on user's own completed contests. Added more font options. Added a setting to use the same font regardless of the theme. Added a setting to hide voting hints. Small fixes.",
+  },
+  {
+    date: '2026-05-13',
+    title:
+      'Added the option to have rounded country design in custom themes (ESC 2026 style)',
+  },
+  {
+    date: '2026-04-18',
+    title:
+      'Improved the sound effects logic: fixed overlap issue, added an optional delay for each sound. Fixed the issue with disappearing sound and theme background images. Added grouping for themes and contests. Added the interface font selection for custom themes',
+  },
+  {
+    date: '2026-04-14',
+    title: 'Added the option to enable minimalistic round and square flags',
+  },
+  {
+    date: '2026-04-11',
+    title: 'Sound effects support for custom themes',
+  },
+  {
+    date: '2026-04-09',
+    title:
+      'Added the split screen qualifier reveal mode (ESC 2025 format). To use it, enable "Pick qualifiers without awarding points" in the settings and then enable "Enable split screen qualifier reveal mode".',
+  },
+  {
+    date: '2026-04-08',
+    title: 'Added presets for the predefined voting',
+  },
+  {
+    date: '2026-03-29',
+    title:
+      'Added the global country leaderboard and per-user country statistics based on the completed contests',
+  },
+  {
+    date: '2026-03-22',
+    title:
+      'Added the ability to enter the total country points to quickly share the results (requires enabling predefined voting in the settings).',
+  },
+  {
+    date: '2026-03-17',
+    title: 'Added the running order setup. Improved the tie-break logic.',
+  },
+  {
+    date: '2026-03-15',
+    title:
+      'Added the ability to categorize custom entries. Improved round flags and added square flags. Added the new scoreboard and DouzePoints animations (ESC 2025 style). Added a count-up points animation. Small improvements',
+  },
+  {
+    date: '2026-02-22',
+    title:
+      'Added the ability to select multiple entries in a section and move them in bulk',
+  },
+  {
+    date: '2026-02-21',
+    title:
+      'Added the ability to follow other users and see the feed with their activities. The ability to share a profile, theme, or contest by link. Small improvements',
+  },
+  {
+    date: '2026-02-15',
+    title:
+      "Implemented the user profile page, which displays the user's public custom themes, contests, and profile information (click the user's profile picture to access)",
+  },
+  {
+    date: '2026-02-01',
+    title:
+      'Extended the theme customization: options for jury points panel rounding and removing underline. Added venue and hosts fields for custom contests. Added new rounded flags. Added an option to blur modal background. Small improvements',
+  },
+  {
+    date: '2026-01-25',
+    title:
+      'Extended the theme customization: different flag and points container shapes. Option to not use uppercase for entry names. Better hover effect',
+  },
+  {
+    date: '2026-01-18',
+    title:
+      'Extended the theme customization: separate ranking colors for each state, opacity control for background colors, and gradient support for ranking and jury points panel backgrounds',
+  },
+  {
+    date: '2026-01-13',
+    title: 'Added ESC 2026 setup',
+  },
+  {
+    date: '2026-01-10',
+    title:
+      'Added the ability to quick select themes and contests from the dropdowns',
+  },
+  {
+    date: '2026-01-09',
+    title:
+      'Fixed the issue with the image generation when it includes custom entries',
+  },
+  {
+    date: '2026-01-08',
+    title:
+      'Added saving and loading a theme with a contest. Added two-column scoreboard layout on mobile. Improved the long entry names display',
+  },
+  {
+    date: '2026-01-06',
+    title:
+      'Added the ability to load contest parts (general info, setup, simulation) and present the contest simulation with the same results as the original contest.',
+  },
+  {
+    date: '2026-01-03',
+    title:
+      'Added custom confirmation popups for certain actions. Added loading spinner.',
+  },
+  {
+    date: '2026-01-02',
+    title:
+      'Added rank-based qualifier targets. Added saving custom entries from other contests (to do this, load the contest → remove custom entries from participants → open the Imported section → click the "Save to your custom entries" button).',
+  },
+  {
+    date: '2026-01-01',
+    title:
+      'Added reordering all stages during adding/editing a stage. Minor fixes',
+  },
+  {
+    date: '2025-12-31',
+    title:
+      'Contests - saving the simulation setup and results. Public contests browsing and loading.',
+  },
+  {
+    date: '2025-12-24',
+    title: 'Allowed the negative points in the points system',
+  },
+  {
     date: '2025-12-14',
     title: 'Added winter effects. Added JESC 2025 theme',
   },
@@ -244,183 +409,23 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-07-05',
+    title:
+      'Rebuilt the simulation randomization engine. It now uses a new probability model calibrated against 20+ years of real Eurovision results, so simulated scoreboards mirror the real shape of a contest. The Randomness and Points Spread controls were rebuilt so each does one clear job (how unpredictable vs. how spread-out the results are). Implemented the Diaspora & Affinity system that adds directed country-to-country voting bias — neighbours, diaspora, and rivalries — with presets generated from two decades of real voting data. Fixed the issue with displaying incorrect results when loading a saved contest using the presentation mode.',
+  },
+  {
     date: '2026-06-20',
     title:
       'Added the rank-based odds system. Added the points spread slider (controls the gap between winners and losers). Redesigned the theme creation UI. Small UI improvements',
   },
-  {
-    date: '2026-06-18',
-    title: 'Improved the UI for the themes and contests modals',
-  },
-  {
-    date: '2026-06-14',
-    title: 'Added Portuguese localization',
-  },
-  {
-    date: '2026-06-05',
-    title:
-      'Added the ability to have different points system for each stage. Made the final reveal animation less predictable. The "Allow points to the same entry multiple times" option now also works for televote. Small UI improvements',
-  },
-  {
-    date: '2026-06-05',
-    title:
-      'Added the Pre-1975 points system support. Added the heart flag icons for all world countries. Added a donation option. Bug fixes',
-  },
-  {
-    date: '2026-06-04',
-    title:
-      'Added the winner reveal animation (ESC 2026 style). Added a guidebook for the app. Small improvements',
-  },
-  {
-    date: '2026-05-25',
-    title:
-      'Improved the winner modal UI. Corrected the default semi-final voting mode for each ESC edition',
-  },
-  {
-    date: '2026-05-24',
-    title: 'The ESC 2026 theme. Small UI improvements',
-  },
-  {
-    date: '2026-05-17',
-    title: 'Added the ESC 2026 data',
-  },
-  {
-    date: '2026-05-16',
-    title:
-      "Added the ability to have different points system for jury and televote. Added the country leaderboard based on user's own completed contests. Added more font options. Added a setting to use the same font regardless of the theme. Added a setting to hide voting hints. Small fixes.",
-  },
-  {
-    date: '2026-05-13',
-    title:
-      'Added the option to have rounded country design in custom themes (ESC 2026 style)',
-  },
-  {
-    date: '2026-04-18',
-    title:
-      'Improved the sound effects logic: fixed overlap issue, added an optional delay for each sound. Fixed the issue with disappearing sound and theme background images. Added grouping for themes and contests. Added the interface font selection for custom themes',
-  },
-  {
-    date: '2026-04-14',
-    title: 'Added the option to enable minimalistic round and square flags',
-  },
-  {
-    date: '2026-04-11',
-    title: 'Sound effects support for custom themes',
-  },
-  {
-    date: '2026-04-09',
-    title:
-      'Added the split screen qualifier reveal mode (ESC 2025 format). To use it, enable "Pick qualifiers without awarding points" in the settings and then enable "Enable split screen qualifier reveal mode".',
-  },
-  {
-    date: '2026-04-08',
-    title: 'Added presets for the predefined voting',
-  },
-  {
-    date: '2026-03-29',
-    title:
-      'Added the global country leaderboard and per-user country statistics based on the completed contests',
-  },
-  {
-    date: '2026-03-22',
-    title:
-      'Added the ability to enter the total country points to quickly share the results (requires enabling predefined voting in the settings).',
-  },
-  {
-    date: '2026-03-17',
-    title: 'Added the running order setup. Improved the tie-break logic.',
-  },
-  {
-    date: '2026-03-15',
-    title:
-      'Added the ability to categorize custom entries. Improved round flags and added square flags. Added the new scoreboard and DouzePoints animations (ESC 2025 style). Added a count-up points animation. Small improvements',
-  },
-  {
-    date: '2026-02-22',
-    title:
-      'Added the ability to select multiple entries in a section and move them in bulk',
-  },
-  {
-    date: '2026-02-21',
-    title:
-      'Added the ability to follow other users and see the feed with their activities. The ability to share a profile, theme, or contest by link. Small improvements',
-  },
-  {
-    date: '2026-02-15',
-    title:
-      "Implemented the user profile page, which displays the user's public custom themes, contests, and profile information (click the user's profile picture to access)",
-  },
-  {
-    date: '2026-02-01',
-    title:
-      'Extended the theme customization: options for jury points panel rounding and removing underline. Added venue and hosts fields for custom contests. Added new rounded flags. Added an option to blur modal background. Small improvements',
-  },
-  {
-    date: '2026-01-25',
-    title:
-      'Extended the theme customization: different flag and points container shapes. Option to not use uppercase for entry names. Better hover effect',
-  },
-  {
-    date: '2026-01-18',
-    title:
-      'Extended the theme customization: separate ranking colors for each state, opacity control for background colors, and gradient support for ranking and jury points panel backgrounds',
-  },
-  {
-    date: '2026-01-13',
-    title: 'Added ESC 2026 setup',
-  },
-  {
-    date: '2026-01-10',
-    title:
-      'Added the ability to quick select themes and contests from the dropdowns',
-  },
-  {
-    date: '2026-01-09',
-    title:
-      'Fixed the issue with the image generation when it includes custom entries',
-  },
-  {
-    date: '2026-01-08',
-    title:
-      'Added saving and loading a theme with a contest. Added two-column scoreboard layout on mobile. Improved the long entry names display',
-  },
-  {
-    date: '2026-01-06',
-    title:
-      'Added the ability to load contest parts (general info, setup, simulation) and present the contest simulation with the same results as the original contest.',
-  },
-  {
-    date: '2026-01-03',
-    title:
-      'Added custom confirmation popups for certain actions. Added loading spinner.',
-  },
-  {
-    date: '2026-01-02',
-    title:
-      'Added rank-based qualifier targets. Added saving custom entries from other contests (to do this, load the contest → remove custom entries from participants → open the Imported section → click the "Save to your custom entries" button).',
-  },
-  {
-    date: '2026-01-01',
-    title:
-      'Added reordering all stages during adding/editing a stage. Minor fixes',
-  },
-  {
-    date: '2025-12-31',
-    title:
-      'Contests - saving the simulation setup and results. Public contests browsing and loading.',
-  },
-  {
-    date: '2025-12-24',
-    title: 'Allowed the negative points in the points system',
-  },
-
   ...OLD_WHATS_NEW,
 ];
 
 export const UPCOMING_FEATURES = [
   {
     approximateDates: { start: '2026-06-21', end: '2026-06-25' },
-    title: 'Separate odds per stage. Diaspora/neighbour voting factor',
+    title:
+      'Create custom diaspora factors blocs. Persist the diaspora factors settings with saved contests. Separate odds per stage.',
   },
   {
     title: 'Upload custom fonts',

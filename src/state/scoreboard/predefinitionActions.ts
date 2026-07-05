@@ -4,6 +4,7 @@ import { EventStage } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
+import { resolveDiaspora } from './diaspora';
 import { resolveStagePointsSystem } from './stageOverrides';
 import { ManualShareTotalsRow, ScoreboardState } from './types';
 import { predefineStageVotes } from './votesPredefinition';
@@ -93,7 +94,7 @@ export const createPredefinitionActions: StateCreator<
     const { countryOdds, getStageVotingCountries } =
       useCountriesStore.getState();
     const generalState = useGeneralStore.getState();
-    const { randomnessLevel, pointsSpread } = generalState.settings;
+    const { randomnessLevel, pointsSpread, diaspora } = generalState.settings;
 
     const {
       pointsSystem,
@@ -113,6 +114,7 @@ export const createPredefinitionActions: StateCreator<
       pointsSystem,
       televotePointsSystem,
       allowMultiplePointsToSameEntry,
+      resolveDiaspora(diaspora),
     );
 
     set((state) => ({
@@ -158,12 +160,14 @@ export const createPredefinitionActions: StateCreator<
       const merged: Record<string, ManualShareTotalsRow> = {
         ...existing,
       };
+
       for (const [countryCode, row] of Object.entries(partial)) {
         merged[countryCode] = {
           ...(merged[countryCode] || {}),
           ...row,
         };
       }
+
       return {
         manualShareTotals: {
           ...state.manualShareTotals,

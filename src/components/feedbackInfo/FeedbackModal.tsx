@@ -1,4 +1,4 @@
-import { Coffee } from 'lucide-react';
+import { Coffee, InfoIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
@@ -157,6 +157,11 @@ const FeedbackModal = ({
                 <Coffee className="w-5 h-5" />
                 {t('supportOnKoFi')}
               </a>
+
+              <p className="text-white/70 text-xs font-normal flex items-center gap-1 mt-2">
+                <InfoIcon className="w-4 h-4" />
+                Currently, the donations may not work
+              </p>
             </div>
           </div>
         )}

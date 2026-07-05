@@ -1,36 +1,37 @@
 import { BaseCountry } from '../../models';
 import { CountryOdds } from '../countriesStore';
 
-// Odds value range produced by the rank generator. Matches the 0-100 range that
-// year-data and the Randomize button already use, and stays well within the
-// CountryOddsItem MAX_ODDS (1000) cap. Kept easy to tweak while we validate the feel.
-export const RANK_ODDS_MIN = 1;
-export const RANK_ODDS_MAX = 100;
-
 /**
- * Map the 0-100 "points spread" slider to the curve exponent (gamma) used to
- * distribute odds across ranks.
- * - spread 50 -> gamma 1 (even spacing between ranks)
- * - spread < 50 -> gamma < 1 (values bunch toward the top = tighter gap)
- * - spread > 50 -> gamma > 1 (values drop off quickly = wider gap)
+ * Map the 0-100 "points spread" slider to the odds band `[lo, hi]` used when
+ * generating rank odds. Spread is intentionally a TWO-layer lever: the band here
+ * AND the simulation weight exponent (`calculateDistributionExponent`, which
+ * grows 1 -> 4). Because both move with spread and compound, the band stays
+ * deliberately narrow — especially at the top, where the exponent does the
+ * amplifying. Anchors (linear with a knee at 50):
+ *   spread 0   -> [50, 73]  (exponent 1.0  -> ~1.5:1  result gap, near-flat)
+ *   spread 50  -> [33, 85]  (exponent 2.5  -> ~11:1   result gap, default)
+ *   spread 100 -> [13, 98]  (exponent 4.0  -> ~3200:1 result gap, blowout)
  */
-const calculateRankGamma = (pointsSpread: number): number => {
-  const clamped = Math.max(0, Math.min(pointsSpread, 100));
+const bandFor = (pointsSpread: number): { lo: number; hi: number } => {
+  const s = Math.max(0, Math.min(pointsSpread, 100));
 
-  if (clamped <= 50) {
-    // 0 -> 0.4, 50 -> 1
-    return 0.4 + (clamped / 50) * 0.6;
+  if (s <= 50) {
+    const t = s / 50;
+
+    return { lo: 50 + (33 - 50) * t, hi: 73 + (85 - 73) * t };
   }
 
-  // 50 -> 1, 100 -> 2.5
-  return 1 + ((clamped - 50) / 50) * 1.5;
+  const t = (s - 50) / 50;
+
+  return { lo: 33 + (13 - 33) * t, hi: 85 + (98 - 85) * t };
 };
 
 const roundToHalf = (value: number): number => Math.round(value * 2) / 2;
 
 /**
  * Generate an odds value per country from a ranked order (index 0 = best).
- * The gap between the top and bottom is shaped by `pointsSpread`.
+ * Odds interpolate linearly from `hi` (top rank) down to `lo` (last rank); the
+ * band width is set by `pointsSpread` via `bandFor`.
  */
 export const rankOrderToOdds = (
   orderedCodes: string[],
@@ -43,20 +44,19 @@ export const rankOrderToOdds = (
     return result;
   }
 
+  const { lo, hi } = bandFor(pointsSpread);
+
   if (n === 1) {
-    result[orderedCodes[0]] = RANK_ODDS_MAX;
+    result[orderedCodes[0]] = roundToHalf(hi);
 
     return result;
   }
-
-  const gamma = calculateRankGamma(pointsSpread);
-  const range = RANK_ODDS_MAX - RANK_ODDS_MIN;
 
   orderedCodes.forEach((code, rank) => {
     // Normalized position: 1 at the top rank, 0 at the bottom rank.
     const p = (n - 1 - rank) / (n - 1);
 
-    result[code] = roundToHalf(RANK_ODDS_MIN + range * Math.pow(p, gamma));
+    result[code] = roundToHalf(lo + (hi - lo) * p);
   });
 
   return result;

@@ -1,0 +1,2641 @@
+{
+  "2026": [
+    {
+      "name": "Bulgaria",
+      "juryPoints": 204,
+      "televotePoints": 312
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 123,
+      "televotePoints": 220
+    },
+    {
+      "name": "Romania",
+      "juryPoints": 64,
+      "televotePoints": 232
+    },
+    {
+      "name": "Australia",
+      "juryPoints": 165,
+      "televotePoints": 122
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 134,
+      "televotePoints": 147
+    },
+    {
+      "name": "Finland",
+      "juryPoints": 141,
+      "televotePoints": 138
+    },
+    {
+      "name": "Denmark",
+      "juryPoints": 165,
+      "televotePoints": 78
+    },
+    {
+      "name": "Moldova",
+      "juryPoints": 43,
+      "televotePoints": 183
+    },
+    {
+      "name": "Ukraine",
+      "juryPoints": 54,
+      "televotePoints": 167
+    },
+    {
+      "name": "Greece",
+      "juryPoints": 73,
+      "televotePoints": 147
+    },
+    {
+      "name": "France",
+      "juryPoints": 144,
+      "televotePoints": 14
+    },
+    {
+      "name": "Poland",
+      "juryPoints": 133,
+      "televotePoints": 17
+    },
+    {
+      "name": "Albania",
+      "juryPoints": 60,
+      "televotePoints": 85
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 115,
+      "televotePoints": 19
+    },
+    {
+      "name": "Croatia",
+      "juryPoints": 53,
+      "televotePoints": 71
+    },
+    {
+      "name": "Czechia",
+      "juryPoints": 104,
+      "televotePoints": 9
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 38,
+      "televotePoints": 52
+    },
+    {
+      "name": "Malta",
+      "juryPoints": 81,
+      "televotePoints": 8
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 41,
+      "televotePoints": 34
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 35,
+      "televotePoints": 16
+    },
+    {
+      "name": "Belgium",
+      "juryPoints": 36,
+      "televotePoints": 0
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 10,
+      "televotePoints": 12
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 12,
+      "televotePoints": 0
+    },
+    {
+      "name": "Austria",
+      "juryPoints": 1,
+      "televotePoints": 5
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 1,
+      "televotePoints": 0
+    }
+  ],
+  "2025": [
+    {
+      "name": "Austria",
+      "juryPoints": 258,
+      "televotePoints": 178
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 60,
+      "televotePoints": 297
+    },
+    {
+      "name": "Estonia",
+      "juryPoints": 98,
+      "televotePoints": 258
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 126,
+      "televotePoints": 195
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 159,
+      "televotePoints": 97
+    },
+    {
+      "name": "Greece",
+      "juryPoints": 105,
+      "televotePoints": 126
+    },
+    {
+      "name": "France",
+      "juryPoints": 180,
+      "televotePoints": 50
+    },
+    {
+      "name": "Albania",
+      "juryPoints": 45,
+      "televotePoints": 173
+    },
+    {
+      "name": "Ukraine",
+      "juryPoints": 60,
+      "televotePoints": 158
+    },
+    {
+      "name": "Switzerland",
+      "juryPoints": 214,
+      "televotePoints": 0
+    },
+    {
+      "name": "Finland",
+      "juryPoints": 88,
+      "televotePoints": 108
+    },
+    {
+      "name": "Netherlands",
+      "juryPoints": 133,
+      "televotePoints": 42
+    },
+    {
+      "name": "Latvia",
+      "juryPoints": 116,
+      "televotePoints": 42
+    },
+    {
+      "name": "Poland",
+      "juryPoints": 17,
+      "televotePoints": 139
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 77,
+      "televotePoints": 74
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 34,
+      "televotePoints": 62
+    },
+    {
+      "name": "Malta",
+      "juryPoints": 83,
+      "televotePoints": 8
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 22,
+      "televotePoints": 67
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 88,
+      "televotePoints": 0
+    },
+    {
+      "name": "Armenia",
+      "juryPoints": 42,
+      "televotePoints": 30
+    },
+    {
+      "name": "Portugal",
+      "juryPoints": 37,
+      "televotePoints": 13
+    },
+    {
+      "name": "Luxembourg",
+      "juryPoints": 23,
+      "televotePoints": 24
+    },
+    {
+      "name": "Denmark",
+      "juryPoints": 45,
+      "televotePoints": 2
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 27,
+      "televotePoints": 10
+    },
+    {
+      "name": "Iceland",
+      "juryPoints": 0,
+      "televotePoints": 33
+    },
+    {
+      "name": "San Marino",
+      "juryPoints": 9,
+      "televotePoints": 18
+    }
+  ],
+  "2024": [
+    {
+      "name": "Switzerland",
+      "juryPoints": 365,
+      "televotePoints": 226
+    },
+    {
+      "name": "Croatia",
+      "juryPoints": 210,
+      "televotePoints": 337
+    },
+    {
+      "name": "Ukraine",
+      "juryPoints": 146,
+      "televotePoints": 307
+    },
+    {
+      "name": "France",
+      "juryPoints": 218,
+      "televotePoints": 227
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 52,
+      "televotePoints": 323
+    },
+    {
+      "name": "Ireland",
+      "juryPoints": 142,
+      "televotePoints": 136
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 164,
+      "televotePoints": 104
+    },
+    {
+      "name": "Armenia",
+      "juryPoints": 101,
+      "televotePoints": 82
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 125,
+      "televotePoints": 49
+    },
+    {
+      "name": "Portugal",
+      "juryPoints": 139,
+      "televotePoints": 13
+    },
+    {
+      "name": "Greece",
+      "juryPoints": 41,
+      "televotePoints": 85
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 99,
+      "televotePoints": 18
+    },
+    {
+      "name": "Luxembourg",
+      "juryPoints": 83,
+      "televotePoints": 20
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 32,
+      "televotePoints": 58
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 34,
+      "televotePoints": 44
+    },
+    {
+      "name": "Latvia",
+      "juryPoints": 36,
+      "televotePoints": 28
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 22,
+      "televotePoints": 32
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 46,
+      "televotePoints": 0
+    },
+    {
+      "name": "Finland",
+      "juryPoints": 7,
+      "televotePoints": 31
+    },
+    {
+      "name": "Estonia",
+      "juryPoints": 4,
+      "televotePoints": 33
+    },
+    {
+      "name": "Georgia",
+      "juryPoints": 15,
+      "televotePoints": 19
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 19,
+      "televotePoints": 11
+    },
+    {
+      "name": "Slovenia",
+      "juryPoints": 15,
+      "televotePoints": 12
+    },
+    {
+      "name": "Austria",
+      "juryPoints": 19,
+      "televotePoints": 5
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 12,
+      "televotePoints": 4
+    }
+  ],
+  "2023": [
+    {
+      "name": "Sweden",
+      "juryPoints": 340,
+      "televotePoints": 243
+    },
+    {
+      "name": "Finland",
+      "juryPoints": 150,
+      "televotePoints": 376
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 177,
+      "televotePoints": 185
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 176,
+      "televotePoints": 174
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 52,
+      "televotePoints": 216
+    },
+    {
+      "name": "Ukraine",
+      "juryPoints": 54,
+      "televotePoints": 189
+    },
+    {
+      "name": "Belgium",
+      "juryPoints": 127,
+      "televotePoints": 55
+    },
+    {
+      "name": "Estonia",
+      "juryPoints": 146,
+      "televotePoints": 22
+    },
+    {
+      "name": "Australia",
+      "juryPoints": 130,
+      "televotePoints": 21
+    },
+    {
+      "name": "Czechia",
+      "juryPoints": 94,
+      "televotePoints": 35
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 81,
+      "televotePoints": 46
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 68,
+      "televotePoints": 58
+    },
+    {
+      "name": "Croatia",
+      "juryPoints": 11,
+      "televotePoints": 112
+    },
+    {
+      "name": "Armenia",
+      "juryPoints": 69,
+      "televotePoints": 53
+    },
+    {
+      "name": "Austria",
+      "juryPoints": 104,
+      "televotePoints": 16
+    },
+    {
+      "name": "France",
+      "juryPoints": 54,
+      "televotePoints": 50
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 95,
+      "televotePoints": 5
+    },
+    {
+      "name": "Moldova",
+      "juryPoints": 20,
+      "televotePoints": 76
+    },
+    {
+      "name": "Poland",
+      "juryPoints": 12,
+      "televotePoints": 81
+    },
+    {
+      "name": "Switzerland",
+      "juryPoints": 61,
+      "televotePoints": 31
+    },
+    {
+      "name": "Slovenia",
+      "juryPoints": 33,
+      "televotePoints": 45
+    },
+    {
+      "name": "Albania",
+      "juryPoints": 17,
+      "televotePoints": 59
+    },
+    {
+      "name": "Portugal",
+      "juryPoints": 43,
+      "televotePoints": 16
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 14,
+      "televotePoints": 16
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 15,
+      "televotePoints": 9
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 3,
+      "televotePoints": 15
+    }
+  ],
+  "2022": [
+    {
+      "name": "Ukraine",
+      "juryPoints": 192,
+      "televotePoints": 439
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 283,
+      "televotePoints": 183
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 231,
+      "televotePoints": 228
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 258,
+      "televotePoints": 180
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 87,
+      "televotePoints": 225
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 158,
+      "televotePoints": 110
+    },
+    {
+      "name": "Moldova",
+      "juryPoints": 14,
+      "televotePoints": 239
+    },
+    {
+      "name": "Greece",
+      "juryPoints": 158,
+      "televotePoints": 57
+    },
+    {
+      "name": "Portugal",
+      "juryPoints": 171,
+      "televotePoints": 36
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 36,
+      "televotePoints": 146
+    },
+    {
+      "name": "Netherlands",
+      "juryPoints": 129,
+      "televotePoints": 42
+    },
+    {
+      "name": "Poland",
+      "juryPoints": 46,
+      "televotePoints": 105
+    },
+    {
+      "name": "Estonia",
+      "juryPoints": 43,
+      "televotePoints": 98
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 35,
+      "televotePoints": 93
+    },
+    {
+      "name": "Australia",
+      "juryPoints": 123,
+      "televotePoints": 2
+    },
+    {
+      "name": "Azerbaijan",
+      "juryPoints": 103,
+      "televotePoints": 3
+    },
+    {
+      "name": "Switzerland",
+      "juryPoints": 78,
+      "televotePoints": 0
+    },
+    {
+      "name": "Romania",
+      "juryPoints": 12,
+      "televotePoints": 53
+    },
+    {
+      "name": "Belgium",
+      "juryPoints": 59,
+      "televotePoints": 5
+    },
+    {
+      "name": "Armenia",
+      "juryPoints": 40,
+      "televotePoints": 21
+    },
+    {
+      "name": "Finland",
+      "juryPoints": 12,
+      "televotePoints": 26
+    },
+    {
+      "name": "Czechia",
+      "juryPoints": 33,
+      "televotePoints": 5
+    },
+    {
+      "name": "Iceland",
+      "juryPoints": 10,
+      "televotePoints": 10
+    },
+    {
+      "name": "France",
+      "juryPoints": 9,
+      "televotePoints": 8
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 0,
+      "televotePoints": 6
+    }
+  ],
+  "2021": [
+    {
+      "name": "Italy",
+      "juryPoints": 206,
+      "televotePoints": 318
+    },
+    {
+      "name": "France",
+      "juryPoints": 248,
+      "televotePoints": 251
+    },
+    {
+      "name": "Switzerland",
+      "juryPoints": 267,
+      "televotePoints": 165
+    },
+    {
+      "name": "Iceland",
+      "juryPoints": 198,
+      "televotePoints": 180
+    },
+    {
+      "name": "Ukraine",
+      "juryPoints": 97,
+      "televotePoints": 267
+    },
+    {
+      "name": "Finland",
+      "juryPoints": 83,
+      "televotePoints": 218
+    },
+    {
+      "name": "Malta",
+      "juryPoints": 208,
+      "televotePoints": 47
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 55,
+      "televotePoints": 165
+    },
+    {
+      "name": "Russia",
+      "juryPoints": 104,
+      "televotePoints": 100
+    },
+    {
+      "name": "Greece",
+      "juryPoints": 91,
+      "televotePoints": 79
+    },
+    {
+      "name": "Bulgaria",
+      "juryPoints": 140,
+      "televotePoints": 30
+    },
+    {
+      "name": "Portugal",
+      "juryPoints": 126,
+      "televotePoints": 27
+    },
+    {
+      "name": "Moldova",
+      "juryPoints": 53,
+      "televotePoints": 62
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 46,
+      "televotePoints": 63
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 20,
+      "televotePoints": 82
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 50,
+      "televotePoints": 44
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 73,
+      "televotePoints": 20
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 15,
+      "televotePoints": 60
+    },
+    {
+      "name": "Belgium",
+      "juryPoints": 71,
+      "televotePoints": 3
+    },
+    {
+      "name": "Azerbaijan",
+      "juryPoints": 32,
+      "televotePoints": 33
+    },
+    {
+      "name": "Albania",
+      "juryPoints": 22,
+      "televotePoints": 35
+    },
+    {
+      "name": "San Marino",
+      "juryPoints": 37,
+      "televotePoints": 13
+    },
+    {
+      "name": "Netherlands",
+      "juryPoints": 11,
+      "televotePoints": 0
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 6,
+      "televotePoints": 0
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 3,
+      "televotePoints": 0
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 0,
+      "televotePoints": 0
+    }
+  ],
+  "2019": [
+    {
+      "name": "Netherlands",
+      "juryPoints": 237,
+      "televotePoints": 261
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 219,
+      "televotePoints": 253
+    },
+    {
+      "name": "Russia",
+      "juryPoints": 126,
+      "televotePoints": 244
+    },
+    {
+      "name": "Switzerland",
+      "juryPoints": 152,
+      "televotePoints": 212
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 241,
+      "televotePoints": 93
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 40,
+      "televotePoints": 291
+    },
+    {
+      "name": "North MacedoniaN.Macedonia",
+      "juryPoints": 247,
+      "televotePoints": 58
+    },
+    {
+      "name": "Azerbaijan",
+      "juryPoints": 202,
+      "televotePoints": 100
+    },
+    {
+      "name": "Australia",
+      "juryPoints": 153,
+      "televotePoints": 131
+    },
+    {
+      "name": "Iceland",
+      "juryPoints": 46,
+      "televotePoints": 186
+    },
+    {
+      "name": "Czechia",
+      "juryPoints": 150,
+      "televotePoints": 7
+    },
+    {
+      "name": "Denmark",
+      "juryPoints": 69,
+      "televotePoints": 51
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 77,
+      "televotePoints": 32
+    },
+    {
+      "name": "Malta",
+      "juryPoints": 87,
+      "televotePoints": 20
+    },
+    {
+      "name": "Slovenia",
+      "juryPoints": 46,
+      "televotePoints": 59
+    },
+    {
+      "name": "France",
+      "juryPoints": 67,
+      "televotePoints": 38
+    },
+    {
+      "name": "Albania",
+      "juryPoints": 43,
+      "televotePoints": 47
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 35,
+      "televotePoints": 54
+    },
+    {
+      "name": "San Marino",
+      "juryPoints": 12,
+      "televotePoints": 65
+    },
+    {
+      "name": "Estonia",
+      "juryPoints": 28,
+      "televotePoints": 48
+    },
+    {
+      "name": "Greece",
+      "juryPoints": 50,
+      "televotePoints": 24
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 1,
+      "televotePoints": 53
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 0,
+      "televotePoints": 35
+    },
+    {
+      "name": "Belarus",
+      "juryPoints": 18,
+      "televotePoints": 13
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 24,
+      "televotePoints": 0
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 8,
+      "televotePoints": 3
+    }
+  ],
+  "2018": [
+    {
+      "name": "Israel",
+      "juryPoints": 212,
+      "televotePoints": 317
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 183,
+      "televotePoints": 253
+    },
+    {
+      "name": "Austria",
+      "juryPoints": 271,
+      "televotePoints": 71
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 204,
+      "televotePoints": 136
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 59,
+      "televotePoints": 249
+    },
+    {
+      "name": "Czechia",
+      "juryPoints": 66,
+      "televotePoints": 215
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 253,
+      "televotePoints": 21
+    },
+    {
+      "name": "Estonia",
+      "juryPoints": 143,
+      "televotePoints": 102
+    },
+    {
+      "name": "Denmark",
+      "juryPoints": 38,
+      "televotePoints": 188
+    },
+    {
+      "name": "Moldova",
+      "juryPoints": 94,
+      "televotePoints": 115
+    },
+    {
+      "name": "Albania",
+      "juryPoints": 126,
+      "televotePoints": 58
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 90,
+      "televotePoints": 91
+    },
+    {
+      "name": "France",
+      "juryPoints": 114,
+      "televotePoints": 59
+    },
+    {
+      "name": "Bulgaria",
+      "juryPoints": 100,
+      "televotePoints": 66
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 60,
+      "televotePoints": 84
+    },
+    {
+      "name": "Ireland",
+      "juryPoints": 74,
+      "televotePoints": 62
+    },
+    {
+      "name": "Ukraine",
+      "juryPoints": 11,
+      "televotePoints": 119
+    },
+    {
+      "name": "Netherlands",
+      "juryPoints": 89,
+      "televotePoints": 32
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 38,
+      "televotePoints": 75
+    },
+    {
+      "name": "Australia",
+      "juryPoints": 90,
+      "televotePoints": 9
+    },
+    {
+      "name": "Hungary",
+      "juryPoints": 28,
+      "televotePoints": 65
+    },
+    {
+      "name": "Slovenia",
+      "juryPoints": 41,
+      "televotePoints": 23
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 43,
+      "televotePoints": 18
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 23,
+      "televotePoints": 25
+    },
+    {
+      "name": "Finland",
+      "juryPoints": 23,
+      "televotePoints": 23
+    },
+    {
+      "name": "Portugal",
+      "juryPoints": 21,
+      "televotePoints": 18
+    }
+  ],
+  "2017": [
+    {
+      "name": "Portugal",
+      "juryPoints": 382,
+      "televotePoints": 376
+    },
+    {
+      "name": "Bulgaria",
+      "juryPoints": 278,
+      "televotePoints": 337
+    },
+    {
+      "name": "Moldova",
+      "juryPoints": 110,
+      "televotePoints": 264
+    },
+    {
+      "name": "Belgium",
+      "juryPoints": 108,
+      "televotePoints": 255
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 218,
+      "televotePoints": 126
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 126,
+      "televotePoints": 208
+    },
+    {
+      "name": "Romania",
+      "juryPoints": 58,
+      "televotePoints": 224
+    },
+    {
+      "name": "Hungary",
+      "juryPoints": 48,
+      "televotePoints": 152
+    },
+    {
+      "name": "Australia",
+      "juryPoints": 171,
+      "televotePoints": 2
+    },
+    {
+      "name": "Norway",
+      "juryPoints": 129,
+      "televotePoints": 29
+    },
+    {
+      "name": "Netherlands",
+      "juryPoints": 135,
+      "televotePoints": 15
+    },
+    {
+      "name": "France",
+      "juryPoints": 45,
+      "televotePoints": 90
+    },
+    {
+      "name": "Croatia",
+      "juryPoints": 25,
+      "televotePoints": 103
+    },
+    {
+      "name": "Azerbaijan",
+      "juryPoints": 78,
+      "televotePoints": 42
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 99,
+      "televotePoints": 12
+    },
+    {
+      "name": "Austria",
+      "juryPoints": 93,
+      "televotePoints": 0
+    },
+    {
+      "name": "Belarus",
+      "juryPoints": 50,
+      "televotePoints": 33
+    },
+    {
+      "name": "Armenia",
+      "juryPoints": 58,
+      "televotePoints": 21
+    },
+    {
+      "name": "Greece",
+      "juryPoints": 48,
+      "televotePoints": 29
+    },
+    {
+      "name": "Denmark",
+      "juryPoints": 69,
+      "televotePoints": 8
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 36,
+      "televotePoints": 32
+    },
+    {
+      "name": "Poland",
+      "juryPoints": 23,
+      "televotePoints": 41
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 34,
+      "televotePoints": 5
+    },
+    {
+      "name": "Ukraine",
+      "juryPoints": 12,
+      "televotePoints": 24
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 3,
+      "televotePoints": 3
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 0,
+      "televotePoints": 5
+    }
+  ],
+  "2016": [
+    {
+      "name": "Ukraine",
+      "juryPoints": 211,
+      "televotePoints": 323
+    },
+    {
+      "name": "Australia",
+      "juryPoints": 320,
+      "televotePoints": 191
+    },
+    {
+      "name": "Russia",
+      "juryPoints": 130,
+      "televotePoints": 361
+    },
+    {
+      "name": "Bulgaria",
+      "juryPoints": 127,
+      "televotePoints": 180
+    },
+    {
+      "name": "Sweden",
+      "juryPoints": 122,
+      "televotePoints": 139
+    },
+    {
+      "name": "France",
+      "juryPoints": 148,
+      "televotePoints": 109
+    },
+    {
+      "name": "Armenia",
+      "juryPoints": 115,
+      "televotePoints": 134
+    },
+    {
+      "name": "Poland",
+      "juryPoints": 7,
+      "televotePoints": 222
+    },
+    {
+      "name": "Lithuania",
+      "juryPoints": 104,
+      "televotePoints": 96
+    },
+    {
+      "name": "Belgium",
+      "juryPoints": 130,
+      "televotePoints": 51
+    },
+    {
+      "name": "Netherlands",
+      "juryPoints": 114,
+      "televotePoints": 39
+    },
+    {
+      "name": "Malta",
+      "juryPoints": 137,
+      "televotePoints": 16
+    },
+    {
+      "name": "Austria",
+      "juryPoints": 31,
+      "televotePoints": 120
+    },
+    {
+      "name": "Israel",
+      "juryPoints": 124,
+      "televotePoints": 11
+    },
+    {
+      "name": "Latvia",
+      "juryPoints": 69,
+      "televotePoints": 63
+    },
+    {
+      "name": "Italy",
+      "juryPoints": 90,
+      "televotePoints": 34
+    },
+    {
+      "name": "Azerbaijan",
+      "juryPoints": 44,
+      "televotePoints": 73
+    },
+    {
+      "name": "Serbia",
+      "juryPoints": 35,
+      "televotePoints": 80
+    },
+    {
+      "name": "Hungary",
+      "juryPoints": 52,
+      "televotePoints": 56
+    },
+    {
+      "name": "Georgia",
+      "juryPoints": 80,
+      "televotePoints": 24
+    },
+    {
+      "name": "Cyprus",
+      "juryPoints": 43,
+      "televotePoints": 53
+    },
+    {
+      "name": "Spain",
+      "juryPoints": 67,
+      "televotePoints": 10
+    },
+    {
+      "name": "Croatia",
+      "juryPoints": 40,
+      "televotePoints": 33
+    },
+    {
+      "name": "United KingdomUK",
+      "juryPoints": 54,
+      "televotePoints": 8
+    },
+    {
+      "name": "Czechia",
+      "juryPoints": 41,
+      "televotePoints": 0
+    },
+    {
+      "name": "Germany",
+      "juryPoints": 1,
+      "televotePoints": 10
+    }
+  ],
+  "2015": [
+    {
+      "name": "Sweden",
+      "points": 365
+    },
+    {
+      "name": "Russia",
+      "points": 303
+    },
+    {
+      "name": "Italy",
+      "points": 292
+    },
+    {
+      "name": "Belgium",
+      "points": 217
+    },
+    {
+      "name": "Australia",
+      "points": 196
+    },
+    {
+      "name": "Latvia",
+      "points": 186
+    },
+    {
+      "name": "Estonia",
+      "points": 106
+    },
+    {
+      "name": "Norway",
+      "points": 102
+    },
+    {
+      "name": "Israel",
+      "points": 97
+    },
+    {
+      "name": "Serbia",
+      "points": 53
+    },
+    {
+      "name": "Georgia",
+      "points": 51
+    },
+    {
+      "name": "Azerbaijan",
+      "points": 49
+    },
+    {
+      "name": "Montenegro",
+      "points": 44
+    },
+    {
+      "name": "Slovenia",
+      "points": 39
+    },
+    {
+      "name": "Romania",
+      "points": 35
+    },
+    {
+      "name": "Armenia",
+      "points": 34
+    },
+    {
+      "name": "Albania",
+      "points": 34
+    },
+    {
+      "name": "Lithuania",
+      "points": 30
+    },
+    {
+      "name": "Greece",
+      "points": 23
+    },
+    {
+      "name": "Hungary",
+      "points": 19
+    },
+    {
+      "name": "Spain",
+      "points": 15
+    },
+    {
+      "name": "Cyprus",
+      "points": 11
+    },
+    {
+      "name": "Poland",
+      "points": 10
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 5
+    },
+    {
+      "name": "France",
+      "points": 4
+    },
+    {
+      "name": "Austria",
+      "points": 0
+    },
+    {
+      "name": "Germany",
+      "points": 0
+    }
+  ],
+  "2014": [
+    {
+      "name": "Austria",
+      "points": 290
+    },
+    {
+      "name": "Netherlands",
+      "points": 238
+    },
+    {
+      "name": "Sweden",
+      "points": 218
+    },
+    {
+      "name": "Armenia",
+      "points": 174
+    },
+    {
+      "name": "Hungary",
+      "points": 143
+    },
+    {
+      "name": "Ukraine",
+      "points": 113
+    },
+    {
+      "name": "Russia",
+      "points": 89
+    },
+    {
+      "name": "Norway",
+      "points": 88
+    },
+    {
+      "name": "Denmark",
+      "points": 74
+    },
+    {
+      "name": "Spain",
+      "points": 74
+    },
+    {
+      "name": "Finland",
+      "points": 72
+    },
+    {
+      "name": "Romania",
+      "points": 72
+    },
+    {
+      "name": "Switzerland",
+      "points": 64
+    },
+    {
+      "name": "Poland",
+      "points": 62
+    },
+    {
+      "name": "Iceland",
+      "points": 58
+    },
+    {
+      "name": "Belarus",
+      "points": 43
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 40
+    },
+    {
+      "name": "Germany",
+      "points": 39
+    },
+    {
+      "name": "Montenegro",
+      "points": 37
+    },
+    {
+      "name": "Greece",
+      "points": 35
+    },
+    {
+      "name": "Italy",
+      "points": 33
+    },
+    {
+      "name": "Azerbaijan",
+      "points": 33
+    },
+    {
+      "name": "Malta",
+      "points": 32
+    },
+    {
+      "name": "San Marino",
+      "points": 14
+    },
+    {
+      "name": "Slovenia",
+      "points": 9
+    },
+    {
+      "name": "France",
+      "points": 2
+    }
+  ],
+  "2013": [
+    {
+      "name": "Denmark",
+      "points": 281
+    },
+    {
+      "name": "Azerbaijan",
+      "points": 234
+    },
+    {
+      "name": "Ukraine",
+      "points": 214
+    },
+    {
+      "name": "Norway",
+      "points": 191
+    },
+    {
+      "name": "Russia",
+      "points": 174
+    },
+    {
+      "name": "Greece",
+      "points": 152
+    },
+    {
+      "name": "Italy",
+      "points": 126
+    },
+    {
+      "name": "Malta",
+      "points": 120
+    },
+    {
+      "name": "Netherlands",
+      "points": 114
+    },
+    {
+      "name": "Hungary",
+      "points": 84
+    },
+    {
+      "name": "Moldova",
+      "points": 71
+    },
+    {
+      "name": "Belgium",
+      "points": 71
+    },
+    {
+      "name": "Romania",
+      "points": 65
+    },
+    {
+      "name": "Sweden",
+      "points": 62
+    },
+    {
+      "name": "Georgia",
+      "points": 50
+    },
+    {
+      "name": "Belarus",
+      "points": 48
+    },
+    {
+      "name": "Iceland",
+      "points": 47
+    },
+    {
+      "name": "Armenia",
+      "points": 41
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 23
+    },
+    {
+      "name": "Estonia",
+      "points": 19
+    },
+    {
+      "name": "Germany",
+      "points": 18
+    },
+    {
+      "name": "Lithuania",
+      "points": 17
+    },
+    {
+      "name": "France",
+      "points": 14
+    },
+    {
+      "name": "Finland",
+      "points": 13
+    },
+    {
+      "name": "Spain",
+      "points": 8
+    },
+    {
+      "name": "Ireland",
+      "points": 5
+    }
+  ],
+  "2012": [
+    {
+      "name": "Sweden",
+      "points": 372
+    },
+    {
+      "name": "Russia",
+      "points": 259
+    },
+    {
+      "name": "Serbia",
+      "points": 214
+    },
+    {
+      "name": "Azerbaijan",
+      "points": 150
+    },
+    {
+      "name": "Albania",
+      "points": 146
+    },
+    {
+      "name": "Estonia",
+      "points": 120
+    },
+    {
+      "name": "Turkey",
+      "points": 112
+    },
+    {
+      "name": "Germany",
+      "points": 110
+    },
+    {
+      "name": "Italy",
+      "points": 101
+    },
+    {
+      "name": "Spain",
+      "points": 97
+    },
+    {
+      "name": "Moldova",
+      "points": 81
+    },
+    {
+      "name": "Romania",
+      "points": 71
+    },
+    {
+      "name": "North MacedoniaN.Macedonia",
+      "points": 71
+    },
+    {
+      "name": "Lithuania",
+      "points": 70
+    },
+    {
+      "name": "Ukraine",
+      "points": 65
+    },
+    {
+      "name": "Cyprus",
+      "points": 65
+    },
+    {
+      "name": "Greece",
+      "points": 64
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 55
+    },
+    {
+      "name": "Ireland",
+      "points": 46
+    },
+    {
+      "name": "Iceland",
+      "points": 46
+    },
+    {
+      "name": "Malta",
+      "points": 41
+    },
+    {
+      "name": "France",
+      "points": 21
+    },
+    {
+      "name": "Denmark",
+      "points": 21
+    },
+    {
+      "name": "Hungary",
+      "points": 19
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 12
+    },
+    {
+      "name": "Norway",
+      "points": 7
+    }
+  ],
+  "2011": [
+    {
+      "name": "Azerbaijan",
+      "points": 221
+    },
+    {
+      "name": "Italy",
+      "points": 189
+    },
+    {
+      "name": "Sweden",
+      "points": 185
+    },
+    {
+      "name": "Ukraine",
+      "points": 159
+    },
+    {
+      "name": "Denmark",
+      "points": 134
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 125
+    },
+    {
+      "name": "Greece",
+      "points": 120
+    },
+    {
+      "name": "Ireland",
+      "points": 119
+    },
+    {
+      "name": "Georgia",
+      "points": 110
+    },
+    {
+      "name": "Germany",
+      "points": 107
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 100
+    },
+    {
+      "name": "Moldova",
+      "points": 97
+    },
+    {
+      "name": "Slovenia",
+      "points": 96
+    },
+    {
+      "name": "Serbia",
+      "points": 85
+    },
+    {
+      "name": "France",
+      "points": 82
+    },
+    {
+      "name": "Russia",
+      "points": 77
+    },
+    {
+      "name": "Romania",
+      "points": 77
+    },
+    {
+      "name": "Austria",
+      "points": 64
+    },
+    {
+      "name": "Lithuania",
+      "points": 63
+    },
+    {
+      "name": "Iceland",
+      "points": 61
+    },
+    {
+      "name": "Finland",
+      "points": 57
+    },
+    {
+      "name": "Hungary",
+      "points": 53
+    },
+    {
+      "name": "Spain",
+      "points": 50
+    },
+    {
+      "name": "Estonia",
+      "points": 44
+    },
+    {
+      "name": "Switzerland",
+      "points": 19
+    }
+  ],
+  "2010": [
+    {
+      "name": "Germany",
+      "points": 246
+    },
+    {
+      "name": "Turkey",
+      "points": 170
+    },
+    {
+      "name": "Romania",
+      "points": 162
+    },
+    {
+      "name": "Denmark",
+      "points": 149
+    },
+    {
+      "name": "Azerbaijan",
+      "points": 145
+    },
+    {
+      "name": "Belgium",
+      "points": 143
+    },
+    {
+      "name": "Armenia",
+      "points": 141
+    },
+    {
+      "name": "Greece",
+      "points": 140
+    },
+    {
+      "name": "Georgia",
+      "points": 136
+    },
+    {
+      "name": "Ukraine",
+      "points": 108
+    },
+    {
+      "name": "Russia",
+      "points": 90
+    },
+    {
+      "name": "France",
+      "points": 82
+    },
+    {
+      "name": "Serbia",
+      "points": 72
+    },
+    {
+      "name": "Israel",
+      "points": 71
+    },
+    {
+      "name": "Spain",
+      "points": 68
+    },
+    {
+      "name": "Albania",
+      "points": 62
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 51
+    },
+    {
+      "name": "Portugal",
+      "points": 43
+    },
+    {
+      "name": "Iceland",
+      "points": 41
+    },
+    {
+      "name": "Norway",
+      "points": 35
+    },
+    {
+      "name": "Cyprus",
+      "points": 27
+    },
+    {
+      "name": "Moldova",
+      "points": 27
+    },
+    {
+      "name": "Ireland",
+      "points": 25
+    },
+    {
+      "name": "Belarus",
+      "points": 18
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 10
+    }
+  ],
+  "2009": [
+    {
+      "name": "Norway",
+      "points": 387
+    },
+    {
+      "name": "Iceland",
+      "points": 218
+    },
+    {
+      "name": "Azerbaijan",
+      "points": 207
+    },
+    {
+      "name": "Turkey",
+      "points": 177
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 173
+    },
+    {
+      "name": "Estonia",
+      "points": 129
+    },
+    {
+      "name": "Greece",
+      "points": 120
+    },
+    {
+      "name": "France",
+      "points": 107
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 106
+    },
+    {
+      "name": "Armenia",
+      "points": 92
+    },
+    {
+      "name": "Russia",
+      "points": 91
+    },
+    {
+      "name": "Ukraine",
+      "points": 76
+    },
+    {
+      "name": "Denmark",
+      "points": 74
+    },
+    {
+      "name": "Moldova",
+      "points": 69
+    },
+    {
+      "name": "Portugal",
+      "points": 57
+    },
+    {
+      "name": "Israel",
+      "points": 53
+    },
+    {
+      "name": "Albania",
+      "points": 48
+    },
+    {
+      "name": "Croatia",
+      "points": 45
+    },
+    {
+      "name": "Romania",
+      "points": 40
+    },
+    {
+      "name": "Germany",
+      "points": 35
+    },
+    {
+      "name": "Sweden",
+      "points": 33
+    },
+    {
+      "name": "Malta",
+      "points": 31
+    },
+    {
+      "name": "Lithuania",
+      "points": 23
+    },
+    {
+      "name": "Spain",
+      "points": 23
+    },
+    {
+      "name": "Finland",
+      "points": 22
+    }
+  ],
+  "2008": [
+    {
+      "name": "Russia",
+      "points": 272
+    },
+    {
+      "name": "Ukraine",
+      "points": 230
+    },
+    {
+      "name": "Greece",
+      "points": 218
+    },
+    {
+      "name": "Armenia",
+      "points": 199
+    },
+    {
+      "name": "Norway",
+      "points": 182
+    },
+    {
+      "name": "Serbia",
+      "points": 160
+    },
+    {
+      "name": "Turkey",
+      "points": 138
+    },
+    {
+      "name": "Azerbaijan",
+      "points": 132
+    },
+    {
+      "name": "Israel",
+      "points": 124
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 110
+    },
+    {
+      "name": "Georgia",
+      "points": 83
+    },
+    {
+      "name": "Latvia",
+      "points": 83
+    },
+    {
+      "name": "Portugal",
+      "points": 69
+    },
+    {
+      "name": "Iceland",
+      "points": 64
+    },
+    {
+      "name": "Denmark",
+      "points": 60
+    },
+    {
+      "name": "Spain",
+      "points": 55
+    },
+    {
+      "name": "Albania",
+      "points": 55
+    },
+    {
+      "name": "Sweden",
+      "points": 47
+    },
+    {
+      "name": "France",
+      "points": 47
+    },
+    {
+      "name": "Romania",
+      "points": 45
+    },
+    {
+      "name": "Croatia",
+      "points": 44
+    },
+    {
+      "name": "Finland",
+      "points": 35
+    },
+    {
+      "name": "Germany",
+      "points": 14
+    },
+    {
+      "name": "Poland",
+      "points": 14
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 14
+    }
+  ],
+  "2007": [
+    {
+      "name": "Serbia",
+      "points": 268
+    },
+    {
+      "name": "Ukraine",
+      "points": 235
+    },
+    {
+      "name": "Russia",
+      "points": 207
+    },
+    {
+      "name": "Turkey",
+      "points": 163
+    },
+    {
+      "name": "Bulgaria",
+      "points": 157
+    },
+    {
+      "name": "Belarus",
+      "points": 145
+    },
+    {
+      "name": "Greece",
+      "points": 139
+    },
+    {
+      "name": "Armenia",
+      "points": 138
+    },
+    {
+      "name": "Hungary",
+      "points": 128
+    },
+    {
+      "name": "Moldova",
+      "points": 109
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 106
+    },
+    {
+      "name": "Georgia",
+      "points": 97
+    },
+    {
+      "name": "Romania",
+      "points": 84
+    },
+    {
+      "name": "North MacedoniaN.Macedonia",
+      "points": 73
+    },
+    {
+      "name": "Slovenia",
+      "points": 66
+    },
+    {
+      "name": "Latvia",
+      "points": 54
+    },
+    {
+      "name": "Finland",
+      "points": 53
+    },
+    {
+      "name": "Sweden",
+      "points": 51
+    },
+    {
+      "name": "Germany",
+      "points": 49
+    },
+    {
+      "name": "Spain",
+      "points": 43
+    },
+    {
+      "name": "Lithuania",
+      "points": 28
+    },
+    {
+      "name": "France",
+      "points": 19
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 19
+    },
+    {
+      "name": "Ireland",
+      "points": 5
+    }
+  ],
+  "2006": [
+    {
+      "name": "Finland",
+      "points": 292
+    },
+    {
+      "name": "Russia",
+      "points": 248
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 229
+    },
+    {
+      "name": "Romania",
+      "points": 172
+    },
+    {
+      "name": "Sweden",
+      "points": 170
+    },
+    {
+      "name": "Lithuania",
+      "points": 162
+    },
+    {
+      "name": "Ukraine",
+      "points": 145
+    },
+    {
+      "name": "Armenia",
+      "points": 129
+    },
+    {
+      "name": "Greece",
+      "points": 128
+    },
+    {
+      "name": "Ireland",
+      "points": 93
+    },
+    {
+      "name": "Turkey",
+      "points": 91
+    },
+    {
+      "name": "North MacedoniaN.Macedonia",
+      "points": 56
+    },
+    {
+      "name": "Croatia",
+      "points": 56
+    },
+    {
+      "name": "Norway",
+      "points": 36
+    },
+    {
+      "name": "Germany",
+      "points": 36
+    },
+    {
+      "name": "Switzerland",
+      "points": 30
+    },
+    {
+      "name": "Latvia",
+      "points": 30
+    },
+    {
+      "name": "Denmark",
+      "points": 26
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 25
+    },
+    {
+      "name": "Moldova",
+      "points": 22
+    },
+    {
+      "name": "Spain",
+      "points": 18
+    },
+    {
+      "name": "France",
+      "points": 5
+    },
+    {
+      "name": "Israel",
+      "points": 4
+    },
+    {
+      "name": "Malta",
+      "points": 1
+    }
+  ],
+  "2005": [
+    {
+      "name": "Greece",
+      "points": 230
+    },
+    {
+      "name": "Malta",
+      "points": 192
+    },
+    {
+      "name": "Romania",
+      "points": 158
+    },
+    {
+      "name": "Israel",
+      "points": 154
+    },
+    {
+      "name": "Latvia",
+      "points": 153
+    },
+    {
+      "name": "Moldova",
+      "points": 148
+    },
+    {
+      "name": "Serbia & Montenegro",
+      "points": 137
+    },
+    {
+      "name": "Switzerland",
+      "points": 128
+    },
+    {
+      "name": "Norway",
+      "points": 125
+    },
+    {
+      "name": "Denmark",
+      "points": 125
+    },
+    {
+      "name": "Croatia",
+      "points": 115
+    },
+    {
+      "name": "Hungary",
+      "points": 97
+    },
+    {
+      "name": "Turkey",
+      "points": 92
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 79
+    },
+    {
+      "name": "Russia",
+      "points": 57
+    },
+    {
+      "name": "Albania",
+      "points": 53
+    },
+    {
+      "name": "North MacedoniaN.Macedonia",
+      "points": 52
+    },
+    {
+      "name": "Cyprus",
+      "points": 46
+    },
+    {
+      "name": "Sweden",
+      "points": 30
+    },
+    {
+      "name": "Ukraine",
+      "points": 30
+    },
+    {
+      "name": "Spain",
+      "points": 28
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 18
+    },
+    {
+      "name": "France",
+      "points": 11
+    },
+    {
+      "name": "Germany",
+      "points": 4
+    }
+  ],
+  "2004": [
+    {
+      "name": "Ukraine",
+      "points": 280
+    },
+    {
+      "name": "Serbia & Montenegro",
+      "points": 263
+    },
+    {
+      "name": "Greece",
+      "points": 252
+    },
+    {
+      "name": "Turkey",
+      "points": 195
+    },
+    {
+      "name": "Cyprus",
+      "points": 170
+    },
+    {
+      "name": "Sweden",
+      "points": 170
+    },
+    {
+      "name": "Albania",
+      "points": 106
+    },
+    {
+      "name": "Germany",
+      "points": 93
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 91
+    },
+    {
+      "name": "Spain",
+      "points": 87
+    },
+    {
+      "name": "Russia",
+      "points": 67
+    },
+    {
+      "name": "Malta",
+      "points": 50
+    },
+    {
+      "name": "Croatia",
+      "points": 50
+    },
+    {
+      "name": "North MacedoniaN.Macedonia",
+      "points": 47
+    },
+    {
+      "name": "France",
+      "points": 40
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 29
+    },
+    {
+      "name": "Poland",
+      "points": 27
+    },
+    {
+      "name": "Romania",
+      "points": 18
+    },
+    {
+      "name": "Iceland",
+      "points": 16
+    },
+    {
+      "name": "Netherlands",
+      "points": 11
+    },
+    {
+      "name": "Austria",
+      "points": 9
+    },
+    {
+      "name": "Belgium",
+      "points": 7
+    },
+    {
+      "name": "Ireland",
+      "points": 7
+    },
+    {
+      "name": "Norway",
+      "points": 3
+    }
+  ],
+  "2003": [
+    {
+      "name": "Turkey",
+      "points": 167
+    },
+    {
+      "name": "Belgium",
+      "points": 165
+    },
+    {
+      "name": "Russia",
+      "points": 164
+    },
+    {
+      "name": "Norway",
+      "points": 123
+    },
+    {
+      "name": "Sweden",
+      "points": 107
+    },
+    {
+      "name": "Austria",
+      "points": 101
+    },
+    {
+      "name": "Poland",
+      "points": 90
+    },
+    {
+      "name": "Iceland",
+      "points": 81
+    },
+    {
+      "name": "Spain",
+      "points": 81
+    },
+    {
+      "name": "Romania",
+      "points": 73
+    },
+    {
+      "name": "Ireland",
+      "points": 53
+    },
+    {
+      "name": "Germany",
+      "points": 53
+    },
+    {
+      "name": "Netherlands",
+      "points": 45
+    },
+    {
+      "name": "Ukraine",
+      "points": 30
+    },
+    {
+      "name": "Croatia",
+      "points": 29
+    },
+    {
+      "name": "Bosnia & Herzegovina.",
+      "points": 27
+    },
+    {
+      "name": "Greece",
+      "points": 25
+    },
+    {
+      "name": "France",
+      "points": 19
+    },
+    {
+      "name": "Israel",
+      "points": 17
+    },
+    {
+      "name": "Cyprus",
+      "points": 15
+    },
+    {
+      "name": "Estonia",
+      "points": 14
+    },
+    {
+      "name": "Portugal",
+      "points": 13
+    },
+    {
+      "name": "Slovenia",
+      "points": 7
+    },
+    {
+      "name": "Latvia",
+      "points": 5
+    },
+    {
+      "name": "Malta",
+      "points": 4
+    },
+    {
+      "name": "United KingdomUK",
+      "points": 0
+    }
+  ]
+}
