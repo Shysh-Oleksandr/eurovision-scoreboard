@@ -156,9 +156,9 @@ export default function Error({
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 p-6 text-white overflow-y-auto">
           <div className="max-w-2xl w-full">
             {/* Error Card */}
-            <div className="bg-primary-800/50 backdrop-blur-sm rounded-2xl border border-primary-700/50 shadow-2xl overflow-hidden">
+            <div className="bg-primary-800/50 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
               {/* Header Section */}
-              <div className="bg-gradient-to-br from-primary-700/40 to-primary-800/60 px-8 py-10 text-center border-b border-primary-700/30">
+              <div className="bg-gradient-to-br from-white/10 to-primary-800/60 px-8 py-10 text-center border-b border-white/10">
                 <div className="flex justify-center mb-6">
                   <div className="relative">
                     {/* Pulsing background circle */}
@@ -194,7 +194,7 @@ export default function Error({
                     {t('common.copy')}
                   </Button>
                 </div>
-                <div className="bg-primary-900/60 rounded-lg flex items-center justify-between border border-primary-700/40 p-5 mb-6 max-h-[150px] overflow-auto">
+                <div className="bg-primary-900/60 rounded-lg flex items-center justify-between border border-white/10 p-5 mb-6 max-h-[150px] overflow-auto">
                   <p className="text-sm font-mono text-red-300 break-words">
                     {error.message || 'Unknown error occurred'}
                   </p>
@@ -238,7 +238,7 @@ export default function Error({
                 <div className="flex justify-center items-center gap-4">
                   <Button
                     onClick={() => window.location.reload()}
-                    className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
+                    className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-white/10 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
                   >
                     {t('error.reloadPage')}
                   </Button>
@@ -249,7 +249,7 @@ export default function Error({
                       localStorage.clear();
                     }}
                     variant="destructive"
-                    className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-primary-600/50 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
+                    className="!px-8 !py-3 text-base font-semibold bg-primary-700 hover:bg-primary-600 border border-white/10 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105"
                   >
                     {t('error.resetApplication')}
                   </Button>
@@ -257,7 +257,7 @@ export default function Error({
               </div>
 
               {/* Footer */}
-              <div className="bg-primary-900/40 px-8 py-4 border-t border-primary-700/30">
+              <div className="bg-primary-900/40 px-8 py-4 border-t border-white/10">
                 <p className="text-xs text-center text-primary-400">
                   Error ID: {Date.now().toString(36).toUpperCase()}
                 </p>

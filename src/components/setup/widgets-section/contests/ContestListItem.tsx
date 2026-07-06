@@ -144,7 +144,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     toast.success('Link copied to clipboard!');
   };
 
-  const overflowItems: OverflowMenuEntry[] = [
+  const overflowItems = [
     {
       icon: <Link2 className="size-4" />,
       label: t('widgets.copyLink'),
@@ -155,16 +155,20 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
       label: t('simulation.header.share'),
       onClick: () => handleShare('contest', contest._id, contest.name),
     },
-    'hr',
-    {
-      icon: quickSelectedByMe ? (
-        <PinSolidIcon className="size-4" />
-      ) : (
-        <PinIcon className="size-4" />
-      ),
-      label: t('widgets.quickSelect'),
-      onClick: handleQuickSelect,
-    },
+    user ? 'hr' : null,
+    ...(user
+      ? [
+          {
+            icon: quickSelectedByMe ? (
+              <PinSolidIcon className="size-4" />
+            ) : (
+              <PinIcon className="size-4" />
+            ),
+            label: t('widgets.quickSelect'),
+            onClick: handleQuickSelect,
+          },
+        ]
+      : []),
     ...(isMyContest
       ? ([
           'hr',
@@ -206,7 +210,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
           },
         ] as OverflowMenuEntry[])
       : []),
-  ];
+  ].filter(Boolean) as OverflowMenuEntry[];
 
   const secondaryActionClassName =
     'inline-flex items-center justify-center h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]';

@@ -26,6 +26,7 @@ import {
   ROUNDED_SUBTLE_GLOW_HOVER,
   splitRoundedCountryItemSurfaceClasses,
 } from '@/components/countryItem/utils/roundedCountryItemGlow';
+import { useIsLowPerfDevice } from '@/hooks/useIsLowPerfDevice';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 import { ItemState } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -176,11 +177,17 @@ const CountryItem = ({
     (isJuryVoting ||
       (!isJuryVoting && !isActive && revealTelevoteLowestToHighest));
 
+  const isLowPerfDevice = useIsLowPerfDevice();
+
   const roundedContainerStyle = useMemo((): React.CSSProperties | undefined => {
     if (!roundedCountryContainer) return undefined;
 
     const glowHovered = isRoundedGlowHovered && isRoundedGlowHoverable;
 
+    // The active televote halo never transitions: animating a blurred,
+    // multi-layer drop-shadow across rows on every vote is what lags the 2026
+    // board on weak GPUs. It snaps in; the state background still fades
+    // (transition-colors on the container).
     if (isActive) {
       return {
         filter: buildActiveTelevoteDropShadowFilter(
@@ -190,9 +197,15 @@ const CountryItem = ({
       };
     }
 
+    // The subtle glow only transitions for glow-hoverable rows (jury voting /
+    // reveal mode) — one row at a time, on real hover, so its single-layer fade
+    // is cheap. Disabled on low-perf devices, where even that is skipped.
     return {
       filter: glowHovered ? ROUNDED_SUBTLE_GLOW_HOVER : ROUNDED_SUBTLE_GLOW,
-      transition: ROUNDED_GLOW_TRANSITION,
+      transition:
+        isRoundedGlowHoverable && !isLowPerfDevice
+          ? ROUNDED_GLOW_TRANSITION
+          : undefined,
     };
   }, [
     roundedCountryContainer,
@@ -200,6 +213,7 @@ const CountryItem = ({
     televoteOutlineColor,
     isRoundedGlowHovered,
     isRoundedGlowHoverable,
+    isLowPerfDevice,
   ]);
 
   return (

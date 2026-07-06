@@ -144,11 +144,17 @@ export const useItemState = ({
 
   const buttonClassName = useMemo(
     () =>
-      `relative will-change-colors outline-countryItem-televoteOutline flex justify-between rounded-[1px] lg:mb-[6px] mb-1 ${
+      `relative outline-countryItem-televoteOutline flex justify-between rounded-[1px] lg:mb-[6px] mb-1 ${
         roundedCountryContainer ? 'lg:h-9' : 'lg:h-10 shadow-md'
-      } md:h-9 h-8 w-full transition-all !duration-500 ${
-        isActive ? 'rounded-sm' : ''
-      } ${showPlaceAnimation ? 'lg:ml-2 xs:ml-1.5 ml-1' : ''}
+      } md:h-9 h-8 w-full ${
+        // Rounded (2026) items carry the drop-shadow glow in their inline
+        // `filter`; `transition-all` would animate that filter every frame on
+        // state changes (the board-lag cause), so limit them to color fades or remove completely.
+        // Other themes have no filter — keep their original transition.
+        roundedCountryContainer ? '' : 'transition-all'
+      } !duration-500 ${isActive ? 'rounded-sm' : ''} ${
+        showPlaceAnimation ? 'lg:ml-2 xs:ml-1.5 ml-1' : ''
+      }
       ${isVotingCountry ? 'opacity-70 cursor-not-allowed' : ''}
       ${buttonColors}
       ${isVotingOver ? 'pointer-events-none' : ''}

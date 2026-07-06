@@ -79,6 +79,11 @@ import {
 
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
 
+// The live-preview theme's timestamps are never rendered — only the visual
+// content is applied. Use a fixed value so rebuilding the preview object on
+// every tweak doesn't allocate a fresh Date each time.
+const PREVIEW_TIMESTAMP = '1970-01-01T00:00:00.000Z';
+
 interface CustomizeThemeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -196,6 +201,11 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   // Debounce hue and shade to avoid heavy recomputation on every tick
   const debouncedHue = useDebounce(hue, 40);
   const debouncedShade = useDebounce(hsva.v, 40);
+  // Overrides update on every pointer-move while dragging a swatch in the color
+  // picker; debounce them for the live preview so we re-inject the theme <style>
+  // (and trigger a style recalc) at most ~25x/s instead of per event. The swatch
+  // grid itself still renders the live `overrides` for instant feedback.
+  const debouncedOverrides = useDebounce(overrides, 40);
   const debouncedHsva = useMemo(
     () => ({ ...hsva, h: debouncedHue, v: debouncedShade }),
     [hsva, debouncedHue, debouncedShade],
@@ -339,10 +349,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       baseThemeYear,
       hue: debouncedHue,
       shadeValue: debouncedShade,
-      overrides,
+      overrides: debouncedOverrides,
       backgroundImageUrl,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: PREVIEW_TIMESTAMP,
+      updatedAt: PREVIEW_TIMESTAMP,
       pointsContainerShape,
       uppercaseEntryName,
       juryActivePointsUnderline,
@@ -365,7 +375,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     debouncedShade,
     baseThemeYear,
     backgroundImageUrl,
-    overrides,
+    debouncedOverrides,
     pointsContainerShape,
     uppercaseEntryName,
     juryActivePointsUnderline,
@@ -1064,7 +1074,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const previewItem = (
     <ThemePreviewCountryItem
       backgroundImage={displayBg}
-      overrides={overrides}
+      // Debounced like the injected preview vars so the preview subtree (with
+      // its countup/gsap children) re-renders ~25x/s while dragging a swatch,
+      // not on every pointer-move. The swatch grid still uses live `overrides`.
+      overrides={debouncedOverrides}
       baseThemeYear={baseThemeYear}
       uppercaseEntryName={uppercaseEntryName}
       juryActivePointsUnderline={juryActivePointsUnderline}

@@ -164,13 +164,13 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       : lastPointsLabel !== '' && showLastPoints;
 
   if (roundedCountryLayout) {
-    const roundedLastPointsBlockClass = `flex h-full shrink-0 will-change-all ${
+    const roundedLastPointsBlockClass = `flex h-full shrink-0 ${
       isTwoColumnLayoutDisplayed
         ? 'pl-[23px] pr-[15px] w-9 -ml-[0.95rem]'
         : 'pr-[16px] pl-[24px] md:pr-[18px] md:pl-[26px] w-9 lg:pr-[24px] lg:pl-[32px] lg:w-10 -ml-3.5 lg:-ml-4'
     }`;
 
-    const roundedCurrentPointsBlockClass = `flex h-full shrink-0 will-change-all ${
+    const roundedCurrentPointsBlockClass = `flex h-full shrink-0 ${
       isTwoColumnLayoutDisplayed
         ? 'pl-0.5 w-[2.8rem]'
         : 'pl-1 md:w-[3.2rem] w-[3.35rem] lg:pl-2 lg:w-[4.4rem]'
@@ -252,7 +252,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
             )}
             <h6
               ref={lastPointsRef}
-              className={`${roundedPointsTextClass} h-full items-center flex justify-center will-change-all !z-[40] relative tabular-nums ${lastPointsTextClass}`}
+              className={`${roundedPointsTextClass} h-full items-center flex justify-center !z-[40] relative tabular-nums ${lastPointsTextClass}`}
             >
               {lastPointsLabel}
             </h6>
@@ -268,7 +268,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       {showLastPoints && (
         <div
           ref={lastPointsContainerRef}
-          className={`absolute z-10 h-full will-change-all transition-colors !duration-500 ${
+          className={`absolute z-10 h-full transition-colors !duration-500 ${
             withTriangle
               ? `pr-[0.5rem] lg:right-[2.4rem] lg:w-[2.5rem] ${
                   isTwoColumnLayoutDisplayed
@@ -291,7 +291,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
             ref={lastPointsRef}
             className={`xl:text-lg lg:text-base ${
               isTwoColumnLayoutDisplayed ? 'xs:text-sm text-xs' : 'text-sm'
-            } font-semibold h-full items-center flex justify-center will-change-all !z-[40] relative ${lastPointsTextClass}`}
+            } font-semibold h-full items-center flex justify-center !z-[40] relative ${lastPointsTextClass}`}
           >
             {lastPointsLabel}
           </h6>

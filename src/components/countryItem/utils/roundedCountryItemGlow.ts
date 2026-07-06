@@ -108,7 +108,6 @@ export function buildActiveTelevoteDropShadowFilter(
     layer(2, 1),
     layer(10, 0.8),
     layer(18, 0.55),
-    layer(26, 0.35),
   ].join(' ');
 }
 

@@ -75,11 +75,17 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     (s) => s.settings.enableMinimalisticFlags,
   );
   const previewCountry = useMemo(() => {
-    return ALL_COUNTRIES.find(
-      (country) =>
-        country.code.toLowerCase() ===
-        (previewCountryCode || user?.country || '/flags/ww.svg').toLowerCase(),
-    )!;
+    // Fall back to the "Rest of the World" (WW) entry when there's no explicit
+    // preview country and no signed-in user (e.g. a logged-out visitor remixing
+    // a public theme). The previous fallback was a flag PATH, not a country
+    // code, so `.find` returned undefined and the `!` crashed on `.code`.
+    const target = (previewCountryCode || user?.country || 'WW').toLowerCase();
+
+    return (
+      ALL_COUNTRIES.find((country) => country.code.toLowerCase() === target) ??
+      ALL_COUNTRIES.find((country) => country.code === 'WW') ??
+      ALL_COUNTRIES[0]
+    );
   }, [user, previewCountryCode]);
 
   // Refs for douze points animation

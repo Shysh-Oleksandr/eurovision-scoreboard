@@ -120,4 +120,7 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   );
 };
 
-export default ThemePreviewCountryItem;
+// Memoized so it re-renders with the (debounced) overrides rather than on every
+// pointer-move while a swatch is dragged — all props are primitives or the
+// stable debounced overrides object, so shallow comparison is effective.
+export default React.memo(ThemePreviewCountryItem);

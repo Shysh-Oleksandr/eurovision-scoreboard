@@ -136,16 +136,20 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
     [theme],
   );
 
-  const overflowItems: OverflowMenuEntry[] = [
-    {
-      icon: <CopyIcon className="size-4" />,
-      label:
-        (theme.duplicatesCount ?? 0) > 0
-          ? `${t('widgets.remix')} (${theme.duplicatesCount})`
-          : t('widgets.remix'),
-      onClick: () => onDuplicate(theme),
-    },
-    'hr',
+  const overflowItems = [
+    ...(user
+      ? [
+          {
+            icon: <CopyIcon className="size-4" />,
+            label:
+              (theme.duplicatesCount ?? 0) > 0
+                ? `${t('widgets.remix')} (${theme.duplicatesCount})`
+                : t('widgets.remix'),
+            onClick: () => onDuplicate(theme),
+          },
+        ]
+      : []),
+    user ? 'hr' : null,
     {
       icon: <Link2 className="size-4" />,
       label: t('widgets.copyLink'),
@@ -156,16 +160,20 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
       label: t('simulation.header.share'),
       onClick: () => handleShare('theme', theme._id, theme.name),
     },
-    'hr',
-    {
-      icon: quickSelectedByMe ? (
-        <PinSolidIcon className="size-4" />
-      ) : (
-        <PinIcon className="size-4" />
-      ),
-      label: t('widgets.quickSelect'),
-      onClick: handleQuickSelect,
-    },
+    user ? 'hr' : null,
+    ...(user
+      ? [
+          {
+            icon: quickSelectedByMe ? (
+              <PinSolidIcon className="size-4" />
+            ) : (
+              <PinIcon className="size-4" />
+            ),
+            label: t('widgets.quickSelect'),
+            onClick: handleQuickSelect,
+          },
+        ]
+      : []),
     ...(isMyTheme
       ? ([
           'hr',
@@ -207,7 +215,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           },
         ] as OverflowMenuEntry[])
       : []),
-  ];
+  ].filter(Boolean) as OverflowMenuEntry[];
 
   const secondaryActionClassName =
     'inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]';
