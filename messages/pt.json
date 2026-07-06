@@ -757,7 +757,18 @@
     "donationCardTitle": "Está a gostar do DouzePoints?",
     "donationCardIntro": "Olá, sou o Oleksandr — um fã da Eurovisão e programador da Ucrânia. O DouzePoints é um projeto gratuito usado por milhares de fãs da Eurovisão em todo o mundo e é construído e mantido inteiramente por mim.",
     "donationCardSupport": "Se quiser apoiar o desenvolvimento futuro e ajudar-me a continuar a melhorar a plataforma, a sua contribuição significaria muito para mim.",
-    "supportOnKoFi": "Apoiar no Ko-Fi"
+    "supportButton": "Apoiar o projeto",
+    "donationModalTitle": "Apoiar o DouzePoints",
+    "donationModalIntro": "Por estar na Ucrânia, infelizmente não consigo configurar nenhum dos serviços de doação habituais e convenientes (Ko-Fi, PayPal, Stripe, etc.) — os fornecedores de pagamento por trás deles não funcionam para mim. Por agora, uma transferência bancária direta na UE (SEPA) é a única opção funcional que encontrei. Exige um pouco mais de esforço, por isso obrigado por dedicar o tempo.",
+    "donationModalSepaTitle": "Doar via transferência bancária UE (SEPA)",
+    "donationModalIban": "IBAN / Número da conta",
+    "donationModalBic": "BIC / SWIFT",
+    "donationModalAccountHolder": "Titular da conta",
+    "donationModalNote": "Nota / Mensagem da transferência",
+    "donationModalNoteValue": "Presente / Apoio",
+    "donationModalDisclaimer": "Esta é uma conta Zen.com e muito provavelmente só funcionará para transferências feitas a partir de bancos da UE.",
+    "donationModalThankYou": "Muito obrigado pelo seu apoio — significa mesmo muito para mim!",
+    "copied": "Copiado para a área de transferência!"
   },
   "share": {
     "generating": "A gerar...",

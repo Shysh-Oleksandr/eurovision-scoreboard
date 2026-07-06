@@ -759,7 +759,18 @@
     "donationCardTitle": "Enjoying DouzePoints?",
     "donationCardIntro": "Hi, I'm Oleksandr — a Eurovision fan and developer from Ukraine. DouzePoints is a free project used by thousands of Eurovision fans around the world and is built and maintained entirely by me.",
     "donationCardSupport": "If you'd like to support future development and help me continue improving the platform, your contribution would mean a lot to me.",
-    "supportOnKoFi": "Support on Ko-Fi"
+    "supportButton": "Support the project",
+    "donationModalTitle": "Support DouzePoints",
+    "donationModalIntro": "Because I'm based in Ukraine, I unfortunately can't set up any of the usual, convenient donation services (Ko-Fi, PayPal, Stripe, etc.) — the payment providers behind them don't work for me. For now, a direct EU bank transfer (SEPA) is the only working option I've found. It's a bit of extra effort, so thank you for taking the time.",
+    "donationModalSepaTitle": "Donate via EU Bank Transfer (SEPA)",
+    "donationModalIban": "IBAN / Account Number",
+    "donationModalBic": "BIC / SWIFT",
+    "donationModalAccountHolder": "Account Holder Name",
+    "donationModalNote": "Transfer Note / Message",
+    "donationModalNoteValue": "Gift / Support",
+    "donationModalDisclaimer": "This is a Zen.com account and will most likely only work for transfers made from EU banks.",
+    "donationModalThankYou": "Thank you so much for your support — it truly means a lot!",
+    "copied": "Copied to clipboard!"
   },
   "share": {
     "generating": "Generating...",
