@@ -760,18 +760,7 @@
     "donationCardTitle": "Gefällt dir DouzePoints?",
     "donationCardIntro": "Hallo, ich bin Oleksandr — ein Eurovision-Fan und Entwickler aus der Ukraine. DouzePoints ist ein kostenloses Projekt, das von Tausenden Eurovision-Fans weltweit genutzt wird und vollständig von mir entwickelt und gepflegt wird.",
     "donationCardSupport": "Wenn du die weitere Entwicklung unterstützen und mir helfen möchtest, die Plattform weiter zu verbessern, würde mich dein Beitrag sehr freuen.",
-    "supportButton": "Projekt unterstützen",
-    "donationModalTitle": "DouzePoints unterstützen",
-    "donationModalIntro": "Da ich in der Ukraine lebe, kann ich leider keine der üblichen, bequemen Spenden-Dienste (Ko-Fi, PayPal, Stripe usw.) einrichten — die Zahlungsanbieter dahinter funktionieren für mich nicht. Vorerst ist eine direkte EU-Banküberweisung (SEPA) die einzige funktionierende Option, die ich gefunden habe. Es ist etwas mehr Aufwand, daher danke ich dir für deine Zeit.",
-    "donationModalSepaTitle": "Spenden per EU-Banküberweisung (SEPA)",
-    "donationModalIban": "IBAN / Kontonummer",
-    "donationModalBic": "BIC / SWIFT",
-    "donationModalAccountHolder": "Kontoinhaber",
-    "donationModalNote": "Verwendungszweck / Nachricht",
-    "donationModalNoteValue": "Geschenk / Unterstützung",
-    "donationModalDisclaimer": "Dies ist ein Zen.com-Konto und funktioniert höchstwahrscheinlich nur für Überweisungen von EU-Banken.",
-    "donationModalThankYou": "Vielen Dank für deine Unterstützung — das bedeutet mir wirklich sehr viel!",
-    "copied": "In die Zwischenablage kopiert!"
+    "supportOnPatreon": "Auf Patreon unterstützen"
   },
   "share": {
     "generating": "Generiere...",
