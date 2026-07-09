@@ -8,6 +8,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { UmamiAnalytics } from './analytics';
 import AppBootstrap from './app-bootstrap';
+import { ClarityAnalytics } from './clarity';
 import IntlProvider from './IntlProvider';
 import Providers from './providers';
 import ToastRoot from './toast-root';
@@ -156,6 +157,7 @@ export default async function RootLayout({
             {children}
             <ToastRoot />
             <UmamiAnalytics />
+            <ClarityAnalytics />
             <IntlProvider />
           </Providers>
         </NextIntlClientProvider>
