@@ -10,9 +10,11 @@ import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
 import EventStageVoters from './EventStageVoters';
 import { usePostSetupStageForm } from './hooks/usePostSetupStageForm';
+import { useStageOddsOverrideDraft } from './hooks/useStageOddsOverrideDraft';
 import { useStagePointsOverrideDraft } from './hooks/useStagePointsOverrideDraft';
 import { RunningOrderTab, useRunningOrder } from './running-order';
 import StageGeneralTab from './StageGeneralTab';
+import StageOddsTab from './StageOddsTab';
 
 import { PlayIcon } from '@/assets/icons/PlayIcon';
 import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
@@ -28,6 +30,7 @@ enum PostSetupModalTab {
   RUNNING_ORDER = 'Running Order',
   VOTERS = 'Voters',
   GENERAL = 'General',
+  ODDS = 'Odds',
 }
 
 interface PostSetupModalProps {
@@ -50,6 +53,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const [isVotersLoaded, setIsVotersLoaded] = useState(false);
+  const [isOddsLoaded, setIsOddsLoaded] = useState(false);
 
   const [selectedLayout, setSelectedLayout] = useState<'list' | 'grid'>('grid');
 
@@ -107,10 +111,14 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     isOpen,
   );
 
+  const { controller: oddsController, getOddsOverride } =
+    useStageOddsOverrideDraft(stage, isOpen);
+
   const tabs = useMemo(
     () => [
       { value: PostSetupModalTab.RUNNING_ORDER, label: t('runningOrder') },
       { value: PostSetupModalTab.VOTERS, label: t('voters') },
+      { value: PostSetupModalTab.ODDS, label: t('odds') },
       { value: PostSetupModalTab.GENERAL, label: t('general') },
     ],
     [t],
@@ -129,6 +137,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       setTimeout(() => {
         const runningOrder = orderedCodes;
         const pointsOverride = getOverride();
+        const oddsOverride = getOddsOverride();
 
         const enablePredefinedOverride =
           localEnablePredefined !== undefined &&
@@ -143,6 +152,8 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
 
           if (enablePredefinedOverride !== undefined)
             result.enablePredefinedVotes = enablePredefinedOverride;
+
+          if (oddsOverride) result.odds = oddsOverride;
 
           return Object.keys(result).length > 0 ? result : undefined;
         };
@@ -186,6 +197,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     onClose,
     orderedCodes,
     getOverride,
+    getOddsOverride,
     localEnablePredefined,
     globalEnablePredefined,
     configuredEventStages,
@@ -231,6 +243,20 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       },
       {
         ...tabs[2],
+        content: (
+          <>
+            {(activeTab === PostSetupModalTab.ODDS || isOddsLoaded) && (
+              <StageOddsTab
+                controller={oddsController}
+                stage={stage}
+                onLoaded={() => setIsOddsLoaded(true)}
+              />
+            )}
+          </>
+        ),
+      },
+      {
+        ...tabs[3],
         content: (
           <StageGeneralTab
             controller={controller}

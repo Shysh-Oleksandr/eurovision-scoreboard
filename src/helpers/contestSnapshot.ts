@@ -13,7 +13,7 @@ import {
   StageVotingMode,
   VotingCountry,
 } from '@/models';
-import { useCountriesStore } from '@/state/countriesStore';
+import { CountryOdds, useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { Contest } from '@/types/contest';
@@ -177,20 +177,39 @@ const getPointsSystem = (
 const buildStageOverridesFromSnapshot = (
   raw: ContestSnapshot['setup']['stages'][number]['overrides'],
 ): StageOverrides | undefined => {
-  if (!raw?.pointsSystem) return undefined;
-  const o = raw.pointsSystem;
-  const splitPointsSystem = o.splitPointsSystem ?? false;
+  if (!raw) return undefined;
 
-  return {
-    pointsSystem: {
+  const result: StageOverrides = {};
+
+  if (raw.pointsSystem) {
+    const o = raw.pointsSystem;
+    const splitPointsSystem = o.splitPointsSystem ?? false;
+
+    result.pointsSystem = {
       pointsSystem: getPointsSystem(o.pointsSystem),
       televotePointsSystem: splitPointsSystem
         ? getPointsSystem(o.televotePointsSystem)
         : getPointsSystem(o.pointsSystem),
       splitPointsSystem,
       allowMultiplePointsToSameEntry: o.allowMultiplePointsToSameEntry ?? false,
-    },
-  };
+    };
+  }
+
+  if (raw.odds) {
+    const countryOdds: CountryOdds = {};
+
+    (raw.odds.countryOdds || []).forEach(([code, juryOdds, televoteOdds]) => {
+      countryOdds[code] = { juryOdds, televoteOdds };
+    });
+
+    result.odds = {
+      countryOdds,
+      randomnessLevel: raw.odds.randomnessLevel ?? DEFAULT_RANDOMNESS_LEVEL,
+      pointsSpread: raw.odds.pointsSpread ?? DEFAULT_POINTS_SPREAD,
+    };
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
 };
 
 export function buildContestSnapshotFromStores() {
@@ -372,26 +391,51 @@ export function buildContestSnapshotFromStores() {
   const setupStagesPayload = setupStages.map((stage) => {
     const participants = getOrderedStageParticipantCodes(stage);
     const o = stage.overrides?.pointsSystem;
-    const stageOverridesPayload = o
-      ? {
-          overrides: {
-            pointsSystem: {
-              pointsSystem: createPointsPayload(o.pointsSystem),
-              ...(o.splitPointsSystem
-                ? {
-                    televotePointsSystem: createPointsPayload(
-                      o.televotePointsSystem,
-                    ),
-                  }
-                : {}),
-              ...(o.splitPointsSystem ? { splitPointsSystem: true } : {}),
-              ...(o.allowMultiplePointsToSameEntry
-                ? { allowMultiplePointsToSameEntry: true }
-                : {}),
-            },
-          },
-        }
-      : {};
+    const oddsOverride = stage.overrides?.odds;
+    const overridesPayload: NonNullable<
+      ContestSnapshot['setup']['stages'][number]['overrides']
+    > = {};
+
+    if (o) {
+      overridesPayload.pointsSystem = {
+        pointsSystem: createPointsPayload(o.pointsSystem),
+        ...(o.splitPointsSystem
+          ? {
+              televotePointsSystem: createPointsPayload(o.televotePointsSystem),
+            }
+          : {}),
+        ...(o.splitPointsSystem ? { splitPointsSystem: true } : {}),
+        ...(o.allowMultiplePointsToSameEntry
+          ? { allowMultiplePointsToSameEntry: true }
+          : {}),
+      };
+    }
+
+    if (oddsOverride) {
+      // Save every stage country's odds explicitly (all-or-nothing), so the
+      // override still resolves correctly if the global odds later change.
+      const oddsCountryTuples = Object.entries(oddsOverride.countryOdds).map(
+        ([code, odds]) =>
+          [
+            code,
+            odds.juryOdds ?? DEFAULT_ODDS.juryOdds,
+            odds.televoteOdds ?? DEFAULT_ODDS.televoteOdds,
+          ] as [string, number, number],
+      );
+
+      overridesPayload.odds = {
+        ...(oddsCountryTuples.length > 0
+          ? { countryOdds: oddsCountryTuples }
+          : {}),
+        randomnessLevel: oddsOverride.randomnessLevel,
+        pointsSpread: oddsOverride.pointsSpread,
+      };
+    }
+
+    const stageOverridesPayload =
+      Object.keys(overridesPayload).length > 0
+        ? { overrides: overridesPayload }
+        : {};
     const stageData: any = {
       id: stage.id,
       name: stage.name,

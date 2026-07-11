@@ -9,6 +9,7 @@ import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '../common/tabs/Tabs';
 
 import { GeneralSettings } from './GeneralSettings';
+import { useGlobalOddsController } from './useGlobalOddsController';
 
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { BaseCountry } from '@/models';
@@ -56,6 +57,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const [isOddsLoaded, setIsOddsLoaded] = useState(false);
   const [isRelationsLoaded, setIsRelationsLoaded] = useState(false);
 
+  const oddsController = useGlobalOddsController();
+
   const tabs = useMemo(
     () => [
       { value: SettingsTab.GENERAL, label: t('general') },
@@ -77,6 +80,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           <>
             {(activeTab === SettingsTab.ODDS || isOddsLoaded) && (
               <OddsSettings
+                controller={oddsController}
                 countries={participatingCountries}
                 onLoaded={() => setIsOddsLoaded(true)}
               />
@@ -95,7 +99,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         ),
       },
     ],
-    [activeTab, isOddsLoaded, isRelationsLoaded, participatingCountries, tabs],
+    [
+      activeTab,
+      isOddsLoaded,
+      isRelationsLoaded,
+      oddsController,
+      participatingCountries,
+      tabs,
+    ],
   );
 
   useEffectOnce(onLoaded);

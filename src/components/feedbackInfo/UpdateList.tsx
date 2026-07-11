@@ -1,6 +1,8 @@
 import { useLocale } from 'next-intl';
 import React, { useState } from 'react';
 
+import { RichText } from '../common/RichText';
+
 import { UpdateItem, getDateLabel } from './types';
 
 interface UpdateListProps {
@@ -36,10 +38,13 @@ const UpdateList = ({
             key={item.date ? `${item.date}-${item.title}` : item.title}
             className="border-l-2 rounded border-solid border-white sm:pl-4 pl-3 bg-gradient-to-r from-primary-800/30 to-primary-900/30 shadow-sm rounded-r-lg sm:w-fit w-full sm:p-1 p-0.5 !pr-2"
           >
-            <p className="text-white/70 text-sm font-medium">
+            <p className="text-white/50 text-sm font-medium">
               {getDateLabel(item, locale)}
             </p>
-            <p className="mt-0.5 leading-normal">{item.title}</p>
+            <RichText
+              content={item.title}
+              className="mt-0.5 leading-normal text-white/90"
+            />
           </li>
         ))}
       </ul>

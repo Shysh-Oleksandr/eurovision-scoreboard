@@ -1,4 +1,5 @@
 import { EventStage, PointsItem } from '@/models';
+import type { CountryOdds } from '@/state/countriesStore';
 import { GeneralState } from '@/state/generalStore';
 
 export interface ResolvedPointsSystem {
@@ -39,4 +40,37 @@ export const resolveStagePointsSystem = (
     splitPointsSystem,
     allowMultiplePointsToSameEntry,
   };
+};
+
+export interface ResolvedStageOdds {
+  countryOdds: CountryOdds;
+  randomnessLevel: number;
+  pointsSpread: number;
+}
+
+/**
+ * Resolves the odds configuration a stage uses during simulation. When the stage
+ * carries an `odds` override, its per-country odds are merged over the global map
+ * (override wins for the stage's countries) and its randomness/spread replace the
+ * globals. Otherwise the passed-in globals are returned unchanged.
+ */
+export const resolveStageOdds = (
+  stage: EventStage | undefined,
+  globals: {
+    countryOdds: CountryOdds;
+    randomnessLevel: number;
+    pointsSpread: number;
+  },
+): ResolvedStageOdds => {
+  const o = stage?.overrides?.odds;
+
+  if (o) {
+    return {
+      countryOdds: { ...globals.countryOdds, ...o.countryOdds },
+      randomnessLevel: o.randomnessLevel,
+      pointsSpread: o.pointsSpread,
+    };
+  }
+
+  return globals;
 };

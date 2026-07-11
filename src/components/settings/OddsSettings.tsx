@@ -10,9 +10,9 @@ import { Tooltip } from '../common/Tooltip';
 
 import { CountryOddsItem } from './CountryOddsItem';
 import { CountryRankList } from './CountryRankList';
+import { OddsController } from './useGlobalOddsController';
 
 import { BaseCountry } from '@/models';
-import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { rankOrderToOdds } from '@/state/scoreboard/rankToOdds';
 
@@ -44,27 +44,32 @@ const LABELS = [
 ];
 
 interface OddsSettingsProps {
+  controller: OddsController;
   countries: BaseCountry[];
   onLoaded?: () => void;
 }
 
-const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
+const OddsSettings: React.FC<OddsSettingsProps> = ({
+  controller,
+  countries,
+  onLoaded,
+}) => {
   const t = useTranslations();
-  const countryOdds = useCountriesStore((state) => state.countryOdds);
-  const updateCountryOdds = useCountriesStore(
-    (state) => state.updateCountryOdds,
-  );
-  const setBulkCountryOdds = useCountriesStore(
-    (state) => state.setBulkCountryOdds,
-  );
-  const loadYearOdds = useCountriesStore((state) => state.loadYearOdds);
-  const randomnessLevel = useGeneralStore(
-    (state) => state.settings.randomnessLevel,
-  );
-  const pointsSpread = useGeneralStore((state) => state.settings.pointsSpread);
+  const {
+    countryOdds,
+    randomnessLevel,
+    pointsSpread,
+    updateCountryOdds,
+    setBulkCountryOdds,
+    setRandomnessLevel,
+    setPointsSpread,
+    loadYearOdds,
+  } = controller;
+
+  // Rank layout is a global UI preference (not part of the odds override).
+  const rankLayout = useGeneralStore((state) => state.settings.oddsRankLayout);
   const setSettings = useGeneralStore((state) => state.setSettings);
 
-  const rankLayout = useGeneralStore((state) => state.settings.oddsRankLayout);
   const [rankDimension, setRankDimension] = useState<RankDimension>('jury');
   const [viewMode, setViewMode] = useState<'numbers' | 'rank'>('numbers');
 
@@ -257,7 +262,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
           min={0}
           max={100}
           value={randomnessLevel}
-          onChange={(value) => setSettings({ randomnessLevel: value })}
+          onChange={(value) => setRandomnessLevel(value)}
           minLabel={t('settings.odds.predictable')}
           maxLabel={t('settings.odds.chaotic')}
         />
@@ -269,7 +274,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
           min={0}
           max={100}
           value={pointsSpread}
-          onChange={(value) => setSettings({ pointsSpread: value })}
+          onChange={(value) => setPointsSpread(value)}
           minLabel={t('settings.odds.tight')}
           maxLabel={t('settings.odds.wide')}
         />
@@ -375,6 +380,7 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({ countries, onLoaded }) => {
             dimension={rankDimension}
             pointsSpread={pointsSpread}
             layout={rankLayout}
+            oddsSource={countryOdds}
             onReorder={handleRankReorder}
           />
         </>

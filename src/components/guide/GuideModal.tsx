@@ -1,22 +1,11 @@
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { CollapsibleSection } from '../common/CollapsibleSection';
 import Modal from '../common/Modal/Modal';
 import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
+import { GUIDE_RICH_TEXT_COMPONENTS } from '../common/RichText';
 import Tabs from '../common/tabs/Tabs';
-
-const RICH_TEXT = {
-  list: (chunks: ReactNode) => (
-    <ul className="list-disc list-inside mt-2 space-y-1.5 text-white/80">
-      {chunks}
-    </ul>
-  ),
-  item: (chunks: ReactNode) => <li>{chunks}</li>,
-  strong: (chunks: ReactNode) => (
-    <strong className="font-semibold text-white">{chunks}</strong>
-  ),
-};
 
 const TAB_SECTIONS: Record<string, string[]> = {
   start: ['gettingStarted', 'signIn', 'savingContests', 'customEntries'],
@@ -128,7 +117,7 @@ const GuideModal = ({
             <div className="text-sm sm:text-base text-white/90 leading-relaxed">
               {t.rich(
                 `${activeTab}.${key}.content` as Parameters<typeof t>[0],
-                RICH_TEXT,
+                GUIDE_RICH_TEXT_COMPONENTS,
               )}
             </div>
           </CollapsibleSection>

@@ -5,7 +5,7 @@ import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
 import { resolveDiaspora } from './diaspora';
-import { resolveStagePointsSystem } from './stageOverrides';
+import { resolveStageOdds, resolveStagePointsSystem } from './stageOverrides';
 import { ManualShareTotalsRow, ScoreboardState } from './types';
 import { predefineStageVotes } from './votesPredefinition';
 
@@ -91,10 +91,19 @@ export const createPredefinitionActions: StateCreator<
   PredefinitionActions
 > = (set) => ({
   predefineVotesForStage: (stage: EventStage, resetOtherStages = false) => {
-    const { countryOdds, getStageVotingCountries } =
+    const { countryOdds: globalCountryOdds, getStageVotingCountries } =
       useCountriesStore.getState();
     const generalState = useGeneralStore.getState();
-    const { randomnessLevel, pointsSpread, diaspora } = generalState.settings;
+    const { diaspora } = generalState.settings;
+
+    const { countryOdds, randomnessLevel, pointsSpread } = resolveStageOdds(
+      stage,
+      {
+        countryOdds: globalCountryOdds,
+        randomnessLevel: generalState.settings.randomnessLevel,
+        pointsSpread: generalState.settings.pointsSpread,
+      },
+    );
 
     const {
       pointsSystem,

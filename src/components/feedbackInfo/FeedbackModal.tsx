@@ -78,7 +78,7 @@ const FeedbackModal = ({
       isOpen={showModal}
       onClose={() => setShowModal(false)}
       containerClassName="!w-[min(100%,650px)]"
-      contentClassName="pb-2 !pt-4 xs:!px-8 !px-6 text-white sm:h-[51vh] h-[55vh] narrow-scrollbar"
+      contentClassName="pb-2 !pt-4 xs:!px-8 !px-6 text-white sm:h-[55vh] h-[55vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       withBlur
       topContent={

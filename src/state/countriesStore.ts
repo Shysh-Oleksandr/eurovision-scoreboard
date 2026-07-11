@@ -24,6 +24,31 @@ export type CountryOdds = Record<
   { juryOdds?: number; televoteOdds?: number }
 >;
 
+/**
+ * Builds an odds map for `countries` from the selected year's JSON defaults
+ * (falling back to 50/50 when a country isn't in the year list). Shared by the
+ * store's `loadYearOdds` and the per-stage odds-override draft's "Load year data".
+ */
+export const resolveYearOddsFor = (
+  countries: BaseCountry[],
+  allCountriesForYear: BaseCountry[],
+): CountryOdds => {
+  const yearOdds: CountryOdds = {};
+
+  countries.forEach((country) => {
+    const yearCountryData = allCountriesForYear.find(
+      (c) => c.code === country.code,
+    );
+
+    yearOdds[country.code] = {
+      juryOdds: yearCountryData?.juryOdds ?? 50,
+      televoteOdds: yearCountryData?.televoteOdds ?? 50,
+    };
+  });
+
+  return yearOdds;
+};
+
 export interface CountriesState {
   // State
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
@@ -341,22 +366,10 @@ export const useCountriesStore = create<CountriesState>()(
           },
 
           loadYearOdds: (countries: BaseCountry[]) => {
-            const { allCountriesForYear } = get();
-            const yearOdds: Record<
-              string,
-              { juryOdds?: number; televoteOdds?: number }
-            > = {};
-
-            countries.forEach((country) => {
-              const yearCountryData = allCountriesForYear.find(
-                (c) => c.code === country.code,
-              );
-
-              yearOdds[country.code] = {
-                juryOdds: yearCountryData?.juryOdds ?? 50,
-                televoteOdds: yearCountryData?.televoteOdds ?? 50,
-              };
-            });
+            const yearOdds = resolveYearOddsFor(
+              countries,
+              get().allCountriesForYear,
+            );
 
             set((state) => ({
               countryOdds: {

@@ -409,32 +409,30 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-07-11',
+    title:
+      '<list><item>Creating custom diaspora blocs</item><item>Persisting the diaspora settings in the user profile</item><item>Overriding odds per stage</item><item>Auto-syncing the settings in the user profile</item><item>The by-country view of the relations</item><item>Filtering your own leaderboard by contest groups</item><item>Small improvements and bug fixes</item></list>',
+  },
+  {
     date: '2026-07-05',
     title:
-      'Rebuilt the simulation randomization engine. It now uses a new probability model calibrated against 20+ years of real Eurovision results, so simulated scoreboards mirror the real shape of a contest. The Randomness and Points Spread controls were rebuilt so each does one clear job (how unpredictable vs. how spread-out the results are). Implemented the Diaspora & Affinity system that adds directed country-to-country voting bias — neighbours, diaspora, and rivalries — with presets generated from two decades of real voting data. Fixed the issue with displaying incorrect results when loading a saved contest using the presentation mode.',
+      '<list><item>Rebuilt the simulation randomization engine with a new probability model calibrated against 20+ years of real Eurovision results, so simulated scoreboards mirror the real shape of a contest</item><item>Rebuilt the Randomness and Points Spread controls so each does one clear job (how unpredictable vs. how spread-out the results are)</item><item>Implemented the Diaspora & Affinity system that adds directed country-to-country voting bias — neighbours, diaspora, and rivalries — with presets generated from two decades of real voting data</item><item>Fixed the issue with displaying incorrect results when loading a saved contest using the presentation mode</item></list>',
   },
   {
     date: '2026-06-20',
     title:
-      'Added the rank-based odds system. Added the points spread slider (controls the gap between winners and losers). Redesigned the theme creation UI. Small UI improvements',
+      '<list><item>Added the rank-based odds system</item><item>Added the points spread slider (controls the gap between winners and losers)</item><item>Redesigned the theme creation UI</item><item>Small UI improvements</item></list>',
   },
   ...OLD_WHATS_NEW,
 ];
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-06-21', end: '2026-06-25' },
-    title:
-      'Create custom diaspora factors blocs. Persist the diaspora factors settings with saved contests. Separate odds per stage.',
+    approximateDates: { start: '2026-07-12', end: '2026-07-13' },
+    title: 'Rank-based predefined voting generator',
   },
   {
     title: 'Upload custom fonts',
-  },
-  {
-    title: 'Save settings in the user profile',
-  },
-  {
-    title: 'Rank-based predefined voting generator',
   },
   {
     title: 'Allocation draw',

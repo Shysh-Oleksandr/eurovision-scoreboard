@@ -59,13 +59,26 @@ export const useVotingPredefinition = ({
   const getPointsSystemForSource = (source: 'jury' | 'televote') =>
     source === 'televote' ? effectiveTelevotePointsSystem : pointsSystem;
 
-  const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
-  const pointsSpread = useGeneralStore((s) => s.settings.pointsSpread);
+  const globalRandomnessLevel = useGeneralStore(
+    (s) => s.settings.randomnessLevel,
+  );
+  const globalPointsSpread = useGeneralStore((s) => s.settings.pointsSpread);
   const diasporaSettings = useGeneralStore((s) => s.settings.diaspora);
   const getStageVotingCountries = useCountriesStore(
     (s) => s.getStageVotingCountries,
   );
-  const { countryOdds } = useCountriesStore();
+  const { countryOdds: globalCountryOdds } = useCountriesStore();
+
+  // Per-stage odds override (configuredStage is fresher than the stage prop),
+  // mirroring the points-system resolution above.
+  const oddsOverride =
+    configuredStage?.overrides?.odds ?? stage.overrides?.odds;
+  const randomnessLevel =
+    oddsOverride?.randomnessLevel ?? globalRandomnessLevel;
+  const pointsSpread = oddsOverride?.pointsSpread ?? globalPointsSpread;
+  const countryOdds = oddsOverride
+    ? { ...globalCountryOdds, ...oddsOverride.countryOdds }
+    : globalCountryOdds;
 
   const isReplayingSavedVotes = useScoreboardStore(
     (s) => s.isReplayingSavedVotes,

@@ -69,6 +69,12 @@ export interface ContestSnapshot {
           splitPointsSystem?: boolean;
           allowMultiplePointsToSameEntry?: boolean;
         };
+        odds?: {
+          // [code, juryOdds, televoteOdds] for each of the stage's countries
+          countryOdds?: Array<[string, number, number]>;
+          randomnessLevel?: number;
+          pointsSpread?: number;
+        };
       };
     }>;
   };

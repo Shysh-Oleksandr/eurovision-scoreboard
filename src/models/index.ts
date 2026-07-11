@@ -79,9 +79,16 @@ export interface StagePointsSystemOverride {
   allowMultiplePointsToSameEntry: boolean;
 }
 
+export interface StageOddsOverride {
+  countryOdds: Record<string, { juryOdds?: number; televoteOdds?: number }>;
+  randomnessLevel: number;
+  pointsSpread: number;
+}
+
 export interface StageOverrides {
   pointsSystem?: StagePointsSystemOverride;
   enablePredefinedVotes?: boolean;
+  odds?: StageOddsOverride;
 }
 
 export interface EventStage {

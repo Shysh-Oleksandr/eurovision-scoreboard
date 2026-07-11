@@ -47,7 +47,7 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
       <div className="sm:mb-1 gap-1 px-2">
         <div className="flex items-center justify-between md:gap-4 gap-2 flex-wrap">
           <div className="md:w-auto w-full">
-            <div className="flex gap-4 items-center sm:justify-start justify-between">
+            <div className="flex gap-4 flex-wrap items-center sm:justify-start justify-between">
               <h3 className="text-lg font-bold">{stageName}</h3>
 
               <div className="flex flex-wrap sm:gap-2 gap-1.5 items-center justify-end">

@@ -128,7 +128,9 @@
       "allParticipants": "Всі учасники",
       "general": "Загальне",
       "startStage": "Почати {stageName}",
-      "enablePredefinedVotesForStage": "Увімкнути попередньо визначене голосування для цього етапу"
+      "enablePredefinedVotesForStage": "Увімкнути попередньо визначене голосування для цього етапу",
+      "odds": "Шанси",
+      "oddsOverrideNote": "Ці шанси застосовуються лише до цього етапу. Постійні глобальні шанси конкурсу налаштовуються в Налаштуваннях."
     },
     "validation": {
       "noCountriesInStage": "У {stageName} немає країн.",

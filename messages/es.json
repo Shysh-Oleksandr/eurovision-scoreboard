@@ -128,7 +128,9 @@
       "allParticipants": "Todos los participantes",
       "general": "General",
       "startStage": "Iniciar {stageName}",
-      "enablePredefinedVotesForStage": "Habilitar votos predefinidos para esta fase"
+      "enablePredefinedVotesForStage": "Habilitar votos predefinidos para esta fase",
+      "odds": "Probabilidades",
+      "oddsOverrideNote": "Estas probabilidades se aplican solo a esta fase. Las probabilidades globales persistentes del concurso se configuran en Ajustes."
     },
     "validation": {
       "noCountriesInStage": "No hay países en {stageName}.",

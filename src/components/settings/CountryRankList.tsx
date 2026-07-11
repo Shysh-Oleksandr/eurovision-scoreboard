@@ -6,7 +6,7 @@ import { BaseCountry } from '../../models';
 import { DragGripIcon } from '@/assets/icons/DragGripIcon';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { cn } from '@/helpers/utils';
-import { useCountriesStore } from '@/state/countriesStore';
+import { CountryOdds, useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import {
   oddsToRankOrder,
@@ -23,6 +23,11 @@ interface CountryRankListProps {
   dimension: 'jury' | 'televote';
   pointsSpread: number;
   layout?: 'list' | 'grid';
+  /**
+   * Odds map used to seed the rank order. Defaults to the global store's
+   * `countryOdds`; pass a draft map (e.g. a per-stage override) to seed from it.
+   */
+  oddsSource?: CountryOdds;
   /** Persist callback: receives the current order (best first). */
   onReorder: (orderedCodes: string[]) => void;
 }
@@ -35,6 +40,7 @@ export const CountryRankList: React.FC<CountryRankListProps> = ({
   dimension,
   pointsSpread,
   layout = 'list',
+  oddsSource,
   onReorder,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -43,12 +49,12 @@ export const CountryRankList: React.FC<CountryRankListProps> = ({
 
   const countryCodesKey = countries.map((c) => c.code).join(',');
 
+  // Seed from the provided draft odds when given, else the global store map.
+  const getSeedOdds = () =>
+    oddsSource ?? useCountriesStore.getState().countryOdds;
+
   const [orderedCodes, setOrderedCodes] = useState<string[]>(() =>
-    oddsToRankOrder(
-      countries,
-      useCountriesStore.getState().countryOdds,
-      dimension,
-    ),
+    oddsToRankOrder(countries, getSeedOdds(), dimension),
   );
 
   // Reseed the order when the active dimension or the participating set changes.
@@ -64,13 +70,7 @@ export const CountryRankList: React.FC<CountryRankListProps> = ({
     if (seededKeyRef.current === key) return;
     seededKeyRef.current = key;
 
-    setOrderedCodes(
-      oddsToRankOrder(
-        countries,
-        useCountriesStore.getState().countryOdds,
-        dimension,
-      ),
-    );
+    setOrderedCodes(oddsToRankOrder(countries, getSeedOdds(), dimension));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dimension, countryCodesKey]);
 
