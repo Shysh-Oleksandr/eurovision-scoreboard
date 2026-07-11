@@ -50,7 +50,7 @@ import { Input } from '@/components/Input';
 import { JESC_THEME_OPTIONS, THEME_OPTIONS } from '@/data/data';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
-import { useConfirmation } from '@/hooks/useConfirmation';
+import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useGeneralStore } from '@/state/generalStore';
@@ -98,7 +98,13 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   isEditMode = false,
 }) => {
   const t = useTranslations();
-  const { confirm } = useConfirmation();
+
+  const { onClickOutside } = useConfirmModalClose({
+    onClose,
+    confirmKey: 'close-customize-theme',
+    title: t('widgets.themes.confirmCloseCustomizeThemeTitle'),
+    description: t('widgets.themes.confirmCloseCustomizeThemeDescription'),
+  });
 
   const themeYear = useGeneralStore((state) => state.themeYear);
   const applyCustomThemeToStore = useGeneralStore((s) => s.applyCustomTheme);
@@ -1018,16 +1024,6 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       handleFileChange(e.dataTransfer.files[0]);
       e.dataTransfer.clearData();
     }
-  };
-
-  const onClickOutside = () => {
-    confirm({
-      key: 'close-customize-theme',
-      type: 'alert',
-      title: t('widgets.themes.confirmCloseCustomizeThemeTitle'),
-      description: t('widgets.themes.confirmCloseCustomizeThemeDescription'),
-      onConfirm: onClose,
-    });
   };
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);

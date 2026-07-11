@@ -15,11 +15,12 @@ interface WidgetResourceGroupBadgesProps {
   selectedGroupId: string | null;
   onSelectAll: () => void;
   onSelectGroup: (id: string) => void;
-  onAddGroup: () => void;
-  onEditGroup: (group: ResourceGroupRowItem) => void;
+  onAddGroup?: () => void;
+  onEditGroup?: (group: ResourceGroupRowItem) => void;
   allLabel: string;
-  addGroupAriaLabel: string;
-  editGroupAriaLabel: string;
+  addGroupAriaLabel?: string;
+  editGroupAriaLabel?: string;
+  readOnly?: boolean;
   className?: string;
 }
 
@@ -33,6 +34,7 @@ const WidgetResourceGroupBadges: React.FC<WidgetResourceGroupBadgesProps> = ({
   allLabel,
   addGroupAriaLabel,
   editGroupAriaLabel,
+  readOnly = false,
   className = '',
 }) => {
   return (
@@ -58,9 +60,9 @@ const WidgetResourceGroupBadges: React.FC<WidgetResourceGroupBadgesProps> = ({
               onClick={() => onSelectGroup(g._id)}
               isActive={isActive}
               Icon
-              className={cn(isActive && 'py-1')}
+              className={cn(isActive && !readOnly && 'py-1')}
             >
-              {isActive && (
+              {isActive && !readOnly && onEditGroup && (
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
@@ -76,14 +78,16 @@ const WidgetResourceGroupBadges: React.FC<WidgetResourceGroupBadgesProps> = ({
           </div>
         );
       })}
-      <button
-        type="button"
-        onClick={onAddGroup}
-        className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary-900 hover:bg-primary-800 text-white/80 hover:text-white transition-colors border border-white/10"
-        aria-label={addGroupAriaLabel}
-      >
-        <Plus className="w-5 h-5" />
-      </button>
+      {!readOnly && onAddGroup && (
+        <button
+          type="button"
+          onClick={onAddGroup}
+          className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary-900 hover:bg-primary-800 text-white/80 hover:text-white transition-colors border border-white/10"
+          aria-label={addGroupAriaLabel}
+        >
+          <Plus className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 };

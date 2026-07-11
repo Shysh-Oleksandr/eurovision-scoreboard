@@ -17,17 +17,35 @@ export type AffinityMap = Record<string, Record<string, number>>;
 
 export type DiasporaOverride = { from: string; to: string; affinity: number };
 
+/**
+ * A user-created bloc. Generates a directed affinity `base` for every ordered
+ * member pair (k members -> k*(k-1) pairs); `pairs` are optional per-pair tweaks
+ * within the group. Sits below `overrides` in resolution, so a global override
+ * still wins over a custom-group value.
+ */
+export type DiasporaCustomGroup = {
+  id: string;
+  name: string;
+  memberCodes: string[];
+  /** affinity applied to every ordered member pair, before per-pair tweaks. */
+  base: number;
+  enabled: boolean;
+  /** optional per-pair tweaks within the group (same shape as an override). */
+  pairs?: DiasporaOverride[];
+};
+
 export type DiasporaSettings = {
   enabled: boolean;
   /** 0-100; maps to the internal affinity strength K (60 -> K3, the default). */
   strength: number;
   enabledGroupIds: string[];
   useSpecialPairs: boolean;
-  useRivalries: boolean;
   /** "All historical pairs" — the full significant-pair set (max realism). */
   useBroadPreset: boolean;
   /** User custom directed pairs; win over any preset value. */
   overrides: DiasporaOverride[];
+  /** User-created blocs; generate tunable directed member pairs. */
+  customGroups: DiasporaCustomGroup[];
 };
 
 export type PresetPair = { from: string; to: string; affinity: number };
@@ -66,12 +84,13 @@ export const DEFAULT_DIASPORA_SETTINGS: DiasporaSettings = {
   enabledGroupIds: diasporaPresets.groups
     .filter((g) => g.defaultOn)
     .map((g) => g.id),
-  // Blocs + the top-40 special pairs (which now include rivalries) are the core.
-  // "All historical pairs" is an advanced, off-by-default opt-in.
+  // Blocs + the top-40 special pairs (which already fold in the significant
+  // rivalries/negatives) are the core. "All historical pairs" is an advanced,
+  // off-by-default opt-in.
   useSpecialPairs: true,
-  useRivalries: false,
   useBroadPreset: false,
   overrides: [],
+  customGroups: [],
 };
 
 const clamp = (v: number, lo: number, hi: number) =>
@@ -82,7 +101,7 @@ export const strengthToK = (strength: number): number =>
 
 /**
  * Resolve the settings into a directed affinity map. Layering (later wins):
- * broad preset < groups < special pairs < rivalries < user overrides.
+ * broad preset < groups < special pairs < custom blocs < user overrides.
  */
 export const resolveAffinityMap = (s: DiasporaSettings): AffinityMap => {
   const map: AffinityMap = {};
@@ -104,8 +123,14 @@ export const resolveAffinityMap = (s: DiasporaSettings): AffinityMap => {
   if (s.useSpecialPairs) {
     for (const p of diasporaPresets.specialPairs) set(p.from, p.to, p.affinity);
   }
-  if (s.useRivalries) {
-    for (const p of diasporaPresets.rivalries) set(p.from, p.to, p.affinity);
+  // Custom blocs sit above presets but below overrides, so a user's explicit
+  // override still wins. `?? []` guards persisted state from before this field.
+  for (const cg of s.customGroups ?? []) {
+    if (!cg.enabled) continue;
+    for (const a of cg.memberCodes) {
+      for (const b of cg.memberCodes) set(a, b, cg.base); // set() skips a === b
+    }
+    for (const p of cg.pairs ?? []) set(p.from, p.to, p.affinity);
   }
   for (const o of s.overrides) set(o.from, o.to, o.affinity);
 
@@ -208,7 +233,6 @@ const buildBasePresetMap = (): Map<string, number> => {
     for (const p of g.pairs) add(p.from, p.to, p.affinity);
   }
   for (const p of diasporaPresets.specialPairs) add(p.from, p.to, p.affinity);
-  for (const p of diasporaPresets.rivalries) add(p.from, p.to, p.affinity);
   basePresetMap = m;
 
   return m;
@@ -216,3 +240,85 @@ const buildBasePresetMap = (): Map<string, number> => {
 
 export const basePresetValue = (from: string, to: string): number | null =>
   buildBasePresetMap().get(`${from}|${to}`) ?? null;
+
+// ---- custom-group helpers ---------------------------------------------------
+
+export const newDiasporaGroupId = (): string =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+
+/**
+ * Keep only per-pair tweaks whose endpoints are still members — called when a
+ * bloc's membership shrinks, so a removed member leaves no stray directed pair
+ * (the resolver applies `pairs` unconditionally, base cross-product aside).
+ */
+export const pruneGroupPairs = (
+  pairs: DiasporaOverride[] | undefined,
+  memberCodes: string[],
+): DiasporaOverride[] =>
+  (pairs ?? []).filter(
+    (p) => memberCodes.includes(p.from) && memberCodes.includes(p.to),
+  );
+
+// ---- by-country lens derivation ---------------------------------------------
+// A read/tune view over the SAME resolved data, filtered to one country. Built
+// from the settings on demand (no second copy of the data) and tagged with the
+// source each value came from.
+
+export type RelationSource =
+  | { kind: 'group' | 'customGroup'; name: string }
+  | { kind: 'special' | 'override' };
+
+export type ResolvedRelation = {
+  from: string;
+  to: string;
+  affinity: number;
+  source: RelationSource;
+};
+
+/**
+ * All directed relationships that are actually in effect for the lens, deduped
+ * by later-wins precedence (same order as resolveAffinityMap, minus the broad
+ * historical set — 323 pairs would swamp the rail and carry no per-pair source).
+ * The lens component derives the flag rail and per-country favors/snubs from this.
+ */
+export const collectLensRelations = (
+  s: DiasporaSettings,
+): ResolvedRelation[] => {
+  const map = new Map<string, ResolvedRelation>();
+  const set = (
+    from: string,
+    to: string,
+    affinity: number,
+    source: RelationSource,
+  ) => {
+    if (from === to) return;
+    map.set(`${from}|${to}`, { from, to, affinity, source });
+  };
+
+  if (!s.enabled) return [];
+
+  for (const g of diasporaPresets.groups) {
+    if (!s.enabledGroupIds.includes(g.id)) continue;
+    for (const p of g.pairs)
+      set(p.from, p.to, p.affinity, { kind: 'group', name: g.name });
+  }
+  if (s.useSpecialPairs) {
+    for (const p of diasporaPresets.specialPairs)
+      set(p.from, p.to, p.affinity, { kind: 'special' });
+  }
+  for (const cg of s.customGroups ?? []) {
+    if (!cg.enabled) continue;
+    const source: RelationSource = { kind: 'customGroup', name: cg.name };
+
+    for (const a of cg.memberCodes) {
+      for (const b of cg.memberCodes) set(a, b, cg.base, source);
+    }
+    for (const p of cg.pairs ?? []) set(p.from, p.to, p.affinity, source);
+  }
+  for (const o of s.overrides)
+    set(o.from, o.to, o.affinity, { kind: 'override' });
+
+  return [...map.values()];
+};

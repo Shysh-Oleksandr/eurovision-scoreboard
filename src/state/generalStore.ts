@@ -17,7 +17,9 @@ import { Theme } from '../theme/types';
 import { useCountriesStore } from './countriesStore';
 import {
   DEFAULT_DIASPORA_SETTINGS,
+  DiasporaCustomGroup,
   DiasporaSettings,
+  pruneGroupPairs,
   removeOverride,
   upsertOverride,
 } from './scoreboard/diaspora';
@@ -61,6 +63,7 @@ export const INITIAL_THEME_YEAR = '2026' as Year;
 const DEFAULT_SETTINGS: Settings = {
   alwaysShowRankings: true,
   showQualificationModal: true,
+  showQualifierTargetStages: true,
   showWinnerModal: true,
   showWinnerConfetti: true,
   enableFullscreen: false,
@@ -152,9 +155,10 @@ export const ASPECT_RATIO_PRESETS = {
   '750x1000': { width: 750, height: 1000, label: 'Portrait (3:4)' },
 } as const;
 
-interface Settings {
+export interface Settings {
   alwaysShowRankings: boolean;
   showQualificationModal: boolean;
+  showQualifierTargetStages: boolean;
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
   enableFullscreen: boolean;
@@ -205,7 +209,7 @@ interface Settings {
   overrideThemeFontAlias: string;
 }
 
-interface PresentationSettings {
+export interface PresentationSettings {
   isPresenting: boolean;
   presentationSpeedSeconds: number; // delay between actions in seconds
   presentationJuryGrouping: PresentationPointsGrouping;
@@ -268,6 +272,18 @@ export interface GeneralState {
   setDiaspora: (diaspora: Partial<DiasporaSettings>) => void;
   updateDiasporaOverride: (from: string, to: string, affinity: number) => void;
   removeDiasporaOverride: (from: string, to: string) => void;
+  addDiasporaCustomGroup: (group: DiasporaCustomGroup) => void;
+  removeDiasporaCustomGroup: (id: string) => void;
+  updateDiasporaCustomGroup: (
+    id: string,
+    patch: Partial<DiasporaCustomGroup>,
+  ) => void;
+  updateDiasporaCustomGroupPair: (
+    id: string,
+    from: string,
+    to: string,
+    affinity: number,
+  ) => void;
   setImageCustomization: (
     customization: Partial<ImageCustomizationSettings>,
   ) => void;
@@ -602,6 +618,95 @@ export const useGeneralStore = create<GeneralState>()(
             },
           }));
         },
+        // Custom-group edits mutate inside the updater (reading the latest list)
+        // like the override actions, so rapid concurrent edits don't clobber via
+        // stale closures. `?? []` guards state persisted before this field.
+        addDiasporaCustomGroup: (group: DiasporaCustomGroup) => {
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              diaspora: {
+                ...state.settings.diaspora,
+                customGroups: [
+                  ...(state.settings.diaspora.customGroups ?? []),
+                  group,
+                ],
+              },
+            },
+          }));
+        },
+        removeDiasporaCustomGroup: (id: string) => {
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              diaspora: {
+                ...state.settings.diaspora,
+                customGroups: (
+                  state.settings.diaspora.customGroups ?? []
+                ).filter((g) => g.id !== id),
+              },
+            },
+          }));
+        },
+        updateDiasporaCustomGroup: (
+          id: string,
+          patch: Partial<DiasporaCustomGroup>,
+        ) => {
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              diaspora: {
+                ...state.settings.diaspora,
+                customGroups: (state.settings.diaspora.customGroups ?? []).map(
+                  (g) => {
+                    if (g.id !== id) return g;
+                    const next = { ...g, ...patch };
+
+                    // Shrinking membership prunes tweaks referencing a dropped
+                    // member so it leaves no stray directed pair.
+                    if (patch.memberCodes) {
+                      next.pairs = pruneGroupPairs(
+                        next.pairs,
+                        next.memberCodes,
+                      );
+                    }
+
+                    return next;
+                  },
+                ),
+              },
+            },
+          }));
+        },
+        updateDiasporaCustomGroupPair: (
+          id: string,
+          from: string,
+          to: string,
+          affinity: number,
+        ) => {
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              diaspora: {
+                ...state.settings.diaspora,
+                customGroups: (state.settings.diaspora.customGroups ?? []).map(
+                  (g) =>
+                    g.id === id
+                      ? {
+                          ...g,
+                          pairs: upsertOverride(
+                            g.pairs ?? [],
+                            from,
+                            to,
+                            affinity,
+                          ),
+                        }
+                      : g,
+                ),
+              },
+            },
+          }));
+        },
         setImageCustomization: (
           customization: Partial<ImageCustomizationSettings>,
         ) => {
@@ -784,6 +889,8 @@ export const useGeneralStore = create<GeneralState>()(
             overrideThemeFontAlias: normalizeFontAlias(
               persistedSettings.overrideThemeFontAlias,
             ),
+            showQualifierTargetStages:
+              persistedSettings.showQualifierTargetStages ?? true,
           };
 
           // Merge imageCustomization, keeping only aspectRatio from persistence

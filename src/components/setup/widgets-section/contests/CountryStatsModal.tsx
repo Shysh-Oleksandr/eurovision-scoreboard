@@ -1,11 +1,13 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
+
 import { api } from '@/api/client';
-import { useMyEntryStatsQuery } from '@/api/contests';
+import { useContestGroupsQuery, useMyEntryStatsQuery } from '@/api/contests';
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
@@ -22,6 +24,7 @@ interface CountryStatsModalProps {
   /** Called after a contest is loaded from this modal; use to close the picker too. */
   onContestLoaded?: () => void;
   entryCode: string | null;
+  initialGroupId?: string | null;
 }
 
 const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
@@ -29,9 +32,15 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   onClose,
   onContestLoaded,
   entryCode,
+  initialGroupId = null,
 }) => {
   const t = useTranslations('widgets.contests.entryStats');
   const tContests = useTranslations('widgets.contests');
+  const tGroups = useTranslations('widgets.contests.groups');
+
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(
+    initialGroupId,
+  );
 
   const setContestToLoad = useGeneralStore((s) => s.setContestToLoad);
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -39,10 +48,25 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   );
   const getAllCountries = useCountriesStore((s) => s.getAllCountries);
 
-  const { data, isLoading, isError, error } = useMyEntryStatsQuery(
-    entryCode,
-    isOpen && !!entryCode,
-  );
+  const { data: contestGroups = [] } = useContestGroupsQuery(isOpen);
+  const { data, isLoading, isError, error } = useMyEntryStatsQuery(entryCode, {
+    enabled: isOpen && !!entryCode,
+    groupId: selectedGroupId,
+  });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setSelectedGroupId(initialGroupId);
+  }, [isOpen, entryCode, initialGroupId]);
+
+  useEffect(() => {
+    if (
+      selectedGroupId &&
+      !contestGroups.some((g) => g._id === selectedGroupId)
+    ) {
+      setSelectedGroupId(null);
+    }
+  }, [contestGroups, selectedGroupId]);
 
   const customEntryFallback = t('customEntryName');
 
@@ -167,6 +191,17 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
             </h2>
           </div>
         </div>
+
+        {contestGroups.length > 0 && (
+          <WidgetResourceGroupBadges
+            groups={contestGroups}
+            selectedGroupId={selectedGroupId}
+            onSelectAll={() => setSelectedGroupId(null)}
+            onSelectGroup={setSelectedGroupId}
+            allLabel={tGroups('all')}
+            readOnly
+          />
+        )}
 
         {isLoading && (
           <div className="flex justify-center py-8">

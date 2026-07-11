@@ -1,18 +1,19 @@
 import { create } from 'zustand';
+
 import { persist } from 'zustand/middleware';
 
+import { useCountriesStore } from './countriesStore';
+import { useGeneralStore } from './generalStore';
+
+import { clearUserData } from '@/api/clearUserData';
 import {
   api,
   setAccessTokenGetter,
   attachRefreshInterceptor,
 } from '@/api/client';
-import { clearUserData } from '@/api/clearUserData';
 import { queryClient } from '@/api/queryClient';
 import { API_BASE_URL } from '@/config';
 import type { Profile } from '@/types/profile';
-import { toast } from 'react-toastify';
-
-import { useCountriesStore } from './countriesStore';
 
 export interface AuthState {
   user: Profile | null;
@@ -43,6 +44,7 @@ export const useAuthStore = create<AuthState>()(
         setAccessTokenGetter(() => useAuthStore.getState().accessToken);
         try {
           const token = await get().refresh();
+
           if (token) {
             await get().fetchMe();
 
@@ -52,7 +54,8 @@ export const useAuthStore = create<AuthState>()(
             // Invalidate by the 'user' prefix to catch all user queries
             queryClient.invalidateQueries({
               predicate: (query) => {
-                const key = query.queryKey[0];
+                const [key] = query.queryKey;
+
                 return key === 'user';
               },
             });
@@ -69,6 +72,7 @@ export const useAuthStore = create<AuthState>()(
         }
         // Strip query params after handling redirect
         const url = new URL(window.location.href);
+
         if (url.search) {
           window.history.replaceState({}, '', url.origin + url.pathname);
         }
@@ -79,7 +83,9 @@ export const useAuthStore = create<AuthState>()(
         // Always attempt; backend verifies cookie and returns 401 if not present
         try {
           const { data } = await api.post('/auth/refresh', {});
+
           set({ accessToken: data.accessToken });
+
           return data.accessToken as string;
         } catch (e) {
           // On refresh failure, clear session so UI reflects logged-out state
@@ -90,6 +96,7 @@ export const useAuthStore = create<AuthState>()(
       fetchMe: async () => {
         try {
           const { data } = await api.get('/auth/me');
+
           set({ user: data.user });
         } catch (e) {
           // If fetching current user fails (e.g., token expired), clear session
@@ -111,6 +118,11 @@ export const useAuthStore = create<AuthState>()(
 
           // Clear user-specific data from Zustand stores
           useCountriesStore.setState({ customCountries: [] });
+
+          // Custom blocs are account-only, so drop them; the rest of the
+          // diaspora settings (custom pairs, toggles, strength) stay and keep
+          // persisting locally.
+          useGeneralStore.getState().setDiaspora({ customGroups: [] });
 
           // Add more store cleanups here as needed in the future:
           // e.g., useSavedEventsStore.setState({ savedEvents: [] });

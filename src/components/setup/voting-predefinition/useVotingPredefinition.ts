@@ -49,6 +49,16 @@ export const useVotingPredefinition = ({
     stageOverride?.splitPointsSystem ?? globalSplitPointsSystem;
   const allowMultiplePointsToSameEntry =
     stageOverride?.allowMultiplePointsToSameEntry ?? globalAllowMultiple;
+
+  // When a split points system is enabled, televote uses its own system while
+  // jury (and everything else) uses the default `pointsSystem`.
+  const effectiveTelevotePointsSystem = splitPointsSystem
+    ? televotePointsSystem
+    : pointsSystem;
+
+  const getPointsSystemForSource = (source: 'jury' | 'televote') =>
+    source === 'televote' ? effectiveTelevotePointsSystem : pointsSystem;
+
   const randomnessLevel = useGeneralStore((s) => s.settings.randomnessLevel);
   const pointsSpread = useGeneralStore((s) => s.settings.pointsSpread);
   const diasporaSettings = useGeneralStore((s) => s.settings.diaspora);
@@ -138,10 +148,15 @@ export const useVotingPredefinition = ({
     return null;
   };
 
-  const randomizeAll = () => {
-    const effectiveTelevoteSystem = splitPointsSystem
-      ? televotePointsSystem
+  // Points system shown in the header / used for reference. When the televote
+  // tab is active and a split system is configured, show the televote system.
+  const displayPointsSystem =
+    getActiveSource() === 'televote'
+      ? effectiveTelevotePointsSystem
       : pointsSystem;
+
+  const randomizeAll = () => {
+    const effectiveTelevoteSystem = effectiveTelevotePointsSystem;
 
     const isJuryOnly =
       selectedType === StageVotingType.JURY && totalBadgeLabel === 'Total';
@@ -210,6 +225,8 @@ export const useVotingPredefinition = ({
 
     if (!source) return; // Total tab is non-editable
 
+    const sourcePointsSystem = getPointsSystemForSource(source);
+
     setVotes((prev) => {
       const nextVotes: Partial<StageVotes> = prev ? { ...prev } : {};
       const sourceMap: Record<string, any[]> = (nextVotes as any)[source] || {};
@@ -275,7 +292,9 @@ export const useVotingPredefinition = ({
           arr.splice(idx, 1);
         }
       } else {
-        const matchingPoints = pointsSystem.filter((p) => p.value === parsed);
+        const matchingPoints = sourcePointsSystem.filter(
+          (p) => p.value === parsed,
+        );
 
         if (matchingPoints.length === 0) {
           if (idx !== -1) {
@@ -326,7 +345,9 @@ export const useVotingPredefinition = ({
           }
 
           if (chosenId !== undefined) {
-            const chosenPoint = pointsSystem.find((p) => p.id === chosenId);
+            const chosenPoint = sourcePointsSystem.find(
+              (p) => p.id === chosenId,
+            );
             const entry = {
               countryCode: participantCode,
               points: parsed,
@@ -358,7 +379,7 @@ export const useVotingPredefinition = ({
 
     if (!used || used.length === 0) return 'incomplete';
 
-    const expectedIds = pointsSystem.map((p) => p.id);
+    const expectedIds = getPointsSystemForSource(source).map((p) => p.id);
 
     const usedIds = used.map((v: any) => v.pointsId);
 
@@ -502,9 +523,13 @@ export const useVotingPredefinition = ({
     }
 
     const errors: Array<{ label: string; reasons: string[] }> = [];
-    const expected = pointsSystem.map((p) => ({ id: p.id, value: p.value }));
 
     for (const mode of modesToValidate) {
+      const expected = getPointsSystemForSource(mode).map((p) => ({
+        id: p.id,
+        value: p.value,
+      }));
+
       for (const voter of votingCountries) {
         if (mode === 'jury' && voter.code === 'WW') continue;
 
@@ -573,6 +598,7 @@ export const useVotingPredefinition = ({
   return {
     // stores & config
     pointsSystem,
+    displayPointsSystem,
     // state
     selectedType,
     setSelectedType,

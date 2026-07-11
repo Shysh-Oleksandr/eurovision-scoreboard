@@ -333,11 +333,21 @@ export function useContestSnapshotQuery(id: string, enabled = true) {
   });
 }
 
-export function useMyLeaderboardQuery(enabled = true) {
+export function useMyLeaderboardQuery(opts: {
+  enabled?: boolean;
+  groupId?: string | null;
+} = {}) {
+  const { enabled = true, groupId } = opts;
+
   return useQuery<MyLeaderboardResponse>({
-    queryKey: queryKeys.user.myLeaderboard(),
+    queryKey: queryKeys.user.myLeaderboard(groupId),
     queryFn: async () => {
-      const { data } = await api.get('/contests/me/leaderboard');
+      const params = new URLSearchParams();
+      if (groupId) params.set('groupId', groupId);
+      const qs = params.toString();
+      const { data } = await api.get(
+        `/contests/me/leaderboard${qs ? `?${qs}` : ''}`,
+      );
 
       return data as MyLeaderboardResponse;
     },
@@ -347,13 +357,22 @@ export function useMyLeaderboardQuery(enabled = true) {
   });
 }
 
-export function useMyEntryStatsQuery(entryCode: string | null, enabled = true) {
+export function useMyEntryStatsQuery(
+  entryCode: string | null,
+  opts: { enabled?: boolean; groupId?: string | null } = {},
+) {
+  const { enabled = true, groupId } = opts;
   const encoded = entryCode ? encodeURIComponent(entryCode) : '';
 
   return useQuery<EntryStatsResponse>({
-    queryKey: queryKeys.user.entryStats(entryCode || ''),
+    queryKey: queryKeys.user.entryStats(entryCode || '', groupId),
     queryFn: async () => {
-      const { data } = await api.get(`/contests/me/entry-stats/${encoded}`);
+      const params = new URLSearchParams();
+      if (groupId) params.set('groupId', groupId);
+      const qs = params.toString();
+      const { data } = await api.get(
+        `/contests/me/entry-stats/${encoded}${qs ? `?${qs}` : ''}`,
+      );
 
       return data as EntryStatsResponse;
     },

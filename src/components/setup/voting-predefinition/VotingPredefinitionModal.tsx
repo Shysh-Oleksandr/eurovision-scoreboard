@@ -21,6 +21,7 @@ import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { EventStage, StatsTableType } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
@@ -77,6 +78,7 @@ const VotingPredefinitionModal = ({
 
   const {
     pointsSystem,
+    displayPointsSystem,
     selectedType,
     setSelectedType,
     votes,
@@ -99,6 +101,13 @@ const VotingPredefinitionModal = ({
 
   const t = useTranslations();
   const tSetup = useTranslations('setup.votingPredefinition');
+
+  const { onClickOutside } = useConfirmModalClose({
+    onClose,
+    confirmKey: 'close-voting-predefinition',
+    title: tSetup('confirmCloseTitle'),
+    description: tSetup('confirmCloseDescription'),
+  });
 
   // local-only state for matrix cell editing (must be before useVotingPresetsFlow)
   const [editing, setEditing] = React.useState<Record<CellKey, string>>({});
@@ -234,7 +243,7 @@ const VotingPredefinitionModal = ({
             <VotingPredefinitionHeader
               stageName={stage.name}
               totalBadgeLabel={totalBadgeLabel}
-              pointsSystem={pointsSystem as any}
+              pointsSystem={displayPointsSystem as any}
               selectedType={selectedType}
               setSelectedType={setSelectedType}
               voteTypeOptions={voteTypeOptions}
@@ -391,7 +400,7 @@ const VotingPredefinitionModal = ({
       tSetup,
       stage,
       totalBadgeLabel,
-      pointsSystem,
+      displayPointsSystem,
       selectedType,
       setSelectedType,
       voteTypeOptions,
@@ -424,7 +433,7 @@ const VotingPredefinitionModal = ({
     <>
       <Modal
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={onClickOutside}
         overlayClassName="!z-[1000]"
         contentClassName="h-[75vh] !px-2 text-white flex flex-col"
         topContent={

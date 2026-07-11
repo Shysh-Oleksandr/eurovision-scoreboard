@@ -73,6 +73,9 @@ const UserContests: React.FC<UserContestsProps> = ({
   const [myLeaderboardOpen, setMyLeaderboardOpen] = useState(false);
   const [entryStatsOpen, setEntryStatsOpen] = useState(false);
   const [entryStatsCode, setEntryStatsCode] = useState<string | null>(null);
+  const [entryStatsGroupId, setEntryStatsGroupId] = useState<string | null>(
+    null,
+  );
   const [selectedContestGroupId, setSelectedContestGroupId] = useState<
     string | null
   >(null);
@@ -521,8 +524,9 @@ const UserContests: React.FC<UserContestsProps> = ({
         <MyLeaderboardModal
           isOpen={myLeaderboardOpen}
           onClose={() => setMyLeaderboardOpen(false)}
-          onSelectEntry={(code) => {
+          onSelectEntry={(code, groupId) => {
             setEntryStatsCode(code);
+            setEntryStatsGroupId(groupId);
             setEntryStatsOpen(true);
           }}
         />
@@ -533,9 +537,11 @@ const UserContests: React.FC<UserContestsProps> = ({
           onClose={() => {
             setEntryStatsOpen(false);
             setEntryStatsCode(null);
+            setEntryStatsGroupId(null);
           }}
           onContestLoaded={() => setMyLeaderboardOpen(false)}
           entryCode={entryStatsCode}
+          initialGroupId={entryStatsGroupId}
         />
       )}
     </div>

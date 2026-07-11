@@ -67,16 +67,17 @@ export const queryKeys = {
     }) => ['user', 'saved-contests', filters] as const,
     contestsState: (ids: string[]) =>
       ['user', 'contests-state', { ids: [...ids].sort() }] as const,
-    entryStats: (entryCode: string) =>
-      ['user', 'entry-stats', entryCode] as const,
-    myLeaderboard: () => ['user', 'my-leaderboard'] as const,
+    entryStats: (entryCode: string, groupId?: string | null) =>
+      ['user', 'entry-stats', entryCode, { groupId: groupId ?? null }] as const,
+    myLeaderboard: (groupId?: string | null) =>
+      ['user', 'my-leaderboard', { groupId: groupId ?? null }] as const,
     quickSelectContests: () => ['user', 'quick-select-contests'] as const,
     quickSelectThemes: () => ['user', 'quick-select-themes'] as const,
     quickSelectState: (ids: string[]) =>
       ['user', 'quick-select-state', { ids: [...ids].sort() }] as const,
+    preferences: () => ['user', 'preferences'] as const,
     // Add more user-specific queries here in the future:
     // savedEvents: () => ['user', 'saved-events'] as const,
-    // preferences: () => ['user', 'preferences'] as const,
   },
 
   // Users
@@ -173,6 +174,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.contests(),
   queryKeys.user.savedContests(),
   queryKeys.user.contestGroups(),
+  queryKeys.user.preferences(),
   ['user', 'entry-stats'] as const,
   queryKeys.user.myLeaderboard(),
   queryKeys.follows.followingFeed({}),

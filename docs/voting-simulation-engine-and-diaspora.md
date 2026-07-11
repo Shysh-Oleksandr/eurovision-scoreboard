@@ -140,7 +140,7 @@ historical set is an advanced opt-in.
 `resolveAffinityMap(settings)` builds `affinity[from][to]`, layering **later-wins**:
 
 ```
-broadPreset  <  enabled groups  <  specialPairs  <  rivalries  <  user overrides
+broadPreset  <  enabled groups  <  specialPairs  <  custom blocs  <  user overrides
 ```
 
 `resolveDiaspora(settings)` returns `{ affinity, affinityK, juryScale, betaTeleBoost }`, or `null`
@@ -151,8 +151,9 @@ when disabled / strength 0 (engine then behaves exactly as before this feature).
 `DiasporaSettings` lives at `settings.diaspora` (persisted via the general store):
 
 ```ts
-{ enabled, strength, enabledGroupIds[], useSpecialPairs, useRivalries, useBroadPreset,
-  overrides: { from, to, affinity }[] }
+{ enabled, strength, enabledGroupIds[], useSpecialPairs, useBroadPreset,
+  overrides: { from, to, affinity }[],
+  customGroups: DiasporaCustomGroup[] }   // Phase 2, see §9a
 ```
 
 **Every per-pair edit** — tuning a bloc pair, a special pair, or a historical pair, or adding a
@@ -206,6 +207,12 @@ Components in `src/components/settings/relations/`:
   `RelFlag`, `AddPairEditor` (two searchable country pickers), `countryMeta` (code→name/flag,
   **including custom entries**).
 
+**Phase 2 components** (shipped, see §9): `RelSegmented` (the compact Blocs | By-country and
+Votes given | got switcher), `CustomGroupCard` (a user bloc — CUSTOM badge, enable toggle,
+Rename / Add-member / Delete, generated member-pair sliders), `CreateBlocEditor` (name + members +
+default-affinity draft), `CountryLens` (the by-country view — flag rail + favors/snubs lists driven
+by `collectLensRelations`).
+
 Diverging favor/snub/warn colours are fixed CSS vars scoped to `.relations-tab` in `styles.css`
 (accent/panel/ink use the app's `primary-*` / `white/NN` theme tokens).
 
@@ -255,53 +262,108 @@ adding presets, re-run it (and `compareDiasporaConfigs.ts` for diaspora) and che
 
 ---
 
-## 9. Phase 2 (v2) — instructions & context
+## 9. Phase 2 (v2) — **shipped**
 
 Phase 1 shipped **blocs + special pairs + the historical browser + per-pair overrides**. Phase 2
-adds the two advanced surfaces from the original design (Variant D), to be implemented in a fresh
-chat.
+added the two advanced surfaces from the original design (Variant D): **custom blocs** and the
+**by-country lens**. Both are now implemented — this section documents what was built.
 
-**Design handoff:** `currentTask/design_handoff_relations_tab/` (README + `relations-*.jsx`) has the
-full spec for `CustomGroupCard`, `CreateBlocEditor`, and `CountryLens`. Treat the JSX as a
-layout/interaction spec, re-expressed with the app's real primitives (already done for Phase 1).
+**Design handoff:** `currentTask/design_handoff_relations_tab/` (README + `relations-*.jsx`) had the
+full spec for `CustomGroupCard`, `CreateBlocEditor`, and `CountryLens` — re-expressed with the app's
+real primitives (as in Phase 1).
+
+**Two product decisions taken during the build:**
+- **Custom blocs have a working on/off toggle**, so `DiasporaCustomGroup` carries an `enabled`
+  boolean (the design showed the toggle; the original type sketch omitted it). Off ⇒ its pairs stop
+  applying but the bloc is kept; Delete removes it.
+- **New UI strings live in `messages/en.json` only**; the other 8 locales fall back to English via
+  `deepMergeMessages` in `src/i18n/request.ts`.
 
 ### 9a. Custom blocs
 
 Let users create their own bloc from any countries, generating tunable directed member pairs.
 
-- **Data model** — add to `DiasporaSettings` (`src/state/scoreboard/diaspora.ts`):
+- **Data model** — `DiasporaSettings.customGroups: DiasporaCustomGroup[]`
+  (`src/state/scoreboard/diaspora.ts`):
   ```ts
   export type DiasporaCustomGroup = {
     id: string; name: string; memberCodes: string[];
     base: number;                 // affinity applied to every ordered member pair
+    enabled: boolean;             // on/off toggle (decision above)
     pairs?: DiasporaOverride[];   // optional per-pair tweaks within the group
   };
-  // DiasporaSettings: customGroups: DiasporaCustomGroup[]
   ```
-  Add `customGroups: []` to `DEFAULT_DIASPORA_SETTINGS`. **Guard persisted state** with
-  `s.customGroups ?? []` everywhere (existing users' persisted `diaspora` predates the field).
-- **Resolver** — in `resolveAffinityMap`, layer custom groups **after** presets and **before** the
-  `overrides` loop (so explicit overrides still win): for each custom group, `set(a, b, base)` over
-  every ordered member pair, then apply its `pairs`. No change needed to `resolveDiaspora`,
-  `positiveAffinityLoad`, or `betaTeleBoostFor` (they operate on the resolved map, so the
-  compensation auto-accounts for custom mass).
-- **UI** — `CustomGroupCard` (like `GroupCard` + a CUSTOM badge, Rename / Add-member / Delete) and
-  `CreateBlocEditor` (name input, member chips + a searchable country picker — reuse
-  `CustomSelect` / `CountryStatsPickerModal`, a "default affinity" `DivergingSlider`, live
-  "N countries → N·(N−1) pairs" count). Store the draft in local state until Create commits to
-  `customGroups`. Member-pair edits write to `customGroups[].pairs` (not global overrides).
+  `DEFAULT_DIASPORA_SETTINGS.customGroups = []`. **Persisted state is guarded** with
+  `s.customGroups ?? []` everywhere (the store's `merge` is shallow, so a returning user's persisted
+  `diaspora` can lack the field). IDs come from `newDiasporaGroupId()`.
+- **Resolver** — `resolveAffinityMap` layers custom groups **after** presets and **before** the
+  `overrides` loop (so explicit overrides still win): for each *enabled* group, `set(a, b, base)`
+  over every ordered member pair, then apply its `pairs`. `resolveDiaspora` /
+  `positiveAffinityLoad` / `betaTeleBoostFor` are untouched (they run on the resolved map, so the
+  shape compensation auto-accounts for custom mass).
+- **Store** — race-safe actions mirroring the override actions:
+  `addDiasporaCustomGroup` / `removeDiasporaCustomGroup` / `updateDiasporaCustomGroup`
+  (rename, toggle, membership, base — shrinking membership `pruneGroupPairs` the tweaks) /
+  `updateDiasporaCustomGroupPair` (upserts into that group's `pairs`).
+- **UI** — `CustomGroupCard` (clones `GroupCard`: CUSTOM badge, enable toggle, header **Add-member
+  (+)** and **Edit (pencil)** buttons, removable member chips, generated `k·(k−1)` member-pair
+  sliders), `CustomGroupEditModal` (the pencil opens it — rename input + Delete-bloc button, built
+  on the shared `Modal`, overlay `z-[1002]` to sit above the settings modal), and `CreateBlocEditor`
+  (name input, member chips + a `CustomSelect` country picker, a "default affinity" `DivergingSlider`,
+  live "N countries → N·(N−1) pairs" count). The create draft lives in local state until Create
+  commits. Member-pair edits write to `customGroups[].pairs` (not global overrides).
+
+### 9a-bis. Account persistence of relations settings
+
+A whitelisted slice of client settings syncs to the logged-in user's profile — the diaspora
+settings plus other global app/UX preferences. The **section-keyed** blob is
+`{ settings, presentation, confirmations }`.
+
+- **What syncs** (`src/state/syncedSettings.ts` — `SYNCED_SETTINGS_KEYS` / `SYNCED_PRESENTATION_KEYS`
+  are the single source of truth; adding a synced setting is a one-line change):
+  - `settings`: `diaspora` + the whitelisted global toggles (display/UI, audio, and voting/reveal
+    *habits* — see the key list).
+  - `presentation`: `presentationSpeedSeconds` / `presentationJuryGrouping` /
+    `pauseAfterAnimatedPoints` / `scoreboardMobileLayout` (not the transient `isPresenting`).
+  - `confirmations`: the whole `useConfirmationStore.preferences` ("don't ask again") map.
+  - **Deliberately excluded:** contest-bound fields (points systems, `randomnessLevel`,
+    `pointsSpread`, `splitPointsSystem`, `allowMultiplePointsToSameEntry`, odds, contest identity) —
+    they're restored from a loaded contest, so syncing them would let a contest-load overwrite and
+    then re-save your account default; device-local `customBgImage`/`shouldUseCustomBgImage`;
+    per-export `imageCustomization`; and language (already on `profile.preferredLocale`).
+- **Backend** (`douze-points-backend`): a free-form `preferences` blob on the Profile schema, with
+  `GET`/`PATCH /profiles/me/preferences` (`UpdatePreferencesDto` declares the `settings` /
+  `presentation` / `confirmations` sections; the global `whitelist` ValidationPipe drops anything
+  else). `PATCH` merges at the section level.
+- **Frontend**: `syncedSettings.ts` (`UserPreferences` type + `toUserPreferences` / `pickKeys` /
+  `applyUserPreferences` / `mergeDiasporaPreference`), `useMyPreferencesQuery` /
+  `useUpdatePreferencesMutation` in `api/profiles.ts` (keyed `['user','preferences']`, so
+  login-invalidation refetches it and logout clears it), and the headless **`SyncUserPreferences`**
+  (mounted in `app/providers.tsx`). On login it hydrates from the account (**server-wins** if it has
+  data, else **seeds** the account from local); on change it **debounced-saves**. The save guard is
+  **value-based on the serialized whitelisted slice**, so a hydrate can't swallow a real edit *and* a
+  contest-load mutating contest-bound fields never triggers a save. Logged out it's a no-op — local
+  `persist` still keeps everything on the device.
+- **Custom blocs are account-only.** Creation is gated on `!!user` (a sign-in hint replaces the
+  create button when logged out). On **logout**, `customGroups` is dropped but the rest of the
+  diaspora settings (custom pairs, toggles, strength) stays and keeps persisting locally.
 
 ### 9b. By-country lens
 
 A secondary read/tune view over the *same* data, filtered to one country.
 
-- Add a **segmented switcher** (Blocs | By country) in the browse-area header (Blocs stays default).
-- `CountryLens`: a searchable flag rail of every country that appears in any relationship; a country
-  header (favors/snubs counts + a "Votes given | Votes got" segmented toggle); two grouped lists
-  (Favors/Snubs) of tunable rows with a source label (which bloc/special/custom the value came from).
-- **Derive** the rows from store selectors (scan enabled groups' pairs, special pairs, rivalries,
-  custom groups, and overrides) — do **not** keep a second copy of the data. Edits go through the
-  same override actions.
+- A **segmented switcher** (`RelSegmented`: Blocs | By country) sits in the browse-area header
+  (Blocs stays default); the Curated + Your-pairs sections stay unchanged below in both modes.
+- `CountryLens`: a searchable flag rail of every country that appears in any relationship (sorted by
+  relationship count); a country header (favors/snubs counts + a "Votes given | Votes got" segmented
+  toggle); two grouped lists (Favors/Snubs) of tunable rows with a source label (which
+  bloc/special/rivalry/custom the value came from).
+- **Derivation** is `collectLensRelations(settings)` in `diaspora.ts` — the same later-wins layering
+  as `resolveAffinityMap` (enabled groups, special pairs, rivalries, enabled custom groups, then
+  overrides), tagging each pair with its source. No second copy of the data. It **deliberately
+  excludes the broad historical set** (323 pairs would swamp the rail and carry no per-pair source).
+- Lens edits route through `updateDiasporaOverride` (the single overrides sink), so tuning a row in
+  the lens creates/updates a global override, exactly like Phase 1's per-pair edits.
 
 ### 9c. Preset data polish (optional)
 

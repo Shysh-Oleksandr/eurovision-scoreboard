@@ -1,3 +1,5 @@
+import type { UserPreferences } from '@/state/syncedSettings';
+
 export interface Profile {
   _id: string;
   username: string;
@@ -10,6 +12,7 @@ export interface Profile {
   activeContestId?: string;
   isAdmin?: boolean;
   preferredLocale?: PreferredLocale;
+  preferences?: UserPreferences;
 }
 
 export type PreferredLocale =

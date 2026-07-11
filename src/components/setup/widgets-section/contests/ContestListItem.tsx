@@ -1,5 +1,5 @@
 import { isSameYear } from 'date-fns';
-import { Link2, Share2 } from 'lucide-react';
+import { Folder, Link2, Share2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import { toast } from 'react-toastify';
@@ -286,12 +286,20 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
         {/* Right: info + actions */}
         <div className="flex flex-col min-w-0">
           <div className="flex justify-between items-start gap-2">
-            <span className="text-[11px] font-[800] tracking-[0.16em] uppercase whitespace-nowrap text-white/40">
-              {isMyContest && !contest.isPublic
-                ? t('widgets.private')
-                : t('widgets.public')}{' '}
-              {t('common.contest').toLowerCase()}
-            </span>
+            <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+              <span className="text-[11px] font-[800] tracking-[0.16em] uppercase whitespace-nowrap text-white/40">
+                {isMyContest && !contest.isPublic
+                  ? t('widgets.private')
+                  : t('widgets.public')}{' '}
+                {t('common.contest').toLowerCase()}
+              </span>
+              {contest.group && (
+                <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
+                  <Folder className="size-3 shrink-0" aria-hidden />
+                  <span className="truncate">{contest.group.name}</span>
+                </div>
+              )}
+            </div>
             <span className="sm:text-[12.5px] text-[11px] text-white/40 whitespace-nowrap flex-shrink-0">
               {new Date(contest.createdAt).toLocaleDateString(locale, {
                 year: isSameYear(new Date(contest.createdAt), new Date())

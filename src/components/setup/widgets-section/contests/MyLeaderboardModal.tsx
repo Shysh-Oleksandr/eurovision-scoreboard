@@ -1,9 +1,11 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { useMyLeaderboardQuery } from '@/api/contests';
+import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
+
+import { useContestGroupsQuery, useMyLeaderboardQuery } from '@/api/contests';
 import { Checkbox } from '@/components/common/Checkbox';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
@@ -45,7 +47,7 @@ function compareMetricValue(
 interface MyLeaderboardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectEntry: (entryCode: string) => void;
+  onSelectEntry: (entryCode: string, groupId: string | null) => void;
 }
 
 export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
@@ -55,13 +57,34 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
 }) => {
   const t = useTranslations('widgets.contests.myLeaderboard');
   const tLb = useTranslations('widgets.contests.leaderboard');
+  const tGroups = useTranslations('widgets.contests.groups');
 
   const [sortKey, setSortKey] = useState<SortKey>('wins');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [search, setSearch] = useState('');
   const [onlyEurovisionCountries, setOnlyEurovisionCountries] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 
-  const { data, isLoading, isError, error } = useMyLeaderboardQuery(isOpen);
+  const { data: contestGroups = [] } = useContestGroupsQuery(isOpen);
+  const { data, isLoading, isError, error } = useMyLeaderboardQuery({
+    enabled: isOpen,
+    groupId: selectedGroupId,
+  });
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedGroupId(null);
+
+      return;
+    }
+
+    if (
+      selectedGroupId &&
+      !contestGroups.some((g) => g._id === selectedGroupId)
+    ) {
+      setSelectedGroupId(null);
+    }
+  }, [isOpen, contestGroups, selectedGroupId]);
 
   const getAllCountries = useCountriesStore((s) => s.getAllCountries);
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -208,6 +231,17 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
           <p className="text-sm text-white/60 mt-1">{t('subtitle')}</p>
         </div>
 
+        {contestGroups.length > 0 && (
+          <WidgetResourceGroupBadges
+            groups={contestGroups}
+            selectedGroupId={selectedGroupId}
+            onSelectAll={() => setSelectedGroupId(null)}
+            onSelectGroup={setSelectedGroupId}
+            allLabel={tGroups('all')}
+            readOnly
+          />
+        )}
+
         <div className="relative">
           <Input
             className="text-sm pr-10"
@@ -321,7 +355,9 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
                         <tr
                           key={row.code}
                           className="border-b border-primary-800/60 align-middle cursor-pointer hover:bg-primary-800/40 transition-colors duration-150"
-                          onClick={() => onSelectEntry(row.code)}
+                          onClick={() =>
+                            onSelectEntry(row.code, selectedGroupId)
+                          }
                         >
                           <td className="py-2 px-2 tabular-nums text-center">
                             {index + 1}

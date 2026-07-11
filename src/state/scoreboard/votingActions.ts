@@ -1590,10 +1590,47 @@ export const createVotingActions: StateCreator<
     const state = get();
     if (state.splitScreenQualifierCandidates.length === 0) return;
 
-    const randomIndex = Math.floor(
-      Math.random() * state.splitScreenQualifierCandidates.length,
-    );
-    const selectedCandidate = state.splitScreenQualifierCandidates[randomIndex];
+    let selectedCandidate: SplitScreenQualifierCandidate | undefined;
+
+    // When replaying a saved contest, the qualifier is already determined by the
+    // predefined votes. Resolve to the shown candidate that actually qualifies —
+    // the one ranked highest by predefined points — instead of a uniform-random
+    // pick. Because the candidate set always contains a genuine qualifier (the
+    // "anchor" from the top remaining slots) and any candidate ranked above it is
+    // also within the cutoff, the top-ranked candidate is always a real
+    // predefined qualifier. This keeps `pickQualifier` from swapping votes, so
+    // the saved results stand.
+    if (state.isReplayingSavedVotes) {
+      const currentStage = state.getCurrentStage();
+      const stageCountryPoints = currentStage
+        ? state.countryPoints[currentStage.id]
+        : undefined;
+
+      if (currentStage && stageCountryPoints) {
+        const rankByCode = new Map(
+          getRankedCountriesWithPoints(currentStage, stageCountryPoints).map(
+            (country, index) => [country.code, index],
+          ),
+        );
+
+        const sortedByRank = [...state.splitScreenQualifierCandidates].sort(
+          (a, b) =>
+            (rankByCode.get(a.code) ?? Infinity) -
+            (rankByCode.get(b.code) ?? Infinity),
+        );
+
+        [selectedCandidate] = sortedByRank;
+      }
+    }
+
+    if (!selectedCandidate) {
+      const randomIndex = Math.floor(
+        Math.random() * state.splitScreenQualifierCandidates.length,
+      );
+
+      selectedCandidate = state.splitScreenQualifierCandidates[randomIndex];
+    }
+
     if (!selectedCandidate) return;
 
     set({

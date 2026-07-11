@@ -11,6 +11,7 @@ import Modal, { ANIMATION_DURATION } from '../../common/Modal/Modal';
 import { useContinueToNextPhase } from '../hooks/useContinueToNextPhase';
 
 import { CountryQualificationItem } from './CountryQualificationItem';
+import { useQualifierTargetStageNames } from './useQualifierTargetStageNames';
 
 import { useGeneralStore } from '@/state/generalStore';
 import { createCountriesComparator } from '@/state/scoreboard/helpers';
@@ -19,6 +20,9 @@ const QualificationResultsModal = () => {
   const t = useTranslations();
   const showQualificationModal = useGeneralStore(
     (state) => state.settings.showQualificationModal,
+  );
+  const showQualifierTargetStages = useGeneralStore(
+    (state) => state.settings.showQualifierTargetStages,
   );
   const showQualificationResults = useScoreboardStore(
     (state) => state.showQualificationResults,
@@ -68,6 +72,11 @@ const QualificationResultsModal = () => {
       return orderA - orderB;
     });
   }, [qualifiedCountries, qualificationOrder, stageId]);
+
+  const targetStageNameByCountryCode = useQualifierTargetStageNames(
+    currentStage,
+    sortedQualifiedCountries.map((country) => country.code),
+  );
 
   useEffect(() => {
     if (shouldShowQualificationModal) {
@@ -169,6 +178,11 @@ const QualificationResultsModal = () => {
             country={country}
             shouldAnimate={false}
             isModal
+            targetStageName={
+              showQualifierTargetStages
+                ? targetStageNameByCountryCode.get(country.code)
+                : undefined
+            }
           />
         ))}
       </div>

@@ -65,6 +65,15 @@ export const UIPreferencesSettings: React.FC = () => {
         }
       />
       <Checkbox
+        id="show-qualifier-target-stages"
+        labelClassName="w-full"
+        label={t('showQualifierTargetStages')}
+        checked={settings.showQualifierTargetStages}
+        onChange={(e) =>
+          setSettings({ showQualifierTargetStages: e.target.checked })
+        }
+      />
+      <Checkbox
         id="show-winner-modal"
         labelClassName="w-full"
         label={t('showWinnerPopup')}

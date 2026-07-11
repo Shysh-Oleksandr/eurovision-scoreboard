@@ -19,6 +19,7 @@ interface CountryQualificationItemProps {
   shouldAnimate?: boolean;
   isModal?: boolean;
   onClick?: () => void;
+  targetStageName?: string;
 }
 
 export const CountryQualificationItem: React.FC<
@@ -29,6 +30,7 @@ export const CountryQualificationItem: React.FC<
   hideIfQualified = false,
   shouldAnimate = false,
   isModal = false,
+  targetStageName,
 }) => {
   const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
   const themeYear = useGeneralStore(
@@ -105,6 +107,16 @@ export const CountryQualificationItem: React.FC<
         .join(' ')
     : '';
 
+  const useInlineLayout = roundedCountryContainer || !!targetStageName;
+
+  let contentClassName: string | undefined;
+
+  if (roundedCountryContainer) {
+    contentClassName = `rounded-full ${roundedNameStripSurfaceClasses} !opacity-100`;
+  } else if (useInlineLayout) {
+    contentClassName = 'min-w-0';
+  }
+
   if (!country) {
     return (
       <div
@@ -135,14 +147,10 @@ export const CountryQualificationItem: React.FC<
               : 'brighten-on-hover'
             : ''
         } ${roundedCountryContainer ? roundedTextClasses : itemClassName} ${
-          roundedCountryContainer ? 'flex-1 min-w-0 overflow-hidden' : ''
+          useInlineLayout ? 'flex-1 min-w-0 overflow-hidden' : ''
         }`}
-        contentClassName={
-          roundedCountryContainer
-            ? `rounded-full ${roundedNameStripSurfaceClasses} !opacity-100`
-            : ''
-        }
-        useInlineContentLayout={roundedCountryContainer}
+        contentClassName={contentClassName}
+        useInlineContentLayout={useInlineLayout}
         contentStyle={roundedCountryContainer ? itemSpecialStyle : undefined}
         style={
           roundedCountryContainer ? roundedContainerStyle : itemSpecialStyle
@@ -181,12 +189,24 @@ export const CountryQualificationItem: React.FC<
           <span
             className={`${
               uppercaseEntryName ? 'uppercase' : ''
-            } text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] truncate flex-1`}
+            } text-left ml-2 font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm text-[0.9rem] truncate flex-1 min-w-0`}
             title={country.name}
           >
             {country.name}
           </span>
         )}
+        renderPoints={
+          targetStageName
+            ? () => (
+                <span
+                  className="shrink-0 px-2 my-auto font-semibold xl:text-xs lg:text-xs md:text-xs text-[0.7rem] uppercase tracking-wide text-white/70 truncate max-w-[5.5rem] sm:max-w-[6.5rem]"
+                  title={targetStageName}
+                >
+                  {targetStageName}
+                </span>
+              )
+            : undefined
+        }
       />
     </div>
   );
