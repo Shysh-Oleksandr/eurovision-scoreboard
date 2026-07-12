@@ -129,7 +129,8 @@
       "startStage": "Iniciar {stageName}",
       "enablePredefinedVotesForStage": "Ativar votação predefinida para esta fase",
       "odds": "Odds",
-      "oddsOverrideNote": "Estas odds aplicam-se apenas a esta fase. As odds globais persistentes do concurso são definidas em Definições."
+      "oddsOverrideNote": "Estas odds aplicam-se apenas a esta fase. As odds globais persistentes do concurso são definidas em Definições.",
+      "resetToGlobalOdds": "Repor para global"
     },
     "validation": {
       "noCountriesInStage": "Não há países em {stageName}.",

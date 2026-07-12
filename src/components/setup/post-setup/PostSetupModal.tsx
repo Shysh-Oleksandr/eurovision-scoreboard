@@ -111,8 +111,12 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     isOpen,
   );
 
-  const { controller: oddsController, getOddsOverride } =
-    useStageOddsOverrideDraft(stage, isOpen);
+  const {
+    controller: oddsController,
+    getOddsOverride,
+    isOverridden: isOddsOverridden,
+    resetToGlobal: resetOddsToGlobal,
+  } = useStageOddsOverrideDraft(stage, isOpen);
 
   const tabs = useMemo(
     () => [
@@ -249,6 +253,8 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
               <StageOddsTab
                 controller={oddsController}
                 stage={stage}
+                isOverridden={isOddsOverridden}
+                onResetToGlobal={resetOddsToGlobal}
                 onLoaded={() => setIsOddsLoaded(true)}
               />
             )}

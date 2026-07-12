@@ -158,9 +158,13 @@ Manages the local draft for the Odds tab, mirroring `useStagePointsOverrideDraft
   `StageOddsOverride` whose `countryOdds` is restricted to (and explicit for) the stage's
   countries.
 
-> `isOverridden` / `resetToGlobal` are currently exposed but unused by the UI (the Odds tab has
-> no override banner or reset button), matching `useStagePointsOverrideDraft`, whose
-> `isOverridden` / `resetToGlobal` are likewise unused.
+`isOverridden` gates the **Reset to global** button, and `resetToGlobal()` reseeds the draft
+from the current globals. Because the reset only touches the draft, the override is actually
+cleared on **Save**: with the draft back to global, `getOddsOverride()` returns `undefined`, so
+`buildOverrides()` omits `odds` and the stored `stage.overrides.odds` is dropped — the stage
+resumes following the global odds. (This is the recovery path for the all-or-nothing model: once
+a stage has an override it no longer tracks later global-odds edits, so Reset to global is how
+you re-link it.)
 
 ---
 
@@ -191,11 +195,15 @@ The assembled `overrides` object is written to both `configuredEventStages` and 
 
 A thin wrapper: a note ("These odds apply to this stage only — the persistent global contest
 odds are set in Settings") above `<OddsSettings controller={...} countries={stage.countries} />`.
+When the stage differs from global (`isOverridden`), a **Reset to global** button is shown next
+to the note (it calls the draft's `resetToGlobal`); it doubles as the only signal that the stage
+carries a custom-odds override. There is intentionally no coloured banner or tab indicator dot.
 
 i18n keys (under `setup.eventStageModal`, English base; other locales fall back to English via
 `deepMergeMessages` in `src/i18n/request.ts`):
 - `odds` — tab label
 - `oddsOverrideNote` — the per-stage note
+- `resetToGlobalOdds` — the reset button label
 
 ---
 

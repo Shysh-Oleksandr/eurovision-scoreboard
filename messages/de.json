@@ -130,7 +130,8 @@
       "startStage": "{stageName} starten",
       "enablePredefinedVotesForStage": "Vordefiniertes Voting für diese Phase aktivieren",
       "odds": "Quoten",
-      "oddsOverrideNote": "Diese Quoten gelten nur für diese Phase. Die persistenten globalen Wettbewerbsquoten werden in den Einstellungen festgelegt."
+      "oddsOverrideNote": "Diese Quoten gelten nur für diese Phase. Die persistenten globalen Wettbewerbsquoten werden in den Einstellungen festgelegt.",
+      "resetToGlobalOdds": "Auf global zurücksetzen"
     },
     "validation": {
       "noCountriesInStage": "Es gibt keine Länder in {stageName}.",

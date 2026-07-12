@@ -130,7 +130,8 @@
       "startStage": "Rozpocznij {stageName}",
       "enablePredefinedVotesForStage": "Włącz predefiniowane głosowanie dla tej fazy",
       "odds": "Szanse",
-      "oddsOverrideNote": "Te szanse dotyczą tylko tej fazy. Trwałe globalne szanse konkursu ustawia się w Ustawieniach."
+      "oddsOverrideNote": "Te szanse dotyczą tylko tej fazy. Trwałe globalne szanse konkursu ustawia się w Ustawieniach.",
+      "resetToGlobalOdds": "Przywróć globalne"
     },
     "validation": {
       "noCountriesInStage": "Brak krajów w {stageName}.",

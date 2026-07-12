@@ -130,7 +130,8 @@
       "startStage": "Démarrer {stageName}",
       "enablePredefinedVotesForStage": "Activer le vote prédéfini pour cette phase",
       "odds": "Cotes",
-      "oddsOverrideNote": "Ces cotes s'appliquent uniquement à cette phase. Les cotes globales persistantes du concours se configurent dans Paramètres."
+      "oddsOverrideNote": "Ces cotes s'appliquent uniquement à cette phase. Les cotes globales persistantes du concours se configurent dans Paramètres.",
+      "resetToGlobalOdds": "Réinitialiser au global"
     },
     "validation": {
       "noCountriesInStage": "Aucun pays dans {stageName}.",
