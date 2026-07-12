@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import Badge from '../common/Badge';
 import Button from '../common/Button';
 import { RangeSlider } from '../common/RangeSlider';
+import { RankModeToggle } from '../common/rank/RankModeToggle';
 import Tabs from '../common/tabs/Tabs';
 import { Tooltip } from '../common/Tooltip';
 
@@ -204,23 +205,15 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({
 
   return (
     <>
-      <div className="flex gap-6 border-b relative border-white/10 mb-3.5">
-        {(['numbers', 'rank'] as OddsViewMode[]).map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            onClick={() => setViewMode(mode)}
-            className="relative pb-3 pt-1.5 text-[14px] font-bold bg-transparent border-none cursor-pointer transition-colors duration-150"
-            style={{
-              color: viewMode === mode ? '#fff' : 'rgba(255,255,255,.46)',
-            }}
-          >
-            {t(`settings.odds.${mode}View`)}
-            {viewMode === mode && (
-              <span className="absolute left-0 right-0 bottom-0 h-[2px] rounded-t-[2px] bg-primary-700/80" />
-            )}
-          </button>
-        ))}
+      <div className="relative border-b border-white/10 mb-3.5">
+        <RankModeToggle
+          tabs={(['numbers', 'rank'] as OddsViewMode[]).map((mode) => ({
+            value: mode,
+            label: t(`settings.odds.${mode}View`),
+          }))}
+          activeTab={viewMode}
+          onChange={setViewMode}
+        />
         <div className="absolute top-0 right-0 z-10">
           <Tooltip
             position="right"

@@ -8,10 +8,14 @@ import dynamic from 'next/dynamic';
 
 import { useVotingPredefinition } from './useVotingPredefinition';
 import { useVotingPresetsFlow } from './useVotingPresetsFlow';
-import { VotingPredefinitionHeader } from './VotingPredefinitionHeader';
+import {
+  DetailedViewMode,
+  VotingPredefinitionHeader,
+} from './VotingPredefinitionHeader';
 import { VotingPredefinitionPresetModals } from './VotingPredefinitionPresetModals';
 import { VotingPredefinitionTable } from './VotingPredefinitionTable';
 import { VotingPresetToolbar } from './VotingPresetToolbar';
+import { VotingRankView } from './VotingRankView';
 import VotingTotalsShareTable from './VotingTotalsShareTable';
 
 import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
@@ -72,6 +76,8 @@ const VotingPredefinitionModal = ({
     Record<string, ManualShareTotalsRow>
   >({});
   const [isTotalsSortByName, setIsTotalsSortByName] = useState(false);
+  const [detailedViewMode, setDetailedViewMode] =
+    useState<DetailedViewMode>('numbers');
 
   const contestName = useGeneralStore((s) => s.settings.contestName);
   const contestYear = useGeneralStore((s) => s.settings.contestYear);
@@ -97,6 +103,14 @@ const VotingPredefinitionModal = ({
     getTotalPointsForCountry,
     getCellValue,
     validateAllBeforeSave,
+    rankTarget,
+    rankOrder,
+    showRankPoints,
+    getRankTotals,
+    enterRankMode,
+    reorderRank,
+    randomizeRankPoints,
+    randomizeRankOrder,
   } = useVotingPredefinition({ stage });
 
   const t = useTranslations();
@@ -256,54 +270,73 @@ const VotingPredefinitionModal = ({
               onRandomize={randomizeAll}
               onSavePreset={() => openSavePresetCreate('detailed')}
               onLoadPreset={() => openLoadPresetModal('detailed')}
+              viewMode={detailedViewMode}
+              onViewModeChange={setDetailedViewMode}
             />
 
-            <VotingPredefinitionTable
-              rankedCountries={rankedCountries as any}
-              votingCountries={votingCountries as any}
-              shouldShowHeartFlagIcon={shouldShowHeartFlagIcon}
-              isTotalOrCombinedVoteType={isTotalOrCombinedVoteType}
-              getVoterValidity={getVoterValidity as any}
-              getTotalPointsForCountry={getTotalPointsForCountry}
-              getCellClassName={getCellClassName}
-              getCellValue={getCellValue}
-              isSameCountry={(participant, voter) => participant === voter}
-              isTotalOrCombinedDisabled={(participant, voter) =>
-                isTotalOrCombinedVoteType || participant === voter
-              }
-              valueForCell={(participant, voter) => {
-                const key: CellKey = `${participant}:${voter}`;
-                const displayValue = toFixedIfDecimalFloat(
-                  getCellValue(participant, voter),
-                );
-
-                return (editing[key] ?? String(displayValue || '')) as string;
-              }}
-              onChangeCell={(participant, voter, val) => {
-                const key: CellKey = `${participant}:${voter}`;
-
-                setEditing((s) => ({ ...s, [key]: val }));
-              }}
-              onBlurCell={(participant, voter, val) => {
-                const key: CellKey = `${participant}:${voter}`;
-                const parsed = Number(val);
-                const ok =
-                  Number.isFinite(parsed) &&
-                  (applyInputValue(participant, voter, val), true);
-
-                setEditing((s) => {
-                  const next = { ...s } as Record<CellKey, string>;
-
-                  delete next[key];
-
-                  return next;
-                });
-
-                if (!ok) {
-                  // noop
+            {detailedViewMode === 'rank' ? (
+              <VotingRankView
+                countries={stage.countries as any}
+                orderedCodes={
+                  rankOrder ?? (stage.countries as any[]).map((c) => c.code)
                 }
-              }}
-            />
+                onReorder={reorderRank}
+                showPoints={showRankPoints}
+                totals={getRankTotals()}
+                onRandomizePoints={randomizeRankPoints}
+                onRandomizeRanking={randomizeRankOrder}
+                rankTarget={rankTarget}
+                onEnter={enterRankMode}
+              />
+            ) : (
+              <VotingPredefinitionTable
+                rankedCountries={rankedCountries as any}
+                votingCountries={votingCountries as any}
+                shouldShowHeartFlagIcon={shouldShowHeartFlagIcon}
+                isTotalOrCombinedVoteType={isTotalOrCombinedVoteType}
+                getVoterValidity={getVoterValidity as any}
+                getTotalPointsForCountry={getTotalPointsForCountry}
+                getCellClassName={getCellClassName}
+                getCellValue={getCellValue}
+                isSameCountry={(participant, voter) => participant === voter}
+                isTotalOrCombinedDisabled={(participant, voter) =>
+                  isTotalOrCombinedVoteType || participant === voter
+                }
+                valueForCell={(participant, voter) => {
+                  const key: CellKey = `${participant}:${voter}`;
+                  const displayValue = toFixedIfDecimalFloat(
+                    getCellValue(participant, voter),
+                  );
+                  const fallback = String(displayValue || '');
+
+                  return (editing[key] ?? fallback) as string;
+                }}
+                onChangeCell={(participant, voter, val) => {
+                  const key: CellKey = `${participant}:${voter}`;
+
+                  setEditing((s) => ({ ...s, [key]: val }));
+                }}
+                onBlurCell={(participant, voter, val) => {
+                  const key: CellKey = `${participant}:${voter}`;
+                  const parsed = Number(val);
+                  const ok =
+                    Number.isFinite(parsed) &&
+                    (applyInputValue(participant, voter, val), true);
+
+                  setEditing((s) => {
+                    const next = { ...s } as Record<CellKey, string>;
+
+                    delete next[key];
+
+                    return next;
+                  });
+
+                  if (!ok) {
+                    // noop
+                  }
+                }}
+              />
+            )}
           </>
         ),
       },
@@ -424,6 +457,15 @@ const VotingPredefinitionModal = ({
       openLoadPresetModal,
       editing,
       applyInputValue,
+      detailedViewMode,
+      rankTarget,
+      rankOrder,
+      showRankPoints,
+      getRankTotals,
+      enterRankMode,
+      reorderRank,
+      randomizeRankPoints,
+      randomizeRankOrder,
     ],
   );
 
@@ -435,7 +477,7 @@ const VotingPredefinitionModal = ({
         isOpen={isOpen}
         onClose={onClickOutside}
         overlayClassName="!z-[1000]"
-        contentClassName="h-[75vh] !px-2 text-white flex flex-col"
+        contentClassName="h-[75vh] !px-2 !py-3 text-white flex flex-col"
         topContent={
           <Tabs
             tabs={tabs}

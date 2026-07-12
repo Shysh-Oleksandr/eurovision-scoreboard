@@ -177,6 +177,11 @@
     },
     "votingPredefinition": {
       "tabDetailed": "Détaillé",
+      "detailedView": "Détaillé",
+      "rankView": "Classement",
+      "randomizePoints": "Points aléatoires",
+      "randomizeRanking": "Classement aléatoire",
+      "dragToRankHint": "Faites glisser les pays pour définir le classement final. Cliquez sur « Points aléatoires » pour générer les votes — le classement reste inchangé.",
       "tabTotals": "Totals (partager uniquement)",
       "totalsHint": "Les totales sont uniquement pour partager les résultats. Utilisez la table détaillée et enregistrez pour exécuter une simulation.",
       "confirmCloseTitle": "Fermer la prédefinition de vote ?",

@@ -83,6 +83,7 @@ const DEFAULT_SETTINGS: Settings = {
   pointsSpread: 50, // 0-100; controls the points gap between winners and losers
   diaspora: DEFAULT_DIASPORA_SETTINGS,
   oddsRankLayout: 'grid',
+  votingRankLayout: 'grid',
   isPickQualifiersMode: false,
   enableSplitScreenQualifierRevealMode: false,
   enableSplitScreenForLastQualifier: false,
@@ -180,6 +181,8 @@ export interface Settings {
   diaspora: DiasporaSettings;
   /** Odds rank view: list vs grid layout. */
   oddsRankLayout: 'list' | 'grid';
+  /** Voting predefinition rank view: list vs grid layout. */
+  votingRankLayout: 'list' | 'grid';
   isPickQualifiersMode: boolean;
   enableSplitScreenQualifierRevealMode: boolean;
   enableSplitScreenForLastQualifier: boolean;

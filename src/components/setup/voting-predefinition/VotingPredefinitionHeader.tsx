@@ -8,8 +8,11 @@ import { RestartIcon } from '@/assets/icons/RestartIcon';
 import SortAZIcon from '@/assets/icons/SortAZIcon';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
+import { RankModeToggle } from '@/components/common/rank/RankModeToggle';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { StageVotingType } from '@/models';
+
+export type DetailedViewMode = 'numbers' | 'rank';
 
 type Props = {
   stageName: string;
@@ -24,6 +27,8 @@ type Props = {
   onRandomize: () => void;
   onSavePreset: () => void;
   onLoadPreset: () => void;
+  viewMode?: DetailedViewMode;
+  onViewModeChange?: (mode: DetailedViewMode) => void;
 };
 
 export const VotingPredefinitionHeader: React.FC<Props> = ({
@@ -39,11 +44,30 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
   onRandomize,
   onSavePreset,
   onLoadPreset,
+  viewMode = 'numbers',
+  onViewModeChange,
 }) => {
   const t = useTranslations();
+  const isRank = viewMode === 'rank';
 
   return (
     <>
+      {onViewModeChange && (
+        <div className="relative border-b border-white/10 mb-2 px-2">
+          <RankModeToggle
+            tabs={(['numbers', 'rank'] as DetailedViewMode[]).map((mode) => ({
+              value: mode,
+              label: t(
+                mode === 'numbers'
+                  ? 'setup.votingPredefinition.detailedView'
+                  : 'setup.votingPredefinition.rankView',
+              ),
+            }))}
+            activeTab={viewMode}
+            onChange={onViewModeChange}
+          />
+        </div>
+      )}
       <div className="sm:mb-1 gap-1 px-2">
         <div className="flex items-center justify-between md:gap-4 gap-2 flex-wrap">
           <div className="md:w-auto w-full">
@@ -92,23 +116,29 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
             />
 
             <div className="flex gap-2 ml-auto">
-              <Button
-                onClick={() => setIsSorting(!isSorting)}
-                className="!p-3"
-                aria-label={
-                  isSorting ? t('common.sortByName') : t('common.sortByPoints')
-                }
-                title={
-                  isSorting ? t('common.sortByName') : t('common.sortByPoints')
-                }
-                Icon={
-                  isSorting ? (
-                    <SortAZIcon className="w-5 h-5" />
-                  ) : (
-                    <ArrowDown10 className="w-5 h-5" />
-                  )
-                }
-              />
+              {!isRank && (
+                <Button
+                  onClick={() => setIsSorting(!isSorting)}
+                  className="!p-3"
+                  aria-label={
+                    isSorting
+                      ? t('common.sortByName')
+                      : t('common.sortByPoints')
+                  }
+                  title={
+                    isSorting
+                      ? t('common.sortByName')
+                      : t('common.sortByPoints')
+                  }
+                  Icon={
+                    isSorting ? (
+                      <SortAZIcon className="w-5 h-5" />
+                    ) : (
+                      <ArrowDown10 className="w-5 h-5" />
+                    )
+                  }
+                />
+              )}
               <Button
                 variant="primary"
                 onClick={onReset}
@@ -117,9 +147,15 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
                 title={t('common.restart')}
                 Icon={<RestartIcon className="w-5 h-5" />}
               />
-              <Button variant="primary" onClick={onRandomize} className="!px-4">
-                {t('common.randomize')}
-              </Button>
+              {!isRank && (
+                <Button
+                  variant="primary"
+                  onClick={onRandomize}
+                  className="!px-4"
+                >
+                  {t('common.randomize')}
+                </Button>
+              )}
             </div>
           </div>
         </div>

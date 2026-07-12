@@ -177,6 +177,11 @@
     },
     "votingPredefinition": {
       "tabDetailed": "Detailliert",
+      "detailedView": "Detailliert",
+      "rankView": "Rang",
+      "randomizePoints": "Punkte zufällig",
+      "randomizeRanking": "Reihenfolge zufällig",
+      "dragToRankHint": "Ziehe die Länder, um das Endergebnis festzulegen. Klicke auf „Punkte zufällig“, um die Stimmen zu erzeugen – die Reihenfolge bleibt erhalten.",
       "tabTotals": "Totals (nur teilen)",
       "totalsHint": "Totals sind nur zum Teilen der Ergebnisse. Verwende die Detaillierte Tabelle und speichere, um eine Simulation zu starten.",
       "confirmCloseTitle": "Abstimmungsvordefinition schließen?",

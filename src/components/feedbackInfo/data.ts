@@ -411,6 +411,11 @@ export const WHATS_NEW = [
   {
     date: '2026-07-11',
     title:
+      'Rank-based predefined voting generator',
+  },
+  {
+    date: '2026-07-11',
+    title:
       '<list><item>Creating custom diaspora blocs</item><item>Persisting the diaspora settings in the user profile</item><item>Overriding odds per stage</item><item>Auto-syncing the settings in the user profile</item><item>The by-country view of the relations</item><item>Filtering your own leaderboard by contest groups</item><item>Small improvements and bug fixes</item></list>',
   },
   {
@@ -429,7 +434,7 @@ export const WHATS_NEW = [
 export const UPCOMING_FEATURES = [
   {
     approximateDates: { start: '2026-07-12', end: '2026-07-13' },
-    title: 'Rank-based predefined voting generator',
+    title: 'Redesign some parts of the app',
   },
   {
     title: 'Upload custom fonts',

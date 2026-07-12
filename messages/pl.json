@@ -177,6 +177,11 @@
     },
     "votingPredefinition": {
       "tabDetailed": "Szczegółowy",
+      "detailedView": "Szczegółowy",
+      "rankView": "Ranking",
+      "randomizePoints": "Losuj punkty",
+      "randomizeRanking": "Losuj ranking",
+      "dragToRankHint": "Przeciągaj kraje, aby ustalić końcową kolejność. Kliknij „Losuj punkty”, aby wygenerować głosy — ranking pozostaje bez zmian.",
       "tabTotals": "Sumy (tylko udostępnianie)",
       "totalsHint": "Sumy są tylko do udostępniania wyników. Użyj szczegółowej karty i zapisz, aby uruchomić symulację.",
       "confirmCloseTitle": "Zamknąć predefinicję głosowania?",

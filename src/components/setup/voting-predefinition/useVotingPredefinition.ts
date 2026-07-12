@@ -9,6 +9,13 @@ import {
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { resolveDiaspora } from '@/state/scoreboard/diaspora';
+import {
+  generateRankConsistentVotes,
+  RankChannel,
+  RankTarget,
+  resolveRankTarget,
+  totalsForChannels,
+} from '@/state/scoreboard/rankToStageVotes';
 import { StageVotes } from '@/state/scoreboard/types';
 import { predefineStageVotes } from '@/state/scoreboard/votesPredefinition';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -107,6 +114,12 @@ export const useVotingPredefinition = ({
   );
   const [isSorting, setIsSorting] = useState(false);
 
+  // Rank-view state (drag-to-rank mode of the Detailed tab). Kept here — not in
+  // the view component — so the ranking and reveal survive switching between the
+  // Numbers matrix and the Rank view (which mounts/unmounts the view component).
+  const [rankOrder, setRankOrder] = useState<string[] | null>(null);
+  const [showRankPoints, setShowRankPoints] = useState(false);
+
   const [lastStageId, setLastStageId] = useState<string | null>(stage.id);
   const [lastStageVotingMode, setLastStageVotingMode] =
     useState<StageVotingMode | null>(effectiveVotingMode);
@@ -168,6 +181,25 @@ export const useVotingPredefinition = ({
       ? effectiveTelevotePointsSystem
       : pointsSystem;
 
+  // Which running total the rank view controls, from the active badge:
+  // Jury/Televote rank those channels; Total ranks the combined outcome.
+  const rankTarget: RankTarget =
+    selectedType === StageVotingType.JURY
+      ? 'jury'
+      : selectedType === StageVotingType.TELEVOTE
+      ? 'televote'
+      : 'total';
+
+  const rankChannels = useMemo<RankChannel[]>(
+    () => resolveRankTarget(rankTarget, effectiveVotingMode).rankChannels,
+    [rankTarget, effectiveVotingMode],
+  );
+
+  const stageCodes = useMemo<string[]>(
+    () => stage.countries.map((c: any) => c.code),
+    [stage.countries],
+  );
+
   const randomizeAll = () => {
     const effectiveTelevoteSystem = effectiveTelevotePointsSystem;
 
@@ -210,12 +242,16 @@ export const useVotingPredefinition = ({
     }
 
     setIsSorting(true);
+
+    return generated;
   };
 
   const resetVotes = () => {
     setVotes(null);
     setSelectedType('Total');
     setIsSorting(false);
+    setRankOrder(null);
+    setShowRankPoints(false);
   };
 
   // Called when the modal's stage/voting-mode changes (e.g. advancing to the
@@ -227,6 +263,105 @@ export const useVotingPredefinition = ({
     setVotes(seed);
     setSelectedType('Total');
     setIsSorting(!!seed);
+    setRankOrder(null);
+    setShowRankPoints(false);
+  };
+
+  // Per-country aggregate total across the rank target's channels — the value
+  // shown on the right of each row once points are revealed.
+  const getRankTotals = (): Record<string, number> =>
+    totalsForChannels(votes || {}, rankChannels, stageCodes);
+
+  // Derive a rank order from the current votes (highest total first); countries
+  // with equal totals keep the stage's running order (stable sort). With no
+  // votes yet this is simply the running order.
+  const seedRankOrder = (): string[] => {
+    const totals = getRankTotals();
+
+    return [...stage.countries]
+      .sort((a: any, b: any) => (totals[b.code] || 0) - (totals[a.code] || 0))
+      .map((c: any) => c.code);
+  };
+
+  // Generate a points-consistent matrix for the current rank target from a drag
+  // order, writing only the target channels into `votes`. `reveal` shows the
+  // per-country totals on the rows.
+  const generateRankVotes = (order: string[], reveal: boolean) => {
+    const { votes: generated } = generateRankConsistentVotes({
+      orderedCodes: order,
+      stageCountries: stage.countries,
+      votingCountries,
+      target: rankTarget,
+      votingMode: effectiveVotingMode,
+      juryPointsSystem: pointsSystem,
+      televotePointsSystem: effectiveTelevotePointsSystem,
+      randomnessLevel,
+      pointsSpread,
+      allowMultiplePointsToSameEntry,
+    });
+
+    setVotes((prev) => {
+      const next: Partial<StageVotes> = prev ? { ...prev } : {};
+
+      // Merge every channel the generator produced (COMBINED writes three).
+      Object.keys(generated).forEach((ch) => {
+        (next as any)[ch] = (generated as any)[ch];
+      });
+
+      return next;
+    });
+    setIsSorting(true);
+    if (reveal) setShowRankPoints(true);
+  };
+
+  const targetChannelsEmpty = (): boolean =>
+    rankChannels.every((ch) => {
+      const byVoter = (votes as any)?.[ch];
+
+      return !byVoter || Object.keys(byVoter).length === 0;
+    });
+
+  // Entering the rank view (or switching the active badge): seed the order from
+  // the current votes. If the target has no votes yet, silently predefine a
+  // baseline so the contest is playable even if the user never clicks
+  // "Randomize points" — points stay hidden until they do.
+  const enterRankMode = () => {
+    const order = seedRankOrder();
+
+    setRankOrder(order);
+    if (targetChannelsEmpty()) {
+      generateRankVotes(order, false);
+    }
+  };
+
+  // Called on a drag reorder: the user redefined the intended order, so
+  // regenerate the target channels to match it (keeping the current reveal).
+  const reorderRank = (order: string[]) => {
+    setRankOrder(order);
+    generateRankVotes(order, showRankPoints);
+  };
+
+  // Called by the "Randomize points" button: re-roll the target channels for the
+  // current order and reveal the resulting totals.
+  const randomizeRankPoints = () => {
+    const order = rankOrder ?? seedRankOrder();
+
+    if (!rankOrder) setRankOrder(order);
+    generateRankVotes(order, true);
+  };
+
+  // Called by the "Randomize ranking" button: run the standard odds-based engine
+  // (`randomizeAll`) so the new ranking reflects the countries' actual odds, then
+  // derive the rank order from the generated standings. The reveal state is left
+  // as-is so the ranking and points can be randomized independently.
+  const randomizeRankOrder = () => {
+    const generated = randomizeAll();
+    const totals = totalsForChannels(generated || {}, rankChannels, stageCodes);
+    const order = [...stage.countries]
+      .sort((a: any, b: any) => (totals[b.code] || 0) - (totals[a.code] || 0))
+      .map((c: any) => c.code);
+
+    setRankOrder(order);
   };
 
   const applyInputValue = (
@@ -635,6 +770,18 @@ export const useVotingPredefinition = ({
     getVoterValidity,
     getTotalPointsForCountry,
     getCellValue,
+    // rank view
+    rankTarget,
+    rankChannels,
+    rankOrder,
+    showRankPoints,
+    getRankTotals,
+    enterRankMode,
+    reorderRank,
+    randomizeRankPoints,
+    randomizeRankOrder,
+    generateRankVotes,
+    seedRankOrder,
     // validation
     validateAllBeforeSave,
   };

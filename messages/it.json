@@ -177,6 +177,11 @@
     },
     "votingPredefinition": {
       "tabDetailed": "Dettagliato",
+      "detailedView": "Dettagliato",
+      "rankView": "Classifica",
+      "randomizePoints": "Punti casuali",
+      "randomizeRanking": "Classifica casuale",
+      "dragToRankHint": "Trascina i paesi per impostare la classifica finale. Premi «Punti casuali» per generare i voti — l'ordine resta invariato.",
       "tabTotals": "Totali (solo condivisione)",
       "totalsHint": "I totali sono per la condivisione dei risultati. Usa la scheda Dettagliata e Salva per eseguire una simulazione.",
       "confirmCloseTitle": "Chiudere la predefinizione di voto?",

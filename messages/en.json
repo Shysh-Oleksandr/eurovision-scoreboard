@@ -175,6 +175,11 @@
     },
     "votingPredefinition": {
       "tabDetailed": "Detailed",
+      "detailedView": "Detailed",
+      "rankView": "Rank",
+      "randomizePoints": "Randomize points",
+      "randomizeRanking": "Randomize ranking",
+      "dragToRankHint": "Drag countries to set the final ranking. Press \"Randomize points\" to generate the votes — the ranking stays fixed.",
       "tabTotals": "Totals (share only)",
       "totalsHint": "Totals are for sharing results only. Use the Detailed tab and Save to run a simulation.",
       "confirmCloseTitle": "Close voting predefinition?",
