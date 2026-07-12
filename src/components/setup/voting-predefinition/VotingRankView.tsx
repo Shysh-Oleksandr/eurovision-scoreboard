@@ -93,15 +93,14 @@ export const VotingRankView: React.FC<Props> = ({
       <p className="text-[12.5px] text-white/40 mt-1 mb-2">
         {t('setup.votingPredefinition.dragToRankHint')}
       </p>
-      <div className="narrow-scrollbar overflow-auto flex-1 min-h-0 pb-2">
-        <RankableCountryList
-          countries={countries}
-          orderedCodes={orderedCodes}
-          onReorder={onReorder}
-          layout={layout}
-          valueFor={(code) => (showPoints ? totals[code] ?? 0 : null)}
-        />
-      </div>
+      <RankableCountryList
+        countries={countries}
+        orderedCodes={orderedCodes}
+        onReorder={onReorder}
+        layout={layout}
+        scrollable
+        valueFor={(code) => (showPoints ? totals[code] ?? 0 : null)}
+      />
     </div>
   );
 };

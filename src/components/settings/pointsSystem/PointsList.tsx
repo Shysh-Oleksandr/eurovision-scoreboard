@@ -1,9 +1,9 @@
 import React from 'react';
-import SortableList from 'react-easy-sort';
 
 import { AddPointButton } from './AddPointButton';
 import { PointItem } from './PointItem';
 
+import { SortableList } from '@/components/common/sort/SortableList';
 import { PointsItem } from '@/state/generalStore';
 
 interface PointsListProps {

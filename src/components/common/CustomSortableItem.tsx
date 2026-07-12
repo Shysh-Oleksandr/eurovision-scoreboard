@@ -1,8 +1,8 @@
 import React from 'react';
-import { SortableItem } from 'react-easy-sort';
 
 import { DragGripIcon } from '@/assets/icons/DragGripIcon';
 import { XCloseIcon } from '@/assets/icons/XClose';
+import { SortableItem } from '@/components/common/sort/SortableList';
 
 interface CustomSortableItemProps {
   id: number | string;

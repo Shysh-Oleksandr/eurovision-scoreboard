@@ -1,9 +1,9 @@
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
-import SortableList from 'react-easy-sort';
 
 import { CountrySortableItem } from './CountrySortableItem';
 
+import { SortableList } from '@/components/common/sort/SortableList';
 import { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 

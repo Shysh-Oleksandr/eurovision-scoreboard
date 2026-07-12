@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
-import SortableList from 'react-easy-sort';
 
 import Tabs from '../../../common/tabs/Tabs';
 import { CountrySortableItem } from '../../event-stage/CountrySortableItem';
@@ -17,6 +16,7 @@ import { CountrySortableItem } from '../../event-stage/CountrySortableItem';
 import SortAZIcon from '@/assets/icons/SortAZIcon';
 import SortZAIcon from '@/assets/icons/SortZAIcon';
 import Button from '@/components/common/Button';
+import { SortableList } from '@/components/common/sort/SortableList';
 import type { Country } from '@/models';
 import { ScoreboardMobileLayout } from '@/state/generalStore';
 

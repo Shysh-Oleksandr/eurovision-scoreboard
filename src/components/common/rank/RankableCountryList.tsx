@@ -1,9 +1,12 @@
 import React, { useMemo } from 'react';
-import SortableList, { SortableItem } from 'react-easy-sort';
 
 import { BaseCountry } from '../../../models';
 
 import { DragGripIcon } from '@/assets/icons/DragGripIcon';
+import {
+  SortableItem,
+  SortableList,
+} from '@/components/common/sort/SortableList';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { cn } from '@/helpers/utils';
 import { useGeneralStore } from '@/state/generalStore';
@@ -20,6 +23,11 @@ export interface RankableCountryListProps {
   /** Called with the new order (best first) after a drag. */
   onReorder: (orderedCodes: string[]) => void;
   layout?: 'list' | 'grid';
+  /**
+   * When true, wraps the list in a scroll container. Use inside flex layouts with
+   * a constrained height so drag-and-drop can auto-scroll while sorting.
+   */
+  scrollable?: boolean;
   /**
    * Optional trailing value rendered on the right of each row (e.g. generated
    * odds or points). Return `null`/`undefined` to render nothing.
@@ -39,6 +47,7 @@ export const RankableCountryList: React.FC<RankableCountryListProps> = ({
   orderedCodes,
   onReorder,
   layout = 'list',
+  scrollable = false,
   valueFor,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -68,6 +77,8 @@ export const RankableCountryList: React.FC<RankableCountryListProps> = ({
   return (
     <SortableList
       onSortEnd={onSortEnd}
+      scrollable={scrollable}
+      lockAxis={isGrid ? undefined : 'y'}
       className={
         isGrid
           ? 'grid grid-cols-2 sm:grid-cols-3 gap-2'

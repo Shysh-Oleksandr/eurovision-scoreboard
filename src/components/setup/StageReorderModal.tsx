@@ -1,12 +1,12 @@
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
-import SortableList from 'react-easy-sort';
 
 import { EventStage } from '../../models';
 import { CustomSortableItem } from '../common/CustomSortableItem';
 import Modal from '../common/Modal/Modal';
 import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 
+import { SortableList } from '@/components/common/sort/SortableList';
 import { useConfirmation } from '@/hooks/useConfirmation';
 
 interface StageReorderModalProps {

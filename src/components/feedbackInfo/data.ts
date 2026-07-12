@@ -411,7 +411,7 @@ export const WHATS_NEW = [
   {
     date: '2026-07-11',
     title:
-      'Rank-based predefined voting generator',
+      '<list><item>Rank-based predefined voting generator</item><item>Fixed the drag-and-drop sorting issues when scrolling</item></list>',
   },
   {
     date: '2026-07-11',

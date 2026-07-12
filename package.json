@@ -54,7 +54,7 @@
     "react-best-gradient-color-picker": "^3.0.14",
     "react-confetti": "^6.4.0",
     "react-dom": "19.1.0",
-    "react-easy-sort": "^1.6.0",
+    "react-easy-sort": "1.8.0",
     "react-error-boundary": "^6.0.0",
     "react-flip-toolkit": "^7.2.4",
     "react-hook-form": "^7.63.0",

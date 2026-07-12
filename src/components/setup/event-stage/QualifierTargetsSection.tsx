@@ -1,7 +1,6 @@
 /* eslint-disable eqeqeq */
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useState } from 'react';
-import SortableList from 'react-easy-sort';
 import { useFormContext } from 'react-hook-form';
 
 import { EventStage, QualifierTarget } from '../../../models';
@@ -12,6 +11,7 @@ import { Input } from '../../Input';
 import { MinusIcon } from '@/assets/icons/MinusIcon';
 import { PlusIcon } from '@/assets/icons/PlusIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
+import { SortableList } from '@/components/common/sort/SortableList';
 import { ToggleButton } from '@/components/common/ToggleButton';
 import { useCountriesStore } from '@/state/countriesStore';
 
