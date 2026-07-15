@@ -61,6 +61,7 @@
     "react-json-view": "^1.21.3",
     "react-snowfall": "^2.4.0",
     "react-toastify": "^11.0.5",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.11",
     "zundo": "^2.3.0",
     "zustand": "^5.0.5"

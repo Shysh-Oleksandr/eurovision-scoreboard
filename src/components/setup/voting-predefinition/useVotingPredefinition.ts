@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { mergeImportedVotes } from './voteSpreadsheetParse';
+import {
+  buildExportSectionsForStageVotes,
+  downloadVoteSpreadsheet,
+  importVotesFromSpreadsheetFile,
+  type VoteSpreadsheetImportResult,
+} from './voteSpreadsheet';
 
 import {
   BaseCountry,
@@ -24,6 +32,93 @@ type UseVotingPredefinitionArgs = {
   stage: Pick<EventStage, 'id' | 'name' | 'votingMode' | 'overrides'> & {
     countries: (BaseCountry | any)[];
   };
+};
+
+export type VoteSpreadsheetActionSuccess = {
+  ok: true;
+  appliedCells: number;
+  invalidVoters: string[];
+  skippedSections: string[];
+  unmatched: string[];
+};
+
+export type VoteSpreadsheetActionFailure = {
+  ok: false;
+  reason:
+    | 'empty-file'
+    | 'no-sections'
+    | 'no-assignments'
+    | 'multiple-points-blocked'
+    | 'export-unavailable';
+  unmatched?: string[];
+  skippedSections?: string[];
+};
+
+export type VoteSpreadsheetActionResult =
+  | VoteSpreadsheetActionSuccess
+  | VoteSpreadsheetActionFailure;
+
+const getInvalidVoterNames = (
+  byVoter: Record<string, { pointsId: number }[]>,
+  voters: Array<{ code: string; name: string }>,
+  pointsSystem: Array<{ id: number }>,
+  source: 'jury' | 'televote',
+): string[] => {
+  const expectedIds = pointsSystem.map((p) => p.id);
+  const invalid: string[] = [];
+
+  for (const voter of voters) {
+    if (source === 'jury' && voter.code === 'WW') continue;
+
+    const arr = byVoter[voter.code] || [];
+    const usedIds = arr.map((v) => v.pointsId);
+    const hasAll = expectedIds.every((id) => usedIds.includes(id));
+    const noDuplicates = new Set(usedIds).size === usedIds.length;
+
+    if (!hasAll || !noDuplicates || usedIds.length !== expectedIds.length) {
+      invalid.push(voter.name);
+    }
+  }
+
+  return invalid;
+};
+
+const getInvalidVotersForVotes = (
+  votes: Partial<StageVotes>,
+  voters: Array<{ code: string; name: string }>,
+  juryPointsSystem: Array<{ id: number }>,
+  televotePointsSystem: Array<{ id: number }>,
+  votingMode: StageVotingMode,
+): string[] => {
+  const invalid = new Set<string>();
+
+  if (
+    votingMode === StageVotingMode.JURY_ONLY ||
+    votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+    votingMode === StageVotingMode.COMBINED
+  ) {
+    getInvalidVoterNames(
+      votes.jury ?? {},
+      voters,
+      juryPointsSystem,
+      'jury',
+    ).forEach((name) => invalid.add(name));
+  }
+
+  if (
+    votingMode === StageVotingMode.TELEVOTE_ONLY ||
+    votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+    votingMode === StageVotingMode.COMBINED
+  ) {
+    getInvalidVoterNames(
+      votes.televote ?? {},
+      voters,
+      televotePointsSystem,
+      'televote',
+    ).forEach((name) => invalid.add(name));
+  }
+
+  return Array.from(invalid);
 };
 
 export const useVotingPredefinition = ({
@@ -729,6 +824,138 @@ export const useVotingPredefinition = ({
     return { ok: errors.length === 0, errors } as const;
   };
 
+  const importVotesFromSpreadsheet = useCallback(
+    async (file: File): Promise<VoteSpreadsheetActionResult> => {
+      if (allowMultiplePointsToSameEntry) {
+        return { ok: false, reason: 'multiple-points-blocked' };
+      }
+
+      const result = await importVotesFromSpreadsheetFile(file, {
+        participants: stage.countries.map((c: any) => ({
+          code: c.code,
+          name: c.name,
+        })),
+        voters: votingCountries.map((c) => ({
+          code: c.code,
+          name: c.name,
+        })),
+        juryPointsSystem: pointsSystem,
+        televotePointsSystem: effectiveTelevotePointsSystem,
+        votingMode: effectiveVotingMode,
+      });
+
+      if (!result.ok) {
+        return {
+          ok: false,
+          reason: result.error,
+          unmatched: result.unmatched,
+          skippedSections: result.skippedSections,
+        };
+      }
+
+      const nextVotes = mergeImportedVotes(votes, {
+        jury: result.votes.jury,
+        televote: result.votes.televote,
+        unmatched: result.unmatched,
+        skippedSections: result.skippedSections,
+        appliedCells: result.appliedCells,
+      });
+
+      setVotes(nextVotes);
+      setIsSorting(true);
+
+      return {
+        ok: true,
+        appliedCells: result.appliedCells,
+        invalidVoters: getInvalidVotersForVotes(
+          nextVotes,
+          votingCountries,
+          pointsSystem,
+          effectiveTelevotePointsSystem,
+          effectiveVotingMode,
+        ),
+        skippedSections: result.skippedSections,
+        unmatched: result.unmatched,
+      };
+    },
+    [
+      allowMultiplePointsToSameEntry,
+      effectiveTelevotePointsSystem,
+      effectiveVotingMode,
+      pointsSystem,
+      stage.countries,
+      votes,
+      votingCountries,
+    ],
+  );
+
+  const exportVotesToSpreadsheet = useCallback(
+    (filename: string): VoteSpreadsheetActionResult => {
+      const participants = rankedCountries.map((country) => ({
+        code: country.code,
+        name: country.name,
+        rank: country.rank,
+      }));
+
+      const getParticipantTotal = (
+        code: string,
+        source: 'jury' | 'televote' | 'combined',
+      ) => {
+        if (!votes) return 0;
+
+        const sumFrom = (channel: 'jury' | 'televote' | 'combined') => {
+          let sum = 0;
+          Object.values(votes[channel] ?? {}).forEach((ballot) => {
+            ballot
+              .filter((vote) => vote.countryCode === code)
+              .forEach((vote) => {
+                sum += vote.points;
+              });
+          });
+          return sum;
+        };
+
+        if (
+          source === 'combined' &&
+          effectiveVotingMode === StageVotingMode.JURY_AND_TELEVOTE
+        ) {
+          return sumFrom('jury') + sumFrom('televote');
+        }
+
+        return sumFrom(source);
+      };
+
+      const sections = buildExportSectionsForStageVotes({
+        stageName: stage.name,
+        votingMode: effectiveVotingMode,
+        participants,
+        voters: votingCountries.map((c) => ({ code: c.code, name: c.name })),
+        votes,
+        getParticipantTotal,
+      });
+
+      if (sections.length === 0) {
+        return { ok: false, reason: 'export-unavailable' };
+      }
+
+      downloadVoteSpreadsheet({ filename, sections });
+      return {
+        ok: true,
+        appliedCells: 0,
+        invalidVoters: [],
+        skippedSections: [],
+        unmatched: [],
+      };
+    },
+    [
+      effectiveVotingMode,
+      rankedCountries,
+      stage.name,
+      votes,
+      votingCountries,
+    ],
+  );
+
   useEffect(() => {
     if (stage.id !== lastStageId) {
       reseedVotesForStage();
@@ -784,6 +1011,8 @@ export const useVotingPredefinition = ({
     seedRankOrder,
     // validation
     validateAllBeforeSave,
+    importVotesFromSpreadsheet,
+    exportVotesToSpreadsheet,
   };
 };
 

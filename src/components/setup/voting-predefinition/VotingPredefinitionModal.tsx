@@ -3,11 +3,14 @@
 import { Grid3x2, Share, Sheet } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
 import { useVotingPredefinition } from './useVotingPredefinition';
+import type { VoteSpreadsheetActionResult } from './useVotingPredefinition';
 import { useVotingPresetsFlow } from './useVotingPresetsFlow';
+import VoteSpreadsheetButtons from './VoteSpreadsheetButtons';
 import {
   DetailedViewMode,
   VotingPredefinitionHeader,
@@ -111,10 +114,13 @@ const VotingPredefinitionModal = ({
     reorderRank,
     randomizeRankPoints,
     randomizeRankOrder,
+    importVotesFromSpreadsheet,
+    exportVotesToSpreadsheet,
   } = useVotingPredefinition({ stage });
 
   const t = useTranslations();
   const tSetup = useTranslations('setup.votingPredefinition');
+  const tSpreadsheet = useTranslations('setup.votingPredefinition.spreadsheet');
 
   const { onClickOutside } = useConfirmModalClose({
     onClose,
@@ -129,6 +135,162 @@ const VotingPredefinitionModal = ({
   const clearDetailedCellEditing = useCallback(() => {
     setEditing({});
   }, []);
+
+  const showSpreadsheetResultToast = useCallback(
+    (result: VoteSpreadsheetActionResult) => {
+      if (result.ok) {
+        if (result.appliedCells > 0) {
+          if (result.invalidVoters.length > 0) {
+            toast.warning(
+              tSpreadsheet('successWithInvalidVoters', {
+                count: result.appliedCells,
+                voters: result.invalidVoters.slice(0, 5).join(', '),
+              }),
+            );
+          } else {
+            toast.success(
+              tSpreadsheet('importSuccess', { count: result.appliedCells }),
+            );
+          }
+        } else {
+          toast.success(tSpreadsheet('exportSuccess'));
+        }
+
+        if (result.unmatched.length > 0) {
+          toast.warning(
+            tSpreadsheet('unmatchedCountries', {
+              countries: result.unmatched.slice(0, 5).join(', '),
+            }),
+          );
+        }
+
+        if (result.skippedSections.length > 0) {
+          toast.info(
+            tSpreadsheet('sectionSkipped', {
+              sections: result.skippedSections.join(', '),
+            }),
+          );
+        }
+
+        return;
+      }
+
+      switch (result.reason) {
+        case 'empty-file':
+          toast.error(tSpreadsheet('emptyFile'));
+          break;
+        case 'no-sections':
+          toast.error(tSpreadsheet('noSections'));
+          break;
+        case 'no-assignments':
+          toast.error(tSpreadsheet('noAssignments'));
+          break;
+        case 'multiple-points-blocked':
+          toast.error(tSpreadsheet('multiplePointsBlocked'));
+          break;
+        case 'export-unavailable':
+          toast.error(tSpreadsheet('exportUnavailable'));
+          break;
+        default:
+          break;
+      }
+
+      if (result.unmatched?.length) {
+        toast.warning(
+          tSpreadsheet('unmatchedCountries', {
+            countries: result.unmatched.slice(0, 5).join(', '),
+          }),
+        );
+      }
+    },
+    [tSpreadsheet],
+  );
+
+  const handleImportSpreadsheet = useCallback(
+    async (file: File) => {
+      const result = await importVotesFromSpreadsheet(file);
+
+      clearDetailedCellEditing();
+      showSpreadsheetResultToast(result);
+    },
+    [
+      clearDetailedCellEditing,
+      importVotesFromSpreadsheet,
+      showSpreadsheetResultToast,
+    ],
+  );
+
+  const handleExportSpreadsheet = useCallback(() => {
+    const safeName = `${contestName}-${stage.name}-votes`
+      .replace(/[^\w.-]+/g, '-')
+      .replace(/-+/g, '-');
+    const result = exportVotesToSpreadsheet(safeName);
+
+    showSpreadsheetResultToast(result);
+  }, [
+    contestName,
+    exportVotesToSpreadsheet,
+    showSpreadsheetResultToast,
+    stage.name,
+  ]);
+
+  const [isSpreadsheetDragOver, setIsSpreadsheetDragOver] = useState(false);
+
+  const isSpreadsheetFile = useCallback((file: File) => {
+    const name = file.name.toLowerCase();
+
+    return (
+      name.endsWith('.xlsx') || name.endsWith('.xls') || name.endsWith('.csv')
+    );
+  }, []);
+
+  const handleSpreadsheetDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      if (activeTab !== PredefinitionTab.DETAILED) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'copy';
+      setIsSpreadsheetDragOver(true);
+    },
+    [activeTab],
+  );
+
+  const handleSpreadsheetDragLeave = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+      setIsSpreadsheetDragOver(false);
+    },
+    [],
+  );
+
+  const handleSpreadsheetDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      setIsSpreadsheetDragOver(false);
+
+      if (activeTab !== PredefinitionTab.DETAILED) return;
+
+      const file = event.dataTransfer.files?.[0];
+
+      if (!file || !isSpreadsheetFile(file)) {
+        toast.error(tSpreadsheet('invalidDropFile'));
+
+        return;
+      }
+
+      void handleImportSpreadsheet(file);
+    },
+    [activeTab, handleImportSpreadsheet, isSpreadsheetFile, tSpreadsheet],
+  );
+
+  const spreadsheetButtons = useMemo(
+    () => (
+      <VoteSpreadsheetButtons
+        onImport={handleImportSpreadsheet}
+        onExport={handleExportSpreadsheet}
+      />
+    ),
+    [handleImportSpreadsheet, handleExportSpreadsheet],
+  );
 
   const {
     openSavePresetCreate,
@@ -272,6 +434,7 @@ const VotingPredefinitionModal = ({
               onLoadPreset={() => openLoadPresetModal('detailed')}
               viewMode={detailedViewMode}
               onViewModeChange={setDetailedViewMode}
+              spreadsheetButtons={spreadsheetButtons}
             />
 
             {detailedViewMode === 'rank' ? (
@@ -466,6 +629,9 @@ const VotingPredefinitionModal = ({
       reorderRank,
       randomizeRankPoints,
       randomizeRankOrder,
+      handleImportSpreadsheet,
+      handleExportSpreadsheet,
+      spreadsheetButtons,
     ],
   );
 
@@ -510,11 +676,25 @@ const VotingPredefinitionModal = ({
           </div>
         }
       >
-        <TabContent
-          tabs={tabsWithContent}
-          activeTab={activeTab}
-          preserveContent
-        />
+        <div
+          className="relative flex flex-col flex-1 min-h-0"
+          onDragOver={handleSpreadsheetDragOver}
+          onDragLeave={handleSpreadsheetDragLeave}
+          onDrop={handleSpreadsheetDrop}
+        >
+          {isSpreadsheetDragOver && activeTab === PredefinitionTab.DETAILED && (
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-lg border-2 border-dashed border-white/40 bg-primary-900/80 backdrop-blur-sm">
+              <p className="text-sm font-medium text-white/90 px-4 text-center">
+                {tSpreadsheet('dropToImport')}
+              </p>
+            </div>
+          )}
+          <TabContent
+            tabs={tabsWithContent}
+            activeTab={activeTab}
+            preserveContent
+          />
+        </div>
 
         {(shareResultsOpen || shareStatsOpen) && (
           <>

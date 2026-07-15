@@ -6,6 +6,7 @@ import Badge from '../../common/Badge';
 
 import { ShareIcon } from '@/assets/icons/ShareIcon';
 import Button from '@/components/common/Button';
+import VoteSpreadsheetButtons from '@/components/setup/voting-predefinition/VoteSpreadsheetButtons';
 
 interface StatsHeaderProps {
   finishedStages: EventStage[];
@@ -17,6 +18,8 @@ interface StatsHeaderProps {
   totalBadgeLabel: string;
   hideVoteTypeOptions?: boolean;
   handleShareClick: () => void;
+  onExportSpreadsheet?: () => void;
+  showSpreadsheetExport?: boolean;
 }
 
 const StatsHeader: React.FC<StatsHeaderProps> = ({
@@ -29,6 +32,8 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
   totalBadgeLabel,
   hideVoteTypeOptions = false,
   handleShareClick,
+  onExportSpreadsheet,
+  showSpreadsheetExport = false,
 }) => {
   const t = useTranslations('simulation');
   // const isCombinedVoting = finishedStages.some(
@@ -43,14 +48,23 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
         finishedStages.length > 5 ? '!flex-col' : ''
       }`}
     >
-      <Button
-        variant="tertiary"
-        className="!px-4 z-20 h-fit sm:w-fit w-full justify-center"
-        onClick={handleShareClick}
-        Icon={<ShareIcon className="w-[20px] h-[20px]" />}
-      >
-        {t('header.share')}
-      </Button>
+      <div className="flex items-center gap-2 sm:w-auto w-full">
+        <Button
+          variant="tertiary"
+          className="!px-4 z-20 h-fit sm:w-fit w-full justify-center"
+          onClick={handleShareClick}
+          Icon={<ShareIcon className="w-[20px] h-[20px]" />}
+        >
+          {t('header.share')}
+        </Button>
+        {showSpreadsheetExport && onExportSpreadsheet && (
+          <VoteSpreadsheetButtons
+            showImport={false}
+            onExport={onExportSpreadsheet}
+            className="z-20 sm:hidden flex"
+          />
+        )}
+      </div>
 
       {/* TODO: the combined voting is not fully correct now */}
       {/* {isCombinedVoting && (
@@ -111,15 +125,12 @@ const StatsHeader: React.FC<StatsHeaderProps> = ({
         )}
       </div>
 
-      {finishedStages.length <= 5 && (
-        <Button
-          variant="tertiary"
-          className="!px-4 z-20 h-fit sm:block hidden invisible"
-          onClick={() => {}}
-          Icon={<ShareIcon className="w-[20px] h-[20px]" />}
-        >
-          {t('header.share')}
-        </Button>
+      {showSpreadsheetExport && onExportSpreadsheet && (
+        <VoteSpreadsheetButtons
+          showImport={false}
+          onExport={onExportSpreadsheet}
+          className="z-20 sm:flex hidden"
+        />
       )}
     </div>
   );

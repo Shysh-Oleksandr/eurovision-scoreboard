@@ -29,6 +29,7 @@ type Props = {
   onLoadPreset: () => void;
   viewMode?: DetailedViewMode;
   onViewModeChange?: (mode: DetailedViewMode) => void;
+  spreadsheetButtons?: React.ReactNode;
 };
 
 export const VotingPredefinitionHeader: React.FC<Props> = ({
@@ -46,6 +47,7 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
   onLoadPreset,
   viewMode = 'numbers',
   onViewModeChange,
+  spreadsheetButtons,
 }) => {
   const t = useTranslations();
   const isRank = viewMode === 'rank';
@@ -112,7 +114,8 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
             <VotingPresetToolbar
               onSavePreset={onSavePreset}
               onLoadPreset={onLoadPreset}
-              wrapperClassName="md:hidden flex-wrap flex gap-2"
+              endContent={spreadsheetButtons}
+              wrapperClassName="md:hidden w-full"
             />
 
             <div className="flex gap-2 ml-auto">
@@ -163,6 +166,7 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
       <VotingPresetToolbar
         onSavePreset={onSavePreset}
         onLoadPreset={onLoadPreset}
+        endContent={spreadsheetButtons}
         wrapperClassName="md:flex hidden pb-2 px-2"
       />
     </>

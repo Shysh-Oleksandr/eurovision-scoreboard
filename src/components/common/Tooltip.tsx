@@ -13,6 +13,7 @@ interface TooltipProps {
   withInfoIcon?: boolean;
   position?: 'left' | 'right' | 'center';
   dataTheme?: string;
+  classNameIcon?: string;
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({
@@ -22,6 +23,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   position = 'left',
   withInfoIcon = true,
   dataTheme,
+  classNameIcon = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
@@ -117,7 +119,9 @@ export const Tooltip: React.FC<TooltipProps> = ({
         {withInfoIcon ? (
           <div className="flex items-center gap-1">
             {children}
-            <InfoIcon className="w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer" />
+            <InfoIcon
+              className={`w-[20px] h-[20px] mt-[0.18rem] text-white/60 cursor-pointer ${classNameIcon}`}
+            />
           </div>
         ) : (
           children

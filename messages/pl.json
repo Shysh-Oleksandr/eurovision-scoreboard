@@ -213,6 +213,28 @@
         "toastPresetLoadedDetailed": "Wczytano szczegółowy preset „{name}”",
         "toastPresetLoadedTotals": "Wczytano preset sum „{name}”",
         "toastPresetDeleted": "Usunięto preset „{name}”"
+      },
+      "spreadsheet": {
+        "import": "Import",
+        "export": "Export",
+        "formatHelp": "Spreadsheet format help",
+        "tooltipIntro": "Import or export vote breakdowns as Excel (.xlsx). Each section is a matrix of participants (rows) and voting countries (columns).",
+        "tooltipRowFormat": "Each row should include a participant country name and point values per voter. A totals column (TOT) is optional.",
+        "tooltipSections": "For split voting, use separate JURY and TELEVOTE sections. Combined totals can be included as a third section on export.",
+        "tooltipFlexible": "Country names are matched flexibly — column order and row order do not need to match the app.",
+        "importSuccess": "Imported {count} scores from spreadsheet.",
+        "exportSuccess": "Spreadsheet exported.",
+        "successWithInvalidVoters": "Imported {count} scores, but some voters are still incomplete: {voters}.",
+        "unmatchedCountries": "Could not match countries: {countries}.",
+        "multiplePointsBlocked": "Import is not available when multiple points to the same country are enabled.",
+        "emptyFile": "The selected file is empty.",
+        "noSections": "No vote sections were found in the spreadsheet.",
+        "noAssignments": "No valid scores were found in the spreadsheet.",
+        "sectionSkipped": "Skipped sections: {sections}.",
+        "exportUnavailable": "Nothing to export yet.",
+        "dropToImport": "Drop a spreadsheet file to import votes.",
+        "invalidDropFile": "Please drop an Excel (.xlsx, .xls) or CSV file.",
+        "tooltipDragDrop": "You can also drag and drop a spreadsheet onto the Detailed tab to import."
       }
     },
     "customCountryModal": {
@@ -344,7 +366,8 @@
       "totalPoints": "Łączne punkty",
       "juryPoints": "Punkty jury",
       "televotePoints": "Punkty televote",
-      "combined": "Łącznie"
+      "combined": "Łącznie",
+      "spreadsheetExportSuccess": "Spreadsheet exported."
     }
   },
   "widgets": {

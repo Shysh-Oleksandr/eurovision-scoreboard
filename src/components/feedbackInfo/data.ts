@@ -409,7 +409,12 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
-    date: '2026-07-11',
+    date: '2026-07-15',
+    title:
+      'Added the Excel file import/export functionality for the predefined voting',
+  },
+  {
+    date: '2026-07-12',
     title:
       '<list><item>Rank-based predefined voting generator</item><item>Fixed the drag-and-drop sorting issues when scrolling</item></list>',
   },

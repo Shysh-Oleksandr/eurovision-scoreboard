@@ -1,6 +1,7 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
@@ -12,7 +13,12 @@ import StatsTable from './StatsTable';
 import { useFinalStats } from './useFinalStats';
 
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
-import { StatsTableType } from '@/models';
+import {
+  buildExportSectionsForStageVotes,
+  downloadVoteSpreadsheet,
+} from '@/components/setup/voting-predefinition/voteSpreadsheet';
+import { Country, StatsTableType } from '@/models';
+import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const ShareStatsModal = dynamic(() => import('../share/ShareStatsModal'), {
@@ -69,6 +75,10 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   const t = useTranslations('simulation.finalStats');
 
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const predefinedVotes = useScoreboardStore((state) => state.predefinedVotes);
+  const getStageVotingCountries = useCountriesStore(
+    (state) => state.getStageVotingCountries,
+  );
   const [activeTab, setActiveTab] = useState(FinalStatsTab.BREAKDOWN);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isShareModalLoaded, setIsShareModalLoaded] = useState(false);
@@ -161,6 +171,54 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     setIsShareModalOpen(true);
   };
 
+  const handleExportSpreadsheet = useCallback(() => {
+    if (!selectedStage || !selectedStageId) return;
+
+    const voters = getStageVotingCountries(selectedStageId, false, true);
+    const votes = predefinedVotes[selectedStageId];
+
+    const getParticipantTotal = (
+      code: string,
+      source: 'jury' | 'televote' | 'combined',
+    ) => {
+      const country = rankedCountries.find((entry) => entry.code === code) as
+        | Country
+        | undefined;
+
+      if (!country) return 0;
+
+      return getPoints(country, source);
+    };
+
+    const sections = buildExportSectionsForStageVotes({
+      stageName: selectedStage.name,
+      votingMode: selectedStage.votingMode,
+      participants: rankedCountries.map((country) => ({
+        code: country.code,
+        name: country.name,
+        rank: country.rank,
+      })),
+      voters: voters.map((voter) => ({ code: voter.code, name: voter.name })),
+      votes,
+      getParticipantTotal,
+    });
+
+    const filename = `${selectedStage.name}-breakdown`
+      .replace(/[^\w.-]+/g, '-')
+      .replace(/-+/g, '-');
+
+    downloadVoteSpreadsheet({ filename, sections });
+    toast.success(t('spreadsheetExportSuccess'));
+  }, [
+    getPoints,
+    getStageVotingCountries,
+    predefinedVotes,
+    rankedCountries,
+    selectedStage,
+    selectedStageId,
+    t,
+  ]);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -197,6 +255,8 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
         totalBadgeLabel={totalBadgeLabel}
         hideVoteTypeOptions={activeTab !== FinalStatsTab.BREAKDOWN}
         handleShareClick={handleShareClick}
+        showSpreadsheetExport={activeTab === FinalStatsTab.BREAKDOWN}
+        onExportSpreadsheet={handleExportSpreadsheet}
       />
 
       {selectedStage ? (
