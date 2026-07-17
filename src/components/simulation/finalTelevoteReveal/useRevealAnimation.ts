@@ -46,6 +46,13 @@ export const useRevealAnimation = ({
         ?.televotePoints ?? 0,
   );
 
+  const pendingFinalRevealTelevote = useScoreboardStore(
+    (state) => state.pendingFinalRevealTelevote,
+  );
+  const commitPendingFinalRevealTelevote = useScoreboardStore(
+    (state) => state.commitPendingFinalRevealTelevote,
+  );
+
   const finalRevealAnimationSpeed = useGeneralStore(
     (s) => s.settings.finalRevealAnimationSpeed,
   );
@@ -505,6 +512,18 @@ export const useRevealAnimation = ({
     },
     { scope: containerRef, dependencies: [] },
   );
+
+  // The panel only mounts once the reveal is triggered, so it is now safe to
+  // apply the last country's televote points that `giveTelevotePoints` buffered
+  // (deferred so the board never spoils them). Committing here drives the reveal:
+  // the watch effect below then picks up the points and plays the animation.
+  // Handles both a buffer set before the panel mounted ("Random" spam during the
+  // trigger delay) and one set after (awarding the last country while up).
+  useEffect(() => {
+    if (pendingFinalRevealTelevote) {
+      commitPendingFinalRevealTelevote();
+    }
+  }, [pendingFinalRevealTelevote, commitPendingFinalRevealTelevote]);
 
   // Watch for last country receiving their televote points
   useEffect(() => {

@@ -115,6 +115,7 @@ export const createEventActions: StateCreator<
       splitScreenQualifierLastShownByStage: {},
       revealData: null,
       isRevealAnimationComplete: false,
+      pendingFinalRevealTelevote: null,
     });
 
     playThemeSound('stageStart');
@@ -356,6 +357,7 @@ export const createEventActions: StateCreator<
       splitScreenQualifierLastShownByStage: {},
       revealData: null,
       isRevealAnimationComplete: false,
+      pendingFinalRevealTelevote: null,
     });
 
     playThemeSound('stageStart');
@@ -392,6 +394,7 @@ export const createEventActions: StateCreator<
       splitScreenQualifierLastShownByStage: {},
       revealData: null,
       isRevealAnimationComplete: false,
+      pendingFinalRevealTelevote: null,
     });
   },
 });

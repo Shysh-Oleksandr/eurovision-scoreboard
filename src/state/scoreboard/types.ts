@@ -21,6 +21,14 @@ export type RevealData = {
   pointsNeeded: number;
 };
 
+// Televote award for the last Grand Final country that has been buffered (not yet
+// applied to the board) so the final reveal animation can drive it. See
+// `getFinalRevealInfo` and the `giveTelevotePoints` guard.
+export type PendingFinalRevealTelevote = {
+  countryCode: string;
+  points: number;
+};
+
 export type ManualShareTotalsRow = {
   jury?: number;
   televote?: number;
@@ -74,6 +82,7 @@ export type ScoreboardState = {
   isWinnerAnimationAlreadyDisplayed: boolean;
   revealData: RevealData | null;
   isRevealAnimationComplete: boolean;
+  pendingFinalRevealTelevote: PendingFinalRevealTelevote | null;
   isLastSimulationAnimationFinished: boolean;
   splitScreenQualifierModalOpen: boolean;
   splitScreenQualifierCandidates: SplitScreenQualifierCandidate[];
@@ -94,7 +103,12 @@ export type ScoreboardState = {
   // Actions
   setEventStages: (eventStages: EventStage[]) => void;
   giveJuryPoints: (countryCode: string) => void;
-  giveTelevotePoints: (countryCode: string, votingPoints: number) => void;
+  giveTelevotePoints: (
+    countryCode: string,
+    votingPoints: number,
+    options?: { fromFinalReveal?: boolean },
+  ) => void;
+  commitPendingFinalRevealTelevote: () => void;
   giveRandomJuryPoints: () => void;
   finishJuryVotingRandomly: () => void;
   finishTelevoteVotingRandomly: () => void;

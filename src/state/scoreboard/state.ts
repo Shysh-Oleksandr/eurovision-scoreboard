@@ -40,6 +40,7 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   isWinnerAnimationAlreadyDisplayed: false,
   revealData: null,
   isRevealAnimationComplete: false,
+  pendingFinalRevealTelevote: null,
   isLastSimulationAnimationFinished: true,
   splitScreenQualifierModalOpen: false,
   splitScreenQualifierCandidates: [],

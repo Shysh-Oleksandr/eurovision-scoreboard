@@ -14,8 +14,9 @@ import FinalTelevoteReveal from './FinalTelevoteReveal';
 import { PhaseActions } from './PhaseActions';
 import { SimulationHeader } from './SimulationHeader';
 
-import { StageId, StageVotingMode } from '@/models';
+import { StageId } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
+import { getFinalRevealInfo } from '@/state/scoreboard/helpers';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import {
   stopSimulationBackgroundThemeSound,
@@ -106,43 +107,10 @@ const Simulation = () => {
   // ── Final televote reveal ─────────────────────────────────────────────────
 
   // Derive the single pending country code when we should show the reveal panel.
-  // Returns null if conditions are not met (not GF, not televote phase, etc.).
-  const lastPendingCountryCode = (() => {
-    if (!enableFinalReveal) return null;
-    if (
-      !currentStage?.isLastStage ||
-      currentStage.isJuryVoting ||
-      currentStage.isOver
-    ) {
-      return null;
-    }
-    if (
-      currentStage.votingMode !== StageVotingMode.TELEVOTE_ONLY &&
-      currentStage.votingMode !== StageVotingMode.JURY_AND_TELEVOTE
-    ) {
-      return null;
-    }
-    const unfinished = currentStage.countries.filter(
-      (c) => !c.isVotingFinished,
-    );
-
-    if (unfinished.length !== 1) return null;
-    const [lastCountry] = unfinished;
-
-    if (!lastCountry) return null;
-    const otherCountries = currentStage.countries.filter(
-      (c) => c.code !== lastCountry.code,
-    );
-    const maxOtherPoints = otherCountries.reduce(
-      (max, c) => Math.max(max, c.points),
-      0,
-    );
-
-    // Skip reveal if last country is already winning
-    if (lastCountry.points >= maxOtherPoints) return null;
-
-    return lastCountry.code;
-  })();
+  // `getFinalRevealInfo` is the shared source of truth (also used by the
+  // `giveTelevotePoints` guard) so the trigger and the guard never disagree.
+  const lastPendingCountryCode =
+    getFinalRevealInfo(currentStage, enableFinalReveal)?.lastCode ?? null;
 
   const revealData = useScoreboardStore((state) => state.revealData);
   const isRevealAnimationComplete = useScoreboardStore(
@@ -159,36 +127,17 @@ const Simulation = () => {
     if (!lastPendingCountryCode || revealData) return;
 
     triggerTimerRef.current = setTimeout(() => {
+      // Re-check against fresh state before committing: the condition may have
+      // changed during the delay (e.g. the stage advanced).
       const stage = useScoreboardStore.getState().getCurrentStage();
+      const info = getFinalRevealInfo(stage, enableFinalReveal);
 
-      if (!stage) return;
-
-      const unfinished = stage.countries.filter((c) => !c.isVotingFinished);
-
-      if (unfinished.length !== 1) return;
-
-      const [lastCountry] = unfinished;
-
-      if (!lastCountry) return;
-
-      const otherCountries = stage.countries.filter(
-        (c) => c.code !== lastCountry.code,
-      );
-
-      if (otherCountries.length === 0) return;
-
-      const leaderCountry = otherCountries.reduce((best, c) =>
-        c.points > best.points ? c : best,
-      );
-
-      const pointsNeeded = leaderCountry.points - lastCountry.points + 1;
-
-      if (pointsNeeded <= 0) return;
+      if (!info) return;
 
       setRevealData({
-        leaderCode: leaderCountry.code,
-        lastCode: lastCountry.code,
-        pointsNeeded,
+        leaderCode: info.leaderCode,
+        lastCode: info.lastCode,
+        pointsNeeded: info.pointsNeeded,
       });
     }, REVEAL_TRIGGER_DELAY_MS);
 
@@ -197,7 +146,7 @@ const Simulation = () => {
         clearTimeout(triggerTimerRef.current);
       }
     };
-  }, [lastPendingCountryCode, revealData, setRevealData]);
+  }, [lastPendingCountryCode, revealData, setRevealData, enableFinalReveal]);
 
   const handleRevealComplete = () => {
     setIsRevealAnimationComplete(true);

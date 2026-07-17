@@ -43,12 +43,15 @@ Winner modal / confetti are deferred until the reveal animation finishes.
 | File | Responsibility |
 |------|----------------|
 | `src/components/simulation/FinalTelevoteReveal.tsx` | The entire reveal panel + all GSAP animations. |
-| `src/components/simulation/Simulation.tsx` | Detection of the reveal condition, the 3.5 s trigger delay, mounting the panel, gating winner modal/confetti. |
+| `src/components/simulation/finalTelevoteReveal/useRevealAnimation.ts` | Owns the refs + GSAP choreography; commits any buffered last-country award (`commitPendingFinalRevealTelevote`) once the panel is mounted. |
+| `src/components/simulation/Simulation.tsx` | Detection of the reveal condition (via `getFinalRevealInfo`), the 3.5 s trigger delay, mounting the panel, gating winner modal/confetti. |
 | `src/components/board/BoardHeader.tsx` | Teaser text during reveal, winner text + "View Scoreboard" button after, hiding the "X points go to…" reveal label. |
-| `src/state/scoreboard/types.ts` | `RevealData` type, `revealData` / `isRevealAnimationComplete` state + action signatures. |
-| `src/state/scoreboard/state.ts` | Initial values (`revealData: null`, `isRevealAnimationComplete: false`). |
+| `src/state/scoreboard/helpers.ts` | `getFinalRevealInfo` — shared reveal-eligibility source of truth for the trigger and the award guard. |
+| `src/state/scoreboard/votingActions.ts` | `giveTelevotePoints` deferred-award guard + `commitPendingFinalRevealTelevote`. |
+| `src/state/scoreboard/types.ts` | `RevealData` / `PendingFinalRevealTelevote` types, `revealData` / `isRevealAnimationComplete` / `pendingFinalRevealTelevote` state + action signatures. |
+| `src/state/scoreboard/state.ts` | Initial values (`revealData: null`, `isRevealAnimationComplete: false`, `pendingFinalRevealTelevote: null`). |
 | `src/state/scoreboard/miscActions.ts` | `setRevealData`, `setIsRevealAnimationComplete`, `clearReveal`. |
-| `src/state/scoreboard/eventActions.ts` | Resets reveal state on `startEvent`, `continueToNextPhase`, `leaveEvent`. |
+| `src/state/scoreboard/eventActions.ts` | Resets reveal state (incl. `pendingFinalRevealTelevote`) on `startEvent`, `continueToNextPhase`, `leaveEvent`. |
 | `src/components/simulation/SimulationHeader.tsx` | Calls `clearReveal()` alongside `undo()`. |
 | `src/components/settings/UIPreferencesSettings.tsx` | The three user settings. |
 | `src/state/generalStore.ts` | Settings type + defaults. |
@@ -79,10 +82,41 @@ The reveal panel triggers only when **all** of these are true (see `lastPendingC
 ### Timing
 
 - When the condition becomes true, a **`REVEAL_TRIGGER_DELAY_MS` (3500 ms)** timer starts.
-  This lets the board settle before swapping. The condition is re-checked inside the timeout
-  before committing, and the timer is cleared on cleanup if the condition changes.
+  This lets the board settle before swapping (and lets the user watch the **next-to-last**
+  country's points reveal). The condition is re-checked inside the timeout before committing,
+  and the timer is cleared on cleanup if the condition changes.
 - On commit, `setRevealData({ leaderCode, lastCode, pointsNeeded })` is called. `revealData`
   being non-null is what swaps `<Board />` for `<FinalTelevoteReveal />`.
+
+Eligibility (the six conditions above) is centralized in **`getFinalRevealInfo(stage,
+enableFinalReveal)`** (`state/scoreboard/helpers.ts`), which returns
+`{ leaderCode, lastCode, pointsNeeded } | null`. Both the trigger (`Simulation.tsx`) and the
+award guard (below) call it, so they can never disagree about whether a reveal is due.
+
+### The deferred-award guard (spam-proofing the last country)
+
+The 3500 ms delay used to be a race: if the last country's televote was awarded **before** the
+timer fired (fast clicks, or spamming the **"Random"** button), the panel never mounted and the
+last country's points were flashed on the normal board — no reveal at all.
+
+To make the reveal reliable, **`giveTelevotePoints`** now guards against this. When
+`getFinalRevealInfo` is non-null and the award targets `lastCode`, the points are **not applied
+to the board**; instead they are buffered in `pendingFinalRevealTelevote` and the action returns
+early. Because the last country stays unfinished, the trigger timer still fires and mounts the
+panel. Once mounted, `useRevealAnimation` calls **`commitPendingFinalRevealTelevote`**, which
+re-invokes `giveTelevotePoints` with `{ fromFinalReveal: true }` to bypass the guard and apply
+the award — now consumed by the animation instead of shown on the board. This works whether the
+buffer was set **before** the panel mounted (spam during the delay) or **after** (awarding the
+last country while the panel is already up).
+
+- All individual-award paths funnel through `giveTelevotePoints`
+  (`givePredefinedTelevotePoints` = "Random", `giveManualTelevotePointsInRevealMode` = clicking
+  a country, and the manual `TelevoteInput` submit), so all of them are covered.
+- **"Finish randomly"** (`finishTelevoteVotingRandomly`) intentionally does **not** route through
+  `giveTelevotePoints` — it finishes every remaining country at once, so it is not intercepted
+  and simply ends voting (no reveal), matching its "skip the drama" purpose.
+- The buffer is idempotent: once set, repeat awards to the same country are no-ops, so spamming
+  "Random" can neither double-apply nor lose the reveal.
 
 ### Two-flag state
 
@@ -118,16 +152,19 @@ data while the component kept showing the stale reveal panel.
 Reset points:
 
 - **`startEvent`**, **`continueToNextPhase`**, **`leaveEvent`** (`eventActions.ts`) set
-  `revealData: null` and `isRevealAnimationComplete: false` in their `set(...)`.
+  `revealData: null`, `isRevealAnimationComplete: false`, and `pendingFinalRevealTelevote: null`
+  in their `set(...)`.
 - **Undo** — `SimulationHeader.tsx` calls `useScoreboardStore.getState().clearReveal()`
-  immediately after `undo()`. (Undo is a `zundo` temporal action that restores past store
-  snapshots; `clearReveal()` ensures the panel closes regardless of the snapshot contents.)
+  immediately after `undo()`. `clearReveal()` clears all three fields. (Undo is a `zundo`
+  temporal action that restores past store snapshots; `clearReveal()` ensures the panel closes
+  regardless of the snapshot contents.)
 - `triggerRestartEvent` only bumps `restartCounter` (re-opens setup); the actual reset
   happens when the user re-starts via `startEvent`. (The inline reset there is intentionally
   left commented out.)
 
-> ⚠️ If you add another way to mutate/restart the simulation, remember to reset these two
-> flags (or call `clearReveal()`), or the stale reveal panel may linger.
+> ⚠️ If you add another way to mutate/restart the simulation, remember to reset these three
+> fields (or call `clearReveal()`), or the stale reveal panel / a stranded buffered award may
+> linger.
 
 ---
 
@@ -160,6 +197,14 @@ country's televote is awarded:
 - Otherwise → stash the points in `pendingRevealPointsRef` to fire after the entrance.
 
 `revealDoneRef` guards against double-firing.
+
+**Committing a buffered award.** A second `useEffect` watches `pendingFinalRevealTelevote`
+(see the deferred-award guard above). Because this effect lives in the panel, it only runs while
+the panel is mounted — so calling `commitPendingFinalRevealTelevote()` applies the last
+country's points at exactly the right time. The commit re-renders the store, the watch effect
+above picks up `lastCountryFinished`, and the reveal plays. Since the commit runs *after* mount,
+`initialLastCountryPointsRef` has already captured the **pre-televote** total, so the animation
+math stays correct.
 
 ### Phase 2a — the fill rises (the "count")
 
@@ -257,8 +302,14 @@ is used. `handleFlagError` provides the standard flag fallback chain.
 
 ## Extending / changing the feature — checklist
 
-- **New trigger/reset path for the simulation** → reset `revealData` + `isRevealAnimationComplete`
-  (or call `clearReveal()`).
+- **New trigger/reset path for the simulation** → reset `revealData`,
+  `isRevealAnimationComplete`, **and** `pendingFinalRevealTelevote` (or call `clearReveal()`).
+- **New way to award televote to a single country** → if it must not spoil the last country,
+  route it through `giveTelevotePoints` (the deferred-award guard covers it automatically). A
+  path that finishes multiple countries at once (like `finishTelevoteVotingRandomly`) bypasses
+  the guard by design.
+- **Changing reveal eligibility** → edit `getFinalRevealInfo` only; the trigger and the guard
+  both read it, so they stay in sync.
 - **Changing animation timing** → all phase-2a tweens (fill bar, badge `bottom`, count-up,
   needs-countdown) must share the same `segDur*` / `ease*` / `pct*Ratio` or they desync.
 - **Adding theme color support** → bar backgrounds come from `barStyles` (built via

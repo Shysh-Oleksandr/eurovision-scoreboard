@@ -10,6 +10,7 @@ import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
 import {
+  getFinalRevealInfo,
   getLastCountryCodeByPoints,
   getLastCountryIndexByPoints,
   getRemainingCountries,
@@ -409,7 +410,12 @@ const pickSplitScreenCandidates = (
 
 type VotingActions = {
   giveJuryPoints: (countryCode: string) => void;
-  giveTelevotePoints: (countryCode: string, votingPoints: number) => void;
+  giveTelevotePoints: (
+    countryCode: string,
+    votingPoints: number,
+    options?: { fromFinalReveal?: boolean },
+  ) => void;
+  commitPendingFinalRevealTelevote: () => void;
   giveRandomJuryPoints: () => void;
   finishJuryVotingRandomly: () => void;
   finishTelevoteVotingRandomly: () => void;
@@ -876,11 +882,40 @@ export const createVotingActions: StateCreator<
     });
   },
 
-  giveTelevotePoints: (countryCode: string, votingPoints: number) => {
+  giveTelevotePoints: (
+    countryCode: string,
+    votingPoints: number,
+    options?: { fromFinalReveal?: boolean },
+  ) => {
     const state = get();
     const currentStage = state.getCurrentStage();
 
     if (!currentStage) return;
+
+    // Final televote reveal guard: if this award would finish the last Grand
+    // Final country while the reveal is eligible, buffer it instead of applying
+    // it to the board. The reveal panel commits it (via
+    // `commitPendingFinalRevealTelevote`, which passes `fromFinalReveal`) once it
+    // is mounted, so the last country's points are only ever revealed by the
+    // animation — never flashed on the board, even if the user spams "Random".
+    // The "Finish randomly" button bypasses this because it does not route
+    // through `giveTelevotePoints`.
+    if (!options?.fromFinalReveal) {
+      const revealInfo = getFinalRevealInfo(
+        currentStage,
+        useGeneralStore.getState().settings.enableFinalReveal,
+      );
+
+      if (revealInfo && revealInfo.lastCode === countryCode) {
+        if (!state.pendingFinalRevealTelevote) {
+          set({
+            pendingFinalRevealTelevote: { countryCode, points: votingPoints },
+          });
+        }
+
+        return;
+      }
+    }
 
     let updatedCountries = currentStage.countries.map((country) => {
       if (country.code === countryCode) {
@@ -945,6 +980,23 @@ export const createVotingActions: StateCreator<
       showQualificationResults,
       televotingProgress: state.televotingProgress + 1,
     });
+  },
+
+  commitPendingFinalRevealTelevote: () => {
+    const { pendingFinalRevealTelevote } = get();
+
+    if (!pendingFinalRevealTelevote) return;
+
+    set({ pendingFinalRevealTelevote: null });
+
+    // `fromFinalReveal` bypasses the buffering guard so the award is actually
+    // applied. This runs only while the reveal panel is mounted, so the store
+    // update is consumed by the animation rather than shown on the board.
+    get().giveTelevotePoints(
+      pendingFinalRevealTelevote.countryCode,
+      pendingFinalRevealTelevote.points,
+      { fromFinalReveal: true },
+    );
   },
 
   givePredefinedJuryPoint: () => {

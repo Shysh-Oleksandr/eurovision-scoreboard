@@ -185,6 +185,10 @@ export const createMiscActions: StateCreator<
   },
 
   clearReveal: () => {
-    set({ revealData: null, isRevealAnimationComplete: false });
+    set({
+      revealData: null,
+      isRevealAnimationComplete: false,
+      pendingFinalRevealTelevote: null,
+    });
   },
 });

@@ -64,6 +64,58 @@ export const getLastCountryIndexByPoints = (
 export const isVotingOver = (lastCountryIndexByPoints: number) =>
   lastCountryIndexByPoints === -1;
 
+/**
+ * Determines whether the Grand Final "final televote reveal" is eligible for the
+ * given stage: last stage, televote phase, exactly one country still unfinished,
+ * and that country is not already winning (so there is real tension to show).
+ *
+ * Returns the leader/last codes and the points the last country needs to overtake,
+ * or `null` when the reveal should not be shown. This is the single source of truth
+ * shared by the trigger (`Simulation.tsx`) and the televote-award guard
+ * (`giveTelevotePoints`) so they can never disagree.
+ */
+export const getFinalRevealInfo = (
+  stage: EventStage | undefined | null,
+  enableFinalReveal: boolean,
+): { leaderCode: string; lastCode: string; pointsNeeded: number } | null => {
+  if (!enableFinalReveal) return null;
+  if (!stage || !stage.isLastStage || stage.isJuryVoting || stage.isOver) {
+    return null;
+  }
+  if (
+    stage.votingMode !== StageVotingMode.TELEVOTE_ONLY &&
+    stage.votingMode !== StageVotingMode.JURY_AND_TELEVOTE
+  ) {
+    return null;
+  }
+
+  const unfinished = stage.countries.filter((c) => !c.isVotingFinished);
+
+  if (unfinished.length !== 1) return null;
+  const [lastCountry] = unfinished;
+
+  if (!lastCountry) return null;
+
+  const otherCountries = stage.countries.filter(
+    (c) => c.code !== lastCountry.code,
+  );
+
+  if (otherCountries.length === 0) return null;
+
+  const leaderCountry = otherCountries.reduce((best, c) =>
+    c.points > best.points ? c : best,
+  );
+  const pointsNeeded = leaderCountry.points - lastCountry.points + 1;
+
+  if (pointsNeeded <= 0) return null;
+
+  return {
+    leaderCode: leaderCountry.code,
+    lastCode: lastCountry.code,
+    pointsNeeded,
+  };
+};
+
 export const getWinnerCountry = (
   countries: Country[],
   runningOrder?: string[],
