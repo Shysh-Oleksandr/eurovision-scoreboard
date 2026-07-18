@@ -986,6 +986,49 @@
       "odds": "Odds",
       "relations": "Relações"
     },
+    "general2": {
+      "look": "Aparência",
+      "effects": "Efeitos e animação",
+      "audio": "Áudio",
+      "confirmations": "Confirmações",
+      "searchPlaceholder": "Pesquisar definições…",
+      "noResults": "Nenhuma definição corresponde a «{query}»",
+      "blurb": {
+        "contest": "Identidade do concurso que está a simular.",
+        "voting": "Sistema de pontos e como os votos são atribuídos e revelados.",
+        "look": "Idioma, bandeiras e aspeto do marcador e dos modais.",
+        "effects": "Celebração, ambiente e animações de revelação.",
+        "audio": "Efeitos sonoros e ambiente.",
+        "confirmations": "Diálogos que dispensou e reposição das definições."
+      },
+      "subhead": {
+        "votingBehaviour": "Comportamento de votação",
+        "flagsRankings": "Bandeiras e classificações",
+        "popupsChrome": "Popups e interface",
+        "personalization": "Personalização",
+        "suppressedDialogs": "Diálogos suprimidos",
+        "reset": "Repor"
+      },
+      "upload": {
+        "title": "Largue uma imagem ou clique para procurar",
+        "subtext": "PNG, JPG ou WEBP · guardado neste dispositivo."
+      },
+      "danger": {
+        "confirm": "Sim, repor tudo"
+      },
+      "tip": {
+        "heartFlags": "Substituir miniaturas de bandeiras por ícones em forma de coração nas cores de destaque da app.",
+        "minimalFlags": "Usar formas de bandeira redondas e quadradas simplificadas em vez de bandeiras detalhadas.",
+        "rankChange": "Mostrar uma seta a indicar se cada participante subiu ou desceu desde os últimos pontos atribuídos.",
+        "targetStages": "Mostrar para que fase avança cada qualificado.",
+        "blurModal": "Desfocar o marcador por trás dos modais abertos para maior concentração.",
+        "overrideFont": "Ignorar a fonte de cada tema e usar sempre a que escolher abaixo.",
+        "customBg": "Usar a sua própria imagem de fundo. Guardada apenas neste dispositivo — não sincronizada com a sua conta.",
+        "winter": "Adicionar neve a cair e toques festivos em toda a app.",
+        "finalReveal": "Revelar os pontos finais do televoto país a país com uma animação dramática.",
+        "predictableReveal": "Revelar os pontos do televoto numa ordem suave e determinística, sem suspense aleatório."
+      }
+    },
     "relations": {
       "title": "Diáspora e afinidade",
       "subtitle": "Blocos, vizinhos e rivalidades inclinam os votos simulados para além da qualidade da canção.",

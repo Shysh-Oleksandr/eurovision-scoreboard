@@ -21,7 +21,13 @@ const imageSize = 100;
 
 const MAX_IMAGE_SIZE = 1024 * 1024 * 4; // 4MB
 
-export const BgImageSelect: React.FC = () => {
+/**
+ * The upload dropzone + preview for the custom background image, without the
+ * enabling checkbox. Used as the conditional child of the "Use custom background
+ * image" switch in the redesigned General settings. All IndexedDB / validation
+ * logic lives here so it can be reused.
+ */
+export const CustomBgUpload: React.FC = () => {
   const t = useTranslations();
   const shouldUseCustomBgImage = useGeneralStore(
     (state) => state.settings.shouldUseCustomBgImage,
@@ -114,6 +120,72 @@ export const BgImageSelect: React.FC = () => {
   }, [shouldUseCustomBgImage, customBgImage, setSettings]);
 
   return (
+    <div className="flex flex-col gap-2 px-3 pb-2">
+      <div
+        onDragEnter={handleDragIn}
+        onDragLeave={handleDragOut}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        className={`flex items-center gap-2 border-2 border-dashed rounded-[9px] p-3 cursor-pointer transition-colors ${
+          isDragOver ? 'border-white bg-primary-700/50' : 'border-white/40'
+        }`}
+        onClick={handleBrowseClick}
+        role="button"
+        aria-label="Upload background image"
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png, image/jpeg, image/webp"
+          onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+          className="hidden"
+        />
+        <UploadIcon className="w-6 h-6 text-white pointer-events-none" />
+        <div className="flex flex-col pointer-events-none">
+          <span className="text-white text-sm">
+            {t('settings.general2.upload.title')}
+          </span>
+          <span className="text-white/60 text-xs">
+            {t('settings.general2.upload.subtext')}
+          </span>
+        </div>
+      </div>
+
+      {customBgImage && (
+        <div className="flex items-center gap-2">
+          <Image
+            src={customBgImage}
+            alt="Background preview"
+            className="rounded object-cover"
+            width={screenAspectRatio * imageSize}
+            height={imageSize}
+            style={{
+              width: screenAspectRatio * imageSize,
+              height: imageSize,
+            }}
+          />
+          <Button variant="secondary" onClick={clearImage}>
+            {t('common.clear')}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
+ * Legacy self-contained control (checkbox + upload). Retained for the old
+ * accordion-based settings; the redesigned General tab drives the checkbox via a
+ * switch row and renders `CustomBgUpload` as its conditional child.
+ */
+export const BgImageSelect: React.FC = () => {
+  const shouldUseCustomBgImage = useGeneralStore(
+    (state) => state.settings.shouldUseCustomBgImage,
+  );
+  const setSettings = useGeneralStore((state) => state.setSettings);
+  const t = useTranslations();
+
+  return (
     <>
       <Checkbox
         id="use-custom-bg-image"
@@ -125,57 +197,7 @@ export const BgImageSelect: React.FC = () => {
           setSettings({ shouldUseCustomBgImage: e.target.checked })
         }
       />
-
-      {shouldUseCustomBgImage && (
-        <div className="flex flex-col gap-2">
-          <div
-            onDragEnter={handleDragIn}
-            onDragLeave={handleDragOut}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            className={`flex items-center gap-2 border-2 border-dashed rounded-md p-2 cursor-pointer transition-colors ${
-              isDragOver ? 'border-white bg-primary-700/50' : 'border-white/40'
-            }`}
-            onClick={handleBrowseClick}
-            role="button"
-            aria-label="Upload background image"
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png, image/jpeg, image/webp"
-              onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
-              className="hidden"
-            />
-            <UploadIcon className="w-6 h-6 text-white pointer-events-none" />
-            <div className="flex flex-col pointer-events-none">
-              <span className="text-white text-sm">
-                {t('settings.ui.dragAndDropToUpload')}
-              </span>
-              <span className="text-white/70 text-xs">PNG, JPG, WEBP</span>
-            </div>
-          </div>
-
-          {customBgImage && (
-            <div className="flex items-center gap-2">
-              <Image
-                src={customBgImage}
-                alt="Background preview"
-                className="rounded object-cover"
-                width={screenAspectRatio * imageSize}
-                height={imageSize}
-                style={{
-                  width: screenAspectRatio * imageSize,
-                  height: imageSize,
-                }}
-              />
-              <Button variant="secondary" onClick={clearImage}>
-                {t('common.clear')}
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+      {shouldUseCustomBgImage && <CustomBgUpload />}
     </>
   );
 };

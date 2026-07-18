@@ -988,6 +988,49 @@
       "odds": "Odds",
       "relations": "Relations"
     },
+    "general2": {
+      "look": "Look & feel",
+      "effects": "Effects & motion",
+      "audio": "Audio",
+      "confirmations": "Confirmations",
+      "searchPlaceholder": "Search settings…",
+      "noResults": "No settings match “{query}”",
+      "blurb": {
+        "contest": "Identity of the contest you are simulating.",
+        "voting": "Points system and how votes are cast and revealed.",
+        "look": "Language, flags and how the scoreboard and modals appear.",
+        "effects": "Celebration, ambience and reveal animations.",
+        "audio": "Sound effects and ambience.",
+        "confirmations": "Dialogs you have dismissed, and settings reset."
+      },
+      "subhead": {
+        "votingBehaviour": "Voting behaviour",
+        "flagsRankings": "Flags & rankings",
+        "popupsChrome": "Popups & chrome",
+        "personalization": "Personalization",
+        "suppressedDialogs": "Suppressed dialogs",
+        "reset": "Reset"
+      },
+      "upload": {
+        "title": "Drop an image or click to browse",
+        "subtext": "PNG, JPG or WEBP · stored on this device."
+      },
+      "danger": {
+        "confirm": "Yes, reset everything"
+      },
+      "tip": {
+        "heartFlags": "Replace flag thumbnails with heart-shaped icons in the app’s accent colours.",
+        "minimalFlags": "Use simplified round and square flag shapes instead of detailed flags.",
+        "rankChange": "Show an arrow indicating whether each entry moved up or down since the previous points were awarded.",
+        "targetStages": "Show which stage each qualifier advances to.",
+        "blurModal": "Blur the scoreboard behind open modals for extra focus.",
+        "overrideFont": "Ignore each theme’s font and always use the font you pick below.",
+        "customBg": "Use your own background image. Stored only on this device — not synced to your account.",
+        "winter": "Add falling snow and festive touches across the app.",
+        "finalReveal": "Reveal the final televote scores one country at a time with a dramatic animation.",
+        "predictableReveal": "Reveal televote scores in a smooth, deterministic order with no random suspense."
+      }
+    },
     "relations": {
       "title": "Diaspora & affinity",
       "subtitle": "Blocs, neighbours & rivalries nudge simulated votes beyond song quality.",

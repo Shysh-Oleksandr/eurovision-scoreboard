@@ -224,8 +224,17 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 
       <div className="grid gap-4 p-4 sm:[grid-template-columns:minmax(0,230px)_1fr] grid-cols-1">
         {/* Left: status panel */}
-        <div className="flex sm:flex-col items-center sm:justify-center justify-between gap-2.5 rounded-[12px] text-center sm:border-b sm:border-r border-white/10 sm:py-[18px] sm:px-[14px] sm:bg-black/25 sm:shadow-[inset 0 0 0 1px rgba(255,255,255,0.06)] sm:flex-nowrap flex-wrap">
-          <div className="flex sm:flex-col items-center sm:gap-2.5 gap-2">
+        <div className="relative flex sm:flex-col items-center sm:justify-center justify-between gap-2.5 rounded-[12px] text-center sm:border-b sm:border-r border-white/10 sm:py-[18px] sm:px-[14px] sm:bg-black/25 sm:shadow-[inset 0 0 0 1px rgba(255,255,255,0.06)] sm:flex-nowrap flex-wrap overflow-hidden">
+          {/* <Image
+            src={
+              'https://cdn.douzepoints.app/themes/bg-images/6a4e6616957fcac4035ed5e2/6a551ffbd07904cb692405e8-e5eab1e8-c736-44e8-9a47-336bcf3a1859.jpeg'
+            }
+            alt="Contest logo"
+            unoptimized
+            className="object-cover absolute top-0 left-0 bottom-0 right-0 z-10"
+            fill
+          /> */}
+          <div className="flex sm:flex-col items-center sm:gap-2.5 gap-2 z-20">
             {/* Host flag/logo */}
             <Image
               src={logo}
@@ -252,35 +261,37 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
             </div>
           </div>
 
-          {/* Status badge */}
-          {contest.winner ? (
-            <ContestBadge variant="gold">
-              {winnerFlag && (
-                <Image
-                  src={winnerFlag}
-                  alt={winnerName ?? 'Winner flag'}
-                  className="w-[18px] h-[13px] rounded-sm object-cover flex-none"
-                  width={18}
-                  height={13}
-                  onError={(e) => {
-                    e.currentTarget.src = getFlagPath('ww');
-                  }}
-                  unoptimized
-                />
-              )}
-              {winnerName} 🏆
-            </ContestBadge>
-          ) : contest.isSimulationStarted ? (
-            <ContestBadge variant="green">
-              <LoaderCircleIcon className="size-3.5 flex-none" />
-              {t('widgets.contests.inProgress')}
-            </ContestBadge>
-          ) : (
-            <ContestBadge variant="red">
-              <CircleDashedIcon className="size-3.5 flex-none" />
-              {t('widgets.contests.notStarted')}
-            </ContestBadge>
-          )}
+          <div className="z-20">
+            {/* Status badge */}
+            {contest.winner ? (
+              <ContestBadge variant="gold">
+                {winnerFlag && (
+                  <Image
+                    src={winnerFlag}
+                    alt={winnerName ?? 'Winner flag'}
+                    className="w-[18px] h-[13px] rounded-sm object-cover flex-none"
+                    width={18}
+                    height={13}
+                    onError={(e) => {
+                      e.currentTarget.src = getFlagPath('ww');
+                    }}
+                    unoptimized
+                  />
+                )}
+                {winnerName} 🏆
+              </ContestBadge>
+            ) : contest.isSimulationStarted ? (
+              <ContestBadge variant="green">
+                <LoaderCircleIcon className="size-3.5 flex-none" />
+                {t('widgets.contests.inProgress')}
+              </ContestBadge>
+            ) : (
+              <ContestBadge variant="red">
+                <CircleDashedIcon className="size-3.5 flex-none" />
+                {t('widgets.contests.notStarted')}
+              </ContestBadge>
+            )}
+          </div>
         </div>
 
         {/* Right: info + actions */}

@@ -1353,3 +1353,26 @@ h6 {
 .rel-diverging-input::-moz-range-track {
   background: transparent;
 }
+
+/* General settings redesign: category pane enter animation */
+@keyframes st2-pane-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.st2-pane-fade {
+  animation: st2-pane-fade 0.22s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st2-pane-fade {
+    animation: none;
+  }
+}

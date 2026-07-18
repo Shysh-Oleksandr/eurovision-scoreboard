@@ -1,85 +1,92 @@
-import { useTranslations } from 'next-intl';
-import React from 'react';
-import { toast } from 'react-toastify';
+'use client';
+import React, { useEffect, useMemo, useState } from 'react';
 
-import { useGeneralStore } from '../../state/generalStore';
-import Button from '../common/Button';
-import { CollapsibleSection } from '../common/CollapsibleSection';
+import { CategoryPane } from './general/CategoryPane';
+import { CATEGORIES } from './general/model/settingsModel';
+import { SearchResults } from './general/SearchResults';
+import { SettingsSearchBar } from './general/SettingsSearchBar';
+import { SidebarNav } from './general/SidebarNav';
+import { SubTabStrip } from './general/SubTabStrip';
+import { useSettingsSearch } from './general/useSettingsSearch';
 
-import { ConfirmationsSettings } from './ConfirmationsSettings';
-import { ContestSettings } from './ContestSettings';
-import { UIPreferencesSettings } from './UIPreferencesSettings';
-import { VotingSettings } from './VotingSettings';
-
-import { RestartIcon } from '@/assets/icons/RestartIcon';
-import { useConfirmation } from '@/hooks/useConfirmation';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useGeneralStore } from '@/state/generalStore';
+import { customThemeHasSimulationBackground } from '@/theme/customThemeHasAudio';
 
 export const GeneralSettings: React.FC = () => {
-  const t = useTranslations('settings');
-  const resetAllSettings = useGeneralStore((state) => state.resetAllSettings);
-  const expansion = useGeneralStore((state) => state.generalSettingsExpansion);
-  const setExpansion = useGeneralStore(
-    (state) => state.setGeneralSettingsExpansion,
+  const [activeCategory, setActiveCategory] = useState('contest');
+  const [query, setQuery] = useState('');
+  const isMobile = useMediaQuery('(max-width: 720px)');
+
+  const customTheme = useGeneralStore((s) => s.customTheme);
+  const env = useMemo(
+    () => ({
+      fullscreenEnabled:
+        typeof document !== 'undefined' && document.fullscreenEnabled,
+      hasSimBg: customThemeHasSimulationBackground(customTheme),
+    }),
+    [customTheme],
   );
-  const { confirm } = useConfirmation();
+
+  const search = useSettingsSearch(CATEGORIES, query, env);
+
+  // In search mode, keep the highlighted category following the first match.
+  useEffect(() => {
+    if (
+      search.active &&
+      search.groups.length > 0 &&
+      !search.groups.some((group) => group.category.id === activeCategory)
+    ) {
+      setActiveCategory(search.groups[0].category.id);
+    }
+  }, [search, activeCategory]);
+
+  const activeCat =
+    CATEGORIES.find((category) => category.id === activeCategory) ??
+    CATEGORIES[0];
+
+  const selectAndClear = (id: string) => {
+    setActiveCategory(id);
+    setQuery('');
+  };
 
   return (
-    <div className="flex flex-col gap-3">
-      <CollapsibleSection
-        title={t('general.contest')}
-        isExpanded={expansion.contest}
-        onToggle={() => setExpansion({ contest: !expansion.contest })}
-        contentClassName="grid sm:grid-cols-2 grid-cols-1 gap-2 items-center"
-      >
-        <ContestSettings />
-      </CollapsibleSection>
+    <div className="flex flex-col gap-1 text-white">
+      <SettingsSearchBar value={query} onChange={setQuery} />
 
-      <CollapsibleSection
-        title={t('general.voting')}
-        isExpanded={expansion.voting}
-        onToggle={() => setExpansion({ voting: !expansion.voting })}
-      >
-        <VotingSettings />
-      </CollapsibleSection>
-      <CollapsibleSection
-        title={t('general.uiPreferences')}
-        isExpanded={expansion.uiPreferences}
-        onToggle={() =>
-          setExpansion({ uiPreferences: !expansion.uiPreferences })
-        }
-        contentClassName="grid sm:grid-cols-2 grid-cols-1 gap-1"
-      >
-        <UIPreferencesSettings />
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        title={t('general.confirmations')}
-        isExpanded={expansion.confirmations}
-        onToggle={() =>
-          setExpansion({ confirmations: !expansion.confirmations })
-        }
-      >
-        <ConfirmationsSettings />
-      </CollapsibleSection>
-
-      <Button
-        variant="tertiary"
-        className="w-full justify-center"
-        onClick={() => {
-          confirm({
-            key: 'reset-all-settings',
-            title: t('confirmations.resetAllSettings'),
-            description: t('confirmations.resetAllSettingsDescription'),
-            onConfirm: () => {
-              resetAllSettings();
-              toast.success(t('confirmations.resetAllSettingsSuccess'));
-            },
-          });
-        }}
-        Icon={<RestartIcon className="size-5" />}
-      >
-        {t('general.resetAllSettings')}
-      </Button>
+      {search.active ? (
+        isMobile ? (
+          <SearchResults groups={search.groups} query={query} />
+        ) : (
+          <div className="grid grid-cols-[200px_1fr] items-start gap-[18px]">
+            <SidebarNav
+              categories={search.groups.map((group) => group.category)}
+              counts={search.counts}
+              activeId={activeCategory}
+              onSelect={selectAndClear}
+            />
+            <SearchResults groups={search.groups} query={query} />
+          </div>
+        )
+      ) : isMobile ? (
+        <>
+          <SubTabStrip
+            categories={CATEGORIES}
+            activeId={activeCategory}
+            onSelect={setActiveCategory}
+          />
+          <CategoryPane key={activeCat.id} category={activeCat} env={env} />
+        </>
+      ) : (
+        <div className="grid grid-cols-[200px_1fr] items-start gap-[18px]">
+          <SidebarNav
+            categories={CATEGORIES}
+            activeId={activeCategory}
+            onSelect={setActiveCategory}
+          />
+          <CategoryPane key={activeCat.id} category={activeCat} env={env} />
+        </div>
+      )}
     </div>
   );
 };

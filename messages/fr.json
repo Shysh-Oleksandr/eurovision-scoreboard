@@ -991,6 +991,49 @@
       "odds": "Cotes",
       "relations": "Relations"
     },
+    "general2": {
+      "look": "Apparence",
+      "effects": "Effets et animations",
+      "audio": "Audio",
+      "confirmations": "Confirmations",
+      "searchPlaceholder": "Rechercher dans les réglages…",
+      "noResults": "Aucun réglage ne correspond à « {query} »",
+      "blurb": {
+        "contest": "Identité du concours que vous simulez.",
+        "voting": "Système de points et façon dont les votes sont attribués et révélés.",
+        "look": "Langue, drapeaux et apparence du tableau de scores et des modales.",
+        "effects": "Célébration, ambiance et animations de révélation.",
+        "audio": "Effets sonores et ambiance.",
+        "confirmations": "Dialogues que vous avez fermés et réinitialisation des réglages."
+      },
+      "subhead": {
+        "votingBehaviour": "Comportement de vote",
+        "flagsRankings": "Drapeaux et classements",
+        "popupsChrome": "Popups et interface",
+        "personalization": "Personnalisation",
+        "suppressedDialogs": "Dialogues supprimés",
+        "reset": "Réinitialiser"
+      },
+      "upload": {
+        "title": "Déposez une image ou cliquez pour parcourir",
+        "subtext": "PNG, JPG ou WEBP · stocké sur cet appareil."
+      },
+      "danger": {
+        "confirm": "Oui, tout réinitialiser"
+      },
+      "tip": {
+        "heartFlags": "Remplacer les miniatures de drapeaux par des icônes en forme de cœur aux couleurs d’accent de l’app.",
+        "minimalFlags": "Utiliser des formes de drapeau rondes et carrées simplifiées plutôt que des drapeaux détaillés.",
+        "rankChange": "Afficher une flèche indiquant si chaque entrée a monté ou descendu depuis les derniers points attribués.",
+        "targetStages": "Afficher l’étape vers laquelle chaque qualifié se dirige.",
+        "blurModal": "Flouter le tableau de scores derrière les modales ouvertes pour plus de concentration.",
+        "overrideFont": "Ignorer la police de chaque thème et toujours utiliser celle choisie ci-dessous.",
+        "customBg": "Utiliser votre propre image de fond. Stockée uniquement sur cet appareil — non synchronisée avec votre compte.",
+        "winter": "Ajouter de la neige qui tombe et des touches festives dans toute l’app.",
+        "finalReveal": "Révéler les scores finaux du télévote pays par pays avec une animation dramatique.",
+        "predictableReveal": "Révéler les scores du télévote dans un ordre fluide et déterministe, sans suspense aléatoire."
+      }
+    },
     "relations": {
       "title": "Diaspora et affinités",
       "subtitle": "Blocs, voisins et rivalités influencent les votes simulés au-delà de la qualité des chansons.",

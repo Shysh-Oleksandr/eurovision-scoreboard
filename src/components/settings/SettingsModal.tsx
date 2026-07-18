@@ -115,8 +115,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      containerClassName="!w-[min(100%,850px)]"
-      contentClassName="!py-0 !px-2 text-white h-[70vh] narrow-scrollbar"
+      containerClassName="!w-[min(100%,900px)] !max-w-[900px]"
+      contentClassName="!py-0 !px-2 text-white h-[70vh] narrow-scrollbar overscroll-none"
       overlayClassName="!z-[1001]"
       topContent={
         <Tabs

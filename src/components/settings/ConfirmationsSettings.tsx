@@ -42,7 +42,6 @@ export const ConfirmationsSettings: React.FC = () => {
   if (confirmationKeys.length === 0) {
     return (
       <div className="space-y-3">
-        <div className="text-white/80 text-sm">{t('description')}</div>
         <div className="text-white/80 text-center py-3">
           {t('noConfirmationsDisabled')}
         </div>
@@ -52,8 +51,6 @@ export const ConfirmationsSettings: React.FC = () => {
 
   return (
     <div className="space-y-3">
-      <div className="text-white/80 text-sm">{t('description')}</div>
-
       <div className="space-y-2">
         {confirmationKeys.map((key) => (
           <div

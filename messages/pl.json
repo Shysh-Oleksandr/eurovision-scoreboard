@@ -991,6 +991,49 @@
       "odds": "Szanse",
       "relations": "Relacje"
     },
+    "general2": {
+      "look": "Wygląd",
+      "effects": "Efekty i animacje",
+      "audio": "Dźwięk",
+      "confirmations": "Potwierdzenia",
+      "searchPlaceholder": "Szukaj ustawień…",
+      "noResults": "Żadne ustawienie nie pasuje do „{query}”",
+      "blurb": {
+        "contest": "Tożsamość konkursu, który symulujesz.",
+        "voting": "System punktów i sposób przyznawania oraz ujawniania głosów.",
+        "look": "Język, flagi oraz wygląd tablicy wyników i okien modalnych.",
+        "effects": "Świętowanie, atmosfera i animacje ujawniania.",
+        "audio": "Efekty dźwiękowe i atmosfera.",
+        "confirmations": "Okna dialogowe, które zamknąłeś, oraz reset ustawień."
+      },
+      "subhead": {
+        "votingBehaviour": "Zachowanie głosowania",
+        "flagsRankings": "Flagi i rankingi",
+        "popupsChrome": "Popupy i interfejs",
+        "personalization": "Personalizacja",
+        "suppressedDialogs": "Ukryte okna dialogowe",
+        "reset": "Reset"
+      },
+      "upload": {
+        "title": "Upuść obraz lub kliknij, aby przeglądać",
+        "subtext": "PNG, JPG lub WEBP · przechowywane na tym urządzeniu."
+      },
+      "danger": {
+        "confirm": "Tak, zresetuj wszystko"
+      },
+      "tip": {
+        "heartFlags": "Zastąp miniatury flag ikonami w kształcie serca w kolorach akcentu aplikacji.",
+        "minimalFlags": "Używaj uproszczonych okrągłych i kwadratowych kształtów flag zamiast szczegółowych flag.",
+        "rankChange": "Pokaż strzałkę wskazującą, czy uczestnik awansował lub spadł od ostatnio przyznanych punktów.",
+        "targetStages": "Pokaż, do którego etapu przechodzi każdy zakwalifikowany uczestnik.",
+        "blurModal": "Rozmyj tablicę wyników za otwartymi oknami modalnymi dla lepszego skupienia.",
+        "overrideFont": "Ignoruj czcionkę każdego motywu i zawsze używaj tej wybranej poniżej.",
+        "customBg": "Użyj własnego obrazu tła. Przechowywany tylko na tym urządzeniu — nie synchronizowany z kontem.",
+        "winter": "Dodaj padający śnieg i świąteczne akcenty w całej aplikacji.",
+        "finalReveal": "Ujawniaj końcowe wyniki teległosowania po jednym kraju z dramatyczną animacją.",
+        "predictableReveal": "Ujawniaj wyniki teległosowania w płynnej, deterministycznej kolejności bez losowej napięcia."
+      }
+    },
     "relations": {
       "title": "Diaspora i powinowactwo",
       "subtitle": "Bloki, sąsiedzi i rywalizacje wpływają na symulowane głosy ponad jakość utworu.",

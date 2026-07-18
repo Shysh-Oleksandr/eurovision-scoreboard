@@ -989,6 +989,49 @@
       "odds": "Quoten",
       "relations": "Beziehungen"
     },
+    "general2": {
+      "look": "Erscheinungsbild",
+      "effects": "Effekte & Animation",
+      "audio": "Audio",
+      "confirmations": "Bestätigungen",
+      "searchPlaceholder": "Einstellungen suchen…",
+      "noResults": "Keine Einstellungen entsprechen „{query}“",
+      "blurb": {
+        "contest": "Identität des Wettbewerbs, den du simulierst.",
+        "voting": "Punktesystem und wie Stimmen abgegeben und enthüllt werden.",
+        "look": "Sprache, Flaggen und das Erscheinungsbild von Scoreboard und Modals.",
+        "effects": "Feier, Atmosphäre und Enthüllungsanimationen.",
+        "audio": "Soundeffekte und Atmosphäre.",
+        "confirmations": "Dialoge, die du geschlossen hast, und Einstellungen zurücksetzen."
+      },
+      "subhead": {
+        "votingBehaviour": "Abstimmungsverhalten",
+        "flagsRankings": "Flaggen & Platzierungen",
+        "popupsChrome": "Popups & Oberfläche",
+        "personalization": "Personalisierung",
+        "suppressedDialogs": "Unterdrückte Dialoge",
+        "reset": "Zurücksetzen"
+      },
+      "upload": {
+        "title": "Bild ablegen oder zum Durchsuchen klicken",
+        "subtext": "PNG, JPG oder WEBP · auf diesem Gerät gespeichert."
+      },
+      "danger": {
+        "confirm": "Ja, alles zurücksetzen"
+      },
+      "tip": {
+        "heartFlags": "Flaggen-Miniaturen durch herzförmige Icons in den Akzentfarben der App ersetzen.",
+        "minimalFlags": "Vereinfachte runde und quadratische Flaggenformen statt detaillierter Flaggen verwenden.",
+        "rankChange": "Einen Pfeil anzeigen, ob sich ein Beitrag seit der letzten Punktevergabe verbessert oder verschlechtert hat.",
+        "targetStages": "Anzeigen, in welche Phase jeder Qualifikant weiterkommt.",
+        "blurModal": "Das Scoreboard hinter geöffneten Modals verwischen für mehr Fokus.",
+        "overrideFont": "Die Schriftart jedes Themes ignorieren und immer die unten gewählte verwenden.",
+        "customBg": "Eigenes Hintergrundbild verwenden. Nur auf diesem Gerät gespeichert — nicht mit deinem Konto synchronisiert.",
+        "winter": "Fallenden Schnee und festliche Akzente in der gesamten App hinzufügen.",
+        "finalReveal": "Die finalen Televote-Punkte ein Land nach dem anderen mit dramatischer Animation enthüllen.",
+        "predictableReveal": "Televote-Punkte in einer gleichmäßigen, deterministischen Reihenfolge ohne zufällige Spannung enthüllen."
+      }
+    },
     "relations": {
       "title": "Diaspora & Affinität",
       "subtitle": "Blöcke, Nachbarn und Rivalitäten beeinflussen simulierte Stimmen über die Songqualität hinaus.",
