@@ -1644,35 +1644,36 @@ export const createVotingActions: StateCreator<
 
     let selectedCandidate: SplitScreenQualifierCandidate | undefined;
 
-    // When replaying a saved contest, the qualifier is already determined by the
-    // predefined votes. Resolve to the shown candidate that actually qualifies —
-    // the one ranked highest by predefined points — instead of a uniform-random
-    // pick. Because the candidate set always contains a genuine qualifier (the
-    // "anchor" from the top remaining slots) and any candidate ranked above it is
-    // also within the cutoff, the top-ranked candidate is always a real
-    // predefined qualifier. This keeps `pickQualifier` from swapping votes, so
-    // the saved results stand.
-    if (state.isReplayingSavedVotes) {
-      const currentStage = state.getCurrentStage();
-      const stageCountryPoints = currentStage
-        ? state.countryPoints[currentStage.id]
-        : undefined;
+    // A random pick carries no user intent about *which* country should win, so
+    // it reveals the qualifier rather than deciding it: resolve to the shown
+    // candidate that actually qualifies (the one ranked highest by predefined
+    // points) instead of picking uniformly at random. Because the candidate set
+    // always contains a genuine qualifier (the "anchor" from the top remaining
+    // slots) and any candidate ranked above it is also within the cutoff, the
+    // top-ranked candidate is always a real predefined qualifier. That keeps
+    // `pickQualifier` from swapping votes, so predefined results always stand —
+    // whether they were loaded from a save, typed in the predefinition modal, or
+    // generated for this run. Manual picks still swap: there the choice is
+    // deliberate and is meant to decide who qualifies.
+    const currentStage = state.getCurrentStage();
+    const stageCountryPoints = currentStage
+      ? state.countryPoints[currentStage.id]
+      : undefined;
 
-      if (currentStage && stageCountryPoints) {
-        const rankByCode = new Map(
-          getRankedCountriesWithPoints(currentStage, stageCountryPoints).map(
-            (country, index) => [country.code, index],
-          ),
-        );
+    if (currentStage && stageCountryPoints) {
+      const rankByCode = new Map(
+        getRankedCountriesWithPoints(currentStage, stageCountryPoints).map(
+          (country, index) => [country.code, index],
+        ),
+      );
 
-        const sortedByRank = [...state.splitScreenQualifierCandidates].sort(
-          (a, b) =>
-            (rankByCode.get(a.code) ?? Infinity) -
-            (rankByCode.get(b.code) ?? Infinity),
-        );
+      const sortedByRank = [...state.splitScreenQualifierCandidates].sort(
+        (a, b) =>
+          (rankByCode.get(a.code) ?? Infinity) -
+          (rankByCode.get(b.code) ?? Infinity),
+      );
 
-        [selectedCandidate] = sortedByRank;
-      }
+      [selectedCandidate] = sortedByRank;
     }
 
     if (!selectedCandidate) {
