@@ -47,4 +47,35 @@ describe('buildExportSectionsForStageVotes', () => {
     expect(combined?.participants[0]?.total).toBe(22);
     expect(combined?.getCellPoints('P1', 'V1')).toBe(22);
   });
+
+  it('reads combined channel data in combined voting mode', () => {
+    const votes: Partial<StageVotes> = {
+      combined: {
+        V1: [
+          {
+            countryCode: 'P1',
+            points: 12,
+            pointsId: 0,
+            showDouzePointsAnimation: true,
+          },
+        ],
+      },
+    };
+
+    const sections = buildExportSectionsForStageVotes({
+      stageName: 'Final',
+      votingMode: StageVotingMode.COMBINED,
+      participants: [{ code: 'P1', name: 'One', rank: 1 }],
+      voters: [{ code: 'V1', name: 'Voter' }],
+      votes,
+      getParticipantTotal: (_code, source) => {
+        if (source === 'combined') return 12;
+        return 0;
+      },
+    });
+
+    const combined = sections.find((section) => section.source === 'combined');
+    expect(combined?.participants[0]?.total).toBe(12);
+    expect(combined?.getCellPoints('P1', 'V1')).toBe(12);
+  });
 });

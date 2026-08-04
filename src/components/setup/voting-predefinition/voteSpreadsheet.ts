@@ -134,6 +134,7 @@ export function importVotesFromSpreadsheetGrid(
   const votes: Partial<StageVotes> = {};
   if (parsed.jury) votes.jury = parsed.jury;
   if (parsed.televote) votes.televote = parsed.televote;
+  if (parsed.combined) votes.combined = parsed.combined;
 
   return {
     ok: true,

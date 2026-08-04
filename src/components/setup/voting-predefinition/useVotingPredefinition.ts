@@ -25,7 +25,10 @@ import {
   totalsForChannels,
 } from '@/state/scoreboard/rankToStageVotes';
 import { StageVotes } from '@/state/scoreboard/types';
-import { predefineStageVotes } from '@/state/scoreboard/votesPredefinition';
+import {
+  buildCombinedBallotsFromJuryTelevote,
+  predefineStageVotes,
+} from '@/state/scoreboard/votesPredefinition';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 type UseVotingPredefinitionArgs = {
@@ -856,10 +859,25 @@ export const useVotingPredefinition = ({
       const nextVotes = mergeImportedVotes(votes, {
         jury: result.votes.jury,
         televote: result.votes.televote,
+        combined: result.votes.combined,
         unmatched: result.unmatched,
         skippedSections: result.skippedSections,
         appliedCells: result.appliedCells,
       });
+
+      if (
+        effectiveVotingMode === StageVotingMode.COMBINED &&
+        !result.votes.combined &&
+        (nextVotes.jury || nextVotes.televote)
+      ) {
+        nextVotes.combined = buildCombinedBallotsFromJuryTelevote(
+          stage.countries,
+          votingCountries,
+          nextVotes.jury ?? {},
+          nextVotes.televote ?? {},
+          pointsSystem,
+        );
+      }
 
       setVotes(nextVotes);
       setIsSorting(true);

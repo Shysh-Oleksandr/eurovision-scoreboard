@@ -92,6 +92,64 @@ describe('voteSpreadsheetParse', () => {
     expect(parsed?.skippedSections).not.toContain('combined');
   });
 
+  it('skips combined sections in split voting mode', () => {
+    const combinedSection = [
+      ['', 'COMBINED S2', 'TOT', 'Andorra', 'Azerbaijan', 'Belgium'],
+      ['1', 'Andorra', '20', '', '8', '12'],
+    ];
+    const grid = [...jurySection, [], ...combinedSection];
+    const parsed = parseVoteSpreadsheetGrid(grid, baseCtx);
+
+    expect(parsed?.jury).toBeDefined();
+    expect(parsed?.combined).toBeUndefined();
+    expect(parsed?.skippedSections).toContain('combined');
+  });
+
+  it('imports combined sections in combined voting mode', () => {
+    const combinedSection = [
+      ['', 'COMBINED S2', 'TOT', 'Andorra', 'Azerbaijan', 'Belgium'],
+      ['1', 'Andorra', '20', '', '8', '12'],
+      ['2', 'Azerbaijan', '16', '6', '', '10'],
+    ];
+    const televoteSection = [
+      ['', 'TELEVOTE S2', 'TOT', 'Andorra', 'Azerbaijan', 'Belgium'],
+      ['7', 'Andorra', '0', '', '', ''],
+      ['15', 'Azerbaijan', '160', '10', '', '12'],
+    ];
+    const grid = [
+      ...jurySection,
+      [],
+      ...televoteSection,
+      [],
+      ...combinedSection,
+    ];
+    const parsed = parseVoteSpreadsheetGrid(grid, {
+      ...baseCtx,
+      votingMode: StageVotingMode.COMBINED,
+    });
+
+    expect(parsed?.jury).toBeDefined();
+    expect(parsed?.televote).toBeDefined();
+    expect(parsed?.combined).toBeDefined();
+    expect(parsed?.skippedSections).not.toContain('combined');
+    expect(Object.keys(parsed!.combined!)).not.toHaveLength(0);
+  });
+
+  it('merges combined votes into existing state', () => {
+    const combinedSection = [
+      ['', 'COMBINED', 'TOT', 'Andorra', 'Azerbaijan', 'Belgium'],
+      ['1', 'Andorra', '20', '', '8', '12'],
+    ];
+    const parsed = parseVoteSpreadsheetGrid(combinedSection, {
+      ...baseCtx,
+      votingMode: StageVotingMode.COMBINED,
+    });
+    expect(parsed).not.toBeNull();
+
+    const merged = mergeImportedVotes(null, parsed!);
+    expect(merged.combined).toBeDefined();
+  });
+
   it('reports unmatched country names', () => {
     const grid = [
       ['', 'JURY', 'TOT', 'Andorra', 'Azerbaijan', 'Belgium'],

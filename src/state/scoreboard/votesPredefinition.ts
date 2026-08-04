@@ -248,6 +248,88 @@ const generateCombinedVotes = (
     .map((pointsItem, index) => toVote(combinedRanking[index], pointsItem));
 };
 
+function rankPositionsFromBallot(
+  candidates: string[],
+  ballot: Vote[],
+): Record<string, number> {
+  const pointsByCode = new Map<string, number>();
+
+  ballot.forEach((vote) => pointsByCode.set(vote.countryCode, vote.points));
+
+  const sorted = [...candidates].sort((a, b) => {
+    const pointsA = pointsByCode.get(a) ?? 0;
+    const pointsB = pointsByCode.get(b) ?? 0;
+
+    if (pointsA !== pointsB) return pointsB - pointsA;
+
+    return a.localeCompare(b);
+  });
+
+  const positions: Record<string, number> = {};
+
+  sorted.forEach((code, index) => {
+    positions[code] = index;
+  });
+
+  return positions;
+}
+
+function buildCombinedBallotForVoter(
+  votingCountry: BaseCountry,
+  stageCountries: (Country | BaseCountry)[],
+  juryBallot: Vote[],
+  televoteBallot: Vote[],
+  pointsSystem: PointsItem[],
+): Vote[] {
+  const candidates = candidatesFor(votingCountry, stageCountries);
+
+  if (candidates.length === 0) return [];
+
+  const juryPos = rankPositionsFromBallot(candidates, juryBallot);
+  const televotePos = rankPositionsFromBallot(candidates, televoteBallot);
+
+  const combinedRanking = [...candidates].sort((a, b) => {
+    const combinedA = juryPos[a] + televotePos[a];
+    const combinedB = juryPos[b] + televotePos[b];
+
+    if (combinedA !== combinedB) return combinedA - combinedB;
+
+    return televotePos[a] - televotePos[b];
+  });
+
+  const sortedPoints = sortedPointsDesc(pointsSystem);
+  const numPointsToAward = Math.min(sortedPoints.length, combinedRanking.length);
+
+  return sortedPoints
+    .slice(0, numPointsToAward)
+    .map((pointsItem, index) => toVote(combinedRanking[index], pointsItem));
+}
+
+/** Rebuild combined ballots from imported jury/televote matrices (Combined voting). */
+export const buildCombinedBallotsFromJuryTelevote = (
+  stageCountries: (Country | BaseCountry)[],
+  votingCountries: VotingCountry[],
+  juryByVoter: Record<string, Vote[]>,
+  televoteByVoter: Record<string, Vote[]>,
+  pointsSystem: PointsItem[],
+): Record<string, Vote[]> => {
+  const combined: Record<string, Vote[]> = {};
+
+  for (const votingCountry of votingCountries) {
+    if (votingCountry.code === 'WW') continue;
+
+    combined[votingCountry.code] = buildCombinedBallotForVoter(
+      votingCountry,
+      stageCountries,
+      juryByVoter[votingCountry.code] ?? [],
+      televoteByVoter[votingCountry.code] ?? [],
+      pointsSystem,
+    );
+  }
+
+  return combined;
+};
+
 export const predefineStageVotes = (
   stageCountries: (Country | BaseCountry)[],
   votingCountries: VotingCountry[],

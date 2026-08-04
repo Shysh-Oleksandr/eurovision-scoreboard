@@ -23,6 +23,7 @@ export type CellAssignment = {
 export type ParsedVoteSections = {
   jury?: Record<string, Vote[]>;
   televote?: Record<string, Vote[]>;
+  combined?: Record<string, Vote[]>;
   unmatched: string[];
   skippedSections: string[];
   appliedCells: number;
@@ -301,9 +302,27 @@ export function parseVoteSpreadsheetGrid(
   const unmatched = new Set<string>();
   const skippedSections = new Set<string>();
 
+  const importCombined = ctx.votingMode === StageVotingMode.COMBINED;
+
   for (const section of voteSections) {
     if (section.hint === 'combined') {
-      skippedSections.add('combined');
+      if (!importCombined) {
+        skippedSections.add('combined');
+        continue;
+      }
+
+      const parsedCombined = parseVoteSection(section.grid, ctx);
+      parsedCombined.unmatched.forEach((label) => unmatched.add(label));
+
+      const combinedByVoter = buildVotesByVoter(
+        parsedCombined.assignments,
+        ctx.juryPointsSystem,
+      );
+
+      if (Object.keys(combinedByVoter).length === 0) continue;
+
+      result.combined = combinedByVoter;
+      result.appliedCells += parsedCombined.assignments.length;
       continue;
     }
 
@@ -350,7 +369,7 @@ export function parseVoteSpreadsheetGrid(
   result.unmatched = Array.from(unmatched);
   result.skippedSections = Array.from(skippedSections);
 
-  if (!result.jury && !result.televote) return null;
+  if (!result.jury && !result.televote && !result.combined) return null;
 
   return result;
 }
@@ -363,6 +382,7 @@ export function mergeImportedVotes(
 
   if (parsed.jury) next.jury = { ...parsed.jury };
   if (parsed.televote) next.televote = { ...parsed.televote };
+  if (parsed.combined) next.combined = { ...parsed.combined };
 
   return next;
 }
