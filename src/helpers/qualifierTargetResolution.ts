@@ -120,3 +120,35 @@ export const getQualifierTargetStageNames = (
     )
     .filter((name): name is string => !!name);
 };
+
+export const getGrandFinalStage = (
+  eventStages: EventStage[],
+): EventStage | undefined =>
+  eventStages.find((stage) => stage.isLastStage) ??
+  eventStages[eventStages.length - 1];
+
+/** True when every qualifier from the current stage advances only to the Grand Final. */
+export const qualifiesOnlyToGrandFinal = (
+  qualifiesTo: QualifierTarget[] | undefined,
+  eventStages: EventStage[],
+): boolean => {
+  if (!qualifiesTo?.length || !eventStages.length) return false;
+
+  const grandFinalStage = getGrandFinalStage(eventStages);
+
+  if (!grandFinalStage) return false;
+
+  const targetStageIds = new Set(
+    qualifiesTo.map((target) => target.targetStageId),
+  );
+
+  return (
+    targetStageIds.size === 1 && targetStageIds.has(grandFinalStage.id)
+  );
+};
+
+export const shouldShowQualifierTargetLabels = (
+  qualifiesTo: QualifierTarget[] | undefined,
+  eventStages: EventStage[],
+  enabled = true,
+): boolean => enabled && !qualifiesOnlyToGrandFinal(qualifiesTo, eventStages);

@@ -70,7 +70,9 @@
     "loadYearData": "Load year data",
     "country": "Country",
     "current": "Current",
-    "dontShowAgain": "Don't show this again"
+    "dontShowAgain": "Don't show this again",
+    "more": "More",
+    "share": "Share"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -130,7 +132,9 @@
       "enablePredefinedVotesForStage": "Enable predefined voting for this stage",
       "odds": "Odds",
       "oddsOverrideNote": "These odds apply to this stage only. The persistent global contest odds are set in Settings.",
-      "resetToGlobalOdds": "Reset to global"
+      "resetToGlobalOdds": "Reset to global",
+      "confirmCloseTitle": "Close stage setup?",
+      "confirmCloseDescription": "Any unsaved changes will be lost."
     },
     "validation": {
       "noCountriesInStage": "There are no countries in {stageName}.",
@@ -179,7 +183,7 @@
       "rankView": "Rank",
       "randomizePoints": "Randomize points",
       "randomizeRanking": "Randomize ranking",
-      "dragToRankHint": "Drag countries to set the final ranking. Press \"Randomize points\" to generate the votes — the ranking stays fixed.",
+      "dragToRankHint": "Drag countries to set the final order, then generate a matching points breakdown.",
       "tabTotals": "Totals (share only)",
       "totalsHint": "Totals are for sharing results only. Use the Detailed tab and Save to run a simulation.",
       "confirmCloseTitle": "Close voting predefinition?",
@@ -233,7 +237,64 @@
         "toastPresetLoadedDetailed": "Loaded detailed preset \"{name}\"",
         "toastPresetLoadedTotals": "Loaded totals preset \"{name}\"",
         "toastPresetDeleted": "Deleted preset \"{name}\""
-      }
+      },
+      "totalsView": "Totals",
+      "generateBreakdown": "Generate breakdown",
+      "regenerateBreakdown": "Regenerate breakdown",
+      "totalsIntro": "Type a target total per country — leave a field <b>blank</b> to let the engine decide it (blank isn’t zero). Not every set of totals can be split into a valid ballot: each voting country hands out a fixed set of points and must use every one exactly once, so we generate the <b>closest achievable</b> breakdown and flag anything we had to adjust.",
+      "totalsUngeneratedHint": "Enter target totals and press \"Generate breakdown\" to enable Save.",
+      "totalsStaleHint": "You changed a total. Regenerate the breakdown to reflect your changes before saving.",
+      "totalsAdjustedTitle": "Some totals were adjusted",
+      "totalsAdjustedExplainer": "Not every combination of totals can be split into a valid vote-by-vote breakdown — each voting country hands out a fixed set of points and must use all of them, once each. We generated the closest possible breakdown; adjusted countries are marked below.",
+      "adjustmentBadge": "Adjusted",
+      "adjustmentTooltip": "Adjusted: you entered {requested}, closest achievable is {achieved}",
+      "budgetTitleJury": "Jury budget",
+      "budgetTitleTelevote": "Televote budget",
+      "budgetTitleCombined": "Combined budget",
+      "budgetUsed": "{used} / {total}",
+      "budgetFillCount": "{filled} of {count} countries filled — the rest are generated automatically.",
+      "budgetOverSingle": "{country}: {value} exceeds the {max} maximum for one country ({voters} × {top}). It will be clamped when you generate.",
+      "budgetOverBudget": "Totals exceed the {total}-point budget — some will be scaled down when you generate.",
+      "shareBreakdown": "Breakdown table",
+      "resetField": "Clear this total",
+      "totalsInSyncHint": "The breakdown already matches these totals. Change a total to regenerate it.",
+      "kicker": "Predefine votes",
+      "saveVotes": "Save votes",
+      "participantColumn": "Participant",
+      "pointsSummary": "Points: {points}",
+      "detailedHelp": "Enter the points each voting country awards its rivals: <b>{points}</b> — each value used once per column. A country can’t vote for itself (the shaded diagonal). The dot on each column header shows whether that ballot is <b>complete</b>, <b>incomplete</b>, or <b>invalid</b>.",
+      "channelSwitchLabel": "Points channel",
+      "validityComplete": "complete",
+      "validityIncomplete": "incomplete",
+      "validityInvalid": "invalid",
+      "layoutGrid": "Grid layout",
+      "layoutList": "List layout",
+      "totalsHelpLabel": "How totals work",
+      "dismissHelp": "Dismiss",
+      "shareWhat": "Share what?",
+      "shareSourceMatrix": "from this matrix",
+      "shareSourceTotals": "from typed totals",
+      "shareScoreboardSub": "podium",
+      "shareSplitSub": "jury / tele",
+      "shareSummarySub": "totals",
+      "shareBreakdownSub": "voter × entry",
+      "shareBreakdownEmpty": "no votes",
+      "presetsLabel": "Presets",
+      "spreadsheetLabel": "Spreadsheet",
+      "resetMatrixTitle": "Reset matrix",
+      "resetMatrixDescription": "Every predefined vote will be removed. This can’t be undone.",
+      "resetTotalsTitle": "Reset totals",
+      "resetTotalsDescription": "Every typed total will be cleared and the generated breakdown discarded. This can’t be undone.",
+      "saveBlockedTooltip": "Some voters don’t award a complete set of points yet.",
+      "saveBlockedCallout": "Can’t save yet — these voters don’t award a complete set of points: <b>{voters}</b>. Fix the flagged columns (amber / red dots) and try again.",
+      "toastVotesSaved": "Votes saved",
+      "toastVotesRandomized": "Votes randomized",
+      "toastMatrixCleared": "Matrix cleared",
+      "toastTotalsCleared": "Totals cleared",
+      "toastRankingRandomized": "Ranking randomized",
+      "toastRankPointsGenerated": "Points generated for this ranking",
+      "toastBreakdownGenerated": "Breakdown generated",
+      "toastBreakdownGeneratedAdjusted": "Breakdown generated · {count} adjusted"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Please sign in to create custom entries.",
@@ -426,7 +487,16 @@
     "foundNItems": "Found {count} {count, plural, =1 {item} other {items}}",
     "userProfile": {
       "noContentFound": "No content found matching your search.",
-      "noFollowingContent": "No content from people you follow yet. Follow users to see their themes and contests here."
+      "noFollowingContent": "No content from people you follow yet. Follow users to see their themes and contests here.",
+      "entryLeaderboard": {
+        "buttonTitle": "Entry leaderboard",
+        "title": "{name}'s entry leaderboard",
+        "subtitle": "Click any row to view detailed results across this user's public completed contests.",
+        "noData": "No public completed contests yet.",
+        "searchPlaceholder": "Search countries...",
+        "noEntriesMatch": "No entries match your search.",
+        "customEntryName": "Custom entry"
+      }
     },
     "searchUsers": {
       "title": "Find users",
@@ -505,6 +575,8 @@
       "confirmCreateNewContestDescription": "You have an active contest ({name}). Make sure you save it before creating a new one.",
       "venue": "Venue",
       "hosts": "Hosts",
+      "logoBanner": "Logo / banner",
+      "logoBannerHint": "Optional image shown on the contest card",
       "entryStats": {
         "pickerTitle": "Your entry stats",
         "pickerSubtitle": "Search and select a country or custom entry to see results across your completed contests.",
@@ -889,7 +961,7 @@
       },
       "predefinedVoting": {
         "title": "Predefined Voting & Presets",
-        "content": "Enable 'Predefined voting' in 'Settings → Voting' to fill in every country's votes before the simulation starts. A full voting matrix lets you assign specific points from each voter to each entry. Save the configuration locally as a named preset to reload it anytime — perfect for replaying official Eurovision results or sharing a specific scenario."
+        "content": "Enable 'Predefined voting' in 'Settings → Voting' to author every country's votes before the simulation starts. Three modes — Detailed, Rank, and Totals — all write the same vote matrix: edit the full voter-by-entry grid, drag entries into your desired final order and generate a matching breakdown, or type target totals per country and generate the closest achievable breakdown. Switch modes anytime without losing data. Save detailed or totals presets locally, or import/export spreadsheets in Detailed mode — perfect for replaying official Eurovision results or sharing a specific scenario."
       },
       "oddsRandomness": {
         "title": "Odds & Randomness",

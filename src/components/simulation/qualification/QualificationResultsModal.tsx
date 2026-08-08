@@ -13,6 +13,7 @@ import { useContinueToNextPhase } from '../hooks/useContinueToNextPhase';
 import { CountryQualificationItem } from './CountryQualificationItem';
 import { useQualifierTargetStageNames } from './useQualifierTargetStageNames';
 
+import { shouldShowQualifierTargetLabels } from '@/helpers/qualifierTargetResolution';
 import { useGeneralStore } from '@/state/generalStore';
 import { createCountriesComparator } from '@/state/scoreboard/helpers';
 
@@ -28,6 +29,7 @@ const QualificationResultsModal = () => {
     (state) => state.showQualificationResults,
   );
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
   const closeQualificationResults = useScoreboardStore(
     (state) => state.closeQualificationResults,
   );
@@ -39,7 +41,12 @@ const QualificationResultsModal = () => {
     showQualificationModal && showQualificationResults;
 
   const currentStage = getCurrentStage();
-  const { name: currentStageName, countries, id: stageId } = currentStage || {};
+  const {
+    name: currentStageName,
+    countries,
+    id: stageId,
+    qualifiesTo,
+  } = currentStage || {};
   const { nextPhase } = useNextEventName();
 
   const { handleContinue } = useContinueToNextPhase();
@@ -76,6 +83,12 @@ const QualificationResultsModal = () => {
   const targetStageNameByCountryCode = useQualifierTargetStageNames(
     currentStage,
     sortedQualifiedCountries.map((country) => country.code),
+  );
+
+  const showTargetLabels = shouldShowQualifierTargetLabels(
+    qualifiesTo,
+    eventStages,
+    showQualifierTargetStages,
   );
 
   useEffect(() => {
@@ -179,7 +192,7 @@ const QualificationResultsModal = () => {
             shouldAnimate={false}
             isModal
             targetStageName={
-              showQualifierTargetStages
+              showTargetLabels
                 ? targetStageNameByCountryCode.get(country.code)
                 : undefined
             }

@@ -70,7 +70,9 @@
     "loadYearData": "Charger les données de l’année",
     "country": "Pays",
     "current": "Actuel",
-    "dontShowAgain": "Ne pas afficher à nouveau"
+    "dontShowAgain": "Ne pas afficher à nouveau",
+    "more": "Plus",
+    "share": "Partager"
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",
@@ -131,7 +133,9 @@
       "enablePredefinedVotesForStage": "Activer le vote prédéfini pour cette phase",
       "odds": "Cotes",
       "oddsOverrideNote": "Ces cotes s'appliquent uniquement à cette phase. Les cotes globales persistantes du concours se configurent dans Paramètres.",
-      "resetToGlobalOdds": "Réinitialiser au global"
+      "resetToGlobalOdds": "Réinitialiser au global",
+      "confirmCloseTitle": "Fermer la configuration de l'étape ?",
+      "confirmCloseDescription": "Les modifications non enregistrées seront perdues."
     },
     "validation": {
       "noCountriesInStage": "Aucun pays dans {stageName}.",
@@ -181,7 +185,7 @@
       "rankView": "Classement",
       "randomizePoints": "Points aléatoires",
       "randomizeRanking": "Classement aléatoire",
-      "dragToRankHint": "Faites glisser les pays pour définir le classement final. Cliquez sur « Points aléatoires » pour générer les votes — le classement reste inchangé.",
+      "dragToRankHint": "Fais glisser les pays pour définir le classement final, puis génère une répartition de points correspondante.",
       "tabTotals": "Totals (partager uniquement)",
       "totalsHint": "Les totales sont uniquement pour partager les résultats. Utilisez la table détaillée et enregistrez pour exécuter une simulation.",
       "confirmCloseTitle": "Fermer la prédefinition de vote ?",
@@ -235,7 +239,64 @@
         "dropToImport": "Drop a spreadsheet file to import votes.",
         "invalidDropFile": "Please drop an Excel (.xlsx, .xls) or CSV file.",
         "tooltipDragDrop": "You can also drag and drop a spreadsheet onto the Detailed tab to import."
-      }
+      },
+      "totalsView": "Totaux",
+      "generateBreakdown": "Générer la répartition",
+      "regenerateBreakdown": "Régénérer",
+      "totalsIntro": "Saisis un total cible par pays — laisse un champ <b>vide</b> pour laisser le moteur décider (vide ≠ zéro). Tous les totaux ne peuvent pas être répartis en bulletins valides : chaque pays votant distribue un jeu de points fixe et doit utiliser chaque valeur exactement une fois. Nous générons donc la répartition <b>la plus proche possible</b> et signalons tout ce qu’il a fallu ajuster.",
+      "totalsUngeneratedHint": "Saisissez les totaux cibles et appuyez sur « Générer la répartition » pour activer l'enregistrement.",
+      "totalsStaleHint": "Vous avez modifié un total. Régénérez la répartition pour prendre en compte vos modifications avant d'enregistrer.",
+      "totalsAdjustedTitle": "Certains totaux ont été ajustés",
+      "totalsAdjustedExplainer": "Toutes les combinaisons de totaux ne peuvent pas être réparties en un vote par vote valide — chaque pays votant distribue un ensemble fixe de points et doit tous les utiliser, une fois chacun. Nous avons généré la répartition la plus proche possible ; les pays ajustés sont indiqués ci-dessous.",
+      "adjustmentBadge": "Ajusté",
+      "adjustmentTooltip": "Ajusté : vous avez saisi {requested}, le plus proche possible est {achieved}",
+      "budgetTitleJury": "Budget jury",
+      "budgetTitleTelevote": "Budget télévote",
+      "budgetTitleCombined": "Budget combiné",
+      "budgetUsed": "{used} / {total}",
+      "budgetFillCount": "{filled} pays sur {count} remplis — le reste est généré automatiquement.",
+      "budgetOverSingle": "{country} : {value} dépasse le maximum de {max} pour un pays ({voters} × {top}). La valeur sera plafonnée lors de la génération.",
+      "budgetOverBudget": "Les totaux dépassent le budget de {total} points — certains seront réduits lors de la génération.",
+      "shareBreakdown": "Tableau détaillé",
+      "resetField": "Effacer ce total",
+      "totalsInSyncHint": "La répartition correspond déjà à ces totaux. Modifiez un total pour la régénérer.",
+      "kicker": "Prédéfinir les votes",
+      "saveVotes": "Enregistrer les votes",
+      "participantColumn": "Participant",
+      "pointsSummary": "Points : {points}",
+      "detailedHelp": "Saisis les points que chaque pays votant attribue à ses rivaux : <b>{points}</b> — chaque valeur utilisée une fois par colonne. Un pays ne peut pas voter pour lui-même (la diagonale hachurée). Le point dans chaque en-tête de colonne indique si ce bulletin est <b>complet</b>, <b>incomplet</b> ou <b>invalide</b>.",
+      "channelSwitchLabel": "Canal de points",
+      "validityComplete": "complet",
+      "validityIncomplete": "incomplet",
+      "validityInvalid": "invalide",
+      "layoutGrid": "Affichage en grille",
+      "layoutList": "Affichage en liste",
+      "totalsHelpLabel": "Comment fonctionnent les totaux",
+      "dismissHelp": "Masquer",
+      "shareWhat": "Partager quoi ?",
+      "shareSourceMatrix": "depuis cette matrice",
+      "shareSourceTotals": "depuis les totaux saisis",
+      "shareScoreboardSub": "podium",
+      "shareSplitSub": "jury / télé",
+      "shareSummarySub": "totaux",
+      "shareBreakdownSub": "votant × candidat",
+      "shareBreakdownEmpty": "aucun vote",
+      "presetsLabel": "Préréglages",
+      "spreadsheetLabel": "Tableur",
+      "resetMatrixTitle": "Réinitialiser la matrice",
+      "resetMatrixDescription": "Tous les votes prédéfinis seront supprimés. Cette action est irréversible.",
+      "resetTotalsTitle": "Réinitialiser les totaux",
+      "resetTotalsDescription": "Tous les totaux saisis seront effacés et la répartition générée sera abandonnée. Cette action est irréversible.",
+      "saveBlockedTooltip": "Certains pays n’attribuent pas encore un jeu de points complet.",
+      "saveBlockedCallout": "Enregistrement impossible pour l’instant — ces pays n’attribuent pas un jeu de points complet : <b>{voters}</b>. Corrige les colonnes signalées (points orange / rouges) et réessaie.",
+      "toastVotesSaved": "Votes enregistrés",
+      "toastVotesRandomized": "Votes générés aléatoirement",
+      "toastMatrixCleared": "Matrice effacée",
+      "toastTotalsCleared": "Totaux effacés",
+      "toastRankingRandomized": "Classement généré aléatoirement",
+      "toastRankPointsGenerated": "Points générés pour ce classement",
+      "toastBreakdownGenerated": "Répartition générée",
+      "toastBreakdownGeneratedAdjusted": "Répartition générée · {count} ajustés"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Veuillez vous connecter pour créer des entrées personnalisées.",
@@ -431,7 +492,16 @@
     "foundNItems": "{count} {count, plural, =1 {élément} other {éléments}} trouvé(s)",
     "userProfile": {
       "noContentFound": "Aucun contenu ne correspond à votre recherche.",
-      "noFollowingContent": "Aucun contenu de personnes que vous suivez encore. Suivez des personnes pour voir leurs thèmes et concours ici."
+      "noFollowingContent": "Aucun contenu de personnes que vous suivez encore. Suivez des personnes pour voir leurs thèmes et concours ici.",
+      "entryLeaderboard": {
+        "buttonTitle": "Classement des participants",
+        "title": "Classement des participants de {name}",
+        "subtitle": "Cliquez sur une ligne pour voir les résultats détaillés des concours publics terminés de cet utilisateur.",
+        "noData": "Aucun concours public terminé pour le moment.",
+        "searchPlaceholder": "Rechercher des pays...",
+        "noEntriesMatch": "Aucune entrée ne correspond à votre recherche.",
+        "customEntryName": "Entrée personnalisée"
+      }
     },
     "searchUsers": {
       "title": "Trouver des utilisateurs",
@@ -892,7 +962,7 @@
       },
       "predefinedVoting": {
         "title": "Vote prédéfini et préréglages",
-        "content": "Activez « Activer le vote prédéfini » dans « Paramètres → Vote » pour remplir les votes de chaque pays avant le début de la simulation. Une matrice de vote complète vous permet d’attribuer des points spécifiques de chaque votant à chaque entrée. Enregistrez la configuration localement sous forme de préréglage nommé pour la recharger à tout moment — parfait pour rejouer les résultats officiels de l’Eurovision ou partager un scénario précis."
+        "content": "Activez « Activer le vote prédéfini » dans « Paramètres → Vote » pour définir les votes de chaque pays avant le début de la simulation. Trois modes — Détaillé, Classement et Totaux — écrivent tous dans la même matrice : modifiez la grille complète votant×entrée, faites glisser les entrées dans l’ordre final souhaité puis générez une répartition correspondante, ou saisissez des totaux cibles par pays et générez la répartition la plus proche possible. Changez de mode à tout moment sans perdre de données. Enregistrez des préréglages détaillés ou totaux localement, ou importez/exportez des tableurs en mode Détaillé — parfait pour rejouer les résultats officiels de l’Eurovision ou partager un scénario précis."
       },
       "oddsRandomness": {
         "title": "Cotes et aléatoire",

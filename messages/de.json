@@ -70,7 +70,9 @@
     "loadYearData": "Jahresdaten laden",
     "country": "Land",
     "current": "Aktuell",
-    "dontShowAgain": "Nicht erneut anzeigen"
+    "dontShowAgain": "Nicht erneut anzeigen",
+    "more": "Mehr",
+    "share": "Teilen"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -131,7 +133,9 @@
       "enablePredefinedVotesForStage": "Vordefiniertes Voting für diese Phase aktivieren",
       "odds": "Quoten",
       "oddsOverrideNote": "Diese Quoten gelten nur für diese Phase. Die persistenten globalen Wettbewerbsquoten werden in den Einstellungen festgelegt.",
-      "resetToGlobalOdds": "Auf global zurücksetzen"
+      "resetToGlobalOdds": "Auf global zurücksetzen",
+      "confirmCloseTitle": "Stage-Einrichtung schließen?",
+      "confirmCloseDescription": "Nicht gespeicherte Änderungen gehen verloren."
     },
     "validation": {
       "noCountriesInStage": "Es gibt keine Länder in {stageName}.",
@@ -181,7 +185,7 @@
       "rankView": "Rang",
       "randomizePoints": "Punkte zufällig",
       "randomizeRanking": "Reihenfolge zufällig",
-      "dragToRankHint": "Ziehe die Länder, um das Endergebnis festzulegen. Klicke auf „Punkte zufällig“, um die Stimmen zu erzeugen – die Reihenfolge bleibt erhalten.",
+      "dragToRankHint": "Ziehe die Länder in die gewünschte Endreihenfolge und erzeuge dann eine passende Punkteaufschlüsselung.",
       "tabTotals": "Totals (nur teilen)",
       "totalsHint": "Totals sind nur zum Teilen der Ergebnisse. Verwende die Detaillierte Tabelle und speichere, um eine Simulation zu starten.",
       "confirmCloseTitle": "Abstimmungsvordefinition schließen?",
@@ -235,7 +239,64 @@
         "toastPresetLoadedDetailed": "Detailliertes Preset \"{name}\" geladen",
         "toastPresetLoadedTotals": "Summen-Preset \"{name}\" geladen",
         "toastPresetDeleted": "Preset \"{name}\" gelöscht"
-      }
+      },
+      "totalsView": "Gesamt",
+      "generateBreakdown": "Aufschlüsselung erzeugen",
+      "regenerateBreakdown": "Neu erzeugen",
+      "totalsIntro": "Gib pro Land eine Zielsumme ein — lass ein Feld <b>leer</b>, damit die Engine entscheidet (leer ist nicht null). Nicht jede Kombination von Summen lässt sich in gültige Wertungen aufteilen: Jedes abstimmende Land vergibt einen festen Punktesatz und muss jeden Wert genau einmal verwenden. Wir erzeugen daher die <b>nächstmögliche</b> Aufschlüsselung und markieren alles, was angepasst werden musste.",
+      "totalsUngeneratedHint": "Gib Zielpunktzahlen ein und klicke auf „Aufschlüsselung erzeugen“, um das Speichern zu aktivieren.",
+      "totalsStaleHint": "Du hast eine Punktzahl geändert. Erzeuge die Aufschlüsselung neu, um deine Änderungen vor dem Speichern zu übernehmen.",
+      "totalsAdjustedTitle": "Einige Punktzahlen wurden angepasst",
+      "totalsAdjustedExplainer": "Nicht jede Kombination von Punktzahlen lässt sich in eine gültige Stimme-für-Stimme-Aufschlüsselung aufteilen – jedes abstimmende Land vergibt einen festen Satz Punkte und muss alle genau einmal verwenden. Wir haben die bestmögliche Aufschlüsselung erzeugt; angepasste Länder sind unten markiert.",
+      "adjustmentBadge": "Angepasst",
+      "adjustmentTooltip": "Angepasst: du hast {requested} eingegeben, am nächsten erreichbar ist {achieved}",
+      "budgetTitleJury": "Jury-Budget",
+      "budgetTitleTelevote": "Televoting-Budget",
+      "budgetTitleCombined": "Kombiniertes Budget",
+      "budgetUsed": "{used} / {total}",
+      "budgetFillCount": "{filled} von {count} Ländern ausgefüllt — der Rest wird automatisch erzeugt.",
+      "budgetOverSingle": "{country}: {value} überschreitet das Maximum von {max} für ein Land ({voters} × {top}). Beim Erzeugen wird der Wert begrenzt.",
+      "budgetOverBudget": "Die Summen überschreiten das Budget von {total} Punkten — einige werden beim Erzeugen verringert.",
+      "shareBreakdown": "Aufschlüsselungstabelle",
+      "resetField": "Punktzahl löschen",
+      "totalsInSyncHint": "Die Aufschlüsselung entspricht bereits diesen Punktzahlen. Ändere eine Punktzahl, um sie neu zu erzeugen.",
+      "kicker": "Stimmen vordefinieren",
+      "saveVotes": "Stimmen speichern",
+      "participantColumn": "Teilnehmer",
+      "pointsSummary": "Punkte: {points}",
+      "detailedHelp": "Gib die Punkte ein, die jedes abstimmende Land vergibt: <b>{points}</b> — jeder Wert einmal pro Spalte. Ein Land kann nicht für sich selbst stimmen (die schraffierte Diagonale). Der Punkt in jeder Spaltenüberschrift zeigt, ob diese Wertung <b>vollständig</b>, <b>unvollständig</b> oder <b>ungültig</b> ist.",
+      "channelSwitchLabel": "Punktekanal",
+      "validityComplete": "vollständig",
+      "validityIncomplete": "unvollständig",
+      "validityInvalid": "ungültig",
+      "layoutGrid": "Rasteransicht",
+      "layoutList": "Listenansicht",
+      "totalsHelpLabel": "Wie Gesamtpunkte funktionieren",
+      "dismissHelp": "Ausblenden",
+      "shareWhat": "Was teilen?",
+      "shareSourceMatrix": "aus dieser Matrix",
+      "shareSourceTotals": "aus den eingegebenen Summen",
+      "shareScoreboardSub": "Podium",
+      "shareSplitSub": "Jury / Tele",
+      "shareSummarySub": "Summen",
+      "shareBreakdownSub": "Wähler × Beitrag",
+      "shareBreakdownEmpty": "keine Stimmen",
+      "presetsLabel": "Voreinstellungen",
+      "spreadsheetLabel": "Tabelle",
+      "resetMatrixTitle": "Matrix zurücksetzen",
+      "resetMatrixDescription": "Alle vordefinierten Stimmen werden entfernt. Das kann nicht rückgängig gemacht werden.",
+      "resetTotalsTitle": "Summen zurücksetzen",
+      "resetTotalsDescription": "Alle eingegebenen Summen werden gelöscht und die erzeugte Aufschlüsselung verworfen. Das kann nicht rückgängig gemacht werden.",
+      "saveBlockedTooltip": "Einige Länder vergeben noch keinen vollständigen Punktesatz.",
+      "saveBlockedCallout": "Speichern noch nicht möglich — diese Länder vergeben keinen vollständigen Punktesatz: <b>{voters}</b>. Korrigiere die markierten Spalten (gelbe / rote Punkte) und versuche es erneut.",
+      "toastVotesSaved": "Stimmen gespeichert",
+      "toastVotesRandomized": "Stimmen zufällig erzeugt",
+      "toastMatrixCleared": "Matrix geleert",
+      "toastTotalsCleared": "Summen geleert",
+      "toastRankingRandomized": "Platzierung zufällig erzeugt",
+      "toastRankPointsGenerated": "Punkte für diese Platzierung erzeugt",
+      "toastBreakdownGenerated": "Aufschlüsselung erzeugt",
+      "toastBreakdownGeneratedAdjusted": "Aufschlüsselung erzeugt · {count} angepasst"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Bitte melde dich an, um eigene Beiträge zu erstellen.",
@@ -429,7 +490,16 @@
     "foundNItems": "{count} {count, plural, =1 {Element} other {Elemente}} gefunden",
     "userProfile": {
       "noContentFound": "Keine Inhalte entsprechen Ihrer Suche.",
-      "noFollowingContent": "Keine Inhalte von Leuten, die du folgst, noch vorhanden. Folge Leuten, um ihre Themes und Wettbewerbe hier zu sehen."
+      "noFollowingContent": "Keine Inhalte von Leuten, die du folgst, noch vorhanden. Folge Leuten, um ihre Themes und Wettbewerbe hier zu sehen.",
+      "entryLeaderboard": {
+        "buttonTitle": "Teilnehmer-Rangliste",
+        "title": "Teilnehmer-Rangliste von {name}",
+        "subtitle": "Klicke auf eine Zeile, um detaillierte Ergebnisse aus den öffentlichen abgeschlossenen Wettbewerben dieses Nutzers zu sehen.",
+        "noData": "Noch keine öffentlichen abgeschlossenen Wettbewerbe.",
+        "searchPlaceholder": "Länder suchen...",
+        "noEntriesMatch": "Keine Einträge entsprechen deiner Suche.",
+        "customEntryName": "Benutzerdefinierter Eintrag"
+      }
     },
     "searchUsers": {
       "title": "Benutzer finden",
@@ -890,7 +960,7 @@
       },
       "predefinedVoting": {
         "title": "Vordefiniertes Voting und Presets",
-        "content": "Aktiviere „Vordefiniertes Voting aktivieren“ in „Einstellungen → Voting“, um die Stimmen jedes Landes vor Simulationsstart auszufüllen. Eine vollständige Voting-Matrix erlaubt dir, jedem Beitrag spezifische Punkte von jedem Wähler zuzuweisen. Speichere die Konfiguration lokal als benanntes Preset, um sie jederzeit neu zu laden — perfekt, um offizielle Eurovision-Ergebnisse nachzuspielen oder ein bestimmtes Szenario zu teilen."
+        "content": "Aktiviere „Vordefiniertes Voting“ in „Einstellungen → Voting“, um die Stimmen jedes Landes vor Simulationsstart festzulegen. Drei Modi — Detailliert, Rang und Gesamt — schreiben alle in dieselbe Voting-Matrix: Bearbeite das vollständige Wähler×Beitrag-Grid, ziehe Beiträge in die gewünschte Endreihenfolge und generiere eine passende Aufschlüsselung, oder gib Ziel-Summen pro Land ein und generiere die bestmögliche Aufschlüsselung. Wechsle jederzeit zwischen Modi, ohne Daten zu verlieren. Speichere Detailliert- oder Gesamt-Presets lokal oder importiere/exportiere Tabellen im Detailliert-Modus — perfekt, um offizielle Eurovision-Ergebnisse nachzuspielen oder ein bestimmtes Szenario zu teilen."
       },
       "oddsRandomness": {
         "title": "Quoten und Zufall",

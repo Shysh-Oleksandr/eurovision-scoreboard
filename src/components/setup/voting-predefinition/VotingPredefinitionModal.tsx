@@ -1,36 +1,67 @@
 'use client';
 
-import { Grid3x2, Share, Sheet } from 'lucide-react';
+import {
+  AlertTriangle,
+  Check,
+  Columns2,
+  Dices,
+  Download,
+  FolderOpen,
+  HelpCircle,
+  Image as ImageIcon,
+  LayoutGrid,
+  List,
+  MoreHorizontal,
+  RotateCcw,
+  Save,
+  Share2,
+  Shuffle,
+  Sparkles,
+  Table,
+  Trophy,
+  Upload,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
+import { TotalsPredefinitionView } from './TotalsPredefinitionView';
 import { useVotingPredefinition } from './useVotingPredefinition';
 import type { VoteSpreadsheetActionResult } from './useVotingPredefinition';
 import { useVotingPresetsFlow } from './useVotingPresetsFlow';
-import VoteSpreadsheetButtons from './VoteSpreadsheetButtons';
+import { VoteSpreadsheetFormatTooltipContent } from './VoteSpreadsheetButtons';
 import {
-  DetailedViewMode,
+  VotingBarButton,
+  VotingBarIconButton,
+  VotingSegmentedControl,
+} from './VotingBarControls';
+import {
+  VotingBarMenu,
+  VotingMenuLabel,
+  VotingMenuRow,
+  VotingMenuSeparator,
+} from './VotingBarMenu';
+import { VotingCallout } from './VotingCallout';
+import {
   VotingPredefinitionHeader,
+  type PredefinitionMode,
 } from './VotingPredefinitionHeader';
 import { VotingPredefinitionPresetModals } from './VotingPredefinitionPresetModals';
 import { VotingPredefinitionTable } from './VotingPredefinitionTable';
-import { VotingPresetToolbar } from './VotingPresetToolbar';
 import { VotingRankView } from './VotingRankView';
-import VotingTotalsShareTable from './VotingTotalsShareTable';
 
 import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
-import { RestartIcon } from '@/assets/icons/RestartIcon';
 import SortAZIcon from '@/assets/icons/SortAZIcon';
-import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
-import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
+import { Tooltip } from '@/components/common/Tooltip';
+import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
-import { EventStage, StatsTableType } from '@/models';
+import { EventStage, StageVotingType, StatsTableType } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import {
   buildCountriesOverrideForPodium,
@@ -38,6 +69,12 @@ import {
   buildRankedCountriesForManualTotals,
 } from '@/state/scoreboard/manualShareTotalsHelpers';
 import type { ManualShareTotalsRow } from '@/state/scoreboard/types';
+import {
+  buildCountriesOverrideForPodiumFromVotes,
+  buildGetCellPointsFromVotes,
+  buildGetPointsFromVotes,
+  buildRankedCountriesFromVotes,
+} from '@/state/scoreboard/votesShareHelpers';
 
 const ShareResultsModal = dynamic(
   () => import('@/components/simulation/share/ShareResultsModal'),
@@ -58,10 +95,8 @@ type VotingPredefinitionModalProps = {
 
 type CellKey = `${string}:${string}`; // participant:voter
 
-enum PredefinitionTab {
-  DETAILED = 'Detailed',
-  TOTALS = 'Totals',
-}
+/** How many offending voters the "can't save yet" callout names before eliding. */
+const MAX_LISTED_INVALID_VOTERS = 6;
 
 const VotingPredefinitionModal = ({
   isOpen,
@@ -70,7 +105,7 @@ const VotingPredefinitionModal = ({
   onSave,
   onLoaded,
 }: VotingPredefinitionModalProps) => {
-  const [activeTab, setActiveTab] = useState(PredefinitionTab.DETAILED);
+  const [activeMode, setActiveMode] = useState<PredefinitionMode>('detailed');
   const [shareResultsOpen, setShareResultsOpen] = useState(false);
   const [shareStatsOpen, setShareStatsOpen] = useState<StatsTableType | null>(
     null,
@@ -79,14 +114,17 @@ const VotingPredefinitionModal = ({
     Record<string, ManualShareTotalsRow>
   >({});
   const [isTotalsSortByName, setIsTotalsSortByName] = useState(false);
-  const [detailedViewMode, setDetailedViewMode] =
-    useState<DetailedViewMode>('numbers');
+  const [showTotalsHelp, setShowTotalsHelp] = useState(true);
 
   const contestName = useGeneralStore((s) => s.settings.contestName);
   const contestYear = useGeneralStore((s) => s.settings.contestYear);
+  const rankLayout = useGeneralStore((s) => s.settings.votingRankLayout);
+  const setSettings = useGeneralStore((s) => s.setSettings);
+  const shouldShowHeartFlagIcon = useGeneralStore(
+    (s) => s.settings.shouldShowHeartFlagIcon,
+  );
 
   const {
-    pointsSystem,
     displayPointsSystem,
     selectedType,
     setSelectedType,
@@ -114,6 +152,15 @@ const VotingPredefinitionModal = ({
     reorderRank,
     randomizeRankPoints,
     randomizeRankOrder,
+    totalsStatus,
+    totalsAdjustments,
+    getTotalsChannelBudgets,
+    generateFromTotals,
+    markTotalsStale,
+    resetTotalsGeneration,
+    getTotalsFromVotes,
+    markTotalsSynced,
+    pointsSystem,
     importVotesFromSpreadsheet,
     exportVotesToSpreadsheet,
   } = useVotingPredefinition({ stage });
@@ -121,6 +168,7 @@ const VotingPredefinitionModal = ({
   const t = useTranslations();
   const tSetup = useTranslations('setup.votingPredefinition');
   const tSpreadsheet = useTranslations('setup.votingPredefinition.spreadsheet');
+  const { confirm } = useConfirmation();
 
   const { onClickOutside } = useConfirmModalClose({
     onClose,
@@ -234,6 +282,10 @@ const VotingPredefinitionModal = ({
     stage.name,
   ]);
 
+  // The overflow menu drives spreadsheet import, so the file input lives here
+  // rather than inside a visible button.
+  const importInputRef = useRef<HTMLInputElement>(null);
+
   const [isSpreadsheetDragOver, setIsSpreadsheetDragOver] = useState(false);
 
   const isSpreadsheetFile = useCallback((file: File) => {
@@ -246,12 +298,12 @@ const VotingPredefinitionModal = ({
 
   const handleSpreadsheetDragOver = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
-      if (activeTab !== PredefinitionTab.DETAILED) return;
+      if (activeMode !== 'detailed') return;
       event.preventDefault();
       event.dataTransfer.dropEffect = 'copy';
       setIsSpreadsheetDragOver(true);
     },
-    [activeTab],
+    [activeMode],
   );
 
   const handleSpreadsheetDragLeave = useCallback(
@@ -267,7 +319,7 @@ const VotingPredefinitionModal = ({
       event.preventDefault();
       setIsSpreadsheetDragOver(false);
 
-      if (activeTab !== PredefinitionTab.DETAILED) return;
+      if (activeMode !== 'detailed') return;
 
       const file = event.dataTransfer.files?.[0];
 
@@ -279,17 +331,7 @@ const VotingPredefinitionModal = ({
 
       void handleImportSpreadsheet(file);
     },
-    [activeTab, handleImportSpreadsheet, isSpreadsheetFile, tSpreadsheet],
-  );
-
-  const spreadsheetButtons = useMemo(
-    () => (
-      <VoteSpreadsheetButtons
-        onImport={handleImportSpreadsheet}
-        onExport={handleExportSpreadsheet}
-      />
-    ),
-    [handleImportSpreadsheet, handleExportSpreadsheet],
+    [activeMode, handleImportSpreadsheet, isSpreadsheetFile, tSpreadsheet],
   );
 
   const {
@@ -310,24 +352,36 @@ const VotingPredefinitionModal = ({
     clearDetailedCellEditing,
   });
 
-  const shouldShowHeartFlagIcon =
-    (window as any)?.store?.general?.settings?.shouldShowHeartFlagIcon ?? false;
-
   const handleTotalsCellChange = useCallback(
     (
       countryCode: string,
       field: 'jury' | 'televote' | 'combined',
-      value: number,
+      value: number | undefined,
     ) => {
-      setLocalTotals((prev) => ({
-        ...prev,
-        [countryCode]: {
-          ...(prev[countryCode] || {}),
-          [field]: value,
-        },
-      }));
+      setLocalTotals((prev) => {
+        const nextRow = { ...(prev[countryCode] || {}) };
+
+        // `undefined` means "blank" — drop the key entirely so the generator
+        // treats it as unpinned rather than as a pinned target of 0.
+        if (value === undefined) {
+          delete nextRow[field];
+        } else {
+          nextRow[field] = value;
+        }
+
+        const next = { ...prev };
+
+        if (Object.keys(nextRow).length === 0) {
+          delete next[countryCode];
+        } else {
+          next[countryCode] = nextRow;
+        }
+
+        return next;
+      });
+      markTotalsStale();
     },
-    [],
+    [markTotalsStale],
   );
 
   const totalsRankedCountries = useMemo(
@@ -343,56 +397,118 @@ const VotingPredefinitionModal = ({
     [stage, localTotals],
   );
 
+  // The same three adapters, but sourced from the real per-voter matrix. Used by
+  // Detailed/Rank sharing, and always by the breakdown grid.
+  const votesRankedCountries = useMemo(
+    () => buildRankedCountriesFromVotes(stage, votes, stage.votingMode),
+    [stage, votes],
+  );
+  const votesGetPoints = useMemo(
+    () => buildGetPointsFromVotes(stage.votingMode, votes),
+    [stage.votingMode, votes],
+  );
+  const votesCountriesOverrideForPodium = useMemo(
+    () =>
+      buildCountriesOverrideForPodiumFromVotes(stage, votes, stage.votingMode),
+    [stage, votes],
+  );
+  const votesGetCellPoints = useMemo(
+    () => buildGetCellPointsFromVotes(stage.votingMode, votes),
+    [stage.votingMode, votes],
+  );
+
+  // Whether the matrix holds anything at all — the breakdown grid is meaningless
+  // without it, so its share option stays disabled until there are votes.
+  const hasAnyVotes = useMemo(
+    () =>
+      !!votes &&
+      (['jury', 'televote', 'combined'] as const).some(
+        (ch) => Object.keys(votes[ch] ?? {}).length > 0,
+      ),
+    [votes],
+  );
+
+  // Share sources follow what you're looking at: the typed totals on the Totals
+  // tab, the real matrix on Detailed/Rank. The breakdown always uses the matrix.
+  const isBreakdownShare = shareStatsOpen === StatsTableType.BREAKDOWN;
+  const useVotesShareSource = isBreakdownShare || activeMode !== 'totals';
+
+  const shareRankedCountries = useVotesShareSource
+    ? votesRankedCountries
+    : totalsRankedCountries;
+  const shareGetPoints = useVotesShareSource ? votesGetPoints : totalsGetPoints;
+  const sharePodiumCountries =
+    activeMode !== 'totals'
+      ? votesCountriesOverrideForPodium
+      : countriesOverrideForPodium;
+
   const shareTitleOverride = `${contestName} ${contestYear}`;
   const shareSubtitleOverride = stage.name;
 
+  // Entering the Totals tab mirrors whatever Detailed/Rank currently hold, so the
+  // three modes stay in sync. Skipped when un-generated edits are pending (they'd
+  // be silently discarded) or when the matrix is empty (seeding zeros would pin
+  // every country to 0).
+  const handleModeChange = useCallback(
+    (mode: PredefinitionMode) => {
+      if (
+        mode === 'totals' &&
+        activeMode !== 'totals' &&
+        totalsStatus !== 'stale'
+      ) {
+        const seeded = getTotalsFromVotes();
+
+        if (seeded) {
+          setLocalTotals(seeded);
+          markTotalsSynced();
+        }
+      }
+      setActiveMode(mode);
+    },
+    [activeMode, totalsStatus, getTotalsFromVotes, markTotalsSynced],
+  );
+
+  // Higher points get a stronger accent wash, so the shape of a ballot is
+  // readable at a glance without reading any number.
   const getCellClassName = useCallback(
     (points: number) => {
-      if (
-        (!isTotalOrCombinedVoteType && points === 12) ||
-        (isTotalOrCombinedVoteType && points >= 20)
-      ) {
-        return 'font-bold bg-primary-700/50';
-      }
+      const tier = (a: number, b: number) =>
+        isTotalOrCombinedVoteType ? a : b;
 
-      if (
-        (!isTotalOrCombinedVoteType && points === 10) ||
-        (isTotalOrCombinedVoteType && points >= 17)
-      ) {
-        return 'font-semibold bg-primary-800/60';
-      }
-
-      if (
-        (!isTotalOrCombinedVoteType && points === 8) ||
-        (isTotalOrCombinedVoteType && points >= 15)
-      ) {
-        return 'font-semibold bg-primary-800/30';
-      }
+      if (points >= tier(20, 12)) return 'font-bold bg-primary-700/60';
+      if (points >= tier(17, 10)) return 'font-semibold bg-primary-700/50';
+      if (points >= tier(15, 7)) return 'font-semibold bg-primary-700/30';
+      if (points >= tier(10, 4)) return 'font-medium bg-primary-700/20';
+      if (points > 0) return 'font-medium bg-primary-700/[0.13]';
 
       return 'font-medium';
     },
     [isTotalOrCombinedVoteType],
   );
 
+  // Save is gated, never allowed-then-erroring: on Detailed/Rank every ballot
+  // must be complete and valid; on Totals a fresh breakdown must exist.
+  const saveValidation = useMemo(
+    () => validateAllBeforeSave(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [votes, votingCountries, stage.votingMode],
+  );
+
+  const canSave =
+    activeMode === 'totals' ? totalsStatus === 'fresh' : saveValidation.ok;
+
+  const saveDisabledReason = !canSave
+    ? activeMode === 'totals'
+      ? totalsStatus === 'stale'
+        ? tSetup('totalsStaleHint')
+        : tSetup('totalsUngeneratedHint')
+      : tSetup('saveBlockedTooltip')
+    : undefined;
+
   const handleSave = () => {
-    const { ok, errors } = validateAllBeforeSave();
-
-    if (!ok) {
-      const list = errors
-        .slice(0, 5)
-        .map((e) => `- ${e.label}: ${e.reasons.join('; ')}`)
-        .join('\n');
-
-      alert(
-        `Please complete valid assignments for all voters before saving.\n\nIssues:\n${list}\n${
-          errors.length > 5 ? '...' : ''
-        }`,
-      );
-
-      return;
-    }
-    if (!votes) return;
+    if (!canSave || !votes) return;
     onClose();
+    toast.success(tSetup('toastVotesSaved'));
 
     setTimeout(() => {
       onSave(votes);
@@ -401,241 +517,343 @@ const VotingPredefinitionModal = ({
 
   useEffectOnce(onLoaded);
 
-  const tabs = useMemo(
-    () => [
-      { value: PredefinitionTab.DETAILED, label: tSetup('tabDetailed') },
-      { value: PredefinitionTab.TOTALS, label: tSetup('tabTotals') },
-    ],
-    [tSetup],
+  const modeTabs = [
+    { value: 'detailed' as const, label: tSetup('detailedView') },
+    { value: 'rank' as const, label: tSetup('rankView') },
+    { value: 'totals' as const, label: tSetup('totalsView') },
+  ];
+
+  const pointsSummary = displayPointsSystem.every(
+    (p: { value: number }, index: number) =>
+      PREDEFINED_SYSTEMS_MAP['default']?.[index]?.value === p?.value,
+  )
+    ? '1-8, 10, 12'
+    : displayPointsSystem.map((p: { value: number }) => p.value).join(', ');
+
+  const confirmReset = () => {
+    const isTotals = activeMode === 'totals';
+
+    confirm({
+      key: 'reset-voting-predefinition',
+      type: 'danger',
+      title: isTotals ? tSetup('resetTotalsTitle') : tSetup('resetMatrixTitle'),
+      description: isTotals
+        ? tSetup('resetTotalsDescription')
+        : tSetup('resetMatrixDescription'),
+      onConfirm: () => {
+        if (isTotals) {
+          setLocalTotals({});
+          resetTotalsGeneration();
+          toast.success(tSetup('toastTotalsCleared'));
+
+          return;
+        }
+
+        resetVotes();
+        setEditing({});
+        toast.success(tSetup('toastMatrixCleared'));
+      },
+    });
+  };
+
+  const sortToggle = (isByPoints: boolean, onToggle: () => void) => (
+    <VotingBarIconButton
+      label={isByPoints ? t('common.sortByName') : t('common.sortByPoints')}
+      onClick={onToggle}
+      icon={
+        isByPoints ? (
+          <SortAZIcon className="h-[18px] w-[18px]" />
+        ) : (
+          <ArrowDown10 className="h-[18px] w-[18px]" />
+        )
+      }
+    />
   );
 
-  const tabsWithContent = useMemo(
-    () => [
-      {
-        value: PredefinitionTab.DETAILED,
-        label: tSetup('tabDetailed'),
-        content: (
-          <>
-            <VotingPredefinitionHeader
-              stageName={stage.name}
-              totalBadgeLabel={totalBadgeLabel}
-              pointsSystem={displayPointsSystem as any}
-              selectedType={selectedType}
-              setSelectedType={setSelectedType}
-              voteTypeOptions={voteTypeOptions}
-              isSorting={isSorting}
-              setIsSorting={(v) => setIsSorting(v)}
-              onReset={() => {
-                resetVotes();
-                setEditing({});
-              }}
-              onRandomize={randomizeAll}
-              onSavePreset={() => openSavePresetCreate('detailed')}
-              onLoadPreset={() => openLoadPresetModal('detailed')}
-              viewMode={detailedViewMode}
-              onViewModeChange={setDetailedViewMode}
-              spreadsheetButtons={spreadsheetButtons}
+  const contextualControls = (
+    <>
+      {activeMode === 'detailed' && (
+        <>
+          {voteTypeOptions.length > 0 && (
+            <VotingSegmentedControl
+              ariaLabel={tSetup('channelSwitchLabel')}
+              value={selectedType}
+              onChange={setSelectedType}
+              options={[
+                { value: 'Total' as const, label: totalBadgeLabel },
+                ...voteTypeOptions.map((type: StageVotingType) => ({
+                  value: type,
+                  label:
+                    type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+                })),
+              ]}
             />
+          )}
+          {sortToggle(isSorting, () => setIsSorting(!isSorting))}
+          <VotingBarButton
+            variant="ghost"
+            onClick={confirmReset}
+            icon={<RotateCcw className="h-4 w-4" />}
+          >
+            {t('common.reset')}
+          </VotingBarButton>
+          <VotingBarButton
+            variant="primary"
+            onClick={() => {
+              randomizeAll();
+              setEditing({});
+              toast.success(tSetup('toastVotesRandomized'));
+            }}
+            icon={<Shuffle className="h-4 w-4" />}
+          >
+            {t('common.randomize')}
+          </VotingBarButton>
+        </>
+      )}
 
-            {detailedViewMode === 'rank' ? (
-              <VotingRankView
-                countries={stage.countries as any}
-                orderedCodes={
-                  rankOrder ?? (stage.countries as any[]).map((c) => c.code)
-                }
-                onReorder={reorderRank}
-                showPoints={showRankPoints}
-                totals={getRankTotals()}
-                onRandomizePoints={randomizeRankPoints}
-                onRandomizeRanking={randomizeRankOrder}
-                rankTarget={rankTarget}
-                onEnter={enterRankMode}
-              />
-            ) : (
-              <VotingPredefinitionTable
-                rankedCountries={rankedCountries as any}
-                votingCountries={votingCountries as any}
-                shouldShowHeartFlagIcon={shouldShowHeartFlagIcon}
-                isTotalOrCombinedVoteType={isTotalOrCombinedVoteType}
-                getVoterValidity={getVoterValidity as any}
-                getTotalPointsForCountry={getTotalPointsForCountry}
-                getCellClassName={getCellClassName}
-                getCellValue={getCellValue}
-                isSameCountry={(participant, voter) => participant === voter}
-                isTotalOrCombinedDisabled={(participant, voter) =>
-                  isTotalOrCombinedVoteType || participant === voter
-                }
-                valueForCell={(participant, voter) => {
-                  const key: CellKey = `${participant}:${voter}`;
-                  const displayValue = toFixedIfDecimalFloat(
-                    getCellValue(participant, voter),
-                  );
-                  const fallback = String(displayValue || '');
+      {activeMode === 'rank' && (
+        <>
+          <VotingBarIconButton
+            label={
+              rankLayout === 'list'
+                ? tSetup('layoutGrid')
+                : tSetup('layoutList')
+            }
+            onClick={() =>
+              setSettings({
+                votingRankLayout: rankLayout === 'list' ? 'grid' : 'list',
+              })
+            }
+            icon={
+              rankLayout === 'list' ? (
+                <LayoutGrid className="h-[18px] w-[18px]" />
+              ) : (
+                <List className="h-[18px] w-[18px]" />
+              )
+            }
+          />
+          <VotingBarButton
+            variant="ghost"
+            onClick={() => {
+              randomizeRankOrder();
+              toast.success(tSetup('toastRankingRandomized'));
+            }}
+            icon={<Dices className="h-4 w-4" />}
+          >
+            {tSetup('randomizeRanking')}
+          </VotingBarButton>
+          <VotingBarButton
+            variant="primary"
+            onClick={() => {
+              randomizeRankPoints();
+              toast.success(tSetup('toastRankPointsGenerated'));
+            }}
+            icon={<Sparkles className="h-4 w-4" />}
+          >
+            {tSetup('randomizePoints')}
+          </VotingBarButton>
+        </>
+      )}
 
-                  return (editing[key] ?? fallback) as string;
-                }}
-                onChangeCell={(participant, voter, val) => {
-                  const key: CellKey = `${participant}:${voter}`;
-
-                  setEditing((s) => ({ ...s, [key]: val }));
-                }}
-                onBlurCell={(participant, voter, val) => {
-                  const key: CellKey = `${participant}:${voter}`;
-                  const parsed = Number(val);
-                  const ok =
-                    Number.isFinite(parsed) &&
-                    (applyInputValue(participant, voter, val), true);
-
-                  setEditing((s) => {
-                    const next = { ...s } as Record<CellKey, string>;
-
-                    delete next[key];
-
-                    return next;
-                  });
-
-                  if (!ok) {
-                    // noop
-                  }
-                }}
-              />
-            )}
-          </>
-        ),
-      },
-      {
-        value: PredefinitionTab.TOTALS,
-        label: tSetup('tabTotals'),
-        content: (
-          <div className="flex flex-col gap-4 flex-1 min-h-0">
-            <div className="px-2 flex flex-col gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex flex-wrap gap-2 items-center border-b w-full sm:w-auto sm:border-none border-solid border-primary-800 pb-2 sm:pb-0">
-                  <h4 className="sm:text-lg text-base font-medium mr-1">
-                    {t('simulation.header.share')}
-                  </h4>
-                  <Button
-                    variant="tertiary"
-                    className="gap-2 sm:!px-4 !px-2.5"
-                    Icon={<Share className="w-5 h-5" />}
-                    onClick={() => setShareResultsOpen(true)}
-                  >
-                    {tSetup('shareScoreboardResults')}
-                  </Button>
-                  <Button
-                    variant="tertiary"
-                    className="gap-2 sm:!px-4 !px-2.5"
-                    Icon={<Grid3x2 className="w-5 h-5" />}
-                    onClick={() => setShareStatsOpen(StatsTableType.SPLIT)}
-                  >
-                    {tSetup('shareSplit')}
-                  </Button>
-                  <Button
-                    variant="tertiary"
-                    className="gap-2 sm:!px-4 !px-2.5"
-                    Icon={<Sheet className="w-5 h-5" />}
-                    onClick={() => setShareStatsOpen(StatsTableType.SUMMARY)}
-                  >
-                    {tSetup('shareSummary')}
-                  </Button>
-                </div>
-                <div className="flex gap-2 items-start flex-wrap">
-                  <VotingPresetToolbar
-                    wrapperClassName="flex flex-wrap gap-2 md:hidden"
-                    onSavePreset={() => openSavePresetCreate('totals')}
-                    onLoadPreset={() => openLoadPresetModal('totals')}
-                  />
-                  <Button
-                    onClick={() => setIsTotalsSortByName(!isTotalsSortByName)}
-                    className="!p-3"
-                    aria-label={
-                      isTotalsSortByName
-                        ? t('common.sortByPoints')
-                        : t('common.sortByName')
-                    }
-                    title={
-                      isTotalsSortByName
-                        ? t('common.sortByPoints')
-                        : t('common.sortByName')
-                    }
-                    Icon={
-                      isTotalsSortByName ? (
-                        <SortAZIcon className="w-5 h-5" />
-                      ) : (
-                        <ArrowDown10 className="w-5 h-5" />
-                      )
-                    }
-                  />
-                  <Button
-                    variant="primary"
-                    onClick={() => setLocalTotals({})}
-                    className="!p-3"
-                    aria-label={t('common.reset')}
-                    title={t('common.reset')}
-                    Icon={<RestartIcon className="w-5 h-5" />}
-                  />
-                </div>
-              </div>
-              <VotingPresetToolbar
-                wrapperClassName="md:flex flex-wrap gap-2 hidden"
-                onSavePreset={() => openSavePresetCreate('totals')}
-                onLoadPreset={() => openLoadPresetModal('totals')}
-              />
-            </div>
-            <VotingTotalsShareTable
-              stage={stage}
-              manualRowByCode={localTotals}
-              onCellChange={handleTotalsCellChange}
-              sortByName={isTotalsSortByName}
-            />
-          </div>
-        ),
-      },
-    ],
-    [
-      tSetup,
-      stage,
-      totalBadgeLabel,
-      displayPointsSystem,
-      selectedType,
-      setSelectedType,
-      voteTypeOptions,
-      isSorting,
-      randomizeAll,
-      rankedCountries,
-      votingCountries,
-      shouldShowHeartFlagIcon,
-      isTotalOrCombinedVoteType,
-      getVoterValidity,
-      getTotalPointsForCountry,
-      getCellClassName,
-      getCellValue,
-      t,
-      isTotalsSortByName,
-      localTotals,
-      handleTotalsCellChange,
-      setIsSorting,
-      resetVotes,
-      openSavePresetCreate,
-      openLoadPresetModal,
-      editing,
-      applyInputValue,
-      detailedViewMode,
-      rankTarget,
-      rankOrder,
-      showRankPoints,
-      getRankTotals,
-      enterRankMode,
-      reorderRank,
-      randomizeRankPoints,
-      randomizeRankOrder,
-      handleImportSpreadsheet,
-      handleExportSpreadsheet,
-      spreadsheetButtons,
-    ],
+      {activeMode === 'totals' && (
+        <>
+          {sortToggle(!isTotalsSortByName, () =>
+            setIsTotalsSortByName(!isTotalsSortByName),
+          )}
+          <VotingBarIconButton
+            label={tSetup('totalsHelpLabel')}
+            onClick={() => setShowTotalsHelp((prev) => !prev)}
+            icon={<HelpCircle className="h-[18px] w-[18px]" />}
+          />
+        </>
+      )}
+    </>
   );
 
-  const isTotalsTab = activeTab === PredefinitionTab.TOTALS;
+  const shareMenu = (
+    <VotingBarMenu
+      align="end"
+      panelClassName="min-w-[300px]"
+      renderTrigger={({ ref, onClick }) => (
+        <VotingBarButton
+          ref={ref}
+          onClick={onClick}
+          icon={<Share2 className="h-4 w-4" />}
+        >
+          {t('common.share')}
+        </VotingBarButton>
+      )}
+    >
+      {(close) => (
+        <>
+          <VotingMenuLabel
+            hint={
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-2 py-0.5 text-[10px] font-bold normal-case tracking-normal text-white/55">
+                <Table className="h-3 w-3" />
+                {activeMode === 'totals'
+                  ? tSetup('shareSourceTotals')
+                  : tSetup('shareSourceMatrix')}
+              </span>
+            }
+          >
+            {tSetup('shareWhat')}
+          </VotingMenuLabel>
+          <VotingMenuRow
+            icon={<Trophy className="h-[17px] w-[17px]" />}
+            sub={tSetup('shareScoreboardSub')}
+            onClick={() => {
+              close();
+              setShareResultsOpen(true);
+            }}
+          >
+            {tSetup('shareScoreboardResults')}
+          </VotingMenuRow>
+          <VotingMenuRow
+            icon={<Columns2 className="h-[17px] w-[17px]" />}
+            sub={tSetup('shareSplitSub')}
+            onClick={() => {
+              close();
+              setShareStatsOpen(StatsTableType.SPLIT);
+            }}
+          >
+            {tSetup('shareSplit')}
+          </VotingMenuRow>
+          <VotingMenuRow
+            icon={<ImageIcon className="h-[17px] w-[17px]" />}
+            sub={tSetup('shareSummarySub')}
+            onClick={() => {
+              close();
+              setShareStatsOpen(StatsTableType.SUMMARY);
+            }}
+          >
+            {tSetup('shareSummary')}
+          </VotingMenuRow>
+          <VotingMenuRow
+            icon={<Table className="h-[17px] w-[17px]" />}
+            disabled={!hasAnyVotes}
+            sub={
+              hasAnyVotes
+                ? tSetup('shareBreakdownSub')
+                : tSetup('shareBreakdownEmpty')
+            }
+            onClick={() => {
+              close();
+              setShareStatsOpen(StatsTableType.BREAKDOWN);
+            }}
+          >
+            {tSetup('shareBreakdown')}
+          </VotingMenuRow>
+        </>
+      )}
+    </VotingBarMenu>
+  );
+
+  const overflowMenu = (
+    <VotingBarMenu
+      align="end"
+      renderTrigger={({ ref, onClick }) => (
+        <VotingBarIconButton
+          ref={ref}
+          onClick={onClick}
+          label={t('common.more')}
+          icon={<MoreHorizontal className="h-5 w-5" />}
+        />
+      )}
+    >
+      {(close) => (
+        <>
+          <VotingMenuLabel>{tSetup('presetsLabel')}</VotingMenuLabel>
+          <VotingMenuRow
+            icon={<Save className="h-[17px] w-[17px]" />}
+            onClick={() => {
+              close();
+              openSavePresetCreate(
+                activeMode === 'totals' ? 'totals' : 'detailed',
+              );
+            }}
+          >
+            {tSetup('presets.savePreset')}
+          </VotingMenuRow>
+          <VotingMenuRow
+            icon={<FolderOpen className="h-[17px] w-[17px]" />}
+            onClick={() => {
+              close();
+              openLoadPresetModal(
+                activeMode === 'totals' ? 'totals' : 'detailed',
+              );
+            }}
+          >
+            {tSetup('presets.loadPreset')}
+          </VotingMenuRow>
+
+          <VotingMenuSeparator />
+
+          <VotingMenuLabel
+            hint={
+              <Tooltip
+                position="right"
+                classNameIcon="!mt-0 !w-4 !h-4"
+                className="!z-[99999]"
+                content={
+                  <VoteSpreadsheetFormatTooltipContent withDragDrop={false} />
+                }
+              >
+                <span className="sr-only">{tSpreadsheet('formatHelp')}</span>
+              </Tooltip>
+            }
+          >
+            {tSetup('spreadsheetLabel')}
+          </VotingMenuLabel>
+          <VotingMenuRow
+            icon={<Upload className="h-[17px] w-[17px]" />}
+            sub=".xlsx"
+            onClick={() => {
+              close();
+              importInputRef.current?.click();
+            }}
+          >
+            {tSpreadsheet('import')}
+          </VotingMenuRow>
+          <VotingMenuRow
+            icon={<Download className="h-[17px] w-[17px]" />}
+            sub=".xlsx"
+            onClick={() => {
+              close();
+              handleExportSpreadsheet();
+            }}
+          >
+            {tSpreadsheet('export')}
+          </VotingMenuRow>
+
+          <VotingMenuSeparator />
+
+          <VotingMenuRow
+            variant="danger"
+            icon={<RotateCcw className="h-[17px] w-[17px]" />}
+            onClick={() => {
+              close();
+              confirmReset();
+            }}
+          >
+            {activeMode === 'totals'
+              ? tSetup('resetTotalsTitle')
+              : tSetup('resetMatrixTitle')}
+          </VotingMenuRow>
+        </>
+      )}
+    </VotingBarMenu>
+  );
+
+  // 37 voters worth of names would bury the instruction that follows, so the
+  // callout names the first few and counts the rest.
+  const invalidVoterNames = saveValidation.errors.map((e) => e.label);
+  const hiddenInvalidCount = Math.max(
+    0,
+    invalidVoterNames.length - MAX_LISTED_INVALID_VOTERS,
+  );
+  const listedInvalidVoters =
+    invalidVoterNames.slice(0, MAX_LISTED_INVALID_VOTERS).join(', ') +
+    (hiddenInvalidCount > 0 ? `, +${hiddenInvalidCount}` : '');
 
   return (
     <>
@@ -643,57 +861,190 @@ const VotingPredefinitionModal = ({
         isOpen={isOpen}
         onClose={onClickOutside}
         overlayClassName="!z-[1000]"
-        contentClassName="h-[75vh] !px-2 !py-3 text-white flex flex-col"
+        // Fixed-height shell: the header and footer are pinned and only the body
+        // between them scrolls. Full-bleed below 640px, per the design.
+        containerClassName="!flex !flex-col !h-[min(720px,92vh)] max-sm:!h-[100dvh] max-sm:!mx-0 max-sm:!max-w-none max-sm:!rounded-none"
+        contentClassName="!flex-1 !min-h-0 !px-4 sm:!px-5 !pt-0 !pb-1 text-white flex flex-col"
         topContent={
-          <Tabs
-            tabs={tabs}
-            activeTab={activeTab}
-            setActiveTab={(v) => setActiveTab(v as PredefinitionTab)}
-            containerClassName="!rounded-none"
+          <VotingPredefinitionHeader
+            modeTabs={modeTabs}
+            activeMode={activeMode}
+            onModeChange={handleModeChange}
+            contextualControls={contextualControls}
+            shareMenu={shareMenu}
+            overflowMenu={overflowMenu}
+            kicker={tSetup('kicker')}
+            title={stage.name}
+            titleAdornment={
+              activeMode === 'detailed' ? (
+                <VotingBarMenu
+                  panelClassName="max-w-[300px] min-w-0 p-3.5"
+                  renderTrigger={({ ref, onClick }) => (
+                    <button
+                      ref={ref}
+                      type="button"
+                      onClick={onClick}
+                      className="inline-flex h-[26px] items-center gap-[5px] rounded-lg px-2 text-[12.5px] font-bold text-white/55 transition-colors hover:bg-white/[0.06] hover:text-white"
+                    >
+                      <HelpCircle className="h-[15px] w-[15px]" />
+                      {tSetup('pointsSummary', { points: pointsSummary })}
+                    </button>
+                  )}
+                >
+                  <p className="text-[12.5px] font-medium leading-relaxed text-white/70 [&_b]:font-extrabold [&_b]:text-white">
+                    {tSetup.rich('detailedHelp', {
+                      points: pointsSummary,
+                      b: (chunks) => <b>{chunks}</b>,
+                    })}
+                  </p>
+                </VotingBarMenu>
+              ) : undefined
+            }
           />
         }
         bottomContent={
-          <div className="flex flex-col gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
-            {isTotalsTab && (
-              <p className="text-sm text-white/70">{tSetup('totalsHint')}</p>
-            )}
-            <div className="flex justify-end xs:gap-4 gap-2">
-              <Button
-                variant="secondary"
-                className="md:text-base text-sm"
-                onClick={onClose}
-              >
-                {t('common.close')}
-              </Button>
-              <Button
-                className="w-full !text-base"
-                onClick={handleSave}
-                disabled={isTotalsTab}
-              >
-                {t('common.save')}
-              </Button>
-            </div>
+          <div className="z-30 flex items-center justify-end gap-2.5 border-t border-white/10 bg-black/[0.18] px-4 py-3 sm:px-5">
+            <VotingBarButton onClick={onClose}>
+              {t('common.close')}
+            </VotingBarButton>
+            <VotingBarButton
+              variant="primary"
+              onClick={handleSave}
+              disabled={!canSave}
+              title={saveDisabledReason}
+              icon={<Check className="h-4 w-4" />}
+            >
+              {tSetup('saveVotes')}
+            </VotingBarButton>
           </div>
         }
       >
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+
+            event.target.value = '';
+            if (file) void handleImportSpreadsheet(file);
+          }}
+        />
+
         <div
-          className="relative flex flex-col flex-1 min-h-0"
+          className="relative flex min-h-0 flex-1 flex-col gap-3.5"
           onDragOver={handleSpreadsheetDragOver}
           onDragLeave={handleSpreadsheetDragLeave}
           onDrop={handleSpreadsheetDrop}
         >
-          {isSpreadsheetDragOver && activeTab === PredefinitionTab.DETAILED && (
-            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-lg border-2 border-dashed border-white/40 bg-primary-900/80 backdrop-blur-sm">
-              <p className="text-sm font-medium text-white/90 px-4 text-center">
+          {isSpreadsheetDragOver && activeMode === 'detailed' && (
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-xl border-2 border-dashed border-white/40 bg-primary-900/80 backdrop-blur-sm">
+              <p className="px-4 text-center text-sm font-medium text-white/90">
                 {tSpreadsheet('dropToImport')}
               </p>
             </div>
           )}
-          <TabContent
-            tabs={tabsWithContent}
-            activeTab={activeTab}
-            preserveContent
-          />
+
+          {/* With nothing entered yet every column is trivially incomplete, and
+              the empty dots already say so — the callout is for a matrix that
+              has been worked on and is still not savable. */}
+          {activeMode !== 'totals' &&
+            hasAnyVotes &&
+            invalidVoterNames.length > 0 && (
+              <VotingCallout
+                variant="warn"
+                icon={<AlertTriangle className="h-[18px] w-[18px]" />}
+              >
+                {tSetup.rich('saveBlockedCallout', {
+                  voters: listedInvalidVoters,
+                  b: (chunks) => <b>{chunks}</b>,
+                })}
+              </VotingCallout>
+            )}
+
+          {activeMode === 'detailed' && (
+            <VotingPredefinitionTable
+              rankedCountries={rankedCountries as any}
+              votingCountries={votingCountries as any}
+              shouldShowHeartFlagIcon={shouldShowHeartFlagIcon}
+              isTotalOrCombinedVoteType={isTotalOrCombinedVoteType}
+              getVoterValidity={getVoterValidity as any}
+              getTotalPointsForCountry={getTotalPointsForCountry}
+              getCellClassName={getCellClassName}
+              getCellValue={getCellValue}
+              isSameCountry={(participant, voter) => participant === voter}
+              isTotalOrCombinedDisabled={(participant, voter) =>
+                isTotalOrCombinedVoteType || participant === voter
+              }
+              valueForCell={(participant, voter) => {
+                const key: CellKey = `${participant}:${voter}`;
+                const displayValue = toFixedIfDecimalFloat(
+                  getCellValue(participant, voter),
+                );
+                const fallback = String(displayValue || '');
+
+                return (editing[key] ?? fallback) as string;
+              }}
+              onChangeCell={(participant, voter, val) => {
+                const key: CellKey = `${participant}:${voter}`;
+
+                setEditing((s) => ({ ...s, [key]: val }));
+              }}
+              onBlurCell={(participant, voter, val) => {
+                const key: CellKey = `${participant}:${voter}`;
+
+                applyInputValue(participant, voter, val);
+
+                setEditing((s) => {
+                  const next = { ...s } as Record<CellKey, string>;
+
+                  delete next[key];
+
+                  return next;
+                });
+              }}
+            />
+          )}
+
+          {activeMode === 'rank' && (
+            <VotingRankView
+              countries={stage.countries as any}
+              orderedCodes={
+                rankOrder ?? (stage.countries as any[]).map((c) => c.code)
+              }
+              onReorder={reorderRank}
+              showPoints={showRankPoints}
+              totals={getRankTotals()}
+              rankTarget={rankTarget}
+              onEnter={enterRankMode}
+            />
+          )}
+
+          {activeMode === 'totals' && (
+            <TotalsPredefinitionView
+              stage={stage}
+              localTotals={localTotals}
+              onCellChange={handleTotalsCellChange}
+              sortByName={isTotalsSortByName}
+              budgets={getTotalsChannelBudgets()}
+              status={totalsStatus}
+              adjustments={totalsAdjustments}
+              showHelp={showTotalsHelp}
+              onDismissHelp={() => setShowTotalsHelp(false)}
+              onGenerate={() => {
+                const adjusted = generateFromTotals(localTotals).length;
+
+                toast.success(
+                  adjusted > 0
+                    ? tSetup('toastBreakdownGeneratedAdjusted', {
+                        count: adjusted,
+                      })
+                    : tSetup('toastBreakdownGenerated'),
+                );
+              }}
+            />
+          )}
         </div>
 
         {(shareResultsOpen || shareStatsOpen) && (
@@ -702,7 +1053,7 @@ const VotingPredefinitionModal = ({
               isOpen={shareResultsOpen}
               onClose={() => setShareResultsOpen(false)}
               onLoaded={() => {}}
-              countriesOverride={countriesOverrideForPodium}
+              countriesOverride={sharePodiumCountries}
               titleOverride={shareTitleOverride}
               subtitleOverride={shareSubtitleOverride}
             />
@@ -712,14 +1063,16 @@ const VotingPredefinitionModal = ({
                 onClose={() => setShareStatsOpen(null)}
                 onLoaded={() => {}}
                 activeTab={shareStatsOpen}
-                rankedCountries={totalsRankedCountries}
+                rankedCountries={shareRankedCountries}
                 selectedStageId={stage.id}
                 selectedVoteType="Total"
-                getCellPoints={() => ''}
-                getCellClassName={() => ''}
-                getPoints={totalsGetPoints}
+                getCellPoints={votesGetCellPoints}
+                getCellClassName={getCellClassName}
+                getPoints={shareGetPoints}
                 selectedStage={stage}
-                aggregateOnly
+                // Typed totals carry no jury/televote split under COMBINED, so
+                // collapse those columns; the matrix source has real ones.
+                aggregateOnly={!useVotesShareSource}
               />
             )}
           </>

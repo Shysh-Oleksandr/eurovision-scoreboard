@@ -108,7 +108,8 @@ const IconButtonTooltip = ({ content, children, className = '' }: Props) => {
   }>;
 
   const trigger = React.cloneElement(child, {
-    ref: mergeRefs(triggerRef, (child as any).ref),
+    // React 19 moved `ref` into props; reading `element.ref` warns.
+    ref: mergeRefs(triggerRef, child.props.ref),
     className: [child.props.className, className].filter(Boolean).join(' '),
     onMouseEnter: (event: React.MouseEvent<HTMLElement>) => {
       child.props.onMouseEnter?.(event);

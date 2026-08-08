@@ -382,6 +382,50 @@ export function useMyEntryStatsQuery(
   });
 }
 
+export function useUserLeaderboardQuery(
+  userId: string | null,
+  opts: { enabled?: boolean } = {},
+) {
+  const { enabled = true } = opts;
+
+  return useQuery<MyLeaderboardResponse>({
+    queryKey: queryKeys.public.userLeaderboard(userId ?? ''),
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/contests/users/${userId}/leaderboard`,
+      );
+
+      return data as MyLeaderboardResponse;
+    },
+    enabled: !!userId && enabled,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
+  });
+}
+
+export function useUserEntryStatsQuery(
+  userId: string | null,
+  entryCode: string | null,
+  opts: { enabled?: boolean } = {},
+) {
+  const { enabled = true } = opts;
+  const encoded = entryCode ? encodeURIComponent(entryCode) : '';
+
+  return useQuery<EntryStatsResponse>({
+    queryKey: queryKeys.public.userEntryStats(userId ?? '', entryCode || ''),
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/contests/users/${userId}/entry-stats/${encoded}`,
+      );
+
+      return data as EntryStatsResponse;
+    },
+    enabled: !!userId && !!entryCode && enabled,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
+  });
+}
+
 export function useCreateContestMutation() {
   const qc = useQueryClient();
 
@@ -417,6 +461,47 @@ export function useUpdateContestMutation() {
           data,
         );
       }
+      qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
+      qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
+    },
+  });
+}
+
+export function useUploadContestLogoMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, file }: { id: string; file: File }) => {
+      const formData = new FormData();
+
+      formData.append('file', file);
+      const { data } = await api.post(`/contests/${id}/logo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      return data as Contest;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(queryKeys.user.contestById(data._id), data);
+      qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
+      qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
+    },
+  });
+}
+
+export function useClearContestLogoMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await api.delete(`/contests/${id}/logo`);
+
+      return data as Contest;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(queryKeys.user.contestById(data._id), data);
       qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
       qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
       qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });

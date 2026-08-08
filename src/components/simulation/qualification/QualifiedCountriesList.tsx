@@ -10,6 +10,8 @@ import SnowPileEffect from '@/components/effects/SnowPileEffect';
 import {
   getQualifierTargetStageNames,
   getTotalQualifiersAmount,
+  qualifiesOnlyToGrandFinal,
+  shouldShowQualifierTargetLabels,
 } from '@/helpers/qualifierTargetResolution';
 import { useGeneralStore } from '@/state/generalStore';
 import { useQualifiedCountriesPanelGlowStyle } from '@/theme/useQualifiedCountriesPanelGlowStyle';
@@ -75,6 +77,12 @@ const QualifiedCountriesList = () => {
     [qualifiesTo, eventStages],
   );
 
+  const showTargetLabels = shouldShowQualifierTargetLabels(
+    qualifiesTo,
+    eventStages,
+    showQualifierTargetStages,
+  );
+
   const headerContent = useMemo(() => {
     const span = (chunks: React.ReactNode) => (
       <span className="font-bold bg-gradient-to-br from-white to-primary-700 bg-clip-text text-transparent">
@@ -83,7 +91,10 @@ const QualifiedCountriesList = () => {
     );
     const br = () => <br />;
 
-    if (!showQualifierTargetStages) {
+    if (
+      !showQualifierTargetStages ||
+      qualifiesOnlyToGrandFinal(qualifiesTo, eventStages)
+    ) {
       return t.rich('qualifiedForTheGrandFinal', {
         span,
         br,
@@ -102,7 +113,7 @@ const QualifiedCountriesList = () => {
       span,
       br,
     });
-  }, [t, targetStageNames, showQualifierTargetStages]);
+  }, [t, targetStageNames, showQualifierTargetStages, qualifiesTo, eventStages]);
 
   const countriesContainerRef = useRef<HTMLDivElement>(null);
   const { roundedCountryContainer } = useThemeSpecifics();
@@ -127,7 +138,7 @@ const QualifiedCountriesList = () => {
               country={country}
               shouldAnimate
               targetStageName={
-                showQualifierTargetStages && isOver && country
+                showTargetLabels && isOver && country
                   ? targetStageNameByCountryCode.get(country.code)
                   : undefined
               }

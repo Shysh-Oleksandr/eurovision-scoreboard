@@ -23,6 +23,7 @@ export interface Contest {
   description?: string;
   venue?: string;
   hosts?: string;
+  logoUrl?: string;
   isPublic: boolean;
   year?: number;
   hostingCountryCode: string;

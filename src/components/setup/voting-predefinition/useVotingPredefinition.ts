@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { mergeImportedVotes } from './voteSpreadsheetParse';
 import {
   buildExportSectionsForStageVotes,
   downloadVoteSpreadsheet,
   importVotesFromSpreadsheetFile,
-  type VoteSpreadsheetImportResult,
 } from './voteSpreadsheet';
+import { mergeImportedVotes } from './voteSpreadsheetParse';
 
 import {
   BaseCountry,
@@ -24,11 +23,16 @@ import {
   resolveRankTarget,
   totalsForChannels,
 } from '@/state/scoreboard/rankToStageVotes';
-import { StageVotes } from '@/state/scoreboard/types';
 import {
-  buildCombinedBallotsFromJuryTelevote,
-  predefineStageVotes,
-} from '@/state/scoreboard/votesPredefinition';
+  ChannelBudget,
+  computeChannelBudget,
+  generateVotesForTargets,
+  resolveTargetChannels,
+  TargetAdjustment,
+  TargetField,
+} from '@/state/scoreboard/totalsToStageVotes';
+import { ManualShareTotalsRow, StageVotes } from '@/state/scoreboard/types';
+import { buildCombinedBallotsFromJuryTelevote, predefineStageVotes } from '@/state/scoreboard/votesPredefinition';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 type UseVotingPredefinitionArgs = {
@@ -218,6 +222,19 @@ export const useVotingPredefinition = ({
   const [rankOrder, setRankOrder] = useState<string[] | null>(null);
   const [showRankPoints, setShowRankPoints] = useState(false);
 
+  // Totals-view state (type target totals -> generate a best-fit breakdown).
+  // 'ungenerated' -> no breakdown yet; 'fresh' -> breakdown matches the current
+  // inputs (Save allowed); 'stale' -> an input changed since generating.
+  const [totalsStatus, setTotalsStatus] = useState<
+    'ungenerated' | 'fresh' | 'stale'
+  >('ungenerated');
+  const [totalsAdjustments, setTotalsAdjustments] = useState<
+    TargetAdjustment[]
+  >([]);
+  const [totalsAchieved, setTotalsAchieved] = useState<Record<string, number>>(
+    {},
+  );
+
   const [lastStageId, setLastStageId] = useState<string | null>(stage.id);
   const [lastStageVotingMode, setLastStageVotingMode] =
     useState<StageVotingMode | null>(effectiveVotingMode);
@@ -344,12 +361,19 @@ export const useVotingPredefinition = ({
     return generated;
   };
 
+  const resetTotalsGeneration = () => {
+    setTotalsStatus('ungenerated');
+    setTotalsAdjustments([]);
+    setTotalsAchieved({});
+  };
+
   const resetVotes = () => {
     setVotes(null);
     setSelectedType('Total');
     setIsSorting(false);
     setRankOrder(null);
     setShowRankPoints(false);
+    resetTotalsGeneration();
   };
 
   // Called when the modal's stage/voting-mode changes (e.g. advancing to the
@@ -363,6 +387,7 @@ export const useVotingPredefinition = ({
     setIsSorting(!!seed);
     setRankOrder(null);
     setShowRankPoints(false);
+    resetTotalsGeneration();
   };
 
   // Per-country aggregate total across the rank target's channels — the value
@@ -460,6 +485,124 @@ export const useVotingPredefinition = ({
       .map((c: any) => c.code);
 
     setRankOrder(order);
+  };
+
+  // Per target channel (jury/televote for JURY_AND_TELEVOTE, one otherwise), the
+  // budget/feasibility numbers that drive the budget bar — cheap, no generation.
+  const getTotalsChannelBudgets = (): Array<{
+    channel: RankChannel;
+    field: TargetField;
+    budget: ChannelBudget;
+  }> => {
+    const { targetChannels } = resolveTargetChannels(
+      effectiveVotingMode,
+      pointsSystem,
+      effectiveTelevotePointsSystem,
+    );
+
+    return targetChannels.map(({ channel, field, pointsSystem: ps }) => ({
+      channel,
+      field,
+      budget: computeChannelBudget(
+        channel,
+        ps,
+        votingCountries,
+        stage.countries.length,
+      ),
+    }));
+  };
+
+  // Generate a best-fit per-voter breakdown from the typed target totals and
+  // merge it into `votes`. Marks the breakdown "fresh" (Save allowed) and records
+  // the achieved totals + any adjustments (targets the ballot math couldn't hit).
+  const generateFromTotals = (
+    targets: Record<string, ManualShareTotalsRow>,
+  ) => {
+    const {
+      votes: generated,
+      achieved,
+      adjustments,
+    } = generateVotesForTargets({
+      targets,
+      stageCountries: stage.countries,
+      votingCountries,
+      votingMode: effectiveVotingMode,
+      juryPointsSystem: pointsSystem,
+      televotePointsSystem: effectiveTelevotePointsSystem,
+      randomnessLevel,
+      pointsSpread,
+      allowMultiplePointsToSameEntry,
+    });
+
+    setVotes((prev) => {
+      const next: Partial<StageVotes> = prev ? { ...prev } : {};
+
+      Object.keys(generated).forEach((ch) => {
+        (next as any)[ch] = (generated as any)[ch];
+      });
+
+      return next;
+    });
+    setIsSorting(true);
+    setTotalsAchieved(achieved);
+    setTotalsAdjustments(adjustments);
+    setTotalsStatus('fresh');
+
+    // Returned so the caller can report how many targets had to be adjusted.
+    return adjustments;
+  };
+
+  // Called when a target input changes after generating: the breakdown no longer
+  // reflects the inputs, so Save is disabled until the user regenerates.
+  const markTotalsStale = () => {
+    setTotalsStatus((s) => (s === 'fresh' ? 'stale' : s));
+  };
+
+  // Read the current matrix back out as per-channel totals, so entering the
+  // Totals view mirrors whatever Detailed/Rank produced. Returns null when the
+  // target channels are empty — seeding zeros would pin every country to 0.
+  const getTotalsFromVotes = (): Record<
+    string,
+    ManualShareTotalsRow
+  > | null => {
+    const { targetChannels } = resolveTargetChannels(
+      effectiveVotingMode,
+      pointsSystem,
+      effectiveTelevotePointsSystem,
+    );
+    const rows: Record<string, ManualShareTotalsRow> = {};
+    let hasAny = false;
+
+    targetChannels.forEach(({ channel, field }) => {
+      const byVoter = (votes as any)?.[channel];
+
+      if (!byVoter || Object.keys(byVoter).length === 0) return;
+
+      hasAny = true;
+
+      const channelTotals = totalsForChannels(
+        votes || {},
+        [channel],
+        stageCodes,
+      );
+
+      stageCodes.forEach((code) => {
+        rows[code] = {
+          ...(rows[code] || {}),
+          [field]: channelTotals[code] || 0,
+        };
+      });
+    });
+
+    return hasAny ? rows : null;
+  };
+
+  // The totals inputs now mirror the matrix exactly, so the breakdown is in sync
+  // (Save allowed) and there is nothing that was adjusted away from a target.
+  const markTotalsSynced = () => {
+    setTotalsStatus('fresh');
+    setTotalsAdjustments([]);
+    setTotalsAchieved({});
   };
 
   const applyInputValue = (
@@ -923,6 +1066,7 @@ export const useVotingPredefinition = ({
 
         const sumFrom = (channel: 'jury' | 'televote' | 'combined') => {
           let sum = 0;
+
           Object.values(votes[channel] ?? {}).forEach((ballot) => {
             ballot
               .filter((vote) => vote.countryCode === code)
@@ -930,6 +1074,7 @@ export const useVotingPredefinition = ({
                 sum += vote.points;
               });
           });
+
           return sum;
         };
 
@@ -957,6 +1102,7 @@ export const useVotingPredefinition = ({
       }
 
       downloadVoteSpreadsheet({ filename, sections });
+
       return {
         ok: true,
         appliedCells: 0,
@@ -965,13 +1111,7 @@ export const useVotingPredefinition = ({
         unmatched: [],
       };
     },
-    [
-      effectiveVotingMode,
-      rankedCountries,
-      stage.name,
-      votes,
-      votingCountries,
-    ],
+    [effectiveVotingMode, rankedCountries, stage.name, votes, votingCountries],
   );
 
   useEffect(() => {
@@ -1027,6 +1167,16 @@ export const useVotingPredefinition = ({
     randomizeRankOrder,
     generateRankVotes,
     seedRankOrder,
+    // totals view
+    totalsStatus,
+    totalsAdjustments,
+    totalsAchieved,
+    getTotalsChannelBudgets,
+    generateFromTotals,
+    markTotalsStale,
+    resetTotalsGeneration,
+    getTotalsFromVotes,
+    markTotalsSynced,
     // validation
     validateAllBeforeSave,
     importVotesFromSpreadsheet,

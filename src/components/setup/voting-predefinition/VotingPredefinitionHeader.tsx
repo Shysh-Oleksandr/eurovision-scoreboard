@@ -1,175 +1,98 @@
-import { useTranslations } from 'next-intl';
-import React from 'react';
+'use client';
 
-import VotingPresetToolbar from './VotingPresetToolbar';
+import React, { useRef } from 'react';
 
-import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
-import { RestartIcon } from '@/assets/icons/RestartIcon';
-import SortAZIcon from '@/assets/icons/SortAZIcon';
-import Badge from '@/components/common/Badge';
-import Button from '@/components/common/Button';
-import { RankModeToggle } from '@/components/common/rank/RankModeToggle';
-import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
-import { StageVotingType } from '@/models';
+import { cn } from '@/helpers/utils';
+import { useReadableForegroundFromCssVar } from '@/theme/useReadableForegroundFromCssVar';
 
-export type DetailedViewMode = 'numbers' | 'rank';
+export type PredefinitionMode = 'detailed' | 'rank' | 'totals';
+
+type ModeTab = { value: PredefinitionMode; label: string };
 
 type Props = {
-  stageName: string;
-  totalBadgeLabel: string;
-  pointsSystem: Array<{ id: number; value: number }>;
-  selectedType: 'Total' | StageVotingType;
-  setSelectedType: (t: 'Total' | StageVotingType) => void;
-  voteTypeOptions: StageVotingType[];
-  isSorting: boolean;
-  setIsSorting: (v: boolean) => void;
-  onReset: () => void;
-  onRandomize: () => void;
-  onSavePreset: () => void;
-  onLoadPreset: () => void;
-  viewMode?: DetailedViewMode;
-  onViewModeChange?: (mode: DetailedViewMode) => void;
-  spreadsheetButtons?: React.ReactNode;
+  modeTabs: ModeTab[];
+  activeMode: PredefinitionMode;
+  onModeChange: (mode: PredefinitionMode) => void;
+  /** Per-tab controls, rendered between the tab group and Share. */
+  contextualControls?: React.ReactNode;
+  shareMenu: React.ReactNode;
+  overflowMenu: React.ReactNode;
+  kicker: string;
+  title: string;
+  /** Inline pill after the title (the points-system help on Detailed). */
+  titleAdornment?: React.ReactNode;
 };
 
+/**
+ * The modal's fixed shell header: a wrapping command bar (mode tabs, per-tab
+ * controls, Share, overflow) above a hero row naming the stage being authored.
+ */
 export const VotingPredefinitionHeader: React.FC<Props> = ({
-  stageName,
-  totalBadgeLabel,
-  pointsSystem,
-  selectedType,
-  setSelectedType,
-  voteTypeOptions,
-  isSorting,
-  setIsSorting,
-  onReset,
-  onRandomize,
-  onSavePreset,
-  onLoadPreset,
-  viewMode = 'numbers',
-  onViewModeChange,
-  spreadsheetButtons,
+  modeTabs,
+  activeMode,
+  onModeChange,
+  contextualControls,
+  shareMenu,
+  overflowMenu,
+  kicker,
+  title,
+  titleAdornment,
 }) => {
-  const t = useTranslations();
-  const isRank = viewMode === 'rank';
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const activeTabColor = useReadableForegroundFromCssVar(
+    tabsRef,
+    '--twc-primary-700',
+  );
 
   return (
-    <>
-      {onViewModeChange && (
-        <div className="relative border-b border-white/10 mb-2 px-2">
-          <RankModeToggle
-            tabs={(['numbers', 'rank'] as DetailedViewMode[]).map((mode) => ({
-              value: mode,
-              label: t(
-                mode === 'numbers'
-                  ? 'setup.votingPredefinition.detailedView'
-                  : 'setup.votingPredefinition.rankView',
-              ),
-            }))}
-            activeTab={viewMode}
-            onChange={onViewModeChange}
-          />
+    <div className="flex-none px-4 pt-4 sm:px-5">
+      <div className="flex flex-wrap items-center gap-[9px]">
+        <div
+          ref={tabsRef}
+          role="tablist"
+          aria-label={kicker}
+          className="flex flex-wrap mr-auto flex-none gap-0.5 rounded-xl border border-white/10 bg-black/[0.26] p-1"
+        >
+          {modeTabs.map((tab) => {
+            const isActive = tab.value === activeMode;
+
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => onModeChange(tab.value)}
+                className={cn(
+                  'whitespace-nowrap rounded-[7px] px-[15px] py-[7px]',
+                  'text-[13.5px] font-bold tracking-[-0.01em] transition-colors duration-200',
+                  isActive
+                    ? 'bg-gradient-to-b from-primary-700 to-primary-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]'
+                    : 'text-white/55 hover:text-white/75',
+                )}
+                style={isActive ? { color: activeTabColor } : undefined}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
-      )}
-      <div className="sm:mb-1 gap-1 px-2">
-        <div className="flex items-center justify-between md:gap-4 gap-2 flex-wrap">
-          <div className="md:w-auto w-full">
-            <div className="flex gap-4 flex-wrap items-center sm:justify-start justify-between">
-              <h3 className="text-lg font-bold">{stageName}</h3>
 
-              <div className="flex flex-wrap sm:gap-2 gap-1.5 items-center justify-end">
-                <Badge
-                  label={totalBadgeLabel}
-                  onClick={() => setSelectedType('Total')}
-                  isActive={selectedType === 'Total'}
-                />
-                {voteTypeOptions.map((type) => (
-                  <Badge
-                    key={type}
-                    label={
-                      type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()
-                    }
-                    onClick={() => setSelectedType(type)}
-                    isActive={selectedType === type}
-                  />
-                ))}
-              </div>
-            </div>
-            <p className="text-sm text-white/60 mt-1">
-              {t(
-                'setup.eventSetupModal.enterThePointsEachVotingCountryAwardsToParticipants',
-              )}{' '}
-              (
-              {pointsSystem.every(
-                (p, index) =>
-                  PREDEFINED_SYSTEMS_MAP['default']?.[index]?.value ===
-                  p?.value,
-              )
-                ? '1-8, 10, 12'
-                : pointsSystem.map((p) => p.value).join(', ')}
-              )
-            </p>
-          </div>
-
-          <div className="flex items-start flex-wrap justify-between w-full md:w-auto gap-2 md:mb-0 mb-2">
-            <VotingPresetToolbar
-              onSavePreset={onSavePreset}
-              onLoadPreset={onLoadPreset}
-              endContent={spreadsheetButtons}
-              wrapperClassName="md:hidden w-full"
-            />
-
-            <div className="flex gap-2 ml-auto">
-              {!isRank && (
-                <Button
-                  onClick={() => setIsSorting(!isSorting)}
-                  className="!p-3"
-                  aria-label={
-                    isSorting
-                      ? t('common.sortByName')
-                      : t('common.sortByPoints')
-                  }
-                  title={
-                    isSorting
-                      ? t('common.sortByName')
-                      : t('common.sortByPoints')
-                  }
-                  Icon={
-                    isSorting ? (
-                      <SortAZIcon className="w-5 h-5" />
-                    ) : (
-                      <ArrowDown10 className="w-5 h-5" />
-                    )
-                  }
-                />
-              )}
-              <Button
-                variant="primary"
-                onClick={onReset}
-                className="!p-3"
-                aria-label={t('common.restart')}
-                title={t('common.restart')}
-                Icon={<RestartIcon className="w-5 h-5" />}
-              />
-              {!isRank && (
-                <Button
-                  variant="primary"
-                  onClick={onRandomize}
-                  className="!px-4"
-                >
-                  {t('common.randomize')}
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+        {contextualControls}
+        {shareMenu}
+        {overflowMenu}
       </div>
-      <VotingPresetToolbar
-        onSavePreset={onSavePreset}
-        onLoadPreset={onLoadPreset}
-        endContent={spreadsheetButtons}
-        wrapperClassName="md:flex hidden pb-2 px-2"
-      />
-    </>
+
+      <div className="mb-3 mt-3.5 flex flex-wrap items-baseline gap-3">
+        <span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/40">
+          {kicker}
+        </span>
+        <h1 className="text-[21px] font-extrabold tracking-[-0.025em] sm:text-[25px]">
+          {title}
+        </h1>
+        {titleAdornment}
+      </div>
+    </div>
   );
 };
 

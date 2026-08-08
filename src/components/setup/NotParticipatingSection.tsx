@@ -347,7 +347,7 @@ const NotParticipatingSection = ({
                         })
                       }
                       onEditGroup={
-                        section.id
+                        section.id && section.id !== UNGROUPED_KEY
                           ? () => {
                               setGroupToEdit({
                                 _id: section.id!,

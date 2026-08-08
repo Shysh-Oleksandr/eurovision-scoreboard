@@ -10,7 +10,7 @@ export type RichTextComponents = {
 
 export const RICH_TEXT_COMPONENTS: RichTextComponents = {
   list: (chunks: ReactNode) => (
-    <ul className="list-disc list-inside space-y-1 text-white/80">{chunks}</ul>
+    <ul className="list-disc list-inside space-y-1 text-white/90">{chunks}</ul>
   ),
   item: (chunks: ReactNode) => <li>{chunks}</li>,
   strong: (chunks: ReactNode) => (
@@ -21,7 +21,7 @@ export const RICH_TEXT_COMPONENTS: RichTextComponents = {
 export const GUIDE_RICH_TEXT_COMPONENTS: RichTextComponents = {
   ...RICH_TEXT_COMPONENTS,
   list: (chunks: ReactNode) => (
-    <ul className="list-disc list-inside mt-2 space-y-1.5 text-white/80">
+    <ul className="list-disc list-inside mt-2 space-y-1.5 text-white/90">
       {chunks}
     </ul>
   ),

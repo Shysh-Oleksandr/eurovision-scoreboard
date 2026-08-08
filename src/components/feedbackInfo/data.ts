@@ -409,6 +409,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-08-08',
+    title:
+      '<list><item>Predefine voting by only entering the total points</item><item>Redesigned the voting predefinition modal</item><item>Ability to upload a contest banner image</item><item>View contest leaderboard stats of other users</item><item>Small improvements</item></list>',
+  },
+  {
     date: '2026-07-15',
     title:
       'Added the Excel file import/export functionality for the predefined voting',

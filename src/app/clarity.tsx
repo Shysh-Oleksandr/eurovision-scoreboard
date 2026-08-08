@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import Clarity from '@microsoft/clarity';
+// import Clarity from '@microsoft/clarity';
 
 export const ClarityAnalytics = () => {
   const projectId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
@@ -14,7 +14,8 @@ export const ClarityAnalytics = () => {
       return;
     }
 
-    Clarity.init(projectId);
+    // Stop clarity for now as we already have many recordings
+    // Clarity.init(projectId);
   }, [projectId, isDev]);
 
   return <></>;

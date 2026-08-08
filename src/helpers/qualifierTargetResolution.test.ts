@@ -3,10 +3,12 @@ import { describe, expect, it } from 'vitest';
 import {
   getQualifierTargetStageId,
   getTotalQualifiersAmount,
+  qualifiesOnlyToGrandFinal,
   resolveTargetStageIdForRank,
+  shouldShowQualifierTargetLabels,
 } from './qualifierTargetResolution';
 
-import { QualifierTarget } from '@/models';
+import { EventStage, QualifierTarget, StageVotingMode } from '@/models';
 
 describe('qualifierTargetResolution', () => {
   const amountBasedTargets: QualifierTarget[] = [
@@ -67,6 +69,75 @@ describe('qualifierTargetResolution', () => {
 
     it('sums rank-based target ranges', () => {
       expect(getTotalQualifiersAmount(rankBasedTargets)).toBe(15);
+    });
+  });
+
+  describe('qualifiesOnlyToGrandFinal', () => {
+    const eventStages: EventStage[] = [
+      {
+        id: 'sf1',
+        name: 'Semi-Final 1',
+        order: 0,
+        votingMode: StageVotingMode.TELEVOTE_ONLY,
+        countries: [],
+        isOver: false,
+        isJuryVoting: false,
+      },
+      {
+        id: 'gf',
+        name: 'Grand Final',
+        order: 1,
+        votingMode: StageVotingMode.JURY_AND_TELEVOTE,
+        countries: [],
+        isOver: false,
+        isJuryVoting: false,
+        isLastStage: true,
+      },
+    ];
+
+    it('returns true when the only target is the Grand Final', () => {
+      expect(
+        qualifiesOnlyToGrandFinal(
+          [{ targetStageId: 'gf', amount: 10 }],
+          eventStages,
+        ),
+      ).toBe(true);
+    });
+
+    it('returns false when qualifiers also advance to another stage', () => {
+      const stagesWithSf2: EventStage[] = [
+        ...eventStages.slice(0, 1),
+        {
+          id: 'sf2',
+          name: 'Semi-Final 2',
+          order: 1,
+          votingMode: StageVotingMode.TELEVOTE_ONLY,
+          countries: [],
+          isOver: false,
+          isJuryVoting: false,
+        },
+        { ...eventStages[1], order: 2 },
+      ];
+
+      expect(
+        qualifiesOnlyToGrandFinal(
+          [
+            { targetStageId: 'gf', amount: 5 },
+            { targetStageId: 'sf2', amount: 5 },
+          ],
+          stagesWithSf2,
+        ),
+      ).toBe(false);
+    });
+
+    it('hides labels when enabled but all qualifiers go to the Grand Final', () => {
+      expect(
+        shouldShowQualifierTargetLabels(
+          [{ targetStageId: 'gf', amount: 10 }],
+          eventStages,
+          true,
+        ),
+      ).toBe(false);
     });
   });
 });

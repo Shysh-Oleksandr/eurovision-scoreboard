@@ -257,12 +257,6 @@ export interface GeneralState {
   settingsPointsSystem: PointsItem[]; // jury system used locally in settings
   televotePointsSystem: PointsItem[]; // televote system used during simulation (only when splitPointsSystem=true)
   settingsTelevotePointsSystem: PointsItem[]; // televote system used locally in settings (only when splitPointsSystem=true)
-  generalSettingsExpansion: {
-    contest: boolean;
-    voting: boolean;
-    uiPreferences: boolean;
-    confirmations: boolean;
-  };
   setLastSeenUpdate: (update: string) => void;
   setShouldShowNewChangesIndicator: (show: boolean) => void;
   checkForNewUpdates: () => void;
@@ -294,9 +288,6 @@ export interface GeneralState {
   setSettingsPointsSystem: (points: PointsItem[]) => void;
   setTelevotePointsSystem: (points: PointsItem[]) => void;
   setSettingsTelevotePointsSystem: (points: PointsItem[]) => void;
-  setGeneralSettingsExpansion: (
-    expansion: Partial<GeneralState['generalSettingsExpansion']>,
-  ) => void;
   getHostingCountry: () => BaseCountry;
   resetAllSettings: () => void;
   setPresentationSettings: (settings: Partial<PresentationSettings>) => void;
@@ -370,12 +361,6 @@ export const useGeneralStore = create<GeneralState>()(
         settingsPointsSystem: initialPointsSystem,
         televotePointsSystem: initialPointsSystem,
         settingsTelevotePointsSystem: initialPointsSystem,
-        generalSettingsExpansion: {
-          contest: true,
-          voting: true,
-          uiPreferences: true,
-          confirmations: true,
-        },
         settings: DEFAULT_SETTINGS,
         presentationSettings: DEFAULT_PRESENTATION_SETTINGS,
         imageCustomization: DEFAULT_IMAGE_CUSTOMIZATION,
@@ -732,14 +717,6 @@ export const useGeneralStore = create<GeneralState>()(
         setSettingsTelevotePointsSystem: (points: PointsItem[]) => {
           set({ settingsTelevotePointsSystem: points });
         },
-        setGeneralSettingsExpansion: (expansion) => {
-          set((state) => ({
-            generalSettingsExpansion: {
-              ...state.generalSettingsExpansion,
-              ...expansion,
-            },
-          }));
-        },
         getHostingCountry: () => {
           const countries = useCountriesStore.getState().getAllCountries();
 
@@ -825,7 +802,6 @@ export const useGeneralStore = create<GeneralState>()(
             settingsPointsSystem: state.settingsPointsSystem,
             televotePointsSystem: state.televotePointsSystem,
             settingsTelevotePointsSystem: state.settingsTelevotePointsSystem,
-            generalSettingsExpansion: state.generalSettingsExpansion,
             presentationSettings: restPresentationSettings,
           };
         },

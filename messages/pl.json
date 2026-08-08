@@ -70,7 +70,9 @@
     "loadYearData": "Załaduj dane roku",
     "country": "Kraj",
     "current": "Bieżący",
-    "dontShowAgain": "Nie pokazuj ponownie"
+    "dontShowAgain": "Nie pokazuj ponownie",
+    "more": "Więcej",
+    "share": "Udostępnij"
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",
@@ -131,7 +133,9 @@
       "enablePredefinedVotesForStage": "Włącz predefiniowane głosowanie dla tej fazy",
       "odds": "Szanse",
       "oddsOverrideNote": "Te szanse dotyczą tylko tej fazy. Trwałe globalne szanse konkursu ustawia się w Ustawieniach.",
-      "resetToGlobalOdds": "Przywróć globalne"
+      "resetToGlobalOdds": "Przywróć globalne",
+      "confirmCloseTitle": "Zamknąć konfigurację etapu?",
+      "confirmCloseDescription": "Niezapisane zmiany zostaną utracone."
     },
     "validation": {
       "noCountriesInStage": "Brak krajów w {stageName}.",
@@ -181,7 +185,7 @@
       "rankView": "Ranking",
       "randomizePoints": "Losuj punkty",
       "randomizeRanking": "Losuj ranking",
-      "dragToRankHint": "Przeciągaj kraje, aby ustalić końcową kolejność. Kliknij „Losuj punkty”, aby wygenerować głosy — ranking pozostaje bez zmian.",
+      "dragToRankHint": "Przeciągnij kraje, aby ustawić kolejność końcową, a następnie wygeneruj pasujący rozkład punktów.",
       "tabTotals": "Sumy (tylko udostępnianie)",
       "totalsHint": "Sumy są tylko do udostępniania wyników. Użyj szczegółowej karty i zapisz, aby uruchomić symulację.",
       "confirmCloseTitle": "Zamknąć predefinicję głosowania?",
@@ -235,7 +239,64 @@
         "dropToImport": "Drop a spreadsheet file to import votes.",
         "invalidDropFile": "Please drop an Excel (.xlsx, .xls) or CSV file.",
         "tooltipDragDrop": "You can also drag and drop a spreadsheet onto the Detailed tab to import."
-      }
+      },
+      "totalsView": "Sumy",
+      "generateBreakdown": "Wygeneruj rozkład",
+      "regenerateBreakdown": "Wygeneruj ponownie",
+      "totalsIntro": "Wpisz docelową sumę dla każdego kraju — zostaw pole <b>puste</b>, aby silnik zdecydował za Ciebie (puste to nie zero). Nie każdy zestaw sum da się podzielić na prawidłowe głosowania: każdy głosujący kraj rozdaje stały zestaw punktów i musi użyć każdej wartości dokładnie raz, więc generujemy <b>najbliższy możliwy</b> rozkład i oznaczamy wszystko, co trzeba było dopasować.",
+      "totalsUngeneratedHint": "Wpisz docelowe sumy i naciśnij „Wygeneruj rozkład”, aby włączyć zapisywanie.",
+      "totalsStaleHint": "Zmieniono sumę. Wygeneruj rozkład ponownie, aby uwzględnić zmiany przed zapisaniem.",
+      "totalsAdjustedTitle": "Niektóre sumy zostały skorygowane",
+      "totalsAdjustedExplainer": "Nie każdą kombinację sum można rozłożyć na prawidłowy rozkład głos po głosie — każdy głosujący kraj przyznaje stały zestaw punktów i musi użyć wszystkich, po jednym razie. Wygenerowaliśmy najbliższy możliwy rozkład; skorygowane kraje są oznaczone poniżej.",
+      "adjustmentBadge": "Skorygowano",
+      "adjustmentTooltip": "Skorygowano: wpisano {requested}, najbliższa możliwa wartość to {achieved}",
+      "budgetTitleJury": "Budżet jury",
+      "budgetTitleTelevote": "Budżet televote",
+      "budgetTitleCombined": "Budżet łączny",
+      "budgetUsed": "{used} / {total}",
+      "budgetFillCount": "Wypełniono {filled} z {count} krajów — reszta jest generowana automatycznie.",
+      "budgetOverSingle": "{country}: {value} przekracza maksimum {max} dla jednego kraju ({voters} × {top}). Wartość zostanie ograniczona przy generowaniu.",
+      "budgetOverBudget": "Sumy przekraczają budżet {total} punktów — część zostanie zmniejszona przy generowaniu.",
+      "shareBreakdown": "Tabela rozkładu",
+      "resetField": "Wyczyść tę sumę",
+      "totalsInSyncHint": "Rozkład już odpowiada tym sumom. Zmień sumę, aby wygenerować go ponownie.",
+      "kicker": "Predefiniuj głosy",
+      "saveVotes": "Zapisz głosy",
+      "participantColumn": "Uczestnik",
+      "pointsSummary": "Punkty: {points}",
+      "detailedHelp": "Wprowadź punkty, które każdy głosujący kraj przyznaje rywalom: <b>{points}</b> — każda wartość użyta raz w kolumnie. Kraj nie może głosować na siebie (zacieniona przekątna). Kropka w nagłówku kolumny pokazuje, czy dane głosowanie jest <b>kompletne</b>, <b>niekompletne</b> czy <b>nieprawidłowe</b>.",
+      "channelSwitchLabel": "Kanał punktów",
+      "validityComplete": "kompletne",
+      "validityIncomplete": "niekompletne",
+      "validityInvalid": "nieprawidłowe",
+      "layoutGrid": "Widok siatki",
+      "layoutList": "Widok listy",
+      "totalsHelpLabel": "Jak działają sumy",
+      "dismissHelp": "Zamknij",
+      "shareWhat": "Co udostępnić?",
+      "shareSourceMatrix": "z tej macierzy",
+      "shareSourceTotals": "z wpisanych sum",
+      "shareScoreboardSub": "podium",
+      "shareSplitSub": "jury / televote",
+      "shareSummarySub": "sumy",
+      "shareBreakdownSub": "głosujący × uczestnik",
+      "shareBreakdownEmpty": "brak głosów",
+      "presetsLabel": "Ustawienia zapisane",
+      "spreadsheetLabel": "Arkusz kalkulacyjny",
+      "resetMatrixTitle": "Zresetuj macierz",
+      "resetMatrixDescription": "Wszystkie predefiniowane głosy zostaną usunięte. Tej operacji nie można cofnąć.",
+      "resetTotalsTitle": "Zresetuj sumy",
+      "resetTotalsDescription": "Wszystkie wpisane sumy zostaną wyczyszczone, a wygenerowany rozkład odrzucony. Tej operacji nie można cofnąć.",
+      "saveBlockedTooltip": "Niektóre kraje nie przyznają jeszcze pełnego zestawu punktów.",
+      "saveBlockedCallout": "Nie można jeszcze zapisać — te kraje nie przyznają pełnego zestawu punktów: <b>{voters}</b>. Popraw oznaczone kolumny (bursztynowe / czerwone kropki) i spróbuj ponownie.",
+      "toastVotesSaved": "Głosy zapisane",
+      "toastVotesRandomized": "Głosy wylosowane",
+      "toastMatrixCleared": "Macierz wyczyszczona",
+      "toastTotalsCleared": "Sumy wyczyszczone",
+      "toastRankingRandomized": "Ranking wylosowany",
+      "toastRankPointsGenerated": "Punkty wygenerowane dla tego rankingu",
+      "toastBreakdownGenerated": "Rozkład wygenerowany",
+      "toastBreakdownGeneratedAdjusted": "Rozkład wygenerowany · dopasowano {count}"
     },
     "customCountryModal": {
       "pleaseSignInToCreateCustomEntries": "Zaloguj się, aby tworzyć własne wpisy.",
@@ -431,7 +492,16 @@
     "foundNItems": "Znaleziono {count} {count, plural, =1 {element} other {elementów}}",
     "userProfile": {
       "noContentFound": "Brak treści pasujących do wyszukiwania.",
-      "noFollowingContent": "Brak treści od osób, które obserwujesz. Obserwuj osoby, aby zobaczyć ich motywy i konkursy tutaj."
+      "noFollowingContent": "Brak treści od osób, które obserwujesz. Obserwuj osoby, aby zobaczyć ich motywy i konkursy tutaj.",
+      "entryLeaderboard": {
+        "buttonTitle": "Ranking uczestników",
+        "title": "Ranking uczestników użytkownika {name}",
+        "subtitle": "Kliknij wiersz, aby zobaczyć szczegółowe wyniki z publicznych ukończonych konkursów tego użytkownika.",
+        "noData": "Brak publicznych ukończonych konkursów.",
+        "searchPlaceholder": "Szukaj krajów...",
+        "noEntriesMatch": "Żaden wpis nie pasuje do wyszukiwania.",
+        "customEntryName": "Własny wpis"
+      }
     },
     "searchUsers": {
       "title": "Znajdź użytkowników",
@@ -892,7 +962,7 @@
       },
       "predefinedVoting": {
         "title": "Głosowanie predefiniowane i presety",
-        "content": "Włącz « Włącz predefiniowane głosowanie » w « Ustawienia → Głosowanie », aby wypełnić głosy każdego kraju przed rozpoczęciem symulacji. Pełna macierz głosowania pozwala przypisać konkretne punkty od każdego głosującego do każdego uczestnika. Zapisz konfigurację lokalnie jako nazwany preset, aby wczytać ją w dowolnym momencie — idealne do odtwarzania oficjalnych wyników Eurovision lub udostępniania konkretnego scenariusza."
+        "content": "Włącz « Włącz predefiniowane głosowanie » w « Ustawienia → Głosowanie », aby ustawić głosy każdego kraju przed rozpoczęciem symulacji. Trzy tryby — Szczegółowy, Ranking i Sumy — zapisują do tej samej macierzy: edytuj pełną siatkę głosujący×uczestnik, przeciągnij uczestników do docelowej kolejności i wygeneruj pasujący podział punktów, lub wpisz docelowe sumy per kraj i wygeneruj najbliższy możliwy podział. Przełączaj tryby w dowolnym momencie bez utraty danych. Zapisuj presety szczegółowe lub sum lokalnie albo importuj/eksportuj arkusze w trybie Szczegółowym — idealne do odtwarzania oficjalnych wyników Eurovision lub udostępniania konkretnego scenariusza."
       },
       "oddsRandomness": {
         "title": "Szanse i losowość",

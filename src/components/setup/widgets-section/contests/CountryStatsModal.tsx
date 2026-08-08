@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 
 import { api } from '@/api/client';
-import { useContestGroupsQuery, useMyEntryStatsQuery } from '@/api/contests';
+import { useContestGroupsQuery, useMyEntryStatsQuery, useUserEntryStatsQuery } from '@/api/contests';
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
@@ -25,6 +25,8 @@ interface CountryStatsModalProps {
   onContestLoaded?: () => void;
   entryCode: string | null;
   initialGroupId?: string | null;
+  /** When set, shows public completed contests for that user instead of the current user's. */
+  userId?: string;
 }
 
 const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
@@ -33,13 +35,15 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   onContestLoaded,
   entryCode,
   initialGroupId = null,
+  userId,
 }) => {
+  const isUserScope = !!userId;
   const t = useTranslations('widgets.contests.entryStats');
   const tContests = useTranslations('widgets.contests');
   const tGroups = useTranslations('widgets.contests.groups');
 
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(
-    initialGroupId,
+    isUserScope ? null : initialGroupId,
   );
 
   const setContestToLoad = useGeneralStore((s) => s.setContestToLoad);
@@ -48,16 +52,24 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   );
   const getAllCountries = useCountriesStore((s) => s.getAllCountries);
 
-  const { data: contestGroups = [] } = useContestGroupsQuery(isOpen);
-  const { data, isLoading, isError, error } = useMyEntryStatsQuery(entryCode, {
-    enabled: isOpen && !!entryCode,
+  const { data: contestGroups = [] } = useContestGroupsQuery(
+    isOpen && !isUserScope,
+  );
+  const myEntryStatsQuery = useMyEntryStatsQuery(entryCode, {
+    enabled: isOpen && !!entryCode && !isUserScope,
     groupId: selectedGroupId,
   });
+  const userEntryStatsQuery = useUserEntryStatsQuery(userId ?? null, entryCode, {
+    enabled: isOpen && !!entryCode && isUserScope,
+  });
+  const { data, isLoading, isError, error } = isUserScope
+    ? userEntryStatsQuery
+    : myEntryStatsQuery;
 
   useEffect(() => {
     if (!isOpen) return;
-    setSelectedGroupId(initialGroupId);
-  }, [isOpen, entryCode, initialGroupId]);
+    setSelectedGroupId(isUserScope ? null : initialGroupId);
+  }, [isOpen, entryCode, initialGroupId, isUserScope]);
 
   useEffect(() => {
     if (
@@ -192,7 +204,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
           </div>
         </div>
 
-        {contestGroups.length > 0 && (
+        {!isUserScope && contestGroups.length > 0 && (
           <WidgetResourceGroupBadges
             groups={contestGroups}
             selectedGroupId={selectedGroupId}

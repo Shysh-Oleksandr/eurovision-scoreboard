@@ -1,13 +1,19 @@
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+
+import Image from 'next/image';
 
 import {
   useApplyContestMutation,
+  useClearContestLogoMutation,
   useContestGroupsQuery,
   useCreateContestMutation,
   useUpdateContestMutation,
+  useUploadContestLogoMutation,
 } from '@/api/contests';
+import { UploadIcon } from '@/assets/icons/UploadIcon';
+import Button from '@/components/common/Button';
 import { Checkbox } from '@/components/common/Checkbox';
 import { CollapsibleSection } from '@/components/common/CollapsibleSection';
 import CustomSelect from '@/components/common/customSelect/CustomSelect';
@@ -23,6 +29,7 @@ import {
 } from '@/helpers/contestSnapshot';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -66,11 +73,21 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const [overwriteContestSetupAndResults, setOverwriteContestSetupAndResults] =
     useState(true);
   const [contestGroupId, setContestGroupId] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [logoCleared, setLogoCleared] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageUpload = useImageUpload({ maxSizeInMB: 1.5 });
 
   const { mutateAsync: createContest, isPending: isCreating } =
     useCreateContestMutation();
   const { mutateAsync: updateContest, isPending: isUpdating } =
     useUpdateContestMutation();
+  const { mutateAsync: uploadContestLogo, isPending: isUploadingLogo } =
+    useUploadContestLogoMutation();
+  const { mutateAsync: clearContestLogo, isPending: isClearingLogo } =
+    useClearContestLogoMutation();
   const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
   const user = useAuthStore((s) => s.user);
 
@@ -115,6 +132,10 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
       );
       setOverwriteContestSetupAndResults(isEditingActiveContest);
       setContestGroupId(initialContest.groupId || '');
+      setLogoUrl(initialContest.logoUrl ?? '');
+      setUploadedFile(null);
+      setLogoCleared(false);
+      imageUpload.clear();
     } else {
       setName(settings.contestName);
       setYear(Number(settings.contestYear));
@@ -126,6 +147,10 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
       setHosts('');
       setIsPublic(true);
       setContestGroupId('');
+      setLogoUrl('');
+      setUploadedFile(null);
+      setLogoCleared(false);
+      imageUpload.clear();
     }
   }, [
     initialContest,
@@ -201,6 +226,15 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
         toast.success(t('widgets.contests.contestCreatedSuccessfully'));
       }
 
+      if (uploadedFile) {
+        contest = await uploadContestLogo({
+          id: contest._id,
+          file: uploadedFile,
+        });
+      } else if (logoCleared && initialContest?.logoUrl) {
+        contest = await clearContestLogo(contest._id);
+      }
+
       if (!isEditMode || activeContest?._id === contest._id) {
         // Set as active contest (immediate)
         useGeneralStore.getState().setActiveContest(contest);
@@ -224,7 +258,62 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
     }
   };
 
-  const isSaving = isCreating || isUpdating;
+  const isSaving =
+    isCreating || isUpdating || isUploadingLogo || isClearingLogo;
+  const displayLogo = uploadedFile
+    ? imageUpload.base64
+    : logoCleared
+    ? null
+    : logoUrl || null;
+
+  const handleFileChange = async (file: File | null) => {
+    if (!file) return;
+
+    const { isValid, error } = await imageUpload.validateAndSetFile(file);
+
+    if (isValid) {
+      setUploadedFile(file);
+      setLogoCleared(false);
+    } else if (error) {
+      toast.error(error);
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragIn = (e: React.DragEvent) => {
+    handleDrag(e);
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragOver(true);
+    }
+  };
+
+  const handleDragOut = (e: React.DragEvent) => {
+    handleDrag(e);
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    handleDrag(e);
+    setIsDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileChange(e.dataTransfer.files[0]);
+      e.dataTransfer.clearData();
+    }
+  };
+
+  const handleClearLogo = () => {
+    setUploadedFile(null);
+    imageUpload.clear();
+    setLogoUrl('');
+    setLogoCleared(true);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   return (
     <Modal
@@ -374,6 +463,64 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
             placeholder="e.g. Petra Mede and Hannah Waddingham"
             className="w-full"
           />
+          <div>
+            <label className="font-medium text-white">
+              {t('widgets.contests.logoBanner')}
+            </label>
+            <p className="text-white/60 text-xs mt-0.5 mb-2">
+              {t('widgets.contests.logoBannerHint')}
+            </p>
+            <div
+              onDragEnter={handleDragIn}
+              onDragLeave={handleDragOut}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-[10px] p-3 cursor-pointer transition-colors ${
+                isDragOver
+                  ? 'border-white bg-primary-700/50'
+                  : 'border-white/40'
+              }`}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+                className="hidden"
+              />
+              <UploadIcon className="w-8 h-8 text-white pointer-events-none" />
+              <p className="text-white text-xs pointer-events-none text-center">
+                {t('common.dragAndDropOrClickToUpload')}
+              </p>
+              <Button
+                variant="tertiary"
+                className="w-fit pointer-events-auto text-sm !py-1.5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+              >
+                {t('common.browse')}
+              </Button>
+            </div>
+            {displayLogo && (
+              <div className="flex items-center gap-2 mt-2">
+                <Image
+                  src={displayLogo}
+                  alt={t('widgets.contests.logoBanner')}
+                  className="rounded object-cover"
+                  width={184}
+                  height={80}
+                  style={{ width: 184, height: 80 }}
+                  unoptimized
+                />
+                <Button variant="secondary" onClick={handleClearLogo}>
+                  {t('common.clear')}
+                </Button>
+              </div>
+            )}
+          </div>
         </CollapsibleSection>
       </div>
     </Modal>

@@ -135,6 +135,10 @@ export const queryKeys = {
         endDate?: string;
       },
     ) => ['public', 'user-content', userId, filters] as const,
+    userLeaderboard: (userId: string) =>
+      ['public', 'user-leaderboard', userId] as const,
+    userEntryStats: (userId: string, entryCode: string) =>
+      ['public', 'user-entry-stats', userId, entryCode] as const,
   },
 
   // Errors queries (admin only)

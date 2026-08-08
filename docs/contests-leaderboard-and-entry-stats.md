@@ -1,5 +1,7 @@
 # Contests: global leaderboard & per-user entry stats
 
+> **Storage (2026):** Leaderboard and entry-stats no longer read heavy fields from `contestsnapshots` after migration — they use denormalized `participantCodes` / `gfResults` / `customEntries` on `contests`. See [contest-snapshot-compression-and-stats-denormalization.md](./contest-snapshot-compression-and-stats-denormalization.md). Metric definitions below are unchanged.
+
 This document describes how **platform-wide country leaderboard** and **per-user entry statistics** are computed, stored, and surfaced in the UI. Use it when refactoring, extending metrics, or aligning new features with the same rules.
 
 ---

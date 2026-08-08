@@ -18,6 +18,7 @@ import StageOddsTab from './StageOddsTab';
 
 import { PlayIcon } from '@/assets/icons/PlayIcon';
 import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
+import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useHotKey } from '@/hooks/useHotKey';
 import { EventStage, StageOverrides, StageVotingMode } from '@/models';
@@ -49,6 +50,12 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   onSave,
 }) => {
   const t = useTranslations('setup.eventStageModal');
+  const { onClickOutside } = useConfirmModalClose({
+    onClose,
+    confirmKey: 'close-post-setup',
+    title: t('confirmCloseTitle'),
+    description: t('confirmCloseDescription'),
+  });
   const [activeTab, setActiveTab] = useState(PostSetupModalTab.RUNNING_ORDER);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
@@ -292,7 +299,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={onClickOutside}
       onClosed={onClose}
       overlayClassName="!z-[1002]"
       containerClassName="!w-[min(100%,800px)]"

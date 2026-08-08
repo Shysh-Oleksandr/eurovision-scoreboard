@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 
-import { useContestGroupsQuery, useMyLeaderboardQuery } from '@/api/contests';
+import { useContestGroupsQuery, useMyLeaderboardQuery, useUserLeaderboardQuery } from '@/api/contests';
 import { Checkbox } from '@/components/common/Checkbox';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
@@ -48,14 +48,25 @@ interface MyLeaderboardModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectEntry: (entryCode: string, groupId: string | null) => void;
+  /** When set, shows public completed contests for that user instead of the current user's. */
+  userId?: string;
+  /** Display name for user-specific title (when `userId` is set). */
+  userName?: string;
 }
 
 export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
   isOpen,
   onClose,
   onSelectEntry,
+  userId,
+  userName,
 }) => {
-  const t = useTranslations('widgets.contests.myLeaderboard');
+  const isUserScope = !!userId;
+  const t = useTranslations(
+    isUserScope
+      ? 'widgets.userProfile.entryLeaderboard'
+      : 'widgets.contests.myLeaderboard',
+  );
   const tLb = useTranslations('widgets.contests.leaderboard');
   const tGroups = useTranslations('widgets.contests.groups');
 
@@ -65,11 +76,19 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
   const [onlyEurovisionCountries, setOnlyEurovisionCountries] = useState(false);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
 
-  const { data: contestGroups = [] } = useContestGroupsQuery(isOpen);
-  const { data, isLoading, isError, error } = useMyLeaderboardQuery({
-    enabled: isOpen,
+  const { data: contestGroups = [] } = useContestGroupsQuery(
+    isOpen && !isUserScope,
+  );
+  const myLeaderboardQuery = useMyLeaderboardQuery({
+    enabled: isOpen && !isUserScope,
     groupId: selectedGroupId,
   });
+  const userLeaderboardQuery = useUserLeaderboardQuery(userId ?? null, {
+    enabled: isOpen && isUserScope,
+  });
+  const { data, isLoading, isError, error } = isUserScope
+    ? userLeaderboardQuery
+    : myLeaderboardQuery;
 
   useEffect(() => {
     if (!isOpen) {
@@ -226,12 +245,14 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
       <div className="flex flex-col gap-4 px-1">
         <div>
           <h2 className="text-lg sm:text-2xl font-bold text-white">
-            {t('title')}
+            {isUserScope
+              ? t('title', { name: userName || 'User' })
+              : t('title')}
           </h2>
           <p className="text-sm text-white/60 mt-1">{t('subtitle')}</p>
         </div>
 
-        {contestGroups.length > 0 && (
+        {!isUserScope && contestGroups.length > 0 && (
           <WidgetResourceGroupBadges
             groups={contestGroups}
             selectedGroupId={selectedGroupId}

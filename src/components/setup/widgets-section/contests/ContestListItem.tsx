@@ -225,21 +225,22 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
       <div className="grid gap-4 p-4 sm:[grid-template-columns:minmax(0,230px)_1fr] grid-cols-1">
         {/* Left: status panel */}
         <div className="relative flex sm:flex-col items-center sm:justify-center justify-between gap-2.5 rounded-[12px] text-center sm:border-b sm:border-r border-white/10 sm:py-[18px] sm:px-[14px] sm:bg-black/25 sm:shadow-[inset 0 0 0 1px rgba(255,255,255,0.06)] sm:flex-nowrap flex-wrap overflow-hidden">
-          {/* <Image
-            src={
-              'https://cdn.douzepoints.app/themes/bg-images/6a4e6616957fcac4035ed5e2/6a551ffbd07904cb692405e8-e5eab1e8-c736-44e8-9a47-336bcf3a1859.jpeg'
-            }
-            alt="Contest logo"
-            unoptimized
-            className="object-cover absolute top-0 left-0 bottom-0 right-0 z-10"
-            fill
-          /> */}
+          {/* Contest logo/banner */}
+          {contest.logoUrl && (
+            <Image
+              src={contest.logoUrl}
+              alt="Contest logo"
+              unoptimized
+              className="object-cover absolute top-0 left-0 bottom-0 right-0 z-10"
+              fill
+            />
+          )}
           <div className="flex sm:flex-col items-center sm:gap-2.5 gap-2 z-20">
             {/* Host flag/logo */}
             <Image
               src={logo}
               alt={t('simulation.header.hostingCountryLogo')}
-              className={`flex-none rounded-sm ${
+              className={`flex-none overflow-visible rounded-sm ${
                 isExisting
                   ? 'sm:w-[52px] w-[36px] sm:h-[52px] h-[36px] object-cover'
                   : 'w-[52px] h-[40px] object-cover'
@@ -255,7 +256,10 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
             {/* Contest name + year */}
             <div
               className="text-white font-[800] leading-tight sm:text-[17px] text-[16px]"
-              style={{ letterSpacing: '-0.02em' }}
+              style={{
+                letterSpacing: '-0.02em',
+                textShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+              }}
             >
               {contest.name} {contest.year}
             </div>
