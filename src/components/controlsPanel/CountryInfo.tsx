@@ -5,9 +5,19 @@ import { useCountriesStore } from '../../state/countriesStore';
 
 import { useGeneralStore } from '@/state/generalStore';
 
-type Props = { votingCountryIndex: number };
+type Props = {
+  votingCountryIndex: number;
+  /** Override the default panel padding when embedded in another container. */
+  containerClassName?: string;
+};
 
-const CountryInfo = ({ votingCountryIndex }: Props) => {
+const DEFAULT_CONTAINER_CLASS_NAME =
+  'w-full pb-2 lg:pt-4 pt-3 lg:px-4 px-3 rounded-md rounded-b-none';
+
+const CountryInfo = ({
+  votingCountryIndex,
+  containerClassName = DEFAULT_CONTAINER_CLASS_NAME,
+}: Props) => {
   const t = useTranslations('simulation');
 
   const [shouldBlink, setShouldBlink] = useState(false);
@@ -35,7 +45,7 @@ const CountryInfo = ({ votingCountryIndex }: Props) => {
   }, [votingCountryIndex]);
 
   return (
-    <div className="w-full pb-2 lg:pt-4 pt-3 lg:px-4 px-3 rounded-md rounded-b-none">
+    <div className={containerClassName}>
       <h4
         className={`text-white uppercase break-words lg:text-2xl text-xl ${
           shouldBlink ? 'blinker' : ''

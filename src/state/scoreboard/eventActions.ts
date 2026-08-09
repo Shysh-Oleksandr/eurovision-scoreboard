@@ -2,9 +2,8 @@ import { StateCreator } from 'zustand';
 
 import { EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../countriesStore';
-
 import { useGeneralStore } from '../generalStore';
-import { playThemeSound } from '@/theme/playThemeSound';
+
 import {
   createCountriesComparator,
   getLastCountryCodeByPoints,
@@ -12,6 +11,8 @@ import {
   getRemainingCountries,
 } from './helpers';
 import { ScoreboardState } from './types';
+
+import { playThemeSound } from '@/theme/playThemeSound';
 
 type EventActions = {
   setEventStages: (eventStages: EventStage[]) => void;
@@ -38,6 +39,9 @@ export const createEventActions: StateCreator<
   },
 
   startEvent: () => {
+    // Also covers Restart, which routes back through EventSetupModal.
+    get().resetJuryScaleReveal();
+
     const enablePredefined =
       useGeneralStore.getState().settings.enablePredefinedVotes;
 
@@ -88,6 +92,7 @@ export const createEventActions: StateCreator<
     }
 
     const generalStore = useGeneralStore.getState();
+
     generalStore.setPresentationSettings({
       isPresenting: generalStore.settings.autoStartPresentation,
     });
@@ -153,6 +158,7 @@ export const createEventActions: StateCreator<
     // Only do this once per transition; subsequent calls (e.g. from
     // continueToNextPhase after handleContinue) should not re-append qualifiers.
     const currentStageQualifiesTo = currentStage.qualifiesTo || [];
+
     if (
       currentStageQualifiesTo.length > 0 &&
       !nextStage.isPreparedForNextStage
@@ -237,6 +243,7 @@ export const createEventActions: StateCreator<
       } else {
         // Amount-based qualification (backward compatibility)
         let qualifierIndex = 0;
+
         for (const target of currentStageQualifiesTo) {
           const targetStageIndex = updatedEventStages.findIndex(
             (s) => s.id === target.targetStageId,
@@ -304,7 +311,7 @@ export const createEventActions: StateCreator<
 
     if (!nextStage || currentStageIndex === -1) return;
 
-    let nextStageCountries = nextStage.countries;
+    const nextStageCountries = nextStage.countries;
     let nextVotingCountryIndex = 0;
 
     if (nextStage.votingMode === StageVotingMode.TELEVOTE_ONLY) {
@@ -330,6 +337,7 @@ export const createEventActions: StateCreator<
     }
 
     const generalStore = useGeneralStore.getState();
+
     generalStore.setPresentationSettings({
       isPresenting: generalStore.settings.autoStartPresentation,
     });
@@ -378,6 +386,7 @@ export const createEventActions: StateCreator<
 
   leaveEvent: () => {
     useCountriesStore.getState().setEventSetupModalOpen(true);
+    get().resetJuryScaleReveal();
 
     set({
       eventStages: [],

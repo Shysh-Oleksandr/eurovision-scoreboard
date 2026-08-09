@@ -13,18 +13,46 @@ import { Columns2Icon } from '@/assets/icons/Columns2Icon';
 import { PauseIcon } from '@/assets/icons/PauseIcon';
 import { PlayIcon } from '@/assets/icons/PlayIcon';
 import { Rows2Icon } from '@/assets/icons/Rows2Icon';
-import { StageId } from '@/models';
+import { EventStage, StageId } from '@/models';
 import {
   PresentationPointsGrouping,
   ScoreboardMobileLayout,
   useGeneralStore,
 } from '@/state/generalStore';
+import { isJuryScaleRevealActive } from '@/state/scoreboard/juryScaleReveal';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { useQualifiedCountriesPanelGlowStyle } from '@/theme/useQualifiedCountriesPanelGlowStyle';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const MIN_SPEED_SECONDS = 0.5;
 const MAX_SPEED_SECONDS = 7.5;
+
+/**
+ * Whether the scale-countdown reveal owns this stage's jury vote. Read from the
+ * stores at call time so the auto-presentation loop and the rendered board can
+ * never disagree about which flow drives the next award.
+ */
+const isScaleRevealRunning = (stage: EventStage): boolean => {
+  const { settings } = useGeneralStore.getState();
+  const {
+    juryScaleReveal,
+    votingCountryIndex,
+    votingPointsIndex,
+    viewedStageId,
+    showAllParticipants,
+  } = useScoreboardStore.getState();
+
+  return isJuryScaleRevealActive({
+    stage,
+    enableJuryScaleReveal: settings.enableJuryScaleReveal,
+    isPickQualifiersMode: settings.isPickQualifiersMode,
+    juryScaleReveal,
+    votingCountryIndex,
+    votingPointsIndex,
+    viewedStageId,
+    showAllParticipants,
+  });
+};
 
 const layoutTabs = [
   {
@@ -83,6 +111,7 @@ const PresentationPanel = (): JSX.Element | null => {
     presentationSettings,
     isPickQualifiersMode,
     enableSplitScreenQualifierRevealMode,
+    enableJuryScaleReveal,
     setPresentationSettings,
   } = useGeneralStore(
     useShallow((s) => ({
@@ -90,6 +119,7 @@ const PresentationPanel = (): JSX.Element | null => {
       isPickQualifiersMode: s.settings.isPickQualifiersMode,
       enableSplitScreenQualifierRevealMode:
         s.settings.enableSplitScreenQualifierRevealMode,
+      enableJuryScaleReveal: s.settings.enableJuryScaleReveal,
       setPresentationSettings: s.setPresentationSettings,
     })),
   );
@@ -145,6 +175,8 @@ const PresentationPanel = (): JSX.Element | null => {
 
       if (!latestStage || latestStage.isOver) return;
 
+      let isScaleRevealStep = false;
+
       const getNextDelayMs = (awardedAnimated: boolean) => {
         const baseSeconds = MAX_SPEED_SECONDS - presentationSpeedSeconds;
         const delayAfterAnimation = pauseAfterAnimatedPoints
@@ -189,6 +221,9 @@ const PresentationPanel = (): JSX.Element | null => {
         }
 
         pickQualifierRandomly();
+      } else if (isScaleRevealRunning(latestStage)) {
+        useScoreboardStore.getState().advanceJuryScaleReveal();
+        isScaleRevealStep = true;
       } else if (latestStage.isJuryVoting) {
         if (presentationJuryGrouping === 'grouped') {
           givePredefinedJuryPointsGrouped();
@@ -203,11 +238,15 @@ const PresentationPanel = (): JSX.Element | null => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      // If the just-awarded batch contains an animated point, add +2s delay
-      const awardedAnimated = useScoreboardStore
-        .getState()
-        .getCurrentStage()
-        ?.countries?.some((c) => c.showDouzePointsAnimation);
+      // If the just-awarded batch contains an animated point, add +2s delay.
+      // The scale reveal never sets `showDouzePointsAnimation` (it renders its
+      // own overlay), so its douze steps are detected from the reveal phase.
+      const scoreboardState = useScoreboardStore.getState();
+      const awardedAnimated = isScaleRevealStep
+        ? scoreboardState.juryScaleReveal?.phase !== 'scale'
+        : scoreboardState
+            .getCurrentStage()
+            ?.countries?.some((c) => c.showDouzePointsAnimation);
       const nextDelay = getNextDelayMs(!!awardedAnimated);
 
       timeoutRef.current = setTimeout(runOnce, nextDelay);
@@ -291,24 +330,33 @@ const PresentationPanel = (): JSX.Element | null => {
         />
         {withPointsGrouping && (
           <div className="flex flex-col gap-1">
-            <h4 className="text-base font-medium text-white">
-              {t('simulation.presentation.pointsGrouping.title')}
-            </h4>
-            <Tabs
-              tabs={tabs}
-              activeTab={activeTab}
-              setActiveTab={(tab) => {
-                const grouping =
-                  (tab as PresentationPointsGrouping) ===
-                  PresentationPointsGrouping.GROUPED
-                    ? PresentationPointsGrouping.GROUPED
-                    : PresentationPointsGrouping.INDIVIDUAL;
+            {/* Grouping is meaningless during the scale countdown — the whole
+                board is revealed one points value at a time — but the pause
+                after animated points still applies to the douze phase. */}
+            {!enableJuryScaleReveal && (
+              <>
+                <h4 className="text-base font-medium text-white">
+                  {t('simulation.presentation.pointsGrouping.title')}
+                </h4>
+                <Tabs
+                  tabs={tabs}
+                  activeTab={activeTab}
+                  setActiveTab={(tab) => {
+                    const grouping =
+                      (tab as PresentationPointsGrouping) ===
+                      PresentationPointsGrouping.GROUPED
+                        ? PresentationPointsGrouping.GROUPED
+                        : PresentationPointsGrouping.INDIVIDUAL;
 
-                setPresentationSettings({ presentationJuryGrouping: grouping });
-              }}
-              containerClassName="!p-[3px] !overflow-hidden"
-              overlayClassName="!inset-y-[2px]"
-            />
+                    setPresentationSettings({
+                      presentationJuryGrouping: grouping,
+                    });
+                  }}
+                  containerClassName="!p-[3px] !overflow-hidden"
+                  overlayClassName="!inset-y-[2px]"
+                />
+              </>
+            )}
             <Checkbox
               id="pause-after-animated-points"
               labelClassName="w-full !px-0 !pt-1 text-white"

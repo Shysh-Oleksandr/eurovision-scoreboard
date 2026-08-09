@@ -51,6 +51,30 @@ export type SplitScreenQualifierCandidate = Pick<
   'code' | 'name' | 'flag'
 >;
 
+/*
+ * `awaitingFinish` is the beat after the last spokesperson: the final douze is on
+ * the board and jury voting is still formally in progress, so the televote board
+ * / results modal cannot cover up the reveal until the user (or the presentation
+ * loop) moves on.
+ */
+export type JuryScaleRevealPhase =
+  | 'scale'
+  | 'douze'
+  | 'awaitingFinish'
+  | 'done';
+
+/*
+ * Cursor for the "scale countdown" jury reveal (see ./juryScaleReveal.ts).
+ * `votingCountryIndex` doubles as the spokesperson cursor during the `douze`
+ * phase, so it is deliberately NOT duplicated here.
+ */
+export type JuryScaleReveal = {
+  stageId: string;
+  phase: JuryScaleRevealPhase;
+  /** How many scale steps have been revealed; indexes `getScaleSteps(...)`. */
+  stepIndex: number;
+};
+
 export type ScoreboardState = {
   // State
   eventStages: EventStage[];
@@ -90,6 +114,15 @@ export type ScoreboardState = {
   splitScreenQualifierCandidatesQualifiedCount: number | null;
   splitScreenQualifierShownCountByStage: Record<string, Record<string, number>>;
   splitScreenQualifierLastShownByStage: Record<string, string[]>;
+  /* Persisted + undoable cursor of the scale-countdown jury reveal. */
+  juryScaleReveal: JuryScaleReveal | null;
+  /*
+   * Transient, and deliberately kept OUT of the cursor object: it is excluded
+   * from the persist/undo partializers, so the hide timer firing cannot push a
+   * junk zundo past-state that "undo" would then consume.
+   */
+  juryScaleRevealAwardsHidden: boolean;
+  juryScaleRevealHideTimerId: NodeJS.Timeout | null;
 
   // Getters
   getCurrentStage: () => EventStage | undefined;
@@ -156,6 +189,10 @@ export type ScoreboardState = {
     stageId: string,
     partial: Record<string, Partial<ManualShareTotalsRow>>,
   ) => void;
+  advanceJuryScaleReveal: () => void;
+  finishJuryScaleRevealRandomly: () => void;
+  hideJuryScaleRevealAwards: () => void;
+  resetJuryScaleReveal: () => void;
   pickQualifier: (countryCode: string) => void;
   pickQualifierRandomly: () => void;
   openSplitScreenQualifierModal: () => boolean;

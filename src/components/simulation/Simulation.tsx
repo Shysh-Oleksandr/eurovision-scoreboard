@@ -17,6 +17,7 @@ import { SimulationHeader } from './SimulationHeader';
 import { StageId } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { getFinalRevealInfo } from '@/state/scoreboard/helpers';
+import { isJuryScaleRevealActive } from '@/state/scoreboard/juryScaleReveal';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import {
   stopSimulationBackgroundThemeSound,
@@ -41,6 +42,12 @@ const PickQualifiersSimulation = dynamic(
     ssr: false,
   },
 );
+const JuryScaleRevealSimulation = dynamic(
+  () => import('./juryScaleReveal/JuryScaleRevealSimulation'),
+  {
+    ssr: false,
+  },
+);
 const WinnerConfetti = dynamic(() => import('./WinnerConfetti'), {
   ssr: false,
 });
@@ -57,6 +64,7 @@ const Simulation = () => {
     showWinnerConfetti,
     showWinnerModal,
     presentationModeEnabled,
+    enableJuryScaleReveal,
   } = useGeneralStore(
     useShallow((state) => ({
       showQualificationModal: state.settings.showQualificationModal,
@@ -64,11 +72,27 @@ const Simulation = () => {
       showWinnerConfetti: state.settings.showWinnerConfetti,
       showWinnerModal: state.settings.showWinnerModal,
       presentationModeEnabled: state.settings.presentationModeEnabled,
+      enableJuryScaleReveal: state.settings.enableJuryScaleReveal,
     })),
   );
 
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  const {
+    juryScaleReveal,
+    votingCountryIndex,
+    votingPointsIndex,
+    viewedStageId,
+    showAllParticipants,
+  } = useScoreboardStore(
+    useShallow((state) => ({
+      juryScaleReveal: state.juryScaleReveal,
+      votingCountryIndex: state.votingCountryIndex,
+      votingPointsIndex: state.votingPointsIndex,
+      viewedStageId: state.viewedStageId,
+      showAllParticipants: state.showAllParticipants,
+    })),
+  );
   const enableFinalReveal = useGeneralStore(
     (state) => state.settings.enableFinalReveal,
   );
@@ -101,6 +125,17 @@ const Simulation = () => {
 
   const isSemiFinalStage =
     currentStage?.id.toUpperCase() !== StageId.GF.toUpperCase();
+
+  const isScaleRevealActive = isJuryScaleRevealActive({
+    stage: currentStage,
+    enableJuryScaleReveal,
+    isPickQualifiersMode,
+    juryScaleReveal,
+    votingCountryIndex,
+    votingPointsIndex,
+    viewedStageId,
+    showAllParticipants,
+  });
 
   const phaseTitle = usePhaseTitle();
 
@@ -173,6 +208,8 @@ const Simulation = () => {
           <PhaseActions />
           {isPickQualifiersMode && isSemiFinalStage ? (
             <PickQualifiersSimulation />
+          ) : isScaleRevealActive ? (
+            <JuryScaleRevealSimulation />
           ) : (
             <div className="pt-2 md:pt-1 lg:pt-0 w-full flex md:flex-row flex-col lg:gap-6 md:gap-4 gap-3">
               <div className="flex-1 flex flex-col min-w-0">

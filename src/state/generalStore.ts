@@ -91,6 +91,8 @@ const DEFAULT_SETTINGS: Settings = {
   revealTelevoteLowestToHighest: false,
   presentationModeEnabled: true,
   useGroupedJuryPoints: false,
+  enableJuryScaleReveal: false,
+  keepJuryScaleRevealAwards: true,
   autoStartPresentation: false,
   enablePredefinedVotes: false,
   enableWinterEffects: false,
@@ -190,6 +192,18 @@ export interface Settings {
   revealTelevoteLowestToHighest: boolean;
   presentationModeEnabled: boolean;
   useGroupedJuryPoints: boolean;
+  /**
+   * Presents jury voting as the JESC 2024 "scale countdown": every 1 point from
+   * every jury at once, then every 2 … then spokespersons for the 12s.
+   * See `state/scoreboard/juryScaleReveal.ts`.
+   */
+  enableJuryScaleReveal: boolean;
+  /**
+   * Scale-countdown only: keep each revealed set of points (and the jury flags)
+   * on screen until the next set replaces it, instead of clearing after a few
+   * seconds. Does not affect the douze phase, which always persists.
+   */
+  keepJuryScaleRevealAwards: boolean;
   autoStartPresentation: boolean;
   enablePredefinedVotes: boolean;
   enableWinterEffects: boolean;

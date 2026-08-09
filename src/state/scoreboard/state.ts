@@ -48,4 +48,7 @@ export const initialScoreboardState: Partial<ScoreboardState> = {
   splitScreenQualifierCandidatesQualifiedCount: null,
   splitScreenQualifierShownCountByStage: {},
   splitScreenQualifierLastShownByStage: {},
+  juryScaleReveal: null,
+  juryScaleRevealAwardsHidden: false,
+  juryScaleRevealHideTimerId: null,
 };

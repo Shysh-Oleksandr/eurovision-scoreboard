@@ -409,6 +409,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-08-09',
+    title:
+      'Added the JESC 2024 jury reveal format. Enable "Scale countdown jury reveal" in the voting settings: the jury vote is then shown on a bar chart that first counts down the whole scale (every 1 point from every jury at once, then every 2, and so on), and only then brings on the spokespersons to announce their 12 points.',
+  },
+  {
     date: '2026-08-08',
     title:
       '<list><item>Predefine voting by only entering the total points</item><item>Redesigned the voting predefinition modal</item><item>Ability to upload a contest banner image</item><item>View contest leaderboard stats of other users</item><item>Small improvements</item></list>',
@@ -442,6 +447,10 @@ export const WHATS_NEW = [
 ];
 
 export const UPCOMING_FEATURES = [
+  {
+    approximateDates: { start: '2026-08-12', end: '2026-08-16' },
+    title: 'Improve the JESC 2024 jury reveal format UI',
+  },
   {
     approximateDates: { start: '2026-07-12', end: '2026-07-13' },
     title: 'Redesign some parts of the app',

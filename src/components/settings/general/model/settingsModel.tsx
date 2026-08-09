@@ -128,6 +128,22 @@ export const CATEGORIES: Category[] = [
       },
       {
         kind: 'switch',
+        id: 'enableJuryScaleReveal',
+        settingKey: 'enableJuryScaleReveal',
+        labelKey: 'settings.voting.enableJuryScaleReveal',
+        tipKey: 'settings.voting.enableJuryScaleRevealTooltip',
+        children: [
+          {
+            kind: 'switch',
+            id: 'keepJuryScaleRevealAwards',
+            settingKey: 'keepJuryScaleRevealAwards',
+            labelKey: 'settings.voting.keepJuryScaleRevealAwards',
+            tipKey: 'settings.voting.keepJuryScaleRevealAwardsTooltip',
+          },
+        ],
+      },
+      {
+        kind: 'switch',
         id: 'revealTelevoteLowestToHighest',
         settingKey: 'revealTelevoteLowestToHighest',
         labelKey: 'settings.voting.televoteRevealOrder',

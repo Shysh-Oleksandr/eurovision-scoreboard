@@ -59,6 +59,8 @@ export const SYNCED_SETTINGS_KEYS = [
   'revealTelevoteLowestToHighest',
   'shouldLimitManualTelevotePoints',
   'useGroupedJuryPoints',
+  'enableJuryScaleReveal',
+  'keepJuryScaleRevealAwards',
   'enablePredefinedVotes',
   'autoStartPresentation',
   'presentationModeEnabled',

@@ -879,6 +879,14 @@ export async function applyContestSnapshotToStores(
     });
   }
 
+  // This path bypasses `startEvent`, so simulation state it does not overwrite
+  // has to be cleared explicitly. The scale-countdown cursor is persisted and
+  // stage ids repeat across contests (SF1/SF2/GF), so a cursor left over from a
+  // previous run would match the incoming stage and make the replay skip the
+  // whole countdown, awarding only the 12 points. This also cancels any pending
+  // "hide awards" timer.
+  useScoreboardStore.getState().resetJuryScaleReveal();
+
   // Apply simulation state if present and enabled
   if (snapshot.simulation && loadOptions.simulation) {
     // Resolve jury and televote systems for vote decoding

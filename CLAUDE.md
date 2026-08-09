@@ -57,6 +57,7 @@ Next.js App Router. Main app lives under `app/(main)/`. Page-level React compone
 Read `docs/` before touching non-obvious subsystems:
 - `general-app-features-overview.md`
 - `final-televote-reveal.md`
+- `jury-scale-reveal.md` — the opt-in JESC 2024 jury presentation (bar board, scale countdown then spokespersons)
 - `running-order-and-tiebreaking.md`
 - `contests-leaderboard-and-entry-stats.md`
 - `theme-animations-and-specifics.md`

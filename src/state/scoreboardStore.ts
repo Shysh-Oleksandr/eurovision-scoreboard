@@ -2,11 +2,12 @@ import isDeepEqual from 'fast-deep-equal';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 
-import { devtools, persist } from 'zustand/middleware';
 import deepMerge from '@75lb/deep-merge';
+import { devtools, persist } from 'zustand/middleware';
 
 import { createEventActions } from './scoreboard/eventActions';
 import { createGetters } from './scoreboard/getters';
+import { createJuryScaleRevealActions } from './scoreboard/juryScaleRevealActions';
 import { createMiscActions } from './scoreboard/miscActions';
 import { createPredefinitionActions } from './scoreboard/predefinitionActions';
 import { initialScoreboardState } from './scoreboard/state';
@@ -22,6 +23,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
             ...createEventActions(set, get, store),
             ...createMiscActions(set, get, store),
             ...createVotingActions(set, get, store),
+            ...createJuryScaleRevealActions(set, get, store),
             ...createGetters(set, get, store),
             ...createPredefinitionActions(set, get, store),
 
@@ -46,6 +48,10 @@ export const useScoreboardStore = create<ScoreboardState>()(
             currentRevealTelevotePoints: state.currentRevealTelevotePoints,
             isWinnerAnimationAlreadyDisplayed:
               state.isWinnerAnimationAlreadyDisplayed,
+            // Must be persisted alongside the points it accounts for: a refresh
+            // mid-countdown would otherwise restore the awarded points but reset
+            // the cursor to step 0 and award every step a second time.
+            juryScaleReveal: state.juryScaleReveal,
           }),
         },
       ),
@@ -70,6 +76,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           predefinedVotes,
           countryPoints,
           qualificationOrder,
+          juryScaleReveal,
         } = state;
 
         return {
@@ -83,6 +90,10 @@ export const useScoreboardStore = create<ScoreboardState>()(
           predefinedVotes,
           countryPoints,
           qualificationOrder,
+          // Undo must roll the reveal cursor back together with the points it
+          // awarded. `juryScaleRevealAwardsHidden` is deliberately excluded —
+          // the hide timer would otherwise push a past-state that "undo" eats.
+          juryScaleReveal,
         };
       },
     },
