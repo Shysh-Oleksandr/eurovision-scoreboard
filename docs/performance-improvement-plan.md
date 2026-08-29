@@ -438,6 +438,107 @@ mechanical wins.
    profile browse + scroll; virtualize lists only if measurement says so.
 3. Re-check `SnowfallAnimation` cost when seasonal effects are active.
 
+**Status: DONE (2026-08-29).** Traces in `../../perf-artifacts/phase4/`
+(`trace-before-*` = pre-phase build, `trace-after3-look-drag` /
+`trace-after2-picker-drag` = final editor states, plus browse/snowfall traces).
+Same emulation as always (390x844x3 mobile+touch, 4x CPU, Slow 4G), scripted
+synthetic drags (~60 Hz pointer events, identical paths before/after).
+
+**Auth + CORS workarounds** (the blockers this phase had to clear):
+
+- CORS: backend `main.ts` now accepts a comma-separated `FRONTEND_URL` list;
+  local `.env` carries `http://localhost:3000,http://localhost:8787`. (Prod
+  single-value env behaves identically.)
+- Login without Google: `/auth/refresh` matches the raw cookie token by SHA-256
+  against `refresh_tokens`, so a session can be minted by inserting a
+  refresh-token doc directly in Mongo and setting a non-httpOnly
+  `refresh_token` cookie on `localhost` (port-agnostic), then hitting
+  `/?provider=google` to force `handlePostLogin`. Scripted in
+  `douze-points-backend/perf-seed.tmp.mjs` (also creates the `perf-seed-user`
+  profile; `cleanup` arg removes everything it made). **Caution: the local
+  backend's Atlas URI is production-scale data** (17k profiles, 19k public
+  themes, 45k public contests — the §A7 "no public content" note was stale).
+  The 48 seed themes the script created were deleted the same session;
+  `perf-seed-user` + its refresh token were kept for future profiling logins.
+
+**Step 1 — editor drag.** Baseline: Look-tab hue/shade drag ran at 52–58 fps
+with 91–113 % busy (≈500 ms JS/s) — every pointer-move re-rendered the whole
+`CustomizeThemeModal`; picker drag (mobile `ColorEditorPanel`) ran at
+**31–37 fps**, 110 % busy, ≈650 ms JS/s. Two systemic finds beyond §A5:
+
+- **The "debounced" live preview never updated during a drag at all.** The
+  modal debounced hue/shade/overrides at 40 ms (`useDebounce`), but pointer
+  moves arrive every ~16 ms, so the timer reset forever and the preview only
+  caught up when the finger paused. The intended "~25x/s" cadence in the old
+  comment never existed. All "before" smoothness numbers benefited from this
+  accidental freeze.
+- **`Tabs` re-measured on every parent render** (measure effect keyed on the
+  `tabs` array identity, which parents rebuild per render): 5 forced
+  `offsetWidth` reads + a state write + a `fonts.ready`→rAF re-measure per
+  modal render — the moment the preview became live this turned into an
+  offsetWidth/rAF storm (1.2 s reads + 1.6 s rAF per 20 s trace).
+
+Fixes shipped (all state-flow, no visual/UX change except the preview now
+genuinely tracks the drag):
+
+1. `useThrottledEdit` (new hook, custom-themes/hooks): local-echo + 40 ms
+   leading/trailing-throttled propagation, used by `ColorEditorPanel`,
+   `ColorOverridePicker`, and the new `InterfaceColorSliders` (hue/shade
+   extracted out of the modal). Drags re-render only the small editor
+   component; modal state updates at ≤25 Hz.
+2. The modal's preview values now use `useThrottledValue` (new, src/hooks) at
+   100 ms — a real throttle, so the preview updates ~10x/s *during* the drag
+   (each tick costs a full-document style recalc, ~20 ms at 4x, since the
+   preview `<style>` tag rewrite invalidates everything; 10 Hz is the budget
+   that holds 60 fps).
+3. `Tabs` measures on `[tab values, activeTab]` instead of array identity;
+   `tabItems` memoized in the modal.
+4. `useReadableForegroundFromCssVar` reads post-paint (rAF → macrotask) instead
+   of inside rAF — reading computed style right after the `<style>` rewrite
+   forced a second full recalc per tick.
+5. The picker gets the throttled prop value through a `React.memo` wrapper
+   (its drag cross is component-local state, so full-rate feedback survives);
+   the per-move value echo feeds only the cheap swatch/readout row.
+
+Results (same scripted drags): **Look tab 52–58 fps saturated + frozen preview
+→ steady 59–61 fps with a live preview** (JS 500 → ~430 ms/s, rAF storm
+1.6 s → 13 ms). **Picker drag 31–37 → 35–41 fps, also now with a live
+preview** — the remaining cost is `react-best-gradient-color-picker` itself:
+its context provider `setState`s on every move (its internal
+`lodash.throttle(250)` is recreated per event, i.e. broken), so the whole
+picker subtree re-renders per move, and its per-move
+`getBoundingClientRect` forces layout on a style-dirty document (~130 ms/s).
+An A/B prototype caching that rect in `node_modules` cut ~100 ms/s JS but did
+not move fps (reverted). **Getting the picker flow to 60 fps needs either
+patch-package surgery on the lib (hoist the throttle, cache the rect) or a
+lighter picker — a UX/product decision, deliberately left open.** Also left on
+the table: a one-time ~350 ms React discrete-event commit on the first slider
+touch after the modal opens (pre-existing — 309 ms in the baseline trace).
+
+**Step 2 — browsing (real prod-scale data, no seeding needed).** Public themes
+(19,189 rows, paginated 10/page): tab-switch mount is one ~470 ms task (React
+render of 10 preview cards — `content-visibility: auto` on the cards was tried
+and reverted: the cost is render, not layout/paint), scroll 48–60 fps at
+≤55 % busy, page flips cheap. Public contests (45,290 rows): worst task 270 ms,
+scroll ≤33 % busy. **Verdict: no virtualization warranted**; the lists are
+fine.
+
+**Step 3 — snowfall.** `react-snowfall` at intensity 5: ~23 % busy @4x, steady
+60 fps, zero paint (canvas); at max intensity 10 (500 flakes): ~24 %.
+Cheap — no action. (Note: `enableWinterEffects` is account-synced, so it must
+be toggled via the API/UI, not localStorage.)
+
+Verification: `yarn lint:types-cli` clean; ESLint clean on changed files;
+vitest 93/95 (same 2 pre-existing stale failures as phases 0–2). Functional
+pass on the rebuilt preview: hue drag updates the preview mid-drag and settles
+exactly at the thumb; mobile swatch editor edits land in the grid, undo
+reverts, back-navigation flushes pending edits; desktop popover picker applies
+overrides. Changed files: `Tabs.tsx`, `CustomizeThemeModal.tsx`,
+`ColorEditorPanel.tsx`, `ColorOverridePicker.tsx`,
+`useReadableForegroundFromCssVar.ts` + new `InterfaceColorSliders.tsx`,
+`hooks/useThrottledEdit.ts`, `src/hooks/useThrottledValue.ts`; backend
+`main.ts` (CORS list).
+
 ### Splitting across Claude Code chats
 
 One phase = one chat, each started fresh with this exact context recipe:

@@ -56,7 +56,15 @@ const readAll = (): void => {
 
 const scheduleRead = (): void => {
   if (typeof window === 'undefined' || rafId) return;
-  rafId = window.requestAnimationFrame(readAll);
+  // Read *after* the frame commits (rAF → macrotask). The mutation that got us
+  // here just invalidated style for the whole document; reading computed style
+  // inside the rAF callback would force that recalc synchronously, doubling
+  // the per-tick recalc cost while the theme editor rewrites the preview
+  // <style> during a drag. One frame later the styles are clean and the reads
+  // are free.
+  rafId = window.requestAnimationFrame(() => {
+    window.setTimeout(readAll, 0);
+  });
 };
 
 const ensureObserver = (): void => {
