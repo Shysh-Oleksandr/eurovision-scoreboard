@@ -36,7 +36,7 @@ const WidgetContainer = ({
         </div>
         <h5 className="text-base font-semibold">{title}</h5>
       </div>
-      <p className="text-sm text-white/50 text-center">{description}</p>
+      <p className="text-sm text-white/75 text-center">{description}</p>
       {children}
     </div>
   );

@@ -34,6 +34,13 @@ const PresentationPanel = dynamic(
   () => import('../presentationPanel/PresentationPanel'),
   {
     ssr: false,
+    // Mirrors the panel's outer structure and min-height so the layout does
+    // not shift when the chunk arrives on a slow connection.
+    loading: () => (
+      <div className="w-full">
+        <div className="min-h-[120px] bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-[10px]" />
+      </div>
+    ),
   },
 );
 const PickQualifiersSimulation = dynamic(

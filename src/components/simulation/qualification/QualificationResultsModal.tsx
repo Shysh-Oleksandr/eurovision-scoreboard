@@ -167,7 +167,8 @@ const QualificationResultsModal = () => {
                 handleContinue();
               }, ANIMATION_DURATION / 2);
             }}
-            className="animated-border !flex flex-row-reverse flex-nowrap !text-sm md:!text-base w-full"
+            animatedBorder
+            className="!flex flex-row-reverse flex-nowrap !text-sm md:!text-base w-full"
             Icon={<ArrowRightIcon className="w-5 h-5" />}
           >
             {t('simulation.phaseActions.continueTo', {

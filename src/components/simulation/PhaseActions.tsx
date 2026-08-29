@@ -126,7 +126,8 @@ export const PhaseActions = () => {
         {isVotingOver && !isLastStage && (
           <Button
             onClick={handleContinue}
-            className="animated-border !flex flex-row-reverse"
+            animatedBorder
+            className="!flex flex-row-reverse"
             snowEffect="right"
             Icon={<ArrowRightIcon className="w-5 h-5" />}
           >
