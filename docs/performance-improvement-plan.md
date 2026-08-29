@@ -210,6 +210,58 @@ INP <200 ms @4x on voting taps.
 
 Nothing in this phase touches choreography or store semantics.
 
+**Status: DONE (2026-08-29).** Fresh before/after traces (same scripted SF1 flow,
+same emulation) are in `../../perf-artifacts/phase1/` (`trace-before-*` vs
+`trace-after-*`). Results against the targets:
+
+- **Tap waterfalls: eliminated.** Before, the ПОЧАТИ tap fetched 5 chunks
+  (~470 KB, largest arriving ~1.2 s later on Slow 4G) and the start-stage tap 7
+  more; after, **zero chunk fetches occur anywhere in the setup→SF1→qualifiers
+  flow** — everything is warmed during setup idle time. Two pieces: (a)
+  zod+react-hook-form are gone from the post-setup path — the RHF form was a
+  single always-valid array, replaced by a ~50-line external-store form in
+  `usePostSetupStageForm.ts` (the 270 KB chunk no longer exists on that path);
+  (b) an idle-time preloader (`useSimulationChunksPreload`) warms the
+  post-setup/gsap/board/reveal batch. Gotcha that cost one iteration: Turbopack
+  builds a chunk group per `import()` *call site*, so a preload written as its
+  own `import(...)` warms shared chunks but not group-specific ones — the
+  `dynamic()` wrappers and the preloader now share thunks in
+  `src/hooks/simulationChunkImports.ts` so the preload warms the exact groups.
+- **Setup→voting transition CLS 0.42–0.49 → 0.02** (the phase-0 skeleton helped
+  only the panel; with every chunk warm nothing mounts late any more).
+- **Voting-tap INP 191 ms → 170–171 ms** @4x (individual taps 137–171 ms). Target
+  <200 ms met.
+- **Per-award render fan-out cut** (helps every second of voting): `Main` now
+  subscribes to `eventStages.length > 0` only, so the whole `EventSetupModal`
+  hook tree no longer re-renders on every award; `ControlsPanel`,
+  `PresentationPanel`, `SimulationHeader` are memoized with narrow
+  subscriptions (stage id/isJuryVoting/isOver; undo availability is now read
+  reactively from the temporal store instead of relying on parent re-renders).
+  The qualification modal mounts via a gate one task *after* the stage-end
+  commit (and not at all during voting) instead of living mounted and
+  re-rendering per award; `Simulation` mounts through `useDeferredValue` so the
+  setup-modal unmount and board mount are separate commits.
+- **The three transition tasks remain >150 ms — and are Phase 2's, not this
+  phase's.** After the splits: stage-start ~360–460 ms, jury→televote
+  ~215–250 ms (interaction 270–353 ms), televote→reveal ~355–415 ms
+  (interaction 484–534 ms) — run-to-run spread is the random vote sets changing
+  the animation load. CPU-sample attribution (new tool:
+  `scripts/perf/attribute-samples.mjs`) shows each is ~70–75 % **gsap
+  CSSPlugin style application + style clearing (`removeProperty`) + countUp
+  `innerHTML` writes running inside the commit's effects** — React component
+  rendering is ~20–30 ms of each. §A1's "React render+commit" attribution was
+  the trace's task-level label, not the real cost. This is exactly the
+  animation *delivery mechanism* Phase 2 rewrites; splitting further here would
+  have meant touching the choreography, which this phase forbids.
+
+Verification: `yarn lint:types-cli` clean; ESLint clean on changed files;
+vitest 93/95 (same 2 pre-existing stale failures as phase 0). Functional pass
+on the real preview: full SF1 run (manual votes + finish-randomly ×2),
+qualifiers modal opens with its usual 3.4 s delay and stagger, continue→SF2
+post-setup opens, voters tab add/remove/reset works against the new form, SF2
+starts with the saved voters, presentation auto-loop advances and pauses, undo
+button enables/disables correctly.
+
 ### Phase 2 — Board animation delivery mechanism (effort: L, risk: medium; the big one)
 
 Target: style recalcs during a full auto-run cut ≥3x (2,871 → <1,000 per 97 s
@@ -217,6 +269,10 @@ equivalent), no 145–200 ms frames during manual voting, visual parity per grou
 rule 3. **The choreography (constants, phase order, queueing, tiebreak-driven
 ordering) must not change** — only how phase state reaches the DOM. Read
 `theme-animations-and-specifics.md` and `running-order-and-tiebreaking.md` first.
+Baseline: Phase 1's `perf-artifacts/phase1/trace-after-*.json.gz` traces, whose
+CPU-sample attribution (`scripts/perf/attribute-samples.mjs`) already shows the
+remaining transition stalls are ~70–75 % gsap CSSPlugin style writes + clearProps
+inside commit-phase effects — start from that, not from §A1's task-level labels.
 Sub-steps, each independently shippable and re-profiled:
 
 1. **Stop routing per-frame animation state through Board-level React state.** The

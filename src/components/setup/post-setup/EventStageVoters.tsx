@@ -5,13 +5,15 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
 
 import VotersCountriesSearch from '../event-stage/VotersCountriesSearch';
 import VotersList from '../event-stage/VotersList';
 import VotersSelectionHeader from '../event-stage/VotersSelectionHeader';
 
-import { PostSetupStageFormData } from './hooks/usePostSetupStageForm';
+import {
+  usePostSetupFormContext,
+  useWatchVotingCountries,
+} from './hooks/usePostSetupStageForm';
 
 import { BaseCountry, EventStage, StageId, VotingCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -32,12 +34,8 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
   stage,
   onLoaded,
 }) => {
-  const { control, setValue } = useFormContext<PostSetupStageFormData>();
-  const votingCountries = useWatch({
-    control,
-    name: 'votingCountries',
-    defaultValue: [],
-  }) as VotingCountry[];
+  const form = usePostSetupFormContext();
+  const votingCountries = useWatchVotingCountries(form);
 
   const votingCountriesRef = useRef<VotingCountry[]>(votingCountries || []);
 
@@ -76,12 +74,12 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
             : updater;
 
         // Keep form value in sync when local changes
-        setValue('votingCountries', next as any, { shouldDirty: true });
+        form.setVotingCountries(next as VotingCountry[]);
 
         return next;
       });
     },
-    [setLocalVotingCountries, setValue],
+    [setLocalVotingCountries, form],
   );
 
   const handleAddVoter = (country: BaseCountry) => {
@@ -153,7 +151,7 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
 
     const setInitial = (list: VotingCountry[]) => {
       setLocalVotingCountries(list);
-      setValue('votingCountries', list as any, { shouldDirty: false });
+      form.setVotingCountries(list);
       onLoaded?.();
     };
 
@@ -179,7 +177,7 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
     participatingVoters,
     stage.id,
     stage.votingCountries,
-    setValue,
+    form,
   ]);
 
   return (

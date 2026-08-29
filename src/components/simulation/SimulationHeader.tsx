@@ -1,6 +1,7 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
+import { useStore } from 'zustand';
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -28,12 +29,16 @@ interface SimulationHeaderProps {
   phaseTitle: string;
 }
 
-export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
+const SimulationHeaderComponent = ({ phaseTitle }: SimulationHeaderProps) => {
   const t = useTranslations('simulation.header');
   const showHostingCountryLogo = useGeneralStore(
     (state) => state.settings.showHostingCountryLogo,
   );
   const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
+
+  // `getHostingCountry` reads other stores at call time; subscribing to the
+  // code keeps the memoized header's logo fresh when the setting changes.
+  useGeneralStore((state) => state.settings.hostingCountryCode);
   const setEventSetupModalOpen = useCountriesStore(
     (state) => state.setEventSetupModalOpen,
   );
@@ -45,14 +50,21 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
 
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
   const currentStageId = useScoreboardStore((state) => state.currentStageId);
-  const { undo, pastStates } = useScoreboardStore.temporal.getState();
+  const { undo } = useScoreboardStore.temporal.getState();
+  // Subscribe to the undo availability instead of reading `pastStates` during
+  // render: the memoized header no longer re-renders on every award, so a
+  // non-reactive read would leave the undo button stale.
+  const hasUndoablePast = useStore(
+    useScoreboardStore.temporal,
+    (state) =>
+      state.pastStates.length > 0 &&
+      !!state.pastStates[state.pastStates.length - 1].currentStageId,
+  );
 
   const { confirm } = useConfirmation();
 
   const canUndo =
-    pastStates.length > 0 &&
-    !!pastStates[pastStates.length - 1].currentStageId &&
-    (!viewedStageId || viewedStageId === currentStageId);
+    hasUndoablePast && (!viewedStageId || viewedStageId === currentStageId);
 
   const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
 
@@ -164,3 +176,5 @@ export const SimulationHeader = ({ phaseTitle }: SimulationHeaderProps) => {
     </>
   );
 };
+
+export const SimulationHeader = React.memo(SimulationHeaderComponent);

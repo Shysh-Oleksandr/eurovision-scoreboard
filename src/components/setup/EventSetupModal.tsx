@@ -41,6 +41,7 @@ import {
   applyContestSnapshotToStores,
   LoadContestOptions,
 } from '@/helpers/contestSnapshot';
+import { importPostSetupModal } from '@/hooks/simulationChunkImports';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
@@ -63,7 +64,7 @@ const VotingPredefinitionModal = dynamic(
     ssr: false,
   },
 );
-const PostSetupModal = dynamic(() => import('./post-setup/PostSetupModal'), {
+const PostSetupModal = dynamic(importPostSetupModal, {
   ssr: false,
 });
 const StageReorderModal = dynamic(() => import('./StageReorderModal'), {

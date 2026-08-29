@@ -1,7 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FormProvider } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import Modal from '../../common/Modal/Modal';
@@ -9,7 +8,10 @@ import ModalBottomContent from '../../common/Modal/ModalBottomContent';
 import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
 import EventStageVoters from './EventStageVoters';
-import { usePostSetupStageForm } from './hooks/usePostSetupStageForm';
+import {
+  PostSetupFormContext,
+  usePostSetupStageForm,
+} from './hooks/usePostSetupStageForm';
 import { useStageOddsOverrideDraft } from './hooks/useStageOddsOverrideDraft';
 import { useStagePointsOverrideDraft } from './hooks/useStagePointsOverrideDraft';
 import { RunningOrderTab, useRunningOrder } from './running-order';
@@ -136,73 +138,73 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   );
 
   const handleSave = useCallback(() => {
-    form.handleSubmit((data) => {
-      if (data.votingCountries.length === 0) {
-        toast.error('Please add at least one voter');
+    const data = { votingCountries: form.getVotingCountries() };
 
-        return;
-      }
+    if (data.votingCountries.length === 0) {
+      toast.error('Please add at least one voter');
 
-      onClose();
+      return;
+    }
 
-      setTimeout(() => {
-        const runningOrder = orderedCodes;
-        const pointsOverride = getOverride();
-        const oddsOverride = getOddsOverride();
+    onClose();
 
-        const enablePredefinedOverride =
-          localEnablePredefined !== undefined &&
-          localEnablePredefined !== globalEnablePredefined
-            ? localEnablePredefined
-            : undefined;
+    setTimeout(() => {
+      const runningOrder = orderedCodes;
+      const pointsOverride = getOverride();
+      const oddsOverride = getOddsOverride();
 
-        const buildOverrides = (): StageOverrides | undefined => {
-          const result: StageOverrides = {};
+      const enablePredefinedOverride =
+        localEnablePredefined !== undefined &&
+        localEnablePredefined !== globalEnablePredefined
+          ? localEnablePredefined
+          : undefined;
 
-          if (pointsOverride) result.pointsSystem = pointsOverride;
+      const buildOverrides = (): StageOverrides | undefined => {
+        const result: StageOverrides = {};
 
-          if (enablePredefinedOverride !== undefined)
-            result.enablePredefinedVotes = enablePredefinedOverride;
+        if (pointsOverride) result.pointsSystem = pointsOverride;
 
-          if (oddsOverride) result.odds = oddsOverride;
+        if (enablePredefinedOverride !== undefined)
+          result.enablePredefinedVotes = enablePredefinedOverride;
 
-          return Object.keys(result).length > 0 ? result : undefined;
-        };
-        const stageOverrides = buildOverrides();
+        if (oddsOverride) result.odds = oddsOverride;
 
-        const updatedStages = configuredEventStages.map((s) =>
-          s.id === stage.id
-            ? {
-                ...s,
-                votingCountries: data.votingCountries,
-                runningOrder,
-                votingMode: localVotingMode,
-                overrides: stageOverrides,
-              }
-            : s,
-        );
-        const updatedEventStages = eventStages.map((s) =>
-          s.id === stage.id
-            ? {
-                ...s,
-                votingCountries: data.votingCountries,
-                runningOrder,
-                votingMode: localVotingMode,
-                isJuryVoting: localVotingMode !== StageVotingMode.TELEVOTE_ONLY,
-                countries: s.countries
-                  .slice()
-                  .sort(createCountriesComparator(runningOrder)),
-                overrides: stageOverrides,
-              }
-            : s,
-        );
+        return Object.keys(result).length > 0 ? result : undefined;
+      };
+      const stageOverrides = buildOverrides();
 
-        setConfiguredEventStages(updatedStages);
-        setEventStages(updatedEventStages);
+      const updatedStages = configuredEventStages.map((s) =>
+        s.id === stage.id
+          ? {
+              ...s,
+              votingCountries: data.votingCountries,
+              runningOrder,
+              votingMode: localVotingMode,
+              overrides: stageOverrides,
+            }
+          : s,
+      );
+      const updatedEventStages = eventStages.map((s) =>
+        s.id === stage.id
+          ? {
+              ...s,
+              votingCountries: data.votingCountries,
+              runningOrder,
+              votingMode: localVotingMode,
+              isJuryVoting: localVotingMode !== StageVotingMode.TELEVOTE_ONLY,
+              countries: s.countries
+                .slice()
+                .sort(createCountriesComparator(runningOrder)),
+              overrides: stageOverrides,
+            }
+          : s,
+      );
 
-        onSave();
-      }, 300);
-    })();
+      setConfiguredEventStages(updatedStages);
+      setEventStages(updatedEventStages);
+
+      onSave();
+    }, 300);
   }, [
     form,
     onClose,
@@ -324,7 +326,9 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       <h3 className="text-xl font-semibold text-white middle-line after:bg-primary-800 before:bg-primary-800">
         {stage.name}
       </h3>
-      <FormProvider {...(form as any)}>{renderContent()}</FormProvider>
+      <PostSetupFormContext.Provider value={form}>
+        {renderContent()}
+      </PostSetupFormContext.Provider>
       <ShareResultsModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}

@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useRef, type JSX } from 'react';
+import React, { useEffect, useMemo, useRef, type JSX } from 'react';
 
 import { useShallow } from 'zustand/shallow';
 
@@ -86,6 +86,22 @@ const PresentationPanel = (): JSX.Element | null => {
     [t],
   );
 
+  // The panel only renders/schedules from these three stage facts; subscribing
+  // to them (rather than deriving from a parent-driven `getCurrentStage()`
+  // call) keeps the memoized panel out of per-award commits while still
+  // restarting the presentation loop at stage/phase changes.
+  const { stageId, stageIsJuryVoting, stageIsOver } = useScoreboardStore(
+    useShallow((state) => {
+      const stage = state.getCurrentStage();
+
+      return {
+        stageId: stage?.id,
+        stageIsJuryVoting: stage?.isJuryVoting,
+        stageIsOver: stage?.isOver,
+      };
+    }),
+  );
+
   const {
     getCurrentStage,
     givePredefinedJuryPoint,
@@ -124,8 +140,6 @@ const PresentationPanel = (): JSX.Element | null => {
     })),
   );
 
-  const currentStage = getCurrentStage();
-
   const {
     isPresenting,
     pauseAfterAnimatedPoints,
@@ -140,10 +154,9 @@ const PresentationPanel = (): JSX.Element | null => {
 
   const isNotQualifierModeStage =
     !isPickQualifiersMode ||
-    currentStage?.id.toUpperCase() === StageId.GF.toUpperCase();
+    stageId?.toUpperCase() === StageId.GF.toUpperCase();
 
-  const withPointsGrouping =
-    currentStage?.isJuryVoting && isNotQualifierModeStage;
+  const withPointsGrouping = stageIsJuryVoting && isNotQualifierModeStage;
 
   // Timer handling
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -158,7 +171,7 @@ const PresentationPanel = (): JSX.Element | null => {
       return;
     }
 
-    if (!currentStage || currentStage.isOver) {
+    if (!stageId || stageIsOver) {
       return;
     }
 
@@ -266,8 +279,8 @@ const PresentationPanel = (): JSX.Element | null => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isPresenting,
-    currentStage?.id,
-    currentStage?.isJuryVoting,
+    stageId,
+    stageIsJuryVoting,
     isPickQualifiersMode,
     enableSplitScreenQualifierRevealMode,
     boardAnimationMode,
@@ -391,4 +404,4 @@ const PresentationPanel = (): JSX.Element | null => {
   );
 };
 
-export default PresentationPanel;
+export default React.memo(PresentationPanel);

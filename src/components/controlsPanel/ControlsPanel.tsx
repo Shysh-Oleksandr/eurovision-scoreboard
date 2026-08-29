@@ -1,5 +1,7 @@
 import { useTranslations } from 'next-intl';
-import { type JSX } from 'react';
+import React, { type JSX } from 'react';
+
+import { useShallow } from 'zustand/shallow';
 
 import { StageVotingMode } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
@@ -18,7 +20,23 @@ const ControlsPanel = (): JSX.Element | null => {
   const votingCountryIndex = useScoreboardStore(
     (state) => state.votingCountryIndex,
   );
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
+  // Subscribe to the exact stage fields this panel renders from, so the
+  // memoized panel re-renders at phase transitions but not on every award.
+  const {
+    isJuryVoting,
+    isOver: isVotingOver,
+    votingMode,
+  } = useScoreboardStore(
+    useShallow((state) => {
+      const stage = state.getCurrentStage();
+
+      return {
+        isJuryVoting: stage?.isJuryVoting,
+        isOver: stage?.isOver,
+        votingMode: stage?.votingMode,
+      };
+    }),
+  );
   const {
     isJuryPointsPanelRounded,
     juryActivePointsUnderline,
@@ -27,12 +45,6 @@ const ControlsPanel = (): JSX.Element | null => {
   const roundedPanelGlowStyle = useQualifiedCountriesPanelGlowStyle(
     roundedCountryContainer,
   );
-
-  const {
-    isJuryVoting,
-    isOver: isVotingOver,
-    votingMode,
-  } = getCurrentStage() || {};
 
   if (isVotingOver) {
     return null;
@@ -80,4 +92,4 @@ const ControlsPanel = (): JSX.Element | null => {
   );
 };
 
-export default ControlsPanel;
+export default React.memo(ControlsPanel);

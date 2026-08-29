@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/shallow';
@@ -14,6 +14,14 @@ import FinalTelevoteReveal from './FinalTelevoteReveal';
 import { PhaseActions } from './PhaseActions';
 import { SimulationHeader } from './SimulationHeader';
 
+import {
+  importJuryScaleRevealSimulation,
+  importPickQualifiersSimulation,
+  importPresentationPanel,
+  importQualificationResultsModal,
+  importWinnerConfetti,
+  importWinnerModal,
+} from '@/hooks/simulationChunkImports';
 import { StageId } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { getFinalRevealInfo } from '@/state/scoreboard/helpers';
@@ -24,45 +32,60 @@ import {
   syncSimulationBackgroundThemeSound,
 } from '@/theme/simulationBackgroundThemeSound';
 
-const QualificationResultsModal = dynamic(
-  () => import('./qualification/QualificationResultsModal'),
-  {
-    ssr: false,
-  },
-);
-const PresentationPanel = dynamic(
-  () => import('../presentationPanel/PresentationPanel'),
-  {
-    ssr: false,
-    // Mirrors the panel's outer structure and min-height so the layout does
-    // not shift when the chunk arrives on a slow connection.
-    loading: () => (
-      <div className="w-full">
-        <div className="min-h-[120px] bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-[10px]" />
-      </div>
-    ),
-  },
-);
-const PickQualifiersSimulation = dynamic(
-  () => import('./qualification/PickQualifiersSimulation'),
-  {
-    ssr: false,
-  },
-);
-const JuryScaleRevealSimulation = dynamic(
-  () => import('./juryScaleReveal/JuryScaleRevealSimulation'),
-  {
-    ssr: false,
-  },
-);
-const WinnerConfetti = dynamic(() => import('./WinnerConfetti'), {
+const QualificationResultsModal = dynamic(importQualificationResultsModal, {
   ssr: false,
 });
-const WinnerModal = dynamic(() => import('./WinnerModal'), {
+const PresentationPanel = dynamic(importPresentationPanel, {
+  ssr: false,
+  // Mirrors the panel's outer structure and min-height so the layout does
+  // not shift when the chunk arrives on a slow connection.
+  loading: () => (
+    <div className="w-full">
+      <div className="min-h-[120px] bg-gradient-to-tr from-[30%] from-primary-950 to-primary-900 rounded-[10px]" />
+    </div>
+  ),
+});
+const PickQualifiersSimulation = dynamic(importPickQualifiersSimulation, {
+  ssr: false,
+});
+const JuryScaleRevealSimulation = dynamic(importJuryScaleRevealSimulation, {
+  ssr: false,
+});
+const WinnerConfetti = dynamic(importWinnerConfetti, {
+  ssr: false,
+});
+const WinnerModal = dynamic(importWinnerModal, {
   ssr: false,
 });
 
 const REVEAL_TRIGGER_DELAY_MS = 3500;
+
+/**
+ * Mounts the qualification-results modal only once the first qualification
+ * result is ready, and does so in a deferred effect (one task after the
+ * stage-end commit) so the modal's mount cost never lands inside the
+ * televote-finish transition commit. Once mounted it stays mounted, so the
+ * modal's own open/close animations and per-stage timers are untouched — the
+ * modal itself opens after its usual 3.4s `openDelay`.
+ */
+const QualificationResultsModalGate = () => {
+  const showQualificationResults = useScoreboardStore(
+    (state) => state.showQualificationResults,
+  );
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    if (!showQualificationResults || mounted) return;
+
+    const timerId = setTimeout(() => setMounted(true), 0);
+
+    return () => clearTimeout(timerId);
+  }, [showQualificationResults, mounted]);
+
+  if (!mounted) return null;
+
+  return <QualificationResultsModal />;
+};
 
 const Simulation = () => {
   const {
@@ -248,7 +271,7 @@ const Simulation = () => {
           {showWinnerModal &&
             (isRevealAnimationComplete || !showRevealPanel) && <WinnerModal />}
 
-          {showQualificationModal && <QualificationResultsModal />}
+          {showQualificationModal && <QualificationResultsModalGate />}
         </div>
       </div>
 
