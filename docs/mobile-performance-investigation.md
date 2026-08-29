@@ -3,6 +3,17 @@
 > **Follow-up:** the runtime-smoothness investigation and the phased execution plan
 > live in [performance-improvement-plan.md](./performance-improvement-plan.md) —
 > start there; this document is the load-path background.
+>
+> **Phase 3 (2026-08-29) executed §4's mechanical table and superseded parts of
+> §3.** Corrections worth knowing before reading on: the entry route's lazy chain
+> was **four** levels deep, not two (§3.1) — the third was a 1 KB
+> `SnowfallAnimation` chunk and the fourth was the countries preset, fetched only
+> after the eager bundle evaluated; the local preview **does** gzip static chunks
+> (§1's compression caveat holds only for the HTML document); and the eager
+> chunk's lodash (§3.5) came from `@75lb/deep-merge`, with the 34 KB `Buffer`
+> polyfill coming from a stray `Buffer` reference in axios. See Phase 3's section
+> in the plan for the numbers and for the two rows measured and *declined*
+> (i18n namespace split, ~25–40 ms in production).
 
 Date: 2026-08-29. Research only — no fixes applied. Raw artifacts (traces, Lighthouse
 reports, screenshots, filmstrips) are in `../../perf-artifacts/` at the monorepo root.

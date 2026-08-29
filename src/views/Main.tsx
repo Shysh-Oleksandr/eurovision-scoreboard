@@ -4,6 +4,7 @@ import { useDeferredValue } from 'react';
 
 import dynamic from 'next/dynamic';
 
+import SnowfallAnimation from '../components/effects/SnowfallAnimation';
 import EventSetupModal from '../components/setup/EventSetupModal';
 import { PageWrapper } from '../components/simulation/PageWrapper';
 
@@ -15,10 +16,6 @@ import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const Simulation = dynamic(importSimulation, { ssr: false });
-const SnowfallAnimation = dynamic(
-  () => import('../components/effects/SnowfallAnimation'),
-  { ssr: false },
-);
 
 const Main = () => {
   // Subscribe to the boolean only: Main re-rendering per store update would

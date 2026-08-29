@@ -2,7 +2,6 @@ import { create } from 'zustand';
 
 import { devtools, persist } from 'zustand/middleware';
 
-import deepMerge from '@75lb/deep-merge';
 import { Year } from '../config';
 import { ALL_COUNTRIES } from '../data/countries/common-countries';
 import {
@@ -15,9 +14,12 @@ import {
   VotingCountry,
 } from '../models';
 
-import { RestOfWorld } from '@/data/countries';
+import deepMerge from './deepMerge';
 import { useGeneralStore } from './generalStore';
 import { useScoreboardStore } from './scoreboardStore';
+
+import { RestOfWorld } from '@/data/countries';
+import { buildCountriesUrl } from '@/data/countries/countriesDataUrl';
 
 export type CountryOdds = Record<
   string,
@@ -100,20 +102,12 @@ export const useCountriesStore = create<CountriesState>()(
     persist(
       (set, get) => {
         // Helpers (internal to store factory)
-        const COUNTRIES_DATA_VERSION = '2026-05-25'; // bump when any data in countries JSON changes
-
-        const buildCountriesUrl = (year: Year, isJunior: boolean) => {
-          const base = isJunior
-            ? `/data/countries/junior-countries-${year}.json`
-            : `/data/countries/countries-${year}.json`;
-          return `${base}?v=${COUNTRIES_DATA_VERSION}`;
-        };
-
         const parseCountriesJson = (json: unknown): CountriesPreset => {
           if (Array.isArray(json)) {
             return { countries: json };
           }
           const preset = json as CountriesPreset;
+
           return {
             semiFinalVotingMode: preset.semiFinalVotingMode,
             countries: preset.countries,
@@ -130,6 +124,7 @@ export const useCountriesStore = create<CountriesState>()(
             if (typeof window !== 'undefined') return path;
             const baseEnv =
               process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
             try {
               return new URL(path, baseEnv).toString();
             } catch {
@@ -138,6 +133,7 @@ export const useCountriesStore = create<CountriesState>()(
           };
 
           const res = await fetch(toAbsolute(url), { cache: 'force-cache' });
+
           if (res.ok) return parseCountriesJson(await res.json());
 
           if (isJunior && res.status === 404) {
@@ -147,6 +143,7 @@ export const useCountriesStore = create<CountriesState>()(
                 cache: 'force-cache',
               },
             );
+
             if (escRes.ok) return parseCountriesJson(await escRes.json());
           }
 
@@ -279,7 +276,7 @@ export const useCountriesStore = create<CountriesState>()(
             // never tie visibility to isJuryVoting or persisted predefinedVotes — those
             // reflect a previous run and would hide WW on the Televote tab while
             // stale televote.WW data still affects totals.
-            const votingMode = relevantStage.votingMode;
+            const { votingMode } = relevantStage;
             const isRestOfWorldVoting =
               allowROTW &&
               (fromScoreboard
@@ -322,12 +319,14 @@ export const useCountriesStore = create<CountriesState>()(
           getContestParticipants: () => {
             const { getAllCountries, eventAssignments } = get();
             const participants: BaseCountry[] = [];
+
             getAllCountries().forEach((country) => {
               const assignedGroup = eventAssignments[country.code];
 
               const participatesSomewhere =
                 assignedGroup &&
                 assignedGroup !== CountryAssignmentGroup.NOT_PARTICIPATING;
+
               if (participatesSomewhere) {
                 participants.push(country);
               }
@@ -397,6 +396,7 @@ export const useCountriesStore = create<CountriesState>()(
               { juryOdds?: number; televoteOdds?: number }
             > = get().countryOdds;
             const shouldLoadOdds = Object.keys(initialOdds).length === 0;
+
             if (shouldLoadOdds) {
               initialOdds = {};
 

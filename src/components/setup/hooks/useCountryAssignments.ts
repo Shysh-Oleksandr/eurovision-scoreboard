@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
 
 import {
   BaseCountry,
@@ -26,8 +26,11 @@ export const useCountryAssignments = () => {
 
   const stageIds = configuredEventStages.map((s) => s.id).join(',');
 
-  // This is used to initialize the country assignments for the event
-  useEffect(() => {
+  // This is used to initialize the country assignments for the event.
+  // Layout effect for the same reason as useInitialLineup: the initial
+  // assignment has to land before the first paint, otherwise every country
+  // shows up under "not participating" for a frame and then jumps.
+  useLayoutEffect(() => {
     if (Object.keys(eventAssignments).length > 0) return;
 
     // Initialize assignments even if there are no stages

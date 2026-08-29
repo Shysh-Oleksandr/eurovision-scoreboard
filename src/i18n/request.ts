@@ -74,6 +74,31 @@ function deepMergeMessages(base: any, override: any): any {
   return result;
 }
 
+// The en+locale deep merge produces a ~70 KB structure and is otherwise
+// repeated on every request; cache it per locale for the life of the isolate.
+const mergedMessagesCache = new Map<SupportedLocale, any>();
+
+async function getMessages(locale: SupportedLocale) {
+  const cached = mergedMessagesCache.get(locale);
+
+  if (cached) return cached;
+
+  const defaultMessages = (await import('../../messages/en.json')).default;
+
+  let messages = defaultMessages;
+
+  if (locale !== 'en') {
+    const localeMessages = (await import(`../../messages/${locale}.json`))
+      .default;
+
+    messages = deepMergeMessages(defaultMessages, localeMessages);
+  }
+
+  mergedMessagesCache.set(locale, messages);
+
+  return messages;
+}
+
 export default getRequestConfig(async () => {
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get('locale')?.value as
@@ -87,19 +112,8 @@ export default getRequestConfig(async () => {
     (cookieLocale && normalizeLocale(cookieLocale)) ||
     parseAcceptLanguage(acceptLanguage);
 
-  const defaultMessages = (await import('../../messages/en.json')).default;
-
-  let messages = defaultMessages;
-
-  if (resolvedLocale !== 'en') {
-    const localeMessages = (
-      await import(`../../messages/${resolvedLocale}.json`)
-    ).default;
-    messages = deepMergeMessages(defaultMessages, localeMessages);
-  }
-
   return {
     locale: resolvedLocale,
-    messages,
+    messages: await getMessages(resolvedLocale),
   };
 });

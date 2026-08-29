@@ -2,9 +2,9 @@ import isDeepEqual from 'fast-deep-equal';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 
-import deepMerge from '@75lb/deep-merge';
 import { devtools, persist } from 'zustand/middleware';
 
+import deepMerge from './deepMerge';
 import { createEventActions } from './scoreboard/eventActions';
 import { createGetters } from './scoreboard/getters';
 import { createJuryScaleRevealActions } from './scoreboard/juryScaleRevealActions';

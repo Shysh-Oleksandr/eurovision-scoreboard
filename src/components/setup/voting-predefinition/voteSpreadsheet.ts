@@ -1,5 +1,3 @@
-import * as XLSX from 'xlsx';
-
 import {
   parseVoteSpreadsheetGrid,
   type ParsedVoteSections,
@@ -9,6 +7,21 @@ import {
 
 import { StageVotingMode } from '@/models';
 import type { StageVotes } from '@/state/scoreboard/types';
+
+/**
+ * `xlsx` is ~400 KB. It used to be a static import, and because this module is
+ * reached from two different lazy subtrees (the voting-predefinition modal and
+ * the final-stats modal) Turbopack emitted the whole library *twice*. Loading
+ * it through a single `import()` call site here gives both subtrees one shared
+ * async chunk, fetched only when a spreadsheet is actually read or written.
+ */
+let xlsxPromise: Promise<typeof import('xlsx')> | null = null;
+
+const loadXlsx = () => {
+  xlsxPromise ??= import('xlsx');
+
+  return xlsxPromise;
+};
 
 export type VoteSpreadsheetSection = {
   label: string;
@@ -46,6 +59,7 @@ export type VoteSpreadsheetImportResult =
 export async function readSpreadsheetGridFromFile(
   file: File,
 ): Promise<string[][]> {
+  const XLSX = await loadXlsx();
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, { type: 'array' });
   const sheetName = workbook.SheetNames[0];
@@ -97,10 +111,11 @@ export function buildSpreadsheetRows(
   return rows;
 }
 
-export function downloadVoteSpreadsheet({
+export async function downloadVoteSpreadsheet({
   filename,
   sections,
 }: VoteSpreadsheetExportPayload) {
+  const XLSX = await loadXlsx();
   const rows = buildSpreadsheetRows(sections);
   const worksheet = XLSX.utils.aoa_to_sheet(rows);
   const workbook = XLSX.utils.book_new();

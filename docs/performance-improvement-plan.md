@@ -427,6 +427,217 @@ shell (the only route to ~2.5 s mobile LCP) is still worth a project-sized effor
 the user cares about metrics least, so default is to stop at ~4.5–5 s LCP from the
 mechanical wins.
 
+**Status: DONE (2026-08-29).** Traces in `../../perf-artifacts/phase3/`
+(`trace-before-cold*` = pre-phase build, `trace-step1/step2-cold` = per-step,
+`trace-after-cold` = final; `lh-before*` / `lh-after*` = Lighthouse reports).
+
+Method note (differs from phases 0–2, and matters): every load number below is a
+**cold** load in a *fresh isolated browser context* (new cache + new storage =
+a genuine first visit), traced by navigating *into* an already-started
+recording. Reloading an already-visited page hides the whole finding — Chrome
+serves the late dynamic-import chunks from the memory cache even with
+`ignoreCache`, so their round trips cost ~1 ms and the waterfall looks flat.
+Two more environment facts: the preview **does** gzip static chunks (the
+part-1 "no compression" caveat applies only to the HTML document, which is
+still served `identity` locally but brotli in prod), and the ~580 ms
+`navigationStart`→request gap is present in every run, so it cancels out in
+before/after comparisons.
+
+### Results
+
+Cold first visit, mobile emulation (390x844x3 + touch, 4x CPU, Slow 4G),
+2 baseline runs / 2 final runs:
+
+| | before | after |
+|---|---|---|
+| LCP (= FCP) | 5079 / 5076 ms | **4505 / 4518 ms** |
+| render-critical JS round-trip levels | **4** | **2** |
+| initial chunk batch | 17 chunks / 272 KB | 18 chunks / 300 KB |
+| countries preset fetch | 3830 → 4398 ms | **616 → 1207 ms** |
+| load CLS | 0.00 | 0.00 |
+| deployed chunk weight | 20 MB | **18 MB** |
+
+Lighthouse (mobile, `--throttling-method=simulate`, 3 runs each) is far noisier
+than the trace method — LCP 7.2 / 5.8 / 5.3 s before vs 5.3 / 5.0 / 5.2 s
+after, score 73 / 73 / 76 → 77 / 79 / 80, TBT 110 / 80 / 70 → 80 / 30 / 40 ms.
+Read it as "~6.1 → ~5.2 s, 74 → 79"; the ±1 s spread means the trace numbers
+above are the ones to trust. a11y stayed 100.
+
+### What the "before" waterfall actually looked like
+
+The interesting finding is that §3.1's "two-level chain" was really a
+**four-level** one, and the last two levels were nearly free in bytes:
+
+- L1 — 17 render-critical chunks, 272 KB, 606 → 3462 ms.
+- L2 — `Main` + `EventSetupModal` (16 + 16 KB), 3637 → 4395 ms. Discovered only
+  after hydration, because of `dynamic(() => import('views/Main'), {ssr:false})`.
+- L3 — **a 1 KB chunk containing nothing but `SnowfallAnimation.tsx`**,
+  4448 → 5035 ms. `Main` wrapped it in a second `dynamic()`, even though the
+  component is a 40-line wrapper that *itself* lazy-loads `react-snowfall`. A
+  whole round trip, ~590 ms, for a byte-free indirection.
+- In parallel with all that, `/data/countries/countries-2026.json` was not
+  requested until **3830 ms** — it is fetched by `generalStore`'s
+  `onRehydrateStorage`, so it cannot start until the eager bundle has
+  evaluated. The setup screen cannot lay out its stages without it.
+
+### Step 1 — kill the render-critical round trips (the whole win)
+
+1. **`Main` is imported statically again.** `app/(main)/page.tsx` renders it
+   behind a `useIsClient()` gate (new `src/hooks/useIsClient.ts`) instead of
+   `dynamic(..., {ssr:false})`: the server output stays empty (the stores
+   rehydrate from localStorage, so server-rendering it would guarantee a
+   hydration mismatch) but the code now ships with the initial bundle and
+   downloads in parallel with it. L1 grows 272 → 303 KB and its tail moves
+   +224 ms; the 758 ms serialized hop disappears.
+2. **`SnowfallAnimation` is a static import** in `views/Main.tsx`. `react-snowfall`
+   stays lazy inside it, so nothing heavy moved — the third round trip is
+   simply gone.
+3. **The countries preset is preloaded from the document** —
+   `ReactDOM.preload(INITIAL_COUNTRIES_URL, {as:'fetch', crossOrigin:'anonymous'})`
+   in the root layout, with the URL built by the new
+   `src/data/countries/countriesDataUrl.ts` that `countriesStore` now imports
+   too (so the preload can never drift from the fetch). 3830 → **616 ms**.
+
+Step 1 alone: LCP 5079 → 4538 ms, 4 levels → 2.
+
+**A 0.43 first-visit CLS appeared during this step and was fixed by (3).** With
+`Main` mounting ~600 ms earlier, the setup screen started painting *before* the
+countries JSON arrived: 16 buttons, no stage cards, a "Не беруть участі"
+section — then the data landed and the layout jumped. Making
+`useInitialLineup` / `useCountryAssignments` layout effects (worth keeping —
+their initialisation now lands before paint) was *not* enough, because the
+missing input was a network response, not a render pass. Preloading the JSON
+removed the intermediate state entirely; load CLS is back to 0.00.
+
+Also fixed here, a **pre-existing latent bug** the new chunk grouping exposed:
+`src/app/error.tsx` read `navigator.platform` at module scope, which crashed
+the `/about` prerender (`ReferenceError: navigator is not defined`) as soon as
+that module landed in a chunk evaluated during SSR. It now reads lazily.
+
+### Step 2 — eager-chunk diet
+
+`@75lb/deep-merge` is gone, replaced by `src/state/deepMerge.ts` (~45 lines,
+`src/state/deepMerge.test.ts` covers the semantics). The package is trivial but
+reaches its work through `lodash/assignWith`, which dragged **50 lodash modules
+plus Next's 34 KB `Buffer` polyfill** (via `lodash/isBuffer` → `_nodeUtil`)
+into the render-critical chunk, since both stores are on the boot path. The
+replacement is a faithful port — including the quirks (mutates the target,
+empty incoming arrays are ignored *unless* the target has no value, `null`
+counts as defined) — and was validated by differential-testing it against the
+real package over ~13,000 generated structures plus the store-shaped cases:
+0 mismatches.
+
+Measured: eager chunk 263 → 255 KB raw / 73 → 70 KB gz, LCP 4538 → 4518 ms
+(inside run-to-run noise; the value here is bytes and parse work, not a
+visible LCP move).
+
+**The 34 KB `Buffer` polyfill is still there, and it is axios's fault** —
+`axios/lib/helpers/toFormData.js` references the free variable `Buffer` in a
+branch that only runs under Node, and that one reference makes Turbopack inject
+the polyfill. A `turbopack.resolveAlias` mapping `buffer` to a browser stub was
+tried and had **zero effect** (byte-identical chunk), so the injection does not
+go through user-facing resolution. Removing it therefore means removing axios:
+~59 KB raw / ~17 KB gz off the first hop (axios ~25 KB + polyfill 34 KB), at
+the cost of porting 103 `api.*` call sites and the 401-refresh interceptor to a
+fetch wrapper. Scoped and ready, deliberately **not** done in this phase — see
+"left on the table".
+
+### Step 3 — i18n namespace split: measured, then rejected
+
+Built a probe that trims the server catalog to the shell namespaces (drops the
+`guide` bodies, `settings.{general2,relations,odds,voting}` and all of
+`simulation` — 44 % of the merged catalog, the most aggressive split the app
+can support): document **141 → 92 KB**, LCP 4518 → **4435 ms**, i.e. **−83 ms**
+locally, where the HTML is uncompressed. In production the document is brotli'd
+(~25 KB), so the real saving is roughly a third of that — **~25–40 ms**.
+
+The reason is visible in the waterfall: the document finishes at ~1.7 s while
+the JS finishes at ~3.7 s, so the catalog is *not* on the critical path; it
+only competes for bandwidth. Shipping the split would mean a route handler
+serving the deferred namespaces, a client provider that merges them in, and
+failure modes across 9 locales — and the deferrable set shrinks further on
+inspection, because shell components reach into supposedly-modal namespaces
+(`SetupHeader` uses `settings.general.contest`, `ThemeSoundVolumeHud` uses
+`settings.ui`, `GuideButton` uses `guide.title`, and the post-setup tabs use
+`settings.odds` / `settings.voting`). **Not worth it.** The probe was reverted.
+
+One safe piece was kept: `src/i18n/request.ts` now memoises the en+locale deep
+merge per locale for the life of the isolate, instead of rebuilding a ~70 KB
+structure on every request.
+
+### Step 4 — xlsx dedup
+
+`voteSpreadsheet.ts` loads `xlsx` through a single `import()` call site
+(`loadXlsx()`) instead of a static import. Because the module is reached from
+two different lazy subtrees (the voting-predefinition modal and the final-stats
+modal), Turbopack had been emitting the entire library **twice**: two 412 KB
+chunks. Now one 403 KB chunk, shared — and it is fetched only when a
+spreadsheet is actually read or written, not when either modal opens.
+`downloadVoteSpreadsheet` / `exportVotesToSpreadsheet` and their two call sites
+became async. Deployed `static/chunks` weight 20 MB → 18 MB. Verified live: the
+Export button in the stats modal fetches exactly one new chunk and the download
+works.
+
+### SSR shell: not attempted
+
+Per this phase's own instruction, the decision after phases 1–2 was to stop at
+the mechanical wins. The mechanical wins landed us at ~4.5 s (trace) / ~5.2 s
+(Lighthouse) rather than the hoped ~4.5–5 s Lighthouse figure, and the
+remaining LCP is still ~90 % render delay gated by the 300 KB initial bundle.
+An SSR shell remains the only route to ~2.5 s and is still a project, not a
+patch.
+
+### Left on the table (scoped, with numbers)
+
+- **Drop axios for a fetch wrapper**: ~17 KB gz off the render-critical first
+  hop (25 KB axios + the 34 KB `Buffer` polyfill it forces in). 103 call sites,
+  plus `parseAxiosError` and the refresh interceptor.
+- **The i18n split**: ~25–40 ms in production, moderate risk. Numbers above.
+- `themes.ts` (11 KB raw) and `votingActions.ts` (27 KB raw) are still eager
+  because the stores are reachable from `layout.tsx`; decoupling them is part 1's
+  L-effort/high-risk row and untouched.
+
+### Setup→voting CLS: re-verified, as Phase 2 asked
+
+Phase 2 flagged a 0.49 CLS at the setup→voting transition in all its MCP runs
+(including its phase-1-build baseline, where phase 1 had measured 0.02) and
+asked for a re-check here. Measured on the final build, same emulation, three
+scripted runs of setup → ПОЧАТИ → start SF1: **0.489, 0.037, 0.027**. So it is
+real but **intermittent**, it predates phase 3 (phase 2 saw it on the phase-1
+build), and the shifting elements are board rows (`data-flip-config`) moving
+from their pre-FLIP position to the final one at board mount — an animation
+concern, not a load-path one. Load CLS itself is 0.00. Left for a targeted
+follow-up rather than smuggled into this phase.
+
+### Verification
+
+`yarn lint:types-cli` clean; ESLint on every changed file at or below its
+pre-existing error count (`countriesStore.ts` 14 → 0 and `i18n/request.ts`
+3 → 2 after `--fix`, everything else unchanged); vitest **102/104** — the same
+2 pre-existing stale failures as phases 0–2, and 9 new `deepMerge` tests.
+Functional pass on the rebuilt preview: first visit renders the full lineup
+(SF1 15 / SF2 15 / GF 5, qualifiers 10+10) with no intermediate state;
+ПОЧАТИ → post-setup → start SF1 mounts the board; two finish-randomly cycles
+complete the show; stats modal opens and its spreadsheet Export fetches the
+shared xlsx chunk and downloads; reload restores the persisted board through
+the new `deepMerge`; continue → SF2 post-setup → SF2 starts; settings and guide
+modals open fully translated (Ukrainian); no console errors beyond the known
+umami 429 on localhost.
+
+New tooling: `scripts/perf/load-waterfall.mjs` (round-trip levels, per-level
+bytes, cache hits, FP/FCP/LCP from a trace) and `scripts/perf/chunk-modules.mjs`
+(attribute built chunks to source modules via the Turbopack source maps,
+`--find <module>` to locate one across chunks).
+
+Changed files: `app/(main)/page.tsx`, `app/layout.tsx`, `app/error.tsx`,
+`views/Main.tsx`, `i18n/request.ts`, `state/countriesStore.ts`,
+`state/scoreboardStore.ts`, `components/setup/hooks/useInitialLineup.ts`,
+`components/setup/hooks/useCountryAssignments.ts`,
+`components/setup/voting-predefinition/{voteSpreadsheet.ts,useVotingPredefinition.ts,VotingPredefinitionModal.tsx}`,
+`components/simulation/finalStats/FinalStatsModal.tsx`, `package.json`,
+`yarn.lock`; new `hooks/useIsClient.ts`, `data/countries/countriesDataUrl.ts`,
+`state/deepMerge.ts` + `state/deepMerge.test.ts`, and the two perf scripts.
+
 ### Phase 4 — Editor and browsing (effort: M, risk: low; needs auth + data)
 
 1. Log in (real Google account, or a seeded local user) and profile a theme-editing

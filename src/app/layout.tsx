@@ -2,6 +2,7 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
+import ReactDOM from 'react-dom';
 
 import Script from 'next/script';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -13,6 +14,7 @@ import IntlProvider from './IntlProvider';
 import Providers from './providers';
 import ToastRoot from './toast-root';
 
+import { INITIAL_COUNTRIES_URL } from '@/data/countries/countriesDataUrl';
 import { FONT_ALIAS_ALLOWLIST } from '@/theme/fontAliases';
 
 const FOUC_FONT_ALLOWED_LITERAL = `{${FONT_ALIAS_ALLOWLIST.map(
@@ -99,6 +101,17 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const locale = await getLocale();
+
+  // The countries preset gates the *useful* first render — the setup screen
+  // can only lay out its stages once it arrives — but the store only requests
+  // it after the eager bundle has evaluated, a whole round trip later.
+  // Preloading it alongside the bundle removes that serialized hop, and with
+  // it a first-visit layout shift (the screen no longer paints country-less
+  // and then fills in).
+  ReactDOM.preload(INITIAL_COUNTRIES_URL, {
+    as: 'fetch',
+    crossOrigin: 'anonymous',
+  });
 
   return (
     <html
