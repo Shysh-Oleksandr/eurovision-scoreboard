@@ -1,5 +1,12 @@
 import gsap from 'gsap';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useGSAP } from '@gsap/react';
 
@@ -13,7 +20,7 @@ export type BoardItemAnimationMode = 'flip' | 'teleport';
 
 type TeleportAnimationPhase = 'outStart' | 'out' | 'inStart' | 'in';
 type TeleportDirection = 'up' | 'down';
-type TeleportAnimationState = {
+type ActiveTeleportPhase = {
   phase: TeleportAnimationPhase;
   direction: TeleportDirection;
 };
@@ -21,16 +28,65 @@ type TeleportAnimationState = {
 const TELEPORT_OUT_DURATION_MS = 400;
 const TELEPORT_IN_DURATION_MS = 400;
 const TELEPORT_OUT_PHASE_DURATION_MS = 420;
-const TELEPORT_IN_PHASE_DURATION_MS = 420;
 const TELEPORT_FLIP_PHASE_DURATION_MS = 380;
 const TELEPORT_IN_START_DELAY_MS = 40;
 const TELEPORT_OUT_START_DELAY_MS = 16;
 const TELEPORT_START_DELAY_MS = 0;
 const COUNT_UP_DURATION_MS = 600; // must match CountUp duration in PointsSection
 const PHASE_OVERLAP_RATIO = 0.7;
-const TELEPORT_OUT_PREFERRED_STAGGER_MS = 70;
-const TELEPORT_IN_PREFERRED_STAGGER_MS = 70;
-const TELEPORT_MIN_STAGGER_MS = 42;
+
+// Teleport phases write inline styles straight to the item DOM nodes (via the
+// node registry below) instead of routing through React state: the visuals are
+// identical to the old class flips, but a phase tick no longer re-renders the
+// whole board subtree. Only opacity/transform ever change during a phase, so
+// the transitions list them explicitly instead of `all`.
+const buildTeleportTransition = (durationMs: number) =>
+  `opacity ${durationMs}ms ease-out, transform ${durationMs}ms ease-out`;
+const TELEPORT_TRANSITION_OUT = buildTeleportTransition(
+  TELEPORT_OUT_DURATION_MS,
+);
+const TELEPORT_TRANSITION_IN = buildTeleportTransition(TELEPORT_IN_DURATION_MS);
+
+const applyTeleportPhaseStyles = (
+  node: HTMLElement,
+  phase: TeleportAnimationPhase,
+  direction: TeleportDirection,
+) => {
+  const startOffset = direction === 'up' ? '6px' : '-6px';
+
+  // will-change is applied per phase (like the old class flips did), not
+  // statically: a permanent will-change would make every row a stacking
+  // context and paint the overflowing douze-hearts overlay under the
+  // following rows.
+  if (phase === 'outStart') {
+    node.style.transition = '';
+    node.style.willChange = '';
+    node.style.opacity = '1';
+    node.style.transform = `translateY(${startOffset})`;
+  } else if (phase === 'out') {
+    node.style.transition = TELEPORT_TRANSITION_OUT;
+    node.style.willChange = 'transform, opacity';
+    node.style.opacity = '0';
+    node.style.transform = 'translateY(0px)';
+  } else if (phase === 'inStart') {
+    node.style.transition = '';
+    node.style.willChange = '';
+    node.style.opacity = '0';
+    node.style.transform = `translateY(${startOffset})`;
+  } else {
+    node.style.transition = TELEPORT_TRANSITION_IN;
+    node.style.willChange = 'transform, opacity';
+    node.style.opacity = '1';
+    node.style.transform = 'translateY(0px)';
+  }
+};
+
+const clearTeleportStyles = (node: HTMLElement) => {
+  node.style.transition = '';
+  node.style.willChange = '';
+  node.style.opacity = '';
+  node.style.transform = '';
+};
 
 const areOrdersEqual = (left: string[], right: string[]) => {
   if (left.length !== right.length) return false;
@@ -44,30 +100,9 @@ const sortBottomToTopByOrder = (codes: string[], order: string[]) => {
   });
 };
 
-const getAdaptiveStaggerMs = (
-  itemCount: number,
-  phaseDurationMs: number,
-  phaseStartDelayMs: number,
-  transitionDurationMs: number,
-  preferredStaggerMs: number,
-) => {
-  if (itemCount <= 1) return 0;
-
-  const availableWindow =
-    phaseDurationMs - phaseStartDelayMs - transitionDurationMs;
-  const maxStaggerThatFits = availableWindow / (itemCount - 1);
-
-  if (maxStaggerThatFits <= 0) return 0;
-
-  if (maxStaggerThatFits >= preferredStaggerMs) {
-    return preferredStaggerMs;
-  }
-
-  return Math.max(TELEPORT_MIN_STAGGER_MS, maxStaggerThatFits);
-};
-
 const getPointsByCode = (countries: Country[]) => {
   const pointsByCode: Record<string, number> = {};
+
   countries.forEach((country) => {
     pointsByCode[country.code] = country.points;
   });
@@ -106,12 +141,17 @@ export const useBoardAnimations = (
     sortedCountries.map((c) => c.code),
   );
   const [finalCountries, setFinalCountries] = useState<Country[]>([]);
-  const [teleportStateByCode, setTeleportStateByCode] = useState<
-    Record<string, TeleportAnimationState>
-  >({});
-  const [teleportOnlyByCode, setTeleportOnlyByCode] = useState<
-    Record<string, boolean>
-  >({});
+  const itemNodesRef = useRef(new Map<string, HTMLElement>());
+  const itemRefCallbacksRef = useRef(
+    new Map<string, (node: HTMLElement | null) => void>(),
+  );
+  const teleportOnlyByCodeRef = useRef<Record<string, boolean>>({});
+  /** Phase currently applied to each animated node — the source of truth for
+   *  re-asserting inline styles after react-flip-toolkit wipes them. */
+  const activeTeleportPhaseByCodeRef = useRef(
+    new Map<string, ActiveTeleportPhase>(),
+  );
+  const boardItemAnimationModeRef = useRef(boardItemAnimationMode);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const teleportTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const displayOrderRef = useRef(displayOrder);
@@ -160,6 +200,47 @@ export const useBoardAnimations = (
     teleportTimelineRef.current = null;
   }, []);
 
+  /** Registry of item root nodes, keyed by country code (stable callbacks so
+   *  memoized items don't re-render from ref identity churn). */
+  const getItemRef = useCallback((code: string) => {
+    let refCallback = itemRefCallbacksRef.current.get(code);
+
+    if (!refCallback) {
+      refCallback = (node: HTMLElement | null) => {
+        if (node) {
+          itemNodesRef.current.set(code, node);
+        } else {
+          itemNodesRef.current.delete(code);
+        }
+      };
+      itemRefCallbacksRef.current.set(code, refCallback);
+    }
+
+    return refCallback;
+  }, []);
+
+  const clearAllTeleportItemStyles = useCallback(() => {
+    Object.keys(teleportOnlyByCodeRef.current).forEach((code) => {
+      const node = itemNodesRef.current.get(code);
+
+      if (node) clearTeleportStyles(node);
+    });
+    teleportOnlyByCodeRef.current = {};
+    activeTeleportPhaseByCodeRef.current.clear();
+  }, []);
+
+  // Mirrors the old mode check in getCountryAnimationClassName: when the mode
+  // leaves 'teleport' mid-cycle (theme change, winner board), phase styles
+  // vanish immediately while the timeline still runs to completion so its
+  // side effects (queue handoff, last-points reset) fire exactly as before.
+  useEffect(() => {
+    boardItemAnimationModeRef.current = boardItemAnimationMode;
+
+    if (boardItemAnimationMode !== 'teleport') {
+      clearAllTeleportItemStyles();
+    }
+  }, [boardItemAnimationMode, clearAllTeleportItemStyles]);
+
   const runTeleportSequence = useCallback(
     (
       newOrder: string[],
@@ -175,6 +256,7 @@ export const useBoardAnimations = (
         if (runId !== animationRunIdRef.current) return;
 
         const queuedUpdate = queuedTeleportUpdateRef.current;
+
         if (queuedUpdate) {
           queuedTeleportUpdateRef.current = null;
 
@@ -190,6 +272,7 @@ export const useBoardAnimations = (
               TELEPORT_START_DELAY_MS,
               countUpRemaining,
             );
+
             timeoutRef.current = setTimeout(() => {
               runTeleportSequence(
                 queuedUpdate.order,
@@ -218,33 +301,26 @@ export const useBoardAnimations = (
       const animatedMovedCodes = movedCodes.filter(
         (code) => shouldAnimateByCode[code],
       );
-      const nextTeleportOnlyByCode: Record<string, boolean> = {};
-      animatedMovedCodes.forEach((code) => {
-        nextTeleportOnlyByCode[code] = true;
-      });
-      setTeleportOnlyByCode(nextTeleportOnlyByCode);
 
-      if (movedCodes.length === 0) {
-        displayOrderRef.current = newOrder;
-        setDisplayOrder(newOrder);
-        setTeleportStateByCode({});
-        setTeleportOnlyByCode({});
-        continueWithQueuedOrFinish(newOrder, hasDouzePointsAnimation);
+      // Any styles a previous (killed) run left behind are stale now.
+      clearAllTeleportItemStyles();
 
-        return;
-      }
-
-      // When no moved country received points, we should only do FLIP movement.
-      // Avoid creating a no-op timeline that can leave the cycle locked.
+      // Nothing moved, or no moved country received points (FLIP-only move):
+      // don't create a no-op timeline that can leave the cycle locked.
       if (animatedMovedCodes.length === 0) {
         displayOrderRef.current = newOrder;
         setDisplayOrder(newOrder);
-        setTeleportStateByCode({});
-        setTeleportOnlyByCode({});
         continueWithQueuedOrFinish(newOrder, hasDouzePointsAnimation);
 
         return;
       }
+
+      const nextTeleportOnlyByCode: Record<string, boolean> = {};
+
+      animatedMovedCodes.forEach((code) => {
+        nextTeleportOnlyByCode[code] = true;
+      });
+      teleportOnlyByCodeRef.current = nextTeleportOnlyByCode;
 
       teleportTimelineRef.current?.kill();
 
@@ -254,12 +330,12 @@ export const useBoardAnimations = (
 
           displayOrderRef.current = newOrder;
           setDisplayOrder(newOrder);
-          setTeleportStateByCode({});
-          setTeleportOnlyByCode({});
+          clearAllTeleportItemStyles();
           teleportTimelineRef.current = null;
           continueWithQueuedOrFinish(newOrder, hasDouzePointsAnimation);
         },
       });
+
       teleportTimelineRef.current = timeline;
 
       const outOrder = sortBottomToTopByOrder(
@@ -272,61 +348,50 @@ export const useBoardAnimations = (
       animatedMovedCodes.forEach((code) => {
         const previousIndex = previousOrder.indexOf(code);
         const newIndex = newOrder.indexOf(code);
+
         directionByCode[code] = newIndex < previousIndex ? 'up' : 'down';
       });
 
       const outStartDelay = TELEPORT_OUT_START_DELAY_MS / 1000;
       const inStartDelay = TELEPORT_IN_START_DELAY_MS / 1000;
       const inDuration = TELEPORT_IN_DURATION_MS / 1000;
-      const outStaggerMs = getAdaptiveStaggerMs(
-        outOrder.length,
-        TELEPORT_OUT_PHASE_DURATION_MS,
-        TELEPORT_OUT_START_DELAY_MS,
-        TELEPORT_OUT_DURATION_MS,
-        TELEPORT_OUT_PREFERRED_STAGGER_MS,
-      );
-      const inStaggerMs = getAdaptiveStaggerMs(
-        inOrder.length,
-        TELEPORT_IN_PHASE_DURATION_MS,
-        TELEPORT_IN_START_DELAY_MS,
-        TELEPORT_IN_DURATION_MS,
-        TELEPORT_IN_PREFERRED_STAGGER_MS,
-      );
       const outPhaseDurationMs =
         animatedMovedCodes.length > 0 ? TELEPORT_OUT_PHASE_DURATION_MS : 0;
-      const outBlockDuration = outPhaseDurationMs / 1000;
       const flipStartAtSeconds =
         (outPhaseDurationMs * PHASE_OVERLAP_RATIO) / 1000;
       const fadeInPhaseStartAtSeconds =
         flipStartAtSeconds +
         (TELEPORT_FLIP_PHASE_DURATION_MS * PHASE_OVERLAP_RATIO) / 1000;
 
-      outOrder.forEach((code) => {
-        const itemStartTime = 0;
+      const applyPhaseToItem = (
+        code: string,
+        phase: TeleportAnimationPhase,
+      ) => {
+        if (runId !== animationRunIdRef.current) return;
+        if (boardItemAnimationModeRef.current !== 'teleport') return;
+
         const direction = directionByCode[code];
 
-        timeline.call(
-          () => {
-            if (runId !== animationRunIdRef.current) return;
+        activeTeleportPhaseByCodeRef.current.set(code, { phase, direction });
 
-            setTeleportStateByCode((previous) => ({
-              ...previous,
-              [code]: { phase: 'outStart', direction },
-            }));
-          },
+        const node = itemNodesRef.current.get(code);
+
+        if (!node) return;
+
+        applyTeleportPhaseStyles(node, phase, direction);
+      };
+
+      outOrder.forEach((code) => {
+        const itemStartTime = 0;
+
+        timeline.call(
+          () => applyPhaseToItem(code, 'outStart'),
           undefined,
           itemStartTime,
         );
 
         timeline.call(
-          () => {
-            if (runId !== animationRunIdRef.current) return;
-
-            setTeleportStateByCode((previous) => ({
-              ...previous,
-              [code]: { phase: 'out', direction },
-            }));
-          },
+          () => applyPhaseToItem(code, 'out'),
           undefined,
           itemStartTime + outStartDelay,
         );
@@ -345,30 +410,15 @@ export const useBoardAnimations = (
 
       inOrder.forEach((code) => {
         const itemStartTime = fadeInPhaseStartAtSeconds;
-        const direction = directionByCode[code];
 
         timeline.call(
-          () => {
-            if (runId !== animationRunIdRef.current) return;
-
-            setTeleportStateByCode((previous) => ({
-              ...previous,
-              [code]: { phase: 'inStart', direction },
-            }));
-          },
+          () => applyPhaseToItem(code, 'inStart'),
           undefined,
           itemStartTime,
         );
 
         timeline.call(
-          () => {
-            if (runId !== animationRunIdRef.current) return;
-
-            setTeleportStateByCode((previous) => ({
-              ...previous,
-              [code]: { phase: 'in', direction },
-            }));
-          },
+          () => applyPhaseToItem(code, 'in'),
           undefined,
           itemStartTime + inStartDelay,
         );
@@ -377,12 +427,11 @@ export const useBoardAnimations = (
           () => {
             if (runId !== animationRunIdRef.current) return;
 
-            setTeleportStateByCode((previous) => {
-              const nextPhases = { ...previous };
-              delete nextPhases[code];
+            activeTeleportPhaseByCodeRef.current.delete(code);
 
-              return nextPhases;
-            });
+            const node = itemNodesRef.current.get(code);
+
+            if (node) clearTeleportStyles(node);
           },
           undefined,
           itemStartTime + inStartDelay + inDuration,
@@ -390,7 +439,11 @@ export const useBoardAnimations = (
       });
       timeline.play(0);
     },
-    [handleBoardTeleportAnimationComplete, setBoardTeleportAnimationRunning],
+    [
+      clearAllTeleportItemStyles,
+      handleBoardTeleportAnimationComplete,
+      setBoardTeleportAnimationRunning,
+    ],
   );
 
   useEffect(() => {
@@ -403,6 +456,7 @@ export const useBoardAnimations = (
     sortedCountries.forEach((country) => {
       const previousPoints =
         previousPointsByCode[country.code] ?? country.points;
+
       shouldAnimateByCode[country.code] = country.points > previousPoints;
     });
     previousPointsByCodeRef.current = nextPointsByCode;
@@ -415,6 +469,7 @@ export const useBoardAnimations = (
       ) {
         handleBoardTeleportAnimationComplete(isDouzePointsAwarded);
       }
+
       return;
     }
 
@@ -422,10 +477,12 @@ export const useBoardAnimations = (
       isTeleportCycleRunningRef.current = false;
       queuedTeleportUpdateRef.current = null;
       clearPendingAnimations();
+      clearAllTeleportItemStyles();
       setBoardTeleportAnimationRunning(false);
       timeoutRef.current = setTimeout(() => {
         setDisplayOrder(newOrder);
       }, flipMoveDelay);
+
       return;
     }
 
@@ -436,6 +493,7 @@ export const useBoardAnimations = (
         shouldAnimateByCode,
         pointsAwardedAt: Date.now(),
       };
+
       return;
     }
 
@@ -443,6 +501,7 @@ export const useBoardAnimations = (
     animationRunIdRef.current += 1;
     const runId = animationRunIdRef.current;
     const previousOrder = [...displayOrderRef.current];
+
     isTeleportCycleRunningRef.current = true;
     queuedTeleportUpdateRef.current = null;
     setBoardTeleportAnimationRunning(true);
@@ -459,6 +518,7 @@ export const useBoardAnimations = (
     sortedCountries,
     flipMoveDelay,
     boardItemAnimationMode,
+    clearAllTeleportItemStyles,
     clearPendingAnimations,
     handleBoardTeleportAnimationComplete,
     isDouzePointsAwarded,
@@ -473,11 +533,14 @@ export const useBoardAnimations = (
       clearPendingAnimations();
       isTeleportCycleRunningRef.current = false;
       queuedTeleportUpdateRef.current = null;
-      setTeleportStateByCode({});
-      setTeleportOnlyByCode({});
+      clearAllTeleportItemStyles();
       setBoardTeleportAnimationRunning(false);
     };
-  }, [clearPendingAnimations, setBoardTeleportAnimationRunning]);
+  }, [
+    clearAllTeleportItemStyles,
+    clearPendingAnimations,
+    setBoardTeleportAnimationRunning,
+  ]);
 
   useEffect(() => {
     setFinalCountries(reorderedCountries);
@@ -501,6 +564,23 @@ export const useBoardAnimations = (
     () => `${finalCountries.map((c) => c.code).join(',')}-${isVotingOver}`,
     [finalCountries, isVotingOver],
   );
+
+  // react-flip-toolkit wipes inline opacity/transform on every flipped element
+  // when flipKey changes (to measure final positions) — including the rows a
+  // running teleport cycle owns. Without re-asserting the in-flight phase the
+  // moved row transitions back to visible at the mid-timeline reorder and then
+  // fades in a second time when the in-phase starts. This runs in the same
+  // commit as the Flipper update (child lifecycles first), so it lands after
+  // the wipe and before paint.
+  useLayoutEffect(() => {
+    activeTeleportPhaseByCodeRef.current.forEach(
+      ({ phase, direction }, code) => {
+        const node = itemNodesRef.current.get(code);
+
+        if (node) applyTeleportPhaseStyles(node, phase, direction);
+      },
+    );
+  }, [flipKey]);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -551,44 +631,13 @@ export const useBoardAnimations = (
     flipMoveDelay,
   ]);
 
-  const getCountryAnimationClassName = useCallback(
-    (countryCode: string) => {
-      if (boardItemAnimationMode !== 'teleport') return '';
-
-      const teleportState = teleportStateByCode[countryCode];
-      if (!teleportState) return '';
-
-      const transitionClass =
-        'transition-all duration-[400ms] ease-out will-change-transform will-change-opacity';
-      const startOffsetClass =
-        teleportState.direction === 'up'
-          ? 'translate-y-[6px]'
-          : '-translate-y-[6px]';
-
-      if (teleportState.phase === 'outStart') {
-        return `opacity-100 ${startOffsetClass}`;
-      }
-
-      if (teleportState.phase === 'out') {
-        return `${transitionClass} opacity-0 translate-y-0`;
-      }
-
-      if (teleportState.phase === 'inStart') {
-        return `opacity-0 ${startOffsetClass}`;
-      }
-
-      return `${transitionClass} opacity-100 translate-y-0`;
-    },
-    [boardItemAnimationMode, teleportStateByCode],
-  );
-
   const shouldUseFlipAnimationForCountry = useCallback(
     (countryCode: string) => {
       if (boardItemAnimationMode !== 'teleport') return true;
 
-      return !teleportOnlyByCode[countryCode];
+      return !teleportOnlyByCodeRef.current[countryCode];
     },
-    [boardItemAnimationMode, teleportOnlyByCode],
+    [boardItemAnimationMode],
   );
 
   return {
@@ -598,7 +647,7 @@ export const useBoardAnimations = (
     flipKey,
     containerRef,
     isTeleportAnimationEnabled: boardItemAnimationMode === 'teleport',
-    getCountryAnimationClassName,
+    getItemRef,
     shouldUseFlipAnimationForCountry,
   };
 };

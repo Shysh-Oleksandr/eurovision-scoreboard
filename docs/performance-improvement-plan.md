@@ -273,28 +273,151 @@ Baseline: Phase 1's `perf-artifacts/phase1/trace-after-*.json.gz` traces, whose
 CPU-sample attribution (`scripts/perf/attribute-samples.mjs`) already shows the
 remaining transition stalls are ~70–75 % gsap CSSPlugin style writes + clearProps
 inside commit-phase effects — start from that, not from §A1's task-level labels.
-Sub-steps, each independently shippable and re-profiled:
+Sub-steps as originally planned (each independently shippable and re-profiled):
 
 1. **Stop routing per-frame animation state through Board-level React state.** The
-   `timeline.call` callbacks in `useBoardAnimations` currently `setTeleportStateByCode`
-   (≤5 setStates × moved countries per cycle). Replace with direct class application
-   to the item DOM nodes via a `Map<code, HTMLElement>` ref registry — same classes,
+   `timeline.call` callbacks in `useBoardAnimations` used to `setTeleportStateByCode`
+   (≤5 setStates × moved countries per cycle). Replace with direct style application
+   to the item DOM nodes via a `Map<code, HTMLElement>` ref registry — same visuals,
    same timing, zero React renders per tick. React state keeps only cycle start/end
    (`displayOrder`, running flag) so the queueing/`votingActions` interplay is
    untouched.
 2. **Make `CountryItem` memo effective.** Narrow `useCountryDisplay`'s subscription
    (select the viewed stage's `countries` only), and keep country object references
    stable for untouched countries when `votingActions` writes points (update-in-place
-   mapping: reuse the old object when nothing changed). This is a store-adjacent change
-   — it must preserve `votingActions` semantics exactly; the existing
-   rank/totals/juryScaleReveal unit tests plus a recorded full-run state snapshot are
-   the guard.
+   mapping: reuse the old object when nothing changed), preserving `votingActions`
+   semantics exactly.
 3. **Tame FLIP re-measurement**: with (1) in place, `flipKey` changes once per cycle
    instead of mid-timeline; verify forced-reflow total during a session drops from
    ~478 ms to near zero, and replace `transition-all` with explicit
    `transition: transform, opacity` on board items.
-4. Only if still needed after 1–3: make `will-change` static on board items during a
-   stage (layer churn), and isolate the douze-points hearts overlay cost.
+4. Only if still needed after 1–3: reduce `will-change` layer churn on board items,
+   and isolate the douze-points hearts overlay cost.
+
+**Status: DONE (2026-08-29).** All four sub-steps implemented and measured
+(fresh before/after traces of the same two scripted flows, same emulation, in
+`../../perf-artifacts/phase2/` — `trace-before-*` = the phase-1 build,
+`trace-step1/2/34-*` = per-sub-step, `trace-final-*` = all sub-steps before the
+review pass, `trace-after-*` = the definitive post-review build). Choreography
+constants, phase order, queueing, and tiebreak ordering are untouched; only the
+delivery changed. Results, before → after:
+
+- **Full SF1 auto-run** (start → jury finish-randomly → televote finish-randomly
+  → qualifiers): style recalcs **3,585 → 1,142 (3.1x, target met)**, recalc time
+  2,099 → 1,195 ms; compositor commits **3,118 (15.9 s!) → 1,274 (3.5 s)**;
+  FunctionCall 6,330 → 2,941 ms; tasks >100 ms 6 (worst 426 ms) → 5 (worst
+  396 ms); run INP 467 → 253 ms. The qualifiers modal idling behind two
+  spinning CTAs went from ~420 ms/s of JS to ~65 ms/s.
+- **Manual voting** (stage start + 10 taps + 1 random juror, ~80 s both runs):
+  **INP 304 → 159 ms**; **no >100 ms task in the tap window** and steady
+  59–61 fps throughout it — the remaining four long tasks (~120 + ~400 ms at
+  stage start, 2× ~150–180 ms at douze moments) are gsap CSSPlugin + countUp
+  effect batches, see the "left on the table" note below; script-forced reflow
+  763 ms/665 hits → 477 ms/369; long tasks 7 → 4. An intermediate build with a
+  *static* per-row `will-change` also dropped tap-window busy from ~90 % to
+  ~55 %, but was reverted for correctness (stacking contexts, below) — that
+  headroom is recoverable later if the douze/glow z-ordering is reworked to
+  tolerate per-row stacking contexts.
+
+What each sub-step did (and bought), in order:
+
+1. **Teleport phases → direct DOM writes.** `useBoardAnimations` keeps a
+   `Map<code, HTMLElement>` registry (callback refs threaded
+   Board → CountryItem → CountryItemBase); the `timeline.call`s now write
+   inline opacity/transform/transition to the item node instead of
+   `setTeleportStateByCode` — same phases, same timings, zero renders per tick.
+   `teleportOnlyByCode` became a ref read by `shouldFlip` at flip time.
+   Auto-run commits 3,118 → 1,049 came from this step alone.
+2. **`CountryItem` memo made effective.** `stabilizeCountries` (in
+   `state/scoreboard/helpers.ts`) restores reference equality for countries an
+   award didn't change, applied at the award-map sites in `votingActions`,
+   `resetLastPoints`, and `handleStageEnd`; `useCountryDisplay` subscribes to
+   the viewed stage's countries only (whole-`eventStages` only in
+   all-participants mode); Board/`useVoting`/`CountryItem`/
+   `useQualificationStatus` dropped their render-time `getCurrentStage()` reads
+   and whole-array subscriptions for primitive/stable-ref selectors;
+   `useDouzePointsAnimation` only tracks the teleport flag while its overlay is
+   active. Item renders per award are now O(changed countries), not O(board).
+   Little effect on 4x-desktop traces (item renders were ~1–2 ms) but it is the
+   scaling story for 26-row Grand Finals on real phones.
+3. **FLIP verified tame + explicit transitions.** flip-toolkit's forced-reflow
+   share is now ~50–70 ms/session (part 1's 478 ms is gone; flipKey changes
+   once per cycle). The teleport transition is `opacity …, transform …` instead
+   of `all`.
+4. **Layer + clearProps churn.** A static `will-change` class was tried and
+   **reverted in the review pass** (stacking-context hazard, see below) — the
+   phases keep per-phase inline will-change like the old classes did. The
+   lasting win here: `useAnimatePoints` no longer `clearProps`es before every
+   enter/exit tween — it only `killTweensOf` (the tweens overwrite the only
+   two props they ever animate, and clearing wiped gsap's per-element cache,
+   forcing a getComputedStyle reflow per run — 605 forced recalcs/638 ms per
+   session). The full clear on theme/layout change (`pointsLayoutKey`) and on
+   a direction flip is preserved. This halved forced
+   reflow and took manual-vote INP from ~290 to ~155 ms.
+
+Known deltas / left on the table:
+
+- Deliberate micro-deltas, all invisible in testing: an interrupted
+  enter/exit last-points tween now continues from current values instead of
+  snapping to the natural state first (strictly smoother); non-transform/opacity
+  properties can no longer accidentally animate during teleport phases; and in
+  the rare overlap where a row's leftover FLIP spring (>1 s) collides with a
+  new teleport of the same row, the inline-vs-inline transform race resolves
+  slightly differently than the old class-vs-inline one (both were races;
+  sub-pixel stakes).
+- **Stage-start commit is still ~370–420 ms** at 4x: gsap CSSPlugin +
+  countUp + initial exit-tweens for all 15 items land in one effect flush. The
+  initial exit tween per item is load-bearing (it's what hides the last-points
+  block), so shrinking this means changing how those blocks initially hide —
+  candidate for a later pass, not this phase.
+- **Douze-hearts moments** cost ~150–220 ms tasks (hearts-grid tween setup in
+  `DouzePointsAnimation`) — isolated and measured, not optimized.
+- MCP runs report CLS 0.49 at the setup→voting transition in *all* phase-2
+  runs including the phase-1-build baseline, where phase 1 had measured 0.02 —
+  likely a measurement-mode difference (trace running across the tap vs a
+  fresh-trace re-check); re-verify alongside Phase 3 before treating it as a
+  regression.
+
+Verification: `yarn lint:types-cli` clean; ESLint clean on all touched files
+(also removed dead stagger vars this file carried); vitest 93/95 (same 2
+pre-existing stale failures as phases 0–1). Functional pass on the real
+preview: full SF1 run (manual votes 1–8 + random juror + finish-randomly ×2),
+undo reverts the last award and re-enables rows, qualifiers modal lists the
+right top 10, continue → SF2 post-setup opens with the voters tab intact, SF2
+starts with all 15 countries. Ground-rule 3's side-by-side screen recording
+was approximated with live screenshots/board-state snapshots at each phase
+(layouts, ordering, glow, and sequencing all correct); a human-eyes recording
+pass is still worth doing before deploy.
+
+Post-review pass: per this plan's own rule, `/code-review` (8-agent) ran on the
+diff and its confirmed findings were fixed before closing the phase — notably:
+the static `will-change` class from sub-step 4 was **reverted** to per-phase
+inline writes (a permanent will-change makes every row a stacking context and
+would paint the overflowing douze-hearts overlay under the following rows);
+the theme-preview direction flip regained its full GSAP clear (the only
+`useAnimatePoints` caller without a `pointsLayoutKey`); the old
+mode-guard semantics (teleport styles vanish instantly if the animation mode
+leaves `'teleport'` mid-cycle) were restored via a mode ref; `winnerCountry`
+is re-pointed at the stabilized array so it stays reference-identical to the
+stored board entry; `hideDouzePointsAnimation`/`resetLastPoints`/stage-reset
+maps skip value-identical writes; `useVoting` subscribes to
+`votingCountryIndex` explicitly so `getVotingCountry()` freshness no longer
+rides on the countries reference changing; and the per-item selectors were
+consolidated into single `useShallow` selectors (one stage resolution per item
+per write instead of three).
+
+One user-visible bug shipped past both the review and the parity screenshots
+and was fixed after: **teleported rows played their fade-in twice.**
+react-flip-toolkit wipes inline `opacity`/`transform` on every flipped element
+when `flipKey` changes (to measure final positions) — the old class-based
+phase styles survived that wipe, the new inline ones didn't, so at the
+mid-timeline reorder the row transitioned back to visible and then faded in
+again when the in-phase started. Fix: `useBoardAnimations` tracks the
+in-flight phase per code (`activeTeleportPhaseByCodeRef`) and a
+`useLayoutEffect` keyed on `flipKey` re-asserts those styles right after the
+Flipper commit (child lifecycles run first), before paint. Verified with
+transition-event instrumentation: exactly one fade-out and one fade-in per
+moved row, for single awards and bulk finish-randomly cycles alike.
 
 ### Phase 3 — Load path (effort: M, risk: low-medium)
 

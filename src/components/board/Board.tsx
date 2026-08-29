@@ -2,6 +2,8 @@
 import React, { useCallback, useMemo, type JSX } from 'react';
 import { Flipped, Flipper } from 'react-flip-toolkit';
 
+import { useShallow } from 'zustand/shallow';
+
 import { Country } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import CountryItem from '../countryItem/CountryItem';
@@ -18,14 +20,10 @@ import useThemeSpecifics from '@/theme/useThemeSpecifics';
 const FLIP_SPRING = { damping: 5, stiffness: 25, overshootClamping: true };
 
 const Board = (): JSX.Element => {
-  // This is needed to trigger a re-render of the board when the event stages change(usually when giving points)
-  useScoreboardStore((state) => state.eventStages);
-
   const scoreboardMobileLayout = useGeneralStore(
     (state) => state.presentationSettings.scoreboardMobileLayout,
   );
 
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
   );
@@ -45,7 +43,16 @@ const Board = (): JSX.Element => {
 
   const countryItemLayoutKey = `${themeYear}:${customThemeId}:${roundedCountryContainer}:${pointsContainerShape}`;
 
-  const { isOver: isVotingOver, id: currentStageId } = getCurrentStage() || {};
+  const { isVotingOver, currentStageId } = useScoreboardStore(
+    useShallow((state) => {
+      const currentStage = state.getCurrentStage();
+
+      return {
+        isVotingOver: currentStage?.isOver,
+        currentStageId: currentStage?.id,
+      };
+    }),
+  );
 
   const allCountriesToDisplay = useCountryDisplay();
   const sortedCountries = useCountrySorter(allCountriesToDisplay);
@@ -78,7 +85,7 @@ const Board = (): JSX.Element => {
     showPlace,
     flipKey,
     containerRef,
-    getCountryAnimationClassName,
+    getItemRef,
     shouldUseFlipAnimationForCountry,
   } = useBoardAnimations(
     sortedCountries,
@@ -91,9 +98,6 @@ const Board = (): JSX.Element => {
     (country: Country) => {
       const itemIndex = delayedSortedCountries.findIndex(
         (c) => c.code === country.code,
-      );
-      const boardAnimationClassName = getCountryAnimationClassName(
-        country.code,
       );
 
       return (
@@ -111,7 +115,7 @@ const Board = (): JSX.Element => {
               {...props}
               showPlaceAnimation={showPlace}
               hasCountryFinishedVoting={!!hasCountryFinishedVoting}
-              boardAnimationClassName={boardAnimationClassName}
+              rootRef={getItemRef(country.code)}
               themeLayoutKey={countryItemLayoutKey}
             />
           )}
@@ -124,7 +128,7 @@ const Board = (): JSX.Element => {
       showPlace,
       delayedSortedCountries,
       hasCountryFinishedVoting,
-      getCountryAnimationClassName,
+      getItemRef,
       shouldUseFlipAnimationForCountry,
       countryItemLayoutKey,
     ],

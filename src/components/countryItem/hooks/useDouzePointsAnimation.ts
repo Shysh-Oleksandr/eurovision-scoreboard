@@ -8,19 +8,25 @@ const useDouzePointsAnimation = (
   isDouzePoints: boolean,
   countryCode: string,
   initialPoints: number | null,
-  ignoreBoardTeleportDelay: boolean = false,
+  ignoreBoardTeleportDelay = false,
 ) => {
   const hideDouzePointsAnimation = useScoreboardStore(
     (state) => state.hideDouzePointsAnimation,
   );
-  const isBoardTeleportAnimationRunning = useScoreboardStore(
-    (state) => state.isBoardTeleportAnimationRunning,
-  );
-  const { boardAnimationMode } = useThemeSpecifics();
 
   const [shouldRender, setShouldRender] = useState(false);
   const [animationPoints, setAnimationPoints] = useState<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Only track the board-wide teleport flag while this item's overlay is (or
+  // is about to be) active — otherwise every item re-rendered twice per
+  // teleport cycle just to ignore the value.
+  const isBoardTeleportAnimationRunning = useScoreboardStore((state) =>
+    isDouzePoints || shouldRender
+      ? state.isBoardTeleportAnimationRunning
+      : false,
+  );
+  const { boardAnimationMode } = useThemeSpecifics();
 
   useEffect(() => {
     if (timerRef.current) {

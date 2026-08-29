@@ -144,14 +144,19 @@ export const createEventActions: StateCreator<
 
     const updatedEventStages = [...state.eventStages];
 
-    // Reset animations for current stage
+    // Reset animations for current stage (reusing untouched country objects
+    // so memoized board items can bail out by reference)
     updatedEventStages[currentStageIndex] = {
       ...currentStage,
-      countries: currentStage.countries.map((country) => ({
-        ...country,
-        lastReceivedPoints: null,
-        showDouzePointsAnimation: false,
-      })),
+      countries: currentStage.countries.map((country) =>
+        country.lastReceivedPoints === null && !country.showDouzePointsAnimation
+          ? country
+          : {
+              ...country,
+              lastReceivedPoints: null,
+              showDouzePointsAnimation: false,
+            },
+      ),
     };
 
     // Collect qualifiers from current stage based on qualifiesTo relationships.

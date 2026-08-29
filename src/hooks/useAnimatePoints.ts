@@ -52,6 +52,7 @@ const useAnimatePoints = ({
 }): ReturnType => {
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
+  const previousDirectionRef = useRef(lastPointsAnimationDirection);
   /** Avoids playing douze SFX on every useGSAP re-run (e.g. Strict Mode or ref churn). */
   const douzePointsSoundPlayedForParallelogramsRef = useRef(false);
   const { douzePointsAnimationMode } = useThemeSpecifics();
@@ -154,10 +155,25 @@ const useAnimatePoints = ({
     () => {
       if (!lastPointsContainerRef.current || !lastPointsTextRef.current) return;
 
-      clearLastPointsGsapStyles(
-        lastPointsContainerRef.current,
-        lastPointsTextRef.current,
-      );
+      // Only kill in-flight tweens on the hot path — no clearProps. The tweens
+      // below overwrite the only two properties ever animated (opacity, x),
+      // and clearing first wiped gsap's per-element cache, forcing a
+      // getComputedStyle reflow on every enter/exit across the board.
+      // A direction flip (theme preview toggling rounded/classic without a
+      // pointsLayoutKey) still gets the full clear so stale offsets from the
+      // other direction can't leak into the new layout.
+      if (previousDirectionRef.current !== lastPointsAnimationDirection) {
+        previousDirectionRef.current = lastPointsAnimationDirection;
+        clearLastPointsGsapStyles(
+          lastPointsContainerRef.current,
+          lastPointsTextRef.current,
+        );
+      } else {
+        gsap.killTweensOf([
+          lastPointsContainerRef.current,
+          lastPointsTextRef.current,
+        ]);
+      }
 
       const enterFrom =
         lastPointsAnimationDirection === 'left-to-right'
