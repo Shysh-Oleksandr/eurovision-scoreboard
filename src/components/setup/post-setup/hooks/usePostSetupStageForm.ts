@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useSyncExternalStore,
+} from 'react';
 
 import {
   StageId,
@@ -11,18 +13,65 @@ import {
 } from '../../../../models';
 import { useCountriesStore } from '../../../../state/countriesStore';
 
-// Base schema for common fields
-const postSetupStageSchema = z.object({
-  votingCountries: z.array(
-    z.object({
-      code: z.string(),
-      name: z.string(),
-      flag: z.string().optional(),
-    }),
-  ),
-});
+/**
+ * Minimal external-store "form" for the post-setup modal.
+ *
+ * This replaces the previous react-hook-form + zod setup: the form holds a
+ * single always-valid array value, so the two libraries only added ~270 KB to
+ * the chunk fetched on the ПОЧАТИ tap. Keeping the value outside React state
+ * preserves RHF's update granularity — only subscribed components re-render
+ * when voters change, the modal itself does not.
+ */
+export interface PostSetupStageForm {
+  getVotingCountries: () => VotingCountry[];
+  setVotingCountries: (next: VotingCountry[]) => void;
+  subscribe: (listener: () => void) => () => void;
+}
 
-export type PostSetupStageFormData = z.infer<typeof postSetupStageSchema>;
+const createFormStore = (): PostSetupStageForm => {
+  let value: VotingCountry[] = [];
+  const listeners = new Set<() => void>();
+
+  return {
+    getVotingCountries: () => value,
+    setVotingCountries: (next) => {
+      value = next;
+      listeners.forEach((listener) => listener());
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+  };
+};
+
+export const PostSetupFormContext = createContext<PostSetupStageForm | null>(
+  null,
+);
+
+export const usePostSetupFormContext = (): PostSetupStageForm => {
+  const form = useContext(PostSetupFormContext);
+
+  if (!form) {
+    throw new Error(
+      'usePostSetupFormContext must be used within a PostSetupFormContext provider',
+    );
+  }
+
+  return form;
+};
+
+export const useWatchVotingCountries = (
+  form: PostSetupStageForm,
+): VotingCountry[] =>
+  useSyncExternalStore(
+    form.subscribe,
+    form.getVotingCountries,
+    form.getVotingCountries,
+  );
 
 interface UsePostSetupStageFormProps {
   stage?: EventStage;
@@ -32,13 +81,8 @@ interface UsePostSetupStageFormProps {
 export const usePostSetupStageForm = ({
   stage,
   isOpen,
-}: UsePostSetupStageFormProps) => {
-  const form = useForm<PostSetupStageFormData>({
-    resolver: zodResolver(postSetupStageSchema),
-    defaultValues: {
-      votingCountries: [],
-    },
-  });
+}: UsePostSetupStageFormProps): PostSetupStageForm => {
+  const form = useMemo(createFormStore, []);
 
   // Reset form when modal opens or stage changes
   useEffect(() => {
@@ -70,12 +114,7 @@ export const usePostSetupStageForm = ({
       }));
     };
 
-    form.reset(
-      {
-        votingCountries: getDefaultVotingCountries(),
-      },
-      { keepDefaultValues: false },
-    );
+    form.setVotingCountries(getDefaultVotingCountries());
   }, [stage, isOpen, form]);
 
   return form;

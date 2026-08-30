@@ -8,10 +8,8 @@ import React, {
 } from 'react';
 import { toast } from 'react-toastify';
 
-import Hue from '@uiw/react-color-hue';
-import ShadeSlider from '@uiw/react-color-shade-slider';
-
 import ColorOverridesSection from './ColorOverridesSection';
+import InterfaceColorSliders, { type HsvaValue } from './InterfaceColorSliders';
 import {
   emptySoundDelaySecTextState,
   emptySoundFileState,
@@ -51,8 +49,8 @@ import { JESC_THEME_OPTIONS, THEME_OPTIONS } from '@/data/data';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
-import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { useThrottledValue } from '@/hooks/useThrottledValue';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import {
@@ -83,6 +81,10 @@ const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
 // content is applied. Use a fixed value so rebuilding the preview object on
 // every tweak doesn't allocate a fresh Date each time.
 const PREVIEW_TIMESTAMP = '1970-01-01T00:00:00.000Z';
+
+const TAB_ORDER = ['identity', 'look', 'visuals', 'colors', 'sound'] as const;
+
+type ThemeTab = (typeof TAB_ORDER)[number];
 
 interface CustomizeThemeModalProps {
   isOpen: boolean;
@@ -204,14 +206,18 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   const imageUpload = useImageUpload({ maxSizeInMB: 1.5 });
 
-  // Debounce hue and shade to avoid heavy recomputation on every tick
-  const debouncedHue = useDebounce(hue, 40);
-  const debouncedShade = useDebounce(hsva.v, 40);
-  // Overrides update on every pointer-move while dragging a swatch in the color
-  // picker; debounce them for the live preview so we re-inject the theme <style>
-  // (and trigger a style recalc) at most ~25x/s instead of per event. The swatch
-  // grid itself still renders the live `overrides` for instant feedback.
-  const debouncedOverrides = useDebounce(overrides, 40);
+  // Throttle hue/shade/overrides for the live preview. Every preview tick
+  // rewrites the theme <style> tag, which invalidates style for the whole
+  // document (~10-25ms recalc at 4x mobile CPU) — 10 ticks/s is the budget
+  // that keeps a slider drag at 60 fps while the preview still visibly tracks
+  // the drag. This must be a *throttle*: the slider/picker components already
+  // propagate on a 40 ms throttle (useThrottledEdit), and a debounce fed by a
+  // steady stream would keep resetting and never update mid-drag. The editing
+  // controls themselves render their live value locally, so they stay at
+  // pointer-move fidelity regardless of this interval.
+  const debouncedHue = useThrottledValue(hue, 100);
+  const debouncedShade = useThrottledValue(hsva.v, 100);
+  const debouncedOverrides = useThrottledValue(overrides, 100);
   const debouncedHsva = useMemo(
     () => ({ ...hsva, h: debouncedHue, v: debouncedShade }),
     [hsva, debouncedHue, debouncedShade],
@@ -238,6 +244,11 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     },
     [],
   );
+
+  const handleInterfaceColorChange = useCallback((next: HsvaValue) => {
+    setHue(toFixedIfDecimalFloat(next.h));
+    setHsva(next);
+  }, []);
 
   const handleBaseThemeYearChange = useCallback(
     (year: string) => {
@@ -1032,10 +1043,6 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   const displayBg = uploadedFile ? imageUpload.base64 : backgroundImageUrl;
 
-  const TAB_ORDER = ['identity', 'look', 'visuals', 'colors', 'sound'] as const;
-
-  type ThemeTab = (typeof TAB_ORDER)[number];
-
   const [activeTab, setActiveTab] = useState<ThemeTab>('identity');
   const [isMobilePreviewOpen, setIsMobilePreviewOpen] = useState(true);
   const activeTabIndex = TAB_ORDER.indexOf(activeTab);
@@ -1053,19 +1060,23 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     setActiveTab(value as ThemeTab);
   };
 
-  const tabItems = TAB_ORDER.map((value, index) => ({
-    value,
-    label: (
-      <span className="flex items-center gap-1">
-        {index < activeTabIndex && (
-          <span className="text-[8px] opacity-70 hidden sm:block">
-            <CheckIcon className="w-4 h-4" />
+  const tabItems = useMemo(
+    () =>
+      TAB_ORDER.map((value, index) => ({
+        value,
+        label: (
+          <span className="flex items-center gap-1">
+            {index < activeTabIndex && (
+              <span className="text-[8px] opacity-70 hidden sm:block">
+                <CheckIcon className="w-4 h-4" />
+              </span>
+            )}
+            {t(`widgets.themes.tabs.${value}`)}
           </span>
-        )}
-        {t(`widgets.themes.tabs.${value}`)}
-      </span>
-    ),
-  }));
+        ),
+      })),
+    [activeTabIndex, t],
+  );
 
   const previewItem = (
     <ThemePreviewCountryItem
@@ -1248,23 +1259,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                   <h4 className="text-sm font-medium text-white mb-2">
                     {t('widgets.themes.interfaceColor')}
                   </h4>
-                  <Hue
-                    hue={hue}
-                    className="[&>:first-child]:!rounded-[10px] !rounded-[10px]"
-                    onChange={(newHue) => {
-                      setHue(toFixedIfDecimalFloat(newHue.h));
-                      setHsva({ ...hsva, h: newHue.h });
-                    }}
-                  />
-                  <ShadeSlider
-                    className="mt-1 [&>:first-child]:!rounded-[10px] !rounded-[10px]"
+                  <InterfaceColorSliders
                     hsva={hsva}
-                    onChange={(newShade) => {
-                      setHsva({
-                        ...hsva,
-                        v: Math.max(15, Math.min(100, newShade.v)),
-                      });
-                    }}
+                    onChange={handleInterfaceColorChange}
                   />
                 </div>
 

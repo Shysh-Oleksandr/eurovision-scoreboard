@@ -1,8 +1,9 @@
 import gsap from 'gsap';
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { useOnLayoutKeyChange } from '@/hooks/useOnLayoutKeyChange';
 import { playThemeSound } from '@/theme/playThemeSound';
 import { DouzePointsAnimationMode } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -52,6 +53,14 @@ const useAnimatePoints = ({
 }): ReturnType => {
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
+  const previousDirectionRef = useRef(lastPointsAnimationDirection);
+  /**
+   * The last-points block renders with an `opacity-0` class, so until the
+   * enter tween has shown it there is nothing to hide — the exit branch can
+   * skip its tweens. Without this, stage start paid two tweens per row just
+   * to hide blocks that were never visible.
+   */
+  const hasShownLastPointsRef = useRef(false);
   /** Avoids playing douze SFX on every useGSAP re-run (e.g. Strict Mode or ref churn). */
   const douzePointsSoundPlayedForParallelogramsRef = useRef(false);
   const { douzePointsAnimationMode } = useThemeSpecifics();
@@ -141,23 +150,36 @@ const useAnimatePoints = ({
     },
   );
 
-  useLayoutEffect(() => {
-    if (!pointsLayoutKey) return;
-
+  useOnLayoutKeyChange(pointsLayoutKey, () => {
     clearLastPointsGsapStyles(
       lastPointsContainerRef.current,
       lastPointsTextRef.current,
     );
-  }, [pointsLayoutKey]);
+  });
 
   useGSAP(
     () => {
       if (!lastPointsContainerRef.current || !lastPointsTextRef.current) return;
 
-      clearLastPointsGsapStyles(
-        lastPointsContainerRef.current,
-        lastPointsTextRef.current,
-      );
+      // Only kill in-flight tweens on the hot path — no clearProps. The tweens
+      // below overwrite the only two properties ever animated (opacity, x),
+      // and clearing first wiped gsap's per-element cache, forcing a
+      // getComputedStyle reflow on every enter/exit across the board.
+      // A direction flip (theme preview toggling rounded/classic without a
+      // pointsLayoutKey) still gets the full clear so stale offsets from the
+      // other direction can't leak into the new layout.
+      if (previousDirectionRef.current !== lastPointsAnimationDirection) {
+        previousDirectionRef.current = lastPointsAnimationDirection;
+        clearLastPointsGsapStyles(
+          lastPointsContainerRef.current,
+          lastPointsTextRef.current,
+        );
+      } else {
+        gsap.killTweensOf([
+          lastPointsContainerRef.current,
+          lastPointsTextRef.current,
+        ]);
+      }
 
       const enterFrom =
         lastPointsAnimationDirection === 'left-to-right'
@@ -169,6 +191,7 @@ const useAnimatePoints = ({
           : { containerX: 36, textX: 15 };
 
       if (shouldShowLastPoints) {
+        hasShownLastPointsRef.current = true;
         gsap.fromTo(
           lastPointsContainerRef.current,
           { opacity: 0, x: enterFrom.containerX },
@@ -179,7 +202,7 @@ const useAnimatePoints = ({
           { opacity: 0, x: enterFrom.textX },
           { opacity: 1, x: 0, duration: 0.35, ease: 'power1.out' },
         );
-      } else {
+      } else if (hasShownLastPointsRef.current) {
         gsap.to(lastPointsContainerRef.current, {
           opacity: 0,
           x: exitTo.containerX,

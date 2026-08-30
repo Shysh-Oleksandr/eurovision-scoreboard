@@ -9,8 +9,10 @@ import PointsSection from '@/components/countryItem/PointsSection';
 import {
   buildActiveTelevoteDropShadowFilter,
   resolveTelevoteOutlineColor,
+  ROUNDED_GLOW_CLASS,
   ROUNDED_GLOW_TRANSITION,
   ROUNDED_SUBTLE_GLOW,
+  roundedGlowStyle,
   splitRoundedCountryItemSurfaceClasses,
 } from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
@@ -270,16 +272,13 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     if (!roundedCountryContainer) return undefined;
 
     if (state === 'televoteActive') {
-      return {
-        filter: buildActiveTelevoteDropShadowFilter(televoteOutlineColor),
-        transition: ROUNDED_GLOW_TRANSITION,
-      };
+      return roundedGlowStyle(
+        buildActiveTelevoteDropShadowFilter(televoteOutlineColor),
+        ROUNDED_GLOW_TRANSITION,
+      );
     }
 
-    return {
-      filter: ROUNDED_SUBTLE_GLOW,
-      transition: ROUNDED_GLOW_TRANSITION,
-    };
+    return roundedGlowStyle(ROUNDED_SUBTLE_GLOW, ROUNDED_GLOW_TRANSITION);
   }, [roundedCountryContainer, state, televoteOutlineColor]);
 
   const {
@@ -299,7 +298,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       index={0}
       className="flex items-center"
       containerClassName={`relative flex justify-between shadow-md w-full overflow-hidden rounded-sm ${
-        roundedCountryContainer ? '!rounded-full !bg-transparent' : ''
+        roundedCountryContainer
+          ? `!rounded-full !bg-transparent ${ROUNDED_GLOW_CLASS}`
+          : ''
       } h-10 ${
         roundedCountryContainer
           ? `${buttonText} ${containerOpacityClass}`

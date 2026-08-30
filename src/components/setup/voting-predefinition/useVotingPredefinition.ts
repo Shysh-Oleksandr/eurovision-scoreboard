@@ -1051,7 +1051,7 @@ export const useVotingPredefinition = ({
   );
 
   const exportVotesToSpreadsheet = useCallback(
-    (filename: string): VoteSpreadsheetActionResult => {
+    async (filename: string): Promise<VoteSpreadsheetActionResult> => {
       const participants = rankedCountries.map((country) => ({
         code: country.code,
         name: country.name,
@@ -1101,7 +1101,7 @@ export const useVotingPredefinition = ({
         return { ok: false, reason: 'export-unavailable' };
       }
 
-      downloadVoteSpreadsheet({ filename, sections });
+      await downloadVoteSpreadsheet({ filename, sections });
 
       return {
         ok: true,

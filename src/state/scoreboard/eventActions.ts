@@ -4,6 +4,7 @@ import { EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
+import { ensureScoreboardEngine } from './engineLoader';
 import {
   createCountriesComparator,
   getLastCountryCodeByPoints,
@@ -16,13 +17,13 @@ import { playThemeSound } from '@/theme/playThemeSound';
 
 type EventActions = {
   setEventStages: (eventStages: EventStage[]) => void;
-  startEvent: () => void;
+  startEvent: () => Promise<void>;
   prepareForNextStage: (shouldUpdateStore?: boolean) => {
     updatedEventStages: EventStage[];
     nextStage: EventStage | null;
     currentStageIndex: number;
   };
-  continueToNextPhase: () => void;
+  continueToNextPhase: () => Promise<void>;
   closeQualificationResults: () => void;
   triggerRestartEvent: () => void;
   leaveEvent: () => void;
@@ -38,7 +39,12 @@ export const createEventActions: StateCreator<
     set({ eventStages });
   },
 
-  startEvent: () => {
+  startEvent: async () => {
+    // The voting/reveal/predefinition actions are installed lazily; this is
+    // the hard ordering guarantee on the start flow (the idle preloader has
+    // normally resolved this long before the tap).
+    await ensureScoreboardEngine();
+
     // Also covers Restart, which routes back through EventSetupModal.
     get().resetJuryScaleReveal();
 
@@ -144,14 +150,19 @@ export const createEventActions: StateCreator<
 
     const updatedEventStages = [...state.eventStages];
 
-    // Reset animations for current stage
+    // Reset animations for current stage (reusing untouched country objects
+    // so memoized board items can bail out by reference)
     updatedEventStages[currentStageIndex] = {
       ...currentStage,
-      countries: currentStage.countries.map((country) => ({
-        ...country,
-        lastReceivedPoints: null,
-        showDouzePointsAnimation: false,
-      })),
+      countries: currentStage.countries.map((country) =>
+        country.lastReceivedPoints === null && !country.showDouzePointsAnimation
+          ? country
+          : {
+              ...country,
+              lastReceivedPoints: null,
+              showDouzePointsAnimation: false,
+            },
+      ),
     };
 
     // Collect qualifiers from current stage based on qualifiesTo relationships.
@@ -305,7 +316,11 @@ export const createEventActions: StateCreator<
 
     return { updatedEventStages, nextStage, currentStageIndex };
   },
-  continueToNextPhase: () => {
+  continueToNextPhase: async () => {
+    // Same ordering guarantee as startEvent: predefineVotesForStage below is
+    // one of the lazily-installed actions.
+    await ensureScoreboardEngine();
+
     const { updatedEventStages, nextStage, currentStageIndex } =
       get().prepareForNextStage(false);
 

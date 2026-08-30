@@ -1,5 +1,7 @@
 import { StateCreator } from 'zustand';
 
+import { Country } from '../../models';
+
 import { RevealData, ScoreboardState } from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
@@ -40,16 +42,26 @@ export const createMiscActions: StateCreator<
 
     if (!currentStage) return;
 
+    const needsReset = (country: Country) =>
+      country.lastReceivedPoints !== null || country.showDouzePointsAnimation;
+
+    // A value-identical rewrite would still re-render the whole board.
+    if (!currentStage.countries.some(needsReset)) return;
+
     set({
       eventStages: state.eventStages.map((stage) => {
         if (stage.id === state.currentStageId) {
           return {
             ...stage,
-            countries: stage.countries.map((country) => ({
-              ...country,
-              lastReceivedPoints: null,
-              showDouzePointsAnimation: false,
-            })),
+            countries: stage.countries.map((country) =>
+              needsReset(country)
+                ? {
+                    ...country,
+                    lastReceivedPoints: null,
+                    showDouzePointsAnimation: false,
+                  }
+                : country,
+            ),
           };
         }
 
@@ -93,6 +105,14 @@ export const createMiscActions: StateCreator<
 
     if (!currentStage) return;
 
+    // Skip the no-op write (the overlay timer fires even after an award
+    // already cleared the flag) — it would re-render the whole board.
+    const targetCountry = currentStage.countries.find(
+      (country) => country.code === countryCode,
+    );
+
+    if (!targetCountry?.showDouzePointsAnimation) return;
+
     set({
       eventStages: state.eventStages.map((stage) => {
         if (stage.id === state.currentStageId) {
@@ -131,6 +151,7 @@ export const createMiscActions: StateCreator<
 
   handleBoardTeleportAnimationComplete: (hasDouzePointsAnimation: boolean) => {
     const state = get();
+
     if (state.winnerCountry && !state.isLastSimulationAnimationFinished) {
       setTimeout(() => {
         get().setIsLastSimulationAnimationFinished(true);
@@ -141,6 +162,7 @@ export const createMiscActions: StateCreator<
       set({
         isBoardTeleportAnimationRunning: false,
       });
+
       return;
     }
 
@@ -159,6 +181,7 @@ export const createMiscActions: StateCreator<
         shouldResetLastPointsAfterTeleport: false,
         lastPointsResetTimerId: timerId,
       });
+
       return;
     }
 

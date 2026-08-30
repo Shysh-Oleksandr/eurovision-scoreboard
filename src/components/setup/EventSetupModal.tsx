@@ -41,6 +41,7 @@ import {
   applyContestSnapshotToStores,
   LoadContestOptions,
 } from '@/helpers/contestSnapshot';
+import { importPostSetupModal } from '@/hooks/simulationChunkImports';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
@@ -63,7 +64,7 @@ const VotingPredefinitionModal = dynamic(
     ssr: false,
   },
 );
-const PostSetupModal = dynamic(() => import('./post-setup/PostSetupModal'), {
+const PostSetupModal = dynamic(importPostSetupModal, {
   ssr: false,
 });
 const StageReorderModal = dynamic(() => import('./StageReorderModal'), {
@@ -335,9 +336,10 @@ const EventSetupModal = () => {
 
     setEventStages(eventStages);
 
-    startEvent();
-
-    clear();
+    // startEvent awaits the lazily-installed engine, so the history wipe must
+    // wait for its state writes — clearing first would leave the whole stage
+    // start undoable, walking the board back to a pre-start state.
+    void startEvent().then(() => clear());
   };
 
   const proceedToPostSetup = useCallback(() => {

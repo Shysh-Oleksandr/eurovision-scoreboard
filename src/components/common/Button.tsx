@@ -19,6 +19,8 @@ type Props = {
   snowEffect?: 'left' | 'right' | 'middle' | 'none';
   snowEffectClassName?: string;
   style?: React.CSSProperties;
+  animatedBorder?: boolean;
+  'aria-label'?: string;
 };
 
 const Button = ({
@@ -34,6 +36,8 @@ const Button = ({
   snowEffect = 'none',
   snowEffectClassName = '',
   style,
+  animatedBorder = false,
+  'aria-label': ariaLabel,
 }: Props) => {
   const baseClasses =
     'lg:text-base md:text-base text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] font-medium uppercase rounded-[10px] shadow-lg transition-colors lg:leading-5 duration-300 bg-gradient-to-tr from-[20%] relative';
@@ -67,14 +71,20 @@ const Button = ({
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${
         Icon ? 'flex items-center gap-2' : ''
-      } ${Icon && !childrenContent ? '!p-2' : ''} ${className} ${
-        disabled ? 'opacity-50 cursor-not-allowed' : ''
-      } ${isLoading ? 'flex justify-center' : ''}`}
+      } ${Icon && !childrenContent ? '!p-2' : ''} ${
+        animatedBorder ? 'animated-border' : ''
+      } ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
+        isLoading ? 'flex justify-center' : ''
+      }`}
       onClick={onClick}
       title={showTooltip ? undefined : title}
+      aria-label={ariaLabel ?? (isIconOnly ? title : undefined)}
       disabled={disabled || isLoading}
       style={style}
     >
+      {animatedBorder && (
+        <span className="animated-border-spin" aria-hidden="true" />
+      )}
       <SnowPileEffect snowEffect={snowEffect} className={snowEffectClassName} />
       {isLoading ? (
         <span className="loader small" />

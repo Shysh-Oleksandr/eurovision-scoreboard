@@ -22,7 +22,7 @@ import {
   pruneGroupPairs,
   removeOverride,
   upsertOverride,
-} from './scoreboard/diaspora';
+} from './scoreboard/diasporaSettings';
 import { useScoreboardStore } from './scoreboardStore';
 
 import { api } from '@/api/client';
@@ -57,6 +57,16 @@ export enum PresentationPointsGrouping {
   GROUPED = 'grouped',
 }
 
+export type SettingsModalTab = 'General' | 'Odds' | 'Relations';
+
+export type GeneralSettingsCategoryId =
+  | 'contest'
+  | 'voting'
+  | 'look'
+  | 'effects'
+  | 'audio'
+  | 'confirmations';
+
 export const INITIAL_YEAR = '2026' as Year;
 export const INITIAL_THEME_YEAR = '2026' as Year;
 
@@ -84,6 +94,8 @@ const DEFAULT_SETTINGS: Settings = {
   diaspora: DEFAULT_DIASPORA_SETTINGS,
   oddsRankLayout: 'grid',
   votingRankLayout: 'grid',
+  lastOpenedSettingsTab: 'General',
+  lastOpenedGeneralSettingsCategory: 'contest',
   isPickQualifiersMode: false,
   enableSplitScreenQualifierRevealMode: false,
   enableSplitScreenForLastQualifier: false,
@@ -185,6 +197,10 @@ export interface Settings {
   oddsRankLayout: 'list' | 'grid';
   /** Voting predefinition rank view: list vs grid layout. */
   votingRankLayout: 'list' | 'grid';
+  /** Last Settings modal tab (General / Odds / Relations). */
+  lastOpenedSettingsTab: SettingsModalTab;
+  /** Last General settings category (Contest / Voting / Look & feel / …). */
+  lastOpenedGeneralSettingsCategory: GeneralSettingsCategoryId;
   isPickQualifiersMode: boolean;
   enableSplitScreenQualifierRevealMode: boolean;
   enableSplitScreenForLastQualifier: boolean;
@@ -884,6 +900,10 @@ export const useGeneralStore = create<GeneralState>()(
             ),
             showQualifierTargetStages:
               persistedSettings.showQualifierTargetStages ?? true,
+            lastOpenedSettingsTab:
+              persistedSettings.lastOpenedSettingsTab ?? 'General',
+            lastOpenedGeneralSettingsCategory:
+              persistedSettings.lastOpenedGeneralSettingsCategory ?? 'contest',
           };
 
           // Merge imageCustomization, keeping only aspectRatio from persistence

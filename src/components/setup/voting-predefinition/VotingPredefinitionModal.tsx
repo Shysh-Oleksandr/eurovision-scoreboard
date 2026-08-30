@@ -268,11 +268,11 @@ const VotingPredefinitionModal = ({
     ],
   );
 
-  const handleExportSpreadsheet = useCallback(() => {
+  const handleExportSpreadsheet = useCallback(async () => {
     const safeName = `${contestName}-${stage.name}-votes`
       .replace(/[^\w.-]+/g, '-')
       .replace(/-+/g, '-');
-    const result = exportVotesToSpreadsheet(safeName);
+    const result = await exportVotesToSpreadsheet(safeName);
 
     showSpreadsheetResultToast(result);
   }, [

@@ -171,7 +171,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     setIsShareModalOpen(true);
   };
 
-  const handleExportSpreadsheet = useCallback(() => {
+  const handleExportSpreadsheet = useCallback(async () => {
     if (!selectedStage || !selectedStageId) return;
 
     const voters = getStageVotingCountries(selectedStageId, false, true);
@@ -207,7 +207,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       .replace(/[^\w.-]+/g, '-')
       .replace(/-+/g, '-');
 
-    downloadVoteSpreadsheet({ filename, sections });
+    await downloadVoteSpreadsheet({ filename, sections });
     toast.success(t('spreadsheetExportSuccess'));
   }, [
     getPoints,

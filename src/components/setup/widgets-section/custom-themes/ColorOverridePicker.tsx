@@ -10,6 +10,12 @@ import React, {
 import ColorPicker from 'react-best-gradient-color-picker';
 import { createPortal } from 'react-dom';
 
+import { useThrottledEdit } from './hooks/useThrottledEdit';
+
+// Shields the picker from the swatch row's per-move re-renders; it re-renders
+// from its own internal drag state and the throttled prop value instead.
+const MemoColorPicker = React.memo(ColorPicker);
+
 import { CopyIcon } from '@/assets/icons/CopyIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import Button from '@/components/common/Button';
@@ -154,7 +160,11 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   const buttonRef = useRef<HTMLDivElement>(null);
   const copyButtonRef = useRef<HTMLDivElement>(null);
 
-  const currentValue = value || defaultValue || '#000000';
+  // Popover drag moves render only this swatch via the local echo; the
+  // modal-level `overrides` state updates on a 40 ms throttle instead.
+  const [liveValue, pushChange] = useThrottledEdit(value, onChange);
+
+  const currentValue = liveValue || defaultValue || '#000000';
 
   const isGradient = /gradient\(/i.test(currentValue);
   const displayColor = getColorPickerValue(currentValue);
@@ -311,15 +321,23 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
     }
   }, [showPicker, showCopyPopup]);
 
-  const handleColorChange = (color: string) => {
-    // react-best-gradient-color-picker provides a string for both solid and gradient
-    const normalized = parseColor(color);
-    const sanitized = /gradient\(/i.test(normalized)
-      ? sanitizeGradient(normalized)
-      : normalized;
+  const handleColorChange = useCallback(
+    (color: string) => {
+      // react-best-gradient-color-picker provides a string for both solid and gradient
+      const normalized = parseColor(color);
+      const sanitized = /gradient\(/i.test(normalized)
+        ? sanitizeGradient(normalized)
+        : normalized;
 
-    onChange(sanitized);
-  };
+      pushChange(sanitized);
+    },
+    [pushChange],
+  );
+
+  // Throttled *prop* value for the picker (see ColorEditorPanel): a value
+  // change re-renders the picker's whole controlled subtree, so it gets the
+  // 40 ms-throttled value while the swatch row shows the live echo.
+  const pickerValue = getColorPickerValue(value || defaultValue || '#000000');
 
   const handleCopyButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -368,7 +386,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
     setSearchText('');
   };
 
-  const isCustom = value !== undefined && value !== defaultValue;
+  const isCustom = liveValue !== undefined && liveValue !== defaultValue;
 
   return (
     <div className="relative">
@@ -407,7 +425,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
             variant="secondary"
             onClick={(e) => {
               e.stopPropagation();
-              onChange(undefined);
+              pushChange(undefined);
             }}
             className="!px-2.5 !py-1.5"
             Icon={<UndoIcon className="w-4 h-4" />}
@@ -437,8 +455,8 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
                 left: `${pickerPosition.left}px`,
               }}
             >
-              <ColorPicker
-                value={displayColor}
+              <MemoColorPicker
+                value={pickerValue}
                 onChange={handleColorChange}
                 height={200}
                 hideColorTypeBtns={!enableGradient}

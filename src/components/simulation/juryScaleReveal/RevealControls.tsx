@@ -97,7 +97,7 @@ const RevealControls = ({
                 : t('juryScaleReveal.showResults')
             }
             onClick={advance}
-            className="animated-border"
+            animatedBorder
             snowEffect="middle"
           />
         ) : (

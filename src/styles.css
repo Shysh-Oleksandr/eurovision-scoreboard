@@ -817,10 +817,11 @@ h6 {
   place-content: center;
   color: white;
   text-shadow: 0 1px 0 #000;
+  position: relative;
+  z-index: 0;
 
-  --border-angle: 0turn;
   --main-bg: conic-gradient(
-    from var(--border-angle),
+    from 0turn,
     theme('colors.primary-900'),
     theme('colors.primary-950') 5%,
     theme('colors.primary-950') 60%,
@@ -828,31 +829,12 @@ h6 {
   );
 
   border: solid 3px transparent;
-
-  --gradient-border: conic-gradient(
-    from var(--border-angle),
-    transparent 25%,
-    theme('colors.primary-800') 65%,
-    theme('colors.animatedBorder') 99%,
-    transparent
-  );
-
-  background:
-		/* padding-box clip this background in to the overall element except the border. */ var(
-        --main-bg
-      )
-      padding-box,
-    /* border-box extends this background to the border space */
-      var(--gradient-border) border-box,
-    /* Duplicate main background to fill in behind the gradient border. You can remove this if you want the border to extend "outside" the box background. */
-      var(--main-bg) border-box;
-  background-position: center center;
+  background: none;
   transition: all;
-  animation: bg-spin 4s linear infinite;
 
   &:hover {
     --main-bg: conic-gradient(
-      from var(--border-angle),
+      from 0turn,
       theme('colors.primary-800'),
       theme('colors.primary-950') 5%,
       theme('colors.primary-950') 60%,
@@ -861,15 +843,56 @@ h6 {
   }
 }
 
-@property --border-angle {
-  syntax: '<angle>';
-  inherits: true;
-  initial-value: 0turn;
+/* Spinning layer rendered by Button's `animatedBorder` prop. The gradient
+   rotates as a compositor transform; animating a custom property here instead
+   would force a style recalculation + repaint on every frame. The 3px offsets and
+   10px/7px radii must match the .animated-border border width above and the
+   Button base rounded-[10px]. */
+.animated-border-spin {
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  border-radius: 10px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.animated-border-spin::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 200%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(
+    from 0turn,
+    transparent 25%,
+    theme('colors.primary-800') 65%,
+    theme('colors.animatedBorder') 99%,
+    transparent
+  );
+  animation: bg-spin 4s linear infinite;
+}
+
+.animated-border-spin::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 7px;
+  background: var(--main-bg);
+  background-position: center center;
 }
 
 @keyframes bg-spin {
   to {
-    --border-angle: 1turn;
+    rotate: 1turn;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-border-spin::before {
+    animation: none;
   }
 }
 
@@ -1398,4 +1421,75 @@ h6 {
   .vp-pop-in {
     animation: none;
   }
+}
+
+/* Douze-points hearts grid: the grow/shrink choreography runs as
+   compositor-driven CSS animations (transform-only) instead of a per-heart
+   GSAP timeline. Durations, per-column delays and the per-column max scale
+   arrive as CSS variables set from the constants in DouzePointsAnimation.tsx.
+   The two-animation pattern reproduces grow → hold → shrink: `both` fills
+   scale(0) before the grow delay and holds the max after it, while the
+   later-in-list shrink has no backwards fill, so it only takes over once its
+   own delay elapses. */
+@keyframes douze-heart-grow {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(var(--douze-heart-scale));
+  }
+}
+
+@keyframes douze-heart-shrink {
+  from {
+    transform: scale(var(--douze-heart-scale));
+  }
+
+  to {
+    transform: scale(0);
+  }
+}
+
+@keyframes douze-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes douze-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.douze-heart-animated {
+  transform: scale(0);
+
+  /* Cubic-bezier pairs approximate the previous GSAP eases:
+     grow power1.out, shrink power2.in. */
+  animation:
+    douze-heart-grow var(--douze-grow-duration)
+      cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--douze-grow-delay) both,
+    douze-heart-shrink var(--douze-shrink-duration)
+      cubic-bezier(0.55, 0.055, 0.675, 0.19) var(--douze-shrink-delay) forwards;
+}
+
+.douze-country-name-animated {
+  opacity: 0;
+
+  /* Fade-in at 0.3s; fade-out when the shrink phase starts (delay from TSX).
+     Eases: power1.out in, power1.in out. */
+  animation:
+    douze-fade-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both,
+    douze-fade-out 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53)
+      var(--douze-name-out-delay) forwards;
 }

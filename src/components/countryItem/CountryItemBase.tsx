@@ -6,6 +6,8 @@ import { BaseCountry, Country } from '../../models';
 export interface CountryItemBaseProps {
   country: Country | BaseCountry;
   index?: number;
+  /** Ref to the outermost row element (used by the board's teleport animation registry). */
+  rootRef?: React.Ref<HTMLDivElement>;
   className?: string;
   contentClassName?: string;
   containerClassName?: string;
@@ -39,6 +41,7 @@ export interface CountryItemBaseProps {
 const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   country,
   index = 0,
+  rootRef,
   className,
   contentClassName,
   containerClassName,
@@ -67,7 +70,11 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   };
 
   return (
-    <div className={`flex relative min-w-0 ${className || ''}`} {...props}>
+    <div
+      ref={rootRef}
+      className={`flex relative min-w-0 ${className || ''}`}
+      {...props}
+    >
       {/* Place Number */}
       {showPlaceNumber &&
         renderPlaceNumber &&

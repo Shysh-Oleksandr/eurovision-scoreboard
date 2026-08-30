@@ -1,11 +1,12 @@
 import { CountUp } from 'countup.js';
 import gsap from 'gsap';
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import { BaseCountry, Country } from '../../models';
 import RoundedTriangle from '../RoundedTriangle';
 
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useOnLayoutKeyChange } from '@/hooks/useOnLayoutKeyChange';
 import { useScoreboardTwoColumnCompactLayout } from '@/hooks/useScoreboardTwoColumnCompactLayout';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { PointsContainerShape } from '@/theme/types';
@@ -68,7 +69,6 @@ const PointsSection: React.FC<PointsSectionProps> = ({
   const isTransparent = pointsContainerShape === 'transparent';
   const pointsRef = useRef<HTMLHeadingElement | null>(null);
   const previousPointsRef = useRef<number | null>(null);
-  const previousPointsLayoutKeyRef = useRef(pointsLayoutKey);
   const roundedPointsRowRef = useRef<HTMLDivElement | null>(null);
   const roundedPointsTrackRef = useRef<HTMLDivElement | null>(null);
   const currentPoints = useMemo(() => {
@@ -91,23 +91,37 @@ const PointsSection: React.FC<PointsSectionProps> = ({
     const shouldDisableAnimation =
       !shouldUsePointsCountUpAnimation ||
       (winnerCountry && isLastSimulationAnimationFinished);
-    const decimalPlaces = (currentPoints.toString().split('.')[1] ?? '').length;
-    const countUp = new CountUp(pointsRef.current, currentPoints, {
-      startVal,
-      duration: shouldDisableAnimation ? 0 : 0.6,
-      useGrouping: false,
-      decimalPlaces,
-      formattingFn: (value) => String(toFixedIfDecimalFloat(value)),
-    });
 
-    if (countUp.error) {
-      pointsRef.current.textContent = String(currentPoints);
+    // No animation to run — write the value directly. Constructing CountUp
+    // anyway is not free: its constructor prints startVal to the element, so
+    // N no-op constructions land in the stage-start effect flush.
+    if (startVal === currentPoints || shouldDisableAnimation) {
+      if (pointsRef.current.textContent !== String(currentPoints)) {
+        pointsRef.current.textContent = String(currentPoints);
+      }
       previousPointsRef.current = currentPoints;
 
       return;
     }
 
-    if (startVal === currentPoints) {
+    const decimalPlaces = (currentPoints.toString().split('.')[1] ?? '').length;
+    const countUp = new CountUp(pointsRef.current, currentPoints, {
+      startVal,
+      // Must stay in sync with COUNT_UP_DURATION_MS in useBoardAnimations.
+      duration: 0.6,
+      useGrouping: false,
+      decimalPlaces,
+      formattingFn: (value) => String(toFixedIfDecimalFloat(value)),
+      // Without a render plugin countup.js assigns innerHTML per tick;
+      // textContent skips the HTML parse for the same visible result.
+      plugin: {
+        render: (el, formatted) => {
+          el.textContent = formatted;
+        },
+      },
+    });
+
+    if (countUp.error) {
       pointsRef.current.textContent = String(currentPoints);
       previousPointsRef.current = currentPoints;
 
@@ -128,9 +142,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
     pointsContainerShape,
   ]);
 
-  useLayoutEffect(() => {
-    if (!pointsLayoutKey) return;
-
+  useOnLayoutKeyChange(pointsLayoutKey, () => {
     const targets = [
       roundedPointsRowRef.current,
       roundedPointsTrackRef.current,
@@ -138,20 +150,19 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       lastPointsRef?.current,
     ].filter(Boolean) as HTMLElement[];
 
-    if (targets.length === 0) return;
+    if (targets.length > 0) {
+      gsap.killTweensOf(targets);
+      gsap.set(targets, { clearProps: 'all' });
+    }
 
-    gsap.killTweensOf(targets);
-    gsap.set(targets, { clearProps: 'all' });
-  }, [pointsLayoutKey, lastPointsContainerRef, lastPointsRef]);
-
-  useLayoutEffect(() => {
-    if (!pointsRef.current || shouldShowNQLabel || !pointsLayoutKey) return;
-    if (previousPointsLayoutKeyRef.current === pointsLayoutKey) return;
-
-    previousPointsLayoutKeyRef.current = pointsLayoutKey;
-    pointsRef.current.textContent = String(currentPoints);
-    previousPointsRef.current = currentPoints;
-  }, [pointsLayoutKey, currentPoints, shouldShowNQLabel]);
+    // Re-sync the points text the layout change may have left mid-count-up.
+    // (When the NQ label is up there is nothing to sync; the count-up effect
+    // rewrites the number as soon as the label clears.)
+    if (pointsRef.current && !shouldShowNQLabel) {
+      pointsRef.current.textContent = String(currentPoints);
+      previousPointsRef.current = currentPoints;
+    }
+  });
 
   const lastPointsLabel =
     'lastReceivedPoints' in country && country.lastReceivedPoints !== null
@@ -236,9 +247,12 @@ const PointsSection: React.FC<PointsSectionProps> = ({
         >
           {currentBlock}
 
+          {/* opacity-0 (plain, so GSAP inline styles win): hidden until the
+              enter tween shows it — lets stage start skip N exit tweens whose
+              only job was hiding these blocks. */}
           <div
             ref={lastPointsContainerRef}
-            className={`${roundedLastPointsBlockClass} relative z-[20] overflow-hidden rounded-r-full transition-colors !duration-500 justify-center ${lastColumnBg} ${
+            className={`${roundedLastPointsBlockClass} relative z-[20] overflow-hidden rounded-r-full opacity-0 transition-colors !duration-500 justify-center ${lastColumnBg} ${
               resolvedLastReceivedActive ? '' : 'pointer-events-none'
             }`}
           >
@@ -268,7 +282,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       {showLastPoints && (
         <div
           ref={lastPointsContainerRef}
-          className={`absolute z-10 h-full transition-colors !duration-500 ${
+          className={`absolute z-10 h-full opacity-0 transition-colors !duration-500 ${
             withTriangle
               ? `pr-[0.5rem] lg:right-[2.4rem] lg:w-[2.5rem] ${
                   isTwoColumnLayoutDisplayed

@@ -1,49 +1,73 @@
 import { useMemo } from 'react';
 
-import { Country, StageId } from '../../../models';
+import { useShallow } from 'zustand/shallow';
+
+import { Country, EventStage, StageId } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
+
+import type { ScoreboardState } from '@/state/scoreboard/types';
+
+/** The stage this hook reasons about: the viewed stage, falling back to the current one. */
+const resolveViewedStage = (state: ScoreboardState): EventStage | undefined => {
+  const fallbackStage = state.getCurrentStage();
+  const currentStageId = state.viewedStageId || fallbackStage?.id;
+
+  if (!currentStageId) return undefined;
+
+  return (
+    state.eventStages.find((s) => s.id === currentStageId) || fallbackStage
+  );
+};
 
 export const useQualificationStatus = (
   country: Country,
   isVotingOver: boolean,
 ) => {
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const getCountryInSemiFinal = useScoreboardStore(
-    (state) => state.getCountryInSemiFinal,
-  );
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
   );
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
-  const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
-  const eventStages = useScoreboardStore((state) => state.eventStages);
+
+  // One narrow selector per item instead of a whole-`eventStages`
+  // subscription: the stage is resolved once, and the results are primitives
+  // (or a reference-stable country object), so memoized items don't re-render
+  // on unrelated store writes.
+  const { stageId, countryInCurrentStage, isInCurrentStage } =
+    useScoreboardStore(
+      useShallow((state) => {
+        const stage = resolveViewedStage(state);
+
+        if (!stage) {
+          return {
+            stageId: null as string | null,
+            countryInCurrentStage: null as Country | null,
+            isInCurrentStage: false,
+          };
+        }
+
+        const countryInStage = stage.countries.find(
+          (c) => c.code === country.code,
+        );
+
+        return {
+          stageId: stage.id as string | null,
+          countryInCurrentStage:
+            countryInStage || state.getCountryInSemiFinal(country.code),
+          isInCurrentStage: !!countryInStage,
+        };
+      }),
+    );
 
   // Note: Semi-final means any stage before the final stage (GF)
   const { shouldShowAsNonQualified, shouldShowNQLabel } = useMemo(() => {
-    const fallbackStage = getCurrentStage();
-    const currentStageId = viewedStageId || fallbackStage?.id;
-
-    if (!currentStageId)
+    if (!stageId)
       return { shouldShowAsNonQualified: false, shouldShowNQLabel: false };
 
-    const currentStage =
-      eventStages.find((s) => s.id === currentStageId) || fallbackStage;
-
-    if (!currentStage)
-      return { shouldShowAsNonQualified: false, shouldShowNQLabel: false };
-
-    const isGrandFinal =
-      currentStage.id.toUpperCase() === StageId.GF.toUpperCase();
-
-    // Find this country in the currently viewed stage (or latest non-final),
-    // falling back to the semi-final lookup for legacy/all-participants cases.
-    const countryInCurrentStage =
-      currentStage.countries.find((c) => c.code === country.code) ||
-      getCountryInSemiFinal(country.code);
+    const isGrandFinal = stageId.toUpperCase() === StageId.GF.toUpperCase();
 
     const hasQualifiedFromCurrentStage =
       !!countryInCurrentStage &&
-      countryInCurrentStage.qualifiedFromStageIds?.includes(currentStage.id);
+      countryInCurrentStage.qualifiedFromStageIds?.includes(stageId);
 
     // Non-final phases: mark countries as non-qualified once voting is over
     // if they haven't qualified from this stage.
@@ -67,14 +91,10 @@ export const useQualificationStatus = (
 
     // Grand Final: in all-participants mode, any country not participating
     // in the Grand Final should be shown as non-qualified (unless auto-qualified).
-    const isInGrandFinal = currentStage.countries.some(
-      (c) => c.code === country.code,
-    );
-
     const isNonQualifiedInGrandFinalAllParticipants = Boolean(
       showAllParticipants &&
         winnerCountry &&
-        !isInGrandFinal &&
+        !isInCurrentStage &&
         !country?.isAutoQualified,
     );
 
@@ -84,11 +104,9 @@ export const useQualificationStatus = (
         isNonQualifiedInGrandFinalAllParticipants && showAllParticipants,
     };
   }, [
-    viewedStageId,
-    getCurrentStage,
-    getCountryInSemiFinal,
-    eventStages,
-    country.code,
+    stageId,
+    countryInCurrentStage,
+    isInCurrentStage,
     country?.isAutoQualified,
     isVotingOver,
     showAllParticipants,

@@ -11,13 +11,20 @@ import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-const USER_DETAILS = {
-  platform: navigator.platform,
-  userAgent: navigator.userAgent,
-  language: navigator.language,
-  screenWidth: typeof window !== 'undefined' ? window.innerWidth : undefined,
-  screenHeight: typeof window !== 'undefined' ? window.innerHeight : undefined,
-};
+// Read lazily: this module is a client component, but it can still be
+// *evaluated* during SSR/prerender, where `navigator` does not exist.
+const getUserDetails = () =>
+  typeof navigator === 'undefined'
+    ? {}
+    : {
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        screenWidth:
+          typeof window !== 'undefined' ? window.innerWidth : undefined,
+        screenHeight:
+          typeof window !== 'undefined' ? window.innerHeight : undefined,
+      };
 
 export default function Error({
   error,
@@ -95,7 +102,7 @@ export default function Error({
     (error.stack || error.message || 'Unknown error occurred') +
     '\n\n' +
     'User Details: ' +
-    JSON.stringify(USER_DETAILS);
+    JSON.stringify(getUserDetails());
 
   // Silently report error to backend (for both authenticated and unauthenticated users)
   // Use localStorage to prevent duplicate reports on page refresh
@@ -136,7 +143,7 @@ export default function Error({
       createErrorMutation.mutate({
         message: error.message || 'Unknown error occurred',
         stack: error.stack,
-        userDetails: USER_DETAILS,
+        userDetails: getUserDetails(),
         generalInfo,
         scoreboardInfo,
       });

@@ -1,12 +1,13 @@
 import { useCallback, useMemo } from 'react';
 
+import { useShallow } from 'zustand/shallow';
+
 import { useCountriesStore } from '../../../state/countriesStore';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
 import { useGeneralStore } from '@/state/generalStore';
 
 export const useVoting = () => {
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
   const giveJuryPoints = useScoreboardStore((state) => state.giveJuryPoints);
   const giveTelevotePoints = useScoreboardStore(
     (state) => state.giveTelevotePoints,
@@ -34,7 +35,24 @@ export const useVoting = () => {
   const MAX_COUNTRY_WITH_POINTS =
     stagePointsOverride?.pointsSystem.length ?? globalPointsSystem.length;
 
-  const { countries, isJuryVoting } = getCurrentStage() || {};
+  // Reactive narrow reads: the countries array reference changes only when an
+  // award actually lands, so voting state stays fresh without a board-wide
+  // `eventStages` subscription. `votingCountryIndex` is subscribed explicitly
+  // because `getVotingCountry()` below reads it imperatively — without this,
+  // its freshness would silently depend on every index write also changing
+  // the countries array reference.
+  const { countries, isJuryVoting } = useScoreboardStore(
+    useShallow((state) => {
+      const currentStage = state.getCurrentStage();
+
+      return {
+        countries: currentStage?.countries,
+        isJuryVoting: currentStage?.isJuryVoting,
+      };
+    }),
+  );
+
+  useScoreboardStore((state) => state.votingCountryIndex);
 
   const { countriesWithPointsLength, wasTheFirstPointsAwarded } =
     useMemo(() => {

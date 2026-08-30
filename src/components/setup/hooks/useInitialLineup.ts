@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 import { EventStage, StageId, StageVotingMode } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -22,7 +22,12 @@ export const useInitialLineup = () => {
     (state) => state.semiFinalVotingMode,
   );
 
-  useEffect(() => {
+  // Layout effect, not a passive one: on a first visit this runs during the
+  // setup modal's very first commit, and the re-render it schedules is flushed
+  // before paint. As a passive effect it let the browser paint the
+  // "nothing configured yet" state first, which then collapsed — a 0.43 CLS
+  // burst on the load path.
+  useLayoutEffect(() => {
     if (!eventSetupModalOpen) return;
     if (configuredEventStages.length > 0 || allCountriesForYear.length === 0)
       return;

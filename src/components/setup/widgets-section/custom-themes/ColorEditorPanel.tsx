@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ColorPicker from 'react-best-gradient-color-picker';
 
 import {
@@ -8,10 +8,15 @@ import {
   getColorPickerValue,
   sanitizeGradient,
 } from './ColorOverridePicker';
+import { useThrottledEdit } from './hooks/useThrottledEdit';
 
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import Button from '@/components/common/Button';
 import { parseColor } from '@/helpers/colorConversion';
+
+// Shields the picker from the panel's per-move re-renders (the live swatch and
+// value readout above it update at pointer-move frequency).
+const MemoColorPicker = React.memo(ColorPicker);
 
 interface ColorEditorPanelProps {
   label: string;
@@ -39,6 +44,10 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
 }) => {
   const t = useTranslations('widgets.themes');
 
+  // Drag moves render only this panel via the local echo; the modal-level
+  // `overrides` state updates on a 40 ms throttle instead of per pointer-move.
+  const [liveValue, pushChange] = useThrottledEdit(value, onChange);
+
   // The gradient picker renders at a fixed pixel width, so measure the panel and
   // pass that width to make it fill the available space on mobile.
   const pickerWrapRef = useRef<HTMLDivElement>(null);
@@ -59,18 +68,28 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  const currentValue = value || defaultValue || '#000000';
+  const currentValue = liveValue || defaultValue || '#000000';
   const displayColor = getColorPickerValue(currentValue);
-  const isCustom = value !== undefined && value !== defaultValue;
+  const isCustom = liveValue !== undefined && liveValue !== defaultValue;
 
-  const handleColorChange = (color: string) => {
-    const normalized = parseColor(color);
-    const sanitized = /gradient\(/i.test(normalized)
-      ? sanitizeGradient(normalized)
-      : normalized;
+  // The picker gets the throttled *prop* value, not the per-move live echo:
+  // react-best-gradient-color-picker is fully controlled, and a value change
+  // re-renders its entire subtree (context provider, canvases, inputs) — with
+  // the drag cross tracked by cheap component-local state inside it. Feeding
+  // it per-move values tripled its render rate for no visible gain.
+  const pickerValue = getColorPickerValue(value || defaultValue || '#000000');
 
-    onChange(sanitized);
-  };
+  const handleColorChange = useCallback(
+    (color: string) => {
+      const normalized = parseColor(color);
+      const sanitized = /gradient\(/i.test(normalized)
+        ? sanitizeGradient(normalized)
+        : normalized;
+
+      pushChange(sanitized);
+    },
+    [pushChange],
+  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -106,7 +125,7 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
         {isCustom && (
           <Button
             variant="secondary"
-            onClick={() => onChange(undefined)}
+            onClick={() => pushChange(undefined)}
             className="!px-2.5 !py-2 shrink-0"
             Icon={<UndoIcon className="w-4 h-4" />}
           ></Button>
@@ -114,8 +133,8 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
       </div>
 
       <div ref={pickerWrapRef} className="w-full">
-        <ColorPicker
-          value={displayColor}
+        <MemoColorPicker
+          value={pickerValue}
           onChange={handleColorChange}
           width={pickerWidth}
           height={200}

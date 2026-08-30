@@ -1,4 +1,39 @@
+import { shallow } from 'zustand/shallow';
+
 import { Country, EventStage, StageVotingMode } from '../../models';
+
+/**
+ * Reuses the previous country objects (and the previous array, when nothing
+ * changed at all) for entries whose fields did not change. Values are
+ * untouched — this only restores reference equality so that
+ * `React.memo(CountryItem)` can bail out for countries an award didn't affect.
+ * Assumes `next` is an index-aligned rewrite of `previous` (which every award
+ * path produces via `countries.map(...)`).
+ */
+export const stabilizeCountries = (
+  previous: Country[],
+  next: Country[],
+): Country[] => {
+  let changed = previous.length !== next.length;
+
+  const stabilized = next.map((country, index) => {
+    const previousCountry = previous[index];
+
+    if (
+      previousCountry &&
+      previousCountry.code === country.code &&
+      shallow(previousCountry, country)
+    ) {
+      return previousCountry;
+    }
+
+    changed = changed || previousCountry !== country;
+
+    return country;
+  });
+
+  return changed ? stabilized : previous;
+};
 
 export const createCountriesComparator = (runningOrder?: string[]) => {
   const orderMap =
@@ -125,6 +160,7 @@ export const getWinnerCountry = (
   }
 
   const comparator = createCountriesComparator(runningOrder);
+
   return countries.slice().sort(comparator)[0] ?? null;
 };
 
@@ -168,6 +204,7 @@ export const handleStageEnd = (
         if (target.minRank && target.maxRank) {
           return sum + (target.maxRank - target.minRank + 1);
         }
+
         // Amount-based (backward compatibility)
         return sum + target.amount;
       }, 0) || 0;
@@ -183,9 +220,20 @@ export const handleStageEnd = (
     }));
   }
 
+  const stabilizedCountries = stabilizeCountries(countries, updatedCountries);
+
+  // Keep the winner reference-identical to its element in the stored array
+  // (stabilization may have swapped the object back to the previous one).
+  if (winnerCountry) {
+    const winnerCode = winnerCountry.code;
+
+    winnerCountry =
+      stabilizedCountries.find((c) => c.code === winnerCode) ?? winnerCountry;
+  }
+
   return {
     winnerCountry,
     showQualificationResults,
-    countries: updatedCountries,
+    countries: stabilizedCountries,
   };
 };
