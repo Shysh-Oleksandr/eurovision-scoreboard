@@ -871,6 +871,54 @@ into a hashed, immutably-cached static JSON**, so returning users pay for it
 once, ever. Given that this app's audience is people who come back to run more
 contests, this is worth more than the cold-load number suggested.
 
+**Status: DONE (2026-08-30).** The catalog no longer ships in any document:
+
+- `scripts/generateMessages.ts` (ts-node, wired as `prebuild` so
+  `build`/`preview`/`deploy` all regenerate) merges each locale over en,
+  writes content-hashed JSON to `public/messages/<locale>.<hash>.json`
+  (gitignored) and emits the committed manifest
+  `src/i18n/messagesManifest.generated.ts`. `messagesManifest.test.ts`
+  recomputes the hashes from `messages/*.json`, and lint-staged regenerates
+  the manifest when a translation file is staged. The shared merge/type
+  helpers moved to `src/i18n/catalog.ts` (pure) and
+  `src/i18n/serverMessages.ts` (per-isolate cached merge, still used by
+  `generateMetadata`/`getTranslations`).
+- `app/layout.tsx` passes the client an explicit **shell subset**
+  (`SHELL_NAMESPACES` in catalog.ts: Metadata, common, error,
+  widgets.profile, settings.ui — the inventory of everything that renders
+  before the catalog arrives) through the new `AppIntlProvider`; passing
+  explicit messages short-circuits next-intl's server-side
+  auto-serialization that inlined the full catalog into every flight
+  payload. The provider fetches the full catalog (preloaded from the
+  document head beside the countries preset, so it downloads in parallel
+  with the JS), swaps locale+messages in atomically, falls back to the new
+  `/api/messages/[locale]` route (also the dev-mode source — `next dev`
+  runs no prebuild) and degrades to shell-only rather than blocking. The
+  main page gates on `useCatalogReady()` as a correctness backstop.
+- `public/_headers` gained `/messages/* → public,max-age=31536000,immutable`
+  — verified live on :8787 that it beats the global `no-store` block, which
+  was the entire premise.
+
+Measured (same emulation): **document 141 → 38 KB local** (~25–30 → ~8 KB
+brotli in prod), finishing at 781 ms vs 1667 ms; on a repeat visit the
+catalog serves from disk cache with **zero transfer and no revalidation**,
+so the slim document is the only real network work left. Cold LCP
+4252 → 4262 ms (parity — the ~20 KB catalog preload rides level 0 next to
+the 274 KB JS and never touches the critical path), load CLS 0.00, L1
+unchanged at 18 chunks / 274 KB. The force-static `/about`/`/privacy`
+pages, whose views contain zero translations, dropped 111 → 41 KB
+prerendered HTML for free. Locale switch verified end to end: the language
+select POSTs `/api/locale`, `router.refresh()` hands the provider new
+props, the new locale's catalog is fetched (es, 24 KB cold) and the whole
+UI swaps with no mixed-locale frame; a fresh Accept-Language visit resolves
+uk and renders fully translated from the fetched catalog.
+
+Verification: `yarn lint:types-cli` clean; ESLint clean on all new/changed
+files; vitest 118/120 (same 2 stale failures + the manifest guard test).
+Known trade-offs: the shell inlines ~6 KB raw of namespaces every visit
+(unavoidable — they render before the fetch), and a deploy race lands on
+the uncached API route instead of the static file.
+
 **3. The engine boots before the app needs it.** `votingActions.ts` (28 KB raw),
 `themes.ts` (12 KB), `common-countries.ts` (9.5 KB), axios, query-core and
 zustand middleware are all in the render-critical chunk because

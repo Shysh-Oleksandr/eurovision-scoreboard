@@ -6,6 +6,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "next dev",
+    "prebuild": "yarn gen:messages",
     "build": "next build",
     "start": "next start",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
@@ -19,6 +20,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "gen:messages": "npx ts-node -P tsconfig.scripts.json scripts/generateMessages.ts",
     "generate-countries-json": "npx ts-node -P tsconfig.scripts.json scripts/generateCountriesJson.ts",
     "calculate-odds": "npx ts-node -P tsconfig.scripts.json scripts/calculateCountriesOdds.ts",
     "analyze-history": "npx ts-node --files -P tsconfig.scripts.json scripts/analyzeHistoricalShape.ts",

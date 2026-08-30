@@ -1,7 +1,6 @@
 import './globals.css';
 
 import type { Metadata } from 'next';
-import { NextIntlClientProvider } from 'next-intl';
 import ReactDOM from 'react-dom';
 
 import Script from 'next/script';
@@ -9,12 +8,20 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { UmamiAnalytics } from './analytics';
 import AppBootstrap from './app-bootstrap';
+import AppIntlProvider from './AppIntlProvider';
 import IntlProvider from './IntlProvider';
 import Providers from './providers';
 import ToastRoot from './toast-root';
 import { WebVitals } from './web-vitals';
 
 import { INITIAL_COUNTRIES_URL } from '@/data/countries/countriesDataUrl';
+import {
+  pickMessageNamespaces,
+  SHELL_NAMESPACES,
+  SupportedLocale,
+} from '@/i18n/catalog';
+import { MESSAGES_CATALOG } from '@/i18n/messagesManifest.generated';
+import { getMergedMessages } from '@/i18n/serverMessages';
 import { FONT_ALIAS_ALLOWLIST } from '@/theme/fontAliases';
 
 const FOUC_FONT_ALLOWED_LITERAL = `{${FONT_ALIAS_ALLOWLIST.map(
@@ -100,15 +107,36 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
+  const locale = (await getLocale()) as SupportedLocale;
+
+  // The message catalog no longer ships inline in the flight payload (it was
+  // ~70 KB in every document — the entire network cost of a repeat visit).
+  // The document inlines only the shell namespaces; the client fetches the
+  // full catalog as a hashed static JSON, immutably cached via
+  // public/_headers. Dev runs without the prebuild-generated files, so it
+  // fetches from the always-current API route instead.
+  const shellMessages = pickMessageNamespaces(
+    await getMergedMessages(locale),
+    SHELL_NAMESPACES,
+  );
+  const catalogUrl =
+    process.env.NODE_ENV === 'development'
+      ? `/api/messages/${locale}`
+      : MESSAGES_CATALOG[locale].url;
 
   // The countries preset gates the *useful* first render — the setup screen
   // can only lay out its stages once it arrives — but the store only requests
   // it after the eager bundle has evaluated, a whole round trip later.
   // Preloading it alongside the bundle removes that serialized hop, and with
   // it a first-visit layout shift (the screen no longer paints country-less
-  // and then fills in).
+  // and then fills in). The catalog preload rides the same reasoning: ~20 KB
+  // downloading in parallel with the ~300 KB JS can never be the critical
+  // path, and without it the fetch would serialize behind hydration.
   ReactDOM.preload(INITIAL_COUNTRIES_URL, {
+    as: 'fetch',
+    crossOrigin: 'anonymous',
+  });
+  ReactDOM.preload(catalogUrl, {
     as: 'fetch',
     crossOrigin: 'anonymous',
   });
@@ -164,7 +192,11 @@ export default async function RootLayout({
           } catch (e) { console.error('Failed to apply stored theme:', e); }
         `}</Script>
 
-        <NextIntlClientProvider>
+        <AppIntlProvider
+          locale={locale}
+          shellMessages={shellMessages}
+          catalogUrl={catalogUrl}
+        >
           <Providers>
             <AppBootstrap />
             {children}
@@ -173,7 +205,7 @@ export default async function RootLayout({
             <WebVitals />
             <IntlProvider />
           </Providers>
-        </NextIntlClientProvider>
+        </AppIntlProvider>
       </body>
     </html>
   );

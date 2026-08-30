@@ -1,5 +1,6 @@
 'use client';
 
+import { useCatalogReady } from '../AppIntlProvider';
 import Main from '../../views/Main';
 
 import { useIsClient } from '@/hooks/useIsClient';
@@ -12,6 +13,10 @@ export default function Page() {
   // anything painted. Importing it statically ships it with the initial bundle
   // and the mount gate keeps the server output empty.
   const isClient = useIsClient();
+  // The document only inlines the shell i18n namespaces; the full catalog is
+  // a preloaded ~20 KB fetch that finishes long before the JS bundle, so this
+  // gate is a correctness backstop, not a real wait.
+  const catalogReady = useCatalogReady();
 
-  return isClient ? <Main /> : null;
+  return isClient && catalogReady ? <Main /> : null;
 }
