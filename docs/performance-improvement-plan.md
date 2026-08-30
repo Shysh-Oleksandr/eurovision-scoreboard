@@ -880,6 +880,107 @@ first paint needs the voting engine. Decoupling the boot path from
 dropping axios (another ~17 KB gz, and it takes Next's 34 KB `Buffer` polyfill
 with it) that is a real dent in item 1's 300 KB.
 
+**Status: DONE (2026-08-30), in three commits.** Cold trace in
+`../../perf-artifacts/partc/trace-c3-cold.json.gz` (fresh isolated context,
+navigate-into-recording, same emulation): **LCP 4505 → 4252 ms, L1
+18 chunks / 300 → 274 KB gz, load CLS 0.00**; the engine chunk loads in the
+idle-preload batch at ~4 s, after first paint, never as a pre-paint level.
+
+- **axios → fetch wrapper** (`src/api/client.ts`, ~180 lines): same surface —
+  `api.get/post/put/patch/delete` resolving `{ data, status, headers }`,
+  errors carrying `response.{status,data}` (what `parseAxiosError` and the
+  queryClient retry duck-type), JWT injection, single-flight 401 refresh with
+  exactly one retry, refresh-endpoint exclusion, FormData passthrough (caller
+  multipart Content-Type dropped so the browser sets the boundary), DELETE
+  bodies via `config.data`, `params` serialization. Zero call-site edits —
+  audited: the tree uses only `{ params }` (errors.ts) and multipart headers
+  with FormData (5 sites). 14 unit tests in `client.test.ts` cover the shape,
+  the 401/refresh state machine and single-flight. axios and the Buffer
+  polyfill are gone from every chunk (`chunk-modules.mjs --find` empty).
+- **Diaspora split**: `diasporaSettings.ts` holds the JSON-free types,
+  defaults (defaultOn group ids as a literal, guarded by
+  `diasporaSettings.test.ts` against drift) and pure helpers that
+  `generalStore`/`syncedSettings` need; `diaspora.ts` keeps the 46 KB presets
+  JSON + resolvers and re-exports the light module, so the lazy Relations
+  UI / engine consumers are unchanged.
+- **Lazy engine injection**: `scoreboardStore` composes only
+  eventActions/miscActions/getters + typed stubs
+  (`engineStubs.ts`) for the 23 voting / jury-scale-reveal / predefinition
+  actions; `installEngine.ts` — reached only through `engineLoader.ts`'s
+  memoized `import()` — swaps in the real factories via store-level
+  `setState` (routes through the same persist→devtools→temporal chain;
+  zundo's data-only partialize means the swap records no history entry). A
+  stub call pre-install queues on the loader promise (FIFO) and delegates
+  once installed, so stale captured references keep working.
+  `startEvent`/`continueToNextPhase` and the contest-snapshot loader `await
+  ensureScoreboardEngine()` as the hard ordering guarantee (both call
+  `resetJuryScaleReveal`/`predefineVotesForStage` synchronously); the idle
+  preloader (`useSimulationChunksPreload`) warms the chunk during setup.
+  Severing the two `generalStore`/`countriesStore` → store edges was
+  deliberately NOT done: since phase 3 the page chunk statically needs the
+  store object at first render (EventSetupModal's selectors +
+  `temporal.getState()`), so that cut would only shuffle bytes between two
+  render-critical chunks.
+
+Worst case measured (auto-clicker beats the idle preloader on a cold Slow-4G
+load): tap start-SF1 → 15-row board in **806 ms** including the on-demand
+engine fetch. Punted, as planned: the `themes.ts` per-year split
+(`getThemeForYear` is needed synchronously in generalStore's initial state,
+persist merge and rehydrate) and `common-countries.ts` (its other consumers
+sit in the equally-critical page chunk).
+
+Post-review pass (`/code-review` on the C4+C3 diff; half the finder agents
+died on a session rate limit, so the surviving four angles' findings were
+verified by hand and the dead angles' ground — axios parity, cross-file
+callers — re-checked manually). Confirmed and fixed:
+
+- **Undo-history inversion at stage start** (the review's best catch):
+  `startEvent` becoming async silently reordered EventSetupModal's
+  `startEvent(); clear();` — the zundo history wipe ran before the stage
+  start's writes, leaving the whole start undoable (undo would walk the
+  board back to a pre-start state). `startEvent`/`continueToNextPhase` are
+  now honestly typed `() => Promise<void>` and `closeAndStartEvent` clears
+  after the start resolves.
+- **engineLoader cached a rejected promise forever** — one flaky chunk fetch
+  would have bricked the simulation until reload; it now retries.
+- **engineStubs hardening**: the name list is compile-checked both ways
+  against the three factories' exported action types (type-only imports, so
+  no eager edge); the queued replay runtime-guards against a still-stubbed
+  action (no self-call loop on a drifted build); and the two
+  boolean-returning actions (`openSplitScreenQualifierModal`,
+  `computeSplitScreenQualifierCandidatesIfNeeded`) kick the load but do NOT
+  queue a replay — their callers branch on the return value, so a late
+  replay would act on a decision already taken the other way.
+- **client.ts**: the 401-refresh decision now runs before the discarded
+  error body is parsed, and the retry-token policy is one expression
+  (`retry?.token ?? getter() ?? null` — the unit test caught an
+  over-simplification that dropped the returned-token parity).
+- **contestSnapshot** starts the engine download at the top of a full load
+  so it overlaps the countries fetch + decode (deep link into a saved
+  contest before the idle preloader fires).
+- Cleanups: the thrice-duplicated "clear GSAP styles only on a mid-life
+  layout-key change" guard is now one shared `useOnLayoutKeyChange` hook
+  (PointsSection's two same-key effects merged into one call); the douze
+  shrink-phase start is a module constant (it never varied with column
+  count); the diasporaSettings guard-test comment named the wrong file.
+  Left as noted, pre-existing: `newDiasporaGroupId` duplicating
+  `votingPresetsStore`'s `newId`, and the api modules' hand-rolled query
+  builders not yet migrated to the client's `{ params }`.
+
+Verification: `yarn lint:types-cli` clean; ESLint clean on new files, touched
+files at or below their pre-existing error counts (`contestSnapshot.ts`
+43 → 3 after `--fix`); vitest 117/119 (the same 2 stale failures + 15 new
+tests). Functional pass on the rebuilt preview: full SF1 (manual votes, undo
+mid-voting, finish-randomly jury + televote), qualifiers modal with correct
+totals, continue → SF2 post-setup → SF2 starts; a persisted mid-simulation
+rehydrates and the presentation auto-voting drives stubbed actions through
+the on-demand engine load; login via minted refresh token (refresh 201 → me →
+preferences → custom-entries), authed theme reads incl. a query-param'd list,
+logout 201. One pre-existing edge documented while chasing a false alarm: a
+ПОЧАТИ tap in the first ~3 s of a cold load, before the stage cards populate,
+is silently swallowed by `proceedToPostSetup` (no stage with countries yet) —
+present before this work, self-heals on the next tap.
+
 **4. The remaining simulation freezes are all "one big effect flush".**
 - *Stage start, ~390 ms*: the initial exit-tween that hides every row's
   last-points block is load-bearing but does not need to be a tween. Render

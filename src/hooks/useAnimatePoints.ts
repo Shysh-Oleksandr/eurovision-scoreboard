@@ -1,8 +1,9 @@
 import gsap from 'gsap';
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { useOnLayoutKeyChange } from '@/hooks/useOnLayoutKeyChange';
 import { playThemeSound } from '@/theme/playThemeSound';
 import { DouzePointsAnimationMode } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -53,7 +54,6 @@ const useAnimatePoints = ({
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
   const previousDirectionRef = useRef(lastPointsAnimationDirection);
-  const previousLayoutKeyRef = useRef(pointsLayoutKey);
   /**
    * The last-points block renders with an `opacity-0` class, so until the
    * enter tween has shown it there is nothing to hide — the exit branch can
@@ -150,20 +150,12 @@ const useAnimatePoints = ({
     },
   );
 
-  useLayoutEffect(() => {
-    if (!pointsLayoutKey) return;
-    // Fresh mounts carry no GSAP styles; clearProps also wipes gsap's
-    // per-element cache (one getComputedStyle reflow per row), so only clear
-    // when the layout key actually changes mid-life.
-    if (previousLayoutKeyRef.current === pointsLayoutKey) return;
-
-    previousLayoutKeyRef.current = pointsLayoutKey;
-
+  useOnLayoutKeyChange(pointsLayoutKey, () => {
     clearLastPointsGsapStyles(
       lastPointsContainerRef.current,
       lastPointsTextRef.current,
     );
-  }, [pointsLayoutKey]);
+  });
 
   useGSAP(
     () => {

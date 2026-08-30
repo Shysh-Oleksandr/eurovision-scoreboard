@@ -36,7 +36,7 @@ import {
  * two flows never call into each other.
  */
 
-type JuryScaleRevealActions = {
+export type JuryScaleRevealActions = {
   advanceJuryScaleReveal: () => void;
   finishJuryScaleRevealRandomly: () => void;
   hideJuryScaleRevealAwards: () => void;

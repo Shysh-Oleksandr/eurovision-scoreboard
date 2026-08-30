@@ -68,7 +68,7 @@ const calculateAndStoreCountryPoints = (
   }));
 };
 
-type PredefinitionActions = {
+export type PredefinitionActions = {
   predefineVotesForStage: (
     stage: EventStage,
     resetOtherStages?: boolean,

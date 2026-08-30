@@ -40,6 +40,12 @@ const HEARTS_SHRINK_COLUMN_DURATION_SECONDS = 0.8;
 const HEARTS_GROW_STAGGER_SPAN_SECONDS = 0.8;
 const HEARTS_SHRINK_STAGGER_SPAN_SECONDS = 0.8;
 const HEARTS_REVERSE_DELAY_SECONDS = 0.7;
+// The last column's grow delay is always the full stagger span, so the shrink
+// phase starts at a constant offset regardless of column count.
+const HEARTS_SHRINK_PHASE_START_SECONDS =
+  HEARTS_GROW_STAGGER_SPAN_SECONDS +
+  HEARTS_GROW_COLUMN_DURATION_SECONDS +
+  HEARTS_REVERSE_DELAY_SECONDS;
 
 type BaseVariantProps = {
   refs: DouzePointsAnimationProps['refs'];
@@ -138,18 +144,14 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   }, [isThemePreview]);
 
   // The choreography itself is CSS (.douze-heart-animated in styles.css) so
-  // the per-frame work runs on the compositor; this only derives the stagger
-  // numbers the old GSAP timeline computed, exposed as CSS variables.
-  const growStagger =
-    columns > 1 ? HEARTS_GROW_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
-  const shrinkStagger =
-    columns > 1 ? HEARTS_SHRINK_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
-  const shrinkPhaseStart =
-    Math.max(0, (columns - 1) * growStagger) +
-    HEARTS_GROW_COLUMN_DURATION_SECONDS +
-    HEARTS_REVERSE_DELAY_SECONDS;
-
+  // the per-frame work runs on the compositor; this only derives the
+  // per-column stagger delays the old GSAP timeline computed, exposed as CSS
+  // variables.
   const columnHeartVars = useMemo(() => {
+    const growStagger =
+      columns > 1 ? HEARTS_GROW_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
+    const shrinkStagger =
+      columns > 1 ? HEARTS_SHRINK_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
     const maxScale =
       window.innerWidth > 768 ? HEARTS_MAX_SCALE : HEARTS_MAX_SCALE * 1.1;
 
@@ -159,14 +161,14 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
         ({
           '--douze-grow-delay': `${(columns - 1 - column) * growStagger}s`,
           '--douze-shrink-delay': `${
-            shrinkPhaseStart + column * shrinkStagger
+            HEARTS_SHRINK_PHASE_START_SECONDS + column * shrinkStagger
           }s`,
           '--douze-heart-scale': String(
             maxScale * (Math.random() * 0.2 + 0.95),
           ),
         } as React.CSSProperties),
     );
-  }, [columns, growStagger, shrinkStagger, shrinkPhaseStart]);
+  }, [columns]);
 
   const hearts = useMemo(() => {
     return Array.from({ length: heartsCount }, (_, index) => index);
@@ -214,7 +216,7 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
         key={`douze-name-${columns}`}
         style={
           {
-            '--douze-name-out-delay': `${shrinkPhaseStart}s`,
+            '--douze-name-out-delay': `${HEARTS_SHRINK_PHASE_START_SECONDS}s`,
           } as React.CSSProperties
         }
         className={`douze-country-name-animated ${

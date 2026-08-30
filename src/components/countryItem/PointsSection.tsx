@@ -1,11 +1,12 @@
 import { CountUp } from 'countup.js';
 import gsap from 'gsap';
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 import { BaseCountry, Country } from '../../models';
 import RoundedTriangle from '../RoundedTriangle';
 
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useOnLayoutKeyChange } from '@/hooks/useOnLayoutKeyChange';
 import { useScoreboardTwoColumnCompactLayout } from '@/hooks/useScoreboardTwoColumnCompactLayout';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { PointsContainerShape } from '@/theme/types';
@@ -68,8 +69,6 @@ const PointsSection: React.FC<PointsSectionProps> = ({
   const isTransparent = pointsContainerShape === 'transparent';
   const pointsRef = useRef<HTMLHeadingElement | null>(null);
   const previousPointsRef = useRef<number | null>(null);
-  const previousPointsLayoutKeyRef = useRef(pointsLayoutKey);
-  const previousGsapClearLayoutKeyRef = useRef(pointsLayoutKey);
   const roundedPointsRowRef = useRef<HTMLDivElement | null>(null);
   const roundedPointsTrackRef = useRef<HTMLDivElement | null>(null);
   const currentPoints = useMemo(() => {
@@ -143,16 +142,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
     pointsContainerShape,
   ]);
 
-  useLayoutEffect(() => {
-    if (!pointsLayoutKey) return;
-    // Freshly mounted nodes carry no GSAP styles — only clear when the
-    // layout key actually changes mid-life. clearProps wipes gsap's
-    // per-element cache (a getComputedStyle reflow per row), so running it
-    // for every row at stage start was a real cost.
-    if (previousGsapClearLayoutKeyRef.current === pointsLayoutKey) return;
-
-    previousGsapClearLayoutKeyRef.current = pointsLayoutKey;
-
+  useOnLayoutKeyChange(pointsLayoutKey, () => {
     const targets = [
       roundedPointsRowRef.current,
       roundedPointsTrackRef.current,
@@ -160,20 +150,19 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       lastPointsRef?.current,
     ].filter(Boolean) as HTMLElement[];
 
-    if (targets.length === 0) return;
+    if (targets.length > 0) {
+      gsap.killTweensOf(targets);
+      gsap.set(targets, { clearProps: 'all' });
+    }
 
-    gsap.killTweensOf(targets);
-    gsap.set(targets, { clearProps: 'all' });
-  }, [pointsLayoutKey, lastPointsContainerRef, lastPointsRef]);
-
-  useLayoutEffect(() => {
-    if (!pointsRef.current || shouldShowNQLabel || !pointsLayoutKey) return;
-    if (previousPointsLayoutKeyRef.current === pointsLayoutKey) return;
-
-    previousPointsLayoutKeyRef.current = pointsLayoutKey;
-    pointsRef.current.textContent = String(currentPoints);
-    previousPointsRef.current = currentPoints;
-  }, [pointsLayoutKey, currentPoints, shouldShowNQLabel]);
+    // Re-sync the points text the layout change may have left mid-count-up.
+    // (When the NQ label is up there is nothing to sync; the count-up effect
+    // rewrites the number as soon as the label clears.)
+    if (pointsRef.current && !shouldShowNQLabel) {
+      pointsRef.current.textContent = String(currentPoints);
+      previousPointsRef.current = currentPoints;
+    }
+  });
 
   const lastPointsLabel =
     'lastReceivedPoints' in country && country.lastReceivedPoints !== null

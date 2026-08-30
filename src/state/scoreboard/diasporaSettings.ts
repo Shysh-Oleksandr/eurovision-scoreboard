@@ -70,7 +70,8 @@ export const DEFAULT_DIASPORA_SETTINGS: DiasporaSettings = {
   strength: 60,
   // Literal copy of `diasporaPresets.groups.filter(g => g.defaultOn).map(g =>
   // g.id)` — hardcoded so the default doesn't drag the presets JSON into the
-  // boot chunk. diaspora.test.ts guards it against drifting from the JSON.
+  // boot chunk. diasporaSettings.test.ts guards it against drifting from the
+  // JSON — update BOTH when changing which preset groups default on.
   enabledGroupIds: [
     'nordic',
     'ex-yugoslav',

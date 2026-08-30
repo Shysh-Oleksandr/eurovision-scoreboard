@@ -151,7 +151,8 @@ export type ScoreboardState = {
   giveManualTelevotePointsInRevealMode: (countryCode: string) => void;
   resetLastPoints: () => void;
   hideLastReceivedPoints: () => void;
-  startEvent: () => void;
+  // Async: awaits the lazily-installed engine (engineLoader) before running.
+  startEvent: () => Promise<void>;
   triggerRestartEvent: () => void;
   leaveEvent: () => void;
   prepareForNextStage: (shouldUpdateStore?: boolean) => {
@@ -159,7 +160,8 @@ export type ScoreboardState = {
     nextStage: EventStage | null;
     currentStageIndex: number;
   };
-  continueToNextPhase: () => void;
+  // Async: awaits the lazily-installed engine (engineLoader) before running.
+  continueToNextPhase: () => Promise<void>;
   closeQualificationResults: () => void;
   toggleShowAllParticipants: () => void;
   setViewedStageId: (stageId: string | null) => void;

@@ -336,9 +336,10 @@ const EventSetupModal = () => {
 
     setEventStages(eventStages);
 
-    startEvent();
-
-    clear();
+    // startEvent awaits the lazily-installed engine, so the history wipe must
+    // wait for its state writes — clearing first would leave the whole stage
+    // start undoable, walking the board back to a pre-start state.
+    void startEvent().then(() => clear());
   };
 
   const proceedToPostSetup = useCallback(() => {

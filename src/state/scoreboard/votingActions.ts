@@ -426,7 +426,7 @@ const pickSplitScreenCandidates = (
   }));
 };
 
-type VotingActions = {
+export type VotingActions = {
   giveJuryPoints: (countryCode: string) => void;
   giveTelevotePoints: (
     countryCode: string,

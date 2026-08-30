@@ -658,6 +658,17 @@ export async function applyContestSnapshotToStores(
     return;
   }
 
+  // A full snapshot load needs the lazily-installed engine further down
+  // (resetJuryScaleReveal). Start the chunk download now so it overlaps the
+  // countries fetch and the snapshot decode instead of serializing after them
+  // (a deep link into a saved contest can arrive before the idle preloader
+  // has fired).
+  const scoreboardEnginePromise = ensureScoreboardEngine();
+
+  // The await further down surfaces a load failure; this handler only stops
+  // the rejection going unhandled if the decode throws before reaching it.
+  scoreboardEnginePromise.catch(() => undefined);
+
   // Apply custom entries if setup is enabled
   if (loadOptions.setup || loadOptions.simulation) {
     const existing = countriesStore.customCountries || [];
@@ -913,9 +924,9 @@ export async function applyContestSnapshotToStores(
   // previous run would match the incoming stage and make the replay skip the
   // whole countdown, awarding only the 12 points. This also cancels any pending
   // "hide awards" timer. resetJuryScaleReveal is a lazily-installed engine
-  // action — await the install so the reset runs before the snapshot state is
-  // applied below, not queued after it.
-  await ensureScoreboardEngine();
+  // action — await the install (started at the top of the load) so the reset
+  // runs before the snapshot state is applied below, not queued after it.
+  await scoreboardEnginePromise;
   useScoreboardStore.getState().resetJuryScaleReveal();
 
   // Apply simulation state if present and enabled

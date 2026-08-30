@@ -14,6 +14,11 @@
 let enginePromise: Promise<void> | null = null;
 
 export const ensureScoreboardEngine = (): Promise<void> =>
-  (enginePromise ??= import('./installEngine').then((m) =>
-    m.installScoreboardEngine(),
-  ));
+  (enginePromise ??= import('./installEngine')
+    .then((m) => m.installScoreboardEngine())
+    .catch((error) => {
+      // Never cache a rejection: one flaky chunk fetch must not brick the
+      // simulation for the rest of the session — the next call retries.
+      enginePromise = null;
+      throw error;
+    }));

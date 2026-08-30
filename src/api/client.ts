@@ -92,8 +92,7 @@ async function request<T>(
   url: string,
   body: unknown,
   config: ApiRequestConfig | undefined,
-  retryToken?: string | null,
-  isRetry = false,
+  retry?: { token: string | undefined },
 ): Promise<ApiResponse<T>> {
   const headers = new Headers(config?.headers);
 
@@ -105,12 +104,9 @@ async function request<T>(
     headers.set('content-type', 'application/json');
   }
 
-  const token =
-    retryToken !== undefined
-      ? retryToken
-      : accessTokenGetter
-      ? accessTokenGetter()
-      : null;
+  // One token policy: a retry prefers the token the refresh returned (axios
+  // interceptor parity), falling back to the getter either way.
+  const token = retry?.token ?? accessTokenGetter?.() ?? null;
 
   if (token) headers.set('authorization', `Bearer ${token}`);
 
@@ -127,12 +123,13 @@ async function request<T>(
   });
 
   if (!res.ok) {
-    const data = await parseBody(res);
-
+    // Decide about the refresh before touching the body: a 401 that will be
+    // retried discards its error body, and the refresh should start without
+    // waiting for it to stream in.
     if (
       res.status === 401 &&
       refreshFn &&
-      !isRetry &&
+      !retry &&
       !/\/auth\/refresh$/.test(url)
     ) {
       if (!refreshPromise) {
@@ -144,17 +141,10 @@ async function request<T>(
       // interceptor parity); a resolved one retries the request exactly once.
       const freshToken = await refreshPromise;
 
-      return request<T>(
-        method,
-        url,
-        body,
-        config,
-        freshToken ?? (accessTokenGetter ? accessTokenGetter() : null),
-        true,
-      );
+      return request<T>(method, url, body, config, { token: freshToken });
     }
 
-    throw new ApiError(res.status, data);
+    throw new ApiError(res.status, await parseBody(res));
   }
 
   const data = (await parseBody(res)) as T;

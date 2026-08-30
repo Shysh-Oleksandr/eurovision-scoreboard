@@ -17,13 +17,13 @@ import { playThemeSound } from '@/theme/playThemeSound';
 
 type EventActions = {
   setEventStages: (eventStages: EventStage[]) => void;
-  startEvent: () => void;
+  startEvent: () => Promise<void>;
   prepareForNextStage: (shouldUpdateStore?: boolean) => {
     updatedEventStages: EventStage[];
     nextStage: EventStage | null;
     currentStageIndex: number;
   };
-  continueToNextPhase: () => void;
+  continueToNextPhase: () => Promise<void>;
   closeQualificationResults: () => void;
   triggerRestartEvent: () => void;
   leaveEvent: () => void;
