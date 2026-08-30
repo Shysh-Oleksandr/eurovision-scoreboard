@@ -23,9 +23,11 @@ import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradie
 import {
   buildActiveTelevoteDropShadowFilter,
   resolveTelevoteOutlineColor,
+  ROUNDED_GLOW_CLASS,
   ROUNDED_GLOW_TRANSITION,
   ROUNDED_SUBTLE_GLOW,
   ROUNDED_SUBTLE_GLOW_HOVER,
+  roundedGlowStyle,
   splitRoundedCountryItemSurfaceClasses,
 } from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { useIsLowPerfDevice } from '@/hooks/useIsLowPerfDevice';
@@ -198,26 +200,23 @@ const CountryItem = ({
     // The active televote halo never transitions: animating a blurred,
     // multi-layer drop-shadow across rows on every vote is what lags the 2026
     // board on weak GPUs. It snaps in; the state background still fades
-    // (transition-colors on the container).
+    // (transition-colors on the container). The active row also carries
+    // `televoteActiveBg`, so dropping the halo on phones still reads as active.
     if (isActive) {
-      return {
-        filter: buildActiveTelevoteDropShadowFilter(
-          televoteOutlineColor,
-          glowHovered,
-        ),
-      };
+      return roundedGlowStyle(
+        buildActiveTelevoteDropShadowFilter(televoteOutlineColor, glowHovered),
+      );
     }
 
     // The subtle glow only transitions for glow-hoverable rows (jury voting /
     // reveal mode) — one row at a time, on real hover, so its single-layer fade
     // is cheap. Disabled on low-perf devices, where even that is skipped.
-    return {
-      filter: glowHovered ? ROUNDED_SUBTLE_GLOW_HOVER : ROUNDED_SUBTLE_GLOW,
-      transition:
-        isRoundedGlowHoverable && !isLowPerfDevice
-          ? ROUNDED_GLOW_TRANSITION
-          : undefined,
-    };
+    return roundedGlowStyle(
+      glowHovered ? ROUNDED_SUBTLE_GLOW_HOVER : ROUNDED_SUBTLE_GLOW,
+      isRoundedGlowHoverable && !isLowPerfDevice
+        ? ROUNDED_GLOW_TRANSITION
+        : undefined,
+    );
   }, [
     roundedCountryContainer,
     isActive,
@@ -234,7 +233,9 @@ const CountryItem = ({
       rootRef={rootRef}
       className={isVotingOver ? '' : 'md:~md/xl:~w-[14rem]/[26rem]'}
       containerClassName={`${buttonClassName} flex-1 min-w-0 overflow-hidden ${
-        roundedCountryContainer ? '!rounded-full !bg-transparent' : ''
+        roundedCountryContainer
+          ? `!rounded-full !bg-transparent ${ROUNDED_GLOW_CLASS}`
+          : ''
       }`}
       style={
         roundedCountryContainer ? roundedContainerStyle : buttonSpecialStyle

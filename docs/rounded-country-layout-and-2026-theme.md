@@ -133,6 +133,10 @@ Implementation lives entirely inside the `if (roundedCountryLayout)` block in `P
 
 Outer button: `!rounded-full !bg-transparent` + **filter** for glow (not background on the full width).
 
+**The glow is desktop-only (`md` / 768px and up).** JS never sets `filter` inline — it publishes the value as the `--country-item-glow` variable (`roundedGlowStyle()`), and the `ROUNDED_GLOW_CLASS` utility (`md:[filter:var(--country-item-glow)]`) turns it into a `filter` only inside the `md` breakpoint. Below that, rows get no glow at all. The var intentionally has no fallback: unset, `filter` is invalid at computed-value time and resolves to its initial `none`.
+
+Why: iOS Safari clips an element's own `drop-shadow` by that same element's `overflow: hidden` + `border-radius`, so on phones the glow rendered sliced off around the points pills. It looked correct only mid-FLIP/teleport, when the moving row is composited and Safari paints it another way — hence the "fixes itself during the animation, breaks again after" symptom. Moving the filter to a non-clipping wrapper element does **not** help; only skipping it at phone widths does.
+
 Background gradient/colors from `buttonClassName` apply to the **name strip** only:
 
 - `splitRoundedCountryItemSurfaceClasses()` in `roundedCountryItemGlow.ts` splits `bg-*` → content strip, `opacity-*` → container.
@@ -304,6 +308,7 @@ Any change in shared components must stay behind `if (roundedCountryLayout)` / `
 |---------|----------------|---------------|
 | Black flash on active televote | `filter` transition between unlike filters, or comma-`hsl` in `drop-shadow` | `CountryItem` glow; use `toFilterSafeColor` / rgb syntax |
 | Points invisible after theme change | Stale GSAP `opacity`/`transform` | `pointsLayoutKey` + `useLayoutEffect` clear in `PointsSection` |
+| Glow cut off around points pills on iOS | Safari clips an element's own `drop-shadow` by its `overflow: hidden` + `border-radius`; only composited (mid-FLIP) rows paint it right | By design the glow is `md`+ only — `ROUNDED_GLOW_CLASS` in `roundedCountryItemGlow.ts`. Never set the glow as an inline `filter` |
 | Glow color ignores white outline | Old fallback replacing light outlines with `televoteActivePointsBg` | Removed — use `televoteOutline` directly |
 | Mobile points layout “wrong” | Using legacy absolute widths | Rounded branch only; scale from `lg:` baseline |
 | Modal qualification white-on-white text | `text-white` on modal without `text-*` on item | `CountryQualificationItem` `roundedTextClasses` |

@@ -6,7 +6,10 @@ import { useGSAP } from '@gsap/react';
 import CountryItemBase from '@/components/countryItem/CountryItemBase';
 import useFlagClassName from '@/components/countryItem/hooks/useFlagClassName';
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
-import { getRoundedSubtleGlowStyle } from '@/components/countryItem/utils/roundedCountryItemGlow';
+import {
+  getRoundedSubtleGlowStyle,
+  ROUNDED_GLOW_CLASS,
+} from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
@@ -139,7 +142,9 @@ export const CountryQualificationItem: React.FC<
       <CountryItemBase
         country={country}
         containerClassName={`flex items-center rounded-[6px] overflow-hidden ${
-          roundedCountryContainer ? '!rounded-full !bg-transparent' : ''
+          roundedCountryContainer
+            ? `!rounded-full !bg-transparent ${ROUNDED_GLOW_CLASS}`
+            : ''
         } duration-300 lg:h-10 md:h-9 h-8 relative shadow-md w-full ${
           onClick && !isDisabled
             ? roundedCountryContainer

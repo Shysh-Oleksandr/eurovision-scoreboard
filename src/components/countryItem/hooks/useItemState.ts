@@ -147,9 +147,10 @@ export const useItemState = ({
       `relative outline-countryItem-televoteOutline flex justify-between rounded-[1px] lg:mb-[6px] mb-1 ${
         roundedCountryContainer ? 'lg:h-9' : 'lg:h-10 shadow-md'
       } md:h-9 h-8 w-full ${
-        // Rounded (2026) items carry the drop-shadow glow in their inline
-        // `filter`; `transition-all` would animate that filter every frame on
-        // state changes (the board-lag cause), so limit them to color fades or remove completely.
+        // Rounded (2026) items carry the drop-shadow glow in `filter` (via
+        // ROUNDED_GLOW_CLASS, md+ only); `transition-all` would animate that
+        // filter every frame on state changes (the board-lag cause), so limit
+        // them to color fades or remove completely.
         // Other themes have no filter — keep their original transition.
         roundedCountryContainer ? '' : 'transition-all'
       } !duration-500 ${isActive ? 'rounded-sm' : ''} ${
