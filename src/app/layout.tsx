@@ -9,10 +9,10 @@ import { getLocale, getTranslations } from 'next-intl/server';
 
 import { UmamiAnalytics } from './analytics';
 import AppBootstrap from './app-bootstrap';
-import { ClarityAnalytics } from './clarity';
 import IntlProvider from './IntlProvider';
 import Providers from './providers';
 import ToastRoot from './toast-root';
+import { WebVitals } from './web-vitals';
 
 import { INITIAL_COUNTRIES_URL } from '@/data/countries/countriesDataUrl';
 import { FONT_ALIAS_ALLOWLIST } from '@/theme/fontAliases';
@@ -120,12 +120,7 @@ export default async function RootLayout({
       className="notranslate"
       translate="no"
     >
-      <body
-        suppressHydrationWarning
-        translate="no"
-        className="notranslate"
-        data-clarity-unmask="true"
-      >
+      <body suppressHydrationWarning translate="no" className="notranslate">
         {/* Prevent FOUC by applying stored theme */}
         <Script id="theme-fouc-prevention" strategy="beforeInteractive">{`
           try {
@@ -175,7 +170,7 @@ export default async function RootLayout({
             {children}
             <ToastRoot />
             <UmamiAnalytics />
-            <ClarityAnalytics />
+            <WebVitals />
             <IntlProvider />
           </Providers>
         </NextIntlClientProvider>

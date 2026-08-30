@@ -750,6 +750,203 @@ overrides. Changed files: `Tabs.tsx`, `CustomizeThemeModal.tsx`,
 `hooks/useThrottledEdit.ts`, `src/hooks/useThrottledValue.ts`; backend
 `main.ts` (CORS list).
 
+## Part C — Final assessment (2026-08-29, after phases 0–4)
+
+Measured on the final build, same reference device as always (390x844x3 mobile +
+touch, 4x CPU, Slow 4G). Traces in `../../perf-artifacts/final/`.
+
+### Where the app stands, by flow
+
+| Flow | Metric | Now | Was (part A / part 1) |
+|---|---|---|---|
+| **Manual voting** (10 taps) | longest task | **174 ms** | 145–200 ms frames, five-plus in a row |
+| | tasks >100 ms | **3** | 7 |
+| | INP | **~155 ms** (phase 2) | 475 ms |
+| **Auto-run** (start → jury → televote → qualifiers) | longest task | **393 ms** (stage start) | 414 ms |
+| | tasks >100 ms | **5** | 9 |
+| | style recalcs | **1,212** | 2,871 |
+| | worst-second fps | **12** | 2 |
+| **Between phases** (results screen idle) | main thread busy | **6–15 %** | ~50 % |
+| **Theme editor** (hue drag) | fps | **59–61**, live preview | 52–58, preview frozen mid-drag |
+| **Theme editor** (gradient picker drag) | fps | 35–41 | 31–37 |
+| **Browsing** public themes/contests | scroll | 48–60 fps, ≤55 % busy | unmeasured |
+| **Cold first visit** | LCP | **4.5 s** | 5.1 s (6.4 s in part 1's older build) |
+| **Repeat visit** | LCP | **2.2 s** | 2.05 s |
+
+**The honest summary: the stalls are gone, the saturation is not.** Every
+individual freeze the investigation started from has shrunk by 2–3x, and the
+50 %-busy-while-idle bug is gone entirely. But during an active voting sequence
+the main thread still sits at **75–99 % busy at 4x CPU**. Part A's §A2 finding
+("zero headroom") still holds — we made the work cheaper, not asynchronous. On a
+phone slower than the 4x reference, or with anything else competing (see
+Clarity, below), that headroom is where dropped frames come from.
+
+The one number that did not move: **stage start is still a ~390 ms freeze**.
+It is the single worst moment left in regular use, and it is a known,
+scoped item (gsap CSSPlugin + countUp + the initial exit-tween for every row,
+all in one effect flush).
+
+### Microsoft Clarity: measured
+
+**It is already off.** `Clarity.init()` was commented out in `src/app/clarity.tsx`
+in commit `e842712` ("Stop clarity for now as we already have many recordings"),
+which predates this whole workstream — so every number in this document was
+measured without it, and production has not been paying for it either since
+that deploy. What remains is dead weight: an unused `@microsoft/clarity`
+dependency and a no-op component (~0 KB shipped).
+
+To answer the question properly it was re-enabled and measured against the
+identical scripted auto-run (both traces 45 s of main-thread profile):
+
+| | Clarity off | Clarity on |
+|---|---|---|
+| clarity.js main-thread JS | — | **2,585 ms (58 ms/s)** |
+| main thread idle | 850 ms/s | **746 ms/s** (−104 ms/s) |
+| `FireAnimationFrame` total | 636 ms | **2,928 ms** (per callback 0.34 → **1.64 ms**) |
+| tasks >100 ms | 5 (worst 393 ms) | **6 (worst 483 ms)** |
+| cold LCP | 4505 ms | 4491 ms (no effect) |
+| extra network | — | 4 requests, ~26 KB wire, then continuous `collect` uploads |
+
+**Verdict: it costs roughly 10 % of the mobile main thread for the entire
+duration of a simulation** — 58 ms/s directly in `clarity.js` plus ~46 ms/s of
+extra `(program)` time, taken out of the exact headroom the animations do not
+have. It does *not* touch LCP (it initialises in an effect, after hydration).
+The mechanism is visible in the rAF numbers: Clarity's DOM-mutation recorder
+runs per frame, and this app mutates the DOM on every frame of every
+choreography, so it is close to a worst case for session recording.
+
+Recommendation: **delete it** rather than leave it dormant. **DONE
+(2026-08-29):** `@microsoft/clarity`, `src/app/clarity.tsx`, the
+`<ClarityAnalytics />` mount, the `data-clarity-unmask` body attribute and
+`NEXT_PUBLIC_CLARITY_PROJECT_ID` are all gone. If session insight is ever
+wanted again it should be sampled (a few percent of sessions) and disabled
+outright while a stage is running.
+
+(Note: the measurement runs sent a handful of localhost sessions to the real
+Clarity project `xjre9uo6iw`.)
+
+### What the five phases actually bought
+
+- **Phase 0** removed a bug that was burning ~half the throttled main thread
+  while the app sat still, and took accessibility 90 → 100.
+- **Phase 1** removed the two chunk waterfalls between tapping ПОЧАТИ and
+  seeing a board (~610 KB across 12 chunks, fetched at the worst possible
+  moment) — nothing is fetched in the setup→SF1→qualifiers flow any more — and
+  cut the per-award render fan-out from O(board) to O(changed rows).
+- **Phase 2** was the big one: it stopped routing per-frame animation state
+  through React. Style recalcs during an auto-run fell 3.1x, compositor commits
+  2.4x, manual-voting INP 304 → 159 ms.
+- **Phase 4** made the theme editor's live preview actually work (it had been
+  silently frozen mid-drag by a debounce that never fired) while raising the
+  frame rate, and proved that public browsing and snowfall need no work.
+- **Phase 3** removed two full network round trips and a third serialized fetch
+  from the first paint, and halved the deployed chunk weight's worst offender.
+
+Two findings mattered more than any single fix: **the trace's task-level labels
+lied** (the transition stalls were gsap style writes, not React rendering), and
+**several "optimisations" were doing nothing** (a debounce that never fired, a
+`dynamic()` around a 1 KB wrapper, a `clearProps` that forced a reflow per run).
+Measuring before changing was the whole game.
+
+### What is left, biggest first
+
+Everything below is measured or directly attributable, not speculative.
+
+**1. Nothing paints until 300 KB of JS has arrived and parsed (cold LCP 4.5 s,
+90 % of it render delay).** The only structural fix is to server-render or
+prerender the shell. This is the redesign hook: today the setup screen's first
+paint depends on the stores, so it cannot be prerendered at all. If the
+above-the-fold frame (header, widget cards, section chrome) were made
+**store-independent by design**, it could ship as static HTML and paint at
+~1.4 s instead of 4.5 s, with the interactive parts hydrating after. Project,
+not patch — but it is the only route to a ~2 s first visit.
+
+**2. The i18n catalog is the entire cost of a repeat visit.** New measurement:
+on a warm cache all 18 chunks come from disk in 60 ms and the *document* is the
+only real network work — 141 KB local / ~25–30 KB brotli in production, **every
+single visit**, because the catalog is inlined in the RSC flight payload. Phase 3
+measured the namespace-split version of this and rejected it (~25–40 ms on a
+cold load). The better fix is different: **move the catalog out of the document
+into a hashed, immutably-cached static JSON**, so returning users pay for it
+once, ever. Given that this app's audience is people who come back to run more
+contests, this is worth more than the cold-load number suggested.
+
+**3. The engine boots before the app needs it.** `votingActions.ts` (28 KB raw),
+`themes.ts` (12 KB), `common-countries.ts` (9.5 KB), axios, query-core and
+zustand middleware are all in the render-critical chunk because
+`layout.tsx` → `AppBootstrap` → hooks → stores. Nothing about the setup screen's
+first paint needs the voting engine. Decoupling the boot path from
+`scoreboardStore` would take ~30–40 KB gz off the first hop; combined with
+dropping axios (another ~17 KB gz, and it takes Next's 34 KB `Buffer` polyfill
+with it) that is a real dent in item 1's 300 KB.
+
+**4. The remaining simulation freezes are all "one big effect flush".**
+- *Stage start, ~390 ms*: the initial exit-tween that hides every row's
+  last-points block is load-bearing but does not need to be a tween. Render
+  those blocks hidden by default (a class or `hidden` attribute) and the whole
+  per-item initial tween batch disappears.
+- *countUp writes `innerHTML` per tick* — it showed up in phase 1's sample
+  attribution. `textContent`, or skipping the count-up for small deltas, is
+  cheaper.
+- *Douze-points hearts, 150–220 ms*: up to 100 animated SVG hearts, tween setup
+  in one go. A single canvas or one CSS-animated sprite layer would be an order
+  of magnitude cheaper.
+- *The deeper move*: phase 2 took the choreography from "React state per frame"
+  to "cheap direct DOM writes per frame". The next step is **no main-thread work
+  per frame at all** — express the teleport/FLIP phases as Web Animations
+  (`element.animate()` on transform/opacity only) and let the compositor run
+  them, so JS schedules once per cycle instead of ticking. That is what would
+  finally break the 75–99 % busy ceiling.
+
+**5. Setup screen DOM (redesign hook).** 967 elements, **48 native `<select>`s**
+(one per country row, 4 options each) and 37 individually-requested flag/logo
+images. A redesign that replaces per-row selects with one shared assignment
+control (or tap/drag-to-assign) would cut roughly a third of the DOM and the
+matching accessibility tree; a sprite/symbol sheet would collapse ~40 image
+requests into one.
+
+**6. The gradient color picker is still the worst interaction in the app**
+(35–41 fps). Phase 4 established the cause is inside
+`react-best-gradient-color-picker` (its internal throttle is recreated per
+event, so it never throttles; plus a per-move `getBoundingClientRect`).
+`@uiw/react-color` is **already a dependency** — it drives the hue/shade
+sliders that now run at 59–61 fps. Swapping the solid-colour case to it would
+remove the bottleneck and a dependency; gradient-enabled overrides would need
+either a small custom gradient editor or the heavy picker kept lazily for that
+case alone.
+
+**7. Radical option: is Next.js earning its keep here?** The App Router client
+runtime is 82 KB raw / 22 KB gz of segment cache, router reducer and PPR
+navigation code, for an app that is effectively one page. Add the RSC flight
+payload (item 2) and that is a meaningful share of a first paint that renders
+nothing on the server anyway. A Vite SPA plus a thin Worker for HTML/meta would
+delete both. Against it: Next currently provides the Cloudflare deploy path,
+i18n, `next/image`, and metadata/SEO — so this is a multi-week rewrite, and it
+only pays off if item 1 (SSR shell) is *not* pursued. Pick one of the two, not
+both.
+
+**8. Stop guessing about real devices. DONE (2026-08-29).**
+`src/app/web-vitals.tsx` reports LCP / INP / CLS / FCP / TTFB (values plus the
+three Core Web Vitals' good / needs-improvement / poor ratings) to Umami as a
+single `web-vitals` custom event, via Next's built-in `useReportWebVitals` — no
+new dependency, ~3 KB gz added to the critical path. Values are buffered and
+sent once on the first `visibilitychange → hidden` (or `pagehide`), because CLS
+and INP keep changing while the page is open; a session that is killed without
+ever backgrounding reports nothing. It no-ops wherever `window.umami` is absent
+(dev, or a blocked analytics script), so it needs no separate env gating.
+Everything in this document is still 4x-throttled emulation — the first weeks of
+this event are what will say whether any of the remaining items matter to real
+users, and on which devices.
+
+### Two loose threads
+
+- **Setup→voting CLS is intermittently 0.49** (measured 0.489 / 0.037 / 0.027
+  over three runs; board rows settling from their pre-FLIP position at mount).
+  It predates phase 3 and is an animation-timing issue, not a load one.
+- **`react-best-gradient-color-picker` overlaps `@uiw/react-color`**, which is
+  already in the tree and already drives the sliders that hit 59–61 fps. (The
+  third of the trio, `@microsoft/clarity`, is now removed.)
+
 ### Splitting across Claude Code chats
 
 One phase = one chat, each started fresh with this exact context recipe:
