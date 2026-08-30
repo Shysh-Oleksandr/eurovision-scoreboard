@@ -5,15 +5,19 @@ import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
 import deepMerge from './deepMerge';
+import { createEngineStubs } from './scoreboard/engineStubs';
 import { createEventActions } from './scoreboard/eventActions';
 import { createGetters } from './scoreboard/getters';
-import { createJuryScaleRevealActions } from './scoreboard/juryScaleRevealActions';
 import { createMiscActions } from './scoreboard/miscActions';
-import { createPredefinitionActions } from './scoreboard/predefinitionActions';
 import { initialScoreboardState } from './scoreboard/state';
 import { ScoreboardState } from './scoreboard/types';
-import { createVotingActions } from './scoreboard/votingActions';
 
+// The heavy action factories (voting, jury-scale reveal, predefinition — and
+// through them the diaspora presets JSON) are NOT composed here: the store
+// boots with stubs and installEngine.ts swaps the real implementations in via
+// engineLoader. This store is on the render-critical boot path (layout →
+// AppBootstrap → generalStore/countriesStore, and EventSetupModal reads it at
+// first render), so everything imported here ships before first paint.
 export const useScoreboardStore = create<ScoreboardState>()(
   temporal(
     devtools(
@@ -22,10 +26,8 @@ export const useScoreboardStore = create<ScoreboardState>()(
           ({
             ...createEventActions(set, get, store),
             ...createMiscActions(set, get, store),
-            ...createVotingActions(set, get, store),
-            ...createJuryScaleRevealActions(set, get, store),
             ...createGetters(set, get, store),
-            ...createPredefinitionActions(set, get, store),
+            ...createEngineStubs(get),
 
             ...initialScoreboardState,
           } as ScoreboardState),

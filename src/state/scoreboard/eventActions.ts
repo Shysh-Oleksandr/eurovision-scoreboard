@@ -4,6 +4,7 @@ import { EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
+import { ensureScoreboardEngine } from './engineLoader';
 import {
   createCountriesComparator,
   getLastCountryCodeByPoints,
@@ -38,7 +39,12 @@ export const createEventActions: StateCreator<
     set({ eventStages });
   },
 
-  startEvent: () => {
+  startEvent: async () => {
+    // The voting/reveal/predefinition actions are installed lazily; this is
+    // the hard ordering guarantee on the start flow (the idle preloader has
+    // normally resolved this long before the tap).
+    await ensureScoreboardEngine();
+
     // Also covers Restart, which routes back through EventSetupModal.
     get().resetJuryScaleReveal();
 
@@ -310,7 +316,11 @@ export const createEventActions: StateCreator<
 
     return { updatedEventStages, nextStage, currentStageIndex };
   },
-  continueToNextPhase: () => {
+  continueToNextPhase: async () => {
+    // Same ordering guarantee as startEvent: predefineVotesForStage below is
+    // one of the lazily-installed actions.
+    await ensureScoreboardEngine();
+
     const { updatedEventStages, nextStage, currentStageIndex } =
       get().prepareForNextStage(false);
 

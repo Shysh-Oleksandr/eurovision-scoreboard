@@ -11,6 +11,8 @@ import {
   importWinnerModal,
 } from './simulationChunkImports';
 
+import { ensureScoreboardEngine } from '@/state/scoreboard/engineLoader';
+
 let didPreload = false;
 
 /**
@@ -28,6 +30,7 @@ export const useSimulationChunksPreload = () => {
     didPreload = true;
 
     const preload = () => {
+      void ensureScoreboardEngine();
       void importPostSetupModal();
       void import('gsap');
       void import('@gsap/react');
