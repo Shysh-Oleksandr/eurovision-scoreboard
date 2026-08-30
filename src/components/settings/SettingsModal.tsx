@@ -13,6 +13,7 @@ import { useGlobalOddsController } from './useGlobalOddsController';
 
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { BaseCountry } from '@/models';
+import { SettingsModalTab, useGeneralStore } from '@/state/generalStore';
 
 const OddsSettings = dynamic(() => import('./OddsSettings'), {
   ssr: false,
@@ -38,6 +39,11 @@ enum SettingsTab {
   RELATIONS = 'Relations',
 }
 
+const SETTINGS_TABS = new Set<string>(Object.values(SettingsTab));
+
+const resolveSettingsTab = (tab: string | undefined): SettingsTab =>
+  tab && SETTINGS_TABS.has(tab) ? (tab as SettingsTab) : SettingsTab.GENERAL;
+
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -52,7 +58,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   onLoaded,
 }) => {
   const t = useTranslations('settings.general');
-  const [activeTab, setActiveTab] = useState(SettingsTab.GENERAL);
+  const lastOpenedSettingsTab = useGeneralStore(
+    (state) => state.settings.lastOpenedSettingsTab,
+  );
+  const setSettings = useGeneralStore((state) => state.setSettings);
+  const activeTab = resolveSettingsTab(lastOpenedSettingsTab);
+
+  const setActiveTab = (tab: SettingsTab) => {
+    setSettings({ lastOpenedSettingsTab: tab as SettingsModalTab });
+  };
 
   const [isOddsLoaded, setIsOddsLoaded] = useState(false);
   const [isRelationsLoaded, setIsRelationsLoaded] = useState(false);

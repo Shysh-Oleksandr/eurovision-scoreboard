@@ -10,12 +10,26 @@ import { SubTabStrip } from './general/SubTabStrip';
 import { useSettingsSearch } from './general/useSettingsSearch';
 
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { useGeneralStore } from '@/state/generalStore';
+import {
+  GeneralSettingsCategoryId,
+  useGeneralStore,
+} from '@/state/generalStore';
 import { customThemeHasSimulationBackground } from '@/theme/customThemeHasAudio';
 
+const CATEGORY_IDS = new Set(CATEGORIES.map((category) => category.id));
+const DEFAULT_CATEGORY_ID = CATEGORIES[0].id;
+
+const resolveCategory = (id: string | undefined): string =>
+  id && CATEGORY_IDS.has(id) ? id : DEFAULT_CATEGORY_ID;
+
 export const GeneralSettings: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('contest');
+  const lastOpenedGeneralSettingsCategory = useGeneralStore(
+    (state) => state.settings.lastOpenedGeneralSettingsCategory,
+  );
+  const setSettings = useGeneralStore((state) => state.setSettings);
   const [query, setQuery] = useState('');
+  // Search can temporarily highlight a matching category without persisting it.
+  const [searchHighlight, setSearchHighlight] = useState<string | null>(null);
   const isMobile = useMediaQuery('(max-width: 720px)');
 
   const customTheme = useGeneralStore((s) => s.customTheme);
@@ -29,15 +43,34 @@ export const GeneralSettings: React.FC = () => {
   );
 
   const search = useSettingsSearch(CATEGORIES, query, env);
+  const persistedCategory = resolveCategory(lastOpenedGeneralSettingsCategory);
+  const activeCategory = searchHighlight ?? persistedCategory;
+
+  const persistCategory = (id: string) => {
+    setSearchHighlight(null);
+
+    if (!CATEGORY_IDS.has(id) || id === lastOpenedGeneralSettingsCategory) {
+      return;
+    }
+
+    setSettings({
+      lastOpenedGeneralSettingsCategory: id as GeneralSettingsCategoryId,
+    });
+  };
 
   // In search mode, keep the highlighted category following the first match.
   useEffect(() => {
+    if (!search.active) {
+      setSearchHighlight(null);
+
+      return;
+    }
+
     if (
-      search.active &&
       search.groups.length > 0 &&
       !search.groups.some((group) => group.category.id === activeCategory)
     ) {
-      setActiveCategory(search.groups[0].category.id);
+      setSearchHighlight(search.groups[0].category.id);
     }
   }, [search, activeCategory]);
 
@@ -46,7 +79,7 @@ export const GeneralSettings: React.FC = () => {
     CATEGORIES[0];
 
   const selectAndClear = (id: string) => {
-    setActiveCategory(id);
+    persistCategory(id);
     setQuery('');
   };
 
@@ -73,7 +106,7 @@ export const GeneralSettings: React.FC = () => {
           <SubTabStrip
             categories={CATEGORIES}
             activeId={activeCategory}
-            onSelect={setActiveCategory}
+            onSelect={persistCategory}
           />
           <CategoryPane key={activeCat.id} category={activeCat} env={env} />
         </>
@@ -82,7 +115,7 @@ export const GeneralSettings: React.FC = () => {
           <SidebarNav
             categories={CATEGORIES}
             activeId={activeCategory}
-            onSelect={setActiveCategory}
+            onSelect={persistCategory}
           />
           <CategoryPane key={activeCat.id} category={activeCat} env={env} />
         </div>
