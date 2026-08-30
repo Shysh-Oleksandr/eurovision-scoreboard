@@ -88,6 +88,47 @@ const clearTeleportStyles = (node: HTMLElement) => {
   node.style.transform = '';
 };
 
+/**
+ * Re-applies a phase's styles with the `transition` property REMOVED — used
+ * only for the post-Flipper-wipe re-assert. The wipe (react-flip-toolkit's
+ * getSnapshotBeforeUpdate) strips inline opacity/transform but leaves
+ * `transition` live, and the Flipper's measure pass then forces a style
+ * recalc in that wiped state — so re-writing the phase target with the
+ * transition still attached makes the browser start a FRESH fade from the
+ * wiped (fully visible) value: on screen the row popped back to full opacity
+ * at the mid-timeline reorder and faded out a second time, desynchronized
+ * from the other moved rows. Asserting the settled end values instead is
+ * visually equivalent (the out fade is ~70% done when the flip fires) and
+ * leaves no transition behind to restart; the in-phase writes re-establish
+ * their own transitions as usual.
+ */
+const assertTeleportPhaseSettledStyles = (
+  node: HTMLElement,
+  phase: TeleportAnimationPhase,
+  direction: TeleportDirection,
+) => {
+  const startOffset = direction === 'up' ? '6px' : '-6px';
+
+  node.style.transition = '';
+  if (phase === 'outStart') {
+    node.style.willChange = '';
+    node.style.opacity = '1';
+    node.style.transform = `translateY(${startOffset})`;
+  } else if (phase === 'out') {
+    node.style.willChange = 'transform, opacity';
+    node.style.opacity = '0';
+    node.style.transform = 'translateY(0px)';
+  } else if (phase === 'inStart') {
+    node.style.willChange = '';
+    node.style.opacity = '0';
+    node.style.transform = `translateY(${startOffset})`;
+  } else {
+    node.style.willChange = 'transform, opacity';
+    node.style.opacity = '1';
+    node.style.transform = 'translateY(0px)';
+  }
+};
+
 const areOrdersEqual = (left: string[], right: string[]) => {
   if (left.length !== right.length) return false;
 
@@ -571,13 +612,14 @@ export const useBoardAnimations = (
   // moved row transitions back to visible at the mid-timeline reorder and then
   // fades in a second time when the in-phase starts. This runs in the same
   // commit as the Flipper update (child lifecycles first), so it lands after
-  // the wipe and before paint.
+  // the wipe and before paint. The settled variant (no transition property)
+  // is essential — see assertTeleportPhaseSettledStyles.
   useLayoutEffect(() => {
     activeTeleportPhaseByCodeRef.current.forEach(
       ({ phase, direction }, code) => {
         const node = itemNodesRef.current.get(code);
 
-        if (node) applyTeleportPhaseStyles(node, phase, direction);
+        if (node) assertTeleportPhaseSettledStyles(node, phase, direction);
       },
     );
   }, [flipKey]);

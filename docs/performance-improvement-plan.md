@@ -1090,6 +1090,29 @@ loose thread) appeared in one after-run — pre-existing, unchanged by this
 work. Changed files: `PointsSection.tsx`, `useAnimatePoints.ts`,
 `DouzePointsAnimation.tsx`, `styles.css`.
 
+**Teleport pop/double-fade fix (2026-08-30, user-reported on a 24-row 2005
+Grand Final; a phase-2-era latent bug, not a Part C regression).** During a
+multi-row teleport cycle a row could pop back to full opacity at the
+mid-timeline reorder, fade out a second time, and start its fade-in from
+part-way visible — desynchronizing the grouped choreography. Instrumented
+root cause (per-row transition events + style-attribute mutations on a
+39-row board): react-flip-toolkit's **`getSnapshotBeforeUpdate`** wipes
+inline `opacity`/`transform` on every flip-id element but leaves the
+`transition` property live, and its measure pass in `componentDidUpdate`
+forces a style recalc in that wiped state — so when phase 2's re-assert
+layout effect then restored `opacity: 0` *with the transition attached*, the
+browser started a fresh 400 ms fade from the wiped (fully visible) value.
+Whether a given row survived was a per-row transition-retargeting artifact,
+which is why some rows looked grouped and others didn't. Fix:
+`assertTeleportPhaseSettledStyles` — the post-wipe re-assert now writes the
+in-flight phase's settled end values with `transition` removed (visually
+equivalent: the out fade is ~70 % done, computed ≈0.1, when the flip fires),
+leaving nothing to restart; the in-phase writes re-establish their own
+transitions. Verified with the same transition-event instrumentation across
+four bulk random-juror cycles on the 39-row board: every fade-out starts
+from full, every fade-in from zero, no cancels above 0.3 opacity, no
+mid-opacity restarts.
+
 **5. Setup screen DOM (redesign hook).** 967 elements, **48 native `<select>`s**
 (one per country row, 4 options each) and 37 individually-requested flag/logo
 images. A redesign that replaces per-row selects with one shared assignment
