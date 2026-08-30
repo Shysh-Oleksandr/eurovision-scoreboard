@@ -898,6 +898,49 @@ with it) that is a real dent in item 1's 300 KB.
   them, so JS schedules once per cycle instead of ticking. That is what would
   finally break the 75–99 % busy ceiling.
 
+**Status: the three concrete fixes are DONE (2026-08-30); the WAAPI move was
+deliberately deferred** (decision: land + measure these first; revisit with
+fresh baselines if busy stays pinned). Traces in `../../perf-artifacts/partc/`
+(`trace-c4-before/after.json.gz`, same flow: stage start → 10 manual awards →
+douze, same emulation as always). Results:
+
+- **Stage-start flush 408 → 126 ms.** The before-task attributed to gsap
+  CSSPlugin (140 ms) + `removeProperty` clearProps (68 ms) + countUp
+  `printValue` (34 ms); the after-task is purely the React board-mount commit.
+  Three changes: the last-points blocks render with a plain `opacity-0` class
+  (both layouts in `PointsSection`) and `useAnimatePoints` skips the exit
+  tweens until the block has been shown once (`hasShownLastPointsRef`); both
+  on-mount `clearProps:'all'` effects now run only when `pointsLayoutKey`
+  actually changes mid-life (prev-key refs — fresh nodes have nothing to
+  clear); and `PointsSection` no longer constructs a `CountUp` at all when
+  `startVal === currentPoints` or animation is disabled (the constructor
+  itself writes to the element — N no-op constructions per stage start).
+- **Douze moment 178 ms → no task ≥90 ms.** The hearts grid choreography moved
+  from a per-heart GSAP timeline (2×columns tweens, O(hearts) filters per
+  column, per-column `innerWidth` reads) to compositor-run CSS animations
+  (`.douze-heart-animated` in styles.css): per-column delays/scale as CSS
+  vars, durations from the same `HEARTS_*` constants, grid keyed on `columns`
+  so a ResizeObserver change still restarts the run. Grow right-to-left /
+  hold / shrink left-to-right, name fade timings, theme fill colors, z-40
+  layering and SFX-once semantics preserved; `LegacyParallelogramsAnimation`
+  untouched. Per-column random scale is now fixed per mount (was re-rolled
+  per timeline rebuild) — invisible.
+- **countUp per-tick writes are `textContent`** via the public
+  `plugin.render` hook (no fork); the 0.6 s duration is untouched
+  (`COUNT_UP_DURATION_MS` coupling).
+
+Verification: `yarn lint:types-cli` clean, ESLint clean on changed files,
+stylelint unchanged (96 pre-existing), vitest 102/104 (same 2 stale
+failures). Functional pass on the rebuilt preview: rounded (2026) and classic
+(2016) themes — last-points enter/exit per award, hidden at stage start with
+no flash, reset on juror advance; count-up animates through intermediate
+values; douze hearts on the board (frozen mid-grow via `getAnimations()` to
+inspect the stagger) and in the public-themes preview cards; undo restores
+last-points; restart works. The intermittent setup→voting CLS 0.49 (known
+loose thread) appeared in one after-run — pre-existing, unchanged by this
+work. Changed files: `PointsSection.tsx`, `useAnimatePoints.ts`,
+`DouzePointsAnimation.tsx`, `styles.css`.
+
 **5. Setup screen DOM (redesign hook).** 967 elements, **48 native `<select>`s**
 (one per country row, 4 options each) and 37 individually-requested flag/logo
 images. A redesign that replaces per-row selects with one shared assignment

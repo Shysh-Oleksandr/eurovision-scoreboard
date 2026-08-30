@@ -69,6 +69,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
   const pointsRef = useRef<HTMLHeadingElement | null>(null);
   const previousPointsRef = useRef<number | null>(null);
   const previousPointsLayoutKeyRef = useRef(pointsLayoutKey);
+  const previousGsapClearLayoutKeyRef = useRef(pointsLayoutKey);
   const roundedPointsRowRef = useRef<HTMLDivElement | null>(null);
   const roundedPointsTrackRef = useRef<HTMLDivElement | null>(null);
   const currentPoints = useMemo(() => {
@@ -91,23 +92,37 @@ const PointsSection: React.FC<PointsSectionProps> = ({
     const shouldDisableAnimation =
       !shouldUsePointsCountUpAnimation ||
       (winnerCountry && isLastSimulationAnimationFinished);
-    const decimalPlaces = (currentPoints.toString().split('.')[1] ?? '').length;
-    const countUp = new CountUp(pointsRef.current, currentPoints, {
-      startVal,
-      duration: shouldDisableAnimation ? 0 : 0.6,
-      useGrouping: false,
-      decimalPlaces,
-      formattingFn: (value) => String(toFixedIfDecimalFloat(value)),
-    });
 
-    if (countUp.error) {
-      pointsRef.current.textContent = String(currentPoints);
+    // No animation to run — write the value directly. Constructing CountUp
+    // anyway is not free: its constructor prints startVal to the element, so
+    // N no-op constructions land in the stage-start effect flush.
+    if (startVal === currentPoints || shouldDisableAnimation) {
+      if (pointsRef.current.textContent !== String(currentPoints)) {
+        pointsRef.current.textContent = String(currentPoints);
+      }
       previousPointsRef.current = currentPoints;
 
       return;
     }
 
-    if (startVal === currentPoints) {
+    const decimalPlaces = (currentPoints.toString().split('.')[1] ?? '').length;
+    const countUp = new CountUp(pointsRef.current, currentPoints, {
+      startVal,
+      // Must stay in sync with COUNT_UP_DURATION_MS in useBoardAnimations.
+      duration: 0.6,
+      useGrouping: false,
+      decimalPlaces,
+      formattingFn: (value) => String(toFixedIfDecimalFloat(value)),
+      // Without a render plugin countup.js assigns innerHTML per tick;
+      // textContent skips the HTML parse for the same visible result.
+      plugin: {
+        render: (el, formatted) => {
+          el.textContent = formatted;
+        },
+      },
+    });
+
+    if (countUp.error) {
       pointsRef.current.textContent = String(currentPoints);
       previousPointsRef.current = currentPoints;
 
@@ -130,6 +145,13 @@ const PointsSection: React.FC<PointsSectionProps> = ({
 
   useLayoutEffect(() => {
     if (!pointsLayoutKey) return;
+    // Freshly mounted nodes carry no GSAP styles — only clear when the
+    // layout key actually changes mid-life. clearProps wipes gsap's
+    // per-element cache (a getComputedStyle reflow per row), so running it
+    // for every row at stage start was a real cost.
+    if (previousGsapClearLayoutKeyRef.current === pointsLayoutKey) return;
+
+    previousGsapClearLayoutKeyRef.current = pointsLayoutKey;
 
     const targets = [
       roundedPointsRowRef.current,
@@ -236,9 +258,12 @@ const PointsSection: React.FC<PointsSectionProps> = ({
         >
           {currentBlock}
 
+          {/* opacity-0 (plain, so GSAP inline styles win): hidden until the
+              enter tween shows it — lets stage start skip N exit tweens whose
+              only job was hiding these blocks. */}
           <div
             ref={lastPointsContainerRef}
-            className={`${roundedLastPointsBlockClass} relative z-[20] overflow-hidden rounded-r-full transition-colors !duration-500 justify-center ${lastColumnBg} ${
+            className={`${roundedLastPointsBlockClass} relative z-[20] overflow-hidden rounded-r-full opacity-0 transition-colors !duration-500 justify-center ${lastColumnBg} ${
               resolvedLastReceivedActive ? '' : 'pointer-events-none'
             }`}
           >
@@ -268,7 +293,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       {showLastPoints && (
         <div
           ref={lastPointsContainerRef}
-          className={`absolute z-10 h-full transition-colors !duration-500 ${
+          className={`absolute z-10 h-full opacity-0 transition-colors !duration-500 ${
             withTriangle
               ? `pr-[0.5rem] lg:right-[2.4rem] lg:w-[2.5rem] ${
                   isTwoColumnLayoutDisplayed

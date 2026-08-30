@@ -53,6 +53,14 @@ const useAnimatePoints = ({
   const lastPointsContainerRef = useRef<HTMLDivElement | null>(null);
   const lastPointsTextRef = useRef<HTMLDivElement | null>(null);
   const previousDirectionRef = useRef(lastPointsAnimationDirection);
+  const previousLayoutKeyRef = useRef(pointsLayoutKey);
+  /**
+   * The last-points block renders with an `opacity-0` class, so until the
+   * enter tween has shown it there is nothing to hide — the exit branch can
+   * skip its tweens. Without this, stage start paid two tweens per row just
+   * to hide blocks that were never visible.
+   */
+  const hasShownLastPointsRef = useRef(false);
   /** Avoids playing douze SFX on every useGSAP re-run (e.g. Strict Mode or ref churn). */
   const douzePointsSoundPlayedForParallelogramsRef = useRef(false);
   const { douzePointsAnimationMode } = useThemeSpecifics();
@@ -144,6 +152,12 @@ const useAnimatePoints = ({
 
   useLayoutEffect(() => {
     if (!pointsLayoutKey) return;
+    // Fresh mounts carry no GSAP styles; clearProps also wipes gsap's
+    // per-element cache (one getComputedStyle reflow per row), so only clear
+    // when the layout key actually changes mid-life.
+    if (previousLayoutKeyRef.current === pointsLayoutKey) return;
+
+    previousLayoutKeyRef.current = pointsLayoutKey;
 
     clearLastPointsGsapStyles(
       lastPointsContainerRef.current,
@@ -185,6 +199,7 @@ const useAnimatePoints = ({
           : { containerX: 36, textX: 15 };
 
       if (shouldShowLastPoints) {
+        hasShownLastPointsRef.current = true;
         gsap.fromTo(
           lastPointsContainerRef.current,
           { opacity: 0, x: enterFrom.containerX },
@@ -195,7 +210,7 @@ const useAnimatePoints = ({
           { opacity: 0, x: enterFrom.textX },
           { opacity: 1, x: 0, duration: 0.35, ease: 'power1.out' },
         );
-      } else {
+      } else if (hasShownLastPointsRef.current) {
         gsap.to(lastPointsContainerRef.current, {
           opacity: 0,
           x: exitTo.containerX,

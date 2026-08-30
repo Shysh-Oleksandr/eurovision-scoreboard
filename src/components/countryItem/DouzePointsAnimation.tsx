@@ -1,7 +1,4 @@
-import gsap from 'gsap';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-
-import { useGSAP } from '@gsap/react';
 
 import { HeartIcon } from '@/assets/icons/HeartIcon';
 import { getFlagOverlayOffsetClassName } from '@/components/countryItem/hooks/useFlagClassName';
@@ -96,9 +93,7 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   isThemePreview = false,
 }) => {
   const [columns, setColumns] = useState(DOUZE_POINTS_TARGET_COLUMNS);
-  const heartRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const countryNameRef = useRef<HTMLHeadingElement | null>(null);
-  /** useGSAP re-runs when `columns` / ResizeObserver updates — play douze SFX only once per mount. */
+  /** Play douze SFX only once per mount (Strict Mode re-runs effects). */
   const douzePointsSoundPlayedRef = useRef(false);
   const heartsCount = columns * DOUZE_POINTS_ROWS;
 
@@ -135,103 +130,43 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
     };
   }, [refs.containerRef]);
 
-  useGSAP(
-    () => {
-      const hearts = heartRefs.current.filter((el): el is HTMLDivElement =>
-        Boolean(el),
-      );
+  useEffect(() => {
+    if (douzePointsSoundPlayedRef.current) return;
 
-      if (hearts.length === 0) {
-        douzePointsSoundPlayedRef.current = false;
+    douzePointsSoundPlayedRef.current = true;
+    playThemeSound('douzePoints', { skip: isThemePreview });
+  }, [isThemePreview]);
 
-        return;
-      }
+  // The choreography itself is CSS (.douze-heart-animated in styles.css) so
+  // the per-frame work runs on the compositor; this only derives the stagger
+  // numbers the old GSAP timeline computed, exposed as CSS variables.
+  const growStagger =
+    columns > 1 ? HEARTS_GROW_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
+  const shrinkStagger =
+    columns > 1 ? HEARTS_SHRINK_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
+  const shrinkPhaseStart =
+    Math.max(0, (columns - 1) * growStagger) +
+    HEARTS_GROW_COLUMN_DURATION_SECONDS +
+    HEARTS_REVERSE_DELAY_SECONDS;
 
-      if (!douzePointsSoundPlayedRef.current) {
-        playThemeSound('douzePoints', { skip: isThemePreview });
-        douzePointsSoundPlayedRef.current = true;
-      }
+  const columnHeartVars = useMemo(() => {
+    const maxScale =
+      window.innerWidth > 768 ? HEARTS_MAX_SCALE : HEARTS_MAX_SCALE * 1.1;
 
-      gsap.killTweensOf(hearts);
-      gsap.set(hearts, {
-        scale: 0,
-        transformOrigin: 'center center',
-      });
-      gsap.set(countryNameRef.current, { opacity: 0 });
-
-      const timeline = gsap.timeline();
-      const growStagger =
-        columns > 1 ? HEARTS_GROW_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
-      const shrinkStagger =
-        columns > 1 ? HEARTS_SHRINK_STAGGER_SPAN_SECONDS / (columns - 1) : 0;
-      const growSpan = Math.max(0, (columns - 1) * growStagger);
-      const shrinkPhaseStart =
-        growSpan +
-        HEARTS_GROW_COLUMN_DURATION_SECONDS +
-        HEARTS_REVERSE_DELAY_SECONDS;
-
-      timeline.to(
-        countryNameRef.current,
-        {
-          opacity: 1,
-          duration: 0.4,
-          ease: 'power1.out',
-        },
-        0.3,
-      );
-
-      for (let column = columns - 1; column >= 0; column -= 1) {
-        const columnHearts = hearts.filter(
-          (_, index) => index % columns === column,
-        );
-        const columnPosition = (columns - 1 - column) * growStagger;
-
-        const maxScale =
-          window.innerWidth > 768 ? HEARTS_MAX_SCALE : HEARTS_MAX_SCALE * 1.1;
-
-        timeline.to(
-          columnHearts,
-          {
-            scale: maxScale * (Math.random() * 0.2 + 0.95),
-            duration: HEARTS_GROW_COLUMN_DURATION_SECONDS,
-            ease: 'power1.out',
-          },
-          columnPosition,
-        );
-      }
-
-      for (let column = 0; column < columns; column += 1) {
-        const columnHearts = hearts.filter(
-          (_, index) => index % columns === column,
-        );
-        const columnPosition = shrinkPhaseStart + column * shrinkStagger;
-
-        timeline.to(
-          columnHearts,
-          {
-            scale: 0,
-            duration: HEARTS_SHRINK_COLUMN_DURATION_SECONDS,
-            ease: 'power2.in',
-          },
-          columnPosition,
-        );
-      }
-
-      timeline.to(
-        countryNameRef.current,
-        {
-          opacity: 0,
-          duration: 0.4,
-          ease: 'power1.in',
-        },
-        shrinkPhaseStart,
-      );
-    },
-    {
-      scope: refs.containerRef,
-      dependencies: [columns, heartsCount, isThemePreview],
-    },
-  );
+    return Array.from(
+      { length: columns },
+      (_, column) =>
+        ({
+          '--douze-grow-delay': `${(columns - 1 - column) * growStagger}s`,
+          '--douze-shrink-delay': `${
+            shrinkPhaseStart + column * shrinkStagger
+          }s`,
+          '--douze-heart-scale': String(
+            maxScale * (Math.random() * 0.2 + 0.95),
+          ),
+        } as React.CSSProperties),
+    );
+  }, [columns, growStagger, shrinkStagger, shrinkPhaseStart]);
 
   const hearts = useMemo(() => {
     return Array.from({ length: heartsCount }, (_, index) => index);
@@ -243,22 +178,28 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
       className={`${containerClass} p-0 !opacity-100`}
       style={specialStyle}
     >
+      {/* Keyed on `columns` so a ResizeObserver column change remounts the
+          cells and restarts the choreography (matches the old timeline
+          rebuild). */}
       <div
+        key={`douze-grid-${columns}`}
         className="absolute z-40 grid left-0 -right-2"
-        style={{
-          top: `${(-DOUZE_OVERFLOW_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
-          height: `${(DOUZE_POINTS_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
-          gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-          gridTemplateRows: `repeat(${DOUZE_POINTS_ROWS}, minmax(0, 1fr))`,
-        }}
+        style={
+          {
+            top: `${(-DOUZE_OVERFLOW_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
+            height: `${(DOUZE_POINTS_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
+            gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${DOUZE_POINTS_ROWS}, minmax(0, 1fr))`,
+            '--douze-grow-duration': `${HEARTS_GROW_COLUMN_DURATION_SECONDS}s`,
+            '--douze-shrink-duration': `${HEARTS_SHRINK_COLUMN_DURATION_SECONDS}s`,
+          } as React.CSSProperties
+        }
       >
         {hearts.map((heartIndex) => (
           <div
             key={`douze-heart-${heartIndex}`}
-            className="overflow-hidden flex items-center justify-center"
-            ref={(element) => {
-              heartRefs.current[heartIndex] = element;
-            }}
+            className="douze-heart-animated overflow-hidden flex items-center justify-center"
+            style={columnHeartVars[heartIndex % columns]}
           >
             <HeartIcon
               className={`w-full h-full ${
@@ -270,8 +211,13 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
         ))}
       </div>
       <h4
-        ref={countryNameRef}
-        className={`${
+        key={`douze-name-${columns}`}
+        style={
+          {
+            '--douze-name-out-delay': `${shrinkPhaseStart}s`,
+          } as React.CSSProperties
+        }
+        className={`douze-country-name-animated ${
           uppercaseEntryName ? 'uppercase' : ''
         } absolute z-50 left-0 text-countryItem-douzePointsText text-left ${
           isTwoColumnLayout

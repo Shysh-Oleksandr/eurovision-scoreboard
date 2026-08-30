@@ -1422,3 +1422,74 @@ h6 {
     animation: none;
   }
 }
+
+/* Douze-points hearts grid: the grow/shrink choreography runs as
+   compositor-driven CSS animations (transform-only) instead of a per-heart
+   GSAP timeline. Durations, per-column delays and the per-column max scale
+   arrive as CSS variables set from the constants in DouzePointsAnimation.tsx.
+   The two-animation pattern reproduces grow → hold → shrink: `both` fills
+   scale(0) before the grow delay and holds the max after it, while the
+   later-in-list shrink has no backwards fill, so it only takes over once its
+   own delay elapses. */
+@keyframes douze-heart-grow {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(var(--douze-heart-scale));
+  }
+}
+
+@keyframes douze-heart-shrink {
+  from {
+    transform: scale(var(--douze-heart-scale));
+  }
+
+  to {
+    transform: scale(0);
+  }
+}
+
+@keyframes douze-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes douze-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.douze-heart-animated {
+  transform: scale(0);
+
+  /* Cubic-bezier pairs approximate the previous GSAP eases:
+     grow power1.out, shrink power2.in. */
+  animation:
+    douze-heart-grow var(--douze-grow-duration)
+      cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--douze-grow-delay) both,
+    douze-heart-shrink var(--douze-shrink-duration)
+      cubic-bezier(0.55, 0.055, 0.675, 0.19) var(--douze-shrink-delay) forwards;
+}
+
+.douze-country-name-animated {
+  opacity: 0;
+
+  /* Fade-in at 0.3s; fade-out when the shrink phase starts (delay from TSX).
+     Eases: power1.out in, power1.in out. */
+  animation:
+    douze-fade-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both,
+    douze-fade-out 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53)
+      var(--douze-name-out-delay) forwards;
+}
