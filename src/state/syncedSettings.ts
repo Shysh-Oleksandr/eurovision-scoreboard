@@ -3,7 +3,7 @@ import type { PresentationSettings, Settings } from './generalStore';
 import {
   DEFAULT_DIASPORA_SETTINGS,
   DiasporaSettings,
-} from './scoreboard/diaspora';
+} from './scoreboard/diasporaSettings';
 
 /*
  * The slice of client state that round-trips to the user's account

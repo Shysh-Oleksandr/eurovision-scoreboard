@@ -22,7 +22,7 @@ import {
   pruneGroupPairs,
   removeOverride,
   upsertOverride,
-} from './scoreboard/diaspora';
+} from './scoreboard/diasporaSettings';
 import { useScoreboardStore } from './scoreboardStore';
 
 import { api } from '@/api/client';
