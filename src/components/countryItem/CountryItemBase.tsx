@@ -70,9 +70,12 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   };
 
   return (
+    // `dp-scoreboard-font`: the theme's scoreboard font applies to country rows
+    // only (board, share image, qualification and preview variants) — never to
+    // surrounding UI such as headers or controls.
     <div
       ref={rootRef}
-      className={`flex relative min-w-0 ${className || ''}`}
+      className={`dp-scoreboard-font flex relative min-w-0 ${className || ''}`}
       {...props}
     >
       {/* Place Number */}

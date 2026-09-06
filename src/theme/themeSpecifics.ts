@@ -1,4 +1,4 @@
-import { normalizeFontAlias, resolveActiveFontAlias } from './fontAliases';
+import { normalizeFontAlias } from './fontAliases';
 import { getThemeForYear } from './themes';
 import { ThemeSpecifics } from './types';
 
@@ -85,6 +85,12 @@ const sanitizeThemeSpecifics = (
     sanitized.fontAlias = normalizeFontAlias(specifics.fontAlias);
   }
 
+  if (specifics.scoreboardFontAlias) {
+    sanitized.scoreboardFontAlias = normalizeFontAlias(
+      specifics.scoreboardFontAlias,
+    );
+  }
+
   return sanitized;
 };
 
@@ -106,6 +112,7 @@ const mapLegacyCustomThemeSpecifics = (
     usePointsCountUpAnimation: customTheme.usePointsCountUpAnimation,
     roundedCountryContainer: customTheme.roundedCountryContainer,
     fontAlias: customTheme.fontAlias,
+    scoreboardFontAlias: customTheme.scoreboardFontAlias,
   };
 };
 
@@ -148,27 +155,4 @@ export const resolveThemeSpecificsForBaseThemeYear = (
   const baseTheme = getThemeForYear(baseThemeYear);
 
   return resolveThemeSpecifics(baseTheme.themeSpecifics, null);
-};
-
-export const resolveActiveFontAliasForGeneralState = ({
-  themeYear,
-  customTheme,
-  overrideThemeFont,
-  overrideThemeFontAlias,
-}: {
-  themeYear: string;
-  customTheme: CustomTheme | null;
-  overrideThemeFont: boolean;
-  overrideThemeFontAlias?: string | null;
-}): string => {
-  const specifics = resolveThemeSpecificsForGeneralState({
-    themeYear,
-    customTheme,
-  });
-
-  return resolveActiveFontAlias({
-    overrideEnabled: overrideThemeFont,
-    overrideAlias: overrideThemeFontAlias,
-    themeAlias: specifics.fontAlias,
-  });
 };

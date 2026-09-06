@@ -409,6 +409,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-09-06',
+    title: 'Custom fonts. Option for separate fonts for the scoreboard and the interface',
+  },
+  {
     date: '2026-08-30',
     title: 'Performance optimizations',
   },
@@ -452,15 +456,12 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-08-12', end: '2026-08-16' },
-    title: 'Improve the JESC 2024 jury reveal format UI',
+    approximateDates: { start: '2026-09-12', end: '2026-09-13' },
+    title: 'Splitting voting countries: Televote and Juries can have their own countries',
   },
   {
     approximateDates: { start: '2026-07-12', end: '2026-07-13' },
     title: 'Redesign some parts of the app',
-  },
-  {
-    title: 'Upload custom fonts',
   },
   {
     title: 'Allocation draw',

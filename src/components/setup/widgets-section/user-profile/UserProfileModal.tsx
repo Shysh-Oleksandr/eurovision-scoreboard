@@ -57,7 +57,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
         onClose={onClose}
         containerClassName="!w-[min(100%,750px)]"
         fixedHeight
-        overlayClassName="!z-[1002]"
+        overlayClassName="!z-[1100]"
         bottomContent={<ModalBottomCloseButton onClose={onClose} />}
       >
         <div className="mb-4">

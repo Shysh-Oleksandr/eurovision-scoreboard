@@ -22,11 +22,21 @@ import {
 } from '@/i18n/catalog';
 import { MESSAGES_CATALOG } from '@/i18n/messagesManifest.generated';
 import { getMergedMessages } from '@/i18n/serverMessages';
-import { FONT_ALIAS_ALLOWLIST } from '@/theme/fontAliases';
+import {
+  FONT_ALIAS_ALLOWLIST,
+  getFontFamilyStackCss,
+} from '@/theme/fontAliases';
 
 const FOUC_FONT_ALLOWED_LITERAL = `{${FONT_ALIAS_ALLOWLIST.map(
   (a) => `'${a}':1`,
 ).join(',')}}`;
+
+/** alias → font-family stack, so the FOUC script can build fallback stacks for custom fonts. */
+const FOUC_FONT_STACKS_LITERAL = JSON.stringify(
+  Object.fromEntries(
+    FONT_ALIAS_ALLOWLIST.map((a) => [a, getFontFamilyStackCss(a)]),
+  ),
+);
 
 export async function generateMetadata({
   params,
@@ -184,6 +194,56 @@ export default async function RootLayout({
               }
 
               document.documentElement.setAttribute('data-font', fa);
+
+              // Custom (uploaded) fonts: inject @font-face rules and set the same
+              // inline variables applyDocumentFonts() writes after hydration.
+              // Mirrors buildFontFaceCss() in src/theme/customFonts.ts — keep in sync.
+              var stacks = ${FOUC_FONT_STACKS_LITERAL};
+              var hs = document.documentElement.style;
+              var faceCss = function (s) {
+                var out = [];
+                for (var i = 0; i < (s.faces || []).length; i++) {
+                  var f = s.faces[i];
+                  if (!f || typeof f.url !== 'string' || f.url.indexOf('https://') !== 0 || /["\\\\\\s]/.test(f.url)) continue;
+                  var r = f.weightRange || [f.weight, f.weight];
+                  out.push("@font-face{font-family:'dp-font-" + s._id + "';src:url(\\"" + f.url + "\\") format('" + (f.format === 'woff' ? 'woff' : 'woff2') + "');font-weight:" + r[0] + " " + r[1] + ";font-style:normal;font-display:swap}");
+                }
+                return out.join('\\n');
+              };
+              var inject = function (s) {
+                var id = 'dp-font-faces-' + s._id;
+                if (document.getElementById(id)) return;
+                var css = faceCss(s);
+                if (!css) return;
+                var st = document.createElement('style');
+                st.id = id;
+                st.textContent = css;
+                document.head.appendChild(st);
+              };
+              var usable = function (id, s) {
+                return !!(id && s && s._id === id && s.faces && s.faces.length);
+              };
+              if (!settings.overrideThemeFont && customTheme) {
+                var cf = customTheme.customFonts || {};
+                var uiStack = stacks[fa] || stacks.montserrat;
+                if (usable(customTheme.fontId, cf.ui)) {
+                  inject(cf.ui);
+                  hs.setProperty('--dp-font-family', "'dp-font-" + cf.ui._id + "', " + uiStack);
+                  hs.setProperty('--dp-font-synthesis', 'none');
+                }
+                var sbAlias = String(customTheme.scoreboardFontAlias || '').toLowerCase();
+                var sbStack = allowedFont[sbAlias] ? stacks[sbAlias] : uiStack;
+                if (usable(customTheme.scoreboardFontId, cf.scoreboard)) {
+                  inject(cf.scoreboard);
+                  hs.setProperty('--dp-scoreboard-font-family', "'dp-font-" + cf.scoreboard._id + "', " + sbStack);
+                  hs.setProperty('--dp-scoreboard-font-synthesis', 'none');
+                } else if (allowedFont[sbAlias]) {
+                  hs.setProperty('--dp-scoreboard-font-family', sbStack);
+                }
+              } else if (!settings.overrideThemeFont && state.theme && state.theme.themeSpecifics && state.theme.themeSpecifics.scoreboardFontAlias) {
+                var ysb = String(state.theme.themeSpecifics.scoreboardFontAlias).toLowerCase();
+                if (allowedFont[ysb]) hs.setProperty('--dp-scoreboard-font-family', stacks[ysb]);
+              }
 
               document.documentElement.style.backgroundSize = 'cover';
               document.documentElement.style.backgroundPosition = 'center';

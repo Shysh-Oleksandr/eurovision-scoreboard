@@ -29,11 +29,9 @@ import { api } from '@/api/client';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
 import { BaseCountry, PointsItem } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
-import {
-  applyDocumentFontAlias,
-  normalizeFontAlias,
-} from '@/theme/fontAliases';
-import { resolveActiveFontAliasForGeneralState } from '@/theme/themeSpecifics';
+import { applyDocumentFonts } from '@/theme/customFonts';
+import { normalizeFontAlias } from '@/theme/fontAliases';
+import { resolveActiveFonts } from '@/theme/fontResolution';
 import {
   applyCustomTheme as applyCustomThemeUtil,
   clearCustomTheme as clearCustomThemeUtil,
@@ -941,14 +939,15 @@ export function syncDocumentFont() {
   if (typeof document === 'undefined') return;
 
   const { settings, customTheme, themeYear } = useGeneralStore.getState();
-  const alias = resolveActiveFontAliasForGeneralState({
-    themeYear,
-    customTheme,
-    overrideThemeFont: settings.overrideThemeFont,
-    overrideThemeFontAlias: settings.overrideThemeFontAlias,
-  });
 
-  applyDocumentFontAlias(alias);
+  applyDocumentFonts(
+    resolveActiveFonts({
+      themeYear,
+      customTheme,
+      overrideThemeFont: settings.overrideThemeFont,
+      overrideThemeFontAlias: settings.overrideThemeFontAlias,
+    }),
+  );
 }
 
 (async () => {

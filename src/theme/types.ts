@@ -23,6 +23,8 @@ export interface ThemeSpecifics {
   roundedCountryContainer: boolean;
   /** Default UI font for built-in themes; see `normalizeFontAlias` in fontAliases.ts */
   fontAlias?: string;
+  /** Built-in font for scoreboard surfaces only; absent means "same as `fontAlias`". */
+  scoreboardFontAlias?: string;
 }
 
 export type ItemState =

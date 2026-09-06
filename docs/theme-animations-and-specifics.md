@@ -19,6 +19,7 @@ Shared type in `src/theme/types.ts`:
   - `usePointsCountUpAnimation: boolean`
   - `roundedCountryContainer: boolean` — pill country row, points track, panel glow (see [rounded-country-layout-and-2026-theme.md](./rounded-country-layout-and-2026-theme.md))
   - `fontAlias?: string` — interface font (e.g. Gotham on 2026)
+  - `scoreboardFontAlias?: string` — built-in font for scoreboard surfaces only; absent means "same as `fontAlias`" (custom uploaded fonts live on the theme as `fontId` / `scoreboardFontId`, see [custom-fonts-and-font-library.md](./custom-fonts-and-font-library.md))
 
 `Theme` now has:
 
@@ -303,6 +304,8 @@ Still in `CustomizeThemeModal.tsx`, `buildThemePayload(isUpdate)`:
   - Omits the field.
 
 This keeps the DB representation minimal, while allowing themes to move back and forth between default and custom modes cleanly.
+
+**Fonts** follow a slightly different rule: `fontAlias` is always sent (it doubles as the fallback stack for a custom font), while `fontId`, `scoreboardFontAlias` and `scoreboardFontId` are sent when set on create and as `null` on update when the initial theme had them. Font files themselves are never part of the theme save — they live in the font library (see [custom-fonts-and-font-library.md](./custom-fonts-and-font-library.md)).
 
 ---
 

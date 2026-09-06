@@ -28,6 +28,9 @@ export interface ThemeContentInput {
     { url?: string; delayMs?: number } | null | undefined
   > | null;
   fontAlias?: string;
+  fontId?: string | null;
+  scoreboardFontAlias?: string | null;
+  scoreboardFontId?: string | null;
 }
 
 const sortedOverrides = (
@@ -71,6 +74,9 @@ export const themeContentFingerprint = (input: ThemeContentInput): string =>
     douzePointsAnimationMode: input.douzePointsAnimationMode ?? null,
     themeSounds: normalizedSounds(input.themeSounds),
     fontAlias: input.fontAlias ?? null,
+    fontId: input.fontId || null,
+    scoreboardFontAlias: input.scoreboardFontAlias || null,
+    scoreboardFontId: input.scoreboardFontId || null,
   });
 
 /**

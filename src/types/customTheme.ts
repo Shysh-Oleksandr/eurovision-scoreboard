@@ -6,6 +6,7 @@ import {
   PointsContainerShape,
   ThemeSpecifics,
 } from '@/theme/types';
+import type { ThemeFontSnapshot } from '@/types/font';
 
 export type { BoardAnimationMode, DouzePointsAnimationMode };
 
@@ -51,6 +52,14 @@ export interface CustomTheme {
   themeSpecifics?: Partial<ThemeSpecifics>;
   /** e.g. `montserrat` | `geist` | `dm-sans` — see `normalizeFontAlias` */
   fontAlias?: string;
+  /** Custom UI font (font library id); wins over `fontAlias` when its snapshot is present. */
+  fontId?: string;
+  /** Built-in scoreboard font; absent (with no `scoreboardFontId`) means "same as UI font". */
+  scoreboardFontAlias?: string;
+  scoreboardFontId?: string;
+  hasCustomFonts?: boolean;
+  /** Server-attached snapshots for `fontId` / `scoreboardFontId`; also persisted for the FOUC script. */
+  customFonts?: { ui?: ThemeFontSnapshot; scoreboard?: ThemeFontSnapshot };
   createdAt: string;
   updatedAt: string;
   creator?: ThemeCreator;

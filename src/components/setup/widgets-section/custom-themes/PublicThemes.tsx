@@ -34,6 +34,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   const [page, setPage] = useState(1);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
   const [hasCustomAudio, setHasCustomAudio] = useState(false);
+  const [hasCustomFonts, setHasCustomFonts] = useState(false);
   const debouncedSearch = useDebounce(search, 400);
 
   const serverSortBy =
@@ -54,6 +55,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     startDate: dateRange?.startDate,
     endDate: dateRange?.endDate,
     hasCustomAudio,
+    hasCustomFonts,
   });
 
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
@@ -97,16 +99,28 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
         <h3 className="text-white text-lg font-bold">
           {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
         </h3>
-        <Checkbox
-          id="public-themes-audio-filter"
-          label={t('widgets.themes.audioFilterWithAudio')}
-          checked={hasCustomAudio}
-          onChange={(v) => {
-            setHasCustomAudio(v.target.checked);
-            setPage(1);
-          }}
-          labelClassName="!mr-0"
-        />
+        <div className="flex items-center gap-x-3 flex-wrap">
+          <Checkbox
+            id="public-themes-audio-filter"
+            label={t('widgets.themes.audioFilterWithAudio')}
+            checked={hasCustomAudio}
+            onChange={(v) => {
+              setHasCustomAudio(v.target.checked);
+              setPage(1);
+            }}
+            labelClassName="!mr-0"
+          />
+          <Checkbox
+            id="public-themes-fonts-filter"
+            label={t('widgets.themes.fonts.filterWithFonts')}
+            checked={hasCustomFonts}
+            onChange={(v) => {
+              setHasCustomFonts(v.target.checked);
+              setPage(1);
+            }}
+            labelClassName="!mr-0"
+          />
+        </div>
       </div>
 
       {isLoading ? (

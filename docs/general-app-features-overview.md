@@ -92,7 +92,7 @@ Three widget cards in the setup modal:
   - Hover effect customization
   - **Sound effects**: Custom sounds for point reveals with delay control
   - **Simulation background audio**
-  - Interface font selection
+  - Interface font + optional separate scoreboard font, from built-in fonts or the **font library** (upload your own WOFF2/WOFF/TTF/OTF, reuse across themes, add other users' public fonts) — see `custom-fonts-and-font-library.md`
   - Live preview with `ThemePreviewCountryItem`
 - **Theme sharing** (`ThemeShareModal`): Share by link, view shared themes
 - **Theme duplication**: Copy and customize existing themes

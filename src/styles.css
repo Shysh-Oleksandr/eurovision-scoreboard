@@ -36,6 +36,7 @@ aside {
 
 :root {
   --dp-font-family: montserrat, sans-serif;
+  --dp-font-synthesis: weight style;
 }
 
 html[data-font='montserrat'] {
@@ -94,6 +95,7 @@ html,
 body,
 #root {
   font-family: var(--dp-font-family);
+  font-synthesis: var(--dp-font-synthesis);
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -104,6 +106,21 @@ body,
 
 [data-theme='custom-preview'] {
   font-family: var(--dp-font-family);
+  font-synthesis: var(--dp-font-synthesis);
+}
+
+/*
+ * Country rows (CountryItemBase and every variant built on it: board, share
+ * image, qualification, theme previews) render in the theme's scoreboard font.
+ * Surrounding UI (headers, controls, modals) keeps the interface font. The
+ * variables are written inline on <html> by applyDocumentFonts(); when absent,
+ * the UI font applies.
+ * Custom fonts set synthesis to `none` so missing weights use the nearest
+ * uploaded face instead of a faux bold.
+ */
+.dp-scoreboard-font {
+  font-family: var(--dp-scoreboard-font-family, var(--dp-font-family));
+  font-synthesis: var(--dp-scoreboard-font-synthesis, var(--dp-font-synthesis));
 }
 
 input,

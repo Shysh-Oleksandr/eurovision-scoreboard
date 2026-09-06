@@ -62,6 +62,7 @@ Read `docs/` before touching non-obvious subsystems:
 - `contests-leaderboard-and-entry-stats.md`
 - `theme-animations-and-specifics.md`
 - `rounded-country-layout-and-2026-theme.md`
+- `custom-fonts-and-font-library.md` — uploaded fonts, the per-user font library (fork-on-use, content-addressed R2 blobs), UI vs scoreboard font slots, weight fallback, FOUC script contract, R2 CORS prerequisite
 - `voting-simulation-engine-and-diaspora.md` — the random-vote (Plackett–Luce) engine, the diaspora/affinity layer, and the Phase 2 (v2) plan
 - `voting-predefinition.md` — hand-authoring a stage's votes (Detailed/Rank/Totals modes), the totals best-fit algorithm, sharing, presets
 - `USER_DATA_CLEARING.md`

@@ -40,6 +40,11 @@ export type CreateThemeInput = {
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
   groupId?: string;
   fontAlias?: string;
+  /** Custom UI font (library id). Another user's font is forked into the caller's library server-side. */
+  fontId?: string;
+  /** Built-in scoreboard font; omit for "same as UI font". */
+  scoreboardFontAlias?: string;
+  scoreboardFontId?: string;
   /** Source theme _id when creating a remix; denormalized fields derived server-side. */
   remixedFrom?: string;
 };
@@ -65,6 +70,11 @@ export type UpdateThemeInput = {
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
   groupId?: string | null;
   fontAlias?: string | null;
+  /** null clears the custom UI font (falls back to `fontAlias`). */
+  fontId?: string | null;
+  /** null reverts the scoreboard to "same as UI font". */
+  scoreboardFontAlias?: string | null;
+  scoreboardFontId?: string | null;
 };
 
 export type PublicThemesQueryParams = {
@@ -76,6 +86,8 @@ export type PublicThemesQueryParams = {
   endDate?: string;
   /** When true, only themes with custom audio (server flag). */
   hasCustomAudio?: boolean;
+  /** When true, only themes using an uploaded font (server flag). */
+  hasCustomFonts?: boolean;
   enabled?: boolean;
 };
 
@@ -88,6 +100,7 @@ export type MyThemesListQueryParams = {
   startDate?: string;
   endDate?: string;
   hasCustomAudio?: boolean;
+  hasCustomFonts?: boolean;
   /** Passed to GET /themes/me only */
   groupId?: string;
   enabled?: boolean;
@@ -113,6 +126,9 @@ function buildThemesListQueryParams(
   if (params.hasCustomAudio === true) {
     searchParams.append('hasCustomAudio', 'true');
   }
+  if (params.hasCustomFonts === true) {
+    searchParams.append('hasCustomFonts', 'true');
+  }
   if (params.groupId) searchParams.append('groupId', params.groupId);
 
   return searchParams.toString();
@@ -127,6 +143,7 @@ export function useMyThemesListQuery({
   startDate,
   endDate,
   hasCustomAudio,
+  hasCustomFonts,
   groupId,
   enabled = true,
 }: MyThemesListQueryParams) {
@@ -139,6 +156,7 @@ export function useMyThemesListQuery({
     startDate,
     endDate,
     hasCustomAudio,
+    hasCustomFonts,
     groupId,
   };
 
@@ -164,6 +182,7 @@ export function useSavedThemesListQuery({
   startDate,
   endDate,
   hasCustomAudio,
+  hasCustomFonts,
   enabled = true,
 }: MyThemesListQueryParams) {
   const filters = {
@@ -175,6 +194,7 @@ export function useSavedThemesListQuery({
     startDate,
     endDate,
     hasCustomAudio,
+    hasCustomFonts,
   };
 
   return useQuery<ThemeListResponse>({
@@ -198,6 +218,7 @@ export function usePublicThemesQuery({
   startDate,
   endDate,
   hasCustomAudio,
+  hasCustomFonts,
   enabled = true,
 }: PublicThemesQueryParams) {
   return useQuery<ThemeListResponse>({
@@ -209,6 +230,7 @@ export function usePublicThemesQuery({
       startDate,
       endDate,
       hasCustomAudio,
+      hasCustomFonts,
     }),
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -221,6 +243,7 @@ export function usePublicThemesQuery({
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
       if (hasCustomAudio === true) params.append('hasCustomAudio', 'true');
+      if (hasCustomFonts === true) params.append('hasCustomFonts', 'true');
 
       const { data } = await api.get(`/themes/public?${params.toString()}`);
 

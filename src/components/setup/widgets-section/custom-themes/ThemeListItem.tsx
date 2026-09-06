@@ -1,5 +1,5 @@
 import { isSameYear } from 'date-fns';
-import { Folder, Link2, Share2, Volume1 } from 'lucide-react';
+import { ALargeSmall, Folder, Link2, Share2, Volume1 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -32,7 +32,9 @@ import {
   getCssVarsForCustomTheme,
   getCardThemeVars,
   getAccentForegroundColor,
+  getFontCssVarsForCustomTheme,
 } from '@/theme/themeUtils';
+import { useCustomFontFaces } from '@/theme/useCustomFontFaces';
 import { CustomTheme } from '@/types/customTheme';
 
 interface ThemeListItemProps {
@@ -126,6 +128,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
 
   const cssVars = useMemo(() => getCssVarsForCustomTheme(theme), [theme]);
   const cardThemeVars = useMemo(() => getCardThemeVars(theme), [theme]);
+  // The preview inside the card renders in the theme's scoreboard font.
+  const fontVars = useMemo(() => getFontCssVarsForCustomTheme(theme), [theme]);
+
+  useCustomFontFaces(theme.customFonts);
   // White washes out on light accents (yellow/green/cyan); flip to dark on-hue.
   const applyForeground = useMemo(
     () => getAccentForegroundColor(theme),
@@ -226,6 +232,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
       style={{
         ...(cssVars as React.CSSProperties),
         ...(cardThemeVars as React.CSSProperties),
+        ...(fontVars as React.CSSProperties),
         background: 'linear-gradient(155deg, var(--t-a), var(--t-b))',
         borderColor: 'var(--t-bd)',
       }}
@@ -286,6 +293,12 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
                     <Volume1 className="size-[11px]" />
                     Audio
+                  </span>
+                )}
+                {theme.hasCustomFonts && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
+                    <ALargeSmall className="size-[11px]" />
+                    {t('widgets.themes.fonts.badge')}
                   </span>
                 )}
                 {theme.group && (

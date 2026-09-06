@@ -860,6 +860,9 @@ above-the-fold frame (header, widget cards, section chrome) were made
 **store-independent by design**, it could ship as static HTML and paint at
 ~1.4 s instead of 4.5 s, with the interactive parts hydrating after. Project,
 not patch — but it is the only route to a ~2 s first visit.
+**CLOSED by Part D (2026-09-06):** field mobile LCP p75 is 2337 ms, so the 4.5 s
+this item is built on is an artefact of the 4x/Slow-4G reference device. Not worth
+a project-sized effort.
 
 **2. The i18n catalog is the entire cost of a repeat visit.** New measurement:
 on a warm cache all 18 chunks come from disk in 60 ms and the *document* is the
@@ -1138,7 +1141,8 @@ nothing on the server anyway. A Vite SPA plus a thin Worker for HTML/meta would
 delete both. Against it: Next currently provides the Cloudflare deploy path,
 i18n, `next/image`, and metadata/SEO — so this is a multi-week rewrite, and it
 only pays off if item 1 (SSR shell) is *not* pursued. Pick one of the two, not
-both.
+both. **CLOSED by Part D (2026-09-06):** same reason as item 1 — the load path
+real users see is already inside the "good" threshold.
 
 **8. Stop guessing about real devices. DONE (2026-08-29).**
 `src/app/web-vitals.tsx` reports LCP / INP / CLS / FCP / TTFB (values plus the
@@ -1151,7 +1155,9 @@ ever backgrounding reports nothing. It no-ops wherever `window.umami` is absent
 (dev, or a blocked analytics script), so it needs no separate env gating.
 Everything in this document is still 4x-throttled emulation — the first weeks of
 this event are what will say whether any of the remaining items matter to real
-users, and on which devices.
+users, and on which devices. **Answered in [Part D](#part-d--field-data-umami-rum-2026-09-06)
+(2026-09-06)**, which also documents and fixes a listener-ordering bug that made the
+`cls` field empty in every session collected before that date.
 
 ### Two loose threads
 
@@ -1187,3 +1193,109 @@ Practical notes for those chats:
 
 Suggested order: **0 → 1 → 2 → 4 → 3** if simulation feel is strictly the priority;
 move 3 earlier if first-visit numbers start to matter (e.g. sharing links publicly).
+
+## Part D — Field data (Umami RUM), 2026-09-06
+
+The first real-user numbers, from the `web-vitals` event added by Part C item 8.
+A few days of collection on the Umami free plan before credits ran out; the API
+was not available, so these were transcribed from the events table by hand
+(analysis scripts were throwaway, the raw rows are reproduced below in summary
+form only). **118 sessions in two disjoint samples** — 58 unfiltered and 60
+mobile-filtered, with zero overlap, so they are two independent draws rather
+than a set and its subset.
+
+### The numbers
+
+| Metric (ms) | Mobile p50 | Mobile **p75** | Mobile p90 | All p50 | All **p75** | All p90 |
+|---|---|---|---|---|---|---|
+| LCP | 1568 | **2337** | 3276 | 1350 | **2562** | 3868 |
+| INP | 160 | **288** | 370 | 168 | **244** | 298 |
+| FCP | 1125 | 1468 | 2356 | 1172 | 1513 | 2088 |
+| TTFB | 294 | 654 | 1038 | 333 | 703 | 1125 |
+
+Ratings, mobile: LCP **76 % good** / 18 % ni / 6 % poor (n=51). INP **57 % good
+/ 35 % ni / 8 % poor** (n=37). Unfiltered: LCP 74 % good, INP 66 % good with no
+poor at all.
+
+### What it changes
+
+**1. Load-path work is done. Close Phase 3's leftovers.** Mobile LCP p75 is
+2337 ms — inside the 2500 ms "good" threshold, and roughly *half* the
+4.25–4.5 s this document has been quoting from 390x844x3 / 4x CPU / Slow 4G
+emulation. The reference device was overstating the load path by about 2x.
+Both remaining big-ticket load items — the SSR shell (§"What is left" item 1)
+and the "is Next.js earning its keep" Vite rewrite (item 7) — were sized to fix
+a number real users are not experiencing. **Neither is justified; drop them.**
+The 6 % `poor` LCP tail is a first-paint problem (every poor session also has a
+poor FCP), i.e. the 274 KB eager bundle, but it is a tail, not the median.
+
+**2. INP is the only failing metric, and mobile is where it fails.** p75 288 ms
+against a 200 ms threshold, 43 % of interacting sessions not "good". Note the
+direction: this is *worse* than the lab, where Phase 2 left manual-voting INP at
+~155 ms. The lab measured a controlled sequence of voting taps; INP reports the
+worst interaction of the whole session, which is a phase transition.
+
+The mobile sample has a poor tail the unfiltered sample hid entirely —
+**3000 ms, 976 ms, 544 ms**. The 976 ms one is the diagnostic:
+
+```
+fcp 189   ttfb 39   lcp 213   lcp_rating good   inp 976   inp_rating poor
+```
+
+A device that painted the app in 189 ms still hit a ~1 s blocked interaction.
+That is not slow hardware; that is the main thread. It corroborates Part C's
+closing note that **stage start is the single worst moment left in regular use**
+— and says the real-device cost is 2–3x the 393 ms the 4x-throttled trace
+showed. (The 3000 ms session had ttfb 1952 / fcp 2540 and is probably a genuinely
+slow device; weight it less.)
+
+**Conclusion: the one remaining performance target is the stage-start freeze and
+the phase-transition commits, on mobile** — gsap CSSPlugin + countUp + the
+initial exit-tween for every row, all in one effect flush. Everything else in
+"What is left, biggest first" can be closed or deprioritised.
+
+### The CLS instrumentation bug (found and fixed here)
+
+`cls` and `cls_rating` were empty in **118/118 sessions**, while `inp` — which
+web-vitals finalises at the same moment — arrived in 60 % of them. So the
+setup→voting CLS 0.49 question this data was meant to answer is still open.
+
+Cause, traced in `node_modules/next/dist/compiled/web-vitals/web-vitals.js`:
+`visibilitychange` listeners fire in registration order, and web-vitals
+finalises CLS from its own `visibilitychange` handler. `onLCP` and `onINP`
+register theirs synchronously when called; **`onCLS` does not** — it is wrapped
+in `onFCP` (`w = function(n,b){ … S(v(function(){ … p(…) … })) }`), so its
+handler is registered only after FCP fires. Next registers all of them inside
+`useReportWebVitals`'s effect, which runs before ours. Our flush listener,
+attached on mount, therefore beat CLS's handler while losing to LCP's and INP's
+— and because the flush is one-shot (`sent.current`), CLS was lost permanently,
+in every session.
+
+Fixed in `src/app/web-vitals.tsx` by attaching the flush listeners only once the
+**FCP** metric has been reported (not merely the first metric — TTFB can land
+earlier). `onCLS`'s inner FCP callback is registered before Next's own, so by
+the time our callback sees FCP, CLS's handler exists. The reporting callback was
+also wrapped in `useCallback`: `useReportWebVitals` re-runs its effect on every
+callback identity change, and each run registers a fresh set of observers.
+
+The missing LCPs (15–21 % of sessions) come from the same file but are benign:
+`f("LCP")` initialises `value: -1` and the reporter gates on `value >= 0`, so a
+session with no LCP candidate reports nothing rather than reporting a wrong
+number. No bias in the surviving values.
+
+### Caveats on this read
+
+- **n is small.** The unfiltered LCP p75 of 2562 sits within noise of the
+  2500 threshold; the mobile 2337 is the more trustworthy of the two, and the
+  INP finding is more robust than either LCP figure.
+- **Cold and repeat visits are mixed.** Lab repeat-visit LCP is 2.2 s and cold
+  is 4.5 s, so a field p75 of ~2.3–2.6 s implies a warm-cache-skewed sample.
+  It is a user-weighted number, not a cold-visit number.
+- **40 % of sessions report no INP** — no interaction before the tab was
+  backgrounded. INP therefore describes the ~60 % who engaged, which is the
+  population that matters here anyway.
+- **The flush fires on *first* background, not session end**, so a user who
+  alt-tabs shortly after load contributes metrics from before they ever started
+  a simulation. This biases INP *downwards*: 288 ms is a floor, not a ceiling.
+- CLS is unmeasured in the field until the fix above ships and quota is
+  restored.

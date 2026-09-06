@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useReportWebVitals } from 'next/web-vitals';
 
@@ -37,20 +37,43 @@ const isTracked = (name: string): name is TrackedName =>
  * update would both spam Umami and report values that are not final. The
  * trade-off is that a session which never backgrounds the tab and is killed
  * outright reports nothing.
+ *
+ * The flush listeners are attached only once FCP has been reported, not on
+ * mount, and that ordering is load-bearing. `visibilitychange` listeners run
+ * in registration order, and web-vitals finalises CLS from its own
+ * `visibilitychange` handler — but `onCLS` defers registering that handler
+ * until FCP fires, while `onLCP`/`onINP` register theirs synchronously. A
+ * listener attached on mount therefore flushes *before* CLS is ever recorded
+ * (and, because the flush is one-shot, records no CLS at all, ever), while
+ * still catching LCP and INP. That is exactly what the first Umami sample
+ * showed: `cls`/`cls_rating` empty in 118/118 sessions, `inp` present in 60%.
+ * Waiting for FCP specifically — not merely for the first metric, since TTFB
+ * can land earlier — puts us behind all three handlers.
  */
 export const WebVitals = () => {
   const latest = useRef<Partial<Record<TrackedName, number>>>({});
   const ratings = useRef<Partial<Record<TrackedName, string>>>({});
   const sent = useRef(false);
+  const [fcpReported, setFcpReported] = useState(false);
 
-  useReportWebVitals((metric: WebVitalMetric) => {
-    if (!isTracked(metric.name)) return;
+  useReportWebVitals(
+    // Stable identity: `useReportWebVitals` re-runs its effect whenever the
+    // callback changes, and each run registers a fresh set of observers.
+    useCallback((metric: WebVitalMetric) => {
+      if (!isTracked(metric.name)) return;
 
-    latest.current[metric.name] = metric.value;
-    ratings.current[metric.name] = metric.rating;
-  });
+      latest.current[metric.name] = metric.value;
+      ratings.current[metric.name] = metric.rating;
+
+      // See the note above: CLS's own hidden-handler is registered from
+      // within web-vitals' FCP callback, which runs before this one.
+      if (metric.name === 'FCP') setFcpReported(true);
+    }, []),
+  );
 
   useEffect(() => {
+    if (!fcpReported) return;
+
     const flush = () => {
       if (sent.current) return;
 
@@ -97,7 +120,7 @@ export const WebVitals = () => {
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('pagehide', flush);
     };
-  }, []);
+  }, [fcpReported]);
 
   return null;
 };

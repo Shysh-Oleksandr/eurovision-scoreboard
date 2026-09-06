@@ -9,6 +9,12 @@ import React, {
 import { toast } from 'react-toastify';
 
 import ColorOverridesSection from './ColorOverridesSection';
+import FontPickerField from './fonts/FontPickerField';
+import {
+  builtinSelection,
+  customSelection,
+  FontSelection,
+} from './fonts/fontPickerTypes';
 import InterfaceColorSliders, { type HsvaValue } from './InterfaceColorSliders';
 import {
   emptySoundDelaySecTextState,
@@ -53,10 +59,7 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import { useThrottledValue } from '@/hooks/useThrottledValue';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import {
-  getInterfaceFontSelectOptions,
-  normalizeFontAlias,
-} from '@/theme/fontAliases';
+import { normalizeFontAlias } from '@/theme/fontAliases';
 import { themeContentFingerprint } from '@/theme/themeFingerprint';
 import {
   THEME_SOUND_EVENTS,
@@ -128,11 +131,29 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
-  const [fontAlias, setFontAlias] = useState('montserrat');
+  // Fonts: the UI slot always carries a built-in alias as the fallback stack
+  // (also the value saved as `fontAlias` when a custom font is chosen).
+  const [uiFont, setUiFont] = useState<FontSelection>(builtinSelection());
+  const [uiFallbackAlias, setUiFallbackAlias] = useState('montserrat');
+  const [scoreboardMode, setScoreboardMode] = useState<'same' | 'custom'>(
+    'same',
+  );
+  const [scoreboardFont, setScoreboardFont] = useState<FontSelection>(
+    builtinSelection(),
+  );
 
-  const interfaceFontOptions = useMemo(
-    () => getInterfaceFontSelectOptions(),
-    [],
+  const handleUiFontChange = useCallback((selection: FontSelection) => {
+    setUiFont(selection);
+    if (selection.kind === 'builtin') setUiFallbackAlias(selection.alias);
+  }, []);
+
+  const handleScoreboardModeChange = useCallback(
+    (same: boolean) => {
+      setScoreboardMode(same ? 'same' : 'custom');
+      // Start the scoreboard slot from the UI font so unchecking is a no-op visually.
+      if (!same) setScoreboardFont(uiFont);
+    },
+    [uiFont],
   );
 
   // Theme-specific UI options
@@ -240,7 +261,19 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setRoundedCountryContainer(specifics.roundedCountryContainer);
       setBoardAnimationMode(specifics.boardAnimationMode);
       setDouzePointsAnimationMode(specifics.douzePointsAnimationMode);
-      setFontAlias(normalizeFontAlias(specifics.fontAlias));
+      // Base-theme defaults reset both font slots (custom picks are re-applied
+      // by the init effect when editing an existing theme).
+      const alias = normalizeFontAlias(specifics.fontAlias);
+
+      setUiFont(builtinSelection(alias));
+      setUiFallbackAlias(alias);
+      if (specifics.scoreboardFontAlias) {
+        setScoreboardMode('custom');
+        setScoreboardFont(builtinSelection(specifics.scoreboardFontAlias));
+      } else {
+        setScoreboardMode('same');
+        setScoreboardFont(builtinSelection(alias));
+      }
     },
     [],
   );
@@ -282,6 +315,26 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setOverrides(initialTheme.overrides || {});
       setUploadedFile(null);
       applyThemeSpecificsFormState(resolvedInitialThemeSpecifics);
+      // Custom fonts ride on the theme as snapshots; only trust one that
+      // matches the id the theme references (a deleted font degrades to the alias).
+      const uiSnapshot =
+        initialTheme.fontId &&
+        initialTheme.customFonts?.ui?._id === initialTheme.fontId
+          ? initialTheme.customFonts.ui
+          : undefined;
+
+      if (uiSnapshot) setUiFont(customSelection(uiSnapshot));
+      const scoreboardSnapshot =
+        initialTheme.scoreboardFontId &&
+        initialTheme.customFonts?.scoreboard?._id ===
+          initialTheme.scoreboardFontId
+          ? initialTheme.customFonts.scoreboard
+          : undefined;
+
+      if (scoreboardSnapshot) {
+        setScoreboardMode('custom');
+        setScoreboardFont(customSelection(scoreboardSnapshot));
+      }
       setSoundUrls(() => {
         const next = emptySoundUrlState();
 
@@ -383,7 +436,23 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         Object.keys(previewThemeSounds).length > 0
           ? previewThemeSounds
           : undefined,
-      fontAlias: normalizeFontAlias(fontAlias),
+      fontAlias: uiFont.kind === 'builtin' ? uiFont.alias : uiFallbackAlias,
+      fontId: uiFont.kind === 'custom' ? uiFont.font._id : undefined,
+      scoreboardFontAlias:
+        scoreboardMode === 'custom' && scoreboardFont.kind === 'builtin'
+          ? scoreboardFont.alias
+          : undefined,
+      scoreboardFontId:
+        scoreboardMode === 'custom' && scoreboardFont.kind === 'custom'
+          ? scoreboardFont.font._id
+          : undefined,
+      customFonts: {
+        ui: uiFont.kind === 'custom' ? uiFont.font : undefined,
+        scoreboard:
+          scoreboardMode === 'custom' && scoreboardFont.kind === 'custom'
+            ? scoreboardFont.font
+            : undefined,
+      },
     };
 
     applyCustomTheme(previewTheme, true);
@@ -405,7 +474,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     soundUrls,
     soundDelaySecText,
     isOpen,
-    fontAlias,
+    uiFont,
+    uiFallbackAlias,
+    scoreboardMode,
+    scoreboardFont,
   ]);
 
   // Stop preview when closing. Parent often unmounts us via `{open && <Modal />}` so `isOpen`
@@ -544,6 +616,20 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       }
     }
 
+    // Font fields as they will be saved (shared by the fingerprint and payload).
+    const payloadFontAlias =
+      uiFont.kind === 'builtin' ? uiFont.alias : uiFallbackAlias;
+    const payloadFontId =
+      uiFont.kind === 'custom' ? uiFont.font._id : undefined;
+    const payloadScoreboardFontAlias =
+      scoreboardMode === 'custom' && scoreboardFont.kind === 'builtin'
+        ? scoreboardFont.alias
+        : undefined;
+    const payloadScoreboardFontId =
+      scoreboardMode === 'custom' && scoreboardFont.kind === 'custom'
+        ? scoreboardFont.font._id
+        : undefined;
+
     // A "remix" is a brand-new theme created from someone else's theme.
     const isRemix =
       !!initialTheme &&
@@ -588,7 +674,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         boardAnimationMode,
         douzePointsAnimationMode,
         themeSounds: formSounds,
-        fontAlias: normalizeFontAlias(fontAlias),
+        fontAlias: payloadFontAlias,
+        fontId: payloadFontId,
+        scoreboardFontAlias: payloadScoreboardFontAlias,
+        scoreboardFontId: payloadScoreboardFontId,
       });
       const sourceFingerprint = themeContentFingerprint({
         baseThemeYear: initialTheme.baseThemeYear,
@@ -607,6 +696,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         douzePointsAnimationMode: srcSpecifics.douzePointsAnimationMode,
         themeSounds: initialTheme.themeSounds,
         fontAlias: normalizeFontAlias(srcSpecifics.fontAlias),
+        fontId: initialTheme.fontId,
+        scoreboardFontAlias: initialTheme.scoreboardFontAlias,
+        scoreboardFontId: initialTheme.scoreboardFontId,
       });
 
       if (formFingerprint === sourceFingerprint) {
@@ -629,7 +721,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         isPublic,
         backgroundImageUrl,
         overrides,
-        fontAlias: normalizeFontAlias(fontAlias),
+        fontAlias: payloadFontAlias,
       };
 
       if (isUpdate && initialTheme) {
@@ -640,6 +732,28 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         }
       } else if (themeGroupId) {
         payload.groupId = themeGroupId;
+      }
+
+      // Custom font refs: on update, `null` clears a slot the theme had before;
+      // on create only set values are sent. Another user's font id (remix) is
+      // forked into this user's library server-side.
+      if (isUpdate && initialTheme) {
+        payload.fontId =
+          payloadFontId ?? (initialTheme.fontId ? null : undefined);
+        payload.scoreboardFontAlias =
+          payloadScoreboardFontAlias ??
+          (initialTheme.scoreboardFontAlias ? null : undefined);
+        payload.scoreboardFontId =
+          payloadScoreboardFontId ??
+          (initialTheme.scoreboardFontId ? null : undefined);
+      } else {
+        if (payloadFontId) payload.fontId = payloadFontId;
+        if (payloadScoreboardFontAlias) {
+          payload.scoreboardFontAlias = payloadScoreboardFontAlias;
+        }
+        if (payloadScoreboardFontId) {
+          payload.scoreboardFontId = payloadScoreboardFontId;
+        }
       }
 
       // For updates, we need to explicitly handle reverting to defaults
@@ -1239,20 +1353,44 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     dataTheme="custom-preview"
                   />
 
-                  <CustomSelect
-                    options={interfaceFontOptions}
-                    value={fontAlias}
-                    labelClassName="!text-base !font-medium mb-1"
-                    onChange={(value) => setFontAlias(value)}
+                  <FontPickerField
                     id="interface-font-select"
                     label={t('widgets.themes.interfaceFont')}
-                    className="sm:w-[200px] w-full"
-                    dataTheme="custom-preview"
-                    withIndicator={false}
+                    slot="ui"
+                    value={uiFont}
+                    onChange={handleUiFontChange}
+                    className="sm:w-[260px] w-full"
                   />
                   <p className="text-white/50 text-xs basis-full mt-0.5">
                     {t('widgets.themes.baseThemeCascadeHint')}
                   </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Checkbox
+                    id="scoreboard-font-same"
+                    label={t('widgets.themes.fonts.sameAsInterface')}
+                    labelClassName="w-full !px-0 !pt-1 !items-start"
+                    checked={scoreboardMode === 'same'}
+                    onChange={(e) =>
+                      handleScoreboardModeChange(e.target.checked)
+                    }
+                  />
+                  {scoreboardMode === 'custom' && (
+                    <div className="flex gap-3 items-end flex-wrap">
+                      <FontPickerField
+                        id="scoreboard-font-select"
+                        label={t('widgets.themes.fonts.scoreboardFont')}
+                        slot="scoreboard"
+                        value={scoreboardFont}
+                        onChange={setScoreboardFont}
+                        className="sm:w-[260px] w-full"
+                      />
+                      <p className="text-white/50 text-xs basis-full mt-0.5">
+                        {t('widgets.themes.fonts.scoreboardHint')}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div>

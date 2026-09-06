@@ -61,6 +61,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.profile(),
   queryKeys.user.customEntries(),
   queryKeys.user.savedEvents(), // Don't forget to add it here!
+  queryKeys.user.fonts(), // e.g. the font library (src/api/fonts.ts)
   // ...
 ];
 ```

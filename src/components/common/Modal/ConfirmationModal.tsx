@@ -64,7 +64,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      overlayClassName="!z-[1002]"
+      // Confirmations can be raised from any modal (editor 1002, font picker 1003); always sit above them.
+      overlayClassName="!z-[1100]"
       containerClassName="!w-[min(90%,450px)]"
       withBlur
       bottomContent={

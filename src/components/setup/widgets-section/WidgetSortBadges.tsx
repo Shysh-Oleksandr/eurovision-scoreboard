@@ -16,6 +16,8 @@ interface WidgetSortBadgesProps {
   dateRange?: DateRangeFilter;
   onDateRangeChange?: (range: DateRangeFilter) => void;
   hideCopies?: boolean;
+  /** Restrict which sort badges render (e.g. fonts have no likes/saves). Default: all. */
+  visibleKeys?: PublicSortKey[];
 }
 
 const WidgetSortBadges: React.FC<WidgetSortBadgesProps> = ({
@@ -25,8 +27,11 @@ const WidgetSortBadges: React.FC<WidgetSortBadgesProps> = ({
   dateRange,
   onDateRangeChange,
   hideCopies = false,
+  visibleKeys,
 }) => {
   const t = useTranslations('widgets.sortBadges');
+  const show = (key: PublicSortKey) =>
+    !visibleKeys || visibleKeys.includes(key);
 
   const handleDateRangeClick = (
     range:
@@ -72,27 +77,35 @@ const WidgetSortBadges: React.FC<WidgetSortBadgesProps> = ({
     <div className={`space-y-3 ${className || ''}`}>
       <div className="flex items-center flex-wrap justify-start gap-2">
         <FilterIcon className="w-6 h-6" />
-        <Badge
-          label={t('latest')}
-          onClick={() => onChange('latest')}
-          isActive={value === 'latest'}
-        />
-        <Badge
-          label={t('oldest')}
-          onClick={() => onChange('oldest')}
-          isActive={value === 'oldest'}
-        />
-        <Badge
-          label={t('mostLiked')}
-          onClick={() => onChange('likes')}
-          isActive={value === 'likes'}
-        />
-        <Badge
-          label={t('mostSaved')}
-          onClick={() => onChange('saves')}
-          isActive={value === 'saves'}
-        />
-        {!hideCopies && (
+        {show('latest') && (
+          <Badge
+            label={t('latest')}
+            onClick={() => onChange('latest')}
+            isActive={value === 'latest'}
+          />
+        )}
+        {show('oldest') && (
+          <Badge
+            label={t('oldest')}
+            onClick={() => onChange('oldest')}
+            isActive={value === 'oldest'}
+          />
+        )}
+        {show('likes') && (
+          <Badge
+            label={t('mostLiked')}
+            onClick={() => onChange('likes')}
+            isActive={value === 'likes'}
+          />
+        )}
+        {show('saves') && (
+          <Badge
+            label={t('mostSaved')}
+            onClick={() => onChange('saves')}
+            isActive={value === 'saves'}
+          />
+        )}
+        {!hideCopies && show('copies') && (
           <Badge
             label={t('mostCopied')}
             onClick={() => onChange('copies')}

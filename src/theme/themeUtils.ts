@@ -2,7 +2,8 @@ import { getThemeForYear, getThemeBackground } from './themes';
 import { ThemeColors } from './types';
 
 import { toFixedIfDecimal } from '@/helpers/toFixedIfDecimal';
-import { getFontFamilyStackCss, normalizeFontAlias } from '@/theme/fontAliases';
+import { ensureFontsReady, getFontCssVars } from '@/theme/customFonts';
+import { resolveThemeFonts } from '@/theme/fontResolution';
 import { CustomTheme } from '@/types/customTheme';
 
 // Constants for primary/gray shade generation
@@ -247,10 +248,21 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     document.head.appendChild(style);
   }
 
-  const fontStack = getFontFamilyStackCss(normalizeFontAlias(theme.fontAlias));
-  const fontVarLine = `  --dp-font-family: ${fontStack};`;
+  // Document-level font variables are owned by `applyDocumentFonts` (inline on
+  // <html>). The preview block must carry its own so the editor renders the
+  // theme being edited, not the active one.
+  let fontVarLines: string[] = [];
 
-  const cssText = [fontVarLine]
+  if (preview) {
+    const fonts = resolveThemeFonts(theme);
+
+    ensureFontsReady(fonts);
+    fontVarLines = Object.entries(getFontCssVars(fonts)).map(
+      ([k, v]) => `  ${k}: ${v};`,
+    );
+  }
+
+  const cssText = fontVarLines
     .concat(Object.entries(vars).map(([k, v]) => `  ${k}: ${v};`))
     .join('\n');
 
@@ -400,6 +412,17 @@ export function getReadableForegroundColor(
   return relativeLuminance(hslToRgb(h, s, l)) > cutoff
     ? `hsl(${h}, ${Math.max(s, 60)}%, 14%)`
     : '#ffffff';
+}
+
+/**
+ * Scoreboard font variables for a theme card: the card's preview (which
+ * carries `.dp-scoreboard-font`) renders in the theme's scoreboard font while
+ * the rest of the card stays in the app UI font.
+ */
+export function getFontCssVarsForCustomTheme(
+  theme: CustomTheme,
+): Record<string, string> {
+  return getFontCssVars(resolveThemeFonts(theme), { includeUi: false });
 }
 
 /**

@@ -21,6 +21,7 @@ export const queryKeys = {
       startDate?: string;
       endDate?: string;
       hasCustomAudio?: boolean;
+      hasCustomFonts?: boolean;
       groupId?: string;
     }) => ['user', 'themes', 'me', filters] as const,
     themeById: (id: string) => ['user', 'theme', id] as const,
@@ -35,7 +36,18 @@ export const queryKeys = {
       startDate?: string;
       endDate?: string;
       hasCustomAudio?: boolean;
+      hasCustomFonts?: boolean;
     }) => ['user', 'saved-themes', filters] as const,
+    /** Prefix for invalidating all current-user font library queries */
+    fonts: () => ['user', 'fonts'] as const,
+    fontsMeList: (filters: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+    }) => ['user', 'fonts', 'me', filters] as const,
+    fontById: (id: string) => ['user', 'font', id] as const,
     themesState: (ids: string[]) =>
       ['user', 'themes-state', { ids: [...ids].sort() }] as const,
     /** Prefix for invalidating all current-user contest list queries */
@@ -112,7 +124,17 @@ export const queryKeys = {
       startDate?: string;
       endDate?: string;
       hasCustomAudio?: boolean;
+      hasCustomFonts?: boolean;
     }) => ['public', 'themes', filters] as const,
+    fonts: (filters: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      sortBy?: string;
+      sortOrder?: string;
+      startDate?: string;
+      endDate?: string;
+    }) => ['public', 'fonts', filters] as const,
     contests: (filters: {
       page?: number;
       search?: string;
@@ -175,6 +197,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.themes(),
   queryKeys.user.savedThemes(),
   queryKeys.user.themeGroups(),
+  queryKeys.user.fonts(),
   queryKeys.user.contests(),
   queryKeys.user.savedContests(),
   queryKeys.user.contestGroups(),
