@@ -213,6 +213,34 @@ describe('rankToStageVotes', () => {
     });
   });
 
+  describe('per-voter channel overrides', () => {
+    it('skips ineligible voters per channel and keeps the order consistent', () => {
+      const withWW: VotingCountry[] = [
+        ...votingCountries,
+        { code: 'WW', name: 'Rest of the World', flag: '' } as VotingCountry,
+      ];
+      const order = [...codes];
+      const { votes, totals } = generateRankConsistentVotes({
+        orderedCodes: order,
+        stageCountries,
+        votingCountries: withWW,
+        voterChannels: { WW: 'both', AA: 'televote' },
+        target: 'total',
+        votingMode: StageVotingMode.JURY_AND_TELEVOTE,
+        juryPointsSystem: pointsSystem,
+        televotePointsSystem: pointsSystem,
+        randomnessLevel: 20,
+        pointsSpread: 60,
+      });
+
+      assertNonIncreasing(totals, order);
+      expect(votes.jury?.WW).toBeDefined();
+      expect(votes.jury?.AA).toBeUndefined();
+      expect(votes.televote?.AA).toBeDefined();
+      expect(votes.televote?.WW).toBeDefined();
+    });
+  });
+
   describe('repairMonotonicTotals', () => {
     it('fixes an adjacent inversion using a third-party voter', () => {
       // Order says AA should out-total BB, but the votes give BB more (CC's

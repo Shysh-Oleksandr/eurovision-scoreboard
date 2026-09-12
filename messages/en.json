@@ -140,7 +140,22 @@
       "oddsOverrideNote": "These odds apply to this stage only. The persistent global contest odds are set in Settings.",
       "resetToGlobalOdds": "Reset to global",
       "confirmCloseTitle": "Close stage setup?",
-      "confirmCloseDescription": "Any unsaved changes will be lost."
+      "confirmCloseDescription": "Any unsaved changes will be lost.",
+      "voterChannels": "Voter channels",
+      "voterChannelsHint": "Set the channel each voter votes in. Jury spokespersons follow the list order.",
+      "jury": "Jury",
+      "televote": "Televote",
+      "channelJuryOnly": "Jury only",
+      "channelTelevoteOnly": "Televote only",
+      "voterChannelsDone": "Done editing channels",
+      "voterChannelsHintShort": "Set the channel each voter votes in. Spokespersons follow list order.",
+      "votesInJury": "Votes in the jury",
+      "votesInTelevote": "Votes in the televote",
+      "lastChannelLocked": "A voter needs at least one channel. Remove the country to exclude it.",
+      "voterChannelsPaused": "This stage is set to <b>{mode}</b> on the General tab, so per-voter channels are paused. Your saved channel settings are kept and apply again in <b>{juryAndTelevote}</b> mode.",
+      "noJuryVoter": "No voter is set to vote in the jury. Enable <b>J</b> for at least one voter, or switch this stage to <b>Televote only</b> on the General tab.",
+      "noTelevoteVoter": "No voter is set to vote in the televote. Enable <b>T</b> for at least one voter, or switch this stage to <b>Jury only</b> on the General tab.",
+      "giveAllVotersBoth": "Give all voters both"
     },
     "validation": {
       "noCountriesInStage": "There are no countries in {stageName}.",
@@ -1040,7 +1055,11 @@
       },
       "votingCountries": {
         "title": "Voting Countries",
-        "content": "In each stage's 'Voters' tab, choose exactly which countries cast votes during that stage. You can include or exclude any participating country and optionally add 'Rest of the World' as an additional voter. Voter sets are configured per stage, so Semi-Finals and the Grand Final can have completely different voters. If you want to use the original voting countries from the year, you click on the 'Load year data' button."
+        "content": "In each stage's 'Voters' tab, choose exactly which countries cast votes during that stage. You can include or exclude any participating country and optionally add 'Rest of the World' as an additional voter. Voter sets are configured per stage, so Semi-Finals and the Grand Final can have completely different voters. If you want to use the original voting countries from the year, click the 'Load year data' button."
+      },
+      "voterChannels": {
+        "title": "Jury vs. televote voters",
+        "content": "In a 'Jury and Televote' stage every voter votes in both channels by default, except 'Rest of the World', which votes in the televote only. Press the 'Voter channels' button in the voters toolbar to change that per voter: each chip gets a J (jury) and a T (televote) toggle, so a country can vote in the televote but not in the jury, and 'Rest of the World' can be given a jury vote too. Chips that vote in only one channel show a small badge. The jury spokesperson order still follows the list order. In other voting modes these settings are kept but paused."
       },
       "runningOrder": {
         "title": "Running Order",

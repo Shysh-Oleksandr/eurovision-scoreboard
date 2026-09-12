@@ -174,7 +174,10 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   const handleExportSpreadsheet = useCallback(async () => {
     if (!selectedStage || !selectedStageId) return;
 
-    const voters = getStageVotingCountries(selectedStageId, false, true);
+    const voters = getStageVotingCountries(selectedStageId, {
+      fromScoreboard: false,
+      channel: 'all',
+    });
     const votes = predefinedVotes[selectedStageId];
 
     const getParticipantTotal = (

@@ -16,6 +16,7 @@ const TAB_SECTIONS: Record<string, string[]> = {
     'customStages',
     'votingModes',
     'votingCountries',
+    'voterChannels',
     'runningOrder',
   ],
   voting: [

@@ -6,17 +6,30 @@ import React, {
   useState,
 } from 'react';
 
+import { VoterChannelsPausedNote } from '../event-stage/VoterChannelsPausedNote';
 import VotersCountriesSearch from '../event-stage/VotersCountriesSearch';
 import VotersList from '../event-stage/VotersList';
 import VotersSelectionHeader from '../event-stage/VotersSelectionHeader';
 
 import {
   usePostSetupFormContext,
+  useWatchVoterChannels,
   useWatchVotingCountries,
 } from './hooks/usePostSetupStageForm';
 
-import { BaseCountry, EventStage, StageId, VotingCountry } from '@/models';
+import {
+  BaseCountry,
+  EventStage,
+  StageId,
+  StageVotingMode,
+  VoterChannelMode,
+  VotingCountry,
+} from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
+import {
+  countVotersByChannel,
+  normalizeVoterChannels,
+} from '@/state/scoreboard/voterChannels';
 
 const mapToVotingCountry = (country: BaseCountry) => ({
   code: country.code,
@@ -27,15 +40,27 @@ const mapToVotingCountry = (country: BaseCountry) => ({
 interface EventStageVotersProps {
   className?: string;
   stage: EventStage;
+  /** The mode currently chosen on the General tab (may differ from `stage.votingMode`). */
+  votingMode?: StageVotingMode;
   onLoaded?: () => void;
 }
 
 const EventStageVoters: React.FC<EventStageVotersProps> = ({
   stage,
+  votingMode = stage.votingMode,
   onLoaded,
 }) => {
   const form = usePostSetupFormContext();
   const votingCountries = useWatchVotingCountries(form);
+  // Per-voter channel overrides live in the form store (the modal's error bar
+  // resets them too), so there is a single source of truth.
+  const voterChannels = useWatchVoterChannels(form);
+
+  // Transient view state: the J / T toggles are hidden again next time the
+  // modal opens, so regular users never meet them twice.
+  const [showChannelControls, setShowChannelControls] = useState(false);
+
+  const isJuryAndTelevote = votingMode === StageVotingMode.JURY_AND_TELEVOTE;
 
   const votingCountriesRef = useRef<VotingCountry[]>(votingCountries || []);
 
@@ -82,14 +107,30 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
     [setLocalVotingCountries, form],
   );
 
+  const handleChannelModeChange = useCallback(
+    (code: string, mode: VoterChannelMode) => {
+      form.setVoterChannels({
+        ...(form.getVoterChannels() ?? {}),
+        [code]: mode,
+      });
+    },
+    [form],
+  );
+
+  const handleToggleChannelControls = useCallback(() => {
+    setShowChannelControls((prev) => !prev);
+  }, []);
+
   const handleAddVoter = (country: BaseCountry) => {
     if (!localVotingCountries.find((c) => c.code === country.code)) {
       setLocalVotingCountriesAndForm((prev) => [...prev, country]);
     }
   };
 
+  // Reset list: voter order and channels reset.
   const handleReset = () => {
     setLocalVotingCountriesAndForm(participatingVoters);
+    form.setVoterChannels(undefined);
   };
 
   const handleClearAll = () => {
@@ -136,6 +177,16 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
       }
     }
   };
+
+  const channelCounts = useMemo(
+    () => countVotersByChannel(localVotingCountries, voterChannels),
+    [localVotingCountries, voterChannels],
+  );
+  const hasCustomChannels = useMemo(
+    () =>
+      normalizeVoterChannels(localVotingCountries, voterChannels) !== undefined,
+    [localVotingCountries, voterChannels],
+  );
 
   // Load existing voting countries for this stage
   const initializedForStageIdRef = useRef<string | null>(null);
@@ -191,11 +242,26 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
             votersAmount={localVotingCountries.length}
             handleFilter={handleFilter}
             disableLoadYearData={initialVotingCountries.length <= 1}
+            channelCounts={isJuryAndTelevote ? channelCounts : undefined}
+            showChannelControls={isJuryAndTelevote && showChannelControls}
+            onToggleChannelControls={
+              isJuryAndTelevote ? handleToggleChannelControls : undefined
+            }
+            note={
+              !isJuryAndTelevote && hasCustomChannels ? (
+                <VoterChannelsPausedNote votingMode={votingMode} />
+              ) : undefined
+            }
           />
           <VotersList
             localVotingCountries={localVotingCountries}
             setLocalVotingCountries={setLocalVotingCountriesAndForm}
             stageId={stage.id}
+            voterChannels={voterChannels}
+            showChannelControls={isJuryAndTelevote && showChannelControls}
+            onChannelModeChange={
+              isJuryAndTelevote ? handleChannelModeChange : undefined
+            }
           />
         </div>
         <div className="h-px bg-primary-800 w-full my-4" />

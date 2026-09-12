@@ -1,15 +1,22 @@
+import { assignPointIdsForVoter } from './voteAssignmentHelpers';
+
 import type { EventStage, StageVotingMode } from '@/models';
 import { StageVotingMode as VM } from '@/models';
 import type { PointsItem } from '@/state/generalStore';
+import type {
+  ManualShareTotalsRow,
+  StageVotes,
+  Vote,
+} from '@/state/scoreboard/types';
+import {
+  getEffectiveVoterChannels,
+  isVoterInChannel,
+} from '@/state/scoreboard/voterChannels';
 import type {
   DetailedPresetPayload,
   PointsSystemSnapshot,
   TotalsPresetPayload,
 } from '@/state/votingPresetsStore';
-import { assignPointIdsForVoter } from './voteAssignmentHelpers';
-
-import type { ManualShareTotalsRow } from '@/state/scoreboard/types';
-import type { StageVotes, Vote } from '@/state/scoreboard/types';
 import type { CompactVote } from '@/types/contestSnapshot';
 
 function decodeTuplesToPointValues(
@@ -17,14 +24,18 @@ function decodeTuplesToPointValues(
   savedPoints: PointsSystemSnapshot,
 ): { countryCode: string; points: number }[] {
   const byId = new Map(savedPoints.map((p) => [p.id, p]));
+
   if (!tuples?.length) return [];
   const out: { countryCode: string; points: number }[] = [];
+
   for (const t of tuples) {
     const [countryCode, pointsId] = t;
     const meta = byId.get(pointsId);
     const points = meta?.value ?? 0;
+
     out.push({ countryCode, points });
   }
+
   return out;
 }
 
@@ -69,6 +80,7 @@ export function applyDetailedPresetToStageVotes(
 ): Partial<StageVotes> {
   const participantSet = new Set(stage.countries.map((c) => c.code));
   const voterSet = new Set((stage.votingCountries || []).map((v) => v.code));
+  const voterChannels = getEffectiveVoterChannels(stage);
   const activeSources = new Set(sourcesForMode(stage.votingMode));
   const savedSources = new Set(sourcesForMode(payload.votingMode));
 
@@ -77,13 +89,14 @@ export function applyDetailedPresetToStageVotes(
   for (const source of ['jury', 'televote', 'combined'] as const) {
     if (!activeSources.has(source) || !savedSources.has(source)) continue;
     const byVoter = payload.compact[source];
+
     if (!byVoter) continue;
 
     const nextByVoter: Record<string, Vote[]> = {};
 
     for (const [voterCode, tuples] of Object.entries(byVoter)) {
       if (!voterSet.has(voterCode)) continue;
-      if (source === 'jury' && voterCode === 'WW') continue;
+      if (!isVoterInChannel(voterCode, source, voterChannels)) continue;
 
       const filtered = filterVotesForVoter(
         tuples,
@@ -92,6 +105,7 @@ export function applyDetailedPresetToStageVotes(
         voterCode,
       );
       const assigned = assignPointIdsForVoter(filtered, currentPointsSystem);
+
       if (assigned.length) nextByVoter[voterCode] = assigned;
     }
 
@@ -129,11 +143,13 @@ export function hasAnyStageVotes(
   if (!v) return false;
   for (const source of ['jury', 'televote', 'combined'] as const) {
     const byVoter = v[source];
+
     if (!byVoter) continue;
     for (const arr of Object.values(byVoter)) {
       if (Array.isArray(arr) && arr.length > 0) return true;
     }
   }
+
   return false;
 }
 
@@ -150,9 +166,11 @@ export function applyTotalsPresetToLocalTotals(
   for (const [code, row] of Object.entries(payload.rows)) {
     if (!participantSet.has(code)) continue;
     const next: ManualShareTotalsRow = {};
+
     for (const f of ['jury', 'televote', 'combined'] as const) {
       if (!allowed.has(f) || !savedAllowed.has(f)) continue;
       const val = row[f];
+
       if (typeof val === 'number' && Number.isFinite(val)) {
         next[f] = val;
       }

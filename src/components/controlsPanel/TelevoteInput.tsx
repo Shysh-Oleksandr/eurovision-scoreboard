@@ -62,7 +62,9 @@ const TelevoteInput = () => {
   );
 
   const { countries } = getCurrentStage() || {};
-  const votingCountries = getStageVotingCountries();
+  const votingCountries = getStageVotingCountries(undefined, {
+    channel: 'televote',
+  });
 
   const [enteredPoints, setEnteredPoints] = useState('');
   const [error, setError] = useState('');

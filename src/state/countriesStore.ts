@@ -20,6 +20,12 @@ import { useScoreboardStore } from './scoreboardStore';
 
 import { RestOfWorld } from '@/data/countries';
 import { buildCountriesUrl } from '@/data/countries/countriesDataUrl';
+import {
+  filterVotersByChannel,
+  getEffectiveVoterChannels,
+  getStagePhaseChannel,
+  VoteChannel,
+} from '@/state/scoreboard/voterChannels';
 
 export type CountryOdds = Record<
   string,
@@ -51,7 +57,12 @@ export const resolveYearOddsFor = (
   return yearOdds;
 };
 
-export interface CountriesState {
+export interface StageVotingCountriesOptions {
+  fromScoreboard?: boolean;
+  channel?: VoteChannel | 'all';
+}
+
+interface CountriesState {
   // State
   allCountriesForYear: BaseCountry[]; // All countries from the selected year, both qualified and not qualified
   eventSetupModalOpen: boolean;
@@ -70,10 +81,14 @@ export interface CountriesState {
   setCurrentSetupStageType: (type: 'initial' | 'next') => void;
   setPostSetupModalOpen: (open: boolean) => void;
   getInitialVotingCountries: (stageId?: string) => VotingCountry[];
+  /**
+   * Voters of a stage filtered to a vote channel. `channel` defaults to the
+   * stage's current phase (jury / televote / combined); pass `'all'` for the
+   * raw list. `fromScoreboard: false` reads the configured (setup) stage.
+   */
   getStageVotingCountries: (
     stageId?: string,
-    fromScoreboard?: boolean,
-    allowROTW?: boolean,
+    options?: StageVotingCountriesOptions,
   ) => VotingCountry[];
   getContestParticipants: () => BaseCountry[];
   getVotingCountry: () => VotingCountry | undefined;
@@ -250,11 +265,13 @@ export const useCountriesStore = create<CountriesState>()(
 
           getStageVotingCountries: (
             stageId?: string,
-            fromScoreboard = true,
-            allowROTW = true,
+            {
+              fromScoreboard = true,
+              channel,
+            }: StageVotingCountriesOptions = {},
           ) => {
             const { configuredEventStages } = get();
-            const { eventStages, currentStageId, predefinedVotes } =
+            const { eventStages, currentStageId } =
               useScoreboardStore.getState();
 
             const relevantStageId = stageId ?? currentStageId;
@@ -262,41 +279,20 @@ export const useCountriesStore = create<CountriesState>()(
             const configuredEventStage = configuredEventStages.find(
               (stage) => stage.id === relevantStageId,
             );
-            const relevantStage =
-              eventStages.find((stage) => stage.id === relevantStageId) ||
-              configuredEventStage;
+            const relevantStage = fromScoreboard
+              ? eventStages.find((stage) => stage.id === relevantStageId) ||
+                configuredEventStage
+              : configuredEventStage;
 
             if (!relevantStage) {
               return [];
             }
 
-            // WW is a televote-only voter. During live simulation (fromScoreboard),
-            // hide the WW column until the televote phase (or until televote predefs
-            // do not exist yet). In setup / voting predefinition (fromScoreboard false),
-            // never tie visibility to isJuryVoting or persisted predefinedVotes — those
-            // reflect a previous run and would hide WW on the Televote tab while
-            // stale televote.WW data still affects totals.
-            const { votingMode } = relevantStage;
-            const isRestOfWorldVoting =
-              allowROTW &&
-              (fromScoreboard
-                ? votingMode === StageVotingMode.TELEVOTE_ONLY ||
-                  (votingMode === StageVotingMode.JURY_AND_TELEVOTE &&
-                    (!relevantStage.isJuryVoting ||
-                      !predefinedVotes[relevantStageId!]?.televote))
-                : votingMode === StageVotingMode.TELEVOTE_ONLY ||
-                  votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
-                  votingMode === StageVotingMode.COMBINED);
-
-            const votingCountries =
-              (fromScoreboard
-                ? relevantStage
-                : configuredEventStage
-              )?.votingCountries?.filter(
-                (country) => country.code !== 'WW' || isRestOfWorldVoting,
-              ) || [];
-
-            return votingCountries;
+            return filterVotersByChannel(
+              relevantStage.votingCountries || [],
+              channel ?? getStagePhaseChannel(relevantStage),
+              getEffectiveVoterChannels(relevantStage),
+            );
           },
 
           getVotingCountry: () => {

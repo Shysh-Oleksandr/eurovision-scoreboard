@@ -95,6 +95,7 @@ export default function Error({
       qualifiesTo: stage.qualifiesTo,
       countries: stage.countries.map((country) => country.code),
       votingCountries: stage.votingCountries?.map((country) => country.code),
+      voterChannels: stage.voterChannels,
     })),
   };
 

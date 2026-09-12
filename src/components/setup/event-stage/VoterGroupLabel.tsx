@@ -9,11 +9,14 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 interface VoterGroupLabelProps {
   country: BaseCountry;
   stageId: string;
+  /** Render as a flex child of a badge row (truncates first) instead of self-positioning. */
+  inline?: boolean;
 }
 
 export const VoterGroupLabel: React.FC<VoterGroupLabelProps> = ({
   country,
   stageId,
+  inline = false,
 }) => {
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const eventAssignments = useCountriesStore((state) => state.eventAssignments);
@@ -55,6 +58,17 @@ export const VoterGroupLabel: React.FC<VoterGroupLabelProps> = ({
     country.code,
     eventAssignments,
   ]);
+
+  if (inline) {
+    return (
+      <span
+        className="flex-[0_1_auto] min-w-[26px] px-1 rounded-md bg-primary-700 text-[10px] leading-5 text-white whitespace-nowrap overflow-hidden text-ellipsis"
+        title={getCategoryLabel(label)}
+      >
+        {getCategoryLabel(label)}
+      </span>
+    );
+  }
 
   return (
     <div className="absolute -top-[8px] -left-1 px-1 rounded-md bg-primary-700 z-10">

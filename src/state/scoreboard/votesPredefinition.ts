@@ -2,6 +2,7 @@ import {
   BaseCountry,
   Country,
   StageVotingMode,
+  VoterChannels,
   VotingCountry,
 } from '../../models';
 import { CountryOdds } from '../countriesStore';
@@ -9,6 +10,7 @@ import { PointsItem } from '../generalStore';
 
 import { ResolvedDiaspora } from './diaspora';
 import { StageVotes, Vote } from './types';
+import { isVoterInChannel } from './voterChannels';
 
 /*
  * Random-vote ("predefinition") engine.
@@ -298,7 +300,10 @@ function buildCombinedBallotForVoter(
   });
 
   const sortedPoints = sortedPointsDesc(pointsSystem);
-  const numPointsToAward = Math.min(sortedPoints.length, combinedRanking.length);
+  const numPointsToAward = Math.min(
+    sortedPoints.length,
+    combinedRanking.length,
+  );
 
   return sortedPoints
     .slice(0, numPointsToAward)
@@ -312,11 +317,14 @@ export const buildCombinedBallotsFromJuryTelevote = (
   juryByVoter: Record<string, Vote[]>,
   televoteByVoter: Record<string, Vote[]>,
   pointsSystem: PointsItem[],
+  voterChannels?: VoterChannels,
 ): Record<string, Vote[]> => {
   const combined: Record<string, Vote[]> = {};
 
   for (const votingCountry of votingCountries) {
-    if (votingCountry.code === 'WW') continue;
+    if (!isVoterInChannel(votingCountry.code, 'combined', voterChannels)) {
+      continue;
+    }
 
     combined[votingCountry.code] = buildCombinedBallotForVoter(
       votingCountry,
@@ -341,6 +349,7 @@ export const predefineStageVotes = (
   televotePointsSystem: PointsItem[],
   allowMultiplePointsToSameEntry = false,
   diaspora?: ResolvedDiaspora | null,
+  voterChannels?: VoterChannels,
 ): Partial<StageVotes> => {
   const { betaJury, betaTele, luckMag } = deriveEngineParams(
     randomnessLevel,
@@ -387,7 +396,7 @@ export const predefineStageVotes = (
   if (shouldGenerateJury) {
     stageVotes.jury = {};
     for (const votingCountry of votingCountries) {
-      if (votingCountry.code === 'WW') {
+      if (!isVoterInChannel(votingCountry.code, 'jury', voterChannels)) {
         continue;
       }
 
@@ -405,6 +414,10 @@ export const predefineStageVotes = (
   if (shouldGenerateCombined) {
     stageVotes.combined = {};
     for (const votingCountry of votingCountries) {
+      if (!isVoterInChannel(votingCountry.code, 'combined', voterChannels)) {
+        continue;
+      }
+
       stageVotes.combined[votingCountry.code] = generateCombinedVotes(
         votingCountry,
         stageCountries,
@@ -420,6 +433,10 @@ export const predefineStageVotes = (
   if (shouldGenerateTelevote) {
     stageVotes.televote = {};
     for (const votingCountry of votingCountries) {
+      if (!isVoterInChannel(votingCountry.code, 'televote', voterChannels)) {
+        continue;
+      }
+
       stageVotes.televote[votingCountry.code] = generateVotesForSource(
         votingCountry,
         stageCountries,

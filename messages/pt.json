@@ -140,7 +140,22 @@
       "oddsOverrideNote": "Estas odds aplicam-se apenas a esta fase. As odds globais persistentes do concurso são definidas em Definições.",
       "resetToGlobalOdds": "Repor para global",
       "confirmCloseTitle": "Fechar a configuração da fase?",
-      "confirmCloseDescription": "As alterações não guardadas serão perdidas."
+      "confirmCloseDescription": "As alterações não guardadas serão perdidas.",
+      "voterChannels": "Canais de voto",
+      "voterChannelsHint": "Defina o canal em que cada votante vota. Os porta-vozes do júri seguem a ordem da lista.",
+      "jury": "Júri",
+      "televote": "Televoto",
+      "channelJuryOnly": "Só Júri",
+      "channelTelevoteOnly": "Só Televoto",
+      "voterChannelsDone": "Concluir edição dos canais",
+      "voterChannelsHintShort": "Defina o canal de cada votante. Os porta-vozes seguem a ordem da lista.",
+      "votesInJury": "Vota no júri",
+      "votesInTelevote": "Vota no televoto",
+      "lastChannelLocked": "Um votante precisa de pelo menos um canal. Remova o país para o excluir.",
+      "voterChannelsPaused": "Esta fase está definida como <b>{mode}</b> no separador Geral, pelo que os canais por votante estão em pausa. As definições de canal guardadas são mantidas e voltam a aplicar-se no modo <b>{juryAndTelevote}</b>.",
+      "noJuryVoter": "Nenhum votante está definido para votar no júri. Ative <b>J</b> em pelo menos um votante, ou mude esta fase para <b>Só Televoto</b> no separador Geral.",
+      "noTelevoteVoter": "Nenhum votante está definido para votar no televoto. Ative <b>T</b> em pelo menos um votante, ou mude esta fase para <b>Só Júri</b> no separador Geral.",
+      "giveAllVotersBoth": "Dar ambos a todos"
     },
     "validation": {
       "noCountriesInStage": "Não há países em {stageName}.",
@@ -1037,6 +1052,10 @@
       "votingCountries": {
         "title": "Países Votantes",
         "content": "No separador 'Votantes' de cada fase, escolha exatamente quais os países que votam durante essa fase. Pode incluir ou excluir qualquer país participante e opcionalmente adicionar o 'Resto do Mundo' como votante adicional. Os conjuntos de votantes são configurados por fase, pelo que as Semifinais e a Grande Final podem ter votantes completamente diferentes. Se quiser usar os países votantes originais do ano, clique no botão 'Carregar dados do ano'."
+      },
+      "voterChannels": {
+        "title": "Votantes do júri vs. televoto",
+        "content": "Numa fase 'Júri e Televoto' cada votante vota por predefinição em ambos os canais, exceto o 'Resto do Mundo', que vota apenas no televoto. Prima o botão 'Canais de voto' na barra de votantes para alterar isso por votante: cada etiqueta recebe um interruptor J (júri) e T (televoto), para que um país possa votar no televoto mas não no júri, e o 'Resto do Mundo' também possa receber um voto do júri. As etiquetas que votam num só canal mostram um pequeno distintivo. A ordem dos porta-vozes do júri continua a seguir a ordem da lista. Nos outros modos de votação estas definições são mantidas mas ficam em pausa."
       },
       "runningOrder": {
         "title": "Ordem de Actuação",

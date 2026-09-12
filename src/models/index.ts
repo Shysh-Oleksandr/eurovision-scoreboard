@@ -66,6 +66,15 @@ export interface CountriesPreset {
 
 export type VotingCountry = Pick<BaseCountry, 'code' | 'name' | 'flag'>;
 
+/**
+ * Which channel(s) a voter casts votes in. Absent = default: `both`, except
+ * the Rest of the World voter (`WW`), which defaults to `televote`.
+ */
+export type VoterChannelMode = 'both' | 'jury' | 'televote';
+
+/** Per-voter channel overrides keyed by country code; only non-default entries are stored. */
+export type VoterChannels = Record<string, VoterChannelMode>;
+
 export interface PointsItem {
   value: number;
   showDouzePoints: boolean;
@@ -98,6 +107,8 @@ export interface EventStage {
   votingMode: StageVotingMode;
   countries: Country[];
   votingCountries?: VotingCountry[];
+  /** Per-voter jury/televote eligibility overrides (see `state/scoreboard/voterChannels.ts`). */
+  voterChannels?: VoterChannels;
   isOver: boolean;
   isJuryVoting: boolean;
   isLastStage?: boolean;

@@ -27,6 +27,9 @@ import type {
 } from '@/types/contestSnapshot';
 
 const DEFAULT_VOTING_MODE = 'JURY_AND_TELEVOTE';
+
+const hasVoterChannels = (stage: Pick<EventStage, 'voterChannels'>): boolean =>
+  !!stage.voterChannels && Object.keys(stage.voterChannels).length > 0;
 const DEFAULT_ODDS = { juryOdds: 50, televoteOdds: 50 };
 const DEFAULT_RANDOMNESS_LEVEL = 50;
 const DEFAULT_POINTS_SPREAD = 50;
@@ -460,6 +463,9 @@ export function buildContestSnapshotFromStores() {
       ...(stage.votingCountries && stage.votingCountries.length > 0
         ? { voters: stage.votingCountries.map((v) => v.code) }
         : {}),
+      ...(hasVoterChannels(stage)
+        ? { voterChannels: stage.voterChannels }
+        : {}),
       ...stageOverridesPayload,
     };
 
@@ -553,7 +559,8 @@ export function buildContestSnapshotFromStores() {
         isDeepEqual(
           setupStage.voters || [],
           (stage.votingCountries || []).map((v) => v.code),
-        );
+        ) &&
+        isDeepEqual(setupStage.voterChannels, stage.voterChannels);
 
       if (isSameAsSetupWithoutParticipants) {
         const participants = getOrderedStageParticipantCodes(stage);
@@ -582,6 +589,9 @@ export function buildContestSnapshotFromStores() {
         qualifiesTo: stage.qualifiesTo,
         participants: getOrderedStageParticipantCodes(stage),
         voters: (stage.votingCountries || []).map((v) => v.code),
+        ...(hasVoterChannels(stage)
+          ? { voterChannels: stage.voterChannels }
+          : {}),
         isOver: !!stage.isOver,
         isJuryVoting: !!stage.isJuryVoting,
       };
@@ -905,6 +915,7 @@ export async function applyContestSnapshotToStores(
         qualifiesTo: s.qualifiesTo,
         countries: [],
         votingCountries: (s.voters || []).map(toVotingCountry),
+        ...(s.voterChannels ? { voterChannels: s.voterChannels } : {}),
         isOver: false, // Setup stages are never "over"
         isJuryVoting: (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY',
         runningOrder,
@@ -1090,6 +1101,9 @@ export async function applyContestSnapshotToStores(
             votingMode: (setupStage.votingMode || DEFAULT_VOTING_MODE) as any,
             qualifiesTo: setupStage.qualifiesTo,
             votingCountries: (setupStage.voters || []).map(toVotingCountry),
+            ...(setupStage.voterChannels
+              ? { voterChannels: setupStage.voterChannels }
+              : {}),
             isOver: isPresentationMode ? false : (s as any).isOver, // Runtime state
             isJuryVoting: (s as any).isJuryVoting, // Runtime state
             isLastStage: idx === arr.length - 1,
@@ -1119,6 +1133,7 @@ export async function applyContestSnapshotToStores(
           votingMode: (s.votingMode || DEFAULT_VOTING_MODE) as any,
           qualifiesTo: s.qualifiesTo,
           votingCountries: (s.voters || []).map(toVotingCountry),
+          ...(s.voterChannels ? { voterChannels: s.voterChannels } : {}),
           isOver: isPresentationMode ? false : s.isOver, // Preserve runtime state
           isJuryVoting:
             s.isJuryVoting !== undefined

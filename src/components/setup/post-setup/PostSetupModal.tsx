@@ -11,12 +11,15 @@ import EventStageVoters from './EventStageVoters';
 import {
   PostSetupFormContext,
   usePostSetupStageForm,
+  useWatchVoterChannels,
+  useWatchVotingCountries,
 } from './hooks/usePostSetupStageForm';
 import { useStageOddsOverrideDraft } from './hooks/useStageOddsOverrideDraft';
 import { useStagePointsOverrideDraft } from './hooks/useStagePointsOverrideDraft';
 import { RunningOrderTab, useRunningOrder } from './running-order';
 import StageGeneralTab from './StageGeneralTab';
 import StageOddsTab from './StageOddsTab';
+import { VoterChannelsErrorBar } from './VoterChannelsErrorBar';
 
 import { PlayIcon } from '@/assets/icons/PlayIcon';
 import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
@@ -27,6 +30,10 @@ import { EventStage, StageOverrides, StageVotingMode } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { createCountriesComparator } from '@/state/scoreboard/helpers';
+import {
+  filterVotersByChannel,
+  normalizeVoterChannels,
+} from '@/state/scoreboard/voterChannels';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 enum PostSetupModalTab {
@@ -114,6 +121,27 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     stage,
     isOpen,
   });
+  const watchedVotingCountries = useWatchVotingCountries(form);
+  const watchedVoterChannels = useWatchVoterChannels(form);
+
+  // Live validation: a Jury and Televote stage needs at least one voter per
+  // channel. Never raised in other modes, where per-voter channels are paused.
+  const channelError = useMemo<'jury' | 'televote' | null>(() => {
+    if (localVotingMode !== StageVotingMode.JURY_AND_TELEVOTE) return null;
+    if (watchedVotingCountries.length === 0) return null;
+
+    const hasVoterIn = (channel: 'jury' | 'televote') =>
+      filterVotersByChannel(
+        watchedVotingCountries,
+        channel,
+        watchedVoterChannels,
+      ).length > 0;
+
+    if (!hasVoterIn('jury')) return 'jury';
+    if (!hasVoterIn('televote')) return 'televote';
+
+    return null;
+  }, [localVotingMode, watchedVotingCountries, watchedVoterChannels]);
 
   const { controller, getOverride } = useStagePointsOverrideDraft(
     stage,
@@ -138,10 +166,27 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   );
 
   const handleSave = useCallback(() => {
-    const data = { votingCountries: form.getVotingCountries() };
+    const votingCountries = form.getVotingCountries();
+    const voterChannels = normalizeVoterChannels(
+      votingCountries,
+      form.getVoterChannels(),
+    );
+    const data = { votingCountries, voterChannels };
 
-    if (data.votingCountries.length === 0) {
-      toast.error('Please add at least one voter');
+    if (votingCountries.length === 0) {
+      toast.error(t('pleaseSelectAtLeastOneVotingCountry'));
+
+      return;
+    }
+
+    // The footer button is disabled while the error bar is up; this guards the
+    // "s" hotkey path with the same copy.
+    if (channelError) {
+      toast.error(
+        t.rich(channelError === 'jury' ? 'noJuryVoter' : 'noTelevoteVoter', {
+          b: (chunks) => <b>{chunks}</b>,
+        }),
+      );
 
       return;
     }
@@ -178,6 +223,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
           ? {
               ...s,
               votingCountries: data.votingCountries,
+              voterChannels: data.voterChannels,
               runningOrder,
               votingMode: localVotingMode,
               overrides: stageOverrides,
@@ -189,6 +235,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
           ? {
               ...s,
               votingCountries: data.votingCountries,
+              voterChannels: data.voterChannels,
               runningOrder,
               votingMode: localVotingMode,
               isJuryVoting: localVotingMode !== StageVotingMode.TELEVOTE_ONLY,
@@ -206,7 +253,9 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       onSave();
     }, 300);
   }, [
+    t,
     form,
+    channelError,
     onClose,
     orderedCodes,
     getOverride,
@@ -248,6 +297,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
             {(activeTab === PostSetupModalTab.VOTERS || isVotersLoaded) && (
               <EventStageVoters
                 stage={stage}
+                votingMode={localVotingMode}
                 onLoaded={() => setIsVotersLoaded(true)}
               />
             )}
@@ -315,12 +365,21 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
         />
       }
       bottomContent={
-        <ModalBottomContent
-          onClose={onClose}
-          onSave={handleSave}
-          saveButtonIcon={<PlayIcon className="size-4" />}
-          saveButtonText={t('startStage', { stageName: stage.name })}
-        />
+        <>
+          {channelError && (
+            <VoterChannelsErrorBar
+              channel={channelError}
+              onFix={() => form.setVoterChannels(undefined)}
+            />
+          )}
+          <ModalBottomContent
+            onClose={onClose}
+            onSave={handleSave}
+            saveButtonIcon={<PlayIcon className="size-4" />}
+            saveButtonText={t('startStage', { stageName: stage.name })}
+            saveButtonDisabled={!!channelError}
+          />
+        </>
       }
     >
       <h3 className="text-xl font-semibold text-white middle-line after:bg-primary-800 before:bg-primary-800">

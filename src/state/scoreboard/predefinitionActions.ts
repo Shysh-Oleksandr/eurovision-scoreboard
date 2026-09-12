@@ -7,6 +7,7 @@ import { useGeneralStore } from '../generalStore';
 import { resolveDiaspora } from './diaspora';
 import { resolveStageOdds, resolveStagePointsSystem } from './stageOverrides';
 import { ManualShareTotalsRow, ScoreboardState } from './types';
+import { getEffectiveVoterChannels } from './voterChannels';
 import { predefineStageVotes } from './votesPredefinition';
 
 // Helper function to calculate and store country points from predefined votes
@@ -111,7 +112,10 @@ export const createPredefinitionActions: StateCreator<
       allowMultiplePointsToSameEntry,
     } = resolveStagePointsSystem(stage, generalState);
 
-    const votingCountries = getStageVotingCountries(stage.id);
+    // The engine filters per channel itself, so hand it every voter.
+    const votingCountries = getStageVotingCountries(stage.id, {
+      channel: 'all',
+    });
 
     const predefinedVotes = predefineStageVotes(
       stage.countries,
@@ -124,6 +128,7 @@ export const createPredefinitionActions: StateCreator<
       televotePointsSystem,
       allowMultiplePointsToSameEntry,
       resolveDiaspora(diaspora),
+      getEffectiveVoterChannels(stage),
     );
 
     set((state) => ({

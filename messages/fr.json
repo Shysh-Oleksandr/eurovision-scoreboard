@@ -141,7 +141,22 @@
       "oddsOverrideNote": "Ces cotes s'appliquent uniquement à cette phase. Les cotes globales persistantes du concours se configurent dans Paramètres.",
       "resetToGlobalOdds": "Réinitialiser au global",
       "confirmCloseTitle": "Fermer la configuration de l'étape ?",
-      "confirmCloseDescription": "Les modifications non enregistrées seront perdues."
+      "confirmCloseDescription": "Les modifications non enregistrées seront perdues.",
+      "voterChannels": "Canaux de vote",
+      "voterChannelsHint": "Définissez le canal dans lequel chaque votant vote. Les porte-parole du jury suivent l’ordre de la liste.",
+      "jury": "Jury",
+      "televote": "Télévote",
+      "channelJuryOnly": "Jury uniquement",
+      "channelTelevoteOnly": "Télévote uniquement",
+      "voterChannelsDone": "Terminer la modification des canaux",
+      "voterChannelsHintShort": "Définissez le canal de chaque votant. Les porte-parole suivent l’ordre de la liste.",
+      "votesInJury": "Vote au jury",
+      "votesInTelevote": "Vote au télévote",
+      "lastChannelLocked": "Un votant doit avoir au moins un canal. Retirez le pays pour l’exclure.",
+      "voterChannelsPaused": "Cette étape est définie sur <b>{mode}</b> dans l’onglet Général, les canaux par votant sont donc en pause. Vos réglages de canaux enregistrés sont conservés et s’appliquent de nouveau en mode <b>{juryAndTelevote}</b>.",
+      "noJuryVoter": "Aucun votant n’est configuré pour voter au jury. Activez <b>J</b> pour au moins un votant, ou passez cette étape en <b>Télévote uniquement</b> dans l’onglet Général.",
+      "noTelevoteVoter": "Aucun votant n’est configuré pour voter au télévote. Activez <b>T</b> pour au moins un votant, ou passez cette étape en <b>Jury uniquement</b> dans l’onglet Général.",
+      "giveAllVotersBoth": "Donner les deux à tous"
     },
     "validation": {
       "noCountriesInStage": "Aucun pays dans {stageName}.",
@@ -1042,6 +1057,10 @@
       "votingCountries": {
         "title": "Pays votants",
         "content": "Dans l’onglet « Votants » de chaque étape, choisissez exactement quels pays votent pendant cette étape. Vous pouvez inclure ou exclure tout pays participant et éventuellement ajouter « Rest of the World » comme votant supplémentaire. Les ensembles de votants sont configurés par étape, donc les Demi-finales et la Grande Finale peuvent avoir des votants complètement différents. Si vous souhaitez utiliser les pays votants d’origine de l’année, cliquez sur le bouton « Charger les données de l’année »."
+      },
+      "voterChannels": {
+        "title": "Votants jury vs. télévote",
+        "content": "Dans une étape « Jury et Télévote », chaque votant vote par défaut dans les deux canaux, sauf « Rest of the World », qui vote uniquement au télévote. Appuyez sur le bouton « Canaux de vote » dans la barre d’outils des votants pour le modifier par votant : chaque pastille reçoit un interrupteur J (jury) et T (télévote), afin qu’un pays puisse voter au télévote mais pas au jury, et que « Rest of the World » puisse aussi recevoir un vote du jury. Les pastilles qui votent dans un seul canal affichent un petit badge. L’ordre des porte-parole du jury suit toujours l’ordre de la liste. Dans les autres modes de vote, ces réglages sont conservés mais mis en pause."
       },
       "runningOrder": {
         "title": "Ordre de départ",

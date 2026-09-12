@@ -9,6 +9,7 @@ import {
 import {
   StageId,
   type EventStage,
+  type VoterChannels,
   type VotingCountry,
 } from '../../../../models';
 import { useCountriesStore } from '../../../../state/countriesStore';
@@ -25,17 +26,25 @@ import { useCountriesStore } from '../../../../state/countriesStore';
 export interface PostSetupStageForm {
   getVotingCountries: () => VotingCountry[];
   setVotingCountries: (next: VotingCountry[]) => void;
+  getVoterChannels: () => VoterChannels | undefined;
+  setVoterChannels: (next: VoterChannels | undefined) => void;
   subscribe: (listener: () => void) => () => void;
 }
 
 const createFormStore = (): PostSetupStageForm => {
   let value: VotingCountry[] = [];
+  let voterChannels: VoterChannels | undefined;
   const listeners = new Set<() => void>();
 
   return {
     getVotingCountries: () => value,
     setVotingCountries: (next) => {
       value = next;
+      listeners.forEach((listener) => listener());
+    },
+    getVoterChannels: () => voterChannels,
+    setVoterChannels: (next) => {
+      voterChannels = next;
       listeners.forEach((listener) => listener());
     },
     subscribe: (listener) => {
@@ -71,6 +80,15 @@ export const useWatchVotingCountries = (
     form.subscribe,
     form.getVotingCountries,
     form.getVotingCountries,
+  );
+
+export const useWatchVoterChannels = (
+  form: PostSetupStageForm,
+): VoterChannels | undefined =>
+  useSyncExternalStore(
+    form.subscribe,
+    form.getVoterChannels,
+    form.getVoterChannels,
   );
 
 interface UsePostSetupStageFormProps {
@@ -115,6 +133,7 @@ export const usePostSetupStageForm = ({
     };
 
     form.setVotingCountries(getDefaultVotingCountries());
+    form.setVoterChannels(stage?.voterChannels);
   }, [stage, isOpen, form]);
 
   return form;

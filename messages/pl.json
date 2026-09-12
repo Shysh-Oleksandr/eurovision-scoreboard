@@ -141,7 +141,22 @@
       "oddsOverrideNote": "Te szanse dotyczą tylko tej fazy. Trwałe globalne szanse konkursu ustawia się w Ustawieniach.",
       "resetToGlobalOdds": "Przywróć globalne",
       "confirmCloseTitle": "Zamknąć konfigurację etapu?",
-      "confirmCloseDescription": "Niezapisane zmiany zostaną utracone."
+      "confirmCloseDescription": "Niezapisane zmiany zostaną utracone.",
+      "voterChannels": "Kanały głosowania",
+      "voterChannelsHint": "Ustaw kanał, w którym głosuje każdy głosujący. Rzecznicy jury zachowują kolejność listy.",
+      "jury": "Jury",
+      "televote": "Televote",
+      "channelJuryOnly": "Tylko Jury",
+      "channelTelevoteOnly": "Tylko Televote",
+      "voterChannelsDone": "Zakończ edycję kanałów",
+      "voterChannelsHintShort": "Ustaw kanał każdego głosującego. Rzecznicy zachowują kolejność listy.",
+      "votesInJury": "Głosuje w jury",
+      "votesInTelevote": "Głosuje w televote",
+      "lastChannelLocked": "Głosujący musi mieć co najmniej jeden kanał. Usuń kraj, aby go wykluczyć.",
+      "voterChannelsPaused": "Ten etap jest ustawiony na <b>{mode}</b> w zakładce Ogólne, więc kanały poszczególnych głosujących są wstrzymane. Zapisane ustawienia kanałów są zachowane i znów obowiązują w trybie <b>{juryAndTelevote}</b>.",
+      "noJuryVoter": "Żaden głosujący nie jest ustawiony do głosowania w jury. Włącz <b>J</b> dla co najmniej jednego głosującego albo przełącz ten etap na <b>Tylko Televote</b> w zakładce Ogólne.",
+      "noTelevoteVoter": "Żaden głosujący nie jest ustawiony do głosowania w televote. Włącz <b>T</b> dla co najmniej jednego głosującego albo przełącz ten etap na <b>Tylko Jury</b> w zakładce Ogólne.",
+      "giveAllVotersBoth": "Włącz oba wszystkim"
     },
     "validation": {
       "noCountriesInStage": "Brak krajów w {stageName}.",
@@ -1042,6 +1057,10 @@
       "votingCountries": {
         "title": "Kraje głosujące",
         "content": "W zakładce « Głosujący » każdego etapu wybierz dokładnie, które kraje głosują na tym etapie. Możesz uwzględnić lub wykluczyć dowolny kraj uczestniczący i opcjonalnie dodać « Rest of the World » jako dodatkowego głosującego. Zestawy głosujących są konfigurowane osobno na etap, więc Półfinały i Finał mogą mieć zupełnie innych głosujących. Aby użyć oryginalnych krajów głosujących z danego roku, kliknij « Załaduj dane roku »."
+      },
+      "voterChannels": {
+        "title": "Głosujący jury vs. televote",
+        "content": "Na etapie « Jury i Televote » każdy głosujący głosuje domyślnie w obu kanałach, z wyjątkiem « Rest of the World », które głosuje tylko w televote. Naciśnij przycisk « Kanały głosowania » na pasku głosujących, aby zmienić to dla każdego głosującego: każdy chip otrzymuje przełącznik J (jury) i T (televote), więc kraj może głosować w televote, ale nie w jury, a « Rest of the World » może też otrzymać głos jury. Chipy głosujące tylko w jednym kanale pokazują małą odznakę. Kolejność rzeczników jury nadal wynika z kolejności listy. W innych trybach głosowania te ustawienia są zachowane, ale wstrzymane."
       },
       "runningOrder": {
         "title": "Kolejność startowa",

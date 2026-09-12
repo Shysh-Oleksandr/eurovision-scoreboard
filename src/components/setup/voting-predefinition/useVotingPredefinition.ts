@@ -32,11 +32,22 @@ import {
   TargetField,
 } from '@/state/scoreboard/totalsToStageVotes';
 import { ManualShareTotalsRow, StageVotes } from '@/state/scoreboard/types';
-import { buildCombinedBallotsFromJuryTelevote, predefineStageVotes } from '@/state/scoreboard/votesPredefinition';
+import {
+  filterVotersByChannel,
+  getEffectiveVoterChannels,
+  isVoterInChannel,
+} from '@/state/scoreboard/voterChannels';
+import {
+  buildCombinedBallotsFromJuryTelevote,
+  predefineStageVotes,
+} from '@/state/scoreboard/votesPredefinition';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 type UseVotingPredefinitionArgs = {
-  stage: Pick<EventStage, 'id' | 'name' | 'votingMode' | 'overrides'> & {
+  stage: Pick<
+    EventStage,
+    'id' | 'name' | 'votingMode' | 'overrides' | 'voterChannels'
+  > & {
     countries: (BaseCountry | any)[];
   };
 };
@@ -70,12 +81,13 @@ const getInvalidVoterNames = (
   voters: Array<{ code: string; name: string }>,
   pointsSystem: Array<{ id: number }>,
   source: 'jury' | 'televote',
+  voterChannels?: EventStage['voterChannels'],
 ): string[] => {
   const expectedIds = pointsSystem.map((p) => p.id);
   const invalid: string[] = [];
 
   for (const voter of voters) {
-    if (source === 'jury' && voter.code === 'WW') continue;
+    if (!isVoterInChannel(voter.code, source, voterChannels)) continue;
 
     const arr = byVoter[voter.code] || [];
     const usedIds = arr.map((v) => v.pointsId);
@@ -96,6 +108,7 @@ const getInvalidVotersForVotes = (
   juryPointsSystem: Array<{ id: number }>,
   televotePointsSystem: Array<{ id: number }>,
   votingMode: StageVotingMode,
+  voterChannels?: EventStage['voterChannels'],
 ): string[] => {
   const invalid = new Set<string>();
 
@@ -109,6 +122,7 @@ const getInvalidVotersForVotes = (
       voters,
       juryPointsSystem,
       'jury',
+      voterChannels,
     ).forEach((name) => invalid.add(name));
   }
 
@@ -122,6 +136,7 @@ const getInvalidVotersForVotes = (
       voters,
       televotePointsSystem,
       'televote',
+      voterChannels,
     ).forEach((name) => invalid.add(name));
   }
 
@@ -239,10 +254,25 @@ export const useVotingPredefinition = ({
   const [lastStageVotingMode, setLastStageVotingMode] =
     useState<StageVotingMode | null>(effectiveVotingMode);
 
-  const votingCountries = getStageVotingCountries(
-    stage.id,
-    false,
-    selectedType !== StageVotingType.JURY,
+  // Overrides are paused outside Jury and Televote mode.
+  const voterChannels = getEffectiveVoterChannels({
+    votingMode: effectiveVotingMode,
+    voterChannels: stage.voterChannels,
+  });
+  // Every voter of the stage; the engine filters per channel itself.
+  const votingCountries = getStageVotingCountries(stage.id, {
+    fromScoreboard: false,
+    channel: 'all',
+  });
+  // Voters shown as columns on the selected tab.
+  const visibleVotingCountries = filterVotersByChannel(
+    votingCountries,
+    selectedType === StageVotingType.JURY
+      ? 'jury'
+      : selectedType === StageVotingType.TELEVOTE
+      ? 'televote'
+      : 'all',
+    voterChannels,
   );
 
   const isCombinedVoting = effectiveVotingMode === StageVotingMode.COMBINED;
@@ -340,6 +370,7 @@ export const useVotingPredefinition = ({
       effectiveTelevoteSystem,
       allowMultiplePointsToSameEntry,
       resolveDiaspora(diasporaSettings),
+      voterChannels,
     );
 
     if (isJuryOnly) {
@@ -414,6 +445,7 @@ export const useVotingPredefinition = ({
       orderedCodes: order,
       stageCountries: stage.countries,
       votingCountries,
+      voterChannels,
       target: rankTarget,
       votingMode: effectiveVotingMode,
       juryPointsSystem: pointsSystem,
@@ -508,6 +540,7 @@ export const useVotingPredefinition = ({
         ps,
         votingCountries,
         stage.countries.length,
+        voterChannels,
       ),
     }));
   };
@@ -526,6 +559,7 @@ export const useVotingPredefinition = ({
       targets,
       stageCountries: stage.countries,
       votingCountries,
+      voterChannels,
       votingMode: effectiveVotingMode,
       juryPointsSystem: pointsSystem,
       televotePointsSystem: effectiveTelevotePointsSystem,
@@ -920,7 +954,7 @@ export const useVotingPredefinition = ({
       }));
 
       for (const voter of votingCountries) {
-        if (mode === 'jury' && voter.code === 'WW') continue;
+        if (!isVoterInChannel(voter.code, mode, voterChannels)) continue;
 
         const arr: any[] = (votes as any)?.[mode]?.[voter.code] || [];
         const usedIds: number[] = arr.map((v) => v.pointsId as number);
@@ -1019,6 +1053,7 @@ export const useVotingPredefinition = ({
           nextVotes.jury ?? {},
           nextVotes.televote ?? {},
           pointsSystem,
+          voterChannels,
         );
       }
 
@@ -1034,6 +1069,7 @@ export const useVotingPredefinition = ({
           pointsSystem,
           effectiveTelevotePointsSystem,
           effectiveVotingMode,
+          voterChannels,
         ),
         skippedSections: result.skippedSections,
         unmatched: result.unmatched,
@@ -1045,6 +1081,7 @@ export const useVotingPredefinition = ({
       effectiveVotingMode,
       pointsSystem,
       stage.countries,
+      voterChannels,
       votes,
       votingCountries,
     ],
@@ -1144,7 +1181,10 @@ export const useVotingPredefinition = ({
     totalBadgeLabel,
     isTotalVoteType,
     isTotalOrCombinedVoteType,
-    votingCountries,
+    /** Voters shown as columns on the selected tab. */
+    votingCountries: visibleVotingCountries,
+    /** Every voter of the stage regardless of channel. */
+    allVotingCountries: votingCountries,
     voteTypeOptions,
     rankedCountries,
     // actions

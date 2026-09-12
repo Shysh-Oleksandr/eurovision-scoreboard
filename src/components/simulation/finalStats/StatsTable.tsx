@@ -50,13 +50,17 @@ const StatsTable: React.FC<StatsTableProps> = ({
 
   const cssVars = useBorderOpacity(!enableHover);
 
-  const isRestOfWorldVoting =
-    selectedVoteType === StageVotingType.TELEVOTE ||
-    selectedVoteType === 'Total';
-
   const votingCountries = getStageVotingCountries(
     selectedStageId ?? undefined,
-  ).filter((country) => country.code !== 'WW' || isRestOfWorldVoting);
+    {
+      channel:
+        selectedVoteType === StageVotingType.JURY
+          ? 'jury'
+          : selectedVoteType === StageVotingType.TELEVOTE
+          ? 'televote'
+          : 'all',
+    },
+  );
 
   return (
     <div

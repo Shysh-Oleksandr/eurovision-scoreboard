@@ -21,6 +21,7 @@ type Props = {
   style?: React.CSSProperties;
   animatedBorder?: boolean;
   'aria-label'?: string;
+  'aria-pressed'?: boolean;
 };
 
 const Button = ({
@@ -38,6 +39,7 @@ const Button = ({
   style,
   animatedBorder = false,
   'aria-label': ariaLabel,
+  'aria-pressed': ariaPressed,
 }: Props) => {
   const baseClasses =
     'lg:text-base md:text-base text-sm lg:px-5 md:px-4 sm:px-3 px-3 lg:py-3 py-[10px] font-medium uppercase rounded-[10px] shadow-lg transition-colors lg:leading-5 duration-300 bg-gradient-to-tr from-[20%] relative';
@@ -79,6 +81,7 @@ const Button = ({
       onClick={onClick}
       title={showTooltip ? undefined : title}
       aria-label={ariaLabel ?? (isIconOnly ? title : undefined)}
+      aria-pressed={ariaPressed}
       disabled={disabled || isLoading}
       style={style}
     >

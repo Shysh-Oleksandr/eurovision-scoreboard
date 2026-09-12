@@ -1104,7 +1104,7 @@ export const createVotingActions: StateCreator<
 
     const votingCountries = useCountriesStore
       .getState()
-      .getStageVotingCountries();
+      .getStageVotingCountries(undefined, { channel: 'televote' });
     let totalPoints = 0;
 
     for (const vc of votingCountries) {
@@ -1537,7 +1537,7 @@ export const createVotingActions: StateCreator<
     const televoteTotals: Record<string, number> = {};
     const votingCountries = useCountriesStore
       .getState()
-      .getStageVotingCountries();
+      .getStageVotingCountries(undefined, { channel: 'televote' });
 
     for (const votingCountry of votingCountries) {
       const votes = predefinedTelevoteVotes[votingCountry.code];

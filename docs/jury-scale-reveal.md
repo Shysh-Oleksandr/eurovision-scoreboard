@@ -154,7 +154,7 @@ so it would otherwise be silently lost.
 | Duplicate values in the points system | One step per item — grouping is by `pointsId`, never by value |
 | `allowMultiplePointsToSameEntry` | Handled by the group-by |
 | `COMBINED` stage | Reads `.combined` instead of `.jury`, as `giveJuryPoints` does |
-| Voters absent from the matrix (e.g. televote-only WW) | Skipped — awards iterate `getStageVotingCountries()`, not matrix keys |
+| Voters absent from the matrix (e.g. televote-only WW, or a voter set to "Televote only") | Skipped — awards iterate `getStageVotingCountries(…, { channel: 'jury' })`, not matrix keys |
 | Setting switched on mid-stage | `isJuryScaleRevealActive` refuses to take over once the default flow has put jury points on the board, so points are never re-awarded |
 
 ## When the board is on screen

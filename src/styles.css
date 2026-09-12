@@ -1510,3 +1510,33 @@ h6 {
     douze-fade-out 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53)
       var(--douze-name-out-delay) forwards;
 }
+
+/* Voter chips: the overhanging badge row is a size container so the channel
+   badge can drop "only" when the row is too tight for both badges. */
+.voter-badge-row {
+  container-type: inline-size;
+}
+
+.voter-channel-badge-short {
+  display: none;
+}
+
+@container (width <= 180px) {
+  .voter-channel-badge--televote .voter-channel-badge-full {
+    display: none;
+  }
+
+  .voter-channel-badge--televote .voter-channel-badge-short {
+    display: inline;
+  }
+}
+
+@container (width <= 120px) {
+  .voter-channel-badge--jury .voter-channel-badge-full {
+    display: none;
+  }
+
+  .voter-channel-badge--jury .voter-channel-badge-short {
+    display: inline;
+  }
+}

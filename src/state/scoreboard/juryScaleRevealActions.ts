@@ -226,7 +226,9 @@ export const createJuryScaleRevealActions: StateCreator<
       currentStage,
       useGeneralStore.getState(),
     );
-    const voters = useCountriesStore.getState().getStageVotingCountries();
+    const voters = useCountriesStore
+      .getState()
+      .getStageVotingCountries(undefined, { channel: 'jury' });
 
     return {
       state,

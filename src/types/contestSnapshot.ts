@@ -54,6 +54,8 @@ export interface ContestSnapshot {
       qualifiesTo?: Array<{ targetStageId: string; amount: number }>;
       participants: string[];
       voters?: string[];
+      /** Per-voter channel overrides (code -> mode); only non-default entries. */
+      voterChannels?: Record<string, 'both' | 'jury' | 'televote'>;
       overrides?: {
         pointsSystem?: {
           pointsSystem: Array<{
@@ -102,6 +104,7 @@ export interface ContestSnapshot {
       qualifiesTo?: Array<{ targetStageId: string; amount: number }>;
       participants: string[];
       voters?: string[];
+      voterChannels?: Record<string, 'both' | 'jury' | 'televote'>;
       isOver: boolean;
       isJuryVoting: boolean;
     }>;

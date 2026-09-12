@@ -141,7 +141,22 @@
       "oddsOverrideNote": "Queste quote si applicano solo a questa fase. Le quote globali persistenti del concorso sono impostate in Impostazioni.",
       "resetToGlobalOdds": "Ripristina a globali",
       "confirmCloseTitle": "Chiudere la configurazione della fase?",
-      "confirmCloseDescription": "Le modifiche non salvate andranno perse."
+      "confirmCloseDescription": "Le modifiche non salvate andranno perse.",
+      "voterChannels": "Canali di voto",
+      "voterChannelsHint": "Imposta il canale in cui vota ciascun votante. I portavoce della giuria seguono l'ordine della lista.",
+      "jury": "Giuria",
+      "televote": "Televoto",
+      "channelJuryOnly": "Solo Giuria",
+      "channelTelevoteOnly": "Solo Televoto",
+      "voterChannelsDone": "Termina modifica canali",
+      "voterChannelsHintShort": "Imposta il canale di ciascun votante. I portavoce seguono l'ordine della lista.",
+      "votesInJury": "Vota in giuria",
+      "votesInTelevote": "Vota nel televoto",
+      "lastChannelLocked": "Un votante deve avere almeno un canale. Rimuovi il paese per escluderlo.",
+      "voterChannelsPaused": "Questa fase è impostata su <b>{mode}</b> nella scheda Generale, quindi i canali per votante sono in pausa. Le impostazioni dei canali salvate vengono mantenute e si applicano di nuovo in modalità <b>{juryAndTelevote}</b>.",
+      "noJuryVoter": "Nessun votante è impostato per votare in giuria. Attiva <b>J</b> per almeno un votante, oppure passa questa fase a <b>Solo Televoto</b> nella scheda Generale.",
+      "noTelevoteVoter": "Nessun votante è impostato per votare nel televoto. Attiva <b>T</b> per almeno un votante, oppure passa questa fase a <b>Solo Giuria</b> nella scheda Generale.",
+      "giveAllVotersBoth": "Assegna entrambi a tutti"
     },
     "validation": {
       "noCountriesInStage": "Non ci sono paesi in {stageName}.",
@@ -1042,6 +1057,10 @@
       "votingCountries": {
         "title": "Paesi votanti",
         "content": "Nella scheda « Votanti » di ogni fase, scegli esattamente quali paesi votano in quella fase. Puoi includere o escludere qualsiasi paese partecipante e opzionalmente aggiungere « Rest of the World » come votante aggiuntivo. I set di votanti sono configurati per fase, quindi Semifinali e Finale possono avere votanti completamente diversi. Se vuoi usare i paesi votanti originali dell'anno, clicca sul pulsante « Carica dati anno »."
+      },
+      "voterChannels": {
+        "title": "Votanti giuria vs. televoto",
+        "content": "In una fase « Giuria e Televoto » ogni votante vota di default in entrambi i canali, tranne « Rest of the World », che vota solo nel televoto. Premi il pulsante « Canali di voto » nella barra dei votanti per cambiarlo per votante: ogni chip riceve un interruttore J (giuria) e T (televoto), così un paese può votare nel televoto ma non in giuria, e « Rest of the World » può ricevere anche un voto della giuria. I chip che votano in un solo canale mostrano un piccolo badge. L'ordine dei portavoce della giuria segue ancora quello della lista. Nelle altre modalità di voto queste impostazioni sono conservate ma in pausa."
       },
       "runningOrder": {
         "title": "Ordine di partenza",

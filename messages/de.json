@@ -141,7 +141,22 @@
       "oddsOverrideNote": "Diese Quoten gelten nur für diese Phase. Die persistenten globalen Wettbewerbsquoten werden in den Einstellungen festgelegt.",
       "resetToGlobalOdds": "Auf global zurücksetzen",
       "confirmCloseTitle": "Stage-Einrichtung schließen?",
-      "confirmCloseDescription": "Nicht gespeicherte Änderungen gehen verloren."
+      "confirmCloseDescription": "Nicht gespeicherte Änderungen gehen verloren.",
+      "voterChannels": "Wählerkanäle",
+      "voterChannelsHint": "Lege fest, in welchem Kanal jeder Wähler abstimmt. Die Jury-Sprecher folgen der Listenreihenfolge.",
+      "jury": "Jury",
+      "televote": "Televote",
+      "channelJuryOnly": "Nur Jury",
+      "channelTelevoteOnly": "Nur Televote",
+      "voterChannelsDone": "Kanäle bearbeiten beenden",
+      "voterChannelsHintShort": "Lege fest, in welchem Kanal jeder Wähler abstimmt. Sprecher folgen der Listenreihenfolge.",
+      "votesInJury": "Stimmt in der Jury ab",
+      "votesInTelevote": "Stimmt im Televote ab",
+      "lastChannelLocked": "Ein Wähler braucht mindestens einen Kanal. Entferne das Land, um es auszuschließen.",
+      "voterChannelsPaused": "Dieses Stage ist im Tab „Allgemein“ auf <b>{mode}</b> gesetzt, daher sind die Kanäle pro Wähler pausiert. Deine gespeicherten Kanaleinstellungen bleiben erhalten und gelten wieder im Modus <b>{juryAndTelevote}</b>.",
+      "noJuryVoter": "Kein Wähler ist für die Jury eingestellt. Aktiviere <b>J</b> für mindestens einen Wähler oder stelle dieses Stage im Tab „Allgemein“ auf <b>Nur Televoting</b>.",
+      "noTelevoteVoter": "Kein Wähler ist für das Televote eingestellt. Aktiviere <b>T</b> für mindestens einen Wähler oder stelle dieses Stage im Tab „Allgemein“ auf <b>Nur Jury</b>.",
+      "giveAllVotersBoth": "Allen Wählern beides geben"
     },
     "validation": {
       "noCountriesInStage": "Es gibt keine Länder in {stageName}.",
@@ -1040,6 +1055,10 @@
       "votingCountries": {
         "title": "Abstimmende Länder",
         "content": "Im Tab „Wähler“ jeder Show wählst du genau aus, welche Länder in dieser Show abstimmen. Du kannst jedes teilnehmende Land ein- oder ausschließen und optional „Rest of the World“ als zusätzlichen Wähler hinzufügen. Wählersets werden pro Show konfiguriert, sodass Halbfinals und Grand Final völlig unterschiedliche Wähler haben können. Wenn du die ursprünglichen Voting-Länder des Jahres nutzen möchtest, klicke auf „Jahresdaten laden“."
+      },
+      "voterChannels": {
+        "title": "Jury- vs. Televote-Wähler",
+        "content": "In einer Show „Jury und Televote“ stimmt jeder Wähler standardmäßig in beiden Kanälen ab, außer „Rest of the World“, das nur im Televote abstimmt. Drücke die Schaltfläche „Wählerkanäle“ in der Wähler-Leiste, um das pro Wähler zu ändern: jeder Chip erhält einen J- (Jury) und einen T-Schalter (Televote), sodass ein Land im Televote, aber nicht in der Jury abstimmen kann, und „Rest of the World“ ebenfalls eine Jury-Stimme erhalten kann. Chips, die nur in einem Kanal abstimmen, zeigen ein kleines Badge. Die Reihenfolge der Jury-Sprecher folgt weiterhin der Listenreihenfolge. In anderen Voting-Modi werden diese Einstellungen beibehalten, aber pausiert."
       },
       "runningOrder": {
         "title": "Startreihenfolge",

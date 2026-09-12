@@ -3,11 +3,13 @@ import {
   Country,
   PointsItem,
   StageVotingMode,
+  VoterChannels,
   VotingCountry,
 } from '../../models';
 
 import { RankChannel, totalsForChannels } from './rankToStageVotes';
 import { ManualShareTotalsRow, StageVotes, Vote } from './types';
+import { filterVotersByChannel } from './voterChannels';
 import { predefineStageVotes } from './votesPredefinition';
 
 /*
@@ -110,15 +112,14 @@ export const resolveTargetChannels = (
   };
 };
 
-// The jury channel skips the "WW" (Rest of the World) voter; televote/combined
-// include it, mirroring the loops in `predefineStageVotes`.
+// Only voters eligible for the channel award points (by default the "WW"
+// Rest of the World voter is televote-only), mirroring `predefineStageVotes`.
 const channelVoterCount = (
   channel: RankChannel,
   votingCountries: VotingCountry[],
+  voterChannels?: VoterChannels,
 ): number =>
-  channel === 'jury'
-    ? votingCountries.filter((v) => v.code !== 'WW').length
-    : votingCountries.length;
+  filterVotersByChannel(votingCountries, channel, voterChannels).length;
 
 export interface ChannelBudget {
   /** Voters awarding in this channel. */
@@ -143,8 +144,9 @@ export const computeChannelBudget = (
   pointsSystem: PointsItem[],
   votingCountries: VotingCountry[],
   participantsCount: number,
+  voterChannels?: VoterChannels,
 ): ChannelBudget => {
-  const voters = channelVoterCount(channel, votingCountries);
+  const voters = channelVoterCount(channel, votingCountries, voterChannels);
   const values = sortedValuesDesc(pointsSystem);
   // A voter can't award more distinct points than there are rival participants.
   const numAwardable = Math.max(
@@ -240,12 +242,9 @@ export const constructChannelTowardTargets = (
   channel: RankChannel,
   codes: string[],
   effectiveTargets: Record<string, number>,
+  voterChannels?: VoterChannels,
 ): Record<string, Vote[]> => {
-  // The jury channel skips "WW"; televote/combined include it.
-  const voters =
-    channel === 'jury'
-      ? votingCountries.filter((v) => v.code !== 'WW')
-      : votingCountries;
+  const voters = filterVotersByChannel(votingCountries, channel, voterChannels);
   const items = [...pointsSystem].sort((a, b) => b.value - a.value);
   const awarded: Record<string, number> = {};
 
@@ -297,6 +296,8 @@ export interface GenerateTargetVotesArgs {
   targets: Record<string, ManualShareTotalsRow>;
   stageCountries: (Country | BaseCountry)[];
   votingCountries: VotingCountry[];
+  /** Per-voter channel eligibility overrides (see `voterChannels.ts`). */
+  voterChannels?: VoterChannels;
   votingMode: StageVotingMode;
   juryPointsSystem: PointsItem[];
   televotePointsSystem: PointsItem[];
@@ -333,6 +334,7 @@ export const generateVotesForTargets = ({
   targets,
   stageCountries,
   votingCountries,
+  voterChannels,
   votingMode,
   juryPointsSystem,
   televotePointsSystem,
@@ -358,6 +360,7 @@ export const generateVotesForTargets = ({
       pointsSystem,
       votingCountries,
       participantsCount,
+      voterChannels,
     );
     const pinned: Record<string, number> = {};
 
@@ -395,6 +398,7 @@ export const generateVotesForTargets = ({
       televotePointsSystem,
       allowMultiplePointsToSameEntry,
       null, // diaspora off: the targets are explicit user intent
+      voterChannels,
     );
 
     nonTargetMerge.forEach((channel) => {
@@ -420,6 +424,7 @@ export const generateVotesForTargets = ({
       channel,
       codes,
       effectiveTargets,
+      voterChannels,
     );
     achievedByChannel[channel] = totalsForChannels(votes, [channel], codes);
   });

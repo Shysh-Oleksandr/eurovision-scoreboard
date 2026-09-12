@@ -45,8 +45,11 @@ uses depends on its `StageVotingMode`:
 **Validity contract** (`validateAllBeforeSave` in `useVotingPredefinition.ts`):
 every voter in every required channel must use each `pointsId` exactly once, on
 distinct non-self recipients. All three modes must produce matrices that satisfy
-this or Save is blocked. The `'WW'` ("Rest of the World") voter is skipped for
-jury but participates in televote/combined.
+this or Save is blocked. A voter is only checked in the channels it is eligible
+for (`isVoterInChannel` in `state/scoreboard/voterChannels.ts`): by default
+`'WW'` ("Rest of the World") is televote-only, and the stage's `voterChannels`
+overrides can make any voter jury-only / televote-only (see
+`docs/voter-channels.md`).
 
 The authored matrix is committed via `onSave(votes)` and stored in the scoreboard
 store's `predefinedVotes[stageId]`; the reveal animation replays it verbatim.
@@ -288,7 +291,8 @@ totals"), so the tab-dependent switch is no longer silent.
 
 ### Invariants any change here must preserve
 1. Every mode produces a matrix passing `validateAllBeforeSave` (each voter uses
-   each pointsId once, distinct non-self recipients; `WW` skipped for jury).
+   each pointsId once, distinct non-self recipients; voters ineligible for a
+   channel — by default `WW` for jury — are skipped, see `voterChannels.ts`).
 2. Total channel points always equal `voters × Σ(pointsSystem)` — you can't add or
    remove points, only move them between recipients.
 3. Totals: `blank ≠ 0`; infeasible targets are clamped and surfaced, never

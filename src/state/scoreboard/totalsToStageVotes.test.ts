@@ -141,6 +141,24 @@ describe('totalsToStageVotes', () => {
       ).toBe(9);
     });
 
+    it('honours per-voter channel overrides', () => {
+      const withWW: VotingCountry[] = [
+        ...votingCountries,
+        { code: 'WW', name: 'Rest of the World', flag: '' } as VotingCountry,
+      ];
+      // WW votes in both channels; AA is televote-only; BB is jury-only.
+      const voterChannels = { WW: 'both', AA: 'televote', BB: 'jury' } as const;
+
+      expect(
+        computeChannelBudget('jury', pointsSystem, withWW, 8, voterChannels)
+          .voters,
+      ).toBe(8);
+      expect(
+        computeChannelBudget('televote', pointsSystem, withWW, 8, voterChannels)
+          .voters,
+      ).toBe(8);
+    });
+
     it('shrinks awardable slots when there are fewer rivals than points', () => {
       // 3 participants -> a voter can only award 2 distinct points.
       const b = computeChannelBudget('jury', pointsSystem, votingCountries, 3);
@@ -257,6 +275,39 @@ describe('totalsToStageVotes', () => {
       expect(totalErr).toBeLessThanOrEqual(12);
       expect(achieved.AA).toBeGreaterThanOrEqual(achieved.BB);
       expect(achieved.BB).toBeGreaterThanOrEqual(achieved.CC);
+    });
+
+    it('only builds ballots for voters eligible in each channel', () => {
+      const withWW: VotingCountry[] = [
+        ...votingCountries,
+        { code: 'WW', name: 'Rest of the World', flag: '' } as VotingCountry,
+      ];
+      const voterChannels = { WW: 'both', AA: 'televote', BB: 'jury' } as const;
+      const targets = targetsFor('jury', { AA: 80 });
+
+      const { votes } = generateVotesForTargets({
+        targets: {
+          ...targets,
+          AA: { ...targets.AA, televote: 80 },
+        } as Record<string, ManualShareTotalsRow>,
+        stageCountries,
+        votingCountries: withWW,
+        voterChannels,
+        votingMode: StageVotingMode.JURY_AND_TELEVOTE,
+        juryPointsSystem: pointsSystem,
+        televotePointsSystem: pointsSystem,
+        randomnessLevel: 20,
+        pointsSpread: 60,
+      });
+
+      expect(Object.keys(votes.jury ?? {}).sort()).toEqual(
+        ['BB', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH', 'WW'].sort(),
+      );
+      expect(Object.keys(votes.televote ?? {}).sort()).toEqual(
+        ['AA', 'CC', 'DD', 'EE', 'FF', 'GG', 'HH', 'WW'].sort(),
+      );
+      assertBallotsValid(votes, 'jury');
+      assertBallotsValid(votes, 'televote');
     });
 
     it('clamps and reports adjustments for over-concentrated targets', () => {

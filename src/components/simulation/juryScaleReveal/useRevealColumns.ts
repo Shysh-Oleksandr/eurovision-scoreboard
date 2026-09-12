@@ -111,7 +111,7 @@ export const useRevealColumns = (): RevealModel => {
       pointsSystemSource,
     );
     const matrix = getJuryMatrix(stage, predefinedVotes);
-    const voters = getStageVotingCountries(stage.id);
+    const voters = getStageVotingCountries(stage.id, { channel: 'jury' });
     const voterByCode = new Map(voters.map((voter) => [voter.code, voter]));
     const scaleSteps = getScaleSteps(pointsSystem);
     const douzePointsIds = getDouzePointsIds(pointsSystem);
