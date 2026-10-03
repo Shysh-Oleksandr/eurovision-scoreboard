@@ -138,6 +138,7 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         containerClassName="!w-[min(100%,800px)]"
+        fullScreenOnPhone
         contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh]"
         overlayClassName="!z-[1001]"
         bottomContent={<ModalBottomCloseButton onClose={onClose} />}

@@ -1,6 +1,6 @@
 import './globals.css';
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import ReactDOM from 'react-dom';
 
 import Script from 'next/script';
@@ -37,6 +37,20 @@ const FOUC_FONT_STACKS_LITERAL = JSON.stringify(
     FONT_ALIAS_ALLOWLIST.map((a) => [a, getFontFamilyStackCss(a)]),
   ),
 );
+
+// `cover` lets the app paint behind the iOS home indicator, the landscape
+// notch and Android's gesture bar; `.safe-area-padding` and the full-screen
+// modals (`Modal` `fullScreenOnPhone`) pad their content back in. The status
+// bar stays opaque (`statusBarStyle: 'default'`, see useStatusBarThemeColor):
+// `black-translucent` gets an iOS 26 blur band and a bottom gap.
+// `themeColor` is the default (2026) theme's `--p-900` until the hook takes
+// over with the active theme's.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#544113',
+};
 
 export async function generateMetadata({
   params,

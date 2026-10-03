@@ -132,6 +132,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,750px)]"
+      fullScreenOnPhone
       contentClassName="!pt-3 sm:h-[75vh] h-[72vh] max-h-[72vh]"
       fixedHeight
       overlayClassName="!z-[1001]"

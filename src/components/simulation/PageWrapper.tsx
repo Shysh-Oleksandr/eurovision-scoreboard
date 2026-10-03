@@ -36,7 +36,7 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
 
   return (
     <div
-      className={`w-full h-full theme-default`}
+      className={`w-full h-full theme-default safe-area-padding`}
       id="main"
       style={{
         backgroundColor: theme.colors.appBgColor,

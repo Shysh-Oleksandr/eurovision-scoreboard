@@ -12,6 +12,7 @@ import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import { useShareLinks } from '@/hooks/useShareLinks';
+import { useStatusBarThemeColor } from '@/hooks/useStatusBarThemeColor';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -31,6 +32,7 @@ export default function AppBootstrap() {
   useActiveThemeSync();
   useActiveContestSync();
   useShareLinks();
+  useStatusBarThemeColor();
 
   const t = useTranslations('widgets.profile');
   const { handlePostLogin, user } = useAuthStore();

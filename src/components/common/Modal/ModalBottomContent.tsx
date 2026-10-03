@@ -28,37 +28,32 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
   const t = useTranslations('common');
 
   return (
-    <div
-      className={`flex items-center overflow-x-auto xs:gap-4 gap-2 bg-primary-900 p-4 z-30 ${
-        onDelete ? 'justify-between' : 'justify-end'
-      }`}
-    >
+    <div className="flex items-center gap-2.5 bg-primary-900 px-3.5 pt-[10px] pb-[calc(10px+var(--modal-safe-bottom,0px))] 2cols:px-5 z-30">
       {onDelete && (
         <Button
-          className="sm:!text-base text-sm"
           variant="destructive"
+          size="lg"
           onClick={onDelete}
           snowEffect="left"
-          Icon={<Trash2 className="w-5 h-5" />}
+          Icon={<Trash2 className="size-[18px]" />}
         >
           <span className="xs:block hidden">{t('delete')}</span>
         </Button>
       )}
-      <div
-        className={`flex justify-end xs:gap-4 gap-2 ${
-          !onDelete ? 'w-full' : ''
-        }`}
-      >
+      <div className="flex flex-1 min-w-0 justify-end gap-2.5">
         <Button
-          variant="secondary"
-          className="sm:!text-base text-sm"
+          variant="ghost"
+          size="lg"
+          className="px-[18px]"
           onClick={onClose}
           snowEffect="middle"
         >
           {t('cancel')}
         </Button>
         <Button
-          className="w-full sm:!text-base text-sm px-6 font-semibold justify-center"
+          variant="cta"
+          size="lg"
+          className="flex-1 min-w-0 justify-center gap-2 !uppercase !font-bold"
           onClick={onSave}
           isLoading={isSaving}
           disabled={isSaving || saveButtonDisabled}

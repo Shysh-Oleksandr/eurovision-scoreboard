@@ -5,7 +5,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 
-import { useContestGroupsQuery, useMyLeaderboardQuery, useUserLeaderboardQuery } from '@/api/contests';
+import {
+  useContestGroupsQuery,
+  useMyLeaderboardQuery,
+  useUserLeaderboardQuery,
+} from '@/api/contests';
 import { Checkbox } from '@/components/common/Checkbox';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
@@ -240,6 +244,7 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,960px)]"
+      fullScreenOnPhone
       contentClassName="text-white sm:h-[75vh] h-[70vh] max-h-[70vh] narrow-scrollbar sm:!py-6 !py-4"
       overlayClassName={overlayClassName}
       withBlur

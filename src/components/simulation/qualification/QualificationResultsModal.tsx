@@ -156,8 +156,13 @@ const QualificationResultsModal = () => {
       containerClassName="!w-[min(100%,500px)]"
       withBlur
       bottomContent={
-        <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 sm:p-4 p-2 z-30">
-          <Button variant="secondary" onClick={handleTriggerClose}>
+        <div className="flex items-center gap-2.5 bg-primary-900 px-3.5 pt-[10px] pb-[calc(10px+var(--modal-safe-bottom,0px))] 2cols:px-5 z-30">
+          <Button
+            variant="ghost"
+            size="lg"
+            className="px-[18px]"
+            onClick={handleTriggerClose}
+          >
             {t('common.close')}
           </Button>
           <Button
@@ -167,9 +172,10 @@ const QualificationResultsModal = () => {
                 handleContinue();
               }, ANIMATION_DURATION / 2);
             }}
-            animatedBorder
-            className="!flex flex-row-reverse flex-nowrap !text-sm md:!text-base w-full"
-            Icon={<ArrowRightIcon className="w-5 h-5" />}
+            variant="cta"
+            size="lg"
+            className="flex-1 min-w-0 flex-row-reverse justify-center !uppercase !font-bold"
+            Icon={<ArrowRightIcon className="size-[18px]" />}
           >
             {t('simulation.phaseActions.continueTo', {
               nextPhase: nextPhase ?? '',

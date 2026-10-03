@@ -363,6 +363,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,_95vw)]"
+      fullScreenOnPhone
       contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
       overlayClassName={countriesOverride ? '!z-[1003]' : '!z-[1001]'}
       withBlur

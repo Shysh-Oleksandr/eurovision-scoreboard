@@ -54,6 +54,7 @@ import { VotingRankView } from './VotingRankView';
 
 import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
 import SortAZIcon from '@/assets/icons/SortAZIcon';
+import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import { Tooltip } from '@/components/common/Tooltip';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
@@ -863,8 +864,9 @@ const VotingPredefinitionModal = ({
         onClose={onClickOutside}
         overlayClassName="!z-[1000]"
         // Fixed-height shell: the header and footer are pinned and only the body
-        // between them scrolls. Full-bleed below 640px, per the design.
-        containerClassName="!flex !flex-col !h-[min(720px,92vh)] max-sm:!h-[100dvh] max-sm:!mx-0 max-sm:!max-w-none max-sm:!rounded-none"
+        // between them scrolls. Full-bleed on phones, per the design.
+        containerClassName="!flex !flex-col !h-[min(720px,92vh)]"
+        fullScreenOnPhone
         contentClassName="!flex-1 !min-h-0 !px-4 sm:!px-5 !pt-0 !pb-1 text-white flex flex-col"
         topContent={
           <VotingPredefinitionHeader
@@ -904,19 +906,26 @@ const VotingPredefinitionModal = ({
           />
         }
         bottomContent={
-          <div className="z-30 flex items-center justify-end gap-2.5 border-t border-white/10 bg-black/[0.18] px-4 py-3 sm:px-5">
-            <VotingBarButton onClick={onClose}>
+          <div className="z-30 flex items-center gap-2.5 border-t border-white/10 bg-black/[0.18] px-3.5 pt-[10px] pb-[calc(10px+var(--modal-safe-bottom,0px))] sm:px-5">
+            <Button
+              variant="ghost"
+              size="lg"
+              className="px-[18px]"
+              onClick={onClose}
+            >
               {t('common.close')}
-            </VotingBarButton>
-            <VotingBarButton
-              variant="primary"
+            </Button>
+            <Button
+              variant="cta"
+              size="lg"
+              className="flex-1 min-w-0 justify-center !uppercase !font-bold"
               onClick={handleSave}
               disabled={!canSave}
               title={saveDisabledReason}
-              icon={<Check className="h-4 w-4" />}
+              Icon={<Check className="size-[18px]" />}
             >
               {tSetup('saveVotes')}
-            </VotingBarButton>
+            </Button>
           </div>
         }
       >

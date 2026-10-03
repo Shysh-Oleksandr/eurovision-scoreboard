@@ -216,7 +216,7 @@ export const CountryLens: React.FC<CountryLensProps> = ({ diaspora }) => {
       </div>
 
       {/* country header */}
-      <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-primary-800/50 px-3 py-2.5">
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-primary-800/50 px-3 py-2.5 2cols:flex-nowrap">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black/30">
           <RelFlag code={current} size={26} />
         </div>
@@ -224,7 +224,7 @@ export const CountryLens: React.FC<CountryLensProps> = ({ diaspora }) => {
           <div className="truncate text-base font-extrabold text-white">
             {countryName(current)}
           </div>
-          <div className="mt-0.5 text-[11.5px] text-white/40">
+          <div className="mt-0.5 truncate text-[11.5px] text-white/40">
             {t('favoredSnubbed', {
               favored: favors.length,
               snubbed: snubs.length,
@@ -234,6 +234,7 @@ export const CountryLens: React.FC<CountryLensProps> = ({ diaspora }) => {
         <RelSegmented<Direction>
           value={dir}
           onChange={setDir}
+          className="grid w-full grid-cols-2 2cols:inline-flex 2cols:w-auto"
           options={[
             { value: 'out', label: t('votesGiven') },
             { value: 'inc', label: t('votesGot') },

@@ -91,6 +91,11 @@ html[data-font='zodiak'] {
   --dp-font-family: Zodiak, serif;
 }
 
+/* Canvas colour behind overscroll and any area the app does not cover. */
+html {
+  background-color: var(--p-950);
+}
+
 html,
 body,
 #root {
@@ -663,6 +668,17 @@ h6 {
 
 #main {
   overflow: hidden auto;
+}
+
+/*
+ * The viewport is `viewport-fit=cover`, so full-page surfaces paint behind
+ * the home indicator, the landscape notch and Android's gesture bar; this
+ * keeps their content clear of them.
+ * Plain CSS (not a Tailwind layer) so it is never purged.
+ */
+.safe-area-padding {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 .triangle {
@@ -1493,8 +1509,7 @@ h6 {
 
   /* Cubic-bezier pairs approximate the previous GSAP eases:
      grow power1.out, shrink power2.in. */
-  animation:
-    douze-heart-grow var(--douze-grow-duration)
+  animation: douze-heart-grow var(--douze-grow-duration)
       cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--douze-grow-delay) both,
     douze-heart-shrink var(--douze-shrink-duration)
       cubic-bezier(0.55, 0.055, 0.675, 0.19) var(--douze-shrink-delay) forwards;
@@ -1505,8 +1520,7 @@ h6 {
 
   /* Fade-in at 0.3s; fade-out when the shrink phase starts (delay from TSX).
      Eases: power1.out in, power1.in out. */
-  animation:
-    douze-fade-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both,
+  animation: douze-fade-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both,
     douze-fade-out 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53)
       var(--douze-name-out-delay) forwards;
 }
@@ -1579,8 +1593,7 @@ h6 {
   .dp-surface-modal {
     background: linear-gradient(168deg, var(--p-900), var(--p-950) 92%);
     border: 1px solid var(--hair);
-    box-shadow:
-      0 24px 60px rgb(0 0 0 / 50%),
+    box-shadow: 0 24px 60px rgb(0 0 0 / 50%),
       inset 0 1px 0 rgb(255 255 255 / 6%);
   }
 
@@ -1600,27 +1613,25 @@ h6 {
     background: linear-gradient(
       180deg,
       oklch(calc(var(--cta-l) * 1%) var(--cta-c) var(--accent-h)),
-      oklch(calc((var(--cta-l) - 16) * 1%) calc(var(--cta-c) * 0.9) var(--accent-h))
+      oklch(
+        calc((var(--cta-l) - 16) * 1%) calc(var(--cta-c) * 0.9) var(--accent-h)
+      )
     );
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 30%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%),
       0 8px 20px color-mix(in oklch, var(--accent) 35%, transparent);
     color: var(--accent-ink);
-    text-shadow: 0 1px 2px
-      rgb(0 0 0 / calc(35% * (1 - var(--accent-ink-dark))));
+    text-shadow: 0 1px 2px rgb(0 0 0 / calc(35% * (1 - var(--accent-ink-dark))));
     letter-spacing: 0.07em;
     text-transform: uppercase;
-    transition:
-      transform 0.14s,
-      filter 0.14s;
+    transition: transform 0.14s, filter 0.14s;
   }
 
-  .dp-cta:hover {
+  .dp-cta:hover:not(:disabled) {
     filter: brightness(1.1);
     transform: translateY(-1px);
   }
 
-  .dp-cta:active {
+  .dp-cta:active:not(:disabled) {
     transform: translateY(1px) scale(0.995);
   }
 
@@ -1630,13 +1641,9 @@ h6 {
     border: 1px solid var(--hair-2);
     color: var(--ink);
     letter-spacing: -0.01em;
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 10%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%),
       0 3px 10px rgb(0 0 0 / 30%);
-    transition:
-      transform 0.14s,
-      filter 0.14s,
-      border-color 0.14s,
+    transition: transform 0.14s, filter 0.14s, border-color 0.14s,
       box-shadow 0.14s;
   }
 
@@ -1652,8 +1659,7 @@ h6 {
   .dp-act--strong {
     background: linear-gradient(180deg, var(--p-700), var(--p-750));
     border-color: rgb(255 255 255 / 24%);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 18%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%),
       0 4px 14px rgb(0 0 0 / 34%);
   }
 
@@ -1665,15 +1671,13 @@ h6 {
     );
     border-color: color-mix(in oklch, var(--accent-2) 60%, transparent);
     color: #fff;
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 28%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%),
       0 4px 14px color-mix(in oklch, var(--accent-2) 30%, transparent);
   }
 
   .dp-act.is-on {
     border-color: var(--accent);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 16%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 16%),
       0 0 0 2px color-mix(in oklch, var(--accent) 34%, transparent);
   }
 
@@ -1697,9 +1701,7 @@ h6 {
   .dp-combo {
     background: linear-gradient(180deg, var(--p-750), var(--p-800));
     border: 1px solid var(--hair-2);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 9%),
-      0 2px 8px rgb(0 0 0 / 25%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 9%), 0 2px 8px rgb(0 0 0 / 25%);
     transition: border-color 0.14s;
   }
 
@@ -1710,9 +1712,7 @@ h6 {
   .dp-combo-chip {
     color: var(--ink-40);
     border-left: 1px solid var(--hair);
-    transition:
-      background 0.14s,
-      color 0.14s;
+    transition: background 0.14s, color 0.14s;
   }
 
   .dp-combo-chip:hover:not(:disabled) {
@@ -1730,8 +1730,7 @@ h6 {
   }
 
   .dp-swatch {
-    box-shadow:
-      inset 0 0 0 2px rgb(255 255 255 / 28%),
+    box-shadow: inset 0 0 0 2px rgb(255 255 255 / 28%),
       0 0 10px color-mix(in oklch, var(--accent) 60%, transparent);
   }
 
@@ -1760,12 +1759,9 @@ h6 {
       var(--p-900) 78%
     );
     border: 1px solid color-mix(in oklch, var(--wt) 30%, transparent);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 10%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%),
       0 6px 18px rgb(0 0 0 / 30%);
-    transition:
-      transform 0.16s,
-      filter 0.16s;
+    transition: transform 0.16s, filter 0.16s;
   }
 
   .dp-widget:hover {
@@ -1784,8 +1780,7 @@ h6 {
       color-mix(in oklch, var(--wt) 88%, white 6%),
       color-mix(in oklch, var(--wt) 70%, black 18%)
     );
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 36%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 36%),
       0 4px 12px color-mix(in oklch, var(--wt) 22%, transparent);
   }
 
@@ -1802,8 +1797,7 @@ h6 {
       var(--p-900)
     );
     border: 1px solid color-mix(in oklch, var(--accent) 26%, var(--hair-2));
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 12%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%),
       0 10px 26px rgb(0 0 0 / 16%);
   }
 
@@ -1821,12 +1815,8 @@ h6 {
       var(--p-900) 72%
     );
     border: 1px solid var(--hair-2);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 8%),
-      0 8px 22px rgb(0 0 0 / 20%);
-    transition:
-      border-color 0.14s,
-      box-shadow 0.14s;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 8px 22px rgb(0 0 0 / 20%);
+    transition: border-color 0.14s, box-shadow 0.14s;
   }
 
   .dp-stage--final {
@@ -1845,9 +1835,7 @@ h6 {
     background: rgb(255 255 255 / 7%);
     border: 1px solid var(--hair);
     color: var(--ink-70);
-    transition:
-      background 0.14s,
-      color 0.14s;
+    transition: background 0.14s, color 0.14s;
   }
 
   .dp-count-pill:hover:not(:disabled) {
@@ -1859,10 +1847,7 @@ h6 {
     background: rgb(255 255 255 / 8%);
     border: 1px solid var(--hair);
     color: var(--ink-70);
-    transition:
-      transform 0.14s,
-      background 0.14s,
-      color 0.14s;
+    transition: transform 0.14s, background 0.14s, color 0.14s;
   }
 
   .dp-icon-btn:hover:not(:disabled) {
@@ -1902,11 +1887,7 @@ h6 {
     );
     border: 1px solid var(--hair);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%);
-    transition:
-      transform 0.13s,
-      border-color 0.13s,
-      filter 0.13s,
-      opacity 0.13s;
+    transition: transform 0.13s, border-color 0.13s, filter 0.13s, opacity 0.13s;
   }
 
   .dp-tile:hover {
@@ -1921,12 +1902,12 @@ h6 {
 
   .dp-tile.is-selected {
     border-color: var(--accent);
-    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 60%, transparent);
+    box-shadow: inset 0 0 0 1px
+      color-mix(in oklch, var(--accent) 60%, transparent);
   }
 
   .dp-tile-overlay {
-    box-shadow:
-      0 12px 30px rgb(0 0 0 / 55%),
+    box-shadow: 0 12px 30px rgb(0 0 0 / 55%),
       0 0 0 2px color-mix(in oklch, var(--accent) 45%, transparent);
     cursor: grabbing;
   }
@@ -1940,9 +1921,7 @@ h6 {
   .dp-check {
     border: 1.5px solid var(--ink-40);
     color: transparent;
-    transition:
-      background 0.13s,
-      border-color 0.13s;
+    transition: background 0.13s, border-color 0.13s;
   }
 
   .dp-tile.is-selected .dp-check {
@@ -1954,8 +1933,7 @@ h6 {
   /* Drop target highlight (stages, pool, categories, groups) */
   .dp-drop-on {
     border-color: var(--accent) !important;
-    box-shadow:
-      0 0 0 2px color-mix(in oklch, var(--accent) 45%, transparent),
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 45%, transparent),
       0 8px 22px rgb(0 0 0 / 30%) !important;
   }
 
@@ -1990,20 +1968,15 @@ h6 {
   .dp-pool {
     background: rgb(0 0 0 / 22%);
     border: 1px solid var(--hair);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 12%),
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%),
       0 10px 26px rgb(0 0 0 / 16%);
-    transition:
-      border-color 0.14s,
-      box-shadow 0.14s;
+    transition: border-color 0.14s, box-shadow 0.14s;
   }
 
   .dp-cat {
     background: rgb(255 255 255 / 3.5%);
     border: 1px solid var(--hair);
-    transition:
-      border-color 0.14s,
-      box-shadow 0.14s;
+    transition: border-color 0.14s, box-shadow 0.14s;
   }
 
   .dp-cat-body {
@@ -2013,9 +1986,7 @@ h6 {
   .dp-group {
     background: rgb(255 255 255 / 3%);
     border: 1px solid var(--hair);
-    transition:
-      border-color 0.14s,
-      box-shadow 0.14s;
+    transition: border-color 0.14s, box-shadow 0.14s;
   }
 
   .dp-search {

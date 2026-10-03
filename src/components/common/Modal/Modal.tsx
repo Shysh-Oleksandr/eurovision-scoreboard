@@ -10,6 +10,20 @@ import { useGeneralStore } from '@/state/generalStore';
 
 export const ANIMATION_DURATION = 200;
 
+/**
+ * `fullScreenOnPhone` below the `2cols` breakpoint: the box stretches to the
+ * overlay (the visible viewport, whatever browser bars or PWA mode leave),
+ * drops its margins/rounding, clears any top inset (none while the status
+ * bar is opaque, but cheap insurance), and exposes the home-indicator inset
+ * as `--modal-safe-bottom` for the footer (`ModalBottomContent`,
+ * `ModalBottomCloseButton`, …) to add to its padding, so the footer's own
+ * background runs to the screen edge.
+ */
+const FULL_SCREEN_CONTAINER =
+  'max-2cols:flex max-2cols:flex-col max-2cols:self-stretch max-2cols:!h-auto max-2cols:!mx-0 max-2cols:!max-w-none max-2cols:!rounded-none max-2cols:!border-0 max-2cols:[--modal-safe-bottom:env(safe-area-inset-bottom)]';
+const FULL_SCREEN_CONTENT =
+  'max-2cols:flex-1 max-2cols:min-h-0 max-2cols:!h-auto max-2cols:!max-h-none';
+
 interface ModalProps {
   isOpen: boolean;
   onClose?: () => void;
@@ -28,9 +42,9 @@ interface ModalProps {
   /** Skip the default primary gradient so the caller paints its own surface. */
   unstyledSurface?: boolean;
   /**
-   * Below the `2cols` breakpoint, stretch the box to the overlay's full height
-   * (the visible viewport, whatever browser bars or PWA mode leave) and let
-   * the content fill what `topContent` / `bottomContent` leave over.
+   * Below the `2cols` breakpoint, fill the whole screen edge to edge (see
+   * `FULL_SCREEN_CONTAINER`); the content takes what `topContent` /
+   * `bottomContent` leave over. For screen-like modals, not short dialogs.
    */
   fullScreenOnPhone?: boolean;
   ref?: React.RefObject<HTMLDivElement | null>;
@@ -108,14 +122,12 @@ const Modal: React.FC<ModalProps> = ({
         : '!max-h-[calc(80vh-100px)]';
     }
 
-    if (fullScreenOnPhone) {
-      return 'flex-1 min-h-0 md:!max-h-[calc(90vh-50px)] sm:!max-h-[calc(90vh-70px)] 2cols:!max-h-[calc(90vh-110px)]';
-    }
-
     return fixedHeight
       ? 'sm:!h-[calc(90vh-70px)] !h-[calc(90vh-110px)]'
       : 'md:!max-h-[calc(90vh-50px)] sm:!max-h-[calc(90vh-70px)] !max-h-[calc(90vh-110px)]';
-  }, [isMobileInLandscape, topContent, fixedHeight, fullScreenOnPhone]);
+  }, [isMobileInLandscape, topContent, fixedHeight]);
+
+  const hasWinterTopPadding = !!topContent && enableWinterEffects;
 
   if (!isMounted) {
     return null;
@@ -123,7 +135,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
-      className={`fixed inset-0 flex items-center justify-center z-[100] transition-colors duration-[200ms] ${
+      className={`fixed inset-0 flex items-center justify-center pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] z-[100] transition-colors duration-[200ms] ${
         isActive
           ? `bg-black bg-opacity-60 ${
               (blurModalBackground && withBlur) || shouldBlur
@@ -144,18 +156,24 @@ const Modal: React.FC<ModalProps> = ({
         } rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
           enableWinterEffects ? '' : 'overflow-hidden'
         } ${isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} ${
-          fullScreenOnPhone
-            ? 'flex flex-col self-stretch 2cols:block 2cols:self-auto'
-            : ''
+          hasWinterTopPadding ? 'pt-1' : ''
         } ${
-          topContent && enableWinterEffects ? 'pt-1' : ''
+          fullScreenOnPhone
+            ? `${FULL_SCREEN_CONTAINER} ${
+                hasWinterTopPadding
+                  ? 'max-2cols:pt-[calc(env(safe-area-inset-top)+0.25rem)]'
+                  : 'max-2cols:pt-[env(safe-area-inset-top)]'
+              }`
+            : ''
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}
         ref={ref}
       >
         {topContent}
         <div
-          className={`overflow-y-auto md:p-6 xs:p-5 p-3 py-5 narrow-scrollbar ${modalHeightStyle} ${contentClassName}`}
+          className={`overflow-y-auto md:p-6 xs:p-5 p-3 py-5 narrow-scrollbar ${modalHeightStyle} ${
+            fullScreenOnPhone ? FULL_SCREEN_CONTENT : ''
+          } ${contentClassName}`}
         >
           {enableWinterEffects && (
             <>

@@ -183,7 +183,10 @@ export default function ThemeSoundVolumeHud() {
   }
 
   return (
-    <div ref={rootRef} className="fixed bottom-5 right-5 z-[2000]">
+    <div
+      ref={rootRef}
+      className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-[calc(1.25rem+env(safe-area-inset-right))] z-[2000]"
+    >
       {/*
         Hover/leave only on this 44×44px hit box + absolutely positioned descendants (panel).
         Wide panel is out of flow so it does not extend the hover strip left of the icon.

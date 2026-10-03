@@ -133,6 +133,29 @@ surfaces can be reused elsewhere. `Modal` accepts `unstyledSurface` to skip its
 default gradient. Do not hardcode a font on these surfaces: they inherit the
 app's `--dp-font-family` slot.
 
+`Modal` also accepts `fullScreenOnPhone`. Below `2cols` the box stretches to the
+overlay, which is always exactly the visible viewport (browser bars, PWA mode),
+instead of relying on `vh` math that never matched the screen. The setup modal
+and the other screen-like modals (Settings, Themes, Contests, Profile,
+leaderboards, stats, share, theme editor, font picker, post-setup, voting
+predefinition) use it; short dialogs stay centred. The app runs with
+`viewport-fit=cover`, so the full-screen box pads its top by
+`env(safe-area-inset-top)` and exposes `--modal-safe-bottom`. The iOS status
+bar is the opaque `default` style tinted from `theme-color`, which
+`useStatusBarThemeColor` keeps on the active theme's `--p-900`:
+`black-translucent` gets an iOS 26 Liquid Glass blur band under the status bar
+and a standalone viewport that ends short of the bottom by the top inset
+(WebKit bug 301108).
+
+Modal footers follow the setup footer: `lg` (46px) ghost Close/Cancel and an
+`lg` `cta` primary action that takes the remaining width; `xl` stays reserved
+for the setup modal's Start. **A footer passed as `bottomContent` to a full-screen
+modal must add `var(--modal-safe-bottom, 0px)` to its bottom padding** (see
+`SetupFooter`, `ModalBottomContent`, `ModalBottomCloseButton`), or its buttons
+end up under the iOS home indicator / Android gesture bar. Full-page surfaces
+outside modals use the plain `.safe-area-padding` class (`#main`, About,
+Privacy).
+
 ### Breakpoints
 
 Tailwind arbitrary `max-[…]:` variants are **not** generated in this project

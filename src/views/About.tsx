@@ -4,7 +4,7 @@ import { ArrowIcon } from '@/assets/icons/ArrowIcon';
 
 const About = () => {
   return (
-    <div className="bg-gradient-to-br from-primary-950 text-white via-primary-900 to-primary-800 h-full overflow-y-auto">
+    <div className="bg-gradient-to-br from-primary-950 text-white via-primary-900 to-primary-800 h-full overflow-y-auto safe-area-padding">
       <div className="mx-auto px-4 py-8 max-w-4xl">
         <div className="bg-primary-800/50 backdrop-blur-sm rounded-2xl border border-primary-700/50 shadow-2xl overflow-hidden">
           <header className="bg-gradient-to-br from-primary-700/40 to-primary-800/60 px-8 py-6 border-b border-primary-700/30">

@@ -13,9 +13,11 @@ const ModalBottomCloseButton: React.FC<ModalBottomCloseButtonProps> = ({
   const t = useTranslations('common');
 
   return (
-    <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 lg:p-4 md:p-3 p-2 z-30">
+    <div className="flex items-center bg-primary-900 px-3.5 pt-[10px] pb-[calc(10px+var(--modal-safe-bottom,0px))] 2cols:px-5 z-30">
       <Button
-        className="md:text-base text-sm w-full"
+        variant="ghost"
+        size="lg"
+        className="w-full"
         onClick={onClose}
         snowEffect="left"
       >

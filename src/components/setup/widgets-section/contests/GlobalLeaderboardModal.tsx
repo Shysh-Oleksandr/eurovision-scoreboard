@@ -174,6 +174,7 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,960px)]"
+      fullScreenOnPhone
       contentClassName="text-white sm:h-[75vh] h-[70vh] max-h-[70vh] narrow-scrollbar sm:!py-6 !py-4"
       overlayClassName="!z-[1003]"
       withBlur

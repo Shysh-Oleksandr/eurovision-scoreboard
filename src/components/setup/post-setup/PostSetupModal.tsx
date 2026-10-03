@@ -355,6 +355,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       onClosed={onClose}
       overlayClassName="!z-[1002]"
       containerClassName="!w-[min(100%,800px)]"
+      fullScreenOnPhone
       contentClassName="h-[70vh] narrow-scrollbar !pt-2"
       topContent={
         <Tabs

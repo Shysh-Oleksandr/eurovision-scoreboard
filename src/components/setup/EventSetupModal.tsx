@@ -543,7 +543,7 @@ const EventSetupModal = () => {
         isOpen={eventSetupModalOpen}
         onClose={debouncedCanClose ? onClose : undefined}
         overlayClassName="!z-[1000]"
-        containerClassName="dp-hub dp-surface-modal w-full 2cols:w-[calc(100%-1.5rem)] !mx-0 2cols:!mx-6 md:!mx-10 !rounded-none 2cols:!rounded-2xl border-0 2cols:border md:max-w-6xl lg:max-w-6xl"
+        containerClassName="dp-hub dp-surface-modal 2cols:w-[calc(100%-1.5rem)] !rounded-2xl md:max-w-6xl lg:max-w-6xl"
         contentClassName="!p-3.5 2cols:!p-5 flex flex-col gap-3.5 2cols:gap-4 [&>*]:flex-none"
         unstyledSurface
         fullScreenOnPhone

@@ -191,6 +191,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,800px)]"
+      fullScreenOnPhone
       contentClassName="text-white sm:h-[75vh] h-[70vh] max-h-[70vh] narrow-scrollbar !py-4"
       overlayClassName={overlayClassName}
       withBlur

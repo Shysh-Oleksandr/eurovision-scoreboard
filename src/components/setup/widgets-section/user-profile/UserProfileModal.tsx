@@ -56,6 +56,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
         isOpen={isOpen}
         onClose={onClose}
         containerClassName="!w-[min(100%,750px)]"
+        fullScreenOnPhone
         fixedHeight
         overlayClassName="!z-[1100]"
         bottomContent={<ModalBottomCloseButton onClose={onClose} />}

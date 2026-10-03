@@ -130,6 +130,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,900px)] !max-w-[900px]"
+      fullScreenOnPhone
       contentClassName="!py-0 !px-2 text-white h-[70vh] narrow-scrollbar overscroll-none"
       overlayClassName="!z-[1001]"
       topContent={

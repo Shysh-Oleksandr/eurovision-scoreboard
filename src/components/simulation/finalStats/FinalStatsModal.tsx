@@ -235,6 +235,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,_95vw)]"
+      fullScreenOnPhone
       contentClassName="!py-4 !px-2 text-white sm:h-[75vh] h-[70vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       withBlur

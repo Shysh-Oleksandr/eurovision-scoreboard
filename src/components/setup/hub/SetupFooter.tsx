@@ -22,7 +22,7 @@ const SetupFooter = ({
   const t = useTranslations();
 
   return (
-    <div className="dp-surface-footer flex items-center gap-2.5 px-3.5 pt-[10px] 2cols:px-5 pb-[10px] z-30">
+    <div className="dp-surface-footer flex items-center gap-2.5 px-3.5 pt-[10px] 2cols:px-5 pb-[calc(10px+var(--modal-safe-bottom,0px))] z-30">
       {canClose && (
         <Button
           variant="ghost"

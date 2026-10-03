@@ -131,6 +131,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,_95vw)]"
+      fullScreenOnPhone
       contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}

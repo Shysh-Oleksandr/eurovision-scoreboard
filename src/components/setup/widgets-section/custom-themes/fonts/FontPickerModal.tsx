@@ -48,6 +48,7 @@ const FontPickerModal: React.FC<FontPickerModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,820px)]"
+      fullScreenOnPhone
       contentClassName="text-white sm:h-[72vh] h-[70vh] max-h-[72vh]"
       // Above the theme editor (1002) so it can be opened from inside it.
       overlayClassName="!z-[1003]"
