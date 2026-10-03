@@ -72,7 +72,8 @@
     "current": "Current",
     "dontShowAgain": "Don't show this again",
     "more": "More",
-    "share": "Share"
+    "share": "Share",
+    "done": "Done"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -196,7 +197,35 @@
       "areYouSureYouWantToSaveImportedEntriesDescription": "This will add the imported entries to your custom entries.",
       "customEntriesSavedSuccessfully": "Custom entries saved successfully!",
       "failedToSaveCustomEntries": "Failed to save custom entries. Please try again.",
-      "saveToYourCustomEntries": "Save to your custom entries"
+      "saveToYourCustomEntries": "Save to your custom entries",
+      "countryPool": "Country Pool",
+      "countryPoolSub": "{count} not participating · drag into a stage",
+      "contestSub": "{participants} participating · {stages, plural, =1 {# stage} other {# stages}}",
+      "unsavedChanges": "Unsaved changes",
+      "select": "Select",
+      "selecting": "Selecting",
+      "selectedCount": "{count} selected",
+      "moveTo": "Move to",
+      "moveToEllipsis": "Move to…",
+      "moveCountries": "Move {count, plural, =1 {# country} other {# countries}}",
+      "moveAllTo": "Move all to…",
+      "moveToGroup": "Move to group",
+      "editEntry": "Edit entry",
+      "dropCountriesHere": "Drop countries here",
+      "emptyDropHere": "Empty — drop countries here",
+      "noMatches": "No matches",
+      "movedTo": "{name} moved to {target}",
+      "countriesMoved": "{count, plural, =1 {# country} other {# countries}} moved",
+      "syncThemeToContestYear": "Sync theme to contest year",
+      "themeFollowsYear": "Theme follows the contest year",
+      "themeUnlinked": "Theme unlinked from the year",
+      "deleteSelectedEntries": "Delete {count, plural, =1 {# custom entry} other {# custom entries}}",
+      "stageIndexLabel": "Stage {index}",
+      "gfOnlyDisabledForSavedContest": "Not available while a saved contest is loaded",
+      "newEntry": "New entry",
+      "newGroup": "New group",
+      "groupOptions": "Group options",
+      "sendAllToPool": "Send all to pool"
     },
     "votingPredefinition": {
       "tabDetailed": "Detailed",
@@ -489,7 +518,7 @@
     "copyLink": "Copy link",
     "profile": {
       "title": "Profile",
-      "description": "Manage your profile and followers",
+      "description": "Your profile and followers",
       "continueWithGoogle": "Continue with Google",
       "editProfile": "Edit Profile",
       "authDescription": "Authenticate to be able to create a profile, use custom countries, and more.",
@@ -510,7 +539,8 @@
       "follow": "Follow",
       "signInToFollow": "Sign in to follow",
       "followedUser": "Followed user!",
-      "unfollowedUser": "Unfollowed user!"
+      "unfollowedUser": "Unfollowed user!",
+      "followingCount": "{count} following"
     },
     "contentType": {
       "all": "All",
@@ -539,7 +569,7 @@
     },
     "contests": {
       "title": "Contests",
-      "description": "Create contests or select public contests",
+      "description": "Create or browse public contests",
       "yourContests": "Your Contests",
       "publicContests": "Public Contests",
       "searchContests": "Search contests...",
@@ -665,11 +695,13 @@
         "searchPlaceholder": "Search countries...",
         "noEntriesMatch": "No entries match your search.",
         "customEntryName": "Custom entry"
-      }
+      },
+      "privateCount": "{count} private",
+      "publicCount": "{count} public"
     },
     "themes": {
       "title": "Themes",
-      "widgetDescription": "Create custom themes or select public themes",
+      "widgetDescription": "Create or browse public themes",
       "copyToFields": "Copy to fields",
       "copyToNFields": "Copy to {count} {count, plural, =1 {field} other {fields}}",
       "searchFields": "Search fields...",
@@ -938,7 +970,9 @@
         "signInToUpload": "Sign in to upload fonts and build your library.",
         "badge": "Font",
         "filterWithFonts": "With custom fonts"
-      }
+      },
+      "customCount": "{count} custom",
+      "savedCount": "{count} saved"
     },
     "sortBadges": {
       "latest": "Latest",
@@ -1035,7 +1069,7 @@
     "setup": {
       "yearData": {
         "title": "Year Selection & Official Data",
-        "content": "Use the top-left dropdown to pick an ESC edition (2004–2026) or a JESC edition (2016–2025). Selecting a year automatically loads the official lineup for that edition. The same dropdown also lets you quickly load one of your saved contests."
+        "content": "Use the top-left dropdown to pick an ESC edition (2004–2026), a JESC edition (2016–2026) or an ESC Asia edition (2026). Selecting a year automatically loads the official lineup for that edition. The same dropdown also lets you quickly load one of your saved contests."
       },
       "countryAssignment": {
         "title": "Country Assignment",

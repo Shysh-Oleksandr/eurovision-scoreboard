@@ -88,6 +88,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           onClose={() => setLeaderboardOpen(false)}
           userId={user._id}
           userName={user.name || user.username || undefined}
+          overlayClassName="!z-[1101]"
           onSelectEntry={(code) => {
             setEntryStatsCode(code);
             setEntryStatsOpen(true);
@@ -104,6 +105,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           onContestLoaded={() => setLeaderboardOpen(false)}
           entryCode={entryStatsCode}
           userId={user._id}
+          overlayClassName="!z-[1102]"
         />
       )}
     </>

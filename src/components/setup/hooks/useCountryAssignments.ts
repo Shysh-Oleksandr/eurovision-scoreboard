@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from 'react';
+import { useCallback, useLayoutEffect, useMemo } from 'react';
 
 import {
   BaseCountry,
@@ -6,8 +6,9 @@ import {
   EventStage,
 } from '../../../models';
 import { useCountriesStore } from '../../../state/countriesStore';
-import { useGeneralStore } from '@/state/generalStore';
 import { buildEventStagesFromAssignments } from '../utils/buildEventStagesFromAssignments';
+
+import { useGeneralStore } from '@/state/generalStore';
 
 export const useCountryAssignments = () => {
   const isGfOnly = useGeneralStore((state) => state.isGfOnly);
@@ -55,20 +56,18 @@ export const useCountryAssignments = () => {
           : CountryAssignmentGroup.NOT_PARTICIPATING;
       } else if (countryData?.isQualified || countryData?.isAutoQualified) {
         // For qualified countries, assign to the last stage (typically Grand Final)
-        const lastStage = configuredEventStages.sort(
+        const [lastStage] = configuredEventStages.sort(
           (a, b) => (b.order ?? 0) - (a.order ?? 0),
-        )[0];
+        );
+
         initialAssignments[country.code] = lastStage
           ? lastStage.id
           : CountryAssignmentGroup.NOT_PARTICIPATING;
+      } else if (isGfOnly && countryData) {
+        initialAssignments[country.code] = CountryAssignmentGroup.NOT_QUALIFIED;
       } else {
-        if (isGfOnly && countryData) {
-          initialAssignments[country.code] =
-            CountryAssignmentGroup.NOT_QUALIFIED;
-        } else {
-          initialAssignments[country.code] =
-            CountryAssignmentGroup.NOT_PARTICIPATING;
-        }
+        initialAssignments[country.code] =
+          CountryAssignmentGroup.NOT_PARTICIPATING;
       }
     });
 
@@ -84,33 +83,49 @@ export const useCountryAssignments = () => {
     isGfOnly,
   ]);
 
-  const handleCountryAssignment = (countryCode: string, group: string) => {
-    setEventAssignments({
-      ...eventAssignments,
-      [countryCode]: group,
-    });
-  };
+  // Handlers read the store directly so they keep a stable identity (memoized
+  // tiles depend on it) and never act on a stale assignments map.
+  const handleBulkCountryAssignmentByCodes = useCallback(
+    (countryCodes: string[], group: string) => {
+      const { eventAssignments: current, setEventAssignments: set } =
+        useCountriesStore.getState();
 
-  const handleBulkCountryAssignment = (
-    countries: BaseCountry[],
-    group: string,
-  ) => {
-    const countryCodes = countries.map((c) => c.code);
+      if (countryCodes.every((code) => current[code] === group)) return;
 
-    const newAssignments = { ...eventAssignments };
+      const newAssignments = { ...current };
 
-    countryCodes.forEach((code) => {
-      newAssignments[code] = group;
-    });
+      countryCodes.forEach((code) => {
+        newAssignments[code] = group;
+      });
 
-    setEventAssignments(newAssignments);
-  };
+      set(newAssignments);
+    },
+    [],
+  );
 
-  const getCountryGroupAssignment = (country: BaseCountry) => {
-    return (
-      eventAssignments[country.code] || CountryAssignmentGroup.NOT_PARTICIPATING
-    );
-  };
+  const handleCountryAssignment = useCallback(
+    (countryCode: string, group: string) => {
+      handleBulkCountryAssignmentByCodes([countryCode], group);
+    },
+    [handleBulkCountryAssignmentByCodes],
+  );
+
+  const handleBulkCountryAssignment = useCallback(
+    (countries: BaseCountry[], group: string) => {
+      handleBulkCountryAssignmentByCodes(
+        countries.map((c) => c.code),
+        group,
+      );
+    },
+    [handleBulkCountryAssignmentByCodes],
+  );
+
+  const getCountryGroupAssignment = useCallback(
+    (country: BaseCountry) =>
+      useCountriesStore.getState().eventAssignments[country.code] ||
+      CountryAssignmentGroup.NOT_PARTICIPATING,
+    [],
+  );
 
   const countryGroups = useMemo(() => {
     const allCountries = getAllCountries();
@@ -142,6 +157,7 @@ export const useCountryAssignments = () => {
     countryGroups,
     handleCountryAssignment,
     handleBulkCountryAssignment,
+    handleBulkCountryAssignmentByCodes,
     getCountryGroupAssignment,
     setAssignments: setEventAssignments,
     allAssignments: eventAssignments,

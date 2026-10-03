@@ -1,3 +1,9 @@
+import {
+  getInterfaceTokens,
+  INTERFACE_TOKEN_VARS,
+  interfaceTokensToCssVars,
+  InterfaceTokenVar,
+} from './oklch';
 import { getThemeForYear, getThemeBackground } from './themes';
 import { ThemeColors } from './types';
 
@@ -99,6 +105,29 @@ function buildPalettesFromHueAndShade(
     primary: buildPrimaryFromHsva(hsva),
     gray: buildGrayFromHsva(hsva),
   };
+}
+
+/**
+ * Interface tokens (`--prim-hue/-l/-c`, `--accent-h/-l/-c`) for a custom theme,
+ * read off its generated primary ramp so custom and built-in themes share the
+ * same basis (see src/theme/oklch.ts). The shade slider therefore lightens or
+ * darkens the Event Setup modal along with the rest of the theme.
+ */
+export function getCustomThemeInterfaceVars(
+  theme: Pick<CustomTheme, 'hue' | 'shadeValue'>,
+): Record<InterfaceTokenVar, string> {
+  const { primary } = buildPalettesFromHueAndShade(theme.hue, theme.shadeValue);
+
+  return interfaceTokensToCssVars(
+    getInterfaceTokens({ 800: primary[800], 900: primary[900] }),
+  );
+}
+
+/** `--prim-hue` for a custom theme (see `getCustomThemeInterfaceVars`). */
+export function getCustomThemePrimHue(
+  theme: Pick<CustomTheme, 'hue' | 'shadeValue'>,
+): number {
+  return Number(getCustomThemeInterfaceVars(theme)['--prim-hue']);
 }
 
 /**
@@ -262,7 +291,16 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     );
   }
 
+  const interfaceVars = getCustomThemeInterfaceVars(theme);
+
+  // The preview block carries its own interface tokens so the theme editor's
+  // surfaces follow the theme being edited, not the active one.
   const cssText = fontVarLines
+    .concat(
+      preview
+        ? Object.entries(interfaceVars).map(([k, v]) => `  ${k}: ${v};`)
+        : [],
+    )
     .concat(Object.entries(vars).map(([k, v]) => `  ${k}: ${v};`))
     .join('\n');
 
@@ -272,8 +310,11 @@ export function applyCustomTheme(theme: CustomTheme, preview = false): void {
     // Set theme attribute
     document.documentElement.setAttribute('data-theme', 'custom');
 
-    // Dynamic accent color — set --prim-hue so the global palette can derive from theme hue
-    document.documentElement.style.setProperty('--prim-hue', String(theme.hue));
+    // Theme-derived interface palette (tokens.css): inline beats the compiled
+    // [data-theme="YYYY"] rule while a custom theme is active.
+    Object.entries(interfaceVars).forEach(([k, v]) => {
+      document.documentElement.style.setProperty(k, v);
+    });
 
     // Apply background image if present
     if (theme.backgroundImageUrl) {
@@ -314,6 +355,11 @@ export function clearCustomTheme(): void {
   if (document.documentElement.getAttribute('data-theme') === 'custom') {
     document.documentElement.removeAttribute('data-theme');
   }
+
+  // Let the built-in theme's compiled interface-token rule take over again.
+  INTERFACE_TOKEN_VARS.forEach((name) => {
+    document.documentElement.style.removeProperty(name);
+  });
 
   // Clear background styles
   document.body.style.backgroundImage = '';

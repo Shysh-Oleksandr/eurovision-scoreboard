@@ -25,6 +25,7 @@ export const SYNCED_SETTINGS_KEYS = [
   'diaspora',
   // display / UI
   'shouldShowHeartFlagIcon',
+  'syncThemeWithContest',
   'alwaysShowRankings',
   'showRankChangeIndicator',
   'showQualificationModal',

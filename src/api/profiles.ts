@@ -5,7 +5,7 @@ import { queryKeys } from './queryKeys';
 
 import type { UserPreferences } from '@/state/syncedSettings';
 import { useAuthStore } from '@/state/useAuthStore';
-import type { Profile } from '@/types/profile';
+import type { Profile, ProfileSummary } from '@/types/profile';
 
 export type UpdateProfileInput = Partial<
   Pick<Profile, 'username' | 'name' | 'country' | 'preferredLocale'>
@@ -42,6 +42,19 @@ export function useMeProfileQuery(enabled = true) {
       return data as Profile;
     },
     enabled,
+  });
+}
+
+export function useMyProfileSummaryQuery(enabled = true) {
+  return useQuery<ProfileSummary>({
+    queryKey: queryKeys.user.profileSummary(),
+    queryFn: async () => {
+      const { data } = await api.get('/profiles/me/summary');
+
+      return data as ProfileSummary;
+    },
+    enabled,
+    staleTime: 60_000,
   });
 }
 

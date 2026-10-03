@@ -1540,3 +1540,520 @@ h6 {
     display: inline;
   }
 }
+
+/* ==========================================================================
+   Design-system components (`dp-*`) — theme-derived surfaces.
+   Colours come from src/design-system/tokens.css (--p-*, --accent,
+   --accent-2, --gold, --ink-*, --hair*), which follow the active theme's
+   interface tokens (`--prim-hue/-l/-c`, `--accent-h/-l/-c`). Everything Tailwind can express stays in JSX; only
+   gradients, color-mix() and pseudo-elements live here.
+   ========================================================================== */
+@layer components {
+  /* Tile min widths by viewport (auto-fill grids reflow continuously) */
+  .dp-hub {
+    --tmin: 140px;
+    --pmin: 130px;
+  }
+
+  @media (width >= 576px) {
+    .dp-hub {
+      --tmin: 168px;
+      --pmin: 132px;
+    }
+  }
+
+  @media (width >= 900px) {
+    .dp-hub {
+      --tmin: 180px;
+      --pmin: 136px;
+    }
+  }
+
+  @media (width >= 1180px) {
+    .dp-hub {
+      --tmin: 180px;
+      --pmin: 140px;
+    }
+  }
+
+  .dp-surface-modal {
+    background: linear-gradient(168deg, var(--p-900), var(--p-950) 92%);
+    border: 1px solid var(--hair);
+    box-shadow:
+      0 24px 60px rgb(0 0 0 / 50%),
+      inset 0 1px 0 rgb(255 255 255 / 6%);
+  }
+
+  .dp-surface-footer {
+    background: linear-gradient(180deg, var(--p-900), var(--p-950));
+    border-top: 1px solid var(--hair);
+  }
+
+  /* --- Start CTA: the accent at two lightnesses, the bottom 16 L% below
+     the top (mirrored by getCtaStops() in src/theme/oklch.ts, which picks the
+     ink). Light accents keep their lightness and get dark ink instead of
+     being darkened to mustard for white text. --- */
+  .dp-cta {
+    --cta-l: var(--accent-l);
+    --cta-c: calc(var(--accent-c) * 0.85);
+
+    background: linear-gradient(
+      180deg,
+      oklch(calc(var(--cta-l) * 1%) var(--cta-c) var(--accent-h)),
+      oklch(calc((var(--cta-l) - 16) * 1%) calc(var(--cta-c) * 0.9) var(--accent-h))
+    );
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 30%),
+      0 8px 20px color-mix(in oklch, var(--accent) 35%, transparent);
+    color: var(--accent-ink);
+    text-shadow: 0 1px 2px
+      rgb(0 0 0 / calc(35% * (1 - var(--accent-ink-dark))));
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    transition:
+      transform 0.14s,
+      filter 0.14s;
+  }
+
+  .dp-cta:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  .dp-cta:active {
+    transform: translateY(1px) scale(0.995);
+  }
+
+  /* --- Filled action buttons --- */
+  .dp-act {
+    background: linear-gradient(180deg, var(--p-750), var(--p-800));
+    border: 1px solid var(--hair-2);
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 10%),
+      0 3px 10px rgb(0 0 0 / 30%);
+    transition:
+      transform 0.14s,
+      filter 0.14s,
+      border-color 0.14s,
+      box-shadow 0.14s;
+  }
+
+  .dp-act:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.14);
+  }
+
+  .dp-act:active:not(:disabled) {
+    transform: translateY(1px) scale(0.985);
+  }
+
+  .dp-act--strong {
+    background: linear-gradient(180deg, var(--p-700), var(--p-750));
+    border-color: rgb(255 255 255 / 24%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 18%),
+      0 4px 14px rgb(0 0 0 / 34%);
+  }
+
+  .dp-act--feedback {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--accent-2) 72%, white 4%),
+      color-mix(in oklch, var(--accent-2) 52%, black 12%)
+    );
+    border-color: color-mix(in oklch, var(--accent-2) 60%, transparent);
+    color: #fff;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 28%),
+      0 4px 14px color-mix(in oklch, var(--accent-2) 30%, transparent);
+  }
+
+  .dp-act.is-on {
+    border-color: var(--accent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 16%),
+      0 0 0 2px color-mix(in oklch, var(--accent) 34%, transparent);
+  }
+
+  .dp-dot {
+    position: relative;
+  }
+
+  .dp-dot::after {
+    content: '';
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent-2) 70%, #000);
+  }
+
+  /* --- Header combos (selector + chip) --- */
+  .dp-combo {
+    background: linear-gradient(180deg, var(--p-750), var(--p-800));
+    border: 1px solid var(--hair-2);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 9%),
+      0 2px 8px rgb(0 0 0 / 25%);
+    transition: border-color 0.14s;
+  }
+
+  .dp-combo:hover {
+    border-color: rgb(255 255 255 / 26%);
+  }
+
+  .dp-combo-chip {
+    color: var(--ink-40);
+    border-left: 1px solid var(--hair);
+    transition:
+      background 0.14s,
+      color 0.14s;
+  }
+
+  .dp-combo-chip:hover:not(:disabled) {
+    background: rgb(255 255 255 / 10%);
+    color: #fff;
+  }
+
+  .dp-combo-chip:active:not(:disabled) {
+    transform: scale(0.94);
+  }
+
+  .dp-combo-chip.is-on {
+    background: color-mix(in oklch, var(--accent) 26%, transparent);
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  .dp-swatch {
+    box-shadow:
+      inset 0 0 0 2px rgb(255 255 255 / 28%),
+      0 0 10px color-mix(in oklch, var(--accent) 60%, transparent);
+  }
+
+  /* --- Widget cards (tone set by .dp-tone-*) --- */
+  .dp-tone-blue {
+    --wt: var(--accent-2);
+    --wt-ink: var(--accent-2-ink);
+  }
+
+  .dp-tone-pink {
+    --wt: var(--accent);
+    --wt-ink: var(--accent-ink);
+  }
+
+  .dp-tone-gold {
+    --wt: var(--gold);
+    --wt-ink: #fff;
+  }
+
+  /* Tints mix in oklab: a straight line through gray, so a blue accent on a
+     gold surface does not sweep through green the way an oklch hue mix does. */
+  .dp-widget {
+    background: linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--wt) 26%, var(--p-800)),
+      var(--p-900) 78%
+    );
+    border: 1px solid color-mix(in oklch, var(--wt) 30%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 10%),
+      0 6px 18px rgb(0 0 0 / 30%);
+    transition:
+      transform 0.16s,
+      filter 0.16s;
+  }
+
+  .dp-widget:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+  }
+
+  .dp-widget:active {
+    transform: translateY(0) scale(0.99);
+  }
+
+  .dp-widget-icon {
+    color: var(--wt-ink, #fff);
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--wt) 88%, white 6%),
+      color-mix(in oklch, var(--wt) 70%, black 18%)
+    );
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 36%),
+      0 4px 12px color-mix(in oklch, var(--wt) 22%, transparent);
+  }
+
+  .dp-widget-stat {
+    color: color-mix(in oklch, var(--wt) 62%, white);
+  }
+
+  /* --- Contest card --- */
+  .dp-contest-card {
+    background: linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--accent) 30%, var(--p-800)),
+      color-mix(in oklab, var(--accent-2) 16%, var(--p-900)) 70%,
+      var(--p-900)
+    );
+    border: 1px solid color-mix(in oklch, var(--accent) 26%, var(--hair-2));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 12%),
+      0 10px 26px rgb(0 0 0 / 16%);
+  }
+
+  .dp-badge-pill {
+    background: var(--p-800);
+    border: 1px solid var(--hair-2);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
+  }
+
+  /* --- Stage cards --- */
+  .dp-stage {
+    background: linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--accent-2) 13%, var(--p-800)),
+      var(--p-900) 72%
+    );
+    border: 1px solid var(--hair-2);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 8%),
+      0 8px 22px rgb(0 0 0 / 20%);
+    transition:
+      border-color 0.14s,
+      box-shadow 0.14s;
+  }
+
+  .dp-stage--final {
+    background: linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--gold) 15%, var(--p-800)),
+      var(--p-900) 72%
+    );
+  }
+
+  .dp-stage--muted {
+    background: linear-gradient(150deg, var(--p-800), var(--p-900) 72%);
+  }
+
+  .dp-count-pill {
+    background: rgb(255 255 255 / 7%);
+    border: 1px solid var(--hair);
+    color: var(--ink-70);
+    transition:
+      background 0.14s,
+      color 0.14s;
+  }
+
+  .dp-count-pill:hover:not(:disabled) {
+    background: rgb(255 255 255 / 13%);
+    color: #fff;
+  }
+
+  .dp-icon-btn {
+    background: rgb(255 255 255 / 8%);
+    border: 1px solid var(--hair);
+    color: var(--ink-70);
+    transition:
+      transform 0.14s,
+      background 0.14s,
+      color 0.14s;
+  }
+
+  .dp-icon-btn:hover:not(:disabled) {
+    background: rgb(255 255 255 / 16%);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  .dp-icon-btn:active:not(:disabled) {
+    transform: translateY(1px) scale(0.96);
+  }
+
+  .dp-icon-btn.is-on {
+    background: color-mix(in oklch, var(--accent) 50%, transparent);
+    border-color: color-mix(in oklch, var(--accent) 60%, transparent);
+    color: #fff;
+  }
+
+  .dp-tile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--tmin, 180px), 1fr));
+    gap: 7px;
+  }
+
+  .dp-pool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--pmin, 136px), 1fr));
+    gap: 7px;
+  }
+
+  /* --- Country tile (the whole tile is the control) --- */
+  .dp-tile {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--p-750) 92%, transparent),
+      var(--p-800)
+    );
+    border: 1px solid var(--hair);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%);
+    transition:
+      transform 0.13s,
+      border-color 0.13s,
+      filter 0.13s,
+      opacity 0.13s;
+  }
+
+  .dp-tile:hover {
+    transform: translateY(-1px);
+    border-color: var(--hair-2);
+    filter: brightness(1.12);
+  }
+
+  .dp-tile.is-dragging {
+    opacity: 0.4;
+  }
+
+  .dp-tile.is-selected {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 60%, transparent);
+  }
+
+  .dp-tile-overlay {
+    box-shadow:
+      0 12px 30px rgb(0 0 0 / 55%),
+      0 0 0 2px color-mix(in oklch, var(--accent) 45%, transparent);
+    cursor: grabbing;
+  }
+
+  .dp-flag-gen {
+    background: linear-gradient(180deg, var(--p-700), var(--p-750));
+    border: 1px solid var(--hair-2);
+    color: var(--ink-55);
+  }
+
+  .dp-check {
+    border: 1.5px solid var(--ink-40);
+    color: transparent;
+    transition:
+      background 0.13s,
+      border-color 0.13s;
+  }
+
+  .dp-tile.is-selected .dp-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* Drop target highlight (stages, pool, categories, groups) */
+  .dp-drop-on {
+    border-color: var(--accent) !important;
+    box-shadow:
+      0 0 0 2px color-mix(in oklch, var(--accent) 45%, transparent),
+      0 8px 22px rgb(0 0 0 / 30%) !important;
+  }
+
+  .dp-empty {
+    border: 1px dashed var(--hair-2);
+    color: var(--ink-40);
+  }
+
+  /* Qualifiers divider */
+  .dp-qual-div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink-40);
+  }
+
+  .dp-qual-div::before,
+  .dp-qual-div::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--hair);
+  }
+
+  .dp-qual-chip {
+    background: rgb(255 255 255 / 6%);
+    border: 1px dashed var(--hair-2);
+    color: var(--ink-70);
+  }
+
+  /* --- Country pool --- */
+  .dp-pool {
+    background: rgb(0 0 0 / 22%);
+    border: 1px solid var(--hair);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 12%),
+      0 10px 26px rgb(0 0 0 / 16%);
+    transition:
+      border-color 0.14s,
+      box-shadow 0.14s;
+  }
+
+  .dp-cat {
+    background: rgb(255 255 255 / 3.5%);
+    border: 1px solid var(--hair);
+    transition:
+      border-color 0.14s,
+      box-shadow 0.14s;
+  }
+
+  .dp-cat-body {
+    content-visibility: auto;
+  }
+
+  .dp-group {
+    background: rgb(255 255 255 / 3%);
+    border: 1px solid var(--hair);
+    transition:
+      border-color 0.14s,
+      box-shadow 0.14s;
+  }
+
+  .dp-search {
+    background: rgb(0 0 0 / 25%);
+    border: 1px solid var(--hair);
+    color: var(--ink-40);
+    transition: border-color 0.14s;
+  }
+
+  .dp-search:focus-within {
+    border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+  }
+
+  /* --- Selection tray --- */
+  .dp-tray {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--accent) 34%, var(--p-800)),
+      var(--p-900)
+    );
+    border: 1px solid color-mix(in oklch, var(--accent) 40%, transparent);
+    box-shadow: 0 -6px 24px rgb(0 0 0 / 35%);
+  }
+
+  /* --- Menus (no entrance animation: a fade-in reads as a delayed click).
+     A step below the modal's darkest surface, tinted by the theme. --- */
+  .dp-menu {
+    background: linear-gradient(
+      180deg,
+      var(--p-950),
+      color-mix(in oklch, var(--p-950) 70%, black)
+    );
+    border: 1px solid var(--hair-2);
+    box-shadow: 0 18px 44px rgb(0 0 0 / 60%);
+  }
+
+  .dp-toast-like {
+    background: #0d0912;
+    border: 1px solid var(--hair-2);
+  }
+}

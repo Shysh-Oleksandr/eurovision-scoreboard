@@ -1,4 +1,5 @@
 'use client';
+import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -53,7 +54,15 @@ type CustomSelectProps = {
   dropdownFooter?: CustomSelectDropdownFooterRender | React.ReactNode;
   /** When the search yields no matches, optional replacement (e.g. “use this year” button). Return null to show default “no options”. */
   emptyFilterContent?: CustomSelectEmptyFilterContent;
+  /**
+   * `combo`: borderless 46px trigger for the Event Setup header combos
+   * (the parent `ComboField` paints the surface and label).
+   */
+  variant?: 'default' | 'combo';
 };
+
+const COMBO_TRIGGER_CLASSES =
+  'h-[46px] w-full flex items-center gap-2 px-3 cursor-pointer text-[14.5px] font-extrabold tracking-[-.01em] text-white hover:bg-white/5 transition-colors';
 
 const getThemeColor = (year: string) => {
   const theme = themes[year as Year];
@@ -68,6 +77,7 @@ const SelectDisplay: React.FC<{
   selectClassName?: string;
   customThemeColor?: string;
   withIndicator?: boolean;
+  variant?: 'default' | 'combo';
 }> = ({
   value,
   options,
@@ -75,8 +85,43 @@ const SelectDisplay: React.FC<{
   selectClassName,
   customThemeColor,
   withIndicator = true,
+  variant = 'default',
 }) => {
   const selectedOption = options.find((option) => option.value === value);
+
+  if (variant === 'combo') {
+    return (
+      <div className={`${COMBO_TRIGGER_CLASSES} ${selectClassName ?? ''}`}>
+        {withIndicator &&
+          (selectedOption?.imageUrl ? (
+            <img
+              loading="lazy"
+              src={selectedOption.imageUrl}
+              alt={selectedOption.label}
+              className={`w-6 h-6 flex-none object-cover ${
+                getImageClassName?.(selectedOption, 'display') ?? ''
+              }`}
+              width={24}
+              height={24}
+              onError={(e) => {
+                e.currentTarget.src = getFlagPath('ww');
+              }}
+            />
+          ) : (
+            <span
+              className="dp-swatch w-[22px] h-[22px] rounded-full flex-none"
+              style={{
+                backgroundColor:
+                  customThemeColor ??
+                  getThemeColor(selectedOption?.value ?? ''),
+              }}
+            ></span>
+          ))}
+        <span className="truncate min-w-0">{selectedOption?.label}</span>
+        <ChevronDown className="ml-auto size-4 flex-none text-white/40" />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -158,8 +203,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   withIndicator = true,
   dropdownFooter,
   emptyFilterContent,
+  variant = 'default',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const isCombo = variant === 'combo';
   const selectRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
@@ -408,7 +455,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   const renderTouchSelect = () => (
     <div className="flex flex-col gap-2">
-      <SelectContainer className={className}>
+      <SelectContainer className={`${isCombo ? '!min-w-0' : ''} ${className}`}>
         <SelectDisplay
           value={value}
           options={groups ? groups.flatMap((g) => g.options) : options}
@@ -416,6 +463,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           selectClassName={selectClassName}
           customThemeColor={customThemeColor}
           withIndicator={withIndicator}
+          variant={variant}
         />
         <select
           value={value}
@@ -454,7 +502,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   );
 
   const renderDesktopSelect = () => (
-    <SelectContainer className={`z-30 ${className}`}>
+    <SelectContainer
+      className={`${isCombo ? '!min-w-0' : 'z-30'} ${className}`}
+    >
       <div
         ref={selectRef}
         onMouseDown={(e) => {
@@ -479,7 +529,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       >
         {isOpen ? (
           // While open, show an input in place of the display so users can search immediately.
-          <div className="select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between">
+          <div
+            className={
+              isCombo
+                ? COMBO_TRIGGER_CLASSES
+                : 'select h-12 lg:!text-base !text-sm lg:px-5 sm:px-4 px-3 lg:py-3 !pl-2 py-[10px] w-full flex items-center justify-between'
+            }
+          >
             <div className="flex items-center w-full">
               <input
                 ref={searchInputRef}
@@ -495,9 +551,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                 className="w-full bg-transparent outline-none text-white placeholder:text-white/70"
               />
             </div>
-            <ArrowIcon
-              className={`text-white w-7 h-7 rotate-90 absolute lg:right-2.5 sm:right-2 right-1`}
-            />
+            {isCombo ? (
+              <ChevronDown className="ml-auto size-4 flex-none text-white/40" />
+            ) : (
+              <ArrowIcon
+                className={`text-white w-7 h-7 rotate-90 absolute lg:right-2.5 sm:right-2 right-1`}
+              />
+            )}
           </div>
         ) : (
           <SelectDisplay
@@ -507,6 +567,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             selectClassName={selectClassName}
             customThemeColor={customThemeColor}
             withIndicator={withIndicator}
+            variant={variant}
           />
         )}
         {isOpen &&
@@ -515,7 +576,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               <div
                 ref={dropdownRef}
                 style={dropdownStyle}
-                className={`bg-[var(--p-800)]/95 backdrop-blur-sm rounded-[12px] border border-[var(--hair)] shadow-[var(--shadow-menu)] bg-primary-800/30 ${
+                className={`bg-[var(--p-800)]/95 backdrop-blur-sm rounded-[12px] border border-[var(--hair)] shadow-[var(--shadow-menu)] bg-primary-800/60 ${
                   dropdownFooter
                     ? 'flex flex-col max-h-[min(300px,calc(100vh-120px))] overflow-hidden'
                     : 'max-h-[300px] overflow-y-auto'

@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
 import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
@@ -14,6 +15,15 @@ import { useShareLinks } from '@/hooks/useShareLinks';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
+
+// Dev-only palette tuning panel (`?palette`, see /dev/palette-lab). The branch
+// is constant-false in production builds, so the chunk is compiled out.
+const PaletteDevPanel =
+  process.env.NODE_ENV === 'development'
+    ? dynamic(() => import('@/components/dev/palette/PaletteDevPanel'), {
+        ssr: false,
+      })
+    : null;
 
 export default function AppBootstrap() {
   useFullscreen();
@@ -39,7 +49,7 @@ export default function AppBootstrap() {
       localStorage.setItem(initKey, 'true');
       setInitialCountriesForYear('2026', {
         force: true,
-        isJuniorContest: false,
+        contestType: 'esc',
       });
     }
   }, [setInitialCountriesForYear]);
@@ -110,5 +120,10 @@ export default function AppBootstrap() {
     })();
   }, [user?.preferredLocale, router]);
 
-  return <ThemeSoundVolumeHud />;
+  return (
+    <>
+      <ThemeSoundVolumeHud />
+      {PaletteDevPanel && <PaletteDevPanel />}
+    </>
+  );
 }

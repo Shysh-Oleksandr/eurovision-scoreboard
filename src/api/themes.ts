@@ -335,6 +335,7 @@ export function useCreateThemeMutation() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
 }
@@ -369,6 +370,7 @@ export function useDeleteThemeMutation() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
       qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
 }
@@ -507,6 +509,7 @@ export function useToggleSaveThemeMutation() {
       // Update saved list and state; this won't shift public list
       qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
       qc.invalidateQueries({ queryKey: ['user', 'themes-state'] });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
 }

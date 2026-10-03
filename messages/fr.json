@@ -72,7 +72,8 @@
     "current": "Actuel",
     "dontShowAgain": "Ne pas afficher à nouveau",
     "more": "Plus",
-    "share": "Partager"
+    "share": "Partager",
+    "done": "Terminé"
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",
@@ -198,7 +199,35 @@
       "areYouSureYouWantToSaveImportedEntriesDescription": "Cela ajoutera les entrées importées à vos entrées personnalisées.",
       "customEntriesSavedSuccessfully": "Entrées personnalisées enregistrées avec succès !",
       "failedToSaveCustomEntries": "Erreur lors de l’enregistrement des entrées personnalisées. Veuillez réessayer.",
-      "saveToYourCustomEntries": "Enregistrer dans vos entrées personnalisées"
+      "saveToYourCustomEntries": "Enregistrer dans vos entrées personnalisées",
+      "countryPool": "Réserve de pays",
+      "countryPoolSub": "{count} ne participent pas · glissez dans une étape",
+      "contestSub": "{participants} participants · {stages, plural, =1 {# étape} other {# étapes}}",
+      "unsavedChanges": "Modifications non enregistrées",
+      "select": "Sélectionner",
+      "selecting": "Sélection",
+      "selectedCount": "{count} sélectionnés",
+      "moveTo": "Déplacer vers",
+      "moveToEllipsis": "Déplacer vers…",
+      "moveCountries": "Déplacer {count, plural, =1 {# pays} other {# pays}}",
+      "moveAllTo": "Tout déplacer vers…",
+      "moveToGroup": "Déplacer vers un groupe",
+      "editEntry": "Modifier l'entrée",
+      "dropCountriesHere": "Déposez les pays ici",
+      "emptyDropHere": "Vide — déposez des pays ici",
+      "noMatches": "Aucun résultat",
+      "movedTo": "{name} déplacé vers {target}",
+      "countriesMoved": "{count, plural, =1 {# pays déplacé} other {# pays déplacés}}",
+      "syncThemeToContestYear": "Synchroniser le thème avec l'année du concours",
+      "themeFollowsYear": "Le thème suit l'année du concours",
+      "themeUnlinked": "Thème dissocié de l'année",
+      "deleteSelectedEntries": "Supprimer {count, plural, =1 {# entrée personnalisée} other {# entrées personnalisées}}",
+      "stageIndexLabel": "Étape {index}",
+      "gfOnlyDisabledForSavedContest": "Indisponible lorsqu'un concours enregistré est chargé",
+      "newEntry": "Nouvelle entrée",
+      "newGroup": "Nouveau groupe",
+      "groupOptions": "Options du groupe",
+      "sendAllToPool": "Tout envoyer dans la réserve"
     },
     "votingPredefinition": {
       "tabDetailed": "Détaillé",
@@ -494,7 +523,7 @@
     "copyLink": "Copier le lien",
     "profile": {
       "title": "Profil",
-      "description": "Gérez votre profil et vos paramètres",
+      "description": "Votre profil et vos abonnés",
       "continueWithGoogle": "Continuer avec Google",
       "editProfile": "Modifier le profil",
       "authDescription": "Authentifiez-vous pour pouvoir créer un profil, utiliser des pays personnalisés et plus encore.",
@@ -515,7 +544,8 @@
       "followedUser": "Suivi avec succès !",
       "unfollowedUser": "Suivi avec succès !",
       "follow": "Suivre",
-      "signInToFollow": "Connectez-vous pour suivre"
+      "signInToFollow": "Connectez-vous pour suivre",
+      "followingCount": "{count} abonnements"
     },
     "contentType": {
       "all": "Tout",
@@ -544,7 +574,7 @@
     },
     "contests": {
       "title": "Concours",
-      "description": "Créer des concours ou sélectionner des concours publics",
+      "description": "Créez des concours ou parcourez les concours publics",
       "yourContests": "Vos concours",
       "publicContests": "Concours publics",
       "searchContests": "Rechercher des concours...",
@@ -668,11 +698,13 @@
         "searchPlaceholder": "Rechercher des pays...",
         "noEntriesMatch": "Aucune participation ne correspond à votre recherche.",
         "customEntryName": "Entrée personnalisée"
-      }
+      },
+      "privateCount": "{count} privés",
+      "publicCount": "{count} publics"
     },
     "themes": {
       "title": "Thèmes",
-      "widgetDescription": "Créez des thèmes personnalisés ou sélectionnez des thèmes publics",
+      "widgetDescription": "Créez des thèmes ou parcourez les thèmes publics",
       "copyToFields": "Copier vers les champs",
       "copyToNFields": "Copier vers {count} {count, plural, =1 {champ} other {champs}}",
       "searchFields": "Rechercher des champs...",
@@ -939,7 +971,9 @@
         "signInToUpload": "Connectez-vous pour téléverser des polices et constituer votre bibliothèque.",
         "badge": "Police",
         "filterWithFonts": "Avec polices personnalisées"
-      }
+      },
+      "customCount": "{count} personnalisés",
+      "savedCount": "{count} enregistrés"
     },
     "sortBadges": {
       "latest": "Plus récent",
@@ -1036,7 +1070,7 @@
     "setup": {
       "yearData": {
         "title": "Sélection de l’année et données officielles",
-        "content": "Utilisez le menu déroulant en haut à gauche pour choisir une édition ESC (2004–2026) ou JESC (2016–2025). La sélection d’une année charge automatiquement la lineup officielle de cette édition. Le même menu permet aussi de charger rapidement l’un de vos concours enregistrés."
+        "content": "Utilisez le menu déroulant en haut à gauche pour choisir une édition ESC (2004–2026), JESC (2016–2026) ou ESC Asia (2026). La sélection d’une année charge automatiquement la lineup officielle de cette édition. Le même menu permet aussi de charger rapidement l’un de vos concours enregistrés."
       },
       "countryAssignment": {
         "title": "Attribution des pays",

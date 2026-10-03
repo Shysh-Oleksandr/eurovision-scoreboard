@@ -19,7 +19,7 @@ Three principles guide every decision:
 ## 2. Color
 
 ### Dynamic palette (OKLCH)
-The full dark palette and accent color are derived from a single CSS variable `--prim-hue` (0–360°) that is updated via JS when a theme is applied. This ensures every hue looks equally vivid at every background lightness — something HSL cannot guarantee.
+The full dark palette and accent color are derived from a few bare-number CSS variables read off the active theme's primary ramp — `--prim-hue` (0–360°), `--prim-l`, `--prim-c` and `--accent-h/-l/-c` — emitted per built-in theme at build time and set via JS when a custom theme is applied. See `docs/event-setup-hub-and-design-tokens.md` for the exact derivation; the values below are the hue-300 defaults.
 
 ```
 --p-950  oklch( 8%  0.06  H)   deepest background, behind modals
@@ -28,8 +28,9 @@ The full dark palette and accent color are derived from a single CSS variable `-
 --p-750  oklch(21%  0.13  H)   elevated surface, active tab
 --p-700  oklch(25%  0.14  H)   avatar background, raised elements
 
---accent  oklch(65%  0.28  H+55°)   primary accent — always vivid, readable
---accent-2 oklch(60%  0.22  H−40°)  secondary accent — calmer
+--accent    hand-picked per theme / auto curve   primary accent (src/theme/interfaceAccents.ts)
+--accent-2  hand-picked per theme / auto curve   secondary accent — calmer
+--accent-ink  white, or deep on-hue for light accents (gold, lime, mint)
 ```
 
 Default hue: **300** (deep purple, the DouzePoints brand hue).

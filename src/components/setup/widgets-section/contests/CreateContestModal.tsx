@@ -23,6 +23,7 @@ import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { TextareaField } from '@/components/common/TextareaField';
 import { Tooltip } from '@/components/common/Tooltip';
 import { DEFAULT_HOSTING_COUNTRY_CODE } from '@/data/data';
+import { markContestSetupClean } from '@/helpers/contestFingerprint';
 import {
   applyContestSnapshotToStores,
   buildContestSnapshotFromStores,
@@ -250,6 +251,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           contest,
           !overwriteContestSetupAndResults,
         );
+        markContestSetupClean();
       }
 
       onClose();

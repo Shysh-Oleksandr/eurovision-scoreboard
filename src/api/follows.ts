@@ -95,6 +95,7 @@ export function useFollowMutation() {
       qc.invalidateQueries({
         queryKey: ['follows', 'followers', targetId],
       });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
 }
@@ -114,6 +115,7 @@ export function useUnfollowMutation() {
       qc.invalidateQueries({
         queryKey: ['follows', 'followers', targetId],
       });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
 }

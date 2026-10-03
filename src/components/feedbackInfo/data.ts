@@ -409,6 +409,11 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-10-03',
+    title:
+      '<list><item>Redesigned the setup modal. Added a custom accent color for each theme</item><item>Added the option to assign participants via drag-and-drop</item><item>Added JESC 2026 and the Eurovision Asia 2026 lineups</item><item>Moved Canada to the All-Time Participants category</item></list>',
+  },
+  {
     date: '2026-09-06',
     title:
       '<list><item>Jury and televote can have different voters: press "Voter channels" in the Voters tab of a "Jury and Televote" stage and toggle J / T per country</item><item>Rest of the World can now vote in the jury too (switch its J toggle on)</item></list>',
@@ -462,18 +467,11 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-09-12', end: '2026-09-13' },
-    title:
-      'Splitting voting countries: Televote and Juries can have their own countries',
+    approximateDates: { start: '2026-10-04', end: '2026-10-11' },
+    title: 'Allocation draw',
   },
   {
     approximateDates: { start: '2026-07-12', end: '2026-07-13' },
     title: 'Redesign some parts of the app',
-  },
-  {
-    title: 'Allocation draw',
-  },
-  {
-    title: 'Updated default themes (2016-2025)',
   },
 ];

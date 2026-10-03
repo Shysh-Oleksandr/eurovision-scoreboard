@@ -109,7 +109,7 @@ const OverflowMenu: React.FC<OverflowMenuProps> = ({ items, className }) => {
           <div
             ref={menuRef}
             style={menuStyle}
-            className="bg-black bg-gradient-to-t from-primary-900/60 to-primary-800/50 border border-white/[0.16] rounded-xl p-1.5 min-w-[188px] shadow-2xl"
+            className="bg-gradient-to-b from-primary-900 to-primary-950 border border-white/[0.16] rounded-xl p-1.5 min-w-[188px] shadow-2xl"
             onMouseDown={(e) => e.stopPropagation()}
           >
             {items.map((item, index) => {

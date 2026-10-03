@@ -52,6 +52,8 @@ interface MyLeaderboardModalProps {
   userId?: string;
   /** Display name for user-specific title (when `userId` is set). */
   userName?: string;
+  /** Override the overlay z-index when opened above a higher-stacked modal. */
+  overlayClassName?: string;
 }
 
 export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
@@ -60,6 +62,7 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
   onSelectEntry,
   userId,
   userName,
+  overlayClassName = '!z-[1002]',
 }) => {
   const isUserScope = !!userId;
   const t = useTranslations(
@@ -238,7 +241,7 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
       onClose={onClose}
       containerClassName="!w-[min(100%,960px)]"
       contentClassName="text-white sm:h-[75vh] h-[70vh] max-h-[70vh] narrow-scrollbar sm:!py-6 !py-4"
-      overlayClassName="!z-[1002]"
+      overlayClassName={overlayClassName}
       withBlur
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >

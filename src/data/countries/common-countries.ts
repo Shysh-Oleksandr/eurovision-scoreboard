@@ -53,6 +53,11 @@ export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
     code: 'BG',
     category: 'All-Time Participants',
   },
+  Canada: {
+    name: 'Canada',
+    code: 'CA',
+    category: 'All-Time Participants',
+  },
   Croatia: {
     name: 'Croatia',
     code: 'HR',
@@ -778,11 +783,6 @@ export const COMMON_COUNTRIES: Record<string, CommonCountry> = {
   Belize: {
     name: 'Belize',
     code: 'BZ',
-    category: 'North America',
-  },
-  Canada: {
-    name: 'Canada',
-    code: 'CA',
     category: 'North America',
   },
   CostaRica: {

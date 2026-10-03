@@ -15,6 +15,15 @@ export interface Profile {
   preferences?: UserPreferences;
 }
 
+export interface ProfileSummary {
+  followersCount: number;
+  followingCount: number;
+  customThemesCount: number;
+  savedThemesCount: number;
+  privateContestsCount: number;
+  publicContestsCount: number;
+}
+
 export type PreferredLocale =
   | 'en'
   | 'es'

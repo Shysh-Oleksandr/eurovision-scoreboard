@@ -13,7 +13,12 @@ const ProfileModal = dynamic(() => import('./ProfileModal'), {
   ssr: false,
 });
 
-const ProfileWidget = () => {
+export type WidgetStatProps = {
+  stat?: React.ReactNode;
+  statLoading?: boolean;
+};
+
+const ProfileWidget = ({ stat, statLoading }: WidgetStatProps) => {
   const t = useTranslations('widgets.profile');
   const user = useAuthStore((state) => state.user);
 
@@ -28,11 +33,14 @@ const ProfileWidget = () => {
         }}
         title={t('title')}
         description={t('description')}
+        tone="blue"
+        stat={stat}
+        statLoading={statLoading}
         icon={
           user ? (
-            <UserCheckIcon className="w-6 h-6 flex-none" />
+            <UserCheckIcon className="size-[21px] flex-none" />
           ) : (
-            <UserIcon className="w-6 h-6 flex-none" />
+            <UserIcon className="size-[21px] flex-none" />
           )
         }
       />

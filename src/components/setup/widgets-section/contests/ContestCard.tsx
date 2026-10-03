@@ -1,18 +1,24 @@
+'use client';
+import { Check, CopyCheck, MoreHorizontal } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-
-import Button from '../../../common/Button';
 
 import { api } from '@/api/client';
 import { ArrowDownAndUpIcon } from '@/assets/icons/ArrowDownAndUpIcon';
 import { ListPlusIcon } from '@/assets/icons/ListPlusIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
+import AnchoredMenu, {
+  AnchoredMenuEntry,
+} from '@/components/common/AnchoredMenu';
+import Button from '@/components/common/Button';
+import { useSetupUiStore } from '@/components/setup/hub/state/setupUiStore';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -22,16 +28,28 @@ const CreateContestModal = dynamic(() => import('./CreateContestModal'), {
 });
 
 interface ContestCardProps {
-  onReorderClick?: () => void;
-  onAddStageClick?: () => void;
+  onReorderClick: () => void;
+  onAddStageClick: () => void;
+  participantsCount: number;
+  stagesCount: number;
+  isGfOnly: boolean;
+  /** Setup diverged from the loaded contest snapshot. */
+  hasUnsavedChanges: boolean;
 }
 
 const ContestCard: React.FC<ContestCardProps> = ({
   onReorderClick,
   onAddStageClick,
+  participantsCount,
+  stagesCount,
+  isGfOnly,
+  hasUnsavedChanges,
 }) => {
   const t = useTranslations();
   const locale = useLocale();
+  const isSmallPhone = useMediaQuery('(max-width: 390px)');
+  const isPhone = useMediaQuery('(max-width: 640px)');
+  const isTablet = useMediaQuery('(max-width: 768px)');
 
   const user = useAuthStore((state) => state.user);
   const contestName = useGeneralStore((state) => state.settings.contestName);
@@ -44,23 +62,27 @@ const ContestCard: React.FC<ContestCardProps> = ({
   );
   const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
   const activeContest = useGeneralStore((state) => state.activeContest);
+  const setContestToLoadGlobal = useGeneralStore(
+    (state) => state.setContestToLoad,
+  );
 
-  const isOwner = useMemo(() => {
-    return !activeContest || activeContest.userId.toString() === user?._id;
-  }, [activeContest, user]);
+  const selectionMode = useSetupUiStore((state) => state.selectionMode);
+  const setSelectionMode = useSetupUiStore((state) => state.setSelectionMode);
+
+  const isOwner = useMemo(
+    () => !activeContest || activeContest.userId.toString() === user?._id,
+    [activeContest, user],
+  );
 
   const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
 
   const [isContestsModalOpen, setIsContestsModalOpen] = useState(false);
   const [isContestsModalLoaded, setIsContestsModalLoaded] = useState(false);
+  const [moreAnchor, setMoreAnchor] = useState<HTMLElement | null>(null);
 
   const { confirm: confirmResetContest } = useConfirmation();
 
-  const setContestToLoadGlobal = useGeneralStore(
-    (state) => state.setContestToLoad,
-  );
-
-  const onResetClick = async () => {
+  const onResetClick = () => {
     if (!activeContest) return;
 
     confirmResetContest({
@@ -91,102 +113,199 @@ const ContestCard: React.FC<ContestCardProps> = ({
       : null;
   }, [activeContest, locale, isOwner, t]);
 
-  const ownershipBadge = useMemo(() => {
-    return `${isOwner ? t('widgets.yours') : t('widgets.community')} • ${
-      activeContest
-        ? activeContest?.isPublic
-          ? t('widgets.public')
-          : t('widgets.private')
-        : t('widgets.local')
-    }`;
-  }, [isOwner, activeContest, t]);
+  const ownershipBadge = `${
+    isOwner ? t('widgets.yours') : t('widgets.community')
+  } · ${
+    activeContest
+      ? activeContest.isPublic
+        ? t('widgets.public')
+        : t('widgets.private')
+      : t('widgets.local')
+  }`;
+
+  const subLine = `${t('setup.eventSetupModal.contestSub', {
+    participants: participantsCount,
+    stages: stagesCount,
+  })}${isGfOnly ? ` · ${t('setup.eventSetupModal.grandFinalOnly')}` : ''}`;
+
+  const moreItems: AnchoredMenuEntry[] = [
+    // Small phones have no room for the Select button in the row.
+    ...(isSmallPhone
+      ? [
+          {
+            label: t('setup.eventSetupModal.select'),
+            icon: <CopyCheck className="size-4" />,
+            trailing: selectionMode ? (
+              <Check className="size-4 text-accent" />
+            ) : undefined,
+            onClick: () => setSelectionMode(!selectionMode),
+          },
+          'hr' as const,
+        ]
+      : []),
+    {
+      label: t('setup.eventSetupModal.reorderStages'),
+      icon: <ArrowDownAndUpIcon className="size-4" />,
+      onClick: onReorderClick,
+    },
+    {
+      label: t('setup.eventStageModal.addStage'),
+      icon: <ListPlusIcon className="size-4" />,
+      onClick: onAddStageClick,
+    },
+    ...(activeContest
+      ? [
+          'hr' as const,
+          {
+            label: t('common.reset'),
+            icon: <RestartIcon className="size-4" />,
+            onClick: onResetClick,
+          },
+        ]
+      : []),
+  ];
+
+  const saveButton = (
+    <Button
+      onClick={() => setIsContestsModalOpen(true)}
+      variant="surfaceStrong"
+      size={isPhone ? 'sm' : 'md'}
+      title={user ? t('common.save') : t('common.authenticationRequired')}
+      aria-label={t('common.save')}
+      Icon={<SaveIcon className="size-[17px]" />}
+      snowEffect="right"
+      disabled={!user}
+      className="!h-[38px]"
+    >
+      {t('common.save')}
+    </Button>
+  );
+
+  const selectButton = (
+    <Button
+      onClick={() => setSelectionMode(!selectionMode)}
+      variant="surface"
+      size={isTablet ? 'sm' : 'md'}
+      title={t('setup.eventSetupModal.select')}
+      aria-label={t('setup.eventSetupModal.select')}
+      aria-pressed={selectionMode}
+      Icon={<CopyCheck className="size-[17px]" />}
+      className={`${selectionMode ? 'is-on' : ''} ${
+        isTablet ? '!w-[34px] !px-0 justify-center' : ''
+      }`}
+    >
+      {isTablet
+        ? undefined
+        : selectionMode
+        ? t('setup.eventSetupModal.selecting')
+        : t('setup.eventSetupModal.select')}
+    </Button>
+  );
 
   return (
     <>
-      <div
-        className={`w-full relative bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-700/60 p-3 text-white rounded-lg border border-primary-900 shadow-lg border-solid`}
-      >
-        {/* Ownershib badge */}
-        <div className="flex items-center flex-wrap gap-1 z-[60] absolute -top-[5px] left-2">
-          <div className="px-2 py-0.5 font-medium rounded-md whitespace-nowrap bg-primary-800 text-white text-xs shadow-sm">
+      <div className="dp-contest-card relative flex items-center gap-2.5 2cols:gap-[13px] px-3 py-[13px] 2cols:px-4 2cols:py-[15px] rounded-[14px] text-white">
+        <div className="absolute -top-2.5 left-3.5 flex gap-1.5 z-[2]">
+          <span className="dp-badge-pill text-[10.5px] font-extrabold tracking-[.02em] px-2.5 py-1 rounded-full whitespace-nowrap">
             {ownershipBadge}
-          </div>
+          </span>
+          {hasUnsavedChanges && (
+            <span className="dp-badge-pill text-[10.5px] font-extrabold tracking-[.02em] px-2.5 py-1 rounded-full whitespace-nowrap">
+              {t('setup.eventSetupModal.unsavedChanges')}
+            </span>
+          )}
           {lastUpdatedBadge && (
-            <div className="px-2 py-0.5 font-medium rounded-md whitespace-nowrap bg-primary-800 text-white text-xs shadow-sm">
+            <span className="dp-badge-pill text-[10.5px] font-extrabold tracking-[.02em] px-2.5 py-1 rounded-full whitespace-nowrap hidden 2cols:inline">
               {lastUpdatedBadge}
-            </div>
+            </span>
           )}
         </div>
 
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            {showHostingCountryLogo && (
-              <Image
-                src={logo}
-                alt={t('simulation.header.hostingCountryLogo')}
-                className={`flex-none rounded-sm ${
-                  isExisting
-                    ? 'w-8 h-8 overflow-visible'
-                    : 'w-8 h-6 object-cover mr-1'
-                }`}
-                width={32}
-                height={32}
-                onError={(e) => {
-                  e.currentTarget.src = getFlagPath('ww');
-                }}
-                unoptimized
-              />
-            )}
-            <div>
-              <h5 className="text-base font-semibold">
-                {contestName} {contestYear}
-              </h5>
-              {contestDescription && (
-                <p
-                  className="text-xs text-white/60 line-clamp-2"
-                  title={contestDescription}
-                >
-                  {contestDescription}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {activeContest && (
+        {showHostingCountryLogo && (
+          <Image
+            src={logo}
+            alt={t('simulation.header.hostingCountryLogo')}
+            className={`flex-none rounded-sm ${
+              isExisting ? 'w-8 h-8 overflow-visible' : 'w-8 h-6 object-cover'
+            }`}
+            width={32}
+            height={32}
+            onError={(e) => {
+              e.currentTarget.src = getFlagPath('ww');
+            }}
+            unoptimized
+          />
+        )}
+
+        <div className="min-w-0">
+          <h5
+            className="text-[15.5px] md:text-[17px] lg:text-[19px] font-extrabold tracking-[-.022em] leading-tight truncate"
+            title={contestDescription || undefined}
+          >
+            {contestName} {contestYear}
+          </h5>
+          <p className="text-[10px] 2cols:text-xs font-bold text-white/70 mt-0.5 truncate">
+            {subLine}
+          </p>
+        </div>
+
+        <div className="ml-auto flex items-center gap-[5px] 2cols:gap-[7px] flex-none">
+          {!isSmallPhone && selectButton}
+          {isPhone ? (
+            <>
+              {saveButton}
               <Button
-                onClick={onResetClick}
-                variant="tertiary"
-                title={t('common.reset')}
-                aria-label={t('common.reset')}
-                Icon={<RestartIcon className="w-5 h-5" />}
+                variant="surface"
+                size="sm"
+                onClick={(e) => {
+                  const target = e.currentTarget;
+
+                  setMoreAnchor((prev) => (prev ? null : target));
+                }}
+                title={t('common.more')}
+                aria-label={t('common.more')}
+                Icon={<MoreHorizontal className="size-[18px]" />}
               />
-            )}
-            <Button
-              onClick={onReorderClick}
-              variant="tertiary"
-              title={t('common.reorder')}
-              aria-label={t('common.reorder')}
-              Icon={<ArrowDownAndUpIcon className="w-5 h-5" />}
-            />
-            <Button
-              onClick={onAddStageClick}
-              title={t('setup.eventStageModal.addStage')}
-              aria-label={t('setup.eventStageModal.addStage')}
-              Icon={<ListPlusIcon className="w-5 h-5" />}
-              className="!pr-1.5"
-              variant="tertiary"
-            />
-            <Button
-              onClick={() => setIsContestsModalOpen(true)}
-              title={
-                user ? t('common.save') : t('common.authenticationRequired')
-              }
-              aria-label="Save"
-              Icon={<SaveIcon className="w-5 h-5" />}
-              snowEffect="right"
-              disabled={!user}
-            />
-          </div>
+              <AnchoredMenu
+                open={!!moreAnchor}
+                anchor={moreAnchor}
+                onClose={() => setMoreAnchor(null)}
+                items={moreItems}
+                placement="bottom-end"
+                ariaLabel={t('common.more')}
+              />
+            </>
+          ) : (
+            <>
+              {activeContest && (
+                <Button
+                  onClick={onResetClick}
+                  variant="surface"
+                  size="md"
+                  title={t('common.reset')}
+                  aria-label={t('common.reset')}
+                  Icon={<RestartIcon className="size-[17px]" />}
+                />
+              )}
+              <Button
+                onClick={onReorderClick}
+                variant="surface"
+                size="md"
+                title={t('setup.eventSetupModal.reorderStages')}
+                aria-label={t('setup.eventSetupModal.reorderStages')}
+                Icon={<ArrowDownAndUpIcon className="size-[17px]" />}
+              />
+              <Button
+                onClick={onAddStageClick}
+                variant="surface"
+                size="md"
+                title={t('setup.eventStageModal.addStage')}
+                aria-label={t('setup.eventStageModal.addStage')}
+                Icon={<ListPlusIcon className="size-[17px]" />}
+              />
+              {saveButton}
+            </>
+          )}
         </div>
       </div>
 

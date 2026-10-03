@@ -3,6 +3,8 @@
  * This is intentionally permissive while the feature evolves.
  */
 
+import type { ContestType } from '@/data/contestTypes';
+
 export type CompactVote = [countryCode: string, pointsId: number];
 
 export type CompactStageVotes = {
@@ -25,6 +27,9 @@ export interface ContestSnapshot {
   schemaVersion: number;
   setup: {
     baseYear: number;
+    /** Only saved when not ESC. */
+    contestType?: ContestType;
+    /** Legacy (pre-`contestType`) snapshots; read via `resolveContestType`. */
     isJuniorContest?: boolean;
     randomnessLevel?: number;
     pointsSpread?: number;

@@ -1,18 +1,23 @@
-import { PointsItem } from '@/state/generalStore';
 import { BaseCountry, VotingCountry } from '../models';
-import { getHostingCountryByYear } from '@/theme/hosting';
+
 import { Year } from '@/config';
+import { CONTEST_KEY_PREFIXES, getContestKey } from '@/data/contestTypes';
+import { PointsItem } from '@/state/generalStore';
+import { getHostingCountryByYear } from '@/theme/hosting';
 import { ESC_YEARS_WITH_THEME, JUNIOR_YEARS_WITH_THEME } from '@/theme/themes';
 
 export const SUPPORTED_YEARS = Array.from({ length: 23 }, (_, i) => 2004 + i);
 
 // Junior Eurovision years supported in the app
 export const JUNIOR_SUPPORTED_YEARS = Array.from(
-  { length: 10 },
+  { length: 11 },
   (_, i) => 2016 + i,
 );
 
-export const JUNIOR_THEME_PREFIX = 'JESC-';
+// Eurovision Song Contest Asia years supported in the app
+export const ASIA_SUPPORTED_YEARS = [2026];
+
+export const JUNIOR_THEME_PREFIX = CONTEST_KEY_PREFIXES.jesc;
 
 export const ALL_THEMES = [
   ...SUPPORTED_YEARS,
@@ -27,9 +32,16 @@ export const ESC_YEAR_OPTIONS = SUPPORTED_YEARS.map((year) => ({
 }));
 
 export const JESC_YEAR_OPTIONS = JUNIOR_SUPPORTED_YEARS.map((year) => ({
-  value: `${JUNIOR_THEME_PREFIX}${year}`,
+  value: getContestKey(year.toString(), 'jesc'),
   label: year.toString(),
-  imageUrl: getHostingCountryByYear(year.toString() as Year, true).logo,
+  imageUrl: getHostingCountryByYear(year.toString() as Year, 'jesc').logo,
+  isExisting: true,
+}));
+
+export const ASIA_YEAR_OPTIONS = ASIA_SUPPORTED_YEARS.map((year) => ({
+  value: getContestKey(year.toString(), 'asia'),
+  label: year.toString(),
+  imageUrl: getHostingCountryByYear(year.toString() as Year, 'asia').logo,
   isExisting: true,
 }));
 

@@ -18,6 +18,7 @@ import deepMerge from './deepMerge';
 import { useGeneralStore } from './generalStore';
 import { useScoreboardStore } from './scoreboardStore';
 
+import type { ContestType } from '@/data/contestTypes';
 import { RestOfWorld } from '@/data/countries';
 import { buildCountriesUrl } from '@/data/countries/countriesDataUrl';
 import {
@@ -96,7 +97,7 @@ interface CountriesState {
   updateCountriesForYear: (year: Year) => Promise<void>;
   setInitialCountriesForYear: (
     year: Year,
-    options?: { force?: boolean; isJuniorContest?: boolean },
+    options?: { force?: boolean; contestType?: ContestType },
   ) => Promise<void>;
   getAllCountries: (includeCustomCountries?: boolean) => BaseCountry[];
   setEventAssignments: (assignments: Record<string, string>) => void;
@@ -131,9 +132,9 @@ export const useCountriesStore = create<CountriesState>()(
 
         const loadCountriesByPreset = async (
           year: Year,
-          isJunior: boolean,
+          contestType: ContestType,
         ): Promise<CountriesPreset> => {
-          const url = buildCountriesUrl(year, isJunior);
+          const url = buildCountriesUrl(year, contestType);
 
           const toAbsolute = (path: string) => {
             if (typeof window !== 'undefined') return path;
@@ -151,9 +152,9 @@ export const useCountriesStore = create<CountriesState>()(
 
           if (res.ok) return parseCountriesJson(await res.json());
 
-          if (isJunior && res.status === 404) {
+          if (contestType === 'jesc' && res.status === 404) {
             const escRes = await fetch(
-              toAbsolute(buildCountriesUrl(year, false)),
+              toAbsolute(buildCountriesUrl(year, 'esc')),
               {
                 cache: 'force-cache',
               },
@@ -163,9 +164,7 @@ export const useCountriesStore = create<CountriesState>()(
           }
 
           throw new Error(
-            `Failed to load countries JSON for ${year} (${
-              isJunior ? 'JESC' : 'ESC'
-            })`,
+            `Failed to load countries JSON for ${year} (${contestType.toUpperCase()})`,
           );
         };
 
@@ -207,7 +206,7 @@ export const useCountriesStore = create<CountriesState>()(
             const { allCountriesForYear } = get();
             const {
               year,
-              settings: { isJuniorContest },
+              settings: { contestType },
             } = useGeneralStore.getState();
 
             const allCountriesForYearCopy = [...allCountriesForYear];
@@ -239,8 +238,9 @@ export const useCountriesStore = create<CountriesState>()(
               );
             }
 
+            // Junior Eurovision has no Rest of the World vote
             const shouldAddRestOfWorld =
-              !isJuniorContest && Number(year) >= 2023;
+              contestType !== 'jesc' && Number(year) >= 2023;
 
             if (
               RestOfWorld &&
@@ -335,7 +335,7 @@ export const useCountriesStore = create<CountriesState>()(
             const { settings } = useGeneralStore.getState();
             const preset = await loadCountriesByPreset(
               year,
-              settings.isJuniorContest,
+              settings.contestType,
             );
 
             const initialOdds: Record<
@@ -376,16 +376,13 @@ export const useCountriesStore = create<CountriesState>()(
 
           setInitialCountriesForYear: async (
             year: Year,
-            options?: { force?: boolean; isJuniorContest?: boolean },
+            options?: { force?: boolean; contestType?: ContestType },
           ) => {
-            const { force = false, isJuniorContest } = options || {};
+            const { force = false, contestType = 'esc' } = options || {};
 
             if (!force && get().allCountriesForYear.length > 0) return;
 
-            const effectiveIsJunior =
-              typeof isJuniorContest === 'boolean' ? isJuniorContest : false;
-
-            const preset = await loadCountriesByPreset(year, effectiveIsJunior);
+            const preset = await loadCountriesByPreset(year, contestType);
 
             let initialOdds: Record<
               string,

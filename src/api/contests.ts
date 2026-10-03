@@ -438,6 +438,7 @@ export function useCreateContestMutation() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
       qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
 }
@@ -462,6 +463,7 @@ export function useUpdateContestMutation() {
         );
       }
       qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
       qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
       qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
     },
@@ -518,6 +520,7 @@ export function useDeleteContestMutation() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.user.contests() });
+      qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
       qc.invalidateQueries({ queryKey: queryKeys.user.savedContests() });
       qc.invalidateQueries({ queryKey: queryKeys.public.contests({}) });
     },

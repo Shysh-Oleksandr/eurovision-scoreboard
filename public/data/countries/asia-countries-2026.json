@@ -1,0 +1,79 @@
+[
+  {
+    "name": "Bangladesh",
+    "code": "BD",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Bhutan",
+    "code": "BT",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Cambodia",
+    "code": "KH",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Laos",
+    "code": "LA",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Malaysia",
+    "code": "MY",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Mongolia",
+    "code": "MN",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Nepal",
+    "code": "NP",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Philippines",
+    "code": "PH",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "South Korea",
+    "code": "KR",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Thailand",
+    "code": "TH",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  },
+  {
+    "name": "Vietnam",
+    "code": "VN",
+    "category": "Asia",
+    "isQualified": true,
+    "isAutoQualified": true
+  }
+]

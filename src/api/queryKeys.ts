@@ -88,6 +88,7 @@ export const queryKeys = {
     quickSelectState: (ids: string[]) =>
       ['user', 'quick-select-state', { ids: [...ids].sort() }] as const,
     preferences: () => ['user', 'preferences'] as const,
+    profileSummary: () => ['user', 'profile-summary'] as const,
     // Add more user-specific queries here in the future:
     // savedEvents: () => ['user', 'saved-events'] as const,
   },
@@ -202,6 +203,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.savedContests(),
   queryKeys.user.contestGroups(),
   queryKeys.user.preferences(),
+  queryKeys.user.profileSummary(),
   ['user', 'entry-stats'] as const,
   queryKeys.user.myLeaderboard(),
   queryKeys.follows.followingFeed({}),

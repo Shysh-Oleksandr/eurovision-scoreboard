@@ -9,45 +9,43 @@
 
    Dynamic interface color
    -----------------------
-   Set --prim-hue from JS when a user theme is applied:
-     document.documentElement.style.setProperty('--prim-hue', hue);
-   All palette + accent tokens then update automatically.
-   Use culori's oklch() to extract the hue from a hex color.
+   Everything in the second block derives from a few bare numbers read off
+   the active theme (--prim-hue / --prim-l / --prim-c, --accent-h/l/c,
+   --accent-2-h/l/c and the --*-ink-dark flags; see src/theme/oklch.ts).
+   Built-in themes get them from a compiled [data-theme] rule; custom themes
+   set them inline via applyCustomTheme(). Consumers: Tailwind colors
+   p-950…p-700 / accent / accent-2 / accent-ink / gold (tailwind.config.js)
+   and the `dp-*` component classes in src/styles.css.
 
    Static fallback (default: deep purple, hue 300)
    ============================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&display=swap');
-
 :root {
 
-  /* ---- Primary hue (degrees, 0–360) ---- */
+  /* ---- Interface tokens (bare numbers, no units) ----
+     Emitted per built-in theme at build time ([data-theme="YYYY"], see
+     tailwind.config.js) and set inline on <html> for custom themes
+     (applyCustomTheme in src/theme/themeUtils.ts). Computed by
+     getInterfaceTokens() in src/theme/oklch.ts:
+       --prim-hue      OKLCH hue of primary.800 (the tint of every surface)
+       --prim-l        OKLCH lightness of primary.900 (how light the modal is)
+       --prim-c        OKLCH chroma of primary.900 (how saturated the surfaces are)
+       --accent-*      the accent: hand-picked per built-in theme, from the
+       --accent-2-*    auto curve for custom themes (src/theme/interfaceAccents.ts,
+                       tuned in the Palette Lab at /dev/palette-lab)
+       --*-ink-dark    1 when text on that accent should be dark (light accents)
+     Defaults below reproduce the deep-purple hue-300 look. */
   --prim-hue: 300;
-
-  /* ---- Interface palette (derived from hue via OKLCH) ----
-     Override these with hex for environments without OKLCH support. */
-  --p-950: oklch( 8%  0.06  var(--prim-hue));   /* deepest bg, behind modal */
-  --p-900: oklch(12%  0.09  var(--prim-hue));   /* modal background */
-  --p-800: oklch(17%  0.11  var(--prim-hue));   /* card surface */
-  --p-750: oklch(21%  0.13  var(--prim-hue));   /* elevated surface, active tab */
-  --p-700: oklch(25%  0.14  var(--prim-hue));   /* avatar bg, pill tab active */
-
-  /* Static hex fallbacks (hue 300, deep purple) */
-  --p-950-fb: #130a20;
-  --p-900-fb: #1b0f2c;
-  --p-800-fb: #271640;
-  --p-750-fb: #311c4e;
-  --p-700-fb: #3d2461;
-
-  /* ---- Accent colors (also derived from hue) ---- */
-  /* +55° hue shift at fixed chroma/lightness — vivid, readable at any primary hue */
-  --accent:   oklch(65%  0.28  calc(var(--prim-hue) + 55));   /* primary accent */
-  --accent-2: oklch(60%  0.22  calc(var(--prim-hue) - 40));   /* secondary accent */
-  --accent-ink: #ffffff;
-
-  /* Static hex fallbacks */
-  --accent-fb:   #ff3d84;
-  --accent-2-fb: #6c8cff;
+  --prim-l: 26;
+  --prim-c: 0.07;
+  --accent-h: 355;
+  --accent-l: 66;
+  --accent-c: 0.24;
+  --accent-ink-dark: 0;
+  --accent-2-h: 260;
+  --accent-2-l: 62;
+  --accent-2-c: 0.19;
+  --accent-2-ink-dark: 0;
 
   /* ---- Ink (text) ---- */
   --ink:    #ffffff;
@@ -103,8 +101,6 @@
   --sp-7:  28px;
 
   /* ---- Typography ---- */
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-
   /* sizes */
   --text-2xs: 10px;
   --text-xs:  11px;
@@ -142,5 +138,61 @@
   --z-tooltip:   60;
 }
 
-/* ---- Base reset ---- */
-*, *::before, *::after { box-sizing: border-box; }
+/* ---- Interface palette (OKLCH, derived from the bare numbers above) ----
+   Declared on :root AND on `.dp-palette-scope`: a custom property that reads
+   other variables is resolved where it is declared, so an element that sets
+   its own bare numbers (Palette Lab previews) must re-declare the palette to
+   see them. */
+:root,
+.dp-palette-scope {
+  /* Five surface levels. The base level follows the theme's own lightness
+     (clamped so text stays readable) and each level above it adds a fixed
+     4.2 L% step, so a light or pastel theme yields a lighter modal and a dark
+     theme a darker one while cards always separate from their background.
+     Chroma follows the theme too, rising slightly with lightness so deep
+     levels stay calm and high levels stay tinted. The *-raw triplets exist so
+     Tailwind can add an alpha channel (`bg-p-800/50`); use the plain tokens in
+     hand-written CSS. */
+  --p-base: clamp(17, var(--prim-l), 40);
+  --p-step: 4.2;
+  --p-c: clamp(0.035, var(--prim-c), 0.12);
+  --p-950-raw: calc((var(--p-base) - var(--p-step) * 0.9) * 1%) calc(var(--p-c) * 0.8) var(--prim-hue);   /* page behind the modal */
+  --p-900-raw: calc(var(--p-base) * 1%) var(--p-c) var(--prim-hue);                                       /* modal background */
+  --p-800-raw: calc((var(--p-base) + var(--p-step)) * 1%) calc(var(--p-c) * 1.12) var(--prim-hue);        /* card surface */
+  --p-750-raw: calc((var(--p-base) + var(--p-step) * 2) * 1%) calc(var(--p-c) * 1.22) var(--prim-hue);    /* elevated surface */
+  --p-700-raw: calc((var(--p-base) + var(--p-step) * 3) * 1%) calc(var(--p-c) * 1.32) var(--prim-hue);    /* highest surface */
+  --p-950: oklch(var(--p-950-raw));
+  --p-900: oklch(var(--p-900-raw));
+  --p-800: oklch(var(--p-800-raw));
+  --p-750: oklch(var(--p-750-raw));
+  --p-700: oklch(var(--p-700-raw));
+
+  /* Accents. --accent is the theme's main highlight (CTA, selection, Themes
+     tone), --accent-2 its partner (Profile tone, stage tint), --gold never
+     changes. The ink is white, or a deep on-hue colour when the accent is too
+     light for white text (gold, lime, mint, cream). */
+  --accent-raw:   calc(var(--accent-l) * 1%) var(--accent-c) var(--accent-h);
+  --accent-2-raw: calc(var(--accent-2-l) * 1%) var(--accent-2-c) var(--accent-2-h);
+  --gold-raw:     74% 0.15 82;                              /* hue-independent */
+  --accent:   oklch(var(--accent-raw));
+  --accent-2: oklch(var(--accent-2-raw));
+  --gold:     oklch(var(--gold-raw));
+  --accent-ink: oklch(calc(100% - var(--accent-ink-dark) * 78%) calc(var(--accent-ink-dark) * 0.05) var(--accent-h));
+  --accent-2-ink: oklch(calc(100% - var(--accent-2-ink-dark) * 78%) calc(var(--accent-2-ink-dark) * 0.05) var(--accent-2-h));
+}
+
+/* ---- Static hex fallbacks (hue 300, default tokens) for engines without OKLCH ---- */
+@supports not (color: oklch(0% 0 0)) {
+  :root {
+    --p-950: #1a0f2e;
+    --p-900: #23143c;
+    --p-800: #2f1c4f;
+    --p-750: #3b2562;
+    --p-700: #482f75;
+    --accent: #f83599;
+    --accent-2: #3a81f6;
+    --gold: #d9a028;
+    --accent-ink: #ffffff;
+    --accent-2-ink: #ffffff;
+  }
+}

@@ -6,13 +6,14 @@ import dynamic from 'next/dynamic';
 
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import WidgetContainer from '@/components/common/WidgetContainer';
+import { WidgetStatProps } from '@/components/setup/widgets-section/profile/ProfileWidget';
 import { useGeneralStore } from '@/state/generalStore';
 
 const ContestsModal = dynamic(() => import('./ContestsModal'), {
   ssr: false,
 });
 
-const ContestsWidget = () => {
+const ContestsWidget = ({ stat, statLoading }: WidgetStatProps) => {
   const t = useTranslations('widgets.contests');
 
   const isContestsModalOpen = useGeneralStore(
@@ -31,7 +32,10 @@ const ContestsWidget = () => {
         }}
         title={t('title')}
         description={t('description')}
-        icon={<TrophyIcon className="w-6 h-6 flex-none" />}
+        tone="gold"
+        stat={stat}
+        statLoading={statLoading}
+        icon={<TrophyIcon className="size-[21px] flex-none" />}
       />
 
       {(isContestsModalOpen || isContestsModalLoaded) && (

@@ -1,5 +1,4 @@
 'use client';
-import { PlayIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -7,28 +6,29 @@ import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/shallow';
 
-import {
-  BaseCountry,
-  CountryAssignmentGroup,
-  EventStage,
-  StageVotingMode,
-} from '../../models';
+import { BaseCountry, EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
-import Button from '../common/Button';
 import Modal from '../common/Modal/Modal';
 import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
-import { AvailableGroup } from './CountrySelectionListItem';
+import { useContestDirtyState } from './hooks/useContestDirtyState';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
 import { useInitialLineup } from './hooks/useInitialLineup';
 import { useLoadContest } from './hooks/useLoadContest';
 import { useStageModalActions } from './hooks/useStageModalActions';
-import NotParticipatingSection from './NotParticipatingSection';
-import { SetupHeader } from './SetupHeader';
+import CountryPool from './hub/lineup/CountryPool';
+import LineupDndBoundary from './hub/lineup/dnd/LineupDndBoundary';
+import LineupMenus from './hub/lineup/LineupMenus';
+import LineupProvider from './hub/lineup/LineupProvider';
+import SelectionTray from './hub/lineup/SelectionTray';
+import StageList from './hub/lineup/StageList';
+import { useLineupModel } from './hub/lineup/useLineupModel';
+import SetupFooter from './hub/SetupFooter';
+import SetupHubHeader from './hub/SetupHubHeader';
+import { useSetupUiStore } from './hub/state/setupUiStore';
 import { SyncCustomEntries } from './SyncCustomEntries';
-import UnifiedStageSetup from './UnifiedStageSetup';
 import { buildEventStagesFromAssignments } from './utils/buildEventStagesFromAssignments';
 import { validateEventSetup } from './utils/eventValidation';
 import ContestCard from './widgets-section/contests/ContestCard';
@@ -36,7 +36,9 @@ import { useApplyContestTheme } from './widgets-section/contests/hooks/useApplyC
 import WidgetsSection from './widgets-section/WidgetsSection';
 
 import { useApplyContestMutation } from '@/api/contests';
+import { useCustomEntryGroupsQuery } from '@/api/customEntries';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
+import { markContestSetupClean } from '@/helpers/contestFingerprint';
 import {
   applyContestSnapshotToStores,
   LoadContestOptions,
@@ -181,6 +183,7 @@ const EventSetupModal = () => {
     (state) => state.setSelectedShareContest,
   );
   const { clear } = useScoreboardStore.temporal.getState();
+  const user = useAuthStore((state) => state.user);
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isSettingsModalLoaded, setIsSettingsModalLoaded] = useState(false);
@@ -197,9 +200,7 @@ const EventSetupModal = () => {
       notParticipatingCountries,
       notQualifiedCountries,
     },
-    handleCountryAssignment,
-    handleBulkCountryAssignment,
-    getCountryGroupAssignment,
+    handleBulkCountryAssignmentByCodes,
     setAssignments,
     allAssignments,
   } = useCountryAssignments();
@@ -260,12 +261,23 @@ const EventSetupModal = () => {
     [eventStagesWithCountries],
   );
 
+  const { data: customEntryGroups = [] } = useCustomEntryGroupsQuery(!!user);
+  const lineupModel = useLineupModel({
+    eventStagesWithCountries,
+    notParticipatingCountries,
+    notQualifiedCountries,
+    customEntryGroups,
+    isGfOnly,
+    isSignedIn: !!user,
+  });
+
+  const hasUnsavedChanges = useContestDirtyState();
+
   useInitialLineup();
 
   const { onSaveContinue, nextSetupStage } = useContinueToNextPhase();
   const { confirm } = useConfirmation();
   const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
-  const user = useAuthStore((state) => state.user);
   const applyTheme = useApplyContestTheme();
 
   const handleProfileLoadContest = useLoadContest();
@@ -281,22 +293,8 @@ const EventSetupModal = () => {
 
   const onClose = useCallback(() => {
     setEventSetupModalOpen(false);
+    useSetupUiStore.getState().resetUi();
   }, [setEventSetupModalOpen]);
-
-  const availableGroups: AvailableGroup[] = useMemo(() => {
-    const groups = [
-      ...configuredEventStages
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-        .map((s) => ({ id: s.id, name: s.name })),
-      CountryAssignmentGroup.NOT_PARTICIPATING,
-    ];
-
-    if (isGfOnly) {
-      groups.splice(groups.length - 1, 0, CountryAssignmentGroup.NOT_QUALIFIED);
-    }
-
-    return groups;
-  }, [configuredEventStages, isGfOnly]);
 
   const closeAndStartEvent = () => {
     onClose();
@@ -482,6 +480,7 @@ const EventSetupModal = () => {
 
         // Set as active contest (immediate)
         useGeneralStore.getState().setActiveContest(contest);
+        markContestSetupClean();
 
         // Save to profile (sync across devices)
         if (user) {
@@ -544,33 +543,25 @@ const EventSetupModal = () => {
         isOpen={eventSetupModalOpen}
         onClose={debouncedCanClose ? onClose : undefined}
         overlayClassName="!z-[1000]"
-        containerClassName="w-[calc(100%-1.5rem)]"
-        contentClassName="!pb-4 !pt-4"
+        containerClassName="dp-hub dp-surface-modal w-full 2cols:w-[calc(100%-1.5rem)] !mx-0 2cols:!mx-6 md:!mx-10 !rounded-none 2cols:!rounded-2xl border-0 2cols:border md:max-w-6xl lg:max-w-6xl"
+        contentClassName="!p-3.5 2cols:!p-5 flex flex-col gap-3.5 2cols:gap-4 [&>*]:flex-none"
+        unstyledSurface
+        fullScreenOnPhone
         withBlur
         bottomContent={
-          <div className="flex justify-end xs:gap-4 gap-2 bg-primary-900 md:p-4 xs:p-3 p-2 z-30">
-            {debouncedCanClose && (
-              <Button
-                variant="secondary"
-                className="md:text-base text-sm"
-                onClick={onClose}
-                snowEffect="middle"
-              >
-                {winnerCountry ? t('common.close') : t('common.continue')}
-              </Button>
-            )}
-            <Button
-              className="w-full !text-base justify-center"
-              onClick={handleStartEvent}
-              snowEffect="right"
-              Icon={<PlayIcon className="w-5 h-5" />}
-            >
-              {t('common.start')}
-            </Button>
-          </div>
+          <SetupFooter
+            canClose={debouncedCanClose}
+            closeLabel={
+              winnerCountry ? t('common.close') : t('common.continue')
+            }
+            onClose={onClose}
+            onStart={handleStartEvent}
+          />
         }
       >
-        <SetupHeader openSettingsModal={() => setIsSettingsModalOpen(true)} />
+        <SetupHubHeader
+          openSettingsModal={() => setIsSettingsModalOpen(true)}
+        />
 
         {(isSettingsModalOpen || isSettingsModalLoaded) && (
           <SettingsModal
@@ -610,40 +601,31 @@ const EventSetupModal = () => {
         )}
 
         <WidgetsSection />
-        <div className="mt-2 flex flex-col gap-2">
+        <div className="flex flex-col gap-3.5 2cols:gap-4">
           <ContestCard
             onReorderClick={() => setIsStageReorderModalOpen(true)}
             onAddStageClick={handleOpenCreateEventStageModal}
+            participantsCount={lineupModel.counts.participating}
+            stagesCount={lineupModel.counts.stages}
+            isGfOnly={isGfOnly}
+            hasUnsavedChanges={hasUnsavedChanges}
           />
 
-          <UnifiedStageSetup
-            eventStages={eventStagesWithCountries}
-            onAssignCountryAssignment={handleCountryAssignment}
-            getCountryGroupAssignment={getCountryGroupAssignment}
-            onBulkAssign={handleBulkCountryAssignment}
+          <LineupProvider
+            model={lineupModel}
+            isSignedIn={!!user}
+            assignMany={handleBulkCountryAssignmentByCodes}
+            onEditCustomEntry={handleOpenEditModal}
             onEditStage={handleOpenEditEventStageModal}
-            availableGroups={availableGroups}
-            notQualifiedCountries={notQualifiedCountries}
-          />
-
-          <div className="h-px bg-primary-800 w-full my-1" />
-
-          <NotParticipatingSection
-            handleOpenEditModal={handleOpenEditModal}
-            handleOpenCreateModal={handleOpenCreateModal}
-            notParticipatingCountries={notParticipatingCountries}
-            handleBulkCountryAssignment={handleBulkCountryAssignment}
-            handleCountryAssignment={handleCountryAssignment}
-            getCountryGroupAssignment={getCountryGroupAssignment}
-            availableGroups={availableGroups}
-          />
-
-          <div className="flex justify-center items-center sm:flex-row flex-col-reverse gap-2 text-white/90 mt-2 font-semibold xs:text-base text-sm text-center">
-            <span>
-              © Copyright {new Date().getFullYear()} DouzePoints.app | All
-              rights reserved
-            </span>
-          </div>
+            onCreateCustomEntry={handleOpenCreateModal}
+          >
+            <LineupDndBoundary>
+              <StageList isGfOnly={isGfOnly} />
+              <CountryPool isSignedIn={!!user} />
+              <SelectionTray />
+            </LineupDndBoundary>
+            <LineupMenus isSignedIn={!!user} />
+          </LineupProvider>
         </div>
       </Modal>
 

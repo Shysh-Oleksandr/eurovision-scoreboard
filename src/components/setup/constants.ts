@@ -4,7 +4,7 @@ export const CATEGORY_ORDER = [
   'Imported',
   'Custom',
   'All-Time Participants',
-  'Europe',
+  'Rest of Europe',
   'Asia',
   'Africa',
   'North America',

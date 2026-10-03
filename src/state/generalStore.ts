@@ -26,6 +26,7 @@ import {
 import { useScoreboardStore } from './scoreboardStore';
 
 import { api } from '@/api/client';
+import { ContestType, resolveContestType } from '@/data/contestTypes';
 import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
 import { BaseCountry, PointsItem } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -78,12 +79,13 @@ const DEFAULT_SETTINGS: Settings = {
   showRankChangeIndicator: true,
   showHostingCountryLogo: true,
   shouldShowHeartFlagIcon: true,
+  syncThemeWithContest: true,
   shouldUseCustomBgImage: false,
   customBgImage: null,
   hostingCountryCode: DEFAULT_HOSTING_COUNTRY_CODE,
   contestName: 'Eurovision',
   contestDescription: '',
-  isJuniorContest: false,
+  contestType: 'esc',
   contestYear: INITIAL_YEAR,
   shouldLimitManualTelevotePoints: true,
   shouldShowJuryVotingProgress: true,
@@ -177,13 +179,15 @@ export interface Settings {
   enableFullscreen: boolean;
   showRankChangeIndicator: boolean;
   shouldShowHeartFlagIcon: boolean;
+  /** Follow the contest year with the matching built-in theme (Event Setup sync chip). */
+  syncThemeWithContest: boolean;
   showHostingCountryLogo: boolean;
   hostingCountryCode: string;
   shouldUseCustomBgImage: boolean;
   customBgImage: string | null;
-  contestName: string; // 'Eurovision' | 'Junior Eurovision'
+  contestName: string; // 'Eurovision' | 'Junior Eurovision' | 'Eurovision Asia'
   contestDescription: string;
-  isJuniorContest: boolean;
+  contestType: ContestType;
   contestYear: string;
   shouldLimitManualTelevotePoints: boolean;
   shouldShowJuryVotingProgress: boolean;
@@ -329,6 +333,11 @@ export interface GeneralState {
   suppressProfileActiveOnStatic: boolean;
   // Active contest tracking (similar to active theme)
   activeContest: Contest | null;
+  /**
+   * Fingerprint of the setup as last loaded from / saved to `activeContest`
+   * (see helpers/contestFingerprint). Drives the "Unsaved changes" badge.
+   */
+  loadedContestFingerprint: string | null;
   importedCustomEntries: BaseCountry[]; // Imported from active contest
   setActiveContest: (contest: Contest | null) => void;
   setImportedCustomEntries: (entries: BaseCountry[]) => void;
@@ -384,6 +393,7 @@ export const useGeneralStore = create<GeneralState>()(
         theme: getThemeForYear(INITIAL_THEME_YEAR),
         customTheme: null,
         activeContest: null,
+        loadedContestFingerprint: null,
         importedCustomEntries: [],
         pointsSystem: initialPointsSystem,
         settingsPointsSystem: initialPointsSystem,
@@ -421,17 +431,19 @@ export const useGeneralStore = create<GeneralState>()(
           }
         },
         setYear: (year: Year) => {
-          const isJunior = get().settings.isJuniorContest;
+          const { contestType } = get().settings;
 
           set({
             year: year,
             settings: {
               ...get().settings,
-              hostingCountryCode: getHostingCountryByYear(year, isJunior).code,
+              hostingCountryCode: getHostingCountryByYear(year, contestType)
+                .code,
               contestYear: year,
               contestDescription: '',
             },
             activeContest: null,
+            loadedContestFingerprint: null,
             importedCustomEntries: [],
           });
 
@@ -522,7 +534,11 @@ export const useGeneralStore = create<GeneralState>()(
           set({ blockedActiveThemeId: id });
         },
         setActiveContest: (contest: Contest | null) => {
-          set({ activeContest: contest });
+          set(
+            contest
+              ? { activeContest: contest }
+              : { activeContest: null, loadedContestFingerprint: null },
+          );
         },
         setSuppressActiveContestOnce: (value: boolean) => {
           set({ suppressActiveContestOnce: value });
@@ -815,6 +831,7 @@ export const useGeneralStore = create<GeneralState>()(
             themeYear: state.themeYear,
             customTheme: state.customTheme,
             activeContest: state.activeContest,
+            loadedContestFingerprint: state.loadedContestFingerprint,
             importedCustomEntries: state.importedCustomEntries,
             lastSeenUpdate: state.lastSeenUpdate,
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
@@ -835,13 +852,11 @@ export const useGeneralStore = create<GeneralState>()(
         },
         onRehydrateStorage: () => (state) => {
           if (state) {
-            const isJunior = state.settings?.isJuniorContest ?? false;
-
             useCountriesStore
               .getState()
               .setInitialCountriesForYear(state.year, {
                 force: true,
-                isJuniorContest: isJunior,
+                contestType: state.settings?.contestType ?? 'esc',
               });
 
             // Ensure theme is consistent; fallback to standard theme for the year
@@ -883,21 +898,31 @@ export const useGeneralStore = create<GeneralState>()(
           const settingsTelevotePointsSystem: PointsItem[] =
             state.settingsTelevotePointsSystem || initialPointsSystem;
 
+          // Settings persisted before `contestType` replaced `isJuniorContest`
+          const legacySettings = state.settings as
+            | (Partial<Settings> & { isJuniorContest?: boolean })
+            | undefined;
+          const isLegacyContestType =
+            !!legacySettings && legacySettings.contestType === undefined;
+
           const persistedSettings = {
             ...currentState.settings,
-            ...state.settings,
+            ...legacySettings,
           };
 
-          const isJunior = persistedSettings.isJuniorContest ?? false;
+          delete persistedSettings.isJuniorContest;
+
           const settings = {
             ...persistedSettings,
-            isJuniorContest: isJunior,
+            contestType: resolveContestType(legacySettings),
             overrideThemeFont: persistedSettings.overrideThemeFont ?? false,
             overrideThemeFontAlias: normalizeFontAlias(
               persistedSettings.overrideThemeFontAlias,
             ),
             showQualifierTargetStages:
               persistedSettings.showQualifierTargetStages ?? true,
+            syncThemeWithContest:
+              persistedSettings.syncThemeWithContest ?? true,
             lastOpenedSettingsTab:
               persistedSettings.lastOpenedSettingsTab ?? 'General',
             lastOpenedGeneralSettingsCategory:
@@ -927,6 +952,9 @@ export const useGeneralStore = create<GeneralState>()(
             settingsTelevotePointsSystem,
             settings,
             imageCustomization,
+            // The setup fingerprint now hashes `contestType`; a baseline taken
+            // with the old shape would flag the loaded contest as dirty.
+            ...(isLegacyContestType ? { loadedContestFingerprint: null } : {}),
           };
         },
       },

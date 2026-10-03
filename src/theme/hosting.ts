@@ -1,5 +1,6 @@
 import { years, Year } from '../config';
 
+import type { ContestType } from '@/data/contestTypes';
 import { BaseCountry } from '@/models';
 import {
   getFlagPath,
@@ -49,7 +50,11 @@ const juniorHostingLogosByYear: Record<string, HostingCountryData> = {
   '2023': { code: 'FR', logo: '/hostingCountryLogos/EuroFrancia.svg' },
   '2024': { code: 'ES', logo: '/hostingCountryLogos/EuroEspana.png' },
   '2025': { code: 'GE', logo: '/hostingCountryLogos/EuroGeorgia.svg' },
-  '2026': { code: 'FR', logo: '/hostingCountryLogos/EuroMalta.svg' },
+  '2026': { code: 'MT', logo: '/hostingCountryLogos/EuroMalta.svg' },
+};
+
+const asiaHostingLogosByYear: Record<string, HostingCountryData> = {
+  '2026': { code: 'TH', logo: '/hostingCountryLogos/EuroTailandia.svg' },
 };
 
 // Optional per-country overrides for a default hosting logo not tied to a specific year
@@ -266,10 +271,14 @@ const yearsDesc: Year[] = [...years].reverse() as Year[];
 
 export function getHostingCountryByYear(
   year: Year,
-  isJunior = false,
+  contestType: ContestType = 'esc',
 ): HostingCountryData {
-  if (isJunior) {
+  if (contestType === 'jesc') {
     return juniorHostingLogosByYear[year] || juniorHostingLogosByYear['2024'];
+  }
+
+  if (contestType === 'asia') {
+    return asiaHostingLogosByYear[year] || asiaHostingLogosByYear['2026'];
   }
 
   return hostingLogosByYear[year] || hostingLogosByYear['2026'];

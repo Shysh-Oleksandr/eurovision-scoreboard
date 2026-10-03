@@ -4,6 +4,7 @@ import { isDefaultPointsSystem } from './pointsSystem';
 
 import { buildEventStagesFromAssignments } from '@/components/setup/utils/buildEventStagesFromAssignments';
 import { Year } from '@/config';
+import { resolveContestType } from '@/data/contestTypes';
 import { POINTS_ARRAY } from '@/data/data';
 import {
   BaseCountry,
@@ -476,8 +477,8 @@ export function buildContestSnapshotFromStores() {
     schemaVersion: 1,
     setup: {
       baseYear: general.year,
-      ...(general.settings.isJuniorContest
-        ? { isJuniorContest: general.settings.isJuniorContest }
+      ...(general.settings.contestType !== 'esc'
+        ? { contestType: general.settings.contestType }
         : {}),
       ...(general.settings.randomnessLevel !== DEFAULT_RANDOMNESS_LEVEL
         ? { randomnessLevel: general.settings.randomnessLevel }
@@ -832,15 +833,15 @@ export async function applyContestSnapshotToStores(
 
     // First, load base year defaults for all participants
     const { baseYear } = snapshot.setup;
-    const isJuniorContest = snapshot.setup.isJuniorContest ?? false;
+    const contestType = resolveContestType(snapshot.setup);
 
     if (baseYear) {
-      // Load the base year countries to get correct defaults (junior or senior)
+      // Load the base year countries to get correct defaults (ESC / JESC / Asia)
       await useCountriesStore
         .getState()
         .setInitialCountriesForYear(baseYear.toString() as Year, {
           force: true,
-          isJuniorContest,
+          contestType,
         });
 
       const baseYearCountries =

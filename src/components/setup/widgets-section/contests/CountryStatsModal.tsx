@@ -7,7 +7,11 @@ import { toast } from 'react-toastify';
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 
 import { api } from '@/api/client';
-import { useContestGroupsQuery, useMyEntryStatsQuery, useUserEntryStatsQuery } from '@/api/contests';
+import {
+  useContestGroupsQuery,
+  useMyEntryStatsQuery,
+  useUserEntryStatsQuery,
+} from '@/api/contests';
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
@@ -27,6 +31,8 @@ interface CountryStatsModalProps {
   initialGroupId?: string | null;
   /** When set, shows public completed contests for that user instead of the current user's. */
   userId?: string;
+  /** Override the overlay z-index when opened above a higher-stacked modal. */
+  overlayClassName?: string;
 }
 
 const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
@@ -36,6 +42,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   entryCode,
   initialGroupId = null,
   userId,
+  overlayClassName = '!z-[1003]',
 }) => {
   const isUserScope = !!userId;
   const t = useTranslations('widgets.contests.entryStats');
@@ -59,9 +66,13 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
     enabled: isOpen && !!entryCode && !isUserScope,
     groupId: selectedGroupId,
   });
-  const userEntryStatsQuery = useUserEntryStatsQuery(userId ?? null, entryCode, {
-    enabled: isOpen && !!entryCode && isUserScope,
-  });
+  const userEntryStatsQuery = useUserEntryStatsQuery(
+    userId ?? null,
+    entryCode,
+    {
+      enabled: isOpen && !!entryCode && isUserScope,
+    },
+  );
   const { data, isLoading, isError, error } = isUserScope
     ? userEntryStatsQuery
     : myEntryStatsQuery;
@@ -181,7 +192,7 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
       onClose={onClose}
       containerClassName="!w-[min(100%,800px)]"
       contentClassName="text-white sm:h-[75vh] h-[70vh] max-h-[70vh] narrow-scrollbar !py-4"
-      overlayClassName="!z-[1003]"
+      overlayClassName={overlayClassName}
       withBlur
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >

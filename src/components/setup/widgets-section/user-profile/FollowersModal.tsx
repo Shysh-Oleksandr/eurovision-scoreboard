@@ -48,7 +48,7 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,450px)]"
-      overlayClassName="!z-[1003]"
+      overlayClassName="!z-[1101]"
       bottomContent={<ModalBottomCloseButton onClose={onClose} />}
     >
       <h3 className="text-xl font-bold mb-4">

@@ -72,7 +72,8 @@
     "current": "Поточний",
     "dontShowAgain": "Не показувати знову",
     "more": "Більше",
-    "share": "Поділитися"
+    "share": "Поділитися",
+    "done": "Готово"
   },
   "Metadata": {
     "title": "DouzePoints - Симулятор Євробачення",
@@ -198,7 +199,35 @@
       "areYouSureYouWantToSaveImportedEntriesDescription": "Це додасть імпортованих учасників до ваших користувацьких учасників.",
       "customEntriesSavedSuccessfully": "Користувацькі учасники успішно збережені!",
       "failedToSaveCustomEntries": "Не вдалося зберегти користувацьких учасників. Спробуйте знову.",
-      "saveToYourCustomEntries": "Зберегти до своїх користувацьких учасників"
+      "saveToYourCustomEntries": "Зберегти до своїх користувацьких учасників",
+      "countryPool": "Пул країн",
+      "countryPoolSub": "{count} не беруть участі · перетягніть до етапу",
+      "contestSub": "{participants} беруть участь · {stages, plural, =1 {# етап} few {# етапи} other {# етапів}}",
+      "unsavedChanges": "Незбережені зміни",
+      "select": "Вибрати",
+      "selecting": "Вибір",
+      "selectedCount": "Вибрано: {count}",
+      "moveTo": "Перемістити до",
+      "moveToEllipsis": "Перемістити до…",
+      "moveCountries": "Перемістити {count, plural, =1 {# країну} few {# країни} other {# країн}}",
+      "moveAllTo": "Перемістити всі до…",
+      "moveToGroup": "Перемістити до групи",
+      "editEntry": "Редагувати учасника",
+      "dropCountriesHere": "Перетягніть країни сюди",
+      "emptyDropHere": "Порожньо — перетягніть країни сюди",
+      "noMatches": "Нічого не знайдено",
+      "movedTo": "{name} переміщено до {target}",
+      "countriesMoved": "Переміщено {count, plural, =1 {# країну} few {# країни} other {# країн}}",
+      "syncThemeToContestYear": "Синхронізувати тему з роком конкурсу",
+      "themeFollowsYear": "Тема відповідає року конкурсу",
+      "themeUnlinked": "Тему відв'язано від року",
+      "deleteSelectedEntries": "Видалити {count, plural, =1 {# користувацького учасника} few {# користувацьких учасників} other {# користувацьких учасників}}",
+      "stageIndexLabel": "Етап {index}",
+      "gfOnlyDisabledForSavedContest": "Недоступно, поки завантажено збережений конкурс",
+      "newEntry": "Новий учасник",
+      "newGroup": "Нова група",
+      "groupOptions": "Параметри групи",
+      "sendAllToPool": "Надіслати всі до пулу"
     },
     "votingPredefinition": {
       "tabDetailed": "Детально",
@@ -494,7 +523,7 @@
     "copyLink": "Копіювати посилання",
     "profile": {
       "title": "Профіль",
-      "description": "Керуйте своїм профілем та налаштуваннями",
+      "description": "Ваш профіль і підписники",
       "continueWithGoogle": "Продовжити через Google",
       "editProfile": "Редагувати профіль",
       "authDescription": "Увійдіть, щоб створювати профіль, використовувати власні країни та інше.",
@@ -515,7 +544,8 @@
       "followedUser": "Підписано!",
       "unfollowedUser": "Відписано!",
       "follow": "Підписатись",
-      "signInToFollow": "Увійдіть, щоб підписатись"
+      "signInToFollow": "Увійдіть, щоб підписатись",
+      "followingCount": "Підписок: {count}"
     },
     "contentType": {
       "all": "Усе",
@@ -544,7 +574,7 @@
     },
     "contests": {
       "title": "Конкурси",
-      "description": "Створюйте конкурси або виберіть публічні конкурси",
+      "description": "Створюйте конкурси або переглядайте публічні",
       "yourContests": "Ваші конкурси",
       "publicContests": "Публічні конкурси",
       "searchContests": "Пошук конкурсів...",
@@ -668,11 +698,13 @@
         "searchPlaceholder": "Пошук країн...",
         "noEntriesMatch": "Жоден учасник не відповідає вашому запиту.",
         "customEntryName": "Власний учасник"
-      }
+      },
+      "privateCount": "Приватних: {count}",
+      "publicCount": "Публічних: {count}"
     },
     "themes": {
       "title": "Теми",
-      "widgetDescription": "Створюйте власні теми або обирайте публічні",
+      "widgetDescription": "Створюйте теми або переглядайте публічні",
       "copyToFields": "Скопіювати в поля",
       "copyToNFields": "Скопіювати в {count} {count, plural, =1 {поле} other {поля}}",
       "searchFields": "Пошук полів...",
@@ -939,7 +971,9 @@
         "signInToUpload": "Увійдіть, щоб завантажувати шрифти й збирати бібліотеку.",
         "badge": "Шрифт",
         "filterWithFonts": "З користувацькими шрифтами"
-      }
+      },
+      "customCount": "Власних: {count}",
+      "savedCount": "Збережених: {count}"
     },
     "sortBadges": {
       "latest": "Нові",
@@ -1036,7 +1070,7 @@
     "setup": {
       "yearData": {
         "title": "Вибір року та офіційні дані",
-        "content": "Скористайтеся меню зліва вгорі, щоб обрати видання ESC (2004–2026) або JESC (2016–2025). Вибір року автоматично завантажує офіційний склад цього видання. Те саме меню дозволяє швидко завантажити один із ваших збережених конкурсів."
+        "content": "Скористайтеся меню зліва вгорі, щоб обрати видання ESC (2004–2026), JESC (2016–2026) або ESC Asia (2026). Вибір року автоматично завантажує офіційний склад цього видання. Те саме меню дозволяє швидко завантажити один із ваших збережених конкурсів."
       },
       "countryAssignment": {
         "title": "Призначення країн",

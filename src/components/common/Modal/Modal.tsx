@@ -25,6 +25,14 @@ interface ModalProps {
   withBlur?: boolean;
   shouldBlur?: boolean;
   fixedHeight?: boolean;
+  /** Skip the default primary gradient so the caller paints its own surface. */
+  unstyledSurface?: boolean;
+  /**
+   * Below the `2cols` breakpoint, stretch the box to the overlay's full height
+   * (the visible viewport, whatever browser bars or PWA mode leave) and let
+   * the content fill what `topContent` / `bottomContent` leave over.
+   */
+  fullScreenOnPhone?: boolean;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -44,6 +52,8 @@ const Modal: React.FC<ModalProps> = ({
   withBlur = false,
   shouldBlur = false,
   fixedHeight = false,
+  unstyledSurface = false,
+  fullScreenOnPhone = false,
 }) => {
   const enableWinterEffects = useGeneralStore(
     (state) => state.settings.enableWinterEffects,
@@ -98,10 +108,14 @@ const Modal: React.FC<ModalProps> = ({
         : '!max-h-[calc(80vh-100px)]';
     }
 
+    if (fullScreenOnPhone) {
+      return 'flex-1 min-h-0 md:!max-h-[calc(90vh-50px)] sm:!max-h-[calc(90vh-70px)] 2cols:!max-h-[calc(90vh-110px)]';
+    }
+
     return fixedHeight
       ? 'sm:!h-[calc(90vh-70px)] !h-[calc(90vh-110px)]'
-      : 'sm:!max-h-[calc(90vh-70px)] !max-h-[calc(90vh-110px)]';
-  }, [isMobileInLandscape, topContent, fixedHeight]);
+      : 'md:!max-h-[calc(90vh-50px)] sm:!max-h-[calc(90vh-70px)] !max-h-[calc(90vh-110px)]';
+  }, [isMobileInLandscape, topContent, fixedHeight, fullScreenOnPhone]);
 
   if (!isMounted) {
     return null;
@@ -123,9 +137,17 @@ const Modal: React.FC<ModalProps> = ({
     >
       <div
         data-theme={dataTheme}
-        className={`text-white bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900 rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
+        className={`text-white ${
+          unstyledSurface
+            ? ''
+            : 'bg-primary-950 bg-gradient-to-bl from-primary-950 to-primary-900'
+        } rounded-lg lg:max-w-5xl md:max-w-4xl md:mx-10 xs:mx-6 mx-3 w-full transition-all duration-[200ms] ${
           enableWinterEffects ? '' : 'overflow-hidden'
         } ${isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-0'} ${
+          fullScreenOnPhone
+            ? 'flex flex-col self-stretch 2cols:block 2cols:self-auto'
+            : ''
+        } ${
           topContent && enableWinterEffects ? 'pt-1' : ''
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}
