@@ -16,6 +16,15 @@ import {
   StageVotingMode,
   VotingCountry,
 } from '@/models';
+import {
+  createOfficialRules,
+  DrawRules,
+  OFFICIAL_RULES,
+} from '@/state/allocationDraw/types';
+import {
+  DrawnStageInfo,
+  useAllocationDrawStore,
+} from '@/state/allocationDrawStore';
 import { CountryOdds, useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { ensureScoreboardEngine } from '@/state/scoreboard/engineLoader';
@@ -467,11 +476,40 @@ export function buildContestSnapshotFromStores() {
       ...(hasVoterChannels(stage)
         ? { voterChannels: stage.voterChannels }
         : {}),
+      ...(stage.firstHalfSize !== undefined &&
+      stage.firstHalfSize > 0 &&
+      stage.firstHalfSize < participants.length
+        ? { firstHalfSize: stage.firstHalfSize }
+        : {}),
       ...stageOverridesPayload,
     };
 
     return stageData;
   });
+
+  // Allocation draw: only what differs from a fresh contest, so untouched
+  // contests keep their fingerprint.
+  const drawState = useAllocationDrawStore.getState();
+  const setupStageIds = new Set(setupStages.map((s) => s.id));
+  const drawnEntries = Object.entries(drawState.drawn).filter(([id]) =>
+    setupStageIds.has(id),
+  );
+  const changedRules = Object.fromEntries(
+    (Object.keys(OFFICIAL_RULES) as Array<keyof DrawRules>)
+      .filter((key) => !isDeepEqual(drawState.rules[key], OFFICIAL_RULES[key]))
+      .map((key) => [key, drawState.rules[key]]),
+  );
+  const allocationDraw =
+    drawnEntries.length > 0 || Object.keys(changedRules).length > 0
+      ? {
+          ...(Object.keys(changedRules).length > 0
+            ? { rules: changedRules }
+            : {}),
+          ...(drawnEntries.length > 0
+            ? { drawn: Object.fromEntries(drawnEntries) }
+            : {}),
+        }
+      : undefined;
 
   const snapshot: any = {
     schemaVersion: 1,
@@ -501,6 +539,7 @@ export function buildContestSnapshotFromStores() {
         ? { countryOdds: countryOddsTuples }
         : {}),
       stages: setupStagesPayload,
+      ...(allocationDraw ? { allocationDraw } : {}),
     },
     ...(customEntriesUsed.length > 0 ? { customEntriesUsed } : {}),
   };
@@ -920,6 +959,9 @@ export async function applyContestSnapshotToStores(
         isOver: false, // Setup stages are never "over"
         isJuryVoting: (s.votingMode || DEFAULT_VOTING_MODE) !== 'TELEVOTE_ONLY',
         runningOrder,
+        ...(typeof s.firstHalfSize === 'number'
+          ? { firstHalfSize: s.firstHalfSize }
+          : {}),
         ...(stageOverrides ? { overrides: stageOverrides } : {}),
       };
     });
@@ -927,6 +969,30 @@ export async function applyContestSnapshotToStores(
     useCountriesStore.setState({
       configuredEventStages: configuredStages,
       eventAssignments: assignments,
+    });
+
+    // Allocation draw: a loaded contest never has countries waiting; it keeps
+    // the "Drawn" chips and any customised rules it was saved with.
+    const savedDraw = snapshot.setup.allocationDraw;
+    const stageIds = new Set(configuredStages.map((st) => st.id));
+    const drawn: Record<string, DrawnStageInfo> = {};
+
+    Object.entries(savedDraw?.drawn ?? {}).forEach(([id, info]) => {
+      if (stageIds.has(id) && info && Array.isArray(info.members)) {
+        drawn[id] = {
+          code: String(info.code ?? ''),
+          order: (info.order as DrawnStageInfo['order']) ?? 'halves',
+          members: info.members,
+          voters: Array.isArray(info.voters) ? info.voters : [],
+        };
+      }
+    });
+    useAllocationDrawStore.getState().hydrate({
+      rules: {
+        ...createOfficialRules(),
+        ...((savedDraw?.rules ?? {}) as Partial<DrawRules>),
+      },
+      drawn,
     });
   }
 

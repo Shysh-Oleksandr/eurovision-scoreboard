@@ -25,6 +25,8 @@ export const parseDrop = (id: string): ParsedDrop | null => {
       return { group: parsed.stageId, listId: id };
     case 'notQualified':
       return { group: CountryAssignmentGroup.NOT_QUALIFIED, listId: id };
+    case 'toBeDrawn':
+      return { group: CountryAssignmentGroup.TO_BE_DRAWN, listId: id };
     case 'poolRoot':
       return { group: CountryAssignmentGroup.NOT_PARTICIPATING, listId: id };
     case 'pool':

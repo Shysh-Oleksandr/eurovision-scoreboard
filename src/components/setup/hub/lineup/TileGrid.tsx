@@ -14,6 +14,10 @@ interface TileGridProps {
   matches: Set<string> | null;
   eager?: boolean;
   className?: string;
+  /** Allocation draw: pin description per code (null = no pin). */
+  pinnedFor?: (code: string) => string | null;
+  /** Extra cell rendered after the tiles (e.g. the "+N from the draw" placeholder). */
+  extra?: React.ReactNode;
 }
 
 /** Auto-fill grid of country tiles for one list, filtered by the shared search. */
@@ -24,6 +28,8 @@ const TileGrid: React.FC<TileGridProps> = ({
   matches,
   eager = false,
   className = '',
+  pinnedFor,
+  extra,
 }) => {
   const t = useTranslations('setup.eventSetupModal');
   const { byCode } = useLineupModelContext();
@@ -40,7 +46,7 @@ const TileGrid: React.FC<TileGridProps> = ({
         variant === 'stage' ? 'dp-tile-grid' : 'dp-pool-grid'
       } ${className}`}
     >
-      {visible.length === 0 ? (
+      {visible.length === 0 && !extra ? (
         <div className="dp-empty col-span-full rounded-[10px] px-4 py-[18px] text-center text-[12.5px] font-bold">
           {matches ? t('noMatches') : t('emptyDropHere')}
         </div>
@@ -51,10 +57,17 @@ const TileGrid: React.FC<TileGridProps> = ({
           if (!country) return null;
 
           return (
-            <Tile key={code} country={country} listId={listId} eager={eager} />
+            <Tile
+              key={code}
+              country={country}
+              listId={listId}
+              eager={eager}
+              pinned={pinnedFor ? pinnedFor(code) : null}
+            />
           );
         })
       )}
+      {!matches && extra}
     </div>
   );
 };

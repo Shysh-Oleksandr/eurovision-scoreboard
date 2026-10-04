@@ -21,26 +21,42 @@ export interface StageCardProps {
   title: string;
   listId: ListId;
   codes: string[];
-  kind: 'semi' | 'final' | 'notQualified';
+  kind: 'semi' | 'final' | 'notQualified' | 'draw';
   /** 1-based position shown in the index chip (hidden for the not-qualified card). */
   index?: number;
+  /** Replaces the index chip (the "To be drawn" dice). */
+  badge?: React.ReactNode;
+  /** One line under the title (draw-mode hints). */
+  description?: string;
+  /** Small chip next to the title (the "Drawn" chip). */
+  chip?: React.ReactNode;
   stage?: EventStage;
   qualifiers?: Array<{ sourceStageName: string; amount: number }> | null;
   matches: Set<string> | null;
   /** Load flags eagerly (the first stage on screen). */
   eager?: boolean;
+  /** Allocation draw: pin description per code. */
+  pinnedFor?: (code: string) => string | null;
+  /** Extra cell after the tiles (the "+N from the draw" placeholder). */
+  extraTile?: React.ReactNode;
+  /** Rendered above the body (rule warnings). */
+  notice?: React.ReactNode;
+  /** Replaces the default tile grid. */
+  children?: React.ReactNode;
 }
 
 const surfaceClass = {
   semi: 'dp-stage',
   final: 'dp-stage dp-stage--final',
   notQualified: 'dp-stage dp-stage--muted',
+  draw: 'dp-stage dp-stage--draw',
 };
 
 /**
- * One lineup stage (or the GF-only "Not qualified" bucket): collapsible header
- * with index chip, title, count pill (move all) and pencil (edit stage), then
- * the tile grid and, for the final, the qualifiers block.
+ * One lineup stage (or the GF-only "Not qualified" / draw-mode "To be drawn"
+ * bucket): collapsible header with index chip, title, count pill (move all)
+ * and pencil (edit stage), then the tile grid and, for any stage fed by
+ * another, the qualifiers block.
  */
 const StageCard: React.FC<StageCardProps> = ({
   title,
@@ -48,10 +64,17 @@ const StageCard: React.FC<StageCardProps> = ({
   codes,
   kind,
   index,
+  badge,
+  description,
+  chip,
   stage,
   qualifiers,
   matches,
   eager = false,
+  pinnedFor,
+  extraTile,
+  notice,
+  children,
 }) => {
   const t = useTranslations();
   const { DropZone } = useDndComponents();
@@ -88,24 +111,35 @@ const StageCard: React.FC<StageCardProps> = ({
             }`}
           />
         </button>
-        {index !== undefined && (
-          <span
-            className="hidden 2cols:grid w-[26px] h-[26px] rounded-lg place-items-center flex-none text-[11.5px] font-extrabold bg-white/10 border border-hair text-white/70 tabular-nums"
-            aria-label={t('setup.eventSetupModal.stageIndexLabel', { index })}
-          >
-            {String(index).padStart(2, '0')}
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={toggle}
-          className="min-w-0 flex-1 text-left"
-          tabIndex={-1}
-        >
-          <span className="block truncate text-[17.5px] 2cols:text-xl font-extrabold tracking-[-.024em] text-white">
-            {title}
-          </span>
-        </button>
+        {badge ??
+          (index !== undefined && (
+            <span
+              className="hidden 2cols:grid w-[26px] h-[26px] rounded-lg place-items-center flex-none text-[11.5px] font-extrabold bg-white/10 border border-hair text-white/70 tabular-nums"
+              aria-label={t('setup.eventSetupModal.stageIndexLabel', { index })}
+            >
+              {String(index).padStart(2, '0')}
+            </span>
+          ))}
+        <div className="min-w-0 flex-1 flex flex-col gap-0.5">
+          <div className="flex items-center gap-2.5 min-w-0 flex-wrap">
+            <button
+              type="button"
+              onClick={toggle}
+              className="min-w-0 text-left"
+              tabIndex={-1}
+            >
+              <span className="block truncate text-[17.5px] 2cols:text-xl font-extrabold tracking-[-.024em] text-white">
+                {title}
+              </span>
+            </button>
+            {chip}
+          </div>
+          {description && (
+            <p className="m-0 text-[11.5px] 2cols:text-[12.5px] font-semibold text-white/70 leading-[1.35] text-pretty">
+              {description}
+            </p>
+          )}
+        </div>
         <div className="ml-auto flex items-center gap-[7px] flex-none">
           <CountPill
             count={codes.length}
@@ -136,14 +170,19 @@ const StageCard: React.FC<StageCardProps> = ({
         <div className="min-h-0 overflow-hidden">
           {hasBeenOpened && (
             <div className="px-3.5 pb-3.5">
-              <TileGrid
-                codes={codes}
-                listId={listId}
-                variant="stage"
-                matches={matches}
-                eager={eager}
-              />
-              {kind === 'final' && qualifiers && qualifiers.length > 0 && (
+              {notice}
+              {children ?? (
+                <TileGrid
+                  codes={codes}
+                  listId={listId}
+                  variant="stage"
+                  matches={matches}
+                  eager={eager}
+                  pinnedFor={pinnedFor}
+                  extra={extraTile}
+                />
+              )}
+              {qualifiers && qualifiers.length > 0 && (
                 <div className="mt-2.5">
                   <div className="dp-qual-div text-[11.5px] font-extrabold tracking-[.1em] uppercase mb-2.5">
                     {t('setup.eventSetupModal.qualifiers')}

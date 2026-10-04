@@ -4,6 +4,7 @@
  * Shapes:
  * - `stage:<stageId>`                        — a contest stage
  * - `group:NOT_QUALIFIED`                    — the "Not Qualified" group
+ * - `group:TO_BE_DRAWN`                      — the allocation draw's "To be drawn" bucket
  * - `pool`                                   — the whole country pool
  * - `pool:<category>`                        — a pool category (e.g. `Custom`)
  * - `pool:Custom:<groupId|__ungrouped__>`    — a custom-entry group inside the pool
@@ -13,6 +14,8 @@ export type ListId = string;
 export const UNGROUPED_ID = '__ungrouped__';
 
 export const NOT_QUALIFIED_LIST: ListId = 'group:NOT_QUALIFIED';
+
+export const TO_BE_DRAWN_LIST: ListId = 'group:TO_BE_DRAWN';
 
 export const POOL_ROOT_LIST: ListId = 'pool';
 
@@ -26,11 +29,13 @@ export const poolList = (category: string, groupId?: string | null): ListId =>
 export type ParsedListId =
   | { kind: 'stage'; stageId: string }
   | { kind: 'notQualified' }
+  | { kind: 'toBeDrawn' }
   | { kind: 'poolRoot' }
   | { kind: 'pool'; category: string; groupId?: string };
 
 export function parseListId(id: ListId): ParsedListId {
   if (id === NOT_QUALIFIED_LIST) return { kind: 'notQualified' };
+  if (id === TO_BE_DRAWN_LIST) return { kind: 'toBeDrawn' };
   if (id === POOL_ROOT_LIST) return { kind: 'poolRoot' };
 
   const separator = id.indexOf(':');

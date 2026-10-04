@@ -12,6 +12,10 @@ import { useScoreboardStore } from '../../state/scoreboardStore';
 import Modal from '../common/Modal/Modal';
 import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
+import { AllocationDrawProvider } from './allocation-draw/AllocationDrawContext';
+import DrawModeDialogs from './allocation-draw/DrawModeDialogs';
+import { useDrawUiStore } from './allocation-draw/drawUiStore';
+import { useAllocationDraw } from './allocation-draw/useAllocationDraw';
 import { useContestDirtyState } from './hooks/useContestDirtyState';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
 import { useCustomCountryModal } from './hooks/useCustomCountryModal';
@@ -46,6 +50,10 @@ import {
 import { importPostSetupModal } from '@/hooks/simulationChunkImports';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
+import {
+  isDrawnInfoCurrent,
+  useAllocationDrawStore,
+} from '@/state/allocationDrawStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -72,6 +80,10 @@ const PostSetupModal = dynamic(importPostSetupModal, {
 const StageReorderModal = dynamic(() => import('./StageReorderModal'), {
   ssr: false,
 });
+const AllocationDrawModal = dynamic(
+  () => import('./allocation-draw/AllocationDrawModal'),
+  { ssr: false },
+);
 const LoadContestModal = dynamic(
   () => import('./widgets-section/contests/LoadContestModal'),
   {
@@ -193,12 +205,15 @@ const EventSetupModal = () => {
   const [initialSetupStage, setInitialSetupStage] = useState<EventStage | null>(
     null,
   );
+  const drawWindowOpen = useDrawUiStore((state) => state.windowOpen);
+  const [isDrawWindowLoaded, setIsDrawWindowLoaded] = useState(false);
 
   const {
     countryGroups: {
       eventStagesWithCountries,
       notParticipatingCountries,
       notQualifiedCountries,
+      toBeDrawnCountries,
     },
     handleBulkCountryAssignmentByCodes,
     setAssignments,
@@ -262,14 +277,29 @@ const EventSetupModal = () => {
   );
 
   const { data: customEntryGroups = [] } = useCustomEntryGroupsQuery(!!user);
+  const drawModel = useAllocationDraw(eventSetupModalOpen);
+  const drawnByStage = useAllocationDrawStore((state) => state.drawn);
   const lineupModel = useLineupModel({
     eventStagesWithCountries,
     notParticipatingCountries,
     notQualifiedCountries,
+    toBeDrawnCountries,
     customEntryGroups,
     isGfOnly,
+    drawEnabled: drawModel.enabled,
     isSignedIn: !!user,
   });
+  const isDrawn = useMemo(
+    () =>
+      drawModel.semis.length > 0 &&
+      drawModel.semis.every((semi) =>
+        isDrawnInfoCurrent(
+          drawnByStage[semi.id],
+          lineupModel.lists.get(`stage:${semi.id}`) ?? [],
+        ),
+      ),
+    [drawModel.semis, drawnByStage, lineupModel.lists],
+  );
 
   const hasUnsavedChanges = useContestDirtyState();
 
@@ -294,6 +324,7 @@ const EventSetupModal = () => {
   const onClose = useCallback(() => {
     setEventSetupModalOpen(false);
     useSetupUiStore.getState().resetUi();
+    useDrawUiStore.getState().reset();
   }, [setEventSetupModalOpen]);
 
   const closeAndStartEvent = () => {
@@ -397,6 +428,7 @@ const EventSetupModal = () => {
       },
       {
         stages: eventStagesWithCountries,
+        toBeDrawnCount: toBeDrawnCountries.length,
       },
       t,
     );
@@ -515,8 +547,16 @@ const EventSetupModal = () => {
   }, [restartCounter]);
 
   return (
-    <>
+    <AllocationDrawProvider value={drawModel}>
       <SyncCustomEntries />
+      <DrawModeDialogs />
+      {(drawWindowOpen || isDrawWindowLoaded) && (
+        <AllocationDrawModal
+          isOpen={drawWindowOpen}
+          onClose={() => useDrawUiStore.getState().setWindowOpen(false)}
+          onLoaded={() => setIsDrawWindowLoaded(true)}
+        />
+      )}
       {(predefModalOpen || isPredefModalLoaded) && currentSetupStage && (
         <VotingPredefinitionModal
           isOpen={predefModalOpen}
@@ -556,6 +596,8 @@ const EventSetupModal = () => {
             }
             onClose={onClose}
             onStart={handleStartEvent}
+            waitingCount={toBeDrawnCountries.length}
+            onOpenDraw={() => useDrawUiStore.getState().setWindowOpen(true)}
           />
         }
       >
@@ -609,6 +651,7 @@ const EventSetupModal = () => {
             stagesCount={lineupModel.counts.stages}
             isGfOnly={isGfOnly}
             hasUnsavedChanges={hasUnsavedChanges}
+            isDrawn={isDrawn}
           />
 
           <LineupProvider
@@ -707,7 +750,7 @@ const EventSetupModal = () => {
           }}
         />
       )}
-    </>
+    </AllocationDrawProvider>
   );
 };
 

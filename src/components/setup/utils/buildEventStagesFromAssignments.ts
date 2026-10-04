@@ -9,6 +9,8 @@ export interface BuiltEventStagesResult {
   eventStagesWithCountries: EventStage[];
   notParticipatingCountries: Country[];
   notQualifiedCountries: Country[];
+  /** Participants waiting for the allocation draw (no stage yet). */
+  toBeDrawnCountries: Country[];
 }
 
 /**
@@ -25,6 +27,7 @@ export const buildEventStagesFromAssignments = (
   const initialGroups: Record<string, Country[]> = {
     [CountryAssignmentGroup.NOT_PARTICIPATING]: [],
     [CountryAssignmentGroup.NOT_QUALIFIED]: [],
+    [CountryAssignmentGroup.TO_BE_DRAWN]: [],
   };
 
   configuredEventStages.forEach((stage) => {
@@ -60,6 +63,7 @@ export const buildEventStagesFromAssignments = (
 
   for (const stage of sortedStages) {
     const group = initialGroups[stage.id];
+
     if (!group) continue;
     if (stage.runningOrder && stage.runningOrder.length > 0) {
       const orderMap = new Map(
@@ -67,6 +71,7 @@ export const buildEventStagesFromAssignments = (
       );
       const inOrder = group.filter((c) => orderMap.has(c.code));
       const notInOrder = group.filter((c) => !orderMap.has(c.code));
+
       inOrder.sort(
         (a, b) => (orderMap.get(a.code) ?? 0) - (orderMap.get(b.code) ?? 0),
       );
@@ -80,8 +85,10 @@ export const buildEventStagesFromAssignments = (
   [
     CountryAssignmentGroup.NOT_PARTICIPATING,
     CountryAssignmentGroup.NOT_QUALIFIED,
+    CountryAssignmentGroup.TO_BE_DRAWN,
   ].forEach((key) => {
     const group = initialGroups[key];
+
     if (group) group.sort((a, b) => a.name.localeCompare(b.name));
   });
 
@@ -95,5 +102,6 @@ export const buildEventStagesFromAssignments = (
     notParticipatingCountries:
       initialGroups[CountryAssignmentGroup.NOT_PARTICIPATING],
     notQualifiedCountries: initialGroups[CountryAssignmentGroup.NOT_QUALIFIED],
+    toBeDrawnCountries: initialGroups[CountryAssignmentGroup.TO_BE_DRAWN],
   };
 };

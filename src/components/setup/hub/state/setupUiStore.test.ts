@@ -6,6 +6,7 @@ import {
   POOL_ROOT_LIST,
   poolList,
   stageList,
+  TO_BE_DRAWN_LIST,
   UNGROUPED_ID,
 } from '../lineup/listIds';
 
@@ -159,6 +160,7 @@ describe('listIds', () => {
 
   it('parses the fixed ids', () => {
     expect(parseListId(NOT_QUALIFIED_LIST)).toEqual({ kind: 'notQualified' });
+    expect(parseListId(TO_BE_DRAWN_LIST)).toEqual({ kind: 'toBeDrawn' });
     expect(parseListId(POOL_ROOT_LIST)).toEqual({ kind: 'poolRoot' });
   });
 

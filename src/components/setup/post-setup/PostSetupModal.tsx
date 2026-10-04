@@ -105,17 +105,41 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     [configuredEventStages, stage.id],
   );
 
+  const tDraw = useTranslations('setup.allocationDraw');
   const {
     orderedCodes,
     orderedCountries,
+    firstHalfSize,
     handleRunningOrderSortEnd,
     handleQuickSort,
+    handleDrawHalves,
+    handleRemoveHalves,
+    handleMoveToOtherHalf,
   } = useRunningOrder({
     isOpen,
     stageId: stage.id,
     stageCountries: stage.countries,
     savedRunningOrder: configuredStage?.runningOrder,
+    savedFirstHalfSize: configuredStage?.firstHalfSize,
   });
+
+  const onRunningOrderSortEnd = useCallback(
+    (oldIndex: number, newIndex: number) => {
+      const movedToHalf = handleRunningOrderSortEnd(oldIndex, newIndex);
+
+      if (movedToHalf) {
+        toast.info(
+          tDraw('roMovedToHalf', {
+            name: orderedCountries[oldIndex]?.name ?? '',
+            half: movedToHalf === 1 ? 'first' : 'second',
+          }),
+        );
+      }
+    },
+    // handleRunningOrderSortEnd is recreated every render (it closes over state).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [orderedCountries, firstHalfSize, tDraw],
+  );
 
   const form = usePostSetupStageForm({
     stage,
@@ -218,6 +242,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       };
       const stageOverrides = buildOverrides();
 
+      const halves = firstHalfSize === null ? undefined : { firstHalfSize };
       const updatedStages = configuredEventStages.map((s) =>
         s.id === stage.id
           ? {
@@ -225,6 +250,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
               votingCountries: data.votingCountries,
               voterChannels: data.voterChannels,
               runningOrder,
+              firstHalfSize: halves?.firstHalfSize,
               votingMode: localVotingMode,
               overrides: stageOverrides,
             }
@@ -237,6 +263,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
               votingCountries: data.votingCountries,
               voterChannels: data.voterChannels,
               runningOrder,
+              firstHalfSize: halves?.firstHalfSize,
               votingMode: localVotingMode,
               isJuryVoting: localVotingMode !== StageVotingMode.TELEVOTE_ONLY,
               countries: s.countries
@@ -258,6 +285,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     channelError,
     onClose,
     orderedCodes,
+    firstHalfSize,
     getOverride,
     getOddsOverride,
     localEnablePredefined,
@@ -282,9 +310,29 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
           <RunningOrderTab
             stageId={stage.id}
             orderedCountries={orderedCountries}
+            firstHalfSize={firstHalfSize}
             selectedLayout={selectedLayout}
             setSelectedLayout={setSelectedLayout}
-            onSortEnd={handleRunningOrderSortEnd}
+            onSortEnd={onRunningOrderSortEnd}
+            onDrawHalves={() => {
+              const sizes = handleDrawHalves();
+
+              toast.success(tDraw('roHalvesDrawn', sizes));
+            }}
+            onRemoveHalves={handleRemoveHalves}
+            onMoveToOtherHalf={(code) => {
+              const half = handleMoveToOtherHalf(code);
+
+              if (half) {
+                toast.info(
+                  tDraw('roMovedToHalf', {
+                    name:
+                      orderedCountries.find((c) => c.code === code)?.name ?? '',
+                    half: half === 1 ? 'first' : 'second',
+                  }),
+                );
+              }
+            }}
             onQuickSort={handleQuickSort}
             onShare={() => setIsShareModalOpen(true)}
           />

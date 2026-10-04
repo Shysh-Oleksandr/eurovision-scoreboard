@@ -2027,4 +2027,426 @@ h6 {
     background: #0d0912;
     border: 1px solid var(--hair-2);
   }
+
+  /* ---------- Allocation draw: line-up pieces ---------- */
+  .dp-stage--draw {
+    background: linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--accent) 17%, var(--p-800)),
+      var(--p-900) 74%
+    );
+    border: 1px dashed color-mix(in oklch, var(--accent) 55%, var(--hair-2));
+  }
+
+  .dp-stage--draw.dp-drop-on {
+    border-style: solid;
+  }
+
+  .dp-dice-badge {
+    color: #fff;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--accent) 88%, white 6%),
+      color-mix(in oklch, var(--accent) 66%, black 18%)
+    );
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+  }
+
+  .dp-warn-badge {
+    color: #2a1a00;
+    background: linear-gradient(180deg, oklch(76% 0.15 75deg), oklch(60% 0.14 65deg));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+  }
+
+  .dp-accent-ink {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  .dp-tile--pinned {
+    border-color: color-mix(in oklch, var(--accent) 38%, var(--hair));
+  }
+
+  .dp-tile-pin {
+    color: color-mix(in oklch, var(--accent) 72%, white);
+  }
+
+  .dp-tile-ph {
+    border: 1px dashed color-mix(in oklch, var(--accent) 50%, var(--hair-2));
+    background: color-mix(in oklch, var(--accent) 9%, transparent);
+    color: color-mix(in oklch, var(--accent) 60%, white);
+  }
+
+  .dp-tile-ph--over {
+    border-color: var(--badge-red-bd);
+    background: var(--badge-red-bg);
+    color: var(--badge-red-ink);
+  }
+
+  .dp-drawn-chip {
+    background: color-mix(in oklch, var(--accent) 20%, transparent);
+    border: 1px solid color-mix(in oklch, var(--accent) 45%, transparent);
+    transition: background 0.14s;
+  }
+
+  .dp-drawn-chip:hover {
+    background: color-mix(in oklch, var(--accent) 32%, transparent);
+  }
+
+  .dp-draw-warn {
+    background: var(--badge-red-bg);
+    border: 1px solid var(--badge-red-bd);
+  }
+
+  @keyframes dp-flash-ring {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+
+    50% {
+      box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 70%, transparent);
+    }
+  }
+
+  .dp-tile--flash {
+    border-color: var(--accent);
+    animation: dp-flash-ring 0.8s ease 3;
+  }
+
+  .dp-cta-count {
+    background: rgb(0 0 0 / 22%);
+  }
+
+  .dp-dialog {
+    background: linear-gradient(160deg, var(--p-800), var(--p-900));
+    border: 1px solid var(--hair-2);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 55%);
+  }
+
+  .dp-choice {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair-2);
+    transition: transform 0.14s, filter 0.14s, border-color 0.14s;
+  }
+
+  .dp-choice:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+  }
+
+  .dp-choice:active {
+    transform: translateY(1px);
+  }
+
+  .dp-choice--primary {
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--accent) 26%, var(--p-750)),
+      color-mix(in oklch, var(--accent) 14%, var(--p-800))
+    );
+    border-color: color-mix(in oklch, var(--accent) 60%, transparent);
+  }
+
+  /* ---------- Allocation draw: the draw window ---------- */
+  .dp-dw-surface {
+    background: radial-gradient(
+        55% 45% at 50% 40%,
+        color-mix(in oklch, var(--accent) 13%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(168deg, var(--p-900), var(--p-950));
+    border: 1px solid var(--hair-2);
+    box-shadow: 0 30px 80px rgb(0 0 0 / 60%);
+  }
+
+  .dp-dw-foot {
+    background: linear-gradient(180deg, var(--p-900), var(--p-950));
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-dw-rules-chip {
+    background: rgb(255 255 255 / 7%);
+    border: 1px solid var(--hair-2);
+    color: var(--ink);
+    transition: background 0.14s;
+  }
+
+  .dp-dw-rules-chip:hover:not(:disabled) {
+    background: rgb(255 255 255 / 13%);
+  }
+
+  .dp-dw-rules-chip.is-custom {
+    border-color: color-mix(in oklch, var(--accent) 60%, transparent);
+    background: color-mix(in oklch, var(--accent) 16%, transparent);
+  }
+
+  .dp-dw-pg {
+    background: rgb(255 255 255 / 4%);
+    border: 1px solid var(--hair);
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, opacity 0.2s;
+  }
+
+  .dp-dw-pg--preq {
+    background: color-mix(in oklch, var(--gold) 9%, transparent);
+  }
+
+  .dp-dw-pg.is-active {
+    border-color: var(--accent);
+    background: color-mix(in oklch, var(--accent) 13%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 28%, transparent);
+  }
+
+  .dp-dw-pg.is-done {
+    opacity: 0.7;
+  }
+
+  .dp-dw-pg.is-err {
+    border-color: var(--badge-red-bd);
+    background: var(--badge-red-bg);
+  }
+
+  .dp-dw-pc {
+    transition: opacity 0.25s;
+  }
+
+  .dp-dw-pc.is-taken {
+    opacity: 0.25;
+  }
+
+  .dp-dw-pc.is-taken img {
+    filter: grayscale(1);
+  }
+
+  .dp-dw-group-pill {
+    background: color-mix(in oklch, var(--accent) 26%, transparent);
+    border: 1px solid color-mix(in oklch, var(--accent) 50%, transparent);
+  }
+
+  .dp-dw-chip-semi {
+    background: color-mix(in oklch, var(--accent-2) 30%, var(--p-800));
+    border: 1px solid color-mix(in oklch, var(--accent-2) 65%, transparent);
+  }
+
+  .dp-dw-chip-half {
+    background: rgb(255 255 255 / 9%);
+    border: 1px solid var(--hair-2);
+  }
+
+  .dp-dw-err {
+    background: var(--badge-red-bg);
+    border: 1px solid var(--badge-red-bd);
+  }
+
+  .dp-dw-warn {
+    background: var(--badge-amber-bg);
+    border: 1px solid var(--badge-amber-bd);
+  }
+
+  .dp-dw-done-ic {
+    color: #fff;
+    background: linear-gradient(180deg, oklch(70% 0.15 155deg), oklch(54% 0.13 155deg));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+  }
+
+  .dp-dw-sp {
+    background: linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--accent-2) 13%, var(--p-800)),
+      var(--p-900) 80%
+    );
+    border: 1px solid var(--hair-2);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .dp-dw-sp.is-hl {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 34%, transparent),
+      0 0 28px color-mix(in oklch, var(--accent) 22%, transparent);
+  }
+
+  .dp-dw-sp.is-err {
+    border-color: var(--badge-red-bd);
+  }
+
+  .dp-dw-lane {
+    background: rgb(0 0 0 / 22%);
+    border: 1px solid transparent;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .dp-dw-lane.is-hl {
+    border-color: color-mix(in oklch, var(--accent) 60%, transparent);
+    background: color-mix(in oklch, var(--accent) 10%, transparent);
+  }
+
+  .dp-dw-slot {
+    border: 1px dashed var(--hair-2);
+  }
+
+  .dp-dw-slot.is-on {
+    border-style: solid;
+    border-color: var(--hair);
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--p-750) 92%, transparent),
+      var(--p-800)
+    );
+  }
+
+  .dp-dw-ghost {
+    background: rgb(255 255 255 / 9%);
+  }
+
+  /* Exact positions read like a scoreboard: 1…⌈n/2⌉ down the first column,
+     the rest down the second. */
+  @media (width >= 576px) {
+    .dp-dw-slots--columns {
+      grid-auto-flow: column;
+      grid-template-rows: repeat(var(--rows, 8), minmax(0, auto));
+    }
+  }
+
+  @keyframes dp-sheet-up {
+    from {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (width < 576px) {
+    .dp-sheet {
+      animation: dp-sheet-up 0.24s cubic-bezier(0.2, 0.8, 0.3, 1);
+    }
+  }
+
+  .dp-dw-vf {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 9px 0 5px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 7%);
+    border: 1px solid var(--hair);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+
+  .dp-dw-vf.is-fx {
+    border-color: color-mix(in oklch, var(--accent) 50%, transparent);
+  }
+
+  .dp-dw-vf.is-bad {
+    border-color: var(--badge-red-bd);
+    background: var(--badge-red-bg);
+  }
+
+  /* Semi panels on phones: voters as bare flags (the Customize editor keeps the pill). */
+  @media (width < 576px) {
+    .dp-dw-vf--compact {
+      height: auto;
+      padding: 0;
+      background: none;
+      border: none;
+    }
+  }
+
+  .dp-dw-seg {
+    background: rgb(0 0 0 / 22%);
+    border: 1px solid var(--hair);
+  }
+
+  .dp-dw-seg button:hover {
+    color: var(--ink);
+  }
+
+  .dp-dw-seg button.is-on {
+    background: linear-gradient(180deg, var(--p-700), var(--p-750));
+    color: var(--ink);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%), 0 1px 4px rgb(0 0 0 / 20%);
+  }
+
+  @keyframes dp-dw-slide-in {
+    from {
+      transform: translateX(100%);
+    }
+  }
+
+  .dp-dw-cust {
+    background: linear-gradient(180deg, var(--p-800), var(--p-900));
+    border-left: 1px solid var(--hair-2);
+    box-shadow: -20px 0 50px rgb(0 0 0 / 45%);
+  }
+
+  .dp-dw-cust.is-entering {
+    animation: dp-dw-slide-in 0.24s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+
+  .dp-dw-opt {
+    border: 1px solid transparent;
+    transition: background 0.14s;
+  }
+
+  .dp-dw-opt:hover:not(:disabled) {
+    background: rgb(255 255 255 / 6%);
+  }
+
+  .dp-dw-opt.is-on {
+    background: rgb(255 255 255 / 7%);
+    border-color: var(--hair-2);
+  }
+
+  .dp-dw-radio {
+    border: 1.5px solid var(--ink-40);
+  }
+
+  .dp-dw-radio.is-on {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: inset 0 0 0 3.5px var(--p-800);
+  }
+
+  .dp-dw-changed {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: var(--ink);
+    background: color-mix(in oklch, var(--accent) 22%, transparent);
+    border: 1px solid color-mix(in oklch, var(--accent) 50%, transparent);
+  }
+
+  .dp-dw-changed::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+
+  .dp-check.is-on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* ---------- Allocation draw: running-order halves ---------- */
+  .dp-ro-divider::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: color-mix(in oklch, var(--accent) 55%, transparent);
+  }
+
+  .dp-ro-divider--first::after {
+    height: 1px;
+    background: var(--hair);
+  }
 }
