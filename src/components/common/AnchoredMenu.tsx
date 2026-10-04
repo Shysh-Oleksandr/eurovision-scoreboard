@@ -11,6 +11,8 @@ import { createPortal } from 'react-dom';
 
 export interface AnchoredMenuItem {
   label: string;
+  /** Second, muted line under the label (e.g. why an item is unavailable). */
+  description?: string;
   icon?: React.ReactNode;
   onClick?: () => void;
   variant?: 'default' | 'danger';
@@ -25,7 +27,18 @@ export interface AnchoredMenuHeader {
   label: string;
 }
 
-export type AnchoredMenuEntry = AnchoredMenuItem | AnchoredMenuHeader | 'hr';
+/** A short explanatory paragraph (title + text), e.g. the reason a toggle is unavailable. */
+export interface AnchoredMenuNote {
+  variant: 'note';
+  title: string;
+  text?: string;
+}
+
+export type AnchoredMenuEntry =
+  | AnchoredMenuItem
+  | AnchoredMenuHeader
+  | AnchoredMenuNote
+  | 'hr';
 
 export type AnchoredMenuPlacement =
   | 'bottom-start'
@@ -50,6 +63,9 @@ const ENABLED_ITEM_SELECTOR = '[role="menuitem"]:not([aria-disabled="true"])';
 
 const isHeader = (entry: AnchoredMenuEntry): entry is AnchoredMenuHeader =>
   typeof entry === 'object' && entry.variant === 'header';
+
+const isNote = (entry: AnchoredMenuEntry): entry is AnchoredMenuNote =>
+  typeof entry === 'object' && entry.variant === 'note';
 
 const getEnabledItems = (menu: HTMLElement | null): HTMLElement[] =>
   menu
@@ -271,6 +287,25 @@ const AnchoredMenu: React.FC<AnchoredMenuProps> = ({
           );
         }
 
+        if (isNote(entry)) {
+          return (
+            <div
+              key={keyFor(`note:${entry.title}`)}
+              role="presentation"
+              className="px-2.5 pt-2 pb-2 max-w-[290px] select-none"
+            >
+              <p className="text-[13.5px] font-extrabold leading-[1.35] text-white text-pretty">
+                {entry.title}
+              </p>
+              {entry.text && (
+                <p className="mt-1.5 text-[12.5px] font-semibold leading-[1.45] text-white/70 text-pretty">
+                  {entry.text}
+                </p>
+              )}
+            </div>
+          );
+        }
+
         if (isHeader(entry)) {
           return (
             <div
@@ -312,7 +347,14 @@ const AnchoredMenu: React.FC<AnchoredMenuProps> = ({
                 {entry.icon}
               </span>
             )}
-            <span className="min-w-0 truncate">{entry.label}</span>
+            <span className="min-w-0 flex-1 flex flex-col gap-px">
+              <span className="truncate">{entry.label}</span>
+              {entry.description && (
+                <span className="text-[11.5px] font-semibold text-white/55 whitespace-normal">
+                  {entry.description}
+                </span>
+              )}
+            </span>
             {entry.trailing !== undefined && entry.trailing !== null && (
               <span className="ml-auto pl-3 flex-none text-white/40">
                 {entry.trailing}

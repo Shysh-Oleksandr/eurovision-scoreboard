@@ -409,6 +409,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-10-04',
+    title: 'Allocation draw',
+  },
+  {
     date: '2026-10-03',
     title:
       '<list><item>Redesigned the setup modal. Added a custom accent color for each theme</item><item>Added the option to assign participants via drag-and-drop</item><item>Added JESC 2026 and the Eurovision Asia 2026 lineups</item><item>Moved Canada to the All-Time Participants category</item></list>',
@@ -466,10 +470,10 @@ export const WHATS_NEW = [
 ];
 
 export const UPCOMING_FEATURES = [
-  {
-    approximateDates: { start: '2026-10-04', end: '2026-10-11' },
-    title: 'Allocation draw',
-  },
+  // {
+  //   approximateDates: { start: '2026-10-04', end: '2026-10-11' },
+  //   title: 'Allocation draw',
+  // },
   {
     approximateDates: { start: '2026-07-12', end: '2026-07-13' },
     title: 'Redesign some parts of the app',

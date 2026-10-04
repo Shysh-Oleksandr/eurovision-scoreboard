@@ -25,6 +25,7 @@ import {
   VoterChannelMode,
   VotingCountry,
 } from '@/models';
+import { shuffle } from '@/state/allocationDraw/rng';
 import { useCountriesStore } from '@/state/countriesStore';
 import {
   countVotersByChannel,
@@ -149,7 +150,7 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
         b.name.localeCompare(a.name),
       );
     } else if (sort === 'shuffle') {
-      sortedCountries = localVotingCountries.sort(() => Math.random() - 0.5);
+      sortedCountries = shuffle(localVotingCountries);
     }
 
     setLocalVotingCountriesAndForm([...sortedCountries]);

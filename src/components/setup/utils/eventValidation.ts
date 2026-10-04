@@ -7,6 +7,8 @@ import { resolveStagePointsSystem } from '@/state/scoreboard/stageOverrides';
 
 interface ValidationParams {
   stages: EventStage[];
+  /** Countries still in the allocation draw's "To be drawn" bucket. */
+  toBeDrawnCount?: number;
 }
 
 type ValidationGeneralState = Pick<
@@ -27,7 +29,16 @@ export const validateEventSetup = (
   params: ValidationParams,
   t: any,
 ): EventSetupValidationResult => {
-  const { stages } = params;
+  const { stages, toBeDrawnCount = 0 } = params;
+
+  if (toBeDrawnCount > 0) {
+    return {
+      kind: 'error',
+      message: t('setup.allocationDraw.validationWaiting', {
+        count: toBeDrawnCount,
+      }),
+    };
+  }
 
   const resolvedGeneral = {
     pointsSystem: general.settingsPointsSystem,

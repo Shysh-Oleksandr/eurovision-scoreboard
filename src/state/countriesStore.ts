@@ -14,6 +14,7 @@ import {
   VotingCountry,
 } from '../models';
 
+import { useAllocationDrawStore } from './allocationDrawStore';
 import deepMerge from './deepMerge';
 import { useGeneralStore } from './generalStore';
 import { useScoreboardStore } from './scoreboardStore';
@@ -358,6 +359,8 @@ export const useCountriesStore = create<CountriesState>()(
               eventAssignments: {},
               countryOdds: initialOdds,
             });
+            // A new line-up has no draw state (waiting countries, pins, chips).
+            useAllocationDrawStore.getState().reset();
           },
 
           loadYearOdds: (countries: BaseCountry[]) => {

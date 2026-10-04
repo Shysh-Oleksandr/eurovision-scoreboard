@@ -1,9 +1,10 @@
 # Plan: Semi-final allocation draw
 
-> Status: **not implemented**. Planned with the user on 2026-10-03. Next step is a
-> Claude Design pass ([prompt](../design/allocation-draw-design-prompt.md)); the
-> UX sections below are the brief, the design handoff will supersede their visual
-> details.
+> Status: **v1 implemented (2026-10-03)** — phases 1–4 below. See
+> [allocation-draw.md](../allocation-draw.md) for how it is built and what was
+> left for later. The design handoff (`currentTask/design_handoff_allocation_draw/`)
+> superseded the UX sections' visual details; the brief is
+> [here](../design/allocation-draw-design-prompt.md).
 
 ## Goal
 

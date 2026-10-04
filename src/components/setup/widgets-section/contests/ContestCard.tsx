@@ -1,5 +1,5 @@
 'use client';
-import { Check, CopyCheck, MoreHorizontal } from 'lucide-react';
+import { Check, CopyCheck, Dices, MoreHorizontal } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 
@@ -15,6 +15,9 @@ import AnchoredMenu, {
   AnchoredMenuEntry,
 } from '@/components/common/AnchoredMenu';
 import Button from '@/components/common/Button';
+import DrawToggleButton, {
+  useDrawToggle,
+} from '@/components/setup/allocation-draw/DrawToggleButton';
 import { useSetupUiStore } from '@/components/setup/hub/state/setupUiStore';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
@@ -35,6 +38,8 @@ interface ContestCardProps {
   isGfOnly: boolean;
   /** Setup diverged from the loaded contest snapshot. */
   hasUnsavedChanges: boolean;
+  /** Every semi-final's line-up came from the allocation draw. */
+  isDrawn: boolean;
 }
 
 const ContestCard: React.FC<ContestCardProps> = ({
@@ -44,12 +49,15 @@ const ContestCard: React.FC<ContestCardProps> = ({
   stagesCount,
   isGfOnly,
   hasUnsavedChanges,
+  isDrawn,
 }) => {
   const t = useTranslations();
   const locale = useLocale();
   const isSmallPhone = useMediaQuery('(max-width: 390px)');
   const isPhone = useMediaQuery('(max-width: 640px)');
   const isTablet = useMediaQuery('(max-width: 768px)');
+  const isNarrowDesktop = useMediaQuery('(max-width: 899px)');
+  const drawToggle = useDrawToggle();
 
   const user = useAuthStore((state) => state.user);
   const contestName = useGeneralStore((state) => state.settings.contestName);
@@ -127,8 +135,28 @@ const ContestCard: React.FC<ContestCardProps> = ({
     participants: participantsCount,
     stages: stagesCount,
   })}${isGfOnly ? ` · ${t('setup.eventSetupModal.grandFinalOnly')}` : ''}`;
+  const drawSub = drawToggle.enabled
+    ? t('setup.allocationDraw.subToBeDrawn', {
+        count: drawToggle.waitingCount,
+      })
+    : isDrawn
+    ? t('setup.allocationDraw.subDrawn')
+    : null;
 
   const moreItems: AnchoredMenuEntry[] = [
+    {
+      label: t('setup.allocationDraw.title'),
+      description: drawToggle.available
+        ? undefined
+        : drawToggle.shortReason ?? undefined,
+      icon: <Dices className="size-4" />,
+      trailing: drawToggle.enabled ? (
+        <Check className="size-4 text-accent" />
+      ) : undefined,
+      disabled: !drawToggle.available,
+      onClick: drawToggle.toggle,
+    },
+    'hr' as const,
     // Small phones have no room for the Select button in the row.
     ...(isSmallPhone
       ? [
@@ -246,6 +274,18 @@ const ContestCard: React.FC<ContestCardProps> = ({
           </h5>
           <p className="text-[10px] 2cols:text-xs font-bold text-white/70 mt-0.5 truncate">
             {subLine}
+            {drawSub && (
+              <>
+                {' · '}
+                <span
+                  className={
+                    drawToggle.enabled ? 'text-white font-extrabold' : ''
+                  }
+                >
+                  {drawSub}
+                </span>
+              </>
+            )}
           </p>
         </div>
 
@@ -254,18 +294,26 @@ const ContestCard: React.FC<ContestCardProps> = ({
           {isPhone ? (
             <>
               {saveButton}
-              <Button
-                variant="surface"
-                size="sm"
-                onClick={(e) => {
-                  const target = e.currentTarget;
+              <span className="relative flex-none">
+                <Button
+                  variant="surface"
+                  size="sm"
+                  onClick={(e) => {
+                    const target = e.currentTarget;
 
-                  setMoreAnchor((prev) => (prev ? null : target));
-                }}
-                title={t('common.more')}
-                aria-label={t('common.more')}
-                Icon={<MoreHorizontal className="size-[18px]" />}
-              />
+                    setMoreAnchor((prev) => (prev ? null : target));
+                  }}
+                  title={t('common.more')}
+                  aria-label={t('common.more')}
+                  Icon={<MoreHorizontal className="size-[18px]" />}
+                />
+                {drawToggle.enabled && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-1.5 right-1.5 w-[7px] h-[7px] rounded-full bg-accent shadow-[0_0_0_2px_var(--p-800)]"
+                  />
+                )}
+              </span>
               <AnchoredMenu
                 open={!!moreAnchor}
                 anchor={moreAnchor}
@@ -302,6 +350,14 @@ const ContestCard: React.FC<ContestCardProps> = ({
                 title={t('setup.eventStageModal.addStage')}
                 aria-label={t('setup.eventStageModal.addStage')}
                 Icon={<ListPlusIcon className="size-[17px]" />}
+              />
+              <span
+                aria-hidden="true"
+                className="w-px h-6 bg-[var(--hair-2)] mx-[3px] flex-none"
+              />
+              <DrawToggleButton
+                compact={isNarrowDesktop}
+                size={isTablet ? 'sm' : 'md'}
               />
               {saveButton}
             </>

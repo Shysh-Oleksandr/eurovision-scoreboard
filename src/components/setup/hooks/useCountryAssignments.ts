@@ -134,6 +134,7 @@ export const useCountryAssignments = () => {
       eventStagesWithCountries,
       notParticipatingCountries,
       notQualifiedCountries,
+      toBeDrawnCountries,
     } = buildEventStagesFromAssignments(
       allCountries,
       configuredEventStages as EventStage[],
@@ -144,6 +145,7 @@ export const useCountryAssignments = () => {
       eventStagesWithCountries,
       notParticipatingCountries,
       notQualifiedCountries,
+      toBeDrawnCountries,
       assignments: eventAssignments,
     };
   }, [

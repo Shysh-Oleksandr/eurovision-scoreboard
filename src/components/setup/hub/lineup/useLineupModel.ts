@@ -5,6 +5,7 @@ import {
   NOT_QUALIFIED_LIST,
   poolList,
   stageList,
+  TO_BE_DRAWN_LIST,
   UNGROUPED_ID,
 } from './listIds';
 
@@ -17,7 +18,8 @@ import type { CustomEntryGroup } from '@/types/customEntry';
 export type MoveTarget =
   | { kind: 'stage'; id: string; name: string; group: string }
   | { kind: 'pool'; group: CountryAssignmentGroup.NOT_PARTICIPATING }
-  | { kind: 'notQualified'; group: CountryAssignmentGroup.NOT_QUALIFIED };
+  | { kind: 'notQualified'; group: CountryAssignmentGroup.NOT_QUALIFIED }
+  | { kind: 'toBeDrawn'; group: CountryAssignmentGroup.TO_BE_DRAWN };
 
 export interface LineupStage {
   stage: EventStage;
@@ -46,6 +48,8 @@ export interface LineupModel {
   byCode: Map<string, BaseCountry>;
   stages: LineupStage[];
   notQualified: string[];
+  /** Participants waiting for the allocation draw. */
+  toBeDrawn: string[];
   pool: LineupPoolCategory[];
   moveTargets: MoveTarget[];
   counts: { participating: number; pool: number; stages: number };
@@ -57,8 +61,11 @@ interface UseLineupModelInput {
   eventStagesWithCountries: EventStage[];
   notParticipatingCountries: BaseCountry[];
   notQualifiedCountries: BaseCountry[];
+  toBeDrawnCountries: BaseCountry[];
   customEntryGroups: CustomEntryGroup[];
   isGfOnly: boolean;
+  /** Draw mode: "To be drawn" becomes a move target. */
+  drawEnabled: boolean;
   isSignedIn: boolean;
 }
 
@@ -99,8 +106,10 @@ export const useLineupModel = ({
   eventStagesWithCountries,
   notParticipatingCountries,
   notQualifiedCountries,
+  toBeDrawnCountries,
   customEntryGroups,
   isGfOnly,
+  drawEnabled,
   isSignedIn,
 }: UseLineupModelInput): LineupModel => {
   const customCountries = useCountriesStore((state) => state.customCountries);
@@ -144,6 +153,16 @@ export const useLineupModel = ({
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [notQualifiedCountries],
+  );
+
+  const toBeDrawn = useMemo(
+    () =>
+      stable(
+        TO_BE_DRAWN_LIST,
+        toBeDrawnCountries.map((c) => c.code),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [toBeDrawnCountries],
   );
 
   const pool = useMemo<LineupPoolCategory[]>(() => {
@@ -226,6 +245,14 @@ export const useLineupModel = ({
 
   const moveTargets = useMemo<MoveTarget[]>(
     () => [
+      ...(drawEnabled || toBeDrawn.length > 0
+        ? [
+            {
+              kind: 'toBeDrawn',
+              group: CountryAssignmentGroup.TO_BE_DRAWN,
+            } as MoveTarget,
+          ]
+        : []),
       ...stages.map<MoveTarget>(({ stage }) => ({
         kind: 'stage',
         id: stage.id,
@@ -242,7 +269,7 @@ export const useLineupModel = ({
           ]
         : []),
     ],
-    [stages, isGfOnly],
+    [stages, isGfOnly, drawEnabled, toBeDrawn.length],
   );
 
   const lists = useMemo(() => {
@@ -250,22 +277,33 @@ export const useLineupModel = ({
 
     stages.forEach((s) => map.set(s.listId, s.codes));
     map.set(NOT_QUALIFIED_LIST, notQualified);
+    map.set(TO_BE_DRAWN_LIST, toBeDrawn);
     pool.forEach((cat) => {
       map.set(cat.listId, cat.codes);
       cat.groups?.forEach((g) => map.set(g.listId, g.codes));
     });
 
     return map;
-  }, [stages, notQualified, pool]);
+  }, [stages, notQualified, toBeDrawn, pool]);
 
   const counts = useMemo(
     () => ({
-      participating: new Set(stages.flatMap((s) => s.codes)).size,
+      participating: new Set([...stages.flatMap((s) => s.codes), ...toBeDrawn])
+        .size,
       pool: notParticipatingCountries.length,
       stages: stages.length,
     }),
-    [stages, notParticipatingCountries.length],
+    [stages, toBeDrawn, notParticipatingCountries.length],
   );
 
-  return { byCode, stages, notQualified, pool, moveTargets, counts, lists };
+  return {
+    byCode,
+    stages,
+    notQualified,
+    toBeDrawn,
+    pool,
+    moveTargets,
+    counts,
+    lists,
+  };
 };

@@ -3,6 +3,7 @@ import { useDeferredValue, useMemo } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import { computeCurrentSetupFingerprint } from '@/helpers/contestFingerprint';
+import { useAllocationDrawStore } from '@/state/allocationDrawStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -46,8 +47,13 @@ export const useContestDirtyState = (): boolean => {
     })),
   );
 
+  const drawInputs = useAllocationDrawStore(
+    useShallow((state) => ({ rules: state.rules, drawn: state.drawn })),
+  );
+
   const deferredInputs = useDeferredValue(inputs);
   const deferredCountriesInputs = useDeferredValue(countriesInputs);
+  const deferredDrawInputs = useDeferredValue(drawInputs);
 
   return useMemo(() => {
     if (!activeContestId || !loaded) return false;
@@ -56,5 +62,11 @@ export const useContestDirtyState = (): boolean => {
     // The deferred snapshots are the recompute triggers; the values are read
     // from the stores inside computeCurrentSetupFingerprint.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeContestId, loaded, deferredInputs, deferredCountriesInputs]);
+  }, [
+    activeContestId,
+    loaded,
+    deferredInputs,
+    deferredCountriesInputs,
+    deferredDrawInputs,
+  ]);
 };

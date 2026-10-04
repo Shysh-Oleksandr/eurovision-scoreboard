@@ -124,8 +124,27 @@ export const usePostSetupStageForm = ({
           }));
       }
 
-      // Semi-finals/other stages default: stage participants vote
-      return (stage.countries || []).map((c) => ({
+      // Semi-finals/other stages default: the stage's participants vote, plus
+      // the pre-qualified countries the year data sends to vote in this show
+      // (`aqSemiFinalGroup`), as long as they take part somewhere else.
+      const { allCountriesForYear, eventAssignments, getContestParticipants } =
+        useCountriesStore.getState();
+      const stageKey = stage.id.toUpperCase();
+      const inStage = new Set((stage.countries || []).map((c) => c.code));
+      const aqVoters = getContestParticipants().filter((c) => {
+        if (inStage.has(c.code)) return false;
+
+        const group = eventAssignments[c.code];
+        const yearData = allCountriesForYear.find((y) => y.code === c.code);
+
+        return (
+          !!group &&
+          group !== stage.id &&
+          yearData?.aqSemiFinalGroup?.toUpperCase() === stageKey
+        );
+      });
+
+      return [...(stage.countries || []), ...aqVoters].map((c) => ({
         code: c.code,
         name: c.name,
         ...(c.flag ? { flag: c.flag } : {}),

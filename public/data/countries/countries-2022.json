@@ -7,6 +7,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF1",
+      "pot": 1,
       "juryOdds": 14.5,
       "televoteOdds": 14.5,
       "spokespersonOrder": 5
@@ -17,6 +18,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 3,
       "juryOdds": 31,
       "televoteOdds": 24,
       "spokespersonOrder": 25
@@ -27,6 +29,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 2,
       "juryOdds": 54.5,
       "televoteOdds": 20.5,
       "spokespersonOrder": 37
@@ -37,6 +40,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF1",
+      "pot": 6,
       "juryOdds": 9.5,
       "televoteOdds": 9.5,
       "spokespersonOrder": 33
@@ -47,6 +51,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 3,
       "juryOdds": 49,
       "televoteOdds": 20.5,
       "spokespersonOrder": 7
@@ -57,6 +62,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 6,
       "juryOdds": 36.5,
       "televoteOdds": 21,
       "spokespersonOrder": 10
@@ -67,6 +73,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF1",
+      "pot": 4,
       "juryOdds": 5.5,
       "televoteOdds": 5.5,
       "spokespersonOrder": 16
@@ -77,6 +84,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF1",
+      "pot": 1,
       "juryOdds": 19.5,
       "televoteOdds": 19.5,
       "spokespersonOrder": 31
@@ -87,6 +95,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 4,
       "juryOdds": 16,
       "televoteOdds": 16,
       "spokespersonOrder": 19
@@ -97,6 +106,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 6,
       "juryOdds": 29,
       "televoteOdds": 21,
       "spokespersonOrder": 38
@@ -107,6 +117,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF1",
+      "pot": 2,
       "juryOdds": 13.5,
       "televoteOdds": 13.5,
       "spokespersonOrder": 23
@@ -117,6 +128,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 5,
       "juryOdds": 32,
       "televoteOdds": 37.5,
       "spokespersonOrder": 6
@@ -127,6 +139,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 2,
       "juryOdds": 23.5,
       "televoteOdds": 24.5,
       "spokespersonOrder": 34
@@ -148,6 +161,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 3,
       "juryOdds": 3,
       "televoteOdds": 3,
       "spokespersonOrder": 30
@@ -169,6 +183,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 4,
       "juryOdds": 64,
       "televoteOdds": 30.5,
       "spokespersonOrder": 14
@@ -179,6 +194,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 2,
       "juryOdds": 23,
       "televoteOdds": 22,
       "spokespersonOrder": 18
@@ -189,6 +205,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 6,
       "juryOdds": 11,
       "televoteOdds": 11,
       "spokespersonOrder": 28
@@ -199,6 +216,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 3,
       "juryOdds": 15.5,
       "televoteOdds": 15.5,
       "spokespersonOrder": 12
@@ -220,6 +238,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF1",
+      "pot": 5,
       "juryOdds": 13.5,
       "televoteOdds": 13.5,
       "spokespersonOrder": 20
@@ -230,6 +249,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 5,
       "juryOdds": 30,
       "televoteOdds": 36.5,
       "spokespersonOrder": 32
@@ -240,6 +260,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 4,
       "juryOdds": 11,
       "televoteOdds": 11,
       "spokespersonOrder": 3
@@ -250,6 +271,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 5,
       "juryOdds": 24,
       "televoteOdds": 63,
       "spokespersonOrder": 15
@@ -260,6 +282,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 1,
       "juryOdds": 6.5,
       "televoteOdds": 6.5,
       "spokespersonOrder": 26
@@ -270,6 +293,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 6,
       "juryOdds": 56,
       "televoteOdds": 27.5,
       "spokespersonOrder": 0
@@ -280,6 +304,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 1,
       "juryOdds": 20,
       "televoteOdds": 20,
       "spokespersonOrder": 2
@@ -290,6 +315,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 2,
       "juryOdds": 30,
       "televoteOdds": 46.5,
       "spokespersonOrder": 11
@@ -300,6 +326,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 5,
       "juryOdds": 33,
       "televoteOdds": 39,
       "spokespersonOrder": 13
@@ -310,6 +337,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 4,
       "juryOdds": 67.5,
       "televoteOdds": 26.5,
       "spokespersonOrder": 8
@@ -320,6 +348,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 5,
       "juryOdds": 23.5,
       "televoteOdds": 29.5,
       "spokespersonOrder": 27
@@ -330,6 +359,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF2",
+      "pot": 4,
       "juryOdds": 12,
       "televoteOdds": 12,
       "spokespersonOrder": 1
@@ -340,6 +370,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 1,
       "juryOdds": 44.5,
       "televoteOdds": 60.5,
       "spokespersonOrder": 17
@@ -350,6 +381,7 @@
       "category": "All-Time Participants",
       "isQualified": false,
       "semiFinalGroup": "SF1",
+      "pot": 1,
       "juryOdds": 1,
       "televoteOdds": 1,
       "spokespersonOrder": 29
@@ -371,6 +403,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF2",
+      "pot": 2,
       "juryOdds": 92,
       "televoteOdds": 52.5,
       "spokespersonOrder": 36
@@ -381,6 +414,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 6,
       "juryOdds": 42,
       "televoteOdds": 20,
       "spokespersonOrder": 22
@@ -391,6 +425,7 @@
       "category": "All-Time Participants",
       "isQualified": true,
       "semiFinalGroup": "SF1",
+      "pot": 3,
       "juryOdds": 73.5,
       "televoteOdds": 99,
       "spokespersonOrder": 4

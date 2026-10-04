@@ -1,5 +1,13 @@
 'use client';
-import { Folder, Globe, Layers, Pencil, Trash2 } from 'lucide-react';
+import {
+  Check,
+  Dices,
+  Folder,
+  Globe,
+  Layers,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 
@@ -18,9 +26,11 @@ import {
 import AnchoredMenu, {
   AnchoredMenuEntry,
 } from '@/components/common/AnchoredMenu';
+import { useAllocationDrawContext } from '@/components/setup/allocation-draw/AllocationDrawContext';
 import { getCustomEntryId } from '@/components/setup/utils/getCustomEntryId';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { CountryAssignmentGroup } from '@/models';
+import { useAllocationDrawStore } from '@/state/allocationDrawStore';
 import { useCountriesStore } from '@/state/countriesStore';
 
 interface LineupMenusProps {
@@ -30,6 +40,8 @@ interface LineupMenusProps {
 const targetIcon = (target: MoveTarget) =>
   target.kind === 'stage' ? (
     <Layers className="size-4" />
+  ) : target.kind === 'toBeDrawn' ? (
+    <Dices className="size-4" />
   ) : (
     <Globe className="size-4" />
   );
@@ -45,6 +57,7 @@ const LineupMenus: React.FC<LineupMenusProps> = ({ isSignedIn }) => {
   const closeMenu = useSetupUiStore((state) => state.closeMenu);
   const { byCode, moveTargets, lists } = useLineupModelContext();
   const { move, onEditCustomEntry } = useLineupActions();
+  const draw = useAllocationDrawContext();
   const { confirm } = useConfirmation();
   const { data: customEntryGroups = [] } =
     useCustomEntryGroupsQuery(isSignedIn);
@@ -116,6 +129,40 @@ const LineupMenus: React.FC<LineupMenusProps> = ({ isSignedIn }) => {
           },
         })),
     ];
+
+    // Allocation draw: a pre-qualified country picks the semi it votes in.
+    if (
+      activeMenu.kind === 'tile' &&
+      draw.enabled &&
+      draw.rules.preq === 'drawn' &&
+      draw.finalStage &&
+      currentGroup === draw.finalStage.id &&
+      draw.semis.length > 0
+    ) {
+      const { code } = activeMenu;
+      const current = draw.votesIn[code] ?? 'drawn';
+      const tick = <Check className="size-4 text-accent" />;
+
+      entries.push('hr', {
+        variant: 'header',
+        label: t('setup.allocationDraw.menuVotesIn'),
+      });
+      entries.push({
+        label: t('setup.allocationDraw.menuDrawn'),
+        icon: <Dices className="size-4" />,
+        trailing: current === 'drawn' ? tick : undefined,
+        onClick: () => useAllocationDrawStore.getState().setVotesIn(code, null),
+      });
+      draw.semis.forEach((semi) => {
+        entries.push({
+          label: semi.name,
+          icon: <Layers className="size-4" />,
+          trailing: current === semi.id ? tick : undefined,
+          onClick: () =>
+            useAllocationDrawStore.getState().setVotesIn(code, semi.id),
+        });
+      });
+    }
 
     // Custom-entry extras: regroup / delete / edit.
     const customIds = codes
@@ -200,6 +247,11 @@ const LineupMenus: React.FC<LineupMenusProps> = ({ isSignedIn }) => {
     byCode,
     confirm,
     customEntryGroups,
+    draw.enabled,
+    draw.finalStage,
+    draw.rules.preq,
+    draw.semis,
+    draw.votesIn,
     groupLabel,
     isSignedIn,
     lists,

@@ -61,6 +61,8 @@ export interface ContestSnapshot {
       voters?: string[];
       /** Per-voter channel overrides (code -> mode); only non-default entries. */
       voterChannels?: Record<string, 'both' | 'jury' | 'televote'>;
+      /** Allocation-draw halves: how many of `participants` form the first half. */
+      firstHalfSize?: number;
       overrides?: {
         pointsSystem?: {
           pointsSystem: Array<{
@@ -84,6 +86,14 @@ export interface ContestSnapshot {
         };
       };
     }>;
+    /** Allocation draw: rules that differ from official and what a draw left on each stage. */
+    allocationDraw?: {
+      rules?: Record<string, unknown>;
+      drawn?: Record<
+        string,
+        { code: string; order: string; members: string[]; voters: string[] }
+      >;
+    };
   };
   simulation?: {
     pointsSystem?: Array<{

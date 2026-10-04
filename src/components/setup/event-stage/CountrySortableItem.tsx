@@ -24,6 +24,8 @@ interface CountrySortableItemProps {
   /** Show the J / T toggles (voter channels editing mode). */
   showChannelControls?: boolean;
   onChannelModeChange?: (mode: VoterChannelMode) => void;
+  /** Extra controls at the end of the row (e.g. "move to the other half"). */
+  actions?: React.ReactNode;
 }
 
 export const CountrySortableItem: React.FC<CountrySortableItemProps> = ({
@@ -37,6 +39,7 @@ export const CountrySortableItem: React.FC<CountrySortableItemProps> = ({
   channelMode,
   showChannelControls = false,
   onChannelModeChange,
+  actions,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
@@ -105,6 +108,7 @@ export const CountrySortableItem: React.FC<CountrySortableItemProps> = ({
           onChange={onChannelModeChange}
         />
       )}
+      {actions}
     </CustomSortableItem>
   );
 };

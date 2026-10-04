@@ -18,6 +18,7 @@ import {
   POOL_ROOT_LIST,
   poolList,
   stageList,
+  TO_BE_DRAWN_LIST,
   UNGROUPED_ID,
 } from './listIds';
 import {
@@ -28,6 +29,8 @@ import {
 
 import CustomEntryGroupModal from '@/components/setup/CustomEntryGroupModal';
 import { BaseCountry, CountryAssignmentGroup, EventStage } from '@/models';
+import { useAllocationDrawStore } from '@/state/allocationDrawStore';
+import { useCountriesStore } from '@/state/countriesStore';
 import type { CustomEntryGroup } from '@/types/customEntry';
 
 export interface LineupActions {
@@ -68,6 +71,7 @@ export const targetListIdFor = (
   isSignedIn: boolean,
 ): ListId => {
   if (group === CountryAssignmentGroup.NOT_QUALIFIED) return NOT_QUALIFIED_LIST;
+  if (group === CountryAssignmentGroup.TO_BE_DRAWN) return TO_BE_DRAWN_LIST;
 
   if (group !== CountryAssignmentGroup.NOT_PARTICIPATING) {
     return stageList(group);
@@ -125,6 +129,30 @@ const LineupProvider: React.FC<LineupProviderProps> = ({
   const move = useCallback(
     (codes: string[], group: string) => {
       if (codes.length === 0) return;
+
+      // Allocation draw bookkeeping: remember where a waiting country came
+      // from ("Put them back where they were") and drop a pre-qualified
+      // "Votes in" pin once the country leaves its stage.
+      const previous = useCountriesStore.getState().eventAssignments;
+      const drawStore = useAllocationDrawStore.getState();
+
+      if (group === CountryAssignmentGroup.TO_BE_DRAWN) {
+        const from: Record<string, string> = {};
+
+        codes.forEach((code) => {
+          const prev = previous[code];
+
+          if (prev && prev !== CountryAssignmentGroup.TO_BE_DRAWN) {
+            from[code] = prev;
+          }
+        });
+        if (Object.keys(from).length > 0) drawStore.rememberWaitingFrom(from);
+      }
+      codes.forEach((code) => {
+        if (drawStore.votesIn[code] && previous[code] !== group) {
+          drawStore.setVotesIn(code, null);
+        }
+      });
 
       assignMany(codes, group);
 

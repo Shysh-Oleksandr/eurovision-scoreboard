@@ -1,5 +1,5 @@
 'use client';
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe, Pin } from 'lucide-react';
 import React, { memo, useCallback } from 'react';
 
 import { useSetupUiStore } from '../state/setupUiStore';
@@ -7,6 +7,7 @@ import { useSetupUiStore } from '../state/setupUiStore';
 import { useLineupActions } from './LineupProvider';
 import { ListId } from './listIds';
 
+import { useDrawUiStore } from '@/components/setup/allocation-draw/drawUiStore';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
@@ -19,6 +20,11 @@ export interface CountryTileProps {
   eager?: boolean;
   /** Rendered inside the drag overlay: no interactions, lifted look. */
   overlay?: boolean;
+  /**
+   * Allocation draw: the tile is pinned (fixed in its semi, or a "Votes in"
+   * choice). The string is the accessible description of the pin.
+   */
+  pinned?: string | null;
   /** Set by the drag-and-drop wrapper. */
   innerRef?: (node: HTMLElement | null) => void;
   dragHandleProps?: React.HTMLAttributes<HTMLElement>;
@@ -79,6 +85,7 @@ const CountryTile: React.FC<CountryTileProps> = ({
   listId,
   eager = false,
   overlay = false,
+  pinned = null,
   innerRef,
   dragHandleProps,
   isDragging = false,
@@ -86,6 +93,9 @@ const CountryTile: React.FC<CountryTileProps> = ({
   const selectionMode = useSetupUiStore((state) => state.selectionMode);
   const isSelected = useSetupUiStore((state) =>
     state.selected.has(country.code),
+  );
+  const isFlashing = useDrawUiStore(
+    (state) => !!state.flash && state.flash.codes.includes(country.code),
   );
   const { openTileMenu } = useLineupActions();
 
@@ -111,11 +121,14 @@ const CountryTile: React.FC<CountryTileProps> = ({
       onClick={handleClick}
       aria-pressed={selectionMode ? isSelected : undefined}
       aria-haspopup={selectionMode ? undefined : 'menu'}
+      aria-label={pinned ? `${country.name}, ${pinned}` : undefined}
       title={country.name}
       className={`dp-tile ${isSelected ? 'is-selected' : ''} ${
         isDragging ? 'is-dragging' : ''
+      } ${overlay ? 'dp-tile-overlay' : ''} ${
+        pinned ? 'dp-tile--pinned' : ''
       } ${
-        overlay ? 'dp-tile-overlay' : ''
+        isFlashing ? 'dp-tile--flash' : ''
       } flex items-center gap-[9px] px-[9px] py-2 rounded-[10px] min-w-0 text-left text-white select-none touch-manipulation`}
       {...dragHandleProps}
     >
@@ -129,6 +142,9 @@ const CountryTile: React.FC<CountryTileProps> = ({
       <span className="flex-1 min-w-0 text-[13px] font-bold tracking-[-.005em] truncate">
         {country.name}
       </span>
+      {pinned && !selectionMode && (
+        <Pin className="dp-tile-pin size-3.5 flex-none" aria-hidden="true" />
+      )}
       {!selectionMode && (
         <ChevronDown className="size-[15px] flex-none text-white/40 group-hover:text-white/70" />
       )}

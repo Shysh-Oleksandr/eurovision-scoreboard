@@ -6,6 +6,8 @@ export interface BaseCountry {
   isQualified?: boolean;
   semiFinalGroup?: string;
   aqSemiFinalGroup?: string;
+  /** Official allocation-draw pot of a semi-finalist (1-based), curated per year. */
+  pot?: number;
   isAutoQualified?: boolean;
   juryOdds?: number;
   televoteOdds?: number;
@@ -32,6 +34,8 @@ export enum CountryAssignmentGroup {
   SF2 = 'SF2',
   NOT_QUALIFIED = 'NOT_QUALIFIED',
   NOT_PARTICIPATING = 'NOT_PARTICIPATING',
+  /** Taking part, but waiting for the allocation draw to place it in a semi-final. */
+  TO_BE_DRAWN = 'TO_BE_DRAWN',
 }
 
 export interface SemiFinalQualifiersAmount {
@@ -116,6 +120,11 @@ export interface EventStage {
   isPreparedForNextStage?: boolean; // is set to true when user opens predefinition modal; needed to call prepareForNextStage only once
   /** User-defined running order (country codes). Used for initial display before points exist. */
   runningOrder?: string[];
+  /**
+   * Allocation-draw halves: how many entries of `runningOrder` form the first
+   * half of the show. Absent when the stage has no halves.
+   */
+  firstHalfSize?: number;
   overrides?: StageOverrides;
 }
 
