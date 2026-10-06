@@ -1,4 +1,4 @@
-import { Share2 } from 'lucide-react';
+import { PencilLine, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -19,12 +19,15 @@ import Modal from '../../common/Modal/Modal';
 import Select from '../../common/Select';
 import { Input } from '../../Input';
 
-import ImageGenerator from './ImageGenerator';
-
 import { DownloadIcon } from '@/assets/icons/DownloadIcon';
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import DesignPreview from '@/graphics/components/DesignPreview';
+import { DesignDataProvider } from '@/graphics/render/DesignDataContext';
+import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
+import { toEditableDesign } from '@/graphics/templates/editor';
+import { buildResultsDesign } from '@/graphics/templates/results';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { Country, StageId, StageVotingMode } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -54,10 +57,6 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
     null,
   );
-
-  const [lastGeneratedStageId, setLastGeneratedStageId] = useState<
-    string | null
-  >(null);
 
   const imageCustomization = useGeneralStore(
     (state) => state.imageCustomization,
@@ -147,6 +146,36 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   const handleImageGenerated = (dataUrl: string) => {
     setGeneratedImageUrl(dataUrl);
   };
+
+  // "Open in editor": the same design, made self-contained (running-order
+  // rows become a manual list) and opened in the graphics studio.
+  const openEditor = useGraphicsStudioStore((state) => state.openEditor);
+
+  // The share image as a design document (docs/graphics-studio.md).
+  const design = useMemo(
+    () =>
+      buildResultsDesign({
+        settings: imageCustomization,
+        showPoints: isRunningOrder
+          ? imageCustomization.showPointsForRunningOrder
+          : imageCustomization.showPoints,
+        statusMode: countriesOverride ? 'uniform' : 'live',
+        dataSource: countriesOverride ? 'provided' : 'live',
+      }),
+    [imageCustomization, isRunningOrder, countriesOverride],
+  );
+  const exportOptions = useMemo(
+    () => ({
+      // Parity with the old exporter: html-to-image multiplied the requested
+      // canvas size by the device pixel ratio on top of the quality factor.
+      scale:
+        (imageCustomization.highQuality && !isTouchDevice ? 2 : 1) *
+        Math.min(2, window.devicePixelRatio || 1),
+      format: 'jpeg' as const,
+      quality: 0.9,
+    }),
+    [imageCustomization.highQuality, isTouchDevice],
+  );
 
   const handleDownload = () => {
     if (!generatedImageUrl) return;
@@ -781,15 +810,43 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
           </CollapsibleSection>
         </div>
         {/* Image Generation */}
-        <ImageGenerator
-          onImageGenerated={handleImageGenerated}
-          generatedImageUrl={generatedImageUrl}
-          lastGeneratedStageId={lastGeneratedStageId}
-          setLastGeneratedStageId={setLastGeneratedStageId}
-          modalRef={modalRef}
-          countriesOverride={countriesOverride}
-          isRunningOrder={isRunningOrder}
-        />
+        <DesignDataProvider
+          binding={design.data}
+          providedCountries={countriesOverride}
+        >
+          <DesignPreview
+            design={design}
+            exportOptions={exportOptions}
+            autoGenerate
+            autoGenerateKey={currentStageId ?? null}
+            active={isOpen}
+            onImageGenerated={handleImageGenerated}
+            scrollTargetRef={modalRef}
+            extraActions={
+              <Button
+                variant="tertiary"
+                className="justify-center"
+                Icon={<PencilLine className="size-5" />}
+                onClick={() =>
+                  openEditor({
+                    design: toEditableDesign(design, {
+                      name: isRunningOrder
+                        ? t('graphics.share.runningOrderDesign')
+                        : t('graphics.share.resultsDesign'),
+                      providedCountries: countriesOverride,
+                    }),
+                    draftId: null,
+                    selectId: 'scoreboard',
+                  })
+                }
+              >
+                <span className="hidden sm:inline">
+                  {t('graphics.share.openInEditor')}
+                </span>
+              </Button>
+            }
+          />
+        </DesignDataProvider>
 
         {generatedImageUrl && (
           <div>

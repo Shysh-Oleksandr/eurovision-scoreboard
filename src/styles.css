@@ -1750,6 +1750,12 @@ h6 {
     --wt-ink: #fff;
   }
 
+  /* Graphics widget: fixed teal, hue-independent like gold. */
+  .dp-tone-teal {
+    --wt: oklch(70% 0.12 190deg);
+    --wt-ink: #fff;
+  }
+
   /* Tints mix in oklab: a straight line through gray, so a blue accent on a
      gold surface does not sweep through green the way an oklch hue mix does. */
   .dp-widget {

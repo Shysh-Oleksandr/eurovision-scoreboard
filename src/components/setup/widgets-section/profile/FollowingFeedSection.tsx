@@ -20,11 +20,16 @@ import { useFollowingFeedQuery } from '@/api/follows';
 import { useThemesStateQuery } from '@/api/themes';
 import type { UserContentType } from '@/api/userContent';
 import Button from '@/components/common/Button';
+import { CloudGrid } from '@/graphics/components/CloudDesignCards';
+import ReportDialog from '@/graphics/components/ReportDialog';
+import { parseDesign } from '@/graphics/model/design';
+import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
 import { CustomTheme } from '@/types/customTheme';
+import type { CloudDesign } from '@/types/design';
 
 interface FollowingFeedSectionProps {
   onDuplicate?: (theme: CustomTheme) => void;
@@ -73,6 +78,18 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
   const themeActions = usePublicThemeActions();
   const contestActions = usePublicContestActions();
   const user = useAuthStore((state) => state.user);
+  const openSheet = useGraphicsStudioStore((s) => s.openSheet);
+  const [reporting, setReporting] = useState<CloudDesign | null>(null);
+  const useTemplate = (record: CloudDesign) => {
+    try {
+      openSheet({
+        design: parseDesign(record.design),
+        source: { kind: 'cloud', record },
+      });
+    } catch (err) {
+      console.error('Unreadable design', err);
+    }
+  };
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
   const activeContest = useGeneralStore((state) => state.activeContest);
 
@@ -169,6 +186,14 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
                     !!themeState?.quickSelectedIds?.includes(item.data._id)
                   }
                 />
+              ) : item.type === 'design' ? (
+                <div key={`design-${item.data._id}`} className="gfx-gallery">
+                  <CloudGrid
+                    designs={[item.data]}
+                    onUse={useTemplate}
+                    onReport={setReporting}
+                  />
+                </div>
               ) : (
                 <ContestListItem
                   key={`contest-${item.data._id}`}
@@ -225,6 +250,14 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
       <SearchUsersModal
         isOpen={isSearchUsersOpen}
         onClose={() => setIsSearchUsersOpen(false)}
+      />
+      <ReportDialog
+        target={
+          reporting
+            ? { type: 'design', id: reporting._id, name: reporting.name }
+            : null
+        }
+        onClose={() => setReporting(null)}
       />
     </div>
   );

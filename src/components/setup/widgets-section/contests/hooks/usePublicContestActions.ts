@@ -16,6 +16,7 @@ export function usePublicContestActions() {
   const handleLike = async (id: string) => {
     try {
       const res = await toggleLike(id);
+
       toast.success(
         res.liked
           ? 'Contest liked successfully'
@@ -34,6 +35,7 @@ export function usePublicContestActions() {
           title: t('widgets.contests.confirmRemoveSavedContest'),
           onConfirm: async () => {
             const res = await toggleSave(id);
+
             toast.success(
               t(
                 res.saved
@@ -45,6 +47,7 @@ export function usePublicContestActions() {
         });
       } else {
         const res = await toggleSave(id);
+
         toast.success(
           t(
             res.saved

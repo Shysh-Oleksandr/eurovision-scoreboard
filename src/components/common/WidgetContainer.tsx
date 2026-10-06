@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import React from 'react';
 
-export type WidgetTone = 'blue' | 'pink' | 'gold';
+export type WidgetTone = 'blue' | 'pink' | 'gold' | 'teal';
 
 // Literal class names: `dp-tone-*` live in styles.css under `@layer components`,
 // which Tailwind only emits when the class appears verbatim in the source.
@@ -9,6 +9,7 @@ const TONE_CLASS: Record<WidgetTone, string> = {
   blue: 'dp-tone-blue',
   pink: 'dp-tone-pink',
   gold: 'dp-tone-gold',
+  teal: 'dp-tone-teal',
 };
 
 type WidgetContainerProps = {

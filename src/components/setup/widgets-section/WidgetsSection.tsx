@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 
 import ContestsWidget from './contests/ContestsWidget';
 import ThemesWidget from './custom-themes/ThemesWidget';
+import GraphicsWidget from './graphics/GraphicsWidget';
 import ProfileWidget from './profile/ProfileWidget';
 
 import { useMyProfileSummaryQuery } from '@/api/profiles';
@@ -10,7 +11,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 
 const SEPARATOR = ' · ';
 
-/** Widget row: three labelled cards with live counts (signed-in users only). */
+/** Widget row: four labelled cards with live counts (signed-in users only). */
 const WidgetsSection = () => {
   const t = useTranslations('widgets');
   const user = useAuthStore((state) => state.user);
@@ -19,7 +20,7 @@ const WidgetsSection = () => {
   const statLoading = !!user && isPending;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 w-full">
       <ProfileWidget
         statLoading={statLoading}
         stat={
@@ -52,6 +53,18 @@ const WidgetsSection = () => {
                 count: summary.privateContestsCount,
               })}${SEPARATOR}${t('contests.publicCount', {
                 count: summary.publicContestsCount,
+              })}`
+            : undefined
+        }
+      />
+      <GraphicsWidget
+        statLoading={statLoading}
+        cloudStat={
+          summary && summary.designsCount !== undefined
+            ? `${t('graphics.publishedCount', {
+                count: summary.designsCount,
+              })}${SEPARATOR}${t('graphics.savedCount', {
+                count: summary.savedDesignsCount ?? 0,
               })}`
             : undefined
         }

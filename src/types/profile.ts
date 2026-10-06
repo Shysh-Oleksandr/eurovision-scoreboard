@@ -22,6 +22,9 @@ export interface ProfileSummary {
   savedThemesCount: number;
   privateContestsCount: number;
   publicContestsCount: number;
+  /** Published graphics templates / saved community templates. */
+  designsCount?: number;
+  savedDesignsCount?: number;
 }
 
 export type PreferredLocale =

@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-type ShareableItem = 'theme' | 'contest' | 'profile';
+type ShareableItem = 'theme' | 'contest' | 'profile' | 'design';
 
 export const useHandleShare = () => {
   const handleShare = (

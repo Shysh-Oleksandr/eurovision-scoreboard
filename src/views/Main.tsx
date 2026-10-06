@@ -10,6 +10,7 @@ import { PageWrapper } from '../components/simulation/PageWrapper';
 
 import { SlidersIcon } from '@/assets/icons/SlidersIcon';
 import Button from '@/components/common/Button';
+import GraphicsEditorHost from '@/graphics/components/GraphicsEditorHost';
 import { importSimulation } from '@/hooks/simulationChunkImports';
 import { useSimulationChunksPreload } from '@/hooks/useSimulationChunksPreload';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -38,6 +39,7 @@ const Main = () => {
   return (
     <PageWrapper>
       <EventSetupModal />
+      <GraphicsEditorHost />
       <SnowfallAnimation />
 
       {deferredHasStages ? (

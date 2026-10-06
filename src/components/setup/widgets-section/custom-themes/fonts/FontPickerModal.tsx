@@ -20,9 +20,12 @@ type PickerTab = (typeof PICKER_TABS)[number];
 interface FontPickerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  slot: 'ui' | 'scoreboard';
+  /** `element` = one element of a graphics design (hint copy only). */
+  slot: 'ui' | 'scoreboard' | 'element';
   value: FontSelection;
   onSelect: (selection: FontSelection) => void;
+  /** Override the overlay layer (the graphics editor sits at 1005). */
+  overlayClassName?: string;
 }
 
 const FontPickerModal: React.FC<FontPickerModalProps> = ({
@@ -31,6 +34,7 @@ const FontPickerModal: React.FC<FontPickerModalProps> = ({
   slot,
   value,
   onSelect,
+  overlayClassName = '!z-[1003]',
 }) => {
   const t = useTranslations('widgets.themes.fonts');
   const [activeTab, setActiveTab] = useState<PickerTab>(
@@ -51,7 +55,7 @@ const FontPickerModal: React.FC<FontPickerModalProps> = ({
       fullScreenOnPhone
       contentClassName="text-white sm:h-[72vh] h-[70vh] max-h-[72vh]"
       // Above the theme editor (1002) so it can be opened from inside it.
-      overlayClassName="!z-[1003]"
+      overlayClassName={overlayClassName}
       topContent={
         <Tabs
           tabs={tabs}
@@ -64,7 +68,11 @@ const FontPickerModal: React.FC<FontPickerModalProps> = ({
     >
       <div className="flex flex-col gap-3">
         <p className="text-white/60 text-xs">
-          {slot === 'scoreboard' ? t('pickForScoreboard') : t('pickForUi')}
+          {slot === 'scoreboard'
+            ? t('pickForScoreboard')
+            : slot === 'element'
+            ? t('pickForElement')
+            : t('pickForUi')}
         </p>
         {activeTab === 'builtin' && (
           <BuiltinFontsTab value={value} onSelect={onSelect} />

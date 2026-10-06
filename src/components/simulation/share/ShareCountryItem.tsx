@@ -14,6 +14,7 @@ import {
 import { Country } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import { useScopedTheme } from '@/theme/ThemeScope';
 import { ItemState } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
@@ -75,10 +76,10 @@ const ShareCountryItem: React.FC<Props> = ({
     country.isVotingFinished,
   ]);
 
-  const overrides = useGeneralStore((s) => s.customTheme?.overrides || null);
-  const themeYear = useGeneralStore(
-    (s) => s.customTheme?.baseThemeYear ?? s.themeYear,
-  );
+  const scopedTheme = useScopedTheme();
+  const overrides = scopedTheme.customTheme?.overrides || null;
+  const themeYear =
+    scopedTheme.customTheme?.baseThemeYear ?? scopedTheme.themeYear;
   const {
     uppercaseEntryName,
     pointsContainerShape,
