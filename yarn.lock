@@ -4119,6 +4119,11 @@
     convert-source-map "^2.0.0"
     tinyrainbow "^3.1.0"
 
+"@zumer/snapdom@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@zumer/snapdom/-/snapdom-3.2.0.tgz#002f53be2125365642e33a6c87574c4cfa9c1c0a"
+  integrity sha512-FVYVoH3XXJdgFfZo6VxEX6DZ5XWNlYypMynOLKKFTa0XEZBMOVSQBVDHO66uIcK9q7yuYMyyAb5/KaMYsHIuxg==
+
 abort-controller@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/abort-controller/-/abort-controller-3.0.0.tgz"

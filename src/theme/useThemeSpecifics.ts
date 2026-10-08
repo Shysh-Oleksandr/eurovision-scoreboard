@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 
-import { useGeneralStore } from '@/state/generalStore';
-
+import { useScopedTheme } from './ThemeScope';
 import { resolveThemeSpecificsForGeneralState } from './themeSpecifics';
 
+/** Specifics of the theme the subtree renders in (see `ThemeScope`). */
 const useThemeSpecifics = () => {
-  const themeYear = useGeneralStore((state) => state.themeYear);
-  const customTheme = useGeneralStore((state) => state.customTheme);
+  const { themeYear, customTheme } = useScopedTheme();
 
   return useMemo(() => {
     return resolveThemeSpecificsForGeneralState({ themeYear, customTheme });

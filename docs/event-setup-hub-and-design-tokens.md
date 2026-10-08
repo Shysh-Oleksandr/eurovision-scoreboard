@@ -254,6 +254,9 @@ applies immediately; picking a theme by hand while it is on switches it off
 ## 6. Widget stats
 
 `GET /profiles/me/summary` (backend `src/profile-summary/`) returns followers,
-following, custom/saved themes and private/public contests in one call;
-`useMyProfileSummaryQuery` feeds the three widget cards. The query is
-invalidated by follow, theme and contest mutations and cleared on logout.
+following, custom/saved themes, private/public contests and published /
+public / saved designs in one call; `useMyProfileSummaryQuery` feeds the
+three widget cards (Themes, Contests, Graphics) and the followers line of
+the header's `ProfileButton` (which replaced the Profile widget on
+2026-10-06). The query is invalidated by follow, theme, contest and design
+visibility mutations and cleared on logout.

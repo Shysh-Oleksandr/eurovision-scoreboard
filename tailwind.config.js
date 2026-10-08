@@ -1,6 +1,7 @@
 import fluid, { extract, screens } from 'fluid-tailwind';
-import plugin from 'tailwindcss/plugin';
 import { createThemes } from 'tw-colors';
+
+import plugin from 'tailwindcss/plugin';
 
 import { getThemeInterfaceVars } from './src/theme/oklch';
 import { getThemeForYear, YEARS_WITH_THEME } from './src/theme/themes';
@@ -11,6 +12,30 @@ import { getThemeForYear, YEARS_WITH_THEME } from './src/theme/themes';
  * (`bg-p-800/50`).
  */
 const oklchToken = (name) => `oklch(var(--${name}-raw) / <alpha-value>)`;
+
+/**
+ * tw-colors only understands plain colors and warns on anything else. Gradient
+ * values (e.g. 2026 `panelInfo.inactiveBg`) are painted inline at runtime by
+ * getSpecialBackgroundStyle, so the CSS variable only needs a solid fallback:
+ * the gradient's first color stop.
+ */
+const toTwColorsColors = (colors) =>
+  Object.fromEntries(
+    Object.entries(colors).map(([key, value]) => {
+      if (value && typeof value === 'object') {
+        return [key, toTwColorsColors(value)];
+      }
+      if (typeof value === 'string' && /gradient\(/i.test(value)) {
+        const firstStop = value.match(
+          /#[0-9a-f]{3,8}|rgba?\([^)]*\)|hsla?\([^)]*\)/i,
+        );
+
+        return [key, firstStop ? firstStop[0].toLowerCase() : 'transparent'];
+      }
+
+      return [key, value];
+    }),
+  );
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -59,7 +84,7 @@ export default {
       Object.fromEntries(
         YEARS_WITH_THEME.map((year) => [
           year.toString(),
-          getThemeForYear(year.toString()).colors,
+          toTwColorsColors(getThemeForYear(year.toString()).colors),
         ]),
       ),
       {

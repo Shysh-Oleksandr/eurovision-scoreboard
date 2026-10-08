@@ -83,6 +83,18 @@ export const queryKeys = {
       ['user', 'entry-stats', entryCode, { groupId: groupId ?? null }] as const,
     myLeaderboard: (groupId?: string | null) =>
       ['user', 'my-leaderboard', { groupId: groupId ?? null }] as const,
+    /** Prefix for invalidating the current user's cloud design lists */
+    designs: () => ['user', 'designs'] as const,
+    designsMeList: (filters: Record<string, unknown>) =>
+      ['user', 'designs', 'me', filters] as const,
+    savedDesigns: () => ['user', 'saved-designs'] as const,
+    savedDesignsList: (filters: Record<string, unknown>) =>
+      ['user', 'saved-designs', filters] as const,
+    designsState: (ids: string[]) =>
+      ['user', 'designs-state', { ids: [...ids].sort() }] as const,
+    reportsStateAll: () => ['user', 'reports-state'] as const,
+    reportsState: (targetType: string, ids: string[]) =>
+      ['user', 'reports-state', targetType, { ids: [...ids].sort() }] as const,
     quickSelectContests: () => ['user', 'quick-select-contests'] as const,
     quickSelectThemes: () => ['user', 'quick-select-themes'] as const,
     quickSelectState: (ids: string[]) =>
@@ -144,6 +156,8 @@ export const queryKeys = {
       startDate?: string;
       endDate?: string;
     }) => ['public', 'contests', filters] as const,
+    designs: (filters: Record<string, unknown>) =>
+      ['public', 'designs', filters] as const,
     leaderboard: (year: number | 'global') =>
       ['public', 'leaderboard', year] as const,
     userContent: (
@@ -202,6 +216,9 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.contests(),
   queryKeys.user.savedContests(),
   queryKeys.user.contestGroups(),
+  queryKeys.user.designs(),
+  queryKeys.user.savedDesigns(),
+  queryKeys.user.reportsStateAll(),
   queryKeys.user.preferences(),
   queryKeys.user.profileSummary(),
   ['user', 'entry-stats'] as const,

@@ -12,6 +12,11 @@
     "confirm": "Confirmer",
     "authenticationRequired": "Authentification requise",
     "lastSaved": "Sauvegardé",
+    "relativeTime": {
+      "justNow": "à l’instant",
+      "minutesAgo": "il y a {count} min",
+      "hoursAgo": "il y a {count} h"
+    },
     "copy": "Copier",
     "create": "Créer",
     "searchPlaceholder": "Rechercher...",
@@ -73,7 +78,12 @@
     "dontShowAgain": "Ne pas afficher à nouveau",
     "more": "Plus",
     "share": "Partager",
-    "done": "Terminé"
+    "done": "Terminé",
+    "beta": {
+      "label": "Beta",
+      "hint": "Nouveau et encore en évolution. Dites-nous ce qui manque avec le bouton de retour.",
+      "hintFeedback": "Nouveau et encore en évolution · cliquez pour envoyer un retour"
+    }
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",
@@ -109,7 +119,6 @@
       "voters": "Votants",
       "runningOrder": "Ordre de départ",
       "pleaseSelectAtLeastOneVotingCountry": "Veuillez sélectionner au moins un pays votant",
-      "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer {name} ?",
       "televoteOnly": "Télévote uniquement",
       "juryOnly": "Jury uniquement",
       "combined": "Combiné",
@@ -191,7 +200,6 @@
       "entriesAmount": "{count, plural, =1 {entrée} other {entrées}}",
       "autoQualifiers": "Qualifiés automatiques",
       "qualifiers": "Qualifiés",
-      "contestIsInProgress": "Un concours est en cours. Changer l’année réinitialisera le scoreboard actuel et lancera une nouvelle configuration. Êtes-vous sûr ?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Entrez les points que chaque pays votant attribue aux participants",
       "reorderStages": "Réorganiser les étapes",
       "importedEntriesDescription": "Les entrées importées sont des entrées personnalisées qui ont été importées depuis d’autres concours. Elles ne sont pas editables.",
@@ -353,7 +361,6 @@
       "entryNameIsRequired": "Le nom de l’entrée est requis.",
       "customEntrySavedSuccessfully": "Entrée personnalisée enregistrée avec succès !",
       "pleaseSignInToDeleteCustomEntries": "Veuillez vous connecter pour supprimer des entrées personnalisées.",
-      "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer {name} ?",
       "entryDeletedSuccessfully": "Entrée supprimée avec succès !",
       "standardCountries": "Pays standards",
       "customEntries": "Entrées personnalisées",
@@ -371,9 +378,7 @@
       "groupUpdatedSuccessfully": "Groupe modifié avec succès !",
       "groupDeletedSuccessfully": "Groupe supprimé avec succès !",
       "failedToSaveGroup": "Erreur lors de la création du groupe",
-      "failedToDeleteGroup": "Erreur lors de la suppression du groupe",
-      "group": "Groupe",
-      "noGroup": "Sans groupe"
+      "failedToDeleteGroup": "Erreur lors de la suppression du groupe"
     },
     "categories": {
       "imported": "Importé",
@@ -710,14 +715,14 @@
     "copies": "Copies",
     "remix": "Remix",
     "like": "Aimer",
-    "likes": "Likes",
+    "likes": "J’aime",
     "save": "Enregistrer",
     "saves": "Enregistrements",
     "active": "Actif",
     "created": "Créé",
     "saved": "Enregistré",
     "nCopies": "{count} {count, plural, =1 {copie} other {copies}}",
-    "nLikes": "{count} {count, plural, =1 {like} other {likes}}",
+    "nLikes": "{count} J’aime",
     "nSaves": "{count} {count, plural, =1 {enregistrement} other {enregistrements}}",
     "quickSelect": "Sélection rapide",
     "quickSelectAdded": "Ajouté à la sélection rapide !",
@@ -747,12 +752,14 @@
       "unfollowedUser": "Suivi avec succès !",
       "follow": "Suivre",
       "signInToFollow": "Connectez-vous pour suivre",
-      "followingCount": "{count} abonnements"
+      "followingCount": "{count} abonnements",
+      "signIn": "Se connecter"
     },
     "contentType": {
       "all": "Tout",
       "themes": "Thèmes",
-      "contests": "Concours"
+      "contests": "Concours",
+      "designs": "Designs"
     },
     "foundNItems": "{count} {count, plural, =1 {élément} other {éléments}} trouvé(s)",
     "userProfile": {
@@ -845,6 +852,8 @@
       "confirmCreateNewContestDescription": "Vous avez un concours actif ({name}). Assurez-vous de le sauvegarder avant de créer un nouveau.",
       "venue": "Lieu",
       "hosts": "Présentateurs",
+      "logoBanner": "Logo / bannière",
+      "logoBannerHint": "Image facultative affichée sur la carte du concours",
       "entryStats": {
         "pickerTitle": "Vos statistiques de participation",
         "pickerSubtitle": "Recherchez et sélectionnez un pays ou une entrée personnalisée pour voir les résultats de vos concours terminés.",
@@ -853,13 +862,13 @@
         "victories": "Victoires",
         "finals": "Finales",
         "nulPoints": "Zéro points",
-        "lastPlaces": "Derniers places",
+        "lastPlaces": "Dernières places",
         "bestResult": "Meilleur résultat",
         "noParticipations": "Aucun concours terminé ne contient encore cette entrée.",
         "contest": "Concours",
         "year": "Année",
         "winner": "Gagnant",
-        "gfResult": "Grand final",
+        "gfResult": "Grande Finale",
         "nonQualified": "Non qualifié",
         "points": "points",
         "load": "Charger",
@@ -1001,6 +1010,8 @@
         "deleteGroupConfirmDescription": "Les thèmes dans ce groupe ne seront plus regroupés. Ils ne seront pas supprimés."
       },
       "colorOverrides": {
+        "colors": "Couleurs",
+        "currentValue": "Valeur actuelle",
         "juryColors": "Jury",
         "douzePointsAnimationColors": "Animation Douze Points",
         "televoteColors": "Télévote",
@@ -1172,7 +1183,8 @@
         "deleteInUseDescription": "{count} {count, plural, =1 {de vos thèmes l’utilise} other {de vos thèmes l’utilisent}}. Ils basculeront sur une police intégrée. Supprimer quand même ?",
         "signInToUpload": "Connectez-vous pour téléverser des polices et constituer votre bibliothèque.",
         "badge": "Police",
-        "filterWithFonts": "Avec polices personnalisées"
+        "filterWithFonts": "Avec polices personnalisées",
+        "pickForElement": "Choisissez la police de cet élément uniquement. Les autres éléments conservent leurs propres polices."
       },
       "customCount": "{count} personnalisés",
       "savedCount": "{count} enregistrés"
@@ -1189,6 +1201,9 @@
       "thisMonth": "Ce mois-ci",
       "lastMonth": "Mois dernier",
       "allTime": "Tous les temps"
+    },
+    "graphics": {
+      "savedCount": "{count, plural, =1 {# enregistré} other {# enregistrés}}"
     }
   },
   "feedbackInfo": {
@@ -1276,7 +1291,11 @@
       },
       "countryAssignment": {
         "title": "Attribution des pays",
-        "content": "Les pays affichés lorsque vous choisissez une année sont un point de départ, pas une liste figée. Dans la modale Configuration, cliquez sur un pays pour le déplacer entre les étapes (Demi-finale 1, Demi-finale 2, Grande Finale) ou le marquer comme Ne participe pas. Vous pouvez aussi ajouter des pays d’autres années, d’autres continents ou vos propres entrées personnalisées."
+        "content": "Les pays affichés lorsque vous choisissez une année sont un point de départ, pas une liste figée. Dans la modale Configuration, glissez-déposez les pays entre les étapes (Demi-finale 1, Demi-finale 2, Grande Finale) et la liste Ne participe pas, ou cliquez sur un pays pour le déplacer. Vous pouvez aussi ajouter des pays d’autres années, d’autres continents ou vos propres entrées personnalisées."
+      },
+      "allocationDraw": {
+        "title": "Tirage au sort des demi-finales",
+        "content": "Activez « Tirage au sort » (le bouton dé) dans la modale Configuration pour répartir les demi-finalistes entre les demi-finales, chapeau par chapeau, comme le fait l’UER. Déroulez le tirage pas à pas ou passez directement au résultat, puis appuyez sur « Appliquer à la composition » pour remplir les demi-finales et les moitiés de leur ordre de passage. Les chapeaux et règles officiels sont utilisés par défaut ; « Personnaliser » permet de modifier les chapeaux, la taille des demi-finales, les moitiés et la demi-finale où votent les pays préqualifiés. Nécessite au moins deux demi-finales."
       },
       "grandFinalOnly": {
         "title": "Mode Finale seule",
@@ -1316,6 +1335,10 @@
         "title": "Cotes et aléatoire",
         "content": "Dans « Paramètres → Cotes », attribuez des cotes jury et télévote (0–100) à chaque pays pour influencer la distribution des votes aléatoires. Des cotes plus élevées signifient une meilleure chance de recevoir plus de points. Le curseur Niveau d’aléatoire contrôle à quel point la simulation suit ces cotes : glissez vers la gauche pour des résultats prévisibles qui reflètent les cotes, vers la droite pour une simulation chaotique où tout peut arriver."
       },
+      "diasporaAffinity": {
+        "title": "Diaspora et affinités",
+        "content": "Dans « Paramètres → Relations », les blocs de vote, les voisins, les diasporas et les rivalités orientent les votes aléatoires vers certains pays (ou les en éloignent), d’après plus de 20 ans de données de vote réelles. Le curseur Intensité règle la force de l’effet ; vous pouvez aussi ajuster chaque paire ou ajouter vos propres paires et blocs."
+      },
       "presentationMode": {
         "title": "Mode présentation",
         "content": "Activez « Activer le mode présentation » dans « Paramètres → Vote » pour ajouter un panneau de lecture automatique sous le scoreboard. Réglez la vitesse (0,5–7,5 secondes par action) et appuyez sur Lecture pour laisser la simulation se dérouler sans intervention — idéal pour le streaming ou l’enregistrement. Activez « Démarrage auto de la présentation » pour qu’elle démarre automatiquement dès le début du vote."
@@ -1326,7 +1349,7 @@
       },
       "moreOptions": {
         "title": "Plus d’options de vote",
-        "content": "Options supplémentaires dans Paramètres → Vote et l’en-tête de simulation :<list><item><strong>Dévoilement de la qualification en split-screen</strong> — un moment de style ESC 2025 où plusieurs candidats apparaissent côte à côte et vous en choisissez un pour le qualifier. Configurez 2–6 candidats par révélation, et si le dernier qualifié utilise aussi le split-screen.</item><item><strong>Points pour la même entrée multiple fois</strong> — permet à un pays votant d’attribuer plusieurs jetons de points à la même entrée. Cela simule le système de vote de l’Eurovision avant 1975, où chaque jury distribuait dix jetons égaux librement.</item><item><strong>Ordre d’annonce du télévote</strong> — réglez sur du plus bas au plus haut pour annoncer les résultats du télévote du moins au plus de points, comme à l’ESC 2016–2018.</item><item><strong>Grouper le vote aléatoire du jury</strong> — le bouton « Voter aléatoirement » attribue les points par lots réalistes (1–8+10 ensemble, ou juste 12) au lieu d’une valeur à la fois.</item><item><strong>Annuler et Redémarrer</strong> — Annuler revient en arrière jusqu’à 100 actions ; Redémarrer réinitialise toute la simulation.</item></list>"
+        "content": "Options supplémentaires dans Paramètres → Vote et l’en-tête de simulation :<list><item><strong>Dévoilement de la qualification en split-screen</strong> — un moment de style ESC 2025 où plusieurs candidats apparaissent côte à côte et vous en choisissez un pour le qualifier. Configurez 2–6 candidats par révélation, et si le dernier qualifié utilise aussi le split-screen.</item><item><strong>Points pour la même entrée multiple fois</strong> — permet à un pays votant d’attribuer plusieurs jetons de points à la même entrée. Cela simule le système de vote de l’Eurovision avant 1975, où chaque jury distribuait dix jetons égaux librement.</item><item><strong>Ordre d’annonce du télévote</strong> — réglez sur du plus bas au plus haut pour annoncer les résultats du télévote du moins au plus de points, comme à l’ESC 2016–2018.</item><item><strong>Grouper le vote aléatoire du jury</strong> — le bouton « Voter aléatoirement » attribue les points par lots réalistes (1–8+10 ensemble, ou juste 12) au lieu d’une valeur à la fois.</item><item><strong>Annuler et Redémarrer</strong> — Annuler revient en arrière jusqu’à 100 actions ; Redémarrer réinitialise toute la simulation.</item><item><strong>Révélation du jury par compte à rebours de l'échelle</strong> — le format du JESC 2024 : le vote du jury s’affiche sur un graphique à barres qui révèle d’abord tous les 1 point de tous les jurys à la fois, puis tous les 2, et ainsi de suite, avant que les porte-parole n’annoncent leurs 12 points.</item></list>"
       }
     },
     "themes": {
@@ -1336,11 +1359,15 @@
       },
       "browseThemes": {
         "title": "Parcourir les thèmes de la communauté",
-        "content": "Ouvrez le widget Thèmes pour parcourir les thèmes publics créés par d’autres utilisateurs — aucun compte requis pour les parcourir ou les appliquer. Connectez-vous pour aimer un thème, l’enregistrer dans votre collection pour un accès rapide, le copier comme point de départ pour le vôtre, ou en créer un from scratch."
+        "content": "Ouvrez le widget Thèmes pour parcourir les thèmes publics créés par d’autres utilisateurs — aucun compte requis pour les parcourir ou les appliquer. Connectez-vous pour aimer un thème, l’enregistrer dans votre collection pour un accès rapide, le copier comme point de départ pour le vôtre, ou en créer un à partir de zéro."
       },
       "customThemeBuilder": {
         "title": "Créateur de thème personnalisé",
         "content": "Les utilisateurs connectés peuvent créer un thème entièrement personnalisé : choisir une couleur principale, téléverser une image de fond, sélectionner une police et remplacer les couleurs de chaque état du scoreboard indépendamment (jury actif, télévote non terminé/actif/terminé, entrées non qualifiées et badges de rang). Les formes de drapeaux, les formes des conteneurs de points et les styles d’animation du tableau sont tous configurables. Un panneau d’aperçu en direct montre exactement l’effet de chaque modification sur un vrai élément pays."
+      },
+      "customFonts": {
+        "title": "Polices personnalisées",
+        "content": "Dans l’éditeur de thème, choisissez une police intégrée ou téléversez la vôtre (WOFF2, WOFF, TTF ou OTF — jusqu’à quatre graisses ou une police variable). Les polices téléversées rejoignent votre bibliothèque de polices pour être utilisées dans n’importe quel thème, et vous pouvez y ajouter les polices publiques d’autres utilisateurs. Un thème peut aussi définir une police du tableau de scores distincte pour les lignes des pays, tandis que les menus et en-têtes gardent la police de l’interface."
       },
       "soundEffects": {
         "title": "Effets sonores et audio de fond",
@@ -1367,6 +1394,10 @@
       "shareStats": {
         "title": "Partager les statistiques en image",
         "content": "Dans la modale Statistiques, un bouton de partage permet d’exporter le tableau complet des résultats (détail, répartition ou résumé) en PNG téléchargeable. Idéal pour partager des décomptes détaillés sur les réseaux sociaux ou dans les communautés de fans Eurovision."
+      },
+      "graphics": {
+        "title": "Visuels (Beta)",
+        "content": "Ouvrez le widget Visuels pour créer vos propres images : cartes de résultats, tops 10, affiches, tableaux de statistiques et plus encore.<list><item><strong>Commencez</strong> à partir d’un modèle, d’un design de la communauté dans Explorer ou d’un canevas vierge. « Ouvrir dans l’éditeur » dans la fenêtre de partage d’image envoie aussi l’image actuelle dans l’éditeur.</item><item><strong>Modifiez</strong> : ajoutez du texte, des images, des formes, des drapeaux, des tableaux de scores et des tableaux de statistiques, puis déplacez-les, redimensionnez-les et faites-les pivoter. Définissez la taille du canevas, l’arrière-plan et le thème. Dans Données, choisissez ce qu’affichent les tableaux de scores : le tableau de scores en direct, un concours enregistré ou une liste manuelle.</item><item><strong>Exportez</strong> l’image en PNG ou JPEG pour la télécharger, la partager ou la copier.</item><item><strong>Publiez</strong> (connexion requise) en public, listé dans Explorer, ou en privé, partagé par lien. Vous pouvez choisir des champs modifiables pour que d’autres ne changent que ceux-ci dans un court formulaire avant de générer l’image. Aimez et enregistrez les designs d’autres utilisateurs pour les retrouver dans Enregistrés.</item></list>Les designs sont conservés dans ce navigateur : utilisez « Exporter (.json) » dans Mes designs pour en garder une sauvegarde."
       },
       "leaderboard": {
         "title": "Classement mondial des pays",
@@ -1657,6 +1688,712 @@
       "cancelSimulation": "Annuler la simulation",
       "logout": "Se déconnecter",
       "createNewContest": "Créer un nouveau concours"
+    }
+  },
+  "graphics": {
+    "widget": {
+      "title": "Visuels",
+      "description": "Créez et partagez des images",
+      "noDesignsYet": "Aucun design pour le moment",
+      "nDesigns": "{count, plural, =1 {# design} other {# designs}}",
+      "explore": "Explorer"
+    },
+    "share": {
+      "openInEditor": "Ouvrir dans l’éditeur",
+      "resultsDesign": "Résultats",
+      "runningOrderDesign": "Ordre de passage",
+      "statsDesign": "Statistiques"
+    },
+    "gallery": {
+      "title": "Visuels",
+      "tabs": {
+        "myDesigns": "Mes designs",
+        "explore": "Explorer",
+        "saved": "Enregistrés"
+      },
+      "newBlank": "Nouveau design vierge",
+      "openInEditor": "Ouvrir dans l’éditeur",
+      "duplicate": "Dupliquer",
+      "rename": "Renommer",
+      "delete": "Supprimer",
+      "more": "Plus",
+      "live": "En direct",
+      "manual": "Manuel",
+      "nRows": "{count, plural, =1 {# ligne} other {# lignes}}",
+      "builtIn": "Intégrés",
+      "builtInSub": "Modèles maintenus par DouzePoints",
+      "use": "Utiliser",
+      "empty": {
+        "title": "Aucun design pour le moment",
+        "body": "Partez d’un modèle, d’un design de la communauté ou d’un canevas vierge. Les designs sont conservés dans ce navigateur.",
+        "explore": "Explorer les designs"
+      },
+      "renamePrompt": "Nom du design",
+      "deleteTitle": "Supprimer « {name} » ?",
+      "deleteBody": "Cela retire le design de ce navigateur. Cette action est irréversible.",
+      "toast": {
+        "duplicated": "Design dupliqué",
+        "deleted": "Design supprimé",
+        "linkCopied": "Lien copié dans le presse-papiers !",
+        "failed": "Une erreur s’est produite",
+        "saved": "Enregistré dans votre collection",
+        "unsaved": "Retiré des enregistrés",
+        "unpublished": "Design dépublié",
+        "unreadable": "Ce design ne peut pas être ouvert dans cette version de l’application.",
+        "imported": "« {name} » importé",
+        "importFailed": "Ce fichier n’est pas un design DouzePoints.",
+        "madePublic": "Désormais public · listé dans Explorer",
+        "madePrivate": "Désormais privé · visible par vous seul"
+      },
+      "templates": {
+        "blank": {
+          "name": "Vierge",
+          "description": "Un canevas paysage vide sur l’arrière-plan du thème."
+        },
+        "results": {
+          "name": "Résultats",
+          "description": "Titre, sous-titre et le tableau de scores complet sur trois colonnes."
+        },
+        "top10": {
+          "name": "Top 10",
+          "description": "Une carte portrait avec les meilleures entrées en grandes lignes."
+        },
+        "poster": {
+          "name": "Affiche d’annonce",
+          "description": "Logo, slogan, ville hôte, dates et drapeau du pays hôte."
+        },
+        "runningOrder": {
+          "name": "Ordre de passage",
+          "description": "Les lignes dans l’ordre de passage, sans les points."
+        },
+        "qualifiers": {
+          "name": "Qualifiés",
+          "description": "Les noms sur trois colonnes, sur un canevas de diffusion."
+        },
+        "stats": {
+          "name": "Statistiques",
+          "description": "Un tableau de statistiques, ajusté à son contenu."
+        }
+      },
+      "savedContest": "Concours enregistré",
+      "contentSized": "Ajusté au contenu",
+      "published": "Publié",
+      "updatePublished": "Mettre à jour la copie publiée",
+      "publish": "Publier…",
+      "copyLink": "Copier le lien",
+      "share": "Partager",
+      "unpublish": "Dépublier",
+      "nFields": "{count, plural, =1 {# champ} other {# champs}}",
+      "scoreboard": "Tableau de scores",
+      "stats": "Statistiques",
+      "private": "Privé",
+      "remix": "Remix",
+      "like": "Aimer",
+      "save": "Enregistrer",
+      "signInToReact": "Connectez-vous pour aimer et enregistrer des designs.",
+      "unpublishTitle": "Dépublier « {name} » ?",
+      "unpublishBody": "La copie publiée et son lien cessent de fonctionner pour tout le monde. Votre brouillon local reste dans ce navigateur.",
+      "searchDesigns": "Rechercher des designs",
+      "sort": {
+        "newest": "Plus récents",
+        "used": "Plus utilisés",
+        "liked": "Plus aimés"
+      },
+      "sizes": {
+        "any": "Toutes tailles",
+        "landscape": "Paysage",
+        "portrait": "Portrait",
+        "square": "Carré",
+        "story": "Story",
+        "broadcast": "Diffusion"
+      },
+      "hasScoreboard": "Avec tableau de scores",
+      "hasStats": "Avec statistiques",
+      "mine": "Publiés par vous",
+      "mineSub": "Absents de ce navigateur · ouvrez-en un pour en faire une copie locale",
+      "community": "Communauté",
+      "foundN": "{count, plural, =1 {# design trouvé} other {# designs trouvés}}",
+      "communityError": {
+        "title": "Impossible de charger les designs de la communauté",
+        "body": "Vérifiez votre connexion et réessayez."
+      },
+      "retry": "Réessayer",
+      "noMatch": {
+        "title": "Aucun design de la communauté ne correspond",
+        "body": "Essayez une autre taille ou effacez les filtres."
+      },
+      "noCommunity": {
+        "title": "Aucun design de la communauté pour le moment",
+        "body": "Publiez un design et il apparaîtra ici pour tout le monde."
+      },
+      "clearFilters": "Effacer les filtres",
+      "savedSignIn": {
+        "title": "Connectez-vous pour enregistrer des designs",
+        "body": "Les designs de la communauté enregistrés sont conservés avec votre compte."
+      },
+      "nothingSaved": {
+        "title": "Rien d’enregistré pour le moment",
+        "body": "Enregistrez des designs de la communauté pour les retrouver ici."
+      },
+      "keptInBrowser": "Les designs sont conservés dans ce navigateur · exportez une copie pour la mettre en sûreté",
+      "exportJson": "Exporter (.json)",
+      "importJson": "Importer",
+      "renameTitle": "Renommer le design",
+      "report": "Signaler…",
+      "reported": "Signalé",
+      "unreadable": {
+        "body": "Ce design ne peut pas être ouvert par cette version de l’application. Exportez-le pour en garder une copie, ou supprimez-le."
+      },
+      "starters": "Modèles",
+      "open": "Ouvrir",
+      "public": "Public",
+      "makePublic": "Rendre public",
+      "makePrivate": "Rendre privé",
+      "communitySub": "Designs publics de tous · utilisez ou remixez-en n’importe lequel",
+      "startersSub": "Points de départ intégrés · maintenus par DouzePoints",
+      "updated": "Mis à jour {time}"
+    },
+    "editor": {
+      "aria": "Éditeur de design",
+      "canvasAria": "Canevas",
+      "close": "Fermer l’éditeur",
+      "designName": "Nom du design",
+      "notSavedYet": "Pas encore enregistré",
+      "unsaved": "Non enregistré",
+      "saved": "Enregistré",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "sizedToTable": "Ajusté au tableau",
+      "export": "Exporter",
+      "save": "Enregistrer",
+      "zoom": "Zoom",
+      "label": {
+        "heightFollowsRows": "la hauteur suit les lignes",
+        "rowsFitBox": "les lignes s’ajustent au cadre",
+        "sizesToContent": "s’ajuste au contenu",
+        "nElements": "{count} éléments",
+        "centred": "centré · {px} de chaque côté",
+        "resize": "Redimensionner",
+        "rotate": "Faire pivoter"
+      },
+      "hint": {
+        "dragToMove": "Glissez pour déplacer · affinez dans Disposition",
+        "tapToEdit": "Touchez un élément pour le modifier",
+        "zoomed": "{pct} % · pincez pour zoomer · touchez deux fois pour ajuster"
+      },
+      "rail": {
+        "aria": "Outils de l’éditeur",
+        "add": "Ajouter",
+        "templates": "Modèles",
+        "layers": "Calques",
+        "data": "Données"
+      },
+      "panel": {
+        "add": "Ajouter un élément",
+        "templates": "Modèles",
+        "layers": "Calques",
+        "data": "Données",
+        "close": "Fermer le panneau"
+      },
+      "sheet": {
+        "toolbar": "Éditeur",
+        "inspector": "Élément",
+        "add": "Ajouter un élément",
+        "addShort": "Ajouter",
+        "layers": "Calques",
+        "data": "Données",
+        "canvas": "Canevas",
+        "templates": "Modèles",
+        "close": "Fermer le volet",
+        "publish": "Publier",
+        "published": "Publié"
+      },
+      "nudge": {
+        "move": "Déplacer",
+        "holdForTen": "1 px · maintenez pour 10",
+        "up": "Haut",
+        "left": "Gauche",
+        "centre": "Centrer sur le canevas",
+        "right": "Droite",
+        "down": "Bas"
+      },
+      "toast": {
+        "saved": "Design enregistré",
+        "savedAndSynced": "Enregistré · copie publiée mise à jour",
+        "cloudUpdated": "Copie publiée mise à jour",
+        "cloudUpdateFailed": "Enregistré ici, mais la copie publiée n’a pas pu être mise à jour. Réessayez depuis Publié.",
+        "cloudGone": "La copie publiée n’existe plus. Publiez à nouveau pour partager ce design."
+      },
+      "updatePublished": "Mettre à jour",
+      "publish": "Publier",
+      "canvasSizeChip": "Taille du canevas",
+      "themeChip": "Thème",
+      "untitled": "Design sans titre",
+      "remixChipTitle": "Ce design est issu d’un design de la communauté ; son créateur est crédité lorsque vous publiez.",
+      "remixOf": "Remix de {name}",
+      "published": "Publié",
+      "publishedTitle": "La copie publiée se met à jour à chaque enregistrement. Cliquez pour modifier sa visibilité, sa description ou ses champs modifiables."
+    },
+    "add": {
+      "text": {
+        "name": "Texte",
+        "description": "Un titre, une légende ou toute ligne de texte"
+      },
+      "image": {
+        "name": "Image",
+        "description": "Téléversement, URL ou arrière-plan du thème"
+      },
+      "shape": {
+        "name": "Forme",
+        "description": "Rectangle ou ellipse, uni ou en dégradé"
+      },
+      "flag": {
+        "name": "Drapeau",
+        "description": "Un pays, rectangulaire, rond ou en cœur"
+      },
+      "scoreboard": {
+        "name": "Tableau de scores",
+        "description": "Lignes de la source de données ; s’ajuste à ses lignes"
+      },
+      "stats": {
+        "name": "Statistiques",
+        "description": "Tableau de détail, de répartition ou de résumé"
+      }
+    },
+    "templates": {
+      "replacesEverything": "Remplace tout le contenu du canevas. Annuler le rétablit.",
+      "builtin": {
+        "blank": {
+          "name": "Vierge"
+        },
+        "results": {
+          "name": "Résultats"
+        },
+        "top10": {
+          "name": "Top 10"
+        },
+        "poster": {
+          "name": "Affiche d’annonce"
+        },
+        "runningOrder": {
+          "name": "Ordre de passage"
+        },
+        "qualifiers": {
+          "name": "Qualifiés"
+        },
+        "stats": {
+          "name": "Statistiques"
+        }
+      },
+      "browseCommunity": "Explorer les designs de la communauté"
+    },
+    "layers": {
+      "title": "Calques",
+      "hint": "Le haut de la liste est au premier plan. Glissez pour réorganiser.",
+      "hintPhone": "Le haut de la liste est au premier plan. Touchez des lignes pour en sélectionner plusieurs.",
+      "toggleGroup": "Déplier/replier le groupe",
+      "show": "Afficher",
+      "hide": "Masquer",
+      "lock": "Verrouiller",
+      "unlock": "Déverrouiller"
+    },
+    "data": {
+      "live": "En direct",
+      "manual": "Manuel",
+      "provided": "Lignes fournies",
+      "nRows": "{count, plural, =1 {# ligne} other {# lignes}}",
+      "elementsUseThisData": "Les éléments tableau de scores et statistiques utilisent ces données.",
+      "stage": "Étape",
+      "liveHint": "L’étape à l’écran, triée comme le tableau.",
+      "country": "Pays",
+      "points": "Points",
+      "removeRow": "Supprimer la ligne",
+      "addRow": "Ajouter une ligne",
+      "importFromLive": "Importer depuis le direct",
+      "nowShowing": "Affiché actuellement",
+      "savedContest": "Concours enregistré",
+      "searchContests": "Rechercher des concours",
+      "yours": "Les vôtres",
+      "public": "Publics",
+      "noContestsFound": "Aucun concours trouvé.",
+      "signInForContests": "Connectez-vous pour choisir l’un de vos concours ; les concours publics sont listés ci-dessous.",
+      "viewedStage": "Étape à l’écran",
+      "loadingContest": "Chargement du concours…",
+      "contestInaccessible": "« {name} » ne peut pas être ouvert. Les lignes affichent votre tableau de scores en direct jusqu’à ce que vous choisissiez une autre source.",
+      "statsNeedLive": "Les tableaux de statistiques utilisent le tableau de scores en direct. Passez la source de données sur En direct pour remplir ce tableau.",
+      "pickContestHint": "Choisissez un concours ci-dessous. En attendant, le design conserve sa source de données actuelle.",
+      "statsNeedLiveHint": "Données → En direct dans l’éditeur",
+      "sampleHint": "Aucun concours en cours : les tableaux de scores et statistiques affichent des résultats d’exemple (Grande Finale de l’Eurovision 2026, votes fictifs). Lancez un concours pour utiliser les vôtres."
+    },
+    "inspector": {
+      "properties": "Propriétés",
+      "canvasLabel": "Canevas",
+      "canvas": {
+        "sizedToTable": "Ajusté au tableau.",
+        "sizedToTableHint": "Ce canevas entoure le tableau de statistiques avec une marge.",
+        "preset": "Préréglage",
+        "custom": "Personnalisé",
+        "width": "Largeur",
+        "height": "Hauteur",
+        "solid": "Uni",
+        "gradient": "Dégradé",
+        "theme": "Thème",
+        "image": "Image",
+        "themeBackgroundHint": "L’arrière-plan du thème du design : « {name} ». Modifiez-le dans Thème.",
+        "opacity": "Opacité"
+      },
+      "nothingSelected": "Aucune sélection",
+      "elementName": "Nom de l’élément",
+      "lock": "Verrouiller",
+      "unlock": "Déverrouiller",
+      "show": "Afficher",
+      "hide": "Masquer",
+      "duplicate": "Dupliquer",
+      "delete": "Supprimer",
+      "nElements": "{count} éléments",
+      "multiHint": "Modifiez chaque élément séparément, ou déplacez, dupliquez et supprimez-les ensemble. Maj-clic pour ajouter ou retirer.",
+      "lockAll": "Tout verrouiller",
+      "hideAll": "Tout masquer",
+      "types": {
+        "text": "Texte",
+        "image": "Image",
+        "shape": "Forme",
+        "flag": "Drapeau",
+        "scoreboard": "Tableau de scores",
+        "stats": "Statistiques",
+        "branding": "Branding",
+        "stack": "Pile"
+      },
+      "sections": {
+        "content": "Contenu",
+        "style": "Style",
+        "data": "Données",
+        "rows": "Lignes",
+        "size": "Taille",
+        "rowStyle": "Style des lignes",
+        "table": "Tableau",
+        "positionAndSize": "Position et taille",
+        "canvasSize": "Taille du canevas",
+        "background": "Arrière-plan",
+        "dataSource": "Source de données",
+        "layout": "Disposition",
+        "theme": "Thème"
+      },
+      "text": {
+        "text": "Texte",
+        "font": "Police",
+        "uiFont": "Police de l’interface",
+        "scoreboardFont": "Police du tableau de scores",
+        "size": "Taille",
+        "weight": "Graisse",
+        "weights": {
+          "regular": "Regular",
+          "medium": "Medium",
+          "semibold": "SemiBold",
+          "bold": "Gras"
+        },
+        "colour": "Couleur",
+        "align": "Alignement",
+        "alignLeft": "Gauche",
+        "alignCentre": "Centre",
+        "alignRight": "Droite",
+        "uppercase": "Majuscules",
+        "shadow": "Ombre",
+        "lineHeight": "Interligne",
+        "customFont": "Personnalisée",
+        "libraryFont": "Bibliothèque",
+        "inThisDesign": "Dans ce design",
+        "customFontHint": "Choisissez une police intégrée ou une police de votre bibliothèque. Les polices déjà utilisées dans ce design apparaissent ici pour être réutilisées en un clic."
+      },
+      "image": {
+        "source": "Source",
+        "upload": "Téléverser",
+        "url": "URL",
+        "themeBackground": "Arrière-plan du thème",
+        "imageUrl": "URL de l’image",
+        "replaceImage": "Remplacer l’image",
+        "chooseImage": "Choisir une image…",
+        "uploadHint": "PNG ou JPEG jusqu’à {max}.",
+        "fit": "Ajustement",
+        "cornerRadius": "Rayon des coins",
+        "mask": "Masque",
+        "none": "Aucun",
+        "circle": "Cercle",
+        "heart": "Cœur"
+      },
+      "fill": {
+        "fill": "Remplissage",
+        "colour": "Couleur",
+        "from": "De",
+        "to": "À",
+        "angle": "Angle",
+        "fit": "Ajustement",
+        "cover": "Couvrir",
+        "contain": "Contenir",
+        "themeSurfaceHint": "Utilise la couleur de surface des cartes du thème."
+      },
+      "shape": {
+        "shape": "Forme",
+        "rectangle": "Rectangle",
+        "ellipse": "Ellipse",
+        "solid": "Uni",
+        "gradient": "Dégradé",
+        "themeSurface": "Surface du thème",
+        "image": "Image",
+        "cornerRadius": "Rayon des coins",
+        "stroke": "Contour",
+        "strokeColour": "Couleur du contour",
+        "shadow": "Ombre"
+      },
+      "flag": {
+        "country": "Pays",
+        "shape": "Forme",
+        "rectangle": "Rectangle",
+        "round": "Rond",
+        "heart": "Cœur"
+      },
+      "scoreboard": {
+        "columns": "Colonnes",
+        "rowSize": "Taille des lignes",
+        "showPoints": "Afficher les points",
+        "showRankings": "Afficher le classement",
+        "shortNames": "Noms de pays courts",
+        "rowLimit": "Nombre max de lignes",
+        "nOfTotal": "{n} sur {total}",
+        "allN": "tous ({total})",
+        "status": "Statut",
+        "liveColours": "Couleurs du direct",
+        "uniform": "Uniforme",
+        "sizesToContent": "S’ajuste au contenu.",
+        "layout": "Disposition",
+        "autoFit": "Ajustement auto",
+        "fixed": "Fixe",
+        "autoFitHint": "Les colonnes et la taille des lignes suivent le nombre de lignes, pour que chaque ligne tienne dans le cadre.",
+        "fitsToBox": "S’ajuste à son cadre.",
+        "fitSummary": "{rows} lignes tiennent sur {columns, plural, =1 {# colonne} other {# colonnes}} en {size} → <b>{w} × {h}</b>. Faites glisser n’importe quelle poignée pour redimensionner le cadre ; les lignes se réajustent.",
+        "sizeSummary": "{rows} lignes sur {columns, plural, =1 {# colonne} other {# colonnes}} en {size} → <b>{w} × {h}</b>. Faites glisser les poignées latérales pour la largeur ; la hauteur suit les lignes.",
+        "fitCanvasWidth": "Ajuster à la largeur du canevas",
+        "order": "Ordre",
+        "ranked": "Classement",
+        "runningOrder": "Ordre de passage"
+      },
+      "stats": {
+        "tableType": "Type de tableau",
+        "breakdown": "Détail",
+        "split": "Répartition",
+        "summary": "Résumé",
+        "sizeSummary": "<b>S’ajuste au contenu.</b> Le tableau détermine lui-même sa largeur et sa hauteur : <b>{w} × {h}</b>. Déplacez-le ; le type de tableau, le type de vote et la source de données en modifient la taille.",
+        "voteType": "Type de vote",
+        "total": "Total",
+        "jury": "Jury",
+        "televote": "Télévote",
+        "noSourceTitle": "Aucune statistique pour cette source de données.",
+        "noSourceBody": "Les tableaux de statistiques sont calculés à partir du tableau de scores en direct ; les listes manuelles et les concours enregistrés ne contiennent pas encore de votes.",
+        "changeDataSource": "Passer en direct"
+      },
+      "branding": {
+        "size": "Taille",
+        "staysOnEveryDesign": "Le branding reste sur chaque design. Déplacez-le et redimensionnez-le ; il ne peut être ni supprimé ni masqué.",
+        "showIcon": "Afficher l’icône"
+      },
+      "stack": {
+        "direction": "Direction",
+        "row": "Ligne",
+        "column": "Colonne",
+        "gap": "Espacement",
+        "padding": "Padding",
+        "alignment": "Alignement",
+        "start": "Début",
+        "centre": "Centre",
+        "end": "Fin",
+        "insideThisStack": "Dans cette pile"
+      },
+      "data": {
+        "change": "Changer…",
+        "elementsUseDesignData": "Les éléments tableau de scores et statistiques utilisent la source de données du design.",
+        "nElementsUseThisData": "{count, plural, =1 {# élément utilise} other {# éléments utilisent}} ces données."
+      },
+      "rowStyle": {
+        "rowsFollowTheme": "Les lignes suivent le thème du design <b>« {name} »</b>.",
+        "cellsFollowTheme": "Les cellules suivent le thème du design <b>« {name} »</b>.",
+        "setInThemeEditor": "Les couleurs, la forme des drapeaux et les polices viennent du thème. Choisissez un autre thème pour ce design, ou modifiez le thème lui-même dans l’éditeur de thème.",
+        "changeTheme": "Changer de thème"
+      },
+      "layout": {
+        "setByContent": "Défini par le contenu",
+        "rotation": "Rotation",
+        "opacity": "Opacité",
+        "lock": "Verrouiller",
+        "hide": "Masquer",
+        "order": "Ordre",
+        "sendBackward": "Reculer",
+        "bringForward": "Avancer",
+        "back": "Arrière-plan",
+        "front": "Premier plan"
+      },
+      "theme": {
+        "theme": "Thème",
+        "myThemes": "Mes thèmes",
+        "useAppTheme": "Utiliser le thème de l’application ({name})",
+        "savedWithDesign": "Enregistré avec le design : il garde ce rendu quel que soit le thème de l’application."
+      }
+    },
+    "export": {
+      "title": "Exporter",
+      "close": "Fermer",
+      "format": "Format",
+      "scale": "Échelle",
+      "estimate": "{w} × {h} px · environ {mb} Mo",
+      "download": "Télécharger",
+      "share": "Partager",
+      "copy": "Copier",
+      "copyImage": "Copier l’image",
+      "downloadImage": "Télécharger l’image",
+      "generating": "Génération de l’image…",
+      "generated": "Image générée",
+      "generatedAlt": "Image générée",
+      "cancel": "Annuler",
+      "failed": {
+        "title": "L’image n’a pas pu être générée",
+        "body": "Nous avons essayé deux fois. Réessayez, ou passez à l’autre moteur d’image — plus lent, mais il gère mieux les grands canevas.",
+        "tryAgain": "Réessayer",
+        "otherEngine": "Essayer l’autre moteur"
+      },
+      "toast": {
+        "downloaded": "{name} téléchargé",
+        "copied": "Image copiée",
+        "copyFailed": "Impossible de copier l’image",
+        "shareUnsupported": "Le partage n’est pas pris en charge sur cet appareil.",
+        "shareFailed": "Échec du partage"
+      }
+    },
+    "dialogs": {
+      "tooLarge": {
+        "title": "Cette image est trop volumineuse pour être téléversée",
+        "body": "{name} fait {size}. Les images peuvent atteindre {max}. Réduisez-la, ou exportez-la en JPEG et réessayez.",
+        "chooseAnother": "Choisir une autre image",
+        "cancel": "Annuler"
+      },
+      "unsaved": {
+        "title": "Le design n’a pas pu être enregistré",
+        "body": "Le stockage de ce navigateur a refusé l’écriture. Réessayez d’enregistrer, ou abandonnez les dernières modifications.",
+        "save": "Réessayer",
+        "discard": "Abandonner les modifications",
+        "cancel": "Annuler"
+      },
+      "signIn": {
+        "titlePublish": "Connectez-vous pour publier des designs",
+        "titleCloud": "Connectez-vous pour enregistrer dans le cloud",
+        "bodyPublish": "Les designs publiés portent votre nom. Votre design reste dans ce navigateur jusqu’à votre connexion.",
+        "bodyCloud": "Votre design est conservé dans ce navigateur comme brouillon. Connectez-vous pour le retrouver sur tous vos appareils et le publier.",
+        "signIn": "Se connecter",
+        "keepLocal": "Continuer en local"
+      },
+      "noAccess": {
+        "title": "Ce design utilise un concours que vous ne pouvez pas ouvrir",
+        "body": "{name} est privé ou a été supprimé. Les éléments tableau de scores et statistiques afficheront votre tableau de scores en direct jusqu’à ce que vous choisissiez une autre source.",
+        "thisContest": "Le concours",
+        "useLive": "Utiliser le tableau de scores en direct",
+        "useManual": "Saisir une liste manuelle"
+      },
+      "cancel": "Annuler",
+      "report": {
+        "title": "Signaler « {name} » ?",
+        "body": "Dites-nous ce qui ne va pas avec ce modèle. Les signalements sont examinés par l’équipe DouzePoints.",
+        "reason": "Motif",
+        "reasons": {
+          "spam": "Spam ou contenu trompeur",
+          "offensive": "Contenu offensant",
+          "copyright": "Droit d’auteur ou marque déposée",
+          "other": "Autre chose"
+        },
+        "details": "Détails (facultatif)",
+        "detailsPlaceholder": "Tout ce qui nous aide à comprendre le problème",
+        "send": "Envoyer le signalement",
+        "cancel": "Annuler",
+        "thanks": "Merci, le signalement a été envoyé.",
+        "already": "Vous avez déjà signalé ce modèle.",
+        "failed": "Le signalement n’a pas pu être envoyé."
+      }
+    },
+    "fields": {
+      "columns": "Colonnes",
+      "rowSize": "Taille des lignes",
+      "rowLimit": "Nombre max de lignes",
+      "tableType": "Type de tableau",
+      "voteType": "Type de vote",
+      "dataSource": "Source de données",
+      "size": "Taille",
+      "backgroundOpacity": "Opacité du fond",
+      "rowSizes": {
+        "sm": "S",
+        "md": "M",
+        "lg": "L",
+        "xl": "XL",
+        "2xl": "2XL"
+      },
+      "tables": {
+        "Breakdown": "Détail",
+        "Split": "Répartition",
+        "Summary": "Résumé"
+      },
+      "voteTypes": {
+        "Total": "Total",
+        "Jury": "Jury",
+        "Televote": "Télévote"
+      },
+      "sizeHint": "Réajuste toute la mise en page à la nouvelle taille."
+    },
+    "sheet": {
+      "explore": "Explorer",
+      "close": "Fermer",
+      "inaccessible": "Ce design utilise {name}, que vous ne pouvez pas ouvrir.",
+      "showingLive": "Votre tableau de scores en direct est affiché à la place.",
+      "useManual": "Utiliser une liste manuelle",
+      "sample": "Résultats d’exemple.",
+      "sampleBody": "Aucun concours en cours : voici la Grande Finale de l’Eurovision 2026 avec des votes fictifs. Lancez un concours pour utiliser les vôtres.",
+      "fields": "Champs",
+      "nFields": "{count, plural, =1 {# champ} other {# champs}} · tout le reste se règle dans l’éditeur",
+      "preview": "Aperçu",
+      "sizedToTable": "ajusté au tableau",
+      "theme": "thème « {name} »",
+      "result": "Résultat",
+      "generate": "Générer l’image",
+      "generateAgain": "Générer à nouveau",
+      "openInEditor": "Ouvrir dans l’éditeur",
+      "remixedFrom": "Remixé à partir de {name}"
+    },
+    "publish": {
+      "title": "Publier le design",
+      "close": "Fermer",
+      "name": "Nom",
+      "description": "Description",
+      "visibility": "Visibilité",
+      "public": "Public",
+      "private": "Privé",
+      "fillableFields": "Champs modifiables",
+      "nSelected": "Sélectionnés : {count}",
+      "exposedHint": "Les personnes qui utilisent votre design peuvent modifier uniquement ces champs dans un court formulaire avant de générer l’image ; tout le reste reste tel que vous l’avez conçu. Les valeurs par défaut fonctionnent déjà, vous n’avez rien à configurer.",
+      "fieldLabel": "Libellé du champ",
+      "willShowRemix": "Affichera « Remixé à partir de {name} ».",
+      "whatPeopleSee": "Ce que les gens verront",
+      "noFields": {
+        "title": "Aucun champ pour le moment",
+        "body": "Cochez des champs à gauche pour créer le formulaire. Sans champ, on peut seulement générer l’image telle quelle ou l’ouvrir dans l’éditeur."
+      },
+      "cancel": "Annuler",
+      "publish": "Publier",
+      "update": "Enregistrer les modifications",
+      "toast": {
+        "published": "Publié · visible dans Explorer → Communauté",
+        "private": "Publié en privé · visible par vous seul, partagez-le via son lien",
+        "failed": "Échec de la publication",
+        "missingAsset": "Une image de ce design n’est plus dans ce navigateur. Remplacez-la et publiez à nouveau."
+      },
+      "visibilityHint": "Les designs publics sont listés dans Explorer pour que tout le monde puisse les utiliser et les remixer. Les designs privés n’apparaissent que dans votre galerie ; toute personne disposant du lien peut tout de même les ouvrir.",
+      "optional": "facultatif",
+      "editFields": "Modifier les champs",
+      "hideFields": "Masquer les champs"
     }
   }
 }

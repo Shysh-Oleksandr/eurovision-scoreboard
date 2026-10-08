@@ -1,5 +1,11 @@
 import { useTranslations } from 'next-intl';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import Image from 'next/image';
 
@@ -9,10 +15,17 @@ import { CollapsibleSection } from '../../common/CollapsibleSection';
 import Modal from '../../common/Modal/Modal';
 import { Input } from '../../Input';
 
-import StatsImagePreview from './StatsImagePreview';
-
 import { DownloadIcon } from '@/assets/icons/DownloadIcon';
+import { PencilIcon } from '@/assets/icons/PencilIcon';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import DesignPreview from '@/graphics/components/DesignPreview';
+import {
+  DesignDataProvider,
+  StatsSource,
+} from '@/graphics/render/DesignDataContext';
+import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
+import { toEditableDesign } from '@/graphics/templates/editor';
+import { buildStatsDesign, STATS_MIN_WIDTH } from '@/graphics/templates/stats';
 import { Country, EventStage, StageVotingType, StatsTableType } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
@@ -62,6 +75,8 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
     useState<StatsTableType | null>(null);
 
   const { settings, setSettings, resetSettings } = useStatsCustomizationStore();
+  const openEditor = useGraphicsStudioStore((state) => state.openEditor);
+  const tg = useTranslations('graphics.share');
   const contestName = useGeneralStore((state) => state.settings.contestName);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
 
@@ -82,6 +97,63 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       setLastGeneratedImageType(activeTab);
     },
     [activeTab],
+  );
+
+  // Content-sized canvas: the measured width feeds the title/branding font
+  // sizes on the next render (docs/graphics-studio.md).
+  const [measuredWidth, setMeasuredWidth] = useState(STATS_MIN_WIDTH);
+  const handleMeasured = useCallback((size: { width: number }) => {
+    setMeasuredWidth((prev) =>
+      Math.abs(prev - size.width) > 10 ? size.width : prev,
+    );
+  }, []);
+  const statsSource = useMemo<StatsSource>(
+    () => ({
+      rankedCountries,
+      selectedStage,
+      selectedStageId,
+      selectedVoteType,
+      getCellPoints,
+      getCellClassName,
+      getPoints,
+      aggregateTotalsOnly: aggregateOnly,
+    }),
+    [
+      rankedCountries,
+      selectedStage,
+      selectedStageId,
+      selectedVoteType,
+      getCellPoints,
+      getCellClassName,
+      getPoints,
+      aggregateOnly,
+    ],
+  );
+  const design = useMemo(
+    () =>
+      buildStatsDesign({
+        title: settings.title,
+        table: activeTab,
+        showBackgroundImage: settings.showBackgroundImage,
+        backgroundOpacity: settings.backgroundOpacity,
+        measuredWidth,
+      }),
+    [
+      settings.title,
+      activeTab,
+      settings.showBackgroundImage,
+      settings.backgroundOpacity,
+      measuredWidth,
+    ],
+  );
+  const exportOptions = useMemo(
+    () => ({
+      // Parity with the old exporter, which used html-to-image's default
+      // pixel ratio (the device's).
+      scale: Math.min(3, Math.max(1, window.devicePixelRatio || 1)),
+      format: 'png' as const,
+    }),
+    [],
   );
 
   const handleDownload = () => {
@@ -259,20 +331,40 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
         </div>
 
         {/* Stats Image Preview */}
-        <StatsImagePreview
-          activeTab={activeTab}
-          rankedCountries={rankedCountries}
-          selectedStageId={selectedStageId}
-          selectedVoteType={selectedVoteType}
-          getCellPoints={getCellPoints}
-          getCellClassName={getCellClassName}
-          getPoints={getPoints}
-          selectedStage={selectedStage}
-          modalRef={modalRef}
-          onImageGenerated={handleImageGenerated}
-          generatedImageUrl={generatedImageUrl}
-          aggregateTotalsOnly={aggregateOnly}
-        />
+        <DesignDataProvider binding={design.data} stats={statsSource}>
+          <DesignPreview
+            design={design}
+            exportOptions={exportOptions}
+            autoGenerate={settings.generateOnOpen}
+            autoGenerateKey={activeTab}
+            active={isOpen}
+            onImageGenerated={handleImageGenerated}
+            onMeasured={handleMeasured}
+            scrollTargetRef={modalRef}
+            extraActions={
+              <Button
+                variant="tertiary"
+                Icon={<PencilIcon className="w-[20px] h-[20px]" />}
+                onClick={() => {
+                  // The editor computes the tables itself from the live
+                  // stage this modal shows (statsAccessors), so the design
+                  // binds to that stage rather than to a frozen copy.
+                  onClose();
+                  openEditor({
+                    design: toEditableDesign(design, {
+                      name: tg('statsDesign'),
+                      liveStageId: selectedStageId,
+                    }),
+                    draftId: null,
+                    selectId: 'stats',
+                  });
+                }}
+              >
+                {tg('openInEditor')}
+              </Button>
+            }
+          />
+        </DesignDataProvider>
 
         {/* Generated Image Result */}
         {generatedImageUrl && (

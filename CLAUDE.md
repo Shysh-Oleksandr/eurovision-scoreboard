@@ -69,6 +69,7 @@ Read `docs/` before touching non-obvious subsystems:
 - `voter-channels.md` — per-voter jury/televote eligibility (`EventStage.voterChannels`), the Rest of the World default, and the channel-aware `getStageVotingCountries`
 - `event-setup-hub-and-design-tokens.md` — the Event Setup modal (hue-derived OKLCH tokens `--prim-hue`/`--p-*`/`--accent`, hand-picked accents in `interfaceAccents.ts` + the dev-only Palette Lab at `/dev/palette-lab` and `?palette` panel, `dp-*` classes, Button `cta`/`surface` variants, lineup ListIds + setupUiStore, lazy dnd-kit, contest dirty fingerprint, sync-theme setting, profile summary endpoint)
 - `adding-contest-editions.md` — adding a new ESC/JESC/ESC Asia year or a new contest series to the Contest select: `ContestType`, lineup JSON format and field rules, hosting logos, cache-busting, odds/spokesperson updates, verification checklist
+- `graphics-studio.md` — the design document model, element registry, deterministic export (snapdom + html-to-image fallback) and the share-image templates; read before touching share images or the graphics editor
 - `USER_DATA_CLEARING.md`
 
 ## Code Style

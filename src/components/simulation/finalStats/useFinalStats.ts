@@ -1,15 +1,10 @@
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 
-import { useTranslations } from 'next-intl';
-import {
-  Country,
-  EventStage,
-  StageVotingMode,
-  StageVotingType,
-} from '../../../models';
+import { EventStage, StageVotingMode, StageVotingType } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
-import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
-import { createCountriesComparator } from '@/state/scoreboard/helpers';
+
+import { buildStatsAccessors } from './statsAccessors';
 
 export const useFinalStats = () => {
   const t = useTranslations('simulation.finalStats');
@@ -91,170 +86,17 @@ export const useFinalStats = () => {
     return t('total');
   }, [selectedStage, t]);
 
-  const participatingCountries: Country[] = useMemo(
-    () => (selectedStage ? selectedStage.countries : []),
-    [selectedStage],
-  );
-
   const votesForStage = selectedStageId
     ? predefinedVotes[selectedStageId]
     : null;
 
-  const getTotalPointsForCountry = (
-    countryCode: string,
-    type: 'jury' | 'televote' | 'combined',
-  ): number => {
-    if (!votesForStage?.[type]) return 0;
-
-    return Object.values(votesForStage[type]!).reduce((total, votes) => {
-      const vote = votes.find((v) => v.countryCode === countryCode);
-
-      return toFixedIfDecimalFloat(total + (vote?.points || 0));
-    }, 0);
-  };
-
-  const getPoints = (
-    country: Country,
-    type?: 'jury' | 'televote' | 'combined',
-  ) => {
-    if (
-      (selectedVoteType === StageVotingType.TELEVOTE && !type) ||
-      type === 'televote'
-    ) {
-      if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
-        return getTotalPointsForCountry(country.code, 'televote');
-      }
-
-      return country.televotePoints;
-    }
-
-    if (
-      (selectedVoteType === StageVotingType.JURY && !type) ||
-      type === 'jury'
-    ) {
-      if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
-        return getTotalPointsForCountry(country.code, 'jury');
-      }
-
-      return country.juryPoints;
-    }
-
-    if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
-      return getTotalPointsForCountry(country.code, 'combined');
-    }
-
-    return toFixedIfDecimalFloat(country.points);
-  };
-
-  const rankedCountries = useMemo(
-    () =>
-      [...participatingCountries]
-        .sort((a, b) => {
-          const orderMap =
-            selectedStage?.runningOrder &&
-            selectedStage?.runningOrder.length > 0
-              ? new Map(
-                  selectedStage?.runningOrder.map((code, idx) => [code, idx]),
-                )
-              : null;
-
-          const pointsComparison = getPoints(b) - getPoints(a);
-
-          if (pointsComparison === 0) {
-            const televoteComparison = b.televotePoints - a.televotePoints;
-
-            if (televoteComparison === 0) {
-              if (orderMap) {
-                const aIdx = orderMap.get(a.code);
-                const bIdx = orderMap.get(b.code);
-
-                if (aIdx !== undefined && bIdx !== undefined && aIdx !== bIdx) {
-                  return aIdx - bIdx;
-                }
-              }
-
-              return a.name.localeCompare(b.name);
-            }
-
-            return televoteComparison;
-          }
-
-          return pointsComparison;
-        })
-        .map((country, index) => ({ ...country, rank: index + 1 })),
-    [participatingCountries, selectedVoteType, selectedStage],
-  );
-
-  const getPointsFromVoter = (
-    participantCode: string,
-    voterCode: string,
-    type: 'jury' | 'televote' | 'combined',
-  ) => {
-    const votes = votesForStage?.[type]?.[voterCode];
-
-    if (!votes) return 0;
-    const total = votes
-      .filter((v) => v.countryCode === participantCode)
-      .reduce((sum, v) => sum + v.points, 0);
-
-    return total ? toFixedIfDecimalFloat(total) : 0;
-  };
-
-  const getCellPoints = (participantCode: string, voterCode: string) => {
-    if (!selectedStage) return '';
-
-    const juryPoints = getPointsFromVoter(participantCode, voterCode, 'jury');
-    const televotePoints = getPointsFromVoter(
-      participantCode,
-      voterCode,
-      'televote',
+  // Ranking and point lookups are pure (statsAccessors.ts) so the graphics
+  // studio can compute the same tables for its stats element.
+  const { rankedCountries, getPoints, getCellPoints, getCellClassName } =
+    useMemo(
+      () => buildStatsAccessors(selectedStage, selectedVoteType, votesForStage),
+      [selectedStage, selectedVoteType, votesForStage],
     );
-
-    if (selectedVoteType === StageVotingType.JURY) {
-      return juryPoints || '';
-    }
-    if (selectedVoteType === StageVotingType.TELEVOTE) {
-      return televotePoints || '';
-    }
-
-    if (selectedStage?.votingMode === StageVotingMode.COMBINED) {
-      const combinedPoints =
-        getPointsFromVoter(participantCode, voterCode, 'combined') || '';
-
-      return combinedPoints;
-    }
-
-    const total = juryPoints + televotePoints;
-
-    return total > 0 ? total : '';
-  };
-
-  const getCellClassName = (points: number) => {
-    const isTotalVoteType =
-      selectedVoteType === 'Total' && totalBadgeLabel === t('total');
-
-    if (
-      (points === 12 && !isTotalVoteType) ||
-      (points >= 20 && isTotalVoteType)
-    ) {
-      return 'font-bold bg-primary-700/50';
-    }
-
-    if (
-      (points === 10 && !isTotalVoteType) ||
-      (points >= 17 && isTotalVoteType)
-    ) {
-      return 'font-semibold bg-primary-800/60';
-    }
-    if (
-      (points === 8 && !isTotalVoteType) ||
-      (points >= 15 && isTotalVoteType)
-    ) {
-      return 'font-semibold bg-primary-800/30';
-    }
-
-    return 'font-medium';
-  };
 
   return {
     finishedStages,

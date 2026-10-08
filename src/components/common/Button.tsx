@@ -34,6 +34,8 @@ type Props = {
   snowEffectClassName?: string;
   style?: React.CSSProperties;
   animatedBorder?: boolean;
+  /** `cta` only: a 20% accent glow instead of the default 35%. */
+  softGlow?: boolean;
   'aria-label'?: string;
   'aria-pressed'?: boolean;
 };
@@ -53,6 +55,7 @@ const Button = ({
   snowEffectClassName = '',
   style,
   animatedBorder = false,
+  softGlow = true,
   'aria-label': ariaLabel,
   'aria-pressed': ariaPressed,
 }: Props) => {
@@ -108,13 +111,14 @@ const Button = ({
             ? 'w-[var(--dp-btn-h)] !px-0 justify-center'
             : '!p-2'
           : ''
-      } ${animatedBorder ? 'animated-border' : ''} ${className} ${
-        disabled ? 'opacity-50 cursor-not-allowed' : ''
-      } ${isLoading ? 'flex justify-center' : ''}`}
+      } ${animatedBorder ? 'animated-border' : ''} ${
+        softGlow && variant === 'cta' ? 'dp-cta--soft' : ''
+      } ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={onClick}
       title={showTooltip ? undefined : title}
       aria-label={ariaLabel ?? (isIconOnly ? title : undefined)}
       aria-pressed={ariaPressed}
+      aria-busy={isLoading || undefined}
       disabled={disabled || isLoading}
       style={style}
     >
@@ -122,13 +126,16 @@ const Button = ({
         <span className="animated-border-spin" aria-hidden="true" />
       )}
       <SnowPileEffect snowEffect={snowEffect} className={snowEffectClassName} />
-      {isLoading ? (
-        <span className="loader small" />
-      ) : (
-        <>
-          {Icon}
-          {childrenContent}
-        </>
+      {/* While loading, the content stays in layout (invisible) so the button
+          keeps its width and the spinner overlays it — no layout shift. */}
+      <span className={isLoading ? 'contents invisible' : 'contents'}>
+        {Icon}
+        {childrenContent}
+      </span>
+      {isLoading && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <span className="loader small" />
+        </span>
       )}
     </button>
   );

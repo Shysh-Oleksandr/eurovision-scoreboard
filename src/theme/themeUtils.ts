@@ -391,7 +391,7 @@ export function getDefaultThemeColors(
 
 // Accent surface is always hsl(hue, 88%, 62%) — only the hue varies, so its
 // perceived brightness swings wildly (yellow/green/cyan read far lighter than
-// blue). These mirror the --t-acc values in getCardThemeVars below.
+// blue). Used for the --t-acc values in getCardThemeVars below.
 const ACCENT_S = 88;
 const ACCENT_L = 62;
 
@@ -417,19 +417,6 @@ function relativeLuminance([r, g, b]: [number, number, number]): number {
 
 /** Luminance above this reads as "light" → needs a dark foreground instead of white. */
 export const READABLE_FG_LUMINANCE_CUTOFF = 0.55;
-
-/**
- * Pick a readable label/icon color for the accent-filled "Apply" button.
- * White looks washed out on light accents (yellow/green/cyan), so flip to a
- * dark, on-hue color once the accent's luminance crosses a readability cutoff.
- */
-export function getAccentForegroundColor(theme: CustomTheme): string {
-  const luminance = relativeLuminance(hslToRgb(theme.hue, ACCENT_S, ACCENT_L));
-
-  return luminance > READABLE_FG_LUMINANCE_CUTOFF
-    ? `hsl(${theme.hue}, 90%, 14%)`
-    : '#ffffff';
-}
 
 /** Parse "h s% l%" or "hsl(h, s%, l%)" (commas optional) into [h, s, l]. */
 function parseHsl(color: string): [number, number, number] | null {

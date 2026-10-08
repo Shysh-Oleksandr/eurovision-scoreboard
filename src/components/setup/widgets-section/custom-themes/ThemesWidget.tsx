@@ -5,8 +5,9 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import { ThemeIcon } from '@/assets/icons/ThemeIcon';
-import WidgetContainer from '@/components/common/WidgetContainer';
-import { WidgetStatProps } from '@/components/setup/widgets-section/profile/ProfileWidget';
+import WidgetContainer, {
+  WidgetStatProps,
+} from '@/components/common/WidgetContainer';
 import { useGeneralStore } from '@/state/generalStore';
 
 const ThemesModal = dynamic(() => import('./ThemesModal'), {

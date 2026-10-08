@@ -12,6 +12,11 @@
     "confirm": "Potwierdź",
     "authenticationRequired": "Wymagana autoryzacja",
     "lastSaved": "Zapisane",
+    "relativeTime": {
+      "justNow": "przed chwilą",
+      "minutesAgo": "{count} min temu",
+      "hoursAgo": "{count} godz. temu"
+    },
     "copy": "Kopiuj",
     "create": "Utwórz",
     "searchPlaceholder": "Szukaj...",
@@ -73,7 +78,12 @@
     "dontShowAgain": "Nie pokazuj ponownie",
     "more": "Więcej",
     "share": "Udostępnij",
-    "done": "Gotowe"
+    "done": "Gotowe",
+    "beta": {
+      "label": "Beta",
+      "hint": "Nowość, wciąż się zmienia. Napisz nam, czego brakuje, przyciskiem opinii.",
+      "hintFeedback": "Nowość, wciąż się zmienia · kliknij, aby wysłać opinię"
+    }
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",
@@ -109,7 +119,6 @@
       "voters": "Głosujący",
       "runningOrder": "Kolejność startowa",
       "pleaseSelectAtLeastOneVotingCountry": "Wybierz co najmniej jeden kraj głosujący",
-      "areYouSureYouWantToDelete": "Czy na pewno chcesz usunąć {name}?",
       "televoteOnly": "Tylko Televote",
       "juryOnly": "Tylko Jury",
       "combined": "Łącznie",
@@ -191,7 +200,6 @@
       "entriesAmount": "{count, plural, =1 {wpis} other {wpisy}}",
       "autoQualifiers": "Automatyczni kwalifikanci",
       "qualifiers": "Kwalifikanci",
-      "contestIsInProgress": "Trwa konkurs. Zmiana roku zresetuje bieżącą tablicę wyników i rozpocznie nową konfigurację. Czy na pewno?",
       "enterThePointsEachVotingCountryAwardsToParticipants": "Wprowadź punkty przyznawane uczestnikom przez każdy kraj głosujący",
       "reorderStages": "Zmień kolejność etapów",
       "importedEntriesDescription": "Wpisy importowane są własnymi wpisami, które zostały zaimportowane z innych konkursów. Nie są edytowalne.",
@@ -353,7 +361,6 @@
       "entryNameIsRequired": "Nazwa wpisu jest wymagana.",
       "customEntrySavedSuccessfully": "Własny wpis zapisany pomyślnie!",
       "pleaseSignInToDeleteCustomEntries": "Zaloguj się, aby usuwać własne wpisy.",
-      "areYouSureYouWantToDelete": "Czy na pewno chcesz usunąć {name}?",
       "entryDeletedSuccessfully": "Wpis został pomyślnie usunięty!",
       "standardCountries": "Standardowe kraje",
       "customEntries": "Własne wpisy",
@@ -371,9 +378,7 @@
       "groupUpdatedSuccessfully": "Grupa zaktualizowana pomyślnie!",
       "groupDeletedSuccessfully": "Grupa usunięta pomyślnie!",
       "failedToSaveGroup": "Błąd podczas tworzenia grupy",
-      "failedToDeleteGroup": "Błąd podczas usuwania grupy",
-      "group": "Grupa",
-      "noGroup": "Brak grupy"
+      "failedToDeleteGroup": "Błąd podczas usuwania grupy"
     },
     "categories": {
       "imported": "Importowane",
@@ -658,7 +663,7 @@
       "hostingCountryLogo": "Logo kraju gospodarza",
       "cancelSimulation": "Anuluj symulację",
       "cancelSimulationConfirmation": "Czy na pewno chcesz anulować symulację?",
-      "restart": "Restart",
+      "restart": "Uruchom ponownie",
       "undo": "Cofnij",
       "share": "Udostępnij",
       "setup": "Ustawienia"
@@ -747,12 +752,14 @@
       "unfollowedUser": "Obserwowany pomyślnie!",
       "follow": "Obserwuj",
       "signInToFollow": "Zaloguj się, aby obserwować",
-      "followingCount": "Obserwowani: {count}"
+      "followingCount": "Obserwowani: {count}",
+      "signIn": "Zaloguj się"
     },
     "contentType": {
       "all": "Wszystkie",
       "themes": "Motywy",
-      "contests": "Konkursy"
+      "contests": "Konkursy",
+      "designs": "Projekty"
     },
     "foundNItems": "Znaleziono {count} {count, plural, =1 {element} other {elementów}}",
     "userProfile": {
@@ -845,6 +852,8 @@
       "confirmCreateNewContestDescription": "Masz aktywny konkurs ({name}). Upewnij się, że go zapiszesz przed utworzeniem nowego.",
       "venue": "Miejsce",
       "hosts": "Gospodarze",
+      "logoBanner": "Logo / baner",
+      "logoBannerHint": "Opcjonalny obraz wyświetlany na karcie konkursu",
       "entryStats": {
         "pickerTitle": "Twoje statystyki wkładu",
         "pickerSubtitle": "Szukaj i wybierz kraj lub własny wkład, aby zobaczyć wyniki w swoich zakończonych konkursach.",
@@ -1001,6 +1010,8 @@
         "deleteGroupConfirmDescription": "Motywy w tej grupie nie będą już grupowane. Nie zostaną usunięte."
       },
       "colorOverrides": {
+        "colors": "Kolory",
+        "currentValue": "Bieżąca wartość",
         "juryColors": "Jury",
         "douzePointsAnimationColors": "Animacja Douze Points",
         "televoteColors": "Televote",
@@ -1172,7 +1183,8 @@
         "deleteInUseDescription": "{count} {count, plural, one {twój motyw jej używa} few {twoje motywy jej używają} many {twoich motywów jej używa} other {twoich motywów jej używa}}. Wrócą do wbudowanej czcionki. Usunąć mimo to?",
         "signInToUpload": "Zaloguj się, aby przesyłać czcionki i budować bibliotekę.",
         "badge": "Czcionka",
-        "filterWithFonts": "Z własnymi czcionkami"
+        "filterWithFonts": "Z własnymi czcionkami",
+        "pickForElement": "Wybierz czcionkę tylko dla tego elementu. Pozostałe elementy zachowują własne czcionki."
       },
       "customCount": "Własne: {count}",
       "savedCount": "Zapisane: {count}"
@@ -1189,6 +1201,9 @@
       "thisMonth": "Ten miesiąc",
       "lastMonth": "Poprzedni miesiąc",
       "allTime": "Wszystkie"
+    },
+    "graphics": {
+      "savedCount": "{count, plural, =1 {# zapisany} few {# zapisane} many {# zapisanych} other {# zapisanego}}"
     }
   },
   "feedbackInfo": {
@@ -1276,7 +1291,11 @@
       },
       "countryAssignment": {
         "title": "Przypisanie krajów",
-        "content": "Kraje pokazane po wyborze roku to punkt wyjścia, a nie stała lista. W oknie Konfiguracja kliknij kraj, aby przenieść go między etapami (Półfinał 1, Półfinał 2, Finał) lub oznaczyć jako Nie bierze udziału. Możesz też dodać kraje z innych lat, kontynentów lub własnych uczestników."
+        "content": "Kraje pokazane po wyborze roku to punkt wyjścia, a nie stała lista. W oknie Konfiguracja przeciągaj i upuszczaj kraje między etapami (Półfinał 1, Półfinał 2, Finał) a listą Nie bierze udziału albo kliknij kraj, aby go przenieść. Możesz też dodać kraje z innych lat, kontynentów lub własnych uczestników."
+      },
+      "allocationDraw": {
+        "title": "Losowanie półfinałów",
+        "content": "Włącz « Losowanie półfinałów » (przycisk z kostką) w oknie Konfiguracja, aby rozlosować półfinalistów do półfinałów koszyk po koszyku, tak jak robi to EBU. Przeprowadź losowanie krok po kroku lub przejdź od razu do wyniku, a następnie kliknij « Zastosuj do składu », aby wypełnić półfinały i połowy ich kolejności występów. Domyślnie obowiązują oficjalne koszyki i zasady; w « Dostosuj » zmienisz koszyki, wielkość półfinałów, połowy oraz to, gdzie głosują kraje z zapewnionym awansem. Wymaga co najmniej dwóch półfinałów."
       },
       "grandFinalOnly": {
         "title": "Tryb tylko finał",
@@ -1316,6 +1335,10 @@
         "title": "Szanse i losowość",
         "content": "W « Ustawienia → Szanse » przypisz szanse jury i televote (0–100) każdemu krajowi, aby wpływać na rozkład losowych głosów. Wyższe szanse oznaczają większą szansę na więcej punktów. Suwak Poziom losowości kontroluje, jak ściśle symulacja podąża za tymi szansami: w lewo dla przewidywalnych wyników zgodnych ze szansami, w prawo dla chaotycznej symulacji, w której wszystko może się zdarzyć."
       },
+      "diasporaAffinity": {
+        "title": "Diaspora i powinowactwo",
+        "content": "W « Ustawienia → Relacje » bloki głosowania, sąsiedztwo, diaspora i rywalizacje przesuwają losowe głosy w stronę wybranych krajów (lub od nich), na podstawie ponad 20 lat prawdziwych danych z głosowań. Suwakiem Siła skalujesz efekt; możesz też dostroić pojedyncze pary lub dodać własne pary i bloki."
+      },
       "presentationMode": {
         "title": "Tryb prezentacji",
         "content": "Włącz « Włącz tryb prezentacji » w « Ustawienia → Głosowanie », aby dodać panel auto-play pod tablicą wyników. Ustaw prędkość (0,5–7,5 sekundy na akcję) i naciśnij Odtwórz, aby symulacja działała bez interwencji — idealne do streamingu lub nagrywania. Włącz « Automatyczne uruchomienie prezentacji », aby rozpoczęła się automatycznie po starcie głosowania."
@@ -1326,7 +1349,7 @@
       },
       "moreOptions": {
         "title": "Więcej opcji głosowania",
-        "content": "Dodatkowe opcje w Ustawienia → Głosowanie i nagłówku symulacji:<list><item><strong>Tryb ujawniania kwalifikantów w split-screen</strong> — moment w stylu ESC 2025, gdy kilku kandydatów pojawia się obok siebie i wybierasz jednego do kwalifikacji. Skonfiguruj 2–6 kandydatów na ujawnienie i czy ostatni kwalifikant też używa split-screen.</item><item><strong>Punkty dla tej samej wpisu wiele razy</strong> — umożliwia państwu głosującemu przyznawanie wielu tokenów punktów do tej samej wpisu. To symuluje system głosowania Eurovision przed 1975 rokiem, w którym każda jury rozdawała dziesięć równych tokenów całkowicie swobodnie.</item><item><strong>Kolejność ujawniania televote</strong> — ustaw od najmniejszych do największych, aby ogłaszać wyniki televote od najmniejszej do największej liczby punktów, jak w ESC 2016–2018.</item><item><strong>Grupuj losowe głosowanie jury</strong> — « Głosuj losowo » przyznaje punkty w realistycznych partiach (1–8+10 razem lub tylko 12) zamiast pojedynczo.</item><item><strong>Cofnij i Restart</strong> — Cofnij cofa do 100 akcji; Restart resetuje całą symulację.</item></list>"
+        "content": "Dodatkowe opcje w Ustawienia → Głosowanie i nagłówku symulacji:<list><item><strong>Tryb ujawniania kwalifikantów w split-screen</strong> — moment w stylu ESC 2025, gdy kilku kandydatów pojawia się obok siebie i wybierasz jednego do kwalifikacji. Skonfiguruj 2–6 kandydatów na ujawnienie i czy ostatni kwalifikant też używa split-screen.</item><item><strong>Punkty dla tej samej wpisu wiele razy</strong> — umożliwia państwu głosującemu przyznawanie wielu tokenów punktów do tej samej wpisu. To symuluje system głosowania Eurovision przed 1975 rokiem, w którym każda jury rozdawała dziesięć równych tokenów całkowicie swobodnie.</item><item><strong>Kolejność ujawniania televote</strong> — ustaw od najmniejszych do największych, aby ogłaszać wyniki televote od najmniejszej do największej liczby punktów, jak w ESC 2016–2018.</item><item><strong>Grupuj losowe głosowanie jury</strong> — « Głosuj losowo » przyznaje punkty w realistycznych partiach (1–8+10 razem lub tylko 12) zamiast pojedynczo.</item><item><strong>Cofnij i Restart</strong> — Cofnij cofa do 100 akcji; Restart resetuje całą symulację.</item><item><strong>Ujawnianie głosów jury z odliczaniem skali</strong> — format JESC 2024: głosy jury pokazywane są na wykresie słupkowym, który najpierw odsłania naraz wszystkie 1 punkty od wszystkich jury, potem wszystkie 2 i tak dalej, zanim rzecznicy ogłoszą swoje 12 punktów.</item></list>"
       }
     },
     "themes": {
@@ -1341,6 +1364,10 @@
       "customThemeBuilder": {
         "title": "Kreator własnych motywów",
         "content": "Zalogowani użytkownicy mogą zbudować w pełni własny motyw: wybrać kolor główny, przesłać tło, wybrać czcionkę i nadpisać kolory każdego stanu tablicy niezależnie (aktywne jury, niedokończone/aktywne/zakończone televote, niezakwalifikowani uczestnicy i odznaki rankingu). Kształty flag, kształty kontenerów punktów i style animacji tablicy są konfigurowalne. Panel podglądu na żywo pokazuje dokładnie, jak każda zmiana wygląda na prawdziwym elemencie kraju."
+      },
+      "customFonts": {
+        "title": "Własne czcionki",
+        "content": "W kreatorze motywów wybierz wbudowaną czcionkę lub prześlij własną (WOFF2, WOFF, TTF lub OTF — do czterech grubości lub jedna czcionka zmienna). Przesłane czcionki trafiają do Twojej biblioteki czcionek i można ich użyć w dowolnym motywie; możesz też dodać do niej publiczne czcionki innych użytkowników. Motyw może mieć osobną czcionkę tablicy wyników dla wierszy krajów, a menu i nagłówki zachowują czcionkę interfejsu."
       },
       "soundEffects": {
         "title": "Efekty dźwiękowe i audio w tle",
@@ -1367,6 +1394,10 @@
       "shareStats": {
         "title": "Udostępnij statystyki jako obraz",
         "content": "W oknie Statystyki przycisk udostępniania eksportuje pełną tabelę wyników (breakdown, split lub podsumowanie) jako PNG do pobrania. Świetne do udostępniania szczegółowych rozbitych wyników w social media lub społecznościach fanów Eurovision."
+      },
+      "graphics": {
+        "title": "Grafiki (Beta)",
+        "content": "Otwórz widget Grafiki, aby tworzyć własne obrazy: karty wyników, top 10, plakaty, tabele statystyk i nie tylko.<list><item><strong>Zacznij</strong> od szablonu, projektu społeczności w zakładce Odkrywaj lub pustego płótna. Przycisk „Otwórz w edytorze” w oknie udostępniania obrazu również przenosi bieżący obraz do edytora.</item><item><strong>Edytuj</strong>: dodawaj tekst, obrazy, kształty, flagi, tablice wyników i tabele statystyk, a potem przesuwaj, skaluj i obracaj je. Ustaw rozmiar płótna, tło i motyw. W sekcji Dane wybierz, co pokazują tablice: tablicę na żywo, zapisany konkurs lub ręczną listę.</item><item><strong>Eksportuj</strong> obraz jako PNG lub JPEG, aby go pobrać, udostępnić lub skopiować.</item><item><strong>Opublikuj</strong> (wymaga zalogowania) jako publiczny, widoczny w Odkrywaj, lub prywatny, udostępniany przez link. Możesz wybrać pola do wypełnienia, aby inni zmieniali tylko je w krótkim formularzu przed wygenerowaniem obrazu. Polub i zapisz projekty innych użytkowników, aby znaleźć je w zakładce Zapisane.</item></list>Projekty są przechowywane w tej przeglądarce, więc użyj „Eksportuj (.json)” w zakładce Moje projekty, aby zrobić kopię zapasową."
       },
       "leaderboard": {
         "title": "Globalna tablica krajów",
@@ -1657,6 +1688,712 @@
       "cancelSimulation": "Anuluj symulację",
       "logout": "Wyloguj się",
       "createNewContest": "Utwórz nowy konkurs"
+    }
+  },
+  "graphics": {
+    "widget": {
+      "title": "Grafiki",
+      "description": "Twórz i udostępniaj obrazy",
+      "noDesignsYet": "Brak projektów",
+      "nDesigns": "{count, plural, =1 {# projekt} few {# projekty} many {# projektów} other {# projektu}}",
+      "explore": "Odkrywaj"
+    },
+    "share": {
+      "openInEditor": "Otwórz w edytorze",
+      "resultsDesign": "Wyniki",
+      "runningOrderDesign": "Kolejność startowa",
+      "statsDesign": "Statystyki"
+    },
+    "gallery": {
+      "title": "Grafiki",
+      "tabs": {
+        "myDesigns": "Moje projekty",
+        "explore": "Odkrywaj",
+        "saved": "Zapisane"
+      },
+      "newBlank": "Nowy pusty projekt",
+      "openInEditor": "Otwórz w edytorze",
+      "duplicate": "Duplikuj",
+      "rename": "Zmień nazwę",
+      "delete": "Usuń",
+      "more": "Więcej",
+      "live": "Na żywo",
+      "manual": "Ręczna",
+      "nRows": "{count, plural, =1 {# wiersz} few {# wiersze} many {# wierszy} other {# wiersza}}",
+      "builtIn": "Wbudowane",
+      "builtInSub": "Szablony utrzymywane przez DouzePoints",
+      "use": "Użyj",
+      "empty": {
+        "title": "Brak projektów",
+        "body": "Zacznij od szablonu, projektu społeczności lub pustego płótna. Projekty są przechowywane w tej przeglądarce.",
+        "explore": "Odkrywaj projekty"
+      },
+      "renamePrompt": "Nazwa projektu",
+      "deleteTitle": "Usunąć „{name}”?",
+      "deleteBody": "Projekt zostanie usunięty z tej przeglądarki. Tej operacji nie można cofnąć.",
+      "toast": {
+        "duplicated": "Projekt zduplikowany",
+        "deleted": "Projekt usunięty",
+        "linkCopied": "Link skopiowany do schowka!",
+        "failed": "Coś poszło nie tak",
+        "saved": "Zapisano w Twojej kolekcji",
+        "unsaved": "Usunięto z zapisanych",
+        "unpublished": "Cofnięto publikację projektu",
+        "unreadable": "Tego projektu nie można otworzyć w tej wersji aplikacji.",
+        "imported": "Zaimportowano „{name}”",
+        "importFailed": "Ten plik nie jest projektem DouzePoints.",
+        "madePublic": "Teraz publiczny · widoczny w Odkrywaj",
+        "madePrivate": "Teraz prywatny · widzisz go tylko Ty"
+      },
+      "templates": {
+        "blank": {
+          "name": "Pusty",
+          "description": "Puste poziome płótno na tle motywu."
+        },
+        "results": {
+          "name": "Wyniki",
+          "description": "Tytuł, podtytuł i pełna tablica wyników w trzech kolumnach."
+        },
+        "top10": {
+          "name": "Top 10",
+          "description": "Pionowa karta z najlepszymi wpisami w dużych wierszach."
+        },
+        "poster": {
+          "name": "Plakat zapowiedzi",
+          "description": "Logo, slogan, miasto gospodarza, daty i flaga gospodarza."
+        },
+        "runningOrder": {
+          "name": "Kolejność startowa",
+          "description": "Wiersze w kolejności startowej, bez punktów."
+        },
+        "qualifiers": {
+          "name": "Kwalifikanci",
+          "description": "Nazwy w trzech kolumnach na płótnie telewizyjnym."
+        },
+        "stats": {
+          "name": "Statystyki",
+          "description": "Jedna tabela statystyk, dopasowana do zawartości."
+        }
+      },
+      "savedContest": "Zapisany konkurs",
+      "contentSized": "Dopasowany do zawartości",
+      "published": "Opublikowany",
+      "updatePublished": "Zaktualizuj opublikowaną kopię",
+      "publish": "Opublikuj…",
+      "copyLink": "Skopiuj link",
+      "share": "Udostępnij",
+      "unpublish": "Cofnij publikację",
+      "nFields": "{count, plural, =1 {# pole} few {# pola} many {# pól} other {# pola}}",
+      "scoreboard": "Tablica wyników",
+      "stats": "Statystyki",
+      "private": "Prywatny",
+      "remix": "Remiks",
+      "like": "Lubię to",
+      "save": "Zapisz",
+      "signInToReact": "Zaloguj się, aby polubić i zapisywać projekty.",
+      "unpublishTitle": "Cofnąć publikację „{name}”?",
+      "unpublishBody": "Opublikowana kopia i jej link przestaną działać dla wszystkich. Twoja lokalna wersja robocza zostanie w tej przeglądarce.",
+      "searchDesigns": "Szukaj projektów",
+      "sort": {
+        "newest": "Najnowsze",
+        "used": "Najczęściej używane",
+        "liked": "Najczęściej lubiane"
+      },
+      "sizes": {
+        "any": "Dowolny rozmiar",
+        "landscape": "Poziomy",
+        "portrait": "Pionowy",
+        "square": "Kwadrat",
+        "story": "Relacja",
+        "broadcast": "Telewizyjny"
+      },
+      "hasScoreboard": "Z tablicą wyników",
+      "hasStats": "Ze statystykami",
+      "mine": "Opublikowane przez Ciebie",
+      "mineSub": "Nie ma ich w tej przeglądarce · otwórz jeden, aby utworzyć lokalną kopię",
+      "community": "Społeczność",
+      "foundN": "Znaleziono {count, plural, =1 {# projekt} few {# projekty} many {# projektów} other {# projektu}}",
+      "communityError": {
+        "title": "Nie udało się wczytać projektów społeczności",
+        "body": "Sprawdź połączenie i spróbuj ponownie."
+      },
+      "retry": "Spróbuj ponownie",
+      "noMatch": {
+        "title": "Brak pasujących projektów społeczności",
+        "body": "Wybierz inny rozmiar lub wyczyść filtry."
+      },
+      "noCommunity": {
+        "title": "Brak projektów społeczności",
+        "body": "Opublikuj projekt, a pojawi się tutaj dla wszystkich."
+      },
+      "clearFilters": "Wyczyść filtry",
+      "savedSignIn": {
+        "title": "Zaloguj się, aby zapisywać projekty",
+        "body": "Zapisane projekty społeczności są przechowywane na Twoim koncie."
+      },
+      "nothingSaved": {
+        "title": "Nic jeszcze nie zapisano",
+        "body": "Zapisuj projekty społeczności, aby znaleźć je tutaj."
+      },
+      "keptInBrowser": "Projekty są przechowywane w tej przeglądarce · wyeksportuj kopię, aby ich nie stracić",
+      "exportJson": "Eksportuj (.json)",
+      "importJson": "Importuj",
+      "renameTitle": "Zmień nazwę projektu",
+      "report": "Zgłoś…",
+      "reported": "Zgłoszono",
+      "unreadable": {
+        "body": "Tego projektu nie można otworzyć w tej wersji aplikacji. Wyeksportuj go, aby zachować kopię, albo usuń."
+      },
+      "starters": "Szablony",
+      "open": "Otwórz",
+      "public": "Publiczny",
+      "makePublic": "Upublicznij",
+      "makePrivate": "Ustaw jako prywatny",
+      "communitySub": "Publiczne projekty wszystkich użytkowników · użyj lub zremiksuj dowolny",
+      "startersSub": "Wbudowane punkty wyjścia · utrzymywane przez DouzePoints",
+      "updated": "Zaktualizowano {time}"
+    },
+    "editor": {
+      "aria": "Edytor projektu",
+      "canvasAria": "Płótno",
+      "close": "Zamknij edytor",
+      "designName": "Nazwa projektu",
+      "notSavedYet": "Jeszcze niezapisany",
+      "unsaved": "Niezapisany",
+      "saved": "Zapisany",
+      "undo": "Cofnij",
+      "redo": "Ponów",
+      "sizedToTable": "Dopasowany do tabeli",
+      "export": "Eksportuj",
+      "save": "Zapisz",
+      "zoom": "Powiększenie",
+      "label": {
+        "heightFollowsRows": "wysokość zależy od wierszy",
+        "rowsFitBox": "wiersze dopasowują się do ramki",
+        "sizesToContent": "dopasowuje się do zawartości",
+        "nElements": "Elementy: {count}",
+        "centred": "wyśrodkowano · {px} z każdej strony",
+        "resize": "Zmień rozmiar",
+        "rotate": "Obróć"
+      },
+      "hint": {
+        "dragToMove": "Przeciągnij, aby przesunąć · dopracuj w sekcji Układ",
+        "tapToEdit": "Stuknij element, aby go edytować",
+        "zoomed": "{pct}% · rozsuń palce, aby przybliżyć · stuknij dwukrotnie, aby dopasować"
+      },
+      "rail": {
+        "aria": "Narzędzia edytora",
+        "add": "Dodaj",
+        "templates": "Szablony",
+        "layers": "Warstwy",
+        "data": "Dane"
+      },
+      "panel": {
+        "add": "Dodaj element",
+        "templates": "Szablony",
+        "layers": "Warstwy",
+        "data": "Dane",
+        "close": "Zamknij panel"
+      },
+      "sheet": {
+        "toolbar": "Edytor",
+        "inspector": "Element",
+        "add": "Dodaj element",
+        "addShort": "Dodaj",
+        "layers": "Warstwy",
+        "data": "Dane",
+        "canvas": "Płótno",
+        "templates": "Szablony",
+        "close": "Zamknij panel",
+        "publish": "Opublikuj",
+        "published": "Opublikowany"
+      },
+      "nudge": {
+        "move": "Przesuń",
+        "holdForTen": "1 px · przytrzymaj, aby o 10 px",
+        "up": "W górę",
+        "left": "W lewo",
+        "centre": "Wyśrodkuj na płótnie",
+        "right": "W prawo",
+        "down": "W dół"
+      },
+      "toast": {
+        "saved": "Projekt zapisany",
+        "savedAndSynced": "Zapisano · opublikowana kopia zaktualizowana",
+        "cloudUpdated": "Opublikowana kopia zaktualizowana",
+        "cloudUpdateFailed": "Zapisano tutaj, ale nie udało się zaktualizować opublikowanej kopii. Spróbuj ponownie przyciskiem Opublikowany.",
+        "cloudGone": "Opublikowana kopia już nie istnieje. Opublikuj ponownie, aby udostępnić ten projekt."
+      },
+      "updatePublished": "Zaktualizuj",
+      "publish": "Opublikuj",
+      "canvasSizeChip": "Rozmiar płótna",
+      "themeChip": "Motyw",
+      "untitled": "Projekt bez nazwy",
+      "remixChipTitle": "Ten projekt powstał na podstawie projektu społeczności; jego twórca zostanie wymieniony przy publikacji.",
+      "remixOf": "Remiks: {name}",
+      "published": "Opublikowany",
+      "publishedTitle": "Opublikowana kopia aktualizuje się przy każdym zapisie. Kliknij, aby zmienić jej widoczność, opis lub pola do wypełnienia."
+    },
+    "add": {
+      "text": {
+        "name": "Tekst",
+        "description": "Nagłówek, podpis lub dowolny wiersz tekstu"
+      },
+      "image": {
+        "name": "Obraz",
+        "description": "Przesłany plik, URL lub tło motywu"
+      },
+      "shape": {
+        "name": "Kształt",
+        "description": "Prostokąt lub elipsa, jednolity lub gradient"
+      },
+      "flag": {
+        "name": "Flaga",
+        "description": "Jeden kraj, prostokątna, okrągła lub serce"
+      },
+      "scoreboard": {
+        "name": "Tablica wyników",
+        "description": "Wiersze ze źródła danych; dopasowuje się do wierszy"
+      },
+      "stats": {
+        "name": "Statystyki",
+        "description": "Tabela rozkładu, podziału lub podsumowania"
+      }
+    },
+    "templates": {
+      "replacesEverything": "Zastępuje całą zawartość płótna. Cofnij przywraca poprzedni stan.",
+      "builtin": {
+        "blank": {
+          "name": "Pusty"
+        },
+        "results": {
+          "name": "Wyniki"
+        },
+        "top10": {
+          "name": "Top 10"
+        },
+        "poster": {
+          "name": "Plakat zapowiedzi"
+        },
+        "runningOrder": {
+          "name": "Kolejność startowa"
+        },
+        "qualifiers": {
+          "name": "Kwalifikanci"
+        },
+        "stats": {
+          "name": "Statystyki"
+        }
+      },
+      "browseCommunity": "Odkrywaj projekty społeczności"
+    },
+    "layers": {
+      "title": "Warstwy",
+      "hint": "Góra listy jest na wierzchu. Przeciągnij, aby zmienić kolejność.",
+      "hintPhone": "Góra listy jest na wierzchu. Stukaj wiersze, aby zaznaczyć kilka.",
+      "toggleGroup": "Zwiń/rozwiń grupę",
+      "show": "Pokaż",
+      "hide": "Ukryj",
+      "lock": "Zablokuj",
+      "unlock": "Odblokuj"
+    },
+    "data": {
+      "live": "Na żywo",
+      "manual": "Ręczna",
+      "provided": "Podane wiersze",
+      "nRows": "{count, plural, =1 {# wiersz} few {# wiersze} many {# wierszy} other {# wiersza}}",
+      "elementsUseThisData": "Elementy tablicy wyników i statystyk korzystają z tych danych.",
+      "stage": "Etap",
+      "liveHint": "Etap na ekranie, posortowany jak tablica.",
+      "country": "Kraj",
+      "points": "Punkty",
+      "removeRow": "Usuń wiersz",
+      "addRow": "Dodaj wiersz",
+      "importFromLive": "Importuj z tablicy na żywo",
+      "nowShowing": "Teraz wyświetlane",
+      "savedContest": "Zapisany konkurs",
+      "searchContests": "Szukaj konkursów",
+      "yours": "Twoje",
+      "public": "Publiczne",
+      "noContestsFound": "Nie znaleziono konkursów.",
+      "signInForContests": "Zaloguj się, aby wybrać jeden ze swoich konkursów; publiczne konkursy są wymienione poniżej.",
+      "viewedStage": "Etap na ekranie",
+      "loadingContest": "Wczytywanie konkursu…",
+      "contestInaccessible": "Nie można otworzyć „{name}”. Wiersze pokazują Twoją tablicę na żywo, dopóki nie wybierzesz innego źródła.",
+      "statsNeedLive": "Tabele statystyk korzystają z tablicy na żywo. Przełącz źródło danych na Na żywo, aby wypełnić tę tabelę.",
+      "pickContestHint": "Wybierz konkurs poniżej. Do tego czasu projekt zachowuje obecne źródło danych.",
+      "statsNeedLiveHint": "Dane → Na żywo w edytorze",
+      "sampleHint": "Żaden konkurs nie trwa, więc tablice i statystyki pokazują przykładowe wyniki (Finał Eurovision 2026, zmyślone głosy). Rozpocznij konkurs, aby użyć własnych."
+    },
+    "inspector": {
+      "properties": "Właściwości",
+      "canvasLabel": "Płótno",
+      "canvas": {
+        "sizedToTable": "Dopasowane do tabeli.",
+        "sizedToTableHint": "To płótno otacza tabelę statystyk z marginesem.",
+        "preset": "Preset",
+        "custom": "Własny",
+        "width": "Szerokość",
+        "height": "Wysokość",
+        "solid": "Jednolity",
+        "gradient": "Gradient",
+        "theme": "Motyw",
+        "image": "Obraz",
+        "themeBackgroundHint": "Tło motywu projektu: „{name}”. Zmienisz je w sekcji Motyw.",
+        "opacity": "Przezroczystość"
+      },
+      "nothingSelected": "Nic nie zaznaczono",
+      "elementName": "Nazwa elementu",
+      "lock": "Zablokuj",
+      "unlock": "Odblokuj",
+      "show": "Pokaż",
+      "hide": "Ukryj",
+      "duplicate": "Duplikuj",
+      "delete": "Usuń",
+      "nElements": "Elementy: {count}",
+      "multiHint": "Edytuj każdy element osobno albo przesuwaj, duplikuj i usuwaj je razem. Kliknij z Shift, aby dodać lub usunąć z zaznaczenia.",
+      "lockAll": "Zablokuj wszystkie",
+      "hideAll": "Ukryj wszystkie",
+      "types": {
+        "text": "Tekst",
+        "image": "Obraz",
+        "shape": "Kształt",
+        "flag": "Flaga",
+        "scoreboard": "Tablica wyników",
+        "stats": "Statystyki",
+        "branding": "Branding",
+        "stack": "Stos"
+      },
+      "sections": {
+        "content": "Zawartość",
+        "style": "Styl",
+        "data": "Dane",
+        "rows": "Wiersze",
+        "size": "Rozmiar",
+        "rowStyle": "Styl wierszy",
+        "table": "Tabela",
+        "positionAndSize": "Pozycja i rozmiar",
+        "canvasSize": "Rozmiar płótna",
+        "background": "Tło",
+        "dataSource": "Źródło danych",
+        "layout": "Układ",
+        "theme": "Motyw"
+      },
+      "text": {
+        "text": "Tekst",
+        "font": "Czcionka",
+        "uiFont": "Czcionka interfejsu",
+        "scoreboardFont": "Czcionka tablicy wyników",
+        "size": "Rozmiar",
+        "weight": "Grubość",
+        "weights": {
+          "regular": "Regular",
+          "medium": "Medium",
+          "semibold": "SemiBold",
+          "bold": "Bold"
+        },
+        "colour": "Kolor",
+        "align": "Wyrównanie",
+        "alignLeft": "Do lewej",
+        "alignCentre": "Do środka",
+        "alignRight": "Do prawej",
+        "uppercase": "Wielkie litery",
+        "shadow": "Cień",
+        "lineHeight": "Wysokość linii",
+        "customFont": "Własna",
+        "libraryFont": "Biblioteka",
+        "inThisDesign": "W tym projekcie",
+        "customFontHint": "Wybierz wbudowaną czcionkę lub jedną z Twojej biblioteki czcionek. Czcionki użyte w innych miejscach tego projektu pojawiają się tutaj, aby użyć ich jednym kliknięciem."
+      },
+      "image": {
+        "source": "Źródło",
+        "upload": "Prześlij",
+        "url": "URL",
+        "themeBackground": "Tło motywu",
+        "imageUrl": "URL obrazu",
+        "replaceImage": "Zastąp obraz",
+        "chooseImage": "Wybierz obraz…",
+        "uploadHint": "PNG lub JPEG do {max}.",
+        "fit": "Dopasowanie",
+        "cornerRadius": "Zaokrąglenie rogów",
+        "mask": "Maska",
+        "none": "Brak",
+        "circle": "Koło",
+        "heart": "Serce"
+      },
+      "fill": {
+        "fill": "Wypełnienie",
+        "colour": "Kolor",
+        "from": "Od",
+        "to": "Do",
+        "angle": "Kąt",
+        "fit": "Dopasowanie",
+        "cover": "Wypełnij",
+        "contain": "Zmieść",
+        "themeSurfaceHint": "Używa koloru powierzchni kart z motywu."
+      },
+      "shape": {
+        "shape": "Kształt",
+        "rectangle": "Prostokąt",
+        "ellipse": "Elipsa",
+        "solid": "Jednolity",
+        "gradient": "Gradient",
+        "themeSurface": "Powierzchnia motywu",
+        "image": "Obraz",
+        "cornerRadius": "Zaokrąglenie rogów",
+        "stroke": "Obrys",
+        "strokeColour": "Kolor obrysu",
+        "shadow": "Cień"
+      },
+      "flag": {
+        "country": "Kraj",
+        "shape": "Kształt",
+        "rectangle": "Prostokąt",
+        "round": "Okrągła",
+        "heart": "Serce"
+      },
+      "scoreboard": {
+        "columns": "Kolumny",
+        "rowSize": "Rozmiar wierszy",
+        "showPoints": "Pokaż punkty",
+        "showRankings": "Pokaż rankingi",
+        "shortNames": "Skrócone nazwy krajów",
+        "rowLimit": "Limit wierszy",
+        "nOfTotal": "{n} z {total}",
+        "allN": "wszystkie ({total})",
+        "status": "Status",
+        "liveColours": "Kolory na żywo",
+        "uniform": "Jednolite",
+        "sizesToContent": "Dopasowuje się do zawartości.",
+        "layout": "Układ",
+        "autoFit": "Autodopasowanie",
+        "fixed": "Stały",
+        "autoFitHint": "Kolumny i rozmiar wierszy zależą od liczby wierszy, tak aby każdy wiersz zmieścił się w ramce.",
+        "fitsToBox": "Mieści się w ramce.",
+        "fitSummary": "Wiersze: {rows} mieszczą się w {columns, plural, =1 {# kolumnie} few {# kolumnach} many {# kolumnach} other {# kolumnach}}, rozmiar {size} → <b>{w} × {h}</b>. Przeciągnij dowolny uchwyt, aby zmienić rozmiar ramki; wiersze dopasują się ponownie.",
+        "sizeSummary": "Wiersze: {rows} w {columns, plural, =1 {# kolumnie} few {# kolumnach} many {# kolumnach} other {# kolumnach}}, rozmiar {size} → <b>{w} × {h}</b>. Przeciągnij boczne uchwyty, aby zmienić szerokość; wysokość zależy od wierszy.",
+        "fitCanvasWidth": "Dopasuj do szerokości płótna",
+        "order": "Kolejność",
+        "ranked": "Według miejsc",
+        "runningOrder": "Kolejność startowa"
+      },
+      "stats": {
+        "tableType": "Typ tabeli",
+        "breakdown": "Rozkład",
+        "split": "Podział",
+        "summary": "Podsumowanie",
+        "sizeSummary": "<b>Dopasowuje się do zawartości.</b> Tabela sama ustala szerokość i wysokość: <b>{w} × {h}</b>. Możesz ją przesuwać; rozmiar zmieniają typ tabeli, typ głosów i źródło danych.",
+        "voteType": "Typ głosów",
+        "total": "Łącznie",
+        "jury": "Jury",
+        "televote": "Televote",
+        "noSourceTitle": "Brak statystyk dla tego źródła danych.",
+        "noSourceBody": "Tabele statystyk są obliczane z tablicy na żywo; ręczne listy i zapisane konkursy nie zawierają jeszcze głosów.",
+        "changeDataSource": "Przełącz na Na żywo"
+      },
+      "branding": {
+        "size": "Rozmiar",
+        "staysOnEveryDesign": "Branding pozostaje na każdym projekcie. Możesz go przesuwać i skalować; nie można go usunąć ani ukryć.",
+        "showIcon": "Pokaż ikonę"
+      },
+      "stack": {
+        "direction": "Kierunek",
+        "row": "Wiersz",
+        "column": "Kolumna",
+        "gap": "Odstęp",
+        "padding": "Margines wewnętrzny",
+        "alignment": "Wyrównanie",
+        "start": "Początek",
+        "centre": "Środek",
+        "end": "Koniec",
+        "insideThisStack": "W tym stosie"
+      },
+      "data": {
+        "change": "Zmień…",
+        "elementsUseDesignData": "Elementy tablicy wyników i statystyk korzystają ze źródła danych projektu.",
+        "nElementsUseThisData": "{count, plural, =1 {# element korzysta} few {# elementy korzystają} many {# elementów korzysta} other {# elementu korzysta}} z tych danych."
+      },
+      "rowStyle": {
+        "rowsFollowTheme": "Wiersze korzystają z motywu projektu <b>„{name}”</b>.",
+        "cellsFollowTheme": "Komórki korzystają z motywu projektu <b>„{name}”</b>.",
+        "setInThemeEditor": "Kolory, kształt flag i czcionki pochodzą z motywu. Wybierz inny motyw dla tego projektu albo edytuj sam motyw w edytorze motywów.",
+        "changeTheme": "Zmień motyw"
+      },
+      "layout": {
+        "setByContent": "Ustalane przez zawartość",
+        "rotation": "Obrót",
+        "opacity": "Przezroczystość",
+        "lock": "Zablokuj",
+        "hide": "Ukryj",
+        "order": "Kolejność",
+        "sendBackward": "Przesuń do tyłu",
+        "bringForward": "Przesuń do przodu",
+        "back": "Na spód",
+        "front": "Na wierzch"
+      },
+      "theme": {
+        "theme": "Motyw",
+        "myThemes": "Moje motywy",
+        "useAppTheme": "Użyj motywu aplikacji ({name})",
+        "savedWithDesign": "Zapisywany razem z projektem, więc wygląda tak samo bez względu na motyw aplikacji."
+      }
+    },
+    "export": {
+      "title": "Eksport",
+      "close": "Zamknij",
+      "format": "Format",
+      "scale": "Skala",
+      "estimate": "{w} × {h} px · ok. {mb} MB",
+      "download": "Pobierz",
+      "share": "Udostępnij",
+      "copy": "Kopiuj",
+      "copyImage": "Kopiuj obraz",
+      "downloadImage": "Pobierz obraz",
+      "generating": "Generowanie obrazu…",
+      "generated": "Obraz wygenerowany",
+      "generatedAlt": "Wygenerowany obraz",
+      "cancel": "Anuluj",
+      "failed": {
+        "title": "Nie udało się wygenerować obrazu",
+        "body": "Próbowaliśmy dwa razy. Spróbuj ponownie albo przełącz na drugi silnik obrazów — jest wolniejszy, ale lepiej radzi sobie z dużymi płótnami.",
+        "tryAgain": "Spróbuj ponownie",
+        "otherEngine": "Użyj drugiego silnika"
+      },
+      "toast": {
+        "downloaded": "Pobrano {name}",
+        "copied": "Obraz skopiowany",
+        "copyFailed": "Nie udało się skopiować obrazu",
+        "shareUnsupported": "Udostępnianie nie jest obsługiwane na tym urządzeniu.",
+        "shareFailed": "Nie udało się udostępnić"
+      }
+    },
+    "dialogs": {
+      "tooLarge": {
+        "title": "Ten obraz jest za duży, aby go przesłać",
+        "body": "{name} ma {size}. Obrazy mogą mieć maksymalnie {max}. Zmniejsz go albo wyeksportuj jako JPEG i spróbuj ponownie.",
+        "chooseAnother": "Wybierz inny obraz",
+        "cancel": "Anuluj"
+      },
+      "unsaved": {
+        "title": "Nie udało się zapisać projektu",
+        "body": "Pamięć tej przeglądarki odrzuciła zapis. Spróbuj zapisać ponownie albo odrzuć ostatnie zmiany.",
+        "save": "Spróbuj ponownie",
+        "discard": "Odrzuć zmiany",
+        "cancel": "Anuluj"
+      },
+      "signIn": {
+        "titlePublish": "Zaloguj się, aby publikować projekty",
+        "titleCloud": "Zaloguj się, aby zapisywać w chmurze",
+        "bodyPublish": "Opublikowane projekty są podpisane Twoim imieniem. Do czasu zalogowania projekt zostaje w tej przeglądarce.",
+        "bodyCloud": "Twój projekt jest przechowywany w tej przeglądarce jako wersja robocza. Zaloguj się, aby mieć go na każdym urządzeniu i móc go opublikować.",
+        "signIn": "Zaloguj się",
+        "keepLocal": "Pracuj dalej lokalnie"
+      },
+      "noAccess": {
+        "title": "Ten projekt korzysta z konkursu, którego nie możesz otworzyć",
+        "body": "{name} jest prywatny lub został usunięty. Elementy tablicy wyników i statystyk będą pokazywać Twoją tablicę na żywo, dopóki nie wybierzesz innego źródła.",
+        "thisContest": "Konkurs",
+        "useLive": "Użyj tablicy na żywo",
+        "useManual": "Wpisz ręczną listę"
+      },
+      "cancel": "Anuluj",
+      "report": {
+        "title": "Zgłosić „{name}”?",
+        "body": "Napisz nam, co jest nie tak z tym projektem. Zgłoszenia sprawdza zespół DouzePoints.",
+        "reason": "Powód",
+        "reasons": {
+          "spam": "Spam lub wprowadzanie w błąd",
+          "offensive": "Obraźliwe treści",
+          "copyright": "Prawa autorskie lub znak towarowy",
+          "other": "Coś innego"
+        },
+        "details": "Szczegóły (opcjonalnie)",
+        "detailsPlaceholder": "Cokolwiek, co pomoże nam zrozumieć problem",
+        "send": "Wyślij zgłoszenie",
+        "cancel": "Anuluj",
+        "thanks": "Dziękujemy, zgłoszenie zostało wysłane.",
+        "already": "Ten projekt został już przez Ciebie zgłoszony.",
+        "failed": "Nie udało się wysłać zgłoszenia."
+      }
+    },
+    "fields": {
+      "columns": "Kolumny",
+      "rowSize": "Rozmiar wierszy",
+      "rowLimit": "Limit wierszy",
+      "tableType": "Typ tabeli",
+      "voteType": "Typ głosów",
+      "dataSource": "Źródło danych",
+      "size": "Rozmiar",
+      "backgroundOpacity": "Przezroczystość tła",
+      "rowSizes": {
+        "sm": "S",
+        "md": "M",
+        "lg": "L",
+        "xl": "XL",
+        "2xl": "2XL"
+      },
+      "tables": {
+        "Breakdown": "Rozkład",
+        "Split": "Podział",
+        "Summary": "Podsumowanie"
+      },
+      "voteTypes": {
+        "Total": "Łącznie",
+        "Jury": "Jury",
+        "Televote": "Televote"
+      },
+      "sizeHint": "Dopasowuje cały układ do nowego rozmiaru."
+    },
+    "sheet": {
+      "explore": "Odkrywaj",
+      "close": "Zamknij",
+      "inaccessible": "Ten projekt korzysta z {name}, którego nie możesz otworzyć.",
+      "showingLive": "Zamiast tego pokazujemy Twoją tablicę na żywo.",
+      "useManual": "Użyj ręcznej listy",
+      "sample": "Przykładowe wyniki.",
+      "sampleBody": "Żaden konkurs nie trwa, więc wyświetlany jest Finał Eurovision 2026 ze zmyślonymi głosami. Rozpocznij konkurs, aby użyć własnych.",
+      "fields": "Pola",
+      "nFields": "{count, plural, =1 {# pole} few {# pola} many {# pól} other {# pola}} · wszystko inne jest w edytorze",
+      "preview": "Podgląd",
+      "sizedToTable": "dopasowany do tabeli",
+      "theme": "motyw „{name}”",
+      "result": "Wynik",
+      "generate": "Generuj obraz",
+      "generateAgain": "Generuj ponownie",
+      "openInEditor": "Otwórz w edytorze",
+      "remixedFrom": "Remiks na podstawie {name}"
+    },
+    "publish": {
+      "title": "Opublikuj projekt",
+      "close": "Zamknij",
+      "name": "Nazwa",
+      "description": "Opis",
+      "visibility": "Widoczność",
+      "public": "Publiczny",
+      "private": "Prywatny",
+      "fillableFields": "Pola do wypełnienia",
+      "nSelected": "Wybrano: {count}",
+      "exposedHint": "Osoby korzystające z Twojego projektu mogą zmienić tylko te pola w krótkim formularzu przed wygenerowaniem obrazu; wszystko inne pozostaje zgodne z Twoim projektem. Wartości domyślne już działają, więc nie musisz niczego ustawiać.",
+      "fieldLabel": "Etykieta pola",
+      "willShowRemix": "Wyświetli się „Remiks na podstawie {name}”.",
+      "whatPeopleSee": "Co zobaczą inni",
+      "noFields": {
+        "title": "Brak pól",
+        "body": "Zaznacz pola po lewej, aby zbudować formularz. Bez nich inni mogą tylko wygenerować obraz w obecnej postaci lub otworzyć go w edytorze."
+      },
+      "cancel": "Anuluj",
+      "publish": "Opublikuj",
+      "update": "Zapisz zmiany",
+      "toast": {
+        "published": "Opublikowano · jest w Odkrywaj → Społeczność",
+        "private": "Opublikowano prywatnie · widzisz go tylko Ty, udostępnij go linkiem",
+        "failed": "Publikacja nie powiodła się",
+        "missingAsset": "Obrazu z tego projektu nie ma już w tej przeglądarce. Zastąp go i opublikuj ponownie."
+      },
+      "visibilityHint": "Projekty publiczne są widoczne w Odkrywaj, aby każdy mógł ich używać i je remiksować. Prywatne pojawiają się tylko w Twojej galerii; każdy z linkiem nadal może je otworzyć.",
+      "optional": "opcjonalnie",
+      "editFields": "Edytuj pola",
+      "hideFields": "Ukryj pola"
     }
   }
 }

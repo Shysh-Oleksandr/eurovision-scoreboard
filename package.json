@@ -40,6 +40,7 @@
     "@tanstack/react-query": "^5.90.2",
     "@tanstack/react-table": "^8.21.3",
     "@uiw/react-color": "^2.9.0",
+    "@zumer/snapdom": "3.2.0",
     "array-move": "^4.0.0",
     "countup.js": "^2.10.0",
     "date-fns": "^4.1.0",

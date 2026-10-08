@@ -19,6 +19,7 @@ export function usePublicThemeActions() {
   const handleLike = async (id: string) => {
     try {
       const res = await toggleLike(id);
+
       toast.success(
         res.liked
           ? t('widgets.themes.themeLikedSuccessfully')
@@ -37,6 +38,7 @@ export function usePublicThemeActions() {
           title: t('widgets.themes.confirmRemoveSavedTheme'),
           onConfirm: async () => {
             const res = await toggleSave(id);
+
             toast.success(
               t(
                 res.saved
@@ -48,6 +50,7 @@ export function usePublicThemeActions() {
         });
       } else {
         const res = await toggleSave(id);
+
         toast.success(
           t(
             res.saved

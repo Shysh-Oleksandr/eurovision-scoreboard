@@ -181,6 +181,16 @@
   --accent-2-ink: oklch(calc(100% - var(--accent-2-ink-dark) * 78%) calc(var(--accent-2-ink-dark) * 0.05) var(--accent-2-h));
 }
 
+/* Re-derive the accents inside a subtree that sets its own --accent-h/l/c and
+   --accent-ink-dark inline (e.g. a custom theme card, whose Apply CTA and
+   state toggle are styled in that theme rather than the active one). Custom properties resolve where they
+   are declared, so without this the :root --accent / --accent-ink leak in. */
+.dp-accent-scope {
+  --accent-raw: calc(var(--accent-l) * 1%) var(--accent-c) var(--accent-h);
+  --accent: oklch(var(--accent-raw));
+  --accent-ink: oklch(calc(100% - var(--accent-ink-dark) * 78%) calc(var(--accent-ink-dark) * 0.05) var(--accent-h));
+}
+
 /* ---- Static hex fallbacks (hue 300, default tokens) for engines without OKLCH ---- */
 @supports not (color: oklch(0% 0 0)) {
   :root {

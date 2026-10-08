@@ -1,6 +1,5 @@
-import { isSameYear } from 'date-fns';
 import { ALargeSmall, Folder, Link2, Share2, Volume1 } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -20,18 +19,20 @@ import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
 import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
 import { TrashIcon } from '@/assets/icons/TrashIcon';
+import Button from '@/components/common/Button';
 import OverflowMenu, {
   type OverflowMenuEntry,
 } from '@/components/common/OverflowMenu';
 import UserInfo from '@/components/common/UserInfo';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { resolveThemeSpecificsForCustomTheme } from '@/theme/themeSpecifics';
 import {
   getCssVarsForCustomTheme,
   getCardThemeVars,
-  getAccentForegroundColor,
+  getCustomThemeInterfaceVars,
   getFontCssVarsForCustomTheme,
 } from '@/theme/themeUtils';
 import { useCustomFontFaces } from '@/theme/useCustomFontFaces';
@@ -66,7 +67,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   savedByMe,
   quickSelectedByMe,
 }) => {
-  const locale = useLocale();
+  const formatTime = useFormatItemTime();
   const t = useTranslations();
 
   const user = useAuthStore((state) => state.user);
@@ -132,9 +133,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   const fontVars = useMemo(() => getFontCssVarsForCustomTheme(theme), [theme]);
 
   useCustomFontFaces(theme.customFonts);
-  // White washes out on light accents (yellow/green/cyan); flip to dark on-hue.
-  const applyForeground = useMemo(
-    () => getAccentForegroundColor(theme),
+  // The card's accent (Apply CTA, state toggle) is this theme's interface
+  // accent, not the active one's; `dp-accent-scope` re-derives it on the card.
+  const interfaceVars = useMemo(
+    () => getCustomThemeInterfaceVars(theme),
     [theme],
   );
   const themeSpecifics = useMemo(
@@ -228,9 +230,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
 
   return (
     <div
-      className="relative rounded-[18px] border shadow-xl transition-colors hover:brightness-105 overflow-hidden"
+      className="dp-accent-scope relative rounded-[18px] border shadow-xl transition-colors hover:brightness-105 overflow-hidden"
       style={{
         ...(cssVars as React.CSSProperties),
+        ...(interfaceVars as React.CSSProperties),
         ...(cardThemeVars as React.CSSProperties),
         ...(fontVars as React.CSSProperties),
         background: 'linear-gradient(155deg, var(--t-a), var(--t-b))',
@@ -269,7 +272,6 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             roundedCountryContainer={themeSpecifics.roundedCountryContainer}
             douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
             togglesBelow
-            activeToggleTextColor={applyForeground}
           />
         </div>
 
@@ -343,15 +345,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             {/* Date + overflow */}
             <div className="flex flex-col items-end gap-2 flex-shrink-0">
               <span className="sm:text-[12.5px] text-[11px] font-semibold text-white/40 whitespace-nowrap">
-                {new Date(theme.createdAt).toLocaleDateString(locale, {
-                  year: isSameYear(new Date(theme.createdAt), new Date())
-                    ? undefined
-                    : 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatTime(theme.createdAt)}
               </span>
               <OverflowMenu items={overflowItems} />
             </div>
@@ -364,25 +358,16 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-2 mt-3">
               {/* Apply */}
-              <button
-                type="button"
+              <Button
+                variant="cta"
+                size="lg"
                 onClick={() => onApply(theme)}
                 disabled={isApplied}
-                className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] transition-[filter] hover:brightness-110 disabled:cursor-not-allowed"
-                style={{
-                  color: applyForeground,
-                  background:
-                    'linear-gradient(180deg, var(--t-acc), var(--t-acc-d))',
-                  boxShadow:
-                    '0 6px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.25)',
-                  filter: isApplied
-                    ? 'grayscale(0.3) brightness(0.8)'
-                    : undefined,
-                }}
+                className="flex-1 min-w-[120px] justify-center !uppercase"
+                Icon={<ThemeIcon className="size-5 flex-none" />}
               >
-                <ThemeIcon className="size-5 flex-none" />
                 {isApplied ? t('widgets.applied') : t('widgets.apply')}
-              </button>
+              </Button>
 
               {/* Secondary actions — grouped so they wrap as a unit */}
               <div className="flex items-center gap-2 flex-shrink-0 ml-auto">

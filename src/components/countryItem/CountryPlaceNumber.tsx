@@ -7,6 +7,7 @@ import { ArrowIcon } from '@/assets/icons/ArrowIcon';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import usePrevious from '@/hooks/usePrevious';
 import { useGeneralStore } from '@/state/generalStore';
+import { useScopedTheme } from '@/theme/ThemeScope';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const ARROW_DISPLAY_DURATION_MS = 3000;
@@ -48,12 +49,10 @@ const CountryPlaceNumber = ({
     (state) => state.settings.showRankChangeIndicator,
   );
 
-  const globalOverrides = useGeneralStore(
-    (s) => s.customTheme?.overrides || null,
-  );
-  const themeYear = useGeneralStore(
-    (s) => s.customTheme?.baseThemeYear ?? s.themeYear,
-  );
+  const scopedTheme = useScopedTheme();
+  const globalOverrides = scopedTheme.customTheme?.overrides || null;
+  const themeYear =
+    scopedTheme.customTheme?.baseThemeYear ?? scopedTheme.themeYear;
   const overrides = propOverrides || globalOverrides;
   const { roundedCountryContainer: themeRoundedCountryContainer } =
     useThemeSpecifics();

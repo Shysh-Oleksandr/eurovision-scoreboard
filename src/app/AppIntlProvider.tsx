@@ -104,6 +104,9 @@ export default function AppIntlProvider({
     <NextIntlClientProvider
       locale={state.locale}
       messages={state.messages as never}
+      // No dates are formatted; a fixed zone just keeps server and client
+      // output identical (next-intl errors with ENVIRONMENT_FALLBACK otherwise).
+      timeZone="UTC"
       onError={(error) => {
         // The shell subset is deliberately partial: swallow missing-message
         // noise until the full catalog is in (nothing outside the shell

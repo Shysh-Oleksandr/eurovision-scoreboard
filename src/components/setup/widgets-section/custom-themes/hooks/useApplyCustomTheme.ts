@@ -1,10 +1,11 @@
+import { useTranslations } from 'next-intl';
+import { toast } from 'react-toastify';
+
 import { api } from '@/api/client';
 import { useApplyThemeMutation } from '@/api/themes';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';
-import { useTranslations } from 'next-intl';
-import { toast } from 'react-toastify';
 
 export const useApplyCustomTheme = () => {
   const t = useTranslations();

@@ -1,3 +1,4 @@
+import { Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
@@ -21,6 +22,11 @@ export const CONTENT_TYPE_OPTIONS: {
     id: 'contests',
     labelKey: 'widgets.contentType.contests',
     Icon: <TrophyIcon className="w-4 h-4 flex-none" />,
+  },
+  {
+    id: 'designs',
+    labelKey: 'widgets.contentType.designs',
+    Icon: <Sparkles className="w-4 h-4 flex-none" />,
   },
 ];
 

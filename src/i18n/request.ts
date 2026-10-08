@@ -45,6 +45,7 @@ export default getRequestConfig(async () => {
   // static JSON.
   return {
     locale: resolvedLocale,
+    timeZone: 'UTC',
     messages: await getMergedMessages(resolvedLocale),
   };
 });

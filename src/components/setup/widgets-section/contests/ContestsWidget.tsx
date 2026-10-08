@@ -5,8 +5,9 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
-import WidgetContainer from '@/components/common/WidgetContainer';
-import { WidgetStatProps } from '@/components/setup/widgets-section/profile/ProfileWidget';
+import WidgetContainer, {
+  WidgetStatProps,
+} from '@/components/common/WidgetContainer';
 import { useGeneralStore } from '@/state/generalStore';
 
 const ContestsModal = dynamic(() => import('./ContestsModal'), {

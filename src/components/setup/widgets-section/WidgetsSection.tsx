@@ -3,14 +3,17 @@ import { useTranslations } from 'next-intl';
 
 import ContestsWidget from './contests/ContestsWidget';
 import ThemesWidget from './custom-themes/ThemesWidget';
-import ProfileWidget from './profile/ProfileWidget';
+import GraphicsWidget from './graphics/GraphicsWidget';
 
 import { useMyProfileSummaryQuery } from '@/api/profiles';
 import { useAuthStore } from '@/state/useAuthStore';
 
 const SEPARATOR = ' · ';
 
-/** Widget row: three labelled cards with live counts (signed-in users only). */
+/**
+ * Widget row: the three content libraries (themes, contests, graphics) with
+ * live counts for signed-in users. Profile lives in the header cluster.
+ */
 const WidgetsSection = () => {
   const t = useTranslations('widgets');
   const user = useAuthStore((state) => state.user);
@@ -20,18 +23,6 @@ const WidgetsSection = () => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
-      <ProfileWidget
-        statLoading={statLoading}
-        stat={
-          summary
-            ? `${t('profile.followers', {
-                count: summary.followersCount,
-              })}${SEPARATOR}${t('profile.followingCount', {
-                count: summary.followingCount,
-              })}`
-            : undefined
-        }
-      />
       <ThemesWidget
         statLoading={statLoading}
         stat={
@@ -53,6 +44,14 @@ const WidgetsSection = () => {
               })}${SEPARATOR}${t('contests.publicCount', {
                 count: summary.publicContestsCount,
               })}`
+            : undefined
+        }
+      />
+      <GraphicsWidget
+        statLoading={statLoading}
+        cloudStat={
+          summary && summary.savedDesignsCount !== undefined
+            ? t('graphics.savedCount', { count: summary.savedDesignsCount })
             : undefined
         }
       />

@@ -2,12 +2,15 @@ import { useQuery } from '@tanstack/react-query';
 
 import { api } from './client';
 import { queryKeys } from './queryKeys';
-import type { CustomTheme } from '@/types/customTheme';
+
 import type { Contest } from '@/types/contest';
+import type { CustomTheme } from '@/types/customTheme';
+import type { CloudDesign } from '@/types/design';
 
 export type UserContentItem =
   | { type: 'theme'; data: CustomTheme }
-  | { type: 'contest'; data: Contest };
+  | { type: 'contest'; data: Contest }
+  | { type: 'design'; data: CloudDesign };
 
 export interface UserContentResponse {
   items: UserContentItem[];
@@ -16,7 +19,7 @@ export interface UserContentResponse {
   totalPages: number;
 }
 
-export type UserContentType = 'all' | 'themes' | 'contests';
+export type UserContentType = 'all' | 'themes' | 'contests' | 'designs';
 
 export type UserContentQueryParams = {
   page?: number;
@@ -54,6 +57,7 @@ export function useUserContentQuery(
     }),
     queryFn: async () => {
       const params = new URLSearchParams();
+
       params.append('page', page.toString());
       params.append('limit', '10');
       params.append('type', type);
@@ -66,6 +70,7 @@ export function useUserContentQuery(
       const { data } = await api.get(
         `/profiles/${userId}/content?${params.toString()}`,
       );
+
       return data as UserContentResponse;
     },
     enabled: !!userId && enabled,

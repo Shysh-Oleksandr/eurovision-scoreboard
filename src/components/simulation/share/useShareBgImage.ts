@@ -1,14 +1,21 @@
-import { useGeneralStore } from '@/state/generalStore';
-import { getThemeBackground } from '@/theme/themes';
 import { useMemo } from 'react';
 
+import { useGeneralStore } from '@/state/generalStore';
+import { getThemeBackground } from '@/theme/themes';
+import { useScopedTheme } from '@/theme/ThemeScope';
+
+/**
+ * The background image share images and designs use: the user's custom
+ * background (active theme only), the custom theme's image, or the year
+ * theme's. Inside a `ThemeScope` (a design with its own theme) the scoped
+ * theme decides and the account-level custom background is ignored.
+ */
 export const useShareBgImage = () => {
   const settings = useGeneralStore((state) => state.settings);
-  const themeYear = useGeneralStore((state) => state.themeYear);
-  const customTheme = useGeneralStore((state) => state.customTheme);
+  const { themeYear, customTheme, scoped } = useScopedTheme();
 
   const backgroundImage = useMemo(() => {
-    if (settings.shouldUseCustomBgImage && settings.customBgImage) {
+    if (!scoped && settings.shouldUseCustomBgImage && settings.customBgImage) {
       return settings.customBgImage;
     }
 
@@ -18,6 +25,7 @@ export const useShareBgImage = () => {
 
     return getThemeBackground(themeYear);
   }, [
+    scoped,
     customTheme?.backgroundImageUrl,
     settings.shouldUseCustomBgImage,
     settings.customBgImage,

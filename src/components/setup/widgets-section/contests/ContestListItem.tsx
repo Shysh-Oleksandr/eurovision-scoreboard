@@ -1,6 +1,5 @@
-import { isSameYear } from 'date-fns';
 import { Folder, Link2, Share2 } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import { toast } from 'react-toastify';
 
@@ -34,6 +33,7 @@ import UserInfo from '@/components/common/UserInfo';
 import { POINTS_ARRAY } from '@/data/data';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -66,7 +66,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   quickSelectedByMe,
   isActive,
 }) => {
-  const locale = useLocale();
+  const formatTime = useFormatItemTime();
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const handleShare = useHandleShare();
   const t = useTranslations();
@@ -316,15 +316,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
               )}
             </div>
             <span className="sm:text-[12.5px] text-[11px] text-white/40 whitespace-nowrap flex-shrink-0">
-              {new Date(contest.createdAt).toLocaleDateString(locale, {
-                year: isSameYear(new Date(contest.createdAt), new Date())
-                  ? undefined
-                  : 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              {formatTime(contest.createdAt)}
             </span>
           </div>
 

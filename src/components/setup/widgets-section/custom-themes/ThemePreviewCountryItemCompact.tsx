@@ -61,8 +61,6 @@ type ThemePreviewCountryItemCompactProps = {
   roundedCountryContainer?: boolean;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
   togglesBelow?: boolean;
-  /** Label color for the active (accent-filled) state toggle. Defaults to white. */
-  activeToggleTextColor?: string;
 };
 
 const ThemePreviewCountryItemCompact: React.FC<
@@ -86,7 +84,6 @@ const ThemePreviewCountryItemCompact: React.FC<
   roundedCountryContainer = false,
   douzePointsAnimationMode = 'heartsGrid',
   togglesBelow = false,
-  activeToggleTextColor = '#ffffff',
 }) => {
   const t = useTranslations('widgets.themes.previewCountryItemStates');
 
@@ -212,10 +209,15 @@ const ThemePreviewCountryItemCompact: React.FC<
         >
           {isOverlayReady && (
             <div
-              className="absolute top-1 bottom-1 rounded-[7px] shadow-md transition-all duration-[400ms] ease-in-out pointer-events-none"
+              className="absolute top-1 bottom-1 rounded-[7px] border shadow-md transition-all duration-[400ms] ease-in-out pointer-events-none"
               style={{
                 ...activeToggleStyle,
-                background: 'var(--t-acc, var(--accent, #ff3d84))',
+                // Selected-state tint (as .dp-icon-btn.is-on): the accent's hue
+                // without competing with the solid Apply CTA beside it.
+                background:
+                  'color-mix(in oklch, var(--accent) 42%, transparent)',
+                borderColor:
+                  'color-mix(in oklch, var(--accent) 65%, transparent)',
               }}
             />
           )}
@@ -228,13 +230,10 @@ const ThemePreviewCountryItemCompact: React.FC<
               type="button"
               onClick={() => setState(badge.key as ItemState)}
               className={`relative z-10 flex-1 text-xs font-bold py-2.5 rounded-[7px] text-center leading-tight tracking-tight whitespace-nowrap transition-colors duration-300 ${
-                state === badge.key ? '' : 'text-white/55 hover:text-white'
-              }`}
-              style={
                 state === badge.key
-                  ? { color: activeToggleTextColor }
-                  : undefined
-              }
+                  ? 'text-white'
+                  : 'text-white/55 hover:text-white'
+              }`}
             >
               {t(badge.key)}
             </button>

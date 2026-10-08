@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Country, StageVotingType } from '../../../models';
+import { Country, StageVotingType, VotingCountry } from '../../../models';
 
 import CountryStatsRow from './CountryStatsRow';
 import { useBorderOpacity } from './useBorderOpacity';
@@ -24,6 +24,8 @@ interface StatsTableProps {
   getCellClassName: (points: number) => string;
   getPoints: (country: Country) => number;
   selectedVoteType: StageVotingType | 'Total';
+  /** Columns; absent = the stage's voters from the countries store. */
+  votingCountries?: VotingCountry[];
   enableHover?: boolean;
 }
 
@@ -34,6 +36,7 @@ const StatsTable: React.FC<StatsTableProps> = ({
   getPoints,
   selectedStageId,
   selectedVoteType,
+  votingCountries: votingCountriesOverride,
   enableHover = true,
 }) => {
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -50,17 +53,16 @@ const StatsTable: React.FC<StatsTableProps> = ({
 
   const cssVars = useBorderOpacity(!enableHover);
 
-  const votingCountries = getStageVotingCountries(
-    selectedStageId ?? undefined,
-    {
+  const votingCountries =
+    votingCountriesOverride ??
+    getStageVotingCountries(selectedStageId ?? undefined, {
       channel:
         selectedVoteType === StageVotingType.JURY
           ? 'jury'
           : selectedVoteType === StageVotingType.TELEVOTE
           ? 'televote'
           : 'all',
-    },
-  );
+    });
 
   return (
     <div
