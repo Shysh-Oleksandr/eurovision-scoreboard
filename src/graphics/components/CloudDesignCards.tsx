@@ -2,9 +2,12 @@
 import {
   Bookmark,
   BookmarkCheck,
+  Clock,
   Flag,
+  Globe,
   LayoutTemplate,
   Link2,
+  Lock,
   MoreHorizontal,
   Rows3,
   Share2,
@@ -23,6 +26,7 @@ import DesignThumb from './DesignThumb';
 import {
   useDeleteDesignMutation,
   useDesignsStateQuery,
+  useSetDesignVisibilityMutation,
   useToggleLikeDesignMutation,
   useToggleSaveDesignMutation,
 } from '@/api/designs';
@@ -34,13 +38,16 @@ import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
 import { useHandleShare } from '@/components/setup/hooks/useHandleShare';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { CloudDesign } from '@/types/design';
 
 /**
- * Community template cards (gallery Templates/Saved tabs, profile content
- * feeds) with like / save / report / unpublish, and the grid that wires
- * them to the per-user state queries.
+ * Cloud design cards (gallery Explore / Saved / "Published by you", profile
+ * content feeds) with like / save / report, and for the owner make
+ * public/private + unpublish; plus the grid that wires them to the
+ * per-user state queries. "Use" (others' designs) and "Open" (your own) both
+ * go to the design sheet.
  */
 
 const designLink = (id: string) =>
@@ -55,6 +62,7 @@ export const CommunityCard: React.FC<{
   onLike: () => void;
   onSave: () => void;
   onReport?: () => void;
+  onToggleVisibility?: () => void;
   onDelete?: () => void;
 }> = ({
   record,
@@ -65,9 +73,11 @@ export const CommunityCard: React.FC<{
   onLike,
   onSave,
   onReport,
+  onToggleVisibility,
   onDelete,
 }) => {
   const t = useTranslations('graphics.gallery');
+  const formatTime = useFormatItemTime();
   const handleShare = useHandleShare();
   const user = useAuthStore((s) => s.user);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -80,12 +90,26 @@ export const CommunityCard: React.FC<{
       return null;
     }
   }, [record.design]);
+  const useLabel = mine ? t('open') : t('use');
   const items: AnchoredMenuEntry[] = [
     {
-      label: t('useTemplate'),
+      label: useLabel,
       icon: <LayoutTemplate className="size-4" />,
       onClick: onUse,
     },
+    ...(mine && onToggleVisibility
+      ? [
+          {
+            label: record.isPublic ? t('makePrivate') : t('makePublic'),
+            icon: record.isPublic ? (
+              <Lock className="size-4" />
+            ) : (
+              <Globe className="size-4" />
+            ),
+            onClick: onToggleVisibility,
+          },
+        ]
+      : []),
     {
       label: t('copyLink'),
       icon: <Link2 className="size-4" />,
@@ -128,7 +152,7 @@ export const CommunityCard: React.FC<{
       <button
         type="button"
         className="gfx-gthumb-btn"
-        aria-label={`${t('useTemplate')}: ${record.name}`}
+        aria-label={`${useLabel}: ${record.name}`}
         onClick={onUse}
       >
         <div className="gfx-gthumb">
@@ -191,9 +215,17 @@ export const CommunityCard: React.FC<{
               {t('nFields', { count: record.fieldsCount })}
             </span>
           )}
-          {!record.isPublic && (
-            <span className="gfx-chip">{t('unlisted')}</span>
-          )}
+          {!record.isPublic ? (
+            <span className="gfx-chip">
+              <Lock className="size-[12px]" />
+              {t('private')}
+            </span>
+          ) : mine ? (
+            <span className="gfx-chip gfx-chip--built">
+              <Globe className="size-[12px]" />
+              {t('public')}
+            </span>
+          ) : null}
         </div>
         <div className="gfx-gby">
           <UserInfo user={record.creator} size="sm" />
@@ -203,6 +235,19 @@ export const CommunityCard: React.FC<{
               {t('remix')}
             </span>
           )}
+          <span
+            className="gfx-gtime"
+            title={
+              record.updatedAt !== record.createdAt
+                ? t('updated', {
+                    time: formatTime(record.updatedAt),
+                  })
+                : undefined
+            }
+          >
+            <Clock className="size-3" />
+            {formatTime(record.createdAt)}
+          </span>
         </div>
         <div className="gfx-gact">
           <Button
@@ -211,7 +256,7 @@ export const CommunityCard: React.FC<{
             className="flex-1 justify-center"
             onClick={onUse}
           >
-            {t('useTemplate')}
+            {useLabel}
           </Button>
           <button
             type="button"
@@ -255,6 +300,7 @@ export const useCommunityActions = () => {
   const { mutateAsync: toggleLike } = useToggleLikeDesignMutation();
   const { mutateAsync: toggleSave } = useToggleSaveDesignMutation();
   const { mutateAsync: remove } = useDeleteDesignMutation();
+  const { mutateAsync: setVisibility } = useSetDesignVisibilityMutation();
   const { confirm } = useConfirmation();
   const guard = () => {
     if (user) return true;
@@ -278,6 +324,20 @@ export const useCommunityActions = () => {
         const res = await toggleSave(id);
 
         toast.success(res.saved ? t('toast.saved') : t('toast.unsaved'));
+      } catch (err: any) {
+        toast.error(err?.response?.data?.message || t('toast.failed'));
+      }
+    },
+    toggleVisibility: async (record: CloudDesign) => {
+      try {
+        const updated = await setVisibility({
+          id: record._id,
+          isPublic: !record.isPublic,
+        });
+
+        toast.success(
+          updated.isPublic ? t('toast.madePublic') : t('toast.madePrivate'),
+        );
       } catch (err: any) {
         toast.error(err?.response?.data?.message || t('toast.failed'));
       }
@@ -320,6 +380,7 @@ export const CloudGrid: React.FC<{
           onLike={() => actions.like(record._id)}
           onSave={() => actions.save(record._id)}
           onReport={user ? () => onReport(record) : undefined}
+          onToggleVisibility={() => actions.toggleVisibility(record)}
           onDelete={() => actions.unpublish(record)}
         />
       ))}

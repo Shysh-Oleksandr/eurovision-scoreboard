@@ -33,6 +33,7 @@ import {
   findPreset,
   parseGradient,
 } from '../../model/presets';
+import { fitScoreboard, rowsHeightIn } from '../../model/scoreboardFit';
 import { useDesignData } from '../../render/DesignDataContext';
 import { useEditorStore } from '../editorStore';
 import {
@@ -577,35 +578,76 @@ const ShapeStyle: React.FC<{
   );
 };
 
+type ScoreboardModel = Extract<DesignElement, { type: 'scoreboard' }>;
+
+/** Columns and row size an auto-fit scoreboard resolves to in `box`. */
+const resolvedFit = (el: ScoreboardModel, box: ElementBox, rows: number) =>
+  fitScoreboard(rows, box.w, rowsHeightIn(el.h ?? box.h, el.paddingY));
+
 const ScoreboardRows: React.FC<{
-  el: Extract<DesignElement, { type: 'scoreboard' }>;
-}> = ({ el }) => {
+  el: ScoreboardModel;
+  box: ElementBox;
+}> = ({ el, box }) => {
   const t = useTranslations('graphics.inspector.scoreboard');
   const update = useEditorStore((s) => s.updateElement);
   const { countries } = useDesignData();
   const total = countries.length;
   const shown = el.limit > 0 ? Math.min(el.limit, total) : total;
   const set = (patch: Partial<typeof el>) => update(el.id, patch);
+  const auto = el.fit === 'auto';
 
   return (
     <>
-      <Field label={t('columns')}>
-        <Seg<number>
-          value={el.columns}
-          onChange={(columns) => set({ columns })}
-          options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: n, label: n }))}
+      <Field label={t('layout')}>
+        <Seg<'auto' | 'fixed'>
+          value={el.fit}
+          onChange={(fit) => {
+            if (fit === el.fit) return;
+            if (fit === 'auto') {
+              // A free scoreboard fits into its current box.
+              set({ fit, h: box.inFlow ? el.h : Math.round(box.h) });
+
+              return;
+            }
+            // Keep what is on screen: freeze the fitted columns and size.
+            const { columns, itemSize } = resolvedFit(el, box, shown);
+
+            set({
+              fit,
+              columns,
+              itemSize,
+              h: box.inFlow ? el.h : undefined,
+            });
+          }}
+          options={[
+            { value: 'auto', label: t('autoFit') },
+            { value: 'fixed', label: t('fixed') },
+          ]}
         />
       </Field>
-      <Field label={t('rowSize')}>
-        <Seg<ItemSize>
-          value={el.itemSize}
-          onChange={(itemSize) => set({ itemSize })}
-          options={ITEM_SIZES.map((s) => ({
-            value: s,
-            label: ROW_SIZE_LABELS[s],
-          }))}
-        />
-      </Field>
+      {auto ? (
+        <Hint>{t('autoFitHint')}</Hint>
+      ) : (
+        <>
+          <Field label={t('columns')}>
+            <Seg<number>
+              value={el.columns}
+              onChange={(columns) => set({ columns })}
+              options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: n, label: n }))}
+            />
+          </Field>
+          <Field label={t('rowSize')}>
+            <Seg<ItemSize>
+              value={el.itemSize}
+              onChange={(itemSize) => set({ itemSize })}
+              options={ITEM_SIZES.map((s) => ({
+                value: s,
+                label: ROW_SIZE_LABELS[s],
+              }))}
+            />
+          </Field>
+        </>
+      )}
       <Toggle
         label={t('showPoints')}
         checked={el.showPoints}
@@ -663,7 +705,7 @@ const ScoreboardRows: React.FC<{
 };
 
 const ScoreboardSize: React.FC<{
-  el: Extract<DesignElement, { type: 'scoreboard' }>;
+  el: ScoreboardModel;
   box: ElementBox;
 }> = ({ el, box }) => {
   const t = useTranslations('graphics.inspector.scoreboard');
@@ -672,6 +714,8 @@ const ScoreboardSize: React.FC<{
   const { countries } = useDesignData();
   const total = countries.length;
   const shown = el.limit > 0 ? Math.min(el.limit, total) : total;
+  const auto = el.fit === 'auto';
+  const fit = resolvedFit(el, box, shown);
 
   return (
     <Note
@@ -692,11 +736,11 @@ const ScoreboardSize: React.FC<{
         )
       }
     >
-      <b>{t('sizesToContent')}</b>{' '}
-      {t.rich('sizeSummary', {
+      <b>{t(auto ? 'fitsToBox' : 'sizesToContent')}</b>{' '}
+      {t.rich(auto ? 'fitSummary' : 'sizeSummary', {
         rows: shown,
-        columns: el.columns,
-        size: ROW_SIZE_LABELS[el.itemSize],
+        columns: auto ? fit.columns : el.columns,
+        size: ROW_SIZE_LABELS[auto ? fit.itemSize : el.itemSize],
         w: Math.round(box.w),
         h: Math.round(box.h),
         b: (chunks) => <b>{chunks}</b>,
@@ -917,7 +961,7 @@ export function useElementSections(
       out.push({
         id: 'rows',
         title: t('sections.rows'),
-        content: <ScoreboardRows el={el} />,
+        content: <ScoreboardRows el={el} box={ctx.box} />,
       });
       out.push({
         id: 'size',

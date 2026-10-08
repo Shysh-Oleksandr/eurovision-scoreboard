@@ -137,7 +137,10 @@ export const isFreeSized = (el: DesignElement): boolean =>
 export type ResizeMode = 'all' | 'horizontal' | 'none';
 
 export const resizeModeOf = (el: DesignElement): ResizeMode => {
-  if (el.type === 'scoreboard' || el.type === 'stack') return 'horizontal';
+  // An auto-fit scoreboard fits its rows into a box; a fixed one is as tall
+  // as its rows.
+  if (el.type === 'scoreboard') return el.fit === 'auto' ? 'all' : 'horizontal';
+  if (el.type === 'stack') return 'horizontal';
   if (el.type === 'stats' || el.type === 'branding') return 'none';
 
   return 'all';

@@ -409,6 +409,12 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-10-08',
+    title:
+      'Graphics (beta): make your own designs (e.g., contest posters, results, artwork) from starters, community designs or a blank canvas, then export or publish them',
+  },
+
+  {
     date: '2026-10-04',
     title: 'Allocation draw',
   },
@@ -470,10 +476,10 @@ export const WHATS_NEW = [
 ];
 
 export const UPCOMING_FEATURES = [
-  // {
-  //   approximateDates: { start: '2026-10-04', end: '2026-10-11' },
-  //   title: 'Allocation draw',
-  // },
+  {
+    approximateDates: { start: '2026-10-10', end: '2026-10-18' },
+    title: 'Graphics improvements',
+  },
   {
     approximateDates: { start: '2026-07-12', end: '2026-07-13' },
     title: 'Redesign some parts of the app',

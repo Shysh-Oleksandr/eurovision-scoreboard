@@ -19,11 +19,11 @@ export interface OpenEditorRequest {
   cloudId?: string | null;
   /** Select this element on open (e.g. the scoreboard from a share modal). */
   selectId?: string | null;
-  /** Open the "Publish as template" dialog straight away. */
+  /** Open the Publish dialog straight away. */
   publish?: boolean;
 }
 
-/** What the template sheet (handoff §3) is showing. */
+/** What the design sheet (handoff §3) is showing: a built-in starter or a cloud design. */
 export type TemplateSheetSource =
   | { kind: 'builtin'; templateId: string }
   | { kind: 'cloud'; record: CloudDesign };
@@ -38,7 +38,7 @@ interface GraphicsStudioState {
   editorOpen: boolean;
   isGraphicsModalOpen: boolean;
   /** Tab the Graphics modal opens on next. */
-  galleryTab: 'my-designs' | 'templates' | 'saved';
+  galleryTab: 'my-designs' | 'explore' | 'saved';
   sheetRequest: TemplateSheetRequest | null;
   /** Bumped whenever a draft is saved/deleted so lists refetch. */
   draftsVersion: number;

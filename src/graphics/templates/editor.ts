@@ -33,6 +33,11 @@ export interface EditorTemplate {
   id: string;
   /** Shown in the editor's Templates panel (replaces the canvas). */
   inEditor: boolean;
+  /**
+   * Not offered anywhere (gallery or editor) until it is redesigned; the
+   * builder stays so the field tests keep covering it.
+   */
+  hidden?: boolean;
   width: number;
   height: number;
   /** Content-sized canvas (stats): width/height are minimums. */
@@ -90,30 +95,47 @@ const named = (design: Design): Design => ({
   ),
 });
 
+/**
+ * Results / running order starters: the scoreboard auto-fits (every row of
+ * any stage shows, at any canvas size) and the layout keeps a margin above
+ * the title and below the branding for when the rows fill the canvas.
+ */
+const fitToCanvas = (design: Design): Design => ({
+  ...design,
+  elements: mapElements(design.elements, (el) => {
+    if (el.type === 'scoreboard') return { ...el, fit: 'auto' as const };
+    if (el.type === 'stack' && el.id === 'layout') {
+      return { ...el, paddingY: 36 };
+    }
+
+    return el;
+  }),
+});
+
 const results = (ctx: TemplateContext): Design =>
   named({
-    ...buildResultsDesign({
-      settings: {
-        ...DEFAULT_IMAGE_CUSTOMIZATION,
-        title: ctx.title,
-        subtitle: ctx.subtitle,
-        layout: 3,
-        itemSize: 'lg',
-        horizontalPadding: 72,
-        verticalPadding: 16,
-      },
-      showPoints: true,
-      statusMode: 'live',
-      dataSource: 'live',
-    }),
+    ...fitToCanvas(
+      buildResultsDesign({
+        settings: {
+          ...DEFAULT_IMAGE_CUSTOMIZATION,
+          title: ctx.title,
+          subtitle: ctx.subtitle,
+          layout: 3,
+          itemSize: 'lg',
+          horizontalPadding: 72,
+          verticalPadding: 16,
+        },
+        showPoints: true,
+        statusMode: 'live',
+        dataSource: 'live',
+      }),
+    ),
     id: newElementId('design'),
     name: 'Results',
     templateFields: [
       field('el.title.text', 'Title'),
       field('el.subtitle.text', 'Subtitle'),
       field('canvas.size', 'Size'),
-      field('el.scoreboard.columns', 'Columns'),
-      field('el.scoreboard.itemSize', 'Row size'),
     ],
   });
 
@@ -127,26 +149,25 @@ const runningOrder = (ctx: TemplateContext): Design => {
       itemSize: 'md',
       horizontalPadding: 150,
       verticalPadding: 16,
-      showRankings: false,
     },
     showPoints: false,
     statusMode: 'uniform',
     dataSource: 'live',
   });
 
+  const fitted = fitToCanvas(base);
+
   return named({
-    ...base,
+    ...fitted,
     id: newElementId('design'),
     name: 'Running order',
-    elements: mapElements(base.elements, (el) =>
+    elements: mapElements(fitted.elements, (el) =>
       el.type === 'scoreboard' ? { ...el, rowOrder: 'runningOrder' } : el,
     ),
     templateFields: [
       field('el.title.text', 'Title'),
       field('el.subtitle.text', 'Subtitle'),
       field('canvas.size', 'Size'),
-      field('el.scoreboard.columns', 'Columns'),
-      field('el.scoreboard.itemSize', 'Row size'),
     ],
   });
 };
@@ -488,6 +509,7 @@ export const EDITOR_TEMPLATES: EditorTemplate[] = [
   {
     id: 'qualifiers',
     inEditor: true,
+    hidden: true,
     width: 1920,
     height: 1080,
     tags: ['scoreboard'],
@@ -496,6 +518,7 @@ export const EDITOR_TEMPLATES: EditorTemplate[] = [
   {
     id: 'top10',
     inEditor: true,
+    hidden: true,
     width: 1080,
     height: 1350,
     tags: ['scoreboard'],
@@ -504,6 +527,7 @@ export const EDITOR_TEMPLATES: EditorTemplate[] = [
   {
     id: 'poster',
     inEditor: true,
+    hidden: true,
     width: 1080,
     height: 1350,
     tags: [],

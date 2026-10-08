@@ -2,6 +2,7 @@
 import {
   ChevronLeft,
   Database,
+  Globe,
   Image as ImageIcon,
   Link2,
   Maximize,
@@ -20,6 +21,7 @@ import { editorHistory, useEditorStore } from '../editorStore';
 import { Chip, IconButton } from '../ui/controls';
 import { useDataLabel, useThemeName } from '../useEditorContext';
 
+import BetaBadge from '@/components/common/BetaBadge';
 import Button from '@/components/common/Button';
 
 interface Props {
@@ -29,6 +31,10 @@ interface Props {
   saving: boolean;
   exportAnchorRef: React.RefObject<HTMLButtonElement | null>;
 }
+
+const SAVE_STATES = ['notSavedYet', 'unsaved', 'saved'] as const;
+
+type SaveState = (typeof SAVE_STATES)[number];
 
 /** Desktop top bar (§4): back, name, saved state, undo/redo, chips, actions. */
 const EditorTopBar: React.FC<Props> = ({
@@ -45,6 +51,8 @@ const EditorTopBar: React.FC<Props> = ({
   const canvas = useEditorStore((s) => s.design.canvas);
   const dirty = useEditorStore((s) => s.dirty);
   const draftId = useEditorStore((s) => s.draftId);
+  const saveState: SaveState =
+    !draftId && !dirty ? 'notSavedYet' : dirty ? 'unsaved' : 'saved';
   const cloudId = useEditorStore((s) => s.cloudId);
   const rename = useEditorStore((s) => s.rename);
   const setPanel = useEditorStore((s) => s.setPanel);
@@ -76,12 +84,15 @@ const EditorTopBar: React.FC<Props> = ({
           if (!name.trim()) rename(t('untitled'));
         }}
       />
-      <span className="gfx-saved">
-        {!draftId && !dirty
-          ? t('notSavedYet')
-          : dirty
-          ? t('unsaved')
-          : t('saved')}
+      <BetaBadge className="gfx-beta" />
+      {/* Every label is stacked in one grid cell so the slot is always as wide
+          as the longest one — switching state never shifts the bar. */}
+      <span className="gfx-saved gfx-saved--stack">
+        {SAVE_STATES.map((state) => (
+          <span key={state} aria-hidden={state !== saveState || undefined}>
+            {t(state)}
+          </span>
+        ))}
       </span>
       <div className="gfx-hist">
         <IconButton
@@ -138,10 +149,11 @@ const EditorTopBar: React.FC<Props> = ({
       <button
         type="button"
         className="dp-act text-white gfx-act"
+        title={cloudId ? t('publishedTitle') : undefined}
         onClick={onPublish}
       >
-        <Upload className="size-4" />
-        <span>{cloudId ? t('updateTemplate') : t('publishAsTemplate')}</span>
+        {cloudId ? <Globe className="size-4" /> : <Upload className="size-4" />}
+        <span>{cloudId ? t('published') : t('publish')}</span>
       </button>
       <button
         ref={exportAnchorRef}

@@ -12,6 +12,11 @@
     "confirm": "Confirm",
     "authenticationRequired": "Authentication required",
     "lastSaved": "Last saved",
+    "relativeTime": {
+      "justNow": "just now",
+      "minutesAgo": "{count} min ago",
+      "hoursAgo": "{count} h ago"
+    },
     "copy": "Copy",
     "create": "Create",
     "searchPlaceholder": "Search...",
@@ -73,7 +78,12 @@
     "dontShowAgain": "Don't show this again",
     "more": "More",
     "share": "Share",
-    "done": "Done"
+    "done": "Done",
+    "beta": {
+      "label": "Beta",
+      "hint": "New and still changing. Tell us what’s missing with the feedback button.",
+      "hintFeedback": "New and still changing · click to send feedback"
+    }
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -742,13 +752,14 @@
       "signInToFollow": "Sign in to follow",
       "followedUser": "Followed user!",
       "unfollowedUser": "Unfollowed user!",
-      "followingCount": "{count} following"
+      "followingCount": "{count} following",
+      "signIn": "Sign in"
     },
     "contentType": {
       "all": "All",
       "themes": "Themes",
       "contests": "Contests",
-      "designs": "Templates"
+      "designs": "Designs"
     },
     "foundNItems": "Found {count} {count, plural, =1 {item} other {items}}",
     "userProfile": {
@@ -1192,7 +1203,6 @@
       "allTime": "All Time"
     },
     "graphics": {
-      "publishedCount": "{count, plural, =1 {# published} other {# published}}",
       "savedCount": "{count, plural, =1 {# saved} other {# saved}}"
     }
   },
@@ -1281,7 +1291,11 @@
       },
       "countryAssignment": {
         "title": "Country Assignment",
-        "content": "The countries shown when you pick a year are a starting point, not a locked list. In the Setup modal, click any country to move it between stages (Semi-Final 1, Semi-Final 2, Grand Final) or mark it as Not Participating. You can also add countries from other years, other continents, or your own custom entries."
+        "content": "The countries shown when you pick a year are a starting point, not a locked list. In the Setup modal, drag and drop countries between stages (Semi-Final 1, Semi-Final 2, Grand Final) and the Not Participating list, or click a country to move it. You can also add countries from other years, other continents, or your own custom entries."
+      },
+      "allocationDraw": {
+        "title": "Semi-Final Allocation Draw",
+        "content": "Turn on 'Allocation draw' (the dice button) in the Setup modal to draw the semi-finalists into the semi-finals pot by pot, the way the EBU does it. Run the draw step by step or skip to the result, then press 'Apply to line-up' to fill the semi-finals and their running-order halves. Official pots and rules are used by default; 'Customize' changes the pots, semi-final sizes, halves, and where the pre-qualified countries vote. Needs at least two semi-finals."
       },
       "grandFinalOnly": {
         "title": "Grand Final Only Mode",
@@ -1321,6 +1335,10 @@
         "title": "Odds & Randomness",
         "content": "In 'Settings → Odds', assign jury and televote odds (0–100) to each country to influence how random votes are distributed. Higher odds mean a better chance of receiving more points. The Randomness Level slider controls how closely the simulation follows those odds: slide left for predictable results that mirror the odds, slide right for a chaotic, anything-can-happen simulation."
       },
+      "diasporaAffinity": {
+        "title": "Diaspora & Affinity",
+        "content": "In 'Settings → Relations', voting blocs, neighbours, diaspora ties and rivalries nudge random votes toward (or away from) specific countries, based on 20+ years of real voting data. Use the Strength slider to scale the effect, tune individual pairs, or add your own pairs and blocs."
+      },
       "presentationMode": {
         "title": "Presentation Mode",
         "content": "Enable 'Presentation mode' in 'Settings → Voting' to add an auto-play panel below the scoreboard. Set the speed (0.5–7.5 seconds per action) and press Play to let the simulation run hands-free — ideal for streaming or recording. Enable 'Auto start presentation' to have it begin automatically as soon as voting starts."
@@ -1331,7 +1349,7 @@
       },
       "moreOptions": {
         "title": "More Voting Options",
-        "content": "Additional options in Settings → Voting and the simulation header:<list><item><strong>Split screen qualifier reveal</strong> — an ESC 2025-style moment where several candidates appear side-by-side and you click one to qualify them. Configure 2–6 candidates per reveal, and whether the last qualifier also uses the split screen.</item><item><strong>Televote reveal order</strong> — set to lowest-to-highest to announce televote results from fewest to most points, as in ESC 2016–2018.</item><item><strong>Allow points to the same entry multiple times</strong> — enables a voting country to award multiple point tokens to the same entry. This simulates the pre-1975 Eurovision voting system where each jury distributed ten equal tokens freely.</item><item><strong>Group random jury voting</strong> — the 'Vote randomly' button awards points in realistic batches (1–8+10 together, or just 12) instead of one value at a time.</item><item><strong>Undo and Restart</strong> — Undo steps back up to 100 actions; Restart resets the full simulation.</item></list>"
+        "content": "Additional options in Settings → Voting and the simulation header:<list><item><strong>Split screen qualifier reveal</strong> — an ESC 2025-style moment where several candidates appear side-by-side and you click one to qualify them. Configure 2–6 candidates per reveal, and whether the last qualifier also uses the split screen.</item><item><strong>Televote reveal order</strong> — set to lowest-to-highest to announce televote results from fewest to most points, as in ESC 2016–2018.</item><item><strong>Allow points to the same entry multiple times</strong> — enables a voting country to award multiple point tokens to the same entry. This simulates the pre-1975 Eurovision voting system where each jury distributed ten equal tokens freely.</item><item><strong>Group random jury voting</strong> — the 'Vote randomly' button awards points in realistic batches (1–8+10 together, or just 12) instead of one value at a time.</item><item><strong>Undo and Restart</strong> — Undo steps back up to 100 actions; Restart resets the full simulation.</item><item><strong>Scale countdown jury reveal</strong> — the JESC 2024 format: the jury vote is shown on a bar chart that reveals every 1 point from all juries at once, then every 2, and so on, before the spokespersons announce their 12 points.</item></list>"
       }
     },
     "themes": {
@@ -1346,6 +1364,10 @@
       "customThemeBuilder": {
         "title": "Custom Theme Builder",
         "content": "Signed-in users can build a fully custom theme: choose a primary color, upload a background image, select a font, and override the colors for every scoreboard state independently (jury active, televote unfinished/active/finished, unqualified entries, and rank badges). Flag shapes, points container shapes, and board animation styles are all configurable. A live preview panel shows exactly how each change will look on a real country item."
+      },
+      "customFonts": {
+        "title": "Custom Fonts",
+        "content": "In the theme builder, pick a built-in font or upload your own (WOFF2, WOFF, TTF or OTF — up to four weights or one variable font). Uploaded fonts are kept in your font library for use in any theme, and you can add other users' public fonts to it. A theme can also have a separate scoreboard font for the country rows, while menus and headers keep the interface font."
       },
       "soundEffects": {
         "title": "Sound Effects & Background Audio",
@@ -1372,6 +1394,10 @@
       "shareStats": {
         "title": "Share Stats as Image",
         "content": "Inside the Stats modal, a share button lets you export the full results table (breakdown, split, or summary) as a downloadable PNG. Great for sharing detailed scoreboard breakdowns on social media or in Eurovision fan communities."
+      },
+      "graphics": {
+        "title": "Graphics (Beta)",
+        "content": "Open the Graphics widget to make your own images: results cards, top 10s, posters, stats tables and more.<list><item><strong>Start</strong> from a starter, a community design in Explore, or a blank canvas. 'Open in editor' in the share image window also takes the current image into the editor.</item><item><strong>Edit</strong>: add text, images, shapes, flags, scoreboards and stats tables, then move, resize and rotate them. Set the canvas size, background and theme. In Data, choose what the scoreboards show: the live scoreboard, a saved contest, or a manual list.</item><item><strong>Export</strong> the image as PNG or JPEG to download, share or copy.</item><item><strong>Publish</strong> (requires sign-in) as public, listed in Explore, or private, shared by link. You can pick fillable fields so others change just those in a short form before generating the image. Like and save other users' designs to find them in Saved.</item></list>Designs are kept in this browser, so use 'Export (.json)' in My designs to keep a backup."
       },
       "leaderboard": {
         "title": "Global Country Leaderboard",
@@ -1670,7 +1696,7 @@
       "description": "Make and share images",
       "noDesignsYet": "No designs yet",
       "nDesigns": "{count, plural, =1 {# design} other {# designs}}",
-      "templates": "Templates"
+      "explore": "Explore"
     },
     "share": {
       "openInEditor": "Open in editor",
@@ -1682,7 +1708,7 @@
       "title": "Graphics",
       "tabs": {
         "myDesigns": "My designs",
-        "templates": "Templates",
+        "explore": "Explore",
         "saved": "Saved"
       },
       "newBlank": "New blank design",
@@ -1695,17 +1721,13 @@
       "manual": "Manual",
       "nRows": "{count, plural, =1 {# row} other {# rows}}",
       "builtIn": "Built-in",
-      "builtInSub": "Maintained by DouzePoints",
-      "useTemplate": "Use template",
+      "builtInSub": "Starters maintained by DouzePoints",
+      "use": "Use",
       "empty": {
         "title": "No designs yet",
-        "body": "Start from a template or a blank canvas. Designs are kept in this browser.",
-        "browseTemplates": "Browse templates"
+        "body": "Start from a starter, a community design or a blank canvas. Designs are kept in this browser.",
+        "explore": "Explore designs"
       },
-      "justNow": "just now",
-      "minutesAgo": "{count} min ago",
-      "hoursAgo": "{count} h ago",
-      "daysAgo": "{count} d ago",
       "renamePrompt": "Design name",
       "deleteTitle": "Delete “{name}”?",
       "deleteBody": "This removes the design from this browser. It can’t be undone.",
@@ -1714,12 +1736,14 @@
         "deleted": "Design deleted",
         "linkCopied": "Link copied to clipboard!",
         "failed": "Something went wrong",
-        "saved": "Template saved",
-        "unsaved": "Template removed from saved",
-        "unpublished": "Template unpublished",
-        "unreadable": "This template can’t be opened in this version of the app.",
+        "saved": "Saved to your collection",
+        "unsaved": "Removed from saved",
+        "unpublished": "Design unpublished",
+        "unreadable": "This design can’t be opened in this version of the app.",
         "imported": "Imported “{name}”",
-        "importFailed": "That file isn’t a DouzePoints design."
+        "importFailed": "That file isn’t a DouzePoints design.",
+        "madePublic": "Now public · listed in Explore",
+        "madePrivate": "Now private · only you see it"
       },
       "templates": {
         "blank": {
@@ -1754,22 +1778,22 @@
       "savedContest": "Saved contest",
       "contentSized": "Content-sized",
       "published": "Published",
-      "updateTemplate": "Update template",
-      "publishAsTemplate": "Publish as template",
+      "updatePublished": "Update published copy",
+      "publish": "Publish…",
       "copyLink": "Copy link",
       "share": "Share",
       "unpublish": "Unpublish",
       "nFields": "{count, plural, =1 {# field} other {# fields}}",
       "scoreboard": "Scoreboard",
       "stats": "Stats",
-      "unlisted": "Unlisted",
+      "private": "Private",
       "remix": "Remix",
       "like": "Like",
       "save": "Save",
-      "signInToReact": "Sign in to like and save templates.",
+      "signInToReact": "Sign in to like and save designs.",
       "unpublishTitle": "Unpublish “{name}”?",
-      "unpublishBody": "The template and its link stop working for everyone. Your local draft stays in this browser.",
-      "searchTemplates": "Search templates",
+      "unpublishBody": "The published copy and its link stop working for everyone. Your local draft stays in this browser.",
+      "searchDesigns": "Search designs",
       "sort": {
         "newest": "Newest",
         "used": "Most used",
@@ -1785,31 +1809,31 @@
       },
       "hasScoreboard": "Has scoreboard",
       "hasStats": "Has stats",
-      "mine": "Mine",
-      "mineSub": "Templates you published",
+      "mine": "Published by you",
+      "mineSub": "Not in this browser · open one to make a local copy",
       "community": "Community",
-      "foundN": "Found {count, plural, =1 {# template} other {# templates}}",
+      "foundN": "Found {count, plural, =1 {# design} other {# designs}}",
       "communityError": {
-        "title": "Community templates couldn’t load",
+        "title": "Community designs couldn’t load",
         "body": "Check your connection and try again."
       },
       "retry": "Try again",
       "noMatch": {
-        "title": "No community templates match",
+        "title": "No community designs match",
         "body": "Try another size, or clear the filters."
       },
       "noCommunity": {
-        "title": "No community templates yet",
-        "body": "Publish a design as a template and it shows up here."
+        "title": "No community designs yet",
+        "body": "Publish a design and it shows up here for everyone."
       },
       "clearFilters": "Clear filters",
       "savedSignIn": {
-        "title": "Sign in to save templates",
-        "body": "Saved community templates are kept with your account."
+        "title": "Sign in to save designs",
+        "body": "Saved community designs are kept with your account."
       },
       "nothingSaved": {
         "title": "Nothing saved yet",
-        "body": "Save community templates to find them here."
+        "body": "Save community designs to find them here."
       },
       "keptInBrowser": "Designs are kept in this browser · export a copy to keep it safe",
       "exportJson": "Export (.json)",
@@ -1819,7 +1843,15 @@
       "reported": "Reported",
       "unreadable": {
         "body": "This design can’t be opened by this version of the app. Export it to keep a copy, or delete it."
-      }
+      },
+      "starters": "Starters",
+      "open": "Open",
+      "public": "Public",
+      "makePublic": "Make public",
+      "makePrivate": "Make private",
+      "communitySub": "Public designs by everyone · use or remix any of them",
+      "startersSub": "Built-in starting points · maintained by DouzePoints",
+      "updated": "Updated {time}"
     },
     "editor": {
       "aria": "Design editor",
@@ -1837,6 +1869,7 @@
       "zoom": "Zoom",
       "label": {
         "heightFollowsRows": "height follows the rows",
+        "rowsFitBox": "rows fit the box",
         "sizesToContent": "sizes to content",
         "nElements": "{count} elements",
         "centred": "centred · {px} each side",
@@ -1851,13 +1884,13 @@
       "rail": {
         "aria": "Editor tools",
         "add": "Add",
-        "templates": "Templates",
+        "templates": "Starters",
         "layers": "Layers",
         "data": "Data"
       },
       "panel": {
         "add": "Add element",
-        "templates": "Templates",
+        "templates": "Starters",
         "layers": "Layers",
         "data": "Data",
         "close": "Close panel"
@@ -1870,9 +1903,10 @@
         "layers": "Layers",
         "data": "Data",
         "canvas": "Canvas",
-        "templates": "Templates",
+        "templates": "Starters",
         "close": "Close sheet",
-        "publish": "Publish"
+        "publish": "Publish",
+        "published": "Published"
       },
       "nudge": {
         "move": "Move",
@@ -1884,15 +1918,21 @@
         "down": "Down"
       },
       "toast": {
-        "saved": "Design saved"
+        "saved": "Design saved",
+        "savedAndSynced": "Saved · published copy updated",
+        "cloudUpdated": "Published copy updated",
+        "cloudUpdateFailed": "Saved here, but the published copy couldn’t be updated. Try again from Published.",
+        "cloudGone": "The published copy no longer exists. Publish again to share this design."
       },
-      "updateTemplate": "Update template",
-      "publishAsTemplate": "Publish as template",
+      "updatePublished": "Update",
+      "publish": "Publish",
       "canvasSizeChip": "Canvas size",
       "themeChip": "Theme",
       "untitled": "Untitled design",
-      "remixChipTitle": "This design started from a community template; the template is credited when you publish.",
-      "remixOf": "Remix of {name}"
+      "remixChipTitle": "This design started from a community design; its creator is credited when you publish.",
+      "remixOf": "Remix of {name}",
+      "published": "Published",
+      "publishedTitle": "The published copy updates whenever you save. Click to change its visibility, description or fillable fields."
     },
     "add": {
       "text": {
@@ -1945,7 +1985,7 @@
           "name": "Stats"
         }
       },
-      "browseCommunity": "Browse community templates"
+      "browseCommunity": "Explore community designs"
     },
     "layers": {
       "title": "Layers",
@@ -1982,7 +2022,8 @@
       "contestInaccessible": "“{name}” can’t be opened. The rows show your live scoreboard until you choose another source.",
       "statsNeedLive": "Stats tables use the live scoreboard. Switch the data source to Live to fill this table.",
       "pickContestHint": "Pick a contest below. Until then the design keeps its current data source.",
-      "statsNeedLiveHint": "Data → Live in the editor"
+      "statsNeedLiveHint": "Data → Live in the editor",
+      "sampleHint": "No contest is running, so scoreboards and stats show sample results (Eurovision 2026 Grand Final, made-up votes). Start a contest to use your own."
     },
     "inspector": {
       "properties": "Properties",
@@ -2124,6 +2165,12 @@
         "liveColours": "Live colours",
         "uniform": "Uniform",
         "sizesToContent": "Sizes to content.",
+        "layout": "Layout",
+        "autoFit": "Auto-fit",
+        "fixed": "Fixed",
+        "autoFitHint": "Columns and row size follow the number of rows, so every row fits in the box.",
+        "fitsToBox": "Fits its box.",
+        "fitSummary": "{rows} rows fit in {columns, plural, =1 {# column} other {# columns}} at {size} → <b>{w} × {h}</b>. Drag any handle to resize the box; the rows re-fit.",
         "sizeSummary": "{rows} rows in {columns, plural, =1 {# column} other {# columns}} at {size} → <b>{w} × {h}</b>. Drag the side handles for width; the height follows the rows.",
         "fitCanvasWidth": "Fit canvas width",
         "order": "Order",
@@ -2235,9 +2282,9 @@
         "cancel": "Cancel"
       },
       "signIn": {
-        "titlePublish": "Sign in to publish templates",
+        "titlePublish": "Sign in to publish designs",
         "titleCloud": "Sign in to save to the cloud",
-        "bodyPublish": "Published templates carry your name. Your design stays in this browser until you sign in.",
+        "bodyPublish": "Published designs carry your name. Your design stays in this browser until you sign in.",
         "bodyCloud": "Your design is kept in this browser as a draft. Sign in to keep it on every device and publish it.",
         "signIn": "Sign in",
         "keepLocal": "Keep working locally"
@@ -2298,11 +2345,13 @@
       "sizeHint": "Re-fits the whole layout to the new size."
     },
     "sheet": {
-      "templates": "Templates",
+      "explore": "Explore",
       "close": "Close",
-      "inaccessible": "This template uses {name}, which you can’t open.",
+      "inaccessible": "This design uses {name}, which you can’t open.",
       "showingLive": "Showing your live scoreboard instead.",
       "useManual": "Use a manual list",
+      "sample": "Sample results.",
+      "sampleBody": "No contest is running, so this shows the Eurovision 2026 Grand Final with made-up votes. Start a contest to use your own.",
       "fields": "Fields",
       "nFields": "{count, plural, =1 {# field} other {# fields}} · everything else is in the editor",
       "preview": "Preview",
@@ -2315,32 +2364,36 @@
       "remixedFrom": "Remixed from {name}"
     },
     "publish": {
-      "title": "Publish as template",
+      "title": "Publish design",
       "close": "Close",
       "name": "Name",
       "description": "Description",
       "visibility": "Visibility",
       "public": "Public",
-      "unlisted": "Unlisted",
-      "exposedFields": "Exposed fields",
+      "private": "Private",
+      "fillableFields": "Fillable fields",
       "nSelected": "{count} selected",
-      "exposedHint": "People using the template see only these, as a short form. Everything else stays as you designed it.",
+      "exposedHint": "People using your design can change just these in a short form before generating; everything else stays as you designed it. The defaults already work, so there is nothing you have to set up.",
       "fieldLabel": "Field label",
       "willShowRemix": "Will show “Remixed from {name}”.",
       "whatPeopleSee": "What people will see",
       "noFields": {
         "title": "No fields yet",
-        "body": "Tick fields on the left to build the form. With none, people can only generate the image as is."
+        "body": "Tick fields on the left to build the form. With none, people can only generate the image as is or open it in the editor."
       },
       "cancel": "Cancel",
       "publish": "Publish",
-      "update": "Update",
+      "update": "Save changes",
       "toast": {
-        "published": "Template published · it’s in Templates → Community",
-        "unlisted": "Template published · share it with its link",
+        "published": "Published · it’s in Explore → Community",
+        "private": "Published privately · only you see it, share it with its link",
         "failed": "Publishing failed",
         "missingAsset": "An image in this design is no longer in this browser. Replace it and publish again."
-      }
+      },
+      "visibilityHint": "Public designs are listed in Explore for everyone to use and remix. Private ones show only in your gallery; anyone with the link can still open them.",
+      "optional": "optional",
+      "editFields": "Edit fields",
+      "hideFields": "Hide fields"
     }
   }
 }

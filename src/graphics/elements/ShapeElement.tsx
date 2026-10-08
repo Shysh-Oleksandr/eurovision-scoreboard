@@ -2,14 +2,16 @@
 import React from 'react';
 
 import { ShapeElement as ShapeElementModel } from '../model/design';
-import { useFillPresentation } from '../render/fills';
+import { FillImg, useFillPresentation } from '../render/fills';
 
 const ShapeElement: React.FC<{ el: ShapeElementModel }> = ({ el }) => {
-  const { style, className } = useFillPresentation(el.fill);
+  const { style, className, image } = useFillPresentation(el.fill);
 
   return (
     <div
-      className={`w-full h-full ${className}`}
+      className={`w-full h-full ${
+        image ? 'relative overflow-hidden' : ''
+      } ${className}`}
       style={{
         ...style,
         opacity: el.fill.opacity,
@@ -19,7 +21,9 @@ const ShapeElement: React.FC<{ el: ShapeElementModel }> = ({ el }) => {
           : undefined,
         boxShadow: el.shadow ? '0 12px 40px rgba(0, 0, 0, 0.35)' : undefined,
       }}
-    />
+    >
+      {image && <FillImg image={image} />}
+    </div>
   );
 };
 

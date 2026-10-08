@@ -17,8 +17,8 @@ interface Props {
 }
 
 /**
- * Built-in starting points; applying one replaces the canvas (undoable).
- * "Browse community templates" leaves for the Graphics modal.
+ * Built-in starters; applying one replaces the canvas (undoable).
+ * "Explore community designs" leaves for the Graphics modal.
  */
 const TemplatesPanel: React.FC<Props> = ({ onApplied }) => {
   const t = useTranslations('graphics.templates');
@@ -29,10 +29,12 @@ const TemplatesPanel: React.FC<Props> = ({ onApplied }) => {
   const ctx = useTemplateContext();
   const built = useMemo(
     () =>
-      EDITOR_TEMPLATES.filter((tpl) => tpl.inEditor).map((tpl) => ({
-        tpl,
-        design: tpl.build(ctx),
-      })),
+      EDITOR_TEMPLATES.filter((tpl) => tpl.inEditor && !tpl.hidden).map(
+        (tpl) => ({
+          tpl,
+          design: tpl.build(ctx),
+        }),
+      ),
     [ctx],
   );
 
@@ -69,7 +71,7 @@ const TemplatesPanel: React.FC<Props> = ({ onApplied }) => {
         Icon={<Globe className="size-4" />}
         onClick={() => {
           closeEditor();
-          setGalleryOpen(true, 'templates');
+          setGalleryOpen(true, 'explore');
         }}
       >
         {t('browseCommunity')}

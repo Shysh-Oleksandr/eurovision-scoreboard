@@ -88,6 +88,7 @@ export const AbsoluteChild: React.FC<{
 
 const StackElement: React.FC<{ el: StackElementModel }> = ({ el }) => (
   <div
+    data-stack
     className="flex"
     style={{
       flexDirection: el.direction,

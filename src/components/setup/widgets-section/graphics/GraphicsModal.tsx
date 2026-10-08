@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   Bookmark,
   Clock,
+  Compass,
   Copy,
   Download,
   FilePlus,
@@ -10,8 +11,8 @@ import {
   FolderInput,
   Globe,
   HardDrive,
-  LayoutTemplate,
   Link2,
+  Lock,
   MoreHorizontal,
   PencilLine,
   Search,
@@ -40,11 +41,15 @@ import {
 import AnchoredMenu, {
   AnchoredMenuEntry,
 } from '@/components/common/AnchoredMenu';
+import BetaBadge from '@/components/common/BetaBadge';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
-import { CloudGrid } from '@/graphics/components/CloudDesignCards';
+import {
+  CloudGrid,
+  useCommunityActions,
+} from '@/graphics/components/CloudDesignCards';
 import DesignThumb from '@/graphics/components/DesignThumb';
 import PromptDialog from '@/graphics/components/PromptDialog';
 import ReportDialog from '@/graphics/components/ReportDialog';
@@ -66,12 +71,13 @@ import { EDITOR_TEMPLATES, EditorTemplate } from '@/graphics/templates/editor';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { CloudDesign } from '@/types/design';
 
 import '@/graphics/editor/editor.css';
 
-type GalleryTab = 'my-designs' | 'templates' | 'saved';
+type GalleryTab = 'my-designs' | 'explore' | 'saved';
 
 /** Stable reference so every thumbnail does not re-resolve its data. */
 const LIVE_BINDING = { source: 'live' } as const;
@@ -92,19 +98,6 @@ const SIZES: SizeFilter[] = [
   'story',
   'broadcast',
 ];
-
-const relativeTime = (ts: number, t: ReturnType<typeof useTranslations>) => {
-  const diff = Math.max(0, Date.now() - ts);
-  const m = Math.round(diff / 60000);
-
-  if (m < 1) return t('justNow');
-  if (m < 60) return t('minutesAgo', { count: m });
-  const h = Math.round(m / 60);
-
-  if (h < 24) return t('hoursAgo', { count: h });
-
-  return t('daysAgo', { count: Math.round(h / 24) });
-};
 
 const sizeLabel = (design: Design, t: ReturnType<typeof useTranslations>) =>
   design.canvas.autoSize
@@ -140,22 +133,28 @@ const exportDesignJson = (name: string, design: unknown) => {
 
 const DesignCard: React.FC<{
   record: DesignRecord;
+  /** The published copy, when the draft has one and it could be loaded. */
+  cloud?: CloudDesign;
   onOpen: () => void;
   onDuplicate: () => void;
   onRename: () => void;
   onPublish: () => void;
+  onToggleVisibility?: () => void;
   onExport: () => void;
   onDelete: () => void;
 }> = ({
   record,
+  cloud,
   onOpen,
   onDuplicate,
   onRename,
   onPublish,
+  onToggleVisibility,
   onExport,
   onDelete,
 }) => {
   const t = useTranslations('graphics.gallery');
+  const formatTime = useFormatItemTime();
   const [menuOpen, setMenuOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
   const items: AnchoredMenuEntry[] = [
@@ -179,11 +178,25 @@ const DesignCard: React.FC<{
       icon: <Download className="size-4" />,
       onClick: onExport,
     },
+    'hr',
     {
-      label: record.cloudId ? t('updateTemplate') : t('publishAsTemplate'),
+      label: record.cloudId ? t('updatePublished') : t('publish'),
       icon: <Upload className="size-4" />,
       onClick: onPublish,
     },
+    ...(cloud && onToggleVisibility
+      ? [
+          {
+            label: cloud.isPublic ? t('makePrivate') : t('makePublic'),
+            icon: cloud.isPublic ? (
+              <Lock className="size-4" />
+            ) : (
+              <Globe className="size-4" />
+            ),
+            onClick: onToggleVisibility,
+          },
+        ]
+      : []),
     ...(record.cloudId
       ? [
           {
@@ -248,15 +261,28 @@ const DesignCard: React.FC<{
         <div className="gfx-gmeta">
           <span className="gfx-chip">{sizeLabel(record.design, t)}</span>
           <span className="gfx-chip gfx-chip--data">{dataLabel}</span>
-          {record.cloudId && (
-            <span className="gfx-chip gfx-chip--built">
-              <Globe className="size-[12px]" />
-              {t('published')}
-            </span>
-          )}
+          {record.cloudId &&
+            (cloud ? (
+              cloud.isPublic ? (
+                <span className="gfx-chip gfx-chip--built">
+                  <Globe className="size-[12px]" />
+                  {t('public')}
+                </span>
+              ) : (
+                <span className="gfx-chip">
+                  <Lock className="size-[12px]" />
+                  {t('private')}
+                </span>
+              )
+            ) : (
+              <span className="gfx-chip gfx-chip--built">
+                <Globe className="size-[12px]" />
+                {t('published')}
+              </span>
+            ))}
           <span className="gfx-gtime">
             <Clock className="size-3" />
-            {relativeTime(record.updatedAt, t)}
+            {formatTime(record.updatedAt)}
           </span>
         </div>
       </div>
@@ -308,55 +334,39 @@ const UnreadableCard: React.FC<{
   );
 };
 
-const TemplateCard: React.FC<{
+/**
+ * A built-in starter as a compact tile in the horizontal strip: thumbnail,
+ * name, size and field count; the whole tile is the "Use" button, so the
+ * community grid starts right below.
+ */
+const StarterTile: React.FC<{
   template: EditorTemplate;
   design: Design;
   onUse: () => void;
 }> = ({ template, design, onUse }) => {
   const t = useTranslations('graphics.gallery');
   const n = design.templateFields?.length ?? 0;
+  const name = t(`templates.${template.id}.name`);
 
   return (
-    <article className="gfx-gcard is-built">
-      <button
-        type="button"
-        className="gfx-gthumb-btn"
-        aria-label={`${t('useTemplate')}: ${t(
-          `templates.${template.id}.name`,
-        )}`}
-        onClick={onUse}
-      >
-        <div className="gfx-gthumb">
-          <DesignThumb design={design} width={252} height={150} />
-        </div>
-      </button>
-      <div className="gfx-gbody">
-        <div className="gfx-gtitle-row">
-          <h3>{t(`templates.${template.id}.name`)}</h3>
-          <span className="gfx-chip gfx-chip--built">
-            <Sparkles className="size-[13px]" />
-            {t('builtIn')}
-          </span>
-        </div>
-        <p className="gfx-gdesc">{t(`templates.${template.id}.description`)}</p>
-        <div className="gfx-gmeta">
-          <span className="gfx-chip">{sizeLabel(design, t)}</span>
-          {n > 0 && (
-            <span className="gfx-chip">{t('nFields', { count: n })}</span>
-          )}
-        </div>
-        <div className="gfx-gact">
-          <Button
-            variant="cta"
-            size="md"
-            className="flex-1 justify-center"
-            onClick={onUse}
-          >
-            {t('useTemplate')}
-          </Button>
-        </div>
-      </div>
-    </article>
+    <button
+      type="button"
+      className="gfx-gtile"
+      aria-label={`${t('use')}: ${name}`}
+      title={t(`templates.${template.id}.description`)}
+      onClick={onUse}
+    >
+      <span className="gfx-gthumb">
+        <DesignThumb design={design} width={200} height={112} />
+      </span>
+      <span className="gfx-gtile-t">
+        <b>{name}</b>
+        <em>
+          {sizeLabel(design, t)}
+          {n > 0 ? ` · ${t('nFields', { count: n })}` : ''}
+        </em>
+      </span>
+    </button>
   );
 };
 
@@ -369,9 +379,11 @@ interface Props {
 }
 
 /**
- * Hub → Graphics (handoff §2): My designs (local drafts), Templates (mine
- * in the cloud, built-in, community with search / sort / size / content
- * filters) and Saved. "Use template" opens the template sheet.
+ * Hub → Graphics (handoff §2). My designs: local drafts (with the published
+ * copy's visibility) plus, signed in, the designs you published from another
+ * browser. Explore: built-in starters and every public design (search /
+ * sort / size / content filters). Saved: your saved community designs. "Use"
+ * and "Open" go through the design sheet.
  */
 const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const t = useTranslations('graphics.gallery');
@@ -394,6 +406,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const user = useAuthStore((s) => s.user);
   const ctx = useTemplateContext();
   const { confirm } = useConfirmation();
+  const cloudActions = useCommunityActions();
 
   const [search, setSearch] = useState('');
   const q = useDebounce(search, 350);
@@ -432,21 +445,35 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const community = usePublicDesignsQuery({
     ...filters,
     page,
-    enabled: isOpen && tab === 'templates',
+    enabled: isOpen && tab === 'explore',
   });
+  // Everything you published (public and private): visibility badges on the
+  // drafts, and the "Published by you" list for copies from another browser.
   const mine = useMyDesignsQuery({
-    ...filters,
     limit: 50,
-    enabled: isOpen && tab === 'templates' && !!user,
+    enabled: isOpen && !!user,
   });
   const saved = useSavedDesignsQuery({
     page: savedPage,
     enabled: isOpen && tab === 'saved' && !!user,
   });
 
-  const builtIn = useMemo(
+  const cloudById = useMemo(() => {
+    const map = new Map<string, CloudDesign>();
+
+    mine.data?.designs.forEach((d) => map.set(d._id, d));
+
+    return map;
+  }, [mine.data]);
+  const cloudOnly = useMemo(() => {
+    const local = new Set((records ?? []).map((r) => r.cloudId));
+
+    return (mine.data?.designs ?? []).filter((d) => !local.has(d._id));
+  }, [mine.data, records]);
+
+  const starters = useMemo(
     () =>
-      EDITOR_TEMPLATES.filter((tpl) => tpl.id !== 'blank')
+      EDITOR_TEMPLATES.filter((tpl) => tpl.id !== 'blank' && !tpl.hidden)
         .map((tpl) => ({ tpl, design: tpl.build(ctx) }))
         .filter(({ tpl }) => {
           const cls = sizeClassOf(tpl.width, tpl.height, tpl.autoSize);
@@ -577,7 +604,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const tabs = useMemo(
     () => [
       { value: 'my-designs', label: t('tabs.myDesigns') },
-      { value: 'templates', label: t('tabs.templates') },
+      { value: 'explore', label: t('tabs.explore') },
       { value: 'saved', label: t('tabs.saved') },
     ],
     [t],
@@ -597,7 +624,10 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
     <div className="gfx-gallery">
       <div className="gfx-gallery-head">
         <div className="gfx-gallery-ht">
-          <h2>{t('title')}</h2>
+          <div className="gfx-gallery-hrow">
+            <h2>{t('title')}</h2>
+            <BetaBadge feedback />
+          </div>
           <span className="gfx-gallery-sub">
             <HardDrive className="size-[13px]" />
             {t('keptInBrowser')}
@@ -631,7 +661,10 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
           {t('newBlank')}
         </Button>
       </div>
-      {records && records.length === 0 && unreadable.length === 0 ? (
+      {records &&
+      records.length === 0 &&
+      unreadable.length === 0 &&
+      cloudOnly.length === 0 ? (
         <div className="gfx-gempty">
           <span className="gfx-gempty-ic">
             <Sparkles className="size-5" />
@@ -642,10 +675,10 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
             <Button
               variant="cta"
               size="md"
-              Icon={<LayoutTemplate className="size-4" />}
-              onClick={() => setTab('templates')}
+              Icon={<Compass className="size-4" />}
+              onClick={() => setTab('explore')}
             >
-              {t('empty.browseTemplates')}
+              {t('empty.explore')}
             </Button>
             <Button variant="surface" size="md" onClick={newBlank}>
               {t('newBlank')}
@@ -653,41 +686,72 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
           </div>
         </div>
       ) : (
-        <div className="gfx-ggrid">
-          {(records ?? []).map((record) => (
-            <DesignCard
-              key={record.id}
-              record={record}
-              onOpen={() =>
-                openEditor({
-                  design: record.design,
-                  draftId: record.id,
-                  cloudId: record.cloudId ?? null,
-                })
-              }
-              onDuplicate={() => duplicate(record)}
-              onRename={() => setRenaming(record)}
-              onExport={() => exportDesignJson(record.name, record.design)}
-              onPublish={() =>
-                openEditor({
-                  design: record.design,
-                  draftId: record.id,
-                  cloudId: record.cloudId ?? null,
-                  publish: true,
-                })
-              }
-              onDelete={() => remove(record)}
-            />
-          ))}
-          {unreadable.map((record) => (
-            <UnreadableCard
-              key={record.id}
-              record={record}
-              onExport={() => exportDesignJson(record.name, record.raw)}
-              onDelete={() => removeUnreadable(record)}
-            />
-          ))}
-        </div>
+        <>
+          {((records && records.length > 0) || unreadable.length > 0) && (
+            <div className="gfx-ggrid">
+              {(records ?? []).map((record) => {
+                const cloud = record.cloudId
+                  ? cloudById.get(record.cloudId)
+                  : undefined;
+
+                return (
+                  <DesignCard
+                    key={record.id}
+                    record={record}
+                    cloud={cloud}
+                    onOpen={() =>
+                      openEditor({
+                        design: record.design,
+                        draftId: record.id,
+                        cloudId: record.cloudId ?? null,
+                      })
+                    }
+                    onDuplicate={() => duplicate(record)}
+                    onRename={() => setRenaming(record)}
+                    onExport={() =>
+                      exportDesignJson(record.name, record.design)
+                    }
+                    onPublish={() =>
+                      openEditor({
+                        design: record.design,
+                        draftId: record.id,
+                        cloudId: record.cloudId ?? null,
+                        publish: true,
+                      })
+                    }
+                    onToggleVisibility={
+                      cloud
+                        ? () => cloudActions.toggleVisibility(cloud)
+                        : undefined
+                    }
+                    onDelete={() => remove(record)}
+                  />
+                );
+              })}
+              {unreadable.map((record) => (
+                <UnreadableCard
+                  key={record.id}
+                  record={record}
+                  onExport={() => exportDesignJson(record.name, record.raw)}
+                  onDelete={() => removeUnreadable(record)}
+                />
+              ))}
+            </div>
+          )}
+          {cloudOnly.length > 0 && (
+            <div className="gfx-gsec">
+              <div className="gfx-gsec-h">
+                <h3>{t('mine')}</h3>
+                <span>{t('mineSub')}</span>
+              </div>
+              <CloudGrid
+                designs={cloudOnly}
+                onUse={startCloud}
+                onReport={setReporting}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -709,15 +773,15 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
     </button>
   );
 
-  const templatesTab = (
+  const exploreTab = (
     <div className="gfx-gallery">
       <label className="gfx-csearch is-lg">
         <Search className="size-4" />
         <input
           className="gfx-input"
           value={search}
-          placeholder={t('searchTemplates')}
-          aria-label={t('searchTemplates')}
+          placeholder={t('searchDesigns')}
+          aria-label={t('searchDesigns')}
           onChange={(e) => setSearch(e.target.value)}
         />
       </label>
@@ -737,34 +801,21 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         {chip('st', wantStats, t('hasStats'), () => setWantStats((v) => !v))}
       </div>
 
-      {user && (mine.data?.designs.length ?? 0) > 0 && (
+      {starters.length > 0 && (
         <div className="gfx-gsec">
           <div className="gfx-gsec-h">
-            <h3>{t('mine')}</h3>
-            <span>{t('mineSub')}</span>
+            <h3>{t('starters')}</h3>
+            <span>{t('startersSub')}</span>
           </div>
-          <CloudGrid
-            designs={mine.data!.designs}
-            onUse={startCloud}
-            onReport={setReporting}
-          />
-        </div>
-      )}
-
-      {builtIn.length > 0 && (
-        <div className="gfx-gsec">
-          <div className="gfx-gsec-h">
-            <h3>{t('builtIn')}</h3>
-            <span>{t('builtInSub')}</span>
-          </div>
-          <div className="gfx-ggrid">
-            {builtIn.map((item) => (
-              <TemplateCard
-                key={item.tpl.id}
-                template={item.tpl}
-                design={item.design}
-                onUse={() => startBuiltIn(item)}
-              />
+          <div className="gfx-gstrip" role="list">
+            {starters.map((item) => (
+              <div role="listitem" key={item.tpl.id}>
+                <StarterTile
+                  template={item.tpl}
+                  design={item.design}
+                  onUse={() => startBuiltIn(item)}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -776,7 +827,9 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
           <span>
             {community.isLoading
               ? '…'
-              : t('foundN', { count: community.data?.total ?? 0 })}
+              : `${t('foundN', { count: community.data?.total ?? 0 })} · ${t(
+                  'communitySub',
+                )}`}
           </span>
         </div>
         {community.isLoading ? (
@@ -873,10 +926,10 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
           <Button
             variant="cta"
             size="md"
-            Icon={<LayoutTemplate className="size-4" />}
-            onClick={() => setTab('templates')}
+            Icon={<Compass className="size-4" />}
+            onClick={() => setTab('explore')}
           >
-            {t('empty.browseTemplates')}
+            {t('empty.explore')}
           </Button>
         </div>
       )}
@@ -922,7 +975,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         <TabContent
           tabs={[
             { ...tabs[0], content: myDesigns },
-            { ...tabs[1], content: templatesTab },
+            { ...tabs[1], content: exploreTab },
             { ...tabs[2], content: savedTab },
           ]}
           activeTab={tab}

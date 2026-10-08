@@ -4,14 +4,16 @@ import { useTranslations } from 'next-intl';
 import ContestsWidget from './contests/ContestsWidget';
 import ThemesWidget from './custom-themes/ThemesWidget';
 import GraphicsWidget from './graphics/GraphicsWidget';
-import ProfileWidget from './profile/ProfileWidget';
 
 import { useMyProfileSummaryQuery } from '@/api/profiles';
 import { useAuthStore } from '@/state/useAuthStore';
 
 const SEPARATOR = ' · ';
 
-/** Widget row: four labelled cards with live counts (signed-in users only). */
+/**
+ * Widget row: the three content libraries (themes, contests, graphics) with
+ * live counts for signed-in users. Profile lives in the header cluster.
+ */
 const WidgetsSection = () => {
   const t = useTranslations('widgets');
   const user = useAuthStore((state) => state.user);
@@ -20,19 +22,7 @@ const WidgetsSection = () => {
   const statLoading = !!user && isPending;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 w-full">
-      <ProfileWidget
-        statLoading={statLoading}
-        stat={
-          summary
-            ? `${t('profile.followers', {
-                count: summary.followersCount,
-              })}${SEPARATOR}${t('profile.followingCount', {
-                count: summary.followingCount,
-              })}`
-            : undefined
-        }
-      />
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
       <ThemesWidget
         statLoading={statLoading}
         stat={
@@ -60,12 +50,8 @@ const WidgetsSection = () => {
       <GraphicsWidget
         statLoading={statLoading}
         cloudStat={
-          summary && summary.designsCount !== undefined
-            ? `${t('graphics.publishedCount', {
-                count: summary.designsCount,
-              })}${SEPARATOR}${t('graphics.savedCount', {
-                count: summary.savedDesignsCount ?? 0,
-              })}`
+          summary && summary.savedDesignsCount !== undefined
+            ? t('graphics.savedCount', { count: summary.savedDesignsCount })
             : undefined
         }
       />

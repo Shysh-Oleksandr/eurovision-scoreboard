@@ -42,7 +42,7 @@ not used yet; Phase 3 turns them into user-publishable templates.
 | `render/DesignStage.tsx` | renders a design at design size inside a wrapper scaled by `zoom`; auto-sized canvases are measured with a ResizeObserver; scopes the node to `design.theme` |
 | `render/useElementFont.ts` | class + style for an element's font slot (`ui` / `scoreboard` / `custom`) and `@font-face` injection |
 | `render/DesignDataContext.tsx` | `DesignDataProvider` / `useDesignData`; `StatsSource` |
-| `render/fills.tsx` | fill → style/class; background `FillLayers` |
+| `render/fills.tsx` | fill → style/class + `image` (rendered as `<img>` via `FillImg`, see §4); background `FillLayers` |
 | `export/exportNode.ts` | deterministic DOM → image (see §4) |
 | `export/useDesignExport.ts` | hook: `nodeRef`, `generate(size)`, `isGenerating` |
 | `components/DesignPreview.tsx` | preview + "Generate image" used by the share modals |
@@ -52,7 +52,8 @@ not used yet; Phase 3 turns them into user-publishable templates.
 | `templates/fields.ts` | template fields: candidates per element, control derivation, `applyTemplateField` (see §9) |
 | `data/contestRows.ts` | saved-contest snapshot → ranked rows / stage list |
 | `cloud/publishDesign.ts` | publish pipeline: create/update, upload `asset:` images, rewrite refs, thumbnail |
-| `components/TemplateSheet.tsx`, `TemplateFieldsForm.tsx`, `DataSourceControl.tsx`, `ContestPicker.tsx` | the template sheet and its form controls |
+| `components/TemplateSheet.tsx`, `TemplateFieldsForm.tsx`, `DataSourceControl.tsx`, `ContestPicker.tsx` | the design sheet ("Use" / "Open" on any starter or cloud design) and its form controls |
+| `components/CloudDesignCards.tsx` | the cloud design card (like / save / report; owner: make public/private, unpublish) and `CloudGrid` |
 | `export/imageActions.ts` | download / Web Share / copy helpers shared by the editor and the sheet |
 | `model/elements.ts` | tree helpers (`findElement`, `mapElements`, `removeElementsIn`), per-type capability rules (`resizeModeOf`, `canRotate`, `canDelete`…) |
 | `model/geometry.ts` | pure transform math: resize around the anchored side, rotate, snap + distance hint, bounding/union boxes |
@@ -104,7 +105,25 @@ because it and `ElementView` are mutually recursive.
 1. inline every `<img>` and CSS `background-image` under `node` as data
    URLs (through `/api/image-proxy` for foreign origins, which the flag and
    background helpers already apply), force eager loading, await `decode()`
-   and a real `load`;
+   and a real `load`. Same-origin URLs are fetched `force-cache`;
+   cross-origin ones (`cdn.douzepoints.app`) are fetched `no-cache`: the
+   preview already loaded them without CORS, and a cache-first CORS fetch
+   reuses that entry (no `Access-Control-Allow-Origin`) and fails. If the
+   direct fetch still fails (the app origin is not on R2's CORS allowlist —
+   `www.`, preview deploys), the image goes through `/api/image-proxy`.
+   snapdom reports nothing for a background it could not inline (it just
+   drops it), so this step is what keeps backgrounds in the output;
+   **Image fills are `<img>`, never CSS backgrounds.** Safari (macOS and
+   iOS, any origin) leaves url() backgrounds out of the first render of a
+   snapshot: the SVG carries the data, but its rasteriser skips them, with
+   no warning. Only a later, different snapshot paints them, which is what
+   the old five-attempt loop was papering over. Pre-decoding the data URL
+   or warming it in a separate SVG does not help, because snapdom decodes in
+   its own hidden iframe. Its built-in Safari warm-up stops at the first
+   painted pixel, which the text supplies. `<img>` elements always make the
+   first render, so `useFillPresentation` returns image fills as `image` and
+   `FillLayers` / `ShapeElement` render them with `FillImg` (`object-fit`).
+   Keep any new image-bearing element on `<img>` too;
 2. `await document.fonts.ready` + two animation frames;
 3. snapshot once with **snapdom** (default). snapdom reports degradations;
    an `image-fallback` warning (an image could not be inlined, grey
@@ -163,8 +182,9 @@ JSON keeps drafts small and stops the undo history from copying image bytes.
 
 ## 8. Editor (Phase 2)
 
-Entry points: the **Graphics** widget on the Hub (fourth card, teal) opens
-`GraphicsModal` (My designs = IndexedDB drafts · Templates = built-ins);
+Entry points: the **Graphics** widget on the Hub (third card, teal, with a
+Beta pill) opens `GraphicsModal` (My designs = IndexedDB drafts · Explore =
+starters + community · Saved);
 "Open in editor" in the Share results / running order modal converts the
 share design with `toEditableDesign` (running-order `provided` rows become a
 manual list) and opens it with the scoreboard selected. Both go through
@@ -255,6 +275,18 @@ Styling: `editor/editor.css` (plain CSS on the hue-derived tokens, `gfx-*`
 classes, also loaded by the Graphics modal). Copy lives under the
 `graphics` namespace in `messages/en.json`.
 
+**Back closes the editor.** `GraphicsEditor` pushes a history entry
+(`?editor=1`, state `{ gfxEditor: true }`) on mount; `popstate` runs
+`requestClose` (autosave + cloud sync) and re-pushes the entry when the save
+failed; closing from the UI pops the entry on unmount. A stale `?editor`
+param on load is replaced before pushing.
+
+**Flattening content-sized flow children.** A flow child without `w`
+stretches to the stack width but may centre what it paints (the branding
+row). `useElementBoxes` measures such elements (`resizeModeOf === 'none'`)
+by the union of their leaf descendants' boxes, so `flattenStacks` frees
+them where the content was, not at the stack's left edge.
+
 ## 9. Data sources, templates and the cloud (Phase 3)
 
 **Data binding.** `design.data` is `live` (the scoreboard store; an optional
@@ -272,6 +304,33 @@ order) and, for live sources, `statsStage` (the stage + its predefined
 votes) so stats elements compute their own tables through
 `finalStats/statsAccessors.ts` — the pure part extracted from
 `useFinalStats`. Stats on manual or contest sources show a placeholder.
+With no contest running (no live stage), `live` resolves to the sample
+contest in `data/sampleRows.ts` — the ESC 2026 Grand Final lineup, every
+jury and televote ballot drawn by a seeded simulation of the lineup's odds,
+and an illustrative running order — and sets `isSample`, so starters and
+community designs never preview an empty scoreboard or stats table. The
+sample's `statsStage` carries its own voters per channel (`voters`), which
+`StatsTable` takes as `votingCountries` instead of asking the countries
+store. The Data panel says the rows are a sample.
+
+**Auto-fit scoreboards.** A scoreboard with `fit: 'auto'` ignores its
+`columns` / `itemSize` and picks them with `fitScoreboard`
+(`model/scoreboardFit.ts`): the largest row size first, then the fewest
+columns whose rows fit the height and whose columns stay wide enough for a
+long name; a few rows get one centred column capped at a readable width.
+Row pitches and gaps there mirror `ShareCountryItem` and the grid classes
+(rem at the 14px root) — keep them in sync. The space comes from the DOM:
+a free element's box (`h`, so its resize mode is `all`), or in flow what a
+fixed-height stack leaves after its other children (content-sized canvases
+fall back to the stored values). The element renders `data-fit-pending`
+until measured and then signals `LayoutSignalContext`; the editor waits for
+that before flattening, and flattens from boxes read right then
+(`readElementBoxes`), so the free box resolves to the same layout. The
+Results and Running order starters use it (every row of any stage shows at
+any canvas size, so they expose no Columns / Row size fields); the share
+modals keep their own `getAutoSettingsByCount` presets with `fit: 'fixed'`.
+The inspector's Layout switch freezes the fitted values when going to
+Fixed.
 The Data panel offers Live (stage select), Saved contest (search, yours /
 public, stage select) and Manual (`components/ContestPicker.tsx`,
 `components/DataSourceControl.tsx`).
@@ -281,31 +340,72 @@ few properties as a short form. A field is `{ path, label }`; the control is
 derived from the target (`templateFieldCandidates`, `resolveTemplateField`,
 `applyTemplateField`): `el.<id>.text`, `.columns`, `.itemSize`, `.limit`,
 `.table`, `.voteType`, `.countryCode`, plus `data`, `canvas.size` and
-`canvas.bgOpacity`. `TemplateFieldsForm` renders it; the **template sheet**
-(`components/TemplateSheet.tsx`, handoff §3) shows the form, the live
-preview, Generate → result card (2× PNG, Download / Share / Copy, retry with
-the other engine) and "Open in editor" (which stamps `remixedFrom` for
-provenance). Built-ins (`templates/editor.ts`: results, running order,
-qualifiers, top 10, announcement poster, stats) declare their fields and are
-validated in `templates/fields.test.ts`.
+`canvas.bgOpacity`. `TemplateFieldsForm` renders it; the **design sheet**
+(`components/TemplateSheet.tsx`, handoff §3) shows the form (if the design
+has fields), the live preview, Generate → result card (2× PNG, Download /
+Share / Copy, retry with the other engine) and "Open in editor" — for
+someone else's design a remix (stamps `remixedFrom`, drops the fields), for
+your own a local copy that keeps `cloudId` so Publish updates the record.
+Built-ins (`templates/editor.ts`: results, running order, qualifiers, top
+10, announcement poster, stats) declare their fields and are validated in
+`templates/fields.test.ts`. Qualifiers, Top 10 and the poster carry
+`hidden: true` (pending a redesign): they are offered neither in Explore nor
+in the editor's Starters panel, but the builders and their field tests stay.
+In the UI they are "starters"; the word
+"template" is gone from the UI (code identifiers keep it).
 
 **Cloud.** Backend module `designs` (`douze-points-backend/src/designs`)
 mirrors `themes`: `Design` document (JSON + derived `sizeClass`,
 `hasScoreboard`, `hasStats`, `fieldsCount`, thumbnail, `assetKeys`),
 `DesignLike`/`DesignSave`, routes `POST /designs`, `GET /designs/me|public|
 me/saved|state|:id`, `PATCH|DELETE /designs/:id`, `POST /designs/:id/assets|
-thumbnail|like|save|duplicate`. `isPublic: false` means *unlisted* (link
-only). Frontend: `api/designs.ts`, `types/design.ts`. **Publish as template**
-(`editor/chrome/PublishDialog.tsx`, handoff §8): name, description,
-visibility, exposed fields as checkbox cards per element with label inputs,
-the form preview and a thumbnail; `cloud/publishDesign.ts` creates/updates
-the record, uploads every `asset:` image to R2 and rewrites the cloud copy
-(the local draft keeps `asset:` refs), then uploads a JPEG thumbnail. The
-draft record remembers `cloudId` so later publishes update in place. Signed
-out → sign-in dialog. The Graphics modal's Templates tab lists Mine (cloud),
-Built-in and Community (search, sort, size and content filters, like / save
-/ copy link / share / unpublish); Saved lists saved templates; `?design=<id>`
-share links open the sheet (`useShareLinks`).
+thumbnail|like|save|duplicate`. `isPublic: false` means *private*: only in
+the owner's gallery, still reachable by id/link (same model as themes and
+contests). Frontend: `api/designs.ts`, `types/design.ts`.
+
+**Publishing (one model, 2026-10-06).** There is no separate "template"
+object: every published design can be used and remixed, and fillable fields
+are an optional extra. **Publish design** (`editor/chrome/PublishDialog.tsx`,
+handoff §8): name, description, visibility (**Public** by default, listed in
+Explore; **Private** keeps it to your gallery), and "Fillable fields ·
+optional" — the `defaultOn` candidates are pre-ticked and hidden behind "Edit
+fields", so publishing with zero configuration still yields a working form;
+designs that already carry hand-picked fields open the list. The form
+preview and a thumbnail sit on the right. `cloud/publishDesign.ts`
+creates/updates the record, uploads every `asset:` image to R2 and rewrites
+the cloud copy (the local draft keeps `asset:` refs), then uploads a JPEG
+thumbnail. The draft record remembers `cloudId` so later publishes update in
+place. Signed out → sign-in dialog.
+
+**Published copies stay current.** Once a design has a `cloudId`, an explicit
+Save and closing the editor push the document to the record
+(`syncPublishedDesign`: new `asset:` images are uploaded first, then
+`design` + name replaced and the thumbnail refreshed; description,
+visibility and fields are untouched). `editorStore.cloudDirty` flips with
+`dirty` and `markCloudSynced()` clears it after a publish or sync; autosave
+never syncs (it runs on every edit). A 404 means the copy was unpublished:
+the editor forgets the id and says so. The top-bar button then reads
+"Published" and opens the publish dialog for settings changes. Save and
+Publish stay separate on purpose: Save is local and instant, Publish needs
+an account and uploads.
+
+**Gallery.** *My designs*: local drafts; a draft with a `cloudId` shows a
+Public / Private chip from `useMyDesignsQuery` (fallback "Published" when
+signed out) and its menu gains "Make private/public" and "Copy link"; below
+the drafts, "Published by you" lists cloud designs with no local draft
+(published from another browser) — "Open" makes a local copy that keeps
+the cloud id. *Explore*: Starters (built-ins) and Community (every public
+design: search, sort, size and content filters; like / save / report; owner
+cards get make public/private + unpublish). Starters are a horizontal strip
+of compact tiles (`.gfx-gstrip` / `.gfx-gtile`) so Community starts right
+below. Card timestamps use the shared `hooks/useFormatItemTime.ts` (also used by
+theme and contest cards): relative under 24 h, then absolute; community cards show `createdAt`
+with `updatedAt` in the tooltip. *Saved*: saved community
+designs. `?design=<id>` share links open the sheet over Explore
+(`useShareLinks`). Profile feeds and the following feed show designs as
+"Designs"; the profile summary carries `designsCount`,
+`publicDesignsCount` and `savedDesignsCount`, and the Graphics widget shows
+"N designs · M public".
 
 **Other.** `contest:logo` image source (the loaded contest's logo, else the
 hosting country's). "Open in editor" on the Share stats modal binds the
@@ -412,16 +512,15 @@ What changed after the pre-release review in
 
 ## 12. Still deliberately not here
 
-- Cloud copies of private drafts (only published templates live in the
+- Cloud copies of unpublished drafts (only published designs live in the
   cloud; drafts stay in this browser — export/import JSON is the backup).
+  Publishing privately is the cheap way to get a cloud copy.
 - Theme-driven row overrides per design (the Row style section points at
   the Theme section instead).
-- Custom fonts and uploaded images in exports depend on the same R2 CORS
-  rule as the font library (see `custom-fonts-and-font-library.md` §8).
+- Custom fonts in exports depend on the same R2 CORS rule as the font
+  library (see `custom-fonts-and-font-library.md` §8). Images do not: the
+  export falls back to `/api/image-proxy` when the CDN refuses the origin.
 - Stats tables for saved-contest and manual sources (the inspector says so
   and offers "Switch to Live").
-- R2 CORS for custom-entry flags: the export inlines
-  `cdn.douzepoints.app` images directly, so a contest with uploaded custom
-  flags renders them blank until the bucket allows the app origin.
 
 Those are Phase 3 leftovers and Phase 4 in the plan.

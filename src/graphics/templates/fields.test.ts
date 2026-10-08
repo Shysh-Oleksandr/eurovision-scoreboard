@@ -33,9 +33,12 @@ describe('built-in templates', () => {
       .map((c) => c.path);
 
     expect(paths).toContain('el.title.text');
-    expect(paths).toContain('el.scoreboard.columns');
+    expect(paths).toContain('el.scoreboard.limit');
     expect(paths).toContain('data');
     expect(paths).toContain('canvas.size');
+    // The scoreboard auto-fits, so columns / row size are not offered.
+    expect(paths).not.toContain('el.scoreboard.columns');
+    expect(paths).not.toContain('el.scoreboard.itemSize');
   });
 });
 

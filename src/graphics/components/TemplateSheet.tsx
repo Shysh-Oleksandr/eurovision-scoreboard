@@ -149,9 +149,11 @@ interface Props {
 }
 
 /**
- * The template sheet (handoff §3): a template's exposed fields as a short
- * form, the live preview, Generate → result card, and "Open in editor".
- * Rendered above the Graphics modal; also the landing for `?design=` links.
+ * The design sheet (handoff §3): a design's fillable fields (if any) as a
+ * short form, the live preview, Generate → result card, and "Open in
+ * editor" — a remix for someone else's design, a local copy that keeps the
+ * cloud id for your own. Rendered above the Graphics modal; also the
+ * landing for `?design=` links.
  */
 const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
   const t = useTranslations('graphics.sheet');
@@ -183,7 +185,6 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
   const themeName = useThemeName(design);
   const [result, setResult] = useState<Result>({ kind: 'idle' });
   const nodeRef = useRef<HTMLDivElement | null>(null);
-  const bodyRef = useRef<HTMLDivElement | null>(null);
   const resultRef = useRef<HTMLElement | null>(null);
   const measuredRef = useRef<{ width: number; height: number } | null>(null);
   const engineRef = useRef<ExportEngine>('snapdom');
@@ -232,13 +233,6 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
           width: width * SCALE,
           height: height * SCALE,
         });
-        setTimeout(() => {
-          const body = bodyRef.current?.childNodes[0] as
-            | HTMLDivElement
-            | undefined;
-
-          body?.scrollTo?.({ top: body.scrollHeight, behavior: 'smooth' });
-        }, 80);
       } catch (err) {
         console.error('Template export failed', err);
         setResult({ kind: 'failed' });
@@ -248,6 +242,28 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
     },
     [design.canvas],
   );
+
+  // Bring the fresh result (image + download actions) into view — once the
+  // image has decoded, so the scroll height already includes it.
+  useEffect(() => {
+    if (result.kind !== 'done') return undefined;
+    const section = resultRef.current;
+    const body = section?.closest<HTMLElement>('.gfx-tsheet-body');
+    const img = section?.querySelector('img');
+
+    if (!body) return undefined;
+    const scroll = () =>
+      body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' });
+
+    if (img && !img.complete) {
+      img.addEventListener('load', scroll, { once: true });
+
+      return () => img.removeEventListener('load', scroll);
+    }
+    scroll();
+
+    return undefined;
+  }, [result]);
 
   const messages: ImageActionMessages = useMemo(
     () => ({
@@ -261,29 +277,39 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
   );
   const fileName = `${slugify(design.name || title)}.png`;
 
-  const openInEditor = () => {
-    const editable: Design = {
-      ...design,
-      id: newElementId('design'),
-      name: cloud ? cloud.name : design.name,
-      templateFields: undefined,
-      remixedFrom: cloud
-        ? {
-            designId: cloud._id,
-            name: cloud.name,
-            username: cloud.creator?.username,
-          }
-        : design.remixedFrom,
-    };
+  const ownCloud = !!cloud && !!user && cloud.userId === user._id;
 
-    if (cloud && user && cloud.userId !== user._id) reportDuplicate(cloud._id);
+  const openInEditor = () => {
+    // Your own published design: a local copy that still points at the
+    // cloud record, so Publish updates it. Anyone else's: a remix.
+    const editable: Design = ownCloud
+      ? { ...design, id: newElementId('design'), name: cloud!.name }
+      : {
+          ...design,
+          id: newElementId('design'),
+          name: cloud ? cloud.name : design.name,
+          templateFields: undefined,
+          remixedFrom: cloud
+            ? {
+                designId: cloud._id,
+                name: cloud.name,
+                username: cloud.creator?.username,
+              }
+            : design.remixedFrom,
+        };
+
+    if (cloud && !ownCloud && user) reportDuplicate(cloud._id);
     onClose();
-    openEditor({ design: editable, draftId: null });
+    openEditor({
+      design: editable,
+      draftId: null,
+      cloudId: ownCloud ? cloud!._id : null,
+    });
   };
 
-  const backToTemplates = () => {
+  const backToExplore = () => {
     onClose();
-    setGalleryOpen(true, 'templates');
+    setGalleryOpen(true, 'explore');
   };
 
   const editorButton = (
@@ -300,23 +326,13 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
   const header = (
     <div className="gfx-tsheet-h">
       <div className="gfx-tsheet-ht">
-        <button type="button" className="gfx-back" onClick={backToTemplates}>
+        <button type="button" className="gfx-back" onClick={backToExplore}>
           <ChevronLeft className="size-4" />
-          {t('templates')}
+          {t('explore')}
         </button>
-        <h2>{title}</h2>
-        <div className="gfx-tsheet-by">
-          {cloud ? (
-            <>
-              <UserInfo user={cloud.creator} size="sm" />
-              {cloud.remixedFromName && (
-                <span className="gfx-remix">
-                  <Link2 className="size-3" />
-                  {t('remixedFrom', { name: cloud.remixedFromName })}
-                </span>
-              )}
-            </>
-          ) : (
+        <div className="gfx-tsheet-tl">
+          <h2>{title}</h2>
+          {!cloud && (
             <span className="gfx-chip gfx-chip--built">
               <Sparkles className="size-[13px]" />
               {tg('builtIn')}
@@ -329,6 +345,19 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
       </IconButton>
     </div>
   );
+
+  // The creator scrolls with the body so the pinned header stays short.
+  const byline = cloud ? (
+    <div className="gfx-tsheet-by">
+      <UserInfo user={cloud.creator} size="sm" />
+      {cloud.remixedFromName && (
+        <span className="gfx-remix">
+          <Link2 className="size-3" />
+          {t('remixedFrom', { name: cloud.remixedFromName })}
+        </span>
+      )}
+    </div>
+  ) : null;
 
   const resultCard =
     result.kind === 'failed' ? (
@@ -413,10 +442,11 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
     <Modal
       isOpen
       onClose={onClose}
-      ref={bodyRef}
-      containerClassName="!w-[min(100%,1040px)]"
+      // Fills the viewport height (minus a gutter); the body scrolls between
+      // the header and footer and the preview grows into any spare room.
+      containerClassName="!w-[min(100%,1040px)] 2cols:flex 2cols:flex-col 2cols:h-[calc(100dvh-48px)]"
       fullScreenOnPhone
-      contentClassName="text-white gfx-tsheet-body"
+      contentClassName="text-white gfx-tsheet-body 2cols:flex-1 2cols:min-h-0 2cols:!h-auto 2cols:!max-h-none md:!max-h-none"
       overlayClassName="!z-[1003]"
       topContent={header}
       bottomContent={
@@ -446,6 +476,7 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
     >
       <DesignDataProvider binding={design.data}>
         <div className="gfx-tsheet gfx-gallery">
+          {byline}
           <InaccessibleNote
             onManual={() =>
               setField('data', baseManualRows ?? { source: 'manual', rows: [] })
@@ -464,7 +495,7 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
               />
             </section>
           )}
-          <section className="gfx-tsheet-sec">
+          <section className="gfx-tsheet-sec gfx-tsheet-sec--pv">
             <div className="gfx-sec-title">
               <h3>{t('preview')}</h3>
               <span>

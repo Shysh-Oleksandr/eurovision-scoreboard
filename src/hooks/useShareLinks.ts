@@ -89,12 +89,12 @@ export function useShareLinks() {
         }
 
         if (paramType === 'design') {
-          // A published graphics template: open the Graphics modal on
-          // Templates with the template sheet over it.
+          // A published graphics design: open the Graphics modal on
+          // Explore with the design sheet over it.
           const record = await fetchDesignById(paramValue);
           const studio = useGraphicsStudioStore.getState();
 
-          studio.setGraphicsModalOpen(true, 'templates');
+          studio.setGraphicsModalOpen(true, 'explore');
           studio.openSheet({
             design: parseDesign(record.design),
             source: { kind: 'cloud', record },

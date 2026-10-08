@@ -35,11 +35,18 @@ export function useStatsSource(el: StatsElementModel): StatsSource | null {
       statsStage.votes,
     );
 
+    const { voters } = statsStage;
+
     return {
       ...accessors,
       selectedStage: statsStage.stage,
       selectedStageId: statsStage.stage.id,
       selectedVoteType: voteType,
+      votingCountries: voters
+        ? voteType === StageVotingType.JURY
+          ? voters.jury
+          : voters.televote
+        : undefined,
     };
   }, [stats, statsStage, el.voteType]);
 }
@@ -73,6 +80,7 @@ const StatsElement: React.FC<{ el: StatsElementModel }> = ({ el }) => {
           getPoints={stats.getPoints}
           selectedStageId={stats.selectedStageId}
           selectedVoteType={stats.selectedVoteType}
+          votingCountries={stats.votingCountries}
           enableHover={false}
         />
       );

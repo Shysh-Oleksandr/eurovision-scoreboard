@@ -2,6 +2,7 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 
 import { Design, DesignElement, walkElements } from '../model/design';
+import { resizeModeOf } from '../model/elements';
 import { Rect } from '../model/geometry';
 
 export interface ElementBox extends Rect {
@@ -19,6 +20,92 @@ const sameBox = (a: ElementBox | undefined, b: ElementBox) =>
   a.h === b.h &&
   a.rotation === b.rotation &&
   a.inFlow === b.inFlow;
+
+/**
+ * Union of the leaf boxes inside a node: the painted content of a flow child
+ * that stretches to the stack width but centres (or otherwise aligns) what
+ * it draws, e.g. the branding row. Flattening such an element to a free one
+ * must keep the content where it was, not the stretched wrapper.
+ */
+const contentRect = (node: HTMLElement): DOMRect | null => {
+  let rect: DOMRect | null = null;
+
+  node.querySelectorAll<HTMLElement>('*').forEach((child) => {
+    if (child.children.length > 0) return;
+    const r = child.getBoundingClientRect();
+
+    if (r.width <= 0 || r.height <= 0) return;
+    rect = rect
+      ? new DOMRect(
+          Math.min(rect.left, r.left),
+          Math.min(rect.top, r.top),
+          Math.max(rect.right, r.right) - Math.min(rect.left, r.left),
+          Math.max(rect.bottom, r.bottom) - Math.min(rect.top, r.top),
+        )
+      : r;
+  });
+
+  return rect;
+};
+
+/**
+ * Measure every element's box from the DOM right now (design px). Free
+ * elements take x/y from the model and their layout size from the DOM;
+ * stack children take everything from the DOM.
+ */
+export function readElementBoxes(
+  root: HTMLElement,
+  design: Design,
+  zoom: number,
+): BoxMap {
+  // One id → element map per measure (the DOM walk is per node already).
+  const byId = new Map<string, { el: DesignElement; inFlow: boolean }>();
+
+  walkElements(design.elements, (el, parent) =>
+    byId.set(el.id, { el, inFlow: parent !== null }),
+  );
+  const rootRect = root.getBoundingClientRect();
+  const next: BoxMap = new Map();
+  const nodes = root.querySelectorAll<HTMLElement>('[data-element-id]');
+
+  nodes.forEach((node) => {
+    const id = node.dataset.elementId;
+
+    if (!id) return;
+    const found = byId.get(id);
+
+    if (!found) return;
+    const { el, inFlow } = found;
+    let w = node.offsetWidth;
+    let h = node.offsetHeight;
+    let { x } = el;
+    let { y } = el;
+
+    if (inFlow || (el.type === 'stack' && el.fillCanvas)) {
+      // A content-sized flow child stretched to the stack width: the
+      // box is its painted content, so it keeps its place when freed.
+      const content =
+        inFlow && el.w === undefined && resizeModeOf(el) === 'none'
+          ? contentRect(node)
+          : null;
+      const r = content ?? node.getBoundingClientRect();
+
+      if (content && !el.rotation) {
+        w = content.width / zoom;
+        h = content.height / zoom;
+      }
+      // Centre of the bounding box is rotation-invariant.
+      const cx = (r.left + r.width / 2 - rootRect.left) / zoom;
+      const cy = (r.top + r.height / 2 - rootRect.top) / zoom;
+
+      x = cx - w / 2;
+      y = cy - h / 2;
+    }
+    next.set(id, { x, y, w, h, rotation: el.rotation, inFlow });
+  });
+
+  return next;
+}
 
 /**
  * The on-canvas box of every element, in design px. Free elements take
@@ -40,41 +127,8 @@ export function useElementBoxes(
     const root = designNodeRef.current;
 
     if (!root) return undefined;
-    // One id → element map per measure (the DOM walk is per node already).
-    const byId = new Map<string, { el: DesignElement; inFlow: boolean }>();
-
-    walkElements(design.elements, (el, parent) =>
-      byId.set(el.id, { el, inFlow: parent !== null }),
-    );
     const measure = () => {
-      const rootRect = root.getBoundingClientRect();
-      const next: BoxMap = new Map();
-      const nodes = root.querySelectorAll<HTMLElement>('[data-element-id]');
-
-      nodes.forEach((node) => {
-        const id = node.dataset.elementId;
-
-        if (!id) return;
-        const found = byId.get(id);
-
-        if (!found) return;
-        const { el, inFlow } = found;
-        const w = node.offsetWidth;
-        const h = node.offsetHeight;
-        let { x } = el;
-        let { y } = el;
-
-        if (inFlow || (el.type === 'stack' && el.fillCanvas)) {
-          const r = node.getBoundingClientRect();
-          // Centre of the bounding box is rotation-invariant.
-          const cx = (r.left + r.width / 2 - rootRect.left) / zoom;
-          const cy = (r.top + r.height / 2 - rootRect.top) / zoom;
-
-          x = cx - w / 2;
-          y = cy - h / 2;
-        }
-        next.set(id, { x, y, w, h, rotation: el.rotation, inFlow });
-      });
+      const next = readElementBoxes(root, design, zoom);
 
       setBoxes((prev) => {
         if (prev.size === next.size) {

@@ -37,7 +37,7 @@ const DataPanel: React.FC = () => {
   const data = useEditorStore((s) => s.design.data);
   const setData = useEditorStore((s) => s.setData);
   const label = useDataLabel(data);
-  const { countries, inaccessible, status } = useDesignData();
+  const { countries, inaccessible, status, isSample } = useDesignData();
   const liveCountries = useCountrySorter(useCountryDisplay() ?? []);
   const countryOptions = useCountryOptions();
 
@@ -90,6 +90,7 @@ const DataPanel: React.FC = () => {
             onChange={(stageId) => setData({ source: 'live', stageId })}
           />
           <Hint>{t('liveHint')}</Hint>
+          {isSample && <Hint icon>{t('sampleHint')}</Hint>}
         </>
       )}
 

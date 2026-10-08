@@ -44,6 +44,7 @@ const SetupFooter = ({
       {toDraw ? (
         <Button
           variant="cta"
+          softGlow={false}
           size="xl"
           className="flex-1 justify-center gap-2.5 !uppercase !font-bold"
           onClick={onOpenDraw}
@@ -62,6 +63,7 @@ const SetupFooter = ({
       ) : (
         <Button
           variant="cta"
+          softGlow={false}
           size="xl"
           className="flex-1 justify-center gap-2.5 !uppercase !font-bold"
           onClick={onStart}

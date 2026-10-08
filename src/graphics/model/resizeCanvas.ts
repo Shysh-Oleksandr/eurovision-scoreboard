@@ -46,6 +46,8 @@ export function resizeCanvas(
         break;
       case 'scoreboard':
         if (next.w !== undefined) next.w = r(next.w * kx);
+        // Auto-fit box: rows re-fit to the new height.
+        if (!inFlow && next.h !== undefined) next.h = r(next.h * ky);
         break;
       case 'shape':
       case 'stack':

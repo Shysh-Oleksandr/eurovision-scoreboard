@@ -126,6 +126,7 @@ export const DesignStage: React.FC<DesignStageProps> = ({
       <div
         ref={setRefs}
         data-design-node
+        data-auto-size={autoSize ? '' : undefined}
         className="absolute left-0 top-0 overflow-hidden"
         style={{
           width: autoSize ? 'max-content' : width,

@@ -85,6 +85,19 @@
   white-space: nowrap;
 }
 
+/* All save-state labels share one cell; only the current one is visible. */
+.gfx-saved--stack {
+  display: inline-grid;
+}
+
+.gfx-saved--stack > * {
+  grid-area: 1 / 1;
+}
+
+.gfx-saved--stack > [aria-hidden] {
+  visibility: hidden;
+}
+
 .gfx-hist {
   display: flex;
   gap: 4px;
@@ -2162,13 +2175,15 @@ button.gfx-chip:hover {
 /* ---------------- Phase 3: template sheet ---------------- */
 .gfx-tsheet {
   gap: 18px;
+  min-height: 100%;
 }
 
 .gfx-tsheet-h {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 18px 20px 12px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--hair);
   color: var(--ink);
 }
 
@@ -2180,8 +2195,18 @@ button.gfx-chip:hover {
   gap: 4px;
 }
 
+.gfx-tsheet-tl {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
 .gfx-tsheet-ht h2 {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.025em;
@@ -2209,6 +2234,7 @@ button.gfx-chip:hover {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  margin: -4px 0 0 -4px; /* UserInfo's own hover padding */
   font-size: 12.5px;
   font-weight: 600;
   color: var(--ink-55);
@@ -2286,6 +2312,12 @@ button.gfx-chip:hover {
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 14px 40px rgb(0 0 0 / 45%);
+}
+
+/* The preview soaks up the sheet's spare height (never shrinks below its base). */
+.gfx-tsheet-sec--pv,
+.gfx-tsheet-sec--pv .gfx-pv-box {
+  flex: 1 0 auto;
 }
 
 .gfx-res {
@@ -2525,6 +2557,31 @@ button.gfx-chip:hover {
   gap: 6px;
 }
 
+.gfx-pub-fields-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.gfx-pub-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.gfx-pub-groups[hidden] {
+  display: none;
+}
+
+.gfx-top .gfx-beta {
+  flex: none;
+  margin-right: 2px;
+}
+
 .gfx-pub-groups {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2736,6 +2793,84 @@ button.gfx-chip:hover {
   gap: 2px;
   margin-right: auto;
   min-width: 0;
+}
+
+.gfx-gstrip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  padding: 2px 2px 8px;
+  margin: -2px -2px 0;
+  scrollbar-width: thin;
+}
+
+.gfx-gstrip > div {
+  flex: none;
+  scroll-snap-align: start;
+}
+
+.gfx-gtile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 224px;
+  padding: 8px 8px 10px;
+  border-radius: 14px;
+  background: linear-gradient(165deg, var(--p-800), var(--p-900));
+  border: 1px solid var(--hair);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 28%);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.16s;
+}
+
+.gfx-gtile:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.gfx-gtile .gfx-gthumb {
+  padding: 6px;
+  border-radius: 9px;
+}
+
+.gfx-gtile-t {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 2px;
+  min-width: 0;
+}
+
+.gfx-gtile-t b {
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gfx-gtile-t em {
+  font-style: normal;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gfx-gby .gfx-gtime {
+  margin-left: auto;
+}
+
+.gfx-gallery-hrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .gfx-gallery-sub {

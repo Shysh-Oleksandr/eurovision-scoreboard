@@ -71,22 +71,27 @@ const elementCandidates = (el: DesignElement): FieldCandidate[] => {
       ];
     case 'scoreboard':
       return [
-        {
-          path: `el.${el.id}.columns`,
-          control: { kind: 'select', options: COLUMNS },
-          defaultOn: false,
-          labelKey: 'columns',
-        },
-        {
-          path: `el.${el.id}.itemSize`,
-          control: {
-            kind: 'select',
-            options: [...ITEM_SIZES],
-            labelKeys: 'rowSizes',
-          },
-          defaultOn: false,
-          labelKey: 'rowSize',
-        },
+        // Auto-fit decides columns and row size itself.
+        ...(el.fit === 'auto'
+          ? []
+          : ([
+              {
+                path: `el.${el.id}.columns`,
+                control: { kind: 'select', options: COLUMNS },
+                defaultOn: false,
+                labelKey: 'columns',
+              },
+              {
+                path: `el.${el.id}.itemSize`,
+                control: {
+                  kind: 'select',
+                  options: [...ITEM_SIZES],
+                  labelKeys: 'rowSizes',
+                },
+                defaultOn: false,
+                labelKey: 'rowSize',
+              },
+            ] as FieldCandidate[])),
         {
           path: `el.${el.id}.limit`,
           control: { kind: 'number', min: 0, max: 60 },

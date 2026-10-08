@@ -35,7 +35,7 @@ export interface CreateDesignInput {
   description?: string;
   isPublic?: boolean;
   design: Design;
-  /** Source design `_id` when this was made from a template (provenance). */
+  /** Source design `_id` when this was remixed from another design (provenance). */
   remixedFrom?: string;
 }
 
@@ -271,6 +271,21 @@ export function useReportDesignDuplicateMutation() {
     },
     onSuccess: (res, id) =>
       patchLists(qc, id, { duplicatesCount: res.duplicatesCount }),
+  });
+}
+
+/** Flip a published design between public (listed in Explore) and private. */
+export function useSetDesignVisibilityMutation() {
+  const qc = useQueryClient();
+  const invalidate = useInvalidateDesigns();
+
+  return useMutation({
+    mutationFn: ({ id, isPublic }: { id: string; isPublic: boolean }) =>
+      updateDesign(id, { isPublic }),
+    onSuccess: (record) => {
+      patchLists(qc, record._id, { isPublic: record.isPublic });
+      invalidate();
+    },
   });
 }
 

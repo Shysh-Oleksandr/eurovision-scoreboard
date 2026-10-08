@@ -66,9 +66,11 @@ The app is essentially a **single-page application** -- everything happens at `/
 
 ### 2. Widgets Section (`components/setup/widgets-section/`)
 
-Three widget cards in the setup modal:
+Three widget cards in the setup modal (Themes, Contests, Graphics). Profile
+moved to the header cluster as an identity button (`hub/ProfileButton.tsx`:
+avatar, name and followers count; "Sign in" when signed out).
 
-#### Profile Widget
+#### Profile (header button)
 - **Google OAuth2 login/logout**
 - **Profile modal** with two tabs:
   - **Your Profile**: View profile header (avatar, display name, follower count), your custom themes, your contests
@@ -112,6 +114,10 @@ Three widget cards in the setup modal:
 - **Global Country Leaderboard** (`GlobalLeaderboardModal`): Aggregated country rankings across all users' completed public contests with sortable columns, year range filtering
 - **My Leaderboard** (`MyLeaderboardModal`): Personal country statistics from your own completed contests
 - **Country Stats** (`CountryStatsModal`/`CountryStatsPickerModal`): Per-country performance stats across contests
+
+#### Graphics Widget (beta)
+- **Graphics modal** with tabs: **My designs** (drafts kept in this browser, with the published copy's Public/Private chip), **Explore** (built-in starters + every public community design), **Saved**
+- **Design editor** and **Publish**: public by default (listed in Explore for everyone to use and remix) or private; fillable fields are optional — see `graphics-studio.md`
 
 ### 3. Simulation (`components/simulation/`)
 

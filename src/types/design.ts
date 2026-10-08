@@ -9,13 +9,13 @@ export type DesignSizeClass =
   | 'broadcast'
   | 'content';
 
-/** A design published to the cloud (template or shared design). */
+/** A design published to the cloud; fillable fields are optional extras. */
 export interface CloudDesign {
   _id: string;
   name: string;
   description?: string;
   userId: string;
-  /** `false` = unlisted: reachable by link, not listed in Community. */
+  /** `false` = private: only in the owner's gallery, still reachable by link. */
   isPublic: boolean;
   likes: number;
   saves: number;

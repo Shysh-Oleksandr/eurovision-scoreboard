@@ -45,6 +45,102 @@ const THUMB_WIDTH = 640;
 
 export { localAssetIds, rewriteAssetRefs };
 
+/** JPEG thumbnail of the stage node; failures only log (the record stands). */
+async function uploadThumb(
+  record: CloudDesign,
+  node: HTMLDivElement,
+  design: Design,
+): Promise<CloudDesign> {
+  try {
+    const { width, height } = design.canvas;
+    const size = {
+      width: node.offsetWidth || width,
+      height: node.offsetHeight || height,
+    };
+    const result = await exportNode(node, {
+      ...size,
+      scale: Math.min(1, THUMB_WIDTH / size.width),
+      format: 'jpeg',
+      quality: 0.82,
+    });
+
+    return await uploadDesignThumbnail(
+      record._id,
+      await dataUrlToBlob(result.dataUrl),
+    );
+  } catch (err) {
+    console.error('Thumbnail upload failed', err);
+
+    return record;
+  }
+}
+
+/** Upload the given local assets to the record; returns id → public URL. */
+async function uploadAssets(
+  recordId: string,
+  dataUrls: Map<string, string>,
+): Promise<Map<string, string>> {
+  const urls = new Map<string, string>();
+
+  for (const [id, dataUrl] of dataUrls) {
+    // eslint-disable-next-line no-await-in-loop
+    const blob = await dataUrlToBlob(dataUrl);
+    const ext = blob.type === 'image/jpeg' ? 'jpg' : 'png';
+    // eslint-disable-next-line no-await-in-loop
+    const uploaded = await uploadDesignAsset(recordId, blob, `${id}.${ext}`);
+
+    urls.set(id, uploaded.url);
+  }
+
+  return urls;
+}
+
+/** Every `asset:` image the design references, as data URLs; throws on a missing one. */
+async function resolveAssets(design: Design): Promise<Map<string, string>> {
+  const dataUrls = new Map<string, string>();
+
+  for (const id of localAssetIds(design)) {
+    // eslint-disable-next-line no-await-in-loop
+    const dataUrl = await loadAsset(id);
+
+    if (!dataUrl) throw new MissingAssetError(id);
+    dataUrls.set(id, dataUrl);
+  }
+
+  return dataUrls;
+}
+
+/**
+ * Push the current document to its published record without touching the
+ * publish settings (description, visibility, fields): new `asset:` images
+ * are uploaded first, then `design` (and the name) is replaced and the
+ * thumbnail refreshed. Resolves `null` when the record no longer exists
+ * (unpublished elsewhere) so the caller can forget the `cloudId`.
+ */
+export async function syncPublishedDesign(options: {
+  design: Design;
+  cloudId: string;
+  node?: HTMLDivElement | null;
+}): Promise<CloudDesign | null> {
+  const { design, cloudId, node } = options;
+  const dataUrls = await resolveAssets(design);
+
+  try {
+    const urls = await uploadAssets(cloudId, dataUrls);
+    let record = await updateDesign(cloudId, {
+      name: design.name,
+      design: rewriteAssetRefs(design, urls),
+    });
+
+    if (node) record = await uploadThumb(record, node, design);
+
+    return record;
+  } catch (err) {
+    if (isNotFound(err)) return null;
+    throw err;
+  }
+}
+
 /**
  * Publish a design: create (or update) the cloud record, upload the locally
  * stored images it references and rewrite them to their R2 URLs, then
@@ -70,20 +166,11 @@ export async function publishDesign(
     node,
     onCreated,
   } = options;
-  const assetIds = localAssetIds(design);
-  const needsRewrite = assetIds.length > 0;
   const named = { ...design, name };
 
   // Resolve every upload first so a missing one fails before any request.
-  const dataUrls = new Map<string, string>();
-
-  for (const id of assetIds) {
-    // eslint-disable-next-line no-await-in-loop
-    const dataUrl = await loadAsset(id);
-
-    if (!dataUrl) throw new MissingAssetError(id);
-    dataUrls.set(id, dataUrl);
-  }
+  const dataUrls = await resolveAssets(design);
+  const needsRewrite = dataUrls.size > 0;
 
   const base = {
     name,
@@ -107,51 +194,15 @@ export async function publishDesign(
   }
 
   if (needsRewrite) {
-    const urls = new Map<string, string>();
+    const urls = await uploadAssets(record._id, dataUrls);
 
-    for (const id of assetIds) {
-      const dataUrl = dataUrls.get(id)!;
-
-      // eslint-disable-next-line no-await-in-loop
-      const blob = await dataUrlToBlob(dataUrl);
-      const ext = blob.type === 'image/jpeg' ? 'jpg' : 'png';
-      // eslint-disable-next-line no-await-in-loop
-      const uploaded = await uploadDesignAsset(
-        record._id,
-        blob,
-        `${id}.${ext}`,
-      );
-
-      urls.set(id, uploaded.url);
-    }
     record = await updateDesign(record._id, {
       isPublic,
       design: rewriteAssetRefs(named, urls),
     });
   }
 
-  if (node) {
-    try {
-      const { width, height } = design.canvas;
-      const size = {
-        width: node.offsetWidth || width,
-        height: node.offsetHeight || height,
-      };
-      const result = await exportNode(node, {
-        ...size,
-        scale: Math.min(1, THUMB_WIDTH / size.width),
-        format: 'jpeg',
-        quality: 0.82,
-      });
-
-      record = await uploadDesignThumbnail(
-        record._id,
-        await dataUrlToBlob(result.dataUrl),
-      );
-    } catch (err) {
-      console.error('Thumbnail upload failed', err);
-    }
-  }
+  if (node) record = await uploadThumb(record, node, design);
 
   return record;
 }

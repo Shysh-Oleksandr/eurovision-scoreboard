@@ -122,6 +122,7 @@ export function buildResultsDesign({
             statusMode,
             rowOrder: 'ranked',
             paddingY: settings.verticalPadding ?? 0,
+            fit: 'fixed',
             x: 0,
             y: 0,
             rotation: 0,

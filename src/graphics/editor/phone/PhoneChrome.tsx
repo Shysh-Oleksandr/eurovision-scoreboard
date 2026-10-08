@@ -6,6 +6,7 @@ import {
   ArrowUp,
   ChevronLeft,
   Database,
+  Globe,
   Image as ImageIcon,
   Layers,
   LayoutTemplate,
@@ -145,6 +146,7 @@ export const PhoneBar: React.FC<{ onPublish: () => void }> = ({
 }) => {
   const t = useTranslations('graphics.editor.sheet');
   const setSheet = useEditorStore((s) => s.setSheet);
+  const cloudId = useEditorStore((s) => s.cloudId);
 
   return (
     <div className="gfx-ph-bar" role="toolbar" aria-label={t('toolbar')}>
@@ -155,8 +157,8 @@ export const PhoneBar: React.FC<{ onPublish: () => void }> = ({
         </button>
       ))}
       <button type="button" onClick={onPublish}>
-        <Upload className="size-5" />
-        <span>{t('publish')}</span>
+        {cloudId ? <Globe className="size-5" /> : <Upload className="size-5" />}
+        <span>{cloudId ? t('published') : t('publish')}</span>
       </button>
     </div>
   );

@@ -37,7 +37,33 @@ describe('flattenStacks', () => {
     expect(title.x).toBe(40);
     expect(title.w).toBe(500);
     expect(title.h).toBe(60);
-    // Content-sized: width from the box, height left to the rows.
+    // Auto-fit: the measured box becomes the box its rows fit into.
+    expect(scoreboard.w).toBe(500);
+    expect(scoreboard.h).toBe(60);
+  });
+
+  it('leaves the height of a fixed scoreboard to its rows', () => {
+    const results = EDITOR_TEMPLATES.find((t) => t.id === 'results')!.build(
+      ctx,
+    );
+    const fixed: Design = {
+      ...results,
+      elements: results.elements.map((el) =>
+        el.type === 'stack'
+          ? {
+              ...el,
+              children: el.children.map((child) =>
+                child.type === 'scoreboard'
+                  ? { ...child, fit: 'fixed' as const }
+                  : child,
+              ),
+            }
+          : el,
+      ),
+    };
+    const flat = flattenStacks(fixed, measure(fixed), null);
+    const scoreboard = flat.elements.find((el) => el.id === 'scoreboard')!;
+
     expect(scoreboard.w).toBe(500);
     expect(scoreboard.h).toBeUndefined();
   });

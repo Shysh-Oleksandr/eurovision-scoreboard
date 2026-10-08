@@ -1,5 +1,13 @@
 'use client';
-import { Link2, ListChecks, Maximize, Upload, X } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  Link2,
+  ListChecks,
+  Maximize,
+  Upload,
+  X,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -16,7 +24,14 @@ import {
 } from '../../templates/fields';
 import { useEditorStore } from '../editorStore';
 import { TYPE_ICONS } from '../inspector/Inspector';
-import { Field, IconButton, Seg, TextArea, TextInput } from '../ui/controls';
+import {
+  Field,
+  Hint,
+  IconButton,
+  Seg,
+  TextArea,
+  TextInput,
+} from '../ui/controls';
 
 import { Dialog } from './EditorDialogs';
 
@@ -24,7 +39,7 @@ import { useInvalidateDesigns } from '@/api/designs';
 import Button from '@/components/common/Button';
 import type { CloudDesign } from '@/types/design';
 
-type Visibility = 'public' | 'unlisted';
+type Visibility = 'public' | 'private';
 
 interface Props {
   open: boolean;
@@ -34,9 +49,12 @@ interface Props {
 }
 
 /**
- * "Publish as template" (handoff §8): name, description, visibility, the
- * exposed fields as checkbox cards grouped by element (ticked fields get a
- * label input), and on the right the form people will see plus a thumbnail.
+ * "Publish design" (handoff §8): name, description, visibility (public is
+ * the default and lists the design in Explore; private keeps it to the
+ * owner's gallery), and the optional fillable fields — pre-ticked defaults
+ * behind a collapsed "Edit fields" row, as checkbox cards grouped by element
+ * (ticked fields get a label input). On the right, the form people will see
+ * plus a thumbnail.
  */
 const PublishDialog: React.FC<Props> = ({
   open,
@@ -63,6 +81,7 @@ const PublishDialog: React.FC<Props> = ({
   const [ticked, setTicked] = useState<Set<string>>(new Set());
   const [labels, setLabels] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [fieldsOpen, setFieldsOpen] = useState(false);
   const [preview, setPreview] = useState<Design>(design);
 
   // Seed from the design's published fields, else the defaults.
@@ -80,6 +99,9 @@ const PublishDialog: React.FC<Props> = ({
           }));
 
     setName(design.name);
+    // Designs that already carry hand-picked fields open the editor; new
+    // ones keep the defaults behind "Edit fields".
+    setFieldsOpen(!!existing?.length);
     setTicked(new Set(seed.map((f) => f.path)));
     setLabels(Object.fromEntries(seed.map((f) => [f.path, f.label])));
     setPreview(design);
@@ -141,7 +163,7 @@ const PublishDialog: React.FC<Props> = ({
       setCloudId(record._id);
       invalidate();
       toast.success(
-        visibility === 'public' ? t('toast.published') : t('toast.unlisted'),
+        visibility === 'public' ? t('toast.published') : t('toast.private'),
       );
       onPublished(record);
       onClose();
@@ -185,18 +207,36 @@ const PublishDialog: React.FC<Props> = ({
                 onChange={setVisibility}
                 options={[
                   { value: 'public', label: t('public') },
-                  { value: 'unlisted', label: t('unlisted') },
+                  { value: 'private', label: t('private') },
                 ]}
               />
             </Field>
           </div>
+          <Hint icon>{t('visibilityHint')}</Hint>
           <div className="gfx-pub-fields">
-            <span className="gfx-field-label">
-              {t('exposedFields')}
-              <em>{t('nSelected', { count: ticked.size })}</em>
-            </span>
+            <div className="gfx-pub-fields-h">
+              <span className="gfx-field-label">
+                {t('fillableFields')}
+                <em>
+                  {t('optional')} · {t('nSelected', { count: ticked.size })}
+                </em>
+              </span>
+              <button
+                type="button"
+                className="gfx-link gfx-pub-toggle"
+                aria-expanded={fieldsOpen}
+                onClick={() => setFieldsOpen((v) => !v)}
+              >
+                {fieldsOpen ? t('hideFields') : t('editFields')}
+                {fieldsOpen ? (
+                  <ChevronUp className="size-[14px]" />
+                ) : (
+                  <ChevronDown className="size-[14px]" />
+                )}
+              </button>
+            </div>
             <p className="gfx-hint">{t('exposedHint')}</p>
-            <div className="gfx-pub-groups">
+            <div className="gfx-pub-groups" hidden={!fieldsOpen}>
               {groups.map((g) => (
                 <div className="gfx-pub-group" key={g.id}>
                   <span className="gfx-pg-h">

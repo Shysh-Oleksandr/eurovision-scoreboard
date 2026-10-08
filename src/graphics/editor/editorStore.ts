@@ -48,6 +48,8 @@ export interface EditorState {
   /** Cloud `_id` once published as a template; updated in place after. */
   cloudId: string | null;
   dirty: boolean;
+  /** Edited since the published copy was last updated (only meaningful with `cloudId`). */
+  cloudDirty: boolean;
   savedAt: number | null;
   /** The last autosave failed (validation or storage); shown on close. */
   saveFailed: boolean;
@@ -94,6 +96,8 @@ export interface EditorState {
   rename: (name: string) => void;
   markSaved: (draftId: string, savedAt: number) => void;
   setCloudId: (cloudId: string | null) => void;
+  /** The published copy now matches the document. */
+  markCloudSynced: () => void;
   /** Set the published template's exposed fields (not an undo step). */
   setTemplateFields: (fields: Design['templateFields']) => void;
   /** Replace stacks with free elements at their measured boxes (on open). */
@@ -174,6 +178,7 @@ export const useEditorStore = create<EditorState>()(
       draftId: null,
       cloudId: null,
       dirty: false,
+      cloudDirty: false,
       savedAt: null,
       saveFailed: false,
       flattenPending: false,
@@ -199,6 +204,7 @@ export const useEditorStore = create<EditorState>()(
           draftId,
           cloudId,
           dirty: false,
+          cloudDirty: false,
           saveFailed: false,
           savedAt: draftId ? Date.now() : null,
           flattenPending: hasStacks(design),
@@ -233,6 +239,7 @@ export const useEditorStore = create<EditorState>()(
       markSaved: (draftId, savedAt) => set({ draftId, savedAt, dirty: false }),
 
       setCloudId: (cloudId) => set({ cloudId }),
+      markCloudSynced: () => set({ cloudDirty: false }),
 
       setTemplateFields: (templateFields) => {
         useEditorStore.temporal.getState().pause();
@@ -497,6 +504,7 @@ export const useEditorStore = create<EditorState>()(
           draftId: null,
           cloudId: null,
           dirty: false,
+          cloudDirty: false,
           saveFailed: false,
           savedAt: null,
           flattenPending: false,
@@ -583,4 +591,13 @@ editorHistory.subscribe((state, prev) => {
       editorHistory.getState().resume();
     }
   }
+});
+
+/**
+ * Any edit that dirties the draft also means the published copy (if there
+ * is one) is behind; `markCloudSynced` clears it after a publish or sync.
+ */
+useEditorStore.subscribe((state, prev) => {
+  if (state.dirty && !prev.dirty && !state.cloudDirty)
+    useEditorStore.setState({ cloudDirty: true });
 });

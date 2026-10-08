@@ -12,6 +12,11 @@
     "confirm": "Confirmar",
     "authenticationRequired": "Autenticação necessária",
     "lastSaved": "Guardado em",
+    "relativeTime": {
+      "justNow": "agora mesmo",
+      "minutesAgo": "há {count} min",
+      "hoursAgo": "há {count} h"
+    },
     "copy": "Copiar",
     "create": "Criar",
     "searchPlaceholder": "Pesquisar...",
@@ -73,7 +78,12 @@
     "dontShowAgain": "Não mostrar novamente",
     "more": "Mais",
     "share": "Partilhar",
-    "done": "Concluído"
+    "done": "Concluído",
+    "beta": {
+      "label": "Beta",
+      "hint": "Novo e ainda em evolução. Diga-nos o que falta com o botão de feedback.",
+      "hintFeedback": "Novo e ainda em evolução · clique para enviar feedback"
+    }
   },
   "Metadata": {
     "title": "DouzePoints - Simulador do Painel de Pontuação da Eurovisão",
@@ -742,12 +752,14 @@
       "signInToFollow": "Inicie sessão para seguir",
       "followedUser": "Utilizador seguido!",
       "unfollowedUser": "Deixou de seguir o utilizador!",
-      "followingCount": "{count} a seguir"
+      "followingCount": "{count} a seguir",
+      "signIn": "Iniciar sessão"
     },
     "contentType": {
       "all": "Todos",
       "themes": "Temas",
-      "contests": "Concursos"
+      "contests": "Concursos",
+      "designs": "Designs"
     },
     "foundNItems": "Encontrados {count} {count, plural, =1 {item} other {itens}}",
     "userProfile": {
@@ -840,6 +852,8 @@
       "confirmCreateNewContestDescription": "Tem um concurso ativo ({name}). Certifique-se de guardá-lo antes de criar um novo.",
       "venue": "Local",
       "hosts": "Apresentadores",
+      "logoBanner": "Logótipo / banner",
+      "logoBannerHint": "Imagem opcional mostrada no cartão do concurso",
       "entryStats": {
         "pickerTitle": "Estatísticas da sua entrada",
         "pickerSubtitle": "Pesquise e selecione um país ou entrada personalizada para ver os resultados nos seus concursos concluídos.",
@@ -996,6 +1010,8 @@
         "deleteGroupConfirmDescription": "Os temas neste grupo deixarão de estar agrupados. Não são eliminados."
       },
       "colorOverrides": {
+        "colors": "Cores",
+        "currentValue": "Valor atual",
         "juryColors": "Júri",
         "douzePointsAnimationColors": "Animação Douze Points",
         "televoteColors": "Televoto",
@@ -1167,7 +1183,8 @@
         "deleteInUseDescription": "{count} {count, plural, =1 {dos seus temas usa-a} other {dos seus temas usam-na}}. Passarão a uma fonte integrada. Eliminar mesmo assim?",
         "signInToUpload": "Inicie sessão para carregar fontes e criar a sua biblioteca.",
         "badge": "Fonte",
-        "filterWithFonts": "Com fontes personalizadas"
+        "filterWithFonts": "Com fontes personalizadas",
+        "pickForElement": "Escolha a fonte só para este elemento. Os outros elementos mantêm as suas fontes."
       },
       "customCount": "{count} personalizados",
       "savedCount": "{count} guardados"
@@ -1184,6 +1201,9 @@
       "thisMonth": "Este Mês",
       "lastMonth": "Mês Passado",
       "allTime": "Sempre"
+    },
+    "graphics": {
+      "savedCount": "{count, plural, =1 {# guardado} other {# guardados}}"
     }
   },
   "feedbackInfo": {
@@ -1271,7 +1291,11 @@
       },
       "countryAssignment": {
         "title": "Atribuição de Países",
-        "content": "Os países mostrados quando escolhe um ano são um ponto de partida, não uma lista bloqueada. No modal de Configuração, clique em qualquer país para movê-lo entre fases (Semifinal 1, Semifinal 2, Grande Final) ou marcá-lo como Não Participante. Também pode adicionar países de outros anos, outros continentes ou as suas próprias entradas personalizadas."
+        "content": "Os países mostrados quando escolhe um ano são um ponto de partida, não uma lista bloqueada. No modal de Configuração, arraste e largue países entre fases (Semifinal 1, Semifinal 2, Grande Final) e a lista de Não Participantes, ou clique num país para movê-lo. Também pode adicionar países de outros anos, outros continentes ou as suas próprias entradas personalizadas."
+      },
+      "allocationDraw": {
+        "title": "Sorteio das semifinais",
+        "content": "Ative 'Sorteio das semifinais' (o botão do dado) no modal de Configuração para distribuir os semifinalistas pelas semifinais, pote a pote, como faz a UER. Faça o sorteio passo a passo ou salte para o resultado e prima 'Aplicar à formação' para preencher as semifinais e as metades da sua ordem de atuação. Por predefinição são usados os potes e as regras oficiais; em 'Personalizar' pode alterar os potes, o tamanho das semifinais, as metades e onde votam os países pré-qualificados. Requer pelo menos duas semifinais."
       },
       "grandFinalOnly": {
         "title": "Modo Apenas Grande Final",
@@ -1311,6 +1335,10 @@
         "title": "Odds e Aleatoriedade",
         "content": "Em 'Definições → Odds', atribua odds de júri e televoto (0–100) a cada país para influenciar como os votos aleatórios são distribuídos. Odds mais altas significam uma melhor chance de receber mais pontos. O controlo deslizante de Nível de Aleatoriedade controla quão de perto a simulação segue essas odds: deslize para a esquerda para resultados previsíveis que espelham as odds, deslize para a direita para uma simulação caótica onde tudo pode acontecer."
       },
+      "diasporaAffinity": {
+        "title": "Diáspora e afinidade",
+        "content": "Em 'Definições → Relações', blocos de votação, vizinhos, diásporas e rivalidades inclinam os votos aleatórios a favor (ou contra) certos países, com base em mais de 20 anos de dados reais de votação. Use o controlo de Intensidade para ajustar o efeito, afine pares individuais ou adicione os seus próprios pares e blocos."
+      },
       "presentationMode": {
         "title": "Modo de Apresentação",
         "content": "Ative o 'Modo de apresentação' em 'Definições → Votação' para adicionar um painel de reprodução automática abaixo do painel de pontuação. Defina a velocidade (0,5–7,5 segundos por ação) e carregue em Reproduzir para deixar a simulação correr sem necessitar de cliques — ideal para transmissão ou gravação. Ative 'Início automático da apresentação' para que esta comece automaticamente assim que a votação começar."
@@ -1321,7 +1349,7 @@
       },
       "moreOptions": {
         "title": "Mais Opções de Votação",
-        "content": "Opções adicionais em Definições → Votação e no cabeçalho da simulação:<list><item><strong>Revelação de qualificados em ecrã dividido</strong> — um momento ao estilo do ESC 2025 onde vários candidatos aparecem lado a lado e clica num para qualificá-lo. Configure 2–6 candidatos por revelação e se o último qualificado também usa o ecrã dividido.</item><item><strong>Ordem de revelação do televoto</strong> — defina do mais baixo para o mais alto para anunciar os resultados do televoto do menor para o maior número de pontos, como no ESC 2016–2018.</item><item><strong>Permitir pontos para a mesma entrada várias vezes</strong> — permite a um país votante atribuir múltiplos tokens de pontos à mesma entrada. Isto simula o sistema de votação da Eurovisão anterior a 1975 onde cada júri (e televoto, se ativo) distribuía dez tokens iguais livremente.</item><item><strong>Agrupar votação aleatória do júri</strong> — o botão 'Votar aleatoriamente' atribui pontos em lotes realistas (1–8+10 juntos, ou apenas 12) em vez de um valor de cada vez.</item><item><strong>Desfazer e Reiniciar</strong> — Desfazer recua até 100 ações; Reiniciar repõe a simulação completa.</item></list>"
+        "content": "Opções adicionais em Definições → Votação e no cabeçalho da simulação:<list><item><strong>Revelação de qualificados em ecrã dividido</strong> — um momento ao estilo do ESC 2025 onde vários candidatos aparecem lado a lado e clica num para qualificá-lo. Configure 2–6 candidatos por revelação e se o último qualificado também usa o ecrã dividido.</item><item><strong>Ordem de revelação do televoto</strong> — defina do mais baixo para o mais alto para anunciar os resultados do televoto do menor para o maior número de pontos, como no ESC 2016–2018.</item><item><strong>Permitir pontos para a mesma entrada várias vezes</strong> — permite a um país votante atribuir múltiplos tokens de pontos à mesma entrada. Isto simula o sistema de votação da Eurovisão anterior a 1975 onde cada júri (e televoto, se ativo) distribuía dez tokens iguais livremente.</item><item><strong>Agrupar votação aleatória do júri</strong> — o botão 'Votar aleatoriamente' atribui pontos em lotes realistas (1–8+10 juntos, ou apenas 12) em vez de um valor de cada vez.</item><item><strong>Desfazer e Reiniciar</strong> — Desfazer recua até 100 ações; Reiniciar repõe a simulação completa.</item><item><strong>Revelação do júri com contagem decrescente da escala</strong> — o formato do JESC 2024: o voto do júri é mostrado num gráfico de barras que revela primeiro todos os 1 ponto de todos os júris de uma vez, depois todos os 2, e assim sucessivamente, antes de os porta-vozes anunciarem os seus 12 pontos.</item></list>"
       }
     },
     "themes": {
@@ -1336,6 +1364,10 @@
       "customThemeBuilder": {
         "title": "Construtor de Temas Personalizado",
         "content": "Utilizadores com sessão iniciada podem construir um tema completamente personalizado: escolha uma cor primária, carregue uma imagem de fundo, selecione uma fonte e substitua as cores para cada estado do painel de pontuação independentemente (júri ativo, televoto não terminado/ativo/terminado, entradas não qualificadas e emblemas de posição). Formas de bandeiras, formas de contentores de pontos e estilos de animação do painel são todos configuráveis. Um painel de pré-visualização ao vivo mostra exatamente como cada alteração ficará num item de país real."
+      },
+      "customFonts": {
+        "title": "Fontes personalizadas",
+        "content": "No criador de temas, escolha uma fonte integrada ou carregue a sua (WOFF2, WOFF, TTF ou OTF — até quatro pesos ou uma fonte variável). As fontes carregadas ficam na sua biblioteca de fontes para usar em qualquer tema, e pode adicionar-lhe fontes públicas de outros utilizadores. Um tema também pode ter uma fonte do marcador separada para as linhas dos países, enquanto os menus e cabeçalhos mantêm a fonte da interface."
       },
       "soundEffects": {
         "title": "Efeitos Sonoros e Áudio de Fundo",
@@ -1362,6 +1394,10 @@
       "shareStats": {
         "title": "Partilhar Estatísticas como Imagem",
         "content": "Dentro do modal de Estatísticas, um botão de partilha permite-lhe exportar a tabela de resultados completa (detalhes, divisão ou resumo) como PNG descarregável. Ótimo para partilhar detalhe do painel nas redes sociais ou em comunidades de fãs da Eurovisão."
+      },
+      "graphics": {
+        "title": "Gráficos (Beta)",
+        "content": "Abra o widget de Gráficos para criar as suas próprias imagens: cartões de resultados, tops 10, cartazes, tabelas de estatísticas e mais.<list><item><strong>Comece</strong> a partir de um modelo, de um design da comunidade em Explorar ou de uma tela em branco. «Abrir no editor» na janela da imagem de partilha também leva a imagem atual para o editor.</item><item><strong>Edite</strong>: adicione texto, imagens, formas, bandeiras, painéis e tabelas de estatísticas, depois mova, redimensione e rode-os. Defina o tamanho da tela, o fundo e o tema. Em Dados, escolha o que os painéis mostram: o painel em direto, um concurso guardado ou uma lista manual.</item><item><strong>Exporte</strong> a imagem em PNG ou JPEG para descarregar, partilhar ou copiar.</item><item><strong>Publique</strong> (requer sessão iniciada) como público, listado em Explorar, ou privado, partilhado por link. Pode escolher campos editáveis para que outros alterem só esses num formulário curto antes de gerar a imagem. Dê gosto e guarde designs de outros utilizadores para os encontrar em Guardados.</item></list>Os designs ficam guardados neste navegador, por isso use «Exportar (.json)» em Os meus designs para manter uma cópia de segurança."
       },
       "leaderboard": {
         "title": "Tabela de Classificação Global por País",
@@ -1652,6 +1688,712 @@
       "cancelSimulation": "Cancelar simulação",
       "logout": "Terminar Sessão",
       "createNewContest": "Criar novo concurso"
+    }
+  },
+  "graphics": {
+    "widget": {
+      "title": "Gráficos",
+      "description": "Crie e partilhe imagens",
+      "noDesignsYet": "Ainda não há designs",
+      "nDesigns": "{count, plural, =1 {# design} other {# designs}}",
+      "explore": "Explorar"
+    },
+    "share": {
+      "openInEditor": "Abrir no editor",
+      "resultsDesign": "Resultados",
+      "runningOrderDesign": "Ordem de atuação",
+      "statsDesign": "Estatísticas"
+    },
+    "gallery": {
+      "title": "Gráficos",
+      "tabs": {
+        "myDesigns": "Os meus designs",
+        "explore": "Explorar",
+        "saved": "Guardados"
+      },
+      "newBlank": "Novo design em branco",
+      "openInEditor": "Abrir no editor",
+      "duplicate": "Duplicar",
+      "rename": "Mudar o nome",
+      "delete": "Eliminar",
+      "more": "Mais",
+      "live": "Em direto",
+      "manual": "Manual",
+      "nRows": "{count, plural, =1 {# linha} other {# linhas}}",
+      "builtIn": "Integrados",
+      "builtInSub": "Modelos mantidos pelo DouzePoints",
+      "use": "Usar",
+      "empty": {
+        "title": "Ainda não há designs",
+        "body": "Comece a partir de um modelo, de um design da comunidade ou de uma tela em branco. Os designs ficam guardados neste navegador.",
+        "explore": "Explorar designs"
+      },
+      "renamePrompt": "Nome do design",
+      "deleteTitle": "Eliminar «{name}»?",
+      "deleteBody": "Isto remove o design deste navegador. Esta ação não pode ser anulada.",
+      "toast": {
+        "duplicated": "Design duplicado",
+        "deleted": "Design eliminado",
+        "linkCopied": "Link copiado para a área de transferência!",
+        "failed": "Algo correu mal",
+        "saved": "Guardado na sua coleção",
+        "unsaved": "Removido dos guardados",
+        "unpublished": "Design despublicado",
+        "unreadable": "Este design não pode ser aberto nesta versão da aplicação.",
+        "imported": "«{name}» importado",
+        "importFailed": "Esse ficheiro não é um design do DouzePoints.",
+        "madePublic": "Agora é público · listado em Explorar",
+        "madePrivate": "Agora é privado · só você o vê"
+      },
+      "templates": {
+        "blank": {
+          "name": "Em branco",
+          "description": "Uma tela horizontal vazia sobre o fundo do tema."
+        },
+        "results": {
+          "name": "Resultados",
+          "description": "Título, subtítulo e o painel completo em três colunas."
+        },
+        "top10": {
+          "name": "Top 10",
+          "description": "Um cartão vertical com as melhores entradas em linhas grandes."
+        },
+        "poster": {
+          "name": "Cartaz de anúncio",
+          "description": "Logótipo, slogan, cidade anfitriã, datas e a bandeira do anfitrião."
+        },
+        "runningOrder": {
+          "name": "Ordem de atuação",
+          "description": "As linhas pela ordem de atuação, sem pontos."
+        },
+        "qualifiers": {
+          "name": "Qualificados",
+          "description": "Nomes em três colunas numa tela de transmissão."
+        },
+        "stats": {
+          "name": "Estatísticas",
+          "description": "Uma tabela de estatísticas, ajustada ao conteúdo."
+        }
+      },
+      "savedContest": "Concurso guardado",
+      "contentSized": "Ajustado ao conteúdo",
+      "published": "Publicado",
+      "updatePublished": "Atualizar cópia publicada",
+      "publish": "Publicar…",
+      "copyLink": "Copiar link",
+      "share": "Partilhar",
+      "unpublish": "Despublicar",
+      "nFields": "{count, plural, =1 {# campo} other {# campos}}",
+      "scoreboard": "Painel",
+      "stats": "Estatísticas",
+      "private": "Privado",
+      "remix": "Remix",
+      "like": "Gostar",
+      "save": "Guardar",
+      "signInToReact": "Inicie sessão para dar gosto e guardar designs.",
+      "unpublishTitle": "Despublicar «{name}»?",
+      "unpublishBody": "A cópia publicada e o respetivo link deixam de funcionar para todos. O seu rascunho local fica neste navegador.",
+      "searchDesigns": "Pesquisar designs",
+      "sort": {
+        "newest": "Mais recentes",
+        "used": "Mais usados",
+        "liked": "Mais gostados"
+      },
+      "sizes": {
+        "any": "Qualquer tamanho",
+        "landscape": "Horizontal",
+        "portrait": "Vertical",
+        "square": "Quadrado",
+        "story": "Story",
+        "broadcast": "Transmissão"
+      },
+      "hasScoreboard": "Com painel",
+      "hasStats": "Com estatísticas",
+      "mine": "Publicados por si",
+      "mineSub": "Não estão neste navegador · abra um para criar uma cópia local",
+      "community": "Comunidade",
+      "foundN": "{count, plural, =1 {Encontrado # design} other {Encontrados # designs}}",
+      "communityError": {
+        "title": "Não foi possível carregar os designs da comunidade",
+        "body": "Verifique a sua ligação e tente novamente."
+      },
+      "retry": "Tentar novamente",
+      "noMatch": {
+        "title": "Nenhum design da comunidade corresponde",
+        "body": "Experimente outro tamanho ou limpe os filtros."
+      },
+      "noCommunity": {
+        "title": "Ainda não há designs da comunidade",
+        "body": "Publique um design e ele aparece aqui para todos."
+      },
+      "clearFilters": "Limpar filtros",
+      "savedSignIn": {
+        "title": "Inicie sessão para guardar designs",
+        "body": "Os designs da comunidade guardados ficam associados à sua conta."
+      },
+      "nothingSaved": {
+        "title": "Ainda nada guardado",
+        "body": "Guarde designs da comunidade para os encontrar aqui."
+      },
+      "keptInBrowser": "Os designs ficam guardados neste navegador · exporte uma cópia por segurança",
+      "exportJson": "Exportar (.json)",
+      "importJson": "Importar",
+      "renameTitle": "Mudar o nome do design",
+      "report": "Denunciar…",
+      "reported": "Denunciado",
+      "unreadable": {
+        "body": "Este design não pode ser aberto por esta versão da aplicação. Exporte-o para guardar uma cópia ou elimine-o."
+      },
+      "starters": "Modelos",
+      "open": "Abrir",
+      "public": "Público",
+      "makePublic": "Tornar público",
+      "makePrivate": "Tornar privado",
+      "communitySub": "Designs públicos de todos · use ou faça remix de qualquer um",
+      "startersSub": "Pontos de partida integrados · mantidos pelo DouzePoints",
+      "updated": "Atualizado {time}"
+    },
+    "editor": {
+      "aria": "Editor de design",
+      "canvasAria": "Tela",
+      "close": "Fechar editor",
+      "designName": "Nome do design",
+      "notSavedYet": "Ainda não guardado",
+      "unsaved": "Não guardado",
+      "saved": "Guardado",
+      "undo": "Desfazer",
+      "redo": "Refazer",
+      "sizedToTable": "Ajustado à tabela",
+      "export": "Exportar",
+      "save": "Guardar",
+      "zoom": "Zoom",
+      "label": {
+        "heightFollowsRows": "a altura segue as linhas",
+        "rowsFitBox": "as linhas ajustam-se à caixa",
+        "sizesToContent": "ajusta-se ao conteúdo",
+        "nElements": "{count} elementos",
+        "centred": "centrado · {px} de cada lado",
+        "resize": "Redimensionar",
+        "rotate": "Rodar"
+      },
+      "hint": {
+        "dragToMove": "Arraste para mover · ajuste fino em Disposição",
+        "tapToEdit": "Toque num elemento para o editar",
+        "zoomed": "{pct}% · junte os dedos para ampliar · toque duas vezes para ajustar"
+      },
+      "rail": {
+        "aria": "Ferramentas do editor",
+        "add": "Adicionar",
+        "templates": "Modelos",
+        "layers": "Camadas",
+        "data": "Dados"
+      },
+      "panel": {
+        "add": "Adicionar elemento",
+        "templates": "Modelos",
+        "layers": "Camadas",
+        "data": "Dados",
+        "close": "Fechar painel"
+      },
+      "sheet": {
+        "toolbar": "Editor",
+        "inspector": "Elemento",
+        "add": "Adicionar elemento",
+        "addShort": "Adicionar",
+        "layers": "Camadas",
+        "data": "Dados",
+        "canvas": "Tela",
+        "templates": "Modelos",
+        "close": "Fechar",
+        "publish": "Publicar",
+        "published": "Publicado"
+      },
+      "nudge": {
+        "move": "Mover",
+        "holdForTen": "1 px · mantenha premido para 10",
+        "up": "Cima",
+        "left": "Esquerda",
+        "centre": "Centrar na tela",
+        "right": "Direita",
+        "down": "Baixo"
+      },
+      "toast": {
+        "saved": "Design guardado",
+        "savedAndSynced": "Guardado · cópia publicada atualizada",
+        "cloudUpdated": "Cópia publicada atualizada",
+        "cloudUpdateFailed": "Guardado aqui, mas não foi possível atualizar a cópia publicada. Tente novamente em Publicado.",
+        "cloudGone": "A cópia publicada já não existe. Publique novamente para partilhar este design."
+      },
+      "updatePublished": "Atualizar",
+      "publish": "Publicar",
+      "canvasSizeChip": "Tamanho da tela",
+      "themeChip": "Tema",
+      "untitled": "Design sem título",
+      "remixChipTitle": "Este design partiu de um design da comunidade; o seu criador é creditado quando publicar.",
+      "remixOf": "Remix de {name}",
+      "published": "Publicado",
+      "publishedTitle": "A cópia publicada é atualizada sempre que guarda. Clique para alterar a visibilidade, a descrição ou os campos editáveis."
+    },
+    "add": {
+      "text": {
+        "name": "Texto",
+        "description": "Um título, uma legenda ou qualquer linha de texto"
+      },
+      "image": {
+        "name": "Imagem",
+        "description": "Carregamento, URL ou o fundo do tema"
+      },
+      "shape": {
+        "name": "Forma",
+        "description": "Retângulo ou elipse, sólido ou gradiente"
+      },
+      "flag": {
+        "name": "Bandeira",
+        "description": "Um país, retangular, redonda ou em coração"
+      },
+      "scoreboard": {
+        "name": "Painel",
+        "description": "Linhas da fonte de dados; ajusta-se às linhas"
+      },
+      "stats": {
+        "name": "Estatísticas",
+        "description": "Tabela de detalhes, divisão ou resumo"
+      }
+    },
+    "templates": {
+      "replacesEverything": "Substitui tudo na tela. Desfazer recupera-o.",
+      "builtin": {
+        "blank": {
+          "name": "Em branco"
+        },
+        "results": {
+          "name": "Resultados"
+        },
+        "top10": {
+          "name": "Top 10"
+        },
+        "poster": {
+          "name": "Cartaz de anúncio"
+        },
+        "runningOrder": {
+          "name": "Ordem de atuação"
+        },
+        "qualifiers": {
+          "name": "Qualificados"
+        },
+        "stats": {
+          "name": "Estatísticas"
+        }
+      },
+      "browseCommunity": "Explorar designs da comunidade"
+    },
+    "layers": {
+      "title": "Camadas",
+      "hint": "O topo da lista fica à frente. Arraste para reordenar.",
+      "hintPhone": "O topo da lista fica à frente. Toque nas linhas para selecionar mais do que uma.",
+      "toggleGroup": "Expandir/recolher grupo",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "lock": "Bloquear",
+      "unlock": "Desbloquear"
+    },
+    "data": {
+      "live": "Em direto",
+      "manual": "Manual",
+      "provided": "Linhas fornecidas",
+      "nRows": "{count, plural, =1 {# linha} other {# linhas}}",
+      "elementsUseThisData": "Os elementos de painel e de estatísticas usam estes dados.",
+      "stage": "Fase",
+      "liveHint": "A fase no ecrã, ordenada como no painel.",
+      "country": "País",
+      "points": "Pontos",
+      "removeRow": "Remover linha",
+      "addRow": "Adicionar linha",
+      "importFromLive": "Importar do direto",
+      "nowShowing": "A mostrar",
+      "savedContest": "Concurso guardado",
+      "searchContests": "Pesquisar concursos",
+      "yours": "Seus",
+      "public": "Públicos",
+      "noContestsFound": "Nenhum concurso encontrado.",
+      "signInForContests": "Inicie sessão para escolher um dos seus concursos; os concursos públicos estão listados abaixo.",
+      "viewedStage": "Fase no ecrã",
+      "loadingContest": "A carregar o concurso…",
+      "contestInaccessible": "Não é possível abrir «{name}». As linhas mostram o seu painel em direto até escolher outra fonte.",
+      "statsNeedLive": "As tabelas de estatísticas usam o painel em direto. Mude a fonte de dados para Em direto para preencher esta tabela.",
+      "pickContestHint": "Escolha um concurso abaixo. Até lá, o design mantém a fonte de dados atual.",
+      "statsNeedLiveHint": "Dados → Em direto no editor",
+      "sampleHint": "Não há nenhum concurso a decorrer, por isso os painéis e as estatísticas mostram resultados de exemplo (Grande Final da Eurovisão 2026, votos inventados). Inicie um concurso para usar os seus."
+    },
+    "inspector": {
+      "properties": "Propriedades",
+      "canvasLabel": "Tela",
+      "canvas": {
+        "sizedToTable": "Ajustada à tabela.",
+        "sizedToTableHint": "Esta tela envolve a tabela de estatísticas com uma margem.",
+        "preset": "Predefinição",
+        "custom": "Personalizado",
+        "width": "Largura",
+        "height": "Altura",
+        "solid": "Sólido",
+        "gradient": "Gradiente",
+        "theme": "Tema",
+        "image": "Imagem",
+        "themeBackgroundHint": "O fundo do tema do design: «{name}». Altere-o em Tema.",
+        "opacity": "Opacidade"
+      },
+      "nothingSelected": "Nada selecionado",
+      "elementName": "Nome do elemento",
+      "lock": "Bloquear",
+      "unlock": "Desbloquear",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "duplicate": "Duplicar",
+      "delete": "Eliminar",
+      "nElements": "{count} elementos",
+      "multiHint": "Edite cada elemento individualmente, ou mova, duplique e elimine-os em conjunto. Shift-clique para adicionar ou remover.",
+      "lockAll": "Bloquear todos",
+      "hideAll": "Ocultar todos",
+      "types": {
+        "text": "Texto",
+        "image": "Imagem",
+        "shape": "Forma",
+        "flag": "Bandeira",
+        "scoreboard": "Painel",
+        "stats": "Estatísticas",
+        "branding": "Marca",
+        "stack": "Pilha"
+      },
+      "sections": {
+        "content": "Conteúdo",
+        "style": "Estilo",
+        "data": "Dados",
+        "rows": "Linhas",
+        "size": "Tamanho",
+        "rowStyle": "Estilo das linhas",
+        "table": "Tabela",
+        "positionAndSize": "Posição e tamanho",
+        "canvasSize": "Tamanho da tela",
+        "background": "Fundo",
+        "dataSource": "Fonte de dados",
+        "layout": "Disposição",
+        "theme": "Tema"
+      },
+      "text": {
+        "text": "Texto",
+        "font": "Fonte",
+        "uiFont": "Fonte da interface",
+        "scoreboardFont": "Fonte do painel",
+        "size": "Tamanho",
+        "weight": "Peso",
+        "weights": {
+          "regular": "Normal",
+          "medium": "Médio",
+          "semibold": "Seminegrito",
+          "bold": "Negrito"
+        },
+        "colour": "Cor",
+        "align": "Alinhamento",
+        "alignLeft": "Esquerda",
+        "alignCentre": "Centro",
+        "alignRight": "Direita",
+        "uppercase": "Maiúsculas",
+        "shadow": "Sombra",
+        "lineHeight": "Altura da linha",
+        "customFont": "Personalizada",
+        "libraryFont": "Biblioteca",
+        "inThisDesign": "Neste design",
+        "customFontHint": "Escolha uma fonte incluída ou uma da sua biblioteca de fontes. As fontes usadas noutros pontos deste design aparecem aqui para reutilizar com um clique."
+      },
+      "image": {
+        "source": "Origem",
+        "upload": "Carregar",
+        "url": "URL",
+        "themeBackground": "Fundo do tema",
+        "imageUrl": "URL da imagem",
+        "replaceImage": "Substituir imagem",
+        "chooseImage": "Escolher imagem…",
+        "uploadHint": "PNG ou JPEG até {max}.",
+        "fit": "Ajuste",
+        "cornerRadius": "Raio dos cantos",
+        "mask": "Máscara",
+        "none": "Nenhuma",
+        "circle": "Círculo",
+        "heart": "Coração"
+      },
+      "fill": {
+        "fill": "Preenchimento",
+        "colour": "Cor",
+        "from": "De",
+        "to": "Para",
+        "angle": "Ângulo",
+        "fit": "Ajuste",
+        "cover": "Preencher",
+        "contain": "Conter",
+        "themeSurfaceHint": "Usa a cor da superfície dos cartões do tema."
+      },
+      "shape": {
+        "shape": "Forma",
+        "rectangle": "Retângulo",
+        "ellipse": "Elipse",
+        "solid": "Sólido",
+        "gradient": "Gradiente",
+        "themeSurface": "Superfície do tema",
+        "image": "Imagem",
+        "cornerRadius": "Raio dos cantos",
+        "stroke": "Contorno",
+        "strokeColour": "Cor do contorno",
+        "shadow": "Sombra"
+      },
+      "flag": {
+        "country": "País",
+        "shape": "Forma",
+        "rectangle": "Retângulo",
+        "round": "Redonda",
+        "heart": "Coração"
+      },
+      "scoreboard": {
+        "columns": "Colunas",
+        "rowSize": "Tamanho das linhas",
+        "showPoints": "Mostrar pontos",
+        "showRankings": "Mostrar classificações",
+        "shortNames": "Nomes curtos dos países",
+        "rowLimit": "Limite de linhas",
+        "nOfTotal": "{n} de {total}",
+        "allN": "todas as {total}",
+        "status": "Estado",
+        "liveColours": "Cores em direto",
+        "uniform": "Uniforme",
+        "sizesToContent": "Ajusta-se ao conteúdo.",
+        "layout": "Disposição",
+        "autoFit": "Ajuste automático",
+        "fixed": "Fixo",
+        "autoFitHint": "As colunas e o tamanho das linhas acompanham o número de linhas, para que todas caibam na caixa.",
+        "fitsToBox": "Ajusta-se à caixa.",
+        "fitSummary": "{rows} linhas cabem em {columns, plural, =1 {# coluna} other {# colunas}} com tamanho {size} → <b>{w} × {h}</b>. Arraste qualquer alça para redimensionar a caixa; as linhas reajustam-se.",
+        "sizeSummary": "{rows} linhas em {columns, plural, =1 {# coluna} other {# colunas}} com tamanho {size} → <b>{w} × {h}</b>. Arraste as alças laterais para a largura; a altura segue as linhas.",
+        "fitCanvasWidth": "Ajustar à largura da tela",
+        "order": "Ordem",
+        "ranked": "Classificação",
+        "runningOrder": "Ordem de atuação"
+      },
+      "stats": {
+        "tableType": "Tipo de tabela",
+        "breakdown": "Detalhes",
+        "split": "Divisão",
+        "summary": "Resumo",
+        "sizeSummary": "<b>Ajusta-se ao conteúdo.</b> A tabela define a própria largura e altura: <b>{w} × {h}</b>. Pode movê-la; o tipo de tabela, o tipo de voto e a fonte de dados alteram o tamanho.",
+        "voteType": "Tipo de voto",
+        "total": "Total",
+        "jury": "Júri",
+        "televote": "Televoto",
+        "noSourceTitle": "Sem estatísticas para esta fonte de dados.",
+        "noSourceBody": "As tabelas de estatísticas são calculadas a partir do painel em direto; as listas manuais e os concursos guardados ainda não incluem votos.",
+        "changeDataSource": "Mudar para Em direto"
+      },
+      "branding": {
+        "size": "Tamanho",
+        "staysOnEveryDesign": "A marca fica em todos os designs. Pode movê-la e redimensioná-la, mas não eliminá-la nem ocultá-la.",
+        "showIcon": "Mostrar ícone"
+      },
+      "stack": {
+        "direction": "Direção",
+        "row": "Linha",
+        "column": "Coluna",
+        "gap": "Espaçamento",
+        "padding": "Margem interna",
+        "alignment": "Alinhamento",
+        "start": "Início",
+        "centre": "Centro",
+        "end": "Fim",
+        "insideThisStack": "Dentro desta pilha"
+      },
+      "data": {
+        "change": "Alterar…",
+        "elementsUseDesignData": "Os elementos de painel e de estatísticas usam a fonte de dados do design.",
+        "nElementsUseThisData": "{count, plural, =1 {# elemento usa} other {# elementos usam}} estes dados."
+      },
+      "rowStyle": {
+        "rowsFollowTheme": "As linhas seguem o tema do design <b>«{name}»</b>.",
+        "cellsFollowTheme": "As células seguem o tema do design <b>«{name}»</b>.",
+        "setInThemeEditor": "As cores, a forma das bandeiras e as fontes vêm do tema. Escolha outro tema para este design ou edite o próprio tema no editor de temas.",
+        "changeTheme": "Alterar tema"
+      },
+      "layout": {
+        "setByContent": "Definido pelo conteúdo",
+        "rotation": "Rotação",
+        "opacity": "Opacidade",
+        "lock": "Bloquear",
+        "hide": "Ocultar",
+        "order": "Ordem",
+        "sendBackward": "Enviar para trás",
+        "bringForward": "Trazer para a frente",
+        "back": "Fundo",
+        "front": "Frente"
+      },
+      "theme": {
+        "theme": "Tema",
+        "myThemes": "Os meus temas",
+        "useAppTheme": "Usar o tema da aplicação ({name})",
+        "savedWithDesign": "Guardado com o design, por isso mantém este aspeto qualquer que seja o tema da aplicação."
+      }
+    },
+    "export": {
+      "title": "Exportar",
+      "close": "Fechar",
+      "format": "Formato",
+      "scale": "Escala",
+      "estimate": "{w} × {h} px · cerca de {mb} MB",
+      "download": "Descarregar",
+      "share": "Partilhar",
+      "copy": "Copiar",
+      "copyImage": "Copiar imagem",
+      "downloadImage": "Descarregar imagem",
+      "generating": "A gerar imagem…",
+      "generated": "Imagem gerada",
+      "generatedAlt": "Imagem gerada",
+      "cancel": "Cancelar",
+      "failed": {
+        "title": "Não foi possível gerar a imagem",
+        "body": "Tentámos duas vezes. Tente novamente ou mude para o outro motor de imagem — mais lento, mas lida melhor com telas grandes.",
+        "tryAgain": "Tentar novamente",
+        "otherEngine": "Experimentar o outro motor"
+      },
+      "toast": {
+        "downloaded": "{name} descarregado",
+        "copied": "Imagem copiada",
+        "copyFailed": "Não foi possível copiar a imagem",
+        "shareUnsupported": "A partilha não é suportada neste dispositivo.",
+        "shareFailed": "Falha ao partilhar"
+      }
+    },
+    "dialogs": {
+      "tooLarge": {
+        "title": "Esta imagem é demasiado grande para carregar",
+        "body": "{name} tem {size}. As imagens podem ter até {max}. Reduza-a ou exporte-a em JPEG e tente novamente.",
+        "chooseAnother": "Escolher outra imagem",
+        "cancel": "Cancelar"
+      },
+      "unsaved": {
+        "title": "Não foi possível guardar o design",
+        "body": "O armazenamento deste navegador recusou a gravação. Tente guardar novamente ou descarte as últimas alterações.",
+        "save": "Tentar novamente",
+        "discard": "Descartar alterações",
+        "cancel": "Cancelar"
+      },
+      "signIn": {
+        "titlePublish": "Inicie sessão para publicar designs",
+        "titleCloud": "Inicie sessão para guardar na nuvem",
+        "bodyPublish": "Os designs publicados mostram o seu nome. O seu design fica neste navegador até iniciar sessão.",
+        "bodyCloud": "O seu design fica guardado neste navegador como rascunho. Inicie sessão para o ter em todos os dispositivos e publicá-lo.",
+        "signIn": "Iniciar sessão",
+        "keepLocal": "Continuar a trabalhar localmente"
+      },
+      "noAccess": {
+        "title": "Este design usa um concurso que não pode abrir",
+        "body": "{name} é privado ou foi eliminado. Os elementos de painel e de estatísticas vão mostrar o seu painel em direto até escolher outra fonte.",
+        "thisContest": "O concurso",
+        "useLive": "Usar o painel em direto",
+        "useManual": "Escrever uma lista manual"
+      },
+      "cancel": "Cancelar",
+      "report": {
+        "title": "Denunciar «{name}»?",
+        "body": "Diga-nos o que está errado com este design. As denúncias são analisadas pela equipa do DouzePoints.",
+        "reason": "Motivo",
+        "reasons": {
+          "spam": "Spam ou enganador",
+          "offensive": "Conteúdo ofensivo",
+          "copyright": "Direitos de autor ou marca registada",
+          "other": "Outro motivo"
+        },
+        "details": "Detalhes (opcional)",
+        "detailsPlaceholder": "Qualquer coisa que nos ajude a perceber o problema",
+        "send": "Enviar denúncia",
+        "cancel": "Cancelar",
+        "thanks": "Obrigado, a denúncia foi enviada.",
+        "already": "Já denunciou este design.",
+        "failed": "Não foi possível enviar a denúncia."
+      }
+    },
+    "fields": {
+      "columns": "Colunas",
+      "rowSize": "Tamanho das linhas",
+      "rowLimit": "Limite de linhas",
+      "tableType": "Tipo de tabela",
+      "voteType": "Tipo de voto",
+      "dataSource": "Fonte de dados",
+      "size": "Tamanho",
+      "backgroundOpacity": "Opacidade do fundo",
+      "rowSizes": {
+        "sm": "S",
+        "md": "M",
+        "lg": "L",
+        "xl": "XL",
+        "2xl": "2XL"
+      },
+      "tables": {
+        "Breakdown": "Detalhes",
+        "Split": "Divisão",
+        "Summary": "Resumo"
+      },
+      "voteTypes": {
+        "Total": "Total",
+        "Jury": "Júri",
+        "Televote": "Televoto"
+      },
+      "sizeHint": "Reajusta toda a disposição ao novo tamanho."
+    },
+    "sheet": {
+      "explore": "Explorar",
+      "close": "Fechar",
+      "inaccessible": "Este design usa {name}, que não pode abrir.",
+      "showingLive": "Em vez disso, mostra o seu painel em direto.",
+      "useManual": "Usar uma lista manual",
+      "sample": "Resultados de exemplo.",
+      "sampleBody": "Não há nenhum concurso a decorrer, por isso isto mostra a Grande Final da Eurovisão 2026 com votos inventados. Inicie um concurso para usar os seus.",
+      "fields": "Campos",
+      "nFields": "{count, plural, =1 {# campo} other {# campos}} · tudo o resto está no editor",
+      "preview": "Pré-visualização",
+      "sizedToTable": "ajustado à tabela",
+      "theme": "tema «{name}»",
+      "result": "Resultado",
+      "generate": "Gerar imagem",
+      "generateAgain": "Gerar novamente",
+      "openInEditor": "Abrir no editor",
+      "remixedFrom": "Remix de {name}"
+    },
+    "publish": {
+      "title": "Publicar design",
+      "close": "Fechar",
+      "name": "Nome",
+      "description": "Descrição",
+      "visibility": "Visibilidade",
+      "public": "Público",
+      "private": "Privado",
+      "fillableFields": "Campos editáveis",
+      "nSelected": "{count} selecionados",
+      "exposedHint": "Quem usar o seu design pode alterar só estes campos num formulário curto antes de gerar; tudo o resto fica como o desenhou. Os valores predefinidos já funcionam, por isso não tem nada para configurar.",
+      "fieldLabel": "Rótulo do campo",
+      "willShowRemix": "Vai mostrar «Remix de {name}».",
+      "whatPeopleSee": "O que as pessoas vão ver",
+      "noFields": {
+        "title": "Ainda sem campos",
+        "body": "Marque campos à esquerda para criar o formulário. Sem nenhum, as pessoas só podem gerar a imagem tal como está ou abri-la no editor."
+      },
+      "cancel": "Cancelar",
+      "publish": "Publicar",
+      "update": "Guardar alterações",
+      "toast": {
+        "published": "Publicado · está em Explorar → Comunidade",
+        "private": "Publicado em privado · só você o vê; partilhe-o com o respetivo link",
+        "failed": "Falha ao publicar",
+        "missingAsset": "Uma imagem deste design já não está neste navegador. Substitua-a e publique novamente."
+      },
+      "visibilityHint": "Os designs públicos são listados em Explorar para todos usarem e fazerem remix. Os privados só aparecem na sua galeria; qualquer pessoa com o link pode abri-los na mesma.",
+      "optional": "opcional",
+      "editFields": "Editar campos",
+      "hideFields": "Ocultar campos"
     }
   }
 }

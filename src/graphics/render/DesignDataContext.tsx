@@ -2,11 +2,24 @@
 import React, { createContext, useContext, useMemo } from 'react';
 
 import { resolveSnapshotCountries, snapshotStages } from '../data/contestRows';
+import {
+  SAMPLE_COUNTRIES,
+  SAMPLE_RUNNING_ORDER,
+  SAMPLE_STAGE,
+  SAMPLE_VOTERS,
+  SAMPLE_VOTES,
+} from '../data/sampleRows';
 import { DataBinding, ManualRow } from '../model/design';
 
 import { useContestSnapshotQuery } from '@/api/contests';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
-import { Country, EventStage, StageVotingType, StatsTableType } from '@/models';
+import {
+  Country,
+  EventStage,
+  StageVotingType,
+  StatsTableType,
+  VotingCountry,
+} from '@/models';
 import type { StageVotes } from '@/state/scoreboard/types';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -30,6 +43,8 @@ export interface StatsSource {
   ) => number;
   aggregateTotalsOnly?: boolean;
   table?: StatsTableType;
+  /** Table columns; absent = ask the countries store for the stage's voters. */
+  votingCountries?: VotingCountry[];
 }
 
 export interface ContestAccessProblem {
@@ -54,7 +69,12 @@ export interface ResolvedDesignData {
    * A live stage + its predefined votes, for stats elements to compute
    * their own tables (statsAccessors). Only the live source has it.
    */
-  statsStage?: { stage: EventStage; votes?: Partial<StageVotes> };
+  statsStage?: {
+    stage: EventStage;
+    votes?: Partial<StageVotes>;
+    /** Voters per channel when the stage isn't in the stores (sample). */
+    voters?: Record<'jury' | 'televote', VotingCountry[]>;
+  };
   /** Stages of the bound contest (Data panel stage select). */
   contestStages?: ReturnType<typeof snapshotStages>;
   /**
@@ -62,6 +82,8 @@ export interface ResolvedDesignData {
    * scoreboard (handoff §9, "quiet fallback with a note").
    */
   inaccessible?: ContestAccessProblem;
+  /** No contest is running: the live rows are the sample ones (sampleRows). */
+  isSample?: boolean;
 }
 
 const DesignDataContext = createContext<ResolvedDesignData>({
@@ -102,7 +124,9 @@ const EMPTY: Country[] = [];
  * image always matches what is on screen; a `stageId` on the binding picks
  * another stage of the running event. `contest` loads the saved contest's
  * snapshot (React Query) and ranks the chosen stage; when the contest can't
- * be opened the rows fall back to live and `inaccessible` says why.
+ * be opened the rows fall back to live and `inaccessible` says why. With
+ * no contest running, live rows are the sample Grand Final (`isSample`) so
+ * scoreboards and stats tables never preview empty.
  */
 export const DesignDataProvider: React.FC<ProviderProps> = ({
   binding,
@@ -142,19 +166,34 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
   } | null;
 
   const value = useMemo<ResolvedDesignData>(() => {
-    const live: ResolvedDesignData = {
-      countries: sortedLive,
-      isVotingOver: !!liveStage?.isOver,
-      stageName: liveStage?.name ?? '',
-      runningOrder: liveStage?.runningOrder?.length
-        ? liveStage.runningOrder
-        : liveStage?.countries.map((c) => c.code),
-      status: 'ready',
-      stats,
-      statsStage: liveStage
-        ? { stage: liveStage, votes: liveVotes }
-        : undefined,
-    };
+    const live: ResolvedDesignData = !liveStage
+      ? {
+          countries: SAMPLE_COUNTRIES,
+          isVotingOver: true,
+          stageName: SAMPLE_STAGE.name,
+          runningOrder: SAMPLE_RUNNING_ORDER,
+          status: 'ready',
+          stats,
+          statsStage: {
+            stage: SAMPLE_STAGE,
+            votes: SAMPLE_VOTES,
+            voters: SAMPLE_VOTERS,
+          },
+          isSample: true,
+        }
+      : {
+          countries: sortedLive,
+          isVotingOver: !!liveStage?.isOver,
+          stageName: liveStage?.name ?? '',
+          runningOrder: liveStage?.runningOrder?.length
+            ? liveStage.runningOrder
+            : liveStage?.countries.map((c) => c.code),
+          status: 'ready',
+          stats,
+          statsStage: liveStage
+            ? { stage: liveStage, votes: liveVotes }
+            : undefined,
+        };
 
     switch (binding.source) {
       case 'provided':
@@ -216,7 +255,13 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
           };
         }
 
-        return { ...live, countries: EMPTY, status: 'loading', stats };
+        return {
+          ...live,
+          countries: EMPTY,
+          status: 'loading',
+          stats,
+          isSample: false,
+        };
       }
       case 'live':
       default:

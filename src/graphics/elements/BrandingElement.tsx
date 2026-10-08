@@ -20,7 +20,7 @@ const BrandingElement: React.FC<{ el: BrandingElementModel }> = ({ el }) => {
 
   return (
     <div
-      className={`relative flex justify-center items-center w-full px-2 flex-shrink-0 ${font.className}`}
+      className={`relative flex justify-center items-center w-full flex-shrink-0 ${font.className}`}
       style={{ fontSize: `${el.fontSize}px`, ...font.style }}
     >
       {showIcon && (

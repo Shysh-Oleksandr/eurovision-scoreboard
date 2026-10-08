@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'react-toastify';
 
+import { MissingAssetError, syncPublishedDesign } from '../cloud/publishDesign';
 import { DesignDataProvider, useDesignData } from '../render/DesignDataContext';
 import { OpenEditorRequest } from '../state/graphicsStudioStore';
 import { sweepUnreferencedAssets } from '../storage/designsDb';
@@ -102,6 +103,48 @@ const GraphicsEditor: React.FC<Props> = ({ request, onClose }) => {
 
   const { save, saving } = useAutosave();
 
+  /**
+   * Published designs stay current: after an explicit save (and on close)
+   * the cloud copy gets the new document and thumbnail, settings untouched.
+   * Returns what happened so the caller can word its toast.
+   */
+  const syncCloud = useCallback(async (): Promise<
+    'synced' | 'skipped' | 'failed'
+  > => {
+    const state = useEditorStore.getState();
+
+    if (!state.cloudId || !state.cloudDirty || !user) return 'skipped';
+    try {
+      const record = await syncPublishedDesign({
+        design: state.design,
+        cloudId: state.cloudId,
+        node: designNodeRef.current,
+      });
+
+      if (!record) {
+        // Unpublished from the gallery meanwhile: forget the id.
+        state.setCloudId(null);
+        state.markCloudSynced();
+        toast.info(t('toast.cloudGone'));
+        void save();
+
+        return 'skipped';
+      }
+      state.markCloudSynced();
+
+      return 'synced';
+    } catch (err: any) {
+      console.error('Cloud sync failed', err);
+      toast.error(
+        err instanceof MissingAssetError
+          ? t('toast.cloudUpdateFailed')
+          : err?.response?.data?.message || t('toast.cloudUpdateFailed'),
+      );
+
+      return 'failed';
+    }
+  }, [user, save, t]);
+
   // Closing the tab with unsaved changes asks the browser's own confirm.
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -150,24 +193,71 @@ const GraphicsEditor: React.FC<Props> = ({ request, onClose }) => {
   const handleSave = useCallback(async () => {
     const id = await save();
 
-    if (id) toast.success(t('toast.saved'));
-  }, [save, t]);
+    if (!id) return;
+    const synced = await syncCloud();
 
-  // Every edited design autosaves, so closing just flushes the last edit.
-  // Only a failed save asks what to do with the changes.
-  const requestClose = useCallback(() => {
+    toast.success(
+      synced === 'synced' ? t('toast.savedAndSynced') : t('toast.saved'),
+    );
+  }, [save, syncCloud, t]);
+
+  // Every edited design autosaves, so closing just flushes the last edit
+  // (and the published copy). Only a failed save asks what to do with the
+  // changes. Resolves whether the editor is closing.
+  const requestClose = useCallback(async (): Promise<boolean> => {
     const { dirty } = useEditorStore.getState();
 
-    if (!dirty) {
-      onClose();
+    if (dirty) {
+      const id = await save();
 
-      return;
+      if (!id) {
+        setUnsavedOpen(true);
+
+        return false;
+      }
     }
-    save().then((id) => {
-      if (id) onClose();
-      else setUnsavedOpen(true);
-    });
-  }, [save, onClose]);
+    const synced = await syncCloud();
+
+    if (synced === 'synced') toast.success(t('toast.cloudUpdated'));
+    onClose();
+
+    return true;
+  }, [save, syncCloud, onClose, t]);
+  const requestCloseRef = useRef(requestClose);
+
+  requestCloseRef.current = requestClose;
+
+  // The editor is a history entry (`?editor=1`): the browser's Back closes
+  // it instead of leaving the site, and closing it from the UI pops the
+  // entry again. A close that could not save re-pushes the entry.
+  useEffect(() => {
+    const pushEntry = () => {
+      const url = new URL(window.location.href);
+
+      url.searchParams.set('editor', '1');
+      window.history.pushState({ gfxEditor: true }, '', url.toString());
+    };
+    const stale = new URL(window.location.href);
+
+    if (stale.searchParams.has('editor')) {
+      stale.searchParams.delete('editor');
+      window.history.replaceState(window.history.state, '', stale.toString());
+    }
+    pushEntry();
+    const onPop = () => {
+      if (window.history.state?.gfxEditor) return;
+      requestCloseRef.current().then((closing) => {
+        if (!closing) pushEntry();
+      });
+    };
+
+    window.addEventListener('popstate', onPop);
+
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      if (window.history.state?.gfxEditor) window.history.back();
+    };
+  }, []);
 
   const dialogOpen =
     exportStatus.kind !== 'idle' ||
@@ -246,6 +336,7 @@ const GraphicsEditor: React.FC<Props> = ({ request, onClose }) => {
           onClose={() => setPublishOpen(false)}
           onPublished={() => {
             // The cloud id is part of the draft record: persist it now.
+            useEditorStore.getState().markCloudSynced();
             save();
           }}
         />

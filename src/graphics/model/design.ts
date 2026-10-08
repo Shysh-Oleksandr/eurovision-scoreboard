@@ -164,6 +164,12 @@ export const scoreboardElementSchema = z.object({
   /** `runningOrder` lists the rows in the stage's running order (no ranks). */
   rowOrder: z.enum(['ranked', 'runningOrder']).default('ranked'),
   paddingY: z.number().min(0).default(0),
+  /**
+   * `auto`: columns and row size follow the number of rows and the space the
+   * element has (its `h` when free, the rest of a fixed-height stack in
+   * flow); `columns` / `itemSize` are then ignored. See scoreboardFit.ts.
+   */
+  fit: z.enum(['fixed', 'auto']).default('fixed'),
 });
 
 export const statsElementSchema = z.object({

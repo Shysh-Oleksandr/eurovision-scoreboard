@@ -12,9 +12,16 @@ const TONE_CLASS: Record<WidgetTone, string> = {
   teal: 'dp-tone-teal',
 };
 
+export type WidgetStatProps = {
+  stat?: React.ReactNode;
+  statLoading?: boolean;
+};
+
 type WidgetContainerProps = {
   onClick: () => void;
   title: string;
+  /** Small pill after the title (e.g. a Beta label). */
+  badge?: React.ReactNode;
   description: string;
   icon: React.ReactNode;
   /** Accent used for the icon chip / card tint (`--accent-2`, `--accent`, gold). */
@@ -32,6 +39,7 @@ type WidgetContainerProps = {
 const WidgetContainer = ({
   onClick,
   title,
+  badge,
   description,
   icon,
   tone,
@@ -54,8 +62,9 @@ const WidgetContainer = ({
         {icon}
       </span>
       <span className="min-w-0 flex-1 flex flex-col">
-        <span className="text-[15px] font-extrabold tracking-[-.015em] leading-tight">
+        <span className="flex items-center gap-1.5 text-[15px] font-extrabold tracking-[-.015em] leading-tight">
           {title}
+          {badge}
         </span>
         <span
           className={`${

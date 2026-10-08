@@ -60,22 +60,50 @@ const blobToDataUrl = (blob: Blob): Promise<string> =>
 
 const dataUrlCache = new Map<string, Promise<string>>();
 
+const fetchDataUrl = (url: string, init?: RequestInit): Promise<string> =>
+  fetch(url, init)
+    .then((r) => {
+      if (!r.ok) throw new Error(`${r.status} ${url}`);
+
+      return r.blob();
+    })
+    .then(blobToDataUrl);
+
+const isCrossOrigin = (url: string) => {
+  try {
+    return new URL(url, window.location.href).origin !== window.location.origin;
+  } catch {
+    return false;
+  }
+};
+
+async function loadDataUrl(url: string): Promise<string> {
+  // No cache mode for blob: URLs (Firefox is strict about it).
+  if (url.startsWith('blob:')) return fetchDataUrl(url);
+  if (!isCrossOrigin(url)) return fetchDataUrl(url, { cache: 'force-cache' });
+  // The preview already loaded this image without CORS (CSS background,
+  // plain <img>), so its HTTP cache entry has no Access-Control-Allow-Origin.
+  // A cache-first CORS fetch reuses that entry and fails; `no-cache`
+  // revalidates with an Origin header and the CDN answers with CORS headers.
+  try {
+    return await fetchDataUrl(url, { mode: 'cors', cache: 'no-cache' });
+  } catch (e) {
+    if (!url.startsWith('https://')) throw e;
+
+    // Origin not on the host's CORS allowlist (R2 allows only some app
+    // origins): go through the same-origin proxy instead.
+    return fetchDataUrl(`/api/image-proxy?url=${encodeURIComponent(url)}`, {
+      cache: 'force-cache',
+    });
+  }
+}
+
 async function toDataUrl(url: string): Promise<string> {
   if (url.startsWith('data:')) return url;
   let pending = dataUrlCache.get(url);
 
   if (!pending) {
-    // No cache mode for blob: URLs (Firefox is strict about it).
-    pending = fetch(
-      url,
-      url.startsWith('blob:') ? undefined : { cache: 'force-cache' },
-    )
-      .then((r) => {
-        if (!r.ok) throw new Error(`${r.status} ${url}`);
-
-        return r.blob();
-      })
-      .then(blobToDataUrl);
+    pending = loadDataUrl(url);
     // Blob URLs are revoked by their owners; never cache them.
     if (!url.startsWith('blob:')) dataUrlCache.set(url, pending);
     pending.catch(() => dataUrlCache.delete(url));
@@ -149,6 +177,10 @@ export async function inlineResources(
     }),
   );
 
+  // CSS backgrounds are inlined too, but Safari drops url() backgrounds from
+  // the first render of a snapshot (no warning; only a second, different
+  // snapshot paints them). Image fills therefore render as <img> (see
+  // render/fills.tsx); this pass covers what is left.
   const all = [node, ...Array.from(node.querySelectorAll<HTMLElement>('*'))];
 
   await Promise.all(

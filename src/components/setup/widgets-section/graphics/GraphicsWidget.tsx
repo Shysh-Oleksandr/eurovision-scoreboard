@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
+import BetaBadge from '@/components/common/BetaBadge';
 import WidgetContainer from '@/components/common/WidgetContainer';
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { countDesigns } from '@/graphics/storage/designsDb';
@@ -14,12 +15,12 @@ const GraphicsModal = dynamic(() => import('./GraphicsModal'), {
 });
 
 interface Props {
-  /** "N published · M saved" from the profile summary (signed in). */
+  /** "N saved" from the profile summary (signed in). */
   cloudStat?: string;
   statLoading?: boolean;
 }
 
-/** Fourth Hub widget (teal): opens the Graphics modal on "My designs". */
+/** Hub widget (teal, beta): opens the Graphics modal on "My designs". */
 const GraphicsWidget = ({ cloudStat, statLoading }: Props) => {
   const t = useTranslations('graphics.widget');
   const isOpen = useGraphicsStudioStore((s) => s.isGraphicsModalOpen);
@@ -45,6 +46,7 @@ const GraphicsWidget = ({ cloudStat, statLoading }: Props) => {
       <WidgetContainer
         onClick={() => setOpen(true)}
         title={t('title')}
+        badge={<BetaBadge />}
         description={t('description')}
         tone="teal"
         stat={
@@ -52,7 +54,7 @@ const GraphicsWidget = ({ cloudStat, statLoading }: Props) => {
             ? undefined
             : `${
                 count === 0 ? t('noDesignsYet') : t('nDesigns', { count })
-              } · ${cloudStat ?? t('templates')}`
+              } · ${cloudStat ?? t('explore')}`
         }
         statLoading={count === null || !!statLoading}
         icon={<Sparkles className="size-[21px] flex-none" />}

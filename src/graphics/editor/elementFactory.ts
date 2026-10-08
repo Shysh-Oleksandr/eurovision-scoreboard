@@ -102,6 +102,7 @@ export function createElement(
         statusMode: 'live',
         rowOrder: 'ranked',
         paddingY: 0,
+        fit: 'fixed',
       };
     case 'stats':
       return {

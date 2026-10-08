@@ -44,6 +44,7 @@ interface Props {
   compact: boolean;
   labels: {
     heightFollowsRows: string;
+    rowsFitBox: string;
     sizesToContent: string;
     elements: (n: number) => string;
     centred: (n: number) => string;
@@ -200,7 +201,12 @@ const SelectionOverlay: React.FC<Props> = ({
         const sizeText = `${Math.round(box.w)} × ${Math.round(box.h)}`;
         const angle = signedAngle(el.rotation);
         const label =
-          el.type === 'scoreboard' || el.type === 'stack'
+          el.type === 'scoreboard' && el.fit === 'auto'
+            ? {
+                text: `${elementLabel(el)} · ${sizeText}`,
+                note: labels.rowsFitBox,
+              }
+            : el.type === 'scoreboard' || el.type === 'stack'
             ? {
                 text: `${elementLabel(el)} · ${sizeText}`,
                 note: labels.heightFollowsRows,

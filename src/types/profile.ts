@@ -22,7 +22,7 @@ export interface ProfileSummary {
   savedThemesCount: number;
   privateContestsCount: number;
   publicContestsCount: number;
-  /** Published graphics templates / saved community templates. */
+  /** Published graphics designs and saved community designs. */
   designsCount?: number;
   savedDesignsCount?: number;
 }

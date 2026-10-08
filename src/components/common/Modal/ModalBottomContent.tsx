@@ -52,6 +52,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
         </Button>
         <Button
           variant="cta"
+          softGlow={false}
           size="lg"
           className="flex-1 min-w-0 justify-center gap-2 !uppercase !font-bold"
           onClick={onSave}

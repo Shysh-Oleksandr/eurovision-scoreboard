@@ -14,11 +14,12 @@ import { useShallow } from 'zustand/shallow';
 import { findElement } from '../model/elements';
 import { useDesignData } from '../render/DesignDataContext';
 import { DesignStage } from '../render/DesignStage';
+import { LayoutSignalContext } from '../render/layoutSignal';
 
 import { selectSelectedElements, useEditorStore } from './editorStore';
 import { visibleElementIds } from './flatten';
 import SelectionOverlay from './SelectionOverlay';
-import { BoxMap, useElementBoxes } from './useElementBoxes';
+import { BoxMap, readElementBoxes, useElementBoxes } from './useElementBoxes';
 import { useGestures } from './useGestures';
 import { usePinchZoom } from './usePinchZoom';
 
@@ -135,7 +136,14 @@ const EditorStage: React.FC<Props> = ({ designNodeRef, compact, onBoxes }) => {
       : Math.max(pad, (viewport.height - ch * zoom) / 2)) +
     (compact ? pinch.pan.y : 0);
 
-  const { boxes } = useElementBoxes(designNodeRef, design, zoom);
+  const { boxes, remeasure } = useElementBoxes(designNodeRef, design, zoom);
+  // Bumped when an element settles its own layout (auto-fit scoreboards):
+  // boxes are re-measured and a pending flatten is retried.
+  const [layoutTick, setLayoutTick] = useState(0);
+  const onLayoutSettled = useCallback(() => {
+    remeasure();
+    setLayoutTick((n) => n + 1);
+  }, [remeasure]);
   const boxesRef = useRef<BoxMap>(boxes);
   const zoomRef = useRef(zoom);
 
@@ -160,8 +168,25 @@ const EditorStage: React.FC<Props> = ({ designNodeRef, compact, onBoxes }) => {
     const ids = visibleElementIds(design.elements);
 
     if (ids.length && !ids.every((id) => boxes.has(id))) return;
-    flatten(boxes, measured);
-  }, [flattenPending, dataStatus, autoSize, measured, boxes, design, flatten]);
+    const node = designNodeRef.current;
+
+    // Auto-fit scoreboards settle after their first paint and signal it
+    // (layoutTick); flatten from the DOM as it is now, not the last
+    // measured boxes, which may predate that.
+    if (!node || node.querySelector('[data-fit-pending]')) return;
+    flatten(readElementBoxes(node, design, zoom), measured);
+  }, [
+    flattenPending,
+    dataStatus,
+    autoSize,
+    measured,
+    boxes,
+    design,
+    flatten,
+    designNodeRef,
+    zoom,
+    layoutTick,
+  ]);
 
   /** The element under a pointer event (ignores the full-canvas layout stack). */
   const resolveTarget = useCallback(
@@ -252,6 +277,7 @@ const EditorStage: React.FC<Props> = ({ designNodeRef, compact, onBoxes }) => {
   const overlayLabels = useMemo(
     () => ({
       heightFollowsRows: t('label.heightFollowsRows'),
+      rowsFitBox: t('label.rowsFitBox'),
       sizesToContent: t('label.sizesToContent'),
       elements: (n: number) => t('label.nElements', { count: n }),
       centred: (n: number) => t('label.centred', { px: n }),
@@ -275,15 +301,17 @@ const EditorStage: React.FC<Props> = ({ designNodeRef, compact, onBoxes }) => {
           className="gfx-world"
           style={{ transform: `translate(${ox}px, ${oy}px)` }}
         >
-          <DesignStage
-            design={design}
-            zoom={zoom}
-            nodeRef={designNodeRef}
-            className="gfx-canvas"
-            onMeasured={autoSize ? handleMeasured : undefined}
-            onBackgroundPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-          />
+          <LayoutSignalContext.Provider value={onLayoutSettled}>
+            <DesignStage
+              design={design}
+              zoom={zoom}
+              nodeRef={designNodeRef}
+              className="gfx-canvas"
+              onMeasured={autoSize ? handleMeasured : undefined}
+              onBackgroundPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+            />
+          </LayoutSignalContext.Provider>
         </div>
         <div
           className="gfx-world gfx-world--overlay"

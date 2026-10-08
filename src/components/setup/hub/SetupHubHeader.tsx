@@ -9,6 +9,7 @@ import {
   useContestField,
 } from './hooks/useContestField';
 import { useThemeField } from './hooks/useThemeField';
+import ProfileButton from './ProfileButton';
 
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
 import SyncIcon from '@/assets/icons/SyncIcon';
@@ -24,8 +25,8 @@ type SetupHubHeaderProps = {
 
 /**
  * Header row: Contest combo (+ Grand Final only chip), Theme combo (+ sync
- * chip) and the Settings / Feedback / Guide cluster. On phones it becomes a
- * two-column grid with the cluster on its own row.
+ * chip) and the Profile / Settings / Guide / Feedback cluster. On phones it
+ * becomes a two-column grid with the cluster on its own row.
  */
 export const SetupHubHeader: React.FC<SetupHubHeaderProps> = ({
   openSettingsModal,
@@ -94,7 +95,8 @@ export const SetupHubHeader: React.FC<SetupHubHeaderProps> = ({
         />
       </ComboField>
 
-      <div className="col-span-2 flex items-end gap-2 sm:ml-auto">
+      <div className="col-span-2 flex items-end gap-2 sm:ml-auto min-w-0">
+        <ProfileButton className="flex-1 sm:flex-none" />
         <Button
           onClick={(e) => {
             e.stopPropagation();
