@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
+import { useSetAppLocale } from './AppIntlProvider';
+
 import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
@@ -14,6 +16,9 @@ import { useFullscreen } from '@/hooks/useFullscreen';
 import { useShareLinks } from '@/hooks/useShareLinks';
 import { useStatusBarThemeColor } from '@/hooks/useStatusBarThemeColor';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
+import { normalizeLocale } from '@/i18n/catalog';
+import { getStoredLocale } from '@/i18n/nativeLocale';
+import { IS_NATIVE_APP } from '@/native/platform';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -40,6 +45,7 @@ export default function AppBootstrap() {
     (state) => state.setInitialCountriesForYear,
   );
   const router = useRouter();
+  const setAppLocale = useSetAppLocale();
   const hasSyncedPreferredLocaleRef = useRef(false);
 
   // Initialize countries once on first load
@@ -94,6 +100,17 @@ export default function AppBootstrap() {
 
     if (typeof document === 'undefined') return;
 
+    // Native: same rule, with the saved in-app choice standing in for the
+    // cookie (IntlProvider writes a cookie on every render there, so its
+    // presence means nothing).
+    if (IS_NATIVE_APP) {
+      hasSyncedPreferredLocaleRef.current = true;
+
+      if (!getStoredLocale()) setAppLocale(normalizeLocale(preferred));
+
+      return;
+    }
+
     const hasLocaleCookie = document.cookie
       .split(';')
       .map((c) => c.trim())
@@ -120,7 +137,7 @@ export default function AppBootstrap() {
         console.error('Failed to sync preferred locale', error);
       }
     })();
-  }, [user?.preferredLocale, router]);
+  }, [user?.preferredLocale, router, setAppLocale]);
 
   return (
     <>

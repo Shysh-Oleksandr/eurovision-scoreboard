@@ -5,10 +5,12 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 
 import { useUpdateProfileMutation } from '../../api/profiles';
+import { useSetAppLocale } from '../../app/AppIntlProvider';
 import { useAuthStore } from '../../state/useAuthStore';
 import CustomSelect from '../common/customSelect/CustomSelect';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { IS_NATIVE_APP } from '@/native/platform';
 import { PreferredLocale } from '@/types/profile';
 
 type LocaleOption = {
@@ -35,6 +37,7 @@ export const LanguageSelector: React.FC = () => {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const updateProfile = useUpdateProfileMutation();
+  const setAppLocale = useSetAppLocale();
 
   const handleLanguageChange = async (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -42,6 +45,18 @@ export const LanguageSelector: React.FC = () => {
     const nextLocale = e.target.value as PreferredLocale;
 
     if (nextLocale === locale) return;
+
+    // Native apps have no server to hold a locale cookie: the provider
+    // switches catalogs on the client and remembers the choice.
+    if (IS_NATIVE_APP) {
+      setAppLocale(nextLocale);
+
+      if (user) {
+        updateProfile.mutate({ preferredLocale: nextLocale });
+      }
+
+      return;
+    }
 
     try {
       await fetch('/api/locale', {

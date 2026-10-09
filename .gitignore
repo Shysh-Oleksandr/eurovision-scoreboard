@@ -21,3 +21,6 @@ currentTask/
 
 # Generated per-locale message catalogs (rebuilt by prebuild)
 /public/messages/
+
+# Capacitor static export (yarn build:native)
+/out/

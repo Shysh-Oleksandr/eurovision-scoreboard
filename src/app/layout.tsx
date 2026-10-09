@@ -20,8 +20,9 @@ import {
   SHELL_NAMESPACES,
   SupportedLocale,
 } from '@/i18n/catalog';
-import { MESSAGES_CATALOG } from '@/i18n/messagesManifest.generated';
+import { catalogUrlFor } from '@/i18n/catalogUrl';
 import { getMergedMessages } from '@/i18n/serverMessages';
+import { IS_NATIVE_APP } from '@/native/platform';
 import {
   FONT_ALIAS_ALLOWLIST,
   getFontFamilyStackCss,
@@ -143,10 +144,7 @@ export default async function RootLayout({
     await getMergedMessages(locale),
     SHELL_NAMESPACES,
   );
-  const catalogUrl =
-    process.env.NODE_ENV === 'development'
-      ? `/api/messages/${locale}`
-      : MESSAGES_CATALOG[locale].url;
+  const catalogUrl = catalogUrlFor(locale);
 
   // The countries preset gates the *useful* first render — the setup screen
   // can only lay out its stages once it arrives — but the store only requests
@@ -160,10 +158,14 @@ export default async function RootLayout({
     as: 'fetch',
     crossOrigin: 'anonymous',
   });
-  ReactDOM.preload(catalogUrl, {
-    as: 'fetch',
-    crossOrigin: 'anonymous',
-  });
+  // Native apps pick their locale on the client (AppIntlProvider) and read
+  // the catalog from disk, so an English preload would usually go unused.
+  if (!IS_NATIVE_APP) {
+    ReactDOM.preload(catalogUrl, {
+      as: 'fetch',
+      crossOrigin: 'anonymous',
+    });
+  }
 
   return (
     <html

@@ -21,18 +21,31 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_LOCALE: SupportedLocale = 'en';
 
-export function normalizeLocale(
+/**
+ * Maps a language tag (`uk-UA`, `pt-BR`, a stored `gr`) to a supported
+ * locale, or null when none matches. Greek is `gr` in this app but `el` in
+ * BCP 47, which is what browsers and devices report.
+ */
+export function matchLocale(
   raw: string | undefined | null,
-): SupportedLocale {
-  if (!raw) return DEFAULT_LOCALE;
+): SupportedLocale | null {
+  if (!raw) return null;
 
   const lower = raw.toLowerCase();
+
+  if (lower.startsWith('el')) return 'gr';
 
   for (const locale of SUPPORTED_LOCALES) {
     if (lower.startsWith(locale)) return locale;
   }
 
-  return DEFAULT_LOCALE;
+  return null;
+}
+
+export function normalizeLocale(
+  raw: string | undefined | null,
+): SupportedLocale {
+  return matchLocale(raw) ?? DEFAULT_LOCALE;
 }
 
 export function deepMergeMessages(base: any, override: any): any {

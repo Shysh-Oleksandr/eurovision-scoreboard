@@ -9,12 +9,12 @@ export const MESSAGES_CATALOG: Record<
   { url: string; hash: string }
 > = {
   en: { url: '/messages/en.5bdfa25a20.json', hash: '5bdfa25a20' },
-  es: { url: '/messages/es.7908f48e4c.json', hash: '7908f48e4c' },
-  fr: { url: '/messages/fr.bc906d147d.json', hash: 'bc906d147d' },
-  uk: { url: '/messages/uk.92c6a65286.json', hash: '92c6a65286' },
-  de: { url: '/messages/de.33811981f3.json', hash: '33811981f3' },
-  pl: { url: '/messages/pl.c9ffc8113c.json', hash: 'c9ffc8113c' },
-  it: { url: '/messages/it.742c00ee3a.json', hash: '742c00ee3a' },
-  gr: { url: '/messages/gr.34f64d2ee9.json', hash: '34f64d2ee9' },
-  pt: { url: '/messages/pt.1dd9056891.json', hash: '1dd9056891' },
+  es: { url: '/messages/es.b95f4e3b18.json', hash: 'b95f4e3b18' },
+  fr: { url: '/messages/fr.6a7c763425.json', hash: '6a7c763425' },
+  uk: { url: '/messages/uk.5503c3c2ba.json', hash: '5503c3c2ba' },
+  de: { url: '/messages/de.a3440f660a.json', hash: 'a3440f660a' },
+  pl: { url: '/messages/pl.30f3964400.json', hash: '30f3964400' },
+  it: { url: '/messages/it.1f5f57b6b6.json', hash: '1f5f57b6b6' },
+  gr: { url: '/messages/gr.0d278fff96.json', hash: '0d278fff96' },
+  pt: { url: '/messages/pt.2757862b88.json', hash: '2757862b88' },
 };

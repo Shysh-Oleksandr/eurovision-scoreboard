@@ -1,5 +1,7 @@
-import { FlagShape } from '@/theme/types';
 import { BaseCountry } from '../models';
+
+import { IS_NATIVE_APP } from '@/native/platform';
+import { FlagShape } from '@/theme/types';
 
 const minimalSupportedRoundFlags = ['FR', 'IE', 'IT', 'TR'];
 const supportedRoundFlags = [
@@ -412,7 +414,7 @@ const supportedSquareFlags = [
 export const getFlagPath = (
   country: BaseCountry | string,
   shape: FlagShape = 'big-rectangle',
-  enableMinimalisticFlags: boolean = false,
+  enableMinimalisticFlags = false,
 ): string => {
   if (typeof country === 'string') {
     if (
@@ -459,13 +461,21 @@ export const getFlagPath = (
 };
 
 /**
+ * Same-origin proxy URL for a foreign image, so exports can read its pixels.
+ * The native apps have no API routes: they keep the original URL (it displays
+ * fine as a plain <img>) and exportNode fetches it natively when exporting.
+ */
+const toImageProxyUrl = (url: string): string =>
+  IS_NATIVE_APP ? url : `/api/image-proxy?url=${encodeURIComponent(url)}`;
+
+/**
  * Get flag path with proxy for external URLs to avoid CORS issues during image generation
  * Only use this for image generation contexts where CORS is a problem
  */
 export const getFlagPathForImageGeneration = (
   country: BaseCountry | string,
   shape: FlagShape = 'big-rectangle',
-  enableMinimalisticFlags: boolean = false,
+  enableMinimalisticFlags = false,
 ): string => {
   const flagPath = getFlagPath(country, shape, enableMinimalisticFlags);
 
@@ -480,7 +490,7 @@ export const getFlagPathForImageGeneration = (
     }
 
     // Proxy external URLs through our image proxy
-    return `/api/image-proxy?url=${encodeURIComponent(flagPath)}`;
+    return toImageProxyUrl(flagPath);
   }
 
   // Return local paths as-is
@@ -501,8 +511,9 @@ export const getBackgroundImageForImageGeneration = (
       return backgroundImage;
     }
 
-    return `/api/image-proxy?url=${encodeURIComponent(backgroundImage)}`;
+    return toImageProxyUrl(backgroundImage);
   }
+
   return backgroundImage;
 };
 

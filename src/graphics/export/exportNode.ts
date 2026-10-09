@@ -14,6 +14,8 @@
  * docs/plans/graphics-poc-results.md.
  */
 
+import { IS_NATIVE_APP } from '@/native/platform';
+
 export type ExportEngine = 'snapdom' | 'html-to-image';
 
 export interface ExportOptions {
@@ -81,6 +83,22 @@ async function loadDataUrl(url: string): Promise<string> {
   // No cache mode for blob: URLs (Firefox is strict about it).
   if (url.startsWith('blob:')) return fetchDataUrl(url);
   if (!isCrossOrigin(url)) return fetchDataUrl(url, { cache: 'force-cache' });
+
+  // Native apps: no /api/image-proxy route, and their origin
+  // (capacitor://localhost, https://localhost) is on no CDN's CORS
+  // allowlist. Native HTTP is not subject to CORS, so read the bytes there.
+  if (IS_NATIVE_APP) {
+    const { Capacitor } = await import('@capacitor/core');
+
+    if (Capacitor.isNativePlatform()) {
+      const { fetchImageDataUrlNatively } = await import(
+        '@/native/nativeImage'
+      );
+
+      return fetchImageDataUrlNatively(url);
+    }
+  }
+
   // The preview already loaded this image without CORS (CSS background,
   // plain <img>), so its HTTP cache entry has no Access-Control-Allow-Origin.
   // A cache-first CORS fetch reuses that entry and fails; `no-cache`

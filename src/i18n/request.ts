@@ -26,6 +26,19 @@ function parseAcceptLanguage(value: string | null): SupportedLocale {
 }
 
 export default getRequestConfig(async () => {
+  // Native (Capacitor) bundle: a static export has no request, so cookies() /
+  // headers() would fail the build. The document is rendered once in English
+  // and AppIntlProvider picks the real locale on the client
+  // (i18n/nativeLocale.ts). `yarn dev:native` takes this branch too, so the
+  // dev server behaves like the app.
+  if (process.env.NEXT_PUBLIC_NATIVE_APP === '1') {
+    return {
+      locale: 'en',
+      timeZone: 'UTC',
+      messages: await getMergedMessages('en'),
+    };
+  }
+
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get('locale')?.value as
     | SupportedLocale
