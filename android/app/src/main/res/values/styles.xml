@@ -13,10 +13,17 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- Shows behind the system bars on WebViews older than 140, where
+             Capacitor pads the WebView instead of drawing edge to edge
+             (keep in sync with capacitor.config.ts SPLASH_BACKGROUND). -->
+        <item name="android:windowBackground">#0B0F2E</item>
     </style>
 
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
+        <!-- Android 12+ system splash: the launcher icon on this colour
+             (keep in sync with capacitor.config.ts SPLASH_BACKGROUND). -->
+        <item name="windowSplashScreenBackground">#0B0F2E</item>
     </style>
 </resources>

@@ -24,6 +24,7 @@ import OverflowMenu, {
   type OverflowMenuEntry,
 } from '@/components/common/OverflowMenu';
 import UserInfo from '@/components/common/UserInfo';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useGeneralStore } from '@/state/generalStore';
@@ -108,7 +109,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   };
 
   const handleCopyLink = () => {
-    const url = window.location.href.split('?')[0] + `?theme=${theme._id}`;
+    const url = buildShareUrl({ theme: theme._id });
 
     navigator.clipboard.writeText(url);
     toast.success('Link copied to clipboard!');

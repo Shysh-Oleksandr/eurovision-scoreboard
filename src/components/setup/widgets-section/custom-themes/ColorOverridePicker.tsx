@@ -22,6 +22,7 @@ import Button from '@/components/common/Button';
 import { Checkbox } from '@/components/common/Checkbox';
 import { Input } from '@/components/Input';
 import { hslStringToHex, parseColor } from '@/helpers/colorConversion';
+import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 export const sanitizeGradient = (input: string): string => {
@@ -298,6 +299,19 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
       window.removeEventListener('scroll', updatePosition, true);
     };
   }, [showCopyPopup, calculateCopyPopupPosition]);
+
+  const closePopovers = () => {
+    if (showPicker) {
+      setShowPicker(false);
+    }
+    if (showCopyPopup) {
+      setShowCopyPopup(false);
+      setSelectedFields(new Set());
+      setSearchText('');
+    }
+  };
+
+  useBackHandler(showPicker || showCopyPopup, closePopovers);
 
   // Handle escape key to close picker or copy popup
   useEffect(() => {

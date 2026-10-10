@@ -83,7 +83,8 @@
       "label": "Beta",
       "hint": "Es nuevo y sigue cambiando. Cuéntanos qué falta con el botón de comentarios.",
       "hintFeedback": "Es nuevo y sigue cambiando · haz clic para enviar comentarios"
-    }
+    },
+    "savedTo": "Guardado en {folder}"
   },
   "Metadata": {
     "title": "DouzePoints - Simulador de Marcadores de Eurovisión",
@@ -105,7 +106,6 @@
       "errorImageTooLarge": "La imagen es demasiado grande. El tamaño máximo es {maxSize}MB. Por favor, comprímela o sube una imagen más pequeña."
     },
     "invalidInput": "Entrada no válida",
-    "pleaseSelectValidImageFile": "Selecciona un archivo de imagen válido.",
     "fontUpload": {
       "unsupportedType": "«{name}» no es un archivo de fuente compatible. Usa .woff2, .woff, .ttf u .otf.",
       "tooLarge": "«{name}» es demasiado grande. El tamaño máximo es {maxMb} MB.",
@@ -1413,7 +1413,7 @@
       },
       "uiPreferences": {
         "title": "Preferencias de la interfaz",
-        "content": "Personaliza la apariencia en Ajustes → Preferencias de la interfaz:<list><item><strong>Estilos de bandera</strong> — cambia a iconos de corazón, banderas minimalistas redondas/cuadradas o mantén las rectangulares predeterminadas</item><item><strong>Mostrar siempre rankings</strong> — mantén visibles los números de posición en todo momento, más un indicador de cambio de ranking</item><item><strong>Popups</strong> — activa/desactiva independientemente el popup de clasificados, anuncio del ganador y confeti</item><item><strong>Modo pantalla completa</strong> — entra en pantalla completa para una vista inmersiva del marcador</item><item><strong>Barra de progreso del jurado</strong> — muestra cuántos países han votado en la ronda de jurado actual</item><item><strong>Imagen de fondo personalizada</strong> — sube tu propia imagen para reemplazar el fondo del tema</item><item><strong>Usar siempre la misma fuente</strong> — fija una fuente específica independientemente del tema activo</item><item><strong>Audio</strong> — define volúmenes separados para efectos de sonido y música de fondo, o desactiva todo el audio del tema de una vez</item><item><strong>Efectos de invierno</strong> — activa nieve cayendo con un control deslizante de intensidad ajustable</item></list>"
+        "content": "Personaliza la apariencia en Ajustes → Preferencias de la interfaz:<list><item><strong>Estilos de bandera</strong> — cambia a iconos de corazón, banderas minimalistas redondas/cuadradas o mantén las rectangulares predeterminadas</item><item><strong>Mostrar siempre rankings</strong> — mantén visibles los números de posición en todo momento, más un indicador de cambio de ranking</item><item><strong>Popups</strong> — activa/desactiva independientemente el popup de clasificados, anuncio del ganador y confeti</item><item><strong>Modo pantalla completa</strong> — entra en pantalla completa para una vista inmersiva del marcador</item><item><strong>Barra de progreso del jurado</strong> — muestra cuántos países han votado en la ronda de jurado actual</item><item><strong>Usar siempre la misma fuente</strong> — fija una fuente específica independientemente del tema activo</item><item><strong>Audio</strong> — define volúmenes separados para efectos de sonido y música de fondo, o desactiva todo el audio del tema de una vez</item><item><strong>Efectos de invierno</strong> — activa nieve cayendo con un control deslizante de intensidad ajustable</item></list>"
       },
       "confirmations": {
         "title": "Confirmaciones",
@@ -1463,10 +1463,6 @@
         "suppressedDialogs": "Diálogos suprimidos",
         "reset": "Restablecer"
       },
-      "upload": {
-        "title": "Suelta una imagen o haz clic para buscar",
-        "subtext": "PNG, JPG o WEBP · almacenado en este dispositivo."
-      },
       "danger": {
         "confirm": "Sí, restablecer todo"
       },
@@ -1477,10 +1473,10 @@
         "targetStages": "Mostrar a qué fase avanza cada clasificado.",
         "blurModal": "Desenfocar el marcador detrás de los modales abiertos para mayor concentración.",
         "overrideFont": "Ignorar las fuentes de cada tema (incluidas las subidas) y usar siempre la que elijas abajo, tanto en la interfaz como en el marcador.",
-        "customBg": "Usar tu propia imagen de fondo. Solo se guarda en este dispositivo — no se sincroniza con tu cuenta.",
         "winter": "Añadir nieve cayendo y toques festivos en toda la app.",
         "finalReveal": "Revelar los puntos finales del televoto país por país con una animación dramática.",
-        "predictableReveal": "Revelar los puntos del televoto en un orden suave y determinista, sin suspense aleatorio."
+        "predictableReveal": "Revelar los puntos del televoto en un orden suave y determinista, sin suspense aleatorio.",
+        "haptics": "Vibra con los 12 puntos, al revelar los clasificados y con el ganador."
       }
     },
     "relations": {
@@ -1608,7 +1604,6 @@
       "autoStartPresentationTooltip": "Si está activado, la presentación se iniciará automáticamente al comenzar la votación."
     },
     "ui": {
-      "useCustomBackgroundImage": "Usar imagen de fondo personalizada",
       "dragAndDropToUpload": "Arrastra y suelta o haz clic para subir",
       "useHeartIconsForFlags": "Usar iconos de corazón para las banderas",
       "alwaysShowRankings": "Mostrar siempre las clasificaciones",
@@ -1622,10 +1617,10 @@
       "slow": "Lento",
       "fast": "Rápido",
       "finalRevealLinearAnimation": "Animación suave y predecible (sin aleatoriedad)",
+      "enableHaptics": "Respuesta háptica",
       "enableFullscreenMode": "Activar modo de pantalla completa",
       "warnBeforeManuallyAssigningTelevotePoints": "Avisar antes de asignar manualmente puntos del televoto",
       "showJuryVotingProgressBar": "Mostrar barra de progreso del jurado",
-      "imageSizeIsPrettyLarge": "El tamaño de la imagen es bastante grande ({size}MB). Esto puede ralentizar la simulación, así que quizá prefieras comprimirla o usar una imagen más pequeña. ¿Quieres continuar con esta imagen?",
       "language": "Idioma",
       "enableMinimalisticFlags": "Activar banderas minimalistas",
       "enableWinterEffects": "Activar efectos de invierno",

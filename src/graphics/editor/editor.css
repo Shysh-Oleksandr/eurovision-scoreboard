@@ -26,7 +26,7 @@
   display: flex;
   flex-direction: column;
   background: var(--p-950);
-  padding-top: env(safe-area-inset-top);
+  padding-top: var(--safe-top);
 }
 
 /* Zero-specificity reset so any class on a button (gfx-*, dp-cta, dp-act)
@@ -1648,7 +1648,7 @@ button.gfx-chip:hover {
   display: flex;
   border-top: 1px solid var(--hair);
   background: var(--p-900);
-  padding: 6px 6px calc(14px + env(safe-area-inset-bottom));
+  padding: 6px 6px calc(14px + var(--safe-bottom));
 }
 
 .gfx-ph-bar button {
@@ -1684,7 +1684,7 @@ button.gfx-chip:hover {
   background: var(--p-900);
   box-shadow: 0 -12px 40px rgb(0 0 0 / 45%);
   animation: gfx-sheetin 0.22s ease;
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: var(--safe-bottom);
 }
 
 @keyframes gfx-sheetin {

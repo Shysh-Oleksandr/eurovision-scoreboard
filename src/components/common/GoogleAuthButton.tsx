@@ -8,7 +8,7 @@ import { useAuthStore } from '@/state/useAuthStore';
 
 const GoogleAuthButton = () => {
   const t = useTranslations('widgets.profile');
-  const { login } = useAuthStore();
+  const { login, isSigningIn } = useAuthStore();
 
   return (
     <Button
@@ -16,6 +16,7 @@ const GoogleAuthButton = () => {
       Icon={<GoogleIcon className="w-6 h-6 flex-none" />}
       variant="tertiary"
       onClick={login}
+      disabled={isSigningIn}
     />
   );
 };

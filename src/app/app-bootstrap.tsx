@@ -18,9 +18,10 @@ import { useStatusBarThemeColor } from '@/hooks/useStatusBarThemeColor';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
 import { normalizeLocale } from '@/i18n/catalog';
 import { getStoredLocale } from '@/i18n/nativeLocale';
+import { installBackButtonHandler } from '@/native/backButton';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { useCountriesStore } from '@/state/countriesStore';
-import { useAuthStore } from '@/state/useAuthStore';
+import { NATIVE_LOGIN_EVENT, useAuthStore } from '@/state/useAuthStore';
 
 // Dev-only palette tuning panel (`?palette`, see /dev/palette-lab). The branch
 // is constant-false in production builds, so the chunk is compiled out.
@@ -88,6 +89,27 @@ export default function AppBootstrap() {
 
     handleLogin();
   }, [handlePostLogin, t]);
+
+  useEffect(() => {
+    if (IS_NATIVE_APP) void installBackButtonHandler();
+  }, []);
+
+  // Native apps sign in without a redirect; the store reports the outcome.
+  useEffect(() => {
+    if (!IS_NATIVE_APP) return undefined;
+
+    const onNativeLogin = (event: Event) => {
+      const { success } = (event as CustomEvent<{ success: boolean }>).detail;
+
+      toast(t(success ? 'success' : 'error'), {
+        type: success ? 'success' : 'error',
+      });
+    };
+
+    window.addEventListener(NATIVE_LOGIN_EVENT, onNativeLogin);
+
+    return () => window.removeEventListener(NATIVE_LOGIN_EVENT, onNativeLogin);
+  }, [t]);
 
   useEffect(() => {
     const preferred = user?.preferredLocale;

@@ -68,6 +68,8 @@ import {
   UnreadableRecord,
 } from '@/graphics/storage/designsDb';
 import { EDITOR_TEMPLATES, EditorTemplate } from '@/graphics/templates/editor';
+import { saveFile } from '@/helpers/fileActions';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
@@ -104,11 +106,17 @@ const sizeLabel = (design: Design, t: ReturnType<typeof useTranslations>) =>
     ? t('contentSized')
     : `${design.canvas.width} × ${design.canvas.height}`;
 
-const designLink = (id: string) =>
-  `${window.location.href.split('?')[0]}?design=${id}`;
+const designLink = (id: string) => buildShareUrl({ design: id });
 
-/** Download a draft as JSON (a cheap backup: drafts live in this browser). */
-const exportDesignJson = (name: string, design: unknown) => {
+/**
+ * Download a draft as JSON (a cheap backup: drafts live in this browser).
+ * `savedTo` builds the toast for a save to the device's shared storage.
+ */
+const exportDesignJson = (
+  name: string,
+  design: unknown,
+  savedTo: (folder: string) => string,
+) => {
   const payload = {
     format: 'douzepoints-design',
     version: 1,
@@ -118,15 +126,15 @@ const exportDesignJson = (name: string, design: unknown) => {
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: 'application/json',
   });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
 
-  link.download = `${name
-    .replace(/[^\w-]+/g, '-')
-    .toLowerCase()}.douze-design.json`;
-  link.href = url;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  saveFile(
+    blob,
+    `${name.replace(/[^\w-]+/g, '-').toLowerCase()}.douze-design.json`,
+  )
+    .then((result) => {
+      if (result.kind === 'saved') toast.success(savedTo(result.folder));
+    })
+    .catch((error) => console.error('Design export failed:', error));
 };
 
 /* ---------------- cards ---------------- */
@@ -387,6 +395,11 @@ interface Props {
  */
 const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const t = useTranslations('graphics.gallery');
+  const tc = useTranslations('common');
+  const savedTo = useCallback(
+    (folder: string) => tc('savedTo', { folder }),
+    [tc],
+  );
   const tab = useGraphicsStudioStore((s) => s.galleryTab);
   const setOpen = useGraphicsStudioStore((s) => s.setGraphicsModalOpen);
   const setTab = useCallback(
@@ -709,7 +722,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
                     onDuplicate={() => duplicate(record)}
                     onRename={() => setRenaming(record)}
                     onExport={() =>
-                      exportDesignJson(record.name, record.design)
+                      exportDesignJson(record.name, record.design, savedTo)
                     }
                     onPublish={() =>
                       openEditor({
@@ -732,7 +745,9 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
                 <UnreadableCard
                   key={record.id}
                   record={record}
-                  onExport={() => exportDesignJson(record.name, record.raw)}
+                  onExport={() =>
+                    exportDesignJson(record.name, record.raw, savedTo)
+                  }
                   onDelete={() => removeUnreadable(record)}
                 />
               ))}

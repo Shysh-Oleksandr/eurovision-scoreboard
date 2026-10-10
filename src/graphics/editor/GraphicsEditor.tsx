@@ -29,6 +29,7 @@ import { useEditorExport } from './useEditorExport';
 import { useEditorKeyboard } from './useEditorKeyboard';
 import { BoxMap } from './useElementBoxes';
 
+import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -270,6 +271,19 @@ const GraphicsEditor: React.FC<Props> = ({ request, onClose }) => {
   // Escape never closes the editor itself (one press too many used to): it
   // only unwinds popover → panel → sheet → selection (useEditorKeyboard).
   useEditorKeyboard(!dialogOpen);
+
+  // Android back unwinds like Escape, then leaves through the editor's
+  // history entry (the popstate handler above saves and closes). Dialogs on
+  // top register their own handlers and go first.
+  useBackHandler(true, () => {
+    const s = useEditorStore.getState();
+
+    if (s.exportOpen) s.setExport({ open: false });
+    else if (s.panel) s.setPanel(null);
+    else if (s.sheet) s.setSheet(null);
+    else if (s.selectedIds.length) s.clearSelection();
+    else window.history.back();
+  });
 
   const onBoxes = useCallback((next: BoxMap) => setBoxes(next), []);
 

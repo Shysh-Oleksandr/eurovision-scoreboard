@@ -83,7 +83,8 @@
       "label": "Beta",
       "hint": "Nouveau et encore en évolution. Dites-nous ce qui manque avec le bouton de retour.",
       "hintFeedback": "Nouveau et encore en évolution · cliquez pour envoyer un retour"
-    }
+    },
+    "savedTo": "Enregistré dans {folder}"
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",
@@ -105,7 +106,6 @@
       "errorImageTooLarge": "L’image est trop volumineuse. La taille maximale est de {maxSize} Mo. Veuillez la compresser ou téléverser une image plus petite."
     },
     "invalidInput": "Entrée invalide",
-    "pleaseSelectValidImageFile": "Veuillez sélectionner un fichier image valide.",
     "fontUpload": {
       "unsupportedType": "« {name} » n’est pas un fichier de police pris en charge. Utilisez .woff2, .woff, .ttf ou .otf.",
       "tooLarge": "« {name} » est trop volumineux. Taille max. : {maxMb} Mo.",
@@ -1413,7 +1413,7 @@
       },
       "uiPreferences": {
         "title": "Préférences d’interface",
-        "content": "Personnalisez l’apparence dans Paramètres → Préférences d’interface :<list><item><strong>Styles de drapeaux</strong> — passez aux icônes cœur, drapeaux minimistes ronds/carrés, ou gardez les rectangles par défaut</item><item><strong>Toujours afficher le classement</strong> — gardez les numéros de position visibles en permanence, plus un indicateur de changement de rang montrant les montées ou descentes</item><item><strong>Popups</strong> — activez/désactivez indépendamment la popup des qualifiés, l’annonce du gagnant et les confettis</item><item><strong>Mode plein écran</strong> — passez en plein écran pour une vue scoreboard immersive</item><item><strong>Barre de progression du vote du jury</strong> — affiche combien de pays ont déjà voté dans le tour de jury en cours</item><item><strong>Image de fond personnalisée</strong> — téléversez votre propre image pour remplacer le fond du thème</item><item><strong>Toujours utiliser la même police</strong> — verrouillez une police spécifique quel que soit le thème actif</item><item><strong>Audio</strong> — définissez des niveaux de volume séparés pour les effets sonores et la musique de fond, ou désactivez tout l’audio du thème d’un coup</item><item><strong>Effets de l’hiver</strong> — activez la chute de neige avec un curseur d’intensité réglable</item></list>"
+        "content": "Personnalisez l’apparence dans Paramètres → Préférences d’interface :<list><item><strong>Styles de drapeaux</strong> — passez aux icônes cœur, drapeaux minimistes ronds/carrés, ou gardez les rectangles par défaut</item><item><strong>Toujours afficher le classement</strong> — gardez les numéros de position visibles en permanence, plus un indicateur de changement de rang montrant les montées ou descentes</item><item><strong>Popups</strong> — activez/désactivez indépendamment la popup des qualifiés, l’annonce du gagnant et les confettis</item><item><strong>Mode plein écran</strong> — passez en plein écran pour une vue scoreboard immersive</item><item><strong>Barre de progression du vote du jury</strong> — affiche combien de pays ont déjà voté dans le tour de jury en cours</item><item><strong>Toujours utiliser la même police</strong> — verrouillez une police spécifique quel que soit le thème actif</item><item><strong>Audio</strong> — définissez des niveaux de volume séparés pour les effets sonores et la musique de fond, ou désactivez tout l’audio du thème d’un coup</item><item><strong>Effets de l’hiver</strong> — activez la chute de neige avec un curseur d’intensité réglable</item></list>"
       },
       "confirmations": {
         "title": "Popups de confirmation",
@@ -1463,10 +1463,6 @@
         "suppressedDialogs": "Dialogues supprimés",
         "reset": "Réinitialiser"
       },
-      "upload": {
-        "title": "Déposez une image ou cliquez pour parcourir",
-        "subtext": "PNG, JPG ou WEBP · stocké sur cet appareil."
-      },
       "danger": {
         "confirm": "Oui, tout réinitialiser"
       },
@@ -1477,10 +1473,10 @@
         "targetStages": "Afficher l’étape vers laquelle chaque qualifié se dirige.",
         "blurModal": "Flouter le tableau de scores derrière les modales ouvertes pour plus de concentration.",
         "overrideFont": "Ignorer les polices de chaque thème (y compris celles téléversées) et toujours utiliser celle choisie ci-dessous, à la fois pour l’interface et le tableau de scores.",
-        "customBg": "Utiliser votre propre image de fond. Stockée uniquement sur cet appareil — non synchronisée avec votre compte.",
         "winter": "Ajouter de la neige qui tombe et des touches festives dans toute l’app.",
         "finalReveal": "Révéler les scores finaux du télévote pays par pays avec une animation dramatique.",
-        "predictableReveal": "Révéler les scores du télévote dans un ordre fluide et déterministe, sans suspense aléatoire."
+        "predictableReveal": "Révéler les scores du télévote dans un ordre fluide et déterministe, sans suspense aléatoire.",
+        "haptics": "Vibre lors des 12 points, de l’annonce des qualifiés et du vainqueur."
       }
     },
     "relations": {
@@ -1608,7 +1604,6 @@
       "autoStartPresentationTooltip": "Quand activé, la présentation démarre automatiquement après le début du vote."
     },
     "ui": {
-      "useCustomBackgroundImage": "Utiliser une image de fond personnalisée",
       "dragAndDropToUpload": "Glissez-déposez ou cliquez pour téléverser",
       "useHeartIconsForFlags": "Utiliser des icônes cœur pour les drapeaux",
       "alwaysShowRankings": "Toujours afficher le classement",
@@ -1622,10 +1617,10 @@
       "slow": "Lent",
       "fast": "Rapide",
       "finalRevealLinearAnimation": "Animation fluide et prévisible (sans aléatoire)",
+      "enableHaptics": "Retour haptique",
       "enableFullscreenMode": "Activer le mode plein écran",
       "warnBeforeManuallyAssigningTelevotePoints": "Avertir avant d’attribuer manuellement des points de télévote",
       "showJuryVotingProgressBar": "Afficher la barre de progression du jury",
-      "imageSizeIsPrettyLarge": "L’image est assez lourde ({size}MB). Cela peut ralentir la simulation — vous pouvez la compresser ou utiliser une image plus petite. Voulez-vous continuer ?",
       "language": "Langue",
       "enableMinimalisticFlags": "Activer les drapeaux minimistes",
       "enableWinterEffects": "Activer les effets de l’hiver",

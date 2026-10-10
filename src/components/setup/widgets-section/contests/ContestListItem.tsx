@@ -32,6 +32,7 @@ import OverflowMenu, {
 import UserInfo from '@/components/common/UserInfo';
 import { POINTS_ARRAY } from '@/data/data';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -138,7 +139,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   };
 
   const handleCopyLink = () => {
-    const url = window.location.href.split('?')[0] + `?contest=${contest._id}`;
+    const url = buildShareUrl({ contest: contest._id });
 
     navigator.clipboard.writeText(url);
     toast.success('Link copied to clipboard!');

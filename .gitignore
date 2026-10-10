@@ -24,3 +24,5 @@ currentTask/
 
 # Capacitor static export (yarn build:native)
 /out/
+
+AuthKey_*

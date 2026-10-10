@@ -4,6 +4,8 @@ import { MoreHorizontal } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useBackHandler } from '@/hooks/useBackHandler';
+
 export interface OverflowMenuItem {
   icon?: React.ReactNode;
   label: string;
@@ -36,6 +38,8 @@ const isStatsRow = (item: OverflowMenuEntry): item is OverflowMenuStatsRow =>
 
 const OverflowMenu: React.FC<OverflowMenuProps> = ({ items, className }) => {
   const [open, setOpen] = useState(false);
+
+  useBackHandler(open, () => setOpen(false));
   const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({
     visibility: 'hidden',
   });

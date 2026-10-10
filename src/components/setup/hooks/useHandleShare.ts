@@ -1,27 +1,25 @@
 import { toast } from 'react-toastify';
 
+import { shareLink } from '@/helpers/fileActions';
+import { buildShareUrl } from '@/helpers/shareUrl';
+
 type ShareableItem = 'theme' | 'contest' | 'profile' | 'design';
 
 export const useHandleShare = () => {
-  const handleShare = (
+  const handleShare = async (
     queryParamKey: ShareableItem,
     queryParamValue: string,
     title: string,
   ) => {
     try {
-      const url = window.location.href + `?${queryParamKey}=${queryParamValue}`;
-      const data = {
+      const result = await shareLink(
+        buildShareUrl({ [queryParamKey]: queryParamValue }),
         title,
-        url,
-      };
+      );
 
-      if (navigator.canShare && navigator.canShare(data)) {
-        navigator.share(data);
-      } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(data.url);
-        // Not translated because in theory it shouldn't be displayed
-        toast.success('Link copied to clipboard!');
-      } else {
+      // Not translated because in theory it shouldn't be displayed
+      if (result === 'copied') toast.success('Link copied to clipboard!');
+      if (result === 'unsupported') {
         toast.error('Sharing is not supported on this device.');
       }
     } catch (error: any) {

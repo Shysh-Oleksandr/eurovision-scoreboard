@@ -42,6 +42,7 @@ import {
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useBackHandler } from '@/hooks/useBackHandler';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { getDrawableSemis } from '@/state/allocationDraw/drawInput';
 import { countRuleChanges } from '@/state/allocationDraw/types';
@@ -138,6 +139,9 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
   useEffect(() => {
     if (!isOpen) setCustomizeOpen(false);
   }, [isOpen]);
+
+  // Android back closes Customize before the window (the Modal's handler).
+  useBackHandler(isOpen && customizeOpen, () => setCustomizeOpen(false));
 
   // Keyboard: Space draws, Esc closes Customize then the window.
   useEffect(() => {

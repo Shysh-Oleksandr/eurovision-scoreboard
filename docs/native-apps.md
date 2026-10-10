@@ -18,7 +18,10 @@ roadmap, research findings and status live in
     `src/app/api/**/route.ts` handlers from the export without moving any
     file. Consequence: every page, layout and error file must stay `.tsx`;
     a new `.ts` special file (`route.ts`, `sitemap.ts`, `robots.ts`, …) is
-    silently absent from the apps.
+    silently absent from the apps. The web build adds `web.tsx` to its page
+    extensions, so a `page.web.tsx` is a website-only page: `/about`,
+    `/privacy`, `/admin/errors` and `/dev/*` use it (§4, website-only
+    features).
   - `NEXT_PUBLIC_NATIVE_APP=1` is the client-side flag, exported as
     `IS_NATIVE_APP` from `src/native/platform.ts`. It means "this is the app
     bundle". `yarn build:native` sets both flags, `yarn dev:native` sets only
@@ -44,14 +47,17 @@ roadmap, research findings and status live in
 - **Origins:** the app runs at `capacitor://localhost` on iOS and
   `https://localhost` on Android. Capacitor serves the root `index.html`
   for every path without a file extension (SPA fallback).
+- **Env:** besides the flags, the native build reads
+  `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID`
+  from `.env` (§7).
 - **Generated files:** every build regenerates
   `src/i18n/messagesManifest.generated.ts`. Commit it whenever it changes;
   `messagesManifest.test.ts` fails when the committed manifest is stale.
   Builds also flip `next-env.d.ts` between `.next/types` and
   `.next/dev/types`; revert that one.
-- **Size:** `out/` is about 42 MB, of which about 22 MB is source maps
-  (`productionBrowserSourceMaps`). They are kept for debugging for now;
-  store builds should drop them (plan, Phase 3).
+- **Size:** `out/` is about 18 MB. The native build has no browser source
+  maps (they were 22 MB); `NATIVE_SOURCEMAPS=1 yarn cap:sync` adds them
+  for a debugging session.
 
 ## 2. Commands
 
@@ -64,6 +70,10 @@ roadmap, research findings and status live in
 | `yarn cap:ios` | Same for iOS. **Broken on simulators with Xcode 27**, see below |
 | `yarn dev:native` | Dev server with the app's code paths (`IS_NATIVE_APP`) |
 | `yarn cap:dev ios\|android [--lan]` | Live reload in the native shell (§3) |
+| `yarn assets:native` | Regenerate icons and splash screens from `assets/` (§8) |
+
+`cap sync` also runs the app's `capacitor:sync:after` hook,
+`scripts/native-config.mjs` (§7).
 
 **Xcode 27:** it replaced `Simulator.app` with `DeviceHub.app`
 (`com.apple.dt.Devices`). `native-run` 2.0.3, which `cap run ios` uses,
@@ -135,6 +145,11 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   as runtime-false checks. Import Capacitor with `await import(...)` inside
   those branches: it then lands in a lazy chunk the website never fetches
   (checked 2026-10-09: only `react-loadable-manifest.json` references it).
+- **Never return a plugin object from an async function.** Capacitor
+  plugin proxies answer to every property, `then` included, so
+  `async () => (await import('…')).SomePlugin` resolves by calling a native
+  "then" method ("`SecureStorage.then()` is not implemented on android").
+  Destructure the plugin where it is used (see `src/native/nativeAuth.ts`).
 - **No server in the apps.** No API routes, `cookies()`, `headers()`,
   server actions or middleware. Every same-origin `/api/*` fetch needs a
   native branch. Today's three routes and their native replacements:
@@ -152,10 +167,36 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   it is used for export images (§6). Do not enable its global `fetch`
   patching: it changes upload, cookie and blob semantics app-wide.
 - **Storage** is the WebView's localStorage / IndexedDB. iOS 17.4+ has a
-  WKWebView bug where IndexedDB connections drop after long backgrounding
-  (the custom background image lives there; plan, Phase 3). "Clear data"
-  (`localStorage.clear()`) also wipes the app's saved language, which then
-  falls back to the device language.
+  WKWebView bug where IndexedDB connections drop after long backgrounding.
+  IndexedDB holds graphics drafts and voting presets; `getDB()`
+  (`src/helpers/indexedDB.ts`) opens a fresh connection per call, which is
+  the usual workaround. "Clear data" (`localStorage.clear()`) also wipes the
+  app's saved language, which then falls back to the device language.
+- **Website-only features** (decided 2026-10-09) are hidden with
+  `IS_NATIVE_APP` rather than ported: the fullscreen toggle (the settings
+  row, and `useFullscreen` does nothing, so the account-synced
+  `enableFullscreen` is never reset by the app) and vote spreadsheet
+  import/export (`.xlsx`: the Voting Predefinition menu and the Final Stats
+  export button). The about, privacy, admin and dev pages are `page.web.tsx`
+  and absent from the export (§1). Add to this list rather than porting a
+  desktop-shaped feature by default.
+- **Files and links go through `src/helpers/fileActions.ts`.** Never use
+  `<a download>`, `navigator.share` or `window.location` for a share link
+  directly: `saveFile()`, `shareFile()` and `shareLink()` pick the native
+  path (§6), and `buildShareUrl()` (`src/helpers/shareUrl.ts`) points app
+  links at `https://douzepoints.app/`. Show `common.savedTo` when
+  `saveFile()` returns `saved`.
+- **Every dismissable overlay registers for Android back** with
+  `useBackHandler(open, close)` (`src/hooks/useBackHandler.ts`). `Modal`,
+  `AnchoredMenu`, `OverflowMenu`, `VotingBarMenu`, the editor's `Dialog`
+  and popovers already do; a custom overlay that doesn't is skipped and back
+  closes whatever is under it. An overlay that must not close registers a
+  no-op (as `Modal` does without `onClose`). See §8.
+- **Safe areas: use `var(--safe-top)` etc.** (`src/styles.css` `:root`),
+  never `env(safe-area-inset-*)` directly, also in Tailwind arbitrary values
+  (`pt-[var(--safe-top)]`). Capacitor's Android `SystemBars` sets
+  `--safe-area-inset-*` because old WebViews report wrong `env()` values
+  edge to edge; the variables fall back to `env()` everywhere else.
 
 ## 5. Locale
 
@@ -188,7 +229,7 @@ renders that language; switching POSTs to `/api/locale` and calls
 - The WKWebView reports the device's preferred languages (checked on an
   iOS 26.4 simulator set to Ukrainian: the app came up in Ukrainian).
 
-## 6. Images
+## 6. Images, saving and sharing
 
 - `next/image` is unoptimized in the export: it renders the raw `src`.
 - **Foreign images in exports.** On the web, `getFlagPathForImageGeneration`
@@ -206,22 +247,158 @@ renders that language; switching POSTs to `/api/locale` and calls
 - Custom fonts are fetched from R2 (`cdn.douzepoints.app`), whose CORS
   allowlist does not include the app origins yet, so uploaded fonts do not
   load in the apps (plan, Phase 2).
+- **Saving** (`saveFile()`: share images, stats images, editor exports,
+  design JSON backups). WKWebView ignores `<a download>`, so:
+  - Android 10+: the app's own `MediaSaver` plugin
+    (`android/app/src/main/java/app/douzepoints/MediaSaverPlugin.java`,
+    registered in `MainActivity`) writes through MediaStore, which needs no
+    permission: images to `Pictures/DouzePoints` (they show in the
+    gallery), other files to `Download/DouzePoints`. The caller toasts
+    "Saved to …". Android 9 and older fall back to the share sheet.
+  - iOS: the share sheet on the file; its "Save Image" needs
+    `NSPhotoLibraryAddUsageDescription` (Info.plist, set).
+- **Sharing** (`shareFile()`, `shareLink()`): `@capacitor/filesystem`
+  writes the file to `cache/exports/` (emptied before each new file) and
+  `@capacitor/share` opens the system sheet on it. Android's WebView has no
+  Web Share API, so this path is required there. Dismissing the sheet is
+  not an error.
+- **Copy image** buttons are hidden in the apps: async clipboard image
+  writes are unreliable in the WebViews, and the share sheet has Copy.
+- Verified 2026-10-09 on the Android 14 emulator: saving a share image
+  (MediaStore row in `Pictures/DouzePoints`, toast), and the share sheet
+  with the image preview. Not yet tried on iOS.
 
-## 7. Not working yet
+## 7. Sign-in and tokens
+
+The website signs in with a full-page redirect to the backend's Google OAuth
+flow and keeps the refresh token in an httpOnly cookie on
+`api.douzepoints.app`. Neither works in the apps: Google refuses OAuth inside
+WebViews (`disallowed_useragent`), and the WebView won't keep that cross-site
+cookie. The app flow (`src/native/nativeAuth.ts`, native branches in
+`src/state/useAuthStore.ts`):
+
+1. `login()` opens the platform's Google account sheet
+   (`@capgo/capacitor-social-login`, `mode: 'online'`) and gets an ID token.
+   Dismissing the sheet does nothing; a failure shows the usual login-error
+   toast (the store fires `NATIVE_LOGIN_EVENT`, `AppBootstrap` shows it).
+2. `POST /auth/google/native { idToken }` verifies the token with
+   `google-auth-library` (signature, issuer, expiry, audience = the backend's
+   `GOOGLE_CLIENT_ID` plus `GOOGLE_NATIVE_CLIENT_IDS`), finds or creates the
+   profile like the web strategy (email is only used for linking when
+   `email_verified`), and returns `{ accessToken, refreshToken }` in the body.
+3. The refresh token goes to the Keychain / Android Keystore
+   (`@aparajita/capacitor-secure-storage`, key `refresh-token`). Then the
+   normal `handlePostLogin(true)` path runs.
+4. `/auth/refresh` and `/auth/logout` get `Authorization: Bearer <refresh>`
+   (an explicit header wins over the access token in `src/api/client.ts`).
+   When the backend rotates a header-borne token, the successor comes back as
+   `refreshToken` in the body and replaces the stored one. Only a 401 deletes
+   the stored token; a network error keeps it for the next launch.
+5. On launch, the app restores the session when a refresh token is stored
+   (not when a user is persisted, as on the web), so an offline launch
+   doesn't sign the user out.
+6. Logout revokes the token on the server, deletes it locally and signs out
+   of the Google SDK so the next sign-in shows the account sheet.
+
+The backend allows the app origins for CORS through `NATIVE_APP_ORIGINS`
+(default `capacitor://localhost,https://localhost`), never through
+`FRONTEND_URL`: any `FRONTEND_URL` containing "localhost" makes the auth
+controller treat the server as dev and weaken the refresh cookie.
+
+**Configuration (all public values):**
+
+| Where | Name | Value |
+|---|---|---|
+| Frontend `.env` | `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` | The "Web application" OAuth client = the backend's `GOOGLE_CLIENT_ID` |
+| Frontend `.env` | `NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID` | The "iOS" OAuth client for bundle ID `app.douzepoints` |
+| Backend env | `GOOGLE_NATIVE_CLIENT_IDS` | The iOS client ID (iOS may put it in `aud`); comma-separated |
+| Google Cloud | "Android" OAuth client | Package `app.douzepoints` + the SHA-1 of every signing key (debug, upload, Play App Signing); its ID is never passed to the app |
+
+`scripts/native-config.mjs` writes the iOS client's reversed ID
+(`com.googleusercontent.apps.…`) into `Info.plist` as a URL scheme on every
+sync; GoogleSignIn throws at sign-in without it. `SceneDelegate.swift` passes
+URL callbacks to `GIDSignIn` as the plugin's docs ask (iOS 15+ normally
+completes inside the auth session). Without the env values the app refuses
+to start Google sign-in with a readable error. Debug SHA-1:
+`cd android && ./gradlew signingReport`. Android needs a Google account on
+the device or emulator.
+
+Sign in with Apple is not wired yet (it needs the paid Apple account). The
+plugin is installed with `apple: false` in `capacitor.config.ts`; App Store
+review requires it before an iOS release (guideline 4.8).
+
+## 8. Shell: icons, splash, system bars, back button, haptics, languages
+
+- Sources live in `assets/` (`icon-only`, `icon-foreground`,
+  `icon-background`, `splash`, `splash-dark`; @capacitor/assets "Custom
+  Mode"). The current art is a placeholder made by
+  `scripts/compose-app-assets.mjs`: the website's microphone favicon on the
+  2026 navy (`#070b24` → `#1c2360`). Replace the files and run
+  `yarn assets:native`, which rewrites the iOS asset catalogs and the
+  Android mipmaps and splash drawables.
+- The asset tool also reformats `AndroidManifest.xml` (whitespace only);
+  revert that.
+- Android 12+ shows the launcher icon on `windowSplashScreenBackground`
+  (`android/app/src/main/res/values/styles.xml`), kept in sync with
+  `SPLASH_BACKGROUND` in `capacitor.config.ts`, which also colours the
+  WebView before its first paint.
+- `@capacitor/splash-screen` keeps the splash up until the first screen
+  has painted: `hideSplashWhenPainted()` (`src/native/splash.ts`) runs when
+  the first `Modal` becomes active (usually Event Setup) or the simulation
+  board mounts; `src/app/(main)/page.tsx` calls it 1.5 s after the catalog
+  is ready as a fallback, and `launchShowDuration: 4000` is the safety net.
+- **System bars** (`SystemBars` in `capacitor.config.ts`): `style: 'DARK'`
+  (light icons; every theme is dark) and edge to edge, so the theme shows
+  behind the status and navigation bars and `--safe-*` (§4) pads content.
+  Android WebViews older than 140 can't go edge to edge: Capacitor pads the
+  WebView instead and the bars show `android:windowBackground`
+  (`styles.xml`, the splash navy; the white of the default theme before).
+  Verified on WebView 136 (emulator) and the iOS 26 simulator; the edge to
+  edge Android path (WebView 140+, i.e. updated phones) is untested.
+  `useStatusBarThemeColor` only matters on the website.
+- **Android back button** (`src/native/backButton.ts`, `@capacitor/app`):
+  closes the innermost overlay registered with `useBackHandler` (§4), else
+  goes back in history (the graphics editor is a history entry; its own
+  handler first unwinds export → panel → sheet → selection), else
+  minimises the app. Verified on Android: nested modals close one by one,
+  the editor closes, the root minimises. The keyboard takes the first press
+  itself.
+- **Haptics** (`src/native/haptics.ts`, `@capacitor/haptics`): ride on the
+  theme sound events in `playThemeSound()` (douze points: heavy, qualifier
+  reveal / pick: light, winner: success), independent of theme audio.
+  Setting `enableHaptics` (Effects, shown only in the apps, device-local,
+  default on).
+- **Keyboard:** no plugin. Android resizes the WebView for the keyboard
+  (Capacitor's insets handling) and focused inputs stay visible (checked in
+  Event Setup's country search); iOS keeps WKWebView's default scrolling.
+  Revisit with `@capacitor/keyboard` only for a concrete problem; with
+  Capacitor 8 on Android, don't set `Keyboard.resizeOnFullScreen`.
+- **Orientation:** not locked (portrait and landscape on phones, all four
+  on iPad); the scoreboard uses the width in landscape.
+- **Audio:** Capacitor lets media play without a user gesture on both
+  platforms, so theme sounds and ambience behave as on desktop. iOS mutes
+  them with the silent switch (the WebView's default audio session).
+- **Per-app language:** iOS lists the app's languages in Settings via
+  `CFBundleLocalizations` (Info.plist), Android 13+ via
+  `res/xml/locales_config.xml` (`android:localeConfig`). The choice reaches
+  `navigator.languages`, so it applies when no in-app language is saved
+  (§5); verified on Android with `adb shell cmd locale set-app-locales
+  app.douzepoints --locales uk`.
+
+## 9. Not working yet
 
 Tracked in the plan with the phase that fixes each item:
 
-- Google sign-in (Google blocks OAuth in embedded WebViews) and every
-  backend call (CORS). Lists such as Public Contests show an empty result
-  rather than an error.
-- Uploaded fonts (R2 CORS).
-- Downloads: `<a download>` on data URLs (share images, stats) and
-  `XLSX.writeFile` do nothing in WKWebView. Web Share with files, the
-  fullscreen toggle and share links (built from `window.location`, so they
-  point at `capacitor://localhost`) also need native replacements.
-- Android back button, themed system bars, splash screen and icons.
+- Until the backend changes are deployed and the Google Cloud clients exist,
+  sign-in and every backend call fail in the apps (lists such as Public
+  Contests show an empty result rather than an error).
+- Uploaded fonts until the R2 CORS rule includes the app origins
+  (`npm run r2:cors -- --apply` in the backend).
+- Sign in with Apple (needs the Apple Developer account).
+- Shared links open the website, not the app: no universal links / Android
+  app links yet (they need the Apple team ID and the release signing key).
 
-## 8. Testing recipes
+## 10. Testing recipes
 
 - **Android WebView over the DevTools protocol:** find the socket with
   `adb shell cat /proc/net/unix | grep webview_devtools_remote`, then
@@ -243,6 +420,18 @@ Tracked in the plan with the phase that fixes each item:
   `adb shell input` hangs. `adb emu screenrecord screenshot <path>` still
   works, and a cold boot fixes it. `-gpu swiftshader_indirect` is stable but
   too slow for share-image exports.
+- **Auth end to end without Google:** run the backend on a spare port
+  against a throwaway database (`docker run --rm -p 27018:27017 mongo:7`,
+  `PORT=8011 MONGODB_URI=mongodb://localhost:27018/test node dist/src/main`),
+  seed a profile plus a `refresh_tokens` document (sha256 `tokenHash` of a
+  random hex token), and plant the raw token in the app with
+  `Capacitor.nativePromise('SecureStorage', 'internalSetItem',
+  { prefixedKey: 'capacitor-storage_refresh-token', data, sync: false })`.
+  A relaunch then restores the session. Moving the document's `expiresAt`
+  within a day forces a rotation. A test build that calls an `http://` API
+  on Android needs `server.cleartext` and `android.allowMixedContent`
+  temporarily (`ERR_CLEARTEXT_NOT_PERMITTED` otherwise). Never point these
+  tests at the real database.
 - **Do not click the iOS Simulator with AppleScript.** The window is often
   not frontmost and the clicks land in other apps. For iOS interaction, use
   Safari Web Inspector by hand or a real device.

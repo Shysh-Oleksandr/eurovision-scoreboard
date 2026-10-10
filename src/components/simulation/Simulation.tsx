@@ -23,6 +23,8 @@ import {
   importWinnerModal,
 } from '@/hooks/simulationChunkImports';
 import { StageId } from '@/models';
+import { IS_NATIVE_APP } from '@/native/platform';
+import { hideSplashWhenPainted } from '@/native/splash';
 import { useGeneralStore } from '@/state/generalStore';
 import { getFinalRevealInfo } from '@/state/scoreboard/helpers';
 import { isJuryScaleRevealActive } from '@/state/scoreboard/juryScaleReveal';
@@ -135,6 +137,11 @@ const Simulation = () => {
   const simulationBackgroundUrl = useGeneralStore(
     (state) => state.customTheme?.themeSounds?.simulationBackground?.url,
   );
+
+  // A launch into a running simulation: the board is the first screen.
+  useEffect(() => {
+    if (IS_NATIVE_APP) void hideSplashWhenPainted();
+  }, []);
 
   useEffect(() => {
     syncSimulationBackgroundThemeSound(eventStages.length > 0);

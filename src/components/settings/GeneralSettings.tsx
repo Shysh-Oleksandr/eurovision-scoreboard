@@ -10,6 +10,7 @@ import { SubTabStrip } from './general/SubTabStrip';
 import { useSettingsSearch } from './general/useSettingsSearch';
 
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { IS_NATIVE_APP } from '@/native/platform';
 import {
   GeneralSettingsCategoryId,
   useGeneralStore,
@@ -35,9 +36,13 @@ export const GeneralSettings: React.FC = () => {
   const customTheme = useGeneralStore((s) => s.customTheme);
   const env = useMemo(
     () => ({
+      // The apps are full-screen already, and WKWebView has no Fullscreen API.
       fullscreenEnabled:
-        typeof document !== 'undefined' && document.fullscreenEnabled,
+        !IS_NATIVE_APP &&
+        typeof document !== 'undefined' &&
+        document.fullscreenEnabled,
       hasSimBg: customThemeHasSimulationBackground(customTheme),
+      isNativeApp: IS_NATIVE_APP,
     }),
     [customTheme],
   );

@@ -18,6 +18,7 @@ import {
   downloadVoteSpreadsheet,
 } from '@/components/setup/voting-predefinition/voteSpreadsheet';
 import { Country, StatsTableType } from '@/models';
+import { IS_NATIVE_APP } from '@/native/platform';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -259,7 +260,10 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
         totalBadgeLabel={totalBadgeLabel}
         hideVoteTypeOptions={activeTab !== FinalStatsTab.BREAKDOWN}
         handleShareClick={handleShareClick}
-        showSpreadsheetExport={activeTab === FinalStatsTab.BREAKDOWN}
+        // Spreadsheet export is website-only (no native file download).
+        showSpreadsheetExport={
+          !IS_NATIVE_APP && activeTab === FinalStatsTab.BREAKDOWN
+        }
         onExportSpreadsheet={handleExportSpreadsheet}
       />
 

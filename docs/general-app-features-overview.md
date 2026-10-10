@@ -9,7 +9,7 @@
 | `/api/image-proxy` | API route | Proxies images (for CORS) |
 | `/api/locale` | API route | Locale detection |
 
-The app is essentially a **single-page application** -- everything happens at `/`. The other pages are secondary/legal.
+The app is essentially a **single-page application** -- everything happens at `/`. The other pages are secondary/legal. `/about`, `/privacy`, `/admin/errors` and `/dev/*` are `page.web.tsx` files: website-only, left out of the native apps' export (`docs/native-apps.md`).
 
 ---
 
@@ -226,7 +226,6 @@ Two tabs: **General** and **Odds**
 - Fullscreen mode
 - Jury voting progress bar
 - Blur modal background
-- Custom background image (from file)
 - Minimalistic flags (round/square)
 - Hide voting hints
 - Winter effects (snowfall) with intensity slider

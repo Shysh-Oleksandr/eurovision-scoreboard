@@ -22,6 +22,8 @@ import { ExportResultState, ExportStatus } from '../useEditorExport';
 
 import Button from '@/components/common/Button';
 import { cn } from '@/helpers/utils';
+import { useBackHandler } from '@/hooks/useBackHandler';
+import { IS_NATIVE_APP } from '@/native/platform';
 import { useAuthStore } from '@/state/useAuthStore';
 
 /** Scrim + card; Escape and scrim clicks close it (unless `locked`). */
@@ -33,6 +35,9 @@ export const Dialog: React.FC<{
   role?: 'dialog' | 'alertdialog' | 'status';
   children: React.ReactNode;
 }> = ({ onClose, wide, busy, ariaLabelledBy, role = 'dialog', children }) => {
+  // A locked dialog (no `onClose`) swallows Android back.
+  useBackHandler(true, () => onClose?.());
+
   useEffect(() => {
     if (!onClose) return undefined;
     const onKey = (e: KeyboardEvent) => {
@@ -167,13 +172,16 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
           Icon={<Share2 className="size-[18px]" />}
           onClick={() => onShare(result)}
         />
-        <Button
-          variant="surface"
-          size="lg"
-          title={t('copyImage')}
-          Icon={<Copy className="size-[18px]" />}
-          onClick={() => onCopy(result)}
-        />
+        {/* The apps' share sheet already offers Copy. */}
+        {!IS_NATIVE_APP && (
+          <Button
+            variant="surface"
+            size="lg"
+            title={t('copyImage')}
+            Icon={<Copy className="size-[18px]" />}
+            onClick={() => onCopy(result)}
+          />
+        )}
       </div>
       <span className="sr-only" aria-live="polite">
         {t('generated')}

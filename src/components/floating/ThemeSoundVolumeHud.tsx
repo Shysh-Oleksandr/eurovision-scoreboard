@@ -185,7 +185,7 @@ export default function ThemeSoundVolumeHud() {
   return (
     <div
       ref={rootRef}
-      className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-[calc(1.25rem+env(safe-area-inset-right))] z-[2000]"
+      className="fixed bottom-[calc(1.25rem+var(--safe-bottom))] right-[calc(1.25rem+var(--safe-right))] z-[2000]"
     >
       {/*
         Hover/leave only on this 44×44px hit box + absolutely positioned descendants (panel).

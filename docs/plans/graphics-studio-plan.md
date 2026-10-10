@@ -220,7 +220,7 @@ manual rows. Elements receive only the resolved view model.
 
 ### Phase 0 — PoC (throwaway, dev-only route, ~1 week)
 
-Route `src/app/dev/graphics-poc/page.tsx` following the Palette Lab pattern
+Route `src/app/dev/graphics-poc/page.web.tsx` following the Palette Lab pattern
 (compiled out in production). Nothing here needs to be reusable; copy, don't
 refactor. It must answer these questions with evidence (numbers and screenshots
 in a `docs/plans/graphics-poc-results.md` appendix):

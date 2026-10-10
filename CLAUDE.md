@@ -26,6 +26,7 @@ yarn dev:native       # Dev server with the native app's code paths (IS_NATIVE_A
 yarn build:native     # Static export for Capacitor into out/
 yarn cap:sync         # build:native + copy into ios/ and android/
 yarn cap:dev ios|android [--lan]  # Live reload inside the native shell
+yarn assets:native    # Regenerate app icons + splash screens from assets/
 ```
 
 ## Architecture
@@ -78,7 +79,7 @@ Read `docs/` before touching non-obvious subsystems:
 - `event-setup-hub-and-design-tokens.md` — the Event Setup modal (hue-derived OKLCH tokens `--prim-hue`/`--p-*`/`--accent`, hand-picked accents in `interfaceAccents.ts` + the dev-only Palette Lab at `/dev/palette-lab` and `?palette` panel, `dp-*` classes, Button `cta`/`surface` variants, lineup ListIds + setupUiStore, lazy dnd-kit, contest dirty fingerprint, sync-theme setting, profile summary endpoint)
 - `adding-contest-editions.md` — adding a new ESC/JESC/ESC Asia year or a new contest series to the Contest select: `ContestType`, lineup JSON format and field rules, hosting logos, cache-busting, odds/spokesperson updates, verification checklist
 - `graphics-studio.md` — the design document model, element registry, deterministic export (snapdom + html-to-image fallback) and the share-image templates; read before touching share images or the graphics editor
-- `native-apps.md` — the Capacitor iOS/Android build: static-export flags, commands (Xcode 27 caveat), live reload, rules for native-aware code, client-side locale, native image fetching for exports, what doesn't work yet, emulator/simulator testing recipes. Roadmap, research and phase status: `plans/native-apps-plan.md`
+- `native-apps.md` — the Capacitor iOS/Android build: static-export flags, commands (Xcode 27 caveat), live reload, rules for native-aware code, client-side locale, native image fetching for exports, saving/sharing files (`fileActions`, Android MediaStore plugin), native Google sign-in + Keychain/Keystore refresh tokens, icons/splash, system bars + `--safe-*` vars, Android back button (`useBackHandler`), haptics, per-app languages, what doesn't work yet, emulator/simulator testing recipes. Roadmap, research and phase status: `plans/native-apps-plan.md`
 - `USER_DATA_CLEARING.md`
 
 ## Code Style

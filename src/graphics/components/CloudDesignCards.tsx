@@ -37,6 +37,7 @@ import AnchoredMenu, {
 import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
 import { useHandleShare } from '@/components/setup/hooks/useHandleShare';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -54,8 +55,7 @@ import '@/graphics/editor/editor.css';
  * go to the design sheet.
  */
 
-const designLink = (id: string) =>
-  `${window.location.href.split('?')[0]}?design=${id}`;
+const designLink = (id: string) => buildShareUrl({ design: id });
 
 export const CommunityCard: React.FC<{
   record: CloudDesign;

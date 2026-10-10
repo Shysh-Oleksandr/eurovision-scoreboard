@@ -1,4 +1,5 @@
 import type { Country, EventStage } from '@/models';
+import { playHaptic } from '@/native/haptics';
 import { useGeneralStore } from '@/state/generalStore';
 import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 
@@ -170,6 +171,9 @@ export function playThemeSound(
   options?: { skip?: boolean },
 ): void {
   if (options?.skip) return;
+
+  // Independent of the theme's sounds and volume (native apps only).
+  playHaptic(event);
 
   const { customTheme } = useGeneralStore.getState();
   const linear = getEffectiveThemeSfxVolumeLinear();

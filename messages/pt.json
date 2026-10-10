@@ -83,7 +83,8 @@
       "label": "Beta",
       "hint": "Novo e ainda em evolução. Diga-nos o que falta com o botão de feedback.",
       "hintFeedback": "Novo e ainda em evolução · clique para enviar feedback"
-    }
+    },
+    "savedTo": "Guardado em {folder}"
   },
   "Metadata": {
     "title": "DouzePoints - Simulador do Painel de Pontuação da Eurovisão",
@@ -105,7 +106,6 @@
       "errorImageTooLarge": "A imagem é demasiado grande. O tamanho máximo é {maxSize}MB. Por favor, comprima-a ou carregue uma imagem mais pequena."
     },
     "invalidInput": "Entrada inválida",
-    "pleaseSelectValidImageFile": "Por favor, selecione um ficheiro de imagem válido.",
     "fontUpload": {
       "unsupportedType": "«{name}» não é um ficheiro de fonte suportado. Use .woff2, .woff, .ttf ou .otf.",
       "tooLarge": "«{name}» é demasiado grande. Tamanho máximo: {maxMb} MB.",
@@ -1413,7 +1413,7 @@
       },
       "uiPreferences": {
         "title": "Preferências de Interface",
-        "content": "Personalize a aparência em Definições → Preferências de Interface:<list><item><strong>Estilos de bandeira</strong> — mude para ícones de coração, bandeiras redondas/quadradas minimalistas ou mantenha as retangulares padrão</item><item><strong>Mostrar sempre classificações</strong> — mantenha os números de posição sempre visíveis, mais um indicador de mudança de posição mostrando subida ou descida</item><item><strong>Popups</strong> — ative/desative o popup de qualificados, anúncio de vencedor e confettis independentemente</item><item><strong>Modo de ecrã completo</strong> — entre em ecrã completo para uma vista do painel totalmente imersiva</item><item><strong>Barra de progresso de votação do júri</strong> — mostra quantos países já votaram na ronda de júri atual</item><item><strong>Imagem de fundo personalizada</strong> — carregue a sua própria imagem para substituir o fundo do tema</item><item><strong>Substituir fonte do tema</strong> — fixe uma fonte específica independentemente de qual tema está ativo</item><item><strong>Áudio</strong> — defina níveis de volume separados para efeitos sonoros e música de fundo, ou desative todo o áudio do tema de uma vez</item><item><strong>Efeitos de inverno</strong> — ative neve a cair com um controlo deslizante de intensidade ajustável</item><item><strong>Ativar revelação do vencedor</strong> — o último televoto é revelado com animação especial (estilo ESC 2026)</item></list>"
+        "content": "Personalize a aparência em Definições → Preferências de Interface:<list><item><strong>Estilos de bandeira</strong> — mude para ícones de coração, bandeiras redondas/quadradas minimalistas ou mantenha as retangulares padrão</item><item><strong>Mostrar sempre classificações</strong> — mantenha os números de posição sempre visíveis, mais um indicador de mudança de posição mostrando subida ou descida</item><item><strong>Popups</strong> — ative/desative o popup de qualificados, anúncio de vencedor e confettis independentemente</item><item><strong>Modo de ecrã completo</strong> — entre em ecrã completo para uma vista do painel totalmente imersiva</item><item><strong>Barra de progresso de votação do júri</strong> — mostra quantos países já votaram na ronda de júri atual</item><item><strong>Substituir fonte do tema</strong> — fixe uma fonte específica independentemente de qual tema está ativo</item><item><strong>Áudio</strong> — defina níveis de volume separados para efeitos sonoros e música de fundo, ou desative todo o áudio do tema de uma vez</item><item><strong>Efeitos de inverno</strong> — ative neve a cair com um controlo deslizante de intensidade ajustável</item><item><strong>Ativar revelação do vencedor</strong> — o último televoto é revelado com animação especial (estilo ESC 2026)</item></list>"
       },
       "confirmations": {
         "title": "Popups de Confirmação",
@@ -1463,10 +1463,6 @@
         "suppressedDialogs": "Diálogos suprimidos",
         "reset": "Repor"
       },
-      "upload": {
-        "title": "Largue uma imagem ou clique para procurar",
-        "subtext": "PNG, JPG ou WEBP · guardado neste dispositivo."
-      },
       "danger": {
         "confirm": "Sim, repor tudo"
       },
@@ -1477,10 +1473,10 @@
         "targetStages": "Mostrar para que fase avança cada qualificado.",
         "blurModal": "Desfocar o marcador por trás dos modais abertos para maior concentração.",
         "overrideFont": "Ignorar as fontes de cada tema (incluindo as carregadas) e usar sempre a que escolher abaixo, tanto na interface como no marcador.",
-        "customBg": "Usar a sua própria imagem de fundo. Guardada apenas neste dispositivo — não sincronizada com a sua conta.",
         "winter": "Adicionar neve a cair e toques festivos em toda a app.",
         "finalReveal": "Revelar os pontos finais do televoto país a país com uma animação dramática.",
-        "predictableReveal": "Revelar os pontos do televoto numa ordem suave e determinística, sem suspense aleatório."
+        "predictableReveal": "Revelar os pontos do televoto numa ordem suave e determinística, sem suspense aleatório.",
+        "haptics": "Vibra nos 12 pontos, na revelação dos qualificados e no vencedor."
       }
     },
     "relations": {
@@ -1608,7 +1604,6 @@
       "autoStartPresentationTooltip": "Quando ativado, a apresentação iniciará automaticamente após o início da votação."
     },
     "ui": {
-      "useCustomBackgroundImage": "Usar imagem de fundo personalizada",
       "dragAndDropToUpload": "Arraste e solte ou clique para carregar",
       "useHeartIconsForFlags": "Usar ícones de coração para bandeiras",
       "alwaysShowRankings": "Mostrar sempre classificações",
@@ -1622,10 +1617,10 @@
       "slow": "Lento",
       "fast": "Rápido",
       "finalRevealLinearAnimation": "Animação de revelação suave e previsível (sem aleatoriedade)",
+      "enableHaptics": "Feedback háptico",
       "enableFullscreenMode": "Ativar modo de ecrã completo",
       "warnBeforeManuallyAssigningTelevotePoints": "Avisar antes de atribuir pontos do televoto manualmente",
       "showJuryVotingProgressBar": "Mostrar barra de progresso de votação do júri",
-      "imageSizeIsPrettyLarge": "O tamanho da imagem é bastante grande ({size}MB). Isto pode abrandar a simulação, pelo que pode querer comprimi-la ou usar uma imagem mais pequena. Deseja continuar com esta imagem?",
       "language": "Idioma",
       "enableMinimalisticFlags": "Bandeiras minimalistas redondas e quadradas",
       "enableWinterEffects": "Ativar efeitos de inverno",

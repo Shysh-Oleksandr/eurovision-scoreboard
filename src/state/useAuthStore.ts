@@ -14,12 +14,24 @@ import {
 } from '@/api/client';
 import { queryClient } from '@/api/queryClient';
 import { API_BASE_URL } from '@/config';
+import { IS_NATIVE_APP } from '@/native/platform';
 import type { Profile } from '@/types/profile';
+
+/**
+ * Fired after a native-app sign-in attempt that got past the account sheet
+ * (AppBootstrap shows the toast). The website reports its result through the
+ * `?provider=google` redirect instead.
+ */
+export const NATIVE_LOGIN_EVENT = 'dp:native-login';
+
+const nativeAuth = () => import('@/native/nativeAuth');
 
 export interface AuthState {
   user: Profile | null;
   accessToken: string | null;
   isBusy: boolean;
+  /** Native apps: the Google account sheet / token exchange is in progress. */
+  isSigningIn: boolean;
   login: () => void;
   handlePostLogin: (force?: boolean) => Promise<boolean>;
   refresh: () => Promise<string | undefined>;
@@ -73,11 +85,24 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       isBusy: false,
+      isSigningIn: false,
       login: () => {
+        if (IS_NATIVE_APP) {
+          void loginNatively();
+
+          return;
+        }
         window.location.href = `${API_BASE_URL}/auth/google`;
       },
       handlePostLogin: async (force?: boolean) => {
-        if (!get().user && !force) return false;
+        // Native: the stored refresh token, not the persisted user, says
+        // whether there is a session — an offline launch clears `user`, and
+        // the next online launch should still restore it.
+        const hasSession = IS_NATIVE_APP
+          ? !!(await (await nativeAuth()).getRefreshToken())
+          : !!get().user;
+
+        if (!hasSession && !force) return false;
 
         let success = false;
         let step: LoginStep = 'refresh';
@@ -127,8 +152,38 @@ export const useAuthStore = create<AuthState>()(
         return success;
       },
       refresh: async () => {
-        // Always attempt; backend verifies cookie and returns 401 if not present
         try {
+          if (IS_NATIVE_APP) {
+            const { getRefreshToken, setRefreshToken, clearRefreshToken } =
+              await nativeAuth();
+            const refreshToken = await getRefreshToken();
+
+            if (!refreshToken) throw new Error('No refresh token');
+
+            try {
+              // The bearer header replaces the access token the client would
+              // otherwise attach; a rotated token comes back in the body.
+              const { data } = await api.post(
+                '/auth/refresh',
+                {},
+                { headers: { authorization: `Bearer ${refreshToken}` } },
+              );
+
+              if (data.refreshToken) await setRefreshToken(data.refreshToken);
+              set({ accessToken: data.accessToken });
+
+              return data.accessToken as string;
+            } catch (e) {
+              // Only a rejected token ends the session for good; offline
+              // launches keep it for the next one.
+              if (e instanceof ApiError && e.response.status === 401) {
+                await clearRefreshToken();
+              }
+              throw e;
+            }
+          }
+
+          // Always attempt; backend verifies cookie and returns 401 if not present
           const { data } = await api.post('/auth/refresh', {});
 
           set({ accessToken: data.accessToken });
@@ -155,7 +210,26 @@ export const useAuthStore = create<AuthState>()(
         if (get().isBusy) return;
         set({ isBusy: true });
         try {
-          await api.post('/auth/logout');
+          if (IS_NATIVE_APP) {
+            const { getRefreshToken, clearRefreshToken, signOutOfGoogle } =
+              await nativeAuth();
+            const refreshToken = await getRefreshToken();
+
+            try {
+              await api.post(
+                '/auth/logout',
+                undefined,
+                refreshToken
+                  ? { headers: { authorization: `Bearer ${refreshToken}` } }
+                  : undefined,
+              );
+            } finally {
+              await clearRefreshToken();
+              void signOutOfGoogle();
+            }
+          } else {
+            await api.post('/auth/logout');
+          }
 
           // Clear user data from React Query cache
           clearUserData(queryClient);
@@ -189,3 +263,38 @@ export const useAuthStore = create<AuthState>()(
     },
   ),
 );
+
+/**
+ * Native sign-in: Google account sheet → ID token → our token pair → the same
+ * post-login path the website's redirect takes.
+ */
+async function loginNatively() {
+  if (useAuthStore.getState().isSigningIn) return;
+  useAuthStore.setState({ isSigningIn: true });
+
+  let success: boolean | null = null;
+
+  try {
+    const { getGoogleIdToken, setRefreshToken } = await nativeAuth();
+    const idToken = await getGoogleIdToken();
+
+    if (!idToken) return; // the user dismissed the account sheet
+
+    const { data } = await api.post('/auth/google/native', { idToken });
+
+    await setRefreshToken(data.refreshToken);
+    useAuthStore.setState({ accessToken: data.accessToken });
+    success = await useAuthStore.getState().handlePostLogin(true);
+  } catch (error) {
+    console.error('Native Google sign-in failed', error);
+    success = false;
+  } finally {
+    useAuthStore.setState({ isSigningIn: false });
+
+    if (success !== null) {
+      window.dispatchEvent(
+        new CustomEvent(NATIVE_LOGIN_EVENT, { detail: { success } }),
+      );
+    }
+  }
+}

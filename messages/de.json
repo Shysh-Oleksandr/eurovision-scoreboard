@@ -83,7 +83,8 @@
       "label": "Beta",
       "hint": "Neu und noch in Arbeit. Sag uns über den Feedback-Button, was dir fehlt.",
       "hintFeedback": "Neu und noch in Arbeit · klicke, um Feedback zu senden"
-    }
+    },
+    "savedTo": "Gespeichert in {folder}"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -105,7 +106,6 @@
       "errorImageTooLarge": "Bild ist zu groß. Maximalgröße: {maxSize}MB. Bitte komprimiere es oder lade ein kleineres Bild hoch."
     },
     "invalidInput": "Ungültige Eingabe",
-    "pleaseSelectValidImageFile": "Bitte wähle eine gültige Bilddatei aus.",
     "fontUpload": {
       "unsupportedType": "„{name}“ ist keine unterstützte Schriftdatei. Verwende .woff2, .woff, .ttf oder .otf.",
       "tooLarge": "„{name}“ ist zu groß. Maximalgröße: {maxMb} MB.",
@@ -1413,7 +1413,7 @@
       },
       "uiPreferences": {
         "title": "UI-Einstellungen",
-        "content": "Passe Look and Feel in Einstellungen → UI-Einstellungen an:<list><item><strong>Flaggenstile</strong> — wechsle zu Herz-Icons, minimalistischen runden/quadratischen Flaggen oder behalte rechteckige Standardflaggen</item><item><strong>Rangliste immer anzeigen</strong> — Positionsnummern dauerhaft sichtbar halten plus Rangänderungs-Indikator für Auf- und Abstiege</item><item><strong>Popups</strong> — Qualifikanten-Popup, Siegerbekanntgabe und Konfetti unabhängig umschalten</item><item><strong>Vollbildmodus</strong> — Vollbild für eine immersive Scoreboard-Ansicht</item><item><strong>Jury-Fortschrittsbalken</strong> — zeigt, wie viele Länder in der aktuellen Jury-Runde bereits abgestimmt haben</item><item><strong>Eigenes Hintergrundbild</strong> — lade dein eigenes Bild hoch, um den Theme-Hintergrund zu ersetzen</item><item><strong>Immer dieselbe Schriftart verwenden</strong> — fixiere eine Schriftart unabhängig vom aktiven Theme</item><item><strong>Audio</strong> — separate Lautstärke für Soundeffekte und Hintergrundmusik oder deaktiviere gesamtes Theme-Audio auf einmal</item><item><strong>Winter-Effekte</strong> — fallenden Schnee mit einstellbarem Intensitätsregler aktivieren</item></list>"
+        "content": "Passe Look and Feel in Einstellungen → UI-Einstellungen an:<list><item><strong>Flaggenstile</strong> — wechsle zu Herz-Icons, minimalistischen runden/quadratischen Flaggen oder behalte rechteckige Standardflaggen</item><item><strong>Rangliste immer anzeigen</strong> — Positionsnummern dauerhaft sichtbar halten plus Rangänderungs-Indikator für Auf- und Abstiege</item><item><strong>Popups</strong> — Qualifikanten-Popup, Siegerbekanntgabe und Konfetti unabhängig umschalten</item><item><strong>Vollbildmodus</strong> — Vollbild für eine immersive Scoreboard-Ansicht</item><item><strong>Jury-Fortschrittsbalken</strong> — zeigt, wie viele Länder in der aktuellen Jury-Runde bereits abgestimmt haben</item><item><strong>Immer dieselbe Schriftart verwenden</strong> — fixiere eine Schriftart unabhängig vom aktiven Theme</item><item><strong>Audio</strong> — separate Lautstärke für Soundeffekte und Hintergrundmusik oder deaktiviere gesamtes Theme-Audio auf einmal</item><item><strong>Winter-Effekte</strong> — fallenden Schnee mit einstellbarem Intensitätsregler aktivieren</item></list>"
       },
       "confirmations": {
         "title": "Bestätigungspopups",
@@ -1463,10 +1463,6 @@
         "suppressedDialogs": "Unterdrückte Dialoge",
         "reset": "Zurücksetzen"
       },
-      "upload": {
-        "title": "Bild ablegen oder zum Durchsuchen klicken",
-        "subtext": "PNG, JPG oder WEBP · auf diesem Gerät gespeichert."
-      },
       "danger": {
         "confirm": "Ja, alles zurücksetzen"
       },
@@ -1477,10 +1473,10 @@
         "targetStages": "Anzeigen, in welche Phase jeder Qualifikant weiterkommt.",
         "blurModal": "Das Scoreboard hinter geöffneten Modals verwischen für mehr Fokus.",
         "overrideFont": "Die Schriftarten jedes Themes ignorieren (auch hochgeladene) und immer die unten gewählte für Interface und Scoreboard verwenden.",
-        "customBg": "Eigenes Hintergrundbild verwenden. Nur auf diesem Gerät gespeichert — nicht mit deinem Konto synchronisiert.",
         "winter": "Fallenden Schnee und festliche Akzente in der gesamten App hinzufügen.",
         "finalReveal": "Die finalen Televote-Punkte ein Land nach dem anderen mit dramatischer Animation enthüllen.",
-        "predictableReveal": "Televote-Punkte in einer gleichmäßigen, deterministischen Reihenfolge ohne zufällige Spannung enthüllen."
+        "predictableReveal": "Televote-Punkte in einer gleichmäßigen, deterministischen Reihenfolge ohne zufällige Spannung enthüllen.",
+        "haptics": "Vibriert bei 12 Punkten, bei der Bekanntgabe der Qualifikanten und beim Sieger."
       }
     },
     "relations": {
@@ -1608,7 +1604,6 @@
       "autoStartPresentationTooltip": "Startet automatisch die Präsentation nach Beginn des Votings."
     },
     "ui": {
-      "useCustomBackgroundImage": "Eigenes Hintergrundbild verwenden",
       "dragAndDropToUpload": "Zum Hochladen ziehen oder klicken",
       "useHeartIconsForFlags": "Herzsymbole für Flaggen verwenden",
       "alwaysShowRankings": "Rangliste immer anzeigen",
@@ -1622,10 +1617,10 @@
       "slow": "Langsam",
       "fast": "Schnell",
       "finalRevealLinearAnimation": "Gleichmäßige Animation (kein Zufall)",
+      "enableHaptics": "Haptisches Feedback",
       "enableFullscreenMode": "Vollbildmodus aktivieren",
       "warnBeforeManuallyAssigningTelevotePoints": "Vor manueller Televote-Punktevergabe warnen",
       "showJuryVotingProgressBar": "Jury-Fortschrittsbalken anzeigen",
-      "imageSizeIsPrettyLarge": "Die Bildgröße ist ziemlich groß ({size}MB). Das kann die Simulation verlangsamen. Möchtest du trotzdem fortfahren?",
       "language": "Sprache",
       "enableMinimalisticFlags": "Minimalistische Flaggen aktivieren",
       "enableWinterEffects": "Winter-Effekte aktivieren",

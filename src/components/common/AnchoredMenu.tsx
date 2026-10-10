@@ -9,6 +9,8 @@ import React, {
 } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useBackHandler } from '@/hooks/useBackHandler';
+
 export interface AnchoredMenuItem {
   label: string;
   /** Second, muted line under the label (e.g. why an item is unavailable). */
@@ -83,6 +85,9 @@ const AnchoredMenu: React.FC<AnchoredMenuProps> = ({
   className,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useBackHandler(open, onClose);
+
   const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({
     position: 'fixed',
     zIndex: 10000,

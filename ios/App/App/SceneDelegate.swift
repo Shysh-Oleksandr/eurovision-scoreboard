@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import GoogleSignIn
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -15,7 +16,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        SceneDelegateProxy.shared.scene(scene, openURLContexts: URLContexts)
+        // Google Sign-In redirect (@capgo/capacitor-social-login). On iOS 15+
+        // the SDK normally completes inside its auth session; this covers the
+        // URL-callback path its docs require.
+        let remaining = URLContexts.filter { !GIDSignIn.sharedInstance.handle($0.url) }
+        guard !remaining.isEmpty else { return }
+        SceneDelegateProxy.shared.scene(scene, openURLContexts: remaining)
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {

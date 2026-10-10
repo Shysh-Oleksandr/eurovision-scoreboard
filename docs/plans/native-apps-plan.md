@@ -1,18 +1,27 @@
 # Plan: Native iOS and Android apps (Capacitor)
 
-> Status: **Phase 1 done (2026-10-09).** Phase 0 (spike) ran on the iOS
-> simulator and Android emulator and was confirmed by the owner on a real
-> iPhone and a real Android phone (2026-10-09, "minor issues, fine for
-> now"). Live reload (`yarn cap:dev`) was added the same day. Work is on
-> branch `feat/capacitor-port`. Next: Phase 2. How the native build works:
-> [../native-apps.md](../native-apps.md).
+> Status: **Phase 3 (native polish) done 2026-10-09** apart from optional
+> universal links and a check on real phones. **Phase 2 code done
+> (2026-10-09), except Sign in with Apple** (deferred until there is an
+> Apple Developer account). Not live yet: the
+> backend changes must be deployed, the Google Cloud OAuth clients created,
+> the client IDs set, and the R2 CORS rule applied (checklist below).
+> Placeholder icon and splash screen added the same day. Phase 1
+> (static-export compatibility) and Phase 0 (spike, confirmed by the owner on
+> a real iPhone and Android phone) were done 2026-10-09 too, plus live reload
+> (`yarn cap:dev`). Frontend branch `feat/capacitor-port`; the backend work is
+> on its own `feat/capacitor-port` branch. How the native build works:
+> [../native-apps.md](../native-apps.md). **2026-10-10:** the owner now has
+> an individual Apple Developer Program membership; Phase 4 lists the account
+> setup that unblocks Sign in with Apple, universal links and the uploads.
 
 ## Goal
 
 Ship DouzePoints to the App Store and Google Play from this codebase, with
 an experience at least as good as the mobile website. The owner has a Google
-Play developer account and experience with both stores. As of 2026-10-04
-they had no Apple Developer Program membership.
+Play developer account (exempt from the closed-test rule) and experience
+with both stores, and enrolled in the Apple Developer Program as an
+individual by 2026-10-10.
 
 ## Decision: Capacitor 8
 
@@ -57,7 +66,23 @@ export.
   well before Phase 4.
 - **Google Play:** personal accounts created after 2023-11-13 must run a
   closed test with 12 testers for 14 consecutive days before production.
-  Older accounts and organization accounts are exempt.
+  Older accounts and organization accounts are exempt. The owner's account
+  is exempt (confirmed 2026-10-10).
+- **Apple 1.2 (user-generated content):** public contests, themes and
+  designs need a way to report content (exists for those three), a way to
+  block abusive users (missing), and published contact information.
+- **Apple 3.1.1:** an in-app donation link (the Patreon card in the
+  feedback modal) is treated as an unpaid digital purchase outside the US
+  storefront. Hide it in the apps.
+- **Sign in with Apple and account deletion:** deleting an account must
+  also revoke the user's Apple tokens (Apple's REST API, signed with the
+  Sign in with Apple key).
+- **Toolchain (checked 2026-10-10):** App Store uploads need Xcode 26+ with
+  the iOS 26 SDK (since 2026-04-28); the installed Xcode 27.0 is a release
+  build. Play needs target API 36 for new apps (since 2026-08-31);
+  `targetSdkVersion` is 36.
+- **China mainland** needs an ICP filing number; leave it out of the App
+  Store availability.
 - **Live updates:** Ionic Appflow is shutting down (end of 2027). The
   options are Capgo or Capawesome Cloud, at about $9 to $14 a month, or a
   self-hosted updater. Apple allows downloaded interpreted code that doesn't
@@ -90,76 +115,221 @@ and review rounds.
 - [x] Verified on Android (CDP-driven) and the iOS simulator (device
       language); unit tests in `src/i18n/nativeLocale.test.ts`.
 
-### Phase 2: auth and backend access (4 to 5 days)
+### Phase 2: auth and backend access (code done 2026-10-09)
 
-- [ ] **CORS:** allow `capacitor://localhost` and `https://localhost`
-      through a **new** backend env var merged into `corsOrigins`. Never
-      append them to `FRONTEND_URL`: `auth.controller.ts` computes
-      `isDev = FRONTEND_URL.includes('localhost')`, so that would downgrade
-      the production refresh cookie (SameSite=Lax, no domain) and break
-      website login.
-- [ ] **Refresh token without cookies:** WKWebView won't keep the
-      cross-site httpOnly cookie for `api.douzepoints.app` from
-      `capacitor://localhost`. Native clients need the refresh token in the
-      response body, kept in secure storage (Keychain or Keystore plugin).
-      `/auth/refresh` already accepts `Authorization: Bearer <refresh>`;
-      logout currently only revokes the cookie token.
-- [ ] **Native Google Sign-In** with `@capgo/capacitor-social-login` or
-      Capawesome's google-sign-in. The plugin returns an ID token; a new
-      backend endpoint verifies it and issues tokens. This needs iOS and
-      Android OAuth client IDs in Google Cloud.
-- [ ] **Sign in with Apple** (guideline 4.8): plugin plus backend
+- [x] **CORS:** `NATIVE_APP_ORIGINS` (default
+      `capacitor://localhost,https://localhost`) merged into `corsOrigins` in
+      the backend's `src/config.ts`. Never append the app origins to
+      `FRONTEND_URL`: `auth.controller.ts` computes
+      `isDev = FRONTEND_URL.includes('localhost')`, which would downgrade the
+      production refresh cookie (SameSite=Lax, no domain) and break website
+      login.
+- [x] **Refresh token without cookies:** `POST /auth/google/native` returns
+      both tokens in the body; `/auth/refresh` and `/auth/logout` accept the
+      refresh token as a bearer header, and a rotated header-borne token
+      comes back in the body. The app keeps it in the Keychain / Keystore.
+      Unit tests: `src/auth/auth.controller.spec.ts`,
+      `src/auth/auth.service.spec.ts` (backend).
+- [x] **Native Google Sign-In** with `@capgo/capacitor-social-login`
+      (one plugin for Google now and Apple later); the backend verifies the
+      ID token with `google-auth-library` 10.x (Node 18+).
+- [x] **R2 CORS script:** `scripts/configure-r2-cors.ts` now merges the app
+      origins into the bucket's existing allowlist instead of replacing it.
+- [x] Verified 2026-10-09 against a local backend and a throwaway MongoDB:
+      CORS for both app origins, bearer refresh, rotation, logout
+      revocation and the unchanged cookie path (curl); in the Android app:
+      session restore from the Keystore, rotation storing the new token,
+      logout through the profile UI, and a readable error when Google
+      sign-in isn't configured. Real Google sign-in is untested until the
+      OAuth clients exist.
+- [ ] **Owner:** deploy the backend (`feat/capacitor-port`), set
+      `GOOGLE_NATIVE_CLIENT_IDS` there to the iOS client ID (Android tokens
+      carry the web client ID, which `GOOGLE_CLIENT_ID` already covers), and
+      keep `NATIVE_APP_ORIGINS` unset (the default is right). Checked
+      2026-10-10: the website's cookie flow is unchanged; the deploy must
+      install the new `google-auth-library` dependency.
+- [x] **Owner (2026-10-10):** in the Google Cloud project of the backend's
+      `GOOGLE_CLIENT_ID`, an "iOS" OAuth client (bundle ID
+      `app.douzepoints`) and "Android" clients (package `app.douzepoints`;
+      one SHA-1 each: debug and Play App Signing). Web and iOS client IDs
+      are in the frontend `.env`. Optional: an Android client for the upload
+      key, only needed by release builds installed outside Play.
+- [ ] **Owner:** `npm run r2:cors` (dry run, check the merged list), then
+      `npm run r2:cors -- --apply`, so uploaded fonts load in the apps.
+- [ ] **Sign in with Apple** (guideline 4.8): flip `apple: true` in
+      `capacitor.config.ts`, add the capability, and add backend
       identity-token verification. Needs the paid Apple account.
-- [ ] **R2 CORS:** add the app origins to the R2 allowlist
-      (`npm run r2:cors` in the backend) so uploaded fonts load in the UI
-      and in exports.
 - [ ] Optional: show an error state instead of an empty list when a
       backend call fails (Public Contests currently says "Found 0").
 
-### Phase 3: native polish (3 to 5 days)
+### Phase 3: native polish (done 2026-10-09)
 
-- [ ] **Downloads and sharing:** replace `<a download>` on data URLs (share
-      images, stats) and `XLSX.writeFile` with `@capacitor/filesystem`
-      (cache directory) plus `@capacitor/share`. Users also get "Save to
-      Photos".
-- [ ] **Share links:** they are built from `window.location.href`
-      (`useHandleShare`, `ThemeListItem`, `ShareResultsModal`). Use
-      `https://douzepoints.app`. Optionally add universal links and Android
-      app links so shared links open the app.
-- [ ] **Android back button** (`@capacitor/app`): close the top modal, then
-      go back in history, then exit.
-- [ ] **System bars:** theme-coloured status and navigation bars via
-      Capacitor's SystemBars or StatusBar. `useStatusBarThemeColor` only
-      rewrites the `theme-color` meta tag, which native ignores, so the
-      Android bars are white today.
-- [ ] **Safe areas:** CSS uses `env(safe-area-inset-*)` only. For Android 15
-      edge-to-edge on WebViews older than 140, use
-      `var(--safe-area-inset-top, env(safe-area-inset-top))`, which
-      Capacitor 8 injects.
-- [ ] Hide the fullscreen toggle in the apps (WKWebView has no Fullscreen
-      API).
-- [ ] Move the custom background image (base64, up to about 5 MB, in
-      IndexedDB) to the filesystem, because of the iOS 17.4+ WKWebView
-      IndexedDB connection bug.
-- [ ] Keyboard behaviour (`@capacitor/keyboard`), haptics, splash screen and
-      icons (`@capacitor/assets`), orientation, sound autoplay check, iOS
-      per-app language list (`CFBundleLocalizations`).
-- [ ] Drop source maps from store builds (about 22 MB of the 42 MB bundle).
+Verified on the Android 14 emulator (WebView 136) and, for bars, safe
+areas and languages, the iOS 26 simulator. Details:
+[../native-apps.md](../native-apps.md) §4, §6 and §8.
+
+- [x] **Saving and sharing files** (`src/helpers/fileActions.ts`): Android
+      10+ saves through the app's `MediaSaver` plugin (MediaStore, no
+      permission) to `Pictures/DouzePoints` / `Download/DouzePoints`; iOS
+      saves through the share sheet ("Save Image" to Photos,
+      `NSPhotoLibraryAddUsageDescription` set). Share buttons use
+      `@capacitor/filesystem` + `@capacitor/share`. Copy-image buttons are
+      hidden in the apps. (`.xlsx` export is hidden in the apps instead.)
+- [x] **Share links** point at `https://douzepoints.app/` in the apps
+      (`buildShareUrl()`).
+- [ ] Optional, later: universal links and Android app links so shared
+      links open the app (needs the Apple team ID and the release signing
+      key's SHA-256; served from douzepoints.app/.well-known/).
+- [x] **Android back button** (`@capacitor/app`, `useBackHandler`): closes
+      the innermost overlay, then goes back in history (graphics editor),
+      then minimises the app.
+- [x] **System bars:** light icons, edge to edge with the theme behind
+      them; on WebViews older than 140 the bars show the splash navy
+      instead of white. The edge to edge Android path (WebView 140+) is
+      untested on a device.
+- [x] **Safe areas:** `--safe-top` / `--safe-right` / `--safe-bottom` /
+      `--safe-left` (`src/styles.css`) prefer Capacitor's injected
+      `--safe-area-inset-*` over `env()`.
+- [x] **Website-only features (2026-10-09):** hidden in the apps instead of
+      ported: the fullscreen toggle (WKWebView has no Fullscreen API), vote
+      spreadsheet import/export (`.xlsx`), and the about, privacy, admin
+      and dev pages (`page.web.tsx`, left out of the export). Details:
+      [../native-apps.md](../native-apps.md) §4.
+- [x] **Custom background image removed** (2026-10-09) from the website
+      and the apps; custom themes already cover it (themes can upload a
+      background). Existing browsers delete the stored image once on load.
+      This also dropped the plan to move it out of IndexedDB.
+- [x] Placeholder icon and splash screen (`@capacitor/assets`,
+      `@capacitor/splash-screen` hidden once the first screen paints).
+      Real artwork later: replace `assets/` and run `yarn assets:native`.
+- [x] **Splash hand-off:** hidden when the first modal or the board has
+      painted, not when React first renders.
+- [x] **Haptics** on douze points, qualifier reveals and the winner
+      (`enableHaptics`, apps only).
+- [x] **Keyboard:** no plugin needed (Android resizes, inputs stay
+      visible). **Orientation:** left unlocked. **Sound autoplay:**
+      Capacitor allows it on both platforms. **Per-app language:**
+      `CFBundleLocalizations` (iOS) and `locales_config.xml` (Android 13+).
+- [x] **Source maps** dropped from native builds (`out/` 42 MB → 18 MB;
+      `NATIVE_SOURCEMAPS=1` keeps them).
+- [ ] **Owner, on real phones:** save and share an image on iOS (Photos
+      prompt) and Android; the bars and safe areas on an updated Android
+      phone (WebView 140+); haptics on 12 points.
 
 ### Phase 4: store preparation (2 to 3 days plus review)
 
-- [ ] Apple Developer enrollment (start early), signing, TestFlight.
-- [ ] Final app ID decision before the first upload; it is permanent.
-- [ ] Privacy: App Store privacy labels, Play Data safety form, privacy
-      policy URL, in-app account deletion (5.1.1(v)).
-- [ ] Screenshots, descriptions, age rating, review notes (and a demo login
-      if sign-in gates anything reviewers need).
-- [ ] Decide on live updates and set them up before the first release.
-- [ ] Google Play closed test if the account requires it.
+The owner's account setup was written up on 2026-10-10. Each owner step
+produces a value the code work needs (in brackets).
 
-## Open decisions
+**Owner: Apple Developer portal**
 
-- App ID: `app.douzepoints` unless changed before the first upload.
-- Live updates: provider and whether to use them at launch.
-- Native sign-in plugin: Capgo social-login (Google and Apple in one plugin)
-  or separate Capawesome plugins.
+- [x] Team ID `524WC6G2D9`. The Phase 0 free team was upgraded in place
+      (Xcode lists it as Individual, not free), so `DEVELOPMENT_TEAM` in the
+      Xcode project is already right.
+- [ ] App ID `app.douzepoints`: Xcode registered it on 2026-10-09 as
+      "XC app douzepoints" in this same team, which is why creating it again
+      says "not available". Edit that identifier instead: enable Sign in with
+      Apple (primary App ID) and Associated Domains.
+- [x] Sign in with Apple key (2026-10-10). The `.p8` stays outside the repos
+      until the backend code exists, then goes into the backend env with
+      the Key ID. Used to redeem authorization codes and to revoke tokens on
+      account deletion.
+- [ ] Services ID `app.douzepoints.web` for sign-in on the website: domains
+      `douzepoints.app` and `api.douzepoints.app`, return URL
+      `https://api.douzepoints.app/auth/apple/callback`.
+
+**Owner: App Store Connect**
+
+- [ ] Pending agreements; Digital Services Act trader status (EU).
+- [ ] App record: name, bundle ID `app.douzepoints`, SKU, primary language.
+      Creating it reserves the name.
+- [ ] TestFlight internal testing group.
+- [ ] Before submission: free, without China mainland; category; age rating
+      (user-generated content: yes); privacy labels; screenshots (6.9"
+      iPhone and 13" iPad, since `TARGETED_DEVICE_FAMILY` includes iPad);
+      support, privacy policy URLs; review notes.
+
+**Owner: Google Play Console**
+
+- [x] Create the app (free), 2026-10-10. Play App Signing key fingerprints
+      noted (SHA-1 in a Google Cloud Android client; SHA-256 for
+      `assetlinks.json`).
+- [ ] Upload keystore `~/keys/douzepoints-upload.jks` (alias `upload`),
+      backed up; passwords go in a gitignored file.
+- [ ] First AAB to internal testing.
+- [ ] Before production: store listing, app content (privacy policy, app
+      access, ads, content rating, target audience 13+, data safety).
+
+**Owner: other**
+
+- [x] Contact address: the owner's existing address (already public on the
+      website), decided 2026-10-10. Changing it later is a listing edit.
+- [ ] Approve the rewritten privacy policy (the current one is a 2025
+      template without sign-in, uploads or the apps).
+
+**Code**
+
+- [ ] Sign in with Apple: iOS (`apple: true`, entitlement), backend token
+      verification, revocation; the website through the Services ID.
+      Android keeps Google only until email sign-in lands.
+- [ ] Release signing: paid team in Xcode, Android `keystore.properties`.
+- [ ] In-app account deletion (5.1.1(v)): deletes the user's content too.
+- [ ] Block users (1.2).
+- [ ] Hide the Patreon card in the apps (3.1.1).
+- [ ] Privacy policy draft; Umami loads in the app builds whenever
+      `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set (keep and declare it, or gate it).
+- [ ] Universal links and Android app links: `apple-app-site-association`
+      and `assetlinks.json` under `douzepoints.app/.well-known/`, the
+      Associated Domains entitlement, an `autoVerify` intent filter. Only
+      share links (`?contest=`, `?theme=`, `?design=`) open the app.
+- [ ] Drafts of the privacy labels, the Data safety form and the review
+      notes.
+- [ ] Live updates: self-hosted Capgo updater (`@capgo/capacitor-updater`)
+      with bundles on R2. It must ship in the first binary.
+
+## Later: email sign-in (not scheduled)
+
+Decided 2026-10-09 to add email sign-in after the launch, not before. Not a
+priority. On 2026-10-10 the owner chose email + password with an emailed
+confirmation code, on every platform (website, iOS, Android). Notes from
+the research on 2026-10-09:
+
+- **Codes, not links.** Confirm the address (and reset a password, if there
+  are passwords) with a 6-digit emailed code. A link would need universal
+  links / app links to land in the app. Consider dropping passwords
+  entirely (email, then a code, then signed in): no hashing, reset flow or
+  password guessing, and the address is verified by construction. Refresh
+  tokens last 30 days, so sign-ins and emails are rare.
+- **Backend:** `passwordHash` (if passwords; `bcryptjs` is already a
+  dependency) and `emailVerifiedAt` on `Profile`; endpoints for register /
+  login / verify / resend (+ forgot / reset); tokens issued exactly like
+  `/auth/google/native` (body for the apps) and the Google callback (cookie
+  for the web). Add `@nestjs/throttler` against guessing and against signup
+  spam burning the email quota. Estimate: 1.5 to 2.5 days.
+- **Frontend:** an email form beside Google in the sign-in UI, the code
+  step, errors, strings in every locale; the app path reuses the Keychain /
+  Keystore storage. Estimate: 1.5 to 2 days.
+- **Account linking (security):** `findOrCreateFromGoogle` links by email.
+  Never link a Google sign-in to an account whose email is not verified,
+  or someone who registered the address first keeps a password into the
+  owner's account. Registering an address that already has a Google
+  account should point to Google sign-in (or set a password through the
+  code flow).
+- **Email provider:** Resend (free: 3,000 a month, 100 a day). Fallback:
+  Brevo (free: 300 a day). Cloudflare Email Service has no free tier
+  (needs Workers Paid). Domain setup is SPF / DKIM / DMARC records in
+  Cloudflare DNS. Check the free tiers again when starting.
+- **Apple 4.8:** email sign-in does not replace Sign in with Apple while
+  Google sign-in is offered, because it does not let users hide their
+  address.
+
+## Decisions (2026-10-10)
+
+- App ID `app.douzepoints` on both platforms (permanent after the first
+  upload).
+- Live updates at launch: self-hosted Capgo updater, bundles served from R2.
+- Sign in with Apple on iOS and the website (otherwise an account made on an
+  iPhone with "Hide My Email" can't be reached on the website). Not on
+  Android.
+- iPad kept (needs iPad screenshots).
+- Native sign-in plugin: Capgo social-login (installed in Phase 2).

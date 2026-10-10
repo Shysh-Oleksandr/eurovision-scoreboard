@@ -28,6 +28,8 @@ import { DesignDataProvider } from '@/graphics/render/DesignDataContext';
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { toEditableDesign } from '@/graphics/templates/editor';
 import { buildResultsDesign } from '@/graphics/templates/results';
+import { saveFile, shareFile } from '@/helpers/fileActions';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { Country, StageId, StageVotingMode } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -177,45 +179,42 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
     [imageCustomization.highQuality, isTouchDevice],
   );
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!generatedImageUrl) return;
 
-    const link = document.createElement('a');
+    try {
+      const result = await saveFile(
+        generatedImageUrl,
+        `${defaultTitle} - ${defaultSubtitle} - DouzePoints.app - ${Date.now()}.jpg`,
+      );
 
-    link.download = `${defaultTitle} - ${defaultSubtitle} - DouzePoints.app - ${Date.now()}.png`;
-    link.href = generatedImageUrl;
-    link.click();
+      if (result.kind === 'saved') {
+        toast.success(t('common.savedTo', { folder: result.folder }));
+      }
+    } catch (err) {
+      console.error('Save failed:', err);
+      toast.error('Failed to share');
+    }
   };
 
   const handleShareImage = async () => {
     if (!generatedImageUrl) return;
 
     try {
-      const res = await fetch(generatedImageUrl);
-      const blob = await res.blob();
-      const file = new File([blob], `${defaultTitle} - DouzePoints.app.png`, {
-        type: blob.type || 'image/png',
-      });
-
-      const shareData = {
+      const result = await shareFile({
+        data: generatedImageUrl,
+        fileName: `${defaultTitle} - DouzePoints.app.jpg`,
         title: defaultTitle,
         text: defaultSubtitle,
-        files: [file],
-        url:
-          window.location.href +
-          (activeContest ? `?contest=${activeContest._id}` : ''),
-      };
+        url: buildShareUrl(activeContest ? { contest: activeContest._id } : {}),
+      });
 
-      if (navigator.canShare && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
-      } else {
+      if (result === 'unsupported') {
         toast.error('Sharing is not supported on this device.');
       }
     } catch (err: any) {
-      if (err?.name !== 'AbortError') {
-        console.error('Share failed:', err);
-        toast.error('Failed to share');
-      }
+      console.error('Share failed:', err);
+      toast.error('Failed to share');
     }
   };
 

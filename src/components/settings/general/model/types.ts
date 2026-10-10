@@ -13,6 +13,7 @@ export type IconType = React.ComponentType<{
 export interface SettingsEnv {
   fullscreenEnabled: boolean;
   hasSimBg: boolean;
+  isNativeApp: boolean;
 }
 
 export type SettingsPredicate = (env: SettingsEnv) => boolean;

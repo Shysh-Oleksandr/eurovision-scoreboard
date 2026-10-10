@@ -83,7 +83,8 @@
       "label": "Beta",
       "hint": "Novità ancora in evoluzione. Dicci cosa manca con il pulsante del feedback.",
       "hintFeedback": "Novità ancora in evoluzione · clicca per inviare un feedback"
-    }
+    },
+    "savedTo": "Salvato in {folder}"
   },
   "Metadata": {
     "title": "DouzePoints - Simulatore di Classifica Eurovision",
@@ -105,7 +106,6 @@
       "errorImageTooLarge": "L'immagine è troppo grande. La dimensione massima è {maxSize}MB. Comprimi l'immagine o caricane una più piccola."
     },
     "invalidInput": "Input non valido",
-    "pleaseSelectValidImageFile": "Seleziona un file immagine valido.",
     "fontUpload": {
       "unsupportedType": "«{name}» non è un file di font supportato. Usa .woff2, .woff, .ttf o .otf.",
       "tooLarge": "«{name}» è troppo grande. Dimensione massima: {maxMb} MB.",
@@ -1413,7 +1413,7 @@
       },
       "uiPreferences": {
         "title": "Preferenze UI",
-        "content": "Personalizza l'aspetto in Impostazioni → Preferenze UI:<list><item><strong>Stili bandiera</strong> — passa a icone cuore, bandiere minimaliste rotonde/quadrate o mantieni i rettangoli predefiniti</item><item><strong>Mostra sempre i ranking</strong> — mantieni visibili i numeri di posizione, più un indicatore di cambio ranking</item><item><strong>Popup</strong> — attiva/disattiva indipendentemente popup qualificati, annuncio vincitore e confetti</item><item><strong>Modalità schermo intero</strong> — entra a schermo intero per una vista immersiva del tabellone</item><item><strong>Barra progresso votazione giuria</strong> — mostra quanti paesi hanno già votato nel turno giuria corrente</item><item><strong>Immagine di sfondo personalizzata</strong> — carica la tua immagine per sostituire lo sfondo del tema</item><item><strong>Usa sempre lo stesso font</strong> — imposta un font specifico indipendentemente dal tema attivo</item><item><strong>Audio</strong> — imposta volumi separati per effetti sonori e musica di sottofondo, o disabilita tutto l'audio del tema in una volta</item><item><strong>Effetti invernali</strong> — attiva neve che cade con cursore intensità regolabile</item></list>"
+        "content": "Personalizza l'aspetto in Impostazioni → Preferenze UI:<list><item><strong>Stili bandiera</strong> — passa a icone cuore, bandiere minimaliste rotonde/quadrate o mantieni i rettangoli predefiniti</item><item><strong>Mostra sempre i ranking</strong> — mantieni visibili i numeri di posizione, più un indicatore di cambio ranking</item><item><strong>Popup</strong> — attiva/disattiva indipendentemente popup qualificati, annuncio vincitore e confetti</item><item><strong>Modalità schermo intero</strong> — entra a schermo intero per una vista immersiva del tabellone</item><item><strong>Barra progresso votazione giuria</strong> — mostra quanti paesi hanno già votato nel turno giuria corrente</item><item><strong>Usa sempre lo stesso font</strong> — imposta un font specifico indipendentemente dal tema attivo</item><item><strong>Audio</strong> — imposta volumi separati per effetti sonori e musica di sottofondo, o disabilita tutto l'audio del tema in una volta</item><item><strong>Effetti invernali</strong> — attiva neve che cade con cursore intensità regolabile</item></list>"
       },
       "confirmations": {
         "title": "Popup di conferma",
@@ -1463,10 +1463,6 @@
         "suppressedDialogs": "Dialoghi soppressi",
         "reset": "Ripristina"
       },
-      "upload": {
-        "title": "Trascina un’immagine o clicca per sfogliare",
-        "subtext": "PNG, JPG o WEBP · salvato su questo dispositivo."
-      },
       "danger": {
         "confirm": "Sì, ripristina tutto"
       },
@@ -1477,10 +1473,10 @@
         "targetStages": "Mostrare a quale fase avanza ogni qualificato.",
         "blurModal": "Sfocare il tabellone dietro i modali aperti per maggiore concentrazione.",
         "overrideFont": "Ignorare i font di ogni tema (inclusi quelli caricati) e usare sempre quello scelto qui sotto, sia per l’interfaccia sia per il tabellone.",
-        "customBg": "Usare la propria immagine di sfondo. Salvata solo su questo dispositivo — non sincronizzata con il tuo account.",
         "winter": "Aggiungere neve che cade e tocchi festivi in tutta l’app.",
         "finalReveal": "Rivelare i punteggi finali del televoto un paese alla volta con un’animazione drammatica.",
-        "predictableReveal": "Rivelare i punteggi del televoto in un ordine fluido e deterministico, senza suspense casuale."
+        "predictableReveal": "Rivelare i punteggi del televoto in un ordine fluido e deterministico, senza suspense casuale.",
+        "haptics": "Vibra ai 12 punti, all’annuncio dei qualificati e al vincitore."
       }
     },
     "relations": {
@@ -1608,7 +1604,6 @@
       "autoStartPresentationTooltip": "Se abilitato, la presentazione partirà automaticamente dopo l'inizio della votazione."
     },
     "ui": {
-      "useCustomBackgroundImage": "Usa immagine di sfondo personalizzata",
       "dragAndDropToUpload": "Trascina e rilascia o clicca per caricare",
       "useHeartIconsForFlags": "Usa icone a cuore per le bandiere",
       "alwaysShowRankings": "Mostra sempre le classifiche",
@@ -1622,10 +1617,10 @@
       "slow": "Lento",
       "fast": "Veloce",
       "finalRevealLinearAnimation": "Animazione fluida e prevedibile (senza casualità)",
+      "enableHaptics": "Feedback aptico",
       "enableFullscreenMode": "Abilita modalità a schermo intero",
       "warnBeforeManuallyAssigningTelevotePoints": "Avvisa prima di assegnare manualmente punti televoto",
       "showJuryVotingProgressBar": "Mostra barra avanzamento votazione giuria",
-      "imageSizeIsPrettyLarge": "La dimensione dell'immagine è piuttosto grande ({size}MB). Questo può rallentare la simulazione, quindi potresti volerla comprimere o usare un'immagine più piccola. Vuoi continuare con questa immagine?",
       "language": "Lingua",
       "enableMinimalisticFlags": "Abilita bandiere minimaliste",
       "enableWinterEffects": "Abilita effetti invernali",
