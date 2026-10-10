@@ -42,6 +42,10 @@ import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { CloudDesign } from '@/types/design';
 
+// The profile feeds render these cards outside the Graphics modal, so the
+// gfx-* styles must come with the cards, not only with the modal's chunk.
+import '@/graphics/editor/editor.css';
+
 /**
  * Cloud design cards (gallery Explore / Saved / "Published by you", profile
  * content feeds) with like / save / report, and for the owner make

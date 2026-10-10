@@ -8,6 +8,7 @@ import { useGeneralStore } from './generalStore';
 import { clearUserData } from '@/api/clearUserData';
 import {
   api,
+  ApiError,
   setAccessTokenGetter,
   attachRefreshInterceptor,
 } from '@/api/client';
@@ -26,6 +27,46 @@ export interface AuthState {
   logout: () => Promise<void>;
 }
 
+type LoginStep = 'refresh' | 'me';
+
+/**
+ * The login toast can't say why it failed, so post the failing step and
+ * response to /admin/errors: a 401 "Missing refresh token" means the browser
+ * dropped the cookie, no status means the request never completed.
+ */
+function reportLoginFailure(step: LoginStep, error: unknown) {
+  const response = error instanceof ApiError ? error.response : undefined;
+  const detail =
+    typeof response?.data?.message === 'string'
+      ? ` ${response.data.message}`
+      : '';
+
+  api
+    .post('/errors', {
+      message: `Login failed at /auth/${step}: ${
+        response ? `${response.status}${detail}` : 'network error'
+      }`.slice(0, 300),
+      stack: error instanceof Error ? error.stack : undefined,
+      userDetails: {
+        platform: navigator.platform,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        cookieEnabled: navigator.cookieEnabled,
+        onLine: navigator.onLine,
+      },
+      generalInfo: {
+        step,
+        status: response?.status,
+        response:
+          typeof response?.data === 'string'
+            ? response.data.slice(0, 500)
+            : response?.data,
+        error: error instanceof Error ? error.message : String(error),
+      },
+    })
+    .catch(() => {});
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -39,6 +80,7 @@ export const useAuthStore = create<AuthState>()(
         if (!get().user && !force) return false;
 
         let success = false;
+        let step: LoginStep = 'refresh';
 
         attachRefreshInterceptor(get().refresh);
         setAccessTokenGetter(() => useAuthStore.getState().accessToken);
@@ -46,6 +88,7 @@ export const useAuthStore = create<AuthState>()(
           const token = await get().refresh();
 
           if (token) {
+            step = 'me';
             await get().fetchMe();
 
             // Refetch all user-specific data after successful token refresh
@@ -69,6 +112,10 @@ export const useAuthStore = create<AuthState>()(
           set({ user: null, accessToken: null });
 
           success = false;
+
+          // Only the post-redirect sign-in is reported: an ordinary load with
+          // a lapsed session fails here routinely.
+          if (force) reportLoginFailure(step, e);
         }
         // Strip query params after handling redirect
         const url = new URL(window.location.href);
