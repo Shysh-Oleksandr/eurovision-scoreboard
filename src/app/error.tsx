@@ -8,6 +8,7 @@ import { useCreateErrorMutation } from '@/api/errors';
 import { TriangleAlertIcon } from '@/assets/icons/TriangleAlertIcon';
 import Button from '@/components/common/Button';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
+import { LIVE_BUNDLE_VERSION } from '@/native/liveUpdate';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -24,6 +25,8 @@ const getUserDetails = () =>
           typeof window !== 'undefined' ? window.innerWidth : undefined,
         screenHeight:
           typeof window !== 'undefined' ? window.innerHeight : undefined,
+        // Native apps: which live-update bundle crashed.
+        appBundle: LIVE_BUNDLE_VERSION || undefined,
       };
 
 export default function Error({

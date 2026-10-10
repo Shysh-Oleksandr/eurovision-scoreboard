@@ -19,6 +19,7 @@ import { useThemeSetup } from '@/hooks/useThemeSetup';
 import { normalizeLocale } from '@/i18n/catalog';
 import { getStoredLocale } from '@/i18n/nativeLocale';
 import { installBackButtonHandler } from '@/native/backButton';
+import { liveUpdateBoot, startLiveUpdateChecks } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { useCountriesStore } from '@/state/countriesStore';
 import { NATIVE_LOGIN_EVENT, useAuthStore } from '@/state/useAuthStore';
@@ -65,6 +66,11 @@ export default function AppBootstrap() {
 
   useEffect(() => {
     const handleLogin = async () => {
+      // A launch that switches to a downloaded live update reloads the
+      // WebView; a session restore cut off mid-rotation would lose the new
+      // refresh token.
+      if (IS_NATIVE_APP) await liveUpdateBoot();
+
       const url = new URL(window.location.href);
 
       if (url.searchParams.has('provider')) {
@@ -101,7 +107,10 @@ export default function AppBootstrap() {
   }, [handlePostLogin, t]);
 
   useEffect(() => {
-    if (IS_NATIVE_APP) void installBackButtonHandler();
+    if (!IS_NATIVE_APP) return;
+
+    void installBackButtonHandler();
+    startLiveUpdateChecks();
   }, []);
 
   // Native apps sign in without a redirect; the store reports the outcome.

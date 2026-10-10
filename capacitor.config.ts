@@ -1,3 +1,7 @@
+/// <reference types="@capgo/capacitor-updater" />
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import type { CapacitorConfig } from '@capacitor/cli';
 
 /**
@@ -12,6 +16,20 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 /** Navy of the splash art (assets/, scripts/compose-app-assets.mjs). */
 const SPLASH_BACKGROUND = '#0B0F2E';
+
+/**
+ * Live updates are signed with ~/keys/douzepoints-live-update.pem; binaries
+ * only install bundles that verify against this key, so replacing it cuts
+ * off every installed app until it updates from the store
+ * (docs/native-apps.md §11).
+ */
+const LIVE_UPDATE_PUBLIC_KEY = readFileSync(
+  path.join(
+    typeof __dirname === 'string' ? __dirname : process.cwd(),
+    'live-update-public.pem',
+  ),
+  'utf8',
+).trim();
 
 const config: CapacitorConfig = {
   appId: 'app.douzepoints',
@@ -47,6 +65,27 @@ const config: CapacitorConfig = {
         facebook: false,
         twitter: false,
       },
+    },
+    CapacitorUpdater: {
+      // Manual mode: src/native/liveUpdate.ts reads our own manifests on R2
+      // and decides when to download and switch.
+      autoUpdate: false,
+      // Never contact Capgo's cloud: no update checks, channel calls or stats
+      // (which would include crash and JS error reports).
+      updateUrl: '',
+      channelUrl: '',
+      statsUrl: '',
+      // A bundle that hasn't called notifyAppReady() by then is rolled back.
+      // Generous, so a slow phone never rolls back a working bundle.
+      appReadyTimeout: 20000,
+      // Seconds. On iOS this also caps the whole download (~8 MB).
+      responseTimeout: 120,
+      publicKey: LIVE_UPDATE_PUBLIC_KEY,
+      // Its logs stay in Xcode / logcat instead of being echoed into the
+      // WebView console line by line.
+      disableJSLogging: true,
+      // Defaults kept: a store update drops downloaded bundles
+      // (resetWhenUpdate), failed and replaced bundles are deleted.
     },
   },
 };

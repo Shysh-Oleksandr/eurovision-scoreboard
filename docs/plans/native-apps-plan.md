@@ -14,6 +14,9 @@
 > [../native-apps.md](../native-apps.md). **2026-10-10:** the owner now has
 > an individual Apple Developer Program membership; Phase 4 lists the account
 > setup that unblocks Sign in with Apple, universal links and the uploads.
+> **2026-10-10:** live updates implemented (self-hosted Capgo updater, signed
+> bundles on R2), verified on the Android emulator and iOS simulator against
+> a local server; the first R2 upload waits for the first store release.
 
 ## Goal
 
@@ -290,8 +293,19 @@ produces a value the code work needs (in brackets).
       share links (`?contest=`, `?theme=`, `?design=`) open the app.
 - [ ] Drafts of the privacy labels, the Data safety form and the review
       notes.
-- [ ] Live updates: self-hosted Capgo updater (`@capgo/capacitor-updater`)
-      with bundles on R2. It must ship in the first binary.
+- [x] Live updates (2026-10-10): `@capgo/capacitor-updater` 8.52 in manual
+      mode with Capgo's cloud and stats off, `yarn live-update publish`
+      (build, zip, encrypt and sign, upload to R2 with wrangler), bundles
+      filed per native runtime fingerprint, switch on the next launch,
+      rollback of bundles that never confirm, signing key pair made.
+      `ios/App/App/PrivacyInfo.xcprivacy` added with the required-reason
+      APIs of the plugins that ship none. Details:
+      [../native-apps.md](../native-apps.md) §11.
+- [ ] **Owner:** back up `~/keys/douzepoints-live-update.pem` (losing it
+      blocks live updates until a store release with a new key);
+      `npx wrangler login` once. First publish after the first store
+      release, then `yarn live-update status`; try one update on a real
+      iPhone and Android phone.
 
 ## Later: email sign-in (not scheduled)
 

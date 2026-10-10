@@ -30,11 +30,16 @@ roadmap, research findings and status live in
   flags, `NEXT_PUBLIC_API_URL=https://api.douzepoints.app` and an empty
   Umami id (app sessions must not count as website traffic). Output: `out/`
   (gitignored), which holds the HTML, `/_next/static` and all of `public/`.
+  `next.config.ts` also bakes in the live-update values: the bundle version
+  (the UTC build time) and both native runtime fingerprints (§11). The build
+  log prints them (`[live-update] bundle …, runtimes ios …, android …`).
 - **Locale on the server:** `src/i18n/request.ts` returns a fixed `en`
   when `NEXT_PUBLIC_NATIVE_APP` is set. A static export has no request, so
   `cookies()` / `headers()` would fail the build. The real locale is picked
   on the client (§5).
-- **`yarn cap:sync`** = `build:native` + `cap sync`. It copies `out/` into
+- **`yarn cap:sync`** = `scripts/native-config.mjs` + `build:native` +
+  `cap sync`. The first step updates `Info.plist` before the build
+  fingerprints it (§11); sync runs it again as its hook. It copies `out/` into
   `ios/App/App/public` and `android/app/src/main/assets/public` (both
   gitignored) and regenerates each platform's `capacitor.config.json` from
   `capacitor.config.ts`.
@@ -71,6 +76,8 @@ roadmap, research findings and status live in
 | `yarn dev:native` | Dev server with the app's code paths (`IS_NATIVE_APP`) |
 | `yarn cap:dev ios\|android [--lan]` | Live reload in the native shell (§3) |
 | `yarn assets:native` | Regenerate icons and splash screens from `assets/` (§8) |
+| `yarn live-update publish` | Build, sign and upload a live update to R2 (§11) |
+| `yarn live-update status` | What is published for this tree's native runtimes |
 
 `cap sync` also runs the app's `capacitor:sync:after` hook,
 `scripts/native-config.mjs` (§7).
@@ -197,6 +204,12 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   (`pt-[var(--safe-top)]`). Capacitor's Android `SystemBars` sets
   `--safe-area-inset-*` because old WebViews report wrong `env()` values
   edge to edge; the variables fall back to `env()` everywhere else.
+- **Live updates ship JS, never native changes.** A web change reaches
+  installed apps through `yarn live-update publish` (§11). Anything that
+  changes the native runtime fingerprint (a plugin or its version,
+  `capacitor.config.ts`, the iOS delegates, `Info.plist`, entitlements,
+  Android's Java code, `AndroidManifest.xml`, `res/xml`) needs a store
+  release, and its bundles only reach the new binary.
 
 ## 5. Locale
 
@@ -474,3 +487,162 @@ Tracked in the plan with the phase that fixes each item:
 - Capacitor 8 on Android logs "Error injecting safe area CSS" at startup.
   It is Capacitor's own injector running before the DOM exists, and it is
   harmless.
+
+## 11. Live updates
+
+The apps update their web bundle without a store release (added
+2026-10-10): `@capgo/capacitor-updater` in manual mode, our own manifests
+and bundles on R2, no Capgo account or cloud. Apple's license agreement
+allows downloaded interpreted code that doesn't change the app's purpose,
+and Google's device and network abuse policy exempts WebView JavaScript.
+Native code,
+plugins and anything the binary reads (`capacitor.config.ts`, `Info.plist`,
+`AndroidManifest.xml`) still need a store release.
+
+### How an app updates
+
+1. **Check** (`startLiveUpdateChecks()`, `src/native/liveUpdate.ts`): 10 s
+   after launch, and on resume when the last check is an hour old, the app
+   fetches `https://cdn.douzepoints.app/app-updates/<platform>/<runtime>.json`
+   with `CapacitorHttp` (native, so no CORS rule is needed). A 404 means
+   nothing is published for its runtime. If the manifest's version is newer
+   than the running bundle's and hasn't failed on this device,
+   `CapacitorUpdater.download()` fetches the zip, verifies the signature and
+   unzips it. Older downloads that never ran are deleted first.
+2. **Switch on the next launch** (`liveUpdateBoot()`): every launch asks the
+   plugin for a downloaded bundle newer than the running one
+   (`pickBundleToApply()`, `liveUpdateManifest.ts`) and `set()`s it, which
+   reloads the WebView. It runs before anything that must not be cut off:
+   `AppBootstrap` awaits it before restoring the session (a reload during a
+   refresh-token rotation would lose the new token), and
+   `hideSplashWhenPainted()` awaits it, so the splash covers the switch
+   (`SplashScreen.show()` brings it back if the launch splash already timed
+   out). The plugin's own install-on-background (`next()`) is never used: it
+   would reload the app whenever the user switches away, e.g. to share. A
+   check that takes longer than 8 s gives up for that launch.
+3. **Confirm** (`confirmLiveBundle()`): `src/app/(main)/page.tsx` calls
+   `notifyAppReady()` once `Main` has mounted. A bundle that doesn't get
+   there within `appReadyTimeout` (20 s; the plugin uses at least 30 s for a
+   bundle's first run on Android) is rolled back to the last bundle that
+   worked and deleted. The next launch reads `getFailedUpdate()` and stores
+   the version under localStorage `live-update-failed`, so that version is
+   never downloaded again on this device.
+4. A store update drops all downloaded bundles (`resetWhenUpdate`, default),
+   so the new binary starts from its own bundle.
+
+Versions are the UTC build time, `YYYYMMDD.HHmmss`, baked into every native
+build as `NEXT_PUBLIC_LIVE_UPDATE_VERSION`. A store binary built after a
+published bundle therefore never downloads it. Error reports from the apps
+carry the running version as `userDetails.appBundle`.
+
+### Native runtimes
+
+An app only reads the manifest of its own **runtime**, a fingerprint of its
+native side per platform (`scripts/native-runtime.mjs`): the Capacitor
+runtime and every native plugin with its installed version,
+`capacitor.config.ts`, `live-update-public.pem`, and for iOS the Swift files,
+`Info.plist` and the entitlements in `ios/App/App`; for Android the Java
+sources, `AndroidManifest.xml` and `res/xml` (minus the generated
+`config.xml`). Whitespace doesn't count. Version numbers, icons, Xcode and
+Gradle settings are left out, so a release that only bumps the version keeps
+its runtime and keeps receiving updates.
+
+`build:native` bakes both runtimes into the bundle; `publish` files the
+bundle under the runtimes of the tree it builds from. So:
+
+- After a native change, bundles published from the new tree only reach
+  binaries built from it. Users who haven't updated from the store stay on
+  whatever their runtime last got.
+- Build store binaries right after `yarn cap:sync` with no native edits in
+  between (Xcode edits to `Info.plist` count), or the binary's real runtime
+  differs from the baked one and it never sees an update.
+- To ship a fix to an older runtime, publish from a checkout of the commit
+  its binary was built from (plus the fix). `yarn live-update status` shows
+  the runtimes of the current tree and what is published for them.
+
+### Publishing
+
+```bash
+npx wrangler login                     # once; needs access to the R2 bucket
+yarn live-update publish               # from a clean tree
+yarn live-update publish --dry-run     # build and sign, upload nothing
+yarn live-update status
+```
+
+`publish` refuses a dirty tree (`--allow-dirty` overrides; the manifest then
+says `<commit>-dirty`). It runs `yarn build:native` with a fresh version,
+checks that the version made it into the JS, zips `out/` (about 6.5 MB),
+encrypts and signs it, verifies the result with the public key, and uploads
+with `wrangler r2 object put --remote` to the `douzepoints-assets` bucket
+(`LIVE_UPDATE_BUCKET` overrides): first
+`app-updates/bundles/<version>.zip` (immutable, cached for a year), then one
+`app-updates/<platform>/<runtime>.json` per platform (`no-cache`). The
+manifest holds the version, platform, runtime, zip URL, signed checksum,
+session key, size, commit and publish time.
+
+- **Rolling back** means publishing again from a good commit: it gets a new,
+  newer version. Apps that already run the bad bundle move to the new one
+  on their next launch after a check. Deleting a manifest only stops further
+  downloads.
+- **Size:** every update downloads the whole zip; Capgo's delta updates
+  (per-file manifests) are not used.
+
+### Signing
+
+The binaries carry the RSA public key `live-update-public.pem` (committed;
+`capacitor.config.ts` reads it into `CapacitorUpdater.publicKey`). With a
+key configured the plugin only accepts bundles encrypted with the plugin's
+"encryption v2": the zip is AES-128-CBC encrypted with a random key, and
+that key and the zip's SHA-256 are signed with the private key
+(`privateEncrypt`, PKCS#1 v1.5). Someone with write access to the bucket but
+without the private key cannot ship code to the apps.
+
+- The private key lives at `~/keys/douzepoints-live-update.pem`
+  (`LIVE_UPDATE_PRIVATE_KEY` overrides), outside both repos. **Back it up.**
+  Without it no installed app can be updated until a store release ships a
+  new public key.
+- `yarn live-update keygen` made the pair on 2026-10-10. Running it again
+  (`--force`) cuts off every installed app: their binaries keep the old key.
+- `publish` refuses a private key that doesn't match the committed public
+  key.
+
+### Plugin configuration
+
+`capacitor.config.ts` → `CapacitorUpdater`: `autoUpdate: false`, and
+`updateUrl`, `channelUrl`, `statsUrl` all empty, so the plugin never talks to
+Capgo (its stats would include crash and JS-error reports). It still keeps a
+random device ID in the Keychain / app preferences, which nothing sends
+anywhere. `responseTimeout: 120` (on iOS it caps the whole download),
+`disableJSLogging: true` (Android still echoes its logs into the WebView
+console after the first download; read them in logcat / Xcode either way).
+The plugin uses UserDefaults, file timestamps and free disk space, declared
+with the other plugins' required-reason APIs in
+`ios/App/App/PrivacyInfo.xcprivacy`.
+
+### Testing locally
+
+Point a build and a publish at a local server instead of the CDN:
+
+```bash
+mkdir -p /tmp/lu/app-updates && python3 -m http.server 8787 --directory /tmp/lu
+NEXT_PUBLIC_LIVE_UPDATE_URL=http://localhost:8787/app-updates yarn cap:sync
+# build and install the app, launch it once, then:
+NEXT_PUBLIC_LIVE_UPDATE_URL=http://localhost:8787/app-updates \
+  yarn live-update publish --allow-dirty --out /tmp/lu/app-updates
+```
+
+Launch the app, wait for the check (logcat / the Xcode console show
+`[live-update] downloaded bundle …`), then kill and relaunch it: it switches.
+The iOS simulator reaches `http://localhost` as is. Android needs
+`adb reverse tcp:8787 tcp:8787` and, temporarily,
+`android:usesCleartextTraffic="true"` on `<application>` (which also changes
+the Android runtime, consistently for the build and the publish). Run
+`yarn cap:sync` without the variable afterwards, or the projects keep the
+local URL.
+
+Verified 2026-10-10 on the Android 14 emulator and the iOS 26 simulator:
+download, switch on relaunch with the splash covering it, a bundle that
+never confirms rolled back after 30 s and not downloaded again, a newer good
+bundle installed after that, a bundle signed with another key rejected at
+download, and old bundles deleted from disk. Not tried yet: real phones and
+the R2 upload.

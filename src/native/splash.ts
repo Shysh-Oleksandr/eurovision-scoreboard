@@ -1,9 +1,12 @@
+import { liveUpdateBoot } from './liveUpdate';
+
 /**
  * Hides the native splash screen once the app's first screen has painted:
  * called by the first modal to open (usually Event Setup), the simulation
  * board, and a fallback timer in `src/app/(main)/page.tsx`.
  * capacitor.config.ts keeps it up (with a timeout as a safety net) so the
  * launch goes splash → app instead of splash → bare theme background → app.
+ * It also stays up while a launch switches to a downloaded live update.
  */
 let hidden = false;
 
@@ -14,6 +17,8 @@ export async function hideSplashWhenPainted(): Promise<void> {
   const { Capacitor } = await import('@capacitor/core');
 
   if (!Capacitor.isNativePlatform()) return;
+
+  await liveUpdateBoot();
 
   // Two frames: React has committed, and the browser has painted it.
   await new Promise<void>((resolve) =>

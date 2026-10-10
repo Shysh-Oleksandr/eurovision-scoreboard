@@ -26,3 +26,6 @@ currentTask/
 /out/
 
 AuthKey_*
+
+# Live update staging (yarn live-update publish)
+/.live-update/

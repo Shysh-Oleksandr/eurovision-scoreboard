@@ -6,6 +6,7 @@ import Main from '../../views/Main';
 import { useCatalogReady } from '../AppIntlProvider';
 
 import { useIsClient } from '@/hooks/useIsClient';
+import { confirmLiveBundle } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { hideSplashWhenPainted } from '@/native/splash';
 
@@ -27,6 +28,10 @@ export default function Page() {
   // painted; this is the fallback for a launch that shows neither.
   useEffect(() => {
     if (!IS_NATIVE_APP || !ready) return undefined;
+
+    // `Main` has mounted: this bundle works, so a live update stays
+    // installed instead of being rolled back.
+    confirmLiveBundle();
 
     const timer = window.setTimeout(() => void hideSplashWhenPainted(), 1500);
 

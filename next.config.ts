@@ -2,6 +2,8 @@ import type { NextConfig } from 'next';
 
 import createNextIntlPlugin from 'next-intl/plugin';
 
+import { liveUpdateBuildEnv } from './scripts/native-runtime.mjs';
+
 // `yarn build:native` sets NATIVE_EXPORT to produce the static bundle
 // Capacitor ships inside the iOS/Android apps (`out/`); it also sets
 // NEXT_PUBLIC_NATIVE_APP, the client-side flag (src/native/platform.ts), which
@@ -25,6 +27,10 @@ const nativeOverrides: NextConfig = isNativeExport
       // Website-only pages (`page.web.tsx`: about, privacy, admin, dev) are
       // dropped the same way.
       pageExtensions: ['tsx', 'jsx'],
+      // Live updates: this bundle's version, the native runtime fingerprints
+      // it is built against, and where to look for newer bundles
+      // (src/native/liveUpdate.ts, docs/native-apps.md §11).
+      env: liveUpdateBuildEnv(),
     }
   : {
       pageExtensions: WEB_PAGE_EXTENSIONS,
