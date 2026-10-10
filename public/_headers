@@ -10,3 +10,8 @@
 
 /fonts/*
   Cache-Control: public,max-age=31536000,immutable
+
+# Universal links: Apple wants JSON, and the file has no extension to infer
+# it from. (A comment on a path line becomes part of the path.)
+/.well-known/apple-app-site-association
+  Content-Type: application/json

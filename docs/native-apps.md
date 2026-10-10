@@ -192,7 +192,8 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   directly: `saveFile()`, `shareFile()` and `shareLink()` pick the native
   path (§6), and `buildShareUrl()` (`src/helpers/shareUrl.ts`) points app
   links at `https://douzepoints.app/`. Show `common.savedTo` when
-  `saveFile()` returns `saved`.
+  `saveFile()` returns `saved`. A new kind of share link also needs the
+  universal link / App Link configuration (§12).
 - **Every dismissable overlay registers for Android back** with
   `useBackHandler(open, close)` (`src/hooks/useBackHandler.ts`). `Modal`,
   `AnchoredMenu`, `OverflowMenu`, `VotingBarMenu`, the editor's `Dialog`
@@ -444,8 +445,9 @@ Tracked in the plan with the phase that fixes each item:
   Contests show an empty result rather than an error).
 - Uploaded fonts until the R2 CORS rule includes the app origins
   (`npm run r2:cors -- --apply` in the backend).
-- Shared links open the website, not the app: no universal links / Android
-  app links yet (they need the Apple team ID and the release signing key).
+- Shared links open the website, not the app, until the website with the
+  `.well-known` files is deployed (§12). On Android 14 and older they
+  always will.
 
 ## 10. Testing recipes
 
@@ -646,3 +648,98 @@ never confirms rolled back after 30 s and not downloaded again, a newer good
 bundle installed after that, a bundle signed with another key rejected at
 download, and old bundles deleted from disk. Not tried yet: real phones and
 the R2 upload.
+
+## 12. Universal links and App Links
+
+A tapped share link (`https://douzepoints.app/?profile=…`, `?contest=…`,
+`?theme=…`, `?design=…`, made by `buildShareUrl()`) opens the installed app
+on that item instead of the website (added 2026-10-10). Every other
+douzepoints.app URL keeps opening the website: the home page, `/about`,
+and above all the sign-in redirect back from Google or Apple
+(`/?provider=…`), which has to land in the browser tab that holds the
+session.
+
+**Website** (`public/.well-known/`, served by the Worker's static assets):
+
+- `apple-app-site-association`: app ID `524WC6G2D9.app.douzepoints` (team
+  ID + bundle ID) and one component per share parameter: path `/` and the
+  parameter with at least one character (`"?*"`); other parameters may be
+  present. A URL no component matches stays in Safari. Devices read the
+  file through Apple's CDN, which caches it, so an edit takes a while to
+  arrive (`curl https://app-site-association.cdn-apple.com/a/v1/douzepoints.app`
+  shows Apple's copy).
+- `assetlinks.json`: package `app.douzepoints` and the SHA-256 fingerprint
+  of the Play App Signing key, which signs every build installed from Play
+  (Play Console → the app → Test and release → App integrity → App
+  signing). A release build installed another way is signed with the
+  upload key instead and needs that key's fingerprint added; debug builds
+  are left out (see testing).
+- `public/_headers` serves the Apple file as `application/json`: it has no
+  extension, so Workers would send it untyped. A comment on a path line
+  becomes part of the path and the rule then matches nothing, which is why
+  the comment sits on its own line. (The `/*` rule at the top of the file
+  has that problem: production doesn't send its headers, checked
+  2026-10-10.)
+
+**iOS:** `App.entitlements` has `com.apple.developer.associated-domains` =
+`applinks:douzepoints.app`. The App ID has Associated Domains enabled, so
+automatic signing adds it to the profiles. `SceneDelegate` already passes
+`scene(_:continue:)` and the launch's connection options to Capacitor's
+`SceneDelegateProxy`, which hands the link to the App plugin.
+
+**Android:** an `autoVerify` intent filter on `MainActivity`
+(`AndroidManifest.xml`) with one `<uri-relative-filter-group>` per share
+parameter: path `/` and `queryAdvancedPattern="contest=.+"` (matched against
+each `name=value` pair). Query matching exists only on Android 15 (API 35)
+and later. Older versions skip the groups, so the filter also lists a path
+no link uses (`/app-links-need-android-15`): on Android 14 and older nothing
+opens the app and share links open the website. Without that path the
+filter would be scheme + host only there, and every douzepoints.app URL,
+the sign-in redirect included, could open the app. Dynamic App Links
+(rules inside `assetlinks.json`) are also Android 15+, so they would not
+help older phones either.
+
+**JS:** `installAppLinkHandler()` (`src/native/appLinks.ts`, started by
+`AppBootstrap`) listens for the App plugin's `appUrlOpen`. The plugin fires
+it for a link that reaches the running app and, retained until a listener
+exists, for the link that launched it (`BridgeActivity` replays the launch
+intent on Android; `SceneDelegateProxy` replays the connection options once
+the first view appears on iOS). So `getLaunchUrl()` is not needed, and
+using both would open the item twice. The listener is attached after
+`liveUpdateBoot()`: attaching consumes the retained launch link, and a
+live-update switch reloads the WebView. URLs on other origins (iOS URL
+scheme callbacks also arrive here) are ignored (`parsePublicSiteUrl()`);
+the rest go to `openShareLink()` (`src/hooks/useShareLinks.ts`), the code
+the website runs for its own share URL on load. It opens Event Setup (the
+Graphics modal for a design) with the item over whatever is on screen.
+
+**Adding a share parameter:** add it to `SHARE_PARAM_KEYS`
+(`src/helpers/shareUrl.ts`), the Apple file's components and the manifest's
+groups; `shareUrl.test.ts` fails until the three agree. The manifest change
+reaches users with a store release (it changes the Android runtime, §11);
+the Apple file with the next website deploy.
+
+**Testing:**
+
+- Android, matching without verification:
+  `adb shell "cmd package query-activities --brief -a android.intent.action.VIEW -c android.intent.category.BROWSABLE -d '<url>'"`
+  lists `app.douzepoints/.MainActivity` when the filter matches.
+- Android, verification: `adb shell pm get-app-links app.douzepoints`
+  (`verified`, or `1024` when the check failed);
+  `adb shell pm verify-app-links --re-verify app.douzepoints` after a
+  deploy. A debug build's key is not in `assetlinks.json`; approve the
+  domain by hand instead:
+  `adb shell pm set-app-links-user-selection --user cur --package app.douzepoints true douzepoints.app`,
+  then open a link the way another app would:
+  `adb shell am start -a android.intent.action.VIEW -c android.intent.category.BROWSABLE -d '<url>'`.
+- iOS needs the Apple file live. Tap a link in Notes or Messages, or run
+  `xcrun simctl openurl booted '<url>'`. Links on douzepoints.app pages and
+  URLs typed into Safari stay in Safari (Apple's rule); long-press a link
+  for "Open in DouzePoints".
+- Verified 2026-10-10 on an Android 15 emulator (tablet, debug build,
+  domain approved by hand): all four kinds of share link match the app;
+  `/`, `/?provider=google`, `/?contest=` and `/about?contest=…` don't. A
+  contest link from a cold start, a theme link while running and a design
+  link from the background each opened their item. On an Android 14
+  emulator no share link matches. iOS builds with the entitlement; not
+  tried end to end until the Apple file is deployed.

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.douzepoints",
+      "sha256_cert_fingerprints": [
+        "AD:65:FF:36:A1:D7:7A:10:CA:A8:D1:23:5F:35:5F:69:41:EF:B6:15:A4:4E:43:EE:0E:C8:62:CB:3C:E8:B5:FA"
+      ]
+    }
+  }
+]

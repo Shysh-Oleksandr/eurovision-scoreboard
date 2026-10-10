@@ -23,6 +23,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- App Links: share links (https://douzepoints.app/?contest=…,
+                 ?theme=…, ?design=…, ?profile=…) open the app; verified
+                 against public/.well-known/assetlinks.json. Matching the
+                 query needs Android 15 (uri-relative-filter-group). Older
+                 versions skip the groups and see only the path below, which
+                 no link uses, so they keep opening the website. Without it
+                 they would send every douzepoints.app page to the app,
+                 including the website's sign-in redirect.
+                 docs/native-apps.md §12. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="douzepoints.app" />
+                <data android:path="/app-links-need-android-15" />
+                <uri-relative-filter-group>
+                    <data android:path="/" />
+                    <data android:queryAdvancedPattern="profile=.+" />
+                </uri-relative-filter-group>
+                <uri-relative-filter-group>
+                    <data android:path="/" />
+                    <data android:queryAdvancedPattern="contest=.+" />
+                </uri-relative-filter-group>
+                <uri-relative-filter-group>
+                    <data android:path="/" />
+                    <data android:queryAdvancedPattern="theme=.+" />
+                </uri-relative-filter-group>
+                <uri-relative-filter-group>
+                    <data android:path="/" />
+                    <data android:queryAdvancedPattern="design=.+" />
+                </uri-relative-filter-group>
+            </intent-filter>
+
         </activity>
 
         <provider

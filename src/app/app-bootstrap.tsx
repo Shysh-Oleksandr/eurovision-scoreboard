@@ -13,11 +13,12 @@ import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
-import { useShareLinks } from '@/hooks/useShareLinks';
+import { openShareLink, useShareLinks } from '@/hooks/useShareLinks';
 import { useStatusBarThemeColor } from '@/hooks/useStatusBarThemeColor';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
 import { normalizeLocale } from '@/i18n/catalog';
 import { getStoredLocale } from '@/i18n/nativeLocale';
+import { installAppLinkHandler } from '@/native/appLinks';
 import { installBackButtonHandler } from '@/native/backButton';
 import { liveUpdateBoot, startLiveUpdateChecks } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
@@ -110,6 +111,7 @@ export default function AppBootstrap() {
     if (!IS_NATIVE_APP) return;
 
     void installBackButtonHandler();
+    void installAppLinkHandler(openShareLink);
     startLiveUpdateChecks();
   }, []);
 
