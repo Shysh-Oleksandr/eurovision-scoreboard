@@ -732,6 +732,7 @@
       "title": "Профіль",
       "description": "Ваш профіль і підписники",
       "continueWithGoogle": "Продовжити через Google",
+      "continueWithApple": "Продовжити з Apple",
       "editProfile": "Редагувати профіль",
       "authDescription": "Увійдіть, щоб створювати профіль, використовувати власні країни та інше.",
       "loggingOut": "Вихід...",

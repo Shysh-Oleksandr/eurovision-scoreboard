@@ -69,6 +69,16 @@ export default function AppBootstrap() {
 
       if (url.searchParams.has('provider')) {
         window.history.replaceState({}, '', url.origin + url.pathname);
+
+        // The backend redirects with `error` when the provider's answer
+        // failed verification; any earlier session still stands.
+        if (url.searchParams.has('error')) {
+          toast(t('error'), { type: 'error' });
+          handlePostLogin();
+
+          return;
+        }
+
         const success = await handlePostLogin(true);
 
         if (success) {

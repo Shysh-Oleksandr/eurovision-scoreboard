@@ -732,6 +732,7 @@
       "title": "Perfil",
       "description": "O seu perfil e seguidores",
       "continueWithGoogle": "Continuar com o Google",
+      "continueWithApple": "Continuar com a Apple",
       "editProfile": "Editar Perfil",
       "authDescription": "Autentique-se para poder criar um perfil, usar países personalizados e mais.",
       "loggingOut": "A terminar sessão...",

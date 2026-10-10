@@ -156,9 +156,10 @@ and review rounds.
       key, only needed by release builds installed outside Play.
 - [ ] **Owner:** `npm run r2:cors` (dry run, check the merged list), then
       `npm run r2:cors -- --apply`, so uploaded fonts load in the apps.
-- [ ] **Sign in with Apple** (guideline 4.8): flip `apple: true` in
-      `capacitor.config.ts`, add the capability, and add backend
-      identity-token verification. Needs the paid Apple account.
+- [x] **Sign in with Apple** (guideline 4.8), code done 2026-10-10: iOS app
+      and website, backend verification and code redemption. Details:
+      [../native-apps.md](../native-apps.md) §7. Untested end to end until
+      the backend runs with the `APPLE_*` env (see Phase 4).
 - [ ] Optional: show an error state instead of an empty list when a
       backend call fails (Public Contests currently says "Found 0").
 
@@ -269,15 +270,20 @@ produces a value the code work needs (in brackets).
 
 **Code**
 
-- [ ] Sign in with Apple: iOS (`apple: true`, entitlement), backend token
-      verification, revocation; the website through the Services ID.
-      Android keeps Google only until email sign-in lands.
+- [x] Sign in with Apple (2026-10-10): iOS (`apple: true`, entitlement),
+      backend token verification and code redemption, the website through
+      the Services ID. Android keeps Google only until email sign-in lands.
+      Revoking the Apple tokens lands with account deletion.
+- [ ] **Owner:** set `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`
+      and `APPLE_CALLBACK_URL` on the production backend and deploy; rename
+      the Services ID's description (Apple's web sheet shows it as the app
+      name); then try both flows (website, and an iPhone run from Xcode).
 - [ ] Release signing: paid team in Xcode, Android `keystore.properties`.
 - [ ] In-app account deletion (5.1.1(v)): deletes the user's content too.
 - [ ] Block users (1.2).
 - [ ] Hide the Patreon card in the apps (3.1.1).
-- [ ] Privacy policy draft; Umami loads in the app builds whenever
-      `NEXT_PUBLIC_UMAMI_WEBSITE_ID` is set (keep and declare it, or gate it).
+- [ ] Privacy policy draft. (Umami is already off in the apps:
+      `build:native` blanks `NEXT_PUBLIC_UMAMI_WEBSITE_ID`.)
 - [ ] Universal links and Android app links: `apple-app-site-association`
       and `assetlinks.json` under `douzepoints.app/.well-known/`, the
       Associated Domains entitlement, an `autoVerify` intent filter. Only

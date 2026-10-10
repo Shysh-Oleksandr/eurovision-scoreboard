@@ -11,3 +11,19 @@
  * bridge itself is needed.
  */
 export const IS_NATIVE_APP = process.env.NEXT_PUBLIC_NATIVE_APP === '1';
+
+/**
+ * The native shell's platform, read synchronously from the `Capacitor`
+ * global its bridge injects before the page loads; 'web' on the website and
+ * in `yarn dev:native` in a desktop browser. For render-time decisions —
+ * async code keeps importing `@capacitor/core` lazily.
+ */
+export function nativePlatform(): 'ios' | 'android' | 'web' {
+  if (!IS_NATIVE_APP || typeof window === 'undefined') return 'web';
+
+  const platform = (
+    window as { Capacitor?: { getPlatform?: () => string } }
+  ).Capacitor?.getPlatform?.();
+
+  return platform === 'ios' || platform === 'android' ? platform : 'web';
+}

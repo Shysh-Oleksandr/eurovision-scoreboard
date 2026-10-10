@@ -7,7 +7,8 @@
  * WebViews, and the WebView will not keep that cross-site cookie. So:
  * - sign-in uses the platform's Google SDK (`@capgo/capacitor-social-login`)
  *   and exchanges its ID token at `POST /auth/google/native` for an access +
- *   refresh token pair;
+ *   refresh token pair; Sign in with Apple (iOS only) does the same with the
+ *   system sheet's identity token at `POST /auth/apple/native`;
  * - the refresh token lives in the Keychain / Android Keystore
  *   (`@aparajita/capacitor-secure-storage`) and is sent as
  *   `Authorization: Bearer` to `/auth/refresh` and `/auth/logout`.
@@ -93,6 +94,7 @@ async function ensureGoogle(): Promise<void> {
 }
 
 const isCancellation = (error: unknown) =>
+  (error as { code?: string } | null)?.code === 'USER_CANCELLED' ||
   /cancel/i.test(
     error instanceof Error ? error.message : String((error as any)?.message),
   );
@@ -130,5 +132,59 @@ export async function signOutOfGoogle(): Promise<void> {
     await SocialLogin.logout({ provider: 'google' });
   } catch {
     // Not signed in, or not configured: nothing to forget.
+  }
+}
+
+let appleInit: Promise<void> | null = null;
+
+/** Initializes the Apple provider once (iOS; see the module note on proxies). */
+async function ensureApple(): Promise<void> {
+  const { SocialLogin } = await loadSocialLogin();
+
+  // Without a redirect URL the plugin hands the code back instead of posting
+  // it anywhere; the backend redeems it.
+  appleInit ??= SocialLogin.initialize({
+    apple: { useProperTokenExchange: true },
+  }).catch((error) => {
+    appleInit = null;
+    throw error;
+  });
+
+  await appleInit;
+}
+
+export interface AppleCredential {
+  identityToken: string;
+  authorizationCode?: string;
+  /** Apple shares the name with the app on the first authorization only. */
+  givenName?: string;
+  familyName?: string;
+}
+
+/**
+ * Shows the Sign in with Apple sheet and returns what `POST
+ * /auth/apple/native` needs, or null when the user dismissed it.
+ */
+export async function getAppleCredential(): Promise<AppleCredential | null> {
+  await ensureApple();
+  const { SocialLogin } = await loadSocialLogin();
+
+  try {
+    const { result } = await SocialLogin.login({
+      provider: 'apple',
+      options: { scopes: ['email', 'name'] },
+    });
+
+    if (!result.idToken) throw new Error('Apple sign-in returned no token');
+
+    return {
+      identityToken: result.idToken,
+      authorizationCode: result.authorizationCode || undefined,
+      givenName: result.profile.givenName || undefined,
+      familyName: result.profile.familyName || undefined,
+    };
+  } catch (error) {
+    if (isCancellation(error)) return null;
+    throw error;
   }
 }

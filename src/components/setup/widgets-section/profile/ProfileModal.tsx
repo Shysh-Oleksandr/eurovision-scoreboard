@@ -13,9 +13,9 @@ import FollowingFeedSection from './FollowingFeedSection';
 import { LogoutIcon } from '@/assets/icons/LogoutIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import Button from '@/components/common/Button';
-import GoogleAuthButton from '@/components/common/GoogleAuthButton';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import SignInButtons from '@/components/common/SignInButtons';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
@@ -159,7 +159,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       ) : (
         <div className="flex flex-col items-center gap-4 mt-8">
           <p className="text-base text-white/80">{t('authDescription')}</p>
-          <GoogleAuthButton />
+          <SignInButtons />
         </div>
       )}
 

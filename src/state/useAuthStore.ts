@@ -20,9 +20,11 @@ import type { Profile } from '@/types/profile';
 /**
  * Fired after a native-app sign-in attempt that got past the account sheet
  * (AppBootstrap shows the toast). The website reports its result through the
- * `?provider=google` redirect instead.
+ * `?provider=google` / `?provider=apple` redirect instead.
  */
 export const NATIVE_LOGIN_EVENT = 'dp:native-login';
+
+export type AuthProvider = 'google' | 'apple';
 
 const nativeAuth = () => import('@/native/nativeAuth');
 
@@ -30,9 +32,9 @@ export interface AuthState {
   user: Profile | null;
   accessToken: string | null;
   isBusy: boolean;
-  /** Native apps: the Google account sheet / token exchange is in progress. */
+  /** Native apps: the account sheet / token exchange is in progress. */
   isSigningIn: boolean;
-  login: () => void;
+  login: (provider: AuthProvider) => void;
   handlePostLogin: (force?: boolean) => Promise<boolean>;
   refresh: () => Promise<string | undefined>;
   fetchMe: () => Promise<void>;
@@ -86,13 +88,13 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isBusy: false,
       isSigningIn: false,
-      login: () => {
+      login: (provider) => {
         if (IS_NATIVE_APP) {
-          void loginNatively();
+          void loginNatively(provider);
 
           return;
         }
-        window.location.href = `${API_BASE_URL}/auth/google`;
+        window.location.href = `${API_BASE_URL}/auth/${provider}`;
       },
       handlePostLogin: async (force?: boolean) => {
         // Native: the stored refresh token, not the persisted user, says
@@ -265,28 +267,37 @@ export const useAuthStore = create<AuthState>()(
 );
 
 /**
- * Native sign-in: Google account sheet → ID token → our token pair → the same
- * post-login path the website's redirect takes.
+ * Native sign-in: the provider's sheet → its token → our token pair → the
+ * same post-login path the website's redirect takes.
  */
-async function loginNatively() {
+async function loginNatively(provider: AuthProvider) {
   if (useAuthStore.getState().isSigningIn) return;
   useAuthStore.setState({ isSigningIn: true });
 
   let success: boolean | null = null;
 
   try {
-    const { getGoogleIdToken, setRefreshToken } = await nativeAuth();
-    const idToken = await getGoogleIdToken();
+    const { getGoogleIdToken, getAppleCredential, setRefreshToken } =
+      await nativeAuth();
+    let data: { accessToken: string; refreshToken: string };
 
-    if (!idToken) return; // the user dismissed the account sheet
+    if (provider === 'apple') {
+      const credential = await getAppleCredential();
 
-    const { data } = await api.post('/auth/google/native', { idToken });
+      if (!credential) return; // the user dismissed the sheet
+      ({ data } = await api.post('/auth/apple/native', credential));
+    } else {
+      const idToken = await getGoogleIdToken();
+
+      if (!idToken) return; // the user dismissed the account sheet
+      ({ data } = await api.post('/auth/google/native', { idToken }));
+    }
 
     await setRefreshToken(data.refreshToken);
     useAuthStore.setState({ accessToken: data.accessToken });
     success = await useAuthStore.getState().handlePostLogin(true);
   } catch (error) {
-    console.error('Native Google sign-in failed', error);
+    console.error(`Native ${provider} sign-in failed`, error);
     success = false;
   } finally {
     useAuthStore.setState({ isSigningIn: false });

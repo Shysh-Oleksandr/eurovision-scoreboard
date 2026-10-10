@@ -82,7 +82,8 @@ if (lan) {
   console.log(
     [
       `Phone will load ${devUrl}. For backend calls from the phone:`,
-      `  - run the dev server with NEXT_PUBLIC_API_URL=http://${host}:${API_PORT}`,
+      `  - run the dev server as NEXT_PUBLIC_API_URL=http://${host}:${API_PORT} yarn dev:native`,
+      '    (plain `yarn dev` runs the website code in the app: web sign-in redirects, cookies)',
       `  - add ${devUrl} to FRONTEND_URL in douze-points-backend/.env, after the localhost entry, and restart the backend`,
       '  - allow the "Local Network" prompt on the device',
       '',
@@ -153,14 +154,23 @@ if (platform === 'ios') {
   // Same edit `cap run -l` makes. The file is bundled into the app at build
   // time, so it only has to hold the dev URL while Xcode builds.
   const configPath = path.join('ios', 'App', 'App', 'capacitor.config.json');
-  const original = readFileSync(configPath, 'utf8');
-  const config = JSON.parse(original);
+  const writeConfig = (config) =>
+    writeFileSync(configPath, `${JSON.stringify(config, null, '\t')}\n`);
+  const config = JSON.parse(readFileSync(configPath, 'utf8'));
+  const originalServer = config.server;
 
   config.server = { ...config.server, url: devUrl };
-  writeFileSync(configPath, `${JSON.stringify(config, null, '\t')}\n`);
+  writeConfig(config);
 
+  // Undo only the dev URL. Writing back the whole file as it was at start
+  // would also undo a `cap sync` run meanwhile (e.g. a plugin setting
+  // changed in capacitor.config.ts).
   const restore = () => {
-    writeFileSync(configPath, original);
+    const current = JSON.parse(readFileSync(configPath, 'utf8'));
+
+    if (originalServer === undefined) delete current.server;
+    else current.server = originalServer;
+    writeConfig(current);
     console.log('\nRestored ios/App/App/capacitor.config.json.');
     console.log(
       'Press Run in Xcode once more so the app goes back to its bundled build.',

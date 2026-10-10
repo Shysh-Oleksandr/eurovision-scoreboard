@@ -732,6 +732,7 @@
       "title": "Profilo",
       "description": "Il tuo profilo e i tuoi seguaci",
       "continueWithGoogle": "Continua con Google",
+      "continueWithApple": "Continua con Apple",
       "editProfile": "Modifica Profilo",
       "authDescription": "Autenticati per poter creare un profilo, usare paesi personalizzati e altro.",
       "loggingOut": "Disconnessione in corso...",

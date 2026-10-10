@@ -39,11 +39,11 @@ const config: CapacitorConfig = {
       initialViewportFitValueHint: 'cover',
     },
     SocialLogin: {
-      // Only Google for now; `apple: true` once Sign in with Apple lands
-      // (docs/plans/native-apps-plan.md, Phase 2).
+      // Google on both platforms; Apple is offered on iOS only (the sign-in
+      // buttons hide it on Android). docs/native-apps.md §7.
       providers: {
         google: true,
-        apple: false,
+        apple: true,
         facebook: false,
         twitter: false,
       },

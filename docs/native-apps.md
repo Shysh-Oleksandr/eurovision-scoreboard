@@ -323,9 +323,46 @@ to start Google sign-in with a readable error. Debug SHA-1:
 `cd android && ./gradlew signingReport`. Android needs a Google account on
 the device or emulator.
 
-Sign in with Apple is not wired yet (it needs the paid Apple account). The
-plugin is installed with `apple: false` in `capacitor.config.ts`; App Store
-review requires it before an iOS release (guideline 4.8).
+**Sign in with Apple** (added 2026-10-10; App Store guideline 4.8 requires
+it next to Google). `SignInButtons` (`src/components/common/`) shows
+"Continue with Apple" on the website and in the iOS app, and hides it in the
+Android app (`nativePlatform()` in `src/native/platform.ts` reads the
+platform synchronously from the bridge's `window.Capacitor`). The button
+uses Apple's white style for dark backgrounds (`Button` variant `apple`).
+
+- **iOS app:** `getAppleCredential()` initializes the plugin's Apple provider
+  with `useProperTokenExchange: true` and no redirect URL, so the system
+  sheet's identity token, authorization code and (first time only) name come
+  back to JS. `POST /auth/apple/native` verifies the token (audience = the
+  bundle ID), redeems the code for Apple's refresh token, and returns the
+  same token pair as Google; everything after that is the Google path. A
+  dismissed sheet rejects with code `USER_CANCELLED` and does nothing. The
+  entitlement is `ios/App/App/App.entitlements`
+  (`com.apple.developer.applesignin`), referenced by `CODE_SIGN_ENTITLEMENTS`.
+- **Website:** `login('apple')` navigates to `GET /auth/apple`, which sets a
+  short-lived `apple_oauth` cookie (state + nonce, SameSite=None) and
+  redirects to Apple with the Services ID `app.douzepoints.web`. Apple posts
+  the result to `https://api.douzepoints.app/auth/apple/callback`, which sets
+  the refresh cookie and redirects to `?provider=apple`, handled exactly like
+  `?provider=google`. Failures add `&error=1` (AppBootstrap shows the error
+  toast and keeps any earlier session); cancelling returns to the site
+  without either. Apple refuses `localhost` return URLs, so this flow only
+  runs against a public HTTPS backend.
+- **Accounts:** profiles match by `appleId`, then by a verified email (which
+  links the Apple ID to the existing profile, e.g. a Google account with the
+  same address). A "Hide My Email" relay address matches nothing, so it
+  makes a new account.
+- **Revocation:** the backend keeps Apple's refresh token
+  (`Profile.appleRefreshToken`, never selected) so in-app account deletion
+  can revoke it, as Apple requires.
+
+| Where | Name | Value |
+|---|---|---|
+| Backend env | `APPLE_TEAM_ID`, `APPLE_KEY_ID` | Team ID and the Sign in with Apple key's ID |
+| Backend env | `APPLE_PRIVATE_KEY` | The `.p8` contents (literal `\n` line breaks are fine) |
+| Backend env | `APPLE_CALLBACK_URL` | `https://api.douzepoints.app/auth/apple/callback` in production |
+| Backend env | `APPLE_BUNDLE_ID`, `APPLE_SERVICES_ID` | Defaults `app.douzepoints`, `app.douzepoints.web` |
+| Apple portal | Services ID `app.douzepoints.web` | Domains `douzepoints.app`, `api.douzepoints.app`; the return URL above. Its description is the name Apple's web sheet shows |
 
 ## 8. Shell: icons, splash, system bars, back button, haptics, languages
 
@@ -394,7 +431,6 @@ Tracked in the plan with the phase that fixes each item:
   Contests show an empty result rather than an error).
 - Uploaded fonts until the R2 CORS rule includes the app origins
   (`npm run r2:cors -- --apply` in the backend).
-- Sign in with Apple (needs the Apple Developer account).
 - Shared links open the website, not the app: no universal links / Android
   app links yet (they need the Apple team ID and the release signing key).
 

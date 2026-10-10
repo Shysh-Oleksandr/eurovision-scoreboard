@@ -30,7 +30,7 @@ import { PinIcon } from '@/assets/icons/PinIcon';
 import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
-import GoogleAuthButton from '@/components/common/GoogleAuthButton';
+import SignInButtons from '@/components/common/SignInButtons';
 import UserResourceGroupModal from '@/components/setup/UserResourceGroupModal';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -237,7 +237,7 @@ const UserContests: React.FC<UserContestsProps> = ({
         <p className="text-white/70">
           {t('widgets.contests.authenticateToViewAndCreateYourOwnContests')}
         </p>
-        <GoogleAuthButton />
+        <SignInButtons />
       </div>
     );
   }
