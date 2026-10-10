@@ -184,8 +184,12 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   row, and `useFullscreen` does nothing, so the account-synced
   `enableFullscreen` is never reset by the app) and vote spreadsheet
   import/export (`.xlsx`: the Voting Predefinition menu and the Final Stats
-  export button). The about, privacy, admin and dev pages are `page.web.tsx`
-  and absent from the export (§1). Add to this list rather than porting a
+  export button), and the Patreon donation card in the Feedback modal (an
+  in-app donation link is an unpaid digital purchase under App Store 3.1.1).
+  The about, privacy, terms, admin and dev pages are `page.web.tsx` and
+  absent from the export (§1); the apps open the privacy policy and terms
+  on the website (`PRIVACY_POLICY_URL` / `TERMS_OF_USE_URL` in
+  `src/helpers/shareUrl.ts`). Add to this list rather than porting a
   desktop-shaped feature by default.
 - **Files and links go through `src/helpers/fileActions.ts`.** Never use
   `<a download>`, `navigator.share` or `window.location` for a share link

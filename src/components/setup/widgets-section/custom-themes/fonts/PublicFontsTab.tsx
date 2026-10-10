@@ -1,5 +1,6 @@
 'use client';
 
+import { Flag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
 
@@ -17,8 +18,10 @@ import {
   usePublicFontsQuery,
 } from '@/api/fonts';
 import Button from '@/components/common/Button';
+import OverflowMenu from '@/components/common/OverflowMenu';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { useDebounce } from '@/hooks/useDebounce';
+import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { Font } from '@/types/font';
 
@@ -31,6 +34,7 @@ const PAGE_SIZE = 8;
 
 const PublicFontsTab: React.FC<PublicFontsTabProps> = ({ value, onSelect }) => {
   const t = useTranslations('widgets.themes.fonts');
+  const tModeration = useTranslations('moderation');
   const user = useAuthStore((s) => s.user);
   const forkFont = useForkFontMutation();
 
@@ -135,19 +139,38 @@ const PublicFontsTab: React.FC<PublicFontsTabProps> = ({ value, onSelect }) => {
                   ) : null
                 }
                 actions={
-                  <Button
-                    className="text-sm !py-2"
-                    disabled={!user || forkingId === font._id}
-                    isLoading={forkingId === font._id}
-                    onClick={() => void handleUse(font)}
-                    title={!user ? t('signInToUpload') : undefined}
-                  >
-                    {isMine
-                      ? t('use')
-                      : font.forkedByMe
-                      ? t('useFromLibrary')
-                      : t('addAndUse')}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      className="text-sm !py-2"
+                      disabled={!user || forkingId === font._id}
+                      isLoading={forkingId === font._id}
+                      onClick={() => void handleUse(font)}
+                      title={!user ? t('signInToUpload') : undefined}
+                    >
+                      {isMine
+                        ? t('use')
+                        : font.forkedByMe
+                        ? t('useFromLibrary')
+                        : t('addAndUse')}
+                    </Button>
+                    {!isMine && (
+                      <OverflowMenu
+                        items={[
+                          {
+                            icon: <Flag className="size-4" />,
+                            label: tModeration('report'),
+                            onClick: () =>
+                              openReportDialog({
+                                type: 'font',
+                                id: font._id,
+                                name: font.name,
+                                creator: font.creator,
+                              }),
+                          },
+                        ]}
+                      />
+                    )}
+                  </div>
                 }
               />
             );

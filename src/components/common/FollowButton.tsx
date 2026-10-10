@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import React from 'react';
 import { toast } from 'react-toastify';
 
+import { useBlockedUserIds } from '@/api/blocks';
 import {
   useFollowingStatusQuery,
   useFollowMutation,
@@ -34,10 +35,13 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   const followMutation = useFollowMutation();
   const unfollowMutation = useUnfollowMutation();
 
+  const isBlocked = useBlockedUserIds().has(userId);
+
   const isOwnProfile = !!user && user._id === userId;
   const isAuthenticated = !!user;
 
-  if (isOwnProfile) return null;
+  // Blocking ends the follow both ways and the server refuses new ones.
+  if (isOwnProfile || isBlocked) return null;
 
   if (!isAuthenticated) {
     if (pill) {

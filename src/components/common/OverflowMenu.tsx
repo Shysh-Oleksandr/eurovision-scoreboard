@@ -32,6 +32,8 @@ interface OverflowMenuProps {
 }
 
 const MENU_GAP = 8;
+/** Room a menu opening upwards must leave at the top (status bar, notch). */
+const MIN_TOP_SPACE = 56;
 
 const isStatsRow = (item: OverflowMenuEntry): item is OverflowMenuStatsRow =>
   typeof item === 'object' && item.variant === 'stats';
@@ -50,10 +52,16 @@ const OverflowMenu: React.FC<OverflowMenuProps> = ({ items, className }) => {
     if (!triggerRef.current) return;
 
     const rect = triggerRef.current.getBoundingClientRect();
+    // Opens upwards, unless the trigger sits too close to the top of the
+    // screen (a profile header): then it drops below the trigger.
+    const menuHeight = menuRef.current?.offsetHeight ?? 0;
+    const fitsAbove = rect.top - MENU_GAP - menuHeight >= MIN_TOP_SPACE;
 
     setMenuStyle({
       position: 'fixed',
-      bottom: window.innerHeight - rect.top + MENU_GAP,
+      ...(fitsAbove
+        ? { bottom: window.innerHeight - rect.top + MENU_GAP }
+        : { top: rect.bottom + MENU_GAP }),
       right: window.innerWidth - rect.right,
       zIndex: 10000,
       visibility: 'visible',

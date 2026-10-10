@@ -493,7 +493,9 @@ What changed after the pre-release review in
   that opens Canvas → Theme, and the bar comes back when the selection
   empties. Layers use list semantics; handle labels are translated.
 - **Gallery**: rename and report use dialogs (`PromptDialog`,
-  `ReportDialog`), drafts can be exported/imported as `.douze-design.json`,
+  `ReportDialog`; since 2026-10-10 reports go through the app-wide
+  `components/moderation/ReportModal.tsx`, see
+  `moderation-and-account-deletion.md`), drafts can be exported/imported as `.douze-design.json`,
   the header says drafts live in this browser, thumbnails and counters have
   accessible names, community cards moved to
   `components/CloudDesignCards.tsx` and also render in profile content

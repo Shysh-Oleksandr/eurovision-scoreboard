@@ -4,6 +4,17 @@ import { IS_NATIVE_APP } from '@/native/platform';
 export const PUBLIC_SITE_URL = 'https://douzepoints.app/';
 
 /**
+ * The legal pages are website-only (`page.web.tsx`, absent from the apps'
+ * export), so the apps open them on the public website, in the browser.
+ */
+export const PRIVACY_POLICY_URL = IS_NATIVE_APP
+  ? `${PUBLIC_SITE_URL}privacy`
+  : '/privacy';
+export const TERMS_OF_USE_URL = IS_NATIVE_APP
+  ? `${PUBLIC_SITE_URL}terms`
+  : '/terms';
+
+/**
  * Query keys of share links, in the order they are looked for. Universal
  * links and Android App Links open the apps only for these
  * (`public/.well-known/apple-app-site-association`, AndroidManifest.xml);

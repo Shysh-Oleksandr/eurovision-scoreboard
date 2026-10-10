@@ -84,7 +84,9 @@
       "hint": "Nowość, wciąż się zmienia. Napisz nam, czego brakuje, przyciskiem opinii.",
       "hintFeedback": "Nowość, wciąż się zmienia · kliknij, aby wysłać opinię"
     },
-    "savedTo": "Zapisano w {folder}"
+    "savedTo": "Zapisano w {folder}",
+    "privacyPolicy": "Polityka prywatności",
+    "termsOfUse": "Warunki korzystania"
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",
@@ -754,7 +756,8 @@
       "follow": "Obserwuj",
       "signInToFollow": "Zaloguj się, aby obserwować",
       "followingCount": "Obserwowani: {count}",
-      "signIn": "Zaloguj się"
+      "signIn": "Zaloguj się",
+      "legalAgreement": "Kontynuując, akceptujesz <terms>Warunki korzystania</terms> i potwierdzasz zapoznanie się z <privacy>Polityką prywatności</privacy>."
     },
     "contentType": {
       "all": "Wszystkie",
@@ -2292,25 +2295,7 @@
         "useLive": "Użyj tablicy na żywo",
         "useManual": "Wpisz ręczną listę"
       },
-      "cancel": "Anuluj",
-      "report": {
-        "title": "Zgłosić „{name}”?",
-        "body": "Napisz nam, co jest nie tak z tym projektem. Zgłoszenia sprawdza zespół DouzePoints.",
-        "reason": "Powód",
-        "reasons": {
-          "spam": "Spam lub wprowadzanie w błąd",
-          "offensive": "Obraźliwe treści",
-          "copyright": "Prawa autorskie lub znak towarowy",
-          "other": "Coś innego"
-        },
-        "details": "Szczegóły (opcjonalnie)",
-        "detailsPlaceholder": "Cokolwiek, co pomoże nam zrozumieć problem",
-        "send": "Wyślij zgłoszenie",
-        "cancel": "Anuluj",
-        "thanks": "Dziękujemy, zgłoszenie zostało wysłane.",
-        "already": "Ten projekt został już przez Ciebie zgłoszony.",
-        "failed": "Nie udało się wysłać zgłoszenia."
-      }
+      "cancel": "Anuluj"
     },
     "fields": {
       "columns": "Kolumny",
@@ -2391,5 +2376,48 @@
       "editFields": "Edytuj pola",
       "hideFields": "Ukryj pola"
     }
+  },
+  "moderation": {
+    "report": "Zgłoś",
+    "reportUser": "Zgłoś użytkownika",
+    "blockUser": "Zablokuj użytkownika",
+    "unblockUser": "Odblokuj użytkownika",
+    "unblock": "Odblokuj",
+    "reportTitle": "Zgłoś „{name}”",
+    "reportUserTitle": "Zgłoś użytkownika {name}",
+    "reportBody": "Napisz nam, co jest nie tak. Zespół DouzePoints sprawdza każde zgłoszenie i usuwa treści naruszające Warunki korzystania.",
+    "reason": "Powód",
+    "reasons": {
+      "spam": "Spam lub wprowadzanie w błąd",
+      "offensive": "Obraźliwe treści",
+      "copyright": "Prawa autorskie lub znak towarowy",
+      "other": "Coś innego"
+    },
+    "details": "Szczegóły (opcjonalnie)",
+    "detailsPlaceholder": "Cokolwiek, co pomoże nam zrozumieć problem",
+    "alsoBlock": "Zablokuj też {name}",
+    "send": "Wyślij zgłoszenie",
+    "thanks": "Dziękujemy, zgłoszenie zostało wysłane.",
+    "already": "To zostało już przez Ciebie zgłoszone.",
+    "failed": "Nie udało się wysłać zgłoszenia.",
+    "signInToReport": "Zaloguj się, aby zgłaszać treści lub użytkowników.",
+    "blockConfirmTitle": "Zablokować {name}?",
+    "blockConfirmDescription": "Nie będziecie widzieć swoich motywów, konkursów, projektów ani czcionek na listach społeczności, w wyszukiwarce i na profilach, a żadne z was nie będzie mogło obserwować drugiego. Możesz odblokować tę osobę w sekcji „Edytuj profil”.",
+    "blocked": "Zablokowano: {name}.",
+    "unblocked": "Odblokowano: {name}.",
+    "blockFailed": "Nie udało się zablokować użytkownika.",
+    "unblockFailed": "Nie udało się odblokować użytkownika.",
+    "blockedProfile": "Ten użytkownik jest przez Ciebie zablokowany, więc jego treści są ukryte.",
+    "blockedUsers": "Zablokowani użytkownicy",
+    "blockedUsersDescription": "Ty i osoby, które zablokujesz, nie widzicie nawzajem swoich treści.",
+    "noBlockedUsers": "Nikogo nie zablokowano.",
+    "manageBlocked": "Zarządzaj",
+    "account": "Konto",
+    "deleteAccount": "Usuń konto",
+    "deleteAccountDescription": "Trwale usuń swój profil i wszystko, co zapisano na Twoim koncie.",
+    "deleteAccountConfirmTitle": "Usunąć konto?",
+    "deleteAccountConfirmDescription": "Twój profil, konkursy, motywy, projekty, czcionki i własne wpisy zostaną usunięte razem z polubieniami, zapisanymi elementami, obserwowanymi i blokadami. Tej operacji nie można cofnąć. Ustawienia i wersje robocze zapisane tylko na tym urządzeniu pozostaną.",
+    "accountDeleted": "Konto zostało usunięte.",
+    "deleteAccountFailed": "Nie udało się usunąć konta. Spróbuj ponownie."
   }
 }

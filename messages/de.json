@@ -84,7 +84,9 @@
       "hint": "Neu und noch in Arbeit. Sag uns über den Feedback-Button, was dir fehlt.",
       "hintFeedback": "Neu und noch in Arbeit · klicke, um Feedback zu senden"
     },
-    "savedTo": "Gespeichert in {folder}"
+    "savedTo": "Gespeichert in {folder}",
+    "privacyPolicy": "Datenschutzerklärung",
+    "termsOfUse": "Nutzungsbedingungen"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -754,7 +756,8 @@
       "follow": "Folgen",
       "signInToFollow": "Melde dich an, um zu folgen",
       "followingCount": "Folgt {count}",
-      "signIn": "Anmelden"
+      "signIn": "Anmelden",
+      "legalAgreement": "Wenn du fortfährst, stimmst du den <terms>Nutzungsbedingungen</terms> zu und bestätigst, dass du die <privacy>Datenschutzerklärung</privacy> gelesen hast."
     },
     "contentType": {
       "all": "Alle",
@@ -2292,25 +2295,7 @@
         "useLive": "Live-Scoreboard verwenden",
         "useManual": "Manuelle Liste eingeben"
       },
-      "cancel": "Abbrechen",
-      "report": {
-        "title": "„{name}“ melden?",
-        "body": "Sag uns, was mit dieser Vorlage nicht stimmt. Meldungen werden vom DouzePoints-Team geprüft.",
-        "reason": "Grund",
-        "reasons": {
-          "spam": "Spam oder irreführend",
-          "offensive": "Anstößiger Inhalt",
-          "copyright": "Urheber- oder Markenrecht",
-          "other": "Etwas anderes"
-        },
-        "details": "Details (optional)",
-        "detailsPlaceholder": "Alles, was uns hilft, das Problem zu verstehen",
-        "send": "Meldung senden",
-        "cancel": "Abbrechen",
-        "thanks": "Danke, die Meldung wurde gesendet.",
-        "already": "Du hast diese Vorlage bereits gemeldet.",
-        "failed": "Die Meldung konnte nicht gesendet werden."
-      }
+      "cancel": "Abbrechen"
     },
     "fields": {
       "columns": "Spalten",
@@ -2391,5 +2376,48 @@
       "editFields": "Felder bearbeiten",
       "hideFields": "Felder ausblenden"
     }
+  },
+  "moderation": {
+    "report": "Melden",
+    "reportUser": "Nutzer melden",
+    "blockUser": "Nutzer blockieren",
+    "unblockUser": "Nutzer entsperren",
+    "unblock": "Entsperren",
+    "reportTitle": "„{name}“ melden",
+    "reportUserTitle": "{name} melden",
+    "reportBody": "Sag uns, was nicht stimmt. Das DouzePoints-Team prüft jede Meldung und entfernt Inhalte, die gegen die Nutzungsbedingungen verstoßen.",
+    "reason": "Grund",
+    "reasons": {
+      "spam": "Spam oder irreführend",
+      "offensive": "Anstößiger Inhalt",
+      "copyright": "Urheber- oder Markenrecht",
+      "other": "Etwas anderes"
+    },
+    "details": "Details (optional)",
+    "detailsPlaceholder": "Alles, was uns hilft, das Problem zu verstehen",
+    "alsoBlock": "{name} auch blockieren",
+    "send": "Meldung senden",
+    "thanks": "Danke, die Meldung wurde gesendet.",
+    "already": "Du hast das bereits gemeldet.",
+    "failed": "Die Meldung konnte nicht gesendet werden.",
+    "signInToReport": "Melde dich an, um Inhalte oder Nutzer zu melden.",
+    "blockConfirmTitle": "{name} blockieren?",
+    "blockConfirmDescription": "Ihr seht die Themes, Wettbewerbe, Designs und Schriften des anderen nicht mehr in Community-Listen, in der Suche oder auf Profilen, und keiner von euch kann dem anderen folgen. Entsperren kannst du unter „Profil bearbeiten“.",
+    "blocked": "{name} ist blockiert.",
+    "unblocked": "{name} ist entsperrt.",
+    "blockFailed": "Der Nutzer konnte nicht blockiert werden.",
+    "unblockFailed": "Der Nutzer konnte nicht entsperrt werden.",
+    "blockedProfile": "Du hast diesen Nutzer blockiert, daher sind seine Inhalte ausgeblendet.",
+    "blockedUsers": "Blockierte Nutzer",
+    "blockedUsersDescription": "Du und die Personen, die du blockierst, seht die Inhalte des anderen nicht.",
+    "noBlockedUsers": "Du hast niemanden blockiert.",
+    "manageBlocked": "Verwalten",
+    "account": "Konto",
+    "deleteAccount": "Konto löschen",
+    "deleteAccountDescription": "Lösche dein Profil und alles, was in deinem Konto gespeichert ist, dauerhaft.",
+    "deleteAccountConfirmTitle": "Dein Konto löschen?",
+    "deleteAccountConfirmDescription": "Dein Profil, deine Wettbewerbe, Themes, Designs, Schriften und eigenen Beiträge werden gelöscht, ebenso deine Likes, Saves, Follows und Blockierungen. Das kann nicht rückgängig gemacht werden. Einstellungen und Entwürfe, die nur auf diesem Gerät gespeichert sind, bleiben erhalten.",
+    "accountDeleted": "Dein Konto wurde gelöscht.",
+    "deleteAccountFailed": "Dein Konto konnte nicht gelöscht werden. Bitte versuche es erneut."
   }
 }

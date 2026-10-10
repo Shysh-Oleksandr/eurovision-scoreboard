@@ -19,6 +19,11 @@
 > a local server; the first R2 upload waits for the first store release.
 > **2026-10-10:** universal links and App Links implemented (Android 15+
 > only); live once the website with the `.well-known` files is deployed.
+> **2026-10-10:** review requirements in code: account deletion, blocking,
+> reports for every content type and users, an admin report queue, the
+> Patreon card hidden in the apps, a rewritten privacy policy and new terms
+> of use (branch `feat/app-store-readiness` in both repos, uncommitted).
+> Details: [../moderation-and-account-deletion.md](../moderation-and-account-deletion.md).
 
 
 
@@ -76,8 +81,10 @@ closed test with 12 testers for 14 consecutive days before production.
 Older accounts and organization accounts are exempt. The owner's account
 is exempt (confirmed 2026-10-10).
 - **Apple 1.2 (user-generated content):** public contests, themes and
-designs need a way to report content (exists for those three), a way to
-block abusive users (missing), and published contact information.
+designs need a way to report content, a way to block abusive users,
+terms that forbid objectionable content, action on reports within 24
+hours, and published contact information. All in place since 2026-10-10
+(the 24 hours depend on the owner checking `/admin/reports`).
 - **Apple 3.1.1:** an in-app donation link (the Patreon card in the
 feedback modal) is treated as an unpaid digital purchase outside the US
 storefront. Hide it in the apps.
@@ -356,10 +363,11 @@ produces a value the code work needs (in brackets).
   ```
   website), decided 2026-10-10. Changing it later is a listing edit.
   ```
-- [ ] Approve the rewritten privacy policy (the current one is a 2025
-  ```
-  template without sign-in, uploads or the apps).
-  ```
+- [ ] Review the rewritten privacy policy and the new terms of use
+  (`/privacy`, `/terms`, written 2026-10-10). The privacy policy names the
+  API host only as "our cloud hosting provider"; name it if you prefer.
+- [ ] Check `/admin/reports` every day once the apps are live (there are no
+  notifications yet).
 
 **Code**
 
@@ -367,7 +375,7 @@ produces a value the code work needs (in brackets).
   ```
   backend token verification and code redemption, the website through
   the Services ID. Android keeps Google only until email sign-in lands.
-  Revoking the Apple tokens lands with account deletion.
+  Revoking the Apple tokens landed with account deletion (2026-10-10).
   ```
 - [ ] **Owner:** set `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`
   ```
@@ -376,13 +384,23 @@ produces a value the code work needs (in brackets).
   name); then try both flows (website, and an iPhone run from Xcode).
   ```
 - [ ] Release signing: paid team in Xcode, Android `keystore.properties`.
-- [ ] In-app account deletion (5.1.1(v)): deletes the user's content too.
-- [ ] Block users (1.2).
-- [ ] Hide the Patreon card in the apps (3.1.1).
-- [ ] Privacy policy draft. (Umami is already off in the apps:
-  ```
-  `build:native` blanks `NEXT_PUBLIC_UMAMI_WEBSITE_ID`.)
-  ```
+- [x] In-app account deletion (5.1.1(v)), 2026-10-10: Edit profile →
+  Delete account → `DELETE /account`. Deletes the content, uploads, social
+  data and sessions and revokes Apple tokens.
+- [x] Block users (1.2), 2026-10-10: from a profile's "…" or with "Also
+  block" when reporting. Hidden both ways in community lists, search and
+  profiles. Managed in Edit profile → Blocked users.
+- [x] Reports for themes, contests, designs, fonts and users (1.2),
+  2026-10-10, plus the admin queue at `/admin/reports` (dismiss, remove
+  the content, delete the creator's account).
+- [x] Hide the Patreon card in the apps (3.1.1), 2026-10-10.
+- [x] Privacy policy rewritten and terms of use added (`/terms`),
+  2026-10-10. The apps open both on the website, and the line under the
+  sign-in buttons is where users agree to the terms. (Umami is already
+  off in the apps: `build:native` blanks `NEXT_PUBLIC_UMAMI_WEBSITE_ID`.)
+- [ ] **Owner:** deploy the backend branch `feat/app-store-readiness` (new
+  collections `blocks`; new fields on reports and profiles; no
+  migration) before the website and app builds that use it.
 - [x] Universal links and Android App Links (2026-10-10): only share links
   (`?profile=`, `?contest=`, `?theme=`, `?design=`) open the app.
   `public/.well-known/` files, the Associated Domains entitlement, an

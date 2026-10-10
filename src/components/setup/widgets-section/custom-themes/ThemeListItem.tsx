@@ -1,4 +1,11 @@
-import { ALargeSmall, Folder, Link2, Share2, Volume1 } from 'lucide-react';
+import {
+  ALargeSmall,
+  Flag,
+  Folder,
+  Link2,
+  Share2,
+  Volume1,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -28,6 +35,7 @@ import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useGeneralStore } from '@/state/generalStore';
+import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { resolveThemeSpecificsForCustomTheme } from '@/theme/themeSpecifics';
 import {
@@ -200,6 +208,22 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                 value: theme.saves,
               },
             ],
+          },
+        ] as OverflowMenuEntry[])
+      : []),
+    ...(!isMyTheme
+      ? ([
+          'hr',
+          {
+            icon: <Flag className="size-4" />,
+            label: t('moderation.report'),
+            onClick: () =>
+              openReportDialog({
+                type: 'theme',
+                id: theme._id,
+                name: theme.name,
+                creator: theme.creator,
+              }),
           },
         ] as OverflowMenuEntry[])
       : []),

@@ -12,6 +12,8 @@ import UpdateList from './UpdateList';
 
 import { FilledHeartIcon } from '@/assets/icons/FilledHeartIcon';
 import GitHubIcon from '@/assets/icons/GitHubIcon';
+import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/helpers/shareUrl';
+import { IS_NATIVE_APP } from '@/native/platform';
 
 const FeedbackModal = ({
   showModal,
@@ -24,6 +26,7 @@ const FeedbackModal = ({
 }) => {
   // const locale = useLocale();
   const t = useTranslations('feedbackInfo');
+  const tCommon = useTranslations('common');
   const [activeTab, setActiveTab] = useState('feedback');
   const setLastSeenUpdate = useGeneralStore((state) => state.setLastSeenUpdate);
   const setShouldShowNewChangesIndicator = useGeneralStore(
@@ -133,31 +136,56 @@ const FeedbackModal = ({
                 })}
               </p>
             </div> */}
-            {/* Divider */}
-            <div className="h-px bg-white/10 my-5" />
-
-            <div className="border border-white/10 border-solid rounded-xl bg-primary-800/60 pt-[18px] px-5 pb-5">
-              <div className="flex items-center gap-2 mb-[11px]">
-                <FilledHeartIcon className="w-6 h-6 flex-shrink-0 text-[#FF5E5B]" />
-                <span className="font-bold">{t('donationCardTitle')}</span>
-              </div>
-              <p className="text-white/70 text-base leading-[1.70] mb-[7px]">
-                {t('donationCardIntro')}
-              </p>
-              <p className="text-white/70 text-base leading-[1.70] mb-[17px]">
-                {t('donationCardSupport')}
-              </p>
+            <p className="mb-3 text-white/70 text-base">
               <a
-                href="https://www.patreon.com/c/douzepoints"
+                href={PRIVACY_POLICY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-[9px] rounded-[9px] px-5 py-[10px] text-white text-[13px] font-bold tracking-[0.09em] uppercase whitespace-nowrap hover:opacity-[0.88] transition-opacity"
-                style={{ backgroundColor: '#FF5E5B' }}
+                className="text-primary-300 hover:text-primary-400 underline font-medium"
               >
-                <Heart className="w-5 h-5" />
-                {t('supportOnPatreon')}
+                {tCommon('privacyPolicy')}
               </a>
-            </div>
+              {' · '}
+              <a
+                href={TERMS_OF_USE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-300 hover:text-primary-400 underline font-medium"
+              >
+                {tCommon('termsOfUse')}
+              </a>
+            </p>
+            {/* The apps leave out the donation card: an in-app donation link
+                counts as an unpaid digital purchase (App Store 3.1.1). */}
+            {!IS_NATIVE_APP && (
+              <>
+                {/* Divider */}
+                <div className="h-px bg-white/10 my-5" />
+
+                <div className="border border-white/10 border-solid rounded-xl bg-primary-800/60 pt-[18px] px-5 pb-5">
+                  <div className="flex items-center gap-2 mb-[11px]">
+                    <FilledHeartIcon className="w-6 h-6 flex-shrink-0 text-[#FF5E5B]" />
+                    <span className="font-bold">{t('donationCardTitle')}</span>
+                  </div>
+                  <p className="text-white/70 text-base leading-[1.70] mb-[7px]">
+                    {t('donationCardIntro')}
+                  </p>
+                  <p className="text-white/70 text-base leading-[1.70] mb-[17px]">
+                    {t('donationCardSupport')}
+                  </p>
+                  <a
+                    href="https://www.patreon.com/c/douzepoints"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-[9px] rounded-[9px] px-5 py-[10px] text-white text-[13px] font-bold tracking-[0.09em] uppercase whitespace-nowrap hover:opacity-[0.88] transition-opacity"
+                    style={{ backgroundColor: '#FF5E5B' }}
+                  >
+                    <Heart className="w-5 h-5" />
+                    {t('supportOnPatreon')}
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         )}
 

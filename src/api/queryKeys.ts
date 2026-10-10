@@ -93,6 +93,7 @@ export const queryKeys = {
     designsState: (ids: string[]) =>
       ['user', 'designs-state', { ids: [...ids].sort() }] as const,
     reportsStateAll: () => ['user', 'reports-state'] as const,
+    blockedUsers: () => ['user', 'blocked-users'] as const,
     reportsState: (targetType: string, ids: string[]) =>
       ['user', 'reports-state', targetType, { ids: [...ids].sort() }] as const,
     quickSelectContests: () => ['user', 'quick-select-contests'] as const,
@@ -178,6 +179,13 @@ export const queryKeys = {
       ['public', 'user-entry-stats', userId, entryCode] as const,
   },
 
+  // Moderation queue (admin only)
+  moderation: {
+    all: () => ['moderation'] as const,
+    reports: (params: { status: 'open' | 'resolved'; page: number }) =>
+      ['moderation', 'reports', params] as const,
+  },
+
   // Errors queries (admin only)
   errors: {
     all: () => ['errors'] as const,
@@ -219,6 +227,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.designs(),
   queryKeys.user.savedDesigns(),
   queryKeys.user.reportsStateAll(),
+  queryKeys.user.blockedUsers(),
   queryKeys.user.preferences(),
   queryKeys.user.profileSummary(),
   ['user', 'entry-stats'] as const,

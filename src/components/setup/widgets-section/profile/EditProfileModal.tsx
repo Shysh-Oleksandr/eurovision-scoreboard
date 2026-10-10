@@ -1,3 +1,4 @@
+import { Ban, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -5,6 +6,7 @@ import { toast } from 'react-toastify';
 import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
 import {
@@ -19,10 +21,16 @@ import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { DEFAULT_HOSTING_COUNTRY_CODE } from '@/data/data';
 import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
+
+const BlockedUsersModal = dynamic(
+  () => import('@/components/moderation/BlockedUsersModal'),
+  { ssr: false },
+);
 
 const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1MB
 
@@ -51,6 +59,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const t = useTranslations();
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const user = useAuthStore((s) => s.user);
+  const deleteAccount = useAuthStore((s) => s.deleteAccount);
+  const isDeletingAccount = useAuthStore((s) => s.isBusy);
+  const { confirm } = useConfirmation();
+  const [isBlockedUsersOpen, setIsBlockedUsersOpen] = useState(false);
   const { mutateAsync: updateProfile, isPending } = useUpdateProfileMutation();
   const { mutateAsync: uploadAvatar, isPending: isUploading } =
     useUploadProfileAvatarMutation();
@@ -132,6 +144,26 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     });
     onClose();
   });
+
+  const handleDeleteAccount = () => {
+    confirm({
+      key: 'delete-account',
+      type: 'danger',
+      title: t('moderation.deleteAccountConfirmTitle'),
+      description: t('moderation.deleteAccountConfirmDescription'),
+      onConfirm: async () => {
+        try {
+          await deleteAccount();
+        } catch {
+          toast.error(t('moderation.deleteAccountFailed'));
+
+          return;
+        }
+        toast.success(t('moderation.accountDeleted'));
+        onClose();
+      },
+    });
+  };
 
   const displayAvatarUrl = useMemo(() => {
     if (selectedFile) return URL.createObjectURL(selectedFile);
@@ -261,6 +293,51 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           selectClassName="!shadow-none"
         />
       </div>
+
+      <section className="mt-6 pt-5 border-t border-white/10 space-y-4">
+        <h4 className="text-lg font-bold">{t('moderation.account')}</h4>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="min-w-0 flex-1 basis-56">
+            <div className="font-semibold">{t('moderation.blockedUsers')}</div>
+            <p className="text-white/60 text-sm leading-snug">
+              {t('moderation.blockedUsersDescription')}
+            </p>
+          </div>
+          <Button
+            variant="tertiary"
+            size="md"
+            Icon={<Ban className="size-4 flex-none" />}
+            onClick={() => setIsBlockedUsersOpen(true)}
+          >
+            {t('moderation.manageBlocked')}
+          </Button>
+        </div>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="min-w-0 flex-1 basis-56">
+            <div className="font-semibold">{t('moderation.deleteAccount')}</div>
+            <p className="text-white/60 text-sm leading-snug">
+              {t('moderation.deleteAccountDescription')}
+            </p>
+          </div>
+          <Button
+            variant="destructive"
+            size="md"
+            Icon={<Trash2 className="size-4 flex-none" />}
+            isLoading={isDeletingAccount}
+            disabled={isDeletingAccount}
+            onClick={handleDeleteAccount}
+          >
+            {t('moderation.deleteAccount')}
+          </Button>
+        </div>
+      </section>
+
+      {isBlockedUsersOpen && (
+        <BlockedUsersModal
+          isOpen={isBlockedUsersOpen}
+          onClose={() => setIsBlockedUsersOpen(false)}
+        />
+      )}
     </Modal>
   );
 };

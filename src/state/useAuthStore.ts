@@ -39,6 +39,8 @@ export interface AuthState {
   refresh: () => Promise<string | undefined>;
   fetchMe: () => Promise<void>;
   logout: () => Promise<void>;
+  /** Deletes the account and all of its data on the server, then signs out. */
+  deleteAccount: () => Promise<void>;
 }
 
 type LoginStep = 'refresh' | 'me';
@@ -233,22 +235,26 @@ export const useAuthStore = create<AuthState>()(
             await api.post('/auth/logout');
           }
 
-          // Clear user data from React Query cache
-          clearUserData(queryClient);
+          clearSignedInState();
+        } finally {
+          set({ isBusy: false });
+        }
+      },
+      deleteAccount: async () => {
+        if (get().isBusy) return;
+        set({ isBusy: true });
+        try {
+          // Also ends every session on the server, so there is nothing to log out.
+          await api.delete('/account');
 
-          // Clear auth state
-          set({ user: null, accessToken: null });
+          if (IS_NATIVE_APP) {
+            const { clearRefreshToken, signOutOfGoogle } = await nativeAuth();
 
-          // Clear user-specific data from Zustand stores
-          useCountriesStore.setState({ customCountries: [] });
+            await clearRefreshToken();
+            void signOutOfGoogle();
+          }
 
-          // Custom blocs are account-only, so drop them; the rest of the
-          // diaspora settings (custom pairs, toggles, strength) stay and keep
-          // persisting locally.
-          useGeneralStore.getState().setDiaspora({ customGroups: [] });
-
-          // Add more store cleanups here as needed in the future:
-          // e.g., useSavedEventsStore.setState({ savedEvents: [] });
+          clearSignedInState();
         } finally {
           set({ isBusy: false });
         }
@@ -265,6 +271,26 @@ export const useAuthStore = create<AuthState>()(
     },
   ),
 );
+
+/** Drops the signed-in user's data from this device after logout or deletion. */
+function clearSignedInState() {
+  // Clear user data from React Query cache
+  clearUserData(queryClient);
+
+  // Clear auth state
+  useAuthStore.setState({ user: null, accessToken: null });
+
+  // Clear user-specific data from Zustand stores
+  useCountriesStore.setState({ customCountries: [] });
+
+  // Custom blocs are account-only, so drop them; the rest of the diaspora
+  // settings (custom pairs, toggles, strength) stay and keep persisting
+  // locally.
+  useGeneralStore.getState().setDiaspora({ customGroups: [] });
+
+  // Add more store cleanups here as needed in the future:
+  // e.g., useSavedEventsStore.setState({ savedEvents: [] });
+}
 
 /**
  * Native sign-in: the provider's sheet → its token → our token pair → the

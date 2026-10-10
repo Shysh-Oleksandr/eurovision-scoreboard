@@ -14,6 +14,10 @@ const IGNORE_DO_NOT_SHOW_AGAIN_KEYS = [
   'delete-custom-entries',
   'delete-custom-entry-group',
   'setup-low-participants-warning',
+  'block-user',
+  'delete-account',
+  'moderation-remove',
+  'moderation-delete-user',
 ];
 
 interface ConfirmationModalProps {

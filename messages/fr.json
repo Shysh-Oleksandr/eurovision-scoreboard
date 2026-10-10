@@ -84,7 +84,9 @@
       "hint": "Nouveau et encore en évolution. Dites-nous ce qui manque avec le bouton de retour.",
       "hintFeedback": "Nouveau et encore en évolution · cliquez pour envoyer un retour"
     },
-    "savedTo": "Enregistré dans {folder}"
+    "savedTo": "Enregistré dans {folder}",
+    "privacyPolicy": "Politique de confidentialité",
+    "termsOfUse": "Conditions d’utilisation"
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",
@@ -754,7 +756,8 @@
       "follow": "Suivre",
       "signInToFollow": "Connectez-vous pour suivre",
       "followingCount": "{count} abonnements",
-      "signIn": "Se connecter"
+      "signIn": "Se connecter",
+      "legalAgreement": "En continuant, vous acceptez les <terms>Conditions d’utilisation</terms> et confirmez avoir lu la <privacy>Politique de confidentialité</privacy>."
     },
     "contentType": {
       "all": "Tout",
@@ -2292,25 +2295,7 @@
         "useLive": "Utiliser le tableau de scores en direct",
         "useManual": "Saisir une liste manuelle"
       },
-      "cancel": "Annuler",
-      "report": {
-        "title": "Signaler « {name} » ?",
-        "body": "Dites-nous ce qui ne va pas avec ce modèle. Les signalements sont examinés par l’équipe DouzePoints.",
-        "reason": "Motif",
-        "reasons": {
-          "spam": "Spam ou contenu trompeur",
-          "offensive": "Contenu offensant",
-          "copyright": "Droit d’auteur ou marque déposée",
-          "other": "Autre chose"
-        },
-        "details": "Détails (facultatif)",
-        "detailsPlaceholder": "Tout ce qui nous aide à comprendre le problème",
-        "send": "Envoyer le signalement",
-        "cancel": "Annuler",
-        "thanks": "Merci, le signalement a été envoyé.",
-        "already": "Vous avez déjà signalé ce modèle.",
-        "failed": "Le signalement n’a pas pu être envoyé."
-      }
+      "cancel": "Annuler"
     },
     "fields": {
       "columns": "Colonnes",
@@ -2391,5 +2376,48 @@
       "editFields": "Modifier les champs",
       "hideFields": "Masquer les champs"
     }
+  },
+  "moderation": {
+    "report": "Signaler",
+    "reportUser": "Signaler l’utilisateur",
+    "blockUser": "Bloquer l’utilisateur",
+    "unblockUser": "Débloquer l’utilisateur",
+    "unblock": "Débloquer",
+    "reportTitle": "Signaler « {name} »",
+    "reportUserTitle": "Signaler {name}",
+    "reportBody": "Dites-nous ce qui ne va pas. L’équipe DouzePoints examine chaque signalement et supprime les contenus qui enfreignent les Conditions d’utilisation.",
+    "reason": "Motif",
+    "reasons": {
+      "spam": "Spam ou contenu trompeur",
+      "offensive": "Contenu offensant",
+      "copyright": "Droit d’auteur ou marque déposée",
+      "other": "Autre chose"
+    },
+    "details": "Détails (facultatif)",
+    "detailsPlaceholder": "Tout ce qui nous aide à comprendre le problème",
+    "alsoBlock": "Bloquer aussi {name}",
+    "send": "Envoyer le signalement",
+    "thanks": "Merci, le signalement a été envoyé.",
+    "already": "Vous avez déjà signalé ce contenu.",
+    "failed": "Le signalement n’a pas pu être envoyé.",
+    "signInToReport": "Connectez-vous pour signaler un contenu ou un utilisateur.",
+    "blockConfirmTitle": "Bloquer {name} ?",
+    "blockConfirmDescription": "Vous ne verrez plus les thèmes, concours, designs ou polices l’un de l’autre dans les listes de la communauté, la recherche ou les profils, et aucun de vous ne pourra suivre l’autre. Vous pourrez le débloquer dans Modifier le profil.",
+    "blocked": "{name} est bloqué.",
+    "unblocked": "{name} est débloqué.",
+    "blockFailed": "Impossible de bloquer cet utilisateur.",
+    "unblockFailed": "Impossible de débloquer cet utilisateur.",
+    "blockedProfile": "Vous avez bloqué cet utilisateur : son contenu est masqué.",
+    "blockedUsers": "Utilisateurs bloqués",
+    "blockedUsersDescription": "Vous et les personnes que vous bloquez ne voyez pas le contenu les uns des autres.",
+    "noBlockedUsers": "Vous n’avez bloqué personne.",
+    "manageBlocked": "Gérer",
+    "account": "Compte",
+    "deleteAccount": "Supprimer le compte",
+    "deleteAccountDescription": "Supprime définitivement votre profil et tout ce qui est enregistré dans votre compte.",
+    "deleteAccountConfirmTitle": "Supprimer votre compte ?",
+    "deleteAccountConfirmDescription": "Votre profil, vos concours, thèmes, designs, polices et entrées personnalisées seront supprimés, ainsi que vos j’aime, enregistrements, abonnements et blocages. Cette action est irréversible. Les réglages et brouillons conservés uniquement sur cet appareil restent.",
+    "accountDeleted": "Votre compte a été supprimé.",
+    "deleteAccountFailed": "Votre compte n’a pas pu être supprimé. Veuillez réessayer."
   }
 }

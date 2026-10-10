@@ -84,7 +84,9 @@
       "hint": "Novo e ainda em evolução. Diga-nos o que falta com o botão de feedback.",
       "hintFeedback": "Novo e ainda em evolução · clique para enviar feedback"
     },
-    "savedTo": "Guardado em {folder}"
+    "savedTo": "Guardado em {folder}",
+    "privacyPolicy": "Política de privacidade",
+    "termsOfUse": "Termos de utilização"
   },
   "Metadata": {
     "title": "DouzePoints - Simulador do Painel de Pontuação da Eurovisão",
@@ -754,7 +756,8 @@
       "followedUser": "Utilizador seguido!",
       "unfollowedUser": "Deixou de seguir o utilizador!",
       "followingCount": "{count} a seguir",
-      "signIn": "Iniciar sessão"
+      "signIn": "Iniciar sessão",
+      "legalAgreement": "Ao continuar, aceita os <terms>Termos de utilização</terms> e confirma que leu a <privacy>Política de privacidade</privacy>."
     },
     "contentType": {
       "all": "Todos",
@@ -2292,25 +2295,7 @@
         "useLive": "Usar o painel em direto",
         "useManual": "Escrever uma lista manual"
       },
-      "cancel": "Cancelar",
-      "report": {
-        "title": "Denunciar «{name}»?",
-        "body": "Diga-nos o que está errado com este design. As denúncias são analisadas pela equipa do DouzePoints.",
-        "reason": "Motivo",
-        "reasons": {
-          "spam": "Spam ou enganador",
-          "offensive": "Conteúdo ofensivo",
-          "copyright": "Direitos de autor ou marca registada",
-          "other": "Outro motivo"
-        },
-        "details": "Detalhes (opcional)",
-        "detailsPlaceholder": "Qualquer coisa que nos ajude a perceber o problema",
-        "send": "Enviar denúncia",
-        "cancel": "Cancelar",
-        "thanks": "Obrigado, a denúncia foi enviada.",
-        "already": "Já denunciou este design.",
-        "failed": "Não foi possível enviar a denúncia."
-      }
+      "cancel": "Cancelar"
     },
     "fields": {
       "columns": "Colunas",
@@ -2391,5 +2376,48 @@
       "editFields": "Editar campos",
       "hideFields": "Ocultar campos"
     }
+  },
+  "moderation": {
+    "report": "Denunciar",
+    "reportUser": "Denunciar utilizador",
+    "blockUser": "Bloquear utilizador",
+    "unblockUser": "Desbloquear utilizador",
+    "unblock": "Desbloquear",
+    "reportTitle": "Denunciar «{name}»",
+    "reportUserTitle": "Denunciar {name}",
+    "reportBody": "Diga-nos o que está errado. A equipa do DouzePoints analisa cada denúncia e remove o conteúdo que viola os Termos de utilização.",
+    "reason": "Motivo",
+    "reasons": {
+      "spam": "Spam ou enganador",
+      "offensive": "Conteúdo ofensivo",
+      "copyright": "Direitos de autor ou marca registada",
+      "other": "Outro motivo"
+    },
+    "details": "Detalhes (opcional)",
+    "detailsPlaceholder": "Qualquer coisa que nos ajude a perceber o problema",
+    "alsoBlock": "Bloquear também {name}",
+    "send": "Enviar denúncia",
+    "thanks": "Obrigado, a denúncia foi enviada.",
+    "already": "Já denunciou isto.",
+    "failed": "Não foi possível enviar a denúncia.",
+    "signInToReport": "Inicie sessão para denunciar conteúdo ou utilizadores.",
+    "blockConfirmTitle": "Bloquear {name}?",
+    "blockConfirmDescription": "Deixarão de ver os temas, concursos, designs e tipos de letra um do outro nas listas da comunidade, na pesquisa e nos perfis, e nenhum poderá seguir o outro. Pode desbloquear em Editar Perfil.",
+    "blocked": "{name} foi bloqueado.",
+    "unblocked": "{name} foi desbloqueado.",
+    "blockFailed": "Não foi possível bloquear este utilizador.",
+    "unblockFailed": "Não foi possível desbloquear este utilizador.",
+    "blockedProfile": "Bloqueou este utilizador, por isso o conteúdo dele está oculto.",
+    "blockedUsers": "Utilizadores bloqueados",
+    "blockedUsersDescription": "Você e as pessoas que bloqueia não veem o conteúdo uns dos outros.",
+    "noBlockedUsers": "Não bloqueou ninguém.",
+    "manageBlocked": "Gerir",
+    "account": "Conta",
+    "deleteAccount": "Eliminar conta",
+    "deleteAccountDescription": "Elimine definitivamente o seu perfil e tudo o que está guardado na sua conta.",
+    "deleteAccountConfirmTitle": "Eliminar a sua conta?",
+    "deleteAccountConfirmDescription": "O seu perfil, concursos, temas, designs, tipos de letra e entradas personalizadas serão eliminados, juntamente com os seus gostos, guardados, seguimentos e bloqueios. Não é possível anular. As definições e rascunhos guardados apenas neste dispositivo mantêm-se.",
+    "accountDeleted": "A sua conta foi eliminada.",
+    "deleteAccountFailed": "Não foi possível eliminar a sua conta. Tente novamente."
   }
 }

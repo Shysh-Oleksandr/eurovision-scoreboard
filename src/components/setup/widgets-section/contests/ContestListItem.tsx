@@ -1,4 +1,4 @@
-import { Folder, Link2, Share2 } from 'lucide-react';
+import { Flag, Folder, Link2, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 import { toast } from 'react-toastify';
@@ -36,6 +36,7 @@ import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useCountriesStore } from '@/state/countriesStore';
+import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import { Contest } from '@/types/contest';
@@ -187,6 +188,22 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                 value: contest.saves,
               },
             ],
+          },
+        ] as OverflowMenuEntry[])
+      : []),
+    ...(!isMyContest
+      ? ([
+          'hr',
+          {
+            icon: <Flag className="size-4" />,
+            label: t('moderation.report'),
+            onClick: () =>
+              openReportDialog({
+                type: 'contest',
+                id: contest._id,
+                name: `${contest.name} ${contest.year ?? ''}`.trim(),
+                creator: contest.creator,
+              }),
           },
         ] as OverflowMenuEntry[])
       : []),

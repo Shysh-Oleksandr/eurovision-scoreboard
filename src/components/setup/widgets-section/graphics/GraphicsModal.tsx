@@ -52,7 +52,6 @@ import {
 } from '@/graphics/components/CloudDesignCards';
 import DesignThumb from '@/graphics/components/DesignThumb';
 import PromptDialog from '@/graphics/components/PromptDialog';
-import ReportDialog from '@/graphics/components/ReportDialog';
 import { useTemplateContext } from '@/graphics/editor/useEditorContext';
 import { Design, parseDesign } from '@/graphics/model/design';
 import { SizeClass, sizeClassOf } from '@/graphics/model/presets';
@@ -409,7 +408,6 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const [records, setRecords] = useState<DesignRecord[] | null>(null);
   const [unreadable, setUnreadable] = useState<UnreadableRecord[]>([]);
   const [renaming, setRenaming] = useState<DesignRecord | null>(null);
-  const [reporting, setReporting] = useState<CloudDesign | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const openEditor = useGraphicsStudioStore((s) => s.openEditor);
   const openSheet = useGraphicsStudioStore((s) => s.openSheet);
@@ -759,11 +757,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
                 <h3>{t('mine')}</h3>
                 <span>{t('mineSub')}</span>
               </div>
-              <CloudGrid
-                designs={cloudOnly}
-                onUse={startCloud}
-                onReport={setReporting}
-              />
+              <CloudGrid designs={cloudOnly} onUse={startCloud} />
             </div>
           )}
         </>
@@ -865,11 +859,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
           </div>
         ) : community.data && community.data.designs.length > 0 ? (
           <>
-            <CloudGrid
-              designs={community.data.designs}
-              onUse={startCloud}
-              onReport={setReporting}
-            />
+            <CloudGrid designs={community.data.designs} onUse={startCloud} />
             {community.data.totalPages > 1 && (
               <WidgetPager
                 page={page}
@@ -915,11 +905,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         </div>
       ) : saved.data && saved.data.designs.length > 0 ? (
         <>
-          <CloudGrid
-            designs={saved.data.designs}
-            onUse={startCloud}
-            onReport={setReporting}
-          />
+          <CloudGrid designs={saved.data.designs} onUse={startCloud} />
           {saved.data.totalPages > 1 && (
             <WidgetPager
               page={savedPage}
@@ -977,14 +963,6 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         confirmLabel={t('rename')}
         onConfirm={(name) => renaming && rename(renaming, name)}
         onClose={() => setRenaming(null)}
-      />
-      <ReportDialog
-        target={
-          reporting
-            ? { type: 'design', id: reporting._id, name: reporting.name }
-            : null
-        }
-        onClose={() => setReporting(null)}
       />
       <DesignDataProvider binding={LIVE_BINDING}>
         <TabContent

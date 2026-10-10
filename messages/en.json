@@ -84,7 +84,9 @@
       "hint": "New and still changing. Tell us what’s missing with the feedback button.",
       "hintFeedback": "New and still changing · click to send feedback"
     },
-    "savedTo": "Saved to {folder}"
+    "savedTo": "Saved to {folder}",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -754,7 +756,8 @@
       "followedUser": "Followed user!",
       "unfollowedUser": "Unfollowed user!",
       "followingCount": "{count} following",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "legalAgreement": "By continuing, you agree to the <terms>Terms of Use</terms> and confirm that you have read the <privacy>Privacy Policy</privacy>."
     },
     "contentType": {
       "all": "All",
@@ -2292,25 +2295,7 @@
         "useLive": "Use the live scoreboard",
         "useManual": "Type a manual list"
       },
-      "cancel": "Cancel",
-      "report": {
-        "title": "Report “{name}”?",
-        "body": "Tell us what is wrong with this template. Reports are reviewed by the DouzePoints team.",
-        "reason": "Reason",
-        "reasons": {
-          "spam": "Spam or misleading",
-          "offensive": "Offensive content",
-          "copyright": "Copyright or trademark",
-          "other": "Something else"
-        },
-        "details": "Details (optional)",
-        "detailsPlaceholder": "Anything that helps us understand the problem",
-        "send": "Send report",
-        "cancel": "Cancel",
-        "thanks": "Thanks, the report was sent.",
-        "already": "You already reported this template.",
-        "failed": "The report couldn’t be sent."
-      }
+      "cancel": "Cancel"
     },
     "fields": {
       "columns": "Columns",
@@ -2391,5 +2376,48 @@
       "editFields": "Edit fields",
       "hideFields": "Hide fields"
     }
+  },
+  "moderation": {
+    "report": "Report",
+    "reportUser": "Report user",
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "unblock": "Unblock",
+    "reportTitle": "Report “{name}”",
+    "reportUserTitle": "Report {name}",
+    "reportBody": "Tell us what’s wrong. The DouzePoints team reviews every report and removes content that breaks the Terms of Use.",
+    "reason": "Reason",
+    "reasons": {
+      "spam": "Spam or misleading",
+      "offensive": "Offensive or abusive",
+      "copyright": "Copyright or trademark",
+      "other": "Something else"
+    },
+    "details": "Details (optional)",
+    "detailsPlaceholder": "Anything that helps us understand the problem",
+    "alsoBlock": "Also block {name}",
+    "send": "Send report",
+    "thanks": "Thanks, the report was sent.",
+    "already": "You already reported this.",
+    "failed": "The report couldn’t be sent.",
+    "signInToReport": "Sign in to report content or users.",
+    "blockConfirmTitle": "Block {name}?",
+    "blockConfirmDescription": "You won’t see each other’s themes, contests, designs or fonts in community lists, search or profiles, and neither of you will be able to follow the other. You can unblock them in Edit Profile.",
+    "blocked": "{name} is blocked.",
+    "unblocked": "{name} is unblocked.",
+    "blockFailed": "Couldn’t block this user.",
+    "unblockFailed": "Couldn’t unblock this user.",
+    "blockedProfile": "You blocked this user, so their content is hidden.",
+    "blockedUsers": "Blocked users",
+    "blockedUsersDescription": "You and the people you block don’t see each other’s content.",
+    "noBlockedUsers": "You haven’t blocked anyone.",
+    "manageBlocked": "Manage",
+    "account": "Account",
+    "deleteAccount": "Delete account",
+    "deleteAccountDescription": "Permanently delete your profile and everything saved to your account.",
+    "deleteAccountConfirmTitle": "Delete your account?",
+    "deleteAccountConfirmDescription": "Your profile, contests, themes, designs, fonts and custom entries will be deleted, along with your likes, saves, follows and blocks. This can’t be undone. Settings and drafts kept only on this device stay.",
+    "accountDeleted": "Your account was deleted.",
+    "deleteAccountFailed": "Your account couldn’t be deleted. Please try again."
   }
 }

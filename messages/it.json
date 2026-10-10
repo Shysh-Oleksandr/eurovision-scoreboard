@@ -84,7 +84,9 @@
       "hint": "Novità ancora in evoluzione. Dicci cosa manca con il pulsante del feedback.",
       "hintFeedback": "Novità ancora in evoluzione · clicca per inviare un feedback"
     },
-    "savedTo": "Salvato in {folder}"
+    "savedTo": "Salvato in {folder}",
+    "privacyPolicy": "Informativa sulla privacy",
+    "termsOfUse": "Termini di utilizzo"
   },
   "Metadata": {
     "title": "DouzePoints - Simulatore di Classifica Eurovision",
@@ -754,7 +756,8 @@
       "follow": "Segui",
       "signInToFollow": "Accedi per seguire",
       "followingCount": "{count} seguiti",
-      "signIn": "Accedi"
+      "signIn": "Accedi",
+      "legalAgreement": "Continuando, accetti i <terms>Termini di utilizzo</terms> e confermi di aver letto l’<privacy>Informativa sulla privacy</privacy>."
     },
     "contentType": {
       "all": "Tutti",
@@ -2292,25 +2295,7 @@
         "useLive": "Usa il tabellone live",
         "useManual": "Scrivi un elenco manuale"
       },
-      "cancel": "Annulla",
-      "report": {
-        "title": "Segnalare «{name}»?",
-        "body": "Dicci cosa non va in questo design. Le segnalazioni vengono esaminate dal team di DouzePoints.",
-        "reason": "Motivo",
-        "reasons": {
-          "spam": "Spam o contenuto ingannevole",
-          "offensive": "Contenuto offensivo",
-          "copyright": "Copyright o marchio registrato",
-          "other": "Altro"
-        },
-        "details": "Dettagli (facoltativo)",
-        "detailsPlaceholder": "Qualsiasi cosa che ci aiuti a capire il problema",
-        "send": "Invia segnalazione",
-        "cancel": "Annulla",
-        "thanks": "Grazie, la segnalazione è stata inviata.",
-        "already": "Hai già segnalato questo design.",
-        "failed": "Impossibile inviare la segnalazione."
-      }
+      "cancel": "Annulla"
     },
     "fields": {
       "columns": "Colonne",
@@ -2391,5 +2376,48 @@
       "editFields": "Modifica campi",
       "hideFields": "Nascondi campi"
     }
+  },
+  "moderation": {
+    "report": "Segnala",
+    "reportUser": "Segnala utente",
+    "blockUser": "Blocca utente",
+    "unblockUser": "Sblocca utente",
+    "unblock": "Sblocca",
+    "reportTitle": "Segnala «{name}»",
+    "reportUserTitle": "Segnala {name}",
+    "reportBody": "Dicci cosa non va. Il team di DouzePoints esamina ogni segnalazione e rimuove i contenuti che violano i Termini di utilizzo.",
+    "reason": "Motivo",
+    "reasons": {
+      "spam": "Spam o contenuto ingannevole",
+      "offensive": "Contenuto offensivo",
+      "copyright": "Copyright o marchio registrato",
+      "other": "Altro"
+    },
+    "details": "Dettagli (facoltativo)",
+    "detailsPlaceholder": "Qualsiasi cosa che ci aiuti a capire il problema",
+    "alsoBlock": "Blocca anche {name}",
+    "send": "Invia segnalazione",
+    "thanks": "Grazie, la segnalazione è stata inviata.",
+    "already": "Hai già segnalato questo contenuto.",
+    "failed": "Impossibile inviare la segnalazione.",
+    "signInToReport": "Accedi per segnalare contenuti o utenti.",
+    "blockConfirmTitle": "Bloccare {name}?",
+    "blockConfirmDescription": "Non vedrete i temi, i concorsi, i design o i font l’uno dell’altro negli elenchi della community, nella ricerca o nei profili, e nessuno dei due potrà seguire l’altro. Puoi sbloccarlo in Modifica Profilo.",
+    "blocked": "{name} è stato bloccato.",
+    "unblocked": "{name} è stato sbloccato.",
+    "blockFailed": "Impossibile bloccare questo utente.",
+    "unblockFailed": "Impossibile sbloccare questo utente.",
+    "blockedProfile": "Hai bloccato questo utente, quindi i suoi contenuti sono nascosti.",
+    "blockedUsers": "Utenti bloccati",
+    "blockedUsersDescription": "Tu e le persone che blocchi non vedete i contenuti l’uno dell’altro.",
+    "noBlockedUsers": "Non hai bloccato nessuno.",
+    "manageBlocked": "Gestisci",
+    "account": "Account",
+    "deleteAccount": "Elimina account",
+    "deleteAccountDescription": "Elimina per sempre il tuo profilo e tutto ciò che è salvato nel tuo account.",
+    "deleteAccountConfirmTitle": "Eliminare il tuo account?",
+    "deleteAccountConfirmDescription": "Verranno eliminati il tuo profilo, i concorsi, i temi, i design, i font e le voci personalizzate, insieme ai tuoi mi piace, salvataggi, follow e blocchi. L’operazione non si può annullare. Le impostazioni e le bozze salvate solo su questo dispositivo restano.",
+    "accountDeleted": "Il tuo account è stato eliminato.",
+    "deleteAccountFailed": "Impossibile eliminare il tuo account. Riprova."
   }
 }

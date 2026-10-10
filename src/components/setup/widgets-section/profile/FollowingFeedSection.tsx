@@ -21,7 +21,6 @@ import { useThemesStateQuery } from '@/api/themes';
 import type { UserContentType } from '@/api/userContent';
 import Button from '@/components/common/Button';
 import { CloudGrid } from '@/graphics/components/CloudDesignCards';
-import ReportDialog from '@/graphics/components/ReportDialog';
 import { parseDesign } from '@/graphics/model/design';
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -79,7 +78,6 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
   const contestActions = usePublicContestActions();
   const user = useAuthStore((state) => state.user);
   const openSheet = useGraphicsStudioStore((s) => s.openSheet);
-  const [reporting, setReporting] = useState<CloudDesign | null>(null);
   const useTemplate = (record: CloudDesign) => {
     try {
       openSheet({
@@ -188,11 +186,7 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
                 />
               ) : item.type === 'design' ? (
                 <div key={`design-${item.data._id}`} className="gfx-gallery">
-                  <CloudGrid
-                    designs={[item.data]}
-                    onUse={useTemplate}
-                    onReport={setReporting}
-                  />
+                  <CloudGrid designs={[item.data]} onUse={useTemplate} />
                 </div>
               ) : (
                 <ContestListItem
@@ -250,14 +244,6 @@ const FollowingFeedSection: React.FC<FollowingFeedSectionProps> = ({
       <SearchUsersModal
         isOpen={isSearchUsersOpen}
         onClose={() => setIsSearchUsersOpen(false)}
-      />
-      <ReportDialog
-        target={
-          reporting
-            ? { type: 'design', id: reporting._id, name: reporting.name }
-            : null
-        }
-        onClose={() => setReporting(null)}
       />
     </div>
   );
