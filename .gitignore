@@ -30,5 +30,8 @@ AuthKey_*
 # Live update staging (yarn live-update publish)
 /.live-update/
 
+# Store screenshots (yarn store-screenshots)
+/assets/store/screenshots/
+
 # Local issue tracker (docs/agents/issue-tracker.md)
 /.scratch/

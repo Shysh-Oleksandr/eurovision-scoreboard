@@ -28,6 +28,7 @@ yarn cap:sync         # build:native + copy into ios/ and android/
 yarn cap:dev ios|android [--lan]  # Live reload inside the native shell
 yarn assets:native    # Regenerate app icons + splash screens from assets/
 yarn live-update publish|status  # Live update: build, sign, upload a web bundle for the apps
+yarn store-screenshots          # App Store / Play screenshots from out/ (after yarn build:native)
 ```
 
 ## Architecture
@@ -83,7 +84,8 @@ Read `docs/` before touching non-obvious subsystems:
 - `native-apps.md` — the Capacitor iOS/Android build: static-export flags, commands (Xcode 27 caveat), live reload, rules for native-aware code, client-side locale, native image fetching for exports, saving/sharing files (`fileActions`, Android MediaStore plugin), native Google sign-in + Sign in with Apple (iOS + website) + Keychain/Keystore refresh tokens, icons/splash, system bars + `--safe-*` vars, Android back button (`useBackHandler`), haptics, per-app languages, live updates (`yarn live-update publish`, native runtime fingerprints, signed bundles on R2), universal links / Android App Links (share links only, `.well-known` files, Android 15+ query matching), what doesn't work yet, emulator/simulator testing recipes. Roadmap, research and phase status: `plans/native-apps-plan.md`
 - `email-sign-in.md` — passwordless email sign-in (website + apps): the code dialog and `loginWithEmailCode`, the `/auth/email/*` API and error codes, account linking and normalized addresses, code storage and rate limits, sliding refresh-token rotation, Cloudflare Email Service sending (env, owner setup, review account); read before touching sign-in, sessions or sending email
 - `moderation-and-account-deletion.md` — reports (all content types + users, the app-wide `openReportDialog`), blocking (both directions, server-side list filtering), the admin queue at `/admin/reports`, in-app account deletion (what is deleted, in which order, Apple token revocation), the legal pages and the Terms agreement under the sign-in buttons
-- `store-submission.md` — what the apps collect and the matching App Store privacy labels and Play Data safety answers, age rating and content forms, trademark rules for the listings, review notes and the demo account; update it with the privacy policy whenever data collection changes
+- `store-builds.md` — step by step for the iOS and Android store builds (prepare, archive / bundleRelease, upload, tag, submit) and what a later update needs
+- `store-submission.md` — what the apps collect and the matching App Store privacy labels and Play Data safety answers, age rating and content forms, trademark rules for the listings, review notes and the demo account, the store screenshots (`yarn store-screenshots`: sizes, scenes, upload slots); update it with the privacy policy whenever data collection changes
 - `USER_DATA_CLEARING.md`
 
 ## Code Style

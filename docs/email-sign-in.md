@@ -183,9 +183,12 @@ implementation.
 
 App reviewers have no inbox to read. With `EMAIL_REVIEW_ADDRESS` and a
 6-digit `EMAIL_REVIEW_CODE` set, `start` sends nothing for that address and
-`verify` accepts that code (still under the per-IP limit). Leave both unset
-except while a review is open; anyone who learns the pair can sign in to that
-one account. Apple's reviewers can use Sign in with Apple instead.
+`verify` accepts that code (still under the per-IP limit). Keep both set:
+Google Play wants review credentials that work at any time, and Apple
+reviews every update ([store-submission.md](store-submission.md) §5). Anyone
+who learns the pair can sign in to that one account, which has no special
+rights; if it leaks, change the code. Apple's reviewers can also use Sign in
+with Apple.
 
 ## 7. Testing
 

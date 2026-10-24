@@ -49,6 +49,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Lets you take a photo to upload, such as a profile picture, a flag or a theme background.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Lets you save scoreboard and stats images to your photo library.</string>
 	<key>UIApplicationSceneManifest</key>

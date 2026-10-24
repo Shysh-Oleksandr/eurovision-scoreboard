@@ -349,11 +349,14 @@ produces a value the code work needs (in brackets).
 
 **Owner: Google Play Console**
 
-- [x] Create the app (free), 2026-10-10. Play App Signing key fingerprints
-  ```
-  noted (SHA-1 in a Google Cloud Android client; SHA-256 for
-  `assetlinks.json`).
-  ```
+- [ ] Create the app (free) **with package name `app.douzepoints`**. The
+  app made on 2026-10-10 was registered as `com.douzepoints.app` (Play now
+  asks for the package name at creation and it can't be changed), so the
+  first upload was refused; decided 2026-10-24 to make a new app rather
+  than change the Android package. Its Play App Signing key is new: its
+  SHA-256 is in `public/.well-known/assetlinks.json` (2026-10-24); its
+  SHA-1 goes in the Google Cloud "Android" OAuth client, replacing the old
+  app's. Delete the `com.douzepoints.app` draft if Play offers it.
 - [x] Upload keystore `~/keys/douzepoints-upload.jks` (alias `upload`),
   ```
   backed up; passwords go in a gitignored file.
@@ -397,7 +400,7 @@ produces a value the code work needs (in brackets).
   builds from the gitignored `android/keystore.properties` (template
   `keystore.properties.example`; checked with a throwaway key). **Owner:**
   create the file with the upload keystore's password. Steps:
-  [../native-apps.md](../native-apps.md) §2, "Store builds".
+  [../store-builds.md](../store-builds.md).
 - [x] In-app account deletion (5.1.1(v)), 2026-10-10: Edit profile →
   Delete account → `DELETE /account`. Deletes the content, uploads, social
   data and sessions and revokes Apple tokens.

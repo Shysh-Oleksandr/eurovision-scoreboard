@@ -8342,6 +8342,11 @@ pirates@^4.0.1:
   resolved "https://registry.npmjs.org/pirates/-/pirates-4.0.7.tgz"
   integrity sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA==
 
+playwright-core@1.64.0:
+  version "1.64.0"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.64.0.tgz#a765f91dabd2b2cadd67e87439842c1d6c72c652"
+  integrity sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==
+
 plist@^3.0.4, plist@^3.0.5, plist@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/plist/-/plist-3.1.1.tgz#fa6099e1e3cf6ea180258ebe6378ea3878c2c841"

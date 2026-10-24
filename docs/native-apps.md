@@ -103,30 +103,26 @@ Free-signed builds expire after 7 days. Android: enable USB debugging, then
 `cd android && ./gradlew assembleDebug` →
 `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-**Store builds.** Commit everything, run `yarn cap:sync`, build both
-platforms before touching any native file, and tag the commit: the build
-bakes in the native runtime fingerprints, and live updates only reach a
-binary whose runtime matches (§11). Version numbers are not part of the
-fingerprint. The store forms and review notes: [store-submission.md](store-submission.md).
+**Store builds:** step by step in [store-builds.md](store-builds.md); the
+store forms and review notes in [store-submission.md](store-submission.md).
+The build bakes in the native runtime fingerprints, so store binaries are
+built right after `yarn cap:sync` from a committed tree, then tagged (§11).
 
-- **iOS:** in the App target → General, raise Build
-  (`CURRENT_PROJECT_VERSION`) for every upload and Version
-  (`MARKETING_VERSION`) for every App Store release. Pick the destination
-  "Any iOS Device (arm64)", Product → Archive, then Organizer → Distribute
-  App → App Store Connect. Automatic signing with team `524WC6G2D9` makes
-  the distribution certificate and profile. The build shows up in
-  TestFlight once processed. Archiving is not affected by the Xcode 27
-  simulator problem.
-- **Android:** raise `versionCode` (every upload) and `versionName` in
-  `android/app/build.gradle`. Copy `android/keystore.properties.example` to
-  `android/keystore.properties` (gitignored) and fill in the upload
-  keystore's password, then `cd android && ./gradlew bundleRelease` →
-  `android/app/build/outputs/bundle/release/app-release.aab`. Without the
-  file the release bundle is unsigned; debug builds don't use it. Android
-  Studio's Build → Generate Signed App Bundle works without the file
-  (output in the gitignored `android/app/release/`). Upload to internal
-  testing first: only builds installed from Play carry the Play App Signing
-  key that the Android OAuth client and `assetlinks.json` expect.
+- **iOS** uses automatic signing with team `524WC6G2D9`, which makes the
+  distribution certificate and profile at the first archive. Build
+  (`CURRENT_PROJECT_VERSION`) goes up for every upload, Version
+  (`MARKETING_VERSION`) for every App Store release. Archiving is not
+  affected by the Xcode 27 simulator problem.
+- **Android:** `android/app/build.gradle` signs release builds from the
+  gitignored `android/keystore.properties` (template
+  `keystore.properties.example`): the upload keystore
+  `~/keys/douzepoints-upload.jks`, alias `upload`. Without the file the
+  release bundle is unsigned; debug builds never use it. Android Studio's
+  Build → Generate Signed App Bundle works without the file (output in the
+  gitignored `android/app/release/`). `versionCode` goes up for every
+  upload. Only builds installed from Play carry the Play App Signing key
+  that the Android OAuth client and `assetlinks.json` expect, so test from
+  internal testing.
 
 **Debugging:** Safari → Develop → *device* → `localhost` (enable "Show
 features for web developers" first); Chrome → `chrome://inspect` for
@@ -307,6 +303,11 @@ renders that language; switching POSTs to `/api/locale` and calls
     "Saved to …". Android 9 and older fall back to the share sheet.
   - iOS: the share sheet on the file; its "Save Image" needs
     `NSPhotoLibraryAddUsageDescription` (Info.plist, set).
+- **Uploads** (`<input type="file">`): on iOS an image input offers Take
+  Photo next to the photo library, and taking a photo crashes the app
+  without `NSCameraUsageDescription` (Info.plist, set 2026-10-24). Audio and
+  font inputs only offer Choose File. Android's file chooser has no camera
+  option, so nothing is needed there.
 - **Sharing** (`shareFile()`, `shareLink()`): `@capacitor/filesystem`
   writes the file to `cache/exports/` (emptied before each new file) and
   `@capacitor/share` opens the system sheet on it. Android's WebView has no

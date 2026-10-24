@@ -121,8 +121,10 @@ follows, are that. Answers:
 
 **App Store, other fields.** Price free; availability without China
 mainland (no ICP filing); category Entertainment (secondary: Music);
-copyright line; support URL `https://douzepoints.app`; screenshots for the
-6.9″ iPhone and the 13″ iPad.
+copyright line; support URL `https://douzepoints.app/about` (Apple wants
+contact details at the support URL, and the home page only has them inside
+the Feedback modal); screenshots for the
+6.9″ iPhone and the 13″ iPad (§6).
 
 **Google Play.**
 
@@ -135,8 +137,8 @@ copyright line; support URL `https://douzepoints.app`; screenshots for the
 - App access: **All or some functionality is restricted** → the demo
   account (§5).
 - Category Entertainment; the 512 px icon is
-  `assets/store/play-store-icon-512.png`; the 1024×500 feature graphic and
-  phone screenshots are still to be made.
+  `assets/store/play-store-icon-512.png`; phone and tablet screenshots in
+  §6. The 1024×500 feature graphic is still to be made.
 
 **Trademarks (both stores).** Keep "Eurovision" out of the app name, the
 App Store subtitle and keyword field, and the start of Play's short
@@ -146,57 +148,150 @@ descriptively, with "Unofficial fan project, not affiliated with or
 endorsed by the EBU". The apps bundle official contest logos
 (`public/hostingCountryLogos/<Country><Year>.svg`) and themes modelled on
 broadcast graphics, so a guideline 5.2.1 (intellectual property) question
-from review is possible; keep them out of the first screenshots, and see
-the not-affiliated line in the review notes.
+from review is possible; see the not-affiliated line in the review notes.
+The screenshots (§6) show the 2026 theme and host logo anyway (owner's
+decision, 2026-10-24: the themes imitate the broadcasts, they don't copy
+them); if review objects, retake them with a custom theme.
 
 ## 5. Review notes and demo account
 
 **Demo account.** Email sign-in with a fixed code
 ([email-sign-in.md](email-sign-in.md) §6): set `EMAIL_REVIEW_ADDRESS` and
-a 6-digit `EMAIL_REVIEW_CODE` on the backend before submitting, keep them
-while any review is open, and unset them afterwards. No email is sent for
-that address. If a reviewer deletes the account, the next sign-in creates
-it again. Never commit the pair; this repository is public.
+a 6-digit `EMAIL_REVIEW_CODE` on the backend and leave them set. Play wants
+App access credentials "accessible at all times" and can review the app
+again whenever it likes, and Apple reviews every update. The backend takes
+one pair, so both stores get the same address and code and their reviewers
+share one account; if one of them deletes it, the next sign-in creates it
+again. No email is sent for that address. Never commit the pair; this
+repository is public. If it leaks, change the code on the backend and in
+both consoles.
 
 - App Store Connect → App Review Information → Sign-in required: user name
   = the review address, password = the code.
 - Play Console → App access → instructions: name "Demo account", the
   address and the code in the two fields, and under "Any other
-  information": *Tap Sign in on the Profile card, then Continue with email.
-  Enter the address, then the code. No email is sent for this address. The
-  simulator itself works without signing in.*
+  information": *Tap Sign in at the top of Event Setup, then Continue with
+  email. Enter the address, then the code. No email is sent for this
+  address. The simulator itself works without signing in.*
 
-**App Store review notes** (paste, then fill in the contact address):
+**App Store review notes.** The numbered sections answer what Apple's
+"Guideline 2.1 - Information Needed" request asks for (purpose, steps to
+the main features, external services, regional differences, regulated
+industries, a screen recording from a physical device), so review doesn't
+stop to ask. Paste into App Review Information → Notes (4,000 characters;
+this is about 2,900), and attach the recording in the same section; without
+one, drop section 8.
 
-> DouzePoints is an unofficial, fan-made simulator of Eurovision-style song
-> contest scoreboards. It is not affiliated with or endorsed by the
-> European Broadcasting Union.
->
-> No account is needed for the main feature. The Event Setup screen opens
-> at launch: pick a contest year in the dropdown at the top, tap Start,
-> then step through the jury and televote reveals until the winner is
-> shown.
->
-> Signing in is optional. It saves contests, themes and designs to an
-> account and lets users publish them. Tap Sign in on the Profile card in
-> Event Setup and choose Apple, Google or email. For the demo account,
-> choose Continue with email, enter the address from the sign-in fields,
-> then the code from the password field; no email is sent for it.
->
-> Account deletion: Profile → Edit Profile → Account → Delete account.
->
-> User-generated content appears under Public Contests, Public Themes,
-> Graphics → Explore and public fonts. Every item has Report in its "…"
-> menu, and other users' profiles have Report user and Block in theirs.
-> Blocking hides both users' content from each other. The Terms of Use,
-> linked under the sign-in buttons, forbid objectionable content. Reports
-> go to a moderation queue we check every day, and content or accounts
-> that break the terms are removed within 24 hours. Contact: <contact
-> address>.
->
-> The app uses the system share sheet and Save to Photos for the images it
-> generates, haptics during the vote reveal, and Sign in with Apple. It has
-> no in-app purchases, ads or tracking.
+**Screen recording.** On an iPhone, with the build being submitted (from
+TestFlight), Control Center's Screen Recording with the microphone off, and
+Do Not Disturb on. Two to three minutes, trimmed in Photos, following the
+notes' order:
+
+1. Start on the Home Screen and tap the app icon, which shows a real device.
+2. Event Setup: pick 2026 in the contest dropdown, tap Start.
+3. Give one jury's points by hand, then let presentation mode play the rest
+   of the jury, the televote and the winner.
+4. Share → the share sheet → Save Image (the photo library prompt appears
+   the first time).
+5. Sign in → Continue with email → the review address and code.
+6. Themes → Public Themes → an item's "…" → Report: show the dialog and
+   cancel. On a creator's profile, "…" → Report user and Block user, and
+   cancel those too; real reports and blocks would reach the queue and the
+   shared review account.
+7. Edit Profile → the profile picture → Take Photo: the camera prompt shows,
+   then cancel.
+8. Edit Profile → Account → Delete account → confirm. Last, because it ends
+   the session; the next sign-in creates the account again.
+
+```text
+DouzePoints is an unofficial, fan-made simulator of Eurovision-style song contest scoreboards. It is not affiliated with or endorsed by the European Broadcasting Union (EBU).
+
+1. PURPOSE
+Song contest fans use DouzePoints to replay or invent a contest's vote: pick a year's lineup or build their own, reveal the jury and televote points one by one, and share the results as images. The contests are simulations: there is no real voting, no prizes and no money involved.
+
+2. ACCESS AND MAIN FEATURES
+No account is needed for the main feature. The Event Setup screen opens at launch.
+* Pick a contest year in the dropdown at the top, then tap Start.
+* Step through the jury and televote reveals until the winner is shown.
+* Share (top bar) makes an image of the scoreboard.
+
+3. OPTIONAL SIGN-IN AND DEMO ACCOUNT
+Signing in saves contests, themes and designs to an account and lets users publish them.
+* Tap Sign in at the top of Event Setup and choose Apple, Google or email.
+* Demo account: choose "Continue with email", enter the user name from the sign-in information, then the password as the 6-digit code. No email is sent for this address. Sign in with Apple also works with any Apple ID.
+* Account deletion: tap the profile button at the top of Event Setup → Edit Profile → Account → Delete account.
+
+4. USER-GENERATED CONTENT AND MODERATION
+Users' public content appears under Themes → Public Themes, Contests → Public Contests, Graphics → Explore, and Public fonts in the theme editor's font picker.
+* Every item has Report in its "…" menu, and other users' profiles have Report user and Block user in theirs.
+* Blocking hides both users' content from each other.
+* The Terms of Use, linked under the sign-in buttons, forbid objectionable content.
+* Reports go to a moderation queue checked every day, and content or accounts that break the terms are removed within 24 hours.
+* Contact: sasha.shysh23@gmail.com
+
+5. EXTERNAL SERVICES
+* Our own API server, hosted on Railway behind Cloudflare: accounts, saved and published content, follows, likes, reports and error reports.
+* MongoDB Atlas: the API's database.
+* Cloudflare R2: uploaded images, sounds and fonts, and the app's signed web-content updates.
+* Cloudflare Email Service: sign-in code emails.
+* Sign in with Apple and Google Sign-In: authentication.
+No analytics, advertising, tracking, payment or AI services are used.
+
+6. REGIONAL DIFFERENCES AND REGULATED CONTENT
+The app works the same in every region; only the interface language follows the device (9 languages). It is not in a regulated industry and has no gambling, prizes, health or financial features.
+
+7. DEVICE FEATURES
+The system share sheet and Save to Photos for the images the app generates, the photo library or camera (Take Photo) for image uploads, haptics during the vote reveal, and Sign in with Apple. No location, contacts or tracking.
+
+8. SCREEN RECORDING
+A screen recording made on an iPhone is attached.
+```
+
+The external services are the processors in the privacy policy's
+section 4 (which calls Railway "our cloud hosting provider"); change both
+together.
 
 On Play, the App access instructions above are what the reviewers read;
 the release notes ("What's new") can stay short.
+
+## 6. Screenshots
+
+`yarn store-screenshots` (`scripts/store-screenshots.mjs`) renders them
+from the static export, so run `yarn build:native` first (and again after
+UI changes). Playwright WebKit renders the iOS sizes and Chromium the
+Android ones, in English, into `assets/store/screenshots/<device>/`
+(gitignored). Every run plays the same seeded contest: 2026, Grand Final
+only, 16 random juries, then one jury by hand with the 12 to the
+runner-up. `--device` and `--scene` take comma-separated names; `--url`
+uses a running server instead of `out/`.
+
+| Folder | Pixels | Upload to |
+|---|---|---|
+| `iphone` | 1320×2868 | App Store, iPhone 6.9″; smaller iPhones are scaled from it |
+| `ipad` | 2752×2064, landscape | App Store, iPad 13″: required, the app runs on iPad |
+| `android-phone` | 1242×2208 (9:16) | Play, phone screenshots |
+| `android-tablet` | 2560×1440 (16:9) | Play, 7-inch and 10-inch tablet screenshots (the same files) |
+
+Scenes, in upload order: `01-scoreboard` (a jury vote with the douze
+points hearts frozen mid-sweep), `02-winner` (the winner modal with
+confetti), `03-setup` (Event Setup).
+
+- A browser has no status bar or home indicator, so the script draws them
+  (9:41 on iOS, 12:00 on Android) and passes the devices' safe areas in
+  as `--safe-area-inset-*`. The home indicator / gesture handle turns dark
+  over light content, as on the devices.
+- Apple's spec page also names the 6.1″ "Dynamic Island (medium display)"
+  slot as required, filled by scaling down the 6.9″ screenshots. If App
+  Store Connect asks for it anyway, add a device with a 402×874 viewport at
+  3× (1206×2622).
+- Play needs 2 phone screenshots to publish and 4 at 1080 px or more to be
+  eligible for its recommendations. Tablet screenshots are optional;
+  tablets can install the app either way.
+- App Store screenshots belong to a version: once it is approved, they
+  only change with the next version's submission. Play's can change any
+  time (they are reviewed again).
+- The app removes the douze points hearts 3 s after they start
+  (`ANIMATION_DURATION`). The script fails if that happens before the
+  screenshot; run it again.
+- Adding a scene: a step in the script's Scenes section and its name in
+  `SCENES`.
