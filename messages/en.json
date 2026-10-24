@@ -83,7 +83,10 @@
       "label": "Beta",
       "hint": "New and still changing. Tell us what’s missing with the feedback button.",
       "hintFeedback": "New and still changing · click to send feedback"
-    }
+    },
+    "savedTo": "Saved to {folder}",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfUse": "Terms of Use"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -105,7 +108,6 @@
       "errorImageTooLarge": "Image is too large. Max size is {maxSize}MB. Please compress it or upload a smaller image."
     },
     "invalidInput": "Invalid input",
-    "pleaseSelectValidImageFile": "Please select a valid image file.",
     "fontUpload": {
       "unsupportedType": "“{name}” is not a supported font file. Use .woff2, .woff, .ttf or .otf.",
       "tooLarge": "“{name}” is too large. Max size is {maxMb} MB.",
@@ -560,10 +562,12 @@
       "optSplitRandom": "Fully random",
       "optSplitRandomDesc": "A pot can land mostly in one semi-final",
       "cuSemisTitle": "Semi-finals",
-      "cuSemis": "Semi-finals in the draw",
+      "cuSemis": "Stages in the draw",
       "optAllSemis": "All semi-finals",
+      "optFirstRound": "First round only",
+      "optFirstRoundDesc": "{stages}. Stages that get qualifiers from another round are left out.",
       "optChooseSemis": "Choose",
-      "optChooseSemisDesc": "For contests with three or more semi-finals",
+      "optChooseSemisDesc": "Pick the stages to draw into",
       "cuSizes": "Semi sizes",
       "optBalanced": "Balanced",
       "optBalancedDesc": "Same size, or one apart",
@@ -732,6 +736,37 @@
       "title": "Profile",
       "description": "Your profile and followers",
       "continueWithGoogle": "Continue with Google",
+      "continueWithApple": "Continue with Apple",
+      "continueWithEmail": "Continue with email",
+      "emailSignIn": {
+        "title": "Sign in with email",
+        "emailBody": "We'll email you a 6-digit code. No password needed.",
+        "emailLabel": "Email address",
+        "emailPlaceholder": "you@example.com",
+        "sendCode": "Send code",
+        "codeTitle": "Check your email",
+        "codeBody": "Enter the 6-digit code we sent to <b>{email}</b>.",
+        "codeLabel": "Code",
+        "signIn": "Sign in",
+        "resend": "Send a new code",
+        "resendIn": "Send a new code in {seconds}s",
+        "codeResent": "We've sent you a new code.",
+        "changeEmail": "Use a different email",
+        "spamHint": "Can't find it? Check your spam folder. The code works for 10 minutes.",
+        "errors": {
+          "invalidEmail": "Enter a valid email address.",
+          "tooManyRequests": "Too many attempts. Try again later.",
+          "tooManyRequestsWait": "Too many attempts. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+          "undeliverable": "We couldn't send an email to this address. Check it and try again.",
+          "sendFailed": "We couldn't send the code. Try again in a few minutes.",
+          "invalidCode": "That code isn't right.",
+          "invalidCodeTriesLeft": "That code isn't right. {count, plural, one {# try} other {# tries}} left.",
+          "tooManyAttempts": "Too many wrong codes. Send a new one.",
+          "codeExpired": "This code has expired. Send a new one.",
+          "network": "No connection. Check your internet and try again.",
+          "unknown": "Something went wrong. Try again."
+        }
+      },
       "editProfile": "Edit Profile",
       "authDescription": "Authenticate to be able to create a profile, use custom countries, and more.",
       "loggingOut": "Logging out...",
@@ -753,7 +788,8 @@
       "followedUser": "Followed user!",
       "unfollowedUser": "Unfollowed user!",
       "followingCount": "{count} following",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "legalAgreement": "By continuing, you agree to the <terms>Terms of Use</terms> and confirm that you have read the <privacy>Privacy Policy</privacy>."
     },
     "contentType": {
       "all": "All",
@@ -1413,7 +1449,7 @@
       },
       "uiPreferences": {
         "title": "UI Preferences",
-        "content": "Customize the look and feel in Settings → UI Preferences:<list><item><strong>Flag styles</strong> — switch to heart icons, minimalistic round/square flags, or keep default rectangular ones</item><item><strong>Always show rankings</strong> — keep position numbers visible at all times, plus a rank-change indicator showing movement up or down</item><item><strong>Popups</strong> — toggle the qualifiers popup, winner announcement, and confetti independently</item><item><strong>Fullscreen mode</strong> — enter fullscreen for a fully immersive scoreboard view</item><item><strong>Jury voting progress bar</strong> — shows how many countries have voted so far in the current jury round</item><item><strong>Custom background image</strong> — upload your own image to replace the theme's background</item><item><strong>Override theme font</strong> — lock in a specific font regardless of which theme is active</item><item><strong>Audio</strong> — set separate volume levels for sound effects and background music, or disable all theme audio at once</item><item><strong>Winter effects</strong> — enable falling snow with an adjustable intensity slider</item><item><strong>Enable winner reveal</strong> — the last televote is revealed with special animation (ESC 2026 style)</item></list>"
+        "content": "Customize the look and feel in Settings → UI Preferences:<list><item><strong>Flag styles</strong> — switch to heart icons, minimalistic round/square flags, or keep default rectangular ones</item><item><strong>Always show rankings</strong> — keep position numbers visible at all times, plus a rank-change indicator showing movement up or down</item><item><strong>Popups</strong> — toggle the qualifiers popup, winner announcement, and confetti independently</item><item><strong>Fullscreen mode</strong> — enter fullscreen for a fully immersive scoreboard view</item><item><strong>Jury voting progress bar</strong> — shows how many countries have voted so far in the current jury round</item><item><strong>Override theme font</strong> — lock in a specific font regardless of which theme is active</item><item><strong>Audio</strong> — set separate volume levels for sound effects and background music, or disable all theme audio at once</item><item><strong>Winter effects</strong> — enable falling snow with an adjustable intensity slider</item><item><strong>Enable winner reveal</strong> — the last televote is revealed with special animation (ESC 2026 style)</item></list>"
       },
       "confirmations": {
         "title": "Confirmation Popups",
@@ -1463,10 +1499,6 @@
         "suppressedDialogs": "Suppressed dialogs",
         "reset": "Reset"
       },
-      "upload": {
-        "title": "Drop an image or click to browse",
-        "subtext": "PNG, JPG or WEBP · stored on this device."
-      },
       "danger": {
         "confirm": "Yes, reset everything"
       },
@@ -1477,10 +1509,10 @@
         "targetStages": "Show which stage each qualifier advances to.",
         "blurModal": "Blur the scoreboard behind open modals for extra focus.",
         "overrideFont": "Ignore each theme’s fonts (including uploaded ones) and always use the font you pick below, on both the interface and the scoreboard.",
-        "customBg": "Use your own background image. Stored only on this device — not synced to your account.",
         "winter": "Add falling snow and festive touches across the app.",
         "finalReveal": "Reveal the final televote scores one country at a time with a dramatic animation.",
-        "predictableReveal": "Reveal televote scores in a smooth, deterministic order with no random suspense."
+        "predictableReveal": "Reveal televote scores in a smooth, deterministic order with no random suspense.",
+        "haptics": "Vibrate on 12 points, qualifier reveals and the winner."
       }
     },
     "relations": {
@@ -1608,7 +1640,6 @@
       "autoStartPresentationTooltip": "When enabled, the presentation will start automatically after the voting starts."
     },
     "ui": {
-      "useCustomBackgroundImage": "Use custom background image",
       "dragAndDropToUpload": "Drag and drop or click to upload",
       "useHeartIconsForFlags": "Use heart icons for flags",
       "alwaysShowRankings": "Always show rankings",
@@ -1622,10 +1653,10 @@
       "slow": "Slow",
       "fast": "Fast",
       "finalRevealLinearAnimation": "Smooth, predictable reveal animation (no randomness)",
+      "enableHaptics": "Haptic feedback",
       "enableFullscreenMode": "Enable fullscreen mode",
       "warnBeforeManuallyAssigningTelevotePoints": "Warn before manually assigning televote points",
       "showJuryVotingProgressBar": "Show jury voting progress bar",
-      "imageSizeIsPrettyLarge": "Image size is pretty large ({size}MB). This can slow down the simulation, so you might want to compress it or use a smaller image. Do you want to continue with this image?",
       "language": "Language",
       "enableMinimalisticFlags": "Minimalistic round and square flags",
       "enableWinterEffects": "Enable winter effects",
@@ -2296,25 +2327,7 @@
         "useLive": "Use the live scoreboard",
         "useManual": "Type a manual list"
       },
-      "cancel": "Cancel",
-      "report": {
-        "title": "Report “{name}”?",
-        "body": "Tell us what is wrong with this template. Reports are reviewed by the DouzePoints team.",
-        "reason": "Reason",
-        "reasons": {
-          "spam": "Spam or misleading",
-          "offensive": "Offensive content",
-          "copyright": "Copyright or trademark",
-          "other": "Something else"
-        },
-        "details": "Details (optional)",
-        "detailsPlaceholder": "Anything that helps us understand the problem",
-        "send": "Send report",
-        "cancel": "Cancel",
-        "thanks": "Thanks, the report was sent.",
-        "already": "You already reported this template.",
-        "failed": "The report couldn’t be sent."
-      }
+      "cancel": "Cancel"
     },
     "fields": {
       "columns": "Columns",
@@ -2395,5 +2408,48 @@
       "editFields": "Edit fields",
       "hideFields": "Hide fields"
     }
+  },
+  "moderation": {
+    "report": "Report",
+    "reportUser": "Report user",
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "unblock": "Unblock",
+    "reportTitle": "Report “{name}”",
+    "reportUserTitle": "Report {name}",
+    "reportBody": "Tell us what’s wrong. The DouzePoints team reviews every report and removes content that breaks the Terms of Use.",
+    "reason": "Reason",
+    "reasons": {
+      "spam": "Spam or misleading",
+      "offensive": "Offensive or abusive",
+      "copyright": "Copyright or trademark",
+      "other": "Something else"
+    },
+    "details": "Details (optional)",
+    "detailsPlaceholder": "Anything that helps us understand the problem",
+    "alsoBlock": "Also block {name}",
+    "send": "Send report",
+    "thanks": "Thanks, the report was sent.",
+    "already": "You already reported this.",
+    "failed": "The report couldn’t be sent.",
+    "signInToReport": "Sign in to report content or users.",
+    "blockConfirmTitle": "Block {name}?",
+    "blockConfirmDescription": "You won’t see each other’s themes, contests, designs or fonts in community lists, search or profiles, and neither of you will be able to follow the other. You can unblock them in Edit Profile.",
+    "blocked": "{name} is blocked.",
+    "unblocked": "{name} is unblocked.",
+    "blockFailed": "Couldn’t block this user.",
+    "unblockFailed": "Couldn’t unblock this user.",
+    "blockedProfile": "You blocked this user, so their content is hidden.",
+    "blockedUsers": "Blocked users",
+    "blockedUsersDescription": "You and the people you block don’t see each other’s content.",
+    "noBlockedUsers": "You haven’t blocked anyone.",
+    "manageBlocked": "Manage",
+    "account": "Account",
+    "deleteAccount": "Delete account",
+    "deleteAccountDescription": "Permanently delete your profile and everything saved to your account.",
+    "deleteAccountConfirmTitle": "Delete your account?",
+    "deleteAccountConfirmDescription": "Your profile, contests, themes, designs, fonts and custom entries will be deleted, along with your likes, saves, follows and blocks. This can’t be undone. Settings and drafts kept only on this device stay.",
+    "accountDeleted": "Your account was deleted.",
+    "deleteAccountFailed": "Your account couldn’t be deleted. Please try again."
   }
 }

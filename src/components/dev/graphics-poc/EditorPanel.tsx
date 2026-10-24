@@ -536,7 +536,7 @@ const EditorPanel: React.FC = () => {
               type,
               w: 200,
               h: 200,
-              src: '/img/favicon-128x128.png',
+              src: '/img/brand/mark.png',
               fit: 'contain',
               radius: 0,
               mask: 'none',

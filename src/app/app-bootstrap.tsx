@@ -7,15 +7,23 @@ import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
+import { useSetAppLocale } from './AppIntlProvider';
+
 import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
-import { useShareLinks } from '@/hooks/useShareLinks';
+import { openShareLink, useShareLinks } from '@/hooks/useShareLinks';
 import { useStatusBarThemeColor } from '@/hooks/useStatusBarThemeColor';
 import { useThemeSetup } from '@/hooks/useThemeSetup';
+import { normalizeLocale } from '@/i18n/catalog';
+import { getStoredLocale } from '@/i18n/nativeLocale';
+import { installAppLinkHandler } from '@/native/appLinks';
+import { installBackButtonHandler } from '@/native/backButton';
+import { liveUpdateBoot, startLiveUpdateChecks } from '@/native/liveUpdate';
+import { IS_NATIVE_APP } from '@/native/platform';
 import { useCountriesStore } from '@/state/countriesStore';
-import { useAuthStore } from '@/state/useAuthStore';
+import { NATIVE_LOGIN_EVENT, useAuthStore } from '@/state/useAuthStore';
 
 // Dev-only palette tuning panel (`?palette`, see /dev/palette-lab). The branch
 // is constant-false in production builds, so the chunk is compiled out.
@@ -40,6 +48,7 @@ export default function AppBootstrap() {
     (state) => state.setInitialCountriesForYear,
   );
   const router = useRouter();
+  const setAppLocale = useSetAppLocale();
   const hasSyncedPreferredLocaleRef = useRef(false);
 
   // Initialize countries once on first load
@@ -58,10 +67,25 @@ export default function AppBootstrap() {
 
   useEffect(() => {
     const handleLogin = async () => {
+      // A launch that switches to a downloaded live update reloads the
+      // WebView; a session restore cut off mid-rotation would lose the new
+      // refresh token.
+      if (IS_NATIVE_APP) await liveUpdateBoot();
+
       const url = new URL(window.location.href);
 
       if (url.searchParams.has('provider')) {
         window.history.replaceState({}, '', url.origin + url.pathname);
+
+        // The backend redirects with `error` when the provider's answer
+        // failed verification; any earlier session still stands.
+        if (url.searchParams.has('error')) {
+          toast(t('error'), { type: 'error' });
+          handlePostLogin();
+
+          return;
+        }
+
         const success = await handlePostLogin(true);
 
         if (success) {
@@ -84,6 +108,31 @@ export default function AppBootstrap() {
   }, [handlePostLogin, t]);
 
   useEffect(() => {
+    if (!IS_NATIVE_APP) return;
+
+    void installBackButtonHandler();
+    void installAppLinkHandler(openShareLink);
+    startLiveUpdateChecks();
+  }, []);
+
+  // Native apps sign in without a redirect; the store reports the outcome.
+  useEffect(() => {
+    if (!IS_NATIVE_APP) return undefined;
+
+    const onNativeLogin = (event: Event) => {
+      const { success } = (event as CustomEvent<{ success: boolean }>).detail;
+
+      toast(t(success ? 'success' : 'error'), {
+        type: success ? 'success' : 'error',
+      });
+    };
+
+    window.addEventListener(NATIVE_LOGIN_EVENT, onNativeLogin);
+
+    return () => window.removeEventListener(NATIVE_LOGIN_EVENT, onNativeLogin);
+  }, [t]);
+
+  useEffect(() => {
     const preferred = user?.preferredLocale;
 
     // Only sync once per session and only when there's no explicit locale
@@ -93,6 +142,17 @@ export default function AppBootstrap() {
     }
 
     if (typeof document === 'undefined') return;
+
+    // Native: same rule, with the saved in-app choice standing in for the
+    // cookie (IntlProvider writes a cookie on every render there, so its
+    // presence means nothing).
+    if (IS_NATIVE_APP) {
+      hasSyncedPreferredLocaleRef.current = true;
+
+      if (!getStoredLocale()) setAppLocale(normalizeLocale(preferred));
+
+      return;
+    }
 
     const hasLocaleCookie = document.cookie
       .split(';')
@@ -120,7 +180,7 @@ export default function AppBootstrap() {
         console.error('Failed to sync preferred locale', error);
       }
     })();
-  }, [user?.preferredLocale, router]);
+  }, [user?.preferredLocale, router, setAppLocale]);
 
   return (
     <>

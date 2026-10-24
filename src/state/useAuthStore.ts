@@ -14,17 +14,44 @@ import {
 } from '@/api/client';
 import { queryClient } from '@/api/queryClient';
 import { API_BASE_URL } from '@/config';
+import { IS_NATIVE_APP } from '@/native/platform';
 import type { Profile } from '@/types/profile';
+
+/**
+ * Fired after a native-app sign-in attempt that got past the account sheet
+ * (AppBootstrap shows the toast). The website reports its result through the
+ * `?provider=google` / `?provider=apple` redirect instead.
+ */
+export const NATIVE_LOGIN_EVENT = 'dp:native-login';
+
+export type AuthProvider = 'google' | 'apple';
+
+const nativeAuth = () => import('@/native/nativeAuth');
 
 export interface AuthState {
   user: Profile | null;
   accessToken: string | null;
   isBusy: boolean;
-  login: () => void;
+  /** Native apps: the account sheet / token exchange is in progress. */
+  isSigningIn: boolean;
+  login: (provider: AuthProvider) => void;
+  /**
+   * Email sign-in, step 2 (`EmailSignInModal`): exchanges the emailed code
+   * for a session, creating the account on first use. Rejects with the
+   * server's error for a wrong or expired code; resolves false if the
+   * session couldn't be loaded after that.
+   */
+  loginWithEmailCode: (
+    email: string,
+    code: string,
+    locale: string,
+  ) => Promise<boolean>;
   handlePostLogin: (force?: boolean) => Promise<boolean>;
   refresh: () => Promise<string | undefined>;
   fetchMe: () => Promise<void>;
   logout: () => Promise<void>;
+  /** Deletes the account and all of its data on the server, then signs out. */
+  deleteAccount: () => Promise<void>;
 }
 
 type LoginStep = 'refresh' | 'me';
@@ -73,11 +100,51 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       isBusy: false,
-      login: () => {
-        window.location.href = `${API_BASE_URL}/auth/google`;
+      isSigningIn: false,
+      login: (provider) => {
+        if (IS_NATIVE_APP) {
+          void loginNatively(provider);
+
+          return;
+        }
+        window.location.href = `${API_BASE_URL}/auth/${provider}`;
+      },
+      loginWithEmailCode: async (email, code, locale) => {
+        if (IS_NATIVE_APP) {
+          // The apps keep the refresh token in the Keychain / Keystore, as
+          // after a native Google or Apple sign-in.
+          const { data } = await api.post('/auth/email/verify', {
+            email,
+            code,
+            locale,
+            native: true,
+          });
+          const { setRefreshToken } = await nativeAuth();
+
+          await setRefreshToken(data.refreshToken);
+          set({ accessToken: data.accessToken });
+        } else {
+          // The response sets the website's refresh cookie.
+          const { data } = await api.post('/auth/email/verify', {
+            email,
+            code,
+            locale,
+          });
+
+          set({ accessToken: data.accessToken });
+        }
+
+        return get().handlePostLogin(true);
       },
       handlePostLogin: async (force?: boolean) => {
-        if (!get().user && !force) return false;
+        // Native: the stored refresh token, not the persisted user, says
+        // whether there is a session — an offline launch clears `user`, and
+        // the next online launch should still restore it.
+        const hasSession = IS_NATIVE_APP
+          ? !!(await (await nativeAuth()).getRefreshToken())
+          : !!get().user;
+
+        if (!hasSession && !force) return false;
 
         let success = false;
         let step: LoginStep = 'refresh';
@@ -127,8 +194,38 @@ export const useAuthStore = create<AuthState>()(
         return success;
       },
       refresh: async () => {
-        // Always attempt; backend verifies cookie and returns 401 if not present
         try {
+          if (IS_NATIVE_APP) {
+            const { getRefreshToken, setRefreshToken, clearRefreshToken } =
+              await nativeAuth();
+            const refreshToken = await getRefreshToken();
+
+            if (!refreshToken) throw new Error('No refresh token');
+
+            try {
+              // The bearer header replaces the access token the client would
+              // otherwise attach; a rotated token comes back in the body.
+              const { data } = await api.post(
+                '/auth/refresh',
+                {},
+                { headers: { authorization: `Bearer ${refreshToken}` } },
+              );
+
+              if (data.refreshToken) await setRefreshToken(data.refreshToken);
+              set({ accessToken: data.accessToken });
+
+              return data.accessToken as string;
+            } catch (e) {
+              // Only a rejected token ends the session for good; offline
+              // launches keep it for the next one.
+              if (e instanceof ApiError && e.response.status === 401) {
+                await clearRefreshToken();
+              }
+              throw e;
+            }
+          }
+
+          // Always attempt; backend verifies cookie and returns 401 if not present
           const { data } = await api.post('/auth/refresh', {});
 
           set({ accessToken: data.accessToken });
@@ -155,24 +252,47 @@ export const useAuthStore = create<AuthState>()(
         if (get().isBusy) return;
         set({ isBusy: true });
         try {
-          await api.post('/auth/logout');
+          if (IS_NATIVE_APP) {
+            const { getRefreshToken, clearRefreshToken, signOutOfGoogle } =
+              await nativeAuth();
+            const refreshToken = await getRefreshToken();
 
-          // Clear user data from React Query cache
-          clearUserData(queryClient);
+            try {
+              await api.post(
+                '/auth/logout',
+                undefined,
+                refreshToken
+                  ? { headers: { authorization: `Bearer ${refreshToken}` } }
+                  : undefined,
+              );
+            } finally {
+              await clearRefreshToken();
+              void signOutOfGoogle();
+            }
+          } else {
+            await api.post('/auth/logout');
+          }
 
-          // Clear auth state
-          set({ user: null, accessToken: null });
+          clearSignedInState();
+        } finally {
+          set({ isBusy: false });
+        }
+      },
+      deleteAccount: async () => {
+        if (get().isBusy) return;
+        set({ isBusy: true });
+        try {
+          // Also ends every session on the server, so there is nothing to log out.
+          await api.delete('/account');
 
-          // Clear user-specific data from Zustand stores
-          useCountriesStore.setState({ customCountries: [] });
+          if (IS_NATIVE_APP) {
+            const { clearRefreshToken, signOutOfGoogle } = await nativeAuth();
 
-          // Custom blocs are account-only, so drop them; the rest of the
-          // diaspora settings (custom pairs, toggles, strength) stay and keep
-          // persisting locally.
-          useGeneralStore.getState().setDiaspora({ customGroups: [] });
+            await clearRefreshToken();
+            void signOutOfGoogle();
+          }
 
-          // Add more store cleanups here as needed in the future:
-          // e.g., useSavedEventsStore.setState({ savedEvents: [] });
+          clearSignedInState();
         } finally {
           set({ isBusy: false });
         }
@@ -189,3 +309,67 @@ export const useAuthStore = create<AuthState>()(
     },
   ),
 );
+
+/** Drops the signed-in user's data from this device after logout or deletion. */
+function clearSignedInState() {
+  // Clear user data from React Query cache
+  clearUserData(queryClient);
+
+  // Clear auth state
+  useAuthStore.setState({ user: null, accessToken: null });
+
+  // Clear user-specific data from Zustand stores
+  useCountriesStore.setState({ customCountries: [] });
+
+  // Custom blocs are account-only, so drop them; the rest of the diaspora
+  // settings (custom pairs, toggles, strength) stay and keep persisting
+  // locally.
+  useGeneralStore.getState().setDiaspora({ customGroups: [] });
+
+  // Add more store cleanups here as needed in the future:
+  // e.g., useSavedEventsStore.setState({ savedEvents: [] });
+}
+
+/**
+ * Native sign-in: the provider's sheet → its token → our token pair → the
+ * same post-login path the website's redirect takes.
+ */
+async function loginNatively(provider: AuthProvider) {
+  if (useAuthStore.getState().isSigningIn) return;
+  useAuthStore.setState({ isSigningIn: true });
+
+  let success: boolean | null = null;
+
+  try {
+    const { getGoogleIdToken, getAppleCredential, setRefreshToken } =
+      await nativeAuth();
+    let data: { accessToken: string; refreshToken: string };
+
+    if (provider === 'apple') {
+      const credential = await getAppleCredential();
+
+      if (!credential) return; // the user dismissed the sheet
+      ({ data } = await api.post('/auth/apple/native', credential));
+    } else {
+      const idToken = await getGoogleIdToken();
+
+      if (!idToken) return; // the user dismissed the account sheet
+      ({ data } = await api.post('/auth/google/native', { idToken }));
+    }
+
+    await setRefreshToken(data.refreshToken);
+    useAuthStore.setState({ accessToken: data.accessToken });
+    success = await useAuthStore.getState().handlePostLogin(true);
+  } catch (error) {
+    console.error(`Native ${provider} sign-in failed`, error);
+    success = false;
+  } finally {
+    useAuthStore.setState({ isSigningIn: false });
+
+    if (success !== null) {
+      window.dispatchEvent(
+        new CustomEvent(NATIVE_LOGIN_EVENT, { detail: { success } }),
+      );
+    }
+  }
+}

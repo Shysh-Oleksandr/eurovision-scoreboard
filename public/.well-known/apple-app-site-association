@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["524WC6G2D9.app.douzepoints"],
+        "components": [
+          { "/": "/", "?": { "profile": "?*" }, "comment": "Shared profile" },
+          { "/": "/", "?": { "contest": "?*" }, "comment": "Shared contest" },
+          { "/": "/", "?": { "theme": "?*" }, "comment": "Shared theme" },
+          { "/": "/", "?": { "design": "?*" }, "comment": "Shared design" }
+        ]
+      }
+    ]
+  }
+}

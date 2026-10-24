@@ -7,7 +7,12 @@ import { queryKeys } from './queryKeys';
  * Content reports (`POST /reports`, `GET /reports/me/state`). One report per
  * user and target; a repeat returns `alreadyReported`.
  */
-export type ReportTargetType = 'design' | 'theme' | 'contest';
+export type ReportTargetType =
+  | 'design'
+  | 'theme'
+  | 'contest'
+  | 'font'
+  | 'profile';
 export type ReportReason = 'spam' | 'offensive' | 'copyright' | 'other';
 export const REPORT_REASONS: ReportReason[] = [
   'spam',

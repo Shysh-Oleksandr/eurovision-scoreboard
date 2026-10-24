@@ -7,6 +7,8 @@ import { ExportEngine, exportNode } from '../export/exportNode';
 
 import { ExportFormat, ExportScale, useEditorStore } from './editorStore';
 
+import { saveFile, shareFile } from '@/helpers/fileActions';
+
 export interface ExportResultState {
   dataUrl: string;
   width: number;
@@ -40,6 +42,7 @@ export function useEditorExport(
   designNodeRef: React.RefObject<HTMLDivElement | null>,
 ) {
   const t = useTranslations('graphics.export');
+  const tc = useTranslations('common');
   const [status, setStatus] = useState<ExportStatus>({ kind: 'idle' });
   const engineRef = useRef<ExportEngine>('snapdom');
   const busyRef = useRef(false);
@@ -109,40 +112,38 @@ export function useEditorExport(
   );
 
   const download = useCallback(
-    (result: ExportResultState) => {
-      const link = document.createElement('a');
+    async (result: ExportResultState) => {
       const name = fileName(result);
 
-      link.download = name;
-      link.href = result.dataUrl;
-      link.click();
-      toast.success(t('toast.downloaded', { name }));
+      try {
+        const saved = await saveFile(result.dataUrl, name);
+
+        if (saved.kind === 'downloaded') {
+          toast.success(t('toast.downloaded', { name }));
+        } else if (saved.kind === 'saved') {
+          toast.success(tc('savedTo', { folder: saved.folder }));
+        }
+      } catch (err) {
+        console.error('Save failed:', err);
+        toast.error(t('toast.shareFailed'));
+      }
     },
-    [fileName, t],
+    [fileName, t, tc],
   );
 
   const share = useCallback(
     async (result: ExportResultState) => {
       try {
-        const blob = await dataUrlToBlob(result.dataUrl);
-        const file = new File([blob], fileName(result), {
-          type: blob.type || 'image/png',
-        });
-        const shareData = {
+        const shared = await shareFile({
+          data: result.dataUrl,
+          fileName: fileName(result),
           title: useEditorStore.getState().design.name,
-          files: [file],
-        };
+        });
 
-        if (navigator.canShare && navigator.canShare(shareData)) {
-          await navigator.share(shareData);
-        } else {
-          toast.error(t('toast.shareUnsupported'));
-        }
-      } catch (err: any) {
-        if (err?.name !== 'AbortError') {
-          console.error('Share failed:', err);
-          toast.error(t('toast.shareFailed'));
-        }
+        if (shared === 'unsupported') toast.error(t('toast.shareUnsupported'));
+      } catch (err) {
+        console.error('Share failed:', err);
+        toast.error(t('toast.shareFailed'));
       }
     },
     [fileName, t],

@@ -21,8 +21,10 @@ import { IconButton } from '../ui/controls';
 import { ExportResultState, ExportStatus } from '../useEditorExport';
 
 import Button from '@/components/common/Button';
+import SignInButtons from '@/components/common/SignInButtons';
 import { cn } from '@/helpers/utils';
-import { useAuthStore } from '@/state/useAuthStore';
+import { useBackHandler } from '@/hooks/useBackHandler';
+import { IS_NATIVE_APP } from '@/native/platform';
 
 /** Scrim + card; Escape and scrim clicks close it (unless `locked`). */
 export const Dialog: React.FC<{
@@ -33,6 +35,9 @@ export const Dialog: React.FC<{
   role?: 'dialog' | 'alertdialog' | 'status';
   children: React.ReactNode;
 }> = ({ onClose, wide, busy, ariaLabelledBy, role = 'dialog', children }) => {
+  // A locked dialog (no `onClose`) swallows Android back.
+  useBackHandler(true, () => onClose?.());
+
   useEffect(() => {
     if (!onClose) return undefined;
     const onKey = (e: KeyboardEvent) => {
@@ -167,13 +172,16 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
           Icon={<Share2 className="size-[18px]" />}
           onClick={() => onShare(result)}
         />
-        <Button
-          variant="surface"
-          size="lg"
-          title={t('copyImage')}
-          Icon={<Copy className="size-[18px]" />}
-          onClick={() => onCopy(result)}
-        />
+        {/* The apps' share sheet already offers Copy. */}
+        {!IS_NATIVE_APP && (
+          <Button
+            variant="surface"
+            size="lg"
+            title={t('copyImage')}
+            Icon={<Copy className="size-[18px]" />}
+            onClick={() => onCopy(result)}
+          />
+        )}
       </div>
       <span className="sr-only" aria-live="polite">
         {t('generated')}
@@ -253,13 +261,12 @@ export const UnsavedDialog: React.FC<{
   );
 };
 
-/** "Sign in to publish templates" (handoff §9); `Sign in` starts Google OAuth. */
+/** "Sign in to publish templates" (handoff §9), with the provider buttons. */
 export const SignInDialog: React.FC<{
   reason: 'publish' | 'cloud' | null;
   onClose: () => void;
 }> = ({ reason, onClose }) => {
   const t = useTranslations('graphics.dialogs.signIn');
-  const login = useAuthStore((s) => s.login);
 
   if (!reason) return null;
 
@@ -272,15 +279,8 @@ export const SignInDialog: React.FC<{
         {t(reason === 'publish' ? 'titlePublish' : 'titleCloud')}
       </h3>
       <p>{t(reason === 'publish' ? 'bodyPublish' : 'bodyCloud')}</p>
+      <SignInButtons size="md" />
       <div className="gfx-dlg-row">
-        <Button
-          variant="cta"
-          size="md"
-          Icon={<LogIn className="size-[15px]" />}
-          onClick={login}
-        >
-          {t('signIn')}
-        </Button>
         <Button variant="surface" size="md" onClick={onClose}>
           {t('keepLocal')}
         </Button>

@@ -83,7 +83,10 @@
       "label": "Beta",
       "hint": "Nowość, wciąż się zmienia. Napisz nam, czego brakuje, przyciskiem opinii.",
       "hintFeedback": "Nowość, wciąż się zmienia · kliknij, aby wysłać opinię"
-    }
+    },
+    "savedTo": "Zapisano w {folder}",
+    "privacyPolicy": "Polityka prywatności",
+    "termsOfUse": "Warunki korzystania"
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",
@@ -105,7 +108,6 @@
       "errorImageTooLarge": "Obraz jest za duży. Maksymalny rozmiar to {maxSize} MB. Proszę skompresować lub przesłać mniejszy obraz."
     },
     "invalidInput": "Nieprawidłowe dane wejściowe",
-    "pleaseSelectValidImageFile": "Proszę wybrać poprawny plik obrazu.",
     "fontUpload": {
       "unsupportedType": "„{name}” nie jest obsługiwanym plikiem czcionki. Użyj .woff2, .woff, .ttf lub .otf.",
       "tooLarge": "„{name}” jest za duży. Maksymalny rozmiar to {maxMb} MB.",
@@ -560,10 +562,12 @@
       "optSplitRandom": "Całkowicie losowo",
       "optSplitRandomDesc": "Koszyk może trafić niemal w całości do jednego półfinału",
       "cuSemisTitle": "Półfinały",
-      "cuSemis": "Półfinały w losowaniu",
+      "cuSemis": "Etapy w losowaniu",
       "optAllSemis": "Wszystkie półfinały",
+      "optFirstRound": "Tylko pierwsza runda",
+      "optFirstRoundDesc": "{stages}. Etapy, do których awansują kraje z innej rundy, są pomijane.",
       "optChooseSemis": "Wybierz",
-      "optChooseSemisDesc": "Dla konkursów z trzema lub więcej półfinałami",
+      "optChooseSemisDesc": "Wybierz etapy losowania",
       "cuSizes": "Rozmiary półfinałów",
       "optBalanced": "Zrównoważone",
       "optBalancedDesc": "Taki sam rozmiar lub różnica o jeden",
@@ -732,6 +736,37 @@
       "title": "Profil",
       "description": "Twój profil i obserwujący",
       "continueWithGoogle": "Kontynuuj przez Google",
+      "continueWithApple": "Kontynuuj z Apple",
+      "continueWithEmail": "Kontynuuj z e-mailem",
+      "emailSignIn": {
+        "title": "Zaloguj się e-mailem",
+        "emailBody": "Wyślemy Ci e-mailem 6-cyfrowy kod. Hasło nie jest potrzebne.",
+        "emailLabel": "Adres e-mail",
+        "emailPlaceholder": "ty@przyklad.pl",
+        "sendCode": "Wyślij kod",
+        "codeTitle": "Sprawdź skrzynkę",
+        "codeBody": "Wpisz 6-cyfrowy kod wysłany na adres <b>{email}</b>.",
+        "codeLabel": "Kod",
+        "signIn": "Zaloguj się",
+        "resend": "Wyślij nowy kod",
+        "resendIn": "Nowy kod za {seconds} s",
+        "codeResent": "Wysłaliśmy Ci nowy kod.",
+        "changeEmail": "Użyj innego adresu",
+        "spamHint": "Nie widzisz wiadomości? Sprawdź folder spam. Kod jest ważny przez 10 minut.",
+        "errors": {
+          "invalidEmail": "Wpisz prawidłowy adres e-mail.",
+          "tooManyRequests": "Zbyt wiele prób. Spróbuj później.",
+          "tooManyRequestsWait": "Zbyt wiele prób. Spróbuj ponownie za {minutes, plural, one {# minutę} few {# minuty} many {# minut} other {# minuty}}.",
+          "undeliverable": "Nie udało się wysłać e-maila na ten adres. Sprawdź go i spróbuj ponownie.",
+          "sendFailed": "Nie udało się wysłać kodu. Spróbuj ponownie za kilka minut.",
+          "invalidCode": "Nieprawidłowy kod.",
+          "invalidCodeTriesLeft": "Nieprawidłowy kod. {count, plural, one {Została # próba} few {Zostały # próby} many {Zostało # prób} other {Zostało # próby}}.",
+          "tooManyAttempts": "Zbyt wiele błędnych kodów. Poproś o nowy.",
+          "codeExpired": "Ten kod wygasł. Poproś o nowy.",
+          "network": "Brak połączenia. Sprawdź internet i spróbuj ponownie.",
+          "unknown": "Coś poszło nie tak. Spróbuj ponownie."
+        }
+      },
       "editProfile": "Edytuj profil",
       "authDescription": "Zaloguj się, aby móc tworzyć profil, używać własnych krajów i więcej.",
       "loggingOut": "Wylogowywanie...",
@@ -753,7 +788,8 @@
       "follow": "Obserwuj",
       "signInToFollow": "Zaloguj się, aby obserwować",
       "followingCount": "Obserwowani: {count}",
-      "signIn": "Zaloguj się"
+      "signIn": "Zaloguj się",
+      "legalAgreement": "Kontynuując, akceptujesz <terms>Warunki korzystania</terms> i potwierdzasz zapoznanie się z <privacy>Polityką prywatności</privacy>."
     },
     "contentType": {
       "all": "Wszystkie",
@@ -1413,7 +1449,7 @@
       },
       "uiPreferences": {
         "title": "Preferencje UI",
-        "content": "Dostosuj wygląd w Ustawienia → Preferencje UI:<list><item><strong>Style flag</strong> — ikony serca, minimalistyczne okrągłe/kwadratowe flagi lub domyślne prostokątne</item><item><strong>Zawsze pokazuj rankingi</strong> — stałe numery pozycji plus wskaźnik zmiany rankingu</item><item><strong>Popupy</strong> — niezależne włączanie popupu kwalifikantów, ogłoszenia zwycięzcy i confetti</item><item><strong>Tryb pełnoekranowy</strong> — pełnoekranowy, immersyjny widok tablicy</item><item><strong>Pasek postępu głosowania jury</strong> — ile krajów głosowało w bieżącej rundzie jury</item><item><strong>Własne tło</strong> — prześlij własny obraz zamiast tła motywu</item><item><strong>Nadpisanie czcionki motywu</strong> — stała czcionka niezależnie od aktywnego motywu</item><item><strong>Audio</strong> — osobne poziomy głośności efektów i muzyki w tle lub wyłączenie całego audio motywu</item><item><strong>Efekty zimowe</strong> — padający śnieg z regulowanym suwakiem intensywności</item></list>"
+        "content": "Dostosuj wygląd w Ustawienia → Preferencje UI:<list><item><strong>Style flag</strong> — ikony serca, minimalistyczne okrągłe/kwadratowe flagi lub domyślne prostokątne</item><item><strong>Zawsze pokazuj rankingi</strong> — stałe numery pozycji plus wskaźnik zmiany rankingu</item><item><strong>Popupy</strong> — niezależne włączanie popupu kwalifikantów, ogłoszenia zwycięzcy i confetti</item><item><strong>Tryb pełnoekranowy</strong> — pełnoekranowy, immersyjny widok tablicy</item><item><strong>Pasek postępu głosowania jury</strong> — ile krajów głosowało w bieżącej rundzie jury</item><item><strong>Nadpisanie czcionki motywu</strong> — stała czcionka niezależnie od aktywnego motywu</item><item><strong>Audio</strong> — osobne poziomy głośności efektów i muzyki w tle lub wyłączenie całego audio motywu</item><item><strong>Efekty zimowe</strong> — padający śnieg z regulowanym suwakiem intensywności</item></list>"
       },
       "confirmations": {
         "title": "Popupy potwierdzeń",
@@ -1463,10 +1499,6 @@
         "suppressedDialogs": "Ukryte okna dialogowe",
         "reset": "Reset"
       },
-      "upload": {
-        "title": "Upuść obraz lub kliknij, aby przeglądać",
-        "subtext": "PNG, JPG lub WEBP · przechowywane na tym urządzeniu."
-      },
       "danger": {
         "confirm": "Tak, zresetuj wszystko"
       },
@@ -1477,10 +1509,10 @@
         "targetStages": "Pokaż, do którego etapu przechodzi każdy zakwalifikowany uczestnik.",
         "blurModal": "Rozmyj tablicę wyników za otwartymi oknami modalnymi dla lepszego skupienia.",
         "overrideFont": "Ignoruj czcionki każdego motywu (w tym przesłane) i zawsze używaj wybranej poniżej, zarówno w interfejsie, jak i na tablicy wyników.",
-        "customBg": "Użyj własnego obrazu tła. Przechowywany tylko na tym urządzeniu — nie synchronizowany z kontem.",
         "winter": "Dodaj padający śnieg i świąteczne akcenty w całej aplikacji.",
         "finalReveal": "Ujawniaj końcowe wyniki teległosowania po jednym kraju z dramatyczną animacją.",
-        "predictableReveal": "Ujawniaj wyniki teległosowania w płynnej, deterministycznej kolejności bez losowej napięcia."
+        "predictableReveal": "Ujawniaj wyniki teległosowania w płynnej, deterministycznej kolejności bez losowej napięcia.",
+        "haptics": "Wibruje przy 12 punktach, ogłaszaniu zakwalifikowanych i zwycięzcy."
       }
     },
     "relations": {
@@ -1608,7 +1640,6 @@
       "autoStartPresentationTooltip": "Po włączeniu prezentacja rozpocznie się automatycznie po rozpoczęciu głosowania."
     },
     "ui": {
-      "useCustomBackgroundImage": "Użyj niestandardowego obrazu tła",
       "dragAndDropToUpload": "Przeciągnij i upuść lub kliknij, aby przesłać",
       "useHeartIconsForFlags": "Użyj ikon serc dla flag",
       "alwaysShowRankings": "Zawsze pokazuj rankingi",
@@ -1622,10 +1653,10 @@
       "slow": "Wolno",
       "fast": "Szybko",
       "finalRevealLinearAnimation": "Płynna, przewidywalna animacja (bez losowości)",
+      "enableHaptics": "Wibracje",
       "enableFullscreenMode": "Włącz tryb pełnoekranowy",
       "warnBeforeManuallyAssigningTelevotePoints": "Ostrzeż przed ręcznym przydzielaniem punktów televote",
       "showJuryVotingProgressBar": "Pokaż pasek postępu głosowania jury",
-      "imageSizeIsPrettyLarge": "Rozmiar obrazu jest dość duży ({size}MB). Może to spowolnić symulację, więc warto go skompresować lub użyć mniejszego obrazu. Czy chcesz kontynuować z tym obrazem?",
       "language": "Język",
       "enableMinimalisticFlags": "Włącz minimalistyczne flagi",
       "enableWinterEffects": "Włącz efekty zimowe",
@@ -2296,25 +2327,7 @@
         "useLive": "Użyj tablicy na żywo",
         "useManual": "Wpisz ręczną listę"
       },
-      "cancel": "Anuluj",
-      "report": {
-        "title": "Zgłosić „{name}”?",
-        "body": "Napisz nam, co jest nie tak z tym projektem. Zgłoszenia sprawdza zespół DouzePoints.",
-        "reason": "Powód",
-        "reasons": {
-          "spam": "Spam lub wprowadzanie w błąd",
-          "offensive": "Obraźliwe treści",
-          "copyright": "Prawa autorskie lub znak towarowy",
-          "other": "Coś innego"
-        },
-        "details": "Szczegóły (opcjonalnie)",
-        "detailsPlaceholder": "Cokolwiek, co pomoże nam zrozumieć problem",
-        "send": "Wyślij zgłoszenie",
-        "cancel": "Anuluj",
-        "thanks": "Dziękujemy, zgłoszenie zostało wysłane.",
-        "already": "Ten projekt został już przez Ciebie zgłoszony.",
-        "failed": "Nie udało się wysłać zgłoszenia."
-      }
+      "cancel": "Anuluj"
     },
     "fields": {
       "columns": "Kolumny",
@@ -2395,5 +2408,48 @@
       "editFields": "Edytuj pola",
       "hideFields": "Ukryj pola"
     }
+  },
+  "moderation": {
+    "report": "Zgłoś",
+    "reportUser": "Zgłoś użytkownika",
+    "blockUser": "Zablokuj użytkownika",
+    "unblockUser": "Odblokuj użytkownika",
+    "unblock": "Odblokuj",
+    "reportTitle": "Zgłoś „{name}”",
+    "reportUserTitle": "Zgłoś użytkownika {name}",
+    "reportBody": "Napisz nam, co jest nie tak. Zespół DouzePoints sprawdza każde zgłoszenie i usuwa treści naruszające Warunki korzystania.",
+    "reason": "Powód",
+    "reasons": {
+      "spam": "Spam lub wprowadzanie w błąd",
+      "offensive": "Obraźliwe treści",
+      "copyright": "Prawa autorskie lub znak towarowy",
+      "other": "Coś innego"
+    },
+    "details": "Szczegóły (opcjonalnie)",
+    "detailsPlaceholder": "Cokolwiek, co pomoże nam zrozumieć problem",
+    "alsoBlock": "Zablokuj też {name}",
+    "send": "Wyślij zgłoszenie",
+    "thanks": "Dziękujemy, zgłoszenie zostało wysłane.",
+    "already": "To zostało już przez Ciebie zgłoszone.",
+    "failed": "Nie udało się wysłać zgłoszenia.",
+    "signInToReport": "Zaloguj się, aby zgłaszać treści lub użytkowników.",
+    "blockConfirmTitle": "Zablokować {name}?",
+    "blockConfirmDescription": "Nie będziecie widzieć swoich motywów, konkursów, projektów ani czcionek na listach społeczności, w wyszukiwarce i na profilach, a żadne z was nie będzie mogło obserwować drugiego. Możesz odblokować tę osobę w sekcji „Edytuj profil”.",
+    "blocked": "Zablokowano: {name}.",
+    "unblocked": "Odblokowano: {name}.",
+    "blockFailed": "Nie udało się zablokować użytkownika.",
+    "unblockFailed": "Nie udało się odblokować użytkownika.",
+    "blockedProfile": "Ten użytkownik jest przez Ciebie zablokowany, więc jego treści są ukryte.",
+    "blockedUsers": "Zablokowani użytkownicy",
+    "blockedUsersDescription": "Ty i osoby, które zablokujesz, nie widzicie nawzajem swoich treści.",
+    "noBlockedUsers": "Nikogo nie zablokowano.",
+    "manageBlocked": "Zarządzaj",
+    "account": "Konto",
+    "deleteAccount": "Usuń konto",
+    "deleteAccountDescription": "Trwale usuń swój profil i wszystko, co zapisano na Twoim koncie.",
+    "deleteAccountConfirmTitle": "Usunąć konto?",
+    "deleteAccountConfirmDescription": "Twój profil, konkursy, motywy, projekty, czcionki i własne wpisy zostaną usunięte razem z polubieniami, zapisanymi elementami, obserwowanymi i blokadami. Tej operacji nie można cofnąć. Ustawienia i wersje robocze zapisane tylko na tym urządzeniu pozostaną.",
+    "accountDeleted": "Konto zostało usunięte.",
+    "deleteAccountFailed": "Nie udało się usunąć konta. Spróbuj ponownie."
   }
 }

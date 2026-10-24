@@ -52,7 +52,6 @@ import {
 } from '@/graphics/components/CloudDesignCards';
 import DesignThumb from '@/graphics/components/DesignThumb';
 import PromptDialog from '@/graphics/components/PromptDialog';
-import ReportDialog from '@/graphics/components/ReportDialog';
 import { useTemplateContext } from '@/graphics/editor/useEditorContext';
 import { Design, parseDesign } from '@/graphics/model/design';
 import { SizeClass, sizeClassOf } from '@/graphics/model/presets';
@@ -68,6 +67,8 @@ import {
   UnreadableRecord,
 } from '@/graphics/storage/designsDb';
 import { EDITOR_TEMPLATES, EditorTemplate } from '@/graphics/templates/editor';
+import { saveFile } from '@/helpers/fileActions';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
@@ -104,11 +105,17 @@ const sizeLabel = (design: Design, t: ReturnType<typeof useTranslations>) =>
     ? t('contentSized')
     : `${design.canvas.width} × ${design.canvas.height}`;
 
-const designLink = (id: string) =>
-  `${window.location.href.split('?')[0]}?design=${id}`;
+const designLink = (id: string) => buildShareUrl({ design: id });
 
-/** Download a draft as JSON (a cheap backup: drafts live in this browser). */
-const exportDesignJson = (name: string, design: unknown) => {
+/**
+ * Download a draft as JSON (a cheap backup: drafts live in this browser).
+ * `savedTo` builds the toast for a save to the device's shared storage.
+ */
+const exportDesignJson = (
+  name: string,
+  design: unknown,
+  savedTo: (folder: string) => string,
+) => {
   const payload = {
     format: 'douzepoints-design',
     version: 1,
@@ -118,15 +125,15 @@ const exportDesignJson = (name: string, design: unknown) => {
   const blob = new Blob([JSON.stringify(payload, null, 2)], {
     type: 'application/json',
   });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
 
-  link.download = `${name
-    .replace(/[^\w-]+/g, '-')
-    .toLowerCase()}.douze-design.json`;
-  link.href = url;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  saveFile(
+    blob,
+    `${name.replace(/[^\w-]+/g, '-').toLowerCase()}.douze-design.json`,
+  )
+    .then((result) => {
+      if (result.kind === 'saved') toast.success(savedTo(result.folder));
+    })
+    .catch((error) => console.error('Design export failed:', error));
 };
 
 /* ---------------- cards ---------------- */
@@ -387,6 +394,11 @@ interface Props {
  */
 const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const t = useTranslations('graphics.gallery');
+  const tc = useTranslations('common');
+  const savedTo = useCallback(
+    (folder: string) => tc('savedTo', { folder }),
+    [tc],
+  );
   const tab = useGraphicsStudioStore((s) => s.galleryTab);
   const setOpen = useGraphicsStudioStore((s) => s.setGraphicsModalOpen);
   const setTab = useCallback(
@@ -396,7 +408,6 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
   const [records, setRecords] = useState<DesignRecord[] | null>(null);
   const [unreadable, setUnreadable] = useState<UnreadableRecord[]>([]);
   const [renaming, setRenaming] = useState<DesignRecord | null>(null);
-  const [reporting, setReporting] = useState<CloudDesign | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const openEditor = useGraphicsStudioStore((s) => s.openEditor);
   const openSheet = useGraphicsStudioStore((s) => s.openSheet);
@@ -709,7 +720,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
                     onDuplicate={() => duplicate(record)}
                     onRename={() => setRenaming(record)}
                     onExport={() =>
-                      exportDesignJson(record.name, record.design)
+                      exportDesignJson(record.name, record.design, savedTo)
                     }
                     onPublish={() =>
                       openEditor({
@@ -732,7 +743,9 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
                 <UnreadableCard
                   key={record.id}
                   record={record}
-                  onExport={() => exportDesignJson(record.name, record.raw)}
+                  onExport={() =>
+                    exportDesignJson(record.name, record.raw, savedTo)
+                  }
                   onDelete={() => removeUnreadable(record)}
                 />
               ))}
@@ -744,11 +757,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
                 <h3>{t('mine')}</h3>
                 <span>{t('mineSub')}</span>
               </div>
-              <CloudGrid
-                designs={cloudOnly}
-                onUse={startCloud}
-                onReport={setReporting}
-              />
+              <CloudGrid designs={cloudOnly} onUse={startCloud} />
             </div>
           )}
         </>
@@ -850,11 +859,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
           </div>
         ) : community.data && community.data.designs.length > 0 ? (
           <>
-            <CloudGrid
-              designs={community.data.designs}
-              onUse={startCloud}
-              onReport={setReporting}
-            />
+            <CloudGrid designs={community.data.designs} onUse={startCloud} />
             {community.data.totalPages > 1 && (
               <WidgetPager
                 page={page}
@@ -900,11 +905,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         </div>
       ) : saved.data && saved.data.designs.length > 0 ? (
         <>
-          <CloudGrid
-            designs={saved.data.designs}
-            onUse={startCloud}
-            onReport={setReporting}
-          />
+          <CloudGrid designs={saved.data.designs} onUse={startCloud} />
           {saved.data.totalPages > 1 && (
             <WidgetPager
               page={savedPage}
@@ -962,14 +963,6 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         confirmLabel={t('rename')}
         onConfirm={(name) => renaming && rename(renaming, name)}
         onClose={() => setRenaming(null)}
-      />
-      <ReportDialog
-        target={
-          reporting
-            ? { type: 'design', id: reporting._id, name: reporting.name }
-            : null
-        }
-        onClose={() => setReporting(null)}
       />
       <DesignDataProvider binding={LIVE_BINDING}>
         <TabContent

@@ -1,13 +1,18 @@
 import { toast } from 'react-toastify';
 
+import { saveFile, shareFile } from '@/helpers/fileActions';
+
 /**
  * Download / Web Share / clipboard for a generated image data URL. Shared by
  * the editor's export dialog and the template sheet. Toast copy comes from
- * the caller so each surface keeps its own namespace.
+ * the caller so each surface keeps its own namespace. In the native apps
+ * both download and share open the system share sheet (`fileActions`).
  */
 
 export interface ImageActionMessages {
   downloaded: (name: string) => string;
+  /** Saved to the device's shared storage (Android app). */
+  saved: (folder: string) => string;
   copied: string;
   copyFailed: string;
   shareUnsupported: string;
@@ -23,17 +28,23 @@ export const slugify = (s: string): string =>
 export const dataUrlToBlob = async (dataUrl: string): Promise<Blob> =>
   (await fetch(dataUrl)).blob();
 
-export function downloadImage(
+export async function downloadImage(
   dataUrl: string,
   fileName: string,
   messages: ImageActionMessages,
-): void {
-  const link = document.createElement('a');
+): Promise<void> {
+  try {
+    const result = await saveFile(dataUrl, fileName);
 
-  link.download = fileName;
-  link.href = dataUrl;
-  link.click();
-  toast.success(messages.downloaded(fileName));
+    if (result.kind === 'downloaded') {
+      toast.success(messages.downloaded(fileName));
+    } else if (result.kind === 'saved') {
+      toast.success(messages.saved(result.folder));
+    }
+  } catch (err) {
+    console.error('Save failed:', err);
+    toast.error(messages.shareFailed);
+  }
 }
 
 export async function shareImage(
@@ -43,22 +54,12 @@ export async function shareImage(
   messages: ImageActionMessages,
 ): Promise<void> {
   try {
-    const blob = await dataUrlToBlob(dataUrl);
-    const file = new File([blob], fileName, {
-      type: blob.type || 'image/png',
-    });
-    const shareData = { title, files: [file] };
+    const result = await shareFile({ data: dataUrl, fileName, title });
 
-    if (navigator.canShare && navigator.canShare(shareData)) {
-      await navigator.share(shareData);
-    } else {
-      toast.error(messages.shareUnsupported);
-    }
-  } catch (err: any) {
-    if (err?.name !== 'AbortError') {
-      console.error('Share failed:', err);
-      toast.error(messages.shareFailed);
-    }
+    if (result === 'unsupported') toast.error(messages.shareUnsupported);
+  } catch (err) {
+    console.error('Share failed:', err);
+    toast.error(messages.shareFailed);
   }
 }
 

@@ -329,8 +329,7 @@ settings plus other global app/UX preferences. The **section-keyed** blob is
   - **Deliberately excluded:** contest-bound fields (points systems, `randomnessLevel`,
     `pointsSpread`, `splitPointsSystem`, `allowMultiplePointsToSameEntry`, odds, contest identity) —
     they're restored from a loaded contest, so syncing them would let a contest-load overwrite and
-    then re-save your account default; device-local `customBgImage`/`shouldUseCustomBgImage`;
-    per-export `imageCustomization`; and language (already on `profile.preferredLocale`).
+    then re-save your account default; per-export `imageCustomization`; and language (already on `profile.preferredLocale`).
 - **Backend** (`douze-points-backend`): a free-form `preferences` blob on the Profile schema, with
   `GET`/`PATCH /profiles/me/preferences` (`UpdatePreferencesDto` declares the `settings` /
   `presentation` / `confirmations` sections; the global `whitelist` ValidationPipe drops anything

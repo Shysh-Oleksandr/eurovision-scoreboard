@@ -108,7 +108,11 @@ async function request<T>(
   // interceptor parity), falling back to the getter either way.
   const token = retry?.token ?? accessTokenGetter?.() ?? null;
 
-  if (token) headers.set('authorization', `Bearer ${token}`);
+  // An explicit Authorization header wins (the native apps send their
+  // refresh token this way to /auth/refresh and /auth/logout).
+  if (token && !headers.has('authorization')) {
+    headers.set('authorization', `Bearer ${token}`);
+  }
 
   const res = await fetch(buildUrl(url, config?.params), {
     method,

@@ -67,7 +67,15 @@ const About = () => {
                     className="text-primary-300 hover:text-white underline transition-colors"
                   >
                     Click here.
+                  </a>{' '}
+                  See also the{' '}
+                  <a
+                    href="/terms"
+                    className="text-primary-300 hover:text-white underline transition-colors"
+                  >
+                    Terms of Use
                   </a>
+                  .
                 </p>
 
                 <h3 className="text-xl font-semibold text-white mb-3 mt-6">

@@ -17,7 +17,6 @@ import {
  *     let a contest-load overwrite, then re-save, your account default):
  *     contest identity, points systems, randomnessLevel, pointsSpread,
  *     splitPointsSystem, allowMultiplePointsToSameEntry, odds.
- *   - device-local: customBgImage (IndexedDB blob) + shouldUseCustomBgImage.
  *   - per-export / transient: imageCustomization, presentationSettings.isPresenting.
  *   - already synced elsewhere: language (profile.preferredLocale).
  */

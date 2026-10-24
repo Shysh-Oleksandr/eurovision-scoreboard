@@ -27,7 +27,7 @@ import { useScoreboardStore } from './scoreboardStore';
 
 import { api } from '@/api/client';
 import { ContestType, resolveContestType } from '@/data/contestTypes';
-import { getCustomBgImageFromDB } from '@/helpers/indexedDB';
+import { deleteLegacyCustomBgImage } from '@/helpers/indexedDB';
 import { BaseCountry, PointsItem } from '@/models';
 import { useAuthStore } from '@/state/useAuthStore';
 import { applyDocumentFonts } from '@/theme/customFonts';
@@ -80,8 +80,6 @@ const DEFAULT_SETTINGS: Settings = {
   showHostingCountryLogo: true,
   shouldShowHeartFlagIcon: true,
   syncThemeWithContest: true,
-  shouldUseCustomBgImage: false,
-  customBgImage: null,
   hostingCountryCode: DEFAULT_HOSTING_COUNTRY_CODE,
   contestName: 'Eurovision',
   contestDescription: '',
@@ -109,6 +107,7 @@ const DEFAULT_SETTINGS: Settings = {
   enablePredefinedVotes: false,
   enableWinterEffects: false,
   snowFallIntensity: 5, // 1-10
+  enableHaptics: true,
   blurModalBackground: false,
   themeSoundVolume: 100,
   themeAmbienceVolume: 100,
@@ -183,8 +182,6 @@ export interface Settings {
   syncThemeWithContest: boolean;
   showHostingCountryLogo: boolean;
   hostingCountryCode: string;
-  shouldUseCustomBgImage: boolean;
-  customBgImage: string | null;
   contestName: string; // 'Eurovision' | 'Junior Eurovision' | 'Eurovision Asia'
   contestDescription: string;
   contestType: ContestType;
@@ -226,6 +223,8 @@ export interface Settings {
   enablePredefinedVotes: boolean;
   enableWinterEffects: boolean;
   snowFallIntensity: number;
+  /** Native apps only: vibrate on douze points, qualifiers and the winner. */
+  enableHaptics: boolean;
   blurModalBackground: boolean;
   themeSoundVolume: number;
   themeAmbienceVolume: number;
@@ -818,7 +817,6 @@ export const useGeneralStore = create<GeneralState>()(
       {
         name: 'general-storage',
         partialize(state) {
-          const { customBgImage: _ignore, ...restSettings } = state.settings;
           const {
             isPresenting: _ignorePresenting,
             ...restPresentationSettings
@@ -835,8 +833,7 @@ export const useGeneralStore = create<GeneralState>()(
             importedCustomEntries: state.importedCustomEntries,
             lastSeenUpdate: state.lastSeenUpdate,
             shouldShowNewChangesIndicator: state.shouldShowNewChangesIndicator,
-            // Do not persist large image data URLs in localStorage to avoid quota issues
-            settings: { ...restSettings, customBgImage: null },
+            settings: state.settings,
             // Only persist aspectRatio and isCustomizationExpanded from imageCustomization
             imageCustomization: {
               aspectRatio: state.imageCustomization.aspectRatio,
@@ -864,22 +861,6 @@ export const useGeneralStore = create<GeneralState>()(
 
             useGeneralStore.setState({ theme });
 
-            (async () => {
-              const currentSettings = useGeneralStore.getState().settings;
-
-              if (!currentSettings.shouldUseCustomBgImage) return;
-
-              requestAnimationFrame(async () => {
-                const image = await getCustomBgImageFromDB();
-
-                if (image) {
-                  useGeneralStore.setState({
-                    settings: { ...currentSettings, customBgImage: image },
-                  });
-                }
-              });
-            })();
-
             syncDocumentFont();
           }
         },
@@ -898,9 +879,14 @@ export const useGeneralStore = create<GeneralState>()(
           const settingsTelevotePointsSystem: PointsItem[] =
             state.settingsTelevotePointsSystem || initialPointsSystem;
 
-          // Settings persisted before `contestType` replaced `isJuniorContest`
+          // Settings persisted before `contestType` replaced `isJuniorContest`,
+          // or before the custom background image setting was removed
           const legacySettings = state.settings as
-            | (Partial<Settings> & { isJuniorContest?: boolean })
+            | (Partial<Settings> & {
+                isJuniorContest?: boolean;
+                shouldUseCustomBgImage?: boolean;
+                customBgImage?: string | null;
+              })
             | undefined;
           const isLegacyContestType =
             !!legacySettings && legacySettings.contestType === undefined;
@@ -911,6 +897,15 @@ export const useGeneralStore = create<GeneralState>()(
           };
 
           delete persistedSettings.isJuniorContest;
+
+          // One-time cleanup: the image (up to several MB) stays in IndexedDB
+          // otherwise. Persisting the merged settings drops the flag, so this
+          // runs once per browser.
+          if (persistedSettings.shouldUseCustomBgImage !== undefined) {
+            void deleteLegacyCustomBgImage();
+          }
+          delete persistedSettings.shouldUseCustomBgImage;
+          delete persistedSettings.customBgImage;
 
           const settings = {
             ...persistedSettings,
@@ -977,19 +972,3 @@ export function syncDocumentFont() {
     }),
   );
 }
-
-(async () => {
-  const currentSettings = useGeneralStore.getState().settings;
-
-  if (!currentSettings.shouldUseCustomBgImage) return;
-
-  requestAnimationFrame(async () => {
-    const image = await getCustomBgImageFromDB();
-
-    if (image) {
-      useGeneralStore.setState({
-        settings: { ...currentSettings, customBgImage: image },
-      });
-    }
-  });
-})();

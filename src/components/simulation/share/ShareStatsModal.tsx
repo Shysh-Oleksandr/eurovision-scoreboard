@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { toast } from 'react-toastify';
 
 import Image from 'next/image';
 
@@ -26,6 +27,7 @@ import {
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { toEditableDesign } from '@/graphics/templates/editor';
 import { buildStatsDesign, STATS_MIN_WIDTH } from '@/graphics/templates/stats';
+import { saveFile } from '@/helpers/fileActions';
 import { Country, EventStage, StageVotingType, StatsTableType } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
@@ -156,16 +158,21 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
     [],
   );
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!generatedImageUrl) return;
 
     const filename = `${defaultTitle} - ${tableTypeText} - ${voteTypeText} - DouzePoints.app - ${Date.now()}.png`;
 
-    const link = document.createElement('a');
+    try {
+      const result = await saveFile(generatedImageUrl, filename);
 
-    link.download = filename;
-    link.href = generatedImageUrl;
-    link.click();
+      if (result.kind === 'saved') {
+        toast.success(t('common.savedTo', { folder: result.folder }));
+      }
+    } catch (err) {
+      console.error('Save failed:', err);
+      toast.error('Failed to share');
+    }
   };
 
   const updateSetting = (key: keyof typeof settings, value: any) => {

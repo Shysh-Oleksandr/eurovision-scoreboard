@@ -10,6 +10,7 @@ import React, {
 import { createPortal } from 'react-dom';
 
 import { cn } from '@/helpers/utils';
+import { useBackHandler } from '@/hooks/useBackHandler';
 
 /** Gap between the trigger and the panel. */
 const ANCHOR_GAP = 6;
@@ -63,6 +64,8 @@ export const VotingBarMenu: React.FC<VotingBarMenuProps> = ({
   const panelRef = useRef<HTMLDivElement>(null);
 
   const close = useCallback(() => setIsOpen(false), []);
+
+  useBackHandler(isOpen, close);
 
   const updatePosition = useCallback(() => {
     const trigger = triggerRef.current;

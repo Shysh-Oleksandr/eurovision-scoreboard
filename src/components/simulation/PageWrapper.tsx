@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { useGeneralStore } from '../../state/generalStore';
 
@@ -10,29 +10,9 @@ interface PageWrapperProps {
 export const PageWrapper = ({ children }: PageWrapperProps) => {
   const theme = useGeneralStore((state) => state.theme);
   const customTheme = useGeneralStore((state) => state.customTheme);
-  const shouldUseCustomBgImage = useGeneralStore(
-    (state) => state.settings.shouldUseCustomBgImage,
-  );
-  const customBgImage = useGeneralStore(
-    (state) => state.settings.customBgImage,
-  );
 
-  const backgroundImage = useMemo(() => {
-    if (shouldUseCustomBgImage && customBgImage) {
-      return customBgImage;
-    }
-
-    if (customTheme?.backgroundImageUrl) {
-      return customTheme.backgroundImageUrl;
-    }
-
-    return theme.backgroundImage;
-  }, [
-    customBgImage,
-    customTheme?.backgroundImageUrl,
-    shouldUseCustomBgImage,
-    theme.backgroundImage,
-  ]);
+  const backgroundImage =
+    customTheme?.backgroundImageUrl || theme.backgroundImage;
 
   return (
     <div

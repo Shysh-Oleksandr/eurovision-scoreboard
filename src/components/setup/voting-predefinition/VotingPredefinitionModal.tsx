@@ -63,6 +63,7 @@ import { useConfirmation } from '@/hooks/useConfirmation';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { EventStage, StageVotingType, StatsTableType } from '@/models';
+import { IS_NATIVE_APP } from '@/native/platform';
 import { useGeneralStore } from '@/state/generalStore';
 import {
   buildCountriesOverrideForPodium,
@@ -790,44 +791,54 @@ const VotingPredefinitionModal = ({
 
           <VotingMenuSeparator />
 
-          <VotingMenuLabel
-            hint={
-              <Tooltip
-                position="right"
-                classNameIcon="!mt-0 !w-4 !h-4"
-                className="!z-[99999]"
-                content={
-                  <VoteSpreadsheetFormatTooltipContent withDragDrop={false} />
+          {/* Spreadsheet import/export is website-only: files are awkward on a
+              phone and the apps have no native download/share for them. */}
+          {!IS_NATIVE_APP && (
+            <>
+              <VotingMenuLabel
+                hint={
+                  <Tooltip
+                    position="right"
+                    classNameIcon="!mt-0 !w-4 !h-4"
+                    className="!z-[99999]"
+                    content={
+                      <VoteSpreadsheetFormatTooltipContent
+                        withDragDrop={false}
+                      />
+                    }
+                  >
+                    <span className="sr-only">
+                      {tSpreadsheet('formatHelp')}
+                    </span>
+                  </Tooltip>
                 }
               >
-                <span className="sr-only">{tSpreadsheet('formatHelp')}</span>
-              </Tooltip>
-            }
-          >
-            {tSetup('spreadsheetLabel')}
-          </VotingMenuLabel>
-          <VotingMenuRow
-            icon={<Upload className="h-[17px] w-[17px]" />}
-            sub=".xlsx"
-            onClick={() => {
-              close();
-              importInputRef.current?.click();
-            }}
-          >
-            {tSpreadsheet('import')}
-          </VotingMenuRow>
-          <VotingMenuRow
-            icon={<Download className="h-[17px] w-[17px]" />}
-            sub=".xlsx"
-            onClick={() => {
-              close();
-              handleExportSpreadsheet();
-            }}
-          >
-            {tSpreadsheet('export')}
-          </VotingMenuRow>
+                {tSetup('spreadsheetLabel')}
+              </VotingMenuLabel>
+              <VotingMenuRow
+                icon={<Upload className="h-[17px] w-[17px]" />}
+                sub=".xlsx"
+                onClick={() => {
+                  close();
+                  importInputRef.current?.click();
+                }}
+              >
+                {tSpreadsheet('import')}
+              </VotingMenuRow>
+              <VotingMenuRow
+                icon={<Download className="h-[17px] w-[17px]" />}
+                sub=".xlsx"
+                onClick={() => {
+                  close();
+                  handleExportSpreadsheet();
+                }}
+              >
+                {tSpreadsheet('export')}
+              </VotingMenuRow>
 
-          <VotingMenuSeparator />
+              <VotingMenuSeparator />
+            </>
+          )}
 
           <VotingMenuRow
             variant="danger"

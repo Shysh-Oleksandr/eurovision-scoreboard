@@ -37,8 +37,10 @@ import AnchoredMenu, {
 import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
 import { useHandleShare } from '@/components/setup/hooks/useHandleShare';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
+import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { CloudDesign } from '@/types/design';
 
@@ -54,8 +56,7 @@ import '@/graphics/editor/editor.css';
  * go to the design sheet.
  */
 
-const designLink = (id: string) =>
-  `${window.location.href.split('?')[0]}?design=${id}`;
+const designLink = (id: string) => buildShareUrl({ design: id });
 
 export const CommunityCard: React.FC<{
   record: CloudDesign;
@@ -363,8 +364,7 @@ export const useCommunityActions = () => {
 export const CloudGrid: React.FC<{
   designs: CloudDesign[];
   onUse: (record: CloudDesign) => void;
-  onReport: (record: CloudDesign) => void;
-}> = ({ designs, onUse, onReport }) => {
+}> = ({ designs, onUse }) => {
   const user = useAuthStore((s) => s.user);
   const ids = useMemo(() => designs.map((d) => d._id), [designs]);
   const { data: state } = useDesignsStateQuery(ids, !!user);
@@ -383,7 +383,14 @@ export const CloudGrid: React.FC<{
           onUse={() => onUse(record)}
           onLike={() => actions.like(record._id)}
           onSave={() => actions.save(record._id)}
-          onReport={user ? () => onReport(record) : undefined}
+          onReport={() =>
+            openReportDialog({
+              type: 'design',
+              id: record._id,
+              name: record.name,
+              creator: record.creator,
+            })
+          }
           onToggleVisibility={() => actions.toggleVisibility(record)}
           onDelete={() => actions.unpublish(record)}
         />

@@ -23,7 +23,7 @@ import { useBulkCreateCustomEntriesMutation } from '@/api/customEntries';
 import { PlusIcon } from '@/assets/icons/PlusIcon';
 import { SaveIcon } from '@/assets/icons/SaveIcon';
 import Button from '@/components/common/Button';
-import GoogleAuthButton from '@/components/common/GoogleAuthButton';
+import SignInButtons from '@/components/common/SignInButtons';
 import { useGetCategoryLabel } from '@/components/setup/hooks/useGetCategoryLabel';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
@@ -135,7 +135,7 @@ const PoolCategory: React.FC<PoolCategoryProps> = ({
               'setup.eventSetupModal.youNeedToBeLoggedInToCreateAndUseCustomEntries',
             )}
           </p>
-          <GoogleAuthButton />
+          <SignInButtons />
         </div>
       );
     }

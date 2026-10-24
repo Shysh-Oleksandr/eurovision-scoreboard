@@ -4,6 +4,7 @@ import {
   ChevronLeft,
   Copy,
   Download,
+  Flag,
   Image as ImageIcon,
   Link2,
   PencilLine,
@@ -49,6 +50,8 @@ import UserInfo from '@/components/common/UserInfo';
 import { IconButton } from '@/graphics/editor/ui/controls';
 import { useThemeName } from '@/graphics/editor/useEditorContext';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { IS_NATIVE_APP } from '@/native/platform';
+import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 import '@/graphics/editor/editor.css';
@@ -159,6 +162,8 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
   const t = useTranslations('graphics.sheet');
   const tx = useTranslations('graphics.export');
   const tg = useTranslations('graphics.gallery');
+  const tc = useTranslations('common');
+  const tm = useTranslations('moderation');
   const phone = !useMediaQuery('(min-width: 576px)');
   const user = useAuthStore((s) => s.user);
   const openEditor = useGraphicsStudioStore((s) => s.openEditor);
@@ -268,12 +273,13 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
   const messages: ImageActionMessages = useMemo(
     () => ({
       downloaded: (name) => tx('toast.downloaded', { name }),
+      saved: (folder) => tc('savedTo', { folder }),
       copied: tx('toast.copied'),
       copyFailed: tx('toast.copyFailed'),
       shareUnsupported: tx('toast.shareUnsupported'),
       shareFailed: tx('toast.shareFailed'),
     }),
-    [tx],
+    [tx, tc],
   );
   const fileName = `${slugify(design.name || title)}.png`;
 
@@ -356,6 +362,23 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
           {t('remixedFrom', { name: cloud.remixedFromName })}
         </span>
       )}
+      {!ownCloud && (
+        <button
+          type="button"
+          className="gfx-remix hover:text-white"
+          onClick={() =>
+            openReportDialog({
+              type: 'design',
+              id: cloud._id,
+              name: cloud.name,
+              creator: cloud.creator,
+            })
+          }
+        >
+          <Flag className="size-3" />
+          {tm('report')}
+        </button>
+      )}
     </div>
   ) : null;
 
@@ -427,13 +450,16 @@ const TemplateSheet: React.FC<Props> = ({ request, onClose }) => {
               shareImage(result.dataUrl, fileName, title, messages)
             }
           />
-          <Button
-            variant="surface"
-            size="lg"
-            title={tx('copyImage')}
-            Icon={<Copy className="size-[18px]" />}
-            onClick={() => copyImage(result.dataUrl, messages)}
-          />
+          {/* The apps' share sheet already offers Copy. */}
+          {!IS_NATIVE_APP && (
+            <Button
+              variant="surface"
+              size="lg"
+              title={tx('copyImage')}
+              Icon={<Copy className="size-[18px]" />}
+              onClick={() => copyImage(result.dataUrl, messages)}
+            />
+          )}
         </div>
       </section>
     ) : null;

@@ -19,7 +19,8 @@ type Props = {
     | 'cta'
     | 'surface'
     | 'surfaceStrong'
-    | 'ghost';
+    | 'ghost'
+    | 'apple';
   /**
    * Fixed-height presets from the design system (34 / 40 / 46 / 54px). Omit
    * for the legacy responsive padding.
@@ -87,6 +88,8 @@ const Button = ({
     surfaceStrong: 'dp-act dp-act--strong text-white normal-case',
     ghost:
       'bg-white/[0.07] border border-hair text-white hover:bg-white/[0.13] tracking-[.04em] !shadow-none',
+    // Sign in with Apple, Apple's white style for dark backgrounds.
+    apple: 'bg-white text-black hover:bg-white/85 normal-case',
   };
 
   const childrenContent = children || label;

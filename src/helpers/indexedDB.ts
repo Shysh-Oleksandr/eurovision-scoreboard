@@ -38,37 +38,15 @@ export const getDB = async () => {
   });
 };
 
-// Background image helpers
-const CUSTOM_BG_KEY = 'customBgImage';
-
-export const saveCustomBgImageToDB = async (dataUrl: string) => {
+/**
+ * Removes the image of the retired "custom background image" setting, which
+ * lived under this key in `appAssets` (the store has no other use).
+ */
+export const deleteLegacyCustomBgImage = async () => {
   try {
     const db = await getDB();
 
-    await db.put(ASSETS_STORE_NAME, dataUrl, CUSTOM_BG_KEY);
-  } catch (err) {
-    console.error('Failed to save custom background image to IndexedDB', err);
-  }
-};
-
-export const getCustomBgImageFromDB = async (): Promise<string | null> => {
-  try {
-    const db = await getDB();
-    const value = await db.get(ASSETS_STORE_NAME, CUSTOM_BG_KEY);
-
-    return (value as string) ?? null;
-  } catch (err) {
-    console.error('Failed to read custom background image from IndexedDB', err);
-
-    return null;
-  }
-};
-
-export const deleteCustomBgImageFromDB = async () => {
-  try {
-    const db = await getDB();
-
-    await db.delete(ASSETS_STORE_NAME, CUSTOM_BG_KEY);
+    await db.delete(ASSETS_STORE_NAME, 'customBgImage');
   } catch (err) {
     console.error(
       'Failed to delete custom background image from IndexedDB',

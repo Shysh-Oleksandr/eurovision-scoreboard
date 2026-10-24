@@ -427,8 +427,7 @@ on the design node (re-resolving `font-family` there so the editor chrome's
 inherited face does not leak in). The row components read the theme through
 `useScopedTheme()` — `useThemeSpecifics`, `useShareBgImage`,
 `ShareCountryItem`, `CountryPlaceNumber` — and fall back to the general
-store outside a scope, so the board itself is unchanged. The account-level
-custom background is ignored inside a scope. Without `theme` (share-modal
+store outside a scope, so the board itself is unchanged. Without `theme` (share-modal
 images, the template sheet's previews) a design still follows the active
 theme. The canvas inspector's **Theme** section lists the user's themes
 (`useMyThemesListQuery`), the built-in ESC / JESC years and, when needed,
@@ -494,7 +493,9 @@ What changed after the pre-release review in
   that opens Canvas → Theme, and the bar comes back when the selection
   empties. Layers use list semantics; handle labels are translated.
 - **Gallery**: rename and report use dialogs (`PromptDialog`,
-  `ReportDialog`), drafts can be exported/imported as `.douze-design.json`,
+  `ReportDialog`; since 2026-10-10 reports go through the app-wide
+  `components/moderation/ReportModal.tsx`, see
+  `moderation-and-account-deletion.md`), drafts can be exported/imported as `.douze-design.json`,
   the header says drafts live in this browser, thumbnails and counters have
   accessible names, community cards moved to
   `components/CloudDesignCards.tsx` and also render in profile content

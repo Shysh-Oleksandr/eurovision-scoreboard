@@ -23,6 +23,8 @@ interface CustomizePanelProps {
   rules: DrawRules;
   /** Every semi that could be drawn into (before the "Choose" rule). */
   drawableSemis: EventStage[];
+  /** Names of the first-round stages when later rounds are left out by default, else null. */
+  firstRoundNames: string | null;
   hasOfficialPots: boolean;
   contestYear: string;
   entering: boolean;
@@ -52,6 +54,7 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
   input,
   rules,
   drawableSemis,
+  firstRoundNames,
   hasOfficialPots,
   contestYear,
   entering,
@@ -288,7 +291,15 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
                 key: 'semis' as RuleKey,
                 label: t('cuSemis'),
                 options: [
-                  { value: 'all', label: t('optAllSemis') },
+                  firstRoundNames
+                    ? {
+                        value: 'all',
+                        label: t('optFirstRound'),
+                        desc: t('optFirstRoundDesc', {
+                          stages: firstRoundNames,
+                        }),
+                      }
+                    : { value: 'all', label: t('optAllSemis') },
                   {
                     value: 'choose',
                     label: t('optChooseSemis'),
@@ -299,7 +310,7 @@ const CustomizePanel: React.FC<CustomizePanelProps> = ({
                   rules.semis === 'choose' ? (
                     <div className="flex flex-col gap-2 mt-2 2cols:ml-[37px]">
                       {drawableSemis.map((s) => {
-                        const on = rules.semisPick[s.id] !== false;
+                        const on = input.semis.some((x) => x.id === s.id);
 
                         return (
                           <button

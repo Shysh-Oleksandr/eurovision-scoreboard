@@ -2,6 +2,8 @@ import { useCallback, useEffect } from 'react';
 
 import { useGeneralStore } from '../state/generalStore';
 
+import { IS_NATIVE_APP } from '@/native/platform';
+
 const getFullscreenElement = () =>
   document.fullscreenElement ||
   document.webkitFullscreenElement ||
@@ -55,7 +57,11 @@ export const useFullscreen = () => {
     }
   }, [setSettings]);
 
+  // The apps have no fullscreen toggle. `enableFullscreen` is an account-synced
+  // setting, so the app must not reset it (a failed request would) either.
   useEffect(() => {
+    if (IS_NATIVE_APP) return;
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
@@ -79,6 +85,8 @@ export const useFullscreen = () => {
   }, [handleFullscreenChange]);
 
   useEffect(() => {
+    if (IS_NATIVE_APP) return;
+
     if (enableFullscreen) {
       if (!getFullscreenElement()) {
         requestFullscreen(document.documentElement).catch(() => {

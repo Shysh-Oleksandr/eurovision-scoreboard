@@ -140,7 +140,8 @@ and the other screen-like modals (Settings, Themes, Contests, Profile,
 leaderboards, stats, share, theme editor, font picker, post-setup, voting
 predefinition) use it; short dialogs stay centred. The app runs with
 `viewport-fit=cover`, so the full-screen box pads its top by
-`env(safe-area-inset-top)` and exposes `--modal-safe-bottom`. The iOS status
+`env(safe-area-inset-top)` and exposes `--modal-safe-bottom` (the
+`--safe-bottom-bar` inset, trimmed on iOS; docs/native-apps.md §4). The iOS status
 bar is the opaque `default` style tinted from `theme-color`, which
 `useStatusBarThemeColor` keeps on the active theme's `--p-900`:
 `black-translucent` gets an iOS 26 Liquid Glass blur band under the status bar

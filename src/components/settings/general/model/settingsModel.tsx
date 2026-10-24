@@ -1,7 +1,6 @@
 import { Eye, Flag, List, Shield, Sparkles, Volume2 } from 'lucide-react';
 import React from 'react';
 
-import { CustomBgUpload } from '../../BgImageSelect';
 import { ConfirmationsListItem } from '../custom/ConfirmationsListItem';
 import { DangerResetItem } from '../custom/DangerResetItem';
 import { HostingCountryDropdown } from '../custom/HostingCountryDropdown';
@@ -303,21 +302,6 @@ export const CATEGORIES: Category[] = [
           },
         ],
       },
-      {
-        kind: 'switch',
-        id: 'shouldUseCustomBgImage',
-        settingKey: 'shouldUseCustomBgImage',
-        labelKey: 'settings.ui.useCustomBackgroundImage',
-        tipKey: 'settings.general2.tip.customBg',
-        children: [
-          {
-            kind: 'custom',
-            id: 'bgUpload',
-            searchTextKeys: ['settings.ui.useCustomBackgroundImage'],
-            render: () => <CustomBgUpload />,
-          },
-        ],
-      },
     ],
   },
   {
@@ -384,6 +368,14 @@ export const CATEGORIES: Category[] = [
             tipKey: 'settings.general2.tip.predictableReveal',
           },
         ],
+      },
+      {
+        kind: 'switch',
+        id: 'enableHaptics',
+        settingKey: 'enableHaptics',
+        labelKey: 'settings.ui.enableHaptics',
+        tipKey: 'settings.general2.tip.haptics',
+        when: (env) => env.isNativeApp,
       },
     ],
   },

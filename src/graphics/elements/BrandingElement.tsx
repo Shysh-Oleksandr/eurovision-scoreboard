@@ -12,7 +12,10 @@ export const BRANDING_DEFAULTS = {
   uppercase: false,
 } as const;
 
-/** "DouzePoints.app" with the favicon, as on every share image. */
+/** Icon side, in em of the branding font size. */
+const ICON_SIZE = 1.75;
+
+/** "DouzePoints.app" with the app icon's mark, as on every share image. */
 const BrandingElement: React.FC<{ el: BrandingElementModel }> = ({ el }) => {
   const font = useElementFont(el.fontSlot ?? 'ui', el.font);
   const showIcon = el.showIcon ?? BRANDING_DEFAULTS.showIcon;
@@ -25,14 +28,17 @@ const BrandingElement: React.FC<{ el: BrandingElementModel }> = ({ el }) => {
     >
       {showIcon && (
         <img
-          src="/img/favicon-128x128.png"
+          src="/img/brand/mark.png"
           alt="DouzePoints.app"
           className="mr-2"
           width={32}
           height={32}
           style={{
-            width: `${el.fontSize * 1.4}px`,
-            height: `${el.fontSize * 1.4}px`,
+            width: `${el.fontSize * ICON_SIZE}px`,
+            height: `${el.fontSize * ICON_SIZE}px`,
+            // The row keeps its old 1.4em height, so a bigger icon doesn't
+            // shift the elements laid out around it in saved designs.
+            marginBlock: `${(el.fontSize * (1.4 - ICON_SIZE)) / 2}px`,
           }}
         />
       )}

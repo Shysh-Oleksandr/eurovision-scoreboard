@@ -18,18 +18,23 @@ export const SyncCustomEntries: React.FC = () => {
 
   useEffect(() => {
     if (customEntries) {
-      const userCustomEntries: BaseCountry[] = customEntries
-        .map((entry) => ({
-          name: entry.name || 'Custom',
-          code: `custom-${entry._id}`,
-          category: 'Custom',
-          flag: entry.flagUrl,
-          updatedAt: entry.updatedAt,
-          groupId: entry.groupId ?? undefined,
-        }))
-        .filter((c) => !importedCustomEntries.some((i) => i.code === c.code));
+      const userCustomEntries: BaseCountry[] = customEntries.map((entry) => ({
+        name: entry.name || 'Custom',
+        code: `custom-${entry._id}`,
+        category: 'Custom',
+        flag: entry.flagUrl,
+        updatedAt: entry.updatedAt,
+        groupId: entry.groupId ?? undefined,
+      }));
+      const ownCodes = new Set(userCustomEntries.map((c) => c.code));
 
-      const customCountries = [...userCustomEntries, ...importedCustomEntries];
+      // A loaded contest lists every custom entry it uses, the user's own
+      // included. Those stay regular custom entries: showing them as Imported
+      // hid them from Custom and offered to save them again as duplicates.
+      const customCountries = [
+        ...userCustomEntries,
+        ...importedCustomEntries.filter((c) => !ownCodes.has(c.code)),
+      ];
 
       useCountriesStore.setState({ customCountries });
     } else {

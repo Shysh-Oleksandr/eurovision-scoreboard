@@ -5,7 +5,10 @@ import { createPortal } from 'react-dom';
 
 import Image from 'next/image';
 
+import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { IS_NATIVE_APP } from '@/native/platform';
+import { hideSplashWhenPainted } from '@/native/splash';
 import { useGeneralStore } from '@/state/generalStore';
 
 export const ANIMATION_DURATION = 200;
@@ -13,14 +16,15 @@ export const ANIMATION_DURATION = 200;
 /**
  * `fullScreenOnPhone` below the `2cols` breakpoint: the box stretches to the
  * overlay (the visible viewport, whatever browser bars or PWA mode leave),
- * drops its margins/rounding, clears any top inset (none while the status
- * bar is opaque, but cheap insurance), and exposes the home-indicator inset
- * as `--modal-safe-bottom` for the footer (`ModalBottomContent`,
+ * drops its margins/rounding, clears any top inset (none on the website
+ * while the status bar is opaque; the native apps draw under it), and
+ * exposes the home-indicator inset (`--safe-bottom-bar`) as
+ * `--modal-safe-bottom` for the footer (`ModalBottomContent`,
  * `ModalBottomCloseButton`, …) to add to its padding, so the footer's own
  * background runs to the screen edge.
  */
 const FULL_SCREEN_CONTAINER =
-  'max-2cols:flex max-2cols:flex-col max-2cols:self-stretch max-2cols:!h-auto max-2cols:!mx-0 max-2cols:!max-w-none max-2cols:!rounded-none max-2cols:!border-0 max-2cols:[--modal-safe-bottom:env(safe-area-inset-bottom)]';
+  'max-2cols:flex max-2cols:flex-col max-2cols:self-stretch max-2cols:!h-auto max-2cols:!mx-0 max-2cols:!max-w-none max-2cols:!rounded-none max-2cols:!border-0 max-2cols:[--modal-safe-bottom:var(--safe-bottom-bar)]';
 const FULL_SCREEN_CONTENT =
   'max-2cols:flex-1 max-2cols:min-h-0 max-2cols:!h-auto max-2cols:!max-h-none';
 
@@ -77,6 +81,15 @@ const Modal: React.FC<ModalProps> = ({
   );
   const [isMounted, setIsMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
+
+  // Android back closes the modal like a backdrop tap; one without `onClose`
+  // swallows the press so it can't close whatever is underneath.
+  useBackHandler(isActive, () => onClose?.());
+
+  // A launch into a modal (usually Event Setup): it is the first screen.
+  useEffect(() => {
+    if (isActive && IS_NATIVE_APP) void hideSplashWhenPainted();
+  }, [isActive]);
 
   const isMobileInLandscape = useMediaQuery(
     '(max-height: 480px) and (orientation: landscape)',
@@ -135,7 +148,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
-      className={`fixed inset-0 flex items-center justify-center pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] z-[100] transition-colors duration-[200ms] ${
+      className={`fixed inset-0 flex items-center justify-center pl-[var(--safe-left)] pr-[var(--safe-right)] z-[100] transition-colors duration-[200ms] ${
         isActive
           ? `bg-black bg-opacity-60 ${
               (blurModalBackground && withBlur) || shouldBlur
@@ -161,8 +174,8 @@ const Modal: React.FC<ModalProps> = ({
           fullScreenOnPhone
             ? `${FULL_SCREEN_CONTAINER} ${
                 hasWinterTopPadding
-                  ? 'max-2cols:pt-[calc(env(safe-area-inset-top)+0.25rem)]'
-                  : 'max-2cols:pt-[env(safe-area-inset-top)]'
+                  ? 'max-2cols:pt-[calc(var(--safe-top)+0.25rem)]'
+                  : 'max-2cols:pt-[var(--safe-top)]'
               }`
             : ''
         } ${containerClassName}`}

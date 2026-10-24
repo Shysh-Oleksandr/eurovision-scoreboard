@@ -11,6 +11,7 @@ import FollowersModal from './FollowersModal';
 import { useFollowingStatusQuery } from '@/api/follows';
 import Button from '@/components/common/Button';
 import FollowButton from '@/components/common/FollowButton';
+import UserModerationMenu from '@/components/moderation/UserModerationMenu';
 import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
@@ -106,6 +107,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
           Icon={<Share2 className="sm:size-6 size-5" />}
         ></Button>
         {additionalContent}
+        <UserModerationMenu user={user} />
       </div>
     </div>
   );

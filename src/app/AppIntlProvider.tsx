@@ -3,6 +3,7 @@
 import { IntlErrorCode, NextIntlClientProvider } from 'next-intl';
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -10,6 +11,9 @@ import React, {
 } from 'react';
 
 import type { SupportedLocale } from '@/i18n/catalog';
+import { catalogUrlFor } from '@/i18n/catalogUrl';
+import { resolveNativeLocale, storeLocale } from '@/i18n/nativeLocale';
+import { IS_NATIVE_APP } from '@/native/platform';
 
 /**
  * Client-side i18n provider that keeps the full message catalog OUT of the
@@ -25,6 +29,12 @@ import type { SupportedLocale } from '@/i18n/catalog';
  * arrive and the effect refetches; until the new catalog lands the previous
  * locale+messages pair keeps rendering, so no mixed-locale or missing-key
  * frame ever paints.
+ *
+ * Native apps (IS_NATIVE_APP): the static export is rendered once in English
+ * and has no server to ask, so the props only seed the first render. The
+ * provider picks the locale itself (saved choice, else device language — see
+ * i18n/nativeLocale.ts), fetches that bundled catalog, and switches locales
+ * through `useSetAppLocale()` with the same no-mixed-frame guarantee.
  */
 type Props = {
   locale: SupportedLocale;
@@ -36,6 +46,13 @@ type Props = {
 const CatalogReadyContext = createContext(false);
 
 export const useCatalogReady = () => useContext(CatalogReadyContext);
+
+/** Native apps only: switch and persist the UI locale on the client. */
+const SetAppLocaleContext = createContext<(locale: SupportedLocale) => void>(
+  () => {},
+);
+
+export const useSetAppLocale = () => useContext(SetAppLocaleContext);
 
 export default function AppIntlProvider({
   locale,
@@ -53,7 +70,29 @@ export default function AppIntlProvider({
 
   readyRef.current = state.ready;
 
+  // Native: resolved after mount (storage and navigator are client-only),
+  // so the first render still matches the static HTML.
+  const [nativeLocale, setNativeLocale] = useState<SupportedLocale | null>(
+    null,
+  );
+
   useEffect(() => {
+    if (IS_NATIVE_APP) setNativeLocale(resolveNativeLocale());
+  }, []);
+
+  const setAppLocale = useCallback((next: SupportedLocale) => {
+    storeLocale(next);
+    setNativeLocale(next);
+  }, []);
+
+  const targetLocale = IS_NATIVE_APP ? nativeLocale : locale;
+  const targetUrl = IS_NATIVE_APP
+    ? nativeLocale && catalogUrlFor(nativeLocale)
+    : catalogUrl;
+
+  useEffect(() => {
+    if (!targetLocale || !targetUrl) return;
+
     let cancelled = false;
 
     const fetchCatalog = async (url: string) => {
@@ -68,16 +107,25 @@ export default function AppIntlProvider({
       let catalog: Record<string, unknown> | null = null;
 
       try {
-        catalog = await fetchCatalog(catalogUrl);
-      } catch {
+        catalog = await fetchCatalog(targetUrl);
+      } catch (error) {
+        let lastError: unknown = error;
+
         // Deploy race (document names a pruned hash) or a blocked static
-        // path — the API route serves the current catalog uncached.
-        try {
-          catalog = await fetchCatalog(`/api/messages/${locale}`);
-        } catch (error) {
+        // path — the API route serves the current catalog uncached. The
+        // native bundle has no API routes, and its catalogs ship with it.
+        if (!IS_NATIVE_APP) {
+          try {
+            catalog = await fetchCatalog(`/api/messages/${targetLocale}`);
+          } catch (fallbackError) {
+            lastError = fallbackError;
+          }
+        }
+
+        if (!catalog) {
           console.error(
             'i18n catalog failed to load; continuing with shell messages',
-            error,
+            lastError,
           );
         }
       }
@@ -85,7 +133,7 @@ export default function AppIntlProvider({
       if (cancelled) return;
 
       if (catalog) {
-        setState({ locale, messages: catalog, ready: true });
+        setState({ locale: targetLocale, messages: catalog, ready: true });
       } else {
         // Degraded: unblock the app with whatever we have rather than
         // holding the gate closed forever.
@@ -98,7 +146,13 @@ export default function AppIntlProvider({
     return () => {
       cancelled = true;
     };
-  }, [locale, catalogUrl]);
+  }, [targetLocale, targetUrl]);
+
+  // The static document says lang="en"; keep it truthful for screen readers
+  // and hyphenation once the native locale is known.
+  useEffect(() => {
+    if (IS_NATIVE_APP) document.documentElement.lang = state.locale;
+  }, [state.locale]);
 
   return (
     <NextIntlClientProvider
@@ -117,7 +171,9 @@ export default function AppIntlProvider({
       }}
     >
       <CatalogReadyContext.Provider value={state.ready}>
-        {children}
+        <SetAppLocaleContext.Provider value={setAppLocale}>
+          {children}
+        </SetAppLocaleContext.Provider>
       </CatalogReadyContext.Provider>
     </NextIntlClientProvider>
   );

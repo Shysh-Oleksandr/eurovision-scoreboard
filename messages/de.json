@@ -83,7 +83,10 @@
       "label": "Beta",
       "hint": "Neu und noch in Arbeit. Sag uns über den Feedback-Button, was dir fehlt.",
       "hintFeedback": "Neu und noch in Arbeit · klicke, um Feedback zu senden"
-    }
+    },
+    "savedTo": "Gespeichert in {folder}",
+    "privacyPolicy": "Datenschutzerklärung",
+    "termsOfUse": "Nutzungsbedingungen"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -105,7 +108,6 @@
       "errorImageTooLarge": "Bild ist zu groß. Maximalgröße: {maxSize}MB. Bitte komprimiere es oder lade ein kleineres Bild hoch."
     },
     "invalidInput": "Ungültige Eingabe",
-    "pleaseSelectValidImageFile": "Bitte wähle eine gültige Bilddatei aus.",
     "fontUpload": {
       "unsupportedType": "„{name}“ ist keine unterstützte Schriftdatei. Verwende .woff2, .woff, .ttf oder .otf.",
       "tooLarge": "„{name}“ ist zu groß. Maximalgröße: {maxMb} MB.",
@@ -560,10 +562,12 @@
       "optSplitRandom": "Komplett zufällig",
       "optSplitRandomDesc": "Ein Topf kann größtenteils in einem Halbfinale landen",
       "cuSemisTitle": "Halbfinals",
-      "cuSemis": "Halbfinals in der Auslosung",
+      "cuSemis": "Stages in der Auslosung",
       "optAllSemis": "Alle Halbfinals",
+      "optFirstRound": "Nur die erste Runde",
+      "optFirstRoundDesc": "{stages}. Stages, in die sich Länder aus einer anderen Runde qualifizieren, bleiben außen vor.",
       "optChooseSemis": "Auswählen",
-      "optChooseSemisDesc": "Für Wettbewerbe mit drei oder mehr Halbfinals",
+      "optChooseSemisDesc": "Wähle selbst, in welche Stages gelost wird",
       "cuSizes": "Halbfinalgrößen",
       "optBalanced": "Ausgeglichen",
       "optBalancedDesc": "Gleich groß oder um eins verschieden",
@@ -732,6 +736,37 @@
       "title": "Profil",
       "description": "Dein Profil und deine Follower",
       "continueWithGoogle": "Weiter mit Google",
+      "continueWithApple": "Mit Apple fortfahren",
+      "continueWithEmail": "Weiter mit E-Mail",
+      "emailSignIn": {
+        "title": "Mit E-Mail anmelden",
+        "emailBody": "Wir schicken dir einen 6-stelligen Code per E-Mail. Kein Passwort nötig.",
+        "emailLabel": "E-Mail-Adresse",
+        "emailPlaceholder": "du@beispiel.de",
+        "sendCode": "Code senden",
+        "codeTitle": "Schau in dein Postfach",
+        "codeBody": "Gib den 6-stelligen Code ein, den wir an <b>{email}</b> geschickt haben.",
+        "codeLabel": "Code",
+        "signIn": "Anmelden",
+        "resend": "Neuen Code senden",
+        "resendIn": "Neuer Code in {seconds} s",
+        "codeResent": "Wir haben dir einen neuen Code geschickt.",
+        "changeEmail": "Andere E-Mail verwenden",
+        "spamHint": "Nicht gefunden? Schau im Spam-Ordner nach. Der Code gilt 10 Minuten.",
+        "errors": {
+          "invalidEmail": "Gib eine gültige E-Mail-Adresse ein.",
+          "tooManyRequests": "Zu viele Versuche. Versuch es später noch einmal.",
+          "tooManyRequestsWait": "Zu viele Versuche. Versuch es in {minutes, plural, one {# Minute} other {# Minuten}} noch einmal.",
+          "undeliverable": "Wir konnten keine E-Mail an diese Adresse senden. Prüfe sie und versuch es noch einmal.",
+          "sendFailed": "Der Code konnte nicht gesendet werden. Versuch es in ein paar Minuten noch einmal.",
+          "invalidCode": "Der Code stimmt nicht.",
+          "invalidCodeTriesLeft": "Der Code stimmt nicht. Noch {count, plural, one {# Versuch} other {# Versuche}}.",
+          "tooManyAttempts": "Zu viele falsche Codes. Fordere einen neuen an.",
+          "codeExpired": "Der Code ist abgelaufen. Fordere einen neuen an.",
+          "network": "Keine Verbindung. Prüfe dein Internet und versuch es noch einmal.",
+          "unknown": "Etwas ist schiefgelaufen. Versuch es noch einmal."
+        }
+      },
       "editProfile": "Profil bearbeiten",
       "authDescription": "Authentifiziere dich, um ein Profil zu erstellen, eigene Länder zu nutzen und mehr.",
       "loggingOut": "Abmeldung...",
@@ -753,7 +788,8 @@
       "follow": "Folgen",
       "signInToFollow": "Melde dich an, um zu folgen",
       "followingCount": "Folgt {count}",
-      "signIn": "Anmelden"
+      "signIn": "Anmelden",
+      "legalAgreement": "Wenn du fortfährst, stimmst du den <terms>Nutzungsbedingungen</terms> zu und bestätigst, dass du die <privacy>Datenschutzerklärung</privacy> gelesen hast."
     },
     "contentType": {
       "all": "Alle",
@@ -1413,7 +1449,7 @@
       },
       "uiPreferences": {
         "title": "UI-Einstellungen",
-        "content": "Passe Look and Feel in Einstellungen → UI-Einstellungen an:<list><item><strong>Flaggenstile</strong> — wechsle zu Herz-Icons, minimalistischen runden/quadratischen Flaggen oder behalte rechteckige Standardflaggen</item><item><strong>Rangliste immer anzeigen</strong> — Positionsnummern dauerhaft sichtbar halten plus Rangänderungs-Indikator für Auf- und Abstiege</item><item><strong>Popups</strong> — Qualifikanten-Popup, Siegerbekanntgabe und Konfetti unabhängig umschalten</item><item><strong>Vollbildmodus</strong> — Vollbild für eine immersive Scoreboard-Ansicht</item><item><strong>Jury-Fortschrittsbalken</strong> — zeigt, wie viele Länder in der aktuellen Jury-Runde bereits abgestimmt haben</item><item><strong>Eigenes Hintergrundbild</strong> — lade dein eigenes Bild hoch, um den Theme-Hintergrund zu ersetzen</item><item><strong>Immer dieselbe Schriftart verwenden</strong> — fixiere eine Schriftart unabhängig vom aktiven Theme</item><item><strong>Audio</strong> — separate Lautstärke für Soundeffekte und Hintergrundmusik oder deaktiviere gesamtes Theme-Audio auf einmal</item><item><strong>Winter-Effekte</strong> — fallenden Schnee mit einstellbarem Intensitätsregler aktivieren</item></list>"
+        "content": "Passe Look and Feel in Einstellungen → UI-Einstellungen an:<list><item><strong>Flaggenstile</strong> — wechsle zu Herz-Icons, minimalistischen runden/quadratischen Flaggen oder behalte rechteckige Standardflaggen</item><item><strong>Rangliste immer anzeigen</strong> — Positionsnummern dauerhaft sichtbar halten plus Rangänderungs-Indikator für Auf- und Abstiege</item><item><strong>Popups</strong> — Qualifikanten-Popup, Siegerbekanntgabe und Konfetti unabhängig umschalten</item><item><strong>Vollbildmodus</strong> — Vollbild für eine immersive Scoreboard-Ansicht</item><item><strong>Jury-Fortschrittsbalken</strong> — zeigt, wie viele Länder in der aktuellen Jury-Runde bereits abgestimmt haben</item><item><strong>Immer dieselbe Schriftart verwenden</strong> — fixiere eine Schriftart unabhängig vom aktiven Theme</item><item><strong>Audio</strong> — separate Lautstärke für Soundeffekte und Hintergrundmusik oder deaktiviere gesamtes Theme-Audio auf einmal</item><item><strong>Winter-Effekte</strong> — fallenden Schnee mit einstellbarem Intensitätsregler aktivieren</item></list>"
       },
       "confirmations": {
         "title": "Bestätigungspopups",
@@ -1463,10 +1499,6 @@
         "suppressedDialogs": "Unterdrückte Dialoge",
         "reset": "Zurücksetzen"
       },
-      "upload": {
-        "title": "Bild ablegen oder zum Durchsuchen klicken",
-        "subtext": "PNG, JPG oder WEBP · auf diesem Gerät gespeichert."
-      },
       "danger": {
         "confirm": "Ja, alles zurücksetzen"
       },
@@ -1477,10 +1509,10 @@
         "targetStages": "Anzeigen, in welche Phase jeder Qualifikant weiterkommt.",
         "blurModal": "Das Scoreboard hinter geöffneten Modals verwischen für mehr Fokus.",
         "overrideFont": "Die Schriftarten jedes Themes ignorieren (auch hochgeladene) und immer die unten gewählte für Interface und Scoreboard verwenden.",
-        "customBg": "Eigenes Hintergrundbild verwenden. Nur auf diesem Gerät gespeichert — nicht mit deinem Konto synchronisiert.",
         "winter": "Fallenden Schnee und festliche Akzente in der gesamten App hinzufügen.",
         "finalReveal": "Die finalen Televote-Punkte ein Land nach dem anderen mit dramatischer Animation enthüllen.",
-        "predictableReveal": "Televote-Punkte in einer gleichmäßigen, deterministischen Reihenfolge ohne zufällige Spannung enthüllen."
+        "predictableReveal": "Televote-Punkte in einer gleichmäßigen, deterministischen Reihenfolge ohne zufällige Spannung enthüllen.",
+        "haptics": "Vibriert bei 12 Punkten, bei der Bekanntgabe der Qualifikanten und beim Sieger."
       }
     },
     "relations": {
@@ -1608,7 +1640,6 @@
       "autoStartPresentationTooltip": "Startet automatisch die Präsentation nach Beginn des Votings."
     },
     "ui": {
-      "useCustomBackgroundImage": "Eigenes Hintergrundbild verwenden",
       "dragAndDropToUpload": "Zum Hochladen ziehen oder klicken",
       "useHeartIconsForFlags": "Herzsymbole für Flaggen verwenden",
       "alwaysShowRankings": "Rangliste immer anzeigen",
@@ -1622,10 +1653,10 @@
       "slow": "Langsam",
       "fast": "Schnell",
       "finalRevealLinearAnimation": "Gleichmäßige Animation (kein Zufall)",
+      "enableHaptics": "Haptisches Feedback",
       "enableFullscreenMode": "Vollbildmodus aktivieren",
       "warnBeforeManuallyAssigningTelevotePoints": "Vor manueller Televote-Punktevergabe warnen",
       "showJuryVotingProgressBar": "Jury-Fortschrittsbalken anzeigen",
-      "imageSizeIsPrettyLarge": "Die Bildgröße ist ziemlich groß ({size}MB). Das kann die Simulation verlangsamen. Möchtest du trotzdem fortfahren?",
       "language": "Sprache",
       "enableMinimalisticFlags": "Minimalistische Flaggen aktivieren",
       "enableWinterEffects": "Winter-Effekte aktivieren",
@@ -2296,25 +2327,7 @@
         "useLive": "Live-Scoreboard verwenden",
         "useManual": "Manuelle Liste eingeben"
       },
-      "cancel": "Abbrechen",
-      "report": {
-        "title": "„{name}“ melden?",
-        "body": "Sag uns, was mit dieser Vorlage nicht stimmt. Meldungen werden vom DouzePoints-Team geprüft.",
-        "reason": "Grund",
-        "reasons": {
-          "spam": "Spam oder irreführend",
-          "offensive": "Anstößiger Inhalt",
-          "copyright": "Urheber- oder Markenrecht",
-          "other": "Etwas anderes"
-        },
-        "details": "Details (optional)",
-        "detailsPlaceholder": "Alles, was uns hilft, das Problem zu verstehen",
-        "send": "Meldung senden",
-        "cancel": "Abbrechen",
-        "thanks": "Danke, die Meldung wurde gesendet.",
-        "already": "Du hast diese Vorlage bereits gemeldet.",
-        "failed": "Die Meldung konnte nicht gesendet werden."
-      }
+      "cancel": "Abbrechen"
     },
     "fields": {
       "columns": "Spalten",
@@ -2395,5 +2408,48 @@
       "editFields": "Felder bearbeiten",
       "hideFields": "Felder ausblenden"
     }
+  },
+  "moderation": {
+    "report": "Melden",
+    "reportUser": "Nutzer melden",
+    "blockUser": "Nutzer blockieren",
+    "unblockUser": "Nutzer entsperren",
+    "unblock": "Entsperren",
+    "reportTitle": "„{name}“ melden",
+    "reportUserTitle": "{name} melden",
+    "reportBody": "Sag uns, was nicht stimmt. Das DouzePoints-Team prüft jede Meldung und entfernt Inhalte, die gegen die Nutzungsbedingungen verstoßen.",
+    "reason": "Grund",
+    "reasons": {
+      "spam": "Spam oder irreführend",
+      "offensive": "Anstößiger Inhalt",
+      "copyright": "Urheber- oder Markenrecht",
+      "other": "Etwas anderes"
+    },
+    "details": "Details (optional)",
+    "detailsPlaceholder": "Alles, was uns hilft, das Problem zu verstehen",
+    "alsoBlock": "{name} auch blockieren",
+    "send": "Meldung senden",
+    "thanks": "Danke, die Meldung wurde gesendet.",
+    "already": "Du hast das bereits gemeldet.",
+    "failed": "Die Meldung konnte nicht gesendet werden.",
+    "signInToReport": "Melde dich an, um Inhalte oder Nutzer zu melden.",
+    "blockConfirmTitle": "{name} blockieren?",
+    "blockConfirmDescription": "Ihr seht die Themes, Wettbewerbe, Designs und Schriften des anderen nicht mehr in Community-Listen, in der Suche oder auf Profilen, und keiner von euch kann dem anderen folgen. Entsperren kannst du unter „Profil bearbeiten“.",
+    "blocked": "{name} ist blockiert.",
+    "unblocked": "{name} ist entsperrt.",
+    "blockFailed": "Der Nutzer konnte nicht blockiert werden.",
+    "unblockFailed": "Der Nutzer konnte nicht entsperrt werden.",
+    "blockedProfile": "Du hast diesen Nutzer blockiert, daher sind seine Inhalte ausgeblendet.",
+    "blockedUsers": "Blockierte Nutzer",
+    "blockedUsersDescription": "Du und die Personen, die du blockierst, seht die Inhalte des anderen nicht.",
+    "noBlockedUsers": "Du hast niemanden blockiert.",
+    "manageBlocked": "Verwalten",
+    "account": "Konto",
+    "deleteAccount": "Konto löschen",
+    "deleteAccountDescription": "Lösche dein Profil und alles, was in deinem Konto gespeichert ist, dauerhaft.",
+    "deleteAccountConfirmTitle": "Dein Konto löschen?",
+    "deleteAccountConfirmDescription": "Dein Profil, deine Wettbewerbe, Themes, Designs, Schriften und eigenen Beiträge werden gelöscht, ebenso deine Likes, Saves, Follows und Blockierungen. Das kann nicht rückgängig gemacht werden. Einstellungen und Entwürfe, die nur auf diesem Gerät gespeichert sind, bleiben erhalten.",
+    "accountDeleted": "Dein Konto wurde gelöscht.",
+    "deleteAccountFailed": "Dein Konto konnte nicht gelöscht werden. Bitte versuche es erneut."
   }
 }
