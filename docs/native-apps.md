@@ -103,11 +103,38 @@ Free-signed builds expire after 7 days. Android: enable USB debugging, then
 `cd android && ./gradlew assembleDebug` →
 `android/app/build/outputs/apk/debug/app-debug.apk`.
 
+**Store builds.** Commit everything, run `yarn cap:sync`, build both
+platforms before touching any native file, and tag the commit: the build
+bakes in the native runtime fingerprints, and live updates only reach a
+binary whose runtime matches (§11). Version numbers are not part of the
+fingerprint. The store forms and review notes: [store-submission.md](store-submission.md).
+
+- **iOS:** in the App target → General, raise Build
+  (`CURRENT_PROJECT_VERSION`) for every upload and Version
+  (`MARKETING_VERSION`) for every App Store release. Pick the destination
+  "Any iOS Device (arm64)", Product → Archive, then Organizer → Distribute
+  App → App Store Connect. Automatic signing with team `524WC6G2D9` makes
+  the distribution certificate and profile. The build shows up in
+  TestFlight once processed. Archiving is not affected by the Xcode 27
+  simulator problem.
+- **Android:** raise `versionCode` (every upload) and `versionName` in
+  `android/app/build.gradle`. Copy `android/keystore.properties.example` to
+  `android/keystore.properties` (gitignored) and fill in the upload
+  keystore's password, then `cd android && ./gradlew bundleRelease` →
+  `android/app/build/outputs/bundle/release/app-release.aab`. Without the
+  file the release bundle is unsigned; debug builds don't use it. Android
+  Studio's Build → Generate Signed App Bundle works without the file
+  (output in the gitignored `android/app/release/`). Upload to internal
+  testing first: only builds installed from Play carry the Play App Signing
+  key that the Android OAuth client and `assetlinks.json` expect.
+
 **Debugging:** Safari → Develop → *device* → `localhost` (enable "Show
 features for web developers" first); Chrome → `chrome://inspect` for
 Android. Debug builds are inspectable by default.
 
 ## 3. Live reload
+
+Step-by-step for real phones: [native-dev-on-devices.md](native-dev-on-devices.md).
 
 ```bash
 yarn dev:native                 # or `yarn dev` for the website's code paths
@@ -209,6 +236,11 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   (`pt-[var(--safe-top)]`). Capacitor's Android `SystemBars` sets
   `--safe-area-inset-*` because old WebViews report wrong `env()` values
   edge to edge; the variables fall back to `env()` everywhere else.
+  A bar whose background runs to the bottom edge (modal footers via
+  `--modal-safe-bottom`, bottom sheets, the editor's tab bar) pads with
+  `var(--safe-bottom-bar)` instead: the whole inset on Android, but at most
+  14px on iOS, where the home indicator only fills the bottom 13px of its
+  34px inset. Floating elements keep `--safe-bottom`.
 - **Live updates ship JS, never native changes.** A web change reaches
   installed apps through `yarn live-update publish` (§11). Anything that
   changes the native runtime fingerprint (a plugin or its version,
@@ -263,8 +295,8 @@ renders that language; switching POSTs to `/api/locale` and calls
   image with an injected flagcdn.com image: the plugin call shows in logcat
   and the pixels are in the output.
 - Custom fonts are fetched from R2 (`cdn.douzepoints.app`), whose CORS
-  allowlist does not include the app origins yet, so uploaded fonts do not
-  load in the apps (plan, Phase 2).
+  allowlist includes both app origins (applied by the owner, checked
+  2026-10-23).
 - **Saving** (`saveFile()`: share images, stats images, editor exports,
   design JSON backups). WKWebView ignores `<a download>`, so:
   - Android 10+: the app's own `MediaSaver` plugin
@@ -382,15 +414,47 @@ uses Apple's white style for dark backgrounds (`Button` variant `apple`).
 | Backend env | `APPLE_BUNDLE_ID`, `APPLE_SERVICES_ID` | Defaults `app.douzepoints`, `app.douzepoints.web` |
 | Apple portal | Services ID `app.douzepoints.web` | Domains `douzepoints.app`, `api.douzepoints.app`; the return URL above. Its description is the name Apple's web sheet shows |
 
+**Email sign-in** (added 2026-10-10, every platform): "Continue with email"
+in `SignInButtons` opens a code dialog that needs no native plugin. In the
+apps, `loginWithEmailCode()` sends `native: true` to `/auth/email/verify`,
+stores the returned refresh token in the Keychain / Keystore and then runs
+the same path as above. On Android it is the way in for anyone without
+Google, including iPhone users who signed in with Apple. Details:
+[email-sign-in.md](email-sign-in.md).
+
 ## 8. Shell: icons, splash, system bars, back button, haptics, languages
 
-- Sources live in `assets/` (`icon-only`, `icon-foreground`,
-  `icon-background`, `splash`, `splash-dark`; @capacitor/assets "Custom
-  Mode"). The current art is a placeholder made by
-  `scripts/compose-app-assets.mjs`: the website's microphone favicon on the
-  2026 navy (`#070b24` → `#1c2360`). Replace the files and run
-  `yarn assets:native`, which rewrites the iOS asset catalogs and the
-  Android mipmaps and splash drawables.
+- **App icon.** The artwork is the design handoff's vectors in
+  `assets/brand/` (heart strokes + cyan mic on `#020B2F`), in two variants
+  that differ only in the mic capsule: V1 round, V2 squarer (default).
+  Per variant: `ios-1024` (full bleed, iOS crops the stroke ends),
+  `android-foreground-1024[-transparent]` (the mark at scale 0.619, inside
+  the 626 px safe circle of the 108 dp canvas) and
+  `mono-1024-transparent` (iOS tinted). Never redraw: rasterize.
+  `node scripts/compose-app-assets.mjs [--variant V1]` writes everything
+  from one variant, then `yarn assets:native` updates the projects:
+  - native sources in `assets/` (@capacitor/assets "Custom Mode"):
+    `icon-only` (iOS), `icon-foreground` + `icon-background` (Android
+    adaptive; the tool insets both layers by 16.7%, so the foreground is
+    the central two-thirds of the 108 dp framing), `android/icon` (legacy
+    square/round icons; without it the tool crops `icon-only` into a
+    circle), `splash`, `splash-dark`, `icon-tinted` and
+    `store/play-store-icon-512.png` (upload by hand);
+  - the website set in `public/img/brand/` (`favicon.ico` and `icon.svg`
+    transparent and edge to edge, opaque navy `icon-192/512.png` and
+    `apple-touch-icon.png` with 10% padding, wired in
+    `src/app/layout.tsx`), plus `public/favicon.ico`. Nothing masks these
+    to a circle, so they use the mark cropped to its strokes, not the
+    Android framing;
+  - `public/img/brand/mark.png`, the mark alone on transparent, cropped to
+    a square, used by the share-image branding (`BrandingElement.tsx`,
+    1.75em but laid out as 1.4em so saved designs don't shift).
+    Sharp resizes before it extends or composites whatever the call order,
+    so the script resizes in a separate pipeline.
+- `yarn assets:native` runs `scripts/ios-icon-appearances.mjs` after the
+  tool, which re-adds the iOS 18 tinted icon to `AppIcon.appiconset`
+  (the tool rewrites its `Contents.json`). No dark icon: the default one is
+  already navy. Not done yet: an Android 13 monochrome (themed) layer.
 - The asset tool also reformats `AndroidManifest.xml` (whitespace only);
   revert that.
 - Android 12+ shows the launcher icon on `windowSplashScreenBackground`
@@ -405,11 +469,18 @@ uses Apple's white style for dark backgrounds (`Button` variant `apple`).
 - **System bars** (`SystemBars` in `capacitor.config.ts`): `style: 'DARK'`
   (light icons; every theme is dark) and edge to edge, so the theme shows
   behind the status and navigation bars and `--safe-*` (§4) pads content.
+  Android 15+ enforces edge to edge; `MainActivity` turns it on for 14 and
+  older with `EdgeToEdge.enable` (transparent bars, light icons, no
+  3-button nav scrim). Without that call, Capacitor passes WebView 140+ the
+  real insets as `--safe-area-inset-*` while the window still pads the
+  WebView: double padding at the top and bottom, and the bars show
+  `android:windowBackground` (seen on an Android 14 phone, 2026-10-23).
   Android WebViews older than 140 can't go edge to edge: Capacitor pads the
   WebView instead and the bars show `android:windowBackground`
   (`styles.xml`, the splash navy; the white of the default theme before).
-  Verified on WebView 136 (emulator) and the iOS 26 simulator; the edge to
-  edge Android path (WebView 140+, i.e. updated phones) is untested.
+  Verified on WebView 136 (emulator), WebView 155 on an Android 14 phone
+  (full-screen WebView, single insets) and the iOS 26 simulator; Android
+  15+ with WebView 140+ is untested.
   `useStatusBarThemeColor` only matters on the website.
 - **Android back button** (`src/native/backButton.ts`, `@capacitor/app`):
   closes the innermost overlay registered with `useBackHandler` (§4), else
@@ -444,11 +515,10 @@ uses Apple's white style for dark backgrounds (`Button` variant `apple`).
 
 Tracked in the plan with the phase that fixes each item:
 
-- Until the backend changes are deployed and the Google Cloud clients exist,
-  sign-in and every backend call fail in the apps (lists such as Public
-  Contests show an empty result rather than an error).
-- Uploaded fonts until the R2 CORS rule includes the app origins
-  (`npm run r2:cors -- --apply` in the backend).
+- Account deletion, blocking, reports and email sign-in until the backend's
+  `feat/app-store-readiness` work is deployed (production answered 404 for
+  `DELETE /account` and `/auth/email/start` on 2026-10-23; Google and Apple
+  sign-in and the app-origin CORS are live).
 - Shared links open the website, not the app, until the website with the
   `.well-known` files is deployed (§12). On Android 14 and older they
   always will.

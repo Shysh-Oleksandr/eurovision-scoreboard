@@ -16,7 +16,7 @@
         <!-- Shows behind the system bars on WebViews older than 140, where
              Capacitor pads the WebView instead of drawing edge to edge
              (keep in sync with capacitor.config.ts SPLASH_BACKGROUND). -->
-        <item name="android:windowBackground">#0B0F2E</item>
+        <item name="android:windowBackground">#020B2F</item>
     </style>
 
 
@@ -24,6 +24,6 @@
         <item name="android:background">@drawable/splash</item>
         <!-- Android 12+ system splash: the launcher icon on this colour
              (keep in sync with capacitor.config.ts SPLASH_BACKGROUND). -->
-        <item name="windowSplashScreenBackground">#0B0F2E</item>
+        <item name="windowSplashScreenBackground">#020B2F</item>
     </style>
 </resources>

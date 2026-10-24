@@ -34,8 +34,9 @@ const PrivacyPolicy = () => (
           contests, settings and drafts stay on your device.
         </li>
         <li>
-          If you sign in with Google or Apple, we store the basic profile
-          details they share with us and the content you save to your account.
+          If you sign in with Google, Apple or your email address, we store the
+          basic profile details (for email, just the address) and the content
+          you save to your account.
         </li>
         <li>
           What you publish (your profile, public contests, themes, designs and
@@ -66,8 +67,8 @@ const PrivacyPolicy = () => (
 
     <H3>Account information</H3>
     <p>
-      An account is created when you sign in with Google or Apple. We receive
-      and store:
+      An account is created when you sign in with Google, Apple or your email
+      address. We receive and store:
     </p>
     <List>
       <li>
@@ -80,6 +81,11 @@ const PrivacyPolicy = () => (
         first sign-in, your name if you choose to share it. We also keep a token
         from Apple whose only use is to revoke DouzePoints&apos; access to your
         Apple ID when you delete your account.
+      </li>
+      <li>
+        <Strong>Email:</Strong> your email address. Each time you sign in, we
+        email you a one-time code and keep only a scrambled (hashed) copy of it
+        until it is used or expires 10 minutes later.
       </li>
       <li>
         A username we generate for you, and the display name, country and
@@ -110,6 +116,11 @@ const PrivacyPolicy = () => (
         <Strong>Sessions.</Strong> To keep you signed in we store a session
         record with a hashed token, its expiry date, and the user agent and IP
         address of the device that signed in.
+      </li>
+      <li>
+        <Strong>Abuse protection.</Strong> To stop sign-in codes being requested
+        or guessed in bulk, we count requests per IP address and per hashed
+        email address for up to a day.
       </li>
       <li>
         <Strong>Server logs.</Strong> Our servers and hosting providers process
@@ -191,8 +202,8 @@ const PrivacyPolicy = () => (
     </p>
     <List>
       <li>
-        <Strong>Cloudflare</Strong> hosts the website and stores and delivers
-        uploaded files and app content updates.
+        <Strong>Cloudflare</Strong> hosts the website, stores and delivers
+        uploaded files and app content updates, and sends our sign-in emails.
       </li>
       <li>
         <Strong>MongoDB Atlas</Strong> hosts our database.
@@ -201,8 +212,8 @@ const PrivacyPolicy = () => (
         <Strong>Our cloud hosting provider</Strong> runs the API server.
       </li>
       <li>
-        <Strong>Google and Apple</Strong> provide sign-in. They handle your
-        sign-in under their own privacy policies.
+        <Strong>Google and Apple</Strong> provide sign-in with their accounts.
+        They handle that sign-in under their own privacy policies.
       </li>
       <li>
         <Strong>Umami</Strong> provides anonymous website analytics.
@@ -226,6 +237,11 @@ const PrivacyPolicy = () => (
       <li>
         Session records: deleted automatically when they expire, 30 days after
         they were issued or last renewed.
+      </li>
+      <li>
+        Sign-in codes: deleted when used, or automatically 10 minutes after they
+        were sent. Request counts for abuse protection: deleted automatically
+        within a day.
       </li>
       <li>Error reports: for as long as we need them to fix the problem.</li>
       <li>

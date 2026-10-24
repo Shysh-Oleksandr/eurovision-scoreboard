@@ -20,7 +20,7 @@
     "cap:dev": "node scripts/cap-dev.mjs",
     "cap:open:ios": "cap open ios",
     "cap:open:android": "cap open android",
-    "assets:native": "capacitor-assets generate --ios --android",
+    "assets:native": "capacitor-assets generate --ios --android && node scripts/ios-icon-appearances.mjs",
     "live-update": "node scripts/live-update.mjs",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "yarn lint:js && yarn lint:css && yarn lint:types-cli && yarn lint:last-commit",

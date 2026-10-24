@@ -15,8 +15,9 @@ export interface DrawRules {
   /** Only used with `pots: 'custom'` (country codes per pot). */
   customPots: string[][] | null;
   split: PotSplitMode;
+  /** `all` = the first round (`getDefaultDrawSemis`), not every drawable stage. */
   semis: SemisMode;
-  /** `false` excludes a semi while `semis` is `choose`. */
+  /** Ticked / unticked stages while `semis` is `choose`; missing = as in `all`. */
   semisPick: Record<string, boolean>;
   sizes: SizesMode;
   /** Only used with `sizes: 'custom'`: stage id → size. */

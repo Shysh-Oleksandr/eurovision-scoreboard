@@ -81,7 +81,9 @@ Read `docs/` before touching non-obvious subsystems:
 - `adding-contest-editions.md` — adding a new ESC/JESC/ESC Asia year or a new contest series to the Contest select: `ContestType`, lineup JSON format and field rules, hosting logos, cache-busting, odds/spokesperson updates, verification checklist
 - `graphics-studio.md` — the design document model, element registry, deterministic export (snapdom + html-to-image fallback) and the share-image templates; read before touching share images or the graphics editor
 - `native-apps.md` — the Capacitor iOS/Android build: static-export flags, commands (Xcode 27 caveat), live reload, rules for native-aware code, client-side locale, native image fetching for exports, saving/sharing files (`fileActions`, Android MediaStore plugin), native Google sign-in + Sign in with Apple (iOS + website) + Keychain/Keystore refresh tokens, icons/splash, system bars + `--safe-*` vars, Android back button (`useBackHandler`), haptics, per-app languages, live updates (`yarn live-update publish`, native runtime fingerprints, signed bundles on R2), universal links / Android App Links (share links only, `.well-known` files, Android 15+ query matching), what doesn't work yet, emulator/simulator testing recipes. Roadmap, research and phase status: `plans/native-apps-plan.md`
+- `email-sign-in.md` — passwordless email sign-in (website + apps): the code dialog and `loginWithEmailCode`, the `/auth/email/*` API and error codes, account linking and normalized addresses, code storage and rate limits, sliding refresh-token rotation, Cloudflare Email Service sending (env, owner setup, review account); read before touching sign-in, sessions or sending email
 - `moderation-and-account-deletion.md` — reports (all content types + users, the app-wide `openReportDialog`), blocking (both directions, server-side list filtering), the admin queue at `/admin/reports`, in-app account deletion (what is deleted, in which order, Apple token revocation), the legal pages and the Terms agreement under the sign-in buttons
+- `store-submission.md` — what the apps collect and the matching App Store privacy labels and Play Data safety answers, age rating and content forms, trademark rules for the listings, review notes and the demo account; update it with the privacy policy whenever data collection changes
 - `USER_DATA_CLEARING.md`
 
 ## Code Style
@@ -91,3 +93,17 @@ Prettier: `singleQuote: true`, `trailingComma: 'all'`, `endOfLine: 'auto'`.
 ESLint enforces import ordering: built-in → external → internal (`@/*`) → relative siblings → index. Run `yarn lint:js` after reorganizing imports.
 
 `tsconfig.production.json` is stricter than `tsconfig.json` — `yarn lint:types-cli` catches type errors the dev build misses.
+
+## Agent skills
+
+### Issue tracker
+
+Local markdown under `.scratch/<feature>/` in the frontend repo (gitignored), covering frontend and backend work. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), recorded as `Status:` lines in issue files. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` + `docs/adr/` in the frontend repo, covering the backend too. See `docs/agents/domain.md`.

@@ -161,7 +161,7 @@ const DrawModeDialogs: React.FC = () => {
       isOpen={dialog !== null}
       onClose={closeDialog}
       overlayClassName="!z-[1050] max-2cols:!items-end"
-      containerClassName="dp-dialog dp-sheet !w-[min(470px,calc(100%-1.5rem))] !mx-0 !rounded-2xl max-2cols:!w-full max-2cols:!max-w-none max-2cols:!rounded-b-none max-2cols:!rounded-t-[18px] max-2cols:pb-[var(--safe-bottom)]"
+      containerClassName="dp-dialog dp-sheet !w-[min(470px,calc(100%-1.5rem))] !mx-0 !rounded-2xl max-2cols:!w-full max-2cols:!max-w-none max-2cols:!rounded-b-none max-2cols:!rounded-t-[18px] max-2cols:pb-[var(--safe-bottom-bar)]"
       contentClassName="!p-[22px] !py-[22px] max-2cols:!px-4 max-2cols:!pt-5 max-2cols:!pb-[18px]"
       unstyledSurface
       withBlur

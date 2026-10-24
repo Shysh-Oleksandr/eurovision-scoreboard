@@ -20,7 +20,7 @@ export const getFinalStage = (
   return sorted[sorted.length - 1] ?? null;
 };
 
-/** Stages the draw places countries into: every stage that qualifies into another. */
+/** Stages the draw can place countries into: every stage that qualifies into another. */
 export const getDrawableSemis = (
   stages: readonly EventStage[],
 ): EventStage[] => {
@@ -30,6 +30,25 @@ export const getDrawableSemis = (
   return sorted.filter(
     (s) => s !== last && !!s.qualifiesTo && s.qualifiesTo.length > 0,
   );
+};
+
+/**
+ * Stages the draw fills by default (`semis: 'all'`): the first round, i.e. the
+ * drawable stages no other stage qualifies into. Heats → semi-finals → final
+ * draws into the heats only. Falls back to every drawable stage when the first
+ * round alone has fewer than two (a small pre-qualifying round feeding semis
+ * that also have direct entries).
+ */
+export const getDefaultDrawSemis = (
+  stages: readonly EventStage[],
+): EventStage[] => {
+  const drawable = getDrawableSemis(stages);
+  const fed = new Set(
+    stages.flatMap((s) => (s.qualifiesTo ?? []).map((q) => q.targetStageId)),
+  );
+  const firstRound = drawable.filter((s) => !fed.has(s.id));
+
+  return firstRound.length >= 2 ? firstRound : drawable;
 };
 
 export type DrawUnavailableReason = 'gfOnly' | 'fewSemis' | null;
@@ -48,10 +67,15 @@ export const getDrawUnavailableReason = (
 export const getDrawSemis = (
   stages: readonly EventStage[],
   rules: Pick<DrawRules, 'semis' | 'semisPick'>,
-): EventStage[] =>
-  getDrawableSemis(stages).filter(
-    (s) => rules.semis === 'all' || rules.semisPick[s.id] !== false,
+): EventStage[] => {
+  const byDefault = new Set(getDefaultDrawSemis(stages).map((s) => s.id));
+
+  return getDrawableSemis(stages).filter((s) =>
+    rules.semis === 'all'
+      ? byDefault.has(s.id)
+      : rules.semisPick[s.id] ?? byDefault.has(s.id),
   );
+};
 
 export interface BuildDrawInputArgs {
   stages: readonly EventStage[];

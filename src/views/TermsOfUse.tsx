@@ -46,8 +46,8 @@ const TermsOfUse = () => (
     <List>
       <li>
         You can use the simulator without an account. Saving to the cloud,
-        publishing and the social features need you to sign in with Google or
-        Apple, which creates your account.
+        publishing and the social features need you to sign in with Google,
+        Apple or your email address, which creates your account.
       </li>
       <li>
         You must be at least 13 years old (or the minimum age required where you

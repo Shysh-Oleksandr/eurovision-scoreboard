@@ -44,7 +44,10 @@ import Modal from '@/components/common/Modal/Modal';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
-import { getDrawableSemis } from '@/state/allocationDraw/drawInput';
+import {
+  getDefaultDrawSemis,
+  getDrawableSemis,
+} from '@/state/allocationDraw/drawInput';
 import { countRuleChanges } from '@/state/allocationDraw/types';
 import { useAllocationDrawStore } from '@/state/allocationDrawStore';
 import { useCountriesStore } from '@/state/countriesStore';
@@ -209,6 +212,13 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
   const errorView = state.error ? errorCopy(copy, state.error, rules) : null;
   const changes = countRuleChanges(rules);
   const drawableSemis = useMemo(() => getDrawableSemis(stages), [stages]);
+  const firstRoundNames = useMemo(() => {
+    const firstRound = getDefaultDrawSemis(stages);
+
+    return firstRound.length < drawableSemis.length
+      ? copy.listNames(firstRound.map((s) => s.name))
+      : null;
+  }, [stages, drawableSemis, copy]);
   const hasOfficialPots = useMemo(
     () => allCountriesForYear.some((c) => !!c.pot),
     [allCountriesForYear],
@@ -576,6 +586,7 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
           input={input}
           rules={rules}
           drawableSemis={drawableSemis}
+          firstRoundNames={firstRoundNames}
           hasOfficialPots={hasOfficialPots}
           contestYear={contestYear}
           entering={customizeEntering}

@@ -18,12 +18,13 @@ export const ANIMATION_DURATION = 200;
  * overlay (the visible viewport, whatever browser bars or PWA mode leave),
  * drops its margins/rounding, clears any top inset (none on the website
  * while the status bar is opaque; the native apps draw under it), and
- * exposes the home-indicator inset as `--modal-safe-bottom` for the footer
- * (`ModalBottomContent`, `ModalBottomCloseButton`, …) to add to its padding,
- * so the footer's own background runs to the screen edge.
+ * exposes the home-indicator inset (`--safe-bottom-bar`) as
+ * `--modal-safe-bottom` for the footer (`ModalBottomContent`,
+ * `ModalBottomCloseButton`, …) to add to its padding, so the footer's own
+ * background runs to the screen edge.
  */
 const FULL_SCREEN_CONTAINER =
-  'max-2cols:flex max-2cols:flex-col max-2cols:self-stretch max-2cols:!h-auto max-2cols:!mx-0 max-2cols:!max-w-none max-2cols:!rounded-none max-2cols:!border-0 max-2cols:[--modal-safe-bottom:var(--safe-bottom)]';
+  'max-2cols:flex max-2cols:flex-col max-2cols:self-stretch max-2cols:!h-auto max-2cols:!mx-0 max-2cols:!max-w-none max-2cols:!rounded-none max-2cols:!border-0 max-2cols:[--modal-safe-bottom:var(--safe-bottom-bar)]';
 const FULL_SCREEN_CONTENT =
   'max-2cols:flex-1 max-2cols:min-h-0 max-2cols:!h-auto max-2cols:!max-h-none';
 

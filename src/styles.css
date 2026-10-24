@@ -48,6 +48,24 @@ aside {
   --safe-right: var(--safe-area-inset-right, env(safe-area-inset-right));
   --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
   --safe-left: var(--safe-area-inset-left, env(safe-area-inset-left));
+
+  /*
+   * Bottom padding for a bar whose background runs to the screen's bottom
+   * edge (modal footers, bottom sheets). On Android the whole inset is the
+   * gesture handle or the 3-button bar.
+   */
+  --safe-bottom-bar: var(--safe-bottom);
+}
+
+/*
+ * iOS (WebKit on iOS is the only engine with -webkit-touch-callout): the home
+ * indicator sits in the bottom 13px of the 34px inset, so bars only keep
+ * 14px clear of it instead of the whole inset.
+ */
+@supports (-webkit-touch-callout: none) {
+  :root {
+    --safe-bottom-bar: min(var(--safe-bottom), 14px);
+  }
 }
 
 html[data-font='montserrat'] {

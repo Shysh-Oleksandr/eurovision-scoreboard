@@ -5,6 +5,7 @@ import React from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { queryClient } from '@/api/queryClient';
+import EmailSignInHost from '@/components/auth/EmailSignInHost';
 import { ConfirmationProvider } from '@/components/common/ConfirmationProvider';
 import ReportDialogHost from '@/components/moderation/ReportDialogHost';
 import { SyncUserPreferences } from '@/components/SyncUserPreferences';
@@ -15,6 +16,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <SyncUserPreferences />
       <ConfirmationProvider>{children}</ConfirmationProvider>
       <ReportDialogHost />
+      <EmailSignInHost />
     </QueryClientProvider>
   );
 }

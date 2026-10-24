@@ -14,8 +14,8 @@ import type { CapacitorConfig } from '@capacitor/cli';
  * if needed.
  */
 
-/** Navy of the splash art (assets/, scripts/compose-app-assets.mjs). */
-const SPLASH_BACKGROUND = '#0B0F2E';
+/** Navy of the app icon and splash art (assets/brand/, scripts/compose-app-assets.mjs). */
+const SPLASH_BACKGROUND = '#020B2F';
 
 /**
  * Live updates are signed with ~/keys/douzepoints-live-update.pem; binaries

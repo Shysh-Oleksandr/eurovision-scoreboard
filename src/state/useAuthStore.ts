@@ -35,6 +35,17 @@ export interface AuthState {
   /** Native apps: the account sheet / token exchange is in progress. */
   isSigningIn: boolean;
   login: (provider: AuthProvider) => void;
+  /**
+   * Email sign-in, step 2 (`EmailSignInModal`): exchanges the emailed code
+   * for a session, creating the account on first use. Rejects with the
+   * server's error for a wrong or expired code; resolves false if the
+   * session couldn't be loaded after that.
+   */
+  loginWithEmailCode: (
+    email: string,
+    code: string,
+    locale: string,
+  ) => Promise<boolean>;
   handlePostLogin: (force?: boolean) => Promise<boolean>;
   refresh: () => Promise<string | undefined>;
   fetchMe: () => Promise<void>;
@@ -97,6 +108,33 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
         window.location.href = `${API_BASE_URL}/auth/${provider}`;
+      },
+      loginWithEmailCode: async (email, code, locale) => {
+        if (IS_NATIVE_APP) {
+          // The apps keep the refresh token in the Keychain / Keystore, as
+          // after a native Google or Apple sign-in.
+          const { data } = await api.post('/auth/email/verify', {
+            email,
+            code,
+            locale,
+            native: true,
+          });
+          const { setRefreshToken } = await nativeAuth();
+
+          await setRefreshToken(data.refreshToken);
+          set({ accessToken: data.accessToken });
+        } else {
+          // The response sets the website's refresh cookie.
+          const { data } = await api.post('/auth/email/verify', {
+            email,
+            code,
+            locale,
+          });
+
+          set({ accessToken: data.accessToken });
+        }
+
+        return get().handlePostLogin(true);
       },
       handlePostLogin: async (force?: boolean) => {
         // Native: the stored refresh token, not the persisted user, says

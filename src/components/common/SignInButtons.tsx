@@ -1,3 +1,4 @@
+import { Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
@@ -7,6 +8,7 @@ import AppleIcon from '@/assets/icons/AppleIcon';
 import GoogleIcon from '@/assets/icons/GoogleIcon';
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/helpers/shareUrl';
 import { nativePlatform } from '@/native/platform';
+import { openEmailSignIn } from '@/state/emailSignInStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 type Props = {
@@ -17,12 +19,14 @@ type Props = {
 const legalLinkClass = 'underline hover:text-white transition-colors';
 
 /**
- * "Continue with Google" and "Continue with Apple". Apple appears on the
- * website and in the iOS app (App Store guideline 4.8), not in the Android
- * app. Its button follows Apple's white style for dark backgrounds; the two
- * stack at one width so Apple's is never the smaller one (Apple's HIG).
- * Signing in creates the account, so the Terms of Use (which forbid
- * objectionable content, App Store guideline 1.2) are agreed to here.
+ * "Continue with Google", "Continue with Apple" and "Continue with email".
+ * Apple appears on the website and in the iOS app (App Store guideline 4.8),
+ * not in the Android app. Its button follows Apple's white style for dark
+ * backgrounds; the buttons stack at one width so Apple's is never the
+ * smaller one (Apple's HIG). Email opens the code dialog
+ * (`EmailSignInModal`). Signing in creates the account, so the Terms of Use
+ * (which forbid objectionable content, App Store guideline 1.2) are agreed
+ * to here.
  */
 const SignInButtons = ({ size }: Props) => {
   const t = useTranslations('widgets.profile');
@@ -52,6 +56,15 @@ const SignInButtons = ({ size }: Props) => {
             disabled={isSigningIn}
           />
         )}
+        <Button
+          label={t('continueWithEmail')}
+          Icon={<Mail className={iconClass} />}
+          variant="tertiary"
+          size={size}
+          className="normal-case w-full justify-center"
+          onClick={openEmailSignIn}
+          disabled={isSigningIn}
+        />
       </div>
       <p className="max-w-[300px] text-center text-xs leading-relaxed text-white/55">
         {t.rich('legalAgreement', {

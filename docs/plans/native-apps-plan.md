@@ -24,6 +24,9 @@
 > Patreon card hidden in the apps, a rewritten privacy policy and new terms
 > of use (branch `feat/app-store-readiness` in both repos, uncommitted).
 > Details: [../moderation-and-account-deletion.md](../moderation-and-account-deletion.md).
+> **2026-10-10:** passwordless email sign-in (emailed codes) on the website
+> and both apps, plus sliding sessions; same branches, uncommitted. Owner
+> setup: Cloudflare Email Sending (see "Email sign-in" below).
 
 
 
@@ -182,7 +185,9 @@ and review rounds.
   sign-in isn't configured. Real Google sign-in is untested until the
   OAuth clients exist.
   ```
-- [ ] **Owner:** deploy the backend (`feat/capacitor-port`), set
+- [x] **Owner:** deploy the backend (`feat/capacitor-port`; live in
+  production, checked 2026-10-23: `/auth/google/native` answers and the API
+  allows both app origins), set
   ```
   `GOOGLE_NATIVE_CLIENT_IDS` there to the iOS client ID (Android tokens
   carry the web client ID, which `GOOGLE_CLIENT_ID` already covers), and
@@ -198,7 +203,8 @@ and review rounds.
   are in the frontend `.env`. Optional: an Android client for the upload
   key, only needed by release builds installed outside Play.
   ```
-- [ ] **Owner:** `npm run r2:cors` (dry run, check the merged list), then
+- [x] **Owner:** (applied, checked 2026-10-23: R2 allows both app origins)
+  `npm run r2:cors` (dry run, check the merged list), then
   ```
   `npm run r2:cors -- --apply`, so uploaded fonts load in the apps.
   ```
@@ -243,8 +249,9 @@ areas and languages, the iOS 26 simulator. Details:
 - [x] **System bars:** light icons, edge to edge with the theme behind
   ```
   them; on WebViews older than 140 the bars show the splash navy
-  instead of white. The edge to edge Android path (WebView 140+) is
-  untested on a device.
+  instead of white. Android 14 and older need `EdgeToEdge.enable` in
+  `MainActivity` (2026-10-23; fixed double padding and navy bars on an
+  Android 14 phone with WebView 155).
   ```
 - [x] **Safe areas:** `--safe-top` / `--safe-right` / `--safe-bottom` /
   ```
@@ -374,16 +381,23 @@ produces a value the code work needs (in brackets).
 - [x] Sign in with Apple (2026-10-10): iOS (`apple: true`, entitlement),
   ```
   backend token verification and code redemption, the website through
-  the Services ID. Android keeps Google only until email sign-in lands.
+  the Services ID. Android has Google and email sign-in.
   Revoking the Apple tokens landed with account deletion (2026-10-10).
   ```
-- [ ] **Owner:** set `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`
+- [ ] **Owner:** (env and deploy done, checked 2026-10-23: `GET /auth/apple`
+  redirects to Apple with `app.douzepoints.web`; trying both flows is left)
+  set `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`
   ```
   and `APPLE_CALLBACK_URL` on the production backend and deploy; rename
   the Services ID's description (Apple's web sheet shows it as the app
   name); then try both flows (website, and an iPhone run from Xcode).
   ```
-- [ ] Release signing: paid team in Xcode, Android `keystore.properties`.
+- [x] Release signing (2026-10-23): the Xcode project already uses the paid
+  team with automatic signing; `android/app/build.gradle` signs release
+  builds from the gitignored `android/keystore.properties` (template
+  `keystore.properties.example`; checked with a throwaway key). **Owner:**
+  create the file with the upload keystore's password. Steps:
+  [../native-apps.md](../native-apps.md) §2, "Store builds".
 - [x] In-app account deletion (5.1.1(v)), 2026-10-10: Edit profile →
   Delete account → `DELETE /account`. Deletes the content, uploads, social
   data and sessions and revokes Apple tokens.
@@ -418,10 +432,9 @@ produces a value the code work needs (in brackets).
   Play build (internal testing). `assetlinks.json` lists the Play App
   Signing key only; add the upload key's SHA-256 if release builds are
   ever installed outside Play.
-- [ ] Drafts of the privacy labels, the Data safety form and the review
-  ```
-  notes.
-  ```
+- [x] Drafts of the privacy labels, the Data safety form, the age rating
+  answers and the review notes (2026-10-23):
+  [../store-submission.md](../store-submission.md).
 - [x] Live updates (2026-10-10): `@capgo/capacitor-updater` 8.52 in manual
   ```
   mode with Capgo's cloud and stats off, `yarn live-update publish`
@@ -442,41 +455,51 @@ produces a value the code work needs (in brackets).
 
 
 
-## Later: email sign-in (not scheduled)
+## Email sign-in (code done 2026-10-10)
 
-Decided 2026-10-09 to add email sign-in after the launch, not before. Not a
-priority. On 2026-10-10 the owner chose email + password with an emailed
-confirmation code, on every platform (website, iOS, Android). Notes from
-the research on 2026-10-09:
+Moved before the first release on 2026-10-10, and changed from email +
+password to **passwordless codes**: an address, then a 6-digit emailed code,
+on the website and both apps. One flow signs in and signs up. Chosen for an
+audience of mostly children: nothing to forget or share, no reset flow, and
+the address is proven before an account exists. How it works:
+[../email-sign-in.md](../email-sign-in.md). Branch `feat/app-store-readiness`
+in both repos, uncommitted.
 
-- **Codes, not links.** Confirm the address (and reset a password, if there
-are passwords) with a 6-digit emailed code. A link would need universal
-links / app links to land in the app. Consider dropping passwords
-entirely (email, then a code, then signed in): no hashing, reset flow or
-password guessing, and the address is verified by construction. Refresh
-tokens last 30 days, so sign-ins and emails are rare.
-- **Backend:** `passwordHash` (if passwords; `bcryptjs` is already a
-dependency) and `emailVerifiedAt` on `Profile`; endpoints for register /
-login / verify / resend (+ forgot / reset); tokens issued exactly like
-`/auth/google/native` (body for the apps) and the Google callback (cookie
-for the web). Add `@nestjs/throttler` against guessing and against signup
-spam burning the email quota. Estimate: 1.5 to 2.5 days.
-- **Frontend:** an email form beside Google in the sign-in UI, the code
-step, errors, strings in every locale; the app path reuses the Keychain /
-Keystore storage. Estimate: 1.5 to 2 days.
-- **Account linking (security):** `findOrCreateFromGoogle` links by email.
-Never link a Google sign-in to an account whose email is not verified,
-or someone who registered the address first keeps a password into the
-owner's account. Registering an address that already has a Google
-account should point to Google sign-in (or set a password through the
-code flow).
-- **Email provider:** Resend (free: 3,000 a month, 100 a day). Fallback:
-Brevo (free: 300 a day). Cloudflare Email Service has no free tier
-(needs Workers Paid). Domain setup is SPF / DKIM / DMARC records in
-Cloudflare DNS. Check the free tiers again when starting.
+- [x] Backend: `/auth/email/start` + `/auth/email/verify` (cookie for the
+  website, body for the apps), HMAC'd single-use codes (10 minutes, 5
+  guesses), rate limits in MongoDB per address, per IP
+  (`CF-Connecting-IP`) and per day, Cloudflare Email Service REST sender
+  with a console fallback on a local backend, emails in the 9 app
+  languages, an optional review account.
+- [x] Accounts: normalized, case-insensitive addresses; a proven address
+  links to Google / Apple profiles; the website's Google strategy now only
+  links verified addresses; random usernames instead of ones built from the
+  address.
+- [x] Sliding sessions: refresh tokens rotate weekly with a 60 s grace for
+  racing requests, so only 30 days without use signs a user out.
+- [x] Frontend: "Continue with email" everywhere, the code dialog, strings
+  in every locale; privacy policy and terms updated.
+- [x] Verified against a throwaway backend (44 scripted checks) and the
+  website UI in Chrome. Not yet: real sending, the apps on a device.
+- [ ] **Owner:** Cloudflare → Email Service → Email Sending → onboard
+  `douzepoints.app`; an API token with "Email Sending: Edit"; set
+  `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_EMAIL_TOKEN` (optionally
+  `MAIL_FROM`, `MAIL_FROM_NAME`, `MAIL_REPLY_TO`, `EMAIL_LOGIN_DAILY_LIMIT`)
+  on the backend; deploy. Check the account's daily sending limit and ask
+  for more before the launch.
+- [ ] **Owner:** Apple Developer → Sign in with Apple for Email
+  Communication: register `douzepoints.app` and the sender, so codes reach
+  Hide My Email addresses; try one.
+- [ ] **Owner:** send codes to Gmail, Outlook and iCloud addresses (inbox,
+  not spam; sender name; code in the subject); sign in once in each app
+  (iOS: does the keyboard offer the code from Mail?).
+- [ ] **Owner, for the Play review (optional):** `EMAIL_REVIEW_ADDRESS` +
+  `EMAIL_REVIEW_CODE` for the App access form; unset them afterwards.
 - **Apple 4.8:** email sign-in does not replace Sign in with Apple while
-Google sign-in is offered, because it does not let users hide their
-address.
+  Google sign-in is offered, because it does not let users hide their
+  address.
+- Not done: an age question at sign-up (the terms say 13+ and nothing
+  checks it), changing an account's address, passkeys.
 
 
 

@@ -274,7 +274,7 @@ export function buildLandscapeFixture(): Design {
         opacity: 1,
         locked: false,
         hidden: false,
-        src: '/img/favicon-128x128.png',
+        src: '/img/brand/mark.png',
         fit: 'contain',
         radius: 50,
         mask: 'none',

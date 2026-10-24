@@ -64,6 +64,12 @@ handoff lives in `currentTask/design_handoff_allocation_draw/`.
 - `drawInput.ts` — builds the engine input from stages + assignments + the
   store. Drawable semis = every stage with `qualifiesTo` except the last; the
   final = the last stage by order; pre-qualified = countries in the final.
+  The draw fills the *first round* by default (`getDefaultDrawSemis`): the
+  drawable stages no other stage qualifies into, so heats → semi-finals →
+  final draws into the heats only. If that leaves fewer than two (a small
+  pre-qualifying round feeding semis), it falls back to every drawable stage.
+  Customize → "Choose" (shown with three or more drawable stages) starts from
+  the same set; `semisPick` stores explicit ticks either way.
 - The engine is translation-free. `allocation-draw/drawCopy.ts` turns steps,
   errors, intro lines and the Grand Final description into copy
   (`setup.allocationDraw.*` in `messages/en.json`; other locales fall back).

@@ -121,7 +121,8 @@ same local cleanup as logout (`clearSignedInState`).
 3. **Social data:** follows in both directions (follower counts are
    adjusted), blocks in both directions, and the reports the user filed
    or that are about them.
-4. **Records:** error reports linked to the user and every refresh token.
+4. **Records:** error reports linked to the user, every refresh token and
+   a pending email sign-in code ([email-sign-in.md](email-sign-in.md)).
 5. **Profile:** the profile and its uploaded avatar, last. If anything
    fails before this step, the account still exists and the user can sign
    in and try again.
