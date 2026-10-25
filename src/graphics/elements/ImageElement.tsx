@@ -9,26 +9,12 @@ import {
 } from '../assets/localAssets';
 import { ImageElement as ImageElementModel } from '../model/design';
 
+import { heartMaskStyle } from './eurovisionHeart';
+
 import { useShareBgImage } from '@/components/simulation/share/useShareBgImage';
 import { getBackgroundImageForImageGeneration } from '@/helpers/getFlagPath';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogoForImageGeneration } from '@/theme/hosting';
-
-/* A heart in a 100×100 box used as a CSS mask (self-contained, no id refs). */
-const HEART_PATH =
-  'M50 90 L14 54 C-2 38 6 8 30 8 C40 8 47 14 50 21 C53 14 60 8 70 8 C94 8 102 38 86 54 Z';
-const HEART_MASK = `url("data:image/svg+xml,${encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='${HEART_PATH}' fill='black'/></svg>`,
-)}")`;
-
-export const heartMaskStyle: React.CSSProperties = {
-  WebkitMaskImage: HEART_MASK,
-  maskImage: HEART_MASK,
-  WebkitMaskSize: '100% 100%',
-  maskSize: '100% 100%',
-  WebkitMaskRepeat: 'no-repeat',
-  maskRepeat: 'no-repeat',
-};
 
 export const maskStyle = (
   mask: 'none' | 'heart' | 'circle',

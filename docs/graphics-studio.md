@@ -38,6 +38,7 @@ not used yet; Phase 3 turns them into user-publishable templates.
 | `model/serialize.ts` | canonical (sorted-key) `serializeDesign` / `deserializeDesign`, `getAtPath` / `setAtPath`, `newElementId` |
 | `elements/registry.tsx` | `ElementView` (type → renderer), `AbsoluteChild`, flow children, the stack renderer |
 | `elements/*Element.tsx` | one renderer per type: text, image, shape, flag, scoreboard, stats, branding |
+| `elements/eurovisionHeart.ts` | the official Eurovision heart geometry (silhouette + black outline paths, `heartMaskStyle`, `heartBox`) shared by flag hearts and the image Heart mask |
 | `model/designTheme.ts` | `design.theme` helpers: snapshot of the active theme, `ThemeScope` value, inline CSS variables, labels |
 | `render/DesignStage.tsx` | renders a design at design size inside a wrapper scaled by `zoom`; auto-sized canvases are measured with a ResizeObserver; scopes the node to `design.theme` |
 | `render/useElementFont.ts` | class + style for an element's font slot (`ui` / `scoreboard` / `custom`) and `@font-face` injection |
@@ -93,6 +94,20 @@ look (every row the neutral surface, `withConsistentCountryStatus`);
 `StatsSource` the stats modal passes to `DesignDataProvider`. The stats
 customisation store (border opacity, voting-country names) is still read by
 the tables themselves.
+
+`FlagElement` with `shape: 'heart'` shows the official heart image
+(`getHostingLogoByCountryCode`, `public/hostingCountryLogos/`, the same
+hearts the rest of the app uses) with `object-fit: contain`. Countries
+without one — in practice custom entries, since every built-in country has a
+heart — get their flag masked with the same silhouette plus an inline-SVG
+black outline, sized by `heartBox` to where the official image would sit, so
+both kinds line up. The paths in `eurovisionHeart.ts` are traced from
+`Ukraine2023.svg`; all the official hearts share that 125.33 × 131.44
+geometry. The inspector's Country select lists the user's custom entries
+(`countriesStore.customCountries`) in their own group; picking one copies its
+image into `flag` so the design renders anywhere, and `flag` is ignored when
+`countryCode` is a built-in country (so a template field that swaps the code
+needs no cleanup). The image element's Heart mask uses the same silhouette.
 
 Adding an element type: extend `design.ts` (schema + union), add a renderer,
 add a `case` in `ElementView`. The stack is defined in `registry.tsx`

@@ -79,10 +79,11 @@ export function createElement(
       return {
         ...base('flag'),
         type: 'flag',
+        // The official heart's proportions (125.33 × 131.44).
         x: cx - 60,
-        y: cy - 54,
+        y: cy - 63,
         w: 120,
-        h: 108,
+        h: 126,
         countryCode: 'AT',
         shape: 'heart',
       };

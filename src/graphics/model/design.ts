@@ -143,6 +143,11 @@ export const flagElementSchema = z.object({
   type: z.literal('flag'),
   countryCode: z.string().min(2),
   shape: z.enum(['rect', 'round', 'heart']).default('heart'),
+  /**
+   * A custom entry's flag image, copied in so the design renders without the
+   * entry. Ignored when `countryCode` is a built-in country.
+   */
+  flag: z.string().optional(),
 });
 
 export const scoreboardElementSchema = z.object({

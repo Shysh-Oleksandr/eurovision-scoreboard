@@ -18,6 +18,7 @@ import {
   BrandingElement,
   DesignElement,
   Fill,
+  FlagElement,
   ITEM_SIZES,
   ItemSize,
   ShapeElement,
@@ -50,7 +51,11 @@ import {
   TextArea,
   Toggle,
 } from '../ui/controls';
-import { useDataLabel, useThemeName } from '../useEditorContext';
+import {
+  useCountryOptions,
+  useDataLabel,
+  useThemeName,
+} from '../useEditorContext';
 import { ElementBox } from '../useElementBoxes';
 
 import FontField from './FontField';
@@ -59,8 +64,8 @@ import LayoutSection from './LayoutSection';
 import ThemeSection from './ThemeSection';
 
 import Button from '@/components/common/Button';
-import { ALL_COUNTRIES } from '@/data/countries/common-countries';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useCountriesStore } from '@/state/countriesStore';
 
 export interface InspectorSection {
   id: string;
@@ -821,6 +826,54 @@ const StackContent: React.FC<{ el: StackElement }> = ({ el }) => {
   );
 };
 
+/**
+ * Built-in countries, then the user's custom entries; picking an entry copies
+ * its flag into the element so the design renders without it.
+ */
+const FlagCountryField: React.FC<{ el: FlagElement }> = ({ el }) => {
+  const t = useTranslations('graphics.inspector.flag');
+  const update = useEditorStore((s) => s.updateElement);
+  const countryOptions = useCountryOptions();
+  const customCountries = useCountriesStore((s) => s.customCountries);
+  const customOptions = useMemo(
+    () =>
+      [...customCountries]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((c) => ({ value: c.code, label: c.name })),
+    [customCountries],
+  );
+  const known = [...countryOptions, ...customOptions].some(
+    (o) => o.value === el.countryCode,
+  );
+
+  return (
+    <Field label={t('country')}>
+      <SelectInput<string>
+        value={el.countryCode}
+        onChange={(countryCode) => {
+          const custom = customCountries.find((c) => c.code === countryCode);
+
+          update(el.id, { countryCode, flag: custom?.flag });
+        }}
+        options={
+          known
+            ? countryOptions
+            : [
+                { value: el.countryCode, label: t('customEntry') },
+                ...countryOptions,
+              ]
+        }
+        groups={
+          customOptions.length
+            ? [{ label: t('customEntries'), options: customOptions }]
+            : undefined
+        }
+        ariaLabel={t('country')}
+      />
+    </Field>
+  );
+};
+
 /* ---------------------------------------------------------------- */
 
 export function useElementSections(
@@ -829,13 +882,6 @@ export function useElementSections(
 ): InspectorSection[] {
   const t = useTranslations('graphics.inspector');
   const update = useEditorStore((s) => s.updateElement);
-  const countryOptions = useMemo(
-    () =>
-      [...ALL_COUNTRIES]
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((c) => ({ value: c.code, label: c.name })),
-    [],
-  );
   const out: InspectorSection[] = [];
 
   switch (el.type) {
@@ -923,16 +969,7 @@ export function useElementSections(
       out.push({
         id: 'content',
         title: t('sections.content'),
-        content: (
-          <Field label={t('flag.country')}>
-            <SelectInput<string>
-              value={el.countryCode}
-              onChange={(countryCode) => update(el.id, { countryCode })}
-              options={countryOptions}
-              ariaLabel={t('flag.country')}
-            />
-          </Field>
-        ),
+        content: <FlagCountryField el={el} />,
       });
       out.push({
         id: 'style',

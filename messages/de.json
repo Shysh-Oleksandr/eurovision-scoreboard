@@ -2181,7 +2181,9 @@
         "shape": "Form",
         "rectangle": "Rechteck",
         "round": "Rund",
-        "heart": "Herz"
+        "heart": "Herz",
+        "customEntries": "Benutzerdefinierte Beiträge",
+        "customEntry": "Benutzerdefinierter Beitrag"
       },
       "scoreboard": {
         "columns": "Spalten",

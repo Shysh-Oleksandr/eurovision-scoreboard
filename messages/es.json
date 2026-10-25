@@ -2181,7 +2181,9 @@
         "shape": "Forma",
         "rectangle": "Rectángulo",
         "round": "Redonda",
-        "heart": "Corazón"
+        "heart": "Corazón",
+        "customEntries": "Entradas personalizadas",
+        "customEntry": "Entrada personalizada"
       },
       "scoreboard": {
         "columns": "Columnas",

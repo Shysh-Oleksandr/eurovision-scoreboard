@@ -2181,7 +2181,9 @@
         "shape": "Форма",
         "rectangle": "Прямокутний",
         "round": "Круглий",
-        "heart": "Серце"
+        "heart": "Серце",
+        "customEntries": "Користувацькі учасники",
+        "customEntry": "Користувацький учасник"
       },
       "scoreboard": {
         "columns": "Колонки",

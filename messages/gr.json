@@ -2181,7 +2181,9 @@
         "shape": "Σχήμα",
         "rectangle": "Ορθογώνια",
         "round": "Στρογγυλή",
-        "heart": "Καρδιά"
+        "heart": "Καρδιά",
+        "customEntries": "Προσαρμοσμένες συμμετοχές",
+        "customEntry": "Προσαρμοσμένη συμμετοχή"
       },
       "scoreboard": {
         "columns": "Στήλες",
