@@ -2,7 +2,7 @@ import type { Year } from '@/config';
 import type { ContestType } from '@/data/contestTypes';
 
 /** Bump when any data in the countries JSON files changes. */
-export const COUNTRIES_DATA_VERSION = '2026-10-03';
+export const COUNTRIES_DATA_VERSION = '2026-10-25';
 
 const COUNTRIES_FILE_PREFIXES: Record<ContestType, string> = {
   esc: 'countries',

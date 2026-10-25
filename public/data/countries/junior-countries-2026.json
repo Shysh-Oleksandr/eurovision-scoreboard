@@ -3,112 +3,160 @@
     "name": "Albania",
     "code": "AL",
     "category": "All-Time Participants",
+    "juryOdds": 5,
+    "televoteOdds": 16.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 13
   },
   {
     "name": "Armenia",
     "code": "AM",
     "category": "All-Time Participants",
+    "juryOdds": 99,
+    "televoteOdds": 89.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 7
   },
   {
     "name": "Cyprus",
     "code": "CY",
     "category": "All-Time Participants",
+    "juryOdds": 10,
+    "televoteOdds": 45,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 1
   },
   {
     "name": "France",
     "code": "FR",
     "category": "All-Time Participants",
+    "juryOdds": 18.5,
+    "televoteOdds": 99,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 5
   },
   {
     "name": "Georgia",
     "code": "GE",
     "category": "All-Time Participants",
+    "juryOdds": 18.5,
+    "televoteOdds": 81.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 14
   },
   {
     "name": "Ireland",
     "code": "IE",
     "category": "All-Time Participants",
+    "juryOdds": 6.5,
+    "televoteOdds": 17,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 12
   },
   {
     "name": "Italy",
     "code": "IT",
     "category": "All-Time Participants",
+    "juryOdds": 10,
+    "televoteOdds": 35.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 9
   },
   {
     "name": "Malta",
     "code": "MT",
     "category": "All-Time Participants",
+    "juryOdds": 17,
+    "televoteOdds": 74.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 8
   },
   {
     "name": "Montenegro",
     "code": "ME",
     "category": "All-Time Participants",
+    "juryOdds": 32,
+    "televoteOdds": 7.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 3
   },
   {
     "name": "Netherlands",
     "code": "NL",
     "category": "All-Time Participants",
+    "juryOdds": 25,
+    "televoteOdds": 61.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 0
   },
   {
     "name": "North Macedonia",
     "code": "MK",
     "category": "All-Time Participants",
+    "juryOdds": 18.5,
+    "televoteOdds": 5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 11
   },
   {
     "name": "Poland",
     "code": "PL",
     "category": "All-Time Participants",
+    "juryOdds": 35,
+    "televoteOdds": 72,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 6
   },
   {
     "name": "Portugal",
     "code": "PT",
     "category": "All-Time Participants",
+    "juryOdds": 17,
+    "televoteOdds": 12,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 2
   },
   {
     "name": "San Marino",
     "code": "SM",
     "category": "All-Time Participants",
+    "juryOdds": 64,
+    "televoteOdds": 60.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 4
   },
   {
     "name": "Spain",
     "code": "ES",
     "category": "All-Time Participants",
+    "juryOdds": 60.5,
+    "televoteOdds": 94,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 15
   },
   {
     "name": "Ukraine",
     "code": "UA",
     "category": "All-Time Participants",
+    "juryOdds": 47,
+    "televoteOdds": 33,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 10
   }
 ]

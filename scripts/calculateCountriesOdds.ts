@@ -73,7 +73,7 @@ Array.from(document.querySelectorAll('.national_table tbody tr'))
 
 */
 
-const IS_JESC = false;
+const IS_JESC = true;
 
 const finalists: (
   | {
@@ -87,129 +87,84 @@ const finalists: (
     }
 )[] = [
   {
-    name: 'Bulgaria',
-    juryPoints: 204,
-    televotePoints: 312,
+    name: 'Armenia',
+    juryPoints: 99,
+    televotePoints: 103,
   },
   {
-    name: 'Israel',
-    juryPoints: 123,
-    televotePoints: 220,
-  },
-  {
-    name: 'Romania',
-    juryPoints: 64,
-    televotePoints: 232,
-  },
-  {
-    name: 'Australia',
-    juryPoints: 165,
-    televotePoints: 122,
-  },
-  {
-    name: 'Italy',
-    juryPoints: 134,
-    televotePoints: 147,
-  },
-  {
-    name: 'Finland',
-    juryPoints: 141,
-    televotePoints: 138,
-  },
-  {
-    name: 'Denmark',
-    juryPoints: 165,
-    televotePoints: 78,
-  },
-  {
-    name: 'Moldova',
-    juryPoints: 43,
-    televotePoints: 183,
-  },
-  {
-    name: 'Ukraine',
-    juryPoints: 54,
-    televotePoints: 167,
-  },
-  {
-    name: 'Greece',
-    juryPoints: 73,
-    televotePoints: 147,
+    name: 'Spain',
+    juryPoints: 76,
+    televotePoints: 108,
   },
   {
     name: 'France',
-    juryPoints: 144,
-    televotePoints: 14,
+    juryPoints: 51,
+    televotePoints: 114,
+  },
+  {
+    name: 'San Marino',
+    juryPoints: 78,
+    televotePoints: 70,
+  },
+  {
+    name: 'Georgia',
+    juryPoints: 51,
+    televotePoints: 94,
   },
   {
     name: 'Poland',
-    juryPoints: 133,
-    televotePoints: 17,
-  },
-  {
-    name: 'Albania',
-    juryPoints: 60,
-    televotePoints: 85,
-  },
-  {
-    name: 'Norway',
-    juryPoints: 115,
-    televotePoints: 19,
-  },
-  {
-    name: 'Croatia',
-    juryPoints: 53,
-    televotePoints: 71,
-  },
-  {
-    name: 'Czechia',
-    juryPoints: 104,
-    televotePoints: 9,
-  },
-  {
-    name: 'Serbia',
-    juryPoints: 38,
-    televotePoints: 52,
+    juryPoints: 61,
+    televotePoints: 83,
   },
   {
     name: 'Malta',
-    juryPoints: 81,
-    televotePoints: 8,
+    juryPoints: 50,
+    televotePoints: 86,
+  },
+  {
+    name: 'Netherlands',
+    juryPoints: 55,
+    televotePoints: 71,
+  },
+  {
+    name: 'Ukraine',
+    juryPoints: 68,
+    televotePoints: 38,
   },
   {
     name: 'Cyprus',
-    juryPoints: 41,
-    televotePoints: 34,
+    juryPoints: 46,
+    televotePoints: 52,
   },
   {
-    name: 'Sweden',
-    juryPoints: 35,
-    televotePoints: 16,
+    name: 'Italy',
+    juryPoints: 46,
+    televotePoints: 41,
   },
   {
-    name: 'Belgium',
-    juryPoints: 36,
-    televotePoints: 0,
+    name: 'Montenegro',
+    juryPoints: 59,
+    televotePoints: 9,
   },
   {
-    name: 'Lithuania',
-    juryPoints: 10,
-    televotePoints: 12,
+    name: 'Portugal',
+    juryPoints: 50,
+    televotePoints: 14,
   },
   {
-    name: 'Germany',
-    juryPoints: 12,
-    televotePoints: 0,
+    name: 'Ireland',
+    juryPoints: 44,
+    televotePoints: 20,
   },
   {
-    name: 'Austria',
-    juryPoints: 1,
-    televotePoints: 5,
+    name: 'Albania',
+    juryPoints: 43,
+    televotePoints: 19,
   },
   {
-    name: 'United KingdomUK',
-    juryPoints: 1,
-    televotePoints: 0,
+    name: 'North Macedonia',
+    juryPoints: 51,
+    televotePoints: 6,
   },
 ];
 

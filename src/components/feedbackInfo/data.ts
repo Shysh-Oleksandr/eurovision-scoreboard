@@ -409,6 +409,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-10-25',
+    title: 'Added JESC 2026 data and theme',
+  },
+  {
     date: '2026-10-08',
     title:
       'Graphics (beta): make your own designs (e.g., contest posters, results, artwork) from starters, community designs or a blank canvas, then export or publish them',
@@ -476,6 +480,10 @@ export const WHATS_NEW = [
 ];
 
 export const UPCOMING_FEATURES = [
+  {
+    approximateDates: { start: '2026-10-30', end: '2026-11-02' },
+    title: 'Mobile app for iOS and Android',
+  },
   {
     approximateDates: { start: '2026-10-10', end: '2026-10-18' },
     title: 'Graphics improvements',
