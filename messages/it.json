@@ -86,7 +86,8 @@
     },
     "savedTo": "Salvato in {folder}",
     "privacyPolicy": "Informativa sulla privacy",
-    "termsOfUse": "Termini di utilizzo"
+    "termsOfUse": "Termini di utilizzo",
+    "credits": "Crediti"
   },
   "Metadata": {
     "title": "DouzePoints - Simulatore di Classifica Eurovision",
@@ -1504,6 +1505,7 @@
       },
       "tip": {
         "heartFlags": "Sostituire le miniature delle bandiere con icone a forma di cuore nei colori di accento dell’app.",
+        "whiteHeartFlags2026": "Mostra le bandiere a cuore nel design 2026 con contorno bianco invece di quello nero classico.",
         "minimalFlags": "Usare forme di bandiera rotonde e quadrate semplificate invece di bandiere dettagliate.",
         "rankChange": "Mostrare una freccia che indica se ogni partecipante è salito o sceso dall’ultima assegnazione di punti.",
         "targetStages": "Mostrare a quale fase avanza ogni qualificato.",
@@ -1642,6 +1644,7 @@
     "ui": {
       "dragAndDropToUpload": "Trascina e rilascia o clicca per caricare",
       "useHeartIconsForFlags": "Usa icone a cuore per le bandiere",
+      "use2026WhiteHeartFlags": "Usa le bandiere a cuore 2026 con contorno bianco",
       "alwaysShowRankings": "Mostra sempre le classifiche",
       "showRankChangeIndicator": "Mostra indicatore cambio posizione",
       "showQualifiersPopup": "Mostra popup qualificati",
@@ -2182,6 +2185,7 @@
         "rectangle": "Rettangolo",
         "round": "Rotonda",
         "heart": "Cuore",
+        "use2026WhiteHeart": "Stile 2026 (contorno bianco)",
         "customEntries": "Voci personalizzate",
         "customEntry": "Voce personalizzata"
       },

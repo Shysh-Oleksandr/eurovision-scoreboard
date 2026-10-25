@@ -58,6 +58,9 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const activeContest = useGeneralStore((state) => state.activeContest);
   const customTheme = useGeneralStore((state) => state.customTheme);
   const themeYear = useGeneralStore((state) => state.themeYear);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const isEditingActiveContest = activeContest?._id === initialContest?._id;
 
@@ -107,7 +110,11 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const hostingCountryOptions = useMemo(() => {
     // For now, we only show the countries that are not custom
     return getAllCountries(false).map((country) => {
-      const { logo, isExisting } = getHostingCountryLogo(country);
+      const { logo, isExisting } = getHostingCountryLogo(
+        country,
+        true,
+        shouldUse2026WhiteHeartFlags,
+      );
 
       return {
         label: country.name,
@@ -116,7 +123,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
         isExisting,
       };
     });
-  }, [getAllCountries]);
+  }, [getAllCountries, shouldUse2026WhiteHeartFlags]);
 
   useEffectOnce(onLoaded);
 

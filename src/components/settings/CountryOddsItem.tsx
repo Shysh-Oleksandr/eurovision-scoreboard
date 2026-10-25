@@ -23,6 +23,9 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const [juryOdds, setJuryOdds] = useState<number | undefined>(
     country.juryOdds ?? 50,
@@ -95,6 +98,7 @@ export const CountryOddsItem: React.FC<CountryOddsItemProps> = ({
   const { logo, isExisting } = getHostingCountryLogo(
     country,
     shouldShowHeartFlagIcon,
+    shouldUse2026WhiteHeartFlags,
   );
 
   return (

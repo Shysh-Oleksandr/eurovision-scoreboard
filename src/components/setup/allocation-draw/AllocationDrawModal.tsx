@@ -79,6 +79,9 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  );
   const rules = useAllocationDrawStore((s) => s.rules);
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [customizeEntering, setCustomizeEntering] = useState(false);
@@ -103,9 +106,13 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
 
       if (!country) return getFlagPath('ww');
 
-      return getHostingCountryLogo(country, shouldShowHeartFlagIcon).logo;
+      return getHostingCountryLogo(
+        country,
+        shouldShowHeartFlagIcon,
+        shouldUse2026WhiteHeartFlags,
+      ).logo;
     },
-    [byCode, shouldShowHeartFlagIcon],
+    [byCode, shouldShowHeartFlagIcon, shouldUse2026WhiteHeartFlags],
   );
   const copy = useDrawCopy(nameOf, stageName);
   const dom = useMemo(

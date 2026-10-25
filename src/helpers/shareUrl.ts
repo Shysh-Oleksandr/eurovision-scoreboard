@@ -13,6 +13,10 @@ export const PRIVACY_POLICY_URL = IS_NATIVE_APP
 export const TERMS_OF_USE_URL = IS_NATIVE_APP
   ? `${PUBLIC_SITE_URL}terms`
   : '/terms';
+/** Asset credits (the Commons heart flags) on the About page. */
+export const CREDITS_URL = IS_NATIVE_APP
+  ? `${PUBLIC_SITE_URL}about#credits`
+  : '/about#credits';
 
 /**
  * Query keys of share links, in the order they are looked for. Universal

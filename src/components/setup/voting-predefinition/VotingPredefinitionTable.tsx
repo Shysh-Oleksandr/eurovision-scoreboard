@@ -22,6 +22,7 @@ type Props = {
   rankedCountries: Array<{ code: string; name: string; rank: number }>;
   votingCountries: Array<{ code: string; name: string }>;
   shouldShowHeartFlagIcon: boolean;
+  shouldUse2026WhiteHeartFlags: boolean;
   isTotalOrCombinedVoteType: boolean;
   getVoterValidity: (voterCode: string) => VoterValidity;
   getTotalPointsForCountry: (countryCode: string) => number;
@@ -54,6 +55,7 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
   rankedCountries,
   votingCountries,
   shouldShowHeartFlagIcon,
+  shouldUse2026WhiteHeartFlags,
   isTotalOrCombinedVoteType,
   getVoterValidity,
   getTotalPointsForCountry,
@@ -90,6 +92,7 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
               const { logo, isExisting } = getHostingCountryLogo(
                 country as any,
                 shouldShowHeartFlagIcon,
+                shouldUse2026WhiteHeartFlags,
               );
               const validity = getVoterValidity(country.code);
 
@@ -140,6 +143,7 @@ export const VotingPredefinitionTable: React.FC<Props> = ({
             const { logo, isExisting } = getHostingCountryLogo(
               country as any,
               shouldShowHeartFlagIcon,
+              shouldUse2026WhiteHeartFlags,
             );
 
             return (

@@ -123,6 +123,7 @@ Edit the JSON file and **bump `COUNTRIES_DATA_VERSION`** in every case.
 1. Add `Name: { name, code, category }` to `COMMON_COUNTRIES` (`src/data/countries/common-countries.ts`). Use the continent category, or `'All-Time Participants'` only for countries that have taken part in ESC.
 2. Add `public/flags/<code>.svg`. Round and square variants are needed only if the code is added to the supported lists in `getFlagPath.ts`.
 3. For a hosting country, add a logo (§3 step 4), or add a `countryDefaultHostingLogos` override in `hosting.ts`.
+4. A new `countryDefaultHostingLogos` code also needs its white-outline 2026 heart (the "2026 heart flags with a white outline" setting): run `node scripts/white-hearts-2026.mjs <CODE>`. It takes the country's heart from Wikimedia Commons when there is one (and records the credit in `src/data/whiteHearts2026Credits.json`, listed on `/about#credits`), otherwise it generates one from `public/flags/<code>.svg`. Without the file the setting shows a broken image for that country.
 
 ---
 

@@ -269,6 +269,16 @@ const countryDefaultHostingLogos: Partial<Record<string, string>> = {
 // Helper: latest-first list of years
 const yearsDesc: Year[] = [...years].reverse() as Year[];
 
+/**
+ * The 2026 heart with a white outline (the `shouldUse2026WhiteHeartFlags`
+ * setting). scripts/white-hearts-2026.mjs builds one for every code in
+ * countryDefaultHostingLogos, so a new code there needs a re-run of the script.
+ */
+const get2026WhiteHeartLogo = (countryCode: string): string | null =>
+  countryDefaultHostingLogos[countryCode]
+    ? `/hostingCountryLogos/2026-white/${countryCode}.svg`
+    : null;
+
 export function getHostingCountryByYear(
   year: Year,
   contestType: ContestType = 'esc',
@@ -286,7 +296,14 @@ export function getHostingCountryByYear(
 
 export function getHostingLogoByCountryCode(
   countryCode: string,
+  shouldUse2026WhiteHeartFlags = false,
 ): string | null {
+  if (shouldUse2026WhiteHeartFlags) {
+    const whiteHeart = get2026WhiteHeartLogo(countryCode);
+
+    if (whiteHeart) return whiteHeart;
+  }
+
   // Check explicit default override first
   const override = countryDefaultHostingLogos[countryCode];
   if (override) return override;
@@ -301,6 +318,7 @@ export function getHostingLogoByCountryCode(
 export function getHostingCountryLogo(
   country: BaseCountry | string | undefined | null,
   shouldShowHeartFlagIcon = true,
+  shouldUse2026WhiteHeartFlags = false,
 ): { logo: string; isExisting: boolean } {
   // Handle undefined/null country - return default flag
   if (!country) {
@@ -313,7 +331,10 @@ export function getHostingCountryLogo(
 
   const countryCode = typeof country === 'string' ? country : country.code;
 
-  const existing = getHostingLogoByCountryCode(countryCode);
+  const existing = getHostingLogoByCountryCode(
+    countryCode,
+    shouldUse2026WhiteHeartFlags,
+  );
   if (existing) {
     return { logo: existing, isExisting: true };
   }
@@ -328,6 +349,7 @@ export function getHostingCountryLogo(
 export function getHostingCountryLogoForImageGeneration(
   country: BaseCountry | string | undefined | null,
   shouldShowHeartFlagIcon = true,
+  shouldUse2026WhiteHeartFlags = false,
 ): { logo: string; isExisting: boolean } {
   // Handle undefined/null country - return default flag
   if (!country) {
@@ -340,7 +362,10 @@ export function getHostingCountryLogoForImageGeneration(
 
   const countryCode = typeof country === 'string' ? country : country.code;
 
-  const existing = getHostingLogoByCountryCode(countryCode);
+  const existing = getHostingLogoByCountryCode(
+    countryCode,
+    shouldUse2026WhiteHeartFlags,
+  );
   if (existing) {
     return { logo: existing, isExisting: true };
   }

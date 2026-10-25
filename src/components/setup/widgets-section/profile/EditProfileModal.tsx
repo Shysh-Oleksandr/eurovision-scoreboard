@@ -24,6 +24,7 @@ import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useCountriesStore } from '@/state/countriesStore';
+import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
@@ -58,6 +59,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 }) => {
   const t = useTranslations();
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
   const user = useAuthStore((s) => s.user);
   const deleteAccount = useAuthStore((s) => s.deleteAccount);
   const isDeletingAccount = useAuthStore((s) => s.isBusy);
@@ -87,7 +91,11 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
   const options = useMemo(() => {
     return getAllCountries(false).map((country) => {
-      const { logo, isExisting } = getHostingCountryLogo(country);
+      const { logo, isExisting } = getHostingCountryLogo(
+        country,
+        true,
+        shouldUse2026WhiteHeartFlags,
+      );
 
       return {
         label: country.name,
@@ -96,7 +104,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         isExisting,
       };
     });
-  }, [getAllCountries]);
+  }, [getAllCountries, shouldUse2026WhiteHeartFlags]);
 
   useEffectOnce(onLoaded);
 

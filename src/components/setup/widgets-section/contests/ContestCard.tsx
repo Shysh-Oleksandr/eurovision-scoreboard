@@ -69,6 +69,9 @@ const ContestCard: React.FC<ContestCardProps> = ({
     (state) => state.settings.showHostingCountryLogo,
   );
   const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
   const activeContest = useGeneralStore((state) => state.activeContest);
   const setContestToLoadGlobal = useGeneralStore(
     (state) => state.setContestToLoad,
@@ -82,7 +85,11 @@ const ContestCard: React.FC<ContestCardProps> = ({
     [activeContest, user],
   );
 
-  const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
+  const { logo, isExisting } = getHostingCountryLogo(
+    getHostingCountry(),
+    true,
+    shouldUse2026WhiteHeartFlags,
+  );
 
   const [isContestsModalOpen, setIsContestsModalOpen] = useState(false);
   const [isContestsModalLoaded, setIsContestsModalLoaded] = useState(false);

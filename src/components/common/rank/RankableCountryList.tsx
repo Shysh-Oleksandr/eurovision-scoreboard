@@ -53,6 +53,9 @@ export const RankableCountryList: React.FC<RankableCountryListProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const countryByCode = useMemo(() => {
     const map: Record<string, BaseCountry> = {};
@@ -94,6 +97,7 @@ export const RankableCountryList: React.FC<RankableCountryListProps> = ({
         const { logo, isExisting } = getHostingCountryLogo(
           country,
           shouldShowHeartFlagIcon,
+          shouldUse2026WhiteHeartFlags,
         );
 
         const value = valueFor?.(code, index);

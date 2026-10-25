@@ -12,7 +12,11 @@ import UpdateList from './UpdateList';
 
 import { FilledHeartIcon } from '@/assets/icons/FilledHeartIcon';
 import GitHubIcon from '@/assets/icons/GitHubIcon';
-import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/helpers/shareUrl';
+import {
+  CREDITS_URL,
+  PRIVACY_POLICY_URL,
+  TERMS_OF_USE_URL,
+} from '@/helpers/shareUrl';
 import { IS_NATIVE_APP } from '@/native/platform';
 
 const FeedbackModal = ({
@@ -153,6 +157,15 @@ const FeedbackModal = ({
                 className="text-primary-300 hover:text-primary-400 underline font-medium"
               >
                 {tCommon('termsOfUse')}
+              </a>
+              {' · '}
+              <a
+                href={CREDITS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-300 hover:text-primary-400 underline font-medium"
+              >
+                {tCommon('credits')}
               </a>
             </p>
             {/* The apps leave out the donation card: an in-app donation link

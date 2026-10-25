@@ -109,6 +109,14 @@ image into `flag` so the design renders anywhere, and `flag` is ignored when
 `countryCode` is a built-in country (so a template field that swaps the code
 needs no cleanup). The image element's Heart mask uses the same silhouette.
 
+`use2026WhiteHeart` (the "2026 style (white outline)" toggle, shown for the
+Heart shape) switches a flag to the 2026 hearts in
+`public/hostingCountryLogos/2026-white/` and, for custom entries, to the 2026
+silhouette (`HEART_2026_*` in `eurovisionHeart.ts`, 226.683 × 233.658) with a
+white outline. It is saved per element, so a design looks the same for every
+viewer; the app-wide `shouldUse2026WhiteHeartFlags` setting only picks the
+default for newly added flags (`elementFactory`).
+
 Adding an element type: extend `design.ts` (schema + union), add a renderer,
 add a `case` in `ElementView`. The stack is defined in `registry.tsx`
 because it and `ElementView` are mutually recursive.

@@ -39,6 +39,9 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const [availableCountries, setAvailableCountries] = useState<BaseCountry[]>(
     [],
@@ -133,6 +136,7 @@ const VotersCountriesSearch: React.FC<VotersCountriesSearchProps> = ({
                 const { logo, isExisting } = getHostingCountryLogo(
                   country,
                   shouldShowHeartFlagIcon,
+                  shouldUse2026WhiteHeartFlags,
                 );
 
                 return (

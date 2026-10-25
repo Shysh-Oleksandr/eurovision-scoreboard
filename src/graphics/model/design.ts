@@ -143,6 +143,8 @@ export const flagElementSchema = z.object({
   type: z.literal('flag'),
   countryCode: z.string().min(2),
   shape: z.enum(['rect', 'round', 'heart']).default('heart'),
+  /** Heart shape only: the 2026 heart with a white outline instead of the classic black one. */
+  use2026WhiteHeart: z.boolean().default(false),
   /**
    * A custom entry's flag image, copied in so the design renders without the
    * entry. Ignored when `countryCode` is a built-in country.

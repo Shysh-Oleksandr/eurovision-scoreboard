@@ -3,6 +3,8 @@ import { Design, DesignElement, ElementType } from '../model/design';
 import { DEFAULT_ELEMENT_NAMES } from '../model/elements';
 import { newElementId } from '../model/serialize';
 
+import { useGeneralStore } from '@/state/generalStore';
+
 const base = (type: ElementType, id?: string) => ({
   id: id ?? newElementId(type),
   name: DEFAULT_ELEMENT_NAMES[type],
@@ -86,6 +88,9 @@ export function createElement(
         h: 126,
         countryCode: 'AT',
         shape: 'heart',
+        // New flags start in the heart style the user picked for the app
+        use2026WhiteHeart:
+          useGeneralStore.getState().settings.shouldUse2026WhiteHeartFlags,
       };
     case 'scoreboard':
       return {

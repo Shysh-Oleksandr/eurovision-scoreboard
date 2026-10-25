@@ -79,6 +79,7 @@ const DEFAULT_SETTINGS: Settings = {
   showRankChangeIndicator: true,
   showHostingCountryLogo: true,
   shouldShowHeartFlagIcon: true,
+  shouldUse2026WhiteHeartFlags: false,
   syncThemeWithContest: true,
   hostingCountryCode: DEFAULT_HOSTING_COUNTRY_CODE,
   contestName: 'Eurovision',
@@ -178,6 +179,8 @@ export interface Settings {
   enableFullscreen: boolean;
   showRankChangeIndicator: boolean;
   shouldShowHeartFlagIcon: boolean;
+  /** Heart flags in the 2026 design with a white outline instead of the classic black one. */
+  shouldUse2026WhiteHeartFlags: boolean;
   /** Follow the contest year with the matching built-in theme (Event Setup sync chip). */
   syncThemeWithContest: boolean;
   showHostingCountryLogo: boolean;

@@ -42,6 +42,9 @@ const StatsTable: React.FC<StatsTableProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
   const showVotingCountriesNames =
     useStatsCustomizationStore(
       (state) => state.settings.showVotingCountriesNames,
@@ -75,10 +78,15 @@ const StatsTable: React.FC<StatsTableProps> = ({
             <th className="p-2 min-w-[220px] w-[220px] h-auto"></th>
             {votingCountries.map((country) => {
               const { logo, isExisting } = enableHover
-                ? getHostingCountryLogo(country, shouldShowHeartFlagIcon)
+                ? getHostingCountryLogo(
+                    country,
+                    shouldShowHeartFlagIcon,
+                    shouldUse2026WhiteHeartFlags,
+                  )
                 : getHostingCountryLogoForImageGeneration(
                     country,
                     shouldShowHeartFlagIcon,
+                    shouldUse2026WhiteHeartFlags,
                   );
 
               return (

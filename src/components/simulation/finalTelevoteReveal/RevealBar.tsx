@@ -7,6 +7,7 @@ import { RevealBarStyles } from './types';
 
 import { handleFlagError } from '@/helpers/getFlagPath';
 import { Country } from '@/models';
+import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
 type Props = {
@@ -44,10 +45,16 @@ const RevealBar = ({
   lastBadgePointsRef,
   lastFlagRef,
 }: Props) => {
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
   const { logo: leaderLogo, isExisting: leaderLogoIsHeart } =
-    getHostingCountryLogo(leaderCountry);
-  const { logo: lastLogo, isExisting: lastLogoIsHeart } =
-    getHostingCountryLogo(lastCountry);
+    getHostingCountryLogo(leaderCountry, true, shouldUse2026WhiteHeartFlags);
+  const { logo: lastLogo, isExisting: lastLogoIsHeart } = getHostingCountryLogo(
+    lastCountry,
+    true,
+    shouldUse2026WhiteHeartFlags,
+  );
 
   return (
     // Bar section — no z-index, no backdrop-filter; badges escape to z-20 in outer context

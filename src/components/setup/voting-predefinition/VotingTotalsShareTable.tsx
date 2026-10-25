@@ -57,6 +57,9 @@ const VotingTotalsShareTable: React.FC<VotingTotalsShareTableProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
   const [drafts, setDrafts] = React.useState<Record<CellKey, string>>({});
 
   const rankedCountries = React.useMemo(() => {
@@ -190,6 +193,7 @@ const VotingTotalsShareTable: React.FC<VotingTotalsShareTableProps> = ({
             const { logo, isExisting } = getHostingCountryLogo(
               country as any,
               shouldShowHeartFlagIcon,
+              shouldUse2026WhiteHeartFlags,
             );
             const adjustment = adjustmentByCode?.[country.code];
 

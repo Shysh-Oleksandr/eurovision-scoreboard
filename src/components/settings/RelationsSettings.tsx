@@ -48,6 +48,9 @@ const RelationsSettings: React.FC<RelationsSettingsProps> = ({ onLoaded }) => {
   const t = useTranslations('settings.relations');
   const diaspora = useGeneralStore((s) => s.settings.diaspora);
   const setDiaspora = useGeneralStore((s) => s.setDiaspora);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  );
   const isLoggedIn = useAuthStore((s) => !!s.user);
   const getAllCountries = useCountriesStore((s) => s.getAllCountries);
 
@@ -64,11 +67,15 @@ const RelationsSettings: React.FC<RelationsSettingsProps> = ({ onLoaded }) => {
   const countryOptions: Option[] = useMemo(
     () =>
       getAllCountries().map((c) => {
-        const { logo, isExisting } = getHostingCountryLogo(c);
+        const { logo, isExisting } = getHostingCountryLogo(
+          c,
+          true,
+          shouldUse2026WhiteHeartFlags,
+        );
 
         return { label: c.name, value: c.code, imageUrl: logo, isExisting };
       }),
-    [getAllCountries],
+    [getAllCountries, shouldUse2026WhiteHeartFlags],
   );
 
   const { enabled } = diaspora;

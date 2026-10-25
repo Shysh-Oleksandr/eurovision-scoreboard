@@ -86,7 +86,8 @@
     },
     "savedTo": "Guardado em {folder}",
     "privacyPolicy": "Política de privacidade",
-    "termsOfUse": "Termos de utilização"
+    "termsOfUse": "Termos de utilização",
+    "credits": "Créditos"
   },
   "Metadata": {
     "title": "DouzePoints - Simulador do Painel de Pontuação da Eurovisão",
@@ -1504,6 +1505,7 @@
       },
       "tip": {
         "heartFlags": "Substituir miniaturas de bandeiras por ícones em forma de coração nas cores de destaque da app.",
+        "whiteHeartFlags2026": "Mostrar as bandeiras de coração no design de 2026 com contorno branco em vez do preto clássico.",
         "minimalFlags": "Usar formas de bandeira redondas e quadradas simplificadas em vez de bandeiras detalhadas.",
         "rankChange": "Mostrar uma seta a indicar se cada participante subiu ou desceu desde os últimos pontos atribuídos.",
         "targetStages": "Mostrar para que fase avança cada qualificado.",
@@ -1642,6 +1644,7 @@
     "ui": {
       "dragAndDropToUpload": "Arraste e solte ou clique para carregar",
       "useHeartIconsForFlags": "Usar ícones de coração para bandeiras",
+      "use2026WhiteHeartFlags": "Usar as bandeiras de coração de 2026 com contorno branco",
       "alwaysShowRankings": "Mostrar sempre classificações",
       "showRankChangeIndicator": "Mostrar indicador de mudança de posição",
       "showQualifiersPopup": "Mostrar popup de qualificados",
@@ -2182,6 +2185,7 @@
         "rectangle": "Retângulo",
         "round": "Redonda",
         "heart": "Coração",
+        "use2026WhiteHeart": "Estilo 2026 (contorno branco)",
         "customEntries": "Entradas personalizadas",
         "customEntry": "Entrada personalizada"
       },

@@ -17,11 +17,18 @@ export const HostingCountryDropdown: React.FC = () => {
     (state) => state.settings.hostingCountryCode,
   );
   const setSettings = useGeneralStore((state) => state.setSettings);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const options = useMemo(
     () =>
       getAllCountries().map((country) => {
-        const { logo, isExisting } = getHostingCountryLogo(country);
+        const { logo, isExisting } = getHostingCountryLogo(
+          country,
+          true,
+          shouldUse2026WhiteHeartFlags,
+        );
 
         return {
           label: country.name,
@@ -30,7 +37,7 @@ export const HostingCountryDropdown: React.FC = () => {
           isExisting,
         };
       }),
-    [getAllCountries],
+    [getAllCountries, shouldUse2026WhiteHeartFlags],
   );
 
   return (

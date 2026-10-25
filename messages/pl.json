@@ -86,7 +86,8 @@
     },
     "savedTo": "Zapisano w {folder}",
     "privacyPolicy": "Polityka prywatności",
-    "termsOfUse": "Warunki korzystania"
+    "termsOfUse": "Warunki korzystania",
+    "credits": "Źródła"
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",
@@ -1504,6 +1505,7 @@
       },
       "tip": {
         "heartFlags": "Zastąp miniatury flag ikonami w kształcie serca w kolorach akcentu aplikacji.",
+        "whiteHeartFlags2026": "Pokazuj flagi-serca w projekcie z 2026 roku z białym konturem zamiast klasycznego czarnego.",
         "minimalFlags": "Używaj uproszczonych okrągłych i kwadratowych kształtów flag zamiast szczegółowych flag.",
         "rankChange": "Pokaż strzałkę wskazującą, czy uczestnik awansował lub spadł od ostatnio przyznanych punktów.",
         "targetStages": "Pokaż, do którego etapu przechodzi każdy zakwalifikowany uczestnik.",
@@ -1642,6 +1644,7 @@
     "ui": {
       "dragAndDropToUpload": "Przeciągnij i upuść lub kliknij, aby przesłać",
       "useHeartIconsForFlags": "Użyj ikon serc dla flag",
+      "use2026WhiteHeartFlags": "Użyj flag-serc z 2026 roku z białym konturem",
       "alwaysShowRankings": "Zawsze pokazuj rankingi",
       "showRankChangeIndicator": "Pokaż wskaźnik zmiany miejsca",
       "showQualifiersPopup": "Pokaż popup kwalifikantów",
@@ -2182,6 +2185,7 @@
         "rectangle": "Prostokąt",
         "round": "Okrągła",
         "heart": "Serce",
+        "use2026WhiteHeart": "Styl 2026 (biały kontur)",
         "customEntries": "Własne wpisy",
         "customEntry": "Własny wpis"
       },

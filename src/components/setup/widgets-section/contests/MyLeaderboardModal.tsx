@@ -116,6 +116,9 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const customEntryFallback = t('customEntryName');
 
@@ -135,7 +138,11 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
     if (localCountry) {
       return {
         name: localCountry.name,
-        ...getHostingCountryLogo(localCountry, shouldShowHeartFlagIcon),
+        ...getHostingCountryLogo(
+          localCountry,
+          shouldShowHeartFlagIcon,
+          shouldUse2026WhiteHeartFlags,
+        ),
       };
     }
 
@@ -207,6 +214,7 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
     customEntriesMap,
     customEntryFallback,
     shouldShowHeartFlagIcon,
+    shouldUse2026WhiteHeartFlags,
   ]);
 
   const toggleSort = (key: SortKey) => {

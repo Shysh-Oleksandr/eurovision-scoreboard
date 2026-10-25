@@ -35,6 +35,9 @@ const SimulationHeaderComponent = ({ phaseTitle }: SimulationHeaderProps) => {
     (state) => state.settings.showHostingCountryLogo,
   );
   const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   // `getHostingCountry` reads other stores at call time; subscribing to the
   // code keeps the memoized header's logo fresh when the setting changes.
@@ -66,7 +69,11 @@ const SimulationHeaderComponent = ({ phaseTitle }: SimulationHeaderProps) => {
   const canUndo =
     hasUndoablePast && (!viewedStageId || viewedStageId === currentStageId);
 
-  const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
+  const { logo, isExisting } = getHostingCountryLogo(
+    getHostingCountry(),
+    true,
+    shouldUse2026WhiteHeartFlags,
+  );
 
   const [showShareResultsModal, setShowShareResultsModal] = useState(false);
   const [isShareResultsModalLoaded, setIsShareResultsModalLoaded] =

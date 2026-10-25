@@ -57,6 +57,9 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  );
   const getAllCountries = useCountriesStore((s) => s.getAllCountries);
 
   const { data: contestGroups = [] } = useContestGroupsQuery(
@@ -111,7 +114,11 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
     if (localCountry) {
       return {
         name: localCountry.name,
-        ...getHostingCountryLogo(localCountry, shouldShowHeartFlagIcon),
+        ...getHostingCountryLogo(
+          localCountry,
+          shouldShowHeartFlagIcon,
+          shouldUse2026WhiteHeartFlags,
+        ),
       };
     }
 

@@ -125,6 +125,9 @@ const VotingPredefinitionModal = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const {
     displayPointsSystem,
@@ -989,6 +992,7 @@ const VotingPredefinitionModal = ({
               rankedCountries={rankedCountries as any}
               votingCountries={votingCountries as any}
               shouldShowHeartFlagIcon={shouldShowHeartFlagIcon}
+              shouldUse2026WhiteHeartFlags={shouldUse2026WhiteHeartFlags}
               isTotalOrCombinedVoteType={isTotalOrCombinedVoteType}
               getVoterValidity={getVoterValidity as any}
               getTotalPointsForCountry={getTotalPointsForCountry}

@@ -104,6 +104,9 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const sortedRows = useMemo(() => {
     if (!data?.rows) return [];
@@ -303,7 +306,11 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
                       getAllCountries(true).find((c) => c.code === row.code) ??
                       null;
                     const { logo, isExisting } = country
-                      ? getHostingCountryLogo(country, shouldShowHeartFlagIcon)
+                      ? getHostingCountryLogo(
+                          country,
+                          shouldShowHeartFlagIcon,
+                          shouldUse2026WhiteHeartFlags,
+                        )
                       : { logo: getFlagPath('ww'), isExisting: false };
 
                     return (

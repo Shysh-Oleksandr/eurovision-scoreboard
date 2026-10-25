@@ -41,6 +41,9 @@ export const TileFlag: React.FC<{
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   if (isCustomEntry(country) && !country.flag) {
     return (
@@ -53,6 +56,7 @@ export const TileFlag: React.FC<{
   const { logo, isExisting } = getHostingCountryLogo(
     country,
     shouldShowHeartFlagIcon,
+    shouldUse2026WhiteHeartFlags,
   );
 
   return (

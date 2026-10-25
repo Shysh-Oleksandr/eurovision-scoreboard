@@ -32,6 +32,9 @@ const CountryStatsPickerModal: React.FC<CountryStatsPickerModalProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const allCountriesForYear = useCountriesStore(
@@ -124,6 +127,7 @@ const CountryStatsPickerModal: React.FC<CountryStatsPickerModalProps> = ({
                   const { logo, isExisting } = getHostingCountryLogo(
                     country,
                     shouldShowHeartFlagIcon,
+                    shouldUse2026WhiteHeartFlags,
                   );
 
                   return (

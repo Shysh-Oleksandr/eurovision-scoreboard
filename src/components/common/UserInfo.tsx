@@ -57,11 +57,18 @@ const UserInfo: React.FC<UserInfoProps> = ({ user, size = 'md' }) => {
   const setSelectedProfileUser = useGeneralStore(
     (state) => state.setSelectedProfileUser,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const isViewedUser = selectedProfileUser?._id === user?._id;
 
   if (!user) return null;
-  const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
+  const { logo, isExisting } = getHostingCountryLogo(
+    user?.country || 'WW',
+    true,
+    shouldUse2026WhiteHeartFlags,
+  );
 
   return (
     <div

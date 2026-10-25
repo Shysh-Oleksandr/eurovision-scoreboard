@@ -86,7 +86,8 @@
     },
     "savedTo": "Saved to {folder}",
     "privacyPolicy": "Privacy Policy",
-    "termsOfUse": "Terms of Use"
+    "termsOfUse": "Terms of Use",
+    "credits": "Credits"
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
@@ -1504,6 +1505,7 @@
       },
       "tip": {
         "heartFlags": "Replace flag thumbnails with heart-shaped icons in the app’s accent colours.",
+        "whiteHeartFlags2026": "Show heart flags in the 2026 design with a white outline instead of the classic black one.",
         "minimalFlags": "Use simplified round and square flag shapes instead of detailed flags.",
         "rankChange": "Show an arrow indicating whether each entry moved up or down since the previous points were awarded.",
         "targetStages": "Show which stage each qualifier advances to.",
@@ -1642,6 +1644,7 @@
     "ui": {
       "dragAndDropToUpload": "Drag and drop or click to upload",
       "useHeartIconsForFlags": "Use heart icons for flags",
+      "use2026WhiteHeartFlags": "Use the 2026 heart flags with a white outline",
       "alwaysShowRankings": "Always show rankings",
       "showRankChangeIndicator": "Show rank change indicator",
       "showQualifiersPopup": "Show qualifiers popup",
@@ -2182,6 +2185,7 @@
         "rectangle": "Rectangle",
         "round": "Round",
         "heart": "Heart",
+        "use2026WhiteHeart": "2026 style (white outline)",
         "customEntries": "Custom entries",
         "customEntry": "Custom entry"
       },

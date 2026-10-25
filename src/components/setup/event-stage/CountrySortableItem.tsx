@@ -44,10 +44,14 @@ export const CountrySortableItem: React.FC<CountrySortableItemProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const { logo, isExisting } = getHostingCountryLogo(
     country,
     shouldShowHeartFlagIcon,
+    shouldUse2026WhiteHeartFlags,
   );
 
   const showBadgeRow =

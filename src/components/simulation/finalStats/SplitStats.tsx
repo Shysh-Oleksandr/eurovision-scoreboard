@@ -36,6 +36,9 @@ const SplitStats: React.FC<SplitStatsProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const cssVars = useBorderOpacity(!enableHover);
 
@@ -216,10 +219,12 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                         ? getHostingCountryLogo(
                             totalCountry,
                             shouldShowHeartFlagIcon,
+                            shouldUse2026WhiteHeartFlags,
                           )
                         : getHostingCountryLogoForImageGeneration(
                             totalCountry,
                             shouldShowHeartFlagIcon,
+                            shouldUse2026WhiteHeartFlags,
                           );
 
                       return (
@@ -261,10 +266,12 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                             ? getHostingCountryLogo(
                                 juryCountry,
                                 shouldShowHeartFlagIcon,
+                                shouldUse2026WhiteHeartFlags,
                               )
                             : getHostingCountryLogoForImageGeneration(
                                 juryCountry,
                                 shouldShowHeartFlagIcon,
+                                shouldUse2026WhiteHeartFlags,
                               );
 
                           return (
@@ -308,10 +315,12 @@ const SplitStats: React.FC<SplitStatsProps> = ({
                             ? getHostingCountryLogo(
                                 televoteCountry,
                                 shouldShowHeartFlagIcon,
+                                shouldUse2026WhiteHeartFlags,
                               )
                             : getHostingCountryLogoForImageGeneration(
                                 televoteCountry,
                                 shouldShowHeartFlagIcon,
+                                shouldUse2026WhiteHeartFlags,
                               );
 
                           return (

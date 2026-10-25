@@ -33,9 +33,20 @@ const CountryStatsRow: React.FC<CountryStatsRowProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
   const { logo, isExisting } = enableHover
-    ? getHostingCountryLogo(country, shouldShowHeartFlagIcon)
-    : getHostingCountryLogoForImageGeneration(country, shouldShowHeartFlagIcon);
+    ? getHostingCountryLogo(
+        country,
+        shouldShowHeartFlagIcon,
+        shouldUse2026WhiteHeartFlags,
+      )
+    : getHostingCountryLogoForImageGeneration(
+        country,
+        shouldShowHeartFlagIcon,
+        shouldUse2026WhiteHeartFlags,
+      );
 
   return (
     <tr

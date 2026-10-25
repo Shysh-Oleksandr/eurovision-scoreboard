@@ -13,6 +13,7 @@ import Button from '@/components/common/Button';
 import FollowButton from '@/components/common/FollowButton';
 import UserModerationMenu from '@/components/moderation/UserModerationMenu';
 import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
+import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
 
@@ -29,7 +30,14 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   const t = useTranslations();
   const locale = useLocale();
   const { data: followStatus } = useFollowingStatusQuery(user._id);
-  const { logo, isExisting } = getHostingCountryLogo(user?.country || 'WW');
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
+  const { logo, isExisting } = getHostingCountryLogo(
+    user?.country || 'WW',
+    true,
+    shouldUse2026WhiteHeartFlags,
+  );
 
   const followerCount = followStatus?.followerCount ?? user.followerCount ?? 0;
 

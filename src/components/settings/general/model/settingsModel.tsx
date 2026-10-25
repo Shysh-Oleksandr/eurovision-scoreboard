@@ -210,6 +210,15 @@ export const CATEGORIES: Category[] = [
         settingKey: 'shouldShowHeartFlagIcon',
         labelKey: 'settings.ui.useHeartIconsForFlags',
         tipKey: 'settings.general2.tip.heartFlags',
+        children: [
+          {
+            kind: 'switch',
+            id: 'shouldUse2026WhiteHeartFlags',
+            settingKey: 'shouldUse2026WhiteHeartFlags',
+            labelKey: 'settings.ui.use2026WhiteHeartFlags',
+            tipKey: 'settings.general2.tip.whiteHeartFlags2026',
+          },
+        ],
       },
       {
         kind: 'switch',

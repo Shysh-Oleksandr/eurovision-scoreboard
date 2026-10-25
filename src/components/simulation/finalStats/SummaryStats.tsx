@@ -36,6 +36,9 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
   const shouldShowHeartFlagIcon = useGeneralStore(
     (state) => state.settings.shouldShowHeartFlagIcon,
   );
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const cssVars = useBorderOpacity(!enableHover);
 
@@ -211,10 +214,12 @@ const SummaryStats: React.FC<SummaryStatsProps> = ({
                         ? getHostingCountryLogo(
                             country,
                             shouldShowHeartFlagIcon,
+                            shouldUse2026WhiteHeartFlags,
                           )
                         : getHostingCountryLogoForImageGeneration(
                             country,
                             shouldShowHeartFlagIcon,
+                            shouldUse2026WhiteHeartFlags,
                           );
 
                       return (

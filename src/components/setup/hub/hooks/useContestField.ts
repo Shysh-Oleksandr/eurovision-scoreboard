@@ -23,7 +23,11 @@ import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
+import {
+  getHostingCountryByYear,
+  getHostingCountryLogo,
+  getHostingLogoByCountryCode,
+} from '@/theme/hosting';
 import { applyThemeForContestYear } from '@/theme/syncThemeToContest';
 import { Contest } from '@/types/contest';
 import { ContestSnapshot } from '@/types/contestSnapshot';
@@ -33,6 +37,24 @@ const YEAR_OPTIONS = [
   ...JESC_YEAR_OPTIONS,
   ...ASIA_YEAR_OPTIONS,
 ];
+
+/** Swaps the year options' host logos for the white 2026 hearts when that setting is on. */
+const withHeartFlagStyle = (
+  options: Option[],
+  shouldUse2026WhiteHeartFlags: boolean,
+): Option[] => {
+  if (!shouldUse2026WhiteHeartFlags) return options;
+
+  return options.map((option) => {
+    const { year, contestType } = parseContestKey(option.value);
+    const { code } = getHostingCountryByYear(year as Year, contestType);
+
+    return {
+      ...option,
+      imageUrl: getHostingLogoByCountryCode(code, true) ?? option.imageUrl,
+    };
+  });
+};
 
 export const getContestImageClassName = (
   option: Option,
@@ -57,6 +79,9 @@ export const useContestField = () => {
   const setIsGfOnly = useGeneralStore((state) => state.setIsGfOnly);
   const setSettings = useGeneralStore((state) => state.setSettings);
   const getHostingCountry = useGeneralStore((state) => state.getHostingCountry);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
   const eventStages = useScoreboardStore((state) => state.eventStages);
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const { confirm } = useConfirmation();
@@ -150,9 +175,27 @@ export const useContestField = () => {
 
   const contestGroups = useMemo(() => {
     const groups: OptionGroup[] = [
-      { label: 'ESC', options: ESC_YEAR_OPTIONS },
-      { label: 'JESC', options: JESC_YEAR_OPTIONS },
-      { label: 'ESC Asia', options: ASIA_YEAR_OPTIONS },
+      {
+        label: 'ESC',
+        options: withHeartFlagStyle(
+          ESC_YEAR_OPTIONS,
+          shouldUse2026WhiteHeartFlags,
+        ),
+      },
+      {
+        label: 'JESC',
+        options: withHeartFlagStyle(
+          JESC_YEAR_OPTIONS,
+          shouldUse2026WhiteHeartFlags,
+        ),
+      },
+      {
+        label: 'ESC Asia',
+        options: withHeartFlagStyle(
+          ASIA_YEAR_OPTIONS,
+          shouldUse2026WhiteHeartFlags,
+        ),
+      },
     ];
 
     if (quickSelectContestsData && quickSelectContestsData.length > 0) {
@@ -163,6 +206,8 @@ export const useContestField = () => {
           .map((contest) => {
             const { logo, isExisting } = getHostingCountryLogo(
               contest.hostingCountryCode,
+              true,
+              shouldUse2026WhiteHeartFlags,
             );
 
             return {
@@ -176,7 +221,11 @@ export const useContestField = () => {
     }
 
     if (activeContest) {
-      const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
+      const { logo, isExisting } = getHostingCountryLogo(
+        getHostingCountry(),
+        true,
+        shouldUse2026WhiteHeartFlags,
+      );
 
       groups.unshift({
         label: t('common.custom'),
@@ -192,13 +241,25 @@ export const useContestField = () => {
     }
 
     return groups;
-  }, [activeContest, t, getHostingCountry, quickSelectContestsData]);
+  }, [
+    activeContest,
+    t,
+    getHostingCountry,
+    quickSelectContestsData,
+    shouldUse2026WhiteHeartFlags,
+  ]);
 
   const contestOptions = useMemo(() => {
-    const options: Option[] = [...YEAR_OPTIONS];
+    const options: Option[] = [
+      ...withHeartFlagStyle(YEAR_OPTIONS, shouldUse2026WhiteHeartFlags),
+    ];
 
     if (activeContest) {
-      const { logo, isExisting } = getHostingCountryLogo(getHostingCountry());
+      const { logo, isExisting } = getHostingCountryLogo(
+        getHostingCountry(),
+        true,
+        shouldUse2026WhiteHeartFlags,
+      );
 
       options.push({
         label: activeContest.name,
@@ -209,7 +270,7 @@ export const useContestField = () => {
     }
 
     return options;
-  }, [activeContest, getHostingCountry]);
+  }, [activeContest, getHostingCountry, shouldUse2026WhiteHeartFlags]);
 
   const contestValue = activeContest
     ? activeContest._id

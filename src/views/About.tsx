@@ -1,6 +1,9 @@
 import Link from 'next/link';
 
 import { ArrowIcon } from '@/assets/icons/ArrowIcon';
+import whiteHearts2026Credits from '@/data/whiteHearts2026Credits.json';
+
+const whiteHeartCredits = Object.values(whiteHearts2026Credits);
 
 const About = () => {
   return (
@@ -115,6 +118,46 @@ const About = () => {
                   the material is not authorized and an assertion that you are
                   the copyright holder/representative.
                 </p>
+              </section>
+
+              <section id="credits" className="mb-8 scroll-mt-4">
+                <h2 className="text-2xl font-bold text-white mb-6 border-b border-primary-700/40 pb-3">
+                  Credits
+                </h2>
+                <p className="text-primary-200 leading-relaxed mb-4">
+                  The 2026-style heart flags with a white outline come from{' '}
+                  <a
+                    href="https://commons.wikimedia.org/wiki/Category:Heart-flags_of_Eurovision"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary-300 hover:text-white underline transition-colors"
+                  >
+                    Wikimedia Commons
+                  </a>
+                  . Countries without one there use a heart generated from their
+                  flag.
+                </p>
+                <details className="text-primary-200">
+                  <summary className="cursor-pointer text-primary-300 hover:text-white transition-colors">
+                    Authors and licences ({whiteHeartCredits.length} files)
+                  </summary>
+                  <ul className="mt-3 space-y-1 text-base list-none pl-0">
+                    {whiteHeartCredits.map((credit) => (
+                      <li key={credit.file}>
+                        <a
+                          href={credit.page}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary-300 hover:text-white underline transition-colors"
+                        >
+                          {credit.file}
+                        </a>
+                        {' by '}
+                        {credit.author}, {credit.license}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               </section>
 
               <section className="mb-8">

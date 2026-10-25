@@ -36,6 +36,7 @@ import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useCountriesStore } from '@/state/countriesStore';
+import { useGeneralStore } from '@/state/generalStore';
 import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -74,6 +75,9 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const t = useTranslations();
   const { confirm } = useConfirmation();
   const user = useAuthStore((state) => state.user);
+  const shouldUse2026WhiteHeartFlags = useGeneralStore(
+    (state) => state.settings.shouldUse2026WhiteHeartFlags,
+  );
 
   const { mutateAsync: toggleQuickSelect } =
     useToggleContestQuickSelectMutation();
@@ -123,6 +127,8 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 
   const { logo, isExisting } = getHostingCountryLogo(
     contest.hostingCountryCode,
+    true,
+    shouldUse2026WhiteHeartFlags,
   );
 
   const handleQuickSelect = async () => {

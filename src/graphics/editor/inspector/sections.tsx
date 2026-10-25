@@ -975,17 +975,28 @@ export function useElementSections(
         id: 'style',
         title: t('sections.style'),
         content: (
-          <Field label={t('flag.shape')}>
-            <Seg<'rect' | 'round' | 'heart'>
-              value={el.shape}
-              onChange={(shape) => update(el.id, { shape })}
-              options={[
-                { value: 'rect', label: t('flag.rectangle') },
-                { value: 'round', label: t('flag.round') },
-                { value: 'heart', label: t('flag.heart') },
-              ]}
-            />
-          </Field>
+          <>
+            <Field label={t('flag.shape')}>
+              <Seg<'rect' | 'round' | 'heart'>
+                value={el.shape}
+                onChange={(shape) => update(el.id, { shape })}
+                options={[
+                  { value: 'rect', label: t('flag.rectangle') },
+                  { value: 'round', label: t('flag.round') },
+                  { value: 'heart', label: t('flag.heart') },
+                ]}
+              />
+            </Field>
+            {el.shape === 'heart' && (
+              <Toggle
+                label={t('flag.use2026WhiteHeart')}
+                checked={el.use2026WhiteHeart}
+                onChange={(use2026WhiteHeart) =>
+                  update(el.id, { use2026WhiteHeart })
+                }
+              />
+            )}
+          </>
         ),
       });
       break;

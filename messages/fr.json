@@ -86,7 +86,8 @@
     },
     "savedTo": "Enregistré dans {folder}",
     "privacyPolicy": "Politique de confidentialité",
-    "termsOfUse": "Conditions d’utilisation"
+    "termsOfUse": "Conditions d’utilisation",
+    "credits": "Crédits"
   },
   "Metadata": {
     "title": "DouzePoints - Simulateur de Scoreboard Eurovision",
@@ -1504,6 +1505,7 @@
       },
       "tip": {
         "heartFlags": "Remplacer les miniatures de drapeaux par des icônes en forme de cœur aux couleurs d’accent de l’app.",
+        "whiteHeartFlags2026": "Afficher les drapeaux cœur au design 2026 avec un contour blanc au lieu du contour noir classique.",
         "minimalFlags": "Utiliser des formes de drapeau rondes et carrées simplifiées plutôt que des drapeaux détaillés.",
         "rankChange": "Afficher une flèche indiquant si chaque entrée a monté ou descendu depuis les derniers points attribués.",
         "targetStages": "Afficher l’étape vers laquelle chaque qualifié se dirige.",
@@ -1642,6 +1644,7 @@
     "ui": {
       "dragAndDropToUpload": "Glissez-déposez ou cliquez pour téléverser",
       "useHeartIconsForFlags": "Utiliser des icônes cœur pour les drapeaux",
+      "use2026WhiteHeartFlags": "Utiliser les drapeaux cœur 2026 à contour blanc",
       "alwaysShowRankings": "Toujours afficher le classement",
       "showRankChangeIndicator": "Afficher les changements de rang",
       "showQualifiersPopup": "Afficher la fenêtre des qualifiés",
@@ -2182,6 +2185,7 @@
         "rectangle": "Rectangle",
         "round": "Rond",
         "heart": "Cœur",
+        "use2026WhiteHeart": "Style 2026 (contour blanc)",
         "customEntries": "Entrées personnalisées",
         "customEntry": "Entrée personnalisée"
       },
