@@ -12,7 +12,7 @@ export type HostingCountryData = {
   logo: string;
 };
 
-// Hosting country logos by year (2004-2026)
+// Hosting country logos by year (2004-2027)
 const hostingLogosByYear: Record<Year, HostingCountryData> = {
   '2004': { code: 'TR', logo: '/hostingCountryLogos/Turkey2004.svg' },
   '2005': { code: 'UA', logo: '/hostingCountryLogos/Ukraine2023.svg' },
@@ -37,6 +37,7 @@ const hostingLogosByYear: Record<Year, HostingCountryData> = {
   '2024': { code: 'SE', logo: '/hostingCountryLogos/Sweden2024.svg' },
   '2025': { code: 'CH', logo: '/hostingCountryLogos/Switzerland2025.svg' },
   '2026': { code: 'AT', logo: '/hostingCountryLogos/Austria2015.svg' },
+  '2027': { code: 'BG', logo: '/hostingCountryLogos/EuroBulgaria.svg' },
 };
 
 const juniorHostingLogosByYear: Record<string, HostingCountryData> = {

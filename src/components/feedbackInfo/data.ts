@@ -409,6 +409,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-10-28',
+    title: 'Added the ESC 2027 lineup',
+  },
+  {
     date: '2026-10-25',
     title:
       'Added the 2026 heart flags with a white outline for all countries. Turn them on in Settings → Look & feel, or per flag in Graphics',

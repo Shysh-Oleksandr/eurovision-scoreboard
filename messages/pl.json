@@ -1324,7 +1324,7 @@
     "setup": {
       "yearData": {
         "title": "Wybór roku i dane oficjalne",
-        "content": "Użyj menu rozwijanego w lewym górnym rogu, aby wybrać edycję ESC (2004–2026), JESC (2016–2026) lub ESC Asia (2026). Wybór roku automatycznie ładuje oficjalną lineup tej edycji. To samo menu pozwala też szybko załadować jeden z zapisanych konkursów."
+        "content": "Użyj menu rozwijanego w lewym górnym rogu, aby wybrać edycję ESC (2004–2027), JESC (2016–2026) lub ESC Asia (2026). Wybór roku automatycznie ładuje oficjalną lineup tej edycji. To samo menu pozwala też szybko załadować jeden z zapisanych konkursów."
       },
       "countryAssignment": {
         "title": "Przypisanie krajów",

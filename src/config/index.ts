@@ -22,6 +22,7 @@ export const years = [
   '2024',
   '2025',
   '2026',
+  '2027',
 ] as const;
 
 export type Year = (typeof years)[number];

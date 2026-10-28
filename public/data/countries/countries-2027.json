@@ -1,0 +1,257 @@
+{
+  "semiFinalVotingMode": "JURY_AND_TELEVOTE",
+  "countries": [
+    {
+      "name": "Albania",
+      "code": "AL",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Armenia",
+      "code": "AM",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Australia",
+      "code": "AU",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Austria",
+      "code": "AT",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Azerbaijan",
+      "code": "AZ",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Belgium",
+      "code": "BE",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Bulgaria",
+      "code": "BG",
+      "category": "All-Time Participants",
+      "isQualified": true,
+      "isAutoQualified": true
+    },
+    {
+      "name": "Canada",
+      "code": "CA",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Croatia",
+      "code": "HR",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Cyprus",
+      "code": "CY",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Denmark",
+      "code": "DK",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Estonia",
+      "code": "EE",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Finland",
+      "code": "FI",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "France",
+      "code": "FR",
+      "category": "All-Time Participants",
+      "isQualified": true,
+      "isAutoQualified": true
+    },
+    {
+      "name": "Georgia",
+      "code": "GE",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Germany",
+      "code": "DE",
+      "category": "All-Time Participants",
+      "isQualified": true,
+      "isAutoQualified": true
+    },
+    {
+      "name": "Greece",
+      "code": "GR",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Israel",
+      "code": "IL",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Italy",
+      "code": "IT",
+      "category": "All-Time Participants",
+      "isQualified": true,
+      "isAutoQualified": true
+    },
+    {
+      "name": "Latvia",
+      "code": "LV",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Lithuania",
+      "code": "LT",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Luxembourg",
+      "code": "LU",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Malta",
+      "code": "MT",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Moldova",
+      "code": "MD",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Montenegro",
+      "code": "ME",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "North Macedonia",
+      "code": "MK",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Norway",
+      "code": "NO",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Poland",
+      "code": "PL",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Portugal",
+      "code": "PT",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Romania",
+      "code": "RO",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "San Marino",
+      "code": "SM",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Serbia",
+      "code": "RS",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Sweden",
+      "code": "SE",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Switzerland",
+      "code": "CH",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "Ukraine",
+      "code": "UA",
+      "category": "All-Time Participants",
+      "isQualified": false,
+      "semiFinalGroup": "TO_BE_DRAWN"
+    },
+    {
+      "name": "United Kingdom",
+      "code": "GB",
+      "category": "All-Time Participants",
+      "isQualified": true,
+      "isAutoQualified": true
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import { PointsItem } from '@/state/generalStore';
 import { getHostingCountryByYear } from '@/theme/hosting';
 import { ESC_YEARS_WITH_THEME, JUNIOR_YEARS_WITH_THEME } from '@/theme/themes';
 
-export const SUPPORTED_YEARS = Array.from({ length: 23 }, (_, i) => 2004 + i);
+export const SUPPORTED_YEARS = Array.from({ length: 24 }, (_, i) => 2004 + i);
 
 // Junior Eurovision years supported in the app
 export const JUNIOR_SUPPORTED_YEARS = Array.from(

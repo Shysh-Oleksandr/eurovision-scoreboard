@@ -4,6 +4,7 @@ export interface BaseCountry {
   code: string;
   category?: string;
   isQualified?: boolean;
+  /** `SF1` / `SF2`, or `TO_BE_DRAWN` for an edition whose allocation draw hasn't taken place yet. */
   semiFinalGroup?: string;
   aqSemiFinalGroup?: string;
   /** Official allocation-draw pot of a semi-finalist (1-based), curated per year. */

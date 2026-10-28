@@ -6,6 +6,7 @@ import {
   EventStage,
 } from '../../../models';
 import { useCountriesStore } from '../../../state/countriesStore';
+import { enterPendingDraw } from '../allocation-draw/drawMode';
 import { buildEventStagesFromAssignments } from '../utils/buildEventStagesFromAssignments';
 
 import { useGeneralStore } from '@/state/generalStore';
@@ -47,13 +48,15 @@ export const useCountryAssignments = () => {
 
       if (countryData?.semiFinalGroup && !isGfOnly) {
         const stageId = countryData.semiFinalGroup.toUpperCase();
+        const isWaitingForDraw = stageId === CountryAssignmentGroup.TO_BE_DRAWN;
         const stageExists = configuredEventStages.some(
           (s) => s.id.toUpperCase() === stageId,
         );
 
-        initialAssignments[country.code] = stageExists
-          ? stageId
-          : CountryAssignmentGroup.NOT_PARTICIPATING;
+        initialAssignments[country.code] =
+          isWaitingForDraw || stageExists
+            ? stageId
+            : CountryAssignmentGroup.NOT_PARTICIPATING;
       } else if (countryData?.isQualified || countryData?.isAutoQualified) {
         // For qualified countries, assign to the last stage (typically Grand Final)
         const [lastStage] = configuredEventStages.sort(
@@ -72,6 +75,13 @@ export const useCountryAssignments = () => {
     });
 
     setEventAssignments(initialAssignments);
+
+    // An edition before its allocation draw opens in draw mode.
+    const waiting = allCountries.filter(
+      (c) => initialAssignments[c.code] === CountryAssignmentGroup.TO_BE_DRAWN,
+    );
+
+    if (waiting.length > 0) enterPendingDraw(waiting);
   }, [
     allCountriesForYear,
     getAllCountries,

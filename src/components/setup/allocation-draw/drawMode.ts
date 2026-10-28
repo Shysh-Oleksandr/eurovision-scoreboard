@@ -6,7 +6,9 @@ import { codesInDrawSemis, waitingCodesOf } from './useAllocationDraw';
 
 import { TO_BE_DRAWN_LIST } from '@/components/setup/hub/lineup/listIds';
 import { useSetupUiStore } from '@/components/setup/hub/state/setupUiStore';
-import { CountryAssignmentGroup } from '@/models';
+import { BaseCountry, CountryAssignmentGroup } from '@/models';
+import { getDrawSemis } from '@/state/allocationDraw/drawInput';
+import { splitEvenly } from '@/state/allocationDraw/engine';
 import { useAllocationDrawStore } from '@/state/allocationDrawStore';
 import { useCountriesStore } from '@/state/countriesStore';
 
@@ -45,6 +47,34 @@ export const enterDrawMode = (moveIn: boolean): number => {
   useSetupUiStore.getState().setExpanded(TO_BE_DRAWN_LIST, true);
 
   return moved;
+};
+
+/**
+ * Draw mode for an edition whose allocation draw hasn't taken place yet: its
+ * semi-finalists start in "To be drawn" with nowhere to go back to, so "Put
+ * them back where they were" splits them alphabetically between the semis,
+ * the odd one to the later semi (2027: 15 and 16).
+ */
+export const enterPendingDraw = (waiting: readonly BaseCountry[]) => {
+  const { configuredEventStages } = useCountriesStore.getState();
+  const draw = useAllocationDrawStore.getState();
+  const semis = getDrawSemis(configuredEventStages, draw.rules);
+  const sorted = [...waiting].sort((a, b) => a.name.localeCompare(b.name));
+  const { base, extra } = splitEvenly(sorted.length, semis.length);
+  const from: Record<string, string> = {};
+  let start = 0;
+
+  semis.forEach((semi, i) => {
+    const size = base + (i >= semis.length - extra ? 1 : 0);
+
+    sorted.slice(start, start + size).forEach((country) => {
+      from[country.code] = semi.id;
+    });
+    start += size;
+  });
+
+  draw.rememberWaitingFrom(from);
+  enterDrawMode(false);
 };
 
 export interface RestoreSummary {

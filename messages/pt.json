@@ -1324,7 +1324,7 @@
     "setup": {
       "yearData": {
         "title": "Seleção de Ano e Dados Oficiais",
-        "content": "Use o menu suspenso do canto superior esquerdo para escolher uma edição do ESC (2004–2026), do JESC (2016–2026) ou do ESC Asia (2026). Selecionar um ano carrega automaticamente o alinhamento oficial dessa edição. O mesmo menu suspenso também permite carregar rapidamente um dos seus concursos guardados."
+        "content": "Use o menu suspenso do canto superior esquerdo para escolher uma edição do ESC (2004–2027), do JESC (2016–2026) ou do ESC Asia (2026). Selecionar um ano carrega automaticamente o alinhamento oficial dessa edição. O mesmo menu suspenso também permite carregar rapidamente um dos seus concursos guardados."
       },
       "countryAssignment": {
         "title": "Atribuição de Países",

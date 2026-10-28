@@ -33,6 +33,15 @@ handoff lives in `currentTask/design_handoff_allocation_draw/`.
   `public/data/countries/countries-YYYY.json`, curated for 2022–2026 (sources:
   eurovision.tv / Eurovisionworld / escXtra pot announcements). Years without
   it fall back to "Based on voting history".
+- **Editions before their draw** mark the semi-finalists
+  `"semiFinalGroup": "TO_BE_DRAWN"` in the countries JSON (ESC 2027). Such a
+  line-up opens with empty SF1 + SF2, those countries waiting and draw mode on
+  (`useInitialLineup`, `useCountryAssignments` → `enterPendingDraw`).
+  `enterPendingDraw` records an alphabetical split as their `waitingFrom`
+  (balanced, the odd one to the later semi: 15 + 16), so "Put them back where
+  they were" fills the semis A–Z instead of emptying them into the pool. The
+  pre-qualified then vote in no semi (the year data has no
+  `aqSemiFinalGroup`). In Grand Final only mode they are simply not qualified.
 - **"Drawn" chip**: `drawn[stageId]` is shown only while
   `isDrawnInfoCurrent(info, currentCodes)` — i.e. the stage still holds exactly
   the drawn line-up — so no move hook is needed to clear it.

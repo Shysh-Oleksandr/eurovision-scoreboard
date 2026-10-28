@@ -1,6 +1,11 @@
 import { useLayoutEffect } from 'react';
 
-import { EventStage, StageId, StageVotingMode } from '@/models';
+import {
+  CountryAssignmentGroup,
+  EventStage,
+  StageId,
+  StageVotingMode,
+} from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -36,12 +41,22 @@ export const useInitialLineup = () => {
     const sf2Id = StageId.SF2;
     const gfId = StageId.GF;
 
-    const hasSf1 = allCountriesForYear.some(
-      (c) => c.semiFinalGroup?.toLowerCase() === sf1Id.toLowerCase(),
+    // Before the allocation draw the semi-finalists wait in "To be drawn",
+    // so both semi-finals exist for the draw to fill.
+    const hasCountriesToDraw = allCountriesForYear.some(
+      (c) =>
+        c.semiFinalGroup?.toUpperCase() === CountryAssignmentGroup.TO_BE_DRAWN,
     );
-    const hasSf2 = allCountriesForYear.some(
-      (c) => c.semiFinalGroup?.toLowerCase() === sf2Id.toLowerCase(),
-    );
+    const hasSf1 =
+      hasCountriesToDraw ||
+      allCountriesForYear.some(
+        (c) => c.semiFinalGroup?.toLowerCase() === sf1Id.toLowerCase(),
+      );
+    const hasSf2 =
+      hasCountriesToDraw ||
+      allCountriesForYear.some(
+        (c) => c.semiFinalGroup?.toLowerCase() === sf2Id.toLowerCase(),
+      );
     const initialStages: EventStage[] = [];
 
     let order = 0;

@@ -39,7 +39,7 @@ The file is either a plain array of countries or an object:
 }
 ```
 
-With a plain array, `semiFinalVotingMode` defaults to `TELEVOTE_ONLY`, which is correct for ESC 2004–2009 and 2023–2025. Use the object form when the semi-finals have a jury, as in ESC 2010–2022 and 2026.
+With a plain array, `semiFinalVotingMode` defaults to `TELEVOTE_ONLY`, which is correct for ESC 2004–2009 and 2023–2025. Use the object form when the semi-finals have a jury, as in ESC 2010–2022 and 2026–2027.
 
 Country entry (`BaseCountry` in `src/models/index.ts`; only the preset fields are listed):
 
@@ -48,9 +48,10 @@ Country entry (`BaseCountry` in `src/models/index.ts`; only the preset fields ar
 | `name` | yes | **Must match** the `name` in `src/data/countries/common-countries.ts`, for example `"North Macedonia"` or `"South Korea"`. |
 | `code` | yes | ISO-like code from `common-countries.ts`, for example `"MK"`. |
 | `category` | yes | Copy it from `common-countries.ts`, for example `"All-Time Participants"` or `"Asia"`. |
-| `semiFinalGroup` | ESC with semis | `"SF1"` or `"SF2"`. The semi-final stages are created only when at least one country has this field. Leave it out for single-show contests (JESC, ESC Asia). |
+| `semiFinalGroup` | ESC with semis | `"SF1"` or `"SF2"`. The semi-final stages are created only when at least one country has this field. Leave it out for single-show contests (JESC, ESC Asia). Before the allocation draw (usually late January), use `"TO_BE_DRAWN"` for every semi-finalist: the app then creates SF1 + SF2, puts those countries in the allocation draw's "To be drawn" bucket and turns draw mode on (`useInitialLineup`, `useCountryAssignments`). Leaving the draw with "Put them back where they were" splits them A–Z between the semis (`enterPendingDraw` in `drawMode.ts`). See ESC 2027. |
 | `isAutoQualified` | AQs | `true` for countries that go straight to the final: the Big Five plus the host in ESC, and **every** entry in single-show contests. |
 | `aqSemiFinalGroup` | ESC AQs | The semi-final in which an auto-qualifier votes (`"SF1"` / `"SF2"`). This adds it to that semi-final's voters. |
+| `pot` | optional | Official allocation-draw pot (1-based) of a semi-finalist. Leave it out until the EBU announces the pots; the draw then groups by voting history. |
 | `isQualified` | yes | `true` if the entry is in the Grand Final. For a semi-finalist it is the **real** qualification result. Before the semi-finals have taken place, set it to `false` for every semi-finalist. In "Grand Final only" mode only the auto-qualifiers are then placed in the final. Set it to `true` for every entry in single-show contests. |
 | `juryOdds`, `televoteOdds` | optional | 1–99 strength, derived from **real results** (see §5). **Leave them out before the contest takes place.** Missing values default to 50/50 (`resolveYearOddsFor` in `countriesStore.ts`). |
 | `spokespersonOrder` | optional | 0-based order in which the juries are called in the final. Grand Final voters are sorted by it, and missing values count as `0`, so a stable sort keeps the file order. Leave it out until the order is announced. |
@@ -109,6 +110,8 @@ Example: JESC 2027 (single show).
 
 Edit the JSON file and **bump `COUNTRIES_DATA_VERSION`** in every case.
 
+- **Pots announced** (a few days before the allocation draw): add the official `pot` (1-based) to every semi-finalist. The draw window uses them instead of "Based on voting history".
+- **After the allocation draw:** replace every `"semiFinalGroup": "TO_BE_DRAWN"` with the real `"SF1"` / `"SF2"`, and add `aqSemiFinalGroup` to the auto-qualifiers.
 - **After the semi-finals:** set `isQualified: true` for the qualifiers and `false` for the rest.
 - **Spokesperson order announced:** add `spokespersonOrder` (0-based) to every voter. The browser snippet in `scripts/addSpokespersonOrder.ts` extracts the list from Wikipedia's "Spokespersons" section.
 - **After the contest:** compute the odds from the real points with `scripts/calculateCountriesOdds.ts` (`yarn calculate-odds`):

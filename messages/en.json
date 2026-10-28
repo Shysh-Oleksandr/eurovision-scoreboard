@@ -1324,7 +1324,7 @@
     "setup": {
       "yearData": {
         "title": "Year Selection & Official Data",
-        "content": "Use the top-left dropdown to pick an ESC edition (2004–2026), a JESC edition (2016–2026) or an ESC Asia edition (2026). Selecting a year automatically loads the official lineup for that edition. The same dropdown also lets you quickly load one of your saved contests."
+        "content": "Use the top-left dropdown to pick an ESC edition (2004–2027), a JESC edition (2016–2026) or an ESC Asia edition (2026). Selecting a year automatically loads the official lineup for that edition. The same dropdown also lets you quickly load one of your saved contests."
       },
       "countryAssignment": {
         "title": "Country Assignment",
