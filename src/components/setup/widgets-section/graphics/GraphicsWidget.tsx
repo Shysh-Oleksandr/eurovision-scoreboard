@@ -15,13 +15,15 @@ const GraphicsModal = dynamic(() => import('./GraphicsModal'), {
 });
 
 interface Props {
-  /** "N saved" from the profile summary (signed in). */
+  /** Signed out, the widget shows just its name, like the other libraries. */
+  signedIn: boolean;
+  /** "N saved" from the profile summary. */
   cloudStat?: string;
   statLoading?: boolean;
 }
 
-/** Hub widget (teal, beta): opens the Graphics modal on "My designs". */
-const GraphicsWidget = ({ cloudStat, statLoading }: Props) => {
+/** Hub widget (beta): opens the Graphics modal on "My designs". */
+const GraphicsWidget = ({ signedIn, cloudStat, statLoading }: Props) => {
   const t = useTranslations('graphics.widget');
   const isOpen = useGraphicsStudioStore((s) => s.isGraphicsModalOpen);
   const setOpen = useGraphicsStudioStore((s) => s.setGraphicsModalOpen);
@@ -41,22 +43,22 @@ const GraphicsWidget = ({ cloudStat, statLoading }: Props) => {
     };
   }, [draftsVersion, isOpen]);
 
+  const localStat =
+    count === 0 ? t('noDesignsYet') : t('nDesigns', { count: count ?? 0 });
+
   return (
     <>
       <WidgetContainer
         onClick={() => setOpen(true)}
         title={t('title')}
         badge={<BetaBadge />}
-        description={t('description')}
-        tone="teal"
         stat={
-          count === null
-            ? undefined
-            : `${
-                count === 0 ? t('noDesignsYet') : t('nDesigns', { count })
-              } · ${cloudStat ?? t('explore')}`
+          signedIn && count !== null
+            ? `${localStat}${cloudStat ? `, ${cloudStat}` : ''}`
+            : undefined
         }
-        statLoading={count === null || !!statLoading}
+        shortStat={localStat}
+        statLoading={signedIn && (count === null || !!statLoading)}
         icon={<Sparkles className="size-[21px] flex-none" />}
       />
       {(isOpen || loaded) && (

@@ -35,8 +35,6 @@ type Props = {
   snowEffectClassName?: string;
   style?: React.CSSProperties;
   animatedBorder?: boolean;
-  /** `cta` only: a 20% accent glow instead of the default 35%. */
-  softGlow?: boolean;
   'aria-label'?: string;
   'aria-pressed'?: boolean;
 };
@@ -56,7 +54,6 @@ const Button = ({
   snowEffectClassName = '',
   style,
   animatedBorder = false,
-  softGlow = true,
   'aria-label': ariaLabel,
   'aria-pressed': ariaPressed,
 }: Props) => {
@@ -114,9 +111,9 @@ const Button = ({
             ? 'w-[var(--dp-btn-h)] !px-0 justify-center'
             : '!p-2'
           : ''
-      } ${animatedBorder ? 'animated-border' : ''} ${
-        softGlow && variant === 'cta' ? 'dp-cta--soft' : ''
-      } ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+      } ${animatedBorder ? 'animated-border' : ''} ${className} ${
+        disabled ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
       onClick={onClick}
       title={showTooltip ? undefined : title}
       aria-label={ariaLabel ?? (isIconOnly ? title : undefined)}

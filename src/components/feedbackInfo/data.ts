@@ -409,6 +409,10 @@ const OLD_WHATS_NEW = [
 
 export const WHATS_NEW = [
   {
+    date: '2026-11-01',
+    title: 'Redesigned the setup menu',
+  },
+  {
     date: '2026-10-28',
     title: 'Added the ESC 2027 lineup',
   },
@@ -490,7 +494,7 @@ export const WHATS_NEW = [
 
 export const UPCOMING_FEATURES = [
   {
-    approximateDates: { start: '2026-10-30', end: '2026-11-02' },
+    approximateDates: { start: '2026-11-02', end: '2026-11-06' },
     title: 'Mobile app for iOS and Android',
   },
   {

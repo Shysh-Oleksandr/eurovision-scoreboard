@@ -11,7 +11,6 @@
     "save": "Salva",
     "confirm": "Conferma",
     "authenticationRequired": "Autenticazione richiesta",
-    "lastSaved": "Salvato",
     "relativeTime": {
       "justNow": "proprio ora",
       "minutesAgo": "{count} min fa",
@@ -188,6 +187,11 @@
       "invalidRankRange": "Intervallo di classifica non valido in {stageName}."
     },
     "eventSetupModal": {
+      "contestSaved": "Salvato il {date}",
+      "contestOnThisDevice": "Su questo dispositivo",
+      "customContest": "Concorso personalizzato",
+      "customTheme": "Tema personalizzato",
+      "countryPoolWaiting": "{count, plural, =1 {# paese aspetta} other {# paesi aspettano}} dietro le quinte. Trascinane uno in uno stadio.",
       "grandFinalOnly": "Solo finale",
       "confirmGFOnlyTitle": "Solo finale?",
       "confirmNotGFOnlyTitle": "Restaurare tutti gli stadi?",
@@ -212,8 +216,6 @@
       "failedToSaveCustomEntries": "Errore durante il salvataggio delle voci personalizzate. Per favore, prova di nuovo.",
       "saveToYourCustomEntries": "Salva nelle tue voci personalizzate",
       "countryPool": "Pool di paesi",
-      "countryPoolSub": "{count} non partecipanti · trascina in uno stadio",
-      "contestSub": "{participants} partecipanti · {stages, plural, =1 {# stadio} other {# stadi}}",
       "unsavedChanges": "Modifiche non salvate",
       "select": "Seleziona",
       "selecting": "Selezione",
@@ -403,7 +405,6 @@
       "shortTitle": "Sorteggio",
       "toBeDrawn": "Da sorteggiare",
       "subToBeDrawn": "{count} da sorteggiare",
-      "subDrawn": "Sorteggiato",
       "needsTwoSemis": "Il sorteggio richiede due o più semifinali.",
       "gfOnlyReason": "«Solo finale» è attivo, quindi questo concorso non ha semifinali in cui sorteggiare.",
       "fewSemisReason": "Aggiungi una seconda semifinale che qualifichi alla finale per sorteggiare una formazione.",
@@ -709,10 +710,8 @@
     "previous": "Precedente",
     "next": "Successivo",
     "pageNOfM": "Pagina {page} di {totalPages}",
-    "yours": "Tuo",
     "public": "Pubblico",
     "community": "Comunità",
-    "local": "Locale",
     "private": "Privato",
     "applied": "Applicato",
     "apply": "Applica",
@@ -820,7 +819,6 @@
     },
     "contests": {
       "title": "Concorsi",
-      "description": "Crea concorsi o sfoglia quelli pubblici",
       "yourContests": "I tuoi concorsi",
       "publicContests": "Concorsi pubblici",
       "searchContests": "Cerca concorsi...",
@@ -948,11 +946,11 @@
         "customEntryName": "Voce personalizzata"
       },
       "privateCount": "{count} privati",
-      "publicCount": "{count} pubblici"
+      "publicCount": "{count} pubblici",
+      "totalCount": "{count, plural, =1 {# concorso} other {# concorsi}}"
     },
     "themes": {
       "title": "Temi",
-      "widgetDescription": "Crea temi o sfoglia quelli pubblici",
       "copyToFields": "Copia nei campi",
       "copyToNFields": "Copia in {count} {count, plural, =1 {campo} other {campi}}",
       "searchFields": "Cerca campi...",
@@ -1727,10 +1725,8 @@
   "graphics": {
     "widget": {
       "title": "Grafiche",
-      "description": "Crea e condividi immagini",
       "noDesignsYet": "Ancora nessun design",
-      "nDesigns": "{count, plural, =1 {# design} other {# design}}",
-      "explore": "Esplora"
+      "nDesigns": "{count, plural, =1 {# design} other {# design}}"
     },
     "share": {
       "openInEditor": "Apri nell’editor",

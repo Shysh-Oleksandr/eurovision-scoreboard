@@ -2,7 +2,9 @@ import { create } from 'zustand';
 
 import { devtools } from 'zustand/middleware';
 
-import type { ListId } from '../lineup/listIds';
+import { isStageCardList, type ListId } from '../lineup/listIds';
+
+import { useStageAccordionStore } from './stageAccordionStore';
 
 export type SetupMenuState =
   | { kind: 'tile'; code: string; listId: ListId }
@@ -24,6 +26,7 @@ export const getMenuAnchor = (): HTMLElement | null => menuAnchor;
 interface SetupUiValues {
   selectionMode: boolean;
   selected: Set<string>;
+  /** Pool lists only; stage cards live in the persisted `stageAccordionStore`. */
   expanded: Record<ListId, boolean>;
   poolOpen: boolean;
   search: string;
@@ -37,11 +40,13 @@ interface SetupUiActions {
   toggleSelected: (code: string) => void;
   setSelected: (codes: string[]) => void;
   clearSelection: () => void;
+  /** Stage cards are routed to the persisted `stageAccordionStore`. */
   setExpanded: (listId: ListId, v: boolean) => void;
   /**
    * Flip a list. `defaultExpanded` is what the list shows while it has no
    * explicit state, so the first toggle of a list that is open by default
-   * collapses it instead of pinning it open.
+   * collapses it instead of pinning it open. Stage cards are always open by
+   * default.
    */
   toggleExpanded: (listId: ListId, defaultExpanded?: boolean) => void;
   setPoolOpen: (v: boolean) => void;
@@ -66,7 +71,7 @@ const initialValues = (): SetupUiValues => ({
 });
 
 /**
- * Transient UI state of the Event Setup modal (selection, expanded lists,
+ * Transient UI state of the Event Setup modal (selection, expanded pool lists,
  * open menus, drag state). Not persisted — `resetUi` is expected on close.
  */
 export const useSetupUiStore = create<SetupUiState>()(
@@ -107,14 +112,29 @@ export const useSetupUiStore = create<SetupUiState>()(
       clearSelection: () =>
         set({ selected: new Set<string>() }, undefined, 'clearSelection'),
 
-      setExpanded: (listId, v) =>
+      setExpanded: (listId, v) => {
+        if (isStageCardList(listId)) {
+          useStageAccordionStore.getState().setCollapsed(listId, !v);
+
+          return;
+        }
+
         set(
           (state) => ({ expanded: { ...state.expanded, [listId]: v } }),
           undefined,
           'setExpanded',
-        ),
+        );
+      },
 
-      toggleExpanded: (listId, defaultExpanded = false) =>
+      toggleExpanded: (listId, defaultExpanded = false) => {
+        if (isStageCardList(listId)) {
+          const accordions = useStageAccordionStore.getState();
+
+          accordions.setCollapsed(listId, !accordions.collapsed[listId]);
+
+          return;
+        }
+
         set(
           (state) => ({
             expanded: {
@@ -124,7 +144,8 @@ export const useSetupUiStore = create<SetupUiState>()(
           }),
           undefined,
           'toggleExpanded',
-        ),
+        );
+      },
 
       setPoolOpen: (v) => set({ poolOpen: v }, undefined, 'setPoolOpen'),
 

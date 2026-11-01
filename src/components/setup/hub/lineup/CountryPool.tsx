@@ -63,8 +63,8 @@ const CountryPool: React.FC<CountryPoolProps> = ({ isSignedIn }) => {
             <span className="block text-lg font-extrabold tracking-[-.02em]">
               {t('countryPool')}
             </span>
-            <span className="block text-[11.5px] font-bold text-white/55 mt-px">
-              {t('countryPoolSub', { count: counts.pool })}
+            <span className="block text-[12.5px] font-semibold text-white/80 mt-0.5">
+              {t('countryPoolWaiting', { count: counts.pool })}
             </span>
           </span>
         </button>

@@ -65,6 +65,8 @@ The same frontend ships to iOS/Android via Capacitor 8 as a static export (`NATI
 
 ### Docs
 
+**UI work:** read `DESIGN.md` (package root) first. It holds the visual rules every screen follows (theme-derived colours only, flat surfaces, board-row country tiles, sentence case, layouts fitted by measuring with `useFitStep`, the AI-design tells to avoid) and is the reference for redesigning the rest of the app. `PRODUCT.md` says who the users are.
+
 Read `docs/` before touching non-obvious subsystems:
 - `general-app-features-overview.md`
 - `final-televote-reveal.md`

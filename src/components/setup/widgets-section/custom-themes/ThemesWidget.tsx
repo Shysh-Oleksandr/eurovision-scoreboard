@@ -14,7 +14,7 @@ const ThemesModal = dynamic(() => import('./ThemesModal'), {
   ssr: false,
 });
 
-const ThemesWidget = ({ stat, statLoading }: WidgetStatProps) => {
+const ThemesWidget = ({ stat, shortStat, statLoading }: WidgetStatProps) => {
   const t = useTranslations('widgets.themes');
 
   const isThemesModalOpen = useGeneralStore((state) => state.isThemesModalOpen);
@@ -30,9 +30,8 @@ const ThemesWidget = ({ stat, statLoading }: WidgetStatProps) => {
           setIsThemesModalOpen(true);
         }}
         title={t('title')}
-        description={t('widgetDescription')}
-        tone="pink"
         stat={stat}
+        shortStat={shortStat}
         statLoading={statLoading}
         icon={<ThemeIcon className="size-[21px] flex-none" />}
       />

@@ -4,7 +4,10 @@ The Event Setup Modal (`src/components/setup/EventSetupModal.tsx`) is the
 screen a user configures before running a contest. It was redesigned from the
 `design_handoff_event_setup_modal` handoff (direction D "Hub"). This document
 covers the parts that are not obvious from the code: the palette that follows
-the theme hue, the lineup data flow, drag-and-drop, and dirty tracking.
+the theme hue, the lineup data flow, drag-and-drop, and dirty tracking. The
+visual rules (flat surfaces, board rows, sentence case, fitted layouts, what
+counts as an "AI tell") are in `DESIGN.md` at the package root; read it before
+changing any UI, in the hub or elsewhere.
 
 ## 1. Hue-derived palette (reusable app-wide)
 
@@ -19,10 +22,10 @@ variables computed by `getInterfaceTokens()` in `src/theme/oklch.ts`:
 | Token                                | Meaning                                                        |
 | ------------------------------------ | -------------------------------------------------------------- |
 | `--p-950 … --p-700`                  | five OKLCH surface levels (page → highest)                     |
-| `--accent`                           | primary accent (CTA, Select ring, tray, Themes tone)           |
-| `--accent-2`                         | secondary accent (Profile tone, Feedback, stage tint)          |
+| `--accent`                           | primary accent (CTA, `.is-on` rings, selection, tray, library icons, state dots) |
+| `--accent-2`                         | secondary hue for tints (contest card gradient, avatar placeholder) |
 | `--accent-ink`, `--accent-2-ink`     | text on an accent fill: white, or deep on-hue for light accents |
-| `--gold`                             | fixed, hue-independent (Contests tone, Grand Final tint)       |
+| `--gold`                             | fixed, hue-independent (draw-mode pieces)                      |
 | `--ink*`, `--hair`, `--hair-2`       | white text and hairlines at fixed alphas                       |
 
 **Surfaces follow the theme's lightness.** `--p-900` sits at the theme's own
@@ -47,19 +50,21 @@ from data in `src/theme/interfaceAccents.ts`:
   way round the wheel. A stop without `accent2` uses the old hue − 40° rule.
 
 Every accent is gamut-clamped (`clampAccentToGamut`) and gets an ink from
-`pickAccentInk()`: white while it reaches 3:1 on the lightest Start-button
-stop, otherwise a deep on-hue ink (`oklch(22% 0.05 h)`) when that reads
-better. That is what lets gold, lime, mint and cream be real accents: the
-old CTA darkened every accent to L 66% so white text would pass, which turned
-them mustard or olive and left only pinks and blues usable. `.dp-cta`,
-`.dp-check`, the widget icon chip (`--wt-ink`) and Tailwind's
-`text-accent-ink` use the ink. `getCtaStops()` mirrors the `.dp-cta`
-gradient; keep them in sync. `oklch.test.ts` checks that every shipped accent
-reaches 3:1 and that the shipped curve has no jumps.
+`pickAccentInk()`: white while it reaches 3:1 on the CTA fill, otherwise a
+deep on-hue ink (`oklch(22% 0.05 h)`) when that reads better. That is what
+lets gold, lime, mint and cream be real accents: the old CTA darkened every
+accent to L 66% so white text would pass, which turned them mustard or olive
+and left only pinks and blues usable. `.dp-cta`, `.dp-check`,
+`.dp-board-check` (selected) and Tailwind's `text-accent-ink` use the ink.
+`getCtaStops()[0]` is the `.dp-cta` fill; keep them in sync. The CTA is flat
+everywhere (no glow, inset highlight, gradient or text shadow); hover
+brightens it, a press scales it. `oklch.test.ts` checks that every shipped
+accent reaches 3:1 and that the shipped curve has no jumps.
 
-Cross-hue tints (`dp-widget`, `dp-contest-card`, `dp-stage`, `dp-tray`) use
-`color-mix(in oklab, …)` so a blue accent on a gold surface does not sweep
-through green.
+Cross-hue tints (`dp-contest-card`, `dp-tray`) use `color-mix(in oklab, …)`
+so a blue accent on a gold surface does not sweep through green. Everything
+else in the hub is flat: stages sit on `--p-900` with a hairline, and hub
+buttons drop their shadows (`.dp-hub .dp-act:not(.is-on)`).
 
 ### Palette Lab (dev only)
 
@@ -116,16 +121,76 @@ and WCAG contrast helpers) and is safe to import from the Tailwind config.
 
 ### Component classes
 
-Anything needing `color-mix()` or gradients is a `dp-*` class in
-`src/styles.css` (`@layer components`): `dp-cta` (Start button), `dp-act`
-(filled buttons, `--strong`, `--feedback`, `.is-on`), `dp-combo` /
-`dp-combo-chip`, `dp-widget` + `dp-tone-blue|pink|gold` (write the tone class
-literally: Tailwind only emits `@layer components` classes it finds verbatim
-in the source), `dp-contest-card`,
-`dp-stage` (`--final`, `--muted`), `dp-tile`, `dp-drop-on`, `dp-tray`,
-`dp-menu`, `dp-pool`, `dp-cat`, `dp-group`, `dp-search`, `dp-count-pill`,
-`dp-icon-btn`, `dp-badge-pill`, `dp-tile-grid` / `dp-pool-grid` (auto-fill
+Anything needing `color-mix()`, gradients, pseudo-elements or data-attribute
+layouts is a `dp-*` class in `src/styles.css` (`@layer components`; write the
+class literally: Tailwind only emits `@layer components` classes it finds
+verbatim in the source): `dp-cta` (the primary action, flat accent fill),
+`dp-act` (filled buttons, `--strong`, `--feedback`, `.is-on`), `dp-combo` /
+`dp-combo-chip`, `dp-lib` / `dp-lib-icon` (library buttons),
+`dp-contest-card` (+ the `dp-cc-*` parts), `dp-stage` (`--draw`),
+`dp-board-tile` / `dp-board-cap--*` / `dp-board-check` (stage tiles as board
+rows), `dp-tile` (quiet tiles in the pool and draw buckets), `dp-drop-on`,
+`dp-tray`, `dp-menu`, `dp-pool`, `dp-cat`, `dp-group`, `dp-search`,
+`dp-count-pill`, `dp-icon-btn`, `dp-tile-grid` / `dp-pool-grid` (auto-fill
 grids driven by `--tmin` / `--pmin`, set per breakpoint on `.dp-hub`).
+
+### Board rows
+
+Stage lists (`stage:<id>`) draw their tiles as the theme's jury-state board
+row (`useBoardRowLook` → `CountryTile` `boardRow`): the board's row heights
+(`h-8 md:h-9 lg:h-10`, `lg:h-9` when rounded, as in `useItemState`),
+`bg-countryItem-juryBg` / `juryCountryText`, the theme's flag shape via
+`getFlagPath(country, flagShape, enableMinimalisticFlags)` sized by the
+scoreboard's `useFlagClassName`, pill or 3px corners
+(`roundedCountryContainer`), uppercase names (`uppercaseEntryName`), the
+scoreboard font, and the points box (`pointsContainerShape`; the triangle is
+the board's `RoundedTriangle` wedge in front of the box, with a margin
+keeping it off the name) holding the menu chevron, or the checkbox while
+selecting. The desktop grid keeps 5 columns (`--tmin: 180px`), so the
+longest names ("Switzerland", "Montenegro") truncate next to the full-size
+flags. Gradient backgrounds go through
+`getSpecialBackgroundStyle`. Stage numbers use the place-badge colours. Pool,
+"Not qualified" and "To be drawn" tiles stay quiet `dp-tile`s with the heart
+flags (`shouldShowHeartFlagIcon`).
+
+`useTileEntrance` plays the staggered entrance with the Web Animations API
+(no classes left behind): every row when a grid first mounts, when the
+line-up is replaced wholesale, and when the user expands the stage again
+(`StageCard` bumps `replayKey`); otherwise only the codes that just arrived.
+Its refs make the effect re-run on an `<Activity>` reveal a no-op, so
+reopening the setup never replays it. Reduced motion skips it.
+
+### Fitted layouts
+
+The header and the contest card choose their layout with `useFitStep`
+(`src/hooks/useFitStep.ts`): an ordered list of steps (`{ layout: 'row',
+tools: 'all', … }`), each written as `data-*` attributes, and the hook picks
+the first step at which the element has no horizontal overflow. It measures
+by setting each step's attributes plus `data-fit-measuring` (CSS gives every
+item its natural width then), reading `scrollWidth`, and restoring React's
+attributes, all inside a layout effect, so nothing flashes. It re-measures
+after each render of the host, on width changes, on text changes inside
+(MutationObserver) and when fonts load.
+
+- Header (`HEADER_STEPS`): one row → combos on the first row with the rest
+  stretched across the second → the same with the profile button reduced to
+  the avatar.
+- Contest card (`CARD_STEPS`, measured on the padding-free `.dp-cc-layout`
+  inside the card): one row → short draw label → buttons under the title →
+  Reset / Reorder / Add stage into ⋯ → Select without its label → the draw
+  toggle into ⋯. Save keeps its label.
+- Library row (`LIBRARY_STEPS`, phones only): small icons before the titles →
+  above them. It passes `targets: '.dp-lib-head'`, since a title overflowing
+  its own grid cell never reaches the row's edge.
+
+`scrollWidth` stops at the padding box, so measure an element without
+horizontal padding (that is why the contest card measures an inner
+wrapper). Decorations that may poke out carry `dp-fit-ignore` (hidden while
+measuring), e.g. the winter snow pile on Save.
+
+The CSS for each step lives next to the component's rules in `styles.css`
+("Fitted layouts"). A measuring rule must beat the layout rules
+(`!important`), or the shrinkable items squeeze and every step "fits".
 
 `Button` gained variants `cta`, `surface`, `surfaceStrong`, `ghost` and a
 `size` prop (`sm|md|lg|xl` = 34/40/46/54px) so the accent CTA and the filled
@@ -181,9 +246,16 @@ useCountryAssignments()  ──►  useLineupModel()  ──►  <LineupProvider
 - **Tiles render from `codes: string[]` + `model.byCode`**, and
   `useLineupModel` keeps unchanged code arrays referentially stable, so moving
   one country re-renders only the source and target lists.
-- **Transient UI state** (selection mode + selected set, expanded lists, pool
-  open, search, the active menu, drag state) lives in
+- **Transient UI state** (selection mode + selected set, expanded pool lists,
+  pool open, search, the active menu, drag state) lives in
   `hub/state/setupUiStore.ts` (zustand, not persisted; `resetUi()` on close).
+  Stage cards (`isStageCardList`: stages, "Not qualified", "To be drawn") are
+  the exception: `setExpanded` / `toggleExpanded` route them to
+  `hub/state/stageAccordionStore.ts`, persisted in localStorage
+  (`stage-accordion-storage`) and scoped to the contest
+  (`activeContest._id` or `getContestKey(year, contestType)`, set by
+  `EventSetupModal`). Collapsed stages stay collapsed across closes and
+  reloads; switching to another contest opens them all again.
   Tiles subscribe with `s => s.selected.has(code)`. **Keep DOM nodes and
   React elements out of this state**: the store uses the devtools middleware
   in development, which serializes the whole state on every action, and a
@@ -201,7 +273,8 @@ useCountryAssignments()  ──►  useLineupModel()  ──►  <LineupProvider
   deliberately offers no regroup (it would move every folder's entries).
 - **Collapsible headers** (stages, pool, categories, groups) toggle on a click
   anywhere in the header row except on their own controls
-  (`hub/lineup/headerToggle.ts`). Stages start expanded; the pool, every pool
+  (`hub/lineup/headerToggle.ts`). Stages start expanded (until the user
+  collapses one, see above); the pool, every pool
   category (Custom included) and every custom group ("No group" included)
   start collapsed. `toggleExpanded(listId, defaultExpanded)` takes the list's
   default so the first toggle of a list without explicit state flips what is
@@ -252,12 +325,31 @@ contest-year change apply that year's theme via
 applies immediately; picking a theme by hand while it is on switches it off
 (toast). Years without a built-in theme are a no-op.
 
-## 6. Widget stats
+## 6. Keeping the hub mounted
+
+The setup is reopened from the board all the time, so `EventSetupModal`
+passes `keepMounted` to `Modal`: after the first open, the content stays
+mounted inside `<Activity mode="hidden">` while closed (React keeps the DOM
+and state, disconnects effects and renders updates at idle priority). In a
+4x-throttled development build, reopening went from ~350ms to show (~250ms
+of long tasks rebuilding stages, tiles and drag-and-drop) to ~220ms (~165ms,
+mostly effects reconnecting and layout). `Activity` comes from the React
+canary bundled with Next.js; `src/types/react-activity.d.ts` declares it
+until @types/react catches up, and Vitest's plain React has no `Activity`, so
+tests must not render a `keepMounted` modal.
+
+While hidden, the hub still receives store updates (at idle priority), so
+keep its selectors narrow: e.g. `useContestField` reads
+`eventStages.length > 0`, not `eventStages`, which changes on every vote.
+
+## 7. Widget stats
 
 `GET /profiles/me/summary` (backend `src/profile-summary/`) returns followers,
 following, custom/saved themes, private/public contests and published /
 public / saved designs in one call; `useMyProfileSummaryQuery` feeds the
-three widget cards (Themes, Contests, Graphics) and the followers line of
+three library buttons (Themes, Contests, Graphics) and the followers line of
 the header's `ProfileButton` (which replaced the Profile widget on
-2026-10-06). The query is invalidated by follow, theme, contest and design
+2026-10-06). From `md` the buttons show two counts ("6 private, 3 public");
+below `md` one (`shortStat`: custom themes, all contests, local designs).
+Signed out they show just their names. The query is invalidated by follow, theme, contest and design
 visibility mutations and cleared on logout.

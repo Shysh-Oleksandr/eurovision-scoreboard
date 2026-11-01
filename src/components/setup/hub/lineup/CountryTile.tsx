@@ -6,9 +6,12 @@ import { useSetupUiStore } from '../state/setupUiStore';
 
 import { useLineupActions } from './LineupProvider';
 import { ListId } from './listIds';
+import { BoardRowLook } from './useBoardRowLook';
 
+import useFlagClassName from '@/components/countryItem/hooks/useFlagClassName';
+import RoundedTriangle from '@/components/RoundedTriangle';
 import { useDrawUiStore } from '@/components/setup/allocation-draw/drawUiStore';
-import { getFlagPath } from '@/helpers/getFlagPath';
+import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -29,7 +32,16 @@ export interface CountryTileProps {
   innerRef?: (node: HTMLElement | null) => void;
   dragHandleProps?: React.HTMLAttributes<HTMLElement>;
   isDragging?: boolean;
+  /** Stage lists: draw the tile as the theme's jury-state board row. */
+  boardRow?: BoardRowLook | null;
 }
+
+/** The points box keeps the transparent shape's look (no fill, row text colour). */
+const BOARD_CAP_CLASS = {
+  triangle: '',
+  square: '',
+  transparent: 'dp-board-cap--transparent',
+};
 
 const isCustomEntry = (country: BaseCountry) =>
   country.category === 'Custom' || country.code.startsWith('custom-');
@@ -80,6 +92,31 @@ export const TileFlag: React.FC<{
   );
 };
 
+/** A stage tile's flag: the theme's scoreboard flag, sized like the board's. */
+const BoardFlag: React.FC<{
+  country: BaseCountry;
+  look: BoardRowLook;
+  eager?: boolean;
+}> = ({ country, look, eager }) => {
+  const flagClassName = useFlagClassName(look.flagShape, false, look.rounded);
+
+  if (look.flagShape === 'none') return null;
+
+  return (
+    <img
+      src={getFlagPath(country, look.flagShape, look.minimalisticFlags)}
+      alt=""
+      aria-hidden="true"
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+      width={48}
+      height={36}
+      className={`flex-none object-cover bg-countryItem-juryBg ${flagClassName}`}
+      onError={(e) => handleFlagError(e.currentTarget, country, look.flagShape)}
+    />
+  );
+};
+
 /**
  * The whole tile is the control: click opens the move menu, click-and-hold
  * drags, and in selection mode the click toggles membership.
@@ -93,6 +130,7 @@ const CountryTile: React.FC<CountryTileProps> = ({
   innerRef,
   dragHandleProps,
   isDragging = false,
+  boardRow = null,
 }) => {
   const selectionMode = useSetupUiStore((state) => state.selectionMode);
   const isSelected = useSetupUiStore((state) =>
@@ -102,6 +140,8 @@ const CountryTile: React.FC<CountryTileProps> = ({
     (state) => !!state.flash && state.flash.codes.includes(country.code),
   );
   const { openTileMenu } = useLineupActions();
+  const wedge =
+    !!boardRow && boardRow.pointsShape === 'triangle' && !boardRow.rounded;
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -117,6 +157,74 @@ const CountryTile: React.FC<CountryTileProps> = ({
     },
     [country.code, listId, openTileMenu, overlay, selectionMode],
   );
+
+  if (boardRow) {
+    return (
+      <button
+        type="button"
+        ref={innerRef}
+        onClick={handleClick}
+        aria-pressed={selectionMode ? isSelected : undefined}
+        aria-haspopup={selectionMode ? undefined : 'menu'}
+        aria-label={pinned ? `${country.name}, ${pinned}` : undefined}
+        title={country.name}
+        data-code={country.code}
+        className={`dp-board-tile dp-scoreboard-font bg-countryItem-juryBg text-countryItem-juryCountryText ${
+          boardRow.rounded ? 'rounded-full' : 'rounded-[3px]'
+        } ${isSelected ? 'is-selected' : ''} ${
+          isDragging ? 'is-dragging' : ''
+        } ${overlay ? 'dp-tile-overlay' : ''} ${
+          isFlashing ? 'dp-tile--flash' : ''
+        } flex items-center gap-[5px] md:gap-[6px] h-8 md:h-9 ${
+          // The board row's own heights (useItemState).
+          boardRow.rounded ? 'lg:h-9' : 'lg:h-10'
+        } min-w-0 overflow-hidden text-left select-none touch-manipulation`}
+        style={boardRow.rowStyle}
+        {...dragHandleProps}
+      >
+        <BoardFlag country={country} look={boardRow} eager={eager} />
+        <span
+          className={`flex-1 min-w-0 font-bold truncate ${
+            boardRow.uppercase
+              ? 'uppercase text-[12px] 2cols:text-[12.5px]'
+              : 'text-[13px]'
+          } ${boardRow.flagShape === 'none' ? 'pl-3' : ''}`}
+        >
+          {country.name}
+        </span>
+        {pinned && !selectionMode && (
+          <Pin className="size-3.5 flex-none opacity-70" aria-hidden="true" />
+        )}
+        {/* The points box holds the menu chevron, or the checkbox while
+            selecting; the triangle is the board's rounded wedge in front of it
+            (room kept by the margin). */}
+        <span
+          className={`${
+            BOARD_CAP_CLASS[boardRow.pointsShape]
+          } relative bg-countryItem-juryPointsBg text-countryItem-juryPointsText ${
+            boardRow.rounded ? 'rounded-r-full' : ''
+          } ${
+            wedge ? 'ml-[8px]' : ''
+          } self-stretch w-[28px] md:w-[32px] lg:w-[34px] flex-none grid place-items-center`}
+          aria-hidden="true"
+        >
+          {wedge && (
+            <RoundedTriangle
+              className="text-countryItem-juryPointsBg !z-[1]"
+              withTransition={false}
+            />
+          )}
+          {selectionMode ? (
+            <span className="dp-board-check w-[17px] h-[17px] rounded-[5px] grid place-items-center">
+              {isSelected && <Check className="size-3" strokeWidth={3} />}
+            </span>
+          ) : (
+            <ChevronDown className="size-[15px]" />
+          )}
+        </span>
+      </button>
+    );
+  }
 
   return (
     <button

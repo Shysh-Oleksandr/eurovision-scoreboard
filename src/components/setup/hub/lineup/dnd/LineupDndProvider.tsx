@@ -23,6 +23,7 @@ import { useSetupUiStore } from '../../state/setupUiStore';
 import CountryTile, { CountryTileProps } from '../CountryTile';
 import { useLineupActions, useLineupModelContext } from '../LineupProvider';
 import { POOL_ROOT_LIST } from '../listIds';
+import { useBoardRowLook } from '../useBoardRowLook';
 import { poolCategoryOf } from '../useLineupModel';
 
 import { DndComponentsContext, DropZoneProps } from './DndComponentsContext';
@@ -131,6 +132,9 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
   const { mutateAsync: bulkAssignToGroup } =
     useBulkAssignCustomEntryGroupMutation();
   const [activeCode, setActiveCode] = useState<string | null>(null);
+  // A tile dragged out of a stage keeps its board-row face.
+  const [activeFromStage, setActiveFromStage] = useState(false);
+  const boardRowLook = useBoardRowLook();
   const [dragCount, setDragCount] = useState(1);
   const hoverTimer = useRef<{ id: string; timeout: number } | null>(null);
   /** Pool categories the dragged tiles belong to (gates the custom groups). */
@@ -182,6 +186,9 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
     useSetupUiStore.getState().closeMenu();
     useSetupUiStore.getState().setDragging(code);
     setActiveCode(code);
+    setActiveFromStage(
+      String(active.data.current?.listId ?? '').startsWith('stage:'),
+    );
     setDragCount(codes.length);
   };
 
@@ -267,7 +274,12 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
         <DragOverlay dropAnimation={null} zIndex={10001}>
           {activeCountry && (
             <div className="relative w-[190px]">
-              <CountryTile country={activeCountry} listId="" overlay />
+              <CountryTile
+                country={activeCountry}
+                listId=""
+                overlay
+                boardRow={activeFromStage ? boardRowLook : null}
+              />
               {dragCount > 1 && (
                 <span className="absolute -top-2 -right-2 min-w-[22px] h-[22px] px-1.5 rounded-full bg-accent text-accent-ink text-[11px] font-extrabold grid place-items-center shadow-menu">
                   {dragCount}

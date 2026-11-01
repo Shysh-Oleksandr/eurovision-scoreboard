@@ -706,8 +706,7 @@ h6 {
  * Plain CSS (not a Tailwind layer) so it is never purged.
  */
 .safe-area-padding {
-  padding: var(--safe-top) var(--safe-right)
-    var(--safe-bottom) var(--safe-left);
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
 }
 
 .triangle {
@@ -1631,43 +1630,33 @@ h6 {
     border-top: 1px solid var(--hair);
   }
 
-  /* --- Start CTA: the accent at two lightnesses, the bottom 16 L% below
-     the top (mirrored by getCtaStops() in src/theme/oklch.ts, which picks the
-     ink). Light accents keep their lightness and get dark ink instead of
-     being darkened to mustard for white text. --- */
+  /* --- Primary CTA (Button `variant="cta"`): one flat fill of the accent at
+     85% chroma, the first stop of getCtaStops() in src/theme/oklch.ts (which
+     picks the ink). No glow, gloss, inset highlight or text shadow: the
+     fill alone makes it the loudest thing on screen. Light accents keep
+     their lightness and get dark ink instead of being darkened to mustard
+     for white text. --- */
   .dp-cta {
-    --cta-l: var(--accent-l);
-    --cta-c: calc(var(--accent-c) * 0.85);
-
-    background: linear-gradient(
-      180deg,
-      oklch(calc(var(--cta-l) * 1%) var(--cta-c) var(--accent-h)),
-      oklch(
-        calc((var(--cta-l) - 16) * 1%) calc(var(--cta-c) * 0.9) var(--accent-h)
-      )
+    background: oklch(
+      calc(var(--accent-l) * 1%) calc(var(--accent-c) * 0.85) var(--accent-h)
     );
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%),
-      0 8px 20px
-        color-mix(in oklch, var(--accent) var(--cta-glow, 35%), transparent);
     color: var(--accent-ink);
-    text-shadow: 0 1px 2px rgb(0 0 0 / calc(35% * (1 - var(--accent-ink-dark))));
-    letter-spacing: 0.07em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    transition: transform 0.14s, filter 0.14s;
+    transition: filter 0.14s, transform 0.14s;
   }
 
-  /* Quieter glow where the full one reads as excessive (Button `softGlow`). */
-  .dp-cta--soft {
-    --cta-glow: 20%;
+  .dp-cta:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .dp-cta:hover:not(:disabled) {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
+    filter: brightness(1.07);
   }
 
   .dp-cta:active:not(:disabled) {
-    transform: translateY(1px) scale(0.995);
+    transform: scale(0.985);
   }
 
   /* --- Filled action buttons --- */
@@ -1716,6 +1705,11 @@ h6 {
       0 0 0 2px color-mix(in oklch, var(--accent) 34%, transparent);
   }
 
+  /* The setup hub is flat: no drop shadows on its buttons. */
+  .dp-hub .dp-act:not(.is-on) {
+    box-shadow: none;
+  }
+
   .dp-dot {
     position: relative;
   }
@@ -1740,10 +1734,8 @@ h6 {
     height: 18px;
     padding: 0 7px;
     border-radius: 999px;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     line-height: 1;
     color: var(--badge-gold-ink);
     background: var(--badge-gold-bg);
@@ -1818,7 +1810,6 @@ h6 {
   .dp-combo {
     background: linear-gradient(180deg, var(--p-750), var(--p-800));
     border: 1px solid var(--hair-2);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 9%), 0 2px 8px rgb(0 0 0 / 25%);
     transition: border-color 0.14s;
   }
 
@@ -1847,68 +1838,50 @@ h6 {
   }
 
   .dp-swatch {
-    box-shadow: inset 0 0 0 2px rgb(255 255 255 / 28%),
-      0 0 10px color-mix(in oklch, var(--accent) 60%, transparent);
+    box-shadow: inset 0 0 0 2px rgb(255 255 255 / 28%);
   }
 
-  /* --- Widget cards (tone set by .dp-tone-*) --- */
-  .dp-tone-blue {
-    --wt: var(--accent-2);
-    --wt-ink: var(--accent-2-ink);
+  /* --- Library buttons (Themes / Contests / Graphics): one neutral surface,
+     the accent only on the icon. --- */
+  .dp-lib {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    transition: background 0.14s, transform 0.14s;
   }
 
-  .dp-tone-pink {
-    --wt: var(--accent);
-    --wt-ink: var(--accent-ink);
+  .dp-lib:hover:not(:disabled) {
+    background: rgb(255 255 255 / 11%);
   }
 
-  .dp-tone-gold {
-    --wt: var(--gold);
-    --wt-ink: #fff;
+  .dp-lib:active:not(:disabled) {
+    transform: scale(0.985);
   }
 
-  /* Graphics widget: fixed teal, hue-independent like gold. */
-  .dp-tone-teal {
-    --wt: oklch(70% 0.12 190deg);
-    --wt-ink: #fff;
+  .dp-lib-icon {
+    display: grid;
+    color: var(--accent);
   }
 
-  /* Tints mix in oklab: a straight line through gray, so a blue accent on a
-     gold surface does not sweep through green the way an oklch hue mix does. */
-  .dp-widget {
-    background: linear-gradient(
-      150deg,
-      color-mix(in oklab, var(--wt) 26%, var(--p-800)),
-      var(--p-900) 78%
-    );
-    border: 1px solid color-mix(in oklch, var(--wt) 30%, transparent);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%),
-      0 6px 18px rgb(0 0 0 / 30%);
-    transition: transform 0.16s, filter 0.16s;
+  .dp-lib-icon svg {
+    width: 22px;
+    height: 22px;
   }
 
-  .dp-widget:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.1);
+  /* Phones (before or above the title) and the palette lab swatch */
+  .dp-lib-icon--small svg {
+    width: 15px;
+    height: 15px;
   }
 
-  .dp-widget:active {
-    transform: translateY(0) scale(0.99);
+  .dp-lib-row[data-icons='inline'] .dp-lib-icon--top,
+  .dp-lib-row[data-icons='top'] .dp-lib-icon--inline {
+    display: none;
   }
 
-  .dp-widget-icon {
-    color: var(--wt-ink, #fff);
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklch, var(--wt) 88%, white 6%),
-      color-mix(in oklch, var(--wt) 70%, black 18%)
-    );
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 36%),
-      0 4px 12px color-mix(in oklch, var(--wt) 22%, transparent);
-  }
-
-  .dp-widget-stat {
-    color: color-mix(in oklch, var(--wt) 62%, white);
+  /* While measuring, a title shows its full width so overflow is visible. */
+  .dp-lib-row[data-fit-measuring] .dp-lib-title {
+    flex: none;
+    overflow: visible;
   }
 
   /* --- Contest card --- */
@@ -1920,38 +1893,14 @@ h6 {
       var(--p-900)
     );
     border: 1px solid color-mix(in oklch, var(--accent) 26%, var(--hair-2));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%),
-      0 10px 26px rgb(0 0 0 / 16%);
   }
 
-  .dp-badge-pill {
-    background: var(--p-800);
-    border: 1px solid var(--hair-2);
-    box-shadow: 0 4px 12px rgb(0 0 0 / 30%);
-  }
-
-  /* --- Stage cards --- */
+  /* --- Stage cards: one flat surface, so the board-row tiles carry the
+     colour. --- */
   .dp-stage {
-    background: linear-gradient(
-      150deg,
-      color-mix(in oklab, var(--accent-2) 13%, var(--p-800)),
-      var(--p-900) 72%
-    );
-    border: 1px solid var(--hair-2);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), 0 8px 22px rgb(0 0 0 / 20%);
+    background: var(--p-900);
+    border: 1px solid var(--hair);
     transition: border-color 0.14s, box-shadow 0.14s;
-  }
-
-  .dp-stage--final {
-    background: linear-gradient(
-      150deg,
-      color-mix(in oklab, var(--gold) 15%, var(--p-800)),
-      var(--p-900) 72%
-    );
-  }
-
-  .dp-stage--muted {
-    background: linear-gradient(150deg, var(--p-800), var(--p-900) 72%);
   }
 
   .dp-count-pill {
@@ -2001,22 +1950,19 @@ h6 {
     gap: 7px;
   }
 
-  /* --- Country tile (the whole tile is the control) --- */
+  /* --- Country tile outside the stages (pool, draw buckets): quiet, so the
+     stages' board rows stand out (the whole tile is the control) --- */
   .dp-tile {
-    background: linear-gradient(
-      180deg,
-      color-mix(in oklch, var(--p-750) 92%, transparent),
-      var(--p-800)
-    );
-    border: 1px solid var(--hair);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%);
-    transition: transform 0.13s, border-color 0.13s, filter 0.13s, opacity 0.13s;
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid transparent;
+    transition: transform 0.13s, background 0.13s, border-color 0.13s,
+      opacity 0.13s;
   }
 
   .dp-tile:hover {
     transform: translateY(-1px);
-    border-color: var(--hair-2);
-    filter: brightness(1.12);
+    background: rgb(255 255 255 / 11%);
+    border-color: var(--hair);
   }
 
   .dp-tile.is-dragging {
@@ -2070,7 +2016,7 @@ h6 {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: var(--ink-40);
+    color: var(--ink-70);
   }
 
   .dp-qual-div::before,
@@ -2091,8 +2037,6 @@ h6 {
   .dp-pool {
     background: rgb(0 0 0 / 22%);
     border: 1px solid var(--hair);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 12%),
-      0 10px 26px rgb(0 0 0 / 16%);
     transition: border-color 0.14s, box-shadow 0.14s;
   }
 
@@ -2121,6 +2065,10 @@ h6 {
 
   .dp-search:focus-within {
     border-color: color-mix(in oklch, var(--accent) 55%, transparent);
+  }
+
+  .dp-search input::placeholder {
+    color: var(--ink-55);
   }
 
   /* --- Selection tray --- */
@@ -2153,12 +2101,7 @@ h6 {
 
   /* ---------- Allocation draw: line-up pieces ---------- */
   .dp-stage--draw {
-    background: linear-gradient(
-      150deg,
-      color-mix(in oklab, var(--accent) 17%, var(--p-800)),
-      var(--p-900) 74%
-    );
-    border: 1px dashed color-mix(in oklch, var(--accent) 55%, var(--hair-2));
+    border-style: dashed;
   }
 
   .dp-stage--draw.dp-drop-on {
@@ -2242,6 +2185,187 @@ h6 {
 
   .dp-cta-count {
     background: rgb(0 0 0 / 22%);
+  }
+
+  /* ---------- Stage tiles: the theme's jury-state board row ----------
+     Colours come from the bg-/text-countryItem-jury* utilities and the
+     theme's flag shape and row heights (CountryTile `boardRow`); the cap is
+     the points box (with the board's RoundedTriangle wedge for triangle
+     themes), holding the menu chevron or, while selecting, the checkbox. The
+     staggered entrance is WAAPI (useTileEntrance). */
+  .dp-board-tile {
+    position: relative;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 18%);
+    transition: transform 0.13s, filter 0.13s, opacity 0.13s, box-shadow 0.13s;
+  }
+
+  .dp-board-tile:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 6px 14px rgb(0 0 0 / 26%);
+  }
+
+  .dp-board-tile:focus-visible,
+  .dp-board-tile.is-selected {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dp-board-tile.is-dragging {
+    opacity: 0.4;
+  }
+
+  .dp-board-check {
+    border: 1.5px solid currentcolor;
+    opacity: 0.7;
+    transition: background 0.13s, border-color 0.13s, opacity 0.13s;
+  }
+
+  .dp-board-tile.is-selected .dp-board-check {
+    opacity: 1;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .dp-board-cap--transparent {
+    color: inherit !important;
+    background: transparent !important;
+  }
+
+  /* ---------- Fitted layouts (useFitStep) ----------
+     Each `data-*` value is one step of a component's layout, roomiest
+     first; `data-fit-measuring` is on while the hook tries the steps, and
+     gives every item its natural width so a step only fits when nothing has
+     to squeeze. The measured element has no horizontal padding. */
+
+  /* Contest card: title and buttons on one row while they fit, else the
+     buttons in their own row; then Reset / Reorder / Add stage move into
+     the ⋯ menu (`data-tools='menu'`), Select drops its label ('compact'),
+     and the draw toggle takes its short label or leaves for the menu
+     (`data-draw`). */
+  .dp-cc-layout {
+    display: flex;
+    gap: 12px 14px;
+  }
+
+  .dp-cc-layout[data-layout='row'] {
+    align-items: center;
+  }
+
+  .dp-cc-layout[data-layout='stack'] {
+    flex-direction: column;
+  }
+
+  .dp-cc-layout[data-layout='row'] .dp-cc-head {
+    flex: none;
+  }
+
+  .dp-cc-layout[data-layout='row'] .dp-cc-title,
+  .dp-cc-layout[data-layout='row'] .dp-cc-meta {
+    white-space: nowrap;
+    flex-wrap: nowrap;
+  }
+
+  .dp-cc-tools,
+  .dp-cc-end {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .dp-cc-tools > *,
+  .dp-cc-end > * {
+    flex: none;
+  }
+
+  .dp-cc-layout[data-layout='row'] .dp-cc-tools {
+    margin-left: auto;
+  }
+
+  .dp-cc-layout[data-layout='stack'] .dp-cc-end {
+    margin-left: auto;
+  }
+
+  .dp-cc-layout[data-layout='stack'] .dp-cc-divider,
+  .dp-cc-layout[data-tools='all'] .dp-cc-more,
+  .dp-cc-layout:not([data-tools='all']) .dp-cc-secondary,
+  .dp-cc-layout[data-tools='compact'] .dp-cc-select-label,
+  .dp-cc-layout[data-draw='menu'] .dp-cc-draw,
+  .dp-cc-layout:not([data-draw='full']) .dp-draw-label-full,
+  .dp-cc-layout[data-draw='full'] .dp-draw-label-short {
+    display: none;
+  }
+
+  .dp-cc-layout[data-tools='compact'] .dp-cc-select {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  /* Decorations that may poke out (the winter snow pile) don't count. */
+  [data-fit-measuring] .dp-fit-ignore {
+    display: none !important;
+  }
+
+  /* Header: one row while everything fits, else the phone layout (combos
+     share the first row, the rest stretch across the second). */
+  .dp-hub-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .dp-hub-tools {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .dp-hub-header[data-layout='row'] .dp-combo-field {
+    flex: 0 1 auto;
+    max-width: 300px;
+  }
+
+  .dp-hub-header[data-layout='row'] .dp-hub-tools {
+    flex: none;
+    margin-left: auto;
+  }
+
+  .dp-hub-header[data-layout='stack'] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .dp-hub-header[data-layout='stack'] .dp-hub-tools {
+    grid-column: span 2;
+  }
+
+  /* Grow from the natural width: an equal split would squeeze the profile
+     button below the width the measurement found room for. */
+  .dp-hub-header[data-layout='stack'] .dp-hub-tool-grow {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* Narrow: the profile button is just the avatar. */
+  .dp-hub-header[data-profile='avatar'] .dp-profile-txt {
+    display: none;
+  }
+
+  .dp-hub-header[data-profile='avatar'] .dp-profile-btn {
+    flex: none;
+    width: 46px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  /* Beats the layout rules above while measuring. */
+  .dp-hub-header[data-fit-measuring] > *,
+  .dp-hub-header[data-fit-measuring] .dp-hub-tools > * {
+    flex: none !important;
   }
 
   .dp-dialog {

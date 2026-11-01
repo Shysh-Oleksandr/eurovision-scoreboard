@@ -1,7 +1,16 @@
 'use client';
-import { Check, CopyCheck, Dices, MoreHorizontal } from 'lucide-react';
+import {
+  Check,
+  CopyCheck,
+  Dices,
+  Globe,
+  Lock,
+  MonitorSmartphone,
+  MoreHorizontal,
+  Users,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -21,7 +30,7 @@ import DrawToggleButton, {
 import { useSetupUiStore } from '@/components/setup/hub/state/setupUiStore';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -30,34 +39,43 @@ const CreateContestModal = dynamic(() => import('./CreateContestModal'), {
   ssr: false,
 });
 
+/**
+ * Layouts from roomiest to tightest, picked by `useFitStep` (see
+ * `.dp-cc-layout` in styles.css): one row while the title and every
+ * button fit; then the buttons move under the title; then Reset / Reorder /
+ * Add stage go into the ⋯ menu, Select drops its label, and last the draw
+ * toggle joins the menu. Save always keeps its label.
+ */
+const CARD_STEPS = [
+  { layout: 'row', tools: 'all', draw: 'full' },
+  { layout: 'row', tools: 'all', draw: 'short' },
+  { layout: 'stack', tools: 'all', draw: 'full' },
+  { layout: 'stack', tools: 'all', draw: 'short' },
+  { layout: 'stack', tools: 'menu', draw: 'short' },
+  { layout: 'stack', tools: 'compact', draw: 'short' },
+  { layout: 'stack', tools: 'compact', draw: 'menu' },
+] as const;
+
+const TOOL_CLASS = '!h-[38px]';
+const ICON_TOOL_CLASS = '!h-[38px] !w-[38px]';
+
 interface ContestCardProps {
   onReorderClick: () => void;
   onAddStageClick: () => void;
-  participantsCount: number;
-  stagesCount: number;
-  isGfOnly: boolean;
   /** Setup diverged from the loaded contest snapshot. */
   hasUnsavedChanges: boolean;
-  /** Every semi-final's line-up came from the allocation draw. */
-  isDrawn: boolean;
 }
 
 const ContestCard: React.FC<ContestCardProps> = ({
   onReorderClick,
   onAddStageClick,
-  participantsCount,
-  stagesCount,
-  isGfOnly,
   hasUnsavedChanges,
-  isDrawn,
 }) => {
   const t = useTranslations();
   const locale = useLocale();
-  const isSmallPhone = useMediaQuery('(max-width: 390px)');
-  const isPhone = useMediaQuery('(max-width: 640px)');
-  const isTablet = useMediaQuery('(max-width: 768px)');
-  const isNarrowDesktop = useMediaQuery('(max-width: 899px)');
   const drawToggle = useDrawToggle();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const step = CARD_STEPS[useFitStep(cardRef, CARD_STEPS)];
 
   const user = useAuthStore((state) => state.user);
   const contestName = useGeneralStore((state) => state.settings.contestName);
@@ -115,196 +133,211 @@ const ContestCard: React.FC<ContestCardProps> = ({
     });
   };
 
-  const lastUpdatedBadge = useMemo(() => {
-    return activeContest && isOwner
-      ? `${t('common.lastSaved')}: ${new Date(
-          activeContest.updatedAt,
-        ).toLocaleDateString(locale, {
+  // Where the contest lives, then its save state.
+  const where = !activeContest
+    ? {
+        icon: <MonitorSmartphone className="size-[15px]" />,
+        label: t('setup.eventSetupModal.contestOnThisDevice'),
+      }
+    : !isOwner
+    ? {
+        icon: <Users className="size-[15px]" />,
+        label: t('widgets.community'),
+      }
+    : activeContest.isPublic
+    ? { icon: <Globe className="size-[15px]" />, label: t('widgets.public') }
+    : { icon: <Lock className="size-[15px]" />, label: t('widgets.private') };
+  const savedOn =
+    activeContest && isOwner
+      ? new Date(activeContest.updatedAt).toLocaleDateString(locale, {
           hour: '2-digit',
           minute: '2-digit',
           month: 'short',
           day: 'numeric',
-        })}`
+        })
       : null;
-  }, [activeContest, locale, isOwner, t]);
 
-  const ownershipBadge = `${
-    isOwner ? t('widgets.yours') : t('widgets.community')
-  } · ${
-    activeContest
-      ? activeContest.isPublic
-        ? t('widgets.public')
-        : t('widgets.private')
-      : t('widgets.local')
-  }`;
-
-  const subLine = `${t('setup.eventSetupModal.contestSub', {
-    participants: participantsCount,
-    stages: stagesCount,
-  })}${isGfOnly ? ` · ${t('setup.eventSetupModal.grandFinalOnly')}` : ''}`;
-  const drawSub = drawToggle.enabled
-    ? t('setup.allocationDraw.subToBeDrawn', {
-        count: drawToggle.waitingCount,
-      })
-    : isDrawn
-    ? t('setup.allocationDraw.subDrawn')
-    : null;
-
+  const secondaryInMenu = step.tools !== 'all';
+  const drawInMenu = step.draw === 'menu';
   const moreItems: AnchoredMenuEntry[] = [
-    {
-      label: t('setup.allocationDraw.title'),
-      description: drawToggle.available
-        ? undefined
-        : drawToggle.shortReason ?? undefined,
-      icon: <Dices className="size-4" />,
-      trailing: drawToggle.enabled ? (
-        <Check className="size-4 text-accent" />
-      ) : undefined,
-      disabled: !drawToggle.available,
-      onClick: drawToggle.toggle,
-    },
-    'hr' as const,
-    // Small phones have no room for the Select button in the row.
-    ...(isSmallPhone
+    ...(drawInMenu
       ? [
           {
-            label: t('setup.eventSetupModal.select'),
-            icon: <CopyCheck className="size-4" />,
-            trailing: selectionMode ? (
+            label: t('setup.allocationDraw.title'),
+            description: drawToggle.available
+              ? undefined
+              : drawToggle.shortReason ?? undefined,
+            icon: <Dices className="size-4" />,
+            trailing: drawToggle.enabled ? (
               <Check className="size-4 text-accent" />
             ) : undefined,
-            onClick: () => setSelectionMode(!selectionMode),
+            disabled: !drawToggle.available,
+            onClick: drawToggle.toggle,
           },
           'hr' as const,
         ]
       : []),
-    {
-      label: t('setup.eventSetupModal.reorderStages'),
-      icon: <ArrowDownAndUpIcon className="size-4" />,
-      onClick: onReorderClick,
-    },
-    {
-      label: t('setup.eventStageModal.addStage'),
-      icon: <ListPlusIcon className="size-4" />,
-      onClick: onAddStageClick,
-    },
-    ...(activeContest
+    ...(secondaryInMenu
       ? [
-          'hr' as const,
           {
-            label: t('common.reset'),
-            icon: <RestartIcon className="size-4" />,
-            onClick: onResetClick,
+            label: t('setup.eventSetupModal.reorderStages'),
+            icon: <ArrowDownAndUpIcon className="size-4" />,
+            onClick: onReorderClick,
           },
+          {
+            label: t('setup.eventStageModal.addStage'),
+            icon: <ListPlusIcon className="size-4" />,
+            onClick: onAddStageClick,
+          },
+          ...(activeContest
+            ? [
+                'hr' as const,
+                {
+                  label: t('common.reset'),
+                  icon: <RestartIcon className="size-4" />,
+                  onClick: onResetClick,
+                },
+              ]
+            : []),
         ]
       : []),
   ];
 
-  const saveButton = (
-    <Button
-      onClick={() => setIsContestsModalOpen(true)}
-      variant="surfaceStrong"
-      size={isPhone ? 'sm' : 'md'}
-      title={user ? t('common.save') : t('common.authenticationRequired')}
-      aria-label={t('common.save')}
-      Icon={<SaveIcon className="size-[17px]" />}
-      snowEffect="right"
-      disabled={!user}
-      className="!h-[38px]"
-    >
-      {t('common.save')}
-    </Button>
-  );
-
-  const selectButton = (
-    <Button
-      onClick={() => setSelectionMode(!selectionMode)}
-      variant="surface"
-      size={isTablet ? 'sm' : 'md'}
-      title={t('setup.eventSetupModal.select')}
-      aria-label={t('setup.eventSetupModal.select')}
-      aria-pressed={selectionMode}
-      Icon={<CopyCheck className="size-[17px]" />}
-      className={`${selectionMode ? 'is-on' : ''} ${
-        isTablet ? '!w-[34px] !px-0 justify-center' : ''
-      }`}
-    >
-      {isTablet
-        ? undefined
-        : selectionMode
-        ? t('setup.eventSetupModal.selecting')
-        : t('setup.eventSetupModal.select')}
-    </Button>
-  );
-
   return (
     <>
-      <div className="dp-contest-card relative flex items-center gap-2.5 2cols:gap-[13px] px-3 py-[13px] 2cols:px-4 2cols:py-[15px] rounded-[14px] text-white">
-        <div className="absolute -top-2.5 left-3.5 flex gap-1.5 z-[2]">
-          <span className="dp-badge-pill text-[10.5px] font-extrabold tracking-[.02em] px-2.5 py-1 rounded-full whitespace-nowrap">
-            {ownershipBadge}
-          </span>
-          {hasUnsavedChanges && (
-            <span className="dp-badge-pill text-[10.5px] font-extrabold tracking-[.02em] px-2.5 py-1 rounded-full whitespace-nowrap">
-              {t('setup.eventSetupModal.unsavedChanges')}
-            </span>
-          )}
-          {lastUpdatedBadge && (
-            <span className="dp-badge-pill text-[10.5px] font-extrabold tracking-[.02em] px-2.5 py-1 rounded-full whitespace-nowrap hidden 2cols:inline">
-              {lastUpdatedBadge}
-            </span>
-          )}
-        </div>
-
-        {showHostingCountryLogo && (
-          <Image
-            src={logo}
-            alt={t('simulation.header.hostingCountryLogo')}
-            className={`flex-none rounded-sm ${
-              isExisting ? 'w-8 h-8 overflow-visible' : 'w-8 h-6 object-cover'
-            }`}
-            width={32}
-            height={32}
-            onError={(e) => {
-              e.currentTarget.src = getFlagPath('ww');
-            }}
-            unoptimized
-          />
-        )}
-
-        <div className="min-w-0">
-          <h5
-            className="text-[15.5px] md:text-[17px] lg:text-[19px] font-extrabold tracking-[-.022em] leading-tight truncate"
-            title={contestDescription || undefined}
-          >
-            {contestName} {contestYear}
-          </h5>
-          <p className="text-[10px] 2cols:text-xs font-bold text-white/70 mt-0.5 truncate">
-            {subLine}
-            {drawSub && (
-              <>
-                {' · '}
-                <span
-                  className={
-                    drawToggle.enabled ? 'text-white font-extrabold' : ''
-                  }
-                >
-                  {drawSub}
-                </span>
-              </>
+      <div className="dp-contest-card px-3 py-[13px] 2cols:px-4 2cols:py-[15px] rounded-[14px] text-white">
+        {/* Measured without the card's padding: buttons running into the
+            padding would not show up as overflow. */}
+        <div
+          ref={cardRef}
+          className="dp-cc-layout"
+          {...fitStepAttributes(step)}
+        >
+          <div className="dp-cc-head flex items-center gap-2.5 2cols:gap-[13px] min-w-0">
+            {showHostingCountryLogo && (
+              <Image
+                src={logo}
+                alt={t('simulation.header.hostingCountryLogo')}
+                className={`flex-none rounded-sm ${
+                  isExisting
+                    ? 'w-[32px] h-[32px] 2cols:w-[40px] 2cols:h-[40px] overflow-visible'
+                    : 'w-[40px] h-[30px] object-cover'
+                }`}
+                width={40}
+                height={40}
+                onError={(e) => {
+                  e.currentTarget.src = getFlagPath('ww');
+                }}
+                unoptimized
+              />
             )}
-          </p>
-        </div>
+            <div className="min-w-0">
+              <h5
+                className="dp-cc-title text-[17px] 2cols:text-[22px] lg:text-2xl font-extrabold tracking-[-.022em] leading-tight line-clamp-2 text-balance"
+                title={contestDescription || undefined}
+              >
+                {contestName} {contestYear}
+              </h5>
+              <p className="dp-cc-meta flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-[12.5px] 2cols:text-[13px] font-semibold text-white/80">
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                  {where.icon}
+                  {where.label}
+                </span>
+                {hasUnsavedChanges ? (
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-white">
+                    <span
+                      aria-hidden="true"
+                      className="w-2 h-2 rounded-full bg-accent flex-none"
+                    />
+                    {t('setup.eventSetupModal.unsavedChanges')}
+                  </span>
+                ) : (
+                  savedOn && (
+                    <span className="whitespace-nowrap text-white/60">
+                      {t('setup.eventSetupModal.contestSaved', {
+                        date: savedOn,
+                      })}
+                    </span>
+                  )
+                )}
+              </p>
+            </div>
+          </div>
 
-        <div className="ml-auto flex items-center gap-[5px] 2cols:gap-[7px] flex-none">
-          {!isSmallPhone && selectButton}
-          {isPhone ? (
-            <>
-              {saveButton}
-              <span className="relative flex-none">
+          <div className="dp-cc-tools">
+            <Button
+              onClick={() => setSelectionMode(!selectionMode)}
+              variant="surface"
+              size="md"
+              title={t('setup.eventSetupModal.select')}
+              aria-label={t('setup.eventSetupModal.select')}
+              aria-pressed={selectionMode}
+              Icon={<CopyCheck className="size-[17px]" />}
+              className={`dp-cc-select ${TOOL_CLASS} ${
+                selectionMode ? 'is-on' : ''
+              }`}
+            >
+              <span className="dp-cc-select-label">
+                {selectionMode
+                  ? t('setup.eventSetupModal.selecting')
+                  : t('setup.eventSetupModal.select')}
+              </span>
+            </Button>
+            {activeContest && (
+              <Button
+                onClick={onResetClick}
+                variant="surface"
+                size="md"
+                title={t('common.reset')}
+                aria-label={t('common.reset')}
+                Icon={<RestartIcon className="size-[17px]" />}
+                className={`dp-cc-secondary ${ICON_TOOL_CLASS}`}
+              />
+            )}
+            <Button
+              onClick={onReorderClick}
+              variant="surface"
+              size="md"
+              title={t('setup.eventSetupModal.reorderStages')}
+              aria-label={t('setup.eventSetupModal.reorderStages')}
+              Icon={<ArrowDownAndUpIcon className="size-[17px]" />}
+              className={`dp-cc-secondary ${ICON_TOOL_CLASS}`}
+            />
+            <Button
+              onClick={onAddStageClick}
+              variant="surface"
+              size="md"
+              title={t('setup.eventStageModal.addStage')}
+              aria-label={t('setup.eventStageModal.addStage')}
+              Icon={<ListPlusIcon className="size-[17px]" />}
+              className={`dp-cc-secondary ${ICON_TOOL_CLASS}`}
+            />
+            <span
+              aria-hidden="true"
+              className="dp-cc-divider w-px h-6 bg-[var(--hair-2)] mx-[3px]"
+            />
+            <span className="dp-cc-end">
+              <DrawToggleButton className={`dp-cc-draw ${TOOL_CLASS}`} />
+              <Button
+                onClick={() => setIsContestsModalOpen(true)}
+                variant="surfaceStrong"
+                size="md"
+                title={
+                  user ? t('common.save') : t('common.authenticationRequired')
+                }
+                aria-label={t('common.save')}
+                Icon={<SaveIcon className="size-[17px]" />}
+                snowEffect="right"
+                snowEffectClassName="dp-fit-ignore"
+                disabled={!user}
+                className={TOOL_CLASS}
+              >
+                {t('common.save')}
+              </Button>
+              <span className="dp-cc-more relative">
                 <Button
                   variant="surface"
-                  size="sm"
+                  size="md"
                   onClick={(e) => {
                     const target = e.currentTarget;
 
@@ -313,62 +346,25 @@ const ContestCard: React.FC<ContestCardProps> = ({
                   title={t('common.more')}
                   aria-label={t('common.more')}
                   Icon={<MoreHorizontal className="size-[18px]" />}
+                  className={ICON_TOOL_CLASS}
                 />
-                {drawToggle.enabled && (
+                {drawInMenu && drawToggle.enabled && (
                   <span
                     aria-hidden="true"
                     className="absolute top-1.5 right-1.5 w-[7px] h-[7px] rounded-full bg-accent shadow-[0_0_0_2px_var(--p-800)]"
                   />
                 )}
               </span>
-              <AnchoredMenu
-                open={!!moreAnchor}
-                anchor={moreAnchor}
-                onClose={() => setMoreAnchor(null)}
-                items={moreItems}
-                placement="bottom-end"
-                ariaLabel={t('common.more')}
-              />
-            </>
-          ) : (
-            <>
-              {activeContest && (
-                <Button
-                  onClick={onResetClick}
-                  variant="surface"
-                  size="md"
-                  title={t('common.reset')}
-                  aria-label={t('common.reset')}
-                  Icon={<RestartIcon className="size-[17px]" />}
-                />
-              )}
-              <Button
-                onClick={onReorderClick}
-                variant="surface"
-                size="md"
-                title={t('setup.eventSetupModal.reorderStages')}
-                aria-label={t('setup.eventSetupModal.reorderStages')}
-                Icon={<ArrowDownAndUpIcon className="size-[17px]" />}
-              />
-              <Button
-                onClick={onAddStageClick}
-                variant="surface"
-                size="md"
-                title={t('setup.eventStageModal.addStage')}
-                aria-label={t('setup.eventStageModal.addStage')}
-                Icon={<ListPlusIcon className="size-[17px]" />}
-              />
-              <span
-                aria-hidden="true"
-                className="w-px h-6 bg-[var(--hair-2)] mx-[3px] flex-none"
-              />
-              <DrawToggleButton
-                compact={isNarrowDesktop}
-                size={isTablet ? 'sm' : 'md'}
-              />
-              {saveButton}
-            </>
-          )}
+            </span>
+            <AnchoredMenu
+              open={!!moreAnchor && moreItems.length > 0}
+              anchor={moreAnchor}
+              onClose={() => setMoreAnchor(null)}
+              items={moreItems}
+              placement="bottom-end"
+              ariaLabel={t('common.more')}
+            />
+          </div>
         </div>
       </div>
 

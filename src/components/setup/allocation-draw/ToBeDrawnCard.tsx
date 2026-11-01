@@ -125,7 +125,7 @@ const ToBeDrawnCard: React.FC<ToBeDrawnCardProps> = ({ codes, matches }) => {
             >
               {row.label && (
                 <div
-                  className="text-[11px] font-extrabold tracking-[.08em] uppercase text-white/70 whitespace-nowrap pt-0.5 2cols:pt-3"
+                  className="text-[12.5px] font-bold text-white/80 whitespace-nowrap pt-0.5 2cols:pt-3"
                   title={t('potTooltip')}
                 >
                   {row.label}

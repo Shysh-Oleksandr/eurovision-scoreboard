@@ -11,7 +11,6 @@
     "save": "Save",
     "confirm": "Confirm",
     "authenticationRequired": "Authentication required",
-    "lastSaved": "Last saved",
     "relativeTime": {
       "justNow": "just now",
       "minutesAgo": "{count} min ago",
@@ -188,6 +187,11 @@
       "invalidRankRange": "Invalid rank range in {stageName}."
     },
     "eventSetupModal": {
+      "contestSaved": "Saved {date}",
+      "contestOnThisDevice": "On this device",
+      "customContest": "Custom contest",
+      "customTheme": "Custom theme",
+      "countryPoolWaiting": "{count, plural, =1 {# country} other {# countries}} waiting in the wings. Drag one into a stage.",
       "grandFinalOnly": "GF only",
       "confirmGFOnlyTitle": "Grand Final only?",
       "confirmNotGFOnlyTitle": "Restore all shows?",
@@ -212,8 +216,6 @@
       "failedToSaveCustomEntries": "Failed to save custom entries. Please try again.",
       "saveToYourCustomEntries": "Save to your custom entries",
       "countryPool": "Country Pool",
-      "countryPoolSub": "{count} not participating · drag into a stage",
-      "contestSub": "{participants} participating · {stages, plural, =1 {# stage} other {# stages}}",
       "unsavedChanges": "Unsaved changes",
       "select": "Select",
       "selecting": "Selecting",
@@ -403,7 +405,6 @@
       "shortTitle": "Draw",
       "toBeDrawn": "To be drawn",
       "subToBeDrawn": "{count} to be drawn",
-      "subDrawn": "Drawn",
       "needsTwoSemis": "Allocation draw needs two or more semi-finals.",
       "gfOnlyReason": "Grand Final only is on, so this contest has no semi-finals to draw into.",
       "fewSemisReason": "Add a second semi-final that qualifies into the final to draw a line-up.",
@@ -709,11 +710,9 @@
     "previous": "Previous",
     "next": "Next",
     "pageNOfM": "Page {page} of {totalPages}",
-    "yours": "Yours",
     "public": "Public",
     "private": "Private",
     "community": "Community",
-    "local": "Local",
     "applied": "Applied",
     "apply": "Apply",
     "copy": "Copy",
@@ -820,7 +819,6 @@
     },
     "contests": {
       "title": "Contests",
-      "description": "Create or browse public contests",
       "yourContests": "Your Contests",
       "publicContests": "Public Contests",
       "searchContests": "Search contests...",
@@ -948,11 +946,11 @@
         "customEntryName": "Custom entry"
       },
       "privateCount": "{count} private",
-      "publicCount": "{count} public"
+      "publicCount": "{count} public",
+      "totalCount": "{count, plural, =1 {# contest} other {# contests}}"
     },
     "themes": {
       "title": "Themes",
-      "widgetDescription": "Create or browse public themes",
       "copyToFields": "Copy to fields",
       "copyToNFields": "Copy to {count} {count, plural, =1 {field} other {fields}}",
       "searchFields": "Search fields...",
@@ -1727,10 +1725,8 @@
   "graphics": {
     "widget": {
       "title": "Graphics",
-      "description": "Make and share images",
       "noDesignsYet": "No designs yet",
-      "nDesigns": "{count, plural, =1 {# design} other {# designs}}",
-      "explore": "Explore"
+      "nDesigns": "{count, plural, =1 {# design} other {# designs}}"
     },
     "share": {
       "openInEditor": "Open in editor",

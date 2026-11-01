@@ -354,8 +354,11 @@ export function defaultAccent2(primHue: number): AccentSpec {
 }
 
 /**
- * The two stops of the Start CTA gradient (`.dp-cta` in styles.css — keep in
- * sync): the accent itself at 85% chroma on top, 16 L% darker at the bottom.
+ * The CTA fill and a darker bound. `.dp-cta` in styles.css paints the first
+ * stop (the accent at 85% chroma) flat — keep them in sync. The second stop,
+ * 16 L% darker, is the bottom of the gradient the CTA used to have; ink
+ * picking still measures dark ink against it, a conservative bound that kept
+ * every shipped accent's ink choice when the gradient went.
  */
 export function getCtaStops(accent: AccentSpec): [AccentSpec, AccentSpec] {
   return [
@@ -373,9 +376,9 @@ export const MIN_INK_CONTRAST = 3;
 
 /**
  * Text colour for an accent fill. White is preferred while it reaches 3:1 on
- * the lightest CTA stop; past that (gold, lime, mint, cream accents) a dark
- * on-hue ink takes over when it reads better on the darkest stop. Returns the
- * worst-case contrast of the chosen ink across the gradient.
+ * the CTA fill; past that (gold, lime, mint, cream accents) a dark on-hue ink
+ * takes over when it reads better on the darker bound. Returns the chosen
+ * ink's worst-case contrast.
  */
 export function pickAccentInk(accent: AccentSpec): {
   dark: boolean;

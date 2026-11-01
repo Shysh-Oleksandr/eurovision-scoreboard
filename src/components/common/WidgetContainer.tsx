@@ -1,92 +1,77 @@
-import { ChevronRight } from 'lucide-react';
 import React from 'react';
-
-export type WidgetTone = 'blue' | 'pink' | 'gold' | 'teal';
-
-// Literal class names: `dp-tone-*` live in styles.css under `@layer components`,
-// which Tailwind only emits when the class appears verbatim in the source.
-const TONE_CLASS: Record<WidgetTone, string> = {
-  blue: 'dp-tone-blue',
-  pink: 'dp-tone-pink',
-  gold: 'dp-tone-gold',
-  teal: 'dp-tone-teal',
-};
 
 export type WidgetStatProps = {
   stat?: React.ReactNode;
+  /** Phones: a shorter stat (one number). Defaults to `stat`. */
+  shortStat?: React.ReactNode;
   statLoading?: boolean;
 };
 
-type WidgetContainerProps = {
+type WidgetContainerProps = WidgetStatProps & {
   onClick: () => void;
   title: string;
   /** Small pill after the title (e.g. a Beta label). */
   badge?: React.ReactNode;
-  description: string;
   icon: React.ReactNode;
-  /** Accent used for the icon chip / card tint (`--accent-2`, `--accent`, gold). */
-  tone: WidgetTone;
-  /** Live stat line ("128 followers · 64 following"). Hidden when undefined. */
-  stat?: React.ReactNode;
-  statLoading?: boolean;
   disabled?: boolean;
 };
 
 /**
- * Labelled widget card: tone-tinted gradient, 42px icon chip, title,
- * description (hidden on phones) and a stat line that keeps the card alive.
+ * One library button in the hub's widget row (Themes / Contests / Graphics):
+ * accent icon, title and, for signed-in users, a stat line. Without a stat
+ * it is just the name. On phones a small icon sits before the title, or
+ * above it when a title would not fit beside it ("Wettbewerbe"); the row
+ * picks one for all three (`.dp-lib-row`, WidgetsSection).
  */
 const WidgetContainer = ({
   onClick,
   title,
   badge,
-  description,
   icon,
-  tone,
   stat,
+  shortStat,
   statLoading = false,
   disabled,
-}: WidgetContainerProps) => {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`dp-widget ${
-        TONE_CLASS[tone]
-      } relative flex items-center md:gap-3 sm:gap-2 gap-3 w-full min-w-0 px-[13px] py-[8px] sm:px-2.5 md:px-3.5 sm:py-[13px] rounded-[14px] text-left text-white overflow-hidden ${
-        disabled ? 'opacity-50 !cursor-not-allowed' : ''
-      }`}
-    >
-      <span className="dp-widget-icon w-[42px] h-[42px] rounded-xl grid place-items-center flex-none">
+}: WidgetContainerProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className={`dp-lib flex items-center gap-3 w-full min-w-0 px-2.5 py-2.5 2cols:px-3.5 2cols:py-3 rounded-xl text-left text-white ${
+      disabled ? 'opacity-50 !cursor-not-allowed' : ''
+    }`}
+  >
+    <span className="dp-lib-icon flex-none hidden 2cols:grid">{icon}</span>
+    <span className="min-w-0 w-full flex-1 flex flex-col gap-1">
+      <span className="dp-lib-icon dp-lib-icon--small dp-lib-icon--top 2cols:hidden">
         {icon}
       </span>
-      <span className="min-w-0 flex-1 flex flex-col">
-        <span className="flex items-center gap-1.5 text-[15px] font-extrabold tracking-[-.015em] leading-tight">
-          {title}
-          {badge}
+      <span className="dp-lib-head flex items-center gap-[5px] min-w-0 text-sm 2cols:text-[15px] font-extrabold tracking-[-.01em] leading-tight">
+        <span className="dp-lib-icon dp-lib-icon--small dp-lib-icon--inline flex-none 2cols:hidden">
+          {icon}
         </span>
-        <span
-          className={`${
-            !stat && !statLoading ? '' : 'hidden sm:block'
-          } text-xs truncate font-semibold text-white/55 mt-px leading-[1.3]`}
-        >
-          {description}
-        </span>
-        {statLoading ? (
-          <span
-            className="mt-[5px] h-[11px] w-28 rounded bg-white/10 animate-pulse"
-            aria-hidden="true"
-          />
-        ) : stat !== undefined ? (
-          <span className="dp-widget-stat text-[11px] font-extrabold tracking-[.02em] mt-[3px] truncate">
-            {stat}
-          </span>
-        ) : null}
+        <span className="dp-lib-title truncate">{title}</span>
+        {badge && <span className="hidden sm:inline-flex">{badge}</span>}
       </span>
-      <ChevronRight className="ml-auto block sm:hidden lg:block size-[17px] flex-none text-white/40" />
-    </button>
-  );
-};
+      {statLoading ? (
+        <span
+          className="h-3 w-20 max-w-full rounded bg-white/10 animate-pulse"
+          aria-hidden="true"
+        />
+      ) : (
+        stat !== undefined && (
+          <>
+            <span className="hidden md:block truncate text-[12.5px] font-semibold leading-tight text-white/75">
+              {stat}
+            </span>
+            <span className="md:hidden truncate text-[12px] font-semibold leading-tight text-white/75">
+              {shortStat ?? stat}
+            </span>
+          </>
+        )
+      )}
+    </span>
+  </button>
+);
 
 export default WidgetContainer;

@@ -11,7 +11,6 @@
     "save": "Zapisz",
     "confirm": "Potwierdź",
     "authenticationRequired": "Wymagana autoryzacja",
-    "lastSaved": "Zapisane",
     "relativeTime": {
       "justNow": "przed chwilą",
       "minutesAgo": "{count} min temu",
@@ -188,6 +187,11 @@
       "invalidRankRange": "Nieprawidłowy zakres rankingowy w {stageName}."
     },
     "eventSetupModal": {
+      "contestSaved": "Zapisano {date}",
+      "contestOnThisDevice": "Na tym urządzeniu",
+      "customContest": "Własny konkurs",
+      "customTheme": "Własny motyw",
+      "countryPoolWaiting": "{count, plural, one {# kraj czeka} few {# kraje czekają} many {# krajów czeka} other {# kraju czeka}} za kulisami. Przeciągnij jeden do etapu.",
       "grandFinalOnly": "Tylko Finał",
       "confirmGFOnlyTitle": "Tylko Finał?",
       "confirmNotGFOnlyTitle": "Przywróć wszystkie etapy?",
@@ -212,8 +216,6 @@
       "failedToSaveCustomEntries": "Błąd podczas zapisywania własnych wpisów. Proszę spróbować ponownie.",
       "saveToYourCustomEntries": "Zapisz do swoich własnych wpisów",
       "countryPool": "Pula krajów",
-      "countryPoolSub": "{count} nie uczestniczy · przeciągnij do etapu",
-      "contestSub": "{participants} uczestniczy · {stages, plural, =1 {# etap} few {# etapy} other {# etapów}}",
       "unsavedChanges": "Niezapisane zmiany",
       "select": "Zaznacz",
       "selecting": "Zaznaczanie",
@@ -403,7 +405,6 @@
       "shortTitle": "Losowanie",
       "toBeDrawn": "Do wylosowania",
       "subToBeDrawn": "{count} do wylosowania",
-      "subDrawn": "Wylosowano",
       "needsTwoSemis": "Losowanie wymaga co najmniej dwóch półfinałów.",
       "gfOnlyReason": "Włączono „Tylko finał”, więc ten konkurs nie ma półfinałów, do których można losować.",
       "fewSemisReason": "Dodaj drugi półfinał kwalifikujący do finału, aby wylosować skład.",
@@ -709,10 +710,8 @@
     "previous": "Poprzednia",
     "next": "Następna",
     "pageNOfM": "Strona {page} z {totalPages}",
-    "yours": "Twoje",
     "public": "Publiczne",
     "community": "Społeczność",
-    "local": "Lokalne",
     "private": "Prywatne",
     "applied": "Zastosowane",
     "apply": "Zastosuj",
@@ -820,7 +819,6 @@
     },
     "contests": {
       "title": "Konkursy",
-      "description": "Twórz konkursy lub przeglądaj publiczne",
       "yourContests": "Twoje konkursy",
       "publicContests": "Publiczne konkursy",
       "searchContests": "Szukaj konkursów...",
@@ -948,11 +946,11 @@
         "customEntryName": "Niestandardowy wpis"
       },
       "privateCount": "Prywatne: {count}",
-      "publicCount": "Publiczne: {count}"
+      "publicCount": "Publiczne: {count}",
+      "totalCount": "{count, plural, one {# konkurs} few {# konkursy} many {# konkursów} other {# konkursu}}"
     },
     "themes": {
       "title": "Motywy",
-      "widgetDescription": "Twórz motywy lub przeglądaj publiczne",
       "copyToFields": "Skopiuj do pól",
       "copyToNFields": "Skopiuj do {count} {count, plural, =1 {pola} other {pól}}",
       "searchFields": "Szukaj pól...",
@@ -1727,10 +1725,8 @@
   "graphics": {
     "widget": {
       "title": "Grafiki",
-      "description": "Twórz i udostępniaj obrazy",
       "noDesignsYet": "Brak projektów",
-      "nDesigns": "{count, plural, =1 {# projekt} few {# projekty} many {# projektów} other {# projektu}}",
-      "explore": "Odkrywaj"
+      "nDesigns": "{count, plural, =1 {# projekt} few {# projekty} many {# projektów} other {# projektu}}"
     },
     "share": {
       "openInEditor": "Otwórz w edytorze",

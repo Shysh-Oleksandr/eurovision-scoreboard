@@ -269,6 +269,7 @@ const LineupMenus: React.FC<LineupMenusProps> = ({ isSignedIn }) => {
       items={items}
       placement={activeMenu?.kind === 'tray' ? 'top-start' : 'bottom-start'}
       ariaLabel={t('setup.eventSetupModal.moveTo')}
+      plainHeaders
     />
   );
 };

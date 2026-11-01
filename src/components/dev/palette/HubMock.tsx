@@ -2,16 +2,16 @@
 import {
   Check,
   ChevronDown,
-  ChevronRight,
   CopyCheck,
   MessageSquareWarning,
+  MonitorSmartphone,
   Palette,
   Pencil,
   Play,
   Save,
   Settings,
+  Sparkles,
   Trophy,
-  UserCheck,
 } from 'lucide-react';
 import React, { memo } from 'react';
 
@@ -21,27 +21,10 @@ import { InterfaceTokens, interfaceTokensToCssVars } from '@/theme/oklch';
 export const tokensStyle = (tokens: InterfaceTokens) =>
   interfaceTokensToCssVars(tokens) as unknown as React.CSSProperties;
 
-// Literal class names: `dp-*` live under `@layer components` and are only
-// emitted when they appear verbatim in the source.
 const WIDGETS = [
-  {
-    tone: 'dp-tone-blue',
-    icon: UserCheck,
-    title: 'Profile',
-    stat: '27 followers · 16 following',
-  },
-  {
-    tone: 'dp-tone-pink',
-    icon: Palette,
-    title: 'Themes',
-    stat: '18 custom · 25 saved',
-  },
-  {
-    tone: 'dp-tone-gold',
-    icon: Trophy,
-    title: 'Contests',
-    stat: '22 private · 4 public',
-  },
+  { icon: Palette, title: 'Themes', stat: '18 custom, 25 saved' },
+  { icon: Trophy, title: 'Contests', stat: '22 private, 4 public' },
+  { icon: Sparkles, title: 'Graphics', stat: '3 designs, 4 saved' },
 ];
 
 const TILES = [
@@ -79,73 +62,70 @@ const HubMock = ({ tokens, backgroundImage, zoom = 0.6 }: HubMockProps) => (
       <div className="dp-surface-modal w-[600px] rounded-2xl overflow-hidden text-white">
         <div className="p-4 flex flex-col gap-3.5">
           <div className="flex items-end gap-2.5">
-            <div>
-              <div className="text-[10.5px] font-extrabold tracking-[.09em] uppercase text-white/55 mb-1.5">
-                Contest
-              </div>
-              <div className="dp-combo h-[46px] rounded-xl flex items-stretch overflow-hidden">
-                <span className="px-3 flex items-center gap-2 text-[14.5px] font-extrabold">
-                  <img
-                    src="/flags/at.svg"
-                    alt=""
-                    className="w-6 h-[17px] rounded-[3px] object-cover"
-                  />
+            <div className="dp-combo h-[46px] rounded-xl flex items-stretch overflow-hidden">
+              <span className="px-3 flex items-center gap-2 text-[14.5px] font-extrabold">
+                <img
+                  src="/flags/at.svg"
+                  alt=""
+                  className="w-6 h-[17px] rounded-[3px] object-cover"
+                />
+                <span className="flex flex-col gap-[3px] leading-none">
+                  <span className="text-[12px] font-semibold text-white/75">
+                    Eurovision
+                  </span>
                   2026
-                  <ChevronDown className="size-4 text-white/40" />
                 </span>
-                <span className="dp-combo-chip is-on w-9 grid place-items-center">
-                  <Trophy className="size-4" />
-                </span>
-              </div>
+                <ChevronDown className="size-4 text-white/40" />
+              </span>
+              <span className="dp-combo-chip is-on w-9 grid place-items-center">
+                <Trophy className="size-4" />
+              </span>
             </div>
             <div className="ml-auto flex gap-2">
               <span className="dp-act dp-act--strong h-[46px] px-3.5 rounded-xl flex items-center gap-2 text-[13.5px] font-extrabold">
                 <Settings className="size-[18px]" />
                 Settings
               </span>
-              <span className="dp-act dp-act--feedback dp-dot w-[46px] h-[46px] rounded-xl grid place-items-center">
-                <MessageSquareWarning className="size-5" />
+              <span className="w-[46px] h-[46px] grid place-items-center">
+                <MessageSquareWarning className="size-9" />
               </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5">
-            {WIDGETS.map(({ tone, icon: Icon, title, stat }) => (
+          <div className="grid grid-cols-3 gap-2">
+            {WIDGETS.map(({ icon: Icon, title, stat }) => (
               <div
                 key={title}
-                className={`dp-widget ${tone} rounded-[14px] px-3 py-3 flex items-center gap-2.5 min-w-0`}
+                className="dp-lib rounded-xl px-3 py-2.5 flex items-center gap-3 min-w-0"
               >
-                <span className="dp-widget-icon w-[38px] h-[38px] rounded-xl grid place-items-center flex-none">
-                  <Icon className="size-[19px]" />
+                <span className="dp-lib-icon flex-none">
+                  <Icon />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[14px] font-extrabold leading-tight">
                     {title}
                   </span>
-                  <span className="dp-widget-stat block text-[10.5px] font-extrabold mt-[3px] truncate">
+                  <span className="block text-[12px] font-semibold text-white/75 mt-1 truncate">
                     {stat}
                   </span>
                 </span>
-                <ChevronRight className="size-4 flex-none text-white/40" />
               </div>
             ))}
           </div>
 
-          <div className="dp-contest-card relative rounded-[14px] px-4 py-[15px] mt-1 flex items-center gap-3">
-            <span className="dp-badge-pill absolute -top-2.5 left-3.5 text-[10.5px] font-extrabold px-2.5 py-1 rounded-full">
-              Yours · Local
-            </span>
+          <div className="dp-contest-card rounded-[14px] px-4 py-[15px] mt-1 items-center">
             <img
               src="/flags/at.svg"
               alt=""
-              className="w-8 h-6 rounded-sm object-cover flex-none"
+              className="w-10 h-[30px] rounded-sm object-cover flex-none"
             />
             <div className="min-w-0">
-              <div className="text-[19px] font-extrabold tracking-[-.022em] leading-tight">
+              <div className="text-[22px] font-extrabold tracking-[-.022em] leading-tight">
                 Eurovision 2026
               </div>
-              <div className="text-xs font-bold text-white/70 mt-0.5">
-                35 participating · 3 stages
+              <div className="flex items-center gap-1.5 text-[13px] font-semibold text-white/80 mt-1">
+                <MonitorSmartphone className="size-[15px]" />
+                On this device
               </div>
             </div>
             <div className="ml-auto flex gap-[7px]">
@@ -232,18 +212,18 @@ type SwatchMockProps = {
   tokens: InterfaceTokens;
 };
 
-/** A thumbnail of the accent-bearing parts: both widget chips, a selected tile, the CTA. */
+/** A thumbnail of the accent-bearing parts: library icons, a selected tile, the CTA. */
 export const SwatchMock = memo(({ tokens }: SwatchMockProps) => (
   <span
     className="dp-palette-scope block p-2 rounded-t-lg"
     style={{ ...tokensStyle(tokens), background: 'var(--p-900)' }}
   >
     <span className="flex items-center gap-1.5 mb-1.5">
-      <span className="dp-tone-blue dp-widget-icon w-6 h-6 rounded-md grid place-items-center flex-none">
-        <UserCheck className="size-3.5" />
+      <span className="dp-lib dp-lib-icon dp-lib-icon--small w-6 h-6 rounded-md place-items-center flex-none">
+        <Palette />
       </span>
-      <span className="dp-tone-pink dp-widget-icon w-6 h-6 rounded-md grid place-items-center flex-none">
-        <Palette className="size-3.5" />
+      <span className="dp-lib dp-lib-icon dp-lib-icon--small w-6 h-6 rounded-md place-items-center flex-none">
+        <Trophy />
       </span>
       <span className="dp-tile is-selected flex-1 min-w-0 h-6 rounded-md flex items-center gap-1 px-1">
         <span className="dp-check w-3 h-3 rounded-[3px] grid place-items-center flex-none">

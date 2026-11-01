@@ -82,7 +82,11 @@ export const useContestField = () => {
   const shouldUse2026WhiteHeartFlags = useGeneralStore(
     (state) => state.settings.shouldUse2026WhiteHeartFlags,
   );
-  const eventStages = useScoreboardStore((state) => state.eventStages);
+  // The boolean only: the board updates `eventStages` on every vote, and the
+  // header (kept mounted while the setup is closed) shouldn't follow along.
+  const hasEventStages = useScoreboardStore(
+    (state) => state.eventStages.length > 0,
+  );
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const { confirm } = useConfirmation();
   const { data: quickSelectContestsData } = useQuickSelectContestsQuery(!!user);
@@ -127,7 +131,7 @@ export const useContestField = () => {
         applyThemeForContestYear();
       };
 
-      if (eventStages.length > 0) {
+      if (hasEventStages) {
         confirm({
           key: 'change-contest-year',
           title: t('settings.confirmations.changeContest'),
@@ -144,7 +148,7 @@ export const useContestField = () => {
     [
       activeContest,
       confirm,
-      eventStages.length,
+      hasEventStages,
       isGfOnly,
       setEventStages,
       setIsGfOnly,
@@ -284,5 +288,6 @@ export const useContestField = () => {
     handleGfOnlyChange,
     isGfOnly,
     activeContest,
+    contestType,
   };
 };

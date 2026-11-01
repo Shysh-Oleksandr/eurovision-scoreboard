@@ -27,6 +27,9 @@ const SetupFooter = ({
 }: SetupFooterProps) => {
   const t = useTranslations();
   const toDraw = waitingCount > 0 && !!onOpenDraw;
+  // A larger label: Start is the one loud thing here.
+  const ctaClassName =
+    'flex-1 justify-center gap-2.5 !uppercase !font-extrabold !text-base 2cols:!text-[17px]';
 
   return (
     <div className="dp-surface-footer flex items-center gap-2.5 px-3.5 pt-[10px] 2cols:px-5 pb-[calc(10px+var(--modal-safe-bottom,0px))] z-30">
@@ -44,9 +47,8 @@ const SetupFooter = ({
       {toDraw ? (
         <Button
           variant="cta"
-          softGlow={false}
           size="xl"
-          className="flex-1 justify-center gap-2.5 !uppercase !font-bold"
+          className={ctaClassName}
           onClick={onOpenDraw}
           snowEffect="right"
           Icon={<Dices className="size-5" />}
@@ -63,9 +65,8 @@ const SetupFooter = ({
       ) : (
         <Button
           variant="cta"
-          softGlow={false}
           size="xl"
-          className="flex-1 justify-center gap-2.5 !uppercase !font-bold"
+          className={ctaClassName}
           onClick={onStart}
           snowEffect="right"
           Icon={<PlayIcon className="size-[19px]" />}

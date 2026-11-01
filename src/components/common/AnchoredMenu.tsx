@@ -57,6 +57,8 @@ interface AnchoredMenuProps {
   minWidth?: number;
   ariaLabel?: string;
   className?: string;
+  /** Section headers in sentence case at a readable size instead of tracked caps. */
+  plainHeaders?: boolean;
 }
 
 const MENU_GAP = 6;
@@ -83,6 +85,7 @@ const AnchoredMenu: React.FC<AnchoredMenuProps> = ({
   minWidth,
   ariaLabel,
   className,
+  plainHeaders = false,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -316,7 +319,11 @@ const AnchoredMenu: React.FC<AnchoredMenuProps> = ({
             <div
               key={keyFor(`header:${entry.label}`)}
               role="presentation"
-              className="px-2.5 pt-2 pb-1 text-[10px] font-extrabold uppercase tracking-[.14em] text-white/40 select-none"
+              className={`px-2.5 pt-2 pb-1 select-none ${
+                plainHeaders
+                  ? 'text-[12.5px] font-bold text-white/75'
+                  : 'text-[10px] font-extrabold uppercase tracking-[.14em] text-white/40'
+              }`}
             >
               {entry.label}
             </div>

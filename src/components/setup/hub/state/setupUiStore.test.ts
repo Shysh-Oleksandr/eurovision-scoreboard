@@ -11,10 +11,12 @@ import {
 } from '../lineup/listIds';
 
 import { getMenuAnchor, useSetupUiStore } from './setupUiStore';
+import { useStageAccordionStore } from './stageAccordionStore';
 
 describe('useSetupUiStore', () => {
   beforeEach(() => {
     useSetupUiStore.getState().resetUi();
+    useStageAccordionStore.setState({ contestKey: null, collapsed: {} });
   });
 
   it('toggles selection immutably', () => {
@@ -64,7 +66,7 @@ describe('useSetupUiStore', () => {
 
   it('toggleExpanded flips per list id', () => {
     const { toggleExpanded, setExpanded } = useSetupUiStore.getState();
-    const list = stageList('sf1');
+    const list = poolList('Europe');
 
     toggleExpanded(list);
     expect(useSetupUiStore.getState().expanded[list]).toBe(true);
@@ -78,13 +80,50 @@ describe('useSetupUiStore', () => {
 
   it('toggleExpanded collapses a list that is open by default on the first toggle', () => {
     const { toggleExpanded } = useSetupUiStore.getState();
-    const list = stageList('gf');
+    const list = poolList('Custom', 'abc123');
 
     toggleExpanded(list, true);
     expect(useSetupUiStore.getState().expanded[list]).toBe(false);
 
     toggleExpanded(list, true);
     expect(useSetupUiStore.getState().expanded[list]).toBe(true);
+  });
+
+  it('keeps stage cards in the remembered accordion store, not the transient state', () => {
+    const { toggleExpanded, setExpanded } = useSetupUiStore.getState();
+    const list = stageList('sf1');
+
+    toggleExpanded(list, true);
+    expect(useStageAccordionStore.getState().collapsed[list]).toBe(true);
+    expect(useSetupUiStore.getState().expanded).toEqual({});
+
+    setExpanded(NOT_QUALIFIED_LIST, false);
+    expect(useStageAccordionStore.getState().collapsed).toEqual({
+      [list]: true,
+      [NOT_QUALIFIED_LIST]: true,
+    });
+
+    // Closing the setup resets the transient state only.
+    useSetupUiStore.getState().resetUi();
+    expect(useStageAccordionStore.getState().collapsed[list]).toBe(true);
+
+    toggleExpanded(list, true);
+    expect(useStageAccordionStore.getState().collapsed[list]).toBeUndefined();
+  });
+
+  it('opens every stage again for another contest', () => {
+    const accordions = useStageAccordionStore.getState();
+
+    accordions.setContestKey('2026-esc');
+    accordions.setCollapsed(stageList('sf1'), true);
+
+    useStageAccordionStore.getState().setContestKey('2026-esc');
+    expect(useStageAccordionStore.getState().collapsed).toEqual({
+      [stageList('sf1')]: true,
+    });
+
+    useStageAccordionStore.getState().setContestKey('2025-jesc');
+    expect(useStageAccordionStore.getState().collapsed).toEqual({});
   });
 
   it('keeps the menu anchor out of the store state', () => {

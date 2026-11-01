@@ -11,7 +11,6 @@
     "save": "Guardar",
     "confirm": "Confirmar",
     "authenticationRequired": "Autenticación requerida",
-    "lastSaved": "Guardado",
     "relativeTime": {
       "justNow": "justo ahora",
       "minutesAgo": "hace {count} min",
@@ -188,6 +187,11 @@
       "invalidRankRange": "Rango de clasificación inválido en {stageName}."
     },
     "eventSetupModal": {
+      "contestSaved": "Guardado el {date}",
+      "contestOnThisDevice": "En este dispositivo",
+      "customContest": "Concurso personalizado",
+      "customTheme": "Tema personalizado",
+      "countryPoolWaiting": "{count, plural, =1 {# país espera} other {# países esperan}} entre bastidores. Arrastra uno a una etapa.",
       "grandFinalOnly": "Solo final",
       "confirmGFOnlyTitle": "Solo final?",
       "confirmNotGFOnlyTitle": "Restaurar todas las etapas?",
@@ -212,8 +216,6 @@
       "failedToSaveCustomEntries": "Error al guardar las entradas personalizadas. Por favor, intenta de nuevo.",
       "saveToYourCustomEntries": "Guardar en tus entradas personalizadas",
       "countryPool": "Reserva de países",
-      "countryPoolSub": "{count} sin participar · arrastra a una etapa",
-      "contestSub": "{participants} participantes · {stages, plural, =1 {# etapa} other {# etapas}}",
       "unsavedChanges": "Cambios sin guardar",
       "select": "Seleccionar",
       "selecting": "Seleccionando",
@@ -403,7 +405,6 @@
       "shortTitle": "Sorteo",
       "toBeDrawn": "Por sortear",
       "subToBeDrawn": "{count} por sortear",
-      "subDrawn": "Sorteado",
       "needsTwoSemis": "El sorteo necesita dos o más semifinales.",
       "gfOnlyReason": "«Solo la final» está activado, así que este concurso no tiene semifinales a las que sortear.",
       "fewSemisReason": "Añade una segunda semifinal que clasifique a la final para sortear una alineación.",
@@ -709,10 +710,8 @@
     "previous": "Anterior",
     "next": "Siguiente",
     "pageNOfM": "Página {page} de {totalPages}",
-    "yours": "Tu",
     "public": "Público",
     "community": "Comunidad",
-    "local": "Local",
     "private": "Privado",
     "applied": "Aplicado",
     "apply": "Aplicar",
@@ -820,7 +819,6 @@
     },
     "contests": {
       "title": "Concursos",
-      "description": "Crea concursos o explora los públicos",
       "yourContests": "Tus concursos",
       "publicContests": "Concursos públicos",
       "searchContests": "Buscar concursos...",
@@ -948,11 +946,11 @@
         "customEntryName": "Entrada personalizada"
       },
       "privateCount": "{count} privados",
-      "publicCount": "{count} públicos"
+      "publicCount": "{count} públicos",
+      "totalCount": "{count, plural, =1 {# concurso} other {# concursos}}"
     },
     "themes": {
       "title": "Temas",
-      "widgetDescription": "Crea temas o explora los públicos",
       "copyToFields": "Copiar a los campos",
       "copyToNFields": "Copiar a {count} {count, plural, =1 {campo} other {campos}}",
       "searchFields": "Buscar campos...",
@@ -1727,10 +1725,8 @@
   "graphics": {
     "widget": {
       "title": "Gráficos",
-      "description": "Crea y comparte imágenes",
       "noDesignsYet": "Aún no hay diseños",
-      "nDesigns": "{count, plural, =1 {# diseño} other {# diseños}}",
-      "explore": "Explorar"
+      "nDesigns": "{count, plural, =1 {# diseño} other {# diseños}}"
     },
     "share": {
       "openInEditor": "Abrir en el editor",

@@ -11,7 +11,6 @@
     "save": "Speichern",
     "confirm": "Bestätigen",
     "authenticationRequired": "Authentifizierung erforderlich",
-    "lastSaved": "Gespeichert",
     "relativeTime": {
       "justNow": "gerade eben",
       "minutesAgo": "vor {count} Min.",
@@ -188,6 +187,11 @@
       "invalidRankRange": "Ungültiger Rangbereich in {stageName}."
     },
     "eventSetupModal": {
+      "contestSaved": "Gespeichert {date}",
+      "contestOnThisDevice": "Auf diesem Gerät",
+      "customContest": "Eigener Wettbewerb",
+      "customTheme": "Eigenes Theme",
+      "countryPoolWaiting": "{count, plural, =1 {# Land wartet} other {# Länder warten}} hinter der Bühne. Zieh eins in ein Stage.",
       "grandFinalOnly": "Nur Finale",
       "confirmGFOnlyTitle": "Nur Finale?",
       "confirmNotGFOnlyTitle": "Alle Shows wiederherstellen?",
@@ -212,8 +216,6 @@
       "failedToSaveCustomEntries": "Fehler beim Speichern der benutzerdefinierten Beiträge. Bitte versuche es erneut.",
       "saveToYourCustomEntries": "Zu deinen benutzerdefinierten Beiträgen hinzufügen",
       "countryPool": "Länderpool",
-      "countryPoolSub": "{count} nicht teilnehmend · in eine Stage ziehen",
-      "contestSub": "{participants} teilnehmend · {stages, plural, =1 {# Stage} other {# Stages}}",
       "unsavedChanges": "Ungespeicherte Änderungen",
       "select": "Auswählen",
       "selecting": "Auswahl",
@@ -403,7 +405,6 @@
       "shortTitle": "Auslosung",
       "toBeDrawn": "Noch auszulosen",
       "subToBeDrawn": "{count} auszulosen",
-      "subDrawn": "Ausgelost",
       "needsTwoSemis": "Die Auslosung braucht zwei oder mehr Halbfinals.",
       "gfOnlyReason": "„Nur Finale“ ist aktiv, daher hat dieser Wettbewerb keine Halbfinals, in die ausgelost werden könnte.",
       "fewSemisReason": "Füge ein zweites Halbfinale hinzu, das sich für das Finale qualifiziert, um eine Aufstellung auszulosen.",
@@ -709,10 +710,8 @@
     "previous": "Zurück",
     "next": "Weiter",
     "pageNOfM": "Seite {page} von {totalPages}",
-    "yours": "Deine",
     "public": "Öffentlich",
     "community": "Community",
-    "local": "Lokal",
     "private": "Privat",
     "applied": "Angewendet",
     "apply": "Anwenden",
@@ -820,7 +819,6 @@
     },
     "contests": {
       "title": "Wettbewerbe",
-      "description": "Erstelle Wettbewerbe oder durchsuche öffentliche",
       "yourContests": "Deine Wettbewerbe",
       "publicContests": "Öffentliche Wettbewerbe",
       "searchContests": "Wettbewerbe suchen...",
@@ -948,11 +946,11 @@
         "customEntryName": "Benutzerdefinierter Eintrag"
       },
       "privateCount": "{count} privat",
-      "publicCount": "{count} öffentlich"
+      "publicCount": "{count} öffentlich",
+      "totalCount": "{count, plural, =1 {# Wettbewerb} other {# Wettbewerbe}}"
     },
     "themes": {
       "title": "Themes",
-      "widgetDescription": "Erstelle Themes oder durchsuche öffentliche",
       "copyToFields": "In Felder kopieren",
       "copyToNFields": "In {count} {count, plural, =1 {Feld} other {Felder}} kopieren",
       "searchFields": "Felder suchen...",
@@ -1727,10 +1725,8 @@
   "graphics": {
     "widget": {
       "title": "Grafiken",
-      "description": "Bilder erstellen und teilen",
       "noDesignsYet": "Noch keine Designs",
-      "nDesigns": "{count, plural, =1 {# Design} other {# Designs}}",
-      "explore": "Entdecken"
+      "nDesigns": "{count, plural, =1 {# Design} other {# Designs}}"
     },
     "share": {
       "openInEditor": "Im Editor öffnen",

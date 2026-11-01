@@ -14,7 +14,7 @@ const ContestsModal = dynamic(() => import('./ContestsModal'), {
   ssr: false,
 });
 
-const ContestsWidget = ({ stat, statLoading }: WidgetStatProps) => {
+const ContestsWidget = ({ stat, shortStat, statLoading }: WidgetStatProps) => {
   const t = useTranslations('widgets.contests');
 
   const isContestsModalOpen = useGeneralStore(
@@ -32,9 +32,8 @@ const ContestsWidget = ({ stat, statLoading }: WidgetStatProps) => {
           setIsContestsModalOpen(true);
         }}
         title={t('title')}
-        description={t('description')}
-        tone="gold"
         stat={stat}
+        shortStat={shortStat}
         statLoading={statLoading}
         icon={<TrophyIcon className="size-[21px] flex-none" />}
       />

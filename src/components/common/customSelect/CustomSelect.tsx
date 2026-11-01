@@ -59,6 +59,10 @@ type CustomSelectProps = {
    * (the parent `ComboField` paints the surface and label).
    */
   variant?: 'default' | 'combo';
+  /** `combo` only: a small line above the value inside the trigger. */
+  caption?: React.ReactNode;
+  /** `combo` only: the trigger's text for the selected option (default: its label). */
+  getDisplayLabel?: (option: Option) => string;
 };
 
 const COMBO_TRIGGER_CLASSES =
@@ -78,6 +82,8 @@ const SelectDisplay: React.FC<{
   customThemeColor?: string;
   withIndicator?: boolean;
   variant?: 'default' | 'combo';
+  caption?: React.ReactNode;
+  getDisplayLabel?: (option: Option) => string;
 }> = ({
   value,
   options,
@@ -86,6 +92,8 @@ const SelectDisplay: React.FC<{
   customThemeColor,
   withIndicator = true,
   variant = 'default',
+  caption,
+  getDisplayLabel,
 }) => {
   const selectedOption = options.find((option) => option.value === value);
 
@@ -117,8 +125,24 @@ const SelectDisplay: React.FC<{
               }}
             ></span>
           ))}
-        <span className="truncate min-w-0">{selectedOption?.label}</span>
-        <ChevronDown className="ml-auto size-4 flex-none text-white/40" />
+        {caption ? (
+          <span className="min-w-0 flex flex-col gap-[3px] leading-none">
+            <span className="truncate text-[12px] font-semibold tracking-normal text-white/75">
+              {caption}
+            </span>
+            <span className="truncate">
+              {selectedOption &&
+                (getDisplayLabel?.(selectedOption) ?? selectedOption.label)}
+            </span>
+          </span>
+        ) : (
+          <span className="truncate min-w-0">{selectedOption?.label}</span>
+        )}
+        <ChevronDown
+          className={`ml-auto size-4 flex-none text-white/40 ${
+            caption ? 'hidden 2cols:block' : ''
+          }`}
+        />
       </div>
     );
   }
@@ -204,6 +228,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   dropdownFooter,
   emptyFilterContent,
   variant = 'default',
+  caption,
+  getDisplayLabel,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isCombo = variant === 'combo';
@@ -464,6 +490,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           customThemeColor={customThemeColor}
           withIndicator={withIndicator}
           variant={variant}
+          caption={caption}
+          getDisplayLabel={getDisplayLabel}
         />
         <select
           value={value}
@@ -568,6 +596,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             customThemeColor={customThemeColor}
             withIndicator={withIndicator}
             variant={variant}
+            caption={caption}
+            getDisplayLabel={getDisplayLabel}
           />
         )}
         {isOpen &&

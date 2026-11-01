@@ -1,10 +1,12 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 
 import { useDndComponents } from './dnd/DndComponentsContext';
 import { useLineupModelContext } from './LineupProvider';
 import { ListId } from './listIds';
+import { useBoardRowLook } from './useBoardRowLook';
+import { useTileEntrance } from './useTileEntrance';
 
 interface TileGridProps {
   codes: string[];
@@ -18,6 +20,8 @@ interface TileGridProps {
   pinnedFor?: (code: string) => string | null;
   /** Extra cell rendered after the tiles (e.g. the "+N from the draw" placeholder). */
   extra?: React.ReactNode;
+  /** Stage lists: a change replays the tiles' entrance (see `useTileEntrance`). */
+  replayKey?: number;
 }
 
 /** Auto-fill grid of country tiles for one list, filtered by the shared search. */
@@ -30,6 +34,7 @@ const TileGrid: React.FC<TileGridProps> = ({
   className = '',
   pinnedFor,
   extra,
+  replayKey = 0,
 }) => {
   const t = useTranslations('setup.eventSetupModal');
   const { byCode } = useLineupModelContext();
@@ -40,8 +45,16 @@ const TileGrid: React.FC<TileGridProps> = ({
     [codes, matches],
   );
 
+  // Stage lists draw their tiles as the theme's board rows.
+  const isStage = listId.startsWith('stage:');
+  const boardRowLook = useBoardRowLook();
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useTileEntrance(gridRef, codes, { enabled: isStage, replayKey });
+
   return (
     <div
+      ref={gridRef}
       className={`${
         variant === 'stage' ? 'dp-tile-grid' : 'dp-pool-grid'
       } ${className}`}
@@ -63,6 +76,7 @@ const TileGrid: React.FC<TileGridProps> = ({
               listId={listId}
               eager={eager}
               pinned={pinnedFor ? pinnedFor(code) : null}
+              boardRow={isStage ? boardRowLook : null}
             />
           );
         })

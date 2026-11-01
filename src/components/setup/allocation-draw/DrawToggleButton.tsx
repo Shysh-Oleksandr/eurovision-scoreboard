@@ -88,15 +88,16 @@ export const useDrawToggle = () => {
 };
 
 interface DrawToggleButtonProps {
-  /** Tablet width: short label. */
-  compact: boolean;
-  size: 'sm' | 'md';
+  className?: string;
 }
 
-/** The "Allocation draw" toggle on tablet / desktop; a disabled toggle explains itself on tap. */
+/**
+ * The "Allocation draw" toggle in the contest card; a disabled toggle
+ * explains itself on tap. It renders both labels: the card's layout
+ * (`data-draw`, see `.dp-cc-layout` in styles.css) shows one.
+ */
 const DrawToggleButton: React.FC<DrawToggleButtonProps> = ({
-  compact,
-  size,
+  className = '',
 }) => {
   const t = useTranslations('setup.allocationDraw');
   const { enabled, available, unavailableReason, reason, toggle } =
@@ -121,14 +122,14 @@ const DrawToggleButton: React.FC<DrawToggleButtonProps> = ({
     <>
       <Button
         variant="surface"
-        size={size}
+        size="md"
         title={t('title')}
         aria-label={t('title')}
         aria-pressed={enabled}
         Icon={<Dices className="size-[17px]" />}
         className={`${enabled ? 'is-on' : ''} ${
           available ? '' : 'opacity-50'
-        } whitespace-nowrap`}
+        } whitespace-nowrap ${className}`}
         onClick={(e) => {
           if (available) {
             toggle();
@@ -141,7 +142,8 @@ const DrawToggleButton: React.FC<DrawToggleButtonProps> = ({
           setReasonAnchor((prev) => (prev ? null : target));
         }}
       >
-        {compact ? t('shortTitle') : t('title')}
+        <span className="dp-draw-label-full">{t('title')}</span>
+        <span className="dp-draw-label-short">{t('shortTitle')}</span>
       </Button>
       <AnchoredMenu
         open={!!reasonAnchor}

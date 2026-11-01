@@ -1,7 +1,13 @@
 'use client';
 import { ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { memo, useEffect, useState } from 'react';
+import React, {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { useSetupUiStore } from '../state/setupUiStore';
 
@@ -11,6 +17,7 @@ import { headerToggleHandler } from './headerToggle';
 import { useLineupActions } from './LineupProvider';
 import { ListId } from './listIds';
 import TileGrid from './TileGrid';
+import { useBoardRowLook } from './useBoardRowLook';
 import { useListExpanded } from './useLineupSearch';
 
 import { PencilIcon } from '@/assets/icons/PencilIcon';
@@ -47,8 +54,8 @@ export interface StageCardProps {
 
 const surfaceClass = {
   semi: 'dp-stage',
-  final: 'dp-stage dp-stage--final',
-  notQualified: 'dp-stage dp-stage--muted',
+  final: 'dp-stage',
+  notQualified: 'dp-stage',
   draw: 'dp-stage dp-stage--draw',
 };
 
@@ -80,13 +87,39 @@ const StageCard: React.FC<StageCardProps> = ({
   const { DropZone } = useDndComponents();
   const { onEditStage, openMoveAllMenu } = useLineupActions();
   const expanded = useListExpanded(listId, true, codes, matches);
+  const boardRow = useBoardRowLook();
   const [hasBeenOpened, setHasBeenOpened] = useState(expanded);
+  // Opening the stage by hand replays its tiles' entrance.
+  const [revealKey, setRevealKey] = useState(0);
+
+  // The body clips only while collapsed or sliding open, so the outline of a
+  // selected tile in the first row isn't cut off once the stage is open.
+  const [sliding, setSliding] = useState(false);
+  const isFirstRun = useRef(true);
 
   useEffect(() => {
     if (expanded) setHasBeenOpened(true);
   }, [expanded]);
 
-  const toggle = () => useSetupUiStore.getState().toggleExpanded(listId, true);
+  useLayoutEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+
+      return undefined;
+    }
+
+    if (!expanded) return undefined;
+
+    setSliding(true);
+    const timeout = window.setTimeout(() => setSliding(false), 320);
+
+    return () => window.clearTimeout(timeout);
+  }, [expanded]);
+
+  const toggle = () => {
+    if (!expanded) setRevealKey((key) => key + 1);
+    useSetupUiStore.getState().toggleExpanded(listId, true);
+  };
 
   return (
     <DropZone
@@ -113,9 +146,15 @@ const StageCard: React.FC<StageCardProps> = ({
         </button>
         {badge ??
           (index !== undefined && (
+            // The stage number is the board's place badge.
             <span
-              className="hidden 2cols:grid w-[26px] h-[26px] rounded-lg place-items-center flex-none text-[11.5px] font-extrabold bg-white/10 border border-hair text-white/70 tabular-nums"
-              aria-label={t('setup.eventSetupModal.stageIndexLabel', { index })}
+              className={`dp-scoreboard-font grid w-7 h-7 place-items-center flex-none text-[12.5px] font-bold tabular-nums bg-countryItem-juryPlaceContainerBg text-countryItem-juryPlaceText ${
+                boardRow.rounded ? 'rounded-full' : 'rounded-sm'
+              }`}
+              style={boardRow.placeStyle}
+              aria-label={t('setup.eventSetupModal.stageIndexLabel', {
+                index,
+              })}
             >
               {String(index).padStart(2, '0')}
             </span>
@@ -167,7 +206,9 @@ const StageCard: React.FC<StageCardProps> = ({
         className="grid transition-[grid-template-rows] duration-300 ease-in-out"
         style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
       >
-        <div className="min-h-0 overflow-hidden">
+        <div
+          className={`min-h-0 ${!expanded || sliding ? 'overflow-hidden' : ''}`}
+        >
           {hasBeenOpened && (
             <div className="px-3.5 pb-3.5">
               {notice}
@@ -180,11 +221,12 @@ const StageCard: React.FC<StageCardProps> = ({
                   eager={eager}
                   pinnedFor={pinnedFor}
                   extra={extraTile}
+                  replayKey={revealKey}
                 />
               )}
               {qualifiers && qualifiers.length > 0 && (
                 <div className="mt-2.5">
-                  <div className="dp-qual-div text-[11.5px] font-extrabold tracking-[.1em] uppercase mb-2.5">
+                  <div className="dp-qual-div mb-2.5 text-[13px] font-bold">
                     {t('setup.eventSetupModal.qualifiers')}
                   </div>
                   <div className="flex flex-wrap gap-[9px]">

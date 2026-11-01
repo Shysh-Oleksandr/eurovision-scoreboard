@@ -26,6 +26,15 @@ export const poolList = (category: string, groupId?: string | null): ListId =>
     ? `pool:${category}:${groupId ?? UNGROUPED_ID}`
     : `pool:${category}`;
 
+/**
+ * Lists drawn as a stage card: open by default, and their collapsed state is
+ * remembered across reloads (`stageAccordionStore`).
+ */
+export const isStageCardList = (id: ListId): boolean =>
+  id.startsWith('stage:') ||
+  id === NOT_QUALIFIED_LIST ||
+  id === TO_BE_DRAWN_LIST;
+
 export type ParsedListId =
   | { kind: 'stage'; stageId: string }
   | { kind: 'notQualified' }

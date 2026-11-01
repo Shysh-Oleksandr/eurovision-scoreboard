@@ -1,8 +1,10 @@
 import { useDeferredValue, useMemo } from 'react';
 
 import { useSetupUiStore } from '../state/setupUiStore';
+import { useStageAccordionStore } from '../state/stageAccordionStore';
 
 import { useLineupModelContext } from './LineupProvider';
+import { isStageCardList } from './listIds';
 
 /**
  * Deferred search over every list. `matches` is null when the search is
@@ -30,7 +32,10 @@ export const useLineupSearch = () => {
   return { search, matches, isSearching: matches !== null };
 };
 
-/** Whether a list renders expanded: search hits win, then the explicit toggle, then the default. */
+/**
+ * Whether a list renders expanded: search hits win, then the remembered
+ * collapse (stage cards) or the explicit toggle (pool lists), then the default.
+ */
 export const useListExpanded = (
   listId: string,
   defaultExpanded: boolean,
@@ -38,10 +43,15 @@ export const useListExpanded = (
   matches: Set<string> | null,
 ) => {
   const explicit = useSetupUiStore((state) => state.expanded[listId]);
+  const collapsedStage = useStageAccordionStore(
+    (state) => !!state.collapsed[listId],
+  );
 
   if (matches) {
     return codes.some((code) => matches.has(code));
   }
+
+  if (isStageCardList(listId)) return !collapsedStage;
 
   return explicit ?? defaultExpanded;
 };

@@ -36,7 +36,7 @@ const ComboChip = ({
       title={enableIconButtonTooltips ? undefined : tooltip}
       className={`dp-combo-chip ${
         active ? 'is-on' : ''
-      } w-[30px] 2cols:w-9 flex-none grid place-items-center disabled:opacity-40 disabled:cursor-not-allowed`}
+      } w-[44px] 2cols:w-9 flex-none grid place-items-center disabled:opacity-40 disabled:cursor-not-allowed`}
     >
       {icon}
     </button>

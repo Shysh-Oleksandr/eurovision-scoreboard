@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Activity, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import Image from 'next/image';
@@ -51,6 +51,12 @@ interface ModalProps {
    * `bottomContent` leave over. For screen-like modals, not short dialogs.
    */
   fullScreenOnPhone?: boolean;
+  /**
+   * After the first open, keep the content mounted while closed (hidden in an
+   * `<Activity>`: no effects, low-priority updates) so a modal that is
+   * reopened often doesn't rebuild its whole tree each time.
+   */
+  keepMounted?: boolean;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -72,6 +78,7 @@ const Modal: React.FC<ModalProps> = ({
   fixedHeight = false,
   unstyledSurface = false,
   fullScreenOnPhone = false,
+  keepMounted = false,
 }) => {
   const enableWinterEffects = useGeneralStore(
     (state) => state.settings.enableWinterEffects,
@@ -80,6 +87,7 @@ const Modal: React.FC<ModalProps> = ({
     (state) => state.settings.blurModalBackground,
   );
   const [isMounted, setIsMounted] = useState(false);
+  const [hasBeenMounted, setHasBeenMounted] = useState(false);
   const [isActive, setIsActive] = useState(false);
 
   // Android back closes the modal like a backdrop tap; one without `onClose`
@@ -101,6 +109,7 @@ const Modal: React.FC<ModalProps> = ({
 
     if (isOpen) {
       setIsMounted(true);
+      setHasBeenMounted(true);
       const timeout = openDelay ?? 50;
 
       openTimeoutId = window.setTimeout(() => {
@@ -142,7 +151,7 @@ const Modal: React.FC<ModalProps> = ({
 
   const hasWinterTopPadding = !!topContent && enableWinterEffects;
 
-  if (!isMounted) {
+  if (!isMounted && !(keepMounted && hasBeenMounted)) {
     return null;
   }
 
@@ -228,7 +237,16 @@ const Modal: React.FC<ModalProps> = ({
   );
 
   // Use portal to render modal at document body level to avoid nesting issues
-  return createPortal(modalContent, document.body);
+  return createPortal(
+    keepMounted ? (
+      <Activity mode={isMounted ? 'visible' : 'hidden'}>
+        {modalContent}
+      </Activity>
+    ) : (
+      modalContent
+    ),
+    document.body,
+  );
 };
 
 export default Modal;

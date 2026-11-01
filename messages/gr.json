@@ -11,7 +11,6 @@
     "save": "Αποθήκευση",
     "confirm": "Επιβεβαίωση",
     "authenticationRequired": "Απαιτείται πιστοποίηση",
-    "lastSaved": "Αποθηκευμένο",
     "relativeTime": {
       "justNow": "μόλις τώρα",
       "minutesAgo": "πριν {count} λεπ.",
@@ -188,6 +187,11 @@
       "invalidRankRange": "Μη έγκυρο εύρος κατάταξης στο {stageName}."
     },
     "eventSetupModal": {
+      "contestSaved": "Αποθηκεύτηκε {date}",
+      "contestOnThisDevice": "Σε αυτή τη συσκευή",
+      "customContest": "Προσαρμοσμένος διαγωνισμός",
+      "customTheme": "Προσαρμοσμένο θέμα",
+      "countryPoolWaiting": "{count, plural, =1 {# χώρα περιμένει} other {# χώρες περιμένουν}} στα παρασκήνια. Σύρετε μία σε ένα στάδιο.",
       "grandFinalOnly": "Μόνο τελικός",
       "confirmGFOnlyTitle": "Μόνο τελικός?",
       "confirmNotGFOnlyTitle": "Ανακατασκευή όλων των σταδίων?",
@@ -212,8 +216,6 @@
       "failedToSaveCustomEntries": "Σφάλμα κατά την αποθήκευση των προσαρμοσμένων συμμετοχών. Παρακαλώ δοκιμάστε ξανά.",
       "saveToYourCustomEntries": "Αποθήκευση στις προσαρμοσμένες συμμετοχές σας",
       "countryPool": "Δεξαμενή χωρών",
-      "countryPoolSub": "{count} δεν συμμετέχουν · σύρετε σε ένα στάδιο",
-      "contestSub": "{participants} συμμετέχουν · {stages, plural, =1 {# στάδιο} other {# στάδια}}",
       "unsavedChanges": "Μη αποθηκευμένες αλλαγές",
       "select": "Επιλογή",
       "selecting": "Επιλογή σε εξέλιξη",
@@ -403,7 +405,6 @@
       "shortTitle": "Κλήρωση",
       "toBeDrawn": "Προς κλήρωση",
       "subToBeDrawn": "{count} προς κλήρωση",
-      "subDrawn": "Κληρώθηκε",
       "needsTwoSemis": "Η κλήρωση χρειάζεται δύο ή περισσότερους ημιτελικούς.",
       "gfOnlyReason": "Είναι ενεργό το «Μόνο τελικός», οπότε αυτός ο διαγωνισμός δεν έχει ημιτελικούς για κλήρωση.",
       "fewSemisReason": "Προσθέστε έναν δεύτερο ημιτελικό που προκρίνει στον τελικό για να κληρώσετε σύνθεση.",
@@ -709,10 +710,8 @@
     "previous": "Προηγούμενο",
     "next": "Επόμενο",
     "pageNOfM": "Σελίδα {page} από {totalPages}",
-    "yours": "Τα Θέματά Σας",
     "public": "Δημόσιο",
     "community": "Κοινότητα",
-    "local": "Τοπικό",
     "private": "Ιδιωτικό",
     "applied": "Εφαρμοσμένο",
     "apply": "Εφαρμογή",
@@ -820,7 +819,6 @@
     },
     "contests": {
       "title": "Διαγωνισμοί",
-      "description": "Δημιουργήστε διαγωνισμούς ή περιηγηθείτε στους δημόσιους",
       "yourContests": "Τα Διαγωνισμά Σας",
       "publicContests": "Δημόσια Διαγωνισμά",
       "searchContests": "Αναζήτηση διαγωνισμάτων...",
@@ -948,11 +946,11 @@
         "customEntryName": "Προσαρμοσμένη συμμετοχή"
       },
       "privateCount": "{count} ιδιωτικοί",
-      "publicCount": "{count} δημόσιοι"
+      "publicCount": "{count} δημόσιοι",
+      "totalCount": "{count, plural, =1 {# διαγωνισμός} other {# διαγωνισμοί}}"
     },
     "themes": {
       "title": "Θέματα",
-      "widgetDescription": "Δημιουργήστε θέματα ή περιηγηθείτε στα δημόσια",
       "copyToFields": "Αντιγραφή στα πεδία",
       "copyToNFields": "Αντιγραφή σε {count} {count, plural, =1 {πεδίο} other {πεδία}}",
       "searchFields": "Αναζήτηση πεδίων...",
@@ -1727,10 +1725,8 @@
   "graphics": {
     "widget": {
       "title": "Γραφικά",
-      "description": "Δημιουργήστε και μοιραστείτε εικόνες",
       "noDesignsYet": "Δεν υπάρχουν σχέδια ακόμα",
-      "nDesigns": "{count, plural, =1 {# σχέδιο} other {# σχέδια}}",
-      "explore": "Εξερεύνηση"
+      "nDesigns": "{count, plural, =1 {# σχέδιο} other {# σχέδια}}"
     },
     "share": {
       "openInEditor": "Άνοιγμα στον επεξεργαστή",

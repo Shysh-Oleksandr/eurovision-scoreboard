@@ -32,6 +32,7 @@ import { useLineupModel } from './hub/lineup/useLineupModel';
 import SetupFooter from './hub/SetupFooter';
 import SetupHubHeader from './hub/SetupHubHeader';
 import { useSetupUiStore } from './hub/state/setupUiStore';
+import { useStageAccordionStore } from './hub/state/stageAccordionStore';
 import { SyncCustomEntries } from './SyncCustomEntries';
 import { buildEventStagesFromAssignments } from './utils/buildEventStagesFromAssignments';
 import { validateEventSetup } from './utils/eventValidation';
@@ -41,6 +42,7 @@ import WidgetsSection from './widgets-section/WidgetsSection';
 
 import { useApplyContestMutation } from '@/api/contests';
 import { useCustomEntryGroupsQuery } from '@/api/customEntries';
+import { getContestKey } from '@/data/contestTypes';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import { markContestSetupClean } from '@/helpers/contestFingerprint';
 import {
@@ -50,10 +52,6 @@ import {
 import { importPostSetupModal } from '@/hooks/simulationChunkImports';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
-import {
-  isDrawnInfoCurrent,
-  useAllocationDrawStore,
-} from '@/state/allocationDrawStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -196,6 +194,11 @@ const EventSetupModal = () => {
   );
   const { clear } = useScoreboardStore.temporal.getState();
   const user = useAuthStore((state) => state.user);
+  const contestKey = useGeneralStore(
+    (state) =>
+      state.activeContest?._id ??
+      getContestKey(state.year, state.settings.contestType),
+  );
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isSettingsModalLoaded, setIsSettingsModalLoaded] = useState(false);
@@ -278,7 +281,6 @@ const EventSetupModal = () => {
 
   const { data: customEntryGroups = [] } = useCustomEntryGroupsQuery(!!user);
   const drawModel = useAllocationDraw(eventSetupModalOpen);
-  const drawnByStage = useAllocationDrawStore((state) => state.drawn);
   const lineupModel = useLineupModel({
     eventStagesWithCountries,
     notParticipatingCountries,
@@ -289,21 +291,15 @@ const EventSetupModal = () => {
     drawEnabled: drawModel.enabled,
     isSignedIn: !!user,
   });
-  const isDrawn = useMemo(
-    () =>
-      drawModel.semis.length > 0 &&
-      drawModel.semis.every((semi) =>
-        isDrawnInfoCurrent(
-          drawnByStage[semi.id],
-          lineupModel.lists.get(`stage:${semi.id}`) ?? [],
-        ),
-      ),
-    [drawModel.semis, drawnByStage, lineupModel.lists],
-  );
 
   const hasUnsavedChanges = useContestDirtyState();
 
   useInitialLineup();
+
+  // Collapsed stages are remembered per contest; another contest opens them all.
+  useEffect(() => {
+    useStageAccordionStore.getState().setContestKey(contestKey);
+  }, [contestKey]);
 
   const { onSaveContinue, nextSetupStage } = useContinueToNextPhase();
   const { confirm } = useConfirmation();
@@ -588,6 +584,10 @@ const EventSetupModal = () => {
         unstyledSurface
         fullScreenOnPhone
         withBlur
+        // Reopened from the board all the time. Rebuilding the hub (stages,
+        // tiles, drag-and-drop) took ~350ms to show at 4x CPU throttling in
+        // development; revealing the kept tree takes ~220ms.
+        keepMounted
         bottomContent={
           <SetupFooter
             canClose={debouncedCanClose}
@@ -647,11 +647,7 @@ const EventSetupModal = () => {
           <ContestCard
             onReorderClick={() => setIsStageReorderModalOpen(true)}
             onAddStageClick={handleOpenCreateEventStageModal}
-            participantsCount={lineupModel.counts.participating}
-            stagesCount={lineupModel.counts.stages}
-            isGfOnly={isGfOnly}
             hasUnsavedChanges={hasUnsavedChanges}
-            isDrawn={isDrawn}
           />
 
           <LineupProvider
