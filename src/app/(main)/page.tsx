@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import Main from '../../views/Main';
 import { useCatalogReady } from '../AppIntlProvider';
 
+import { ComponentStackBoundary } from '@/components/common/ComponentStackBoundary';
 import { useIsClient } from '@/hooks/useIsClient';
 import { confirmLiveBundle } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
@@ -38,5 +39,9 @@ export default function Page() {
     return () => window.clearTimeout(timer);
   }, [ready]);
 
-  return ready ? <Main /> : null;
+  return ready ? (
+    <ComponentStackBoundary>
+      <Main />
+    </ComponentStackBoundary>
+  ) : null;
 }

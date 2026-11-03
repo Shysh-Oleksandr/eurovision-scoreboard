@@ -745,6 +745,15 @@ function AdminErrorsPage() {
                 </div>
               )}
 
+              {selectedError.componentStack && (
+                <div>
+                  <h3 className="text-sm font-medium  mb-2">Component stack</h3>
+                  <pre className="text-xs text-white bg-primary-900 p-3 rounded overflow-x-auto max-h-60 overflow-y-auto whitespace-pre-wrap break-words">
+                    {selectedError.componentStack}
+                  </pre>
+                </div>
+              )}
+
               {selectedError.userDetails && (
                 <div>
                   <h3 className="text-sm font-medium  mb-2">User Details</h3>

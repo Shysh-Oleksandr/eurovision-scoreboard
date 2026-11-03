@@ -29,6 +29,7 @@ import { api } from '@/api/client';
 import { ContestType, resolveContestType } from '@/data/contestTypes';
 import { deleteLegacyCustomBgImage } from '@/helpers/indexedDB';
 import { BaseCountry, PointsItem } from '@/models';
+import { safeLocalStorage } from '@/state/safeLocalStorage';
 import { useAuthStore } from '@/state/useAuthStore';
 import { applyDocumentFonts } from '@/theme/customFonts';
 import { normalizeFontAlias } from '@/theme/fontAliases';
@@ -819,6 +820,7 @@ export const useGeneralStore = create<GeneralState>()(
       }),
       {
         name: 'general-storage',
+        storage: safeLocalStorage(),
         partialize(state) {
           const {
             isPresenting: _ignorePresenting,

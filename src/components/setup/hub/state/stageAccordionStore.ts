@@ -4,6 +4,8 @@ import { persist } from 'zustand/middleware';
 
 import type { ListId } from '../lineup/listIds';
 
+import { safeLocalStorage } from '@/state/safeLocalStorage';
+
 interface StageAccordionState {
   /**
    * The contest the collapsed stages belong to: a saved contest's id, or
@@ -48,6 +50,7 @@ export const useStageAccordionStore = create<StageAccordionState>()(
     }),
     {
       name: 'stage-accordion-storage',
+      storage: safeLocalStorage(),
       partialize: ({ contestKey, collapsed }) => ({ contestKey, collapsed }),
     },
   ),

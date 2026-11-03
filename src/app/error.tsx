@@ -7,7 +7,9 @@ import { useEffect, useMemo } from 'react';
 import { useCreateErrorMutation } from '@/api/errors';
 import { TriangleAlertIcon } from '@/assets/icons/TriangleAlertIcon';
 import Button from '@/components/common/Button';
+import type { ErrorWithComponentStack } from '@/components/common/ComponentStackBoundary';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
+import type { EventStage } from '@/models';
 import { LIVE_BUNDLE_VERSION } from '@/native/liveUpdate';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -28,6 +30,33 @@ const getUserDetails = () =>
         // Native apps: which live-update bundle crashed.
         appBundle: LIVE_BUNDLE_VERSION || undefined,
       };
+
+const countryCodes = (countries: unknown) =>
+  Array.isArray(countries)
+    ? countries.map((country) => (country as { code?: string } | null)?.code)
+    : countries;
+
+/** The stages as the report shows them, whatever shape they are in. */
+function summarizeStages(stages: EventStage[] | unknown) {
+  if (!Array.isArray(stages)) return stages;
+
+  try {
+    return stages.map((stage: EventStage) => ({
+      id: stage.id,
+      name: stage.name,
+      votingMode: stage.votingMode,
+      isOver: stage.isOver,
+      isJuryVoting: stage.isJuryVoting,
+      isLastStage: stage.isLastStage,
+      qualifiesTo: stage.qualifiesTo,
+      countries: countryCodes(stage.countries),
+      votingCountries: countryCodes(stage.votingCountries),
+      voterChannels: stage.voterChannels,
+    }));
+  } catch (summaryError) {
+    return { unreadable: String(summaryError) };
+  }
+}
 
 export default function Error({
   error,
@@ -88,18 +117,9 @@ export default function Error({
     televotingProgress: scoreboardState.televotingProgress,
     startCounter: scoreboardState.startCounter,
     restartCounter: scoreboardState.restartCounter,
-    eventStages: scoreboardState.eventStages.map((stage) => ({
-      id: stage.id,
-      name: stage.name,
-      votingMode: stage.votingMode,
-      isOver: stage.isOver,
-      isJuryVoting: stage.isJuryVoting,
-      isLastStage: stage.isLastStage,
-      qualifiesTo: stage.qualifiesTo,
-      countries: stage.countries.map((country) => country.code),
-      votingCountries: stage.votingCountries?.map((country) => country.code),
-      voterChannels: stage.voterChannels,
-    })),
+    // The crash may come from malformed saved stages; summarizing them must
+    // not crash the error page too, or the report never goes out.
+    eventStages: summarizeStages(scoreboardState.eventStages),
   };
 
   const messageToShare =
@@ -128,10 +148,15 @@ export default function Error({
         new Date().getTime() - 1 * 60 * 1000;
 
     if (isFailedToLoadChunkError && !didErrorOccurWithinLastMinute) {
-      localStorage.setItem(
-        'failedToLoadChunkErrorAt',
-        new Date().getTime().toString(),
-      );
+      // A full localStorage throws here; the error page must not.
+      try {
+        localStorage.setItem(
+          'failedToLoadChunkErrorAt',
+          new Date().getTime().toString(),
+        );
+      } catch {
+        // Reload anyway.
+      }
       window.location.reload();
 
       return;
@@ -142,11 +167,20 @@ export default function Error({
 
     if (!hasBeenReported && !isFailedToLoadChunkError) {
       // Mark as reported before sending to prevent race conditions
-      localStorage.setItem(errorKey, Date.now().toString());
+      try {
+        localStorage.setItem(errorKey, Date.now().toString());
+      } catch {
+        // Storage full or blocked: report anyway.
+      }
 
       createErrorMutation.mutate({
         message: error.message || 'Unknown error occurred',
         stack: error.stack,
+        // Attached by ComponentStackBoundary around the main view; the API
+        // takes up to 20 000 characters.
+        componentStack: (
+          error as ErrorWithComponentStack
+        ).componentStack?.slice(0, 20000),
         userDetails: getUserDetails(),
         generalInfo,
         scoreboardInfo,

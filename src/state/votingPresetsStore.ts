@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import type { StageVotingMode } from '@/models';
+import { safeLocalStorage } from '@/state/safeLocalStorage';
 import type { StageVotes } from '@/state/scoreboard/types';
 import type { CompactVote } from '@/types/contestSnapshot';
 
@@ -215,6 +216,7 @@ export const useVotingPresetsStore = create<VotingPresetsState>()(
     }),
     {
       name: 'voting-presets-storage',
+      storage: safeLocalStorage(),
       version: 1,
     },
   ),

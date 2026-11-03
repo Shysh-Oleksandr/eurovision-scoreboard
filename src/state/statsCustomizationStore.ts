@@ -1,5 +1,8 @@
 import { create } from 'zustand';
+
 import { persist } from 'zustand/middleware';
+
+import { safeLocalStorage } from '@/state/safeLocalStorage';
 
 export interface StatsCustomizationSettings {
   title: string;
@@ -44,6 +47,7 @@ export const useStatsCustomizationStore = create<StatsCustomizationState>()(
     }),
     {
       name: 'stats-customization-store',
+      storage: safeLocalStorage(),
       partialize(state) {
         const { title, ...restSettings } = state.settings;
 

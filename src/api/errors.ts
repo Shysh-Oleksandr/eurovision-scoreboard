@@ -7,6 +7,8 @@ export type ErrorData = {
   _id: string;
   message: string;
   stack?: string;
+  /** React's component stack (crashes inside `ComponentStackBoundary`). */
+  componentStack?: string;
   userDetails?: Record<string, any>;
   generalInfo?: Record<string, any>;
   countriesInfo?: Record<string, any>;
@@ -20,6 +22,7 @@ export type ErrorData = {
 export type CreateErrorInput = {
   message: string;
   stack?: string;
+  componentStack?: string;
   userDetails?: Record<string, any>;
   generalInfo?: Record<string, any>;
   countriesInfo?: Record<string, any>;

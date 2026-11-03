@@ -22,6 +22,7 @@ import { useScoreboardStore } from './scoreboardStore';
 import type { ContestType } from '@/data/contestTypes';
 import { RestOfWorld } from '@/data/countries';
 import { buildCountriesUrl } from '@/data/countries/countriesDataUrl';
+import { safeLocalStorage } from '@/state/safeLocalStorage';
 import {
   filterVotersByChannel,
   getEffectiveVoterChannels,
@@ -454,6 +455,7 @@ export const useCountriesStore = create<CountriesState>()(
       },
       {
         name: 'countries-storage',
+        storage: safeLocalStorage(),
         partialize: (state) => ({
           eventSetupModalOpen: state.eventSetupModalOpen,
           eventAssignments: state.eventAssignments,

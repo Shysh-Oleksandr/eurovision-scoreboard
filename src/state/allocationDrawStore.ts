@@ -9,6 +9,8 @@ import {
   OrderMode,
 } from './allocationDraw/types';
 
+import { safeLocalStorage } from '@/state/safeLocalStorage';
+
 /** Keeps only the rule keys that still exist (older builds persisted a draw-code rule). */
 const sanitizeRules = (rules: Partial<DrawRules> | undefined): DrawRules => {
   const out = createOfficialRules();
@@ -135,6 +137,7 @@ export const useAllocationDrawStore = create<AllocationDrawState>()(
       }),
       {
         name: 'allocation-draw-storage',
+        storage: safeLocalStorage(),
         partialize: (state) => ({
           enabled: state.enabled,
           waitingFrom: state.waitingFrom,

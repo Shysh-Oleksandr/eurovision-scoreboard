@@ -1,5 +1,8 @@
 import { create } from 'zustand';
+
 import { devtools, persist } from 'zustand/middleware';
+
+import { safeLocalStorage } from '@/state/safeLocalStorage';
 
 export interface ConfirmationPreferences {
   [confirmationKey: string]: {
@@ -54,6 +57,7 @@ export const useConfirmationStore = create<ConfirmationStore>()(
       }),
       {
         name: 'confirmation-store',
+        storage: safeLocalStorage(),
       },
     ),
     {

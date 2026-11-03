@@ -15,6 +15,7 @@ import {
 import { queryClient } from '@/api/queryClient';
 import { API_BASE_URL } from '@/config';
 import { IS_NATIVE_APP } from '@/native/platform';
+import { safeLocalStorage } from '@/state/safeLocalStorage';
 import type { Profile } from '@/types/profile';
 
 /**
@@ -340,6 +341,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-store',
+      storage: safeLocalStorage(),
       partialize(state) {
         return {
           user: state.user,

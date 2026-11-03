@@ -12,6 +12,8 @@ import { createMiscActions } from './scoreboard/miscActions';
 import { initialScoreboardState } from './scoreboard/state';
 import { ScoreboardState } from './scoreboard/types';
 
+import { safeLocalStorage } from '@/state/safeLocalStorage';
+
 // The heavy action factories (voting, jury-scale reveal, predefinition — and
 // through them the diaspora presets JSON) are NOT composed here: the store
 // boots with stubs and installEngine.ts swaps the real implementations in via
@@ -33,6 +35,7 @@ export const useScoreboardStore = create<ScoreboardState>()(
           } as ScoreboardState),
         {
           name: 'scoreboard-storage',
+          storage: safeLocalStorage(),
           merge: (persistedState, currentState) =>
             deepMerge(currentState, persistedState),
           partialize: (state) => ({
