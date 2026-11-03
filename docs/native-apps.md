@@ -396,7 +396,8 @@ uses Apple's white style for dark backgrounds (`Button` variant `apple`).
   the result to `https://api.douzepoints.app/auth/apple/callback`, which sets
   the refresh cookie and redirects to `?provider=apple`, handled exactly like
   `?provider=google`. Failures add `&error=1` (AppBootstrap shows the error
-  toast and keeps any earlier session); cancelling returns to the site
+  toast for a sign-in started in this browser, see `email-sign-in.md` §4,
+  and keeps any earlier session); cancelling returns to the site
   without either. Apple refuses `localhost` return URLs, so this flow only
   runs against a public HTTPS backend.
 - **Accounts:** profiles match by `appleId`, then by a verified email (which

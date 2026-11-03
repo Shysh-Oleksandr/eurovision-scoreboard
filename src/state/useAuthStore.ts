@@ -24,6 +24,36 @@ import type { Profile } from '@/types/profile';
  */
 export const NATIVE_LOGIN_EVENT = 'dp:native-login';
 
+/**
+ * Set when the website leaves for a provider's sign-in page. Browsers keep
+ * the `?provider=` redirect URL in history, so it also comes back from
+ * bookmarks, new-tab tiles and address-bar suggestions; only a landing with a
+ * recent marker is a sign-in started in this browser.
+ */
+const PENDING_WEB_LOGIN_KEY = 'dp:pending-web-login';
+const PENDING_WEB_LOGIN_TTL_MS = 30 * 60 * 1000;
+
+function markWebLoginPending() {
+  try {
+    localStorage.setItem(PENDING_WEB_LOGIN_KEY, String(Date.now()));
+  } catch {
+    // Storage blocked: the landing still signs in, just without error toasts.
+  }
+}
+
+/** Reads and clears the marker: true when this browser started a sign-in. */
+export function takePendingWebLogin(): boolean {
+  try {
+    const startedAt = Number(localStorage.getItem(PENDING_WEB_LOGIN_KEY));
+
+    localStorage.removeItem(PENDING_WEB_LOGIN_KEY);
+
+    return startedAt > 0 && Date.now() - startedAt < PENDING_WEB_LOGIN_TTL_MS;
+  } catch {
+    return false;
+  }
+}
+
 export type AuthProvider = 'google' | 'apple';
 
 const nativeAuth = () => import('@/native/nativeAuth');
@@ -46,7 +76,15 @@ export interface AuthState {
     code: string,
     locale: string,
   ) => Promise<boolean>;
-  handlePostLogin: (force?: boolean) => Promise<boolean>;
+  /**
+   * Restores the session (refresh + /auth/me). `force` tries even without a
+   * stored session, as right after a sign-in, and posts a failure to
+   * /admin/errors unless `report` is false.
+   */
+  handlePostLogin: (
+    force?: boolean,
+    options?: { report?: boolean },
+  ) => Promise<boolean>;
   refresh: () => Promise<string | undefined>;
   fetchMe: () => Promise<void>;
   logout: () => Promise<void>;
@@ -107,6 +145,7 @@ export const useAuthStore = create<AuthState>()(
 
           return;
         }
+        markWebLoginPending();
         window.location.href = `${API_BASE_URL}/auth/${provider}`;
       },
       loginWithEmailCode: async (email, code, locale) => {
@@ -136,7 +175,7 @@ export const useAuthStore = create<AuthState>()(
 
         return get().handlePostLogin(true);
       },
-      handlePostLogin: async (force?: boolean) => {
+      handlePostLogin: async (force, { report = true } = {}) => {
         // Native: the stored refresh token, not the persisted user, says
         // whether there is a session — an offline launch clears `user`, and
         // the next online launch should still restore it.
@@ -180,9 +219,10 @@ export const useAuthStore = create<AuthState>()(
 
           success = false;
 
-          // Only the post-redirect sign-in is reported: an ordinary load with
-          // a lapsed session fails here routinely.
-          if (force) reportLoginFailure(step, e);
+          // Only a sign-in is reported: an ordinary load with a lapsed
+          // session fails here routinely, and so does a saved `?provider=`
+          // link opened without one.
+          if (force && report) reportLoginFailure(step, e);
         }
         // Strip query params after handling redirect
         const url = new URL(window.location.href);

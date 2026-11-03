@@ -23,7 +23,11 @@ import { installBackButtonHandler } from '@/native/backButton';
 import { liveUpdateBoot, startLiveUpdateChecks } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { useCountriesStore } from '@/state/countriesStore';
-import { NATIVE_LOGIN_EVENT, useAuthStore } from '@/state/useAuthStore';
+import {
+  NATIVE_LOGIN_EVENT,
+  takePendingWebLogin,
+  useAuthStore,
+} from '@/state/useAuthStore';
 
 // Dev-only palette tuning panel (`?palette`, see /dev/palette-lab). The branch
 // is constant-false in production builds, so the chunk is compiled out.
@@ -77,11 +81,27 @@ export default function AppBootstrap() {
       if (url.searchParams.has('provider')) {
         window.history.replaceState({}, '', url.origin + url.pathname);
 
+        const startedHere = takePendingWebLogin();
+
         // The backend redirects with `error` when the provider's answer
         // failed verification; any earlier session still stands.
         if (url.searchParams.has('error')) {
-          toast(t('error'), { type: 'error' });
+          if (startedHere) toast(t('error'), { type: 'error' });
           handlePostLogin();
+
+          return;
+        }
+
+        // A saved `?provider=` link, or a sign-in whose marker didn't
+        // survive (blocked storage): try quietly, and greet only a session
+        // that wasn't there before.
+        if (!startedHere) {
+          const wasSignedIn = !!useAuthStore.getState().user;
+          const success = await handlePostLogin(true, { report: false });
+
+          if (success && !wasSignedIn) {
+            toast(t('success'), { type: 'success' });
+          }
 
           return;
         }

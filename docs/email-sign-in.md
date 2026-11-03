@@ -130,6 +130,25 @@ the old token (a second tab, a retry) still gets an access token instead of
 a 401 that would sign the user out. It is never rotated again, and only one
 of two parallel refreshes rotates.
 
+Logout clears the cookie with the attributes it was set with
+(`AuthController.refreshCookieOptions`): browsers only delete a cookie whose
+domain and path match, and a bare `clearCookie` used to leave the revoked
+cookie behind, which then showed up as "Invalid refresh token".
+
+**Redirect landings (Google, Apple on the website).** Browsers keep
+`/?provider=google` in history, so bookmarks, new-tab tiles and address-bar
+suggestions bring it back long after the sign-in. Until 2026-11 every such
+visit without a session got a "Failed to login" toast and a
+`Login failed at /auth/refresh: 401 Missing refresh token` report: all 52
+post-redirect reports from 10-10 to 11-03 were these. Not one followed a
+callback (the callback saves a refresh token, user agent included, just
+before redirecting). `login()` now stores a timestamp under
+`dp:pending-web-login`, and AppBootstrap takes it on landing. With a marker
+younger than 30 minutes, the landing toasts and reports as before. Without
+one, it tries quietly: no error toast and no report, and the success toast
+appears only when no session existed before. A real sign-in whose marker was
+lost (blocked storage) still goes through.
+
 ## 5. Sending email
 
 `MailService` (backend `src/mail/`) posts to Cloudflare Email Service's REST
