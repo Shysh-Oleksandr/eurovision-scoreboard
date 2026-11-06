@@ -188,6 +188,7 @@ lane :release do |options|
   bundle_android(build: android)
   upload_to_play_store(
     json_key: play_key, package_name: APP_ID, track: 'internal', release_status: 'completed',
+    skip_upload_apk: true,
     aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
     # Release notes: metadata/android/<locale>/changelogs/<versionCode>.txt.
     metadata_path: ANDROID_METADATA,
@@ -313,6 +314,7 @@ platform :android do
     bundle_android(options)
     upload_to_play_store(
       json_key: play_key, package_name: APP_ID, track: 'internal', release_status: 'completed',
+    skip_upload_apk: true,
       aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
       # Release notes: metadata/android/<locale>/changelogs/<versionCode>.txt.
       metadata_path: ANDROID_METADATA,
