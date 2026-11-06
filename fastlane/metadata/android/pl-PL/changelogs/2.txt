@@ -1,0 +1,5 @@
+• Eurowizja 2027 w obecnym kształcie i Eurowizja Junior 2026
+• Odświeżony ekran konfiguracji
+• Jedno konto do logowania przez Google i e-mail
+• Wibracje podczas ogłaszania wyników
+• Poprawki i większa stabilność

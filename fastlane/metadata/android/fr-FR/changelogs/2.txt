@@ -1,0 +1,5 @@
+• L’Eurovision 2027 tel qu’il se dessine, et l’Eurovision Junior 2026
+• Un écran de configuration repensé
+• Un seul compte pour la connexion Google et e-mail
+• Retour haptique pendant le dévoilement des votes
+• Corrections et meilleure stabilité

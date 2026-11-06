@@ -1,0 +1,5 @@
+• Der Eurovision Song Contest 2027 nach aktuellem Stand und der Junior Eurovision Song Contest 2026
+• Ein neu gestaltetes Setup
+• Ein Konto für die Anmeldung mit Google, Apple und E-Mail
+• Haptisches Feedback bei der Punktevergabe
+• Fehlerbehebungen und mehr Stabilität

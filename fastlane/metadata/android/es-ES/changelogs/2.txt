@@ -1,0 +1,5 @@
+• Eurovisión 2027 hasta ahora, y Eurovisión Junior 2026
+• Una configuración del evento rediseñada
+• Una sola cuenta para iniciar sesión con Google y correo electrónico
+• Respuesta háptica durante la revelación de los votos
+• Correcciones y más estabilidad

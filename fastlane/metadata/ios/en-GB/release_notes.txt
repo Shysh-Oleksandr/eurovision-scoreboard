@@ -1,0 +1,5 @@
+• Eurovision 2027 so far, and Junior Eurovision 2026
+• A redesigned Event Setup
+• One account for Google, Apple and email sign-in
+• Haptics during the vote reveal
+• Fixes and stability improvements

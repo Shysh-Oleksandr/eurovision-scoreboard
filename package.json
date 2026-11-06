@@ -23,6 +23,7 @@
     "assets:native": "capacitor-assets generate --ios --android && node scripts/ios-icon-appearances.mjs",
     "live-update": "node scripts/live-update.mjs",
     "store-screenshots": "node scripts/store-screenshots.mjs",
+    "fastlane": "sh scripts/fastlane.sh",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "yarn lint:js && yarn lint:css && yarn lint:types-cli && yarn lint:last-commit",
     "lint:js": "eslint --ext .ts --ext .tsx .",

@@ -29,6 +29,8 @@ yarn cap:dev ios|android [--lan]  # Live reload inside the native shell
 yarn assets:native    # Regenerate app icons + splash screens from assets/
 yarn live-update publish|store|status  # Live update: web bundles for the apps (--mode prompt|required), store-version gate
 yarn store-screenshots          # App Store / Play screenshots from out/ (after yarn build:native)
+yarn fastlane release version:X  # Bump, build, upload both apps to TestFlight / Play internal, tag (docs/store-builds.md)
+yarn fastlane ios|android screenshots|metadata|submit|promote  # Store listings, screenshots, review
 ```
 
 ## Architecture
@@ -88,7 +90,7 @@ Read `docs/` before touching non-obvious subsystems:
 - `email-sign-in.md` — passwordless email sign-in (website + apps): the code dialog and `loginWithEmailCode`, the `/auth/email/*` API and error codes, account linking and normalized addresses, code storage and rate limits, sliding refresh-token rotation, Cloudflare Email Service sending (env, owner setup, review account); read before touching sign-in, sessions or sending email
 - `sign-in-methods.md` — one account, up to three sign-in methods (Google, Apple, email codes): the profile fields and sparse indexes, the connect/remove rules (`in_use`, `already_connected`, `last_method`, no merging), `/auth/methods/*`, the website's redirect connects (link cookie, Google `state`, Apple `.link` mark, `?link=` landing), the apps' sheets, Edit profile → Sign-in methods and the email dialog's link mode; read before touching sign-in, account linking or the Google/Apple callbacks
 - `moderation-and-account-deletion.md` — reports (all content types + users, the app-wide `openReportDialog`), blocking (both directions, server-side list filtering), the admin queue at `/admin/reports`, in-app account deletion (what is deleted, in which order, Apple token revocation), the legal pages and the Terms agreement under the sign-in buttons
-- `store-builds.md` — step by step for the iOS and Android store builds (prepare, archive / bundleRelease, upload, tag, submit) and what a later update needs
+- `store-builds.md` — the iOS and Android store builds with fastlane (`fastlane/Fastfile`, `yarn fastlane …`: credentials wizard `scripts/fastlane-credentials.sh`, `release`, TestFlight / Play internal uploads, submit / promote, listing texts and screenshot uploads per language) and the same steps by hand; what a later update needs
 - `store-submission.md` — what the apps collect and the matching App Store privacy labels and Play Data safety answers, age rating and content forms, trademark rules for the listings, review notes and the demo account, the store screenshots (`yarn store-screenshots`: sizes, scenes, upload slots); update it with the privacy policy whenever data collection changes
 - `USER_DATA_CLEARING.md`
 

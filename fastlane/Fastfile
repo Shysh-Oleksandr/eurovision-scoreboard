@@ -1,0 +1,385 @@
+# Store builds, uploads and listings for DouzePoints (docs/store-builds.md).
+#
+#   yarn fastlane release version:1.2       bump, build and upload both apps, tag
+#   yarn fastlane ios beta                  iOS: build → TestFlight
+#   yarn fastlane android internal          Android: build → internal testing
+#   yarn fastlane ios submit                the TestFlight build → App Review
+#   yarn fastlane android promote           internal testing → production
+#   yarn fastlane ios screenshots           assets/store/screenshots → App Store
+#   yarn fastlane android screenshots       assets/store/screenshots → Google Play
+#   yarn fastlane ios metadata              fastlane/metadata/ios → App Store
+#   yarn fastlane android metadata          fastlane/metadata/android → Google Play
+#   yarn fastlane ios pull_metadata         download the App Store listing
+#   yarn fastlane android pull_metadata     download the Play listing
+#   yarn fastlane check                     test both credentials
+#
+# Credentials come from fastlane/.env (template: fastlane/.env.example) and
+# key files in ~/keys, never from the repository: it is public.
+
+require 'json'
+require 'tmpdir'
+
+default_platform(:ios)
+
+APP_ID = 'app.douzepoints'
+ROOT = File.expand_path('..', __dir__)
+IOS_PROJECT = File.join(ROOT, 'ios/App/App.xcodeproj')
+PBXPROJ = File.join(IOS_PROJECT, 'project.pbxproj')
+GRADLE = File.join(ROOT, 'android/app/build.gradle')
+BUILD_DIR = File.join(ROOT, 'fastlane/build')
+SCREENSHOTS = File.join(ROOT, 'assets/store/screenshots')
+IOS_METADATA = File.join(ROOT, 'fastlane/metadata/ios')
+ANDROID_METADATA = File.join(ROOT, 'fastlane/metadata/android')
+IOS_SCREENSHOT_STAGE = File.join(ROOT, 'fastlane/screenshots/ios')
+
+# App locale (messages/, assets/store/screenshots/) → store listing locale.
+STORE_LOCALES = {
+  'en' => { ios: 'en-GB', android: 'en-US' },
+  'fr' => { ios: 'fr-FR', android: 'fr-FR' },
+  'de' => { ios: 'de-DE', android: 'de-DE' },
+  'it' => { ios: 'it', android: 'it-IT' },
+  'pl' => { ios: 'pl', android: 'pl-PL' },
+  'uk' => { ios: 'uk', android: 'uk' },
+  'gr' => { ios: 'el', android: 'el-GR' },
+  'es' => { ios: 'es-ES', android: 'es-ES' },
+  'pt' => { ios: 'pt-PT', android: 'pt-PT' },
+}.freeze
+
+# Screenshot folders (yarn store-screenshots) → store slots. App Store
+# Connect sorts each locale's files by name and picks the slot by size.
+IOS_DEVICES = %w[iphone ipad].freeze
+ANDROID_SLOTS = {
+  'android-phone' => %w[phoneScreenshots],
+  'android-tablet' => %w[sevenInchScreenshots tenInchScreenshots],
+}.freeze
+
+# --- Helpers -----------------------------------------------------------------
+
+def env!(name)
+  value = ENV[name].to_s.strip
+  UI.user_error!("#{name} is missing: fill in fastlane/.env (template: fastlane/.env.example)") if value.empty?
+  value
+end
+
+def key_file!(name)
+  path = File.expand_path(env!(name))
+  UI.user_error!("#{name} points to #{path}, which doesn't exist") unless File.exist?(path)
+  path
+end
+
+def asc_api_key
+  @asc_api_key ||= app_store_connect_api_key(
+    key_id: env!('ASC_KEY_ID'),
+    issuer_id: env!('ASC_ISSUER_ID'),
+    key_filepath: key_file!('ASC_KEY_PATH'),
+  )
+end
+
+def play_key
+  key_file!('PLAY_JSON_KEY')
+end
+
+def in_root(*command)
+  Dir.chdir(ROOT) { sh(*command) }
+end
+
+def ios_version
+  File.read(PBXPROJ)[/MARKETING_VERSION = ([^;]+);/, 1]
+end
+
+def ios_build_number
+  File.read(PBXPROJ)[/CURRENT_PROJECT_VERSION = ([^;]+);/, 1].to_i
+end
+
+def android_version
+  File.read(GRADLE)[/versionName "([^"]+)"/, 1]
+end
+
+def android_build_number
+  File.read(GRADLE)[/versionCode (\d+)/, 1].to_i
+end
+
+# Version numbers aren't part of the native runtime (native-apps.md §11).
+def set_ios_versions(version, build)
+  text = File.read(PBXPROJ)
+    .gsub(/MARKETING_VERSION = [^;]+;/, "MARKETING_VERSION = #{version};")
+    .gsub(/CURRENT_PROJECT_VERSION = [^;]+;/, "CURRENT_PROJECT_VERSION = #{build};")
+  File.write(PBXPROJ, text)
+end
+
+def set_android_versions(version, build)
+  text = File.read(GRADLE)
+    .sub(/versionName "[^"]+"/, %(versionName "#{version}"))
+    .sub(/versionCode \d+/, "versionCode #{build}")
+  File.write(GRADLE, text)
+end
+
+# The next build numbers: one above what the stores have, or the project's
+# own if that is higher already.
+def next_ios_build
+  latest = latest_testflight_build_number(api_key: asc_api_key, app_identifier: APP_ID, initial_build_number: 0)
+  [latest.to_i + 1, ios_build_number].max
+end
+
+def next_android_build
+  codes = %w[internal alpha beta production].flat_map do |track|
+    google_play_track_version_codes(track: track, json_key: play_key, package_name: APP_ID)
+  rescue StandardError
+    []
+  end
+  [(codes.max || 0) + 1, android_build_number].max
+end
+
+# Locales to upload: `locales:en,fr`, else every locale with a description
+# in fastlane/metadata (a store won't take screenshots for a language its
+# listing doesn't have).
+def listing_locales(options, platform)
+  metadata = platform == :ios ? IOS_METADATA : ANDROID_METADATA
+  locales =
+    if options[:locales]
+      options[:locales].split(',')
+    else
+      text = platform == :ios ? 'description.txt' : 'full_description.txt'
+      STORE_LOCALES.select { |_, codes| File.exist?(File.join(metadata, codes[platform], text)) }.keys
+    end
+  unknown = locales - STORE_LOCALES.keys
+  UI.user_error!("Unknown locale #{unknown.join(', ')}; expected #{STORE_LOCALES.keys.join(', ')}") if unknown.any?
+  UI.user_error!("No listing texts in #{metadata}: run yarn fastlane #{platform} pull_metadata") if locales.empty?
+  locales
+end
+
+def screenshot_files!(locale, device)
+  files = Dir[File.join(SCREENSHOTS, locale, device, '*.png')].sort
+  UI.user_error!("No #{device} screenshots for #{locale}: run yarn store-screenshots") if files.empty?
+  files
+end
+
+# --- Both platforms ----------------------------------------------------------
+
+desc 'Step 1 of docs/store-builds.md: a clean tree, yarn cap:sync, nothing new to commit'
+lane :prepare do
+  ensure_git_status_clean(show_uncommitted_changes: true)
+  in_root('yarn', 'cap:sync')
+  # The build flips it.
+  in_root('git', 'checkout', '--', 'next-env.d.ts')
+  changes = Dir.chdir(ROOT) { sh('git', 'status', '--porcelain', log: false) }.strip
+  unless changes.empty?
+    UI.user_error!("yarn cap:sync changed files (part of the native runtime): commit them and run again\n#{changes}")
+  end
+end
+
+desc 'Bump versions, prepare, build and upload both apps, tag: release version:1.2 [push:false]'
+lane :release do |options|
+  version = options[:version] || UI.user_error!('version: is required, e.g. yarn fastlane release version:1.2')
+  ensure_git_status_clean(show_uncommitted_changes: true)
+  ios = next_ios_build
+  android = next_android_build
+  set_ios_versions(version, ios)
+  set_android_versions(version, android)
+  # A re-run after a failed upload finds the same numbers already committed.
+  bumped = Dir.chdir(ROOT) { sh('git', 'status', '--porcelain', '--', PBXPROJ, GRADLE, log: false) }.strip
+  unless bumped.empty?
+    in_root('git', 'commit', '-m', "Release #{version} (iOS build #{ios}, Android #{android})", '--', PBXPROJ, GRADLE)
+  end
+
+  prepare
+  archive_ios(build: ios)
+  upload_to_testflight(api_key: asc_api_key, ipa: lane_context[SharedValues::IPA_OUTPUT_PATH], skip_waiting_for_build_processing: true)
+  bundle_android(build: android)
+  upload_to_play_store(
+    json_key: play_key, package_name: APP_ID, track: 'internal', release_status: 'completed',
+    aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+    # Release notes: metadata/android/<locale>/changelogs/<versionCode>.txt.
+    metadata_path: ANDROID_METADATA,
+    skip_upload_metadata: true, skip_upload_changelogs: false, skip_upload_images: true, skip_upload_screenshots: true,
+  )
+
+  tag = "app-#{version}-ios#{ios}-android#{android}"
+  in_root('git', 'tag', tag)
+  in_root('git', 'push', 'origin', tag) unless options[:push] == false
+  UI.success("#{tag}: TestFlight is processing the iOS build; the Android bundle is on internal testing")
+end
+
+desc 'Checks both stores accept the credentials'
+lane :check do
+  build = latest_testflight_build_number(api_key: asc_api_key, app_identifier: APP_ID, initial_build_number: 0)
+  UI.success("App Store Connect: latest TestFlight build #{build}")
+  validate_play_store_json_key(json_key: play_key)
+  codes = google_play_track_version_codes(track: 'production', json_key: play_key, package_name: APP_ID)
+  UI.success("Google Play: production version codes #{codes.inspect}")
+end
+
+# --- iOS ---------------------------------------------------------------------
+
+platform :ios do
+  desc 'Archives the App Store build: ios build [version:1.2] [build:3]'
+  lane :build do |options|
+    archive_ios(options)
+  end
+
+  desc 'Builds and uploads to TestFlight: ios beta [version:1.2] [build:3]'
+  lane :beta do |options|
+    archive_ios(options)
+    upload_to_testflight(api_key: asc_api_key, ipa: lane_context[SharedValues::IPA_OUTPUT_PATH], skip_waiting_for_build_processing: true)
+    UI.success('Uploaded. When TestFlight has processed it, add it to the internal group')
+  end
+
+  desc 'Submits a processed TestFlight build for review: ios submit [build:3] [auto_release:true]'
+  lane :submit do |options|
+    FileUtils.mkdir_p(IOS_METADATA)
+    deliver(
+      api_key: asc_api_key,
+      app_version: ios_version,
+      build_number: (options[:build] || ios_build_number).to_s,
+      submit_for_review: true,
+      automatic_release: options[:auto_release] == true || options[:auto_release] == 'true',
+      skip_binary_upload: true, skip_screenshots: true, skip_metadata: true,
+      metadata_path: IOS_METADATA,
+      force: true, run_precheck_before_submit: false,
+      # No ads or advertising identifier (store-submission.md §1).
+      submission_information: { add_id_info_uses_idfa: false },
+    )
+  end
+
+  desc "Uploads the screenshots to the version's listing: ios screenshots [locales:en,fr] [version:1.2]"
+  lane :screenshots do |options|
+    locales = listing_locales(options, :ios)
+    FileUtils.rm_rf(IOS_SCREENSHOT_STAGE)
+    locales.each do |locale|
+      dest = File.join(IOS_SCREENSHOT_STAGE, STORE_LOCALES[locale][:ios])
+      FileUtils.mkdir_p(dest)
+      IOS_DEVICES.each do |device|
+        screenshot_files!(locale, device).each { |f| FileUtils.cp(f, File.join(dest, "#{device}-#{File.basename(f)}")) }
+      end
+    end
+    deliver(
+      api_key: asc_api_key,
+      app_version: options[:version] || ios_version,
+      screenshots_path: IOS_SCREENSHOT_STAGE,
+      metadata_path: IOS_METADATA,
+      overwrite_screenshots: true,
+      skip_binary_upload: true, skip_metadata: true,
+      force: true, run_precheck_before_submit: false,
+    )
+  end
+
+  desc "Uploads the listing texts: ios metadata [version:1.2]"
+  lane :metadata do |options|
+    deliver(
+      api_key: asc_api_key,
+      app_version: options[:version] || ios_version,
+      metadata_path: IOS_METADATA,
+      skip_binary_upload: true, skip_screenshots: true,
+      force: true, run_precheck_before_submit: false,
+    )
+  end
+
+  desc 'Downloads the App Store listing texts into fastlane/metadata/ios'
+  lane :pull_metadata do
+    Dir.mktmpdir do |dir|
+      key = File.join(dir, 'asc.json')
+      File.write(key, JSON.generate(key_id: env!('ASC_KEY_ID'), issuer_id: env!('ASC_ISSUER_ID'), key: File.read(key_file!('ASC_KEY_PATH'))))
+      in_root(
+        'bundle', 'exec', 'fastlane', 'deliver', 'download_metadata',
+        '--api_key_path', key, '--app_identifier', APP_ID, '--metadata_path', IOS_METADATA, '--force',
+      )
+    end
+  end
+end
+
+desc 'iOS archive with automatic signing (your Xcode account, as Product → Archive)'
+private_lane :archive_ios do |options|
+  version = options[:version] || ios_version
+  build = (options[:build] || next_ios_build).to_i
+  set_ios_versions(version, build)
+  build_app(
+    project: IOS_PROJECT, scheme: 'App', configuration: 'Release', clean: true,
+    export_method: 'app-store',
+    output_directory: BUILD_DIR, output_name: "DouzePoints-#{version}-#{build}.ipa",
+    xcargs: '-allowProvisioningUpdates', export_xcargs: '-allowProvisioningUpdates',
+  )
+end
+
+# --- Android -----------------------------------------------------------------
+
+platform :android do
+  desc 'Builds the release bundle: android build [version:1.2] [build:3]'
+  lane :build do |options|
+    bundle_android(options)
+  end
+
+  desc 'Builds and uploads to internal testing: android internal [version:1.2] [build:3]'
+  lane :internal do |options|
+    bundle_android(options)
+    upload_to_play_store(
+      json_key: play_key, package_name: APP_ID, track: 'internal', release_status: 'completed',
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      # Release notes: metadata/android/<locale>/changelogs/<versionCode>.txt.
+      metadata_path: ANDROID_METADATA,
+      skip_upload_metadata: true, skip_upload_changelogs: false, skip_upload_images: true, skip_upload_screenshots: true,
+    )
+  end
+
+  desc 'Promotes internal testing to production (review): android promote [build:3] [rollout:0.2]'
+  lane :promote do |options|
+    rollout = options[:rollout]&.to_s
+    upload_to_play_store(
+      {
+        json_key: play_key, package_name: APP_ID,
+        track: 'internal', track_promote_to: 'production',
+        version_code: (options[:build] || android_build_number).to_i,
+        release_status: rollout ? 'inProgress' : 'completed', rollout: rollout,
+        skip_upload_apk: true, skip_upload_aab: true,
+        skip_upload_metadata: true, skip_upload_changelogs: true, skip_upload_images: true, skip_upload_screenshots: true,
+      }.compact,
+    )
+  end
+
+  desc 'Uploads the screenshots (phone, 7″ and 10″ tablet): android screenshots [locales:en,fr]'
+  lane :screenshots do |options|
+    listing_locales(options, :android).each do |locale|
+      images = File.join(ANDROID_METADATA, STORE_LOCALES[locale][:android], 'images')
+      ANDROID_SLOTS.each do |device, slots|
+        files = screenshot_files!(locale, device)
+        slots.each do |slot|
+          dir = File.join(images, slot)
+          FileUtils.rm_rf(dir)
+          FileUtils.mkdir_p(dir)
+          files.each { |f| FileUtils.cp(f, File.join(dir, File.basename(f))) }
+        end
+      end
+    end
+    upload_to_play_store(
+      json_key: play_key, package_name: APP_ID, metadata_path: ANDROID_METADATA,
+      skip_upload_apk: true, skip_upload_aab: true,
+      skip_upload_metadata: true, skip_upload_changelogs: true, skip_upload_images: true,
+      skip_upload_screenshots: false,
+    )
+  end
+
+  desc 'Uploads the listing texts: android metadata'
+  lane :metadata do
+    upload_to_play_store(
+      json_key: play_key, package_name: APP_ID, metadata_path: ANDROID_METADATA,
+      skip_upload_apk: true, skip_upload_aab: true,
+      skip_upload_changelogs: true, skip_upload_images: true, skip_upload_screenshots: true,
+    )
+  end
+
+  desc 'Downloads the Play listing into fastlane/metadata/android'
+  lane :pull_metadata do
+    in_root(
+      'bundle', 'exec', 'fastlane', 'supply', 'init',
+      '--json_key', play_key, '--package_name', APP_ID, '--metadata_path', ANDROID_METADATA,
+    )
+  end
+end
+
+desc 'Android release bundle, signed with the upload key (android/keystore.properties)'
+private_lane :bundle_android do |options|
+  version = options[:version] || android_version
+  build = (options[:build] || next_android_build).to_i
+  UI.user_error!('android/keystore.properties is missing (docs/store-builds.md, Once)') unless File.exist?(File.join(ROOT, 'android/keystore.properties'))
+  set_android_versions(version, build)
+  gradle(project_dir: File.join(ROOT, 'android'), task: 'bundle', build_type: 'Release', print_command: true)
+end

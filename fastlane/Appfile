@@ -1,0 +1,4 @@
+# Identifiers only; credentials come from fastlane/.env (see .env.example).
+app_identifier('app.douzepoints')
+team_id('524WC6G2D9')
+package_name('app.douzepoints')

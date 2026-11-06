@@ -1,0 +1,5 @@
+• L’Eurovision 2027 finora, e lo Junior Eurovision 2026
+• Una configurazione dell’evento ridisegnata
+• Un unico account per l’accesso con Google ed email
+• Feedback aptico durante la rivelazione dei voti
+• Correzioni e maggiore stabilità

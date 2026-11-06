@@ -267,7 +267,9 @@ key words as a board row in that theme's board colours. Output:
 for all nine app languages. `--device`, `--locale` and `--scene` take
 comma-separated names, `--jobs` sets how many device/language runs go in
 parallel (default 2), `--keep-raw` keeps the bare captures. A full run
-takes about an hour.
+takes about an hour. `yarn fastlane ios screenshots` and `yarn fastlane
+android screenshots` upload them ([store-builds.md](store-builds.md),
+Listings and screenshots).
 
 | Folder | Pixels | Upload to |
 |---|---|---|

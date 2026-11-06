@@ -35,3 +35,15 @@ AuthKey_*
 
 # Local issue tracker (docs/agents/issue-tracker.md)
 /.scratch/
+
+# fastlane (yarn fastlane; credentials live in fastlane/.env and ~/keys)
+/vendor/bundle/
+/fastlane/build/
+/fastlane/screenshots/
+/fastlane/metadata/android/*/images/
+/fastlane/report.xml
+/fastlane/Preview.html
+/fastlane/test_output/
+
+# App Review contact and demo credentials (fastlane ios pull_metadata): never commit
+/fastlane/metadata/ios/review_information/

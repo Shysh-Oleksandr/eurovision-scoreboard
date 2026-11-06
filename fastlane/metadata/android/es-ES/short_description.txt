@@ -1,0 +1,1 @@
+Simula las votaciones de los festivales de la canción, punto a punto

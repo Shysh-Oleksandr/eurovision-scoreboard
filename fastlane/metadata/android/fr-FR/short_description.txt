@@ -1,0 +1,1 @@
+Simulez les votes des concours de la chanson, point par point

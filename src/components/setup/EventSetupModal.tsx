@@ -556,6 +556,11 @@ const EventSetupModal = () => {
       )}
       {(predefModalOpen || isPredefModalLoaded) && currentSetupStage && (
         <VotingPredefinitionModal
+          // Stays mounted between opens, so its draft matrix survives a close
+          // or a restart. Stage ids repeat across contests ('GF'), which hides
+          // a contest switch from its per-stage reseed: remount it instead, or
+          // the last contest's votes open in the new one.
+          key={`${contestKey}:${isGfOnly ? 'gf' : 'full'}`}
           isOpen={predefModalOpen}
           onClose={() => setPredefModalOpen(false)}
           stage={currentSetupStage}
