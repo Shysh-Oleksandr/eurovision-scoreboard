@@ -2,41 +2,6 @@ import { useMemo } from 'react';
 
 import { FlagShape } from '@/theme/types';
 
-export const getFlagOverlayOffsetClassName = (
-  flagShape: FlagShape,
-  lgOnly: boolean = false,
-  roundedCountryContainer: boolean = false,
-) => {
-  switch (flagShape) {
-    case 'round':
-    case 'round-border':
-      if (lgOnly) {
-        return 'left-[36px]';
-      }
-      return 'lg:left-[36px] md:left-[32px] left-[30px]';
-    case 'small-rectangle':
-      if (lgOnly) {
-        return 'left-[44px]';
-      }
-      return 'lg:left-[44px] md:left-[40px] left-[36px]';
-    case 'square':
-      if (lgOnly) {
-        return 'left-[36px]';
-      }
-      return 'lg:left-[36px] md:left-[32px] left-[30px]';
-    case 'none':
-      return 'left-0';
-    default:
-      const lgWidthClass = roundedCountryContainer
-        ? 'lg:left-[42px]'
-        : 'lg:left-[50px]';
-      if (lgOnly) {
-        return roundedCountryContainer ? 'left-[42px]' : 'left-[50px]';
-      }
-      return `${lgWidthClass} md:left-12 left-10`;
-  }
-};
-
 const useFlagClassName = (
   flagShape: FlagShape,
   lgOnly: boolean = false,

@@ -25,6 +25,7 @@ import {
   VoterChannelMode,
   VotingCountry,
 } from '@/models';
+import { playHaptic } from '@/native/haptics';
 import { shuffle } from '@/state/allocationDraw/rng';
 import { useCountriesStore } from '@/state/countriesStore';
 import {
@@ -140,6 +141,8 @@ const EventStageVoters: React.FC<EventStageVotersProps> = ({
 
   const handleSort = (sort: 'az' | 'za' | 'shuffle') => {
     let sortedCountries = [...localVotingCountries];
+
+    playHaptic({ id: sort === 'shuffle' ? 'shuffle' : 'sortSweep' });
 
     if (sort === 'az') {
       sortedCountries = localVotingCountries.sort((a, b) =>

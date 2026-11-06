@@ -13,6 +13,7 @@ import {
 } from './helpers';
 import { ScoreboardState } from './types';
 
+import { playHaptic } from '@/native/haptics';
 import { playThemeSound } from '@/theme/playThemeSound';
 
 type EventActions = {
@@ -130,6 +131,8 @@ export const createEventActions: StateCreator<
     });
 
     playThemeSound('stageStart');
+    // The board rises in as the stage starts.
+    playHaptic({ id: 'curtainUp' });
   },
 
   // Needed to display correct countries for post setup modals
@@ -384,6 +387,8 @@ export const createEventActions: StateCreator<
     });
 
     playThemeSound('stageStart');
+    // The board rises in as the stage starts.
+    playHaptic({ id: 'curtainUp' });
   },
   closeQualificationResults: () => {
     set({

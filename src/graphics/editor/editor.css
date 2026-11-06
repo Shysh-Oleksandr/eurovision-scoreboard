@@ -1866,8 +1866,25 @@ button.gfx-chip:hover {
 
 .gfx-gallery-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+}
+
+.gfx-gallery-act {
+  flex: none;
+  white-space: nowrap;
+}
+
+.gfx-gallery-act svg {
+  flex: none;
+}
+
+@media (width < 576px) {
+  .gfx-gallery-act {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 }
 
 .gfx-gallery-head h2 {
@@ -2789,9 +2806,9 @@ button.gfx-chip:hover {
 
 .gfx-gallery-ht {
   display: flex;
+  flex: 1 1 260px;
   flex-direction: column;
   gap: 2px;
-  margin-right: auto;
   min-width: 0;
 }
 
@@ -2875,11 +2892,17 @@ button.gfx-chip:hover {
 
 .gfx-gallery-sub {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 5px;
+  line-height: 1.35;
   font-size: 11.5px;
   font-weight: 600;
   color: var(--ink-55);
+}
+
+.gfx-gallery-sub svg {
+  flex: none;
+  margin-top: 1px;
 }
 
 .gfx-gcard.is-unreadable::before {

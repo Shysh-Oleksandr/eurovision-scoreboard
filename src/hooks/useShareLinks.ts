@@ -8,7 +8,11 @@ import { fetchDesignById } from '@/api/designs';
 import { fetchProfileById } from '@/api/profiles';
 import { parseDesign } from '@/graphics/model/design';
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
-import { findShareParam, type ShareParamKey } from '@/helpers/shareUrl';
+import {
+  findShareParam,
+  rememberLandingShareParam,
+  type ShareParamKey,
+} from '@/helpers/shareUrl';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import type { ThemeCreator } from '@/types/customTheme';
@@ -94,6 +98,8 @@ export function useShareLinks() {
     hasProcessedRef.current = true;
 
     const url = new URL(window.location.href);
+
+    rememberLandingShareParam(url);
 
     if (openShareLink(url)) {
       window.history.replaceState({}, '', url.origin + url.pathname);

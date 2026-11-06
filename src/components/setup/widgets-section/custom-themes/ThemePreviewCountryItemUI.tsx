@@ -92,6 +92,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
 
   // Refs for douze points animation
   const douzePointsContainerRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
   const douzePointsParallelogramBlueRef = useRef<HTMLDivElement>(null);
   const douzePointsParallelogramYellowRef = useRef<HTMLDivElement>(null);
 
@@ -101,6 +102,13 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     true,
     roundedCountryContainer,
   );
+
+  // Shared with the douze-points overlay, which lays its name over this one.
+  const nameClassName = `${
+    uppercaseEntryName ? 'uppercase' : ''
+  } text-left ml-2 font-bold text-sm truncate flex-1 ${
+    roundedCountryContainer ? 'mr-2' : ''
+  }`;
 
   const { shouldRender: showDouzePointsAnimationHook } =
     useDouzePointsAnimation(
@@ -339,9 +347,9 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
             }}
             overrides={overrides}
             countryName={mockCountry.name}
-            flagShape={flagShape}
-            isTwoColumnLayout={false}
-            uppercaseEntryName={uppercaseEntryName}
+            flagClassName={flagShape !== 'none' ? flagClassName : undefined}
+            nameClassName={nameClassName}
+            sourceNameRef={nameRef}
             isThemePreview
             douzePointsAnimationModeOverride={douzePointsAnimationMode}
           />
@@ -365,13 +373,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
             )
       }
       renderName={() => (
-        <h4
-          className={`${
-            uppercaseEntryName ? 'uppercase' : ''
-          } text-left ml-2 font-bold text-sm truncate flex-1 ${
-            roundedCountryContainer ? 'mr-2' : ''
-          }`}
-        >
+        <h4 ref={nameRef} className={nameClassName}>
           {mockCountry.name}
         </h4>
       )}

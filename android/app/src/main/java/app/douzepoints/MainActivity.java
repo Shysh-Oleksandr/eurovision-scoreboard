@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         // App-local plugins must be registered before the bridge starts.
         registerPlugin(MediaSaverPlugin.class);
+        registerPlugin(DouzeHapticsPlugin.class);
         super.onCreate(savedInstanceState);
         // Draw behind transparent system bars on Android 14 and older too
         // (15+ enforces it), so the theme shows through as on iOS. Without

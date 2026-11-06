@@ -1,17 +1,23 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { HeartIcon } from '@/assets/icons/HeartIcon';
-import { getFlagOverlayOffsetClassName } from '@/components/countryItem/hooks/useFlagClassName';
 import {
   extractSolidColorFromColorValue,
   buildBackgroundColorLookup,
   getSpecialBackgroundStyle,
 } from '@/components/countryItem/utils/gradientUtils';
+import { playHaptic } from '@/native/haptics';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { playThemeSound } from '@/theme/playThemeSound';
 import { DEFAULT_THEME_SPECIFICS } from '@/theme/themeSpecifics';
-import { DouzePointsAnimationMode, FlagShape } from '@/theme/types';
+import { DouzePointsAnimationMode } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 type DouzePointsAnimationProps = {
@@ -23,9 +29,16 @@ type DouzePointsAnimationProps = {
   pointsAmount?: number;
   overrides?: Record<string, string> | null;
   countryName: string;
-  flagShape: FlagShape;
-  isTwoColumnLayout: boolean;
-  uppercaseEntryName: boolean;
+  /**
+   * The row's flag classes (`useFlagClassName`), or undefined when the row has
+   * no flag. The hearts overlay lays out an invisible copy of the flag so it
+   * starts exactly at the flag's right edge, whatever the shape or breakpoint.
+   */
+  flagClassName?: string;
+  /** The row's name classes, so the overlay name sits exactly on top of it. */
+  nameClassName: string;
+  /** The row's name element; the overlay name copies its width (same truncation). */
+  sourceNameRef?: React.RefObject<HTMLHeadingElement | null>;
   isThemePreview?: boolean;
   douzePointsAnimationModeOverride?: DouzePointsAnimationMode;
 };
@@ -53,11 +66,11 @@ type BaseVariantProps = {
   containerClass: string;
   specialStyle: React.CSSProperties | undefined;
   countryName: string;
-  isTwoColumnLayout: boolean;
-  uppercaseEntryName: boolean;
+  flagClassName?: string;
+  nameClassName: string;
+  sourceNameRef?: React.RefObject<HTMLHeadingElement | null>;
   heartsFillColor?: string;
   isThemePreview?: boolean;
-  flagShape: FlagShape;
 };
 
 const LegacyParallelogramsAnimation: React.FC<BaseVariantProps> = ({
@@ -69,7 +82,7 @@ const LegacyParallelogramsAnimation: React.FC<BaseVariantProps> = ({
   return (
     <div
       ref={refs.containerRef}
-      className={`${containerClass} bg-countryItem-douzePointsBg`}
+      className={`${containerClass} left-0 justify-center bg-countryItem-douzePointsBg`}
       style={specialStyle}
     >
       <h4 className="text-countryItem-douzePointsText lg:text-xl md:text-lg xs:text-base text-sm font-bold uppercase">
@@ -92,13 +105,14 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   containerClass,
   specialStyle,
   countryName,
-  isTwoColumnLayout,
-  uppercaseEntryName,
+  flagClassName,
+  nameClassName,
+  sourceNameRef,
   heartsFillColor,
-  flagShape,
   isThemePreview = false,
 }) => {
   const [columns, setColumns] = useState(DOUZE_POINTS_TARGET_COLUMNS);
+  const [sourceNameWidth, setSourceNameWidth] = useState<number | null>(null);
   /** Play douze SFX only once per mount (Strict Mode re-runs effects). */
   const douzePointsSoundPlayedRef = useRef(false);
   const heartsCount = columns * DOUZE_POINTS_ROWS;
@@ -136,11 +150,37 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
     };
   }, [refs.containerRef]);
 
+  // In the rounded layout the row's name stops before the points while the
+  // overlay spans them, so copy the name's width to truncate identically.
+  useLayoutEffect(() => {
+    const sourceNameEl = sourceNameRef?.current;
+
+    if (!sourceNameEl) {
+      return;
+    }
+
+    setSourceNameWidth(sourceNameEl.getBoundingClientRect().width);
+
+    const resizeObserver = new ResizeObserver(() => {
+      setSourceNameWidth(sourceNameEl.getBoundingClientRect().width);
+    });
+
+    resizeObserver.observe(sourceNameEl);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [sourceNameRef]);
+
   useEffect(() => {
     if (douzePointsSoundPlayedRef.current) return;
 
     douzePointsSoundPlayedRef.current = true;
     playThemeSound('douzePoints', { skip: isThemePreview });
+    // The hearts bloom. The 12 itself was felt at the award (votingActions);
+    // in teleport themes the overlay waits for the row's move, so this lands
+    // ~2 s later, with the hearts.
+    if (!isThemePreview) playHaptic({ id: 'douzeBloom', variant: 'hearts' });
   }, [isThemePreview]);
 
   // The choreography itself is CSS (.douze-heart-animated in styles.css) so
@@ -175,70 +215,65 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   }, [heartsCount]);
 
   return (
-    <div
-      ref={refs.containerRef}
-      className={`${containerClass} p-0 !opacity-100`}
-      style={specialStyle}
-    >
-      {/* Keyed on `columns` so a ResizeObserver column change remounts the
-          cells and restarts the choreography (matches the old timeline
-          rebuild). */}
+    // Mirrors the row's content layout (flag, then name) so the name lands on
+    // the row's name to the pixel and the hearts start at the flag's edge.
+    <div className={`${containerClass} left-0 p-0 !opacity-100`}>
+      {flagClassName && (
+        <div aria-hidden className={`${flagClassName} invisible shrink-0`} />
+      )}
       <div
-        key={`douze-grid-${columns}`}
-        className="absolute z-40 grid left-0 -right-2"
-        style={
-          {
-            top: `${(-DOUZE_OVERFLOW_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
-            height: `${(DOUZE_POINTS_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
-            gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-            gridTemplateRows: `repeat(${DOUZE_POINTS_ROWS}, minmax(0, 1fr))`,
-            '--douze-grow-duration': `${HEARTS_GROW_COLUMN_DURATION_SECONDS}s`,
-            '--douze-shrink-duration': `${HEARTS_SHRINK_COLUMN_DURATION_SECONDS}s`,
-          } as React.CSSProperties
-        }
+        ref={refs.containerRef}
+        className="relative self-stretch flex-1 min-w-0 overflow-hidden flex items-center"
+        style={specialStyle}
       >
-        {hearts.map((heartIndex) => (
-          <div
-            key={`douze-heart-${heartIndex}`}
-            className="douze-heart-animated overflow-hidden flex items-center justify-center"
-            style={columnHeartVars[heartIndex % columns]}
-          >
-            <HeartIcon
-              className={`w-full h-full ${
-                heartsFillColor ? '' : 'fill-countryItem-douzePointsBg'
-              }`}
-              style={heartsFillColor ? { color: heartsFillColor } : undefined}
-            />
-          </div>
-        ))}
+        {/* Keyed on `columns` so a ResizeObserver column change remounts the
+            cells and restarts the choreography (matches the old timeline
+            rebuild). */}
+        <div
+          key={`douze-grid-${columns}`}
+          className="absolute z-40 grid left-0 -right-2"
+          style={
+            {
+              top: `${(-DOUZE_OVERFLOW_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
+              height: `${(DOUZE_POINTS_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
+              gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${DOUZE_POINTS_ROWS}, minmax(0, 1fr))`,
+              '--douze-grow-duration': `${HEARTS_GROW_COLUMN_DURATION_SECONDS}s`,
+              '--douze-shrink-duration': `${HEARTS_SHRINK_COLUMN_DURATION_SECONDS}s`,
+            } as React.CSSProperties
+          }
+        >
+          {hearts.map((heartIndex) => (
+            <div
+              key={`douze-heart-${heartIndex}`}
+              className="douze-heart-animated overflow-hidden flex items-center justify-center"
+              style={columnHeartVars[heartIndex % columns]}
+            >
+              <HeartIcon
+                className={`w-full h-full ${
+                  heartsFillColor ? '' : 'fill-countryItem-douzePointsBg'
+                }`}
+                style={heartsFillColor ? { color: heartsFillColor } : undefined}
+              />
+            </div>
+          ))}
+        </div>
+        <h4
+          key={`douze-name-${columns}`}
+          style={
+            {
+              '--douze-name-out-delay': `${HEARTS_SHRINK_PHASE_START_SECONDS}s`,
+              ...(sourceNameWidth !== null && {
+                flex: 'none',
+                width: sourceNameWidth,
+              }),
+            } as React.CSSProperties
+          }
+          className={`douze-country-name-animated relative z-50 text-countryItem-douzePointsText ${nameClassName}`}
+        >
+          {countryName}
+        </h4>
       </div>
-      <h4
-        key={`douze-name-${columns}`}
-        style={
-          {
-            '--douze-name-out-delay': `${HEARTS_SHRINK_PHASE_START_SECONDS}s`,
-          } as React.CSSProperties
-        }
-        className={`douze-country-name-animated ${
-          uppercaseEntryName ? 'uppercase' : ''
-        } absolute z-50 left-0 text-countryItem-douzePointsText text-left ${
-          isTwoColumnLayout
-            ? 'xs:ml-2 ml-1.5 text-[0.8rem]'
-            : `${
-                flagShape === 'small-rectangle'
-                  ? 'ml-[1px]'
-                  : flagShape === 'round' || flagShape === 'round-border'
-                  ? 'ml-[3px]'
-                  : 'ml-2'
-              } text-[0.9rem]`
-        } font-bold ${
-          isThemePreview
-            ? 'text-sm'
-            : 'xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm'
-        } truncate max-w-[70%]`}
-      >
-        {countryName}
-      </h4>
     </div>
   );
 };
@@ -256,9 +291,9 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   pointsAmount = 12,
   overrides = null,
   countryName,
-  flagShape,
-  isTwoColumnLayout,
-  uppercaseEntryName,
+  flagClassName,
+  nameClassName,
+  sourceNameRef,
   isThemePreview = false,
   douzePointsAnimationModeOverride,
 }) => {
@@ -272,8 +307,7 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   const themeYear = useGeneralStore(
     (state) => state.customTheme?.baseThemeYear ?? state.themeYear,
   );
-  const { douzePointsAnimationMode, roundedCountryContainer } =
-    useThemeSpecifics();
+  const { douzePointsAnimationMode } = useThemeSpecifics();
 
   const resolvedDouzePointsAnimationMode =
     douzePointsAnimationModeOverride ?? douzePointsAnimationMode;
@@ -283,18 +317,11 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
     ? resolvedDouzePointsAnimationMode
     : DEFAULT_THEME_SPECIFICS.douzePointsAnimationMode;
 
-  const flagOverlayOffsetClassName = getFlagOverlayOffsetClassName(
-    flagShape,
-    isThemePreview,
-    roundedCountryContainer,
-  );
-  const containerClass = `absolute overflow-hidden ${
-    activeDouzePointsAnimationMode === 'heartsGrid'
-      ? flagOverlayOffsetClassName
-      : 'left-0 bg-countryItem-douzePointsBg'
-  } right-0 top-0 bottom-0 z-40 flex justify-center items-center opacity-0`;
+  const containerClass = `absolute overflow-hidden right-0 top-0 bottom-0 z-40 flex items-center opacity-0`;
   const specialStyle = getSpecialBackgroundStyle(
-    containerClass,
+    activeDouzePointsAnimationMode === 'heartsGrid'
+      ? containerClass
+      : `${containerClass} bg-countryItem-douzePointsBg`,
     overrides,
     themeYear,
   );
@@ -321,11 +348,11 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
       containerClass={containerClass}
       specialStyle={specialStyle}
       countryName={countryName}
-      isTwoColumnLayout={isTwoColumnLayout}
-      uppercaseEntryName={uppercaseEntryName}
+      flagClassName={flagClassName}
+      nameClassName={nameClassName}
+      sourceNameRef={sourceNameRef}
       heartsFillColor={heartsFillColor}
       isThemePreview={isThemePreview}
-      flagShape={flagShape}
     />
   );
 };

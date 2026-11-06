@@ -9,6 +9,7 @@ import { useShallow } from 'zustand/shallow';
 import { BaseCountry, EventStage, StageVotingMode } from '../../models';
 import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
+import AppPromoCard from '../appPromo/AppPromoCard';
 import Modal from '../common/Modal/Modal';
 import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
@@ -604,6 +605,8 @@ const EventSetupModal = () => {
         <SetupHubHeader
           openSettingsModal={() => setIsSettingsModalOpen(true)}
         />
+
+        <AppPromoCard />
 
         {(isSettingsModalOpen || isSettingsModalLoaded) && (
           <SettingsModal

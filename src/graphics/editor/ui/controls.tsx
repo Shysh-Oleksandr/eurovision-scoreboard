@@ -3,6 +3,8 @@ import { ChevronDown, Info, Lock, Minus, Plus } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/helpers/utils';
+import { useSliderHaptics } from '@/hooks/useSliderHaptics';
+import { playHaptic } from '@/native/haptics';
 
 /**
  * Inspector form controls (handoff §5 look): uppercase 10.5 px labels,
@@ -104,7 +106,10 @@ export function Seg<T extends string | number>({
           aria-label={o.title}
           title={o.title}
           className={o.value === value ? 'is-on' : ''}
-          onClick={() => onChange(o.value)}
+          onClick={() => {
+            if (o.value !== value) playHaptic({ id: 'selection' });
+            onChange(o.value);
+          }}
         >
           {o.label}
         </button>
@@ -178,7 +183,10 @@ export const Toggle: React.FC<{
     aria-checked={checked}
     disabled={disabled}
     className={cn('gfx-toggle', checked && 'is-on')}
-    onClick={() => onChange(!checked)}
+    onClick={() => {
+      playHaptic({ id: 'toggle', on: !checked });
+      onChange(!checked);
+    }}
   >
     <span>{label}</span>
     <span className="gfx-toggle-sw" />
@@ -398,20 +406,29 @@ export const RangeField: React.FC<{
   step = 0.05,
   format = (v) => `${Math.round(v * 100)}%`,
   ariaLabel,
-}) => (
-  <span className="gfx-range">
-    <input
-      type="range"
-      min={min}
-      max={max}
-      step={step}
-      value={value}
-      aria-label={ariaLabel}
-      onChange={(e) => onChange(Number(e.target.value))}
-    />
-    <b>{format(value)}</b>
-  </span>
-);
+}) => {
+  const tick = useSliderHaptics(min, max, step);
+
+  return (
+    <span className="gfx-range">
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        aria-label={ariaLabel}
+        onChange={(e) => {
+          const next = Number(e.target.value);
+
+          tick(next);
+          onChange(next);
+        }}
+      />
+      <b>{format(value)}</b>
+    </span>
+  );
+};
 
 export const Hint: React.FC<{
   children: React.ReactNode;

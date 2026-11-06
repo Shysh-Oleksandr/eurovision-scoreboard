@@ -13,6 +13,12 @@ export interface Profile {
   isAdmin?: boolean;
   preferredLocale?: PreferredLocale;
   preferences?: UserPreferences;
+  /**
+   * Last sign-in (or weekly session renewal) on the iOS/Android app; only
+   * on the user's own profile. The website stops promoting the apps once
+   * it is set.
+   */
+  appSignedInAt?: string;
 }
 
 export interface ProfileSummary {

@@ -19,6 +19,7 @@ import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useHotKey } from '@/hooks/useHotKey';
+import { playHaptic } from '@/native/haptics';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const ShareResultsModal = dynamic(() => import('./share/ShareResultsModal'), {
@@ -143,6 +144,7 @@ const SimulationHeaderComponent = ({ phaseTitle }: SimulationHeaderProps) => {
             onClick={() => {
               undo();
               useScoreboardStore.getState().clearReveal();
+              playHaptic({ id: 'undo' });
             }}
             className={buttonClassName}
             aria-label={t('undo')}

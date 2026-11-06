@@ -2,6 +2,7 @@ import { LucideIcon } from 'lucide-react';
 import React from 'react';
 
 import { cn } from '@/helpers/utils';
+import { playHaptic } from '@/native/haptics';
 
 export interface RelSegmentedOption<T extends string> {
   value: T;
@@ -41,7 +42,10 @@ export function RelSegmented<T extends string>({
           <button
             key={o.value}
             type="button"
-            onClick={() => onChange(o.value)}
+            onClick={() => {
+              if (!active) playHaptic({ id: 'selection' });
+              onChange(o.value);
+            }}
             className={cn(
               'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-[12.5px] font-bold transition-colors',
               active

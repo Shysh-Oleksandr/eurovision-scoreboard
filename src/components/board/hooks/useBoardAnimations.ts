@@ -14,6 +14,12 @@ import { useReorderCountries } from '../../../hooks/useReorderCountries';
 import { Country } from '../../../models';
 import { useScoreboardStore } from '../../../state/scoreboardStore';
 
+import {
+  getClimbHapticCue,
+  isBoardMoveHapticAllowed,
+} from './boardMoveHaptics';
+
+import { playHaptic } from '@/native/haptics';
 import { useGeneralStore } from '@/state/generalStore';
 
 export type BoardItemAnimationMode = 'flip' | 'teleport';
@@ -379,6 +385,26 @@ export const useBoardAnimations = (
 
       teleportTimelineRef.current = timeline;
 
+      // The climb is felt from the fade-out; its landing tap meets the
+      // fade-in at the new place (cue timings in native/haptics/cues.ts).
+      const climbCue = getClimbHapticCue(
+        previousOrder,
+        newOrder,
+        shouldAnimateByCode,
+        hasDouzePointsAnimation,
+      );
+
+      if (climbCue) {
+        timeline.call(
+          () => {
+            if (runId !== animationRunIdRef.current) return;
+            if (isBoardMoveHapticAllowed()) playHaptic(climbCue);
+          },
+          undefined,
+          0,
+        );
+      }
+
       const outOrder = sortBottomToTopByOrder(
         animatedMovedCodes,
         previousOrder,
@@ -520,8 +546,17 @@ export const useBoardAnimations = (
       clearPendingAnimations();
       clearAllTeleportItemStyles();
       setBoardTeleportAnimationRunning(false);
+
+      const climbCue = getClimbHapticCue(
+        currentOrder,
+        newOrder,
+        shouldAnimateByCode,
+        isDouzePointsAwarded,
+      );
+
       timeoutRef.current = setTimeout(() => {
         setDisplayOrder(newOrder);
+        if (climbCue && isBoardMoveHapticAllowed()) playHaptic(climbCue);
       }, flipMoveDelay);
 
       return;

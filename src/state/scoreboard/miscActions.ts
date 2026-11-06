@@ -5,6 +5,7 @@ import { Country } from '../../models';
 import { RevealData, ScoreboardState } from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
+import { playHaptic } from '@/native/haptics';
 
 type MiscActions = {
   resetLastPoints: () => void;
@@ -47,6 +48,9 @@ export const createMiscActions: StateCreator<
 
     // A value-identical rewrite would still re-render the whole board.
     if (!currentStage.countries.some(needsReset)) return;
+
+    // The board clears for the next jury: a page turn.
+    if (!currentStage.isOver) playHaptic({ id: 'nextJury' });
 
     set({
       eventStages: state.eventStages.map((stage) => {

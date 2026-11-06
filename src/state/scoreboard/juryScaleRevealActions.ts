@@ -24,6 +24,7 @@ import { resolveStagePointsSystem } from './stageOverrides';
 import { JuryScaleReveal, ScoreboardState } from './types';
 
 import { ANIMATION_DURATION } from '@/data/data';
+import { playHaptic } from '@/native/haptics';
 import {
   notifyThemeSoundStageFinished,
   playThemeSound,
@@ -281,6 +282,13 @@ export const createJuryScaleRevealActions: StateCreator<
         const isLastStep = nextStepIndex >= scaleSteps.length;
 
         playThemeSoundPointsAwardedIfNonDouze(false);
+        playHaptic({
+          id: 'scaleStep',
+          recipients: Object.keys(awards).length,
+          share:
+            step.value /
+            Math.max(1, ...scaleSteps.map((pointsItem) => pointsItem.value)),
+        });
 
         // A points system with nothing flagged as douze has no spokesperson
         // phase — the countdown itself ends jury voting, still via the beat so
@@ -334,6 +342,7 @@ export const createJuryScaleRevealActions: StateCreator<
       const isLastVoter = nextVoterIndex >= voters.length;
 
       playThemeSound('douzePoints');
+      playHaptic({ id: 'spokespersonDouze' });
       showAwards(false);
 
       set((s) => ({
@@ -412,6 +421,7 @@ export const createJuryScaleRevealActions: StateCreator<
 
       showAwards(false);
       playThemeSoundPointsAwardedIfNonDouze(false);
+      playHaptic({ id: 'votingRush' });
 
       // Still stops on the beat: skipping ahead should not bury the 12s either.
       set((s) => ({

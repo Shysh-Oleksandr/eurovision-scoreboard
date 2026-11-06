@@ -18,6 +18,8 @@ import {
 import { editorHistory, useEditorStore } from './editorStore';
 import { BoxMap, boxOf } from './useElementBoxes';
 
+import { playHaptic } from '@/native/haptics';
+
 const SNAP_SCREEN_PX = 6;
 const MIN_SIZE = 24;
 /** At least this much of a moved element stays inside the canvas. */
@@ -66,6 +68,14 @@ type GestureCtx = (MoveCtx | ResizeCtx | RotateCtx) & {
   /** History is paused right after the first tracked set of the gesture. */
   paused: boolean;
   pointerId: number;
+  /** The guides (or rotation stop) last snapped to, for the snap haptic. */
+  snapKey?: string;
+};
+
+/** A tick each time a gesture catches a new guide or rotation stop. */
+const feelSnap = (ctx: GestureCtx, key: string) => {
+  if (key && key !== ctx.snapKey) playHaptic({ id: 'snap' });
+  ctx.snapKey = key;
 };
 
 export interface GestureFeedback {
@@ -163,6 +173,14 @@ export function useGestures(
           }
         }
 
+        feelSnap(
+          ctx,
+          guides
+            .map((guide) => `${guide.axis}:${Math.round(guide.at)}`)
+            .sort()
+            .join('|'),
+        );
+
         // Never let an element leave the canvas entirely: the canvas clips,
         // so a fully outside element would have nothing left to grab.
         ctx.ids.forEach((id) => {
@@ -230,6 +248,8 @@ export function useGestures(
 
         // A small dead zone around 0° so "straight" is easy to hit.
         if (rotation < 3 || rotation > 357) rotation = 0;
+        // Straight, and each 15° stop with Shift, click into place.
+        feelSnap(ctx, rotation === 0 || shift ? `rot:${rotation}` : '');
         trackedUpdate(ctx, (update) => update(ctx.id, { rotation }));
         setFeedback({
           guides: [],
@@ -393,6 +413,8 @@ export function useGestures(
         startPointer: { x: e.clientX, y: e.clientY },
         paused: false,
         pointerId: e.pointerId,
+        // Already straight: no click until it leaves and comes back.
+        snapKey: box.rotation === 0 ? 'rot:0' : undefined,
       });
     },
     [begin, boxesRef, designNodeRef, zoomRef],

@@ -6,6 +6,7 @@ import { SwitchItem } from '../model/types';
 import { SettingsRow } from './SettingsRow';
 
 import { ToggleButton } from '@/components/common/ToggleButton';
+import { playHaptic } from '@/native/haptics';
 import { Settings, useGeneralStore } from '@/state/generalStore';
 
 interface SwitchRowProps {
@@ -28,7 +29,16 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({ item, query }) => {
       desc={item.descKey ? t(item.descKey) : undefined}
       tipKey={item.tipKey}
       query={query}
-      onRowClick={toggle}
+      onRowClick={(event?: React.MouseEvent) => {
+        // A click on the switch itself bubbles here too; the switch plays
+        // its own haptic.
+        const onSwitch = (event?.target as HTMLElement | undefined)?.closest(
+          'button',
+        );
+
+        if (!onSwitch) playHaptic({ id: 'toggle', on: !value });
+        toggle();
+      }}
       control={<ToggleButton isActive={value} onToggle={toggle} />}
     />
   );

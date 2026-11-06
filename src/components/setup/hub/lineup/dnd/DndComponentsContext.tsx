@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext } from 'react';
+import React, { createContext, RefObject, useContext } from 'react';
 
 import CountryTile, { CountryTileProps } from '../CountryTile';
 
@@ -42,3 +42,12 @@ export const DndComponentsContext = createContext<DndComponents>({
 });
 
 export const useDndComponents = () => useContext(DndComponentsContext);
+
+/**
+ * `current` is true during the commit in which `LineupDndBoundary` swaps the
+ * draggable components in. That swap remounts the whole lineup, so whatever
+ * mounts in it is not a reveal (the stage tiles skip their entrance).
+ */
+export const DndSwapContext = createContext<RefObject<boolean>>({
+  current: false,
+});

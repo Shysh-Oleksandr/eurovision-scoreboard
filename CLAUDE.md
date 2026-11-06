@@ -27,7 +27,7 @@ yarn build:native     # Static export for Capacitor into out/
 yarn cap:sync         # build:native + copy into ios/ and android/
 yarn cap:dev ios|android [--lan]  # Live reload inside the native shell
 yarn assets:native    # Regenerate app icons + splash screens from assets/
-yarn live-update publish|status  # Live update: build, sign, upload a web bundle for the apps
+yarn live-update publish|store|status  # Live update: web bundles for the apps (--mode prompt|required), store-version gate
 yarn store-screenshots          # App Store / Play screenshots from out/ (after yarn build:native)
 ```
 
@@ -83,12 +83,31 @@ Read `docs/` before touching non-obvious subsystems:
 - `event-setup-hub-and-design-tokens.md` — the Event Setup modal (hue-derived OKLCH tokens `--prim-hue`/`--p-*`/`--accent`, hand-picked accents in `interfaceAccents.ts` + the dev-only Palette Lab at `/dev/palette-lab` and `?palette` panel, `dp-*` classes, Button `cta`/`surface` variants, lineup ListIds + setupUiStore, lazy dnd-kit, contest dirty fingerprint, sync-theme setting, profile summary endpoint)
 - `adding-contest-editions.md` — adding a new ESC/JESC/ESC Asia year or a new contest series to the Contest select: `ContestType`, lineup JSON format and field rules, hosting logos, cache-busting, odds/spokesperson updates, verification checklist
 - `graphics-studio.md` — the design document model, element registry, deterministic export (snapdom + html-to-image fallback) and the share-image templates; read before touching share images or the graphics editor
-- `native-apps.md` — the Capacitor iOS/Android build: static-export flags, commands (Xcode 27 caveat), live reload, rules for native-aware code, client-side locale, native image fetching for exports, saving/sharing files (`fileActions`, Android MediaStore plugin), native Google sign-in + Sign in with Apple (iOS + website) + Keychain/Keystore refresh tokens, icons/splash, system bars + `--safe-*` vars, Android back button (`useBackHandler`), haptics, per-app languages, live updates (`yarn live-update publish`, native runtime fingerprints, signed bundles on R2), universal links / Android App Links (share links only, `.well-known` files, Android 15+ query matching), what doesn't work yet, emulator/simulator testing recipes. Roadmap, research and phase status: `plans/native-apps-plan.md`
+- `native-apps.md` — the Capacitor iOS/Android build: static-export flags, commands (Xcode 27 caveat), live reload, rules for native-aware code, client-side locale, native image fetching for exports, saving/sharing files (`fileActions`, Android MediaStore plugin), native Google sign-in + Sign in with Apple (iOS + website) + Keychain/Keystore refresh tokens, icons/splash, system bars + `--safe-*` vars, Android back button (`useBackHandler`), haptics, per-app languages, live updates (`yarn live-update publish`, native runtime fingerprints, signed bundles on R2), universal links / Android App Links (share links only, `.well-known` files, Android 15+ query matching), promoting the store apps on the website (§13: `NEXT_PUBLIC_APP_STORES_LIVE` release-date flag, Smart App Banner, setup hub card + winner reminder rules, `/get-app`, Android install check + "Open the app" intent link), what doesn't work yet, emulator/simulator testing recipes. Roadmap, research and phase status: `plans/native-apps-plan.md`
+- `haptics.md` — the native apps' haptics: the cue catalog (`src/native/haptics/cues.ts`) and where each cue fires, the neutral pattern format and its iOS (Core Haptics) / Android (composition primitives) / fallback renderers, priorities, the `DouzeHaptics` plugins (`ios/App/App/DouzeHapticsPlugin.swift`, `android/.../DouzeHapticsPlugin.java`), the dev-only Haptics lab at `/dev/haptics-lab` and the `dp-haptics-debug` log; read before adding or moving a haptic
 - `email-sign-in.md` — passwordless email sign-in (website + apps): the code dialog and `loginWithEmailCode`, the `/auth/email/*` API and error codes, account linking and normalized addresses, code storage and rate limits, sliding refresh-token rotation, Cloudflare Email Service sending (env, owner setup, review account); read before touching sign-in, sessions or sending email
+- `sign-in-methods.md` — one account, up to three sign-in methods (Google, Apple, email codes): the profile fields and sparse indexes, the connect/remove rules (`in_use`, `already_connected`, `last_method`, no merging), `/auth/methods/*`, the website's redirect connects (link cookie, Google `state`, Apple `.link` mark, `?link=` landing), the apps' sheets, Edit profile → Sign-in methods and the email dialog's link mode; read before touching sign-in, account linking or the Google/Apple callbacks
 - `moderation-and-account-deletion.md` — reports (all content types + users, the app-wide `openReportDialog`), blocking (both directions, server-side list filtering), the admin queue at `/admin/reports`, in-app account deletion (what is deleted, in which order, Apple token revocation), the legal pages and the Terms agreement under the sign-in buttons
 - `store-builds.md` — step by step for the iOS and Android store builds (prepare, archive / bundleRelease, upload, tag, submit) and what a later update needs
 - `store-submission.md` — what the apps collect and the matching App Store privacy labels and Play Data safety answers, age rating and content forms, trademark rules for the listings, review notes and the demo account, the store screenshots (`yarn store-screenshots`: sizes, scenes, upload slots); update it with the privacy policy whenever data collection changes
 - `USER_DATA_CLEARING.md`
+
+## Releasing to the apps (live updates)
+
+**Never run `yarn live-update publish` or `yarn live-update store`, in any form (`--dry-run` and `--out` included).** The owner runs them by hand. `yarn live-update status` is read-only and fine.
+
+Instead, suggest the release. Do it when a task that changes what app users get is finished: frontend code that ships in the native bundle, or a backend change the apps depend on. In multi-step work, suggest it at the first step where the change could ship on its own. If more steps have to land first, say which ones and hold the suggestion until they're done. End with one line:
+
+> Live update: `yarn live-update publish --mode <mode>` (<one-line reason>)
+
+Pick the mode:
+
+- **No live update.** Website-only changes (`*.web.tsx`, admin, API routes, SEO), docs, scripts and tests need none. Native changes (a plugin or its version, `capacitor.config.ts`, `Info.plist`, entitlements, `AndroidManifest.xml`, Swift/Java) need a store build instead: bundles from the new tree won't reach older binaries. Once that build is live in the store, suggest `yarn live-update store <ios|android> --recommended <version>`. Suggest `--required <version>` only if older binaries would break.
+- **`silent`** (the default) for fixes and improvements that can wait for the next launch.
+- **`prompt`** when users would want it now: a fix for a crash or broken flow on a common path, a big new feature or redesign.
+- **`required`** only when the old bundle would break or damage data alongside the new state: an incompatible backend API change, a persisted-state or storage format the old bundle can't read, a security fix. First say whether keeping the backend backward compatible would avoid it, which is the better fix.
+
+Also mention anything the release depends on: deploy the backend first, commit (publish needs a clean tree), or set an env var. The levels and the store gate are explained in `docs/native-apps.md` §11.
 
 ## Code Style
 

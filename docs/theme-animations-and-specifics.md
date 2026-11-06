@@ -145,7 +145,7 @@ Component: `src/components/countryItem/DouzePointsAnimation.tsx`
   - `parallelograms` → `LegacyParallelogramsAnimation`
   - `heartsGrid` → `HeartsGridAnimation`
 - Container positioning:
-  - Uses `getFlagOverlayOffsetClassName(flagShape)` for left offset when heartsGrid is active, to avoid covering the flag.
+  - heartsGrid mirrors the row's own layout instead of hard-coded offsets: the caller passes its `flagClassName` (from `useFlagClassName`), its `nameClassName` and a ref to its name `<h4>`. The overlay renders an invisible flag-sized spacer (so the hearts start exactly at the flag's right edge), then the name with the same classes, and copies the row name's width (so truncation matches in the rounded layout, where the overlay also spans the points). The overlay name therefore sits pixel-on-pixel over the row's name for every flag shape, breakpoint, two-column layout and theme preview. Don't reintroduce per-shape offsets: they drifted out of sync with `useFlagClassName`, and the preview read `roundedCountryContainer` from the active theme instead of the previewed one.
 - Trigger condition:
   - In normal runtime:
     - Only renders if the `pointsSystem` entry has `showDouzePoints` and `value === pointsAmount`.

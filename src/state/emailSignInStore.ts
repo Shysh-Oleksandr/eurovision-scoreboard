@@ -1,8 +1,15 @@
 import { create } from 'zustand';
 
+/**
+ * `signIn`: sign in or sign up with a code. `link`: add or change the
+ * signed-in account's address (the sign-in methods in Edit profile).
+ */
+export type EmailDialogMode = 'signIn' | 'link';
+
 interface EmailSignInState {
   isOpen: boolean;
-  open: () => void;
+  mode: EmailDialogMode;
+  open: (mode?: EmailDialogMode) => void;
   close: () => void;
 }
 
@@ -12,8 +19,12 @@ interface EmailSignInState {
  */
 export const useEmailSignInStore = create<EmailSignInState>((set) => ({
   isOpen: false,
-  open: () => set({ isOpen: true }),
+  mode: 'signIn',
+  open: (mode = 'signIn') => set({ isOpen: true, mode }),
   close: () => set({ isOpen: false }),
 }));
 
 export const openEmailSignIn = () => useEmailSignInStore.getState().open();
+
+/** Opens the dialog to add or change the signed-in account's address. */
+export const openEmailLink = () => useEmailSignInStore.getState().open('link');

@@ -102,6 +102,7 @@ const CountryItem = ({
     );
 
   const douzePointsContainerRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
   const douzePointsParallelogramBlueRef = useRef<HTMLDivElement>(null);
   const douzePointsParallelogramYellowRef = useRef<HTMLDivElement>(null);
 
@@ -171,6 +172,15 @@ const CountryItem = ({
     false,
     roundedCountryContainer,
   );
+
+  // Shared with the douze-points overlay, which lays its name over this one.
+  const nameClassName = `${uppercaseEntryName ? 'uppercase' : ''} text-left ${
+    isTwoColumnLayout ? 'xs:ml-2 ml-1.5 text-[0.8rem]' : 'ml-2 text-[0.9rem]'
+  } font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm truncate flex-1 ${
+    roundedCountryContainer
+      ? 'mr-2 md:mr-2 lg:mr-2'
+      : 'lg:mr-[2.57rem] md:mr-9 mr-8'
+  }`;
 
   /** Paints only the flag/name strip; outer row stays transparent under the last-points gutter. */
   const roundedNameStripSurfaceClasses = roundedCountryContainer
@@ -298,9 +308,9 @@ const CountryItem = ({
             pointsAmount={douzePoints ?? 0}
             overrides={overrides}
             countryName={country.name}
-            flagShape={flagShape}
-            isTwoColumnLayout={isTwoColumnLayout}
-            uppercaseEntryName={uppercaseEntryName}
+            flagClassName={flagShape !== 'none' ? flagClassName : undefined}
+            nameClassName={nameClassName}
+            sourceNameRef={nameRef}
           />
         ) : null
       }
@@ -322,17 +332,7 @@ const CountryItem = ({
           : undefined
       }
       renderName={() => (
-        <h4
-          className={`${uppercaseEntryName ? 'uppercase' : ''} text-left ${
-            isTwoColumnLayout
-              ? 'xs:ml-2 ml-1.5 text-[0.8rem]'
-              : 'ml-2 text-[0.9rem]'
-          } font-bold xl:text-lg lg:text-[1.05rem] md:text-base xs:text-sm truncate flex-1 ${
-            roundedCountryContainer
-              ? 'mr-2 md:mr-2 lg:mr-2'
-              : 'lg:mr-[2.57rem] md:mr-9 mr-8'
-          }`}
-        >
+        <h4 ref={nameRef} className={nameClassName}>
           {country.name}
         </h4>
       )}

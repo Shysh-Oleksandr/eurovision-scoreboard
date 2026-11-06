@@ -70,6 +70,7 @@ export const useStagePointsOverrideDraft = (
         allowMultiple: existing.allowMultiplePointsToSameEntry,
       };
     }
+
     return {
       points: globalSettingsPointsSystem,
       televotePoints: globalSettingsTelevotePointsSystem,
@@ -95,6 +96,7 @@ export const useStagePointsOverrideDraft = (
   useEffect(() => {
     if (!isOpen) return;
     const defaults = getGlobalDefaults();
+
     setLocalPoints(defaults.points);
     setLocalTelevotePoints(defaults.televotePoints);
     setLocalSplit(defaults.split);
@@ -136,7 +138,9 @@ export const useStagePointsOverrideDraft = (
       globalSplitPointsSystem,
       globalAllowMultiple,
     );
+
     if (!differs) return undefined;
+
     return {
       pointsSystem: localPoints,
       televotePointsSystem: localTelevotePoints,

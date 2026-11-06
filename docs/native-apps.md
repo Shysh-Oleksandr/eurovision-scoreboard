@@ -491,11 +491,16 @@ Google, including iPhone users who signed in with Apple. Details:
   minimises the app. Verified on Android: nested modals close one by one,
   the editor closes, the root minimises. The keyboard takes the first press
   itself.
-- **Haptics** (`src/native/haptics.ts`, `@capacitor/haptics`): ride on the
-  theme sound events in `playThemeSound()` (douze points: heavy, qualifier
-  reveal / pick: light, winner: success), independent of theme audio.
-  Setting `enableHaptics` (Effects, shown only in the apps, device-local,
-  default on).
+- **Haptics** (`src/native/haptics/`, the app's own `DouzeHaptics` plugin:
+  Core Haptics on iOS, composition primitives on Android, `@capacitor/haptics`
+  presets for binaries without it): cues for every award, the douze, the
+  board's moves, the final reveal and the winner, plus drag and drop, the
+  allocation draw, controls, snapping and toasts, fired at the frame each
+  moment is seen, independent of theme audio. Settings `enableHaptics` and
+  `hapticsStrength` (Effects, shown only in the apps, device-local). The
+  plugins are registered in `SceneDelegate.swift` (`AppBridgeViewController`)
+  and `MainActivity.java`. Details, the cue catalog and the dev-only Haptics
+  lab: [haptics.md](haptics.md).
 - **Keyboard:** no plugin. Android resizes the WebView for the keyboard
   (Capacitor's insets handling) and focused inputs stay visible (checked in
   Event Setup's country search); iOS keeps WKWebView's default scrolling.
@@ -521,9 +526,9 @@ Tracked in the plan with the phase that fixes each item:
   `feat/app-store-readiness` work is deployed (production answered 404 for
   `DELETE /account` and `/auth/email/start` on 2026-10-23; Google and Apple
   sign-in and the app-origin CORS are live).
-- Shared links open the website, not the app, until the website with the
-  `.well-known` files is deployed (§12). On Android 14 and older they
-  always will.
+- Shared links open the website, not the app, on Android 14 and older
+  (§12). The `.well-known` files are deployed (both answered 200
+  `application/json` on 2026-11-06).
 
 ## 10. Testing recipes
 
@@ -598,6 +603,11 @@ plugins and anything the binary reads (`capacitor.config.ts`, `Info.plist`,
    out). The plugin's own install-on-background (`next()`) is never used: it
    would reload the app whenever the user switches away, e.g. to share. A
    check that takes longer than 8 s gives up for that launch.
+   **A resume after 30 minutes or more in the background** also switches
+   (`restartIntoUpdate()`), behind the splash, when nothing is open that
+   could hold input (`isQuietMoment()`: at most one overlay on the
+   `useBackHandler` stack, which allows Event Setup, no graphics editor, no
+   focused field). Short trips away never reload the app.
 3. **Confirm** (`confirmLiveBundle()`): `src/app/(main)/page.tsx` calls
    `notifyAppReady()` once `Main` has mounted. A bundle that doesn't get
    there within `appReadyTimeout` (20 s; the plugin uses at least 30 s for a
@@ -607,6 +617,52 @@ plugins and anything the binary reads (`capacitor.config.ts`, `Info.plist`,
    never downloaded again on this device.
 4. A store update drops all downloaded bundles (`resetWhenUpdate`, default),
    so the new binary starts from its own bundle.
+
+### Update levels and the store gate
+
+Silent switching leaves users on the old bundle until they relaunch or come
+back after a break. When that's not good enough:
+
+| | Set by | What the app does |
+| --- | --- | --- |
+| Silent | `publish` (default) | Switches on the next launch, or on a resume after 30 minutes away |
+| Prompt | `publish --mode prompt` | Also shows a "new version is ready" toast with **Restart** / **Later** once the bundle has downloaded |
+| Required | `publish --mode required` | Blocks the app with a screen that downloads the bundle (progress bar) and restarts into it; **Try again** if the download fails |
+| Store recommended | `store <platform> --recommended 1.2` | A toast with **Update** (opens the store listing) / **Later** (not shown again until a newer version is recommended) |
+| Store required | `store <platform> --required 1.2` | Blocks the app with a screen linking to the store |
+
+- **Bundle levels are floors, not flags.** The manifest stores
+  `requiredVersion` and `promptVersion`: running bundles older than these get
+  the blocking screen or the prompt. `publish` carries both forward from the
+  manifest it replaces, so a later silent bundle doesn't let an app that
+  missed a required one off the hook (`bundleUpdateLevel()`). Floors are per
+  runtime; a new binary starts with none.
+- **Use required only when an old bundle would break**, e.g. after an
+  incompatible API change that couldn't be kept backward compatible. A
+  required bundle that fails and rolls back on a device is never retried
+  there, so that device stays on its old bundle without a blocking screen
+  (no restart loops).
+- **The store gate reaches every binary**, whatever its runtime:
+  `app-updates/<platform>/store.json` holds `required`, `recommended` (the
+  marketing version, `CFBundleShortVersionString` / `versionName`, compared
+  part by part) and the listing `url` (default: `src/config/appStores.ts`).
+  It is how an app on an older native runtime, which no new bundle reaches,
+  learns that it has to update. Only raise `required` once that version is
+  live in the store, or users get a screen with nothing to install.
+  `store` refuses a version above the tree's native project version unless
+  `--force`; `--required none` clears a value, and values not passed are kept.
+- **Restarting mid-session** (prompt, required, long resume) waits for any
+  token refresh in flight (`waitForTokenRefreshes()` in `useAuthStore`), so
+  the reload never lands between the server rotating the refresh token and
+  the app storing it.
+- The UI is `src/components/liveUpdate/LiveUpdateNotices.tsx`, mounted by
+  `AppBootstrap` in native builds only (lazy chunk). It reads the notices
+  from `subscribeLiveUpdateNotices()`. Both checks run together: 10 s after
+  launch and on hourly resumes, so a required update shows up within seconds
+  of a launch, not before.
+- Strings live under `liveUpdate` in `messages/*.json`. The prompt and store
+  toasts use react-toastify; the blocking screens sit at `z-[2000]` and
+  swallow Android back.
 
 Versions are the UTC build time, `YYYYMMDD.HHmmss`, baked into every native
 build as `NEXT_PUBLIC_LIVE_UPDATE_VERSION`. A store binary built after a
@@ -643,8 +699,11 @@ bundle under the runtimes of the tree it builds from. So:
 ```bash
 npx wrangler login                     # once; needs access to the R2 bucket
 yarn live-update publish               # from a clean tree
+yarn live-update publish --mode prompt # or required (see Update levels)
 yarn live-update publish --dry-run     # build and sign, upload nothing
-yarn live-update status
+yarn live-update store android --recommended 1.1
+yarn live-update store ios --required 1.2 --dry-run
+yarn live-update status                # bundles, floors and store gates
 ```
 
 `publish` refuses a dirty tree (`--allow-dirty` overrides; the manifest then
@@ -656,7 +715,9 @@ with `wrangler r2 object put --remote` to the `douzepoints-assets` bucket
 `app-updates/bundles/<version>.zip` (immutable, cached for a year), then one
 `app-updates/<platform>/<runtime>.json` per platform (`no-cache`). The
 manifest holds the version, platform, runtime, zip URL, signed checksum,
-session key, size, commit and publish time.
+session key, the update floors, size, commit and publish time. `publish`
+reads the current manifests before building (to carry the floors forward)
+and stops if the CDN can't be read.
 
 - **Rolling back** means publishing again from a good commit: it gets a new,
   newer version. Apps that already run the bad bundle move to the new one
@@ -819,3 +880,96 @@ the Apple file with the next website deploy.
   link from the background each opened their item. On an Android 14
   emulator no share link matches. iOS builds with the entitlement; not
   tried end to end until the Apple file is deployed.
+
+## 13. Promoting the apps on the website
+
+The website points visitors to the store apps from release day
+(added 2026-11-06). Everything is off until `NEXT_PUBLIC_APP_STORES_LIVE`
+holds the public release date (`2026-11-12`): set it in the Workers Builds
+variables (and in `.env` for CLI deploys) once both listings are public, then
+rebuild. `src/config/appStores.ts` holds the flag (`APP_STORES_LIVE`, never
+true in the apps), the App Store ID `6821299332`, the store URLs and the
+custom URL scheme. To try it locally:
+`NEXT_PUBLIC_APP_STORES_LIVE=2026-11-12 yarn dev`.
+
+**Surfaces:**
+
+- **Safari's Smart App Banner** (`itunes` in the root layout's metadata):
+  "Open" when the app is installed, "View" when not; Safari remembers when
+  it's closed. Safari only: no Chrome on iOS, no in-app browsers. It carries
+  no `app-argument`: share links are cleaned from the address bar on load and
+  the layout can't read the query anyway.
+- **The setup hub card** (`src/components/appPromo/AppPromoCard.tsx`, under
+  the header): the store for this device (both on desktop, plus a QR code to
+  `/get-app`), "Why the app?" (the benefits, then what's coming: offline
+  mode), and "Not now". Its actions sit beside the text when they fit
+  (`useFitStep`), else below, and wrap when even that row is too narrow
+  (desktop at phone width). Store links are surface buttons with plain
+  names, not badges.
+- **The reminder under the winner** (`AppPromoReminder` in `WinnerModal`):
+  one line and a store link, on phones only.
+- **Settings → Look & feel → DouzePoints app**: both store links for good.
+- **What's new**: an entry dated by the flag, slotted in by date
+  (`insertByDate` in `feedbackInfo/data.ts`); the "Mobile app" upcoming item
+  disappears.
+- **About** (`#app`) and **`/get-app`** (`src/app/get-app/page.web.tsx`,
+  website only, a 404 until the flag): the official badges
+  (`public/img/store-badges/`, per language; Apple has no Ukrainian badge,
+  so `uk` is English; Google's PNGs are trimmed to the badge). `/get-app`
+  sends iPhones and iPads (by user agent) to the App Store and Android to
+  Play with a 307; computers, iPads asking for desktop pages and link
+  preview bots get the badges, the QR code (`public/img/get-app-qr.svg`,
+  black on white, regenerate with
+  `npx qrcode -t svg -e M -q 2 -o get-app-qr.svg https://douzepoints.app/get-app`)
+  and the benefits. It's the link to post anywhere.
+
+**When the card and the reminder show** (`appPromoPolicy.ts`, unit tested;
+state per browser in localStorage `app-promo-storage`):
+
+- The card: from the release date for 60 days. "Not now" ends it on desktop;
+  a phone gets it back once after 21 days. Following a store link doesn't
+  hide it (people close it themselves).
+- The reminder: phones only, at most twice, 30 days apart, within the same
+  60 days, until the card has ended for good. It is decided when the winner
+  card opens (and counted then), so it doesn't vanish while shown.
+- Neither for an account that has signed in on an app: the backend sets
+  `Profile.appSignedInAt` on every native sign-in (Google, Apple, email with
+  `native: true`) and on the weekly rotation of a header-borne refresh
+  token, which only the apps send; `/auth/me` returns it.
+
+**Android: "Open the app".** Chrome's `navigator.getInstalledRelatedApps()`
+tells the website whether the app is installed, once both sides vouch for
+each other: `public/app.webmanifest` lists the app (`related_applications`,
+linked from the layout only while the flag is on; `display: browser` and
+`prefer_related_applications` keep Chrome from offering the website as an
+installable app), and the app lists the website (`asset_statements`
+meta-data in `AndroidManifest.xml` + the statement in `strings.xml`,
+from the 2026-11 store build). With the app installed, the hub card turns
+into "Open the app" (until dismissed once, no campaign window): an intent
+link to the app's custom scheme with the Play listing as the fallback,
+`intent://open?contest=…#Intent;scheme=app.douzepoints;package=app.douzepoints;S.browser_fallback_url=…;end`
+(`androidOpenAppUrl()`). It carries the share parameter the page was opened
+with (`rememberLandingShareParam()`, since `useShareLinks` cleans the
+address bar). The app gets `app.douzepoints://open?contest=…` through a
+non-verified intent filter (host `open`) on `MainActivity`, and
+`appLinks.ts` turns it back into the share link (`parseAppSchemeUrl()`), so
+it works on every Android version, unlike App Links. Both native changes
+are part of the Android runtime (§11): older binaries don't answer the
+install check and don't know the scheme. iOS has no install check: the
+Smart App Banner is its "Open".
+
+**Testing:** desktop and phones can be emulated with Playwright user agents
+(`detectDevicePlatform()` reads the UA, not the width: a narrow desktop
+window still gets both stores, and Chrome DevTools' device mode reports an
+Android phone unless an iPhone preset is picked, so it shows Google Play
+only; an iPad asking for desktop pages counts as iOS when it has touch
+points). Stub
+`navigator.getInstalledRelatedApps` in an init script to see the Android
+"Open" variant. Clear `app-promo-storage` to see the card again. On a phone:
+`adb shell am start -a android.intent.action.VIEW -c android.intent.category.BROWSABLE -d 'app.douzepoints://open?contest=<id>'`
+should open the contest in the app. Verified 2026-11-06 in Chromium: the
+card on desktop (QR code decodes to `/get-app`), iPhone and Android in
+English, German, French, Greek and Ukrainian down to 320px, the dismissal
+rules, the reminder after a Grand Final, Settings, `/get-app` redirects and
+the head tags. Not yet tried: the Smart App Banner, the install check and
+the intent link on real devices.

@@ -102,6 +102,7 @@ export const queryKeys = {
       ['user', 'quick-select-state', { ids: [...ids].sort() }] as const,
     preferences: () => ['user', 'preferences'] as const,
     profileSummary: () => ['user', 'profile-summary'] as const,
+    signInMethods: () => ['user', 'sign-in-methods'] as const,
     // Add more user-specific queries here in the future:
     // savedEvents: () => ['user', 'saved-events'] as const,
   },
@@ -230,6 +231,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.blockedUsers(),
   queryKeys.user.preferences(),
   queryKeys.user.profileSummary(),
+  queryKeys.user.signInMethods(),
   ['user', 'entry-stats'] as const,
   queryKeys.user.myLeaderboard(),
   queryKeys.follows.followingFeed({}),

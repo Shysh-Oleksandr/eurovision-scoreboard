@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import type { Country } from '@/models';
+import { playHaptic } from '@/native/haptics';
 import { shuffle } from '@/state/allocationDraw/rng';
 
 type UseRunningOrderParams = {
@@ -128,6 +129,8 @@ export const useRunningOrder = ({
     const shuffled = shuffle(orderedCodes);
     const first = Math.floor(shuffled.length / 2);
 
+    playHaptic({ id: 'shuffle' });
+
     setOrderedCodes(shuffled);
     setFirstHalfSize(first);
 
@@ -155,11 +158,14 @@ export const useRunningOrder = ({
       setFirstHalfSize(firstHalfSize + 1);
     }
     setOrderedCodes(next);
+    playHaptic({ id: 'dragBoundary' });
 
     return toSecond ? 2 : 1;
   };
 
   const handleQuickSort = (sort: 'az' | 'za' | 'shuffle' | 'reset') => {
+    playHaptic({ id: sort === 'shuffle' ? 'shuffle' : 'sortSweep' });
+
     if (sort === 'reset') {
       setOrderedCodes(initialOrderedCodes);
       setFirstHalfSize(initialFirstHalfSize);

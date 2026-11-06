@@ -9,6 +9,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
+import SignInMethodsSection from './SignInMethodsSection';
+
 import {
   useDeleteProfileAvatarMutation,
   useUpdateProfileMutation,
@@ -217,8 +219,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       containerClassName="!w-[min(100%,550px)]"
-      contentClassName="text-white narrow-scrollbar sm:!h-[max(30vh,320px)] !h-[max(30vh,390px)]"
+      contentClassName="text-white narrow-scrollbar"
       overlayClassName="!z-[1001]"
+      fullScreenOnPhone
       bottomContent={
         <ModalBottomContent
           onClose={onClose}
@@ -301,6 +304,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
           selectClassName="!shadow-none"
         />
       </div>
+
+      <SignInMethodsSection isOpen={isOpen} />
 
       <section className="mt-6 pt-5 border-t border-white/10 space-y-4">
         <h4 className="text-lg font-bold">{t('moderation.account')}</h4>

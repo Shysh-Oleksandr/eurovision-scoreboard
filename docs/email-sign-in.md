@@ -81,7 +81,9 @@ code).
   including one made with Google or Apple. The reverse already held: Google
   and Apple link by address only when they vouch for it (`email_verified`).
   The website's Google strategy now checks that too; before, it took the
-  address unchecked.
+  address unchecked. Since 2026-11-06 signed-in users can also connect
+  methods with other addresses, and add or change the address, in Edit
+  profile → Sign-in methods ([sign-in-methods.md](sign-in-methods.md)).
 - **New profiles** get a random `adjective-noun` username
   (`generateRandomUsername`), never one built from the address: usernames are
   public and children's addresses often contain their real name. Google and
@@ -229,6 +231,5 @@ with Apple.
 ## 8. Not done
 
 - An age question at sign-up. The terms say 13+, nothing checks it.
-- Changing the address of an account.
 - Passkeys, with email codes as the recovery path.
 - An optional password, if users ask for one.

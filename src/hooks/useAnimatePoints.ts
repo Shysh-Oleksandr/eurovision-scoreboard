@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react';
 import { useGSAP } from '@gsap/react';
 
 import { useOnLayoutKeyChange } from '@/hooks/useOnLayoutKeyChange';
+import { playHaptic } from '@/native/haptics';
 import { playThemeSound } from '@/theme/playThemeSound';
 import { DouzePointsAnimationMode } from '@/theme/types';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -89,6 +90,9 @@ const useAnimatePoints = ({
       if (isDouzePoints) {
         if (!douzePointsSoundPlayedForParallelogramsRef.current) {
           playThemeSound('douzePoints', { skip: isThemePreview });
+          if (!isThemePreview) {
+            playHaptic({ id: 'douzeBloom', variant: 'sweep' });
+          }
           douzePointsSoundPlayedForParallelogramsRef.current = true;
         }
         gsap.to(containerRef.current, {

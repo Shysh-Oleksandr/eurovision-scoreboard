@@ -10,6 +10,7 @@ import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { cn } from '@/helpers/utils';
+import { playHaptic } from '@/native/haptics';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { playThemeSound } from '@/theme/playThemeSound';
@@ -90,6 +91,14 @@ const SplitScreenQualifierModal = () => {
         });
 
         timeline = gsap.timeline();
+
+        // A tick as each card lands (offsets in native/haptics/cues.ts).
+        timeline.call(
+          () =>
+            playHaptic({ id: 'qualifierCards', count: orderedItems.length }),
+          undefined,
+          0,
+        );
 
         // Slide in first, then scale to full size.
         timeline.to(orderedItems, {

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { playHaptic } from '@/native/haptics';
+
 type ToggleButtonProps = {
   isActive: boolean;
   onToggle: () => void;
@@ -14,7 +16,10 @@ export const ToggleButton = ({
   return (
     <button
       type="button"
-      onClick={onToggle}
+      onClick={() => {
+        playHaptic({ id: 'toggle', on: !isActive });
+        onToggle();
+      }}
       className={`relative inline-flex h-[23px] w-12 items-center rounded-full transition-colors focus:outline-none hover:bg-primary-700/70 ${
         isActive ? 'bg-primary-700' : 'bg-primary-800'
       } ${className}`}

@@ -256,14 +256,18 @@ the release notes ("What's new") can stay short.
 
 ## 6. Screenshots
 
-`yarn store-screenshots` (`scripts/store-screenshots.mjs`) renders them
-from the static export, so run `yarn build:native` first (and again after
-UI changes). Playwright WebKit renders the iOS sizes and Chromium the
-Android ones, in English, into `assets/store/screenshots/<device>/`
-(gitignored). Every run plays the same seeded contest: 2026, Grand Final
-only, 16 random juries, then one jury by hand with the 12 to the
-runner-up. `--device` and `--scene` take comma-separated names; `--url`
-uses a running server instead of `out/`.
+`yarn store-screenshots` (`scripts/store-screenshots.mjs`, the parts in
+`scripts/store-screenshots/`) captures the real app from the static export,
+so run `yarn build:native` first (and again after UI changes). Playwright
+WebKit drives the iOS sizes and Chromium the Android ones. Each screenshot
+is a capture placed 1:1 in a flat device outline (no tilt, shadow or glow)
+on the slide's theme background, under a caption: a plain line, then the
+key words as a board row in that theme's board colours. Output:
+`assets/store/screenshots/<locale>/<device>/<NN>-<scene>.png` (gitignored),
+for all nine app languages. `--device`, `--locale` and `--scene` take
+comma-separated names, `--jobs` sets how many device/language runs go in
+parallel (default 2), `--keep-raw` keeps the bare captures. A full run
+takes about an hour.
 
 | Folder | Pixels | Upload to |
 |---|---|---|
@@ -272,14 +276,51 @@ uses a running server instead of `out/`.
 | `android-phone` | 1242×2208 (9:16) | Play, phone screenshots |
 | `android-tablet` | 2560×1440 (16:9) | Play, 7-inch and 10-inch tablet screenshots (the same files) |
 
-Scenes, in upload order: `01-scoreboard` (a jury vote with the douze
-points hearts frozen mid-sweep), `02-winner` (the winner modal with
-confetti), `03-setup` (Event Setup).
+Slides, in upload order (the first three are what App Store search shows):
 
+| # | Scene | Shows | Theme |
+|---|---|---|---|
+| 01 | `scoreboard` | The real final after 22 of 35 juries, Denmark's 12 to Bulgaria, hearts frozen mid-sweep | 2026 |
+| 02 | `winner` | Bulgaria, 516 points, confetti | 2026 |
+| 03 | `setup` | Event Setup, signed in, library counts | 2026 |
+| 04 | `publicthemes` | Public Themes, most liked first | 2026 |
+| 05 | `builder` | The theme builder's Look step editing "2027 Burgas" | that theme |
+| 06 | `contests` | Your Contests: the real final and two random simulations | 2023 |
+| 07 | `stats` | Final stats | 2025 |
+| 08 | `share` | The share image | 2022 |
+
+- **Votes.** `esc2026-final.csv` is the real ESC 2026 Grand Final (jury
+  and televote per voter, from Wikipedia's detailed voting tables, checked
+  against the published totals). It is imported in the predefinition modal
+  and replayed in the spokesperson order: the stage modal's Voters → Load
+  year data, as the default Grand Final voters are the participants A–Z
+  without the Rest of the World.
+- **Signed-in screens** (03, 05, 06) use a throwaway backend
+  (`backend.mjs`): MongoDB 7 in Docker on :27019 and the sibling
+  `douze-points-backend` compiled to a temp folder, on :8011, with a
+  review address that signs in with a fixed code. Its environment is built
+  from scratch and it runs without a .env, so it can't reach production;
+  the browser's API calls are routed to it. Docker must be running. A seed
+  session saves the real final and two random simulations (2025, 2024) in
+  the 2023 theme, creates `builder-theme.json`, and gives the account the
+  app logo and the name DouzePoints. The setup's library counts and
+  follower count are mock numbers (`MOCK_SUMMARY` in `app.mjs`, answered
+  in place of `/profiles/me/summary`); the Graphics count is this device's
+  drafts, so the session adds placeholder records to IndexedDB.
+- **Public themes** (04) are read from production with GETs only, so they
+  show real creators' names, as in the app.
+- **Captions** are in `captions.json` (lead line, row label, points) for
+  every locale; the translations want a native speaker's check. Lines that
+  don't fit shrink (German and Greek run long). Board styles per slide are
+  in `frame.mjs`, device frames in `devices.mjs`.
 - A browser has no status bar or home indicator, so the script draws them
   (9:41 on iOS, 12:00 on Android) and passes the devices' safe areas in
   as `--safe-area-inset-*`. The home indicator / gesture handle turns dark
   over light content, as on the devices.
+- Stills that differ from the app in motion: the douze points overlay's
+  copy of the name is hidden (frozen mid-fade, the two copies stack and
+  look bold), and the winner's confetti is moved behind the card (in the
+  app it falls in front).
 - Apple's spec page also names the 6.1″ "Dynamic Island (medium display)"
   slot as required, filled by scaling down the 6.9″ screenshots. If App
   Store Connect asks for it anyway, add a device with a 402×874 viewport at
@@ -292,6 +333,7 @@ confetti), `03-setup` (Event Setup).
   time (they are reviewed again).
 - The app removes the douze points hearts 3 s after they start
   (`ANIMATION_DURATION`). The script fails if that happens before the
-  screenshot; run it again.
-- Adding a scene: a step in the script's Scenes section and its name in
-  `SCENES`.
+  screenshot; run it again with `--scene scoreboard`.
+- Adding a scene: a step in a session in `app.mjs` (`SESSIONS` says which
+  session makes which scene), a row in `SLIDES` (`frame.mjs`) and its
+  captions in `captions.json`.

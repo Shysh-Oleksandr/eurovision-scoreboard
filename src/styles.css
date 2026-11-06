@@ -1884,6 +1884,100 @@ h6 {
     overflow: visible;
   }
 
+  /* --- App announcement (AppPromoCard): a quiet row under the header. The
+     actions sit beside the text while both fit at their natural width
+     (`useFitStep`), else they take their own row. --- */
+  .dp-app-promo {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+  }
+
+  .dp-app-promo-grid {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: 'icon text actions close';
+    align-items: center;
+    column-gap: 12px;
+  }
+
+  .dp-app-promo-grid[data-layout='stack'] {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'icon text close'
+      'actions actions actions';
+    row-gap: 10px;
+  }
+
+  .dp-app-promo-icon {
+    grid-area: icon;
+  }
+
+  .dp-app-promo-text {
+    grid-area: text;
+  }
+
+  .dp-app-promo-actions {
+    grid-area: actions;
+  }
+
+  .dp-app-promo-close {
+    grid-area: close;
+  }
+
+  /* Long translations wrap the text to three or four lines: the icon and the
+     close button stay level with the title. */
+  .dp-app-promo-grid[data-layout='stack'] .dp-app-promo-icon,
+  .dp-app-promo-grid[data-layout='stack'] .dp-app-promo-close {
+    align-self: start;
+  }
+
+  /* While measuring, everything takes its natural width on one line. */
+  .dp-app-promo-grid[data-fit-measuring] {
+    grid-template-columns: repeat(4, max-content);
+  }
+
+  .dp-app-promo-grid[data-fit-measuring] .dp-app-promo-text {
+    white-space: nowrap;
+  }
+
+  /* --- Sign-in methods (Edit profile, SignInMethodsSection): the actions
+     sit beside each method while every address fits, else under them for
+     the whole list (useFitStep measures the cut addresses). --- */
+  .dp-signin-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'icon text actions';
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  .dp-signin-icon {
+    grid-area: icon;
+  }
+
+  .dp-signin-text {
+    grid-area: text;
+    min-width: 0;
+  }
+
+  .dp-signin-actions {
+    grid-area: actions;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dp-signin-list[data-layout='stack'] .dp-signin-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'icon text'
+      '. actions';
+  }
+
+  .dp-signin-list[data-layout='stack'] > .dp-signin-row + .dp-signin-row {
+    margin-top: 18px;
+  }
+
   /* --- Contest card --- */
   .dp-contest-card {
     background: linear-gradient(

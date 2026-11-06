@@ -45,3 +45,11 @@ export function runBackHandler(): boolean {
 
   return true;
 }
+
+/**
+ * How many dismissable overlays are open (native apps only; always 0 on the
+ * website). Live updates read it to pick a quiet moment to restart.
+ */
+export function openOverlayCount(): number {
+  return stack.length;
+}

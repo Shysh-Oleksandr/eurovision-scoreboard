@@ -764,6 +764,45 @@
           "tooManyAttempts": "Trop de codes incorrects. Demandez-en un nouveau.",
           "codeExpired": "Ce code a expiré. Demandez-en un nouveau.",
           "network": "Pas de connexion. Vérifiez votre accès à Internet et réessayez.",
+          "unknown": "Une erreur s’est produite. Réessayez.",
+          "inUse": "Cette adresse appartient déjà à un autre compte DouzePoints. Utilisez-en une autre."
+        },
+        "linkTitle": "Ajouter une adresse e-mail",
+        "changeTitle": "Changer d’adresse e-mail",
+        "linkEmailBody": "Nous vous enverrons un code à 6 chiffres pour confirmer qu’elle est à vous. Vous pourrez ensuite vous connecter aussi avec cette adresse.",
+        "changeEmailBody": "Nous enverrons un code à 6 chiffres à la nouvelle adresse. Ensuite, les codes de connexion y seront envoyés.",
+        "confirm": "Confirmer",
+        "linkSuccess": "Adresse e-mail enregistrée. Vous pouvez maintenant vous connecter avec."
+      },
+      "signInMethods": {
+        "title": "Méthodes de connexion",
+        "description": "Les façons de vous connecter à ce compte. Ajoutez-en une autre pour toujours pouvoir y revenir, sur n’importe quel appareil.",
+        "google": "Google",
+        "apple": "Apple",
+        "email": "E-mail",
+        "connected": "Connecté",
+        "notConnected": "Non connecté",
+        "connect": "Connecter",
+        "add": "Ajouter",
+        "change": "Modifier",
+        "remove": "Retirer",
+        "loadFailed": "Impossible de charger vos méthodes de connexion.",
+        "retry": "Réessayer",
+        "googleConnected": "Google est connecté. Vous pouvez maintenant vous connecter avec.",
+        "appleConnected": "Apple est connecté. Vous pouvez maintenant vous connecter avec.",
+        "removed": "Méthode de connexion retirée.",
+        "removeTitle": "Retirer cette méthode de connexion ?",
+        "removeDescription": "Vous ne pourrez plus vous connecter avec {method}. Vous pourrez la reconnecter plus tard.",
+        "removeSharedEmailDescription": "{method} utilise votre adresse e-mail, {email} : se connecter avec {method} ouvrira donc toujours ce compte, et {method} y sera reconnecté. Pour l’éviter, changez aussi votre adresse e-mail.",
+        "removeEmailDescription": "Les codes de connexion ne seront plus envoyés à {email}. Vous pourrez ajouter une adresse plus tard.",
+        "errors": {
+          "inUseGoogle": "Ce compte Google sert déjà à se connecter à un autre compte DouzePoints. Pour le connecter ici, connectez-vous avec et supprimez d’abord cet autre compte.",
+          "inUseApple": "Cet identifiant Apple sert déjà à se connecter à un autre compte DouzePoints. Pour le connecter ici, connectez-vous avec et supprimez d’abord cet autre compte.",
+          "inUseEmail": "Cette adresse e-mail appartient déjà à un autre compte DouzePoints.",
+          "alreadyConnected": "Un autre compte est déjà connecté ici. Retirez-le d’abord.",
+          "lastMethod": "C’est votre seule façon de vous connecter. Ajoutez-en d’abord une autre.",
+          "expired": "Cela a pris trop de temps. Réessayez.",
+          "network": "Pas de connexion. Vérifiez votre accès à Internet et réessayez.",
           "unknown": "Une erreur s’est produite. Réessayez."
         }
       },
@@ -1512,7 +1551,7 @@
         "winter": "Ajouter de la neige qui tombe et des touches festives dans toute l’app.",
         "finalReveal": "Révéler les scores finaux du télévote pays par pays avec une animation dramatique.",
         "predictableReveal": "Révéler les scores du télévote dans un ordre fluide et déterministe, sans suspense aléatoire.",
-        "haptics": "Vibre lors des 12 points, de l’annonce des qualifiés et du vainqueur."
+        "haptics": "Ressentez chaque vote : une pression à chaque attribution de points, un battement de cœur pour les 12 points, la montée au classement, la révélation finale et le vainqueur."
       }
     },
     "relations": {
@@ -1655,6 +1694,9 @@
       "fast": "Rapide",
       "finalRevealLinearAnimation": "Animation fluide et prévisible (sans aléatoire)",
       "enableHaptics": "Retour haptique",
+      "hapticsStrength": "Intensité haptique",
+      "hapticsSubtle": "Discrète",
+      "hapticsStrong": "Forte",
       "enableFullscreenMode": "Activer le mode plein écran",
       "warnBeforeManuallyAssigningTelevotePoints": "Avertir avant d’attribuer manuellement des points de télévote",
       "showJuryVotingProgressBar": "Afficher la barre de progression du jury",
@@ -2453,5 +2495,51 @@
     "deleteAccountConfirmDescription": "Votre profil, vos concours, thèmes, designs, polices et entrées personnalisées seront supprimés, ainsi que vos j’aime, enregistrements, abonnements et blocages. Cette action est irréversible. Les réglages et brouillons conservés uniquement sur cet appareil restent.",
     "accountDeleted": "Votre compte a été supprimé.",
     "deleteAccountFailed": "Votre compte n’a pas pu être supprimé. Veuillez réessayer."
+  },
+  "liveUpdate": {
+    "readyMessage": "Une nouvelle version de DouzePoints est prête. Redémarrez l’app pour l’utiliser.",
+    "restart": "Redémarrer",
+    "later": "Plus tard",
+    "update": "Mettre à jour",
+    "requiredTitle": "Mise à jour de DouzePoints",
+    "requiredBody": "Cette mise à jour est nécessaire pour que l’app continue de fonctionner. Cela ne prend qu’un instant.",
+    "requiredFailedBody": "Impossible de télécharger la mise à jour. Vérifiez votre connexion et réessayez.",
+    "tryAgain": "Réessayer",
+    "restartingBody": "Presque terminé. Redémarrage de l’app…",
+    "progressLabel": "Progression de la mise à jour",
+    "storeRequiredTitle": "Mise à jour nécessaire",
+    "storeRequiredBody": "Cette version de DouzePoints n’est plus prise en charge. Installez la dernière version pour continuer à utiliser l’app.",
+    "openStore": "Ouvrir {store}",
+    "storeRecommendedMessage": "Une nouvelle version de DouzePoints est disponible."
+  },
+  "appPromo": {
+    "title": "DouzePoints existe maintenant en app",
+    "body": "En plein écran sur votre téléphone, avec retour haptique et le menu de partage.",
+    "openTitle": "Ouvrir DouzePoints dans l’app",
+    "openBody": "En plein écran, avec retour haptique et le menu de partage.",
+    "openApp": "Ouvrir l’app",
+    "qrCode": "Code QR",
+    "qrHint": "Scannez-le avec l’appareil photo de votre téléphone pour obtenir l’app.",
+    "why": "Pourquoi l’app ?",
+    "dismiss": "Plus tard",
+    "benefits": {
+      "fullScreen": "Plein écran, sans les barres du navigateur",
+      "haptics": "Un retour haptique tout au long du show, des premiers points jusqu’au vainqueur",
+      "images": "Les images s’enregistrent directement dans Photos ou la galerie et se partagent depuis le menu de partage",
+      "next": "Bientôt : un mode hors ligne et d’autres fonctions réservées au téléphone"
+    },
+    "reminder": "La prochaine fois, regardez-le en plein écran dans l’app.",
+    "reminderAction": "Obtenir l’app",
+    "settingsLabel": "App DouzePoints",
+    "settingsDesc": "Pour iPhone, iPad et Android, en plein écran et avec retour haptique.",
+    "page": {
+      "metaTitle": "Obtenir l’app DouzePoints",
+      "metaDescription": "DouzePoints pour iPhone, iPad et Android : simulez le vote du concours en plein écran, avec retour haptique.",
+      "title": "Obtenir l’app DouzePoints",
+      "intro": "DouzePoints est sur l’App Store et Google Play, pour iPhone, iPad et Android.",
+      "benefitsTitle": "Ce que l’app apporte",
+      "qrHint": "Sur un ordinateur ? Scannez ce code avec l’appareil photo de votre téléphone.",
+      "back": "Ouvrir DouzePoints dans le navigateur"
+    }
   }
 }

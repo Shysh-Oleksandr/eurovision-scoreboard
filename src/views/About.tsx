@@ -1,6 +1,8 @@
 import Link from 'next/link';
 
 import { ArrowIcon } from '@/assets/icons/ArrowIcon';
+import { StoreBadges } from '@/components/appPromo/StoreLinks';
+import { APP_STORES_LIVE } from '@/config/appStores';
 import whiteHearts2026Credits from '@/data/whiteHearts2026Credits.json';
 
 const whiteHeartCredits = Object.values(whiteHearts2026Credits);
@@ -23,6 +25,20 @@ const About = () => {
 
           <div className="px-8 py-8">
             <div className="prose prose-invert prose-lg max-w-none">
+              {APP_STORES_LIVE && (
+                <section id="app" className="mb-8 scroll-mt-4">
+                  <h2 className="text-2xl font-bold text-white mb-6 border-b border-primary-700/40 pb-3">
+                    The app
+                  </h2>
+                  <p className="text-primary-200 leading-relaxed mb-5">
+                    DouzePoints is also an app for iPhone, iPad and Android: the
+                    same simulator, full screen, with haptics and the share
+                    sheet.
+                  </p>
+                  <StoreBadges locale="en" className="not-prose" />
+                </section>
+              )}
+
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-white mb-6 border-b border-primary-700/40 pb-3">
                   Google OAuth2 Homepage

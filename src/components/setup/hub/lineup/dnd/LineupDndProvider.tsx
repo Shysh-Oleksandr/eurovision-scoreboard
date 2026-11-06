@@ -31,6 +31,7 @@ import { acceptsDrop, dropDepth, highlightedZone, parseDrop } from './dndIds';
 
 import { useBulkAssignCustomEntryGroupMutation } from '@/api/customEntries';
 import { getCustomEntryId } from '@/components/setup/utils/getCustomEntryId';
+import { playHaptic } from '@/native/haptics';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -137,6 +138,8 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
   const boardRowLook = useBoardRowLook();
   const [dragCount, setDragCount] = useState(1);
   const hoverTimer = useRef<{ id: string; timeout: number } | null>(null);
+  /** The zone the last `dragOver` tick was for (one tick per zone entered). */
+  const tickedZone = useRef<string | null>(null);
   /** Pool categories the dragged tiles belong to (gates the custom groups). */
   const homeCategories = useRef<ReadonlySet<string>>(new Set());
 
@@ -190,10 +193,20 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
       String(active.data.current?.listId ?? '').startsWith('stage:'),
     );
     setDragCount(codes.length);
+    // Drop zones are the ListIds of their lists: the home zone needs no tick.
+    const homeList = String(active.data.current?.listId ?? '');
+
+    tickedZone.current = homeList ? highlightedZone(homeList) : null;
+    // Confirms the touch hold picked the tile up.
+    playHaptic({ id: 'dragLift' });
   };
 
   const onDragOver = ({ over }: DragOverEvent) => {
     const overId = over ? String(over.id) : null;
+    const zone = overId ? highlightedZone(overId) : null;
+
+    if (zone && zone !== tickedZone.current) playHaptic({ id: 'dragOver' });
+    tickedZone.current = zone;
 
     if (hoverTimer.current?.id === overId) return;
 
@@ -217,11 +230,13 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
     setActiveCode(null);
     useSetupUiStore.getState().setDragging(null);
 
-    if (!over) return;
+    const drop = over ? parseDrop(String(over.id)) : null;
 
-    const drop = parseDrop(String(over.id));
+    if (!drop) {
+      playHaptic({ id: 'dragCancel' });
 
-    if (!drop) return;
+      return;
+    }
 
     const codes = draggedCodes(String(active.id));
     const assignments = useCountriesStore.getState().eventAssignments;
@@ -244,6 +259,14 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
 
+    // A drop that changes nothing (back where it came from) settles softly.
+    playHaptic({
+      id:
+        needsMove || drop.customGroupId !== undefined
+          ? 'dragDrop'
+          : 'dragCancel',
+    });
+
     if (codes.length > 1) useSetupUiStore.getState().clearSelection();
   };
 
@@ -251,6 +274,7 @@ const LineupDndProvider: React.FC<{ children: React.ReactNode }> = ({
     clearHoverTimer();
     setActiveCode(null);
     useSetupUiStore.getState().setDragging(null);
+    playHaptic({ id: 'dragCancel' });
   };
 
   const activeCountry = activeCode ? byCode.get(activeCode) : undefined;

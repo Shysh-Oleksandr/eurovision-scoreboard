@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DrawCopyContext } from './drawCopy';
 import { captionFor, groupLabel, groupText, liveText } from './drawCopy';
 
+import { playHaptic, type HapticCue } from '@/native/haptics';
 import { solve } from '@/state/allocationDraw/engine';
 import { newDrawCode } from '@/state/allocationDraw/rng';
 import type {
@@ -217,6 +218,25 @@ export const useDrawCeremony = ({
   const timeline = useRef<gsap.core.Timeline | null>(null);
   const autoCall = useRef<gsap.core.Tween | null>(null);
   const finishCall = useRef<gsap.core.Tween | null>(null);
+  /** "Draw next" jumping a reveal to its end: its haptics are skipped. */
+  const isJumpingRef = useRef(false);
+
+  /**
+   * Places a haptic in a step's timeline (docs/haptics.md). Durations a cue
+   * spans are given at 1× and divided by the timeline's current speed.
+   */
+  const feel = useCallback(
+    (tl: gsap.core.Timeline, at: number, cue: (speed: number) => HapticCue) => {
+      tl.call(
+        () => {
+          if (!isJumpingRef.current) playHaptic(cue(tl.timeScale() || 1));
+        },
+        undefined,
+        at,
+      );
+    },
+    [],
+  );
 
   const q = useCallback(
     <T extends HTMLElement = HTMLElement>(selector: string): T | null =>
@@ -364,6 +384,7 @@ export const useDrawCeremony = ({
           );
         }
         tl.to({}, { duration: 0.45 });
+        feel(tl, 0.15, () => ({ id: 'drawPot' }));
 
         return tl;
       }
@@ -468,6 +489,7 @@ export const useDrawCeremony = ({
           duration: 0.15,
         });
         tl.call(fill, undefined, '+=0.25');
+        feel(tl, tl.duration(), () => ({ id: 'dragDrop' }));
         if (target) {
           tl.fromTo(target, { opacity: 0 }, { opacity: 1, duration: 0.2 });
         }
@@ -476,6 +498,7 @@ export const useDrawCeremony = ({
           highlight(false);
           flagEl?.classList.add('is-settled');
         });
+        feel(tl, 0, () => ({ id: 'drawChip' }));
 
         return tl;
       }
@@ -641,9 +664,19 @@ export const useDrawCeremony = ({
       }
       tl.call(() => highlight(false), undefined, flyAt + 0.82);
 
+      // Out of the pot into the spotlight (0.55 s), the semi-final chip, the
+      // half chip, then the flight to the slot (0.6 s) and its landing.
+      feel(tl, 0, (speed) => ({ id: 'drawPick', durationMs: 550 / speed }));
+      feel(tl, 0.88, () => ({ id: 'drawChip' }));
+      if (capHalf && halfChip) feel(tl, 1.33, () => ({ id: 'drawChip' }));
+      feel(tl, flyAt, (speed) => ({
+        id: 'drawFlight',
+        durationMs: 600 / speed,
+      }));
+
       return tl;
     },
-    [announce, dom, flagSrcOf, q],
+    [announce, dom, feel, flagSrcOf, q],
   );
 
   const finish = useCallback(() => {
@@ -661,6 +694,7 @@ export const useDrawCeremony = ({
 
     setState({ ...next, phase: 'done', auto: false });
     announce(copyRef.current.t('liveComplete'));
+    playHaptic({ id: 'drawDone' });
   }, [announce, setState, stopAll]);
 
   const runStepRef = useRef<() => void>(() => undefined);
@@ -755,8 +789,16 @@ export const useDrawCeremony = ({
     if (timeline.current) {
       const tl = timeline.current;
 
+      const jumpedStep = current.plan?.steps[current.at];
+
       timeline.current = null;
+      isJumpingRef.current = true;
       tl.progress(1); // fires onComplete → finishStep
+      isJumpingRef.current = false;
+      // The reveal's own cues were skipped: the country just lands.
+      if (jumpedStep && jumpedStep.t !== 'group') {
+        playHaptic({ id: 'drawFlight', durationMs: 80 });
+      }
       // finishStep re-arms auto-play after the gap; this call owns the
       // follow-up instead, so the next reveal is scheduled exactly once.
       killAuto();

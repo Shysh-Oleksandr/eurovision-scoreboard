@@ -1,3 +1,4 @@
+import { APP_URL_SCHEME } from '@/config/appStores';
 import { IS_NATIVE_APP } from '@/native/platform';
 
 /** The public website, which every share link points to from the apps. */
@@ -59,6 +60,42 @@ export function parsePublicSiteUrl(url: string): URL | null {
     return null;
   }
 }
+
+/**
+ * The website's "Open the app" link on Android (`app.douzepoints://open`,
+ * maybe with a share parameter) as the public website URL with the same
+ * query, so the app treats it like the share link it came from; else null.
+ */
+export function parseAppSchemeUrl(url: string): URL | null {
+  try {
+    const parsed = new URL(url);
+
+    if (parsed.protocol !== `${APP_URL_SCHEME}:` || parsed.host !== 'open') {
+      return null;
+    }
+
+    const site = new URL(PUBLIC_SITE_URL);
+
+    site.search = parsed.search;
+
+    return site;
+  } catch {
+    return null;
+  }
+}
+
+let landingShareParam: { key: ShareParamKey; value: string } | null = null;
+
+/**
+ * The share parameter the website was opened with. `useShareLinks` removes
+ * it from the address bar once the item is open; "Open the app" still needs
+ * it to open the same item in the app.
+ */
+export function rememberLandingShareParam(url: URL): void {
+  landingShareParam = findShareParam(url);
+}
+
+export const getLandingShareParam = () => landingShareParam;
 
 /**
  * A link to the app's main page with the given query (`?theme=…`,

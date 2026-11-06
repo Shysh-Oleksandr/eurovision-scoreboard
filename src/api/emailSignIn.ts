@@ -33,6 +33,8 @@ export type EmailSignInErrorKind =
   | 'invalidCode'
   | 'tooManyAttempts'
   | 'codeExpired'
+  /** Adding an address: it belongs to another account. */
+  | 'inUse'
   | 'network'
   | 'unknown';
 
@@ -59,6 +61,8 @@ function kindOfCode(code: unknown): EmailSignInErrorKind | null {
       return 'tooManyAttempts';
     case 'code_expired':
       return 'codeExpired';
+    case 'in_use':
+      return 'inUse';
     default:
       return null;
   }

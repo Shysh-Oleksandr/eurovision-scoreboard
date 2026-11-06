@@ -764,6 +764,45 @@
           "tooManyAttempts": "Demasiados códigos incorrectos. Pide uno nuevo.",
           "codeExpired": "Este código ha caducado. Pide uno nuevo.",
           "network": "Sin conexión. Comprueba tu internet e inténtalo de nuevo.",
+          "unknown": "Algo ha salido mal. Inténtalo de nuevo.",
+          "inUse": "Esta dirección ya pertenece a otra cuenta de DouzePoints. Usa otra."
+        },
+        "linkTitle": "Añadir una dirección de correo",
+        "changeTitle": "Cambiar tu dirección de correo",
+        "linkEmailBody": "Te enviaremos un código de 6 dígitos para confirmar que es tuya. Después también podrás iniciar sesión con esta dirección.",
+        "changeEmailBody": "Enviaremos un código de 6 dígitos a la nueva dirección. Después, los códigos de inicio de sesión irán allí.",
+        "confirm": "Confirmar",
+        "linkSuccess": "Dirección guardada. Ya puedes iniciar sesión con ella."
+      },
+      "signInMethods": {
+        "title": "Métodos de inicio de sesión",
+        "description": "Formas de entrar en esta cuenta. Añade otra para poder volver siempre, desde cualquier dispositivo.",
+        "google": "Google",
+        "apple": "Apple",
+        "email": "Correo",
+        "connected": "Conectado",
+        "notConnected": "Sin conectar",
+        "connect": "Conectar",
+        "add": "Añadir",
+        "change": "Cambiar",
+        "remove": "Quitar",
+        "loadFailed": "No se han podido cargar tus métodos de inicio de sesión.",
+        "retry": "Reintentar",
+        "googleConnected": "Google conectado. Ya puedes iniciar sesión con él.",
+        "appleConnected": "Apple conectado. Ya puedes iniciar sesión con él.",
+        "removed": "Método de inicio de sesión quitado.",
+        "removeTitle": "¿Quitar este método de inicio de sesión?",
+        "removeDescription": "Ya no podrás iniciar sesión con {method}. Puedes volver a conectarlo más adelante.",
+        "removeSharedEmailDescription": "{method} usa tu dirección de correo, {email}, así que iniciar sesión con {method} seguirá abriendo esta cuenta y lo volverá a conectar. Para evitarlo, cambia también tu dirección de correo.",
+        "removeEmailDescription": "Ya no se enviarán códigos de inicio de sesión a {email}. Puedes añadir una dirección más adelante.",
+        "errors": {
+          "inUseGoogle": "Esta cuenta de Google ya sirve para entrar en otra cuenta de DouzePoints. Para conectarla aquí, inicia sesión con ella y elimina antes esa cuenta.",
+          "inUseApple": "Este Apple ID ya sirve para entrar en otra cuenta de DouzePoints. Para conectarlo aquí, inicia sesión con él y elimina antes esa cuenta.",
+          "inUseEmail": "Esta dirección de correo ya pertenece a otra cuenta de DouzePoints.",
+          "alreadyConnected": "Ya hay otra cuenta conectada aquí. Quítala primero.",
+          "lastMethod": "Es tu única forma de iniciar sesión. Añade otra primero.",
+          "expired": "Ha tardado demasiado. Inténtalo de nuevo.",
+          "network": "Sin conexión. Comprueba tu internet e inténtalo de nuevo.",
           "unknown": "Algo ha salido mal. Inténtalo de nuevo."
         }
       },
@@ -1512,7 +1551,7 @@
         "winter": "Añadir nieve cayendo y toques festivos en toda la app.",
         "finalReveal": "Revelar los puntos finales del televoto país por país con una animación dramática.",
         "predictableReveal": "Revelar los puntos del televoto en un orden suave y determinista, sin suspense aleatorio.",
-        "haptics": "Vibra con los 12 puntos, al revelar los clasificados y con el ganador."
+        "haptics": "Siente cada voto: un toque con cada puntuación, un latido con los 12 puntos, la subida en la tabla, la revelación final y el ganador."
       }
     },
     "relations": {
@@ -1655,6 +1694,9 @@
       "fast": "Rápido",
       "finalRevealLinearAnimation": "Animación suave y predecible (sin aleatoriedad)",
       "enableHaptics": "Respuesta háptica",
+      "hapticsStrength": "Intensidad háptica",
+      "hapticsSubtle": "Suave",
+      "hapticsStrong": "Intensa",
       "enableFullscreenMode": "Activar modo de pantalla completa",
       "warnBeforeManuallyAssigningTelevotePoints": "Avisar antes de asignar manualmente puntos del televoto",
       "showJuryVotingProgressBar": "Mostrar barra de progreso del jurado",
@@ -2453,5 +2495,51 @@
     "deleteAccountConfirmDescription": "Se eliminarán tu perfil, concursos, temas, diseños, fuentes y entradas personalizadas, junto con tus me gusta, guardados, seguimientos y bloqueos. No se puede deshacer. Los ajustes y borradores guardados solo en este dispositivo se conservan.",
     "accountDeleted": "Tu cuenta se ha eliminado.",
     "deleteAccountFailed": "No se pudo eliminar tu cuenta. Inténtalo de nuevo."
+  },
+  "liveUpdate": {
+    "readyMessage": "Hay una nueva versión de DouzePoints lista. Reinicia la app para usarla.",
+    "restart": "Reiniciar",
+    "later": "Más tarde",
+    "update": "Actualizar",
+    "requiredTitle": "Actualizando DouzePoints",
+    "requiredBody": "Esta actualización es necesaria para que la app siga funcionando. Solo tardará un momento.",
+    "requiredFailedBody": "No se pudo descargar la actualización. Comprueba tu conexión e inténtalo de nuevo.",
+    "tryAgain": "Intentar de nuevo",
+    "restartingBody": "Casi listo. Reiniciando la app…",
+    "progressLabel": "Progreso de la actualización",
+    "storeRequiredTitle": "Hora de actualizar",
+    "storeRequiredBody": "Esta versión de DouzePoints ya no es compatible. Instala la versión más reciente para seguir usando la app.",
+    "openStore": "Abrir {store}",
+    "storeRecommendedMessage": "Hay una nueva versión de DouzePoints disponible."
+  },
+  "appPromo": {
+    "title": "DouzePoints ya es una app",
+    "body": "Pantalla completa en tu móvil, con respuesta háptica y el menú de compartir.",
+    "openTitle": "Abre DouzePoints en la app",
+    "openBody": "Pantalla completa, con respuesta háptica y el menú de compartir.",
+    "openApp": "Abrir la app",
+    "qrCode": "Código QR",
+    "qrHint": "Escanéalo con la cámara de tu móvil para descargar la app.",
+    "why": "¿Por qué la app?",
+    "dismiss": "Ahora no",
+    "benefits": {
+      "fullScreen": "Pantalla completa, sin las barras del navegador",
+      "haptics": "Respuesta háptica durante todo el show, desde los primeros puntos hasta el ganador",
+      "images": "Las imágenes se guardan directamente en Fotos o en la galería y se comparten desde el menú de compartir",
+      "next": "En camino: modo sin conexión y más funciones solo para el móvil"
+    },
+    "reminder": "La próxima vez, míralo en pantalla completa en la app.",
+    "reminderAction": "Descargar la app",
+    "settingsLabel": "App de DouzePoints",
+    "settingsDesc": "Para iPhone, iPad y Android, en pantalla completa y con respuesta háptica.",
+    "page": {
+      "metaTitle": "Descarga la app de DouzePoints",
+      "metaDescription": "DouzePoints para iPhone, iPad y Android: simula la votación del festival en pantalla completa, con respuesta háptica.",
+      "title": "Descarga la app de DouzePoints",
+      "intro": "DouzePoints está en App Store y Google Play, para iPhone, iPad y Android.",
+      "benefitsTitle": "Lo que añade la app",
+      "qrHint": "¿Estás en un ordenador? Escanéalo con la cámara de tu móvil.",
+      "back": "Abrir DouzePoints en el navegador"
+    }
   }
 }

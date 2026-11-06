@@ -1,3 +1,7 @@
+import type { UpdateItem } from './types';
+
+import { APP_STORES_LIVE, APP_STORES_RELEASE_DATE } from '@/config/appStores';
+
 const OLD_WHATS_NEW = [
   {
     date: '2026-06-18',
@@ -407,7 +411,7 @@ const OLD_WHATS_NEW = [
   },
 ];
 
-export const WHATS_NEW = [
+const WEBSITE_UPDATES: UpdateItem[] = [
   {
     date: '2026-11-01',
     title: 'Redesigned the setup menu',
@@ -492,11 +496,47 @@ export const WHATS_NEW = [
   ...OLD_WHATS_NEW,
 ];
 
-export const UPCOMING_FEATURES = [
-  {
-    approximateDates: { start: '2026-11-02', end: '2026-11-06' },
-    title: 'Mobile app for iOS and Android',
-  },
+/**
+ * The store release, dated by `NEXT_PUBLIC_APP_STORES_LIVE` and slotted in by
+ * date, so the feedback button's dot appears on release day. Website only:
+ * the apps don't announce themselves.
+ */
+const APP_RELEASE_UPDATE: UpdateItem | null =
+  APP_STORES_LIVE && APP_STORES_RELEASE_DATE
+    ? {
+        date: APP_STORES_RELEASE_DATE,
+        title:
+          'DouzePoints is now an app for iPhone, iPad and Android: find it on the App Store and Google Play, or at douzepoints.app/get-app. Store links are also in Settings → Look & feel',
+      }
+    : null;
+
+/** Newest first: `item` goes before the first update that isn't newer. */
+export function insertByDate(
+  updates: UpdateItem[],
+  item: UpdateItem | null,
+): UpdateItem[] {
+  if (!item?.date) return updates;
+
+  const index = updates.findIndex(
+    (update) => !update.date || update.date <= item.date!,
+  );
+
+  return index === -1
+    ? [...updates, item]
+    : [...updates.slice(0, index), item, ...updates.slice(index)];
+}
+
+export const WHATS_NEW = insertByDate(WEBSITE_UPDATES, APP_RELEASE_UPDATE);
+
+export const UPCOMING_FEATURES: UpdateItem[] = [
+  ...(APP_STORES_LIVE
+    ? []
+    : [
+        {
+          approximateDates: { start: '2026-11-02', end: '2026-11-06' },
+          title: 'Mobile app for iOS and Android',
+        },
+      ]),
   {
     approximateDates: { start: '2026-10-10', end: '2026-10-18' },
     title: 'Graphics improvements',

@@ -764,6 +764,45 @@
           "tooManyAttempts": "Too many wrong codes. Send a new one.",
           "codeExpired": "This code has expired. Send a new one.",
           "network": "No connection. Check your internet and try again.",
+          "unknown": "Something went wrong. Try again.",
+          "inUse": "This address already belongs to another DouzePoints account. Use a different one."
+        },
+        "linkTitle": "Add an email address",
+        "changeTitle": "Change your email address",
+        "linkEmailBody": "We'll email you a 6-digit code to confirm it's yours. Then you can sign in with this address too.",
+        "changeEmailBody": "We'll email a 6-digit code to the new address. After that, sign-in codes go there instead.",
+        "confirm": "Confirm",
+        "linkSuccess": "Email address saved. You can now sign in with it."
+      },
+      "signInMethods": {
+        "title": "Sign-in methods",
+        "description": "Ways to sign in to this account. Add another one so you can always get back in, on any device.",
+        "google": "Google",
+        "apple": "Apple",
+        "email": "Email",
+        "connected": "Connected",
+        "notConnected": "Not connected",
+        "connect": "Connect",
+        "add": "Add",
+        "change": "Change",
+        "remove": "Remove",
+        "loadFailed": "Couldn't load your sign-in methods.",
+        "retry": "Try again",
+        "googleConnected": "Google connected. You can now sign in with it.",
+        "appleConnected": "Apple connected. You can now sign in with it.",
+        "removed": "Sign-in method removed.",
+        "removeTitle": "Remove this sign-in method?",
+        "removeDescription": "You won't be able to sign in with {method} anymore. You can connect it again later.",
+        "removeSharedEmailDescription": "{method} uses your email address, {email}, so signing in with {method} will still open this account and connect it again. To stop that, change your email address too.",
+        "removeEmailDescription": "Sign-in codes won't be sent to {email} anymore. You can add an address again later.",
+        "errors": {
+          "inUseGoogle": "This Google account already signs in to another DouzePoints account. To connect it here, sign in with it and delete that account first.",
+          "inUseApple": "This Apple ID already signs in to another DouzePoints account. To connect it here, sign in with it and delete that account first.",
+          "inUseEmail": "This email address already belongs to another DouzePoints account.",
+          "alreadyConnected": "A different account is already connected here. Remove it first.",
+          "lastMethod": "This is your only way to sign in. Add another one first.",
+          "expired": "That took too long. Try connecting again.",
+          "network": "No connection. Check your internet and try again.",
           "unknown": "Something went wrong. Try again."
         }
       },
@@ -1512,7 +1551,7 @@
         "winter": "Add falling snow and festive touches across the app.",
         "finalReveal": "Reveal the final televote scores one country at a time with a dramatic animation.",
         "predictableReveal": "Reveal televote scores in a smooth, deterministic order with no random suspense.",
-        "haptics": "Vibrate on 12 points, qualifier reveals and the winner."
+        "haptics": "Feel every vote: a tap for each points award, a heartbeat for 12 points, the board climbing, the final reveal and the winner."
       }
     },
     "relations": {
@@ -1655,6 +1694,9 @@
       "fast": "Fast",
       "finalRevealLinearAnimation": "Smooth, predictable reveal animation (no randomness)",
       "enableHaptics": "Haptic feedback",
+      "hapticsStrength": "Haptic strength",
+      "hapticsSubtle": "Subtle",
+      "hapticsStrong": "Strong",
       "enableFullscreenMode": "Enable fullscreen mode",
       "warnBeforeManuallyAssigningTelevotePoints": "Warn before manually assigning televote points",
       "showJuryVotingProgressBar": "Show jury voting progress bar",
@@ -2453,5 +2495,51 @@
     "deleteAccountConfirmDescription": "Your profile, contests, themes, designs, fonts and custom entries will be deleted, along with your likes, saves, follows and blocks. This can’t be undone. Settings and drafts kept only on this device stay.",
     "accountDeleted": "Your account was deleted.",
     "deleteAccountFailed": "Your account couldn’t be deleted. Please try again."
+  },
+  "liveUpdate": {
+    "readyMessage": "A new version of DouzePoints is ready. Restart to use it.",
+    "restart": "Restart",
+    "later": "Later",
+    "update": "Update",
+    "requiredTitle": "Updating DouzePoints",
+    "requiredBody": "This update is needed to keep the app working. It only takes a moment.",
+    "requiredFailedBody": "The update couldn’t be downloaded. Check your connection and try again.",
+    "tryAgain": "Try again",
+    "restartingBody": "Almost done. Restarting the app…",
+    "progressLabel": "Update progress",
+    "storeRequiredTitle": "Time to update",
+    "storeRequiredBody": "This version of DouzePoints is no longer supported. Install the latest version to keep using the app.",
+    "openStore": "Open {store}",
+    "storeRecommendedMessage": "A new version of DouzePoints is available."
+  },
+  "appPromo": {
+    "title": "DouzePoints is now an app",
+    "body": "Full screen on your phone, with haptics and the share sheet.",
+    "openTitle": "Open DouzePoints in the app",
+    "openBody": "Full screen, with haptics and the share sheet.",
+    "openApp": "Open the app",
+    "qrCode": "QR code",
+    "qrHint": "Scan it with your phone's camera to get the app.",
+    "why": "Why the app?",
+    "dismiss": "Not now",
+    "benefits": {
+      "fullScreen": "Full screen, without the browser's bars",
+      "haptics": "Haptics you feel through the whole show, from the first points to the winner",
+      "images": "Images save straight to Photos or your gallery and share from the share sheet",
+      "next": "On the way: offline mode and more phone-only features"
+    },
+    "reminder": "Next time, watch it full screen in the app.",
+    "reminderAction": "Get the app",
+    "settingsLabel": "DouzePoints app",
+    "settingsDesc": "For iPhone, iPad and Android, full screen and with haptics.",
+    "page": {
+      "metaTitle": "Get the DouzePoints app",
+      "metaDescription": "DouzePoints for iPhone, iPad and Android: run the song contest vote full screen, with haptics.",
+      "title": "Get the DouzePoints app",
+      "intro": "DouzePoints is on the App Store and Google Play, for iPhone, iPad and Android.",
+      "benefitsTitle": "What the app adds",
+      "qrHint": "On a computer? Scan this with your phone's camera.",
+      "back": "Open DouzePoints in the browser"
+    }
   }
 }

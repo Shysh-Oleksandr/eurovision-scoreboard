@@ -3,10 +3,14 @@ import { describe, expect, it } from 'vitest';
 import type { BundleInfo } from '@capgo/capacitor-updater';
 
 import {
+  bundleUpdateLevel,
+  compareAppVersions,
   isBundleVersion,
   isNewerBundle,
   parseManifest,
+  parseStoreGate,
   pickBundleToApply,
+  storeUpdateLevel,
 } from './liveUpdateManifest';
 
 const BASE_URL = 'https://cdn.douzepoints.app/app-updates';
@@ -102,6 +106,31 @@ describe('parseManifest', () => {
     ).toBeNull();
   });
 
+  it('keeps valid update floors and ignores malformed ones', () => {
+    expect(
+      parseManifest(
+        {
+          ...manifest,
+          requiredVersion: '20261010.000000',
+          promptVersion: '20261012.143005',
+        },
+        expected,
+      ),
+    ).toMatchObject({
+      requiredVersion: '20261010.000000',
+      promptVersion: '20261012.143005',
+    });
+
+    const parsed = parseManifest(
+      { ...manifest, requiredVersion: 'soon', promptVersion: 42 },
+      expected,
+    );
+
+    expect(parsed?.version).toBe(manifest.version);
+    expect(parsed).not.toHaveProperty('requiredVersion');
+    expect(parsed).not.toHaveProperty('promptVersion');
+  });
+
   it('rejects missing signatures and bad versions', () => {
     expect(parseManifest({ ...manifest, checksum: '' }, expected)).toBeNull();
     expect(
@@ -157,5 +186,86 @@ describe('pickBundleToApply', () => {
 
   it('does nothing in a build without a version', () => {
     expect(pickBundleToApply([bundle('20261012.130000')], '', [])).toBeNull();
+  });
+});
+
+describe('bundleUpdateLevel', () => {
+  const floors = {
+    requiredVersion: '20261020.000000',
+    promptVersion: '20261025.000000',
+  };
+
+  it('requires a switch for bundles older than the required one', () => {
+    expect(bundleUpdateLevel(floors, '20261019.235959')).toBe('required');
+  });
+
+  it('prompts bundles between the required and the prompt floor', () => {
+    expect(bundleUpdateLevel(floors, '20261020.000000')).toBe('prompt');
+    expect(bundleUpdateLevel(floors, '20261024.000000')).toBe('prompt');
+  });
+
+  it('stays silent for bundles at or past both floors', () => {
+    expect(bundleUpdateLevel(floors, '20261025.000000')).toBe('silent');
+    expect(bundleUpdateLevel({}, '20261001.000000')).toBe('silent');
+  });
+
+  it('never escalates a build without a version', () => {
+    expect(bundleUpdateLevel(floors, '')).toBe('silent');
+  });
+});
+
+describe('store gate', () => {
+  it('compares app versions numerically', () => {
+    expect(compareAppVersions('1.10', '1.9')).toBe(1);
+    expect(compareAppVersions('1.0', '1')).toBe(0);
+    expect(compareAppVersions('1.0.1', '1.1')).toBe(-1);
+  });
+
+  it('parses the gate for this platform only', () => {
+    const gate = {
+      platform: 'android',
+      required: '1.1',
+      recommended: '1.2',
+      url: 'https://play.google.com/store/apps/details?id=app.douzepoints',
+    };
+
+    expect(parseStoreGate(gate, 'android')).toEqual({
+      required: '1.1',
+      recommended: '1.2',
+      url: gate.url,
+    });
+    expect(parseStoreGate(JSON.stringify(gate), 'android')?.required).toBe(
+      '1.1',
+    );
+    expect(parseStoreGate(gate, 'ios')).toBeNull();
+    expect(parseStoreGate('{nope', 'android')).toBeNull();
+  });
+
+  it('drops malformed versions and non-https links', () => {
+    expect(
+      parseStoreGate(
+        {
+          platform: 'ios',
+          required: 'v2',
+          recommended: '1.2',
+          url: 'http://apps.apple.com/app/id1',
+        },
+        'ios',
+      ),
+    ).toEqual({ recommended: '1.2' });
+  });
+
+  it('blocks below required, nudges below recommended', () => {
+    const gate = { required: '1.1', recommended: '1.2' };
+
+    expect(storeUpdateLevel(gate, '1.0')).toBe('required');
+    expect(storeUpdateLevel(gate, '1.1')).toBe('recommended');
+    expect(storeUpdateLevel(gate, '1.2')).toBeNull();
+    expect(storeUpdateLevel({}, '1.0')).toBeNull();
+  });
+
+  it('never blocks an app whose version it cannot read', () => {
+    expect(storeUpdateLevel({ required: '9.0' }, '')).toBeNull();
+    expect(storeUpdateLevel({ required: '9.0' }, '1.0 (beta)')).toBeNull();
   });
 });

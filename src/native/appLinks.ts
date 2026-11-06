@@ -1,6 +1,6 @@
 import { liveUpdateBoot } from './liveUpdate';
 
-import { parsePublicSiteUrl } from '@/helpers/shareUrl';
+import { parseAppSchemeUrl, parsePublicSiteUrl } from '@/helpers/shareUrl';
 
 let installed = false;
 
@@ -8,7 +8,9 @@ let installed = false;
  * Universal links (iOS) and Android App Links: a tapped douzepoints.app
  * share link opens the app instead of the website, and `onLink` gets the
  * link. The website's `.well-known` files and the native configuration decide
- * which links (docs/native-apps.md §12).
+ * which links (docs/native-apps.md §12). On Android the website's "Open the
+ * app" button arrives the same way, through the app's URL scheme
+ * (`app.douzepoints://open?contest=…`, §13).
  *
  * `appUrlOpen` covers both a link that reaches the running app and the one
  * that launched it: the plugin retains that event until a listener exists.
@@ -31,7 +33,7 @@ export async function installAppLinkHandler(
 
   await App.addListener('appUrlOpen', ({ url }) => {
     // Other URLs reach this event too (iOS URL-scheme callbacks).
-    const link = parsePublicSiteUrl(url);
+    const link = parsePublicSiteUrl(url) ?? parseAppSchemeUrl(url);
 
     if (link) onLink(link);
   });

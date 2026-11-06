@@ -1,14 +1,17 @@
 import { Eye, Flag, List, Shield, Sparkles, Volume2 } from 'lucide-react';
 import React from 'react';
 
+import { AppStoresItem } from '../custom/AppStoresItem';
 import { ConfirmationsListItem } from '../custom/ConfirmationsListItem';
 import { DangerResetItem } from '../custom/DangerResetItem';
+import { HapticsLabLink } from '../custom/HapticsLabLink';
 import { HostingCountryDropdown } from '../custom/HostingCountryDropdown';
 import { LanguageItem } from '../custom/LanguageItem';
 import { PointsBlock } from '../custom/PointsBlock';
 
 import { Category } from './types';
 
+import { APP_STORES_LIVE } from '@/config/appStores';
 import { getInterfaceFontSelectOptions } from '@/theme/fontAliases';
 
 /**
@@ -200,6 +203,13 @@ export const CATEGORIES: Category[] = [
         render: () => <LanguageItem />,
       },
       {
+        kind: 'custom',
+        id: 'appStores',
+        searchTextKeys: ['appPromo.settingsLabel', 'appPromo.settingsDesc'],
+        when: () => APP_STORES_LIVE,
+        render: ({ query }) => <AppStoresItem query={query} />,
+      },
+      {
         kind: 'subhead',
         id: 'sh-flags',
         labelKey: 'settings.general2.subhead.flagsRankings',
@@ -385,6 +395,27 @@ export const CATEGORIES: Category[] = [
         labelKey: 'settings.ui.enableHaptics',
         tipKey: 'settings.general2.tip.haptics',
         when: (env) => env.isNativeApp,
+        children: [
+          {
+            kind: 'slider',
+            id: 'hapticsStrength',
+            settingKey: 'hapticsStrength',
+            min: 0.3,
+            max: 1,
+            step: 0.1,
+            labelKey: 'settings.ui.hapticsStrength',
+            minLabelKey: 'settings.ui.hapticsSubtle',
+            maxLabelKey: 'settings.ui.hapticsStrong',
+          },
+          {
+            // Development only: the cue tuning page (docs/haptics.md §5).
+            kind: 'custom',
+            id: 'hapticsLab',
+            searchTextKeys: [],
+            when: () => process.env.NODE_ENV === 'development',
+            render: () => <HapticsLabLink />,
+          },
+        ],
       },
     ],
   },

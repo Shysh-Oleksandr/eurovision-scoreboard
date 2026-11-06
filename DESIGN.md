@@ -296,8 +296,9 @@ sentence case (`plainHeaders`).
 
 ### Motion
 
-- **Board rows enter staggered** (`useTileEntrance`): 420ms, 30ms per row,
-  capped at 12 steps, ease-out, slide + clip reveal. On first open, on
+- **Board rows enter staggered** (`useTileEntrance`): 420ms, 30ms per row
+  (tighter on long stages, the last row starts by 600ms), ease-out, slide +
+  clip reveal. On first open, on
   expanding a stage, on a new line-up, and for countries that just arrived.
   Never on reopening the setup. Off under reduced motion.
 - Hover lifts by 1px at most; presses scale to 0.985.

@@ -657,6 +657,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         <Button
           variant="surface"
           size="md"
+          className="gfx-gallery-act"
           title={t('importJson')}
           Icon={<FolderInput className="size-4" />}
           onClick={() => importRef.current?.click()}
@@ -666,6 +667,7 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         <Button
           variant="surface"
           size="md"
+          className="gfx-gallery-act"
           Icon={<FilePlus className="size-4" />}
           onClick={newBlank}
         >

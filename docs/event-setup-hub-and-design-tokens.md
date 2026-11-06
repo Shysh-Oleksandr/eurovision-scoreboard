@@ -158,7 +158,9 @@ flags (`shouldShowHeartFlagIcon`).
 line-up is replaced wholesale, and when the user expands the stage again
 (`StageCard` bumps `replayKey`); otherwise only the codes that just arrived.
 Its refs make the effect re-run on an `<Activity>` reveal a no-op, so
-reopening the setup never replays it. Reduced motion skips it.
+reopening the setup never replays it. Reduced motion skips it. Every tile
+gets its own delay (30ms steps, tightened on long stages so the last one
+starts by 600ms); grids remounted by the drag-and-drop swap skip it (§3).
 
 ### Fitted layouts
 
@@ -294,6 +296,12 @@ useCountryAssignments()  ──►  useLineupModel()  ──►  <LineupProvider
 (its own chunk). Until it arrives the lineup renders plain tiles; the
 implementation (`LineupDndProvider.tsx`) swaps draggable tiles / droppable
 zones in through `DndComponentsContext`, so the lineup never imports dnd-kit.
+
+That swap remounts the whole lineup (new wrapper, new tile and zone types).
+So the boundary waits until no tile entrance is playing
+(`afterTileEntrances`), and it sets `DndSwapContext` during its commit, which
+makes the remounted grids skip the entrance. Without both, a reload showed the
+entrance start, every tile vanish, and the entrance start over.
 
 Sensors: mouse needs 6px of travel, touch a 250ms hold — a plain click or tap
 still opens the tile menu (`onClickCapture` suppresses the click that follows a

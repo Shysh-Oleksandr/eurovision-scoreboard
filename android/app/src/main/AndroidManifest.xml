@@ -57,7 +57,27 @@
                 </uri-relative-filter-group>
             </intent-filter>
 
+            <!-- "Open the app" on the website (Chrome intent link, Play Store
+                 fallback): app.douzepoints://open, maybe with a share
+                 parameter, which src/native/appLinks.ts turns back into the
+                 share link. Works on every Android version, unlike the App
+                 Link filter above. docs/native-apps.md §13. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="@string/custom_url_scheme" android:host="open" />
+            </intent-filter>
+
         </activity>
+
+        <!-- Tells Chrome this app belongs to douzepoints.app, so the website
+             can ask getInstalledRelatedApps() whether it is installed (the
+             other half is related_applications in public/app.webmanifest).
+             docs/native-apps.md §13. -->
+        <meta-data
+            android:name="asset_statements"
+            android:resource="@string/asset_statements" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

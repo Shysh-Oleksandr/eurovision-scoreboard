@@ -69,6 +69,22 @@ describe('parsePublicSiteUrl', () => {
   });
 });
 
+describe('parseAppSchemeUrl', () => {
+  it('turns "Open the app" links back into share links', async () => {
+    const { parseAppSchemeUrl } = await load(true);
+
+    expect(parseAppSchemeUrl('app.douzepoints://open?contest=c1')?.href).toBe(
+      'https://douzepoints.app/?contest=c1',
+    );
+    expect(parseAppSchemeUrl('app.douzepoints://open')?.href).toBe(
+      'https://douzepoints.app/',
+    );
+    expect(parseAppSchemeUrl('app.douzepoints://other?contest=c1')).toBe(null);
+    expect(parseAppSchemeUrl('https://douzepoints.app/?contest=c1')).toBe(null);
+    expect(parseAppSchemeUrl('not a url')).toBe(null);
+  });
+});
+
 describe('app link configuration', () => {
   const root = path.join(__dirname, '..', '..');
   const read = (file: string) => readFileSync(path.join(root, file), 'utf8');

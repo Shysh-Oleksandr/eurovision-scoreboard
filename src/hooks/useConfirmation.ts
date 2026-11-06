@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+
+import { playHaptic } from '@/native/haptics';
 import { useConfirmationStore } from '@/state/confirmationStore';
 
 export interface ConfirmationOptions {
@@ -29,13 +31,16 @@ const useConfirmationStoreInternal = create<ConfirmationState>((set, get) => ({
     const { shouldShowConfirmation } = useConfirmationStore.getState();
 
     if (shouldShowConfirmation(options.key)) {
+      // A destructive or cautionary dialog is felt as it opens.
+      if (options.type !== 'info') playHaptic({ id: 'warning' });
       get().setCurrentConfirmation(options);
+
       return false; // Modal will be shown
-    } else {
-      // Directly execute action if "don't show again" was selected
-      options.onConfirm();
-      return true; // Action was executed immediately
     }
+    // Directly execute action if "don't show again" was selected
+    options.onConfirm();
+
+    return true; // Action was executed immediately
   },
 
   closeModal: () => {

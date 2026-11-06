@@ -44,6 +44,8 @@ const HalfDivider: React.FC<{ half: 1 | 2; count: number }> = ({
   return (
     <div
       role="presentation"
+      // Not a sortable row: SortableList counts rows without it.
+      data-sortable-ignore=""
       className={`dp-ro-divider ${
         half === 1 ? 'dp-ro-divider--first' : ''
       } col-span-full flex items-center gap-2.5 px-0.5 ${
@@ -180,6 +182,7 @@ export const RunningOrderTab = ({
 
       <SortableList
         onSortEnd={onSortEnd}
+        hapticBoundary={hasHalves ? firstHalfSize : null}
         className={`${
           selectedLayout === 'grid'
             ? 'grid md:grid-cols-4 2cols:grid-cols-3 grid-cols-2 gap-2'

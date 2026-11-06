@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 
 import { useSetAppLocale } from './AppIntlProvider';
 
+import { takePendingWebLink, webLinkToast } from '@/api/signInMethods';
 import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
@@ -37,6 +38,13 @@ const PaletteDevPanel =
         ssr: false,
       })
     : null;
+
+// Live-update prompts and blocking screens; the chunk only loads in the apps.
+const LiveUpdateNotices = IS_NATIVE_APP
+  ? dynamic(() => import('@/components/liveUpdate/LiveUpdateNotices'), {
+      ssr: false,
+    })
+  : null;
 
 export default function AppBootstrap() {
   useFullscreen();
@@ -77,6 +85,26 @@ export default function AppBootstrap() {
       if (IS_NATIVE_APP) await liveUpdateBoot();
 
       const url = new URL(window.location.href);
+
+      // A website connect (Edit profile → Sign-in methods) came back from
+      // Google or Apple; the session itself didn't change.
+      if (url.searchParams.has('link')) {
+        window.history.replaceState({}, '', url.origin + url.pathname);
+
+        const message = takePendingWebLink()
+          ? webLinkToast(
+              url.searchParams.get('link'),
+              url.searchParams.get('result'),
+            )
+          : null;
+
+        await handlePostLogin();
+        if (message) {
+          toast(t(`signInMethods.${message.key}`), { type: message.type });
+        }
+
+        return;
+      }
 
       if (url.searchParams.has('provider')) {
         window.history.replaceState({}, '', url.origin + url.pathname);
@@ -205,6 +233,7 @@ export default function AppBootstrap() {
   return (
     <>
       <ThemeSoundVolumeHud />
+      {LiveUpdateNotices && <LiveUpdateNotices />}
       {PaletteDevPanel && <PaletteDevPanel />}
     </>
   );

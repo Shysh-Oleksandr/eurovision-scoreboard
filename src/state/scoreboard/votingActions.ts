@@ -21,8 +21,14 @@ import {
 } from './helpers';
 import { resolveStagePointsSystem } from './stageOverrides';
 import { ScoreboardState, SplitScreenQualifierCandidate, Vote } from './types';
+import {
+  hapticJuryAward,
+  hapticJuryAwards,
+  hapticTelevoteAward,
+} from './votingHaptics';
 
 import { ANIMATION_DURATION } from '@/data/data';
+import { playHaptic } from '@/native/haptics';
 import {
   isVotingPointsValueDouzeTier,
   notifyThemeSoundStageFinished,
@@ -644,6 +650,11 @@ export const createVotingActions: StateCreator<
         handleStageEnd(updatedCountries, currentStage);
 
       playThemeSoundPointsAwardedIfNonDouze(votingPointsItem.showDouzePoints);
+      hapticJuryAward(
+        votingPoints,
+        votingPointsItem.showDouzePoints,
+        pointsSystem,
+      );
       notifyThemeSoundStageFinished(currentStage, winnerCountry);
 
       set((s) => ({
@@ -680,6 +691,11 @@ export const createVotingActions: StateCreator<
     }
 
     playThemeSoundPointsAwardedIfNonDouze(votingPointsItem.showDouzePoints);
+    hapticJuryAward(
+      votingPoints,
+      votingPointsItem.showDouzePoints,
+      pointsSystem,
+    );
 
     set((s) => ({
       votingPointsIndex: isNextVotingCountry ? 0 : s.votingPointsIndex + 1,
@@ -796,6 +812,7 @@ export const createVotingActions: StateCreator<
     );
 
     playThemeSoundPointsAwardedIfNonDouze(!batchHasNonDouze);
+    hapticJuryAwards(countriesWithRecentPoints, pointsSystem);
 
     const updatedCountries = stabilizeCountries(
       currentStage.countries,
@@ -990,6 +1007,10 @@ export const createVotingActions: StateCreator<
       playThemeSoundTelevoteRevealIfNonDouze(
         isVotingPointsValueDouzeTier(votingPoints ?? 0),
       );
+    }
+    // The final reveal plays its own cues over its animation.
+    if (!options?.fromFinalReveal) {
+      hapticTelevoteAward(votingPoints ?? 0, currentStage);
     }
     if (isVotingFinished) {
       notifyThemeSoundStageFinished(currentStage, winnerCountry);
@@ -1272,6 +1293,8 @@ export const createVotingActions: StateCreator<
       }),
     );
 
+    hapticJuryAwards(countriesWithRecentPoints, pointsSystem);
+
     if (state.lastPointsResetTimerId) {
       clearTimeout(state.lastPointsResetTimerId);
     }
@@ -1368,6 +1391,8 @@ export const createVotingActions: StateCreator<
       ];
 
     if (!predefinedJuryVotes) return;
+
+    playHaptic({ id: 'votingRush' });
 
     const votingCountries = countriesStore.getStageVotingCountries();
     let countriesLeft = votingCountries.length - state.votingCountryIndex;
@@ -1529,6 +1554,8 @@ export const createVotingActions: StateCreator<
       state.predefinedVotes[currentStage.id]?.televote;
 
     if (!predefinedTelevoteVotes) return;
+
+    playHaptic({ id: 'votingRush' });
 
     const countriesToVote = currentStage.countries.filter(
       (country) => !country.isVotingFinished,
@@ -1842,6 +1869,7 @@ export const createVotingActions: StateCreator<
     }
 
     playThemeSound('qualifierPicked');
+    playHaptic({ id: 'qualifierLockIn' });
 
     // Mark the selected country as qualified
     set((s) => {
@@ -1920,6 +1948,8 @@ export const createVotingActions: StateCreator<
         queueMicrotask(() =>
           notifyThemeSoundStageFinished(currentStage, winner),
         );
+        // After the lock-in: everyone left didn't qualify.
+        playHaptic({ id: 'nonQualifiers' }, { delayMs: 600 });
 
         return {
           eventStages: finalUpdatedEventStages,
@@ -1987,6 +2017,7 @@ export const createVotingActions: StateCreator<
     const selectedCountry = topCountries[randomIndex];
 
     playThemeSound('qualifierPicked');
+    playHaptic({ id: 'qualifierLockIn' });
 
     // Mark the selected country as qualified
     set((s) => {
@@ -2065,6 +2096,8 @@ export const createVotingActions: StateCreator<
         queueMicrotask(() =>
           notifyThemeSoundStageFinished(currentStage, winner),
         );
+        // After the lock-in: everyone left didn't qualify.
+        playHaptic({ id: 'nonQualifiers' }, { delayMs: 600 });
 
         return {
           eventStages: finalUpdatedEventStages,

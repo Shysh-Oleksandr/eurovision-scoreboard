@@ -14,6 +14,7 @@ import Providers from './providers';
 import ToastRoot from './toast-root';
 import { WebVitals } from './web-vitals';
 
+import { APP_STORE_ID, APP_STORES_LIVE } from '@/config/appStores';
 import { INITIAL_COUNTRIES_URL } from '@/data/countries/countriesDataUrl';
 import {
   pickMessageNamespaces,
@@ -112,6 +113,14 @@ export async function generateMetadata({
       ],
       apple: '/img/brand/apple-touch-icon.png',
     },
+    ...(APP_STORES_LIVE && {
+      // Safari's Smart App Banner: "Open" when the app is installed, "View"
+      // (the App Store) when not; Safari remembers when it's closed.
+      itunes: { appId: APP_STORE_ID },
+      // Lists the Android app for getInstalledRelatedApps() (setup hub's
+      // "Open the app"; docs/native-apps.md §13).
+      manifest: '/app.webmanifest',
+    }),
   } as Metadata;
 }
 

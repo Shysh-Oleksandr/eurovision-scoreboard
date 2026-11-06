@@ -17,6 +17,7 @@ import {
   parseEmailSignInError,
   requestEmailCode,
 } from '@/api/emailSignIn';
+import { requestLinkEmailCode, verifyLinkEmailCode } from '@/api/signInMethods';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { Input } from '@/components/Input';
@@ -34,14 +35,20 @@ const linkButtonClass =
  * Passwordless sign-in (docs/email-sign-in.md): an email address, then the
  * 6-digit code we email to it. Signs in or creates the account in one go.
  * Opened by "Continue with email" in `SignInButtons`, over any modal.
+ *
+ * In `link` mode (Edit profile → Sign-in methods, docs/sign-in-methods.md)
+ * the same two steps add or change the signed-in account's address instead.
  */
 const EmailSignInModal: React.FC = () => {
   const t = useTranslations('widgets.profile.emailSignIn');
   const tProfile = useTranslations('widgets.profile');
   const locale = useLocale();
   const isOpen = useEmailSignInStore((s) => s.isOpen);
+  const mode = useEmailSignInStore((s) => s.mode);
   const close = useEmailSignInStore((s) => s.close);
   const loginWithEmailCode = useAuthStore((s) => s.loginWithEmailCode);
+  const hasEmail = useAuthStore((s) => !!s.user?.email);
+  const isLink = mode === 'link';
 
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
@@ -54,11 +61,12 @@ const EmailSignInModal: React.FC = () => {
 
   const emailRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
+  const lastModeRef = useRef(mode);
 
   // Reopening within the code's lifetime resumes at the code step.
   useEffect(() => {
     if (!isOpen) return;
-    const pending = loadPendingEmailSignIn();
+    const pending = loadPendingEmailSignIn(Date.now(), mode);
 
     setError(null);
     setNotice(null);
@@ -68,9 +76,12 @@ const EmailSignInModal: React.FC = () => {
       setResendAt(pending.resendAt);
       setStep('code');
     } else {
+      // An address typed for signing in isn't the one to add, and back.
+      if (lastModeRef.current !== mode) setEmail('');
       setStep('email');
     }
-  }, [isOpen]);
+    lastModeRef.current = mode;
+  }, [isOpen, mode]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -119,15 +130,21 @@ const EmailSignInModal: React.FC = () => {
     setError(null);
     setNotice(null);
     try {
-      const sent = await requestEmailCode(address, locale);
+      const sent = await (isLink ? requestLinkEmailCode : requestEmailCode)(
+        address,
+        locale,
+      );
       const sentAt = Date.now();
       const nextResendAt = sentAt + sent.resendAfter * 1000;
 
-      savePendingEmailSignIn({
-        email: address,
-        resendAt: nextResendAt,
-        expiresAt: sentAt + sent.expiresIn * 1000,
-      });
+      savePendingEmailSignIn(
+        {
+          email: address,
+          resendAt: nextResendAt,
+          expiresAt: sentAt + sent.expiresIn * 1000,
+        },
+        mode,
+      );
       setEmail(address);
       setResendAt(nextResendAt);
       setNow(sentAt);
@@ -150,6 +167,20 @@ const EmailSignInModal: React.FC = () => {
     setError(null);
     setNotice(null);
     try {
+      if (isLink) {
+        await verifyLinkEmailCode(email, value);
+        clearPendingEmailSignIn(mode);
+        // `user.email` follows the new address.
+        void useAuthStore
+          .getState()
+          .fetchMe()
+          .catch(() => undefined);
+        toast.success(t('linkSuccess'));
+        close();
+
+        return;
+      }
+
       const success = await loginWithEmailCode(email, value, locale);
 
       if (!success) {
@@ -157,7 +188,7 @@ const EmailSignInModal: React.FC = () => {
 
         return;
       }
-      clearPendingEmailSignIn();
+      clearPendingEmailSignIn(mode);
       toast.success(tProfile('success'));
       close();
     } catch (e) {
@@ -165,9 +196,14 @@ const EmailSignInModal: React.FC = () => {
 
       setError(describe(parsed));
       setCode('');
-      // The server dropped the code: a new one can be requested right away.
-      if (parsed.kind === 'codeExpired' || parsed.kind === 'tooManyAttempts') {
-        clearPendingEmailSignIn();
+      // The server dropped the code (an address of another account used it
+      // up too): a new one can be requested right away.
+      if (
+        parsed.kind === 'codeExpired' ||
+        parsed.kind === 'tooManyAttempts' ||
+        parsed.kind === 'inUse'
+      ) {
+        clearPendingEmailSignIn(mode);
         setResendAt(0);
       }
       codeRef.current?.focus();
@@ -185,7 +221,7 @@ const EmailSignInModal: React.FC = () => {
   };
 
   const changeEmail = () => {
-    clearPendingEmailSignIn();
+    clearPendingEmailSignIn(mode);
     setError(null);
     setNotice(null);
     setCode('');
@@ -207,7 +243,13 @@ const EmailSignInModal: React.FC = () => {
           onClose={close}
           onSave={() => (step === 'email' ? sendCode(false) : verify(code))}
           isSaving={isBusy}
-          saveButtonText={step === 'email' ? t('sendCode') : t('signIn')}
+          saveButtonText={
+            step === 'email'
+              ? t('sendCode')
+              : isLink
+              ? t('confirm')
+              : t('signIn')
+          }
           saveButtonIcon={
             step === 'email' ? <Send className="size-[18px]" /> : undefined
           }
@@ -226,11 +268,23 @@ const EmailSignInModal: React.FC = () => {
           </span>
           <div className="min-w-0">
             <h3 className="text-xl font-bold leading-tight">
-              {step === 'email' ? t('title') : t('codeTitle')}
+              {step === 'code'
+                ? t('codeTitle')
+                : !isLink
+                ? t('title')
+                : hasEmail
+                ? t('changeTitle')
+                : t('linkTitle')}
             </h3>
             <p className="text-white/70 text-sm mt-1 leading-relaxed break-words">
               {step === 'email'
-                ? t('emailBody')
+                ? t(
+                    !isLink
+                      ? 'emailBody'
+                      : hasEmail
+                      ? 'changeEmailBody'
+                      : 'linkEmailBody',
+                  )
                 : t.rich('codeBody', {
                     email,
                     b: (chunks) => (

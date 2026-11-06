@@ -110,6 +110,7 @@ const DEFAULT_SETTINGS: Settings = {
   enableWinterEffects: false,
   snowFallIntensity: 5, // 1-10
   enableHaptics: true,
+  hapticsStrength: 1,
   blurModalBackground: false,
   themeSoundVolume: 100,
   themeAmbienceVolume: 100,
@@ -227,8 +228,10 @@ export interface Settings {
   enablePredefinedVotes: boolean;
   enableWinterEffects: boolean;
   snowFallIntensity: number;
-  /** Native apps only: vibrate on douze points, qualifiers and the winner. */
+  /** Native apps only: haptics through the simulation (docs/haptics.md). */
   enableHaptics: boolean;
+  /** Native apps only: scales every haptic, 0.3 (subtle) to 1 (as designed). */
+  hapticsStrength: number;
   blurModalBackground: boolean;
   themeSoundVolume: number;
   themeAmbienceVolume: number;

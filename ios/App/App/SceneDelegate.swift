@@ -2,6 +2,15 @@ import UIKit
 import Capacitor
 import GoogleSignIn
 
+/// Capacitor's bridge with the app's own plugins registered. App-local
+/// plugins aren't discovered like packaged ones; they must be registered here,
+/// before the web view loads.
+class AppBridgeViewController: CAPBridgeViewController {
+    override open func capacitorDidLoad() {
+        bridge?.registerPluginInstance(DouzeHapticsPlugin())
+    }
+}
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
@@ -9,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = CAPBridgeViewController()
+        window?.rootViewController = AppBridgeViewController()
         window?.makeKeyAndVisible()
 
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)

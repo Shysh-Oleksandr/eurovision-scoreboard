@@ -1,10 +1,16 @@
+import type { EmailDialogMode } from '@/state/emailSignInStore';
+
 /**
  * The code request in flight, kept in localStorage so that reopening the
  * dialog (after a reload, or the app being killed while the user was in
  * their mail app) lands on the code step instead of sending another email.
+ * Signing in and adding an address keep separate entries.
  */
 
-const STORAGE_KEY = 'email-sign-in-pending';
+const STORAGE_KEYS: Record<EmailDialogMode, string> = {
+  signIn: 'email-sign-in-pending',
+  link: 'email-link-pending',
+};
 
 export interface PendingEmailSignIn {
   email: string;
@@ -16,9 +22,10 @@ export interface PendingEmailSignIn {
 
 export function loadPendingEmailSignIn(
   now = Date.now(),
+  mode: EmailDialogMode = 'signIn',
 ): PendingEmailSignIn | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEYS[mode]);
 
     if (!raw) return null;
     const pending = JSON.parse(raw) as Partial<PendingEmailSignIn>;
@@ -31,7 +38,7 @@ export function loadPendingEmailSignIn(
     ) {
       return pending as PendingEmailSignIn;
     }
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEYS[mode]);
   } catch {
     // Storage blocked or a malformed entry: start from the email step.
   }
@@ -39,17 +46,20 @@ export function loadPendingEmailSignIn(
   return null;
 }
 
-export function savePendingEmailSignIn(pending: PendingEmailSignIn) {
+export function savePendingEmailSignIn(
+  pending: PendingEmailSignIn,
+  mode: EmailDialogMode = 'signIn',
+) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pending));
+    localStorage.setItem(STORAGE_KEYS[mode], JSON.stringify(pending));
   } catch {
     // Not essential: only reopening the dialog loses the code step.
   }
 }
 
-export function clearPendingEmailSignIn() {
+export function clearPendingEmailSignIn(mode: EmailDialogMode = 'signIn') {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(STORAGE_KEYS[mode]);
   } catch {
     // Nothing to clear.
   }

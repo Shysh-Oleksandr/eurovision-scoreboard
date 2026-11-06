@@ -4,4 +4,15 @@
     <string name="title_activity_main">DouzePoints</string>
     <string name="package_name">app.douzepoints</string>
     <string name="custom_url_scheme">app.douzepoints</string>
+    <!-- Digital Asset Links statement for getInstalledRelatedApps() (see
+         the asset_statements meta-data in AndroidManifest.xml). -->
+    <string name="asset_statements" translatable="false">
+        [{
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://douzepoints.app\"
+            }
+        }]
+    </string>
 </resources>

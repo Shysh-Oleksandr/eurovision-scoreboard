@@ -6,6 +6,11 @@ import { useGSAP } from '@gsap/react';
 
 import { FinalTelevoteRevealProps } from './types';
 
+import {
+  createHapticHeartbeat,
+  playHaptic,
+  type HapticHeartbeat,
+} from '@/native/haptics';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -84,6 +89,18 @@ export const useRevealAnimation = ({
   const revealDoneRef = useRef(false);
   const pendingRevealPointsRef = useRef<number | null>(null);
 
+  // Haptics: a heartbeat through phase 2a that speeds up as the last
+  // country nears the mark (0 at the start, 1 at the points needed).
+  const closenessRef = useRef(0);
+  const heartbeatRef = useRef<HapticHeartbeat | null>(null);
+
+  useEffect(() => {
+    return () => {
+      heartbeatRef.current?.stop();
+      heartbeatRef.current = null;
+    };
+  }, []);
+
   // Capture initial points at mount (before any reveal)
   const initialLeaderPointsRef = useRef(leaderCountry?.points ?? 0);
   const initialLastCountryPointsRef = useRef(lastCountry?.points ?? 0);
@@ -149,6 +166,7 @@ export const useRevealAnimation = ({
 
       if (isLinear) {
         const dur = phaseADuration / 3;
+
         segments = [1 / 3, 2 / 3, 1].map((ratio) => ({
           duration: dur,
           fillEnd: cappedFillPct * ratio,
@@ -226,6 +244,8 @@ export const useRevealAnimation = ({
 
       const needsCountObj = { value: pointsNeeded };
       const updateNeedsCount = () => {
+        closenessRef.current =
+          1 - needsCountObj.value / Math.max(1, pointsNeeded);
         if (needsCountdownRef.current) {
           needsCountdownRef.current.textContent = String(
             Math.round(needsCountObj.value),
@@ -284,6 +304,9 @@ export const useRevealAnimation = ({
             '<',
           );
       }
+
+      // End of phase 2a, for the outcome's haptics (a label adds no time).
+      tl.addLabel('revealOutcome');
 
       if (!isWinner) {
         // Leader holds on — gold flash on the leader badge
@@ -369,6 +392,28 @@ export const useRevealAnimation = ({
             '<',
           );
       }
+
+      // Haptics, placed at absolute positions inside the timeline so they
+      // never lengthen it: the heartbeat through phase 2a, then the outcome
+      // (crossing + surge, or the fill falling short) and, 1 s later, the
+      // gold flash on whoever won.
+      heartbeatRef.current?.stop();
+      closenessRef.current = 0;
+      heartbeatRef.current = createHapticHeartbeat(() => closenessRef.current);
+      tl.call(() => heartbeatRef.current?.start(), undefined, 0);
+      tl.call(
+        () => {
+          heartbeatRef.current?.stop();
+          playHaptic({ id: isWinner ? 'revealCross' : 'revealFall' });
+        },
+        undefined,
+        'revealOutcome',
+      );
+      tl.call(
+        () => playHaptic({ id: isWinner ? 'revealWinnerFlash' : 'revealHold' }),
+        undefined,
+        'revealOutcome+=1',
+      );
     },
     [pointsNeeded],
   );

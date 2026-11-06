@@ -31,6 +31,31 @@ export const NATIVE_LOGIN_EVENT = 'dp:native-login';
  * bookmarks, new-tab tiles and address-bar suggestions; only a landing with a
  * recent marker is a sign-in started in this browser.
  */
+/**
+ * Token refreshes in flight. A live-update restart waits for them: a reload
+ * between the server rotating the refresh token and the app storing the new
+ * one would sign the user out (src/native/liveUpdate.ts).
+ */
+const refreshesInFlight = new Set<Promise<unknown>>();
+
+function trackRefresh<T>(run: () => Promise<T>): Promise<T> {
+  const pending = run();
+
+  refreshesInFlight.add(pending);
+  pending
+    .finally(() => refreshesInFlight.delete(pending))
+    .catch(() => undefined);
+
+  return pending;
+}
+
+/** Resolves once no token refresh is running. */
+export async function waitForTokenRefreshes(): Promise<void> {
+  while (refreshesInFlight.size > 0) {
+    await Promise.allSettled([...refreshesInFlight]);
+  }
+}
+
 const PENDING_WEB_LOGIN_KEY = 'dp:pending-web-login';
 const PENDING_WEB_LOGIN_TTL_MS = 30 * 60 * 1000;
 
@@ -234,50 +259,51 @@ export const useAuthStore = create<AuthState>()(
 
         return success;
       },
-      refresh: async () => {
-        try {
-          if (IS_NATIVE_APP) {
-            const { getRefreshToken, setRefreshToken, clearRefreshToken } =
-              await nativeAuth();
-            const refreshToken = await getRefreshToken();
+      refresh: () =>
+        trackRefresh(async () => {
+          try {
+            if (IS_NATIVE_APP) {
+              const { getRefreshToken, setRefreshToken, clearRefreshToken } =
+                await nativeAuth();
+              const refreshToken = await getRefreshToken();
 
-            if (!refreshToken) throw new Error('No refresh token');
+              if (!refreshToken) throw new Error('No refresh token');
 
-            try {
-              // The bearer header replaces the access token the client would
-              // otherwise attach; a rotated token comes back in the body.
-              const { data } = await api.post(
-                '/auth/refresh',
-                {},
-                { headers: { authorization: `Bearer ${refreshToken}` } },
-              );
+              try {
+                // The bearer header replaces the access token the client would
+                // otherwise attach; a rotated token comes back in the body.
+                const { data } = await api.post(
+                  '/auth/refresh',
+                  {},
+                  { headers: { authorization: `Bearer ${refreshToken}` } },
+                );
 
-              if (data.refreshToken) await setRefreshToken(data.refreshToken);
-              set({ accessToken: data.accessToken });
+                if (data.refreshToken) await setRefreshToken(data.refreshToken);
+                set({ accessToken: data.accessToken });
 
-              return data.accessToken as string;
-            } catch (e) {
-              // Only a rejected token ends the session for good; offline
-              // launches keep it for the next one.
-              if (e instanceof ApiError && e.response.status === 401) {
-                await clearRefreshToken();
+                return data.accessToken as string;
+              } catch (e) {
+                // Only a rejected token ends the session for good; offline
+                // launches keep it for the next one.
+                if (e instanceof ApiError && e.response.status === 401) {
+                  await clearRefreshToken();
+                }
+                throw e;
               }
-              throw e;
             }
+
+            // Always attempt; backend verifies cookie and returns 401 if not present
+            const { data } = await api.post('/auth/refresh', {});
+
+            set({ accessToken: data.accessToken });
+
+            return data.accessToken as string;
+          } catch (e) {
+            // On refresh failure, clear session so UI reflects logged-out state
+            set({ user: null, accessToken: null });
+            throw e;
           }
-
-          // Always attempt; backend verifies cookie and returns 401 if not present
-          const { data } = await api.post('/auth/refresh', {});
-
-          set({ accessToken: data.accessToken });
-
-          return data.accessToken as string;
-        } catch (e) {
-          // On refresh failure, clear session so UI reflects logged-out state
-          set({ user: null, accessToken: null });
-          throw e;
-        }
-      },
+        }),
       fetchMe: async () => {
         try {
           const { data } = await api.get('/auth/me');

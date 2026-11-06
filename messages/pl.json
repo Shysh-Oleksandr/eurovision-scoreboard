@@ -764,6 +764,45 @@
           "tooManyAttempts": "Zbyt wiele błędnych kodów. Poproś o nowy.",
           "codeExpired": "Ten kod wygasł. Poproś o nowy.",
           "network": "Brak połączenia. Sprawdź internet i spróbuj ponownie.",
+          "unknown": "Coś poszło nie tak. Spróbuj ponownie.",
+          "inUse": "Ten adres należy już do innego konta DouzePoints. Użyj innego."
+        },
+        "linkTitle": "Dodaj adres e-mail",
+        "changeTitle": "Zmień adres e-mail",
+        "linkEmailBody": "Wyślemy Ci 6-cyfrowy kod, żeby potwierdzić, że to Twój adres. Potem będziesz logować się także nim.",
+        "changeEmailBody": "Wyślemy 6-cyfrowy kod na nowy adres. Potem kody logowania będą trafiać tam.",
+        "confirm": "Potwierdź",
+        "linkSuccess": "Zapisano adres e-mail. Możesz już logować się nim."
+      },
+      "signInMethods": {
+        "title": "Metody logowania",
+        "description": "Sposoby logowania na to konto. Dodaj kolejny, żeby zawsze móc wrócić, na dowolnym urządzeniu.",
+        "google": "Google",
+        "apple": "Apple",
+        "email": "E-mail",
+        "connected": "Połączono",
+        "notConnected": "Nie połączono",
+        "connect": "Połącz",
+        "add": "Dodaj",
+        "change": "Zmień",
+        "remove": "Usuń",
+        "loadFailed": "Nie udało się wczytać metod logowania.",
+        "retry": "Spróbuj ponownie",
+        "googleConnected": "Połączono Google. Możesz już logować się w ten sposób.",
+        "appleConnected": "Połączono Apple. Możesz już logować się w ten sposób.",
+        "removed": "Usunięto metodę logowania.",
+        "removeTitle": "Usunąć tę metodę logowania?",
+        "removeDescription": "Logowanie przez {method} przestanie działać. Możesz połączyć je ponownie później.",
+        "removeSharedEmailDescription": "{method} używa Twojego adresu e-mail, {email}, więc logowanie przez {method} nadal otworzy to konto i połączy je ponownie. Aby tego uniknąć, zmień też adres e-mail.",
+        "removeEmailDescription": "Kody logowania nie będą już wysyłane na {email}. Możesz później ponownie dodać adres.",
+        "errors": {
+          "inUseGoogle": "To konto Google służy już do logowania na inne konto DouzePoints. Aby połączyć je tutaj, zaloguj się nim i najpierw usuń tamto konto.",
+          "inUseApple": "To Apple ID służy już do logowania na inne konto DouzePoints. Aby połączyć je tutaj, zaloguj się nim i najpierw usuń tamto konto.",
+          "inUseEmail": "Ten adres e-mail należy już do innego konta DouzePoints.",
+          "alreadyConnected": "Połączono tu już inne konto. Najpierw je usuń.",
+          "lastMethod": "To Twój jedyny sposób logowania. Najpierw dodaj kolejny.",
+          "expired": "Trwało to zbyt długo. Spróbuj ponownie.",
+          "network": "Brak połączenia. Sprawdź internet i spróbuj ponownie.",
           "unknown": "Coś poszło nie tak. Spróbuj ponownie."
         }
       },
@@ -1512,7 +1551,7 @@
         "winter": "Dodaj padający śnieg i świąteczne akcenty w całej aplikacji.",
         "finalReveal": "Ujawniaj końcowe wyniki teległosowania po jednym kraju z dramatyczną animacją.",
         "predictableReveal": "Ujawniaj wyniki teległosowania w płynnej, deterministycznej kolejności bez losowej napięcia.",
-        "haptics": "Wibruje przy 12 punktach, ogłaszaniu zakwalifikowanych i zwycięzcy."
+        "haptics": "Poczuj każdy głos: stuknięcie przy każdym przyznaniu punktów, bicie serca przy 12 punktach, awans w tabeli, finałowe odsłonięcie i zwycięzcę."
       }
     },
     "relations": {
@@ -1655,6 +1694,9 @@
       "fast": "Szybko",
       "finalRevealLinearAnimation": "Płynna, przewidywalna animacja (bez losowości)",
       "enableHaptics": "Wibracje",
+      "hapticsStrength": "Siła wibracji",
+      "hapticsSubtle": "Delikatna",
+      "hapticsStrong": "Mocna",
       "enableFullscreenMode": "Włącz tryb pełnoekranowy",
       "warnBeforeManuallyAssigningTelevotePoints": "Ostrzeż przed ręcznym przydzielaniem punktów televote",
       "showJuryVotingProgressBar": "Pokaż pasek postępu głosowania jury",
@@ -2453,5 +2495,51 @@
     "deleteAccountConfirmDescription": "Twój profil, konkursy, motywy, projekty, czcionki i własne wpisy zostaną usunięte razem z polubieniami, zapisanymi elementami, obserwowanymi i blokadami. Tej operacji nie można cofnąć. Ustawienia i wersje robocze zapisane tylko na tym urządzeniu pozostaną.",
     "accountDeleted": "Konto zostało usunięte.",
     "deleteAccountFailed": "Nie udało się usunąć konta. Spróbuj ponownie."
+  },
+  "liveUpdate": {
+    "readyMessage": "Nowa wersja DouzePoints jest gotowa. Uruchom aplikację ponownie, aby z niej korzystać.",
+    "restart": "Uruchom ponownie",
+    "later": "Później",
+    "update": "Aktualizuj",
+    "requiredTitle": "Aktualizacja DouzePoints",
+    "requiredBody": "Ta aktualizacja jest potrzebna, aby aplikacja nadal działała. To potrwa tylko chwilę.",
+    "requiredFailedBody": "Nie udało się pobrać aktualizacji. Sprawdź połączenie i spróbuj ponownie.",
+    "tryAgain": "Spróbuj ponownie",
+    "restartingBody": "Prawie gotowe. Ponowne uruchamianie aplikacji…",
+    "progressLabel": "Postęp aktualizacji",
+    "storeRequiredTitle": "Czas na aktualizację",
+    "storeRequiredBody": "Ta wersja DouzePoints nie jest już obsługiwana. Zainstaluj najnowszą wersję, aby dalej korzystać z aplikacji.",
+    "openStore": "Otwórz {store}",
+    "storeRecommendedMessage": "Dostępna jest nowa wersja DouzePoints."
+  },
+  "appPromo": {
+    "title": "DouzePoints jest teraz aplikacją",
+    "body": "Na pełnym ekranie telefonu, z wibracjami i systemowym menu udostępniania.",
+    "openTitle": "Otwórz DouzePoints w aplikacji",
+    "openBody": "Na pełnym ekranie, z wibracjami i systemowym menu udostępniania.",
+    "openApp": "Otwórz aplikację",
+    "qrCode": "Kod QR",
+    "qrHint": "Zeskanuj go aparatem w telefonie, aby pobrać aplikację.",
+    "why": "Po co aplikacja?",
+    "dismiss": "Nie teraz",
+    "benefits": {
+      "fullScreen": "Pełny ekran, bez pasków przeglądarki",
+      "haptics": "Wibracje przez cały pokaz, od pierwszych punktów po zwycięzcę",
+      "images": "Obrazy zapisują się od razu w Zdjęciach lub galerii i można je udostępnić z menu udostępniania",
+      "next": "Wkrótce: tryb offline i więcej funkcji tylko na telefon"
+    },
+    "reminder": "Następnym razem obejrzyj to na pełnym ekranie w aplikacji.",
+    "reminderAction": "Pobierz aplikację",
+    "settingsLabel": "Aplikacja DouzePoints",
+    "settingsDesc": "Na iPhone’a, iPada i Androida, na pełnym ekranie i z wibracjami.",
+    "page": {
+      "metaTitle": "Pobierz aplikację DouzePoints",
+      "metaDescription": "DouzePoints na iPhone’a, iPada i Androida: symuluj głosowanie konkursu na pełnym ekranie, z wibracjami.",
+      "title": "Pobierz aplikację DouzePoints",
+      "intro": "DouzePoints jest w App Store i Google Play, na iPhone’a, iPada i Androida.",
+      "benefitsTitle": "Co daje aplikacja",
+      "qrHint": "Jesteś przy komputerze? Zeskanuj ten kod aparatem w telefonie.",
+      "back": "Otwórz DouzePoints w przeglądarce"
+    }
   }
 }

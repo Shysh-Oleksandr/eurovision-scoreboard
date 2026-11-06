@@ -284,6 +284,12 @@ areas and languages, the iOS 26 simulator. Details:
   ```
   (`enableHaptics`, apps only).
   ```
+- [x] **Haptics v2** (2026-11-06, needs a store build): the `DouzeHaptics`
+  plugins (Core Haptics, Android composition primitives), cues through the
+  whole simulation at the frame each moment is seen, `hapticsStrength`, the
+  dev-only Haptics lab; also drag and drop, shuffles, the stage start, the
+  allocation draw, controls, the studio's snapping, toasts and
+  confirmations. See `docs/haptics.md`.
 - [x] **Keyboard:** no plugin needed (Android resizes, inputs stay
   ```
   visible). **Orientation:** left unlocked. **Sound autoplay:**

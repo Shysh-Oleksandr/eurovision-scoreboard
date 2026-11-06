@@ -96,6 +96,7 @@ const GuideModal = ({
       contentClassName="pb-2 xs:!pt-5 !pt-4 sm:!px-8 xs:!px-6 !px-4 text-white sm:h-[55vh] h-[60vh] narrow-scrollbar"
       overlayClassName="!z-[1001]"
       withBlur
+      fullScreenOnPhone
       topContent={
         <Tabs
           tabs={tabs}

@@ -1,5 +1,15 @@
 import React from 'react';
 
+import { playHaptic } from '@/native/haptics';
+
+/** Wraps a checkbox's onChange with the switch haptic (native apps). */
+const withToggleHaptic =
+  (onChange?: React.ChangeEventHandler<HTMLInputElement>) =>
+  (event: React.ChangeEvent<HTMLInputElement>) => {
+    playHaptic({ id: 'toggle', on: event.target.checked });
+    onChange?.(event);
+  };
+
 type CheckboxProps = {
   id: string;
   label: string;
@@ -17,7 +27,13 @@ export const Checkbox = ({
 
   return (
     <div className={`checkbox-wrapper ${className}`}>
-      <input className="inp-cbx" id={id} type="checkbox" {...rest} />
+      <input
+        className="inp-cbx"
+        id={id}
+        type="checkbox"
+        {...rest}
+        onChange={withToggleHaptic(rest.onChange)}
+      />
       <label className={`cbx ${labelClassName}`} htmlFor={id}>
         <span>
           <svg width="12px" height="10px">
@@ -44,7 +60,13 @@ export const CheckboxButton = ({
 
   return (
     <div className={`checkbox-wrapper ${className}`}>
-      <input className="inp-cbx" id={id} type="checkbox" {...rest} />
+      <input
+        className="inp-cbx"
+        id={id}
+        type="checkbox"
+        {...rest}
+        onChange={withToggleHaptic(rest.onChange)}
+      />
       <label className="cbx !mr-1 !p-1" htmlFor={id}>
         <span>
           <svg width="12px" height="10px">

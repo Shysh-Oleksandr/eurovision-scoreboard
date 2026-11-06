@@ -1,0 +1,93 @@
+{
+  "$comment": "Store screenshot captions per app locale and scene: [lead line, board-row label, optional points]. The row label is drawn in each slide's board style (upper case on most themes).",
+  "en": {
+    "scoreboard": ["Hand out your own", "Douze points", "12"],
+    "winner": ["Crown your", "Winner", "516"],
+    "setup": ["Any year since 2004,", "Or build your own"],
+    "publicthemes": ["Browse thousands of", "Fan-made themes"],
+    "builder": ["Design your own", "Theme"],
+    "contests": ["Save every contest", "To your account"],
+    "stats": ["See where every", "Point came from"],
+    "share": ["Share the results", "As an image"]
+  },
+  "fr": {
+    "scoreboard": ["Distribuez vos propres", "Douze points", "12"],
+    "winner": ["Couronnez votre", "Vainqueur", "516"],
+    "setup": ["Chaque édition depuis 2004,", "Ou créez la vôtre"],
+    "publicthemes": ["Parcourez des milliers de", "Thèmes de fans"],
+    "builder": ["Créez votre propre", "Thème"],
+    "contests": ["Enregistrez vos concours", "Dans votre compte"],
+    "stats": ["Voyez d’où vient", "Chaque point"],
+    "share": ["Partagez les résultats", "En image"]
+  },
+  "de": {
+    "scoreboard": ["Vergib deine eigenen", "Douze points", "12"],
+    "winner": ["Kröne deinen", "Gewinner", "516"],
+    "setup": ["Alle Ausgaben seit 2004,", "Oder ganz eigene"],
+    "publicthemes": ["Stöbere in Tausenden von", "Fan-Themes"],
+    "builder": ["Gestalte dein eigenes", "Theme"],
+    "contests": ["Speichere jeden Wettbewerb", "In deinem Konto"],
+    "stats": ["Sieh, woher jeder", "Punkt kommt"],
+    "share": ["Teile die Ergebnisse", "Als Bild"]
+  },
+  "it": {
+    "scoreboard": ["Assegna i tuoi", "Douze points", "12"],
+    "winner": ["Incorona il tuo", "Vincitore", "516"],
+    "setup": ["Ogni edizione dal 2004,", "O creane una tua"],
+    "publicthemes": ["Sfoglia migliaia di", "Temi dei fan"],
+    "builder": ["Crea il tuo", "Tema"],
+    "contests": ["Salva ogni concorso", "Nel tuo account"],
+    "stats": ["Scopri da dove arriva", "Ogni punto"],
+    "share": ["Condividi i risultati", "Come immagine"]
+  },
+  "pl": {
+    "scoreboard": ["Rozdaj własne", "Douze points", "12"],
+    "winner": ["Ukoronuj swojego", "Zwycięzcę", "516"],
+    "setup": ["Każda edycja od 2004,", "Albo własna"],
+    "publicthemes": ["Przeglądaj tysiące", "Motywów od fanów"],
+    "builder": ["Zaprojektuj własny", "Motyw"],
+    "contests": ["Zapisuj konkursy", "Na swoim koncie"],
+    "stats": ["Zobacz, skąd pochodzi", "Każdy punkt"],
+    "share": ["Udostępniaj wyniki", "Jako obraz"]
+  },
+  "uk": {
+    "scoreboard": ["Роздайте власні", "Douze points", "12"],
+    "winner": ["Коронуйте свого", "Переможця", "516"],
+    "setup": ["Будь-який рік від 2004-го,", "Або власний конкурс"],
+    "publicthemes": ["Переглядайте тисячі", "Тем від фанатів"],
+    "builder": ["Створіть власну", "Тему"],
+    "contests": ["Зберігайте конкурси", "У своєму акаунті"],
+    "stats": ["Дивіться, звідки прийшов", "Кожен бал"],
+    "share": ["Діліться результатами", "Як зображенням"]
+  },
+  "gr": {
+    "scoreboard": ["Δώστε τα δικά σας", "Douze points", "12"],
+    "winner": ["Στέψτε τον δικό σας", "Νικητή", "516"],
+    "setup": ["Κάθε χρονιά από το 2004,", "Ή φτιάξτε δικό σας"],
+    "publicthemes": ["Ανακαλύψτε χιλιάδες", "Θέματα από θαυμαστές"],
+    "builder": ["Σχεδιάστε το δικό σας", "Θέμα"],
+    "contests": ["Αποθηκεύστε κάθε διαγωνισμό", "Στον λογαριασμό σας"],
+    "stats": ["Δείτε από πού ήρθε", "Κάθε βαθμός"],
+    "share": ["Μοιραστείτε τα αποτελέσματα", "Ως εικόνα"]
+  },
+  "es": {
+    "scoreboard": ["Reparte tus propios", "Douze points", "12"],
+    "winner": ["Corona a tu", "Ganador", "516"],
+    "setup": ["Cada edición desde 2004,", "O crea la tuya"],
+    "publicthemes": ["Explora miles de", "Temas de fans"],
+    "builder": ["Diseña tu propio", "Tema"],
+    "contests": ["Guarda cada concurso", "En tu cuenta"],
+    "stats": ["Mira de dónde viene", "Cada punto"],
+    "share": ["Comparte los resultados", "Como imagen"]
+  },
+  "pt": {
+    "scoreboard": ["Distribua os seus", "Douze points", "12"],
+    "winner": ["Coroe o seu", "Vencedor", "516"],
+    "setup": ["Cada edição desde 2004,", "Ou crie a sua"],
+    "publicthemes": ["Explore milhares de", "Temas de fãs"],
+    "builder": ["Crie o seu próprio", "Tema"],
+    "contests": ["Guarde cada concurso", "Na sua conta"],
+    "stats": ["Veja de onde veio", "Cada ponto"],
+    "share": ["Partilhe os resultados", "Como imagem"]
+  }
+}

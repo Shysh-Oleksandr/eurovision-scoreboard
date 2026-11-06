@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/helpers/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 import usePrevious from '@/hooks/usePrevious';
+import { useSliderHaptics } from '@/hooks/useSliderHaptics';
 
 interface RangeSliderProps {
   id?: string;
@@ -36,6 +37,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   const [internalValue, setInternalValue] = useState(value);
   const debouncedValue = useDebounce(internalValue, delay);
   const prevDebouncedValue = usePrevious(debouncedValue);
+  const tick = useSliderHaptics(min, max, step);
 
   useEffect(() => {
     if (debouncedValue !== prevDebouncedValue) {
@@ -48,7 +50,10 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   }, [value]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInternalValue(Number(event.target.value));
+    const next = Number(event.target.value);
+
+    tick(next);
+    setInternalValue(next);
   };
 
   const progress = ((internalValue - min) / (max - min)) * 100;

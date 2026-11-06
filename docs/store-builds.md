@@ -94,8 +94,12 @@ and `/terms`.
 
 - **Web-only change:** `yarn live-update publish` from a clean commit
   ([native-apps.md](native-apps.md) §11). The first time, run
-  `npx wrangler login`.
+  `npx wrangler login`. Add `--mode prompt` to ask users to restart, or
+  `--mode required` when an old bundle would break.
 - **Native change** (a plugin or its version, `capacitor.config.ts`,
   `Info.plist`, entitlements, `AndroidManifest.xml`, Swift or Java code,
   icons, the app name): a new store build, from step 1, with raised
-  versions.
+  versions. Once it is live in the store, nudge older binaries with
+  `yarn live-update store <ios|android> --recommended <version>`, or block
+  them with `--required <version>` if they can't keep working
+  ([native-apps.md](native-apps.md) §11, Update levels and the store gate).

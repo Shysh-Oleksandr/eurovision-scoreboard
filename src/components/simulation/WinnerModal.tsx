@@ -3,10 +3,12 @@ import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import AppPromoReminder from '../appPromo/AppPromoReminder';
 import Button from '../common/Button';
 
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { playHaptic } from '@/native/haptics';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -88,6 +90,12 @@ const WinnerModal = () => {
     }
   }, [winnerCountry, isWinnerAnimationAlreadyDisplayed]);
 
+  // Ta-da as the card springs in (`winner-modal-in` starts after 0.08 s).
+  useEffect(() => {
+    if (shouldShowWinnerModal)
+      playHaptic({ id: 'winnerReveal' }, { delayMs: 80 });
+  }, [shouldShowWinnerModal]);
+
   useEffect(() => {
     if (!shouldShowWinnerModal || !scoreRef.current || !winnerCountry) return;
 
@@ -98,6 +106,9 @@ const WinnerModal = () => {
 
     const timeoutId = setTimeout(() => {
       let start: number | null = null;
+
+      // Ticks that slow down with the count, then the final score lands.
+      playHaptic({ id: 'winnerScore', durationMs: duration });
 
       const step = (ts: number) => {
         if (!start) start = ts;
@@ -342,6 +353,14 @@ const WinnerModal = () => {
           style={{
             opacity: 0,
             animation: 'winner-slide-up 0.45s ease 1.35s both',
+          }}
+        />
+
+        {/* Phones on the website, now and then: the app, for the next show */}
+        <AppPromoReminder
+          style={{
+            opacity: 0,
+            animation: 'winner-slide-up 0.45s ease 1.6s both',
           }}
         />
       </div>

@@ -4,6 +4,7 @@ import { ValueChip } from './ValueChip';
 
 import { cn } from '@/helpers/utils';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useSliderHaptics } from '@/hooks/useSliderHaptics';
 
 interface DivergingSliderProps {
   value: number;
@@ -26,6 +27,9 @@ const colorFor = (value: number): string =>
  * (favor warm / snub cool), with a trailing signed chip. Debounces writes while
  * dragging (mirrors RangeSlider) so it doesn't thrash the store.
  */
+/** Neutral (no favour, no snub) clicks like the ends. */
+const CENTER_DETENT = [0] as const;
+
 export const DivergingSlider: React.FC<DivergingSliderProps> = ({
   value,
   onChange,
@@ -36,6 +40,7 @@ export const DivergingSlider: React.FC<DivergingSliderProps> = ({
 }) => {
   const [internal, setInternal] = useState(value);
   const debounced = useDebounce(internal, delay);
+  const tick = useSliderHaptics(-100, 100, 1, CENTER_DETENT);
 
   // The last value that flowed in from the prop (or that we emitted). We only
   // emit onChange when the debounced value genuinely diverges from it — so the
@@ -90,7 +95,12 @@ export const DivergingSlider: React.FC<DivergingSliderProps> = ({
           max={100}
           value={internal}
           disabled={disabled}
-          onChange={(e) => setInternal(Number(e.target.value))}
+          onChange={(e) => {
+            const next = Number(e.target.value);
+
+            tick(next);
+            setInternal(next);
+          }}
           className="rel-diverging-input"
           aria-label="Affinity"
         />
