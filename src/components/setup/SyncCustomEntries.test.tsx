@@ -20,9 +20,25 @@ const ownEntries: CustomEntry[] = [
   },
 ];
 
+let queryData: CustomEntry[] | undefined = ownEntries;
+
 vi.mock('@/api/customEntries', () => ({
-  useMyCustomEntriesQuery: () => ({ data: ownEntries }),
+  useMyCustomEntriesQuery: () => ({ data: queryData }),
 }));
+
+const persistedOwnEntry = {
+  code: 'custom-own1',
+  name: 'Ohio',
+  category: 'Custom',
+  flag: 'https://cdn.douzepoints.app/custom-entries/flags/u/ohio.png',
+};
+const importedEntry = {
+  code: 'custom-theirs1',
+  name: 'Utah',
+  category: 'Custom',
+  flag: 'https://cdn.douzepoints.app/custom-entries/presets/world.svg',
+  isImported: true,
+};
 
 describe('SyncCustomEntries', () => {
   it("keeps the user's own entries out of a loaded contest's Imported list", () => {
@@ -58,5 +74,33 @@ describe('SyncCustomEntries', () => {
       ['custom-own1', 'Ohio (renamed)', false],
       ['custom-theirs1', 'Utah', true],
     ]);
+  });
+
+  it('keeps the persisted entries while signed in without the list (offline)', () => {
+    queryData = undefined;
+    useAuthStore.setState({ user: { _id: 'u' } } as never);
+    useGeneralStore.setState({ importedCustomEntries: [importedEntry] });
+    useCountriesStore.setState({ customCountries: [persistedOwnEntry] });
+
+    render(<SyncCustomEntries />);
+
+    expect(
+      useCountriesStore.getState().customCountries.map((c) => c.code),
+    ).toEqual(['custom-own1']);
+    queryData = ownEntries;
+  });
+
+  it('keeps only the imported entries when signed out', () => {
+    queryData = undefined;
+    useAuthStore.setState({ user: null } as never);
+    useGeneralStore.setState({ importedCustomEntries: [importedEntry] });
+    useCountriesStore.setState({ customCountries: [persistedOwnEntry] });
+
+    render(<SyncCustomEntries />);
+
+    expect(
+      useCountriesStore.getState().customCountries.map((c) => c.code),
+    ).toEqual(['custom-theirs1']);
+    queryData = ownEntries;
   });
 });

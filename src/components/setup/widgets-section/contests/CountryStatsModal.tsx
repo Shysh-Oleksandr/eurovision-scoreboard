@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 
+import EntryResultsChart from './EntryResultsChart';
+
 import { api } from '@/api/client';
 import {
   useContestGroupsQuery,
@@ -16,11 +18,24 @@ import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import Tabs from '@/components/common/tabs/Tabs';
+import { OfflineNotice } from '@/components/offline/OfflineNotice';
+import {
+  computeEntryStreaks,
+  sortContestsNewestFirst,
+} from '@/helpers/entryStats';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { Contest } from '@/types/contest';
+import type {
+  EntryStatsHostedContest,
+  EntryStatsResult,
+} from '@/types/entryStats';
+
+type ContestListTab = 'all' | 'hosted';
 
 interface CountryStatsModalProps {
   isOpen: boolean;
@@ -48,10 +63,12 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   const t = useTranslations('widgets.contests.entryStats');
   const tContests = useTranslations('widgets.contests');
   const tGroups = useTranslations('widgets.contests.groups');
+  const tLb = useTranslations('widgets.contests.leaderboard');
 
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(
     isUserScope ? null : initialGroupId,
   );
+  const [listTab, setListTab] = useState<ContestListTab>('all');
 
   const setContestToLoad = useGeneralStore((s) => s.setContestToLoad);
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -79,10 +96,12 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   const { data, isLoading, isError, error } = isUserScope
     ? userEntryStatsQuery
     : myEntryStatsQuery;
+  const offline = useIsOffline();
 
   useEffect(() => {
     if (!isOpen) return;
     setSelectedGroupId(isUserScope ? null : initialGroupId);
+    setListTab('all');
   }, [isOpen, entryCode, initialGroupId, isUserScope]);
 
   useEffect(() => {
@@ -145,37 +164,70 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
     isExisting: entryIsExisting,
   } = resolveEntry(entryCode);
 
-  const sortedParticipations = useMemo(() => {
-    if (!data?.participations) return [];
+  const sortedParticipations = useMemo(
+    () => sortContestsNewestFirst(data?.participations ?? []),
+    [data?.participations],
+  );
 
-    return [...data.participations].sort((a, b) => {
-      const yearCmp = (b.year ?? -Infinity) - (a.year ?? -Infinity);
+  // Older backends don't send hosted contests yet.
+  const sortedHosted = useMemo(
+    () => sortContestsNewestFirst(data?.hostedContests ?? []),
+    [data?.hostedContests],
+  );
 
-      if (yearCmp !== 0) return yearCmp;
+  const streaks = useMemo(
+    () => computeEntryStreaks(sortedParticipations, entryCode ?? ''),
+    [sortedParticipations, entryCode],
+  );
 
-      const aTs = a.contestCreatedAt
-        ? new Date(a.contestCreatedAt).getTime()
-        : -Infinity;
-      const bTs = b.contestCreatedAt
-        ? new Date(b.contestCreatedAt).getTime()
-        : -Infinity;
+  const chronologicalParticipations = useMemo(
+    () => [...sortedParticipations].reverse(),
+    [sortedParticipations],
+  );
 
-      if (bTs !== aTs) return bTs - aTs;
+  const activeListTab: ContestListTab =
+    sortedHosted.length > 0 ? listTab : 'all';
+  const listedContests: EntryStatsHostedContest[] =
+    activeListTab === 'hosted' ? sortedHosted : sortedParticipations;
+  const homeWins = sortedHosted.filter(
+    (c) => !!entryCode && c.winnerCode === entryCode,
+  ).length;
 
-      return a.contestName.localeCompare(b.contestName);
-    });
-  }, [data?.participations]);
+  const formatResult = (result: EntryStatsResult | null | undefined) => {
+    if (!result) return '—';
 
-  const qualifyingStreak = useMemo(() => {
-    let streak = 0;
+    return result.year !== undefined
+      ? `#${result.rank} (${result.year})`
+      : `#${result.rank}`;
+  };
 
-    for (const p of sortedParticipations) {
-      if (p.status === 'FINAL') streak += 1;
-      else break;
+  const inARow = (count: number) =>
+    count >= 2 ? t('mostInARow', { count }) : undefined;
+
+  const formatAverage = (value: number | null | undefined) =>
+    typeof value === 'number' ? value.toFixed(1) : '—';
+
+  const semiCell = (row: EntryStatsHostedContest) => {
+    if (row.semi) {
+      return (
+        <span className="flex items-baseline gap-1.5 min-w-0">
+          <span className="flex-none">#{row.semi.rank}</span>
+          <span className="truncate text-white/55" title={row.semi.stageName}>
+            {row.semi.stageName}
+          </span>
+        </span>
+      );
     }
 
-    return streak;
-  }, [sortedParticipations]);
+    return row.preQualified ? t('preQualified') : '—';
+  };
+
+  const resultLabel = (row: EntryStatsHostedContest) => {
+    if (row.status === 'NOT_COMPETING') return t('notCompeting');
+    if (row.status === 'NQ') return t('nonQualified');
+
+    return `#${row.gfRank} (${row.gfPoints ?? 0} ${t('points')})`;
+  };
 
   const handleLoadContest = async (contestId: string) => {
     try {
@@ -234,13 +286,15 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
           />
         )}
 
-        {isLoading && (
+        {offline && !data && <OfflineNotice className="py-8" />}
+
+        {isLoading && !offline && (
           <div className="flex justify-center py-8">
             <span className="loader" />
           </div>
         )}
 
-        {isError && (
+        {isError && !offline && (
           <p className="text-red-300 text-sm">
             {(error as any)?.response?.data?.message ?? t('failedToLoadStats')}
           </p>
@@ -253,37 +307,149 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
                 label={t('participations')}
                 value={data.summary.participations}
               />
-              <Stat label={t('victories')} value={data.summary.victories} />
-              <Stat label={t('finals')} value={data.summary.finals} />
-              <Stat label={t('nulPoints')} value={data.summary.nulPoints} />
-              <Stat label={t('lastPlaces')} value={data.summary.lastPlaces} />
               <Stat
-                label={t('bestResult')}
-                value={
-                  data.summary.bestResult
-                    ? `#${data.summary.bestResult.rank} (${data.summary.bestResult.year})`
-                    : '—'
+                label={t('finals')}
+                value={data.summary.finals}
+                detail={
+                  data.summary.preQualified > 0
+                    ? t('preQualifiedCount', {
+                        count: data.summary.preQualified,
+                      })
+                    : undefined
                 }
               />
               <Stat
                 label={t('qualRate')}
                 value={
-                  data.summary.participations > 0
+                  data.summary.semiFinals > 0
                     ? `${(
-                        (data.summary.finals / data.summary.participations) *
+                        (data.summary.qualifiedFromSemis /
+                          data.summary.semiFinals) *
                         100
                       ).toFixed(1)}%`
                     : '—'
                 }
+                detail={
+                  data.summary.semiFinals > 0
+                    ? t('semisQualified', {
+                        qualified: data.summary.qualifiedFromSemis,
+                        total: data.summary.semiFinals,
+                      })
+                    : undefined
+                }
               />
-              <Stat label={t('qualStreak')} value={qualifyingStreak} />
+              <Stat
+                label={t('qualStreak')}
+                value={streaks.currentQualifying}
+                detail={
+                  streaks.longestQualifying > streaks.currentQualifying
+                    ? inARow(streaks.longestQualifying)
+                    : undefined
+                }
+              />
+              <Stat
+                label={t('victories')}
+                value={data.summary.victories}
+                detail={inARow(streaks.longestWins)}
+              />
+              <Stat
+                label={tLb('top10')}
+                value={data.summary.top10}
+                detail={inARow(streaks.longestTop10)}
+              />
+              <Stat
+                label={t('bestResult')}
+                value={formatResult(data.summary.bestResult)}
+              />
+              <Stat
+                label={t('averagePlace')}
+                value={formatAverage(data.summary.averageRank)}
+              />
+              <Stat
+                label={t('worstResult')}
+                value={formatResult(data.summary.worstResult)}
+              />
+              <Stat label={t('lastPlaces')} value={data.summary.lastPlaces} />
+              <Stat label={t('nulPoints')} value={data.summary.nulPoints} />
+              <Stat
+                label={t('mostNqsInARow')}
+                value={streaks.longestNonQualifying}
+              />
+              {typeof data.summary.averageJuryRank === 'number' && (
+                <>
+                  <Stat label={t('juryWins')} value={data.summary.juryWins} />
+                  <Stat
+                    label={t('televoteWins')}
+                    value={data.summary.televoteWins}
+                  />
+                  <Stat
+                    label={t('averageJuryPlace')}
+                    value={formatAverage(data.summary.averageJuryRank)}
+                  />
+                  <Stat
+                    label={t('averageTelevotePlace')}
+                    value={formatAverage(data.summary.averageTelevoteRank)}
+                  />
+                </>
+              )}
             </div>
 
-            {sortedParticipations.length === 0 && (
+            {entryCode &&
+              chronologicalParticipations.length >= 2 &&
+              data.summary.finals > 0 && (
+                <section className="rounded-[10px] bg-primary-800 border border-white/10 px-3 pt-2.5 pb-1.5">
+                  <h3 className="text-[15px] font-bold text-white mb-1">
+                    {t('resultsOverTime')}
+                  </h3>
+                  <EntryResultsChart
+                    rows={chronologicalParticipations}
+                    entryCode={entryCode}
+                  />
+                </section>
+              )}
+
+            {sortedHosted.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <Tabs
+                  tabs={[
+                    {
+                      value: 'all',
+                      label: (
+                        <TabLabel
+                          text={t('allContestsTab')}
+                          count={sortedParticipations.length}
+                        />
+                      ),
+                    },
+                    {
+                      value: 'hosted',
+                      label: (
+                        <TabLabel
+                          text={t('hostedTab')}
+                          count={sortedHosted.length}
+                        />
+                      ),
+                    },
+                  ]}
+                  activeTab={activeListTab}
+                  setActiveTab={(tab) => setListTab(tab as ContestListTab)}
+                  containerClassName="!w-auto self-start !p-[3px]"
+                  overlayClassName="!inset-y-[2px]"
+                  buttonClassName="!py-[7px] !px-[14px] !text-[13px]"
+                />
+                {activeListTab === 'hosted' && (
+                  <p className="text-white/70 text-[13px] font-semibold">
+                    {t('homeWins', { count: homeWins })}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {listedContests.length === 0 && (
               <p className="text-white/60 text-sm">{t('noParticipations')}</p>
             )}
 
-            {sortedParticipations.length > 0 && (
+            {listedContests.length > 0 && (
               <div className="overflow-x-auto -mx-1">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -291,12 +457,15 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
                       <th className="py-2 pr-2 font-medium">{t('contest')}</th>
                       <th className="py-2 pr-2 font-medium">{t('year')}</th>
                       <th className="py-2 pr-2 font-medium">{t('winner')}</th>
+                      <th className="py-2 pr-2 font-medium">
+                        {t('semiFinal')}
+                      </th>
                       <th className="py-2 pr-2 font-medium">{t('gfResult')}</th>
                       <th className="py-2 pr-0 font-medium w-24" />
                     </tr>
                   </thead>
                   <tbody>
-                    {sortedParticipations.map((row) => {
+                    {listedContests.map((row) => {
                       const { name: winnerName, logo: wLogo } = resolveEntry(
                         row.winnerCode,
                       );
@@ -330,12 +499,11 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
                               <span className="truncate">{winnerName}</span>
                             </div>
                           </td>
+                          <td className="py-2 pr-2 max-w-[160px] whitespace-nowrap">
+                            {semiCell(row)}
+                          </td>
                           <td className="py-2 pr-2 whitespace-nowrap">
-                            {row.status === 'NQ'
-                              ? t('nonQualified')
-                              : `#${row.gfRank} (${row.gfPoints ?? 0} ${t(
-                                  'points',
-                                )})`}
+                            {resultLabel(row)}
                           </td>
                           <td className="py-2 pr-0">
                             <Button
@@ -361,11 +529,28 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   );
 };
 
-const Stat = ({ label, value }: { label: string; value: string | number }) => (
-  <div className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-800 to-primary-800/60 rounded-lg px-3 py-2 border border-primary-800">
+const Stat = ({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string | number;
+  detail?: string;
+}) => (
+  <div className="bg-primary-800 rounded-[10px] px-3 py-2 border border-white/10">
     <div className="text-white/60 text-sm mb-0.5">{label}</div>
     <div className="text-white text-lg font-semibold tabular-nums">{value}</div>
+    {detail && (
+      <div className="text-white/55 text-[12px] font-semibold">{detail}</div>
+    )}
   </div>
+);
+
+const TabLabel = ({ text, count }: { text: string; count: number }) => (
+  <>
+    {text} <span className="opacity-60 tabular-nums">{count}</span>
+  </>
 );
 
 export default CountryStatsModal;

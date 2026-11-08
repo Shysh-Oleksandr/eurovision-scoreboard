@@ -120,13 +120,80 @@ describe('api client (fetch wrapper)', () => {
     expect(err.response.data.message).toEqual(['first problem', 'second']);
   });
 
-  it('propagates network failures without a response property', async () => {
-    fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+  it('turns network failures into a status-0 NetworkError with the offline message', async () => {
+    const cause = new TypeError('Failed to fetch');
+
+    client.setNetworkErrorMessage('Offline, try later');
+    fetchMock.mockRejectedValueOnce(cause);
 
     const err: any = await client.api.get('/things').catch((error) => error);
 
-    expect(err).toBeInstanceOf(TypeError);
-    expect(err.response).toBeUndefined();
+    expect(err).toBeInstanceOf(client.NetworkError);
+    expect(err).toBeInstanceOf(client.ApiError);
+    expect(client.isNetworkError(err)).toBe(true);
+    expect(err.response).toEqual({
+      status: 0,
+      data: { message: 'Offline, try later' },
+    });
+    expect(err.cause).toBe(cause);
+  });
+
+  it('does not treat answered errors as network errors', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(500, { message: 'boom' }));
+
+    const err: any = await client.api.get('/things').catch((error) => error);
+
+    expect(client.isNetworkError(err)).toBe(false);
+    expect(client.isNetworkError(new TypeError('x'))).toBe(false);
+  });
+
+  it('aborts a request that gets no answer within the timeout', async () => {
+    vi.useFakeTimers();
+    try {
+      fetchMock.mockImplementationOnce(
+        (_url: string, init: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init.signal?.addEventListener('abort', () =>
+              reject(new DOMException('Aborted', 'AbortError')),
+            );
+          }),
+      );
+
+      const pending = client.api.get('/slow').catch((error) => error);
+
+      await vi.advanceTimersByTimeAsync(20_000);
+      const err: any = await pending;
+
+      expect(client.isNetworkError(err)).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('reports outcomes and fails fast while the reporter knows it is offline', async () => {
+    const reporter = {
+      isKnownOffline: vi.fn(() => false),
+      onSuccess: vi.fn(),
+      onFailure: vi.fn(),
+    };
+
+    client.setNetworkReporter(reporter);
+
+    fetchMock.mockResolvedValueOnce(jsonResponse(404, {}));
+    await client.api.get('/missing').catch(() => undefined);
+    expect(reporter.onSuccess).toHaveBeenCalledTimes(1);
+
+    fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    await client.api.get('/down').catch(() => undefined);
+    expect(reporter.onFailure).toHaveBeenCalledTimes(1);
+
+    reporter.isKnownOffline.mockReturnValue(true);
+    const err: any = await client.api
+      .post('/contests', {})
+      .catch((error) => error);
+
+    expect(client.isNetworkError(err)).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it('throws 401s straight through before the refresh interceptor attaches', async () => {

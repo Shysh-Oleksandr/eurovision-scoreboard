@@ -85,20 +85,32 @@ const REPORTED_AT_KEY = 'dom-repair-reported-at';
 const REPORT_EVERY_MS = 24 * 60 * 60 * 1000;
 const COLLECT_MS = 5000;
 
-let collected: Map<string, number> | null = null;
+/**
+ * Events that mean a crash was avoided (or the package itself failed). The
+ * rest only say translation started ("translation signal detected, observing
+ * document", "translation activity detected", "<html lang> changed …"):
+ * common on Chrome with auto-translate even under `translate="no"`, and
+ * harmless on their own.
+ */
+const REPAIR_EVENT = /^(removeChild|insertBefore|Yandex|internal error)/;
+
+const events = new Map<string, number>();
+let reportScheduled = false;
 
 /**
- * Collects the repairs' events and posts them as one `/errors` report 5 s
- * after the first, at most once a day per browser. The message starts with
+ * Posts one `/errors` report when a repair happens, 5 s after the first one so
+ * a burst lands together, with every event of the page load so far as
+ * context; at most once a day per browser. The message starts with
  * `DOM repaired:`, which keeps these apart from crash reports.
  */
 export function reportDomRepair(message: string) {
-  if (!collected) {
-    if (reportedRecently()) return;
-    collected = new Map();
-    window.setTimeout(sendDomRepairReport, COLLECT_MS);
+  events.set(message, (events.get(message) ?? 0) + 1);
+
+  if (reportScheduled || !REPAIR_EVENT.test(message) || reportedRecently()) {
+    return;
   }
-  collected.set(message, (collected.get(message) ?? 0) + 1);
+  reportScheduled = true;
+  window.setTimeout(() => sendDomRepairReport(message), COLLECT_MS);
 }
 
 function reportedRecently() {
@@ -111,13 +123,11 @@ function reportedRecently() {
   }
 }
 
-function sendDomRepairReport() {
-  const events = [...(collected ?? [])].map(([message, count]) => ({
+function sendDomRepairReport(firstRepair: string) {
+  const domRepairs = [...events].map(([message, count]) => ({
     message,
     count,
   }));
-
-  if (events.length === 0) return;
 
   try {
     localStorage.setItem(REPORTED_AT_KEY, String(Date.now()));
@@ -128,13 +138,13 @@ function sendDomRepairReport() {
   void import('@/api/client')
     .then(({ api }) =>
       api.post('/errors', {
-        message: `DOM repaired: ${events[0].message}`.slice(0, 300),
+        message: `DOM repaired: ${firstRepair}`.slice(0, 300),
         userDetails: {
           platform: navigator.platform,
           userAgent: navigator.userAgent,
           language: navigator.language,
         },
-        generalInfo: { domRepairs: events.slice(0, 20) },
+        generalInfo: { domRepairs: domRepairs.slice(0, 20) },
       }),
     )
     .catch(() => {});

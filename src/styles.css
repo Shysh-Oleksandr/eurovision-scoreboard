@@ -55,6 +55,9 @@ aside {
    * gesture handle or the 3-button bar.
    */
   --safe-bottom-bar: var(--safe-bottom);
+
+  /* The offline strip's height animates in and out (see .dp-offline-strip). */
+  transition: --offline-strip-h 200ms ease-out;
 }
 
 /*
@@ -706,7 +709,89 @@ h6 {
  * Plain CSS (not a Tailwind layer) so it is never purged.
  */
 .safe-area-padding {
-  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+  padding: calc(var(--safe-top) + var(--offline-strip-h, 0px)) var(--safe-right)
+    var(--safe-bottom) var(--safe-left);
+}
+
+/*
+ * Offline strip (src/components/offline/OfflineStrip.tsx, docs/offline-mode.md):
+ * pinned over the status bar while the app can't reach the API. The component
+ * sets --offline-strip-h to the row's height while it shows; the surfaces that
+ * pad their top by --safe-top add it (`.safe-area-padding`, `Modal`
+ * `fullScreenOnPhone`, the graphics editor), so it never covers content.
+ * Registered so the padding change animates instead of jumping.
+ */
+@property --offline-strip-h {
+  syntax: '<length>';
+  inherits: true;
+  /* stylelint-disable-next-line length-zero-no-unit -- a typed initial value */
+  initial-value: 0px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    transition: none;
+  }
+}
+
+.dp-offline-strip {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1500;
+  height: calc(var(--safe-top) + var(--offline-strip-h, 0px));
+  padding: var(--safe-top) calc(var(--safe-right) + 16px) 0
+    calc(var(--safe-left) + 16px);
+  overflow: hidden;
+  background: var(--p-800);
+  border-bottom: 1px solid var(--hair);
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.dp-offline-strip-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 28px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dp-offline-strip-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--ink-40);
+}
+
+.dp-offline-strip[data-state='back'] .dp-offline-strip-dot {
+  background: var(--accent);
+}
+
+.dp-offline-strip-row[data-text='full'] .dp-offline-strip-short,
+.dp-offline-strip-row[data-text='short'] .dp-offline-strip-full {
+  display: none;
+}
+
+/* Toasts clear the status bar and the strip (react-toastify injects its CSS
+   after ours, hence the extra specificity). */
+html:root {
+  --toastify-toast-top: max(
+    var(--toastify-toast-offset),
+    calc(var(--safe-top) + var(--offline-strip-h, 0px))
+  );
+}
+
+@media only screen and (width <= 480px) {
+  html .Toastify__toast-container--top-left,
+  html .Toastify__toast-container--top-center,
+  html .Toastify__toast-container--top-right {
+    top: calc(var(--safe-top) + var(--offline-strip-h, 0px));
+  }
 }
 
 .triangle {

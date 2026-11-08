@@ -19,8 +19,10 @@ import {
 } from '@/api/fonts';
 import Button from '@/components/common/Button';
 import OverflowMenu from '@/components/common/OverflowMenu';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useQueryView } from '@/hooks/useQueryView';
 import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { Font } from '@/types/font';
@@ -45,7 +47,7 @@ const PublicFontsTab: React.FC<PublicFontsTabProps> = ({ value, onSelect }) => {
   const [forkingId, setForkingId] = useState<string | null>(null);
   const debouncedSearch = useDebounce(search, 400);
 
-  const { data, isLoading } = usePublicFontsQuery({
+  const publicFontsQuery = usePublicFontsQuery({
     page,
     limit: PAGE_SIZE,
     search: debouncedSearch,
@@ -54,6 +56,8 @@ const PublicFontsTab: React.FC<PublicFontsTabProps> = ({ value, onSelect }) => {
     startDate: dateRange?.startDate,
     endDate: dateRange?.endDate,
   });
+  const { data } = publicFontsQuery;
+  const view = useQueryView(publicFontsQuery);
 
   const handleUse = async (font: Font) => {
     if (font.userId === user?._id) {
@@ -102,14 +106,14 @@ const PublicFontsTab: React.FC<PublicFontsTabProps> = ({ value, onSelect }) => {
         />
       </div>
 
-      <h3 className="text-white text-lg font-bold">
-        {t('foundNFonts', { count: data?.total ?? 0 })}
-      </h3>
+      {view === 'ready' && (
+        <h3 className="text-white text-lg font-bold">
+          {t('foundNFonts', { count: data?.total ?? 0 })}
+        </h3>
+      )}
 
-      {isLoading ? (
-        <div className="text-center sm:py-12 py-8">
-          <span className="loader" />
-        </div>
+      {view !== 'ready' ? (
+        <QueryNotice view={view} onRetry={() => publicFontsQuery.refetch()} />
       ) : fonts.length === 0 ? (
         <div className="text-center sm:py-10 py-6">
           <p className="text-white/70">{t('noPublicFonts')}</p>

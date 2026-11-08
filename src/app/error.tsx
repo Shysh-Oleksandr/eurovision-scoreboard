@@ -11,6 +11,7 @@ import type { ErrorWithComponentStack } from '@/components/common/ComponentStack
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
 import type { EventStage } from '@/models';
 import { LIVE_BUNDLE_VERSION } from '@/native/liveUpdate';
+import { noteReviewSetback } from '@/native/review';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -127,6 +128,9 @@ export default function Error({
     '\n\n' +
     'User Details: ' +
     JSON.stringify(getUserDetails());
+
+  // A crash: the apps won't ask for a store rating this session.
+  useEffect(() => noteReviewSetback(), []);
 
   // Silently report error to backend (for both authenticated and unauthenticated users)
   // Use localStorage to prevent duplicate reports on page refresh

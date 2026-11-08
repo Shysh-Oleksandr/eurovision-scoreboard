@@ -11,7 +11,9 @@ import { useBlockedUsersQuery } from '@/api/blocks';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
+import { useQueryView } from '@/hooks/useQueryView';
 
 interface BlockedUsersModalProps {
   isOpen: boolean;
@@ -24,7 +26,9 @@ const BlockedUsersModal: React.FC<BlockedUsersModalProps> = ({
   onClose,
 }) => {
   const t = useTranslations('moderation');
-  const { data, isLoading } = useBlockedUsersQuery(isOpen);
+  const blockedQuery = useBlockedUsersQuery(isOpen);
+  const { data } = blockedQuery;
+  const view = useQueryView(blockedQuery);
   const { unblockUser } = useBlockActions();
   const [pendingId, setPendingId] = useState<string | null>(null);
 
@@ -43,10 +47,12 @@ const BlockedUsersModal: React.FC<BlockedUsersModalProps> = ({
         {t('blockedUsersDescription')}
       </p>
 
-      {isLoading ? (
-        <div className="text-center py-8">
-          <span className="loader" />
-        </div>
+      {view !== 'ready' ? (
+        <QueryNotice
+          view={view}
+          onRetry={() => blockedQuery.refetch()}
+          className="py-8"
+        />
       ) : users.length === 0 ? (
         <p className="text-white/60 text-center py-8">{t('noBlockedUsers')}</p>
       ) : (

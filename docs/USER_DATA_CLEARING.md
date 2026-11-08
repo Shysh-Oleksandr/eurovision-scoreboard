@@ -36,6 +36,10 @@ The system uses a centralized approach to manage user-specific data:
    - **Clears Zustand stores** (customCountries, etc.)
 4. `SyncCustomEntries` automatically updates Zustand when React Query is cleared
 5. UI updates to show logged-out state
+6. The offline copy of the account's lists in IndexedDB is rewritten
+   without them on the next save (`src/api/queryPersistence.ts`); a session
+   the server rejects is cleared the same way (`endSession`). See
+   [offline-mode.md](offline-mode.md) §5.
 
 ## Adding New User-Specific Data
 

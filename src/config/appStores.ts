@@ -33,6 +33,15 @@ export const APP_STORE_URL = `https://apps.apple.com/app/id${APP_STORE_ID}`;
 export const PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`;
 
 /**
+ * Where a "Rate" link goes: Apple opens its write-a-review sheet; Google Play
+ * has no link to its review form, so the listing (the form is on it).
+ */
+export const STORE_REVIEW_URLS: Record<AppStore, string> = {
+  'app-store': `${APP_STORE_URL}?action=write-review`,
+  'google-play': PLAY_STORE_URL,
+};
+
+/**
  * The share-anywhere link: phones go straight to their store, other devices
  * get both badges and a QR code (src/app/get-app).
  */

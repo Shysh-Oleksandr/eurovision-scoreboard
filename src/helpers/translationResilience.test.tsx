@@ -5,6 +5,10 @@ import { translateSubtree } from 'translation-resilience/simulator';
 
 import { installDomResilience } from './translationResilience';
 
+const { post } = vi.hoisted(() => ({ post: vi.fn(() => Promise.resolve({})) }));
+
+vi.mock('@/api/client', () => ({ api: { post } }));
+
 /** Yandex Browser's translator: each text node becomes a `<ya-tr-span>`, the original is detached. */
 function yandexTranslate(root: Node) {
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -88,5 +92,74 @@ describe('page translated by Chrome', () => {
     act(() => rerender(<Board points={12} showBadge={false} />));
 
     expect(container.textContent).toContain('12');
+  });
+});
+
+describe('reportDomRepair', () => {
+  const SIGNAL = 'translation signal detected, observing document';
+  const REPAIR = 'removeChild: removing node from its actual parent';
+
+  // The reporter keeps per-page-load state: a fresh module per test.
+  const loadReporter = async () => {
+    vi.resetModules();
+
+    return (await import('./translationResilience')).reportDomRepair;
+  };
+
+  afterEach(() => {
+    vi.useRealTimers();
+    post.mockClear();
+    localStorage.clear();
+  });
+
+  it('stays quiet while translation only switches on', async () => {
+    vi.useFakeTimers();
+    const report = await loadReporter();
+
+    report(SIGNAL);
+    report('translation activity detected');
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    expect(post).not.toHaveBeenCalled();
+  });
+
+  it('reports a repair once, with the earlier events as context', async () => {
+    vi.useFakeTimers();
+    const report = await loadReporter();
+
+    report(SIGNAL);
+    report(REPAIR);
+    report('Yandex: removeChild of a displaced node');
+    await vi.advanceTimersByTimeAsync(5_000);
+    await vi.waitFor(() => expect(post).toHaveBeenCalledTimes(1));
+
+    expect(post).toHaveBeenCalledWith(
+      '/errors',
+      expect.objectContaining({
+        message: `DOM repaired: ${REPAIR}`,
+        generalInfo: {
+          domRepairs: [
+            { message: SIGNAL, count: 1 },
+            { message: REPAIR, count: 1 },
+            { message: 'Yandex: removeChild of a displaced node', count: 1 },
+          ],
+        },
+      }),
+    );
+
+    report(REPAIR);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(post).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports at most once a day per browser', async () => {
+    vi.useFakeTimers();
+    localStorage.setItem('dom-repair-reported-at', String(Date.now()));
+    const report = await loadReporter();
+
+    report(REPAIR);
+    await vi.advanceTimersByTimeAsync(10_000);
+
+    expect(post).not.toHaveBeenCalled();
   });
 });

@@ -32,6 +32,7 @@ import { saveFile, shareFile } from '@/helpers/fileActions';
 import { buildShareUrl } from '@/helpers/shareUrl';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { Country, StageId, StageVotingMode } from '@/models';
+import { askForReviewSoon } from '@/native/review';
 import { useCountriesStore } from '@/state/countriesStore';
 
 interface ShareResultsModalProps {
@@ -191,6 +192,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       if (result.kind === 'saved') {
         toast.success(t('common.savedTo', { folder: result.folder }));
       }
+      if (result.kind !== 'cancelled') askForReviewSoon('image-shared');
     } catch (err) {
       console.error('Save failed:', err);
       toast.error('Failed to share');
@@ -212,6 +214,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       if (result === 'unsupported') {
         toast.error('Sharing is not supported on this device.');
       }
+      if (result === 'shared') askForReviewSoon('image-shared');
     } catch (err: any) {
       console.error('Share failed:', err);
       toast.error('Failed to share');

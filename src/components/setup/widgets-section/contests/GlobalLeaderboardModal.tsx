@@ -11,8 +11,10 @@ import CustomSelect, {
 } from '@/components/common/customSelect/CustomSelect';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import { OfflineNotice } from '@/components/offline/OfflineNotice';
 import { EUROVISION_COUNTRIES } from '@/data/countries/common-countries';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -99,6 +101,7 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
     year: queryYear,
     enabled: isOpen,
   });
+  const offline = useIsOffline();
 
   const getAllCountries = useCountriesStore((s) => s.getAllCountries);
   const shouldShowHeartFlagIcon = useGeneralStore(
@@ -231,13 +234,15 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
           </label>
         </div>
 
-        {isLoading && (
+        {offline && !data && <OfflineNotice className="py-8" />}
+
+        {isLoading && !offline && (
           <div className="flex justify-center py-8">
             <span className="loader" />
           </div>
         )}
 
-        {isError && (
+        {isError && !offline && (
           <p className="text-red-300 text-sm">
             {(error as any)?.response?.data?.message ?? t('failedToLoad')}
           </p>

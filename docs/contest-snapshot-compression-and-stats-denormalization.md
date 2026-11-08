@@ -92,15 +92,22 @@ Adding new snapshot fields in the future only requires the frontend serializer t
 | Field | Content |
 |-------|---------|
 | `participantCodes` | Union of all `setup.stages[].participants` (includes `custom-*` codes) |
-| `gfResults` | GF stage rows from `simulation.countriesStateByStage` (key where `id.toUpperCase() === 'GF'`), each `{ code, points }` with `points = juryPoints + televotePoints`, sorted points desc then code asc |
+| `gfResults` | GF stage rows from `simulation.countriesStateByStage` (key where `id.toUpperCase() === 'GF'`), each `{ code, points, jury, televote }` with `points = juryPoints + televotePoints`, in **board order** (see below) |
+| `semiResults` | Every other stage in `countriesStateByStage`, in stage `order`: `{ stageId, name, results: { code, points }[] }`, results in board order. `[]` for a final-only contest |
+| `gfVotingMode` | The GF stage's `votingMode` (`JURY_AND_TELEVOTE` when the snapshot omits it). Jury/televote stats only use contests with `JURY_AND_TELEVOTE` |
 | `customEntries` | Copy of `customEntriesUsed` (`code`, `name`, `flag`) |
+| `statsVersion` | `CONTEST_STATS_VERSION` the fields were extracted with (currently **2**) |
 
-These are **derived only** — safe to recompute from a snapshot if ever needed.
+**Board order** mirrors the scoreboard (`createCountriesComparator`): total points desc, then (GF only) the recorded `winnerCountryCode` first among equal totals, then televote desc, then running order. Stage rows are saved in running order (`getOrderedStageParticipantCodes`), so the row index stands in for it. Before stats version 2 the GF was sorted points desc then code asc, so on a points tie the winner could show as #2.
+
+Stage names, order and voting mode come from `simulation.stages`, falling back to `setup.stages` (simulation stages identical to setup are saved as `{ id, isSameAsSetup }`; the setup omits `votingMode` when it is the default).
+
+These are **derived only** — safe to recompute from a snapshot if ever needed. When `extractContestStats` changes, bump `CONTEST_STATS_VERSION` and run the backfill (§7b).
 
 **Consumers:**
 
-- `LeaderboardService` — `forEachCompletedContest()` merges into country aggregates without touching `contestsnapshots` when `participantCodes` is present.
-- `ContestsService.getMyEntryStats()` — same; falls back to snapshot decompress only for unmigrated contests.
+- `LeaderboardService` — `forEachCompletedContest()` merges into country aggregates without touching `contestsnapshots` when `participantCodes` is present (any version). Personal leaderboards count qualification only from contests with `semiResults` (version 2+).
+- `ContestsService.computeEntryStats()` — reads contests at the current `statsVersion` directly and decompresses the snapshot of any older one, so entry stats are complete right after a deploy, only slower until the backfill has run.
 
 ---
 
@@ -112,7 +119,7 @@ Pre-migration fallback (decompressing snapshots for stats) must not load tens of
 
 - Walks completed contests in batches of **100** (`CONTEST_BATCH_SIZE`).
 - Per batch: load only needed snapshots with projection  
-  `data setup.stages.participants simulation.countriesStateByStage customEntriesUsed`  
+  `data setup.stages simulation.stages simulation.countriesStateByStage simulation.results.winnerCountryCode customEntriesUsed`  
   (avoids loading vote payloads on legacy v1 docs).
 - Aggregates into in-memory maps, then discards the batch.
 
@@ -138,8 +145,11 @@ timestamps
 
 ```text
 participantCodes  string[]
-gfResults         { code, points }[]
+gfResults         { code, points, jury?, televote? }[]   (jury/televote from v2)
+semiResults       { stageId, name, results: { code, points }[] }[]   (v2; absent before)
+gfVotingMode      string   (v2)
 customEntries     { code, name, flag }[]
+statsVersion      number   (v2; absent before)
 ```
 
 Existing derived fields (`stageNames`, `winner`, `totalParticipants`, etc.) are unchanged.
@@ -174,6 +184,23 @@ npm run migrate:snapshots -- --apply
 **Batch size:** 100 snapshots per bulk write pass.
 
 **Note:** Logical `dataSize` drops immediately after `$unset` of plain fields. On-disk space may need Atlas compact/resync; verify with `db.stats()` before changing Atlas tier.
+
+### 7b. Contest stats backfill (stats version 2, 2026-11)
+
+**Path:** `douze-points-backend/scripts/backfill-contest-stats.ts` → `backfillContestStats()` in `src/contests/contest-stats-backfill.ts`
+
+```bash
+cd douze-points-backend
+npm run backfill:contest-stats              # dry run: counts, incl. gfOrderChanged
+npm run backfill:contest-stats -- --apply
+```
+
+- Re-extracts every contest whose `statsVersion` is below `CONTEST_STATS_VERSION` from its snapshot (batches of 200) and `$set`s the result. Snapshots are never written.
+- `timestamps: false`, so `updatedAt` (which orders contest lists) doesn't move.
+- The update filter repeats the version check, so a contest its owner re-saves mid-run (which writes current stats) is left alone. Idempotent: a second run only finds contests whose snapshot is missing.
+- `gfOrderChanged` in the report counts contests whose GF ranking changes with the board-order tie-break.
+- Leaderboard snapshots pick the new ranking up on their next refresh (6 h global and recent years, 24 h older years).
+- Deploy the backend first: new saves write version 2 immediately, and entry stats fall back to the snapshot for older contests until the backfill is done.
 
 ---
 
@@ -224,5 +251,6 @@ Types in `src/types/contestSnapshot.ts` still describe the **expanded** API resp
 | Create/update/getSnapshot | `douze-points-backend/src/contests/contests.service.ts` |
 | Leaderboard batch aggregation | `douze-points-backend/src/contests/leaderboard.service.ts` |
 | Migration script | `douze-points-backend/scripts/migrate-snapshots.ts` |
+| Stats v2 backfill | `douze-points-backend/scripts/backfill-contest-stats.ts`, `src/contests/contest-stats-backfill.ts` |
 | Codec/stats unit tests | `douze-points-backend/src/contests/snapshot-codec.spec.ts`, `stats-extract.spec.ts` |
 | Frontend snapshot build/load | `eurovision-scoreboard/src/helpers/contestSnapshot.ts` |

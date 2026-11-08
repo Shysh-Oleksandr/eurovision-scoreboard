@@ -8,6 +8,7 @@ import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 import Tabs from '../common/tabs/Tabs';
 
 import { UPCOMING_FEATURES, WHATS_NEW } from './data';
+import RateAppCard from './RateAppCard';
 import UpdateList from './UpdateList';
 
 import { FilledHeartIcon } from '@/assets/icons/FilledHeartIcon';
@@ -170,7 +171,14 @@ const FeedbackModal = ({
               </a>
             </p>
             {/* The apps leave out the donation card: an in-app donation link
-                counts as an unpaid digital purchase (App Store 3.1.1). */}
+                counts as an unpaid digital purchase (App Store 3.1.1). They
+                link to the store's review form instead. */}
+            {IS_NATIVE_APP && (
+              <>
+                <div className="h-px bg-white/10 my-5" />
+                <RateAppCard />
+              </>
+            )}
             {!IS_NATIVE_APP && (
               <>
                 {/* Divider */}

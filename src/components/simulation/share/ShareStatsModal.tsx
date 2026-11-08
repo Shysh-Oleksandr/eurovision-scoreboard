@@ -29,6 +29,7 @@ import { toEditableDesign } from '@/graphics/templates/editor';
 import { buildStatsDesign, STATS_MIN_WIDTH } from '@/graphics/templates/stats';
 import { saveFile } from '@/helpers/fileActions';
 import { Country, EventStage, StageVotingType, StatsTableType } from '@/models';
+import { askForReviewSoon } from '@/native/review';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
 
@@ -169,6 +170,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       if (result.kind === 'saved') {
         toast.success(t('common.savedTo', { folder: result.folder }));
       }
+      if (result.kind !== 'cancelled') askForReviewSoon('image-shared');
     } catch (err) {
       console.error('Save failed:', err);
       toast.error('Failed to share');

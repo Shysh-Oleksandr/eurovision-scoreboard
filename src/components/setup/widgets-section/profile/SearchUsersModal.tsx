@@ -9,7 +9,9 @@ import { useUsersSearchQuery } from '@/api/users';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import UserInfo from '@/components/common/UserInfo';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useQueryView } from '@/hooks/useQueryView';
 
 interface SearchUsersModalProps {
   isOpen: boolean;
@@ -26,10 +28,12 @@ const SearchUsersModal: React.FC<SearchUsersModalProps> = ({
 
   const debouncedSearch = useDebounce(search, 400);
 
-  const { data, isLoading, isFetching } = useUsersSearchQuery({
+  const usersQuery = useUsersSearchQuery({
     page,
     search: debouncedSearch,
   });
+  const { data, isFetching } = usersQuery;
+  const view = useQueryView(usersQuery);
 
   const hasQuery = debouncedSearch.trim().length > 0;
 
@@ -63,7 +67,9 @@ const SearchUsersModal: React.FC<SearchUsersModalProps> = ({
           <div className="text-center sm:py-12 py-8">
             <p className="text-white/70">{t('widgets.searchUsers.prompt')}</p>
           </div>
-        ) : isLoading || isFetching ? (
+        ) : view !== 'ready' ? (
+          <QueryNotice view={view} onRetry={() => usersQuery.refetch()} />
+        ) : isFetching ? (
           <div className="text-center sm:py-12 py-8">
             <span className="loader" />
           </div>

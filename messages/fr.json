@@ -950,7 +950,28 @@
         "noEntriesMatch": "Aucune entrée ne correspond à votre recherche.",
         "customEntryName": "Entrée personnalisée",
         "qualRate": "Taux de qual.",
-        "qualStreak": "Série de qual."
+        "qualStreak": "Série de qual.",
+        "worstResult": "Pire résultat",
+        "averagePlace": "Place moyenne",
+        "mostInARow": "Plus longue série : {count}",
+        "mostNqsInARow": "Plus longue série sans finale",
+        "resultsOverTime": "Résultats au fil du temps",
+        "nqShort": "NQ",
+        "placeOf": "#{rank} sur {size}",
+        "allContestsTab": "Tous les concours",
+        "hostedTab": "Organisés",
+        "homeWins": "{count, plural, =0 {Aucune victoire à domicile} one {Une victoire à domicile} other {# victoires à domicile}}",
+        "notCompeting": "N’a pas participé",
+        "preQualifiedCount": "{count} qualifiés d’office",
+        "semisQualified": "{qualified} sur {total, plural, one {# demi-finale} other {# demi-finales}}",
+        "juryWins": "Victoires du jury",
+        "televoteWins": "Victoires du télévote",
+        "averageJuryPlace": "Place moyenne du jury",
+        "averageTelevotePlace": "Place moyenne du télévote",
+        "semiFinal": "Demi-finale",
+        "preQualified": "Qualifié d’office",
+        "semiPlaceOf": "{stage} : #{rank} sur {size}",
+        "splitPlaces": "Jury #{jury}, télévote #{televote}"
       },
       "leaderboard": {
         "title": "Classement des pays",
@@ -1300,7 +1321,9 @@
     "donationCardTitle": "Vous appréciez DouzePoints ?",
     "donationCardIntro": "Bonjour, je suis Oleksandr — un fan d'Eurovision et développeur originaire d'Ukraine. DouzePoints est un projet gratuit utilisé par des milliers de fans d'Eurovision dans le monde entier, entièrement conçu et maintenu par moi.",
     "donationCardSupport": "Si vous souhaitez soutenir le développement futur et m'aider à continuer d'améliorer la plateforme, votre contribution compterait énormément pour moi.",
-    "supportOnPatreon": "Soutenir sur Patreon"
+    "supportOnPatreon": "Soutenir sur Patreon",
+    "rateCardTitle": "Notez DouzePoints",
+    "rateCardText": "Une note ou un petit avis sur la boutique aide d'autres fans à trouver l'app."
   },
   "share": {
     "generating": "Génération...",
@@ -2541,5 +2564,22 @@
       "qrHint": "Sur un ordinateur ? Scannez ce code avec l’appareil photo de votre téléphone.",
       "back": "Ouvrir DouzePoints dans le navigateur"
     }
+  },
+  "offline": {
+    "strip": "Vous êtes hors ligne. Les simulations fonctionnent toujours.",
+    "stripShort": "Vous êtes hors ligne",
+    "stripUnreachable": "DouzePoints est injoignable. Les simulations fonctionnent toujours.",
+    "stripUnreachableShort": "DouzePoints injoignable",
+    "backOnline": "De retour en ligne",
+    "title": "Vous êtes hors ligne",
+    "unreachableTitle": "DouzePoints est injoignable",
+    "body": "Ceci se chargera quand vous serez de nouveau en ligne.",
+    "signIn": "Vous pourrez vous connecter une fois de nouveau en ligne.",
+    "needsConnection": "Nécessite une connexion",
+    "requestFailed": "Impossible de joindre DouzePoints. Vérifiez votre connexion et réessayez.",
+    "loadFailed": "Impossible de charger ce contenu.",
+    "retry": "Réessayer",
+    "cachedCopy": "Hors ligne : voici la copie enregistrée sur cet appareil.",
+    "loadContest": "Il faut être en ligne pour charger un concours enregistré."
   }
 }

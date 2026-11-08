@@ -461,6 +461,10 @@ export const useCountriesStore = create<CountriesState>()(
           eventAssignments: state.eventAssignments,
           configuredEventStages: state.configuredEventStages,
           countryOdds: state.countryOdds,
+          // Line-ups store codes; an offline launch can't fetch the user's
+          // custom entries, so keep their names and flags here
+          // (SyncCustomEntries replaces them once the account's list loads).
+          customCountries: state.customCountries,
         }),
         merge: (persistedState, currentState) => {
           const m = deepMerge(currentState, persistedState);

@@ -16,9 +16,11 @@ import {
 import AppleIcon from '@/assets/icons/AppleIcon';
 import GoogleIcon from '@/assets/icons/GoogleIcon';
 import Button from '@/components/common/Button';
+import { OfflineNotice } from '@/components/offline/OfflineNotice';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 import { nativePlatform } from '@/native/platform';
+import { useIsOffline } from '@/state/connectivityStore';
 import { openEmailLink } from '@/state/emailSignInStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -48,6 +50,7 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
   );
   const { confirm } = useConfirmation();
   const [busy, setBusy] = useState<SignInMethod | null>(null);
+  const offline = useIsOffline();
 
   const showError = (error: unknown, method: SignInMethod) => {
     toast.error(t(errorKey(parseSignInMethodError(error), method)));
@@ -121,7 +124,9 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
     return (
       <section className="mt-6 pt-5 border-t border-white/10 space-y-4">
         {header}
-        {isError && !isLoading ? (
+        {offline ? (
+          <OfflineNotice className="py-2" />
+        ) : isError && !isLoading ? (
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <p className="text-white/70 text-sm">{t('loadFailed')}</p>
             <Button variant="tertiary" size="md" onClick={() => refetch()}>
@@ -175,7 +180,7 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
           key="email"
           variant="tertiary"
           size="md"
-          disabled={!!busy}
+          disabled={!!busy || offline}
           onClick={openEmailLink}
         >
           {row.connected ? t('change') : t('add')}
@@ -187,7 +192,7 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
           key="connect"
           variant="tertiary"
           size="md"
-          disabled={!!busy}
+          disabled={!!busy || offline}
           isLoading={busy === row.method}
           onClick={() => void connect(row.method as SignInProvider)}
         >
@@ -201,7 +206,7 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
           key="remove"
           variant="tertiary"
           size="md"
-          disabled={!!busy}
+          disabled={!!busy || offline}
           isLoading={busy === row.method}
           onClick={() => remove(row, data)}
         >

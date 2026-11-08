@@ -12,6 +12,7 @@ import {
   playHaptic,
   type HapticCue,
 } from '@/native/haptics';
+import { noteReviewSetback } from '@/native/review';
 
 /** A toast this soon after another cue confirms an action already felt. */
 const TOAST_AFTER_CUE_MS = 300;
@@ -52,8 +53,22 @@ function useToastHaptics() {
   );
 }
 
+/** After an error toast the apps won't ask for a store rating this session. */
+function useToastReviewSetbacks() {
+  useEffect(
+    () =>
+      toast.onChange((item) => {
+        if (item.status === 'added' && item.type === 'error') {
+          noteReviewSetback();
+        }
+      }),
+    [],
+  );
+}
+
 export default function ToastRoot() {
   useToastHaptics();
+  useToastReviewSetbacks();
 
   return (
     <ToastContainer

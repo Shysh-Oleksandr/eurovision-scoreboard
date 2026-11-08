@@ -45,7 +45,7 @@ const InterfaceColorSliders: React.FC<InterfaceColorSlidersProps> = ({
         onChange={(newShade) => {
           pushChange({
             ...liveHsva,
-            v: Math.max(15, Math.min(100, newShade.v)),
+            v: Math.max(3, Math.min(100, newShade.v)),
           });
         }}
       />

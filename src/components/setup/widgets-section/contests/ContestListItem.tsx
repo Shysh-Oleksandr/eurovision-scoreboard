@@ -35,6 +35,7 @@ import { getFlagPath } from '@/helpers/getFlagPath';
 import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { openReportDialog } from '@/state/reportDialogStore';
@@ -75,6 +76,9 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   const t = useTranslations();
   const { confirm } = useConfirmation();
   const user = useAuthStore((state) => state.user);
+  // Loading fetches the contest's snapshot; editing, likes and saves are
+  // account actions.
+  const offline = useIsOffline();
   const shouldUse2026WhiteHeartFlags = useGeneralStore(
     (state) => state.settings.shouldUse2026WhiteHeartFlags,
   );
@@ -445,7 +449,9 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
             <button
               type="button"
               onClick={() => onLoad(contest)}
-              className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] text-white transition-[filter] hover:brightness-110 disabled:cursor-not-allowed"
+              disabled={offline}
+              title={offline ? t('offline.loadContest') : undefined}
+              className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] text-white transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
               style={{
                 background:
                   'linear-gradient(180deg, hsl(var(--twc-primary-700)), hsl(var(--twc-primary-750)))',
@@ -465,8 +471,10 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                 <button
                   type="button"
                   onClick={() => onEdit(contest)}
-                  className={secondaryActionClassName}
+                  disabled={offline}
+                  className={`${secondaryActionClassName} disabled:opacity-40 disabled:cursor-not-allowed`}
                   aria-label={t('common.edit')}
+                  title={offline ? t('offline.needsConnection') : undefined}
                 >
                   <PencilIcon className="size-[19px]" />
                 </button>
@@ -478,7 +486,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                   <button
                     type="button"
                     onClick={() => onLike?.(contest._id)}
-                    disabled={!user}
+                    disabled={!user || offline}
                     className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                       likedByMe
                         ? 'text-white border-transparent'
@@ -506,7 +514,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                   <button
                     type="button"
                     onClick={() => onSave?.(contest._id, savedByMe ?? false)}
-                    disabled={!user}
+                    disabled={!user || offline}
                     className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                       savedByMe
                         ? 'text-white border-transparent'

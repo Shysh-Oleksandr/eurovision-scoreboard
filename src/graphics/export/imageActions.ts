@@ -1,6 +1,7 @@
 import { toast } from 'react-toastify';
 
 import { saveFile, shareFile } from '@/helpers/fileActions';
+import { askForReviewSoon } from '@/native/review';
 
 /**
  * Download / Web Share / clipboard for a generated image data URL. Shared by
@@ -41,6 +42,7 @@ export async function downloadImage(
     } else if (result.kind === 'saved') {
       toast.success(messages.saved(result.folder));
     }
+    if (result.kind !== 'cancelled') askForReviewSoon('image-shared');
   } catch (err) {
     console.error('Save failed:', err);
     toast.error(messages.shareFailed);
@@ -57,6 +59,7 @@ export async function shareImage(
     const result = await shareFile({ data: dataUrl, fileName, title });
 
     if (result === 'unsupported') toast.error(messages.shareUnsupported);
+    if (result === 'shared') askForReviewSoon('image-shared');
   } catch (err) {
     console.error('Share failed:', err);
     toast.error(messages.shareFailed);

@@ -950,7 +950,28 @@
         "noEntriesMatch": "Nie znaleziono wkładów pasujących do wyszukiwania.",
         "customEntryName": "Niestandardowy wpis",
         "qualRate": "Ws. kwalif.",
-        "qualStreak": "Seria kwalif."
+        "qualStreak": "Seria kwalif.",
+        "worstResult": "Najgorszy wynik",
+        "averagePlace": "Średnie miejsce",
+        "mostInARow": "Najdłuższa seria: {count}",
+        "mostNqsInARow": "Najdłuższa seria bez finału",
+        "resultsOverTime": "Wyniki w czasie",
+        "nqShort": "NQ",
+        "placeOf": "#{rank} z {size}",
+        "allContestsTab": "Wszystkie konkursy",
+        "hostedTab": "Jako gospodarz",
+        "homeWins": "{count, plural, =0 {Jeszcze bez zwycięstwa u siebie} one {Jedno zwycięstwo u siebie} few {# zwycięstwa u siebie} many {# zwycięstw u siebie} other {# zwycięstwa u siebie}}",
+        "notCompeting": "Nie wystąpił",
+        "preQualifiedCount": "{count} z automatycznym awansem",
+        "semisQualified": "{qualified} z {total, plural, one {# półfinału} few {# półfinałów} many {# półfinałów} other {# półfinałów}}",
+        "juryWins": "Zwycięstwa jury",
+        "televoteWins": "Zwycięstwa televotingu",
+        "averageJuryPlace": "Średnie miejsce u jury",
+        "averageTelevotePlace": "Średnie miejsce w televotingu",
+        "semiFinal": "Półfinał",
+        "preQualified": "Automatyczny awans",
+        "semiPlaceOf": "{stage}: #{rank} z {size}",
+        "splitPlaces": "Jury #{jury}, televoting #{televote}"
       },
       "leaderboard": {
         "title": "Ranking krajów",
@@ -1300,7 +1321,9 @@
     "donationCardTitle": "Podoba Ci się DouzePoints?",
     "donationCardIntro": "Cześć, jestem Oleksandr — fan Eurowizji i programista z Ukrainy. DouzePoints to darmowy projekt, z którego korzystają tysiące fanów Eurowizji na całym świecie, a ja go w całości tworzę i utrzymuję.",
     "donationCardSupport": "Jeśli chcesz wesprzeć dalszy rozwój i pomóc mi w dalszym ulepszaniu platformy, Twoja wpłata wiele dla mnie znaczy.",
-    "supportOnPatreon": "Wesprzyj na Patreon"
+    "supportOnPatreon": "Wesprzyj na Patreon",
+    "rateCardTitle": "Oceń DouzePoints",
+    "rateCardText": "Ocena lub krótka recenzja w sklepie pomaga innym fanom znaleźć aplikację."
   },
   "share": {
     "generating": "Generowanie...",
@@ -2541,5 +2564,22 @@
       "qrHint": "Jesteś przy komputerze? Zeskanuj ten kod aparatem w telefonie.",
       "back": "Otwórz DouzePoints w przeglądarce"
     }
+  },
+  "offline": {
+    "strip": "Jesteś offline. Symulacje nadal działają.",
+    "stripShort": "Jesteś offline",
+    "stripUnreachable": "Brak połączenia z DouzePoints. Symulacje nadal działają.",
+    "stripUnreachableShort": "Brak połączenia z DouzePoints",
+    "backOnline": "Znów online",
+    "title": "Jesteś offline",
+    "unreachableTitle": "Brak połączenia z DouzePoints",
+    "body": "To się wczyta, gdy wrócisz do sieci.",
+    "signIn": "Zalogujesz się, gdy wrócisz do sieci.",
+    "needsConnection": "Wymaga połączenia",
+    "requestFailed": "Nie udało się połączyć z DouzePoints. Sprawdź połączenie i spróbuj ponownie.",
+    "loadFailed": "Nie udało się wczytać.",
+    "retry": "Spróbuj ponownie",
+    "cachedCopy": "Offline: to kopia zapisana na tym urządzeniu.",
+    "loadContest": "Do wczytania zapisanego konkursu potrzebne jest połączenie."
   }
 }

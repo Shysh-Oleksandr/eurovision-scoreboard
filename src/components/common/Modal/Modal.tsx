@@ -182,9 +182,10 @@ const Modal: React.FC<ModalProps> = ({
         } ${
           fullScreenOnPhone
             ? `${FULL_SCREEN_CONTAINER} ${
+                // The offline strip's height (styles.css) joins the inset.
                 hasWinterTopPadding
-                  ? 'max-2cols:pt-[calc(var(--safe-top)+0.25rem)]'
-                  : 'max-2cols:pt-[var(--safe-top)]'
+                  ? 'max-2cols:pt-[calc(var(--safe-top)+var(--offline-strip-h,0px)+0.25rem)]'
+                  : 'max-2cols:pt-[calc(var(--safe-top)+var(--offline-strip-h,0px))]'
               }`
             : ''
         } ${containerClassName}`}

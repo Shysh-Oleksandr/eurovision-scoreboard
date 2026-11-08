@@ -10,9 +10,11 @@ android {
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
     implementation project(':aparajita-capacitor-secure-storage')
+    implementation project(':capacitor-community-in-app-review')
     implementation project(':capacitor-app')
     implementation project(':capacitor-filesystem')
     implementation project(':capacitor-haptics')
+    implementation project(':capacitor-network')
     implementation project(':capacitor-share')
     implementation project(':capacitor-splash-screen')
     implementation project(':capgo-capacitor-social-login')

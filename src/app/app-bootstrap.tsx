@@ -9,8 +9,10 @@ import { useRouter } from 'next/navigation';
 
 import { useSetAppLocale } from './AppIntlProvider';
 
+import { setNetworkErrorMessage } from '@/api/client';
 import { takePendingWebLink, webLinkToast } from '@/api/signInMethods';
 import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
+import OfflineStrip from '@/components/offline/OfflineStrip';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';
@@ -23,6 +25,11 @@ import { installAppLinkHandler } from '@/native/appLinks';
 import { installBackButtonHandler } from '@/native/backButton';
 import { liveUpdateBoot, startLiveUpdateChecks } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
+import {
+  isOffline,
+  onReconnect,
+  startConnectivityMonitor,
+} from '@/state/connectivityStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import {
   NATIVE_LOGIN_EVENT,
@@ -55,6 +62,7 @@ export default function AppBootstrap() {
   useStatusBarThemeColor();
 
   const t = useTranslations('widgets.profile');
+  const tOffline = useTranslations('offline');
   const { handlePostLogin, user } = useAuthStore();
   const setInitialCountriesForYear = useCountriesStore(
     (state) => state.setInitialCountriesForYear,
@@ -62,6 +70,42 @@ export default function AppBootstrap() {
   const router = useRouter();
   const setAppLocale = useSetAppLocale();
   const hasSyncedPreferredLocaleRef = useRef(false);
+
+  // Before the session restore below: the restore's own outcome feeds it.
+  useEffect(() => {
+    startConnectivityMonitor();
+  }, []);
+
+  // The error every request without an answer carries (`NetworkError`), so
+  // existing error toasts say "offline" in the user's language.
+  useEffect(() => {
+    setNetworkErrorMessage(tOffline('requestFailed'));
+  }, [tOffline]);
+
+  // A session restored offline stays on screen unverified
+  // (`sessionStatus`); finish the restore once the API answers again, or on
+  // returning to the app.
+  useEffect(() => {
+    const restoreIfUnverified = () => {
+      if (
+        useAuthStore.getState().sessionStatus === 'unverified' &&
+        !isOffline()
+      ) {
+        void useAuthStore.getState().handlePostLogin();
+      }
+    };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') restoreIfUnverified();
+    };
+    const stopWatching = onReconnect(restoreIfUnverified);
+
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      stopWatching();
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
 
   // Initialize countries once on first load
   useEffect(() => {
@@ -232,6 +276,7 @@ export default function AppBootstrap() {
 
   return (
     <>
+      <OfflineStrip />
       <ThemeSoundVolumeHud />
       {LiveUpdateNotices && <LiveUpdateNotices />}
       {PaletteDevPanel && <PaletteDevPanel />}

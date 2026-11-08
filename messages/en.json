@@ -950,7 +950,28 @@
         "noEntriesMatch": "No entries match your search.",
         "customEntryName": "Custom entry",
         "qualRate": "Qual. rate",
-        "qualStreak": "Qualifying streak"
+        "qualStreak": "Qualifying streak",
+        "worstResult": "Worst result",
+        "averagePlace": "Average place",
+        "mostInARow": "Most in a row: {count}",
+        "mostNqsInARow": "Most NQs in a row",
+        "resultsOverTime": "Results over time",
+        "nqShort": "NQ",
+        "placeOf": "#{rank} of {size}",
+        "allContestsTab": "All contests",
+        "hostedTab": "Hosted",
+        "homeWins": "{count, plural, =0 {No wins at home yet} one {One win at home} other {# wins at home}}",
+        "notCompeting": "Didn't compete",
+        "preQualifiedCount": "{count} pre-qualified",
+        "semisQualified": "{qualified} of {total, plural, one {# semi-final} other {# semi-finals}}",
+        "juryWins": "Jury wins",
+        "televoteWins": "Televote wins",
+        "averageJuryPlace": "Average jury place",
+        "averageTelevotePlace": "Average televote place",
+        "semiFinal": "Semi-final",
+        "preQualified": "Pre-qualified",
+        "semiPlaceOf": "{stage}: #{rank} of {size}",
+        "splitPlaces": "Jury #{jury}, televote #{televote}"
       },
       "leaderboard": {
         "title": "Country leaderboard",
@@ -1300,7 +1321,9 @@
     "donationCardTitle": "Enjoying DouzePoints?",
     "donationCardIntro": "Hi, I'm Oleksandr — a Eurovision fan and developer from Ukraine. DouzePoints is a free project used by thousands of Eurovision fans around the world and is built and maintained entirely by me.",
     "donationCardSupport": "If you'd like to support future development and help me continue improving the platform, your contribution would mean a lot to me.",
-    "supportOnPatreon": "Support on Patreon"
+    "supportOnPatreon": "Support on Patreon",
+    "rateCardTitle": "Rate DouzePoints",
+    "rateCardText": "A rating or a short review in the store helps other fans find the app."
   },
   "share": {
     "generating": "Generating...",
@@ -2541,5 +2564,22 @@
       "qrHint": "On a computer? Scan this with your phone's camera.",
       "back": "Open DouzePoints in the browser"
     }
+  },
+  "offline": {
+    "strip": "You’re offline. Simulations still work.",
+    "stripShort": "You’re offline",
+    "stripUnreachable": "Can’t reach DouzePoints. Simulations still work.",
+    "stripUnreachableShort": "Can’t reach DouzePoints",
+    "backOnline": "Back online",
+    "title": "You’re offline",
+    "unreachableTitle": "Can’t reach DouzePoints",
+    "body": "This loads when you’re back online.",
+    "signIn": "You can sign in once you’re back online.",
+    "needsConnection": "Needs a connection",
+    "requestFailed": "Couldn’t reach DouzePoints. Check your connection and try again.",
+    "loadFailed": "Couldn’t load this.",
+    "retry": "Try again",
+    "cachedCopy": "Offline: this is the copy saved on this device.",
+    "loadContest": "Loading a saved contest needs a connection."
   }
 }

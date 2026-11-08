@@ -11,6 +11,7 @@ import BoardHeader from '../board/BoardHeader';
 import ControlsPanel from '../controlsPanel/ControlsPanel';
 
 import FinalTelevoteReveal from './FinalTelevoteReveal';
+import { useReviewShowCounter } from './hooks/useReviewShowCounter';
 import { useSimulationHaptics } from './hooks/useSimulationHaptics';
 import { PhaseActions } from './PhaseActions';
 import { SimulationHeader } from './SimulationHeader';
@@ -233,7 +234,10 @@ const Simulation = () => {
   // ─────────────────────────────────────────────────────────────────────────
 
   // Same gate as the winner modal and the confetti below.
-  useSimulationHaptics(isRevealAnimationComplete || revealData === null);
+  const celebrationOpen = isRevealAnimationComplete || revealData === null;
+
+  useSimulationHaptics(celebrationOpen);
+  useReviewShowCounter(celebrationOpen);
 
   if (eventStages.length === 0) {
     return null;

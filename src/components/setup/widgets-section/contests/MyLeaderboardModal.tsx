@@ -14,9 +14,11 @@ import { Checkbox } from '@/components/common/Checkbox';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import { Input } from '@/components/Input';
+import { OfflineNotice } from '@/components/offline/OfflineNotice';
 import SearchInputIcon from '@/components/setup/SearchInputIcon';
 import { EUROVISION_COUNTRIES } from '@/data/countries/common-countries';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -47,6 +49,13 @@ function compareMetricValue(
 
   return sortDir === 'asc' ? cmp : -cmp;
 }
+
+/**
+ * Share of semi-finals that led to the grand final; pre-qualified entries and
+ * final-only contests don't count. Null without a semi-final.
+ */
+const qualRateOf = (row: MyLeaderboardRow): number | null =>
+  row.semiFinals > 0 ? row.qualifiedFromSemis / row.semiFinals : null;
 
 interface MyLeaderboardModalProps {
   isOpen: boolean;
@@ -96,6 +105,7 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
   const { data, isLoading, isError, error } = isUserScope
     ? userLeaderboardQuery
     : myLeaderboardQuery;
+  const offline = useIsOffline();
 
   useEffect(() => {
     if (!isOpen) {
@@ -193,10 +203,7 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
       }
 
       if (sortKey === 'qualRate') {
-        const ra = a.participations > 0 ? a.finals / a.participations : 0;
-        const rb = b.participations > 0 ? b.finals / b.participations : 0;
-
-        return compareMetricValue(ra, rb, sortDir);
+        return compareMetricValue(qualRateOf(a), qualRateOf(b), sortDir);
       }
 
       return compareMetricValue(a[sortKey], b[sortKey], sortDir);
@@ -242,9 +249,9 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
   };
 
   const formatQualRate = (row: MyLeaderboardRow) => {
-    if (row.participations === 0) return '—';
+    const rate = qualRateOf(row);
 
-    return `${((row.finals / row.participations) * 100).toFixed(1)}%`;
+    return rate === null ? '—' : `${(rate * 100).toFixed(1)}%`;
   };
 
   return (
@@ -294,13 +301,15 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
           />
         </div>
 
-        {isLoading && (
+        {offline && !data && <OfflineNotice className="py-8" />}
+
+        {isLoading && !offline && (
           <div className="flex justify-center py-8">
             <span className="loader" />
           </div>
         )}
 
-        {isError && (
+        {isError && !offline && (
           <p className="text-red-300 text-sm">
             {(error as any)?.response?.data?.message ?? tLb('failedToLoad')}
           </p>

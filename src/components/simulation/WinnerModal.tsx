@@ -9,6 +9,7 @@ import Button from '../common/Button';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { playHaptic } from '@/native/haptics';
+import { askForReviewSoon } from '@/native/review';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -140,6 +141,8 @@ const WinnerModal = () => {
       setShowModal(false);
       setIsClosing(false);
       afterClose?.();
+      // The show is over: the apps may ask for a store rating now.
+      askForReviewSoon('winner-closed');
     }, CLOSE_DURATION_MS);
   }, []);
 

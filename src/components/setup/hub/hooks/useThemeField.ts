@@ -20,7 +20,7 @@ import { buildPrimaryFromHsva } from '@/theme/themeUtils';
 const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
 
 const swatchFor = (hue: number, shadeValue?: number) =>
-  `hsl(${buildPrimaryFromHsva({ h: hue, s: 80, v: shadeValue || 60 })['700']})`;
+  `hsl(${buildPrimaryFromHsva({ h: hue, s: 80, v: shadeValue ?? 60 })['700']})`;
 
 /** Options, value and handlers of the header "Theme" combo, incl. the sync chip. */
 export const useThemeField = () => {

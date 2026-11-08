@@ -19,6 +19,7 @@ import SignInButtons from '@/components/common/SignInButtons';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 const EditProfileModal = dynamic(() => import('./EditProfileModal'), {
@@ -42,7 +43,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   onLoaded,
 }) => {
   const t = useTranslations('widgets.profile');
+  const tOffline = useTranslations('offline');
   const { user, logout: storeLogout, isBusy } = useAuthStore();
+  // Offline the account stays on screen from this device's copy; editing it
+  // and signing out (which revokes the session on the server) wait.
+  const offline = useIsOffline();
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isEditProfileModalLoaded, setIsEditProfileModalLoaded] =
@@ -89,20 +94,28 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                 <UserProfileHeader
                   user={user}
                   additionalContent={
-                    <div className="flex items-center gap-2">
-                      <Button
-                        label={t('editProfile')}
-                        variant="primary"
-                        onClick={() => setIsEditProfileModalOpen(true)}
-                        Icon={<PencilIcon className="w-5 h-5" />}
-                      />
-                      <Button
-                        label={isBusy ? t('loggingOut') : t('logout')}
-                        variant="destructive"
-                        onClick={handleLogout}
-                        disabled={isBusy}
-                        Icon={<LogoutIcon className="w-5 h-5 flex-none" />}
-                      />
+                    <div className="flex flex-col gap-1.5">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          label={t('editProfile')}
+                          variant="primary"
+                          onClick={() => setIsEditProfileModalOpen(true)}
+                          disabled={offline}
+                          Icon={<PencilIcon className="w-5 h-5" />}
+                        />
+                        <Button
+                          label={isBusy ? t('loggingOut') : t('logout')}
+                          variant="destructive"
+                          onClick={handleLogout}
+                          disabled={isBusy || offline}
+                          Icon={<LogoutIcon className="w-5 h-5 flex-none" />}
+                        />
+                      </div>
+                      {offline && (
+                        <p className="text-xs text-white/55">
+                          {tOffline('needsConnection')}
+                        </p>
+                      )}
                     </div>
                   }
                 />
@@ -120,7 +133,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         content: <FollowingFeedSection onLoadContest={onLoadContest} />,
       },
     ],
-    [tabs, user, t, isBusy, handleLogout, onLoadContest],
+    [tabs, user, t, tOffline, offline, isBusy, handleLogout, onLoadContest],
   );
 
   useEffectOnce(() => {

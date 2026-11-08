@@ -22,7 +22,10 @@ export type PublicLeaderboardResponse = {
 export type CustomEntryMeta = { code: string; name: string; flag: string };
 
 export type MyLeaderboardRow = PublicLeaderboardRow & {
+  /** Over contests where the entry competed before the grand final. */
   qualifyingStreak: number;
+  semiFinals: number;
+  qualifiedFromSemis: number;
 };
 
 export type MyLeaderboardResponse = {

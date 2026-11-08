@@ -1,5 +1,6 @@
 import {
   keepPreviousData,
+  type QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
@@ -324,6 +325,27 @@ export function useDeleteThemeGroupMutation() {
   });
 }
 
+/**
+ * Refresh the account's theme lists after a theme is created or changed.
+ * The query client defaults to `refetchOnMount: false`, so invalidating alone
+ * leaves a list that isn't mounted right now (e.g. "Your themes" while a remix
+ * is saved from the public tab) showing its old cache when it mounts later.
+ * Dropping the inactive copies makes those lists fetch fresh on mount.
+ */
+function refreshMyThemeLists(
+  qc: QueryClient,
+  { includeSaved = true }: { includeSaved?: boolean } = {},
+) {
+  const keys = includeSaved
+    ? [queryKeys.user.themes(), queryKeys.user.savedThemes()]
+    : [queryKeys.user.themes()];
+
+  for (const queryKey of keys) {
+    qc.removeQueries({ queryKey, type: 'inactive' });
+    qc.invalidateQueries({ queryKey });
+  }
+}
+
 export function useCreateThemeMutation() {
   const qc = useQueryClient();
 
@@ -334,7 +356,7 @@ export function useCreateThemeMutation() {
       return data as CustomTheme;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
+      refreshMyThemeLists(qc, { includeSaved: false });
       qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
@@ -354,8 +376,7 @@ export function useUpdateThemeMutation() {
       if ((variables as any)?.id) {
         qc.setQueryData(queryKeys.user.themeById((variables as any).id), data);
       }
-      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
-      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+      refreshMyThemeLists(qc);
     },
   });
 }
@@ -368,8 +389,7 @@ export function useDeleteThemeMutation() {
       await api.delete(`/themes/${id}`);
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
-      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+      refreshMyThemeLists(qc);
       qc.invalidateQueries({ queryKey: queryKeys.user.profileSummary() });
     },
   });
@@ -390,8 +410,7 @@ export function useUploadThemeBackgroundMutation() {
       return data as CustomTheme;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
-      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+      refreshMyThemeLists(qc);
     },
   });
 }
@@ -423,8 +442,7 @@ export function useUploadThemeSoundMutation() {
       return data as CustomTheme;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.user.themes() });
-      qc.invalidateQueries({ queryKey: queryKeys.user.savedThemes() });
+      refreshMyThemeLists(qc);
     },
   });
 }

@@ -26,14 +26,15 @@ const newTabProps = (newTab: boolean) =>
  * A store link styled as the app's surface button, for the app's own screens
  * (setup hub, Settings). Pages outside the app use the official badges
  * (`StoreBadges`). Phones follow the link in place (the store app opens);
- * desktops get a new tab.
+ * desktops get a new tab. `href` replaces the listing (the review form).
  */
 export const StoreLinkButton: React.FC<{
   store: AppStore;
   newTab: boolean;
-}> = ({ store, newTab }) => (
+  href?: string;
+}> = ({ store, newTab, href }) => (
   <a
-    href={STORE_URLS[store]}
+    href={href ?? STORE_URLS[store]}
     {...newTabProps(newTab)}
     className="dp-act inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 text-[13px] font-extrabold leading-none text-white"
   >

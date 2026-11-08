@@ -936,7 +936,7 @@
         "victories": "Νίκες",
         "finals": "Τελικοί",
         "nulPoints": "Μηδενικά σημεία",
-        "lastPlaces": "Τελευταία μέρες",
+        "lastPlaces": "Τελευταίες θέσεις",
         "bestResult": "Καλύτερο αποτέλεσμα",
         "noParticipations": "Τέτοιο διαγωνισμα δεν υπάρχει ακόμα.",
         "contest": "Διαγωνισμός",
@@ -950,7 +950,28 @@
         "noEntriesMatch": "Κανένα στοιχείο δεν ταιριάζει με την αναζήτησή σας.",
         "customEntryName": "Προσαρμοσμένη συμμετοχή",
         "qualRate": "Ποσ. πρόκρισης",
-        "qualStreak": "Σερί πρόκρισης"
+        "qualStreak": "Σερί πρόκρισης",
+        "worstResult": "Χειρότερο αποτέλεσμα",
+        "averagePlace": "Μέση θέση",
+        "mostInARow": "Μεγαλύτερο σερί: {count}",
+        "mostNqsInARow": "Μεγαλύτερο σερί αποκλεισμών",
+        "resultsOverTime": "Αποτελέσματα στον χρόνο",
+        "nqShort": "NQ",
+        "placeOf": "#{rank} από {size}",
+        "allContestsTab": "Όλοι οι διαγωνισμοί",
+        "hostedTab": "Διοργανώσεις",
+        "homeWins": "{count, plural, =0 {Καμία νίκη εντός έδρας ακόμα} one {Μία νίκη εντός έδρας} other {# νίκες εντός έδρας}}",
+        "notCompeting": "Δεν συμμετείχε",
+        "preQualifiedCount": "{count} απευθείας στον τελικό",
+        "semisQualified": "{qualified} από {total, plural, one {# ημιτελικό} other {# ημιτελικούς}}",
+        "juryWins": "Νίκες επιτροπής",
+        "televoteWins": "Νίκες televoting",
+        "averageJuryPlace": "Μέση θέση επιτροπής",
+        "averageTelevotePlace": "Μέση θέση televoting",
+        "semiFinal": "Ημιτελικός",
+        "preQualified": "Απευθείας στον τελικό",
+        "semiPlaceOf": "{stage}: #{rank} από {size}",
+        "splitPlaces": "Επιτροπή #{jury}, televoting #{televote}"
       },
       "leaderboard": {
         "title": "Κατάταξη χωρών",
@@ -1300,7 +1321,9 @@
     "donationCardTitle": "Σας αρέσει το DouzePoints;",
     "donationCardIntro": "Γεια σας, είμαι ο Oleksandr — φαν της Eurovision και προγραμματιστής από την Ουκρανία. Το DouzePoints είναι ένα δωρεάν project που χρησιμοποιείται από χιλιάδες φαν της Eurovision σε όλο τον κόσμο και το φτιάχνω και το συντηρώ εξ ολοκλήρου εγώ.",
     "donationCardSupport": "Αν θέλετε να υποστηρίξετε την μελλοντική ανάπτυξη και να με βοηθήσετε να συνεχίσω να βελτιώνω την πλατφόρμα, η συνεισφορά σας θα σήμαινε πολλά για μένα.",
-    "supportOnPatreon": "Υποστήριξη στο Patreon"
+    "supportOnPatreon": "Υποστήριξη στο Patreon",
+    "rateCardTitle": "Βαθμολογήστε το DouzePoints",
+    "rateCardText": "Μια βαθμολογία ή μια σύντομη κριτική στο κατάστημα βοηθά κι άλλους φαν να βρουν την εφαρμογή."
   },
   "share": {
     "generating": "Γίνεται Δημιουργία...",
@@ -2541,5 +2564,22 @@
       "qrHint": "Σε υπολογιστή; Σαρώστε αυτόν τον κωδικό με την κάμερα του κινητού σας.",
       "back": "Άνοιγμα του DouzePoints στο πρόγραμμα περιήγησης"
     }
+  },
+  "offline": {
+    "strip": "Είστε εκτός σύνδεσης. Οι προσομοιώσεις λειτουργούν κανονικά.",
+    "stripShort": "Είστε εκτός σύνδεσης",
+    "stripUnreachable": "Το DouzePoints δεν είναι προσβάσιμο. Οι προσομοιώσεις λειτουργούν κανονικά.",
+    "stripUnreachableShort": "Το DouzePoints δεν είναι προσβάσιμο",
+    "backOnline": "Η σύνδεση αποκαταστάθηκε",
+    "title": "Είστε εκτός σύνδεσης",
+    "unreachableTitle": "Το DouzePoints δεν είναι προσβάσιμο",
+    "body": "Θα φορτωθεί όταν επανέλθει η σύνδεση.",
+    "signIn": "Θα μπορείτε να συνδεθείτε στον λογαριασμό σας όταν επανέλθει η σύνδεση.",
+    "needsConnection": "Απαιτεί σύνδεση",
+    "requestFailed": "Δεν ήταν δυνατή η σύνδεση με το DouzePoints. Ελέγξτε τη σύνδεσή σας και δοκιμάστε ξανά.",
+    "loadFailed": "Δεν ήταν δυνατή η φόρτωση.",
+    "retry": "Δοκιμάστε ξανά",
+    "cachedCopy": "Εκτός σύνδεσης: αυτό είναι το αντίγραφο που είναι αποθηκευμένο σε αυτή τη συσκευή.",
+    "loadContest": "Η φόρτωση αποθηκευμένου διαγωνισμού απαιτεί σύνδεση."
   }
 }

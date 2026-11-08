@@ -26,7 +26,8 @@
   display: flex;
   flex-direction: column;
   background: var(--p-950);
-  padding-top: var(--safe-top);
+  /* The offline strip sits above the editor (styles.css). */
+  padding-top: calc(var(--safe-top) + var(--offline-strip-h, 0px));
 }
 
 /* Zero-specificity reset so any class on a button (gfx-*, dp-cta, dp-act)

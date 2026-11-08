@@ -950,7 +950,28 @@
         "noEntriesMatch": "Немає збігів за запитом.",
         "customEntryName": "Власний учасник",
         "qualRate": "% кваліфікацій",
-        "qualStreak": "Серія кваліфікацій"
+        "qualStreak": "Серія кваліфікацій",
+        "worstResult": "Найгірший результат",
+        "averagePlace": "Середнє місце",
+        "mostInARow": "Найдовша серія: {count}",
+        "mostNqsInARow": "Найдовша серія без фіналу",
+        "resultsOverTime": "Результати з часом",
+        "nqShort": "NQ",
+        "placeOf": "#{rank} з {size}",
+        "allContestsTab": "Усі конкурси",
+        "hostedTab": "Вдома",
+        "homeWins": "{count, plural, =0 {Ще жодної перемоги вдома} one {# перемога вдома} few {# перемоги вдома} many {# перемог вдома} other {# перемоги вдома}}",
+        "notCompeting": "Без участі",
+        "preQualifiedCount": "{count} напряму у фінал",
+        "semisQualified": "{qualified} з {total, plural, one {# півфіналу} few {# півфіналів} many {# півфіналів} other {# півфіналів}}",
+        "juryWins": "Перемоги журі",
+        "televoteWins": "Перемоги телеголосування",
+        "averageJuryPlace": "Середнє місце в журі",
+        "averageTelevotePlace": "Середнє місце в телеголосуванні",
+        "semiFinal": "Півфінал",
+        "preQualified": "Напряму у фінал",
+        "semiPlaceOf": "{stage}: #{rank} з {size}",
+        "splitPlaces": "Журі #{jury}, телеголосування #{televote}"
       },
       "leaderboard": {
         "title": "Рейтинг країн",
@@ -1300,7 +1321,9 @@
     "donationCardTitle": "Подобається DouzePoints?",
     "donationCardIntro": "Привіт, я Олександр — єврофан та розробник з України. DouzePoints — безкоштовний проєкт, яким користуються тисячі фанатів Євробачення з усього світу, і його повністю створюю та підтримую я.",
     "donationCardSupport": "Якщо ви хочете підтримати подальший розвиток і допомогти мені вдосконалювати платформу, я буду вдячний за вашу підтримку.",
-    "supportOnPatreon": "Підтримати на Patreon"
+    "supportOnPatreon": "Підтримати на Patreon",
+    "rateCardTitle": "Оцініть DouzePoints",
+    "rateCardText": "Оцінка або короткий відгук у магазині допомагає іншим фанатам знайти застосунок."
   },
   "share": {
     "generating": "Генерація...",
@@ -2541,5 +2564,22 @@
       "qrHint": "За комп’ютером? Відскануйте цей код камерою телефона.",
       "back": "Відкрити DouzePoints у браузері"
     }
+  },
+  "offline": {
+    "strip": "Ви офлайн. Симуляції працюють і далі.",
+    "stripShort": "Ви офлайн",
+    "stripUnreachable": "DouzePoints недоступний. Симуляції працюють і далі.",
+    "stripUnreachableShort": "DouzePoints недоступний",
+    "backOnline": "Знову онлайн",
+    "title": "Ви офлайн",
+    "unreachableTitle": "DouzePoints недоступний",
+    "body": "Це завантажиться, коли ви знову будете онлайн.",
+    "signIn": "Увійти можна буде, коли ви знову будете онлайн.",
+    "needsConnection": "Потрібне з’єднання",
+    "requestFailed": "Не вдалося з’єднатися з DouzePoints. Перевірте з’єднання і спробуйте ще раз.",
+    "loadFailed": "Не вдалося завантажити.",
+    "retry": "Спробувати ще раз",
+    "cachedCopy": "Офлайн: це копія, збережена на цьому пристрої.",
+    "loadContest": "Щоб завантажити збережений конкурс, потрібне з’єднання."
   }
 }

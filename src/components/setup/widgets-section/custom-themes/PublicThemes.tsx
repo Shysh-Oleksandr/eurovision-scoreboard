@@ -11,8 +11,10 @@ import ThemeListItem from './ThemeListItem';
 
 import { usePublicThemesQuery, useThemesStateQuery } from '@/api/themes';
 import { Checkbox } from '@/components/common/Checkbox';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { useQueryView } from '@/hooks/useQueryView';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';
@@ -47,7 +49,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
       : 'createdAt';
   const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
 
-  const { data, isLoading } = usePublicThemesQuery({
+  const publicThemesQuery = usePublicThemesQuery({
     page,
     search: debouncedSearch,
     sortBy: serverSortBy,
@@ -57,6 +59,8 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     hasCustomAudio,
     hasCustomFonts,
   });
+  const { data } = publicThemesQuery;
+  const view = useQueryView(publicThemesQuery);
 
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
   const user = useAuthStore((state) => state.user);
@@ -96,9 +100,11 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
         />
       </div>
       <div className="flex items-center gap-x-2 justify-between flex-wrap">
-        <h3 className="text-white text-lg font-bold">
-          {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
-        </h3>
+        {view === 'ready' && (
+          <h3 className="text-white text-lg font-bold">
+            {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
+          </h3>
+        )}
         <div className="flex items-center gap-x-3 flex-wrap">
           <Checkbox
             id="public-themes-audio-filter"
@@ -123,10 +129,8 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="text-center sm:py-12 py-8">
-          <span className="loader" />
-        </div>
+      {view !== 'ready' ? (
+        <QueryNotice view={view} onRetry={() => publicThemesQuery.refetch()} />
       ) : data && data.themes.length > 0 ? (
         <>
           <div className="grid gap-4">

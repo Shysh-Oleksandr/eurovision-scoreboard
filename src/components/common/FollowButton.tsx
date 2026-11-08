@@ -13,6 +13,7 @@ import {
 } from '@/api/follows';
 import Button from '@/components/common/Button';
 import { cn } from '@/helpers/utils';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 interface FollowButtonProps {
@@ -36,6 +37,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   const unfollowMutation = useUnfollowMutation();
 
   const isBlocked = useBlockedUserIds().has(userId);
+  const offline = useIsOffline();
 
   const isOwnProfile = !!user && user._id === userId;
   const isAuthenticated = !!user;
@@ -92,7 +94,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
         <button
           type="button"
           onClick={handleClick}
-          disabled={isLoading || isMutating}
+          disabled={isLoading || isMutating || offline}
           className={`inline-flex items-center gap-2 rounded-full text-[12.5px] font-bold uppercase tracking-wide px-4 py-2 border transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
             isFollowing
               ? 'bg-transparent border-white/[0.12] text-white/40 hover:text-white/60'
@@ -122,7 +124,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
         }
         variant={isFollowing ? 'primary' : 'tertiary'}
         onClick={handleClick}
-        disabled={isLoading || isMutating}
+        disabled={isLoading || isMutating || offline}
         isLoading={isMutating}
         className={cn(
           '!gap-2 min-w-[80px] !py-2.5 !px-3',

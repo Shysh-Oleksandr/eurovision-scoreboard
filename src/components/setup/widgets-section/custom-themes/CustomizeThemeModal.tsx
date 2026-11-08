@@ -57,6 +57,7 @@ import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useThrottledValue } from '@/hooks/useThrottledValue';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { normalizeFontAlias } from '@/theme/fontAliases';
@@ -206,6 +207,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   const { mutateAsync: createTheme, isPending: isCreating } =
     useCreateThemeMutation();
+  // Themes save to the account (the strip says why it's off).
+  const offline = useIsOffline();
   const { mutateAsync: updateTheme, isPending: isUpdating } =
     useUpdateThemeMutation();
   const { mutateAsync: uploadBackground, isPending: isUploadingBg } =
@@ -304,7 +307,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setHsva({
         h: initialTheme.hue,
         s: 80,
-        v: initialTheme.shadeValue || 60,
+        v: initialTheme.shadeValue ?? 60,
         a: 1,
       });
       // Remixing someone's theme starts as a private draft — discourages using
@@ -1225,6 +1228,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           onClose={onClose}
           onSave={handleSave}
           isSaving={isSaving}
+          saveButtonDisabled={offline}
         />
       }
     >

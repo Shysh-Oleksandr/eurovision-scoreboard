@@ -237,6 +237,11 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   `var(--safe-bottom-bar)` instead: the whole inset on Android, but at most
   14px on iOS, where the home indicator only fills the bottom 13px of its
   34px inset. Floating elements keep `--safe-bottom`.
+- **Offline is a normal state** ([offline-mode.md](offline-mode.md)). A
+  list backed by the API renders through `useQueryView` + `QueryNotice`,
+  never a bare `isLoading` spinner; an account action is disabled while
+  `useIsOffline()`; a full-screen surface that pads with `--safe-top` adds
+  `var(--offline-strip-h, 0px)`.
 - **Live updates ship JS, never native changes.** A web change reaches
   installed apps through `yarn live-update publish` (§11). Anything that
   changes the native runtime fingerprint (a plugin or its version,
@@ -347,7 +352,9 @@ cookie. The app flow (`src/native/nativeAuth.ts`, native branches in
    the stored token; a network error keeps it for the next launch.
 5. On launch, the app restores the session when a refresh token is stored
    (not when a user is persisted, as on the web), so an offline launch
-   doesn't sign the user out.
+   doesn't sign the user out. Without an answer the persisted user stays on
+   screen, unverified, and the restore runs again on reconnect
+   ([offline-mode.md](offline-mode.md) §3).
 6. Logout revokes the token on the server, deletes it locally and signs out
    of the Google SDK so the next sign-in shows the account sheet.
 
@@ -424,7 +431,7 @@ the same path as above. On Android it is the way in for anyone without
 Google, including iPhone users who signed in with Apple. Details:
 [email-sign-in.md](email-sign-in.md).
 
-## 8. Shell: icons, splash, system bars, back button, haptics, languages
+## 8. Shell: icons, splash, system bars, back button, haptics, rating prompt, languages
 
 - **App icon.** The artwork is the design handoff's vectors in
   `assets/brand/` (heart strokes + cyan mic on `#020B2F`), in two variants
@@ -501,6 +508,40 @@ Google, including iPhone users who signed in with Apple. Details:
   plugins are registered in `SceneDelegate.swift` (`AppBridgeViewController`)
   and `MainActivity.java`. Details, the cue catalog and the dev-only Haptics
   lab: [haptics.md](haptics.md).
+- **Store rating prompt** (`src/native/review/`,
+  `@capacitor-community/in-app-review`: StoreKit's `requestReview` on iOS,
+  Play In-App Review on Android; added 2026-11-08, from the store build
+  after 1.2). The system draws the sheet, throttles it (iOS: three times a
+  year) and never says whether it appeared or whether anyone rated, so the
+  app decides only *who* is asked and *when*:
+  - **When:** right after a success, never during one. 1.5 s after the
+    winner card closes (`WinnerModal`'s `startClose`, so both "Start over"
+    and the backdrop), or 1 s after a result image is shared or saved
+    (share results, stats, graphics exports and template images; not
+    design backups). `askForReviewSoon(moment)`.
+  - **Who** (`reviewPolicy.ts`, unit tested): three finished contests, or
+    contests finished on two different local days. A contest counts when
+    its winner's celebration starts (`useReviewShowCounter`, the
+    fireworks haptic's gate). Not in a session with an error toast
+    (`toast-root.tsx`) or the error screen (`error.tsx`). At most once per
+    app version, 120 days apart, three times in all; an ask counts when
+    it is made. State in localStorage `review-prompt-storage`.
+  - **No question before it** ("Enjoying DouzePoints?"): Google Play bans
+    questions before or around the prompt, and routing unhappy users
+    elsewhere breaks both stores' rules. Never call it from a button
+    either: iOS may show nothing.
+  - **Always there:** Feedback → "Rate DouzePoints" (`RateAppCard`, apps
+    only, where the website has the donation card) links to Apple's
+    write-a-review sheet (`?action=write-review`) or the Play listing
+    (`STORE_REVIEW_URLS`).
+  - **Testing:** iOS builds run from Xcode always show the sheet (Submit
+    does nothing); TestFlight never does. Android shows it only in a build
+    installed from Play (internal testing track or internal app sharing);
+    sideloads and emulators without Play reject quietly (logged as
+    `In-app review failed`). In development,
+    `localStorage['dp-review-debug'] = '1'` makes every moment ask
+    regardless of the rules and logs each decision as `[review]`. Clear
+    `review-prompt-storage` to start over.
 - **Keyboard:** no plugin. Android resizes the WebView for the keyboard
   (Capacitor's insets handling) and focused inputs stay visible (checked in
   Event Setup's country search); iOS keeps WKWebView's default scrolling.

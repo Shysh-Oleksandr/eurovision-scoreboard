@@ -8,6 +8,7 @@ import { ExportEngine, exportNode } from '../export/exportNode';
 import { ExportFormat, ExportScale, useEditorStore } from './editorStore';
 
 import { saveFile, shareFile } from '@/helpers/fileActions';
+import { askForReviewSoon } from '@/native/review';
 
 export interface ExportResultState {
   dataUrl: string;
@@ -123,6 +124,7 @@ export function useEditorExport(
         } else if (saved.kind === 'saved') {
           toast.success(tc('savedTo', { folder: saved.folder }));
         }
+        if (saved.kind !== 'cancelled') askForReviewSoon('image-shared');
       } catch (err) {
         console.error('Save failed:', err);
         toast.error(t('toast.shareFailed'));
@@ -141,6 +143,7 @@ export function useEditorExport(
         });
 
         if (shared === 'unsupported') toast.error(t('toast.shareUnsupported'));
+        if (shared === 'shared') askForReviewSoon('image-shared');
       } catch (err) {
         console.error('Share failed:', err);
         toast.error(t('toast.shareFailed'));

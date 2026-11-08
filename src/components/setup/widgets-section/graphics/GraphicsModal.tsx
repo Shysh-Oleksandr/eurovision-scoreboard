@@ -19,6 +19,7 @@ import {
   Sparkles,
   Trash2,
   Upload,
+  WifiOff,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, {
@@ -73,6 +74,8 @@ import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
+import { queryView } from '@/hooks/useQueryView';
+import { useConnectivityStatus } from '@/state/connectivityStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { CloudDesign } from '@/types/design';
 
@@ -468,6 +471,25 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
     page: savedPage,
     enabled: isOpen && tab === 'saved' && !!user,
   });
+  const tOffline = useTranslations('offline');
+  const connectivity = useConnectivityStatus();
+  const offline = connectivity !== 'online';
+  const communityView = queryView(community, offline);
+  const savedView = queryView(saved, offline);
+  // The cloud lists need the API; local drafts and the editor don't.
+  const offlineEmpty = (
+    <div className="gfx-gempty" role="status">
+      <span className="gfx-gempty-ic">
+        <WifiOff className="size-5" />
+      </span>
+      <h3>
+        {connectivity === 'unreachable'
+          ? tOffline('unreachableTitle')
+          : tOffline('title')}
+      </h3>
+      <p>{tOffline('body')}</p>
+    </div>
+  );
 
   const cloudById = useMemo(() => {
     const map = new Map<string, CloudDesign>();
@@ -836,18 +858,20 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
         <div className="gfx-gsec-h">
           <h3>{t('community')}</h3>
           <span>
-            {community.isLoading
+            {communityView === 'loading' || communityView === 'offline'
               ? '…'
               : `${t('foundN', { count: community.data?.total ?? 0 })} · ${t(
                   'communitySub',
                 )}`}
           </span>
         </div>
-        {community.isLoading ? (
+        {communityView === 'loading' ? (
           <div className="text-center py-8">
             <span className="loader" />
           </div>
-        ) : community.isError ? (
+        ) : communityView === 'offline' ? (
+          offlineEmpty
+        ) : communityView === 'error' ? (
           <div className="gfx-gempty">
             <h3>{t('communityError.title')}</h3>
             <p>{t('communityError.body')}</p>
@@ -901,10 +925,12 @@ const GraphicsModal: React.FC<Props> = ({ isOpen, onClose, onLoaded }) => {
           <h3>{t('savedSignIn.title')}</h3>
           <p>{t('savedSignIn.body')}</p>
         </div>
-      ) : saved.isLoading ? (
+      ) : savedView === 'loading' ? (
         <div className="text-center py-8">
           <span className="loader" />
         </div>
+      ) : savedView === 'offline' ? (
+        offlineEmpty
       ) : saved.data && saved.data.designs.length > 0 ? (
         <>
           <CloudGrid designs={saved.data.designs} onUse={startCloud} />

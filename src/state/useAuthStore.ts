@@ -9,10 +9,11 @@ import { clearUserData } from '@/api/clearUserData';
 import {
   api,
   ApiError,
+  isNetworkError,
   setAccessTokenGetter,
   attachRefreshInterceptor,
 } from '@/api/client';
-import { queryClient } from '@/api/queryClient';
+import { queryClient, whenQueryCacheRestored } from '@/api/queryClient';
 import { API_BASE_URL } from '@/config';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { safeLocalStorage } from '@/state/safeLocalStorage';
@@ -37,6 +38,13 @@ export const NATIVE_LOGIN_EVENT = 'dp:native-login';
  * one would sign the user out (src/native/liveUpdate.ts).
  */
 const refreshesInFlight = new Set<Promise<unknown>>();
+
+/**
+ * The refresh running now, shared by every caller: the native refresh token
+ * rotates, so a second refresh sent with the same token could be refused and
+ * end the session (a reconnect and a 401 retry can ask at the same moment).
+ */
+let currentRefresh: Promise<string | undefined> | null = null;
 
 function trackRefresh<T>(run: () => Promise<T>): Promise<T> {
   const pending = run();
@@ -82,11 +90,22 @@ export function takePendingWebLogin(): boolean {
 
 export type AuthProvider = 'google' | 'apple';
 
+/**
+ * `unverified`: there is a stored session (and usually the persisted `user`)
+ * but the server couldn't be asked about it, because the app is offline or
+ * the API didn't answer. The account stays on screen; AppBootstrap restores
+ * the session when the connection returns. Only a server's rejection signs
+ * the user out (docs/offline-mode.md).
+ */
+export type SessionStatus = 'unknown' | 'verified' | 'unverified';
+
 const nativeAuth = () => import('@/native/nativeAuth');
 
 export interface AuthState {
   user: Profile | null;
   accessToken: string | null;
+  /** Not persisted: every launch starts `unknown`. */
+  sessionStatus: SessionStatus;
   isBusy: boolean;
   /** Native apps: the account sheet / token exchange is in progress. */
   isSigningIn: boolean;
@@ -163,6 +182,7 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       accessToken: null,
+      sessionStatus: 'unknown',
       isBusy: false,
       isSigningIn: false,
       login: (provider) => {
@@ -240,15 +260,20 @@ export const useAuthStore = create<AuthState>()(
             }
           }
         } catch (e) {
-          // Refresh failed (e.g., expired/invalid refresh). Ensure we clear session state.
-          set({ user: null, accessToken: null });
-
           success = false;
 
-          // Only a sign-in is reported: an ordinary load with a lapsed
-          // session fails here routinely, and so does a saved `?provider=`
-          // link opened without one.
-          if (force && report) reportLoginFailure(step, e);
+          // Offline or unreachable: `refresh` / `fetchMe` kept the account
+          // and marked the session unverified. Nothing to report either:
+          // the report couldn't be sent.
+          if (!isNetworkError(e)) {
+            // Refresh failed (e.g., expired/invalid refresh). Ensure we clear session state.
+            endSession();
+
+            // Only a sign-in is reported: an ordinary load with a lapsed
+            // session fails here routinely, and so does a saved `?provider=`
+            // link opened without one.
+            if (force && report) reportLoginFailure(step, e);
+          }
         }
         // Strip query params after handling redirect
         const url = new URL(window.location.href);
@@ -259,8 +284,8 @@ export const useAuthStore = create<AuthState>()(
 
         return success;
       },
-      refresh: () =>
-        trackRefresh(async () => {
+      refresh: () => {
+        currentRefresh ??= trackRefresh(async () => {
           try {
             if (IS_NATIVE_APP) {
               const { getRefreshToken, setRefreshToken, clearRefreshToken } =
@@ -279,7 +304,10 @@ export const useAuthStore = create<AuthState>()(
                 );
 
                 if (data.refreshToken) await setRefreshToken(data.refreshToken);
-                set({ accessToken: data.accessToken });
+                set({
+                  accessToken: data.accessToken,
+                  sessionStatus: 'verified',
+                });
 
                 return data.accessToken as string;
               } catch (e) {
@@ -295,23 +323,37 @@ export const useAuthStore = create<AuthState>()(
             // Always attempt; backend verifies cookie and returns 401 if not present
             const { data } = await api.post('/auth/refresh', {});
 
-            set({ accessToken: data.accessToken });
+            set({ accessToken: data.accessToken, sessionStatus: 'verified' });
 
             return data.accessToken as string;
           } catch (e) {
-            // On refresh failure, clear session so UI reflects logged-out state
-            set({ user: null, accessToken: null });
+            if (isNetworkError(e)) {
+              // No answer: the session may well be fine. Keep the account.
+              set({ sessionStatus: 'unverified' });
+            } else {
+              // On refresh failure, clear session so UI reflects logged-out state
+              endSession();
+            }
             throw e;
           }
-        }),
+        }).finally(() => {
+          currentRefresh = null;
+        });
+
+        return currentRefresh;
+      },
       fetchMe: async () => {
         try {
           const { data } = await api.get('/auth/me');
 
           set({ user: data.user });
         } catch (e) {
-          // If fetching current user fails (e.g., token expired), clear session
-          set({ user: null, accessToken: null });
+          if (isNetworkError(e)) {
+            set({ sessionStatus: 'unverified' });
+          } else {
+            // If fetching current user fails (e.g., token expired), clear session
+            endSession();
+          }
           throw e;
         }
       },
@@ -332,10 +374,14 @@ export const useAuthStore = create<AuthState>()(
                   ? { headers: { authorization: `Bearer ${refreshToken}` } }
                   : undefined,
               );
-            } finally {
-              await clearRefreshToken();
-              void signOutOfGoogle();
+            } catch (e) {
+              // Offline: sign out nothing. Deleting the token here would
+              // leave it valid on the server and the account on screen.
+              if (isNetworkError(e)) throw e;
+              // Any answer (an already revoked token) still ends it here.
             }
+            await clearRefreshToken();
+            void signOutOfGoogle();
           } else {
             await api.post('/auth/logout');
           }
@@ -378,13 +424,33 @@ export const useAuthStore = create<AuthState>()(
   ),
 );
 
+/**
+ * The server refused the session (expired or revoked refresh token, deleted
+ * account): show signed out and drop the account's cached data, which the
+ * query cache would otherwise keep on disk (`queryPersistence.ts`).
+ */
+function endSession() {
+  useAuthStore.setState({
+    user: null,
+    accessToken: null,
+    sessionStatus: 'unknown',
+  });
+  clearUserData(queryClient);
+  // A launch can end the session before the saved copy is back.
+  void whenQueryCacheRestored().then(() => clearUserData(queryClient));
+}
+
 /** Drops the signed-in user's data from this device after logout or deletion. */
 function clearSignedInState() {
   // Clear user data from React Query cache
   clearUserData(queryClient);
 
   // Clear auth state
-  useAuthStore.setState({ user: null, accessToken: null });
+  useAuthStore.setState({
+    user: null,
+    accessToken: null,
+    sessionStatus: 'unknown',
+  });
 
   // Clear user-specific data from Zustand stores
   useCountriesStore.setState({ customCountries: [] });

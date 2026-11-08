@@ -31,6 +31,7 @@ import {
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -86,6 +87,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
 
   const { mutateAsync: createContest, isPending: isCreating } =
     useCreateContestMutation();
+  // Contests save to the account (the strip says why it's off).
+  const offline = useIsOffline();
   const { mutateAsync: updateContest, isPending: isUpdating } =
     useUpdateContestMutation();
   const { mutateAsync: uploadContestLogo, isPending: isUploadingLogo } =
@@ -336,6 +339,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
           onClose={onClose}
           onSave={handleSave}
           isSaving={isSaving}
+          saveButtonDisabled={offline}
         />
       }
     >

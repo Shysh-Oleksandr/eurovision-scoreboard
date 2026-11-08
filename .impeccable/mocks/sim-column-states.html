@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spokesperson column states</title>
+<style>
+@font-face{font-family:Gotham;src:url(../../public/fonts/Gotham-Book.woff2) format('woff2');font-weight:400}
+@font-face{font-family:Gotham;src:url(../../public/fonts/Gotham-Medium.woff2) format('woff2');font-weight:500 600}
+@font-face{font-family:Gotham;src:url(../../public/fonts/Gotham-Bold.woff2) format('woff2');font-weight:700 800}
+@font-face{font-family:Gotham;src:url(../../public/fonts/Gotham-Black.woff2) format('woff2');font-weight:900}
+:root{
+  /* 2026 theme interface tokens (DESIGN.md) */
+  --p-950:oklch(.3482 .0536 86.5);--p-900:oklch(.386 .067 86.5);--p-800:oklch(.428 .07504 86.5);--p-750:oklch(.47 .08174 86.5);--p-700:oklch(.512 .08844 86.5);
+  --accent:oklch(.84 .13 88);--accent-ink:oklch(.22 .05 88);
+  --ink:#fff;--ink-70:rgba(255,255,255,.72);--ink-55:rgba(255,255,255,.55);--ink-40:rgba(255,255,255,.4);--hair:rgba(255,255,255,.1);--hair-2:rgba(255,255,255,.16);
+  /* 2026 board colours (themes.ts countryItem / panelInfo) */
+  --row-bg:#fff;--row-ink:#000;--pts-bg:hsl(245,50%,21%);--pts-ink:#fff;--last-bg:hsl(236,42%,37%);
+  --tv-active-pts:hsl(214,64%,72%);--tv-active-pts-ink:hsl(218,39%,12%);--tv-done-bg:hsl(236,38%,70%);
+  --nq-bg:hsl(233,15%,35%);--nq-ink:hsl(240,10%,67%);--nq-pts:hsl(265,9%,14%);
+  --pi-active-bg:hsl(265,9%,14%);--pi-active-ink:hsl(37,51%,49%);
+  --pi-inactive-bg:radial-gradient(circle,rgba(189,142,61,1) 0%,rgba(168,133,66,1) 36%,rgba(0,0,0,1) 94%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:#07080d;color:#fff;font-family:Gotham,system-ui,sans-serif}
+body{padding:48px 40px 120px;max-width:1480px;margin:0 auto}
+button{font:inherit;color:inherit;border:0;background:none}
+
+/* ---------- document chrome (this page only) ---------- */
+.doc h1{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.doc p.lede{margin-top:10px;max-width:880px;color:var(--ink-70);font-size:15px;line-height:1.55}
+.state{margin-top:64px}
+.state h2{font-size:21px;font-weight:800;letter-spacing:-.015em}
+.state .notes{margin-top:8px;max-width:1000px;color:var(--ink-70);font-size:14px;line-height:1.6}
+.state .notes b{color:#fff;font-weight:700}
+.frames{display:flex;gap:28px;align-items:flex-start;margin-top:20px;flex-wrap:wrap}
+.fw{position:relative;flex:none}
+.fw .cap{font-size:12.5px;font-weight:600;color:var(--ink-55);margin-bottom:8px}
+.scr{position:absolute;left:0;transform-origin:0 0;overflow:hidden;background:#020617 url(../../public/bgImages/GoldBg2026.webp) center/cover;border-radius:8px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+.scr.ph{border-radius:46px}
+.open{margin-top:46px;padding:22px 24px;border:1px solid var(--hair-2);border-radius:14px;background:#11131c;max-width:1000px}
+.open h2{font-size:19px;font-weight:800}
+.open ol{margin:10px 0 0 20px;color:var(--ink-70);font-size:14px;line-height:1.65}
+.open li b{color:#fff}
+
+/* ---------- app chrome ---------- */
+.hd{display:flex;align-items:center;gap:10px;padding:22px 32px 16px}
+.hd .logo{width:40px;height:40px;flex:none;object-fit:contain}
+.hd h3{font-size:24px;font-weight:800;letter-spacing:-.022em;line-height:1.15;text-shadow:0 0 10px rgba(0,0,0,.25)}
+.hd h3 small{font-size:15px;font-weight:600;color:var(--ink-70);margin-left:8px;letter-spacing:0}
+.ph .hd{padding:54px 12px 10px;gap:9px}.ph .hd .logo{width:32px;height:32px}
+.ph .hd h3{font-size:17px}.ph .hd h3 small{display:block;margin:2px 0 0;font-size:12.5px}
+.sp{flex:1}
+.btn{height:40px;min-width:40px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 14px;font-size:13px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;
+  background:linear-gradient(180deg,var(--p-750),var(--p-800));border:1px solid var(--hair-2)}
+.btn.ic{padding:0;width:40px}
+.btn svg{width:20px;height:20px;flex:none}
+.btn.quiet{background:rgba(255,255,255,.07);border-color:var(--hair)}
+.btn.cta{background:oklch(.84 calc(.13 * .85) 88);color:var(--accent-ink);border:0;text-transform:uppercase;letter-spacing:.06em}
+.btn.on{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in oklch,var(--accent) 34%,transparent)}
+.btn.danger{color:#ffb3bb}
+.lbl{font-size:12.5px;font-weight:700;color:var(--ink-70)}
+
+/* ---------- board rows (2026 rounded design) ---------- */
+.board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:var(--cg,16px)}
+.bcol{display:flex;flex-direction:column;gap:var(--rg,6px);min-width:0}
+.r{--h:40px;height:var(--h);display:flex;align-items:center;gap:calc(var(--h)*.12);min-width:0}
+.pl{flex:none;width:calc(var(--h)*1.22);height:var(--h);border-radius:999px;background:#fff;color:#000;font-weight:700;font-size:calc(var(--h)*.42);display:grid;place-items:center}
+.pill{flex:1;min-width:0;height:100%;display:flex;border-radius:999px;overflow:hidden;background:var(--pts-bg);box-shadow:0 0 calc(var(--h)*.28) rgba(120,130,255,.38)}
+.pill img{flex:none;height:100%;width:calc(var(--h)*1.05);object-fit:cover;box-shadow:4px 0 8px rgba(0,0,0,.15)}
+.nm{flex:1;min-width:0;background:var(--row-bg);color:var(--row-ink);font-weight:700;font-size:calc(var(--h)*.4);text-transform:uppercase;display:flex;align-items:center;padding-left:calc(var(--h)*.28);border-radius:0 999px 999px 0;white-space:nowrap;overflow:hidden}
+.nm.fit{font-size:calc(var(--h)*.33)}
+.tight .pt{width:calc(var(--h)*1.2)}.tight .lp{width:calc(var(--h)*.95);margin-left:calc(var(--h)*-.25);padding-left:calc(var(--h)*.25)}.tight .nm{font-size:calc(var(--h)*.37);padding-left:calc(var(--h)*.22)}.tight .nm.fit{font-size:calc(var(--h)*.29)}.tight .pill img{width:calc(var(--h)*.95)}
+.pt{flex:none;width:calc(var(--h)*1.5);display:grid;place-items:center;font-weight:400;font-size:calc(var(--h)*.42);color:var(--pts-ink)}
+.lp{flex:none;width:calc(var(--h)*1.45);display:grid;place-items:center;background:var(--last-bg);border-radius:0 999px 999px 0;font-size:calc(var(--h)*.42);margin-left:calc(var(--h)*-.3);padding-left:calc(var(--h)*.3)}
+.r.off .nm{background:#b4b6bd}
+.r.tv-done .nm{background:var(--tv-done-bg)}.r.tv-done .pt{background:#fff;color:#000}
+.r.tv-on .pill{box-shadow:0 0 0 2px #fff,0 0 calc(var(--h)*.5) rgba(150,190,255,.7)}.r.tv-on .pt{background:var(--tv-active-pts);color:var(--tv-active-pts-ink);font-weight:700}
+.r.nq .pl{background:var(--nq-pts);color:hsl(223,6%,72%)}.r.nq .nm{background:var(--nq-bg);color:var(--nq-ink)}.r.nq .pt{background:var(--nq-pts)}
+.r.nq img{filter:saturate(.35) brightness(.8)}
+.r.winner .pill{box-shadow:0 0 0 2px var(--accent),0 0 calc(var(--h)*.5) rgba(240,200,110,.55)}
+
+/* ---------- the theme's jury points strip (VotingPointsInfo, 2026: rounded) ---------- */
+.pts{display:flex;justify-content:space-between;gap:var(--pg,6px)}
+.pv{--s:32px;position:relative;width:var(--s);height:var(--s);flex:none;border-radius:999px;overflow:hidden;display:grid;place-items:center;background:var(--pi-inactive-bg);color:#000;font-weight:600;font-size:calc(var(--s)*.56);letter-spacing:-.04em}
+.pv.on{background:var(--pi-active-bg);color:var(--pi-active-ink);font-weight:700}
+.pv.on::after{content:'';position:absolute;left:0;right:0;bottom:0;height:calc(var(--s)*.14);background:var(--pi-active-ink)}
+
+/* ---------- spokesperson column ---------- */
+.colm{width:372px;flex:none;border-radius:16px;overflow:hidden;background:var(--p-950);border:1px solid var(--hair);display:flex;flex-direction:column}
+.win{position:relative;flex:1 1 208px;min-height:190px;overflow:hidden;background:#000}
+.win img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.win::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.35))}
+.bar{display:flex;align-items:baseline;gap:10px;padding:11px 16px 12px;background:var(--p-900);border-top:1px solid var(--hair)}
+.bar b{font-size:19px;font-weight:800;text-transform:uppercase;letter-spacing:-.01em}
+.bar span{margin-left:auto;font-size:14px;font-weight:600;color:var(--ink-70)}
+.prog{height:3px;background:rgba(255,255,255,.1)}.prog i{display:block;height:100%;background:var(--accent)}
+.cbody{flex:none;padding:16px;display:flex;flex-direction:column;gap:14px}
+.hint{font-size:15px;font-weight:600;color:#fff}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.seg .btn{padding:0 8px;height:42px;flex-direction:column;gap:1px;line-height:1.05}
+.seg .btn small{font-size:11px;font-weight:600;color:var(--ink-55)}
+.div{height:1px;background:var(--hair)}
+.present{display:flex;gap:8px}.present .cta{flex:1;height:46px}
+.present .btn.ic{height:46px;width:46px}
+
+/* ---------- menus, sheets, stripe ---------- */
+.menu{position:absolute;min-width:236px;padding:6px;border-radius:12px;background:var(--p-800);border:1px solid var(--hair-2);box-shadow:0 18px 44px rgba(0,0,0,.55);z-index:5}
+.mi{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:8px;font-size:14px;font-weight:700}
+.mi svg{width:18px;height:18px;color:var(--ink-70)}.mi kbd{margin-left:auto;font:600 12px Gotham;color:var(--ink-55)}
+.mi.hl{background:rgba(255,255,255,.08)}.mi.danger{color:#ffb3bb}.mi.danger svg{color:#ffb3bb}
+.mhr{height:1px;background:var(--hair);margin:5px 4px}
+.mh{font-size:12.5px;font-weight:700;color:var(--ink-70);padding:8px 10px 4px}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--p-950);border-top:1px solid var(--hair-2);border-radius:24px 24px 0 0;padding:8px 14px 34px;box-shadow:0 -14px 40px rgba(0,0,0,.45)}
+.grab{width:40px;height:5px;border-radius:5px;background:rgba(255,255,255,.3);margin:0 auto 12px}
+.peek{display:flex;align-items:center;gap:11px}
+.peek .fl{width:46px;height:31px;border-radius:5px;object-fit:cover;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.2)}
+.peek b{display:block;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:-.01em}
+.peek span{display:block;font-size:12.5px;font-weight:600;color:var(--ink-70);margin-top:2px}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.stripe{position:absolute;display:flex;align-items:center;gap:14px;padding:8px 10px 8px 10px;border-radius:16px;background:var(--p-950);border:1px solid var(--hair-2);box-shadow:0 16px 40px rgba(0,0,0,.55)}
+.stripe .fl{width:44px;height:30px;border-radius:5px;object-fit:cover;flex:none}
+.stripe b{display:block;font-size:15px;font-weight:800;text-transform:uppercase}
+.stripe span.o{display:block;font-size:12px;font-weight:600;color:var(--ink-70);margin-top:2px}
+.vsep{width:1px;align-self:stretch;background:var(--hair)}
+.grip{width:10px;align-self:stretch;background:radial-gradient(circle,rgba(255,255,255,.35) 1.2px,transparent 1.6px) 0 0/5px 6px;opacity:.8}
+.slider{position:relative;height:4px;border-radius:4px;background:rgba(255,255,255,.14)}
+.slider i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--accent)}
+.slider b{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.input{height:46px;border-radius:12px;background:rgba(0,0,0,.28);border:1px solid var(--hair-2);display:flex;align-items:center;padding:0 12px;font-size:16px;font-weight:700}
+.input.ph{color:var(--ink-40);font-weight:600}
+.tog{display:flex;padding:3px;border-radius:11px;background:rgba(0,0,0,.25);border:1px solid var(--hair)}
+.tog span{flex:1;height:34px;display:grid;place-items:center;border-radius:8px;font-size:13px;font-weight:700;color:var(--ink-70)}
+.tog span.on{background:var(--p-750);color:#fff;box-shadow:0 0 0 1px var(--accent)}
+.chk{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600}
+.chk i{width:20px;height:20px;border-radius:6px;background:var(--accent);display:grid;place-items:center;color:var(--accent-ink);font-style:normal;font-weight:900;font-size:13px}
+.title-only{position:absolute;left:32px;top:22px;display:flex;align-items:center;gap:10px}
+.ann{position:absolute;font:700 12px Gotham;color:#111;background:#ffe27a;padding:4px 8px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.4);white-space:nowrap;z-index:9}
+</style>
+</head>
+<body>
+<div class="doc">
+  <h1>Spokesperson column: every state</h1>
+  <p class="lede">Grand Final 2026 in the 2026 theme, real flags, Gotham. The board rows and the jury points strip are the theme's own components, drawn as they render today; only the chrome around them changes. Desktop frames are 1440 × 900, phone frames 390 × 844, both scaled down. Yellow tags are notes, not UI.</p>
+</div>
+<div id="out"></div>
+
+<div class="open">
+  <h2>Decisions to confirm before I build</h2>
+  <ol>
+    <li><b>“At random” replaces Random / Vote randomly / Finish randomly.</b> One labelled group whose buttons name what gets randomised: the next value, the current voter's whole vote, or every remaining vote. In televote it becomes the country's name (“Croatia”) and “All countries”. On phones the peek keeps one “Random” shortcut for the next value.</li>
+    <li><b>Show mode.</b> Present switches to the minimal layout; Pause returns to the column (as agreed). The stripe can't be dragged in v1; I'll leave room for that in v2 along with the point that flies from the strip to the row.</li>
+    <li><b>Minimal view also works for manual voting</b> (toggle in the header, and on phones in the ⋯ sheet), with the same stripe carrying the points strip and the random menu.</li>
+    <li><b>Phone columns.</b> Two columns whenever every name fits; names that are a little too long (United Kingdom) drop one font step first, and the board falls back to one column only if that still doesn't fit.</li>
+    <li><b>Wide screens.</b> The whole composition scales with the window height instead of stopping at 1100px: at 2560 × 1440 rows are about 56px tall and the column grows with them.</li>
+    <li><b>Results</b> reuse the column as the winner's window (final) or the qualifiers summary (semi-finals); Continue to Grand Final stays the only filled button.</li>
+  </ol>
+</div>
+
+<script>
+const F = c => `../../public/flags/${c}.svg`;
+const LOGO = '../../public/hostingCountryLogos/Austria2015.svg';
+const I = {
+  more:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  setup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  min:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+  exitmin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 010 10h-3"/></svg>',
+  restart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12a8 8 0 11-2.3-5.7L20 8.5M20 3.5v5h-5"/></svg>',
+  share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></svg>',
+  leave:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 4H6a2 2 0 00-2 2v12a2 2 0 002 2h4M15 8l4 4-4 4M19 12H9"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  dice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>',
+  nq:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/><circle cx="12" cy="12" r="2.5"/></svg>',
+};
+
+// ---------- data ----------
+// Jury, Germany voting 17th of 37; 1..6 already given this round (last points box).
+const JURY = [['se','Sweden',100,6],['fr','France',90],['it','Italy',84],['il','Israel',78],['ch','Switzerland',74],['ua','Ukraine',66,5],['fi','Finland',60],['gr','Greece',57],['at','Austria',52],['no','Norway',46],['au','Australia',41],['mt','Malta',37,4],['al','Albania',32],['pl','Poland',28],['hr','Croatia',24],['ee','Estonia',20],['bg','Bulgaria',17],['dk','Denmark',14],['de','Germany',12,0,'off'],['cy','Cyprus',10],['am','Armenia',8,3],['lt','Lithuania',6],['rs','Serbia',5],['md','Moldova',3,1],['gb','United Kingdom',2,2]];
+// Televote: lowest jury score first; Croatia is 5th of 25.
+const TV = [['se','Sweden',318],['fr','France',284],['it','Italy',262],['il','Israel',240],['ch','Switzerland',221],['ua','Ukraine',205],['fi','Finland',188],['gr','Greece',160],['at','Austria',151],['no','Norway',133],['au','Australia',120],['mt','Malta',104],['al','Albania',96],['lt','Lithuania',91,0,'tv-done'],['pl','Poland',88],['md','Moldova',80,0,'tv-done'],['hr','Croatia',71,0,'tv-on'],['ee','Estonia',64],['bg','Bulgaria',57],['rs','Serbia',55,0,'tv-done'],['dk','Denmark',49],['cy','Cyprus',41],['de','Germany',36],['gb','United Kingdom',30,0,'tv-done'],['am','Armenia',27]];
+const FINAL = [['se','Sweden',512,0,'winner'],['ua','Ukraine',488],['fr','France',421],['it','Italy',398],['il','Israel',370],['fi','Finland',340],['ch','Switzerland',301],['gr','Greece',255],['no','Norway',230],['at','Austria',204],['au','Australia',188],['pl','Poland',160],['mt','Malta',142],['al','Albania',130],['hr','Croatia',118],['ee','Estonia',99],['bg','Bulgaria',87],['lt','Lithuania',70],['dk','Denmark',61],['am','Armenia',55],['cy','Cyprus',48],['rs','Serbia',40],['de','Germany',33],['md','Moldova',21],['gb','United Kingdom',12]];
+const SEMI = [['se','Sweden',152],['fi','Finland',131],['il','Israel',120],['hr','Croatia',97],['gr','Greece',90],['pl','Poland',84],['lt','Lithuania',71],['ee','Estonia',66],['rs','Serbia',58],['md','Moldova',51],['pt','Portugal',44,0,'nq'],['ge','Georgia',37,0,'nq'],['be','Belgium',30,0,'nq'],['me','Montenegro',19,0,'nq'],['sm','San Marino',8,0,'nq']];
+const LONG = new Set(['United Kingdom','Switzerland']);
+
+const row = ([c,n,p,last,cls], i, h, tight) =>
+  `<div class="r ${cls||''}" style="--h:${h}px"><b class="pl">${String(i+1).padStart(2,'0')}</b><span class="pill"><img src="${F(c)}" alt=""><span class="nm${tight && LONG.has(n) ? ' fit' : ''}">${n}</span><span class="pt">${p}</span>${last ? `<span class="lp">${last}</span>` : ''}</span></div>`;
+const board = (data, h, rg, cg, tight) => {
+  const half = Math.ceil(data.length / 2);
+  const col = (d, o) => `<div class="bcol" style="--rg:${rg}px">${d.map((x, i) => row(x, i + o, h, tight)).join('')}</div>`;
+  return `<div class="board${tight ? ' tight' : ''}" style="--cg:${cg}px">${col(data.slice(0, half), 0)}${col(data.slice(half), half)}</div>`;
+};
+const strip = (s, g, active = 6) => `<div class="pts" style="--pg:${g}px">${[1,2,3,4,5,6,7,8,10,12].map((v, i) => `<span class="pv${i === active ? ' on' : ''}" style="--s:${s}px">${v}</span>`).join('')}</div>`;
+
+const header = (extra = '') => `<div class="hd"><img class="logo" src="${LOGO}" alt=""><h3>Grand Final<small>Eurovision 2026</small></h3><span class="sp"></span>${extra}<button class="btn ic quiet" title="Minimal view">${I.min}</button><button class="btn">${I.setup}Setup</button><button class="btn ic">${I.more}</button></div>`;
+const phHeader = (buttons = true, title = 'Grand Final') => `<div class="hd"><img class="logo" src="${LOGO}" alt=""><h3>${title}<small>Eurovision 2026</small></h3><span class="sp"></span>${buttons ? `<button class="btn ic">${I.setup}</button><button class="btn ic">${I.more}</button>` : ''}</div>`;
+
+const winBlock = (flag, name, right, pct) => `<div class="win"><img src="${F(flag)}" alt=""></div><div class="bar"><b>${name}</b><span>${right}</span></div>${pct != null ? `<div class="prog"><i style="width:${pct}%"></i></div>` : ''}`;
+const presentRow = `<div class="present"><button class="btn cta">${I.play}Present</button><button class="btn ic" title="Presentation options">${I.gear}</button></div>`;
+
+const juryColumn = `<div class="colm">${winBlock('de','Germany','17th of 37 countries',44)}
+  <div class="cbody">
+    <div class="hint">Tap a country to give 7 points</div>
+    ${strip(31, 4)}
+    <div class="lbl" style="margin-top:2px">At random</div>
+    <div class="seg"><button class="btn">7 points</button><button class="btn">Germany<small>whole vote</small></button><button class="btn">All juries</button></div>
+    <div class="div"></div>
+    ${presentRow}
+  </div></div>`;
+
+const tvColumn = `<div class="colm">${winBlock('hr','Croatia','Televote, 5th of 25',16)}
+  <div class="cbody">
+    <div class="hint">Enter Croatia's televote points</div>
+    <div style="display:flex;gap:8px"><div class="input ph" style="flex:1">Points</div><button class="btn cta" style="height:46px;padding:0 22px">Vote</button></div>
+    <div><div style="display:flex;justify-content:space-between" class="lbl"><span>1,284 of 2,960 points given</span></div><div class="slider" style="margin-top:8px;height:5px"><i style="width:43%"></i></div></div>
+    <div class="lbl" style="margin-top:2px">At random</div>
+    <div class="seg" style="grid-template-columns:1fr 1fr"><button class="btn">Croatia</button><button class="btn">All countries</button></div>
+    <div class="div"></div>
+    ${presentRow}
+  </div></div>`;
+
+const resultColumn = `<div class="colm">${winBlock('se','Sweden','wins Eurovision 2026',null)}
+  <div class="cbody">
+    <div style="display:flex;gap:8px"><button class="btn" style="flex:1">${I.chart}Stats</button><button class="btn" style="flex:1">${I.share}Share</button></div>
+    <div class="lbl">Showing</div>
+    <button class="btn quiet" style="justify-content:space-between;height:44px;padding:0 14px">Grand Final ${I.chev}</button>
+    <button class="btn quiet" style="justify-content:flex-start;height:44px">${I.nq}Show non-qualifiers</button>
+  </div></div>`;
+
+const deskMenu = `<div class="menu" style="right:32px;top:66px"><div class="mi hl">${I.undo}Undo<kbd>Ctrl Z</kbd></div><div class="mi">${I.restart}Restart voting<kbd>R</kbd></div><div class="mi">${I.share}Share results</div><div class="mhr"></div><div class="mi danger">${I.leave}Cancel event</div></div>`;
+const presentPopover = `<div class="menu" style="right:34px;bottom:96px;width:330px;padding:14px;display:flex;flex-direction:column;gap:12px">
+  <div class="lbl" style="color:#fff;font-size:14px">Presentation</div>
+  <div><div class="lbl">Jury points</div><div class="tog" style="margin-top:6px"><span class="on">Individual</span><span>Grouped</span></div><div class="lbl" style="margin-top:6px;font-weight:600;color:var(--ink-55)">Grouped gives 1 to 10 at once, then 12</div></div>
+  <div class="chk"><i>✓</i>Pause after animated points</div>
+  <div><div style="display:flex;justify-content:space-between" class="lbl"><span>Slow</span><span>Fast</span></div><div class="slider" style="margin-top:10px"><i style="width:62%"></i><b style="left:62%"></b></div></div>
+</div>`;
+
+// ---------- frames ----------
+const desk = (inner, scale = .64) => `<div class="fw" style="width:${1440*scale}px;height:${900*scale + 22}px"><div class="cap">Desktop, 1440 × 900</div><div class="scr" style="top:22px;width:1440px;height:900px;transform:scale(${scale})">${inner}</div></div>`;
+const phone = (inner, scale = .64, cap = 'Phone, 390 × 844') => `<div class="fw" style="width:${390*scale}px;height:${844*scale + 22}px"><div class="cap">${cap}</div><div class="scr ph" style="top:22px;width:390px;height:844px;transform:scale(${scale})">${inner}</div></div>`;
+const ann = (text, css) => `<div class="ann" style="${css}">${text}</div>`;
+
+const D_JURY = desk(`${header()}
+  <div style="display:flex;gap:24px;padding:0 32px">
+    <div style="flex:1;min-width:0">${board(JURY, 46, 7, 16)}</div>${juryColumn}</div>
+  ${ann('Setup keeps its label: one tap', 'right:150px;top:8px')}
+  ${ann('The theme’s own points strip', 'right:58px;top:446px')}`);
+
+const P_JURY = phone(`${phHeader()}
+  <div style="padding:0 8px">${board(JURY, 27, 6, 5, true)}</div>
+  <div class="sheet"><div class="grab"></div>
+    <div class="peek"><img class="fl" src="${F('de')}" alt=""><div style="flex:1;min-width:0"><b>Germany</b><span>17th of 37 countries</span></div><button class="btn" style="height:44px">${I.dice}Random</button></div>
+    <div style="margin-top:12px">${strip(31, 0)}</div>
+  </div>
+  ${ann('Long names drop one size', 'left:120px;top:540px')}`);
+
+const P_SHEET = phone(`${phHeader()}
+  <div style="padding:0 8px">${board(JURY, 27, 6, 5, true)}</div>
+  <div class="sheet" style="padding-bottom:34px"><div class="grab"></div>
+    <div class="peek"><img class="fl" src="${F('de')}" alt=""><div style="flex:1;min-width:0"><b>Germany</b><span>17th of 37 countries</span></div><button class="btn" style="height:44px">${I.dice}Random</button></div>
+    <div style="margin-top:12px">${strip(31, 0)}</div>
+    <div class="lbl" style="margin:16px 0 8px">At random</div>
+    <div class="seg"><button class="btn">7 points</button><button class="btn">Germany<small>whole vote</small></button><button class="btn">All juries</button></div>
+    <div class="div" style="margin:16px 0"></div>
+    <div class="lbl" style="margin-bottom:8px">Presentation</div>
+    <div class="lbl" style="margin-bottom:6px;font-weight:600">Jury points</div><div class="tog"><span class="on">Individual</span><span>Grouped</span></div>
+    <div class="chk" style="margin:12px 0">  <i>✓</i>Pause after animated points</div>
+    <div style="display:flex;justify-content:space-between" class="lbl"><span>Slow</span><span>Fast</span></div><div class="slider" style="margin:10px 0 16px"><i style="width:62%"></i><b style="left:62%"></b></div>
+    <button class="btn cta" style="width:100%;height:48px">${I.play}Present</button>
+  </div>`, .6, 'Phone, sheet pulled up');
+
+const P_QUICK = phone(`${phHeader()}
+  <div style="padding:0 8px">${board(JURY, 27, 6, 5, true)}</div>
+  <div class="scrim"></div>
+  <div class="sheet" style="padding:8px 10px 34px"><div class="grab"></div>
+    <div class="mi" style="height:52px;font-size:15px">${I.undo}Undo</div>
+    <div class="mi" style="height:52px;font-size:15px">${I.restart}Restart voting</div>
+    <div class="mi" style="height:52px;font-size:15px">${I.share}Share results</div>
+    <div class="mi" style="height:52px;font-size:15px">${I.min}Minimal view</div>
+    <div class="mhr"></div>
+    <div class="mi danger" style="height:52px;font-size:15px">${I.leave}Cancel event</div>
+  </div>`, .6, 'Phone, ⋯ quick actions');
+
+const D_MENUS = desk(`${header()}
+  <div style="display:flex;gap:24px;padding:0 32px">
+    <div style="flex:1;min-width:0">${board(JURY, 46, 7, 16)}</div>${juryColumn}</div>
+  ${deskMenu}${presentPopover}`, .52);
+
+const D_TV = desk(`${header()}
+  <div style="display:flex;gap:24px;padding:0 32px">
+    <div style="flex:1;min-width:0">${board(TV, 46, 7, 16)}</div>${tvColumn}</div>`);
+
+const P_TV = phone(`${phHeader()}
+  <div style="padding:0 8px">${board(TV, 27, 6, 5, true)}</div>
+  <div class="sheet"><div class="grab"></div>
+    <div class="peek"><img class="fl" src="${F('hr')}" alt=""><div style="flex:1;min-width:0"><b>Croatia</b><span>Televote, 5th of 25</span></div></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><div class="input ph" style="flex:1">Points</div><button class="btn" style="height:46px">${I.dice}Random</button><button class="btn cta" style="height:46px;padding:0 18px">Vote</button></div>
+  </div>`);
+
+const stripeShow = (css) => `<div class="stripe" style="${css}"><img class="fl" src="${F('de')}" alt=""><div style="min-width:150px"><b>Germany</b><span class="o">17th of 37 countries</span></div><div style="width:120px"><div class="slider" style="height:3px"><i style="width:44%"></i></div></div><div class="vsep"></div><button class="btn cta" style="height:44px;padding:0 18px">${I.pause}Pause</button><div style="width:150px"><div style="display:flex;justify-content:space-between" class="lbl"><span>Slow</span><span>Fast</span></div><div class="slider" style="margin-top:9px"><i style="width:62%"></i><b style="left:62%"></b></div></div><button class="btn ic quiet">${I.gear}</button></div>`;
+
+const D_SHOW = desk(`<div class="title-only"><img src="${LOGO}" style="width:40px;height:40px" alt=""><h3 style="font-size:24px;font-weight:800">Grand Final<small style="font-size:15px;font-weight:600;color:var(--ink-70);margin-left:8px">Eurovision 2026</small></h3></div>
+  <div style="position:absolute;left:70px;right:70px;top:84px">${board(JURY, 48, 7, 22)}</div>
+  ${stripeShow('left:50%;bottom:26px;transform:translateX(-50%)')}
+  ${ann('No buttons up here: clean for screen recording', 'left:390px;top:30px')}`);
+
+const P_SHOW = phone(`${phHeader(false)}
+  <div style="padding:0 8px">${board(JURY, 29, 7, 5, true)}</div>
+  <div class="stripe" style="left:10px;right:10px;bottom:30px;gap:10px;padding:8px 8px 8px 10px"><img class="fl" src="${F('de')}" style="width:40px;height:27px" alt=""><div style="flex:1;min-width:0"><b style="font-size:14px">Germany</b><span class="o">17th of 37 countries</span></div><button class="btn cta" style="height:44px;width:52px;padding:0">${I.pause}</button></div>`, .64, 'Phone, presenting');
+
+const stripeManual = `<div class="stripe" style="left:50%;bottom:26px;transform:translateX(-50%)"><span class="grip" title="Drag (v2)"></span><img class="fl" src="${F('de')}" alt=""><div style="min-width:150px"><b>Germany</b><span class="o">17th of 37 countries</span></div><div class="vsep"></div>${strip(30, 4)}<div class="vsep"></div><button class="btn">${I.dice}At random${I.chev}</button><button class="btn cta" style="height:40px">${I.play}Present</button><button class="btn ic quiet" title="Leave minimal view">${I.exitmin}</button></div>`;
+const D_MIN = desk(`<div class="title-only"><img src="${LOGO}" style="width:40px;height:40px" alt=""><h3 style="font-size:24px;font-weight:800">Grand Final<small style="font-size:15px;font-weight:600;color:var(--ink-70);margin-left:8px">Eurovision 2026</small></h3></div>
+  <div style="position:absolute;left:70px;right:70px;top:84px">${board(JURY, 48, 7, 22)}</div>
+  ${stripeManual}
+  <div class="menu" style="left:742px;bottom:92px"><div class="mh">At random</div><div class="mi hl">7 points</div><div class="mi">Germany's whole vote</div><div class="mi">All juries</div></div>
+  ${ann('Grip handle reserved for dragging in v2', 'left:300px;bottom:96px')}`);
+
+const D_RESULT = desk(`<div class="hd"><img class="logo" src="${LOGO}" alt=""><h3>Grand Final<small>Eurovision 2026</small></h3><span class="sp"></span><button class="btn ic quiet">${I.min}</button><button class="btn">${I.setup}Setup</button><button class="btn ic">${I.more}</button></div>
+  <div style="display:flex;gap:24px;padding:0 32px">
+    <div style="flex:1;min-width:0">${board(FINAL, 46, 7, 16)}</div>${resultColumn}</div>`);
+
+const P_RESULT = phone(`${phHeader(true, 'Semi-Final 1')}
+  <div style="padding:0 8px">${board(SEMI, 31, 8, 5, true)}</div>
+  <div class="sheet"><div class="grab"></div>
+    <div class="peek"><div style="flex:1"><b style="text-transform:none;font-size:16px">Semi-Final 1 is over</b><span>10 countries go through to the Grand Final</span></div><button class="btn ic">${I.chart}</button></div>
+    <button class="btn cta" style="width:100%;height:50px;margin-top:14px">Continue to Grand Final${I.arrow}</button>
+  </div>`, .64, 'Phone, semi-final over');
+
+const states = [
+  ['1. Jury voting', `The column is the spokesperson's window: the voter's flag fills it and the window grows with the screen height, the caption bar carries <b>name and “17th of 37 countries”</b>, a thin progress line sits under it. Below: the hint, the theme's own points strip, the <b>At random</b> group, then Present. Header: title, minimal view, <b>Setup (labelled, one tap)</b>, ⋯. On phones the column folds into a sheet: the peek keeps flag, name, count, a Random shortcut for the next value and the theme strip, so tapping a country and seeing the result never needs a scroll.`, D_JURY + P_JURY],
+  ['2. Secondary actions', `Desktop: ⋯ holds Undo, Restart, Share and Cancel (danger, last); the gear next to Present opens the presentation options. Phones: pulling the sheet up shows the same groups inline; ⋯ opens a quick-action sheet with 52px rows. Minimal view is reachable from both.`, D_MENUS + P_SHEET + P_QUICK],
+  ['3. Televote', `The window shows the country whose televote points are being entered, the caption says “Televote, 5th of 25”, and the row on the board carries the theme's televote highlight. The input and Vote sit where the points strip was; the limit bar shows only when “Limit manual televote points” is on. The input takes focus and Enter votes. At random becomes “Croatia” and “All countries”.`, D_TV + P_TV],
+  ['4. Presenting (show mode)', `Present hides the column and the header buttons: the board centres and grows (rows 48px instead of 46px, columns about 30% wider), the title stays as part of the picture. A floating stripe keeps the voter, the count, progress, Pause, speed and the options. Pause returns to the column layout. On phones the stripe shrinks to voter, count and Pause.`, D_SHOW + P_SHOW],
+  ['5. Minimal view, voting by hand', `Same layout as show mode, entered from the header button. The stripe carries the theme strip, an At random menu and Present; you keep tapping countries on the board. The ⤡ button leaves minimal view. The grip on the left is where dragging will attach in v2.`, D_MIN],
+  ['6. Results', `Final: the window shows the winner's flag with “Sweden wins Eurovision 2026”, then Stats, Share, the stage select and Show non-qualifiers. Semi-finals on phones: the sheet becomes the results card with Continue to Grand Final as the one filled button; Stats is an icon next to it.`, D_RESULT + P_RESULT],
+];
+document.getElementById('out').innerHTML = states.map(([t, n, f]) => `<section class="state"><h2>${t}</h2><p class="notes">${n}</p><div class="frames">${f}</div></section>`).join('');
+</script>
+</body>
+</html>

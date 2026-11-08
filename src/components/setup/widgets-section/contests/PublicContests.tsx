@@ -13,8 +13,10 @@ import { usePublicContestActions } from './hooks/usePublicContestActions';
 
 import { useContestsStateQuery, usePublicContestsQuery } from '@/api/contests';
 import Button from '@/components/common/Button';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { useQueryView } from '@/hooks/useQueryView';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
@@ -44,7 +46,7 @@ const PublicContests: React.FC<PublicContestsProps> = ({
     sortKey === 'likes' ? 'likes' : sortKey === 'saves' ? 'saves' : 'createdAt';
   const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
 
-  const { data, isLoading } = usePublicContestsQuery({
+  const publicContestsQuery = usePublicContestsQuery({
     page,
     search: debouncedSearch,
     sortBy: serverSortBy,
@@ -52,6 +54,8 @@ const PublicContests: React.FC<PublicContestsProps> = ({
     startDate: dateRange?.startDate,
     endDate: dateRange?.endDate,
   });
+  const { data } = publicContestsQuery;
+  const view = useQueryView(publicContestsQuery);
 
   const { handleLike, handleSave } = usePublicContestActions();
   const user = useAuthStore((state) => state.user);
@@ -101,14 +105,17 @@ const PublicContests: React.FC<PublicContestsProps> = ({
         />
       </div>
 
-      <h3 className="text-white text-lg font-bold">
-        {`Found ${data?.total ?? 0} contests`}
-      </h3>
+      {view === 'ready' && (
+        <h3 className="text-white text-lg font-bold">
+          {`Found ${data?.total ?? 0} contests`}
+        </h3>
+      )}
 
-      {isLoading ? (
-        <div className="text-center sm:py-12 py-8">
-          <span className="loader" />
-        </div>
+      {view !== 'ready' ? (
+        <QueryNotice
+          view={view}
+          onRetry={() => publicContestsQuery.refetch()}
+        />
       ) : data && data.contests.length > 0 ? (
         <>
           <div className="grid gap-4">

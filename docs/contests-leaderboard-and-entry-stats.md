@@ -48,7 +48,7 @@ For each **standard** country code that appears in any stage’s participants:
    - If the country has a row in that GF list:
      - **Finals** += 1.
      - **Points**: `juryPoints + televotePoints`, then **clamped** to `[LEADERBOARD_GF_MIN, LEADERBOARD_GF_MAX]` (defaults **0–1500** in `leaderboard.constants.ts`) before adding to **total** GF points and **average** (see below).
-     - **Rank**: all GF rows sorted by total points **desc**, tie-break by `code` **asc** (lexicographic).
+     - **Rank**: position in the stored `gfResults`, which are in board order (§3).
      - **Podiums / top5 / top10** from that rank.
 
 If the country participated but has **no** GF row, they get participation (+ win if applicable) but **no** finals / GF-derived stats for that contest.
@@ -108,14 +108,21 @@ Strings: `widgets.contests.leaderboard` in locale files.
 
 ### 2.2 Behaviour (high level)
 
-For each of the user’s completed contests:
+`computeEntryStats` loads the contests (newest update first) and hands them to the pure `aggregateEntryStats` (`douze-points-backend/src/contests/entry-stats.ts`, unit-tested in `entry-stats.spec.ts`). For each completed contest:
 
-1. If the entry **does not** appear in any stage’s `participants`, skip the contest.
-2. If **winner.code === entry**, increment **victories**.
-3. If there is **no** GF row for that entry → row in response with `status: 'NQ'`, still counts toward **participations** in the summary list logic (participations array length drives summary).
-4. If there **is** a GF row → **finals**++, compute rank (same sort as leaderboard: points desc, `code` asc), append `status: 'FINAL'`, `gfRank`, `gfPoints` (raw sum — **not** clamped in this path; see note below).
+1. If `contest.hostingCountryCode === entry`, the contest goes into **`hostedContests`**, whether or not the entry competed (`status: 'NOT_COMPETING'` when it didn't).
+2. If the entry **does not** appear in any stage’s `participants`, it adds nothing else.
+3. If **winner.code === entry**, increment **victories**.
+4. **Semi-final**: the last stage before the GF (in `semiResults`, stage order) that lists the entry becomes `semi: { stageId, stageName, rank, size, points }`. A contest with a `semi` counts towards **semiFinals**, and towards **qualifiedFromSemis** when the entry also reached the GF.
+5. If there is **no** GF row for that entry → row in response with `status: 'NQ'` (plus `semi`), still counts toward **participations** in the summary list logic (participations array length drives summary).
+6. If there **is** a GF row → **finals**++, rank = position in `gfResults` (board order, §3), append `status: 'FINAL'`, `gfRank`, `gfPoints` (raw sum — **not** clamped in this path; see note below) and `gfSize` (entries in that final). Without a `semi` in a contest that has semi-finals, the row is **`preQualified`** (host, Big 5, any direct qualifier); in a final-only contest it is neither.
+7. **Jury/televote split** (only when the GF's `gfVotingMode` is `JURY_AND_TELEVOTE`): `gfJury`, `gfTelevote` and shared ranks `gfJuryRank` / `gfTelevoteRank` (1 + entries with strictly more points, so ties share a place and a "win").
 
-Summary includes: participations count, finals, victories, nul points (GF total 0), last places, best GF result.
+Summary includes: participations count, finals, victories, nul points (GF total 0), last places, **top 10** (GF rank ≤ 10), **averageRank** (mean GF rank, `null` without a final), **bestResult** and **worstResult** (lowest / highest GF rank; on ties, the first contest in the newest-first order), **semiFinals**, **qualifiedFromSemis**, **preQualified**, **juryWins**, **televoteWins**, **averageJuryRank** / **averageTelevoteRank** (over split finals, `null` without one).
+
+**Qualification rate** = `qualifiedFromSemis / semiFinals` (`—` without a semi-final). Pre-qualified entries and final-only contests don't count; before 2026-11 it was finals ÷ participations, which gave Big 5 countries and final-only contests 100%. The personal leaderboard uses the same definition (`semiFinals` / `qualifiedFromSemis` on `MyLeaderboardRow`, from `semiQualifications()`), and its `qualifyingStreak` likewise only walks contests where the entry competed in a semi-final. Contests whose stored stats predate version 2 are left out of the leaderboard's qualification numbers until the backfill runs.
+
+**Streaks are computed on the frontend** (`computeEntryStreaks` in `eurovision-scoreboard/src/helpers/entryStats.ts`), because they depend on the display order (`sortContestsNewestFirst`: year, then contest creation time, then name): current and longest qualifying streak, longest run without a final, longest top-10 run, longest win streak. Qualifying and non-qualifying runs only see rows with a `semi`; pre-qualified contests neither extend nor break them.
 
 **Note:** Entry stats use **raw** `juryPoints + televotePoints` for display and nul/last-place checks; the **leaderboard** clamps GF for **aggregated** avg/total to cap abuse from custom points systems. If you ever need parity, decide explicitly whether to clamp in `getMyEntryStats` too.
 
@@ -126,7 +133,8 @@ Summary includes: participations count, finals, victories, nul points (GF total 
 
 ### 2.4 Frontend
 
-- `CountryStatsModal.tsx`: loads stats when `isOpen && entryCode`, shows summary + per-contest table, **Load** loads contest + snapshot into the app via `setContestToLoad`.
+- `CountryStatsModal.tsx`: loads stats when `isOpen && entryCode`, shows the summary tiles (a tile can carry a detail line: “Most in a row” from the streaks, “N pre-qualified” under Finals, “q of s semi-finals” under the qualification rate; a fourth row of jury/televote tiles appears once a final had the split), the results chart (its tooltip adds the semi-final place and jury/televote places), then the per-contest table with a Semi-final column (“#14 Semi-Final 2”, “Pre-qualified” or “—”). When the entry hosted any contest, **All contests / Hosted** tabs switch the table to `hostedContests` with a home-wins line. **Load** loads contest + snapshot into the app via `setContestToLoad`.
+- `EntryResultsChart.tsx`: grand final place per contest, oldest to newest, rank 1 at the top; non-qualifications sit in an `NQ` band and break the line; wins use the accent. Below 9px between contests it becomes a scatter of small dots. Pointer and arrow keys move a crosshair + tooltip; the table below is its table view. Shown from two participations with at least one final.
 
 Picker / entry flow lives outside this doc (widget that sets `entryCode`).
 
@@ -136,10 +144,14 @@ Strings: `widgets.contests.entryStats` in locale files.
 
 ## 3. Shared algorithm detail (GF rank)
 
-For both systems, GF ordering for rank is:
+For both systems, GF rank is the position in the stored `gfResults`, which `extractContestStats` writes in the scoreboard's order:
 
-1. Sort rows by **total points** (jury + televote) **descending**.
-2. If tied, sort by **`code` ascending** (string compare).
+1. **Total points** (jury + televote) **descending**.
+2. If tied, the contest's recorded **winner** first (so rank 1 always matches `Contest.winner`).
+3. Then **televote points** descending.
+4. Then **running order** (the order the stage's rows are saved in).
+
+Semi-final ranks use the same order without step 2. Contests whose stats predate stats version 2 still have the old points desc / `code` asc order until `npm run backfill:contest-stats -- --apply` runs (see `contest-snapshot-compression-and-stats-denormalization.md` §7b).
 
 ---
 
@@ -149,7 +161,7 @@ For both systems, GF ordering for rank is:
 - **Change GF clamp bounds**: `LEADERBOARD_GF_MIN` / `LEADERBOARD_GF_MAX` only affect **leaderboard** aggregation.
 - **Hot window size**: `PREV_YEAR_COUNT` / `NEXT_YEAR_COUNT` in `leaderboard.constants.ts`.
 - **Cron frequency**: `@Cron` on `recomputeCronSnapshots` in `LeaderboardService`.
-- **Entry stats metrics**: `contests.service.ts` `getMyEntryStats` + `EntryStatsResponse` DTO/types + `CountryStatsModal` UI.
+- **Entry stats metrics**: `entry-stats.ts` `aggregateEntryStats` (+ spec) + `EntryStatsResponse` DTO/types + `CountryStatsModal` UI. Order-dependent metrics (streaks) belong in `src/helpers/entryStats.ts` on the frontend. A metric that needs new per-contest data goes through `extractContestStats` + a `CONTEST_STATS_VERSION` bump + the backfill.
 - **Do not** confuse **platform** contest list (leaderboard) with **user-only** list (entry stats); ownership filter is the main distinction.
 
 ---
@@ -162,9 +174,10 @@ For both systems, GF ordering for rank is:
 | Hot/cold constants | `douze-points-backend/src/contests/leaderboard.constants.ts` |
 | Snapshot schema | `douze-points-backend/src/contests/schemas/leaderboard-snapshot.schema.ts` |
 | Public route | `douze-points-backend/src/contests/contests.controller.ts` (`GET leaderboard/public`) |
-| Entry stats | `douze-points-backend/src/contests/contests.service.ts` (`getMyEntryStats`) |
+| Entry stats | `douze-points-backend/src/contests/contests.service.ts` (`getMyEntryStats`, `computeEntryStats`) → `entry-stats.ts` (`aggregateEntryStats`) |
 | Public leaderboard UI | `eurovision-scoreboard/src/components/setup/widgets-section/contests/GlobalLeaderboardModal.tsx` |
-| Entry stats UI | `eurovision-scoreboard/src/components/setup/widgets-section/contests/CountryStatsModal.tsx` |
+| Entry stats UI | `eurovision-scoreboard/src/components/setup/widgets-section/contests/CountryStatsModal.tsx`, `EntryResultsChart.tsx` |
+| Entry streaks + contest order | `eurovision-scoreboard/src/helpers/entryStats.ts` |
 | API hooks | `eurovision-scoreboard/src/api/contests.ts` |
 | Public row type | `eurovision-scoreboard/src/types/publicLeaderboard.ts` |
 | Custom select (search + empty filter) | `eurovision-scoreboard/src/components/common/customSelect/CustomSelect.tsx` |

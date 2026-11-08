@@ -20,9 +20,11 @@ import {
   useMyFontsQuery,
 } from '@/api/fonts';
 import Button from '@/components/common/Button';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useQueryView } from '@/hooks/useQueryView';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { Font } from '@/types/font';
 
@@ -49,12 +51,14 @@ const MyFontsTab: React.FC<MyFontsTabProps> = ({
   const [managedId, setManagedId] = useState<string | null>(null);
   const debouncedSearch = useDebounce(search, 400);
 
-  const { data, isLoading } = useMyFontsQuery({
+  const myFontsQuery = useMyFontsQuery({
     page,
     limit: PAGE_SIZE,
     search: debouncedSearch,
     enabled: !!user,
   });
+  const { data } = myFontsQuery;
+  const view = useQueryView(myFontsQuery);
 
   if (!user) return <FontSignInPrompt />;
 
@@ -112,14 +116,14 @@ const MyFontsTab: React.FC<MyFontsTabProps> = ({
         onCreateNew={onGoToUpload}
       />
 
-      <h3 className="text-white text-lg font-bold">
-        {t('youHaveNFonts', { count: total, limit: FONT_MAX_PER_USER })}
-      </h3>
+      {view === 'ready' && (
+        <h3 className="text-white text-lg font-bold">
+          {t('youHaveNFonts', { count: total, limit: FONT_MAX_PER_USER })}
+        </h3>
+      )}
 
-      {isLoading ? (
-        <div className="text-center sm:py-12 py-8">
-          <span className="loader" />
-        </div>
+      {view !== 'ready' ? (
+        <QueryNotice view={view} onRetry={() => myFontsQuery.refetch()} />
       ) : fonts.length === 0 ? (
         <div className="text-center sm:py-10 py-6 flex flex-col items-center gap-3">
           <p className="text-white/70">

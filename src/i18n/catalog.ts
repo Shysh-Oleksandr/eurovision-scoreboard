@@ -84,6 +84,7 @@ export function deepMergeMessages(base: any, override: any): any {
  * - `widgets.profile` — AppBootstrap's login toasts (SSR'd every request)
  * - `settings.ui` — ThemeSoundVolumeHud (hook runs above its null-gate)
  * - `error` + `common` — app/error.tsx (error boundary can render any time)
+ * - `offline` — AppBootstrap's offline strip and network error message
  */
 export const SHELL_NAMESPACES = [
   'Metadata',
@@ -91,6 +92,7 @@ export const SHELL_NAMESPACES = [
   'error',
   'widgets.profile',
   'settings.ui',
+  'offline',
 ] as const;
 
 /** Extracts a subset of dotted namespace paths, preserving nesting. */

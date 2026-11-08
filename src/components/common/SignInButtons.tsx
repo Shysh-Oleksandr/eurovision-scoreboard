@@ -6,8 +6,10 @@ import Button from './Button';
 
 import AppleIcon from '@/assets/icons/AppleIcon';
 import GoogleIcon from '@/assets/icons/GoogleIcon';
+import { OfflineNotice } from '@/components/offline/OfflineNotice';
 import { PRIVACY_POLICY_URL, TERMS_OF_USE_URL } from '@/helpers/shareUrl';
 import { nativePlatform } from '@/native/platform';
+import { useIsOffline } from '@/state/connectivityStore';
 import { openEmailSignIn } from '@/state/emailSignInStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -26,12 +28,19 @@ const legalLinkClass = 'underline hover:text-white transition-colors';
  * smaller one (Apple's HIG). Email opens the code dialog
  * (`EmailSignInModal`). Signing in creates the account, so the Terms of Use
  * (which forbid objectionable content, App Store guideline 1.2) are agreed
- * to here.
+ * to here. Offline, every sign-in would fail, so it says when it'll work
+ * instead.
  */
 const SignInButtons = ({ size }: Props) => {
   const t = useTranslations('widgets.profile');
+  const tOffline = useTranslations('offline');
   const { login, isSigningIn } = useAuthStore();
+  const offline = useIsOffline();
   const iconClass = size ? 'size-5 flex-none' : 'w-6 h-6 flex-none';
+
+  if (offline) {
+    return <OfflineNotice message={tOffline('signIn')} className="py-2" />;
+  }
 
   return (
     <div className="flex flex-col items-center gap-3">

@@ -15,10 +15,12 @@ import { useThemesStateQuery } from '@/api/themes';
 import { useUserContentQuery } from '@/api/userContent';
 import type { UserContentType } from '@/api/userContent';
 import Button from '@/components/common/Button';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { CloudGrid } from '@/graphics/components/CloudDesignCards';
 import { parseDesign } from '@/graphics/model/design';
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useQueryView } from '@/hooks/useQueryView';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
@@ -59,7 +61,7 @@ const UserContentSection: React.FC<UserContentSectionProps> = ({
       : 'createdAt';
   const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
 
-  const { data, isLoading } = useUserContentQuery(userId, {
+  const contentQuery = useUserContentQuery(userId, {
     page,
     type: contentType,
     search: debouncedSearch,
@@ -68,6 +70,8 @@ const UserContentSection: React.FC<UserContentSectionProps> = ({
     startDate: dateRange?.startDate ?? undefined,
     endDate: dateRange?.endDate ?? undefined,
   });
+  const { data } = contentQuery;
+  const view = useQueryView(contentQuery);
 
   const themeActions = usePublicThemeActions();
   const contestActions = usePublicContestActions();
@@ -143,14 +147,14 @@ const UserContentSection: React.FC<UserContentSectionProps> = ({
         />
       </div>
 
-      <h3 className="text-white text-lg font-bold">
-        {t('widgets.foundNItems', { count: data?.total ?? 0 })}
-      </h3>
+      {view === 'ready' && (
+        <h3 className="text-white text-lg font-bold">
+          {t('widgets.foundNItems', { count: data?.total ?? 0 })}
+        </h3>
+      )}
 
-      {isLoading ? (
-        <div className="text-center sm:py-12 py-8">
-          <span className="loader" />
-        </div>
+      {view !== 'ready' ? (
+        <QueryNotice view={view} onRetry={() => contentQuery.refetch()} />
       ) : data && data.items.length > 0 ? (
         <>
           <div className="grid gap-4">

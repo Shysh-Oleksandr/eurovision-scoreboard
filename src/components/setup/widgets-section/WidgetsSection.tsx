@@ -8,6 +8,7 @@ import GraphicsWidget from './graphics/GraphicsWidget';
 
 import { useMyProfileSummaryQuery } from '@/api/profiles';
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 /**
@@ -27,7 +28,9 @@ const WidgetsSection = () => {
   const step = useFitStep(rowRef, LIBRARY_STEPS, { targets: '.dp-lib-head' });
   const user = useAuthStore((state) => state.user);
   const { data: summary, isPending } = useMyProfileSummaryQuery(!!user);
-  const statLoading = !!user && isPending;
+  // Offline the counts can't load: show the names alone, not a skeleton.
+  const offline = useIsOffline();
+  const statLoading = !!user && isPending && !offline;
   const themesFirst = summary
     ? t('themes.customCount', { count: summary.customThemesCount })
     : undefined;

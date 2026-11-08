@@ -34,6 +34,7 @@ import UserInfo from '@/components/common/UserInfo';
 import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -80,6 +81,8 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
   const t = useTranslations();
 
   const user = useAuthStore((state) => state.user);
+  // Editing saves to the account; likes and saves are account actions.
+  const offline = useIsOffline();
   const setSelectedShareTheme = useGeneralStore(
     (state) => state.setSelectedShareTheme,
   );
@@ -401,8 +404,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                   <button
                     type="button"
                     onClick={() => onEdit(theme)}
-                    className={secondaryActionClassName}
+                    disabled={offline}
+                    className={`${secondaryActionClassName} disabled:opacity-40 disabled:cursor-not-allowed`}
                     aria-label={t('common.edit')}
+                    title={offline ? t('offline.needsConnection') : undefined}
                   >
                     <PencilIcon className="size-[19px]" />
                   </button>
@@ -414,7 +419,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                     <button
                       type="button"
                       onClick={() => onLike?.(theme._id)}
-                      disabled={!user}
+                      disabled={!user || offline}
                       className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                         likedByMe
                           ? 'text-white border-transparent'
@@ -442,7 +447,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                     <button
                       type="button"
                       onClick={() => onSave?.(theme._id, savedByMe ?? false)}
-                      disabled={!user}
+                      disabled={!user || offline}
                       className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                         savedByMe
                           ? 'text-white border-transparent'

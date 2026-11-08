@@ -33,6 +33,81 @@ export class ApiError extends Error {
   }
 }
 
+let networkErrorMessage =
+  'Couldn’t reach DouzePoints. Check your connection and try again.';
+
+/** The translated text a `NetworkError` carries (set by AppBootstrap). */
+export function setNetworkErrorMessage(message: string) {
+  networkErrorMessage = message;
+}
+
+/**
+ * The request never got an answer: no connection, a timeout, DNS or CORS.
+ * Status 0, as the codebase already modelled network failures, and the
+ * message sits where call sites read the server's (`response.data.message`),
+ * so their error toasts say what happened without each handling it.
+ */
+export class NetworkError extends ApiError {
+  constructor(cause?: unknown) {
+    super(0, { message: networkErrorMessage });
+    this.name = 'NetworkError';
+    this.message = 'Network request failed';
+    if (cause !== undefined) (this as { cause?: unknown }).cause = cause;
+  }
+}
+
+/** True for a request that never got an answer (see `NetworkError`). */
+export function isNetworkError(error: unknown): boolean {
+  return error instanceof ApiError && error.response.status === 0;
+}
+
+/**
+ * The connectivity store (`src/state/connectivityStore.ts`) hears about every
+ * request: answers mean the API is reachable, failures make it check. While
+ * it knows the app is offline, requests fail at once instead of waiting out
+ * a timeout.
+ */
+export interface NetworkReporter {
+  isKnownOffline: () => boolean;
+  onSuccess: () => void;
+  onFailure: () => void;
+}
+
+let networkReporter: NetworkReporter | null = null;
+
+export function setNetworkReporter(reporter: NetworkReporter | null) {
+  networkReporter = reporter;
+}
+
+/** Reads wait at most this long for the response headers. */
+const READ_TIMEOUT_MS = 20_000;
+/** Writes carry bodies (contest snapshots) that take longer on a slow link. */
+const WRITE_TIMEOUT_MS = 60_000;
+
+async function send(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
+): Promise<Response> {
+  if (networkReporter?.isKnownOffline()) throw new NetworkError();
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(url, { ...init, signal: controller.signal });
+
+    networkReporter?.onSuccess();
+
+    return res;
+  } catch (error) {
+    networkReporter?.onFailure();
+    throw new NetworkError(error);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 let accessTokenGetter: (() => string | null) | null = null;
 let refreshFn: (() => Promise<string | undefined>) | null = null;
 let refreshPromise: Promise<string | undefined> | null = null;
@@ -114,17 +189,21 @@ async function request<T>(
     headers.set('authorization', `Bearer ${token}`);
   }
 
-  const res = await fetch(buildUrl(url, config?.params), {
-    method,
-    headers,
-    credentials: 'include',
-    body:
-      body === undefined
-        ? undefined
-        : body instanceof FormData
-        ? body
-        : JSON.stringify(body),
-  });
+  const res = await send(
+    buildUrl(url, config?.params),
+    {
+      method,
+      headers,
+      credentials: 'include',
+      body:
+        body === undefined
+          ? undefined
+          : body instanceof FormData
+          ? body
+          : JSON.stringify(body),
+    },
+    method === 'GET' ? READ_TIMEOUT_MS : WRITE_TIMEOUT_MS,
+  );
 
   if (!res.ok) {
     // Decide about the refresh before touching the body: a 401 that will be
@@ -148,12 +227,22 @@ async function request<T>(
       return request<T>(method, url, body, config, { token: freshToken });
     }
 
-    throw new ApiError(res.status, await parseBody(res));
+    throw new ApiError(res.status, await readBody(res));
   }
 
-  const data = (await parseBody(res)) as T;
+  const data = (await readBody(res)) as T;
 
   return { data, status: res.status, headers: res.headers };
+}
+
+/** `parseBody`, with a connection lost mid-body as a `NetworkError`. */
+async function readBody(res: Response): Promise<any> {
+  try {
+    return await parseBody(res);
+  } catch (error) {
+    networkReporter?.onFailure();
+    throw new NetworkError(error);
+  }
 }
 
 export interface UploadProgress {
@@ -193,6 +282,10 @@ function upload<T>(
   config: ApiUploadConfig | undefined,
   retry?: { token: string | undefined },
 ): Promise<ApiResponse<T>> {
+  if (networkReporter?.isKnownOffline()) {
+    return Promise.reject(new NetworkError());
+  }
+
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
 
@@ -212,7 +305,10 @@ function upload<T>(
       });
     };
 
-    xhr.onerror = () => reject(new ApiError(0, null));
+    xhr.onerror = () => {
+      networkReporter?.onFailure();
+      reject(new NetworkError());
+    };
     xhr.onabort = () =>
       reject(new DOMException('Upload aborted', 'AbortError'));
     config?.signal?.addEventListener('abort', () => xhr.abort(), {
@@ -220,6 +316,7 @@ function upload<T>(
     });
 
     xhr.onload = () => {
+      networkReporter?.onSuccess();
       const { status } = xhr;
       const contentType = xhr.getResponseHeader('content-type') || '';
       let data: any = xhr.responseText || null;

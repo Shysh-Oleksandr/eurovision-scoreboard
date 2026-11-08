@@ -31,9 +31,12 @@ import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import SignInButtons from '@/components/common/SignInButtons';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import UserResourceGroupModal from '@/components/setup/UserResourceGroupModal';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useQueryView } from '@/hooks/useQueryView';
+import { useIsOffline } from '@/state/connectivityStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
@@ -63,6 +66,7 @@ const UserContests: React.FC<UserContestsProps> = ({
 }) => {
   const t = useTranslations();
   const user = useAuthStore((state) => state.user);
+  const offline = useIsOffline();
   const activeContest = useGeneralStore((state) => state.activeContest);
   const setActiveContest = useGeneralStore((state) => state.setActiveContest);
 
@@ -143,12 +147,15 @@ const UserContests: React.FC<UserContestsProps> = ({
       ? savedContestsQuery.data
       : undefined;
 
-  const isListLoading =
+  const activeListQuery =
     view === 'yours'
-      ? myContestsQuery.isLoading
+      ? myContestsQuery
       : view === 'saved'
-      ? savedContestsQuery.isLoading
-      : false;
+      ? savedContestsQuery
+      : null;
+  const listView = useQueryView(
+    activeListQuery ?? { data: null, status: 'success', fetchStatus: 'idle' },
+  );
 
   const contestIdsForState =
     view === 'current' && activeContest
@@ -287,11 +294,13 @@ const UserContests: React.FC<UserContestsProps> = ({
         />
       </div>
     ) : null;
-  } else if (isListLoading) {
+  } else if (listView !== 'ready') {
     content = (
-      <div className="text-center py-8">
-        <span className="loader" />
-      </div>
+      <QueryNotice
+        view={listView}
+        onRetry={() => activeListQuery?.refetch()}
+        className="py-8"
+      />
     );
   } else if (contestsOnPage.length > 0) {
     content = (
@@ -441,8 +450,11 @@ const UserContests: React.FC<UserContestsProps> = ({
 
       {view !== 'current' && (
         <div className="space-y-1">
-          {!(isListLoading && listData === undefined) && (
+          {listView === 'ready' && (
             <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
+          )}
+          {listView === 'ready' && offline && (
+            <p className="text-xs text-white/55">{t('offline.cachedCopy')}</p>
           )}
           <WidgetSortBadges
             value={sortKey}

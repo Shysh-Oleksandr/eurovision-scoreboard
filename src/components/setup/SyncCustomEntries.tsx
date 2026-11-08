@@ -37,10 +37,13 @@ export const SyncCustomEntries: React.FC = () => {
       ];
 
       useCountriesStore.setState({ customCountries });
-    } else {
-      // User is not authenticated or has no entries
+    } else if (!user) {
+      // Signed out: only a loaded contest's imported entries remain.
       useCountriesStore.setState({ customCountries: importedCustomEntries });
     }
+    // Signed in without the list yet (loading, offline, or the request
+    // failed): keep the persisted entries, or line-ups lose their names and
+    // flags until the list arrives.
   }, [customEntries, user, importedCustomEntries]);
 
   return null;

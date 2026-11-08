@@ -10,7 +10,9 @@ import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import UserInfo from '@/components/common/UserInfo';
+import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useQueryView } from '@/hooks/useQueryView';
 import type { ThemeCreator } from '@/types/customTheme';
 
 interface FollowersModalProps {
@@ -37,11 +39,13 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
     }
   }, [isOpen]);
 
-  const { data, isLoading } = useFollowersQuery(userId, {
+  const followersQuery = useFollowersQuery(userId, {
     page,
     search: debouncedSearch || undefined,
     enabled: isOpen,
   });
+  const { data } = followersQuery;
+  const view = useQueryView(followersQuery);
 
   return (
     <Modal
@@ -65,14 +69,18 @@ const FollowersModal: React.FC<FollowersModalProps> = ({
           placeholder={t('common.searchPlaceholder')}
         />
 
-        <p className="text-white/70 text-sm">
-          {t('widgets.foundNItems', { count: data?.total ?? 0 })}
-        </p>
+        {view === 'ready' && (
+          <p className="text-white/70 text-sm">
+            {t('widgets.foundNItems', { count: data?.total ?? 0 })}
+          </p>
+        )}
 
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <span className="loader" />
-          </div>
+        {view !== 'ready' ? (
+          <QueryNotice
+            view={view}
+            onRetry={() => followersQuery.refetch()}
+            className="py-12"
+          />
         ) : data && data.items.length > 0 ? (
           <>
             <div className="flex flex-col gap-1">
