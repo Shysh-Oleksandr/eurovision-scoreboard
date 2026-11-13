@@ -381,6 +381,13 @@ to start Google sign-in with a readable error. Debug SHA-1:
 `cd android && ./gradlew signingReport`. Android needs a Google account on
 the device or emulator.
 
+Never pass `scopes` to the Google login on Android. `MainActivity` is not
+the plugin's `ModifiedMainActivityForSocialLoginPlugin`, so any `scopes`
+make the plugin reject at once ("You CANNOT use scopes without modifying the
+main activity"): no account sheet, just the login-error toast. The defaults
+(openid, email, profile) are all the ID token needs. Android Google sign-in
+failed this way in store builds 1.0–1.2 until the JS fix of 2026-11-11.
+
 **Sign in with Apple** (added 2026-10-10; App Store guideline 4.8 requires
 it next to Google). `SignInButtons` (`src/components/common/`) shows
 "Continue with Apple" on the website and in the iOS app, and hides it in the

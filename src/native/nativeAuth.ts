@@ -106,11 +106,19 @@ const isCancellation = (error: unknown) =>
 export async function getGoogleIdToken(): Promise<string | null> {
   await ensureGoogle();
   const { SocialLogin } = await loadSocialLogin();
+  const { Capacitor } = await import('@capacitor/core');
 
   try {
     const { result } = await SocialLogin.login({
       provider: 'google',
-      options: { scopes: ['email', 'profile'] },
+      // Android: any `scopes` makes the plugin reject before the account
+      // sheet opens ("You CANNOT use scopes without modifying the main
+      // activity"), and its defaults (openid, email, profile) are all an ID
+      // token needs. iOS keeps the scopes it shipped with.
+      options:
+        Capacitor.getPlatform() === 'android'
+          ? {}
+          : { scopes: ['email', 'profile'] },
     });
     const idToken = result.responseType === 'online' ? result.idToken : null;
 
