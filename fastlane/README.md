@@ -125,7 +125,7 @@ Promotes internal testing to production (review): android promote [build:3] [rol
 [bundle exec] fastlane android screenshots
 ```
 
-Uploads the screenshots (phone, 7″ and 10″ tablet): android screenshots [locales:en,fr]
+Uploads the screenshots (phone, 7″ and 10″ tablet) and the feature graphic: android screenshots [locales:en,fr]
 
 ### android metadata
 
