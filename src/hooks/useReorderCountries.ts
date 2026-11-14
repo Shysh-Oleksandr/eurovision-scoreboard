@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
+
 import { Country } from '../models';
+
 import { useMediaQuery } from './useMediaQuery';
+
+import { useBoardLayoutOverride } from '@/components/board/BoardLayoutContext';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 
 export const MIN_COUNTRIES_FOR_3_COLUMNS = 24;
@@ -16,6 +20,8 @@ export const useReorderCountries = (
   const scoreboardMobileLayout = useGeneralStore(
     (state) => state.presentationSettings.scoreboardMobileLayout,
   );
+  const layoutOverride = useBoardLayoutOverride();
+  const overrideColumns = layoutOverride?.columns;
 
   const reorderedCountries = useMemo(() => {
     let columnCount =
@@ -23,6 +29,8 @@ export const useReorderCountries = (
 
     if (customColumnCount) {
       columnCount = customColumnCount;
+    } else if (overrideColumns) {
+      columnCount = overrideColumns;
     } else {
       if (isTablet) {
         columnCount = 2;
@@ -48,8 +56,9 @@ export const useReorderCountries = (
     const columns: Country[][] = [];
     let start = 0;
 
-    for (let col = 0; col < columnCount; col++) {
+    for (let col = 0; col < columnCount; col += 1) {
       const size = baseRowCount + (col < extra ? 1 : 0);
+
       columns[col] = countries.slice(start, start + size);
       start += size;
     }
@@ -57,8 +66,8 @@ export const useReorderCountries = (
     const reordered: Country[] = [];
     const maxRows = Math.max(...columns.map((c) => c.length));
 
-    for (let row = 0; row < maxRows; row++) {
-      for (let col = 0; col < columnCount; col++) {
+    for (let row = 0; row < maxRows; row += 1) {
+      for (let col = 0; col < columnCount; col += 1) {
         if (columns[col][row]) {
           reordered.push(columns[col][row]);
         }
@@ -71,6 +80,7 @@ export const useReorderCountries = (
     isTablet,
     isDesktop,
     customColumnCount,
+    overrideColumns,
     isVotingOver,
     scoreboardMobileLayout,
   ]);

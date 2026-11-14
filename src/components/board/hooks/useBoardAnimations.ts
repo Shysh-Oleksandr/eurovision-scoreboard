@@ -38,6 +38,8 @@ const TELEPORT_FLIP_PHASE_DURATION_MS = 380;
 const TELEPORT_IN_START_DELAY_MS = 40;
 const TELEPORT_OUT_START_DELAY_MS = 16;
 const TELEPORT_START_DELAY_MS = 0;
+/** Host layouts: the longest the board waits hidden for its entrance. */
+const APPEAR_FALLBACK_MS = 1500;
 const COUNT_UP_DURATION_MS = 600; // must match CountUp duration in PointsSection
 const PHASE_OVERLAP_RATIO = 0.7;
 
@@ -141,6 +143,14 @@ const areOrdersEqual = (left: string[], right: string[]) => {
   return left.every((code, index) => code === right[index]);
 };
 
+const haveSameCodes = (left: string[], right: string[]) => {
+  if (left.length !== right.length) return false;
+
+  const codes = new Set(right);
+
+  return left.every((code) => codes.has(code));
+};
+
 const sortBottomToTopByOrder = (codes: string[], order: string[]) => {
   return [...codes].sort((leftCode, rightCode) => {
     return order.indexOf(rightCode) - order.indexOf(leftCode);
@@ -162,6 +172,11 @@ export const useBoardAnimations = (
   wasTheFirstPointsAwarded: boolean,
   isDouzePointsAwarded: boolean,
   boardItemAnimationMode: BoardItemAnimationMode,
+  /**
+   * Set by a host layout (`BoardLayoutContext`): the rows rise in one by one
+   * once it is true, instead of the whole board fading in on mount.
+   */
+  hostAppearReady?: boolean,
 ) => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
@@ -213,6 +228,15 @@ export const useBoardAnimations = (
   } | null>(null);
 
   const { id: currentStageId, isOver: isVotingOver } = getCurrentStage() || {};
+  const hasHost = hostAppearReady !== undefined;
+  /**
+   * Host layouts: each stage start (a new stage, a restart, the stage select,
+   * the non-qualifiers shown) is an entrance. The rows are remounted for it
+   * (`Board` keys the Flipper with it) and rise in together, whatever was on
+   * the board before.
+   */
+  const appearKey = `${currentStageId}|${startCounter}|${showAllParticipants}|${viewedStageId}`;
+  const orderEpochRef = useRef(appearKey);
 
   const countriesToRender = useMemo(() => {
     const countryMap = new Map(sortedCountries.map((c) => [c.code, c]));
@@ -528,6 +552,27 @@ export const useBoardAnimations = (
     });
     previousPointsByCodeRef.current = nextPointsByCode;
 
+    // Host layouts: a new entrance (another stage, a restart, the
+    // non-qualifiers shown) or a new line-up is not a move. The rows take
+    // their places at once and rise in together (below) instead of
+    // teleporting or sliding from where the previous board had them.
+    const isNewEntrance = orderEpochRef.current !== appearKey;
+
+    orderEpochRef.current = appearKey;
+
+    if (hasHost && (isNewEntrance || !haveSameCodes(newOrder, currentOrder))) {
+      animationRunIdRef.current += 1;
+      isTeleportCycleRunningRef.current = false;
+      queuedTeleportUpdateRef.current = null;
+      clearPendingAnimations();
+      clearAllTeleportItemStyles();
+      setBoardTeleportAnimationRunning(false);
+      displayOrderRef.current = newOrder;
+      setDisplayOrder(newOrder);
+
+      return;
+    }
+
     if (areOrdersEqual(newOrder, currentOrder)) {
       if (
         boardItemAnimationMode === 'teleport' &&
@@ -592,6 +637,8 @@ export const useBoardAnimations = (
     }, flipMoveDelay);
   }, [
     sortedCountries,
+    hasHost,
+    appearKey,
     flipMoveDelay,
     boardItemAnimationMode,
     clearAllTeleportItemStyles,
@@ -663,6 +710,9 @@ export const useBoardAnimations = (
 
   useGSAP(
     () => {
+      // A host plays its own entrance once it has sized the board (below).
+      if (hasHost) return;
+
       gsap.fromTo(
         containerRef.current,
         {
@@ -688,6 +738,106 @@ export const useBoardAnimations = (
     },
   );
 
+  // Host layouts: the board stays hidden while the host fits it (column
+  // count, row height, zoom), then the rows rise into place top to bottom.
+  // Once per stage start, like the fade above; relayouts after that (a
+  // resize, the minimal view) just snap.
+  const appearedKeyRef = useRef<string | null>(null);
+  const appearKeyRef = useRef(appearKey);
+  /** When the running entrance ends (performance.now() ms). */
+  const entranceEndsAtRef = useRef(0);
+
+  appearKeyRef.current = appearKey;
+
+  /**
+   * The entrance is pending or playing. No FLIP moves meanwhile: right after
+   * a stage change the rows a stage shares with the previous one (the
+   * qualifiers) would otherwise slide from their old places to the new ones
+   * instead of rising in with the rest, and GSAP would freeze the slide's
+   * offset into the rise.
+   */
+  const isEntranceActive = useCallback(
+    () =>
+      hasHost &&
+      (appearedKeyRef.current !== appearKeyRef.current ||
+        performance.now() < entranceEndsAtRef.current),
+    [hasHost],
+  );
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+
+    if (!hasHost || !container || appearedKeyRef.current === appearKey) {
+      return undefined;
+    }
+
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>(':scope > div > *'),
+    );
+    // Right after an entrance starts the rows still follow the previous
+    // board's order for a render or two (the display order and
+    // `finalCountries` catch up in effects); wait until they show the new
+    // line-up in its new order.
+    const rowsReady =
+      rows.length > 0 &&
+      areOrdersEqual(
+        displayOrder,
+        sortedCountries.map((c) => c.code),
+      ) &&
+      finalCountries === reorderedCountries;
+
+    if (!hostAppearReady || !rowsReady) {
+      container.style.opacity = '0';
+
+      // Never leave the board hidden if the host or the rows never settle.
+      const fallback = window.setTimeout(() => {
+        appearedKeyRef.current = appearKey;
+        container.style.opacity = '';
+      }, APPEAR_FALLBACK_MS);
+
+      return () => window.clearTimeout(fallback);
+    }
+
+    appearedKeyRef.current = appearKey;
+    container.style.opacity = '';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return undefined;
+    }
+
+    // The whole cascade takes about 0.4 s, however long the line-up.
+    const stagger = Math.min(0.035, 0.4 / rows.length);
+    const duration = 0.55;
+
+    entranceEndsAtRef.current =
+      performance.now() + (duration + stagger * (rows.length - 1)) * 1000;
+
+    gsap.fromTo(
+      rows,
+      // `x: 0`: never carry over a horizontal offset left on a row.
+      { opacity: 0, x: 0, y: 14 },
+      {
+        opacity: 1,
+        x: 0,
+        y: 0,
+        duration,
+        ease: 'power3.out',
+        stagger,
+        clearProps: 'opacity,transform',
+      },
+    );
+
+    return undefined;
+  }, [
+    hasHost,
+    hostAppearReady,
+    appearKey,
+    finalCountries,
+    sortedCountries,
+    displayOrder,
+    reorderedCountries,
+  ]);
+
   const [delayedSortedCountries, setDelayedSortedCountries] =
     useState(sortedCountries);
 
@@ -710,11 +860,13 @@ export const useBoardAnimations = (
 
   const shouldUseFlipAnimationForCountry = useCallback(
     (countryCode: string) => {
+      if (isEntranceActive()) return false;
+
       if (boardItemAnimationMode !== 'teleport') return true;
 
       return !teleportOnlyByCodeRef.current[countryCode];
     },
-    [boardItemAnimationMode],
+    [boardItemAnimationMode, isEntranceActive],
   );
 
   return {
@@ -726,5 +878,7 @@ export const useBoardAnimations = (
     isTeleportAnimationEnabled: boardItemAnimationMode === 'teleport',
     getItemRef,
     shouldUseFlipAnimationForCountry,
+    /** Host layouts: remount the rows per entrance (the Flipper's key). */
+    entranceKey: hasHost ? appearKey : null,
   };
 };

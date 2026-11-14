@@ -1,230 +1,29 @@
-import { useTranslations } from 'next-intl';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
-
-import {
-  getMaxPossibleTelevotePoints,
-  getTotalTelevotePoints,
-} from '../../data/data';
-import { useCountriesStore } from '../../state/countriesStore';
-import { useScoreboardStore } from '../../state/scoreboardStore';
 import Button from '../common/Button';
 import { Checkbox } from '../common/Checkbox';
 import { Input } from '../Input';
 
-import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
-import { useConfirmation } from '@/hooks/useConfirmation';
-import { useGeneralStore } from '@/state/generalStore';
+import { useTelevoteEntry } from './useTelevoteEntry';
 
-const NUMBER_REGEX = /^-?\d*$/;
+import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 
 const TelevoteInput = () => {
-  const t = useTranslations();
-  const { confirm } = useConfirmation();
-
-  const giveTelevotePoints = useScoreboardStore(
-    (state) => state.giveTelevotePoints,
-  );
-  const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
-  const televotingProgress = useScoreboardStore(
-    (state) => state.televotingProgress,
-  );
-
-  const shouldLimitManualTelevotePoints = useGeneralStore(
-    (state) => state.settings.shouldLimitManualTelevotePoints,
-  );
-  const revealTelevoteLowestToHighest = useGeneralStore(
-    (state) => state.settings.revealTelevoteLowestToHighest,
-  );
-  const _juryPointsSystem = useGeneralStore((state) => state.pointsSystem);
-  const _televotePointsSystem = useGeneralStore(
-    (state) => state.televotePointsSystem,
-  );
-  const splitPointsSystem = useGeneralStore(
-    (state) => state.settings.splitPointsSystem,
-  );
-  const pointsSystem = splitPointsSystem
-    ? _televotePointsSystem
-    : _juryPointsSystem;
-
-  const currentRevealTelevotePoints = useScoreboardStore(
-    (state) => state.currentRevealTelevotePoints,
-  );
-  const setCurrentRevealTelevotePoints = useScoreboardStore(
-    (state) => state.setCurrentRevealTelevotePoints,
-  );
-  const getNextLowestTelevoteCountry = useScoreboardStore(
-    (state) => state.getNextLowestTelevoteCountry,
-  );
-
-  const getVotingCountry = useCountriesStore((state) => state.getVotingCountry);
-  const getStageVotingCountries = useCountriesStore(
-    (state) => state.getStageVotingCountries,
-  );
-
-  const { countries } = getCurrentStage() || {};
-  const votingCountries = getStageVotingCountries(undefined, {
-    channel: 'televote',
-  });
-
-  const [enteredPoints, setEnteredPoints] = useState('');
-  const [error, setError] = useState('');
-  const [disableLimit, setDisableLimit] = useState(false);
-  const [disableLimitForShow, setDisableLimitForShow] = useState(false);
-
-  const votingCountryCode = getVotingCountry()?.code;
-
-  // Calculate televote points progress and limits
-  const televoteProgress = useMemo(() => {
-    if (!shouldLimitManualTelevotePoints) {
-      return null;
-    }
-
-    if (!countries) return null;
-
-    // Calculate total points already awarded in this stage
-    const totalAwardedPoints = countries.reduce(
-      (sum, country) => sum + country.televotePoints,
-      0,
-    );
-
-    // Calculate total available points for this stage
-    const totalAvailablePoints = getTotalTelevotePoints(
-      votingCountries.length,
-      pointsSystem,
-    );
-
-    const maxPointsPerVotingCountry = getMaxPossibleTelevotePoints(
-      votingCountries,
-      votingCountryCode ?? '',
-      pointsSystem,
-    );
-
-    return {
-      totalAwardedPoints,
-      totalAvailablePoints,
-      progressPercentage: (totalAwardedPoints / totalAvailablePoints) * 100,
-      maxPointsPerVotingCountry,
-    };
-  }, [
-    shouldLimitManualTelevotePoints,
+  const {
+    t,
     countries,
-    votingCountries,
-    pointsSystem,
-    votingCountryCode,
-  ]);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-
-    // Only allow whole numbers
-    if (NUMBER_REGEX.test(inputValue)) {
-      setError('');
-      setEnteredPoints(inputValue);
-    }
-  };
-
-  const handleVoting = () => {
-    const votingPoints = parseInt(enteredPoints);
-
-    if (isNaN(votingPoints)) {
-      setError(t('error.invalidInput'));
-
-      return;
-    }
-
-    // Validate points if limiting is enabled and limit is not disabled
-    if (
-      shouldLimitManualTelevotePoints &&
-      televoteProgress &&
-      !disableLimit &&
-      !disableLimitForShow
-    ) {
-      // Check if the current voting country would exceed their individual limit
-      if (votingPoints > televoteProgress.maxPointsPerVotingCountry) {
-        setError(
-          revealTelevoteLowestToHighest
-            ? t('simulation.maxPossibleTelevotePoints', {
-                count: televoteProgress.maxPointsPerVotingCountry,
-              })
-            : t('simulation.maxPossibleTelevotePointsForCountry', {
-                count: televoteProgress.maxPointsPerVotingCountry,
-              }),
-        );
-
-        return;
-      }
-
-      // Check if the total stage limit would be exceeded
-      if (
-        televoteProgress.totalAwardedPoints + votingPoints >
-        televoteProgress.totalAvailablePoints
-      ) {
-        setError(
-          t('simulation.totalTelevotePointsCannotExceed', {
-            count: televoteProgress.totalAvailablePoints,
-          }),
-        );
-
-        return;
-      }
-    }
-
-    // In reveal mode, update the current reveal points as the user types
-    if (revealTelevoteLowestToHighest) {
-      confirm({
-        key: 'manual-televote-warning',
-        title: t('simulation.confirmWarningTitle'),
-        description: t('simulation.manualTelevotePointsWarning'),
-        onConfirm: () => {
-          setCurrentRevealTelevotePoints(votingPoints);
-        },
-      });
-
-      return;
-    }
-
-    const vote = () => {
-      setEnteredPoints('');
-      setError('');
-      setDisableLimit(false); // Reset the limit disable state after voting
-
-      giveTelevotePoints(votingCountryCode ?? '', votingPoints);
-    };
-
-    confirm({
-      key: 'manual-televote-warning',
-      title: t('simulation.confirmWarningTitle'),
-      description: t('simulation.manualTelevotePointsWarning'),
-      onConfirm: () => {
-        vote();
-      },
-    });
-  };
-
-  useEffect(() => {
-    if (televotingProgress === 0) {
-      setDisableLimit(false);
-      setDisableLimitForShow(false);
-      setError('');
-      setEnteredPoints('');
-    }
-  }, [televotingProgress]);
-
-  useEffect(() => {
-    if (revealTelevoteLowestToHighest) {
-      const nextCountry = getNextLowestTelevoteCountry();
-
-      if (nextCountry && nextCountry.country) {
-        setCurrentRevealTelevotePoints(nextCountry.points ?? 0);
-        setEnteredPoints((nextCountry.points ?? 0).toString());
-      }
-    }
-  }, [
-    revealTelevoteLowestToHighest,
-    getNextLowestTelevoteCountry,
-    setCurrentRevealTelevotePoints,
     televotingProgress,
-  ]);
+    televoteProgress,
+    shouldLimitManualTelevotePoints,
+    revealTelevoteLowestToHighest,
+    enteredPoints,
+    error,
+    disableLimit,
+    setDisableLimit,
+    disableLimitForShow,
+    setDisableLimitForShow,
+    handleInputChange,
+    handleVoting,
+    isVoteDisabled,
+  } = useTelevoteEntry();
 
   return (
     <div className="w-full pb-1 lg:pt-3 pt-2 lg:px-4 px-3 rounded-md rounded-b-none">
@@ -298,12 +97,7 @@ const TelevoteInput = () => {
           }
           onClick={handleVoting}
           className="mt-2 ml-2 md:px-4 !px-6"
-          disabled={
-            enteredPoints === '' ||
-            (error !== '' && !disableLimit && !disableLimitForShow) ||
-            (revealTelevoteLowestToHighest &&
-              enteredPoints === currentRevealTelevotePoints?.toString())
-          }
+          disabled={isVoteDisabled}
         />
       </div>
       {error !== '' && (

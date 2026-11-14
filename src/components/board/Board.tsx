@@ -8,6 +8,7 @@ import { Country } from '../../models';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import CountryItem from '../countryItem/CountryItem';
 
+import { isBoardRelayout, useBoardLayoutOverride } from './BoardLayoutContext';
 import { useBoardAnimations } from './hooks/useBoardAnimations';
 import { useCountryDisplay } from './hooks/useCountryDisplay';
 import { useCountrySorter } from './hooks/useCountrySorter';
@@ -23,6 +24,8 @@ const Board = (): JSX.Element => {
   const scoreboardMobileLayout = useGeneralStore(
     (state) => state.presentationSettings.scoreboardMobileLayout,
   );
+  // A host layout (the column simulation view) picks the column count itself.
+  const layoutOverride = useBoardLayoutOverride();
 
   const showAllParticipants = useScoreboardStore(
     (state) => state.showAllParticipants,
@@ -87,11 +90,13 @@ const Board = (): JSX.Element => {
     containerRef,
     getItemRef,
     shouldUseFlipAnimationForCountry,
+    entranceKey,
   } = useBoardAnimations(
     sortedCountries,
     wasTheFirstPointsAwarded,
     isDouzePointsAwarded,
     boardItemAnimationMode,
+    layoutOverride?.appearReady,
   );
 
   const renderItem = useCallback(
@@ -104,7 +109,11 @@ const Board = (): JSX.Element => {
         <Flipped
           key={country.code}
           flipId={country.code}
-          shouldFlip={() => shouldUseFlipAnimationForCountry(country.code)}
+          shouldFlip={() =>
+            shouldUseFlipAnimationForCountry(country.code) &&
+            // A host relayout (columns, row size, resize) is not a move.
+            !isBoardRelayout(containerRef.current)
+          }
         >
           {(props) => (
             <CountryItem
@@ -131,6 +140,7 @@ const Board = (): JSX.Element => {
       getItemRef,
       shouldUseFlipAnimationForCountry,
       countryItemLayoutKey,
+      containerRef,
     ],
   );
 
@@ -138,20 +148,24 @@ const Board = (): JSX.Element => {
     <div className="w-full h-full">
       <div
         ref={containerRef}
+        data-cols={layoutOverride?.columns}
         className={`container-wrapping-flipper ${
           roundedCountryContainer ? 'rounded-design' : ''
         } will-change-all ${
+          !layoutOverride &&
           scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN
             ? 'two-column'
             : ''
         } ${
-          isVotingOver && finalCountries.length >= MIN_COUNTRIES_FOR_3_COLUMNS
+          !layoutOverride &&
+          isVotingOver &&
+          finalCountries.length >= MIN_COUNTRIES_FOR_3_COLUMNS
             ? 'is-over'
             : ''
         }`}
       >
         <Flipper
-          key={`${currentStageId}-${showAllParticipants}`}
+          key={entranceKey ?? `${currentStageId}-${showAllParticipants}`}
           flipKey={flipKey}
           spring={FLIP_SPRING}
           className={roundedCountryContainer ? 'gap-y-[1px]' : ''}

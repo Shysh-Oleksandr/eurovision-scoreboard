@@ -39,7 +39,7 @@ The phone reaches the Mac by its LAN IP. Get it with
 
 1. Backend: `douze-points-backend/.env` → append `http://<ip>:3000` to
    `FRONTEND_URL` (after the localhost entry; there is already a
-   `192.168.1.83` entry, update it if the IP changed). Then:
+   `192.168.1.83` entry, update it if the IP changed). Then: `npm run start:dev` in the backend terminal.
 
    ```bash
    # douze-points-backend/

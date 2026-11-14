@@ -15,12 +15,18 @@ type Props = {
   revealActive?: boolean;
   revealAnimationComplete?: boolean;
   onBackToScoreboard?: () => void;
+  /**
+   * Only the final reveal's teaser and "View scoreboard" (the column layout
+   * shows the hint, Random and the winner in its own panel).
+   */
+  revealOnly?: boolean;
 };
 
 const BoardHeader = ({
   revealActive,
   revealAnimationComplete,
   onBackToScoreboard,
+  revealOnly = false,
 }: Props): JSX.Element | null => {
   const t = useTranslations('simulation');
 
@@ -194,10 +200,14 @@ const BoardHeader = ({
     }
   };
 
-  const displayText =
-    revealActive && isVotingOver && !revealAnimationComplete
-      ? teaserText
-      : winnerText || votingText;
+  const isTeaserShown =
+    revealActive && isVotingOver && !revealAnimationComplete;
+
+  let displayText: React.ReactNode = isTeaserShown
+    ? teaserText
+    : winnerText || votingText;
+
+  if (revealOnly && !isTeaserShown) displayText = null;
 
   const hasContent =
     winnerCountry || !isVotingOver || revealActive || revealAnimationComplete;
@@ -216,7 +226,7 @@ const BoardHeader = ({
       </h3>
       {revealAnimationComplete ? (
         <Button label={t('backToScoreboard')} onClick={onBackToScoreboard} />
-      ) : !isVotingOver ? (
+      ) : !isVotingOver && !revealOnly ? (
         <Button
           variant="tertiary"
           label={t('random')}

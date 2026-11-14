@@ -30,7 +30,9 @@ The facts every answer below rests on:
   Error reports (message, stack, platform, user agent, language, screen
   size, live-update bundle, settings and scoreboard state) are **not linked
   to the user**: `POST /errors` has no auth guard, so the backend never sets
-  their `userId`.
+  their `userId`. The apps' crash reports, sent at the next launch, add what
+  the app showed, its last UI changes, device memory and CPU cores
+  ([native-apps.md](native-apps.md) §14): still Crash Data / Diagnostics.
 - **Not collected.** Analytics (`build:native` blanks the Umami ID), ads or
   advertising IDs, location, contacts, purchases, search queries (profile
   search isn't stored). Feedback goes through a `mailto:` link. The

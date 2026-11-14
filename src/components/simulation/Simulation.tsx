@@ -10,6 +10,8 @@ import Board from '../board/Board';
 import BoardHeader from '../board/BoardHeader';
 import ControlsPanel from '../controlsPanel/ControlsPanel';
 
+import SimulationColumnLayout from './columnLayout/SimulationColumnLayout';
+import { useSimLayout } from './columnLayout/useSimLayout';
 import FinalTelevoteReveal from './FinalTelevoteReveal';
 import { useReviewShowCounter } from './hooks/useReviewShowCounter';
 import { useSimulationHaptics } from './hooks/useSimulationHaptics';
@@ -177,6 +179,7 @@ const Simulation = () => {
   });
 
   const phaseTitle = usePhaseTitle();
+  const simLayout = useSimLayout();
 
   // ── Final televote reveal ─────────────────────────────────────────────────
 
@@ -245,13 +248,54 @@ const Simulation = () => {
 
   const showRevealPanel = revealData !== null;
 
+  // The column layout (in preview, see useSimLayout) covers the regular
+  // board and Pick qualifiers mode; the jury scale reveal keeps the classic
+  // one.
+  const useColumnLayout = simLayout === 'column' && !isScaleRevealActive;
+  const isPickingQualifiers = isPickQualifiersMode && isSemiFinalStage;
+
+  const celebrationModals = (
+    <>
+      {showWinnerModal && (isRevealAnimationComplete || !showRevealPanel) && (
+        <WinnerModal />
+      )}
+      {/* Picking qualifiers in the column layout, the column shows them. */}
+      {showQualificationModal && !(useColumnLayout && isPickingQualifiers) && (
+        <QualificationResultsModalGate />
+      )}
+    </>
+  );
+
+  if (useColumnLayout) {
+    return (
+      <>
+        <SimulationColumnLayout
+          mode={isPickingQualifiers ? 'qualifiers' : 'vote'}
+          revealData={revealData}
+          isRevealAnimationComplete={isRevealAnimationComplete}
+          onRevealComplete={handleRevealComplete}
+          onBackToScoreboard={handleBackToScoreboard}
+        />
+        {celebrationModals}
+        {showWinnerConfetti &&
+          (isRevealAnimationComplete || !showRevealPanel) && <WinnerConfetti />}
+      </>
+    );
+  }
+
   return (
     <>
       <div className="lg:pt-8 md:pt-6 xs:pt-4 pt-2">
         <div className="sm:w-[min(90%,1024px)] xl:w-[min(88%,1100px)] w-[93%] mx-auto lg:pb-16 md:pb-12 pb-8 lg:pt-5 sm:pt-4 pt-2">
           <SimulationHeader phaseTitle={phaseTitle} />
-          <PhaseActions />
-          {isPickQualifiersMode && isSemiFinalStage ? (
+          <PhaseActions
+            onBackToScoreboard={
+              showRevealPanel && isRevealAnimationComplete
+                ? handleBackToScoreboard
+                : undefined
+            }
+          />
+          {isPickingQualifiers ? (
             <PickQualifiersSimulation />
           ) : isScaleRevealActive ? (
             <JuryScaleRevealSimulation />
@@ -283,10 +327,7 @@ const Simulation = () => {
             </div>
           )}
 
-          {showWinnerModal &&
-            (isRevealAnimationComplete || !showRevealPanel) && <WinnerModal />}
-
-          {showQualificationModal && <QualificationResultsModalGate />}
+          {celebrationModals}
         </div>
       </div>
 

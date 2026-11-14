@@ -16,7 +16,15 @@ const FinalStatsModal = dynamic(() => import('./finalStats/FinalStatsModal'), {
   ssr: false,
 });
 
-export const PhaseActions = () => {
+interface PhaseActionsProps {
+  /**
+   * While the final reveal is still on screen: back to the board. Picking a
+   * stage or the non-qualifiers calls it too, so the board shows the change.
+   */
+  onBackToScoreboard?: () => void;
+}
+
+export const PhaseActions = ({ onBackToScoreboard }: PhaseActionsProps) => {
   const t = useTranslations('simulation.phaseActions');
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const showAllParticipants = useScoreboardStore(
@@ -89,7 +97,12 @@ export const PhaseActions = () => {
         )}
 
         {isSFAndGFEventOver && !isAnotherStageDisplayed && (
-          <Button onClick={toggleShowAllParticipants}>
+          <Button
+            onClick={() => {
+              toggleShowAllParticipants();
+              onBackToScoreboard?.();
+            }}
+          >
             {showAllParticipants ? (
               t('finalistsOnly')
             ) : (
@@ -111,6 +124,7 @@ export const PhaseActions = () => {
               setViewedStageId(
                 eventStages.find((stage) => stage.id === e.target.value)!.id,
               );
+              onBackToScoreboard?.();
             }}
             aria-label={t('selectEventStage')}
             options={eventStages.map((stage) => ({

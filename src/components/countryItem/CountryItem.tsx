@@ -19,6 +19,7 @@ import { useQualificationStatus } from './hooks/useQualificationStatus';
 import useVotingFinished from './hooks/useVotingFinished';
 import PointsSection from './PointsSection';
 
+import { useBoardLayoutOverride } from '@/components/board/BoardLayoutContext';
 import { getSpecialBackgroundStyle } from '@/components/countryItem/utils/gradientUtils';
 import {
   buildActiveTelevoteDropShadowFilter,
@@ -71,10 +72,14 @@ const CountryItem = ({
   const scoreboardMobileLayout = useGeneralStore(
     (s) => s.presentationSettings.scoreboardMobileLayout,
   );
-  const isTwoColumnLayout =
-    scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN;
+  const layoutOverride = useBoardLayoutOverride();
+  const isTwoColumnLayout = layoutOverride
+    ? layoutOverride.columns === 2
+    : scoreboardMobileLayout === ScoreboardMobileLayout.TWO_COLUMN;
 
   const shouldShowPlaceNumber = alwaysShowRankings || showPlaceAnimation;
+  // A host short of width shows a code ("NOR") in place of the name.
+  const shortCode = layoutOverride?.shortCodes?.[country.code];
 
   // One shallow-compared primitive selector so memoized items only re-render
   // when the phase actually flips, not on every store write.
@@ -307,7 +312,7 @@ const CountryItem = ({
             }}
             pointsAmount={douzePoints ?? 0}
             overrides={overrides}
-            countryName={country.name}
+            countryName={shortCode ?? country.name}
             flagClassName={flagShape !== 'none' ? flagClassName : undefined}
             nameClassName={nameClassName}
             sourceNameRef={nameRef}
@@ -332,8 +337,15 @@ const CountryItem = ({
           : undefined
       }
       renderName={() => (
-        <h4 ref={nameRef} className={nameClassName}>
-          {country.name}
+        <h4 ref={nameRef} className={nameClassName} data-entry-name="">
+          {shortCode ? (
+            <>
+              <span aria-hidden="true">{shortCode}</span>
+              <span className="sr-only">{country.name}</span>
+            </>
+          ) : (
+            country.name
+          )}
         </h4>
       )}
       renderPoints={(country) => (

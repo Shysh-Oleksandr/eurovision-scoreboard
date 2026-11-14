@@ -47,9 +47,15 @@ const FOUC_FONT_STACKS_LITERAL = JSON.stringify(
 // `black-translucent` gets an iOS 26 blur band and a bottom gap.
 // `themeColor` is the default (2026) theme's `--p-900` until the hook takes
 // over with the active theme's.
+//
+// The apps lock the scale: iOS zooms into any focused field whose text is
+// under 16px and leaves the page zoomed, and the WKWebView honours the
+// limits (it also stops pinch-zoom, which the Android WebView already has
+// off). The website keeps zoom: browsers must let people pinch.
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  ...(IS_NATIVE_APP && { maximumScale: 1, userScalable: false }),
   viewportFit: 'cover',
   themeColor: '#544113',
 };

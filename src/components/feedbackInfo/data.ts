@@ -413,6 +413,11 @@ const OLD_WHATS_NEW = [
 
 const WEBSITE_UPDATES: UpdateItem[] = [
   {
+    date: '2026-11-14',
+    title:
+      '<list><item>Redesigned the simulation UI</item><item>Added the Eurovision Asia 2026 data</item><item>Offline support for the mobile app</item><item>More contest entry stats</item><item>Bug fixes & small improvements</item></list>',
+  },
+  {
     date: '2026-11-01',
     title: 'Redesigned the setup menu',
   },
@@ -529,14 +534,22 @@ export function insertByDate(
 export const WHATS_NEW = insertByDate(WEBSITE_UPDATES, APP_RELEASE_UPDATE);
 
 export const UPCOMING_FEATURES: UpdateItem[] = [
-  ...(APP_STORES_LIVE
-    ? []
-    : [
-        {
-          approximateDates: { start: '2026-11-02', end: '2026-11-06' },
-          title: 'Mobile app for iOS and Android',
-        },
-      ]),
+  {
+    approximateDates: { start: '2026-11-15', end: '2026-11-16' },
+    title: 'Eurovision Asia 2026 theme',
+  },
+  {
+    approximateDates: { start: '2026-11-15', end: '2026-11-22' },
+    title: 'Eurovision Asia 2026 winner reveal animation',
+  },
+  {
+    approximateDates: { start: '2026-11-21', end: '2026-11-22' },
+    title: "Override the country's official flag and name",
+  },
+  {
+    approximateDates: { start: '2026-11-21', end: '2026-11-22' },
+    title: 'Hotkeys support on desktop',
+  },
   {
     approximateDates: { start: '2026-10-10', end: '2026-10-18' },
     title: 'Graphics improvements',

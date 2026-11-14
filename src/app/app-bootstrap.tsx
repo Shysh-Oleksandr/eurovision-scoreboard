@@ -202,6 +202,11 @@ export default function AppBootstrap() {
   useEffect(() => {
     if (!IS_NATIVE_APP) return;
 
+    // Reports a previous session that crashed; first, so a crash later in
+    // this launch still finds the record (docs/native-apps.md §14).
+    void import('@/native/crashWatch').then(({ startCrashWatch }) =>
+      startCrashWatch(),
+    );
     void installBackButtonHandler();
     void installAppLinkHandler(openShareLink);
     startLiveUpdateChecks();

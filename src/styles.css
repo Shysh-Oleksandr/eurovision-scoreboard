@@ -860,6 +860,98 @@ html:root {
   }
 }
 
+/*
+ * Column simulation layout (src/components/simulation/columnLayout): the host
+ * picks the column count (`BoardLayoutContext`), so it wins over the
+ * viewport rules above, and rows fill their track instead of the fluid
+ * 14-26rem width (the board is scaled as a whole on wide screens).
+ */
+.container-wrapping-flipper[data-cols='1'] > div {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.container-wrapping-flipper[data-cols='2'] > div {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.container-wrapping-flipper[data-cols='3'] > div {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.container-wrapping-flipper[data-cols] > div > .dp-scoreboard-font {
+  width: auto;
+  min-width: 0;
+}
+
+/* Phones, two columns (BoardStage): a name too long for its half-width row
+   takes two lines at the theme's size instead of shrinking; one that still
+   can't fit (a long single word, two columns asked for) ends in an
+   ellipsis. Auto picks one column before that happens. */
+.dp-sim-board[data-names='wrap'] :is([data-entry-name], [data-douze-name]) {
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  text-overflow: ellipsis;
+  line-height: 1.05;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* …or, two columns asked for, short codes ("NOR") when a name doesn't fit:
+   never cut, a code may run into the name's right margin (the name strip
+   still clips), so three letters fit even on a 360px phone. */
+.dp-sim-board[data-names='code'] :is([data-entry-name], [data-douze-name]) {
+  overflow: visible;
+  text-overflow: clip;
+  margin-left: 0.25rem;
+}
+
+/* Two columns on a phone: the rounded points cell gets room for three
+   digits. */
+@media (width < 480px) {
+  .dp-sim-board .container-wrapping-flipper[data-cols='2'] [data-points-current] {
+    width: 3.2rem;
+  }
+
+  .dp-sim-board .container-wrapping-flipper[data-cols='2'] [data-points-track] {
+    width: calc(2.2rem + 3.2rem - 0.4rem);
+  }
+}
+
+/* Phones: rows grow into the height left over (bigger tap targets) as far
+   as the flags keep their shape (--sim-flag-w, measured); the rest becomes
+   spacing between rows. The place badge grows with its row, in both
+   directions, so a round one stays a circle (`min-width` beats its inline
+   width; a wider tablet badge keeps its width). */
+.dp-sim-board[data-tall] .container-wrapping-flipper > div {
+  row-gap: var(--sim-row-gap, 1px);
+}
+
+.dp-sim-board[data-tall] .container-wrapping-flipper > div > .dp-scoreboard-font > button,
+.dp-sim-board[data-tall] .container-wrapping-flipper > div > .dp-scoreboard-font > div:first-child {
+  height: var(--sim-row-h);
+}
+
+.dp-sim-board[data-tall] .container-wrapping-flipper > div > .dp-scoreboard-font > div:first-child {
+  min-width: var(--sim-row-h);
+}
+
+/* Phones (the board has `data-names` only there): a rounded theme's place
+   badge is a circle at any row height, never a pill (its inline width is
+   the classic tablet one). */
+.dp-sim-board[data-names] .container-wrapping-flipper > div > .dp-scoreboard-font > div:first-child[class~='!rounded-full'] {
+  width: auto !important;
+  aspect-ratio: 1;
+}
+
+.dp-sim-board[data-tall] .container-wrapping-flipper > div > .dp-scoreboard-font > button img:not(.rounded-full),
+.dp-sim-board[data-tall] [data-douze-flag]:not(.rounded-full) {
+  flex-shrink: 0;
+  width: var(--sim-flag-w, auto);
+  max-width: none;
+  height: 100%;
+}
+
 @layer utilities {
   /* Webkit browsers */
   ::-webkit-scrollbar {
@@ -1666,6 +1758,18 @@ html:root {
   .voter-channel-badge--jury .voter-channel-badge-short {
     display: inline;
   }
+}
+
+/*
+ * Column simulation layout (the [data-cols] rules above): a relayout
+ * (column count, row size, a window resize: BoardStage `useRelayoutFlags`)
+ * snaps the rows into place: no row transitions, and Board skips FLIP
+ * moves. Also how the phone fit measures rows at rest. After the
+ * `.checkbox-wrapper *` rules (selector order).
+ */
+.dp-sim-board:is([data-relayout], [data-resizing]) .container-wrapping-flipper > div > .dp-scoreboard-font,
+.dp-sim-board:is([data-relayout], [data-resizing]) .container-wrapping-flipper > div > .dp-scoreboard-font * {
+  transition: none !important;
 }
 
 /* ==========================================================================
@@ -2883,5 +2987,294 @@ html:root {
   .dp-ro-divider--first::after {
     height: 1px;
     background: var(--hair);
+  }
+
+  /* ---------- Simulation, column layout (columnLayout/) ----------
+     The board is the stage; this chrome stays flat: one tonal surface per
+     panel, hairlines, the accent only on Present / Vote / Continue. Floating
+     pieces (sheet, stripe, popovers) are the only ones with a shadow. */
+  .dp-sim .dp-act:not(.is-on) {
+    box-shadow: none;
+  }
+
+  .dp-sim-panel {
+    background: var(--p-950);
+    border: 1px solid var(--hair);
+  }
+
+  /* Desktop column: folds away (width, then opacity) while the final reveal
+     runs and unfolds with the results after it. */
+  .dp-sim-col {
+    width: var(--sim-col-w);
+    margin-left: 1.5rem;
+    transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1),
+      margin-left 0.5s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.3s ease-out;
+  }
+
+  .dp-sim-col.is-folded {
+    width: 0;
+    margin-left: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .dp-sim-col:not(.is-folded) {
+    transition-delay: 0s, 0s, 0.2s;
+  }
+
+  .dp-sim-window {
+    background: color-mix(in oklch, var(--p-950) 55%, black);
+  }
+
+  .dp-sim-window-img {
+    animation: dp-sim-flag-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .dp-sim-caption {
+    background: var(--p-900);
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-sim-progress {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  .dp-sim-progress > i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease-out;
+  }
+
+  /* The minimal stripe's progress: a hairline along its top edge, quieter
+     than the column's bar since it sits right under the board. */
+  .dp-sim-edge-progress {
+    background: rgb(255 255 255 / 6%);
+  }
+
+  .dp-sim-edge-progress > i {
+    display: block;
+    height: 100%;
+    background: color-mix(in oklch, var(--accent) 75%, transparent);
+    transition: width 0.3s ease-out;
+  }
+
+  .dp-sim-float {
+    background: var(--p-950);
+    border: 1px solid var(--hair-2);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 50%);
+  }
+
+  .dp-sim-sheet {
+    background: var(--p-950);
+    border-top: 1px solid var(--hair-2);
+    box-shadow: 0 -12px 36px rgb(0 0 0 / 42%);
+    transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* The sheet's controls: height in px from VotingSheet (0 closed). */
+  .dp-sim-sheet-body {
+    transition: height 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .dp-sim-grab {
+    background: rgb(255 255 255 / 30%);
+  }
+
+  .dp-sim-scrim {
+    background: rgb(0 0 0 / 40%);
+    animation: dp-sim-fade-in 0.2s ease-out both;
+
+    /* Follows a drag of the sheet, then settles with it. */
+    transition: opacity 0.26s ease-out;
+  }
+
+  .dp-sim-seg {
+    background: rgb(0 0 0 / 25%);
+    border: 1px solid var(--hair);
+  }
+
+  .dp-sim-seg > button.is-on {
+    background: var(--p-750);
+    color: var(--ink);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .dp-sim-range,
+  .dp-sim-check {
+    accent-color: var(--accent);
+  }
+
+  /* The televote field: a frame around a bare input (and the running count
+     next to it), so the focus ring goes on the frame. */
+  .dp-sim-input {
+    background: rgb(0 0 0 / 28%);
+    border: 1px solid var(--hair-2);
+  }
+
+  .dp-sim-input:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .dp-sim-input > input[type='number'] {
+    appearance: textfield;
+  }
+
+  .dp-sim-input > input::-webkit-inner-spin-button,
+  .dp-sim-input > input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  .dp-sim-input > input::placeholder {
+    color: var(--ink-40);
+  }
+
+  /* Pick qualifiers (QualifierParts): the split screen's candidates and the
+     closing grid of qualifiers' flags, flush with a thin seam like the
+     broadcast's split screen; the places as flags; empty places. */
+  .dp-sim-tiles {
+    gap: 2px;
+    background: color-mix(in oklch, var(--p-950) 55%, black);
+  }
+
+  .dp-sim-tile-name {
+    background: var(--p-900);
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-sim-tile-in {
+    animation: dp-sim-tile-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .dp-sim-chip {
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 20%);
+  }
+
+  .dp-sim-chip.is-empty,
+  .dp-sim-slot {
+    box-shadow: none;
+    border: 1.5px dashed var(--hair-2);
+    color: var(--ink-40);
+  }
+
+  .dp-sim-slot {
+    background: rgb(255 255 255 / 3%);
+  }
+
+  /* A place's number in its circle: 46% of the circle (at most 12px), and
+     gone should a circle ever get too small for two digits. */
+  .dp-sim-chip.is-empty {
+    container-type: inline-size;
+  }
+
+  .dp-sim-chip-num {
+    font-size: min(12px, 46cqi);
+    line-height: 1;
+  }
+
+  @container (width < 16px) {
+    .dp-sim-chip-num {
+      display: none;
+    }
+  }
+
+  /* The stripe and the sheet rise in when they appear (the minimal view,
+     the controls coming back after the final reveal). `translate`, not
+     `transform`: the stripe is centred and the sheet dragged with it. */
+  .dp-sim-float-in {
+    animation: dp-sim-rise-in 0.36s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .dp-sim-sheet-in {
+    animation: dp-sim-sheet-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  /* Phones' ⋯ sheet: slides up over the scrim's fade, and back down. */
+  .dp-sim-menu-sheet {
+    animation: dp-sim-sheet-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .dp-sim-menu[data-closing] {
+    pointer-events: none;
+  }
+
+  .dp-sim-menu[data-closing] .dp-sim-menu-sheet {
+    animation: dp-sim-sheet-out 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  .dp-sim-menu[data-closing] .dp-sim-scrim {
+    animation: dp-sim-fade-out 0.2s ease-in forwards;
+  }
+
+  @keyframes dp-sim-rise-in {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+    }
+  }
+
+  @keyframes dp-sim-sheet-in {
+    from {
+      translate: 0 100%;
+    }
+  }
+
+  @keyframes dp-sim-sheet-out {
+    to {
+      translate: 0 100%;
+    }
+  }
+
+  @keyframes dp-sim-tile-in {
+    from {
+      opacity: 0;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes dp-sim-flag-in {
+    from {
+      opacity: 0;
+      transform: scale(1.04);
+    }
+  }
+
+  @keyframes dp-sim-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes dp-sim-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dp-sim-window-img,
+    .dp-sim-scrim,
+    .dp-sim-float-in,
+    .dp-sim-sheet-in,
+    .dp-sim-menu-sheet,
+    .dp-sim-tile-in,
+    .dp-sim-menu[data-closing] .dp-sim-menu-sheet,
+    .dp-sim-menu[data-closing] .dp-sim-scrim {
+      animation: none;
+    }
+
+    .dp-sim-menu[data-closing] {
+      visibility: hidden;
+    }
+
+    .dp-sim-sheet,
+    .dp-sim-sheet-body,
+    .dp-sim-col,
+    .dp-sim-progress > i,
+    .dp-sim-edge-progress > i {
+      transition: none;
+    }
   }
 }

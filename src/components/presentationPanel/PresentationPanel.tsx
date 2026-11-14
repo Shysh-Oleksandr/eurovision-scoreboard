@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useRef, type JSX } from 'react';
+import React, { useMemo, type JSX } from 'react';
 
 import { useShallow } from 'zustand/shallow';
 
@@ -9,50 +9,25 @@ import { RangeSlider } from '../common/RangeSlider';
 import Tabs from '../common/tabs/Tabs';
 import SnowPileEffect from '../effects/SnowPileEffect';
 
+import {
+  MAX_SPEED_SECONDS,
+  MIN_SPEED_SECONDS,
+  usePresentationLoop,
+} from './usePresentationLoop';
+
 import { Columns2Icon } from '@/assets/icons/Columns2Icon';
 import { PauseIcon } from '@/assets/icons/PauseIcon';
 import { PlayIcon } from '@/assets/icons/PlayIcon';
 import { Rows2Icon } from '@/assets/icons/Rows2Icon';
-import { EventStage, StageId } from '@/models';
+import { StageId } from '@/models';
 import {
   PresentationPointsGrouping,
   ScoreboardMobileLayout,
   useGeneralStore,
 } from '@/state/generalStore';
-import { isJuryScaleRevealActive } from '@/state/scoreboard/juryScaleReveal';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { useQualifiedCountriesPanelGlowStyle } from '@/theme/useQualifiedCountriesPanelGlowStyle';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
-
-const MIN_SPEED_SECONDS = 0.5;
-const MAX_SPEED_SECONDS = 7.5;
-
-/**
- * Whether the scale-countdown reveal owns this stage's jury vote. Read from the
- * stores at call time so the auto-presentation loop and the rendered board can
- * never disagree about which flow drives the next award.
- */
-const isScaleRevealRunning = (stage: EventStage): boolean => {
-  const { settings } = useGeneralStore.getState();
-  const {
-    juryScaleReveal,
-    votingCountryIndex,
-    votingPointsIndex,
-    viewedStageId,
-    showAllParticipants,
-  } = useScoreboardStore.getState();
-
-  return isJuryScaleRevealActive({
-    stage,
-    enableJuryScaleReveal: settings.enableJuryScaleReveal,
-    isPickQualifiersMode: settings.isPickQualifiersMode,
-    juryScaleReveal,
-    votingCountryIndex,
-    votingPointsIndex,
-    viewedStageId,
-    showAllParticipants,
-  });
-};
 
 const layoutTabs = [
   {
@@ -67,7 +42,7 @@ const layoutTabs = [
 
 const PresentationPanel = (): JSX.Element | null => {
   const t = useTranslations();
-  const { boardAnimationMode, roundedCountryContainer } = useThemeSpecifics();
+  const { roundedCountryContainer } = useThemeSpecifics();
   const roundedPanelGlowStyle = useQualifiedCountriesPanelGlowStyle(
     roundedCountryContainer,
   );
@@ -86,55 +61,28 @@ const PresentationPanel = (): JSX.Element | null => {
     [t],
   );
 
-  // The panel only renders/schedules from these three stage facts; subscribing
-  // to them (rather than deriving from a parent-driven `getCurrentStage()`
-  // call) keeps the memoized panel out of per-award commits while still
-  // restarting the presentation loop at stage/phase changes.
-  const { stageId, stageIsJuryVoting, stageIsOver } = useScoreboardStore(
+  // The panel only renders from these stage facts; subscribing to them keeps
+  // the memoized panel out of per-award commits.
+  const { stageId, stageIsJuryVoting } = useScoreboardStore(
     useShallow((state) => {
       const stage = state.getCurrentStage();
 
       return {
         stageId: stage?.id,
         stageIsJuryVoting: stage?.isJuryVoting,
-        stageIsOver: stage?.isOver,
       };
     }),
   );
 
   const {
-    getCurrentStage,
-    givePredefinedJuryPoint,
-    givePredefinedJuryPointsGrouped,
-    givePredefinedTelevotePoints,
-    openSplitScreenQualifierModal,
-    pickQualifierFromSplitScreenCandidatesRandomly,
-    pickQualifierRandomly,
-  } = useScoreboardStore(
-    useShallow((state) => ({
-      getCurrentStage: state.getCurrentStage,
-      givePredefinedJuryPoint: state.givePredefinedJuryPoint,
-      givePredefinedJuryPointsGrouped: state.givePredefinedJuryPointsGrouped,
-      givePredefinedTelevotePoints: state.givePredefinedTelevotePoints,
-      openSplitScreenQualifierModal: state.openSplitScreenQualifierModal,
-      pickQualifierFromSplitScreenCandidatesRandomly:
-        state.pickQualifierFromSplitScreenCandidatesRandomly,
-      pickQualifierRandomly: state.pickQualifierRandomly,
-    })),
-  );
-
-  const {
     presentationSettings,
     isPickQualifiersMode,
-    enableSplitScreenQualifierRevealMode,
     enableJuryScaleReveal,
     setPresentationSettings,
   } = useGeneralStore(
     useShallow((s) => ({
       presentationSettings: s.presentationSettings,
       isPickQualifiersMode: s.settings.isPickQualifiersMode,
-      enableSplitScreenQualifierRevealMode:
-        s.settings.enableSplitScreenQualifierRevealMode,
       enableJuryScaleReveal: s.settings.enableJuryScaleReveal,
       setPresentationSettings: s.setPresentationSettings,
     })),
@@ -158,133 +106,7 @@ const PresentationPanel = (): JSX.Element | null => {
 
   const withPointsGrouping = stageIsJuryVoting && isNotQualifierModeStage;
 
-  // Timer handling
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (!isPresenting) {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-
-      return;
-    }
-
-    if (!stageId || stageIsOver) {
-      return;
-    }
-
-    // Single-step executor that reschedules itself after completion
-    const runOnce = () => {
-      const latestStage = getCurrentStage();
-      const generalStore = useGeneralStore.getState();
-
-      const {
-        presentationJuryGrouping,
-        presentationSpeedSeconds,
-        pauseAfterAnimatedPoints,
-      } = generalStore.presentationSettings;
-
-      if (!latestStage || latestStage.isOver) return;
-
-      let isScaleRevealStep = false;
-
-      const getNextDelayMs = (awardedAnimated: boolean) => {
-        const baseSeconds = MAX_SPEED_SECONDS - presentationSpeedSeconds;
-        const delayAfterAnimation = pauseAfterAnimatedPoints
-          ? Math.max(boardAnimationMode === 'teleport' ? 6 : 4.5, baseSeconds)
-          : baseSeconds;
-        const nextDelaySeconds = awardedAnimated
-          ? delayAfterAnimation
-          : baseSeconds;
-
-        return Math.max(MIN_SPEED_SECONDS, nextDelaySeconds) * 1000;
-      };
-
-      if (
-        generalStore.settings.isPickQualifiersMode &&
-        latestStage.id.toUpperCase() !== StageId.GF.toUpperCase()
-      ) {
-        const isSplitScreenEnabled =
-          generalStore.settings.enableSplitScreenQualifierRevealMode;
-
-        if (isSplitScreenEnabled) {
-          const didOpenModal = openSplitScreenQualifierModal();
-          const nextDelay = getNextDelayMs(false);
-
-          if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-          }
-
-          if (!didOpenModal) {
-            pickQualifierRandomly();
-            timeoutRef.current = setTimeout(runOnce, nextDelay);
-
-            return;
-          }
-
-          timeoutRef.current = setTimeout(() => {
-            pickQualifierFromSplitScreenCandidatesRandomly();
-
-            timeoutRef.current = setTimeout(runOnce, nextDelay);
-          }, nextDelay);
-
-          return;
-        }
-
-        pickQualifierRandomly();
-      } else if (isScaleRevealRunning(latestStage)) {
-        useScoreboardStore.getState().advanceJuryScaleReveal();
-        isScaleRevealStep = true;
-      } else if (latestStage.isJuryVoting) {
-        if (presentationJuryGrouping === 'grouped') {
-          givePredefinedJuryPointsGrouped();
-        } else {
-          givePredefinedJuryPoint();
-        }
-      } else {
-        givePredefinedTelevotePoints();
-      }
-
-      // Schedule next cycle with the latest speed read at schedule time
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      // If the just-awarded batch contains an animated point, add +2s delay.
-      // The scale reveal never sets `showDouzePointsAnimation` (it renders its
-      // own overlay), so its douze steps are detected from the reveal phase.
-      const scoreboardState = useScoreboardStore.getState();
-      const awardedAnimated = isScaleRevealStep
-        ? scoreboardState.juryScaleReveal?.phase !== 'scale'
-        : scoreboardState
-            .getCurrentStage()
-            ?.countries?.some((c) => c.showDouzePointsAnimation);
-      const nextDelay = getNextDelayMs(!!awardedAnimated);
-
-      timeoutRef.current = setTimeout(runOnce, nextDelay);
-    };
-
-    // Start the loop
-    const initialDelay = 1000;
-
-    timeoutRef.current = setTimeout(runOnce, initialDelay);
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isPresenting,
-    stageId,
-    stageIsJuryVoting,
-    isPickQualifiersMode,
-    enableSplitScreenQualifierRevealMode,
-    boardAnimationMode,
-  ]);
+  usePresentationLoop();
 
   return (
     <div className="w-full">

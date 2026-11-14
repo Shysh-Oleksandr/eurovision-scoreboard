@@ -237,6 +237,12 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   `var(--safe-bottom-bar)` instead: the whole inset on Android, but at most
   14px on iOS, where the home indicator only fills the bottom 13px of its
   34px inset. Floating elements keep `--safe-bottom`.
+- **The apps don't zoom.** The app bundle's viewport adds
+  `maximum-scale=1, user-scalable=no` (`src/app/layout.tsx`): iOS otherwise
+  zooms into every focused input under 16px and stays zoomed, and the
+  WKWebView honours the limits (it also stops pinch-zoom; Android's WebView
+  never had it, `zoomEnabled` is off). Inputs can keep any font size. The
+  website keeps zoom.
 - **Offline is a normal state** ([offline-mode.md](offline-mode.md)). A
   list backed by the API renders through `useQueryView` + `QueryNotice`,
   never a bare `isLoading` spinner; an account action is disabled while
@@ -1021,3 +1027,104 @@ English, German, French, Greek and Ukrainian down to 320px, the dismissal
 rules, the reminder after a Grand Final, Settings, `/get-app` redirects and
 the head tags. Not yet tried: the Smart App Banner, the install check and
 the intent link on real devices.
+
+## 14. Crashes: renderer recovery and crash reports
+
+Added 2026-11-13, after Play vitals showed a 3.38% user-perceived crash rate
+on Android 1.2 (the bad-behaviour threshold is 1.09%).
+
+**What crashed.** 38 of the 39 affected users had one crash cluster: a
+SIGTRAP on the main thread inside the WebView library
+(`libwebviewchromium.so`). It is Chromium's `FATAL: Render process (N)'s
+crash wasn't handled by all associated webviews, triggering application
+crash`. When the WebView's renderer process dies, Capacitor's
+`BridgeWebViewClient.onRenderProcessGone` answers "not handled" unless a
+`WebViewListener` returns true, and the WebView then kills the app.
+capgo-updater's listener also returns false (it only reports to Capgo stats,
+which are off). Why the renderer dies is invisible to us: its crash dump
+goes to Google. The crash rate was higher on 4–6 GB phones than on 8 GB
+ones, so memory pressure is the suspect. iOS doesn't crash this way:
+Capacitor reloads the page when the WebContent process ends.
+Play's crash clusters, sample reports and crash rates by dimension
+(`deviceRamBucket`, `versionCode`…) can be read with the Play Developer
+Reporting API and the fastlane service account key.
+
+**Recovery (Android).** `RendererCrashRecovery` is a `WebViewListener`
+added in `MainActivity.onCreate` once the bridge exists. A plugin's `load()`
+can't add it: the bridge builder replaces the listener list after the
+plugins load. On a renderer death it records the event in the
+`douze_diagnostics` SharedPreferences, takes the dead WebView out of the
+layout, destroys it and calls `recreate()`. That builds a fresh bridge and
+loads the page again; the persisted stores bring the contest back, but
+in-progress UI (an open modal) is lost. A death in the background waits for
+the next resume. After 3 recoveries within 60 s it gives up and returns
+false, so a crash loop crashes the app and still shows in Play vitals.
+
+`DouzeDiagnosticsPlugin` saves the foreground state with `commit()` at every
+resume and pause. `takeLastExit()` answers `{ foreground?, rendererGone? }`:
+`foreground` is how the previous launch ended (read in `load()`, before the
+first resume overwrites it), answered once per launch; `rendererGone` once
+per death. Both classes are native changes, so they need a store build
+(§11). Older binaries don't have the plugin; the JS side checks
+`isPluginAvailable`.
+
+**Crash reports (`src/native/crashWatch/`).** AppBootstrap starts it in the
+apps. Each launch keeps `dp:app-session` in localStorage:
+
+- the state, `visible`, `hidden` or `closed`, from `visibilitychange`,
+  `pagehide` and the App plugin's `pause` and `resume`;
+- what the app shows, sampled every 5 s and at stage or winner changes:
+  path (query parameter names only), open overlays (`useBackHandler`),
+  `role="dialog"` labels, graphics editor, stage, winner, theme, DOM nodes
+  and canvases;
+- the DOM peak and the last 30 changes as crumbs.
+
+At the next launch `assessPreviousSession()` (`core.ts`) decides what to
+report:
+
+- a renderer that crashed, or died on screen:
+  `App crash: Android renderer crashed|was killed on screen|in the background`,
+  plus ` (crash loop)` when the guard gave up;
+- a record still `visible` while the native side says the app was in the
+  foreground: `App crash: app ended on screen`. That covers Java crashes,
+  foreground out-of-memory kills, and a force stop or reinstall while on
+  screen;
+- a record still `visible` and sessionStorage shows that the same WebView
+  loaded the page again: `App crash: web content process ended on screen`.
+  That is Capacitor's reload on iOS (untested on a device);
+- otherwise nothing.
+
+The page's record alone is no evidence. Android's WebView reports `hidden`
+about 2 s after the app leaves the screen, and localStorage reaches the
+disk seconds later, so a swipe-away right after leaving would look like a
+crash.
+
+Reports queue in `dp:app-crash-reports` (newest 3). They go out about 5 s
+after the live-update boot check, so a bundle switch can't cut them off. A
+report sent offline, or one that fails with a network error, waits for a
+reconnect. Each device sends at most 5 a day (`dp:app-crash-sent`). A crash
+also calls `noteReviewSetback()`. In the admin errors page, search for
+`App crash:`: `generalInfo.previousSession` holds the context and crumbs,
+`generalInfo.renderer` the native record.
+
+**Testing.** Use the emulator with a debug APK and crash the renderer with
+CDP `Page.crash` on the page target (§10's DevTools recipe). Block the
+WebView's network first, so no test report reaches production:
+`adb shell settings put global http_proxy 127.0.0.1:1` (`:0` undoes it; the
+WebView follows it, native CapacitorHttp doesn't).
+`localStorage['dp-crash-watch-debug'] = '1'` logs the decisions to the
+console (`adb logcat | grep crash-watch`). To test sending, intercept
+`*/errors*` with CDP `Fetch` before lifting the proxy, and answer the CORS
+preflight too.
+
+Verified 2026-11-13 on `Pixel_6a_API_34`:
+
+- renderer crashes on screen and in the background recover (same process,
+  page back);
+- the loop guard lets the 4th crash within a minute through;
+- Home and a force stop 0.3 s later: no report;
+- a force stop on screen: a report;
+- a reload: no report;
+- queued reports go out after a reconnect.
+
+Not tested: real devices, and iOS.

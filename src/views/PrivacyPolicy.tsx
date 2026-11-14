@@ -12,7 +12,7 @@ import {
 } from './legal/LegalPage';
 
 const PrivacyPolicy = () => (
-  <LegalPage title="Privacy Policy" updated="October 10, 2026">
+  <LegalPage title="Privacy Policy" updated="November 13, 2026">
     <p>
       This policy explains what information DouzePoints collects when you use
       the website at <A href="https://douzepoints.app">douzepoints.app</A> and
@@ -131,8 +131,11 @@ const PrivacyPolicy = () => (
         <Strong>Error reports.</Strong> When the app hits an error or a sign-in
         fails, it sends a report with the error, technical details about the
         device and browser (platform, user agent, language and screen size) and
-        the state of the app at the time. Error reports are not linked to your
-        account.
+        the state of the app at the time. When the iOS or Android app crashes,
+        it sends a report the next time you open it, with what it was showing
+        (such as the stage and theme), the last few things that changed on
+        screen, and the device&apos;s memory size and number of processor cores.
+        Error reports are not linked to your account.
       </li>
       <li>
         <Strong>Website analytics.</Strong> The website uses Umami Cloud, a

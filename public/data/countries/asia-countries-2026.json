@@ -3,77 +3,110 @@
     "name": "Bangladesh",
     "code": "BD",
     "category": "Asia",
+    "juryOdds": 5,
+    "televoteOdds": 5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 4
   },
   {
     "name": "Bhutan",
     "code": "BT",
     "category": "Asia",
+    "juryOdds": 52.5,
+    "televoteOdds": 54.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 1
   },
   {
     "name": "Cambodia",
     "code": "KH",
     "category": "Asia",
+    "juryOdds": 26,
+    "televoteOdds": 13.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 8
   },
   {
     "name": "Laos",
     "code": "LA",
     "category": "Asia",
+    "juryOdds": 60,
+    "televoteOdds": 61,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 6
   },
   {
     "name": "Malaysia",
     "code": "MY",
     "category": "Asia",
+    "juryOdds": 85.5,
+    "televoteOdds": 53.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 7
   },
   {
     "name": "Mongolia",
     "code": "MN",
     "category": "Asia",
+    "juryOdds": 55,
+    "televoteOdds": 22,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 3
   },
   {
     "name": "Nepal",
     "code": "NP",
     "category": "Asia",
+    "juryOdds": 28,
+    "televoteOdds": 19,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 9
   },
   {
     "name": "Philippines",
     "code": "PH",
     "category": "Asia",
+    "juryOdds": 99,
+    "televoteOdds": 99,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 0
   },
   {
     "name": "South Korea",
     "code": "KR",
     "category": "Asia",
+    "juryOdds": 60,
+    "televoteOdds": 36.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 5
   },
   {
     "name": "Thailand",
     "code": "TH",
     "category": "Asia",
+    "juryOdds": 61,
+    "televoteOdds": 89.5,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 10
   },
   {
     "name": "Vietnam",
     "code": "VN",
     "category": "Asia",
+    "juryOdds": 87,
+    "televoteOdds": 64,
     "isQualified": true,
-    "isAutoQualified": true
+    "isAutoQualified": true,
+    "spokespersonOrder": 2
   }
 ]

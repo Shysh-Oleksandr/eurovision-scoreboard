@@ -112,7 +112,10 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   isThemePreview = false,
 }) => {
   const [columns, setColumns] = useState(DOUZE_POINTS_TARGET_COLUMNS);
-  const [sourceNameWidth, setSourceNameWidth] = useState<number | null>(null);
+  const [sourceName, setSourceName] = useState<{
+    width: number;
+    style: React.CSSProperties;
+  } | null>(null);
   /** Play douze SFX only once per mount (Strict Mode re-runs effects). */
   const douzePointsSoundPlayedRef = useRef(false);
   const heartsCount = columns * DOUZE_POINTS_ROWS;
@@ -151,7 +154,10 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   }, [refs.containerRef]);
 
   // In the rounded layout the row's name stops before the points while the
-  // overlay spans them, so copy the name's width to truncate identically.
+  // overlay spans them, so copy the name's width to truncate identically,
+  // and its font size (a host may size the row's name past the shared
+  // classes). Host rules that restyle names (`[data-entry-name]`) also
+  // match the overlay's `data-douze-name`.
   useLayoutEffect(() => {
     const sourceNameEl = sourceNameRef?.current;
 
@@ -159,11 +165,25 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
       return;
     }
 
-    setSourceNameWidth(sourceNameEl.getBoundingClientRect().width);
+    // Used values in the element's own CSS px: unlike the bounding rect,
+    // they stay right when an ancestor is zoomed (the scaled board).
+    const read = () => {
+      const computed = getComputedStyle(sourceNameEl);
 
-    const resizeObserver = new ResizeObserver(() => {
-      setSourceNameWidth(sourceNameEl.getBoundingClientRect().width);
-    });
+      setSourceName({
+        width:
+          parseFloat(computed.width) ||
+          sourceNameEl.getBoundingClientRect().width,
+        style: {
+          fontSize: computed.fontSize,
+          lineHeight: computed.lineHeight,
+        },
+      });
+    };
+
+    read();
+
+    const resizeObserver = new ResizeObserver(read);
 
     resizeObserver.observe(sourceNameEl);
 
@@ -219,7 +239,11 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
     // the row's name to the pixel and the hearts start at the flag's edge.
     <div className={`${containerClass} left-0 p-0 !opacity-100`}>
       {flagClassName && (
-        <div aria-hidden className={`${flagClassName} invisible shrink-0`} />
+        <div
+          aria-hidden
+          data-douze-flag=""
+          className={`${flagClassName} invisible shrink-0`}
+        />
       )}
       <div
         ref={refs.containerRef}
@@ -263,12 +287,14 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
           style={
             {
               '--douze-name-out-delay': `${HEARTS_SHRINK_PHASE_START_SECONDS}s`,
-              ...(sourceNameWidth !== null && {
+              ...(sourceName !== null && {
+                ...sourceName.style,
                 flex: 'none',
-                width: sourceNameWidth,
+                width: sourceName.width,
               }),
             } as React.CSSProperties
           }
+          data-douze-name=""
           className={`douze-country-name-animated relative z-50 text-countryItem-douzePointsText ${nameClassName}`}
         >
           {countryName}

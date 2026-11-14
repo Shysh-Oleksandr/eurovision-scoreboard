@@ -201,6 +201,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
 
     const currentBlock = (
       <div
+        data-points-current=""
         className={`${roundedCurrentPointsBlockClass} relative z-[23] rounded-full rounded-l-none overflow-hidden transition-all !duration-500 ${pointsBgClass} ${
           isTransparent ? '!bg-transparent' : ''
         }`}
@@ -243,6 +244,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       <div ref={roundedPointsRowRef} className={roundedRowClass}>
         <div
           ref={roundedPointsTrackRef}
+          data-points-track=""
           className={`flex h-full flex-row items-stretch overflow-visible ${roundedPointsTrackWidthClass}`}
         >
           {currentBlock}
