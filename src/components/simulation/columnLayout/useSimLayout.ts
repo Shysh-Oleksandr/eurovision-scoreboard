@@ -8,13 +8,12 @@ const isSimLayout = (value: string | null): value is SimLayout =>
   value === 'classic' || value === 'column';
 
 /**
- * Which simulation layout to render. The column layout is in preview: open
- * the app with `?simLayout=column` (or `?simLayout=classic` to go back) and
- * the choice sticks on this device. Development builds default to the column
- * layout so `yarn dev` / `yarn dev:native` show it straight away.
+ * Which simulation layout to render: the column layout, unless this device
+ * opened the app with `?simLayout=classic` (`?simLayout=column` switches
+ * back). The choice sticks on this device.
  */
 const readSimLayout = (): SimLayout => {
-  if (typeof window === 'undefined') return 'classic';
+  if (typeof window === 'undefined') return 'column';
 
   try {
     const param = new URLSearchParams(window.location.search).get('simLayout');
@@ -32,7 +31,7 @@ const readSimLayout = (): SimLayout => {
     // Storage can be unavailable (private mode); fall through to the default.
   }
 
-  return process.env.NODE_ENV === 'development' ? 'column' : 'classic';
+  return 'column';
 };
 
 export const useSimLayout = (): SimLayout => useState(readSimLayout)[0];

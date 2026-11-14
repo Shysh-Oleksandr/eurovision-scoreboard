@@ -7,7 +7,7 @@ import Modal from '../common/Modal/Modal';
 import ModalBottomCloseButton from '../common/Modal/ModalBottomCloseButton';
 import Tabs from '../common/tabs/Tabs';
 
-import { UPCOMING_FEATURES, WHATS_NEW } from './data';
+import { LATEST_UPDATE_KEY, UPCOMING_FEATURES, WHATS_NEW } from './data';
 import RateAppCard from './RateAppCard';
 import UpdateList from './UpdateList';
 
@@ -20,19 +20,23 @@ import {
 } from '@/helpers/shareUrl';
 import { IS_NATIVE_APP } from '@/native/platform';
 
+export type FeedbackTab = 'feedback' | 'whats-new' | 'upcoming';
+
 const FeedbackModal = ({
   showModal,
   setShowModal,
   onLoaded,
+  initialTab = 'feedback',
 }: {
   showModal: boolean;
   setShowModal: (show: boolean) => void;
-  onLoaded: () => void;
+  onLoaded?: () => void;
+  initialTab?: FeedbackTab;
 }) => {
   // const locale = useLocale();
   const t = useTranslations('feedbackInfo');
   const tCommon = useTranslations('common');
-  const [activeTab, setActiveTab] = useState('feedback');
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
   const setLastSeenUpdate = useGeneralStore((state) => state.setLastSeenUpdate);
   const setShouldShowNewChangesIndicator = useGeneralStore(
     (state) => state.setShouldShowNewChangesIndicator,
@@ -43,14 +47,12 @@ const FeedbackModal = ({
 
   // Handle "What's New" tab activation
   useEffect(() => {
-    if (activeTab === 'whats-new' && WHATS_NEW.length > 0) {
-      const latestUpdate = `${WHATS_NEW[0].date}-${WHATS_NEW[0].title}`;
-
-      setLastSeenUpdate(latestUpdate);
+    if (activeTab === 'whats-new' && LATEST_UPDATE_KEY) {
+      setLastSeenUpdate(LATEST_UPDATE_KEY);
       setShouldShowNewChangesIndicator(false);
     }
 
-    onLoaded();
+    onLoaded?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, setLastSeenUpdate, setShouldShowNewChangesIndicator]);
 

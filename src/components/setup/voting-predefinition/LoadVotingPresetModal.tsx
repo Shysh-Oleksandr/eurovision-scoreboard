@@ -9,6 +9,7 @@ import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { languageTag } from '@/i18n/catalog';
 import type {
   DetailedVotingPreset,
   TotalsVotingPreset,
@@ -100,7 +101,7 @@ export const LoadVotingPresetModal: React.FC<LoadVotingPresetModalProps> = ({
                 <Badge
                   label={`${t('metaCreated')}: ${new Date(
                     preset.createdAt,
-                  ).toLocaleString(locale, {
+                  ).toLocaleString(languageTag(locale), {
                     dateStyle: 'medium',
                     timeStyle: 'short',
                   })}`}

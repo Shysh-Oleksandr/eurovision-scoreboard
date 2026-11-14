@@ -140,7 +140,7 @@ the Feedback modal); screenshots for the
   account (§5).
 - Category Entertainment; the 512 px icon is
   `assets/store/play-store-icon-512.png`; phone and tablet screenshots in
-  §6. The 1024×500 feature graphic is still to be made.
+  §6. The 1024×500 feature graphic is a §6 banner (`play-feature`).
 
 **Trademarks (both stores).** Keep "Eurovision" out of the app name, the
 App Store subtitle and keyword field, and the start of Play's short
@@ -266,8 +266,9 @@ is a capture placed 1:1 in a flat device outline (no tilt, shadow or glow)
 on the slide's theme background, under a caption: a plain line, then the
 key words as a board row in that theme's board colours. Output:
 `assets/store/screenshots/<locale>/<device>/<NN>-<scene>.png` (gitignored),
-for all nine app languages. `--device`, `--locale` and `--scene` take
-comma-separated names, `--jobs` sets how many device/language runs go in
+for all nine app languages, plus two banners (below). `--device`,
+`--locale` and `--scene` take comma-separated names (`--device
+og,play-feature` makes only the banners), `--jobs` sets how many device/language runs go in
 parallel (default 2), `--keep-raw` keeps the bare captures. A full run
 takes about an hour. `yarn fastlane ios screenshots` and `yarn fastlane
 android screenshots` upload them ([store-builds.md](store-builds.md),
@@ -279,6 +280,21 @@ Listings and screenshots).
 | `ipad` | 2752×2064, landscape | App Store, iPad 13″: required, the app runs on iPad |
 | `android-phone` | 1242×2208 (9:16) | Play, phone screenshots |
 | `android-tablet` | 2560×1440 (16:9) | Play, 7-inch and 10-inch tablet screenshots (the same files) |
+| `play-feature` | 1024×500 PNG, every language | Play, feature graphic (`feature-graphic.png`, uploaded with the Android screenshots) |
+| `og` | 1200×630 JPEG, English | The website's link preview image (`og-image.jpg`): upload it to the CDN by hand under a new name, then point `OG_IMAGE_URL` (`src/config/seo.ts`) at it |
+
+**Banners** (`og`, `play-feature`; `banners.mjs`): the scoreboard slide's
+caption on the left (its lead line, then "Douze points 12" as a gold board
+row) and board places 1–7 of the real final on the right, on the 2026
+background, with the app mark and name above the caption. Both come from
+one desktop capture per language (`bannerSession` in `app.mjs`, scene
+`banner`): 1200×630 at 3×, the column layout, frozen 1.3 s into Denmark's 12
+for Bulgaria, when the row is gold with the name, and taken without the
+page background so the rows keep their glow on the banner's. The layout is
+drawn for 1200×630 and scaled by height for the feature graphic. Link
+previews are English only: preview crawlers don't send the reader's
+language. Facebook, X and LinkedIn cache a preview image by URL for weeks,
+so a new image needs a new file name.
 
 Slides, in upload order (the first three are what App Store search shows):
 
@@ -321,6 +337,9 @@ Slides, in upload order (the first three are what App Store search shows):
   (9:41 on iOS, 12:00 on Android) and passes the devices' safe areas in
   as `--safe-area-inset-*`. The home indicator / gesture handle turns dark
   over light content, as on the devices.
+- The banners' still also differs: by Denmark's 12 the app has moved on
+  to France, whose own row is dimmed while it votes; the capture shows it
+  at full strength.
 - Stills that differ from the app in motion: the douze points overlay's
   copy of the name is hidden (frozen mid-fade, the two copies stack and
   look bold), and the winner's confetti is moved behind the card (in the

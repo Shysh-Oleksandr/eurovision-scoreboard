@@ -1772,6 +1772,25 @@ html:root {
   transition: none !important;
 }
 
+/*
+ * Home page intro (HomeIntro): the text the home page's HTML carries until
+ * the app mounts. It fades in after a delay so a fast load never flashes it.
+ * Outside `@layer components`, which Tailwind purges.
+ */
+.dp-home-intro {
+  animation: dp-home-intro-in 240ms ease-out 400ms both;
+}
+
+@keyframes dp-home-intro-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 /* ==========================================================================
    Design-system components (`dp-*`) — theme-derived surfaces.
    Colours come from src/design-system/tokens.css (--p-*, --accent,

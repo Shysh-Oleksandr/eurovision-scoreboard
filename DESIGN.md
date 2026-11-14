@@ -359,9 +359,10 @@ sentence case (`plainHeaders`).
 
 ### Simulation view (`columnLayout/`, `.dp-sim-*`)
 
-In preview behind `?simLayout=column` (the default in dev builds); the
-mechanics are in `docs/simulation-column-layout.md`. Where the broadcast
-shows the spokesperson, the app shows the voter and their controls. The
+The default since 2026-11-14 (`?simLayout=classic` brings back the old
+layout on a device); the mechanics are in
+`docs/simulation-column-layout.md`. Where the broadcast shows the
+spokesperson, the app shows the voter and their controls. The
 board rows and the theme's jury points strip (`VotingPointsInfo`) are drawn
 by the theme and never restyled here, only sized.
 

@@ -1,8 +1,9 @@
 # Simulation view: the column layout
 
 The redesigned simulation view ("spokesperson column"). It replaces the stacked
-Controls / Presentation panels and the icon header of the classic layout. Both
-layouts ship side by side while the new one is in preview.
+Controls / Presentation panels and the icon header of the classic layout. It is
+the default since 2026-11-14; the classic layout still ships behind
+`?simLayout=classic` until it is deleted.
 
 Code: `src/components/simulation/columnLayout/`. Design brief and direction:
 `.impeccable/surfaces/src-components-simulation-simulation-tsx.md`; approved
@@ -16,8 +17,8 @@ mode's options: `.impeccable/mocks/sim-pick-qualifiers.html` (option A built,
 
 - `?simLayout=column` / `?simLayout=classic` in the URL sets it and stores it in
   localStorage (`dp-sim-layout`), so it sticks on that device, the apps included.
-- Without a stored choice, development builds (`yarn dev`, `yarn dev:native`)
-  default to `column`, production builds to `classic`.
+- Without a stored choice every build uses `column` (the server render too).
+  Only devices that opened `?simLayout=classic` keep the classic layout.
 
 `Simulation.tsx` renders `SimulationColumnLayout` unless the jury scale reveal
 is running (that keeps the classic layout for now). Semi-finals in Pick
@@ -26,9 +27,9 @@ confetti and qualification modal are shared, except that the qualification
 modal stays off while picking qualifiers in the column layout (the column
 shows the qualifiers).
 
-To ship the new layout to everyone, flip the production default in
-`readSimLayout`, then delete the classic branch, `ControlsPanel`,
-`PresentationPanel`, `PhaseActions` and `SimulationHeader` once nothing uses them.
+Once the column layout has settled, delete the classic branch, the
+`?simLayout` switch, `ControlsPanel`, `PresentationPanel`, `PhaseActions` and
+`SimulationHeader` (once nothing else uses them).
 
 ## 2. Structure
 

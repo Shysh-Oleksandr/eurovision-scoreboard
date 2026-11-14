@@ -71,9 +71,31 @@ export const DEVICES = {
   },
 };
 
+/**
+ * Landscape banners (banners.mjs), all made from one desktop capture of the
+ * board: the website's link preview image and Google Play's feature graphic.
+ * `locales` limits a banner to some languages: link previews are English,
+ * as preview crawlers don't send the reader's language.
+ */
+export const BANNERS = {
+  og: { canvas: { width: 1200, height: 630 }, file: 'og-image.jpg', locales: ['en'] },
+  'play-feature': { canvas: { width: 1024, height: 500 }, file: 'feature-graphic.png' },
+};
+
+/** The desktop window the banners' board is captured in, at 3× for the crop. */
+export const BANNER_CAPTURE = {
+  browser: chromium,
+  viewport: { width: 1200, height: 630 },
+  scale: 3,
+  insets: { top: 0, bottom: 0 },
+  hasTouch: false,
+};
+
 /** Device pixel ratio the app is captured at for a 1:1 placement. */
 export const captureScale = (device) =>
-  (device.scale * device.frame.screen) / device.viewport.width;
+  device.frame
+    ? (device.scale * device.frame.screen) / device.viewport.width
+    : device.scale;
 
 /**
  * App locales (messages/<locale>.json) and what the browser reports for

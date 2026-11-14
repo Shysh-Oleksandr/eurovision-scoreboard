@@ -2,6 +2,8 @@ import { isSameYear } from 'date-fns';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 
+import { languageTag } from '@/i18n/catalog';
+
 /**
  * Timestamps on design, theme and contest cards: relative while fresh
  * ("5 min ago", "3 h ago", under 24 h), then absolute ("Oct 6, 08:19 PM",
@@ -23,7 +25,7 @@ export function useFormatItemTime() {
 
       if (hours < 24) return t('hoursAgo', { count: hours });
 
-      return date.toLocaleDateString(locale, {
+      return date.toLocaleDateString(languageTag(locale), {
         year: isSameYear(date, new Date()) ? undefined : 'numeric',
         month: 'short',
         day: 'numeric',

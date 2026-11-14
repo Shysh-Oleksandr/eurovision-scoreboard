@@ -13,6 +13,7 @@ import Button from '@/components/common/Button';
 import FollowButton from '@/components/common/FollowButton';
 import UserModerationMenu from '@/components/moderation/UserModerationMenu';
 import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
+import { languageTag } from '@/i18n/catalog';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 import type { ThemeCreator } from '@/types/customTheme';
@@ -44,7 +45,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
   const handleShare = useHandleShare();
 
   const joinedOn = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString(locale, {
+    ? new Date(user.createdAt).toLocaleDateString(languageTag(locale), {
         year: 'numeric',
         month: 'long',
         day: 'numeric',

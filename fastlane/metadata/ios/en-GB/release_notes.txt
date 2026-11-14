@@ -1,5 +1,5 @@
-• Eurovision 2027 so far, and Junior Eurovision 2026
-• A redesigned Event Setup
-• One account for Google, Apple and email sign-in
-• Haptics during the vote reveal
+• A redesigned simulation screen, with a new minimal view
+• Offline mode: stay signed in and see your contests and themes without a connection
+• More country stats: average place, streaks, semi-final results, jury vs televote
+• Eurovision Asia 2026 odds and voting order
 • Fixes and stability improvements

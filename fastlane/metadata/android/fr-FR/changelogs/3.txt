@@ -1,0 +1,6 @@
+• Un écran de simulation repensé, avec une nouvelle vue minimale
+• Mode hors ligne : vous restez connecté et retrouvez vos concours et thèmes sans réseau
+• Plus de statistiques par pays : place moyenne, séries, résultats en demi-finale, jury contre télévote
+• Eurovision Asia 2026 : cotes et ordre de vote
+• La connexion avec Google fonctionne désormais
+• Corrections et meilleure stabilité

@@ -1,0 +1,6 @@
+• Eine neu gestaltete Simulationsansicht mit neuer Minimalansicht
+• Offline-Modus: Du bleibst angemeldet und siehst deine Wettbewerbe und Themes auch ohne Verbindung
+• Mehr Länderstatistiken: Durchschnittsplatz, Serien, Halbfinalergebnisse, Jury vs. Televote
+• Eurovision Asia 2026: Quoten und Abstimmungsreihenfolge
+• Die Anmeldung mit Google funktioniert jetzt
+• Fehlerbehebungen und mehr Stabilität

@@ -8,8 +8,8 @@
  * (backend.mjs); signed-out ones may only read the public theme list from
  * production.
  */
-/* global document, window, innerHeight, localStorage, indexedDB, MutationObserver, fetch -- page functions */
-import { readFileSync } from 'node:fs';
+/* global document, window, innerHeight, localStorage, indexedDB, MutationObserver, fetch, Element -- page functions */
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import sharp from 'sharp';
@@ -38,6 +38,11 @@ const JURIES_BEFORE_HERO = 22;
  * (DouzePointsAnimation.tsx, .douze-heart-animated in styles.css).
  */
 const DOUZE_FRAME_MS = 600;
+/**
+ * The banners' moment: the hearts have filled the row, which shows gold with
+ * the name, as the caption's douze points row does.
+ */
+const BANNER_DOUZE_FRAME_MS = 1300;
 /** The winner's real total, shown once the count-up ends. */
 const WINNER_POINTS = '516';
 /** Saved-contest library counts on the signed-in setup (mock numbers). */
@@ -316,7 +321,10 @@ const signIn = async ({ page, button, t }) => {
  * (Voters → Load year data: the default voters are the participants A–Z),
  * then the real votes imported in the predefinition modal.
  */
-const startGrandFinal = async ({ page, button, t }, { importVotes = true } = {}) => {
+const startGrandFinal = async (
+  { page, button, t },
+  { importVotes = true, ready = button(t.simulation.voteRandomly) } = {},
+) => {
   const gfOnly = button(t.setup.eventSetupModal.grandFinalOnly);
 
   if ((await gfOnly.getAttribute('aria-pressed')) !== 'true') {
@@ -361,23 +369,31 @@ const startGrandFinal = async ({ page, button, t }, { importVotes = true } = {})
   }
   await page.waitForTimeout(800);
   await button(t.setup.votingPredefinition.saveVotes).click();
-  await button(t.simulation.voteRandomly).waitFor({ timeout: 20000 });
+  await ready.waitFor({ timeout: 20000 });
   await page.waitForTimeout(1500);
 };
 
 /**
  * Gives the first 22 juries' votes, then Denmark's 1–8 and 10 and its 12 to
- * Bulgaria, and freezes the douze points hearts.
+ * Bulgaria, and freezes the douze points hearts `frameMs` in. `voteRandomly`
+ * gives a jury's 1–10, then its 12. `beforeTwelve` is the wait between
+ * Denmark's 1–10 and its 12: rows that moved up show an arrow in place of
+ * their number for 3 s (CountryPlaceNumber's ARROW_DISPLAY_DURATION_MS).
  */
-const playToDouzePoints = async ({ page, button, t }) => {
-  const voteRandomly = button(t.simulation.voteRandomly);
-
+const playToDouzePoints = async (
+  { page, button, t },
+  {
+    voteRandomly = button(t.simulation.voteRandomly),
+    frameMs = DOUZE_FRAME_MS,
+    beforeTwelve = 1600,
+  } = {},
+) => {
   for (let i = 0; i < JURIES_BEFORE_HERO * 2; i += 1) {
     await voteRandomly.click();
     await page.waitForTimeout(i % 2 ? 1300 : 1000);
   }
   await voteRandomly.click();
-  await page.waitForTimeout(1600);
+  await page.waitForTimeout(beforeTwelve);
   await scrollToTop(page);
   await page.waitForTimeout(400);
   await voteRandomly.click();
@@ -396,15 +412,18 @@ const playToDouzePoints = async ({ page, button, t }) => {
         animation.pause();
         animation.currentTime = ms;
       }
-    }, DOUZE_FRAME_MS);
+    }, frameMs);
     await page.waitForTimeout(400);
   }
   // The overlay draws a copy of the name over the row's own name, fading in;
   // in a still the two stack and the name looks bolder than in the app, so
-  // only the row's own name shows (the hearts haven't reached it yet).
-  await page.addStyleTag({
-    content: '.douze-country-name-animated{visibility:hidden!important}',
-  });
+  // only the row's own name shows (the hearts haven't reached it yet). Later
+  // the row's name is under the gold and the overlay's copy is the one shown.
+  if (frameMs < 900) {
+    await page.addStyleTag({
+      content: '.douze-country-name-animated{visibility:hidden!important}',
+    });
+  }
 };
 
 const resumeAnimations = (page) =>
@@ -472,7 +491,7 @@ const openSession = async ({ browser, url, device, locale, rawDir, account, publ
     viewport: device.viewport,
     deviceScaleFactor: captureScale(device),
     userAgent: device.userAgent,
-    hasTouch: true,
+    hasTouch: device.hasTouch ?? true,
     locale: LOCALES[locale],
   });
   let page;
@@ -755,6 +774,66 @@ const seedSession = async (session) => {
   if (created >= 300) throw new Error(`Creating the builder theme: HTTP ${created}`);
   dressTestAccount();
 };
+
+/**
+ * The banners' board (banners.mjs), on desktop in the column layout: the
+ * real final up to Denmark's 12 for Bulgaria, frozen once the row is gold,
+ * captured without the page background so the rows can sit on the banner's.
+ * Saves banner.png and banner.json (the rows' boxes in CSS px).
+ */
+const bannerSession = async (session) => {
+  const { page, t, rawDir } = session;
+  // The column's "At random" button for the voter's whole vote.
+  const wholeVote = page
+    .getByRole('button', {
+      name: new RegExp(`, ${escapeRe(t.simulation.view.wholeVote)}$`),
+    })
+    .first();
+
+  await applySettings(session, { themeYear: '2026' });
+  await startGrandFinal(session, { ready: wholeVote });
+  await playToDouzePoints(session, {
+    voteRandomly: wholeVote,
+    frameMs: BANNER_DOUZE_FRAME_MS,
+    // Every place number back, no rank arrows.
+    beforeTwelve: 3600,
+  });
+  // By the 12 the app has moved on to France, whose own row is dimmed while
+  // it votes; in the still every row shows at full strength.
+  await page.addStyleTag({
+    content:
+      '.dp-sim-board .cursor-not-allowed{opacity:1!important}html,.theme-default{background:none!important;background-color:transparent!important}',
+  });
+  await page.waitForTimeout(100);
+  const layout = await page.evaluate(() => ({
+    viewport: { width: window.innerWidth, height: innerHeight },
+    board: (() => {
+      const box = document.querySelector('.dp-sim-board').getBoundingClientRect();
+
+      return { x: box.x, y: box.y };
+    })(),
+    // The board patches its rows' getBoundingClientRect to undo its zoom
+    // (BoardStage's patchRowRects); the prototype's gives the rows on screen.
+    rows: [...document.querySelectorAll('.dp-sim-board [data-flip-id]')].map(
+      (row) => {
+        const box = Element.prototype.getBoundingClientRect.call(row);
+
+        return { x: box.x, y: box.y, width: box.width, height: box.height };
+      },
+    ),
+  }));
+
+  await page.screenshot({
+    path: path.join(rawDir, 'banner.png'),
+    omitBackground: true,
+  });
+  if (!(await page.locator('.douze-heart-animated').count())) {
+    throw new Error('The douze points animation ended before the screenshot');
+  }
+  writeFileSync(path.join(rawDir, 'banner.json'), JSON.stringify(layout));
+};
+
+export const BANNER_SESSION = { name: 'banner', scenes: ['banner'], run: bannerSession };
 
 /** Which session makes which scene. */
 export const SESSIONS = [

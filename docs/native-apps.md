@@ -718,6 +718,28 @@ back after a break. When that's not good enough:
   toasts use react-toastify; the blocking screens sit at `z-[2000]` and
   swallow Android back.
 
+### After an update: the What's new toast
+
+An update (store build or live bundle) that brings a new What's new entry
+(`WHATS_NEW` in `src/components/feedbackInfo/data.ts`) says so once per
+device: "DouzePoints has been updated." with **See what's new** (opens the
+Feedback modal on What's new, which also clears the feedback button's dot) and
+**Later**. It closes by itself after 10 s.
+`src/components/feedbackInfo/WhatsNewToast.tsx`, mounted lazily by
+`AppBootstrap` in native builds only; the website keeps just the dot.
+
+- **Every new entry is announced**, so add one only for news worth a toast;
+  fold small fixes into the next entry.
+- It shows 3 s after `liveUpdateBoot()`, not while a live-update notice
+  (prompt, required, store gate) is up; that launch skips it and the next
+  one tries again.
+- `localStorage['dp-whats-new-announced']` holds the last entry announced
+  (`announcedUpdate.ts`). A first launch (no `countries_initialized` yet)
+  stores the current entry, so new installs get no toast; an update from a
+  build without the toast (1.2 and older) has nothing stored and gets it.
+  Opening What's new before the toast (`lastSeenUpdate`) also skips it.
+- Strings: `feedbackInfo.updatedToast` / `seeWhatsNew`, plus `liveUpdate.later`.
+
 Versions are the UTC build time, `YYYYMMDD.HHmmss`, baked into every native
 build as `NEXT_PUBLIC_LIVE_UPDATE_VERSION`. A store binary built after a
 published bundle therefore never downloads it. Error reports from the apps

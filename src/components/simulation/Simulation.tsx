@@ -248,7 +248,7 @@ const Simulation = () => {
 
   const showRevealPanel = revealData !== null;
 
-  // The column layout (in preview, see useSimLayout) covers the regular
+  // The column layout (the default, see useSimLayout) covers the regular
   // board and Pick qualifiers mode; the jury scale reveal keeps the classic
   // one.
   const useColumnLayout = simLayout === 'column' && !isScaleRevealActive;

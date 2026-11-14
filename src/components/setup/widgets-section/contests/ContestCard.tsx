@@ -31,6 +31,7 @@ import { useSetupUiStore } from '@/components/setup/hub/state/setupUiStore';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
+import { languageTag } from '@/i18n/catalog';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -149,12 +150,15 @@ const ContestCard: React.FC<ContestCardProps> = ({
     : { icon: <Lock className="size-[15px]" />, label: t('widgets.private') };
   const savedOn =
     activeContest && isOwner
-      ? new Date(activeContest.updatedAt).toLocaleDateString(locale, {
-          hour: '2-digit',
-          minute: '2-digit',
-          month: 'short',
-          day: 'numeric',
-        })
+      ? new Date(activeContest.updatedAt).toLocaleDateString(
+          languageTag(locale),
+          {
+            hour: '2-digit',
+            minute: '2-digit',
+            month: 'short',
+            day: 'numeric',
+          },
+        )
       : null;
 
   const secondaryInMenu = step.tools !== 'all';

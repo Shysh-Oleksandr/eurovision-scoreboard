@@ -6,7 +6,7 @@
 #   yarn fastlane ios submit                the TestFlight build → App Review
 #   yarn fastlane android promote           internal testing → production
 #   yarn fastlane ios screenshots           assets/store/screenshots → App Store
-#   yarn fastlane android screenshots       assets/store/screenshots → Google Play
+#   yarn fastlane android screenshots       assets/store/screenshots → Google Play (+ feature graphic)
 #   yarn fastlane ios metadata              fastlane/metadata/ios → App Store
 #   yarn fastlane android metadata          fastlane/metadata/android → Google Play
 #   yarn fastlane ios pull_metadata         download the App Store listing
@@ -337,7 +337,7 @@ platform :android do
     )
   end
 
-  desc 'Uploads the screenshots (phone, 7″ and 10″ tablet): android screenshots [locales:en,fr]'
+  desc 'Uploads the screenshots (phone, 7″ and 10″ tablet) and the feature graphic: android screenshots [locales:en,fr]'
   lane :screenshots do |options|
     listing_locales(options, :android).each do |locale|
       images = File.join(ANDROID_METADATA, STORE_LOCALES[locale][:android], 'images')
@@ -350,11 +350,16 @@ platform :android do
           files.each { |f| FileUtils.cp(f, File.join(dir, File.basename(f))) }
         end
       end
+      feature = File.join(SCREENSHOTS, locale, 'play-feature', 'feature-graphic.png')
+      UI.user_error!("No feature graphic for #{locale}: run yarn store-screenshots --device play-feature") unless File.exist?(feature)
+      FileUtils.cp(feature, File.join(images, 'featureGraphic.png'))
     end
+    # Images: the feature graphic, plus the icon pull_metadata downloaded
+    # into en-US (the same file as live).
     upload_to_play_store(
       json_key: play_key, package_name: APP_ID, metadata_path: ANDROID_METADATA,
       skip_upload_apk: true, skip_upload_aab: true,
-      skip_upload_metadata: true, skip_upload_changelogs: true, skip_upload_images: true,
+      skip_upload_metadata: true, skip_upload_changelogs: true, skip_upload_images: false,
       skip_upload_screenshots: false,
     )
   end

@@ -11,6 +11,7 @@ import { useSetAppLocale } from './AppIntlProvider';
 
 import { setNetworkErrorMessage } from '@/api/client';
 import { takePendingWebLink, webLinkToast } from '@/api/signInMethods';
+import { markLatestUpdateAnnounced } from '@/components/feedbackInfo/announcedUpdate';
 import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
 import OfflineStrip from '@/components/offline/OfflineStrip';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
@@ -49,6 +50,13 @@ const PaletteDevPanel =
 // Live-update prompts and blocking screens; the chunk only loads in the apps.
 const LiveUpdateNotices = IS_NATIVE_APP
   ? dynamic(() => import('@/components/liveUpdate/LiveUpdateNotices'), {
+      ssr: false,
+    })
+  : null;
+
+// The one-time toast after an update brings a new What's new entry; apps only.
+const WhatsNewToast = IS_NATIVE_APP
+  ? dynamic(() => import('@/components/feedbackInfo/WhatsNewToast'), {
       ssr: false,
     })
   : null;
@@ -114,6 +122,8 @@ export default function AppBootstrap() {
 
     if (!hasBeenInitialized) {
       localStorage.setItem(initKey, 'true');
+      // A first launch has nothing new to announce (WhatsNewToast).
+      if (IS_NATIVE_APP) markLatestUpdateAnnounced();
       setInitialCountriesForYear('2026', {
         force: true,
         contestType: 'esc',
@@ -284,6 +294,7 @@ export default function AppBootstrap() {
       <OfflineStrip />
       <ThemeSoundVolumeHud />
       {LiveUpdateNotices && <LiveUpdateNotices />}
+      {WhatsNewToast && <WhatsNewToast />}
       {PaletteDevPanel && <PaletteDevPanel />}
     </>
   );

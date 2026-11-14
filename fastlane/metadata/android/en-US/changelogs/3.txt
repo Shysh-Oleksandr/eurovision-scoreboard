@@ -1,0 +1,6 @@
+• A redesigned simulation screen, with a new minimal view
+• Offline mode: stay signed in and see your contests and themes without a connection
+• More country stats: average place, streaks, semi-final results, jury vs televote
+• Eurovision Asia 2026 odds and voting order
+• Sign in with Google now works
+• Fixes and stability improvements

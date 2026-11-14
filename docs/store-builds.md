@@ -86,7 +86,9 @@ committing, and skip `prepare`, so run `yarn fastlane prepare` first.
   ([store-submission.md](store-submission.md) §6), then `yarn fastlane ios
   screenshots` and `yarn fastlane android screenshots`. Each replaces that
   language's screenshots in every slot: iPhone 6.9″ and iPad 13″, Play phone
-  and both tablet sizes (the same 16:9 files).
+  and both tablet sizes (the same 16:9 files). The Android lane also
+  uploads that language's feature graphic (`play-feature`), and the icon
+  `pull_metadata` saved in `en-US/images/` (unchanged).
 - **Languages:** both lanes upload every language whose listing has a
   description in `fastlane/metadata` (`description.txt` for iOS,
   `full_description.txt` for Android), or only `locales:en,fr` (app locale

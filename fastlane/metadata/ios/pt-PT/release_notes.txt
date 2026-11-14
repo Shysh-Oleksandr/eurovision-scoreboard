@@ -1,5 +1,5 @@
-• A Eurovisão 2027 até agora, e a Eurovisão Júnior 2026
-• Uma configuração do evento redesenhada
-• Uma só conta para iniciar sessão com Google, Apple e email
-• Feedback háptico durante a revelação dos votos
+• Um ecrã de simulação redesenhado, com uma nova vista mínima
+• Modo offline: mantém a sessão iniciada e tem os seus concursos e temas à mão, sem ligação
+• Mais estatísticas por país: posição média, sequências, resultados nas semifinais, júri vs. televoto
+• Eurovisão Ásia 2026: odds e ordem de votação
 • Correções e maior estabilidade

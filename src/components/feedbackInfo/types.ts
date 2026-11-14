@@ -1,3 +1,5 @@
+import { languageTag } from '@/i18n/catalog';
+
 export interface UpdateItem {
   date?: string;
   title: string;
@@ -7,7 +9,7 @@ export interface UpdateItem {
 export const formatDate = (dateString: string, locale: string) => {
   const date = new Date(dateString);
 
-  return date.toLocaleDateString(locale, {
+  return date.toLocaleDateString(languageTag(locale), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

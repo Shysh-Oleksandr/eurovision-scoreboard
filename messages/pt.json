@@ -90,7 +90,9 @@
   },
   "Metadata": {
     "title": "DouzePoints - Simulador do Painel de Pontuação da Eurovisão",
-    "description": "Experiencie a emoção da Eurovisão com o DouzePoints, o simulador interativo de painel de pontuação. Vote em países, veja os pontos acumular e reviva a magia do Festival Eurovisão da Canção"
+    "description": "Experiencie a emoção da Eurovisão com o DouzePoints, o simulador interativo de painel de pontuação. Vote em países, veja os pontos acumular e reviva a magia do Festival Eurovisão da Canção",
+    "intro": "O DouzePoints é um simulador gratuito do painel de pontuação da Eurovisão. Escolha qualquer Festival Eurovisão da Canção de {escFrom} a {escTo}, a Eurovisão Júnior de {jescFrom} a {jescTo}, a Eurovision Asia ou a sua própria lista de países. Atribua os pontos do júri e do televoto ou deixe as odds decidir, e veja o painel desenrolar-se como na emissão em direto.",
+    "notAffiliated": "Projeto de fãs não oficial, sem ligação à UER nem aprovação desta."
   },
   "error": {
     "title": "Ups! Algo correu mal",
@@ -1354,7 +1356,9 @@
     "donationCardSupport": "Se quiser apoiar o desenvolvimento futuro e ajudar-me a continuar a melhorar a plataforma, a sua contribuição significaria muito para mim.",
     "supportOnPatreon": "Apoiar no Patreon",
     "rateCardTitle": "Avalie o DouzePoints",
-    "rateCardText": "Uma classificação ou uma breve opinião na loja ajuda outros fãs a encontrar a app."
+    "rateCardText": "Uma classificação ou uma breve opinião na loja ajuda outros fãs a encontrar a app.",
+    "updatedToast": "O DouzePoints foi atualizado.",
+    "seeWhatsNew": "Ver novidades"
   },
   "share": {
     "generating": "A gerar...",

@@ -90,7 +90,9 @@
   },
   "Metadata": {
     "title": "DouzePoints - Simulatore di Classifica Eurovision",
-    "description": "Vivi l'emozione dell'Eurovision con DouzePoints, il simulatore di classifica interattivo. Vota per i paesi, guarda i punti accumularsi e rivivi la magia dell'Eurovision Song Contest"
+    "description": "Vivi l'emozione dell'Eurovision con DouzePoints, il simulatore di classifica interattivo. Vota per i paesi, guarda i punti accumularsi e rivivi la magia dell'Eurovision Song Contest",
+    "intro": "DouzePoints è un simulatore di classifica Eurovision gratuito. Scegli qualsiasi Eurovision Song Contest dal {escFrom} al {escTo}, lo Junior Eurovision Song Contest dal {jescFrom} al {jescTo}, Eurovision Asia o una lista di paesi tutta tua. Assegna tu i punti di giuria e televoto o lascia decidere alle quote, poi guarda la classifica svolgersi come nella diretta.",
+    "notAffiliated": "Progetto non ufficiale di fan, non affiliato all'EBU né da essa approvato."
   },
   "error": {
     "title": "Oops! Qualcosa è andato storto",
@@ -1354,7 +1356,9 @@
     "donationCardSupport": "Se vorresti sostenere lo sviluppo futuro e aiutarmi a continuare a migliorare la piattaforma, il tuo contributo significherebbe molto per me.",
     "supportOnPatreon": "Sostieni su Patreon",
     "rateCardTitle": "Valuta DouzePoints",
-    "rateCardText": "Una valutazione o una breve recensione nello store aiuta altri fan a trovare l'app."
+    "rateCardText": "Una valutazione o una breve recensione nello store aiuta altri fan a trovare l'app.",
+    "updatedToast": "DouzePoints è stato aggiornato.",
+    "seeWhatsNew": "Scopri le novità"
   },
   "share": {
     "generating": "Generazione in corso...",

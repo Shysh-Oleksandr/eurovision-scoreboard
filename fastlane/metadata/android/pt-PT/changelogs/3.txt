@@ -1,0 +1,6 @@
+• Um ecrã de simulação redesenhado, com uma nova vista mínima
+• Modo offline: mantém a sessão iniciada e tem os seus concursos e temas à mão, sem ligação
+• Mais estatísticas por país: posição média, sequências, resultados nas semifinais, júri vs. televoto
+• Eurovisão Ásia 2026: odds e ordem de votação
+• O início de sessão com o Google já funciona
+• Correções e maior estabilidade

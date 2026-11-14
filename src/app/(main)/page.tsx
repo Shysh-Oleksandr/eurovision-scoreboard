@@ -6,6 +6,7 @@ import Main from '../../views/Main';
 import { useCatalogReady } from '../AppIntlProvider';
 
 import { ComponentStackBoundary } from '@/components/common/ComponentStackBoundary';
+import HomeIntro from '@/components/home/HomeIntro';
 import { useIsClient } from '@/hooks/useIsClient';
 import { confirmLiveBundle } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
@@ -39,9 +40,15 @@ export default function Page() {
     return () => window.clearTimeout(timer);
   }, [ready]);
 
-  return ready ? (
-    <ComponentStackBoundary>
-      <Main />
-    </ComponentStackBoundary>
-  ) : null;
+  if (ready) {
+    return (
+      <ComponentStackBoundary>
+        <Main />
+      </ComponentStackBoundary>
+    );
+  }
+
+  // The server's output: text for crawlers that don't run JavaScript. The
+  // apps keep their splash screen instead.
+  return IS_NATIVE_APP ? null : <HomeIntro />;
 }

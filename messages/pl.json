@@ -90,7 +90,9 @@
   },
   "Metadata": {
     "title": "DouzePoints - Symulator Tablicy Wyników Eurowizji",
-    "description": "Poczuj emocje Eurowizji z DouzePoints, interaktywnym symulatorem tablicy wyników. Głosuj na kraje, obserwuj przyznawanie punktów i przeżyj magię Konkursu Piosenki Eurowizji."
+    "description": "Poczuj emocje Eurowizji z DouzePoints, interaktywnym symulatorem tablicy wyników. Głosuj na kraje, obserwuj przyznawanie punktów i przeżyj magię Konkursu Piosenki Eurowizji.",
+    "intro": "DouzePoints to darmowy symulator tablicy wyników Eurowizji. Wybierz dowolny Konkurs Piosenki Eurowizji z lat {escFrom}–{escTo}, Eurowizję Junior z lat {jescFrom}–{jescTo}, Eurovision Asia lub własny skład krajów. Przyznaj punkty jury i widzów samodzielnie albo zdaj się na szanse i patrz, jak tablica wyników zmienia się jak w transmisji na żywo.",
+    "notAffiliated": "Nieoficjalny projekt fanów, niepowiązany z EBU ani przez nią niepopierany."
   },
   "error": {
     "title": "Ups! Coś poszło nie tak",
@@ -1354,7 +1356,9 @@
     "donationCardSupport": "Jeśli chcesz wesprzeć dalszy rozwój i pomóc mi w dalszym ulepszaniu platformy, Twoja wpłata wiele dla mnie znaczy.",
     "supportOnPatreon": "Wesprzyj na Patreon",
     "rateCardTitle": "Oceń DouzePoints",
-    "rateCardText": "Ocena lub krótka recenzja w sklepie pomaga innym fanom znaleźć aplikację."
+    "rateCardText": "Ocena lub krótka recenzja w sklepie pomaga innym fanom znaleźć aplikację.",
+    "updatedToast": "Aplikacja DouzePoints została zaktualizowana.",
+    "seeWhatsNew": "Zobacz, co nowego"
   },
   "share": {
     "generating": "Generowanie...",

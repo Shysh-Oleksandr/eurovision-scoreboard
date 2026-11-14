@@ -90,7 +90,9 @@
   },
   "Metadata": {
     "title": "DouzePoints - Eurovision Scoreboard Simulator",
-    "description": "Erlebe die Spannung des Eurovision mit DouzePoints, dem interaktiven Scoreboard-Simulator. Stimme für Länder ab, sieh die Punkte steigen und erlebe den Zauber des Eurovision Song Contest neu."
+    "description": "Erlebe die Spannung des Eurovision mit DouzePoints, dem interaktiven Scoreboard-Simulator. Stimme für Länder ab, sieh die Punkte steigen und erlebe den Zauber des Eurovision Song Contest neu.",
+    "intro": "DouzePoints ist ein kostenloser Eurovision-Scoreboard-Simulator. Wähle einen Eurovision Song Contest von {escFrom} bis {escTo}, den Junior Eurovision Song Contest von {jescFrom} bis {jescTo}, Eurovision Asia oder dein eigenes Teilnehmerfeld. Vergib die Jury- und Televote-Punkte selbst oder lass die Quoten entscheiden und sieh zu, wie sich das Scoreboard wie in der Live-Show füllt.",
+    "notAffiliated": "Inoffizielles Fanprojekt, weder mit der EBU verbunden noch von ihr unterstützt."
   },
   "error": {
     "title": "Ups! Etwas ist schiefgelaufen",
@@ -1354,7 +1356,9 @@
     "donationCardSupport": "Wenn du die weitere Entwicklung unterstützen und mir helfen möchtest, die Plattform weiter zu verbessern, würde mich dein Beitrag sehr freuen.",
     "supportOnPatreon": "Auf Patreon unterstützen",
     "rateCardTitle": "Bewerte DouzePoints",
-    "rateCardText": "Eine Bewertung oder eine kurze Rezension im Store hilft anderen Fans, die App zu finden."
+    "rateCardText": "Eine Bewertung oder eine kurze Rezension im Store hilft anderen Fans, die App zu finden.",
+    "updatedToast": "DouzePoints wurde aktualisiert.",
+    "seeWhatsNew": "Neuigkeiten ansehen"
   },
   "share": {
     "generating": "Generiere...",

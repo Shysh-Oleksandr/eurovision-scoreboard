@@ -7,10 +7,13 @@
  *   yarn build:native                       # once, and after UI changes
  *   yarn store-screenshots                  # every device, language and scene
  *   yarn store-screenshots --device iphone --locale en,de --scene winner
+ *   yarn store-screenshots --device og,play-feature   # the banners only
  *   yarn store-screenshots --jobs 2         # parallel device/language runs
  *
  * Output: assets/store/screenshots/<locale>/<device>/<NN>-<scene>.png
- * (gitignored). The signed-in scenes (setup, builder, contests) need Docker
+ * (gitignored), and the banners (the website's link preview, English only,
+ * and Play's feature graphic) as <locale>/<banner>/<file> from a desktop
+ * capture (scene `banner`). The signed-in scenes (setup, builder, contests) need Docker
  * and the sibling douze-points-backend checkout: a throwaway backend is
  * started for them and stopped at the end. Nothing is written to production.
  */
@@ -26,14 +29,25 @@ import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
 
-import { SESSIONS, runSession, seedAccount } from './store-screenshots/app.mjs';
+import {
+  BANNER_SESSION,
+  SESSIONS,
+  runSession,
+  seedAccount,
+} from './store-screenshots/app.mjs';
 import { startBackend } from './store-screenshots/backend.mjs';
-import { DEVICES, LOCALES } from './store-screenshots/devices.mjs';
+import { composeBanners } from './store-screenshots/banners.mjs';
+import {
+  BANNER_CAPTURE,
+  BANNERS,
+  DEVICES,
+  LOCALES,
+} from './store-screenshots/devices.mjs';
 import { SLIDES, composeFrames } from './store-screenshots/frame.mjs';
 
 const OUT_DIR = 'out';
 const SCREENSHOTS_DIR = 'assets/store/screenshots';
-const SCENES = SLIDES.map(([scene]) => scene);
+const SCENES = [...SLIDES.map(([scene]) => scene), 'banner'];
 
 const args = process.argv.slice(2);
 const listArg = (name, all) => {
@@ -50,7 +64,10 @@ const listArg = (name, all) => {
 
   return picked;
 };
-const deviceNames = listArg('device', Object.keys(DEVICES));
+const deviceNames = listArg('device', [
+  ...Object.keys(DEVICES),
+  ...Object.keys(BANNERS),
+]);
 const locales = listArg('locale', Object.keys(LOCALES));
 const scenes = listArg('scene', SCENES);
 const jobs = Number(args.includes('--jobs') ? args[args.indexOf('--jobs') + 1] : 2);
@@ -118,10 +135,67 @@ const pool = async (items, limit, worker) => {
 
 const { server, url } = await serveExport();
 const rawRoot = mkdtempSync(path.join(os.tmpdir(), 'dp-store-raw-'));
+const frameDevices = deviceNames.filter((name) => DEVICES[name]);
 const sessions = SESSIONS.filter((s) => s.scenes.some((scene) => scenes.includes(scene)));
-const needsAccount = sessions.some((s) => s.account);
+const needsAccount = frameDevices.length > 0 && sessions.some((s) => s.account);
+/** Banners picked for a locale (one desktop capture makes all of them). */
+const bannersFor = (locale) =>
+  scenes.includes('banner')
+    ? deviceNames.filter(
+        (name) => BANNERS[name] && (!BANNERS[name].locales || BANNERS[name].locales.includes(locale)),
+      )
+    : [];
 const failures = [];
 let backend;
+
+/** One store slot in one language: every picked scene, framed. */
+const runDevice = async ({ device: deviceName, locale }) => {
+  const device = DEVICES[deviceName];
+  const rawDir = path.join(rawRoot, locale, deviceName);
+  const outDir = path.join(SCREENSHOTS_DIR, locale, deviceName);
+
+  mkdirSync(rawDir, { recursive: true });
+  mkdirSync(outDir, { recursive: true });
+  for (const spec of sessions) {
+    const started = Date.now();
+
+    try {
+      await runSession(spec, { url, device, locale, rawDir, scenes });
+      console.log(`  ${locale} ${deviceName} ${spec.name} (${Math.round((Date.now() - started) / 1000)} s)`);
+    } catch (error) {
+      failures.push(`${locale} ${deviceName} ${spec.name}: ${error.message.split('\n')[0]}`);
+      console.error(`  ${locale} ${deviceName} ${spec.name} FAILED (debug image in ${rawDir})`);
+    }
+  }
+  const written = await composeFrames({ device, locale, rawDir, outDir, scenes });
+
+  console.log(`${locale} ${deviceName}: ${written.length} screenshots in ${outDir}`);
+};
+
+/** The banners of one language, from one desktop capture. */
+const runBanners = async ({ locale, names }) => {
+  const rawDir = path.join(rawRoot, locale, 'banner');
+  const started = Date.now();
+
+  mkdirSync(rawDir, { recursive: true });
+  try {
+    await runSession(BANNER_SESSION, { url, device: BANNER_CAPTURE, locale, rawDir, scenes });
+    console.log(`  ${locale} banner (${Math.round((Date.now() - started) / 1000)} s)`);
+  } catch (error) {
+    failures.push(`${locale} banner: ${error.message.split('\n')[0]}`);
+    console.error(`  ${locale} banner FAILED (debug image in ${rawDir})`);
+
+    return;
+  }
+  const written = await composeBanners({
+    locale,
+    rawDir,
+    outRoot: path.join(SCREENSHOTS_DIR, locale),
+    names,
+  });
+
+  console.log(`${locale}: ${written.join(', ')}`);
+};
 
 try {
   if (needsAccount) {
@@ -133,30 +207,16 @@ try {
     await seedAccount({ url, device: DEVICES.iphone, locale: 'en', rawDir: seedDir });
   }
 
-  const tasks = deviceNames.flatMap((device) => locales.map((locale) => ({ device, locale })));
+  const tasks = [
+    ...(sessions.length ? frameDevices : []).flatMap((device) =>
+      locales.map((locale) => ({ device, locale })),
+    ),
+    ...locales
+      .map((locale) => ({ locale, names: bannersFor(locale) }))
+      .filter(({ names }) => names.length),
+  ];
 
-  await pool(tasks, jobs, async ({ device: deviceName, locale }) => {
-    const device = DEVICES[deviceName];
-    const rawDir = path.join(rawRoot, locale, deviceName);
-    const outDir = path.join(SCREENSHOTS_DIR, locale, deviceName);
-
-    mkdirSync(rawDir, { recursive: true });
-    mkdirSync(outDir, { recursive: true });
-    for (const spec of sessions) {
-      const started = Date.now();
-
-      try {
-        await runSession(spec, { url, device, locale, rawDir, scenes });
-        console.log(`  ${locale} ${deviceName} ${spec.name} (${Math.round((Date.now() - started) / 1000)} s)`);
-      } catch (error) {
-        failures.push(`${locale} ${deviceName} ${spec.name}: ${error.message.split('\n')[0]}`);
-        console.error(`  ${locale} ${deviceName} ${spec.name} FAILED (debug image in ${rawDir})`);
-      }
-    }
-    const written = await composeFrames({ device, locale, rawDir, outDir, scenes });
-
-    console.log(`${locale} ${deviceName}: ${written.length} screenshots in ${outDir}`);
-  });
+  await pool(tasks, jobs, (task) => (task.names ? runBanners(task) : runDevice(task)));
 } finally {
   backend?.stop();
   server.close();

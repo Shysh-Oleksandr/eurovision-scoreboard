@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 import { devtools, persist } from 'zustand/middleware';
 
-import { WHATS_NEW } from '../components/feedbackInfo/data';
+import { LATEST_UPDATE_KEY } from '../components/feedbackInfo/data';
 import { Year } from '../config';
 import {
   ALL_THEMES,
@@ -371,16 +371,6 @@ export interface GeneralState {
   setContestToEdit: (contest: Contest | null) => void;
 }
 
-const getLatestUpdate = () => {
-  const [latest] = WHATS_NEW;
-
-  if (latest) {
-    return `${latest.date}-${latest.title}`;
-  }
-
-  return null;
-};
-
 const initialPointsSystem = POINTS_ARRAY.map((value, index) => ({
   value,
   showDouzePoints: value === 12,
@@ -429,10 +419,9 @@ export const useGeneralStore = create<GeneralState>()(
           set({ shouldShowNewChangesIndicator: show });
         },
         checkForNewUpdates: () => {
-          const latestUpdate = getLatestUpdate();
           const { lastSeenUpdate } = get();
 
-          if (latestUpdate && lastSeenUpdate !== latestUpdate) {
+          if (LATEST_UPDATE_KEY && lastSeenUpdate !== LATEST_UPDATE_KEY) {
             set({ shouldShowNewChangesIndicator: true });
           }
         },

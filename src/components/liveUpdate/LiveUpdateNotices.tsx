@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { type ReactNode, useEffect, useSyncExternalStore } from 'react';
 import { toast } from 'react-toastify';
 
+import { ActionToast } from '@/components/common/ActionToast';
 import Button from '@/components/common/Button';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import {
@@ -63,7 +64,7 @@ export default function LiveUpdateNotices() {
     if (toast.isActive(PROMPT_TOAST_ID)) return;
 
     toast(
-      <UpdateToast
+      <ActionToast
         message={t('readyMessage')}
         action={t('restart')}
         later={t('later')}
@@ -97,7 +98,7 @@ export default function LiveUpdateNotices() {
     if (toast.isActive(STORE_TOAST_ID)) return;
 
     toast(
-      <UpdateToast
+      <ActionToast
         message={t('storeRecommendedMessage')}
         action={t('update')}
         later={t('later')}
@@ -118,32 +119,6 @@ export default function LiveUpdateNotices() {
   if (blockingBundle) return <BundleRequiredScreen notice={blockingBundle} />;
 
   return null;
-}
-
-function UpdateToast({
-  message,
-  action,
-  later,
-  onAction,
-  onLater,
-}: {
-  message: string;
-  action: string;
-  later: string;
-  onAction: () => void;
-  onLater: () => void;
-}) {
-  return (
-    <div className="flex flex-col gap-2.5">
-      <p className="text-[13px] font-semibold leading-5 text-balance">
-        {message}
-      </p>
-      <div className="flex gap-2">
-        <Button size="sm" variant="cta" label={action} onClick={onAction} />
-        <Button size="sm" variant="surface" label={later} onClick={onLater} />
-      </div>
-    </div>
-  );
 }
 
 function BlockingScreen({

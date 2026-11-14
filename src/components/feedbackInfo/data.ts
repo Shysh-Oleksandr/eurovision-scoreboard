@@ -533,6 +533,14 @@ export function insertByDate(
 
 export const WHATS_NEW = insertByDate(WEBSITE_UPDATES, APP_RELEASE_UPDATE);
 
+/**
+ * Names the newest update: the feedback button's dot (`lastSeenUpdate`) and
+ * the apps' What's new toast compare against it.
+ */
+export const LATEST_UPDATE_KEY: string | null = WHATS_NEW[0]
+  ? `${WHATS_NEW[0].date}-${WHATS_NEW[0].title}`
+  : null;
+
 export const UPCOMING_FEATURES: UpdateItem[] = [
   {
     approximateDates: { start: '2026-11-15', end: '2026-11-16' },

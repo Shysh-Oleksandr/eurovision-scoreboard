@@ -6,6 +6,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
 
+import { languageTag } from '@/i18n/catalog';
 import { splitEvenly } from '@/state/allocationDraw/engine';
 import type {
   DrawEntrantStep,
@@ -61,7 +62,7 @@ export const useDrawCopy = (
 
       try {
         if (ListFormat) {
-          return new ListFormat(locale, {
+          return new ListFormat(languageTag(locale), {
             style: 'long',
             type: 'conjunction',
           }).format(names);

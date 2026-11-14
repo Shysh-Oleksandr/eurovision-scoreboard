@@ -1,5 +1,5 @@
-• L’Eurovision 2027 tel qu’il se dessine, et l’Eurovision Junior 2026
-• Un écran de configuration repensé
-• Un seul compte pour la connexion Google, Apple et e-mail
-• Retour haptique pendant le dévoilement des votes
+• Un écran de simulation repensé, avec une nouvelle vue minimale
+• Mode hors ligne : vous restez connecté et retrouvez vos concours et thèmes sans réseau
+• Plus de statistiques par pays : place moyenne, séries, résultats en demi-finale, jury contre télévote
+• Eurovision Asia 2026 : cotes et ordre de vote
 • Corrections et meilleure stabilité

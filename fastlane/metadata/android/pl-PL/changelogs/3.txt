@@ -1,0 +1,6 @@
+• Przeprojektowany ekran symulacji z nowym widokiem minimalnym
+• Tryb offline: sesja się nie kończy, a Twoje konkursy i motywy są dostępne bez internetu
+• Więcej statystyk krajów: średnie miejsce, serie, wyniki w półfinałach, jury kontra televoting
+• Eurowizja Azja 2026: szanse i kolejność głosowania
+• Logowanie przez Google już działa
+• Poprawki i większa stabilność

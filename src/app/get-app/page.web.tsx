@@ -11,21 +11,17 @@ import {
   GET_APP_PATH,
   PLAY_STORE_URL,
 } from '@/config/appStores';
+import { pageMetadata } from '@/config/seo';
 import GetApp from '@/views/GetApp';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('appPromo.page');
 
-  return {
+  return pageMetadata({
+    path: GET_APP_PATH,
     title: t('metaTitle'),
     description: t('metaDescription'),
-    alternates: { canonical: GET_APP_PATH },
-    openGraph: {
-      title: t('metaTitle'),
-      description: t('metaDescription'),
-      url: `https://douzepoints.app${GET_APP_PATH}`,
-    },
-  };
+  });
 }
 
 /**

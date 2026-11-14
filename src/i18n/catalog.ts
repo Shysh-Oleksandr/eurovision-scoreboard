@@ -42,6 +42,17 @@ export function matchLocale(
   return null;
 }
 
+/**
+ * The BCP 47 tag of a locale, for anything that reads it as a language: the
+ * `lang` attribute and Intl. Greek stays `gr` in this app (cookies, stored
+ * preferences, message files), but `gr` isn't a language code: Intl falls
+ * back to English for it ("Α, Β, and Γ", "November 14, 2026") and
+ * `lang="gr"` means nothing to screen readers, browsers or crawlers.
+ */
+export function languageTag(locale: string): string {
+  return locale === 'gr' ? 'el' : locale;
+}
+
 export function normalizeLocale(
   raw: string | undefined | null,
 ): SupportedLocale {

@@ -10,6 +10,7 @@ import React, {
   useState,
 } from 'react';
 
+import { languageTag } from '@/i18n/catalog';
 import type { SupportedLocale } from '@/i18n/catalog';
 import { catalogUrlFor } from '@/i18n/catalogUrl';
 import { resolveNativeLocale, storeLocale } from '@/i18n/nativeLocale';
@@ -151,7 +152,9 @@ export default function AppIntlProvider({
   // The static document says lang="en"; keep it truthful for screen readers
   // and hyphenation once the native locale is known.
   useEffect(() => {
-    if (IS_NATIVE_APP) document.documentElement.lang = state.locale;
+    if (IS_NATIVE_APP) {
+      document.documentElement.lang = languageTag(state.locale);
+    }
   }, [state.locale]);
 
   return (
