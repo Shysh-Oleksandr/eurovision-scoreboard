@@ -12,6 +12,8 @@ import Select from '../common/Select';
 
 import { useContinueToNextPhase } from './hooks/useContinueToNextPhase';
 
+import { useShortcut } from '@/shortcuts/registry';
+
 const FinalStatsModal = dynamic(() => import('./finalStats/FinalStatsModal'), {
   ssr: false,
 });
@@ -68,6 +70,13 @@ export const PhaseActions = ({ onBackToScoreboard }: PhaseActionsProps) => {
   }, [isSFAndGFEventOver, getCurrentStage, setViewedStageId, viewedStageId]);
 
   const { handleContinue } = useContinueToNextPhase();
+
+  useShortcut('stats', () => setShowFinalStatsModal(true), !!isVotingOver);
+  useShortcut(
+    'continue',
+    () => (onBackToScoreboard ? onBackToScoreboard() : handleContinue()),
+    !!onBackToScoreboard || (!!isVotingOver && !isLastStage),
+  );
 
   if (!isVotingOver && !isSFAndGFEventOver) {
     return null;

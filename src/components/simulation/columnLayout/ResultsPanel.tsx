@@ -19,6 +19,7 @@ import { WINDOW_CLASS } from './VotingColumn';
 
 import Button from '@/components/common/Button';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
+import { useShortcut } from '@/shortcuts/registry';
 import { useGeneralStore } from '@/state/generalStore';
 
 const FinalStatsModal = dynamic(() => import('../finalStats/FinalStatsModal'), {
@@ -134,6 +135,14 @@ const ResultsPanel = ({
     onBackToScoreboard?.();
   };
 
+  // Enter runs the filled button: View scoreboard after the final reveal,
+  // else Continue.
+  const mainAction =
+    onBackToScoreboard ?? (canContinue ? handleContinue : undefined);
+
+  useShortcut('continue', () => mainAction?.(), !!mainAction);
+  useShortcut('stats', () => setStatsOpen(true), !hideStats);
+
   const title =
     winner?.name ?? t('view.stageOver', { stage: viewedStage?.name ?? '' });
   const caption = winner
@@ -159,6 +168,7 @@ const ResultsPanel = ({
       size={variant === 'stripe' ? 'md' : 'xl'}
       className="w-full justify-center gap-2"
       onClick={handleContinue}
+      shortcut={onBackToScoreboard ? undefined : 'continue'}
     >
       <span className="flex items-center gap-2">
         {t('phaseActions.continueTo', { nextPhase: nextPhase ?? '' })}
@@ -174,6 +184,7 @@ const ResultsPanel = ({
       className="w-full justify-center"
       Icon={<LayoutList className="size-[18px]" />}
       onClick={onBackToScoreboard}
+      shortcut="continue"
     >
       {t('backToScoreboard')}
     </Button>
@@ -239,6 +250,7 @@ const ResultsPanel = ({
               className="justify-center"
               Icon={<ChartBar className="size-[18px]" />}
               onClick={() => setStatsOpen(true)}
+              shortcut="stats"
             >
               {t('phaseActions.viewStats')}
             </Button>
@@ -248,6 +260,7 @@ const ResultsPanel = ({
               className="justify-center"
               Icon={<Share2 className="size-[18px]" />}
               onClick={onShare}
+              shortcut="share"
             >
               {t('header.share')}
             </Button>
@@ -271,6 +284,7 @@ const ResultsPanel = ({
       aria-label={t('phaseActions.viewStats')}
       Icon={<ChartBar className="size-[18px]" />}
       onClick={() => setStatsOpen(true)}
+      shortcut="stats"
     />
   );
   const shareButton = (
@@ -281,6 +295,7 @@ const ResultsPanel = ({
       aria-label={t('header.share')}
       Icon={<Share2 className="size-[18px]" />}
       onClick={onShare}
+      shortcut="share"
     />
   );
   const summary = (

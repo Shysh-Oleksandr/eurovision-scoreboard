@@ -14,6 +14,7 @@
  * docs/plans/graphics-poc-results.md.
  */
 
+import { noteCrumb } from '@/native/crashWatch/crumbs';
 import { IS_NATIVE_APP } from '@/native/platform';
 
 export type ExportEngine = 'snapdom' | 'html-to-image';
@@ -335,6 +336,10 @@ export async function exportNode(
   } = options;
   const warnings: string[] = [];
   const t0 = performance.now();
+
+  // The apps' crash reports (an export is the most memory a page asks for).
+  noteCrumb(`export:${width}x${height}@${scale}`);
+
   const restore = await inlineResources(node, warnings);
 
   try {
@@ -363,17 +368,33 @@ export async function exportNode(
     }
 
     const mime = format === 'png' ? 'image/png' : 'image/jpeg';
-
-    return {
-      dataUrl: capture.canvas.toDataURL(mime, quality),
-      width: capture.canvas.width,
-      height: capture.canvas.height,
+    const { canvas } = capture;
+    const dataUrl = canvas.toDataURL(mime, quality);
+    const result: ExportResult = {
+      dataUrl,
+      width: canvas.width,
+      height: canvas.height,
       engine: usedEngine,
       retries: capture.retries,
       usedFallback,
       warnings,
       durationMs: performance.now() - t0,
     };
+
+    // WebKit holds a canvas's pixels until garbage collection, and iOS
+    // counts them against a page-wide canvas limit: let them go now.
+    canvas.width = 0;
+    canvas.height = 0;
+    noteCrumb(
+      `export:done ${result.width}x${result.height} ${Math.round(
+        dataUrl.length / 1024,
+      )}KB ${Math.round(result.durationMs)}ms`,
+    );
+
+    return result;
+  } catch (error) {
+    noteCrumb('export:failed');
+    throw error;
   } finally {
     restore();
   }

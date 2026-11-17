@@ -674,7 +674,9 @@
       "restart": "Restart",
       "undo": "Undo",
       "share": "Share",
-      "setup": "Setup"
+      "setup": "Setup",
+      "restartConfirmation": "Restart the simulation?",
+      "restartConfirmationDescription": "The votes given so far will be lost."
     },
     "phaseActions": {
       "viewStats": "Stats",
@@ -1603,6 +1605,8 @@
         "whiteHeartFlags2026": "Show heart flags in the 2026 design with a white outline instead of the classic black one.",
         "minimalFlags": "Use simplified round and square flag shapes instead of detailed flags.",
         "rankChange": "Show an arrow indicating whether each entry moved up or down since the previous points were awarded.",
+        "fullCountryNames": "Never swap the names for three-letter codes (NOR, SWE). On a phone with two board columns, a name too long for its column is cut short with an ellipsis instead.",
+        "classicSimulationLayout": "Brings back the old simulation screen, with the controls under the board. It is no longer developed: new features and fixes come to the current layout only, and the classic one may be removed in a later update.",
         "targetStages": "Show which stage each qualifier advances to.",
         "blurModal": "Blur the scoreboard behind open modals for extra focus.",
         "overrideFont": "Ignore each theme’s fonts (including uploaded ones) and always use the font you pick below, on both the interface and the scoreboard.",
@@ -1741,6 +1745,8 @@
       "useHeartIconsForFlags": "Use heart icons for flags",
       "use2026WhiteHeartFlags": "Use the 2026 heart flags with a white outline",
       "alwaysShowRankings": "Always show rankings",
+      "alwaysShowFullCountryNames": "Always show full country names",
+      "enableClassicSimulationLayout": "Use the old simulation layout",
       "showRankChangeIndicator": "Show rank change indicator",
       "showQualifiersPopup": "Show qualifiers popup",
       "showQualifierTargetStages": "Show qualifier target stages",
@@ -1819,7 +1825,43 @@
       "closeCustomizeTheme": "Close theme editor",
       "cancelSimulation": "Cancel simulation",
       "logout": "Logout",
-      "createNewContest": "Create new contest"
+      "createNewContest": "Create new contest",
+      "restartSimulation": "Restart simulation"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "blurb": "Run the simulation from the keyboard, with keys of your choice.",
+      "enable": "Use keyboard shortcuts",
+      "enableDesc": "Single keys press the simulation’s buttons. They wait while you type or a window is open.",
+      "showHints": "Show keys on buttons",
+      "showHintsDesc": "The key in the corner of each button that has one.",
+      "changeHint": "Click a key, then press the new one. Backspace clears it, Escape cancels.",
+      "notSet": "Not set",
+      "pressKey": "Press a key…",
+      "movedTo": "Its key went to “{action}”",
+      "resetTo": "Reset to {key}",
+      "resetAll": "Reset all keys",
+      "keys": {
+        "space": "Space"
+      },
+      "actions": {
+        "random": "Random",
+        "randomNext": "Next points at random",
+        "randomVoter": "Whole vote at random",
+        "randomAll": "Finish the round at random",
+        "present": "Present / pause",
+        "undo": "Undo",
+        "restart": "Restart",
+        "continue": "Continue / view scoreboard",
+        "setup": "Open setup",
+        "stats": "Open stats",
+        "minimalView": "Minimal view",
+        "share": "Share",
+        "fullscreen": "Fullscreen",
+        "cancel": "Cancel simulation",
+        "startStage": "Start the stage (in its window)",
+        "shortcutsHelp": "Open these settings"
+      }
     }
   },
   "graphics": {

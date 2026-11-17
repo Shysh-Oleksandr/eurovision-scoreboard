@@ -285,6 +285,28 @@ describe('createSessionTracker', () => {
     });
   });
 
+  it('saves a crumb noted from outside at once', () => {
+    const { storage } = memoryStorage();
+    let now = 3_000_000;
+    const tracker = createSessionTracker({
+      storage,
+      readContext: () => context(),
+      bundle: 'built-in',
+      now: () => now,
+    });
+
+    tracker.start('visible');
+    now += 7_000;
+    tracker.note('share:sheet');
+    expect(readSessionRecord(storage)).toMatchObject({
+      updatedAt: 3_007_000,
+      crumbs: [
+        [0, 'start:visible'],
+        [7, 'share:sheet'],
+      ],
+    });
+  });
+
   it('ignores a malformed saved record', () => {
     const { storage } = memoryStorage({ [SESSION_KEY]: '{"v":1}' });
 

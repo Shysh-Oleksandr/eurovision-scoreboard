@@ -2,8 +2,13 @@
 
 The redesigned simulation view ("spokesperson column"). It replaces the stacked
 Controls / Presentation panels and the icon header of the classic layout. It is
-the default since 2026-11-14; the classic layout still ships behind
-`?simLayout=classic` until it is deleted.
+the default since 2026-11-14; the classic layout still ships behind a
+setting ("Use the classic simulation layout") until it is deleted.
+
+**The classic layout is deprecated.** New features, fixes and redesigns
+target the column layout only. Changes don't have to bring the classic
+layout along or match it; it only has to keep working (no crash, the vote
+still runs). The setting's hint tells users so.
 
 Code: `src/components/simulation/columnLayout/`. Design brief and direction:
 `.impeccable/surfaces/src-components-simulation-simulation-tsx.md`; approved
@@ -15,10 +20,16 @@ mode's options: `.impeccable/mocks/sim-pick-qualifiers.html` (option A built,
 
 `useSimLayout()` (`useSimLayout.ts`) picks `classic` or `column`:
 
-- `?simLayout=column` / `?simLayout=classic` in the URL sets it and stores it in
-  localStorage (`dp-sim-layout`), so it sticks on that device, the apps included.
-- Without a stored choice every build uses `column` (the server render too).
-  Only devices that opened `?simLayout=classic` keep the classic layout.
+- The setting `enableClassicSimulationLayout` (Settings → Look & feel →
+  Popups & chrome, off by default, synced with the account) turns on
+  `classic`. It applies at once: the open simulation switches layouts
+  without a reload.
+- `?simLayout=classic` / `?simLayout=column` in the URL still set the
+  setting. A choice stored before the setting existed (localStorage
+  `dp-sim-layout`) moves into it once and the key is removed
+  (`adoptLegacyChoice`, run when the module loads, before the first render,
+  so the layout never flashes).
+- The server render always uses `column`.
 
 `Simulation.tsx` renders `SimulationColumnLayout` unless the jury scale reveal
 is running (that keeps the classic layout for now). Semi-finals in Pick
@@ -27,14 +38,15 @@ confetti and qualification modal are shared, except that the qualification
 modal stays off while picking qualifiers in the column layout (the column
 shows the qualifiers).
 
-Once the column layout has settled, delete the classic branch, the
-`?simLayout` switch, `ControlsPanel`, `PresentationPanel`, `PhaseActions` and
-`SimulationHeader` (once nothing else uses them).
+When the classic layout goes, delete the classic branch, the setting (and
+its sync key and translations), the `?simLayout` switch, `ControlsPanel`,
+`PresentationPanel`, `PhaseActions` and `SimulationHeader` (once nothing
+else uses them).
 
 ## 2. Structure
 
 ```
-SimulationColumnLayout          usePresentationLoop(), Ctrl+F finish hotkey
+SimulationColumnLayout          usePresentationLoop(), the Share shortcut
 ├─ SimHeader                    logo, stage + contest, minimal view, Setup, ⋯
 ├─ BoardStage                   Board (or FinalTelevoteReveal) + column count + zoom
 ├─ VotingColumn | ResultsPanel  desktop ≥1024px, right of the board (.dp-sim-col)
@@ -49,8 +61,9 @@ SimulationColumnLayout          usePresentationLoop(), Ctrl+F finish hotkey
   televote, `index` of `total`, progress and the next value.
 - **Random actions** come from `useRandomActions(voter)`: jury → next value,
   the voter's whole vote (grouped when `useGroupedJuryPoints`), all juries;
-  televote → this country, all countries. Mount the Ctrl+F hotkey once
-  (`useFinishRandomlyHotkey`), never per button.
+  televote → this country, all countries. Their keyboard shortcuts (Space,
+  N, V, F) are registered once by `SimulationShortcuts`, never per button
+  (docs/keyboard-shortcuts.md).
 - **The one-tap Random** (`useQuickRandomAction`: the stripe's split button,
   the sheet's peek) repeats the jury scope picked last,
   `simViewStore.quickRandom` (`next` by default, `voter` after a whole vote
@@ -233,11 +246,28 @@ only when the line-up, the space or the fonts change (never on awards):
    columns (`data-names="wrap"`) a long name may take two lines; if one is
    still cut off (a long single word: on a phone under ~600px two columns
    leave a name 20-30px), Auto goes back to one column (step 3; the board
-   scrolls a little under the sheet). Two columns picked in the sheet stay,
-   with short codes in place of names (`data-names="code"`, step
-   `twoCodes`; `STEP_ORDER` lists each setting's steps). The styling is the
-   board's attribute, never per row, so rows remounted by an entrance need
-   nothing.
+   scrolls a little under the sheet). Two columns picked in the sheet stay.
+   They keep the names while the names read well enough
+   (`namesReadWell` in `nameFit.ts`): at most a quarter of them (rounded
+   up) may end in an ellipsis, and each cut name still shows at least 70%
+   of its widest line next to an ellipsis taken as 1em ("MONTENE…" yes,
+   "MON…" no). Otherwise the board shows short codes in place of names
+   (`data-names="code"`, step `twoCodes`; `STEP_ORDER` lists each setting's
+   steps). Measured on 2026-11-17: the 2023-style themes on a 390px phone
+   cut only the longest names (Liechtenstein, Netherlands, Switzerland,
+   Montenegro, Luxembourg, Bosnia & Herzegovina) by about 1em and keep
+   names; the 2026 theme leaves a name about 41px at 390px (60px at 430px),
+   so it still shows codes on most phones.
+   **Always show full country names** (Settings → Look & feel,
+   `alwaysShowFullCountryNames`, synced with the account) turns two columns
+   asked for into `TWO_FULL_NAMES` (just `two`): names in two columns
+   however many end in an ellipsis, never codes and never one column. The
+   owner's call (2026-11-17): these users asked for two columns and names
+   both, so a narrow phone with the 2026 theme shows "BELG…", "MON…" rather
+   than taking either away. In Auto and one column the setting changes
+   nothing (they never cut names or show codes).
+   The styling is the board's attribute, never per row, so rows remounted
+   by an entrance need nothing.
    **Short codes** (`src/data/countries/shortCodes.ts`): sports-style
    three-letter codes (IOC; the football ones for England, Scotland, Wales,
    Northern Ireland, Macao, Guadeloupe, French Polynesia; ROW for the Rest
@@ -263,8 +293,19 @@ The fit is keyed on the window's width, not the board's: a scrollbar that
 appears while a step is measured would otherwise change the width and restart
 the fit in a loop.
 
+Each phase is a layout effect that sets state, so passes that keep restarting
+each other never let the frame end, and React stops at 50 nested updates
+(error #185, the error page). One such crash came from an iPhone with a
+393 × 267 window on 2026-11-15, cause unknown. `fitLoopGuard.ts` caps the
+passes at 16 per animation frame (a normal fit needs at most six): past that,
+the fit settles on the last finished layout under the current key, and the
+page posts `Board fit loop stopped (phone)` to `/errors` once, with the key,
+the fit state, the board's top and the visual viewport.
+
 Overflow is measured from the name's text range, not `scrollWidth` (which
-rounds, and a 0.3px overflow already draws an ellipsis). Margins for the row
+rounds, and a 0.3px overflow already draws an ellipsis): `measureName` in
+`nameFit.ts`, with the decisions (`allNamesFit` for Auto, `namesReadWell`
+for two columns) as pure functions under unit test. Margins for the row
 height are read off one row at a time, because rows ease their height and a
 mid-transition read would skew it. Two columns on narrow phones also narrow
 the flags (26px) and give the rounded points cell room for three digits
@@ -369,7 +410,7 @@ column sizing, sheet, stripe, minimal view, presenting) and swaps the parts:
 - **Random**: `useQualifierRandom().next` picks among the split's candidates
   while it shows (`pickQualifierFromSplitScreenCandidatesRandomly`),
   otherwise `pickQualifierRandomly`; `pickAllQualifiersRandomly` fills every
-  place left (also Ctrl+F in this mode).
+  place left (also F in this mode).
 - **Split screen auto-open** (`qualification/useSplitScreenStep`): shared
   with the classic `PickQualifiersSimulation`; mounted once per layout. A
   presentation opens and resolves it itself (`usePresentationLoop`).

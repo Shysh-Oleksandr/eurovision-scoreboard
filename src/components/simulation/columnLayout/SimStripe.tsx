@@ -106,7 +106,9 @@ const SimStripe = ({
   const isJury = voter.phase === 'jury';
 
   // Android back: pause a presentation first, then leave the minimal view.
-  useBackHandler(true, () => (isPresenting ? pause() : onLeave()));
+  useBackHandler(true, () => (isPresenting ? pause() : onLeave()), {
+    blocksShortcuts: false,
+  });
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -135,6 +137,7 @@ const SimStripe = ({
       aria-label={t('view.leaveMinimalView')}
       Icon={<Minimize2 className="size-[18px]" />}
       onClick={onLeave}
+      shortcut="minimalView"
     />
   );
 
@@ -212,6 +215,7 @@ const SimStripe = ({
                   )
                 }
                 onClick={isPresenting ? pause : present}
+                shortcut="present"
               >
                 {isPresenting ? t('presentation.pause') : t('view.present')}
               </Button>
@@ -262,6 +266,7 @@ const SimStripe = ({
               )
             }
             onClick={isPresenting ? pause : present}
+            shortcut="present"
           />
         )}
         {leaveButton}

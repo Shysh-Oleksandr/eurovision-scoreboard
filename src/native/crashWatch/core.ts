@@ -344,6 +344,11 @@ export function createSessionTracker({
       else save();
     },
     sample,
+    /** A crumb from outside the samples (`./crumbs.ts`), saved at once. */
+    note(label: string) {
+      addCrumb(label);
+      save();
+    },
     current: () => record,
   };
 }

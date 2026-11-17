@@ -55,6 +55,7 @@ import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
 import { StageVotes } from '@/state/scoreboard/types';
+import { useSettingsModalStore } from '@/state/settingsModalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { stripCopySuffix } from '@/theme/themeFingerprint';
 
@@ -201,7 +202,10 @@ const EventSetupModal = () => {
       getContestKey(state.year, state.settings.contestType),
   );
 
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const isSettingsModalOpen = useSettingsModalStore((state) => state.isOpen);
+  const setIsSettingsModalOpen = useSettingsModalStore(
+    (state) => state.setOpen,
+  );
   const [isSettingsModalLoaded, setIsSettingsModalLoaded] = useState(false);
   const [isPredefModalLoaded, setIsPredefModalLoaded] = useState(false);
   const [isPostSetupModalLoaded, setIsPostSetupModalLoaded] = useState(false);
@@ -581,6 +585,16 @@ const EventSetupModal = () => {
         />
       )}
 
+      {/* Outside the setup modal: the ? shortcut opens it over the board. */}
+      {(isSettingsModalOpen || isSettingsModalLoaded) && (
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          participatingCountries={participatingCountries}
+          onLoaded={() => setIsSettingsModalLoaded(true)}
+        />
+      )}
+
       <Modal
         isOpen={eventSetupModalOpen}
         onClose={debouncedCanClose ? onClose : undefined}
@@ -612,15 +626,6 @@ const EventSetupModal = () => {
         />
 
         <AppPromoCard />
-
-        {(isSettingsModalOpen || isSettingsModalLoaded) && (
-          <SettingsModal
-            isOpen={isSettingsModalOpen}
-            onClose={() => setIsSettingsModalOpen(false)}
-            participatingCountries={participatingCountries}
-            onLoaded={() => setIsSettingsModalLoaded(true)}
-          />
-        )}
 
         {isCustomCountryModalOpen && (
           <CustomCountryModal

@@ -897,7 +897,8 @@ html:root {
   -webkit-line-clamp: 2;
 }
 
-/* …or, two columns asked for, short codes ("NOR") when a name doesn't fit:
+/* …or, two columns asked for, short codes ("NOR") when the names don't read
+   well enough (`namesReadWell`):
    never cut, a code may run into the name's right margin (the name strip
    still clips), so three letters fit even on a 360px phone. */
 .dp-sim-board[data-names='code'] :is([data-entry-name], [data-douze-name]) {

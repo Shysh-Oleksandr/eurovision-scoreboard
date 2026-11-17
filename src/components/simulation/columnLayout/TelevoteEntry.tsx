@@ -4,6 +4,7 @@ import React, { useId, useRef } from 'react';
 import Button from '@/components/common/Button';
 import { useTelevoteEntry } from '@/components/controlsPanel/useTelevoteEntry';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useHasFinePointer } from '@/hooks/useHasFinePointer';
 
 /**
  * Where the entry sits. The points given so far ("265 / 1044") sit quietly
@@ -19,7 +20,11 @@ interface TelevoteEntryProps {
   variant?: TelevoteEntryVariant;
   /** Field and button height: 40px (the desktop stripe's) or 46px. */
   size?: 'md' | 'lg';
-  /** Focus the input when the next country comes up (desktop only). */
+  /**
+   * Focus the input when the next country comes up. Only with a mouse or
+   * trackpad: on touch screens (tablets get the desktop column from 1024px)
+   * focusing opens the on-screen keyboard after every vote, random ones too.
+   */
   autoFocus?: boolean;
   className?: string;
 }
@@ -55,6 +60,8 @@ const TelevoteEntry = ({
   const errorId = useId();
   const awardedId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const hasFinePointer = useHasFinePointer();
+  const shouldAutoFocus = autoFocus && hasFinePointer;
 
   const isLimitOverridden = disableLimit || disableLimitForShow;
   const awarded =
@@ -127,13 +134,16 @@ const TelevoteEntry = ({
           <input
             ref={inputRef}
             // Remount per country so autofocus lands on each new entry.
-            key={autoFocus ? televotingProgress : undefined}
+            key={shouldAutoFocus ? televotingProgress : undefined}
             id={inputId}
             type="number"
             inputMode="numeric"
             enterKeyHint="done"
             autoComplete="off"
-            autoFocus={autoFocus}
+            autoFocus={shouldAutoFocus}
+            // Keyboard shortcuts get the keys a points field can't type:
+            // Space randomises without leaving the field (src/shortcuts/guard).
+            data-shortcut-field="numeric"
             placeholder={t('simulation.enterPoints')}
             value={enteredPoints}
             onChange={handleInputChange}

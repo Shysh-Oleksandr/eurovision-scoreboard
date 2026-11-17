@@ -7,8 +7,8 @@ import Button from '../../common/Button';
 import CountryInfo from '../../controlsPanel/CountryInfo';
 import SnowPileEffect from '../../effects/SnowPileEffect';
 
-import { useHotKey } from '@/hooks/useHotKey';
 import { StageVotingMode } from '@/models';
+import { useShortcut } from '@/shortcuts/registry';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { useQualifiedCountriesPanelGlowStyle } from '@/theme/useQualifiedCountriesPanelGlowStyle';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -53,7 +53,12 @@ const RevealControls = ({
     finishRandomly();
   }, [finishRandomly]);
 
-  useHotKey('f', onFinishRandomly);
+  // This board's own Random, Finish randomly and Continue (the regular
+  // simulation's shortcuts step aside while it runs).
+  useShortcut('random', advance, !isAwaitingFinish);
+  useShortcut('randomNext', advance, !isAwaitingFinish);
+  useShortcut('randomAll', onFinishRandomly, !isAwaitingFinish);
+  useShortcut('continue', advance, isAwaitingFinish);
 
   return (
     <div
@@ -99,6 +104,7 @@ const RevealControls = ({
             onClick={advance}
             animatedBorder
             snowEffect="middle"
+            shortcut="continue"
           />
         ) : (
           <>
@@ -107,8 +113,13 @@ const RevealControls = ({
               label={t('random')}
               onClick={advance}
               snowEffect="middle"
+              shortcut="random"
             />
-            <Button label={t('finishRandomly')} onClick={onFinishRandomly} />
+            <Button
+              label={t('finishRandomly')}
+              onClick={onFinishRandomly}
+              shortcut="randomAll"
+            />
           </>
         )}
       </div>

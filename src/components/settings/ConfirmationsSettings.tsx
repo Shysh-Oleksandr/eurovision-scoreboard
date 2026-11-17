@@ -30,6 +30,7 @@ export const ConfirmationsSettings: React.FC = () => {
       'remove-saved-contest': t('removeSavedContest'),
       'remove-saved-theme': t('removeSavedTheme'),
       'cancel-simulation': t('cancelSimulation'),
+      'restart-simulation': t('restartSimulation'),
       logout: t('logout'),
     };
 

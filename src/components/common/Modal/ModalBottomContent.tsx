@@ -4,6 +4,8 @@ import React from 'react';
 
 import Button from '../Button';
 
+import type { ShortcutId } from '@/shortcuts/actions';
+
 interface ModalBottomContentProps {
   onClose: () => void;
   onSave: () => void;
@@ -13,6 +15,8 @@ interface ModalBottomContentProps {
   saveButtonText?: string;
   saveButtonIcon?: React.ReactNode;
   saveButtonDisabled?: boolean;
+  /** Shows its key on the save button (the caller registers it). */
+  saveButtonShortcut?: ShortcutId;
 }
 
 const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
@@ -24,6 +28,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
   saveButtonText,
   saveButtonIcon,
   saveButtonDisabled,
+  saveButtonShortcut,
 }) => {
   const t = useTranslations('common');
 
@@ -59,6 +64,7 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
           disabled={isSaving || saveButtonDisabled}
           snowEffect="right"
           Icon={saveButtonIcon}
+          shortcut={saveButtonShortcut}
         >
           {saveButtonText ?? t(saveButtonLabel)}
         </Button>

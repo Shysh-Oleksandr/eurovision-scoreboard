@@ -14,6 +14,8 @@
  * call these when `Capacitor.isNativePlatform()`.
  */
 
+import { noteCrumb } from './crashWatch/crumbs';
+
 /** Subfolder of the cache directory; emptied before each new file. */
 const EXPORT_DIR = 'exports';
 
@@ -61,23 +63,31 @@ export async function shareFileNatively(
     recursive: true,
   }).catch(() => undefined);
 
+  const data = await toBase64(file.data);
+
+  // The apps' crash reports: the sheet often hands over to another app.
+  noteCrumb(`share:file ${Math.round((data.length * 3) / 4 / 1024)}KB`);
+
   const { uri } = await Filesystem.writeFile({
     path: `${EXPORT_DIR}/${safeFileName(file.fileName)}`,
-    data: await toBase64(file.data),
+    data,
     directory: Directory.Cache,
     recursive: true,
   });
 
   try {
+    noteCrumb('share:sheet');
     await Share.share({
       title: file.title,
       text: file.text,
       url: file.url,
       files: [uri],
     });
+    noteCrumb('share:done');
 
     return true;
   } catch (error) {
+    noteCrumb(isCancel(error) ? 'share:cancelled' : 'share:failed');
     if (isCancel(error)) return false;
     throw error;
   }
@@ -113,6 +123,8 @@ export async function saveFileNatively(
     const MediaSaver = registerPlugin<MediaSaverPlugin>('MediaSaver');
 
     try {
+      noteCrumb('save:file');
+
       const { folder } = await MediaSaver.save({
         data: await toBase64(file.data),
         fileName: safeFileName(file.fileName),

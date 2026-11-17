@@ -18,8 +18,8 @@ import { SlidersIcon } from '@/assets/icons/SlidersIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useConfirmation } from '@/hooks/useConfirmation';
-import { useHotKey } from '@/hooks/useHotKey';
 import { playHaptic } from '@/native/haptics';
+import { useShortcut } from '@/shortcuts/registry';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const ShareResultsModal = dynamic(() => import('./share/ShareResultsModal'), {
@@ -83,7 +83,7 @@ const SimulationHeaderComponent = ({ phaseTitle }: SimulationHeaderProps) => {
   const buttonClassName =
     'xs:!p-3 !py-2 !flex-1 justify-center items-center flex xs:!flex-none';
 
-  useHotKey('r', triggerRestartEvent);
+  useShortcut('share', () => setShowShareResultsModal(true));
 
   return (
     <>

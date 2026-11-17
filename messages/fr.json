@@ -674,7 +674,9 @@
       "restart": "Redémarrer",
       "undo": "Annuler",
       "share": "Partager",
-      "setup": "Configuration"
+      "setup": "Configuration",
+      "restartConfirmation": "Redémarrer la simulation ?",
+      "restartConfirmationDescription": "Les votes déjà donnés seront perdus."
     },
     "phaseActions": {
       "viewStats": "Statistiques",
@@ -1603,6 +1605,8 @@
         "whiteHeartFlags2026": "Afficher les drapeaux cœur au design 2026 avec un contour blanc au lieu du contour noir classique.",
         "minimalFlags": "Utiliser des formes de drapeau rondes et carrées simplifiées plutôt que des drapeaux détaillés.",
         "rankChange": "Afficher une flèche indiquant si chaque entrée a monté ou descendu depuis les derniers points attribués.",
+        "fullCountryNames": "Ne jamais remplacer les noms par des codes à trois lettres (NOR, SWE). Sur téléphone, avec deux colonnes au tableau, un nom trop long est coupé par des points de suspension.",
+        "classicSimulationLayout": "Rétablit l’ancien écran de simulation, avec les commandes sous le tableau. Il n’est plus développé : les nouveautés et corrections arrivent seulement dans la mise en page actuelle, et l’ancienne pourra être retirée dans une prochaine mise à jour.",
         "targetStages": "Afficher l’étape vers laquelle chaque qualifié se dirige.",
         "blurModal": "Flouter le tableau de scores derrière les modales ouvertes pour plus de concentration.",
         "overrideFont": "Ignorer les polices de chaque thème (y compris celles téléversées) et toujours utiliser celle choisie ci-dessous, à la fois pour l’interface et le tableau de scores.",
@@ -1741,6 +1745,8 @@
       "useHeartIconsForFlags": "Utiliser des icônes cœur pour les drapeaux",
       "use2026WhiteHeartFlags": "Utiliser les drapeaux cœur 2026 à contour blanc",
       "alwaysShowRankings": "Toujours afficher le classement",
+      "alwaysShowFullCountryNames": "Toujours afficher le nom complet des pays",
+      "enableClassicSimulationLayout": "Utiliser l’ancienne mise en page de la simulation",
       "showRankChangeIndicator": "Afficher les changements de rang",
       "showQualifiersPopup": "Afficher la fenêtre des qualifiés",
       "showQualifierTargetStages": "Afficher les étapes cibles des qualifiés",
@@ -1819,7 +1825,43 @@
       "closeCustomizeTheme": "Fermer l'éditeur de thème",
       "cancelSimulation": "Annuler la simulation",
       "logout": "Se déconnecter",
-      "createNewContest": "Créer un nouveau concours"
+      "createNewContest": "Créer un nouveau concours",
+      "restartSimulation": "Redémarrer la simulation"
+    },
+    "shortcuts": {
+      "title": "Raccourcis clavier",
+      "blurb": "Pilotez la simulation au clavier, avec les touches de votre choix.",
+      "enable": "Utiliser les raccourcis clavier",
+      "enableDesc": "Une seule touche appuie sur les boutons de la simulation. Ils attendent pendant que vous tapez ou qu’une fenêtre est ouverte.",
+      "showHints": "Afficher les touches sur les boutons",
+      "showHintsDesc": "La touche dans le coin de chaque bouton qui en a une.",
+      "changeHint": "Cliquez sur une touche, puis appuyez sur la nouvelle. Retour arrière l’efface, Échap annule.",
+      "notSet": "Aucune",
+      "pressKey": "Appuyez sur une touche…",
+      "movedTo": "Sa touche est passée à « {action} »",
+      "resetTo": "Revenir à {key}",
+      "resetAll": "Réinitialiser toutes les touches",
+      "keys": {
+        "space": "Espace"
+      },
+      "actions": {
+        "random": "Aléatoire",
+        "randomNext": "Points suivants au hasard",
+        "randomVoter": "Vote complet au hasard",
+        "randomAll": "Terminer le tour au hasard",
+        "present": "Présenter / pause",
+        "undo": "Annuler",
+        "restart": "Redémarrer",
+        "continue": "Continuer / voir le classement",
+        "setup": "Ouvrir la configuration",
+        "stats": "Ouvrir les statistiques",
+        "minimalView": "Vue minimale",
+        "share": "Partager",
+        "fullscreen": "Plein écran",
+        "cancel": "Annuler la simulation",
+        "startStage": "Lancer l’étape (dans sa fenêtre)",
+        "shortcutsHelp": "Ouvrir ces réglages"
+      }
     }
   },
   "graphics": {

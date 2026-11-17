@@ -3,15 +3,15 @@ import { useCallback } from 'react';
 import { useStore } from 'zustand';
 
 import { useConfirmation } from '@/hooks/useConfirmation';
-import { useHotKey } from '@/hooks/useHotKey';
 import { playHaptic } from '@/native/haptics';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 /**
  * The simulation-wide actions the header offers (undo, restart, cancel, open
- * setup), shared by the classic header and the column layout's ⋯ menu so
- * both keep the same confirmations, haptics and shortcuts.
+ * setup), shared by the classic header, the column layout's ⋯ menu and the
+ * keyboard shortcuts (`SimulationShortcuts`), so all keep the same
+ * confirmations and haptics.
  */
 export const useSimulationActions = () => {
   const t = useTranslations('simulation.header');
@@ -61,12 +61,22 @@ export const useSimulationActions = () => {
     [setEventSetupModalOpen],
   );
 
-  useHotKey('r', triggerRestartEvent);
+  // From the keyboard, one stray R would wipe the run: ask first (Enter
+  // confirms). The ⋯ menu's Restart already takes two clicks.
+  const confirmRestart = useCallback(() => {
+    confirm({
+      key: 'restart-simulation',
+      title: t('restartConfirmation'),
+      description: t('restartConfirmationDescription'),
+      onConfirm: triggerRestartEvent,
+    });
+  }, [confirm, t, triggerRestartEvent]);
 
   return {
     canUndo,
     undo,
     restart: triggerRestartEvent,
+    confirmRestart,
     cancel,
     openSetup,
   };

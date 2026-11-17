@@ -124,7 +124,7 @@ otherwise (the spokespersons are up):
     last voter → phase 'awaitingFinish'
 
 awaitingFinish:
-    commit the stage (the button, the `f` hotkey and the presentation loop all
+    commit the stage (the button, Enter (the `continue` shortcut) and the presentation loop all
     land here; the loop's `pauseAfterAnimatedPoints` delay is what gives the beat
     its length during auto-presentation)
 ```

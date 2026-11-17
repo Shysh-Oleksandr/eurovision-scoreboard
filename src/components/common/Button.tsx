@@ -6,6 +6,14 @@ import SnowPileEffect from '../effects/SnowPileEffect';
 
 import IconButtonTooltip from './IconButtonTooltip';
 
+import type { ShortcutId } from '@/shortcuts/actions';
+import {
+  SHORTCUT_HINT_CLASS,
+  ShortcutHintText,
+  useAriaKeyShortcuts,
+  useShortcutHint,
+} from '@/shortcuts/hints';
+
 type Props = {
   label?: string;
   className?: string;
@@ -37,9 +45,21 @@ type Props = {
   animatedBorder?: boolean;
   'aria-label'?: string;
   'aria-pressed'?: boolean;
+  /**
+   * The keyboard shortcut that runs this button's action: its key shows in
+   * the top-right corner (in the tooltip when the button is an icon), and
+   * screen readers get `aria-keyshortcuts`. The caller still registers the
+   * handler (`useShortcut`).
+   */
+  shortcut?: ShortcutId;
 };
 
-const Button = ({
+type BaseProps = Omit<Props, 'shortcut'> & {
+  hint?: string | null;
+  ariaKeyShortcuts?: string;
+};
+
+const ButtonBase = ({
   label,
   className = '',
   onClick,
@@ -56,7 +76,9 @@ const Button = ({
   animatedBorder = false,
   'aria-label': ariaLabel,
   'aria-pressed': ariaPressed,
-}: Props) => {
+  hint,
+  ariaKeyShortcuts,
+}: BaseProps) => {
   const baseClasses = 'font-medium uppercase transition-colors relative';
 
   const legacySizeClasses =
@@ -99,7 +121,19 @@ const Button = ({
     (state) => state.settings.enableIconButtonTooltips,
   );
   const isIconOnly = !label && hasIconOnlyContent;
-  const showTooltip = Boolean(title && isIconOnly && enableIconButtonTooltips);
+  // The shortcut's key: in the corner of a labelled button, in the tooltip
+  // of an icon.
+  const hasText = !!childrenContent;
+  const titleText = hint && !hasText && title ? `${title} (${hint})` : title;
+  // Buttons of 40px and less (and the legacy sizes) have no room above the
+  // label: keep it clear of the key.
+  const hintPadding =
+    hint && hasText && (!size || size === 'sm' || size === 'md')
+      ? '!pr-[22px]'
+      : '';
+  const showTooltip = Boolean(
+    titleText && isIconOnly && enableIconButtonTooltips,
+  );
 
   const button = (
     <button
@@ -111,13 +145,16 @@ const Button = ({
             ? 'w-[var(--dp-btn-h)] !px-0 justify-center'
             : '!p-2'
           : ''
-      } ${animatedBorder ? 'animated-border' : ''} ${className} ${
+      } ${
+        animatedBorder ? 'animated-border' : ''
+      } ${className} ${hintPadding} ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       }`}
       onClick={onClick}
-      title={showTooltip ? undefined : title}
+      title={showTooltip ? undefined : titleText}
       aria-label={ariaLabel ?? (isIconOnly ? title : undefined)}
       aria-pressed={ariaPressed}
+      aria-keyshortcuts={ariaKeyShortcuts}
       aria-busy={isLoading || undefined}
       disabled={disabled || isLoading}
       style={style}
@@ -132,6 +169,11 @@ const Button = ({
         {Icon}
         {childrenContent}
       </span>
+      {hint && hasText && (
+        <span aria-hidden="true" className={SHORTCUT_HINT_CLASS.corner}>
+          <ShortcutHintText hint={hint} />
+        </span>
+      )}
       {isLoading && (
         <span className="absolute inset-0 flex items-center justify-center">
           <span className="loader small" />
@@ -143,7 +185,7 @@ const Button = ({
   if (showTooltip) {
     return (
       <IconButtonTooltip
-        content={title!}
+        content={titleText!}
         className={disabled ? 'cursor-not-allowed' : undefined}
       >
         {button}
@@ -153,5 +195,25 @@ const Button = ({
 
   return button;
 };
+
+/** Hooks for the hint only where a button has a shortcut. */
+const ButtonWithShortcut = ({
+  shortcut,
+  ...props
+}: Props & { shortcut: ShortcutId }) => {
+  const hint = useShortcutHint(shortcut);
+  const ariaKeyShortcuts = useAriaKeyShortcuts(shortcut);
+
+  return (
+    <ButtonBase {...props} hint={hint} ariaKeyShortcuts={ariaKeyShortcuts} />
+  );
+};
+
+const Button = ({ shortcut, ...props }: Props) =>
+  shortcut ? (
+    <ButtonWithShortcut {...props} shortcut={shortcut} />
+  ) : (
+    <ButtonBase {...props} />
+  );
 
 export default Button;

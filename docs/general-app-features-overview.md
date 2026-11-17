@@ -190,6 +190,8 @@ avatar, name and followers count; "Sign in" when signed out).
     - Native share API
   - **ShareStatsModal**: Share stats as generated image
 
+- **Keyboard shortcuts** (`src/shortcuts/`, `SimulationShortcuts.tsx`): Space for Random, N / V / F for the random scopes, ⌘Z / Ctrl+Z undo, R restart (asks first), Enter continue, S setup, P present, M minimal view, T stats, ? for their settings, ⌘S / Ctrl+S to start a stage. Buttons show the key in a corner on the website with a mouse or trackpad; Settings → Keyboard shortcuts changes any key or turns them off. See `docs/keyboard-shortcuts.md`.
+
 ### 4. Settings (`components/settings/`)
 
 Two tabs: **General** and **Odds**

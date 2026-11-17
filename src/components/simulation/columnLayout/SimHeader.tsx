@@ -15,6 +15,7 @@ import { createPortal } from 'react-dom';
 
 import Image from 'next/image';
 
+import { useFullscreenToggle } from '../hooks/useFullscreenToggle';
 import { useSimulationActions } from '../hooks/useSimulationActions';
 
 import { useSimViewStore } from './simViewStore';
@@ -27,7 +28,8 @@ import AnchoredMenu, {
 import Button from '@/components/common/Button';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useBackHandler } from '@/hooks/useBackHandler';
-import { IS_NATIVE_APP } from '@/native/platform';
+import type { ShortcutId } from '@/shortcuts/actions';
+import { ShortcutHintText, useShortcutHintFormatter } from '@/shortcuts/hints';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
@@ -38,27 +40,6 @@ interface SimHeaderProps {
   chromeHidden: boolean;
   onShare: () => void;
 }
-
-/**
- * The browser's fullscreen, the same switch as Settings → "Enable fullscreen
- * mode" (`useFullscreen` applies it). Not in the apps (full screen already)
- * nor where the browser has no Fullscreen API (iPhone Safari).
- */
-const useFullscreenToggle = () => {
-  const enabled = useGeneralStore((state) => state.settings.enableFullscreen);
-  const setSettings = useGeneralStore((state) => state.setSettings);
-  const [supported, setSupported] = useState(false);
-
-  useEffect(() => {
-    setSupported(!IS_NATIVE_APP && !!document.fullscreenEnabled);
-  }, []);
-
-  return {
-    supported,
-    enabled,
-    toggle: () => setSettings({ enableFullscreen: !enabled }),
-  };
-};
 
 export const HostingLogo = ({ size }: { size: number }) => {
   const t = useTranslations('simulation.header');
@@ -250,6 +231,11 @@ const QuickActionsSheet = ({
                 {item.icon}
               </span>
               {item.label}
+              {item.trailing && (
+                <span className="ml-auto text-[13px] text-white/40">
+                  {item.trailing}
+                </span>
+              )}
             </button>
           );
         })}
@@ -332,6 +318,13 @@ export const SimHeaderActions = React.memo(
       useSimulationActions();
     const setMinimalView = useSimViewStore((state) => state.setMinimalView);
     const fullscreen = useFullscreenToggle();
+    // The keys show at the end of the menu rows (website, mouse only).
+    const hintFor = useShortcutHintFormatter();
+    const hint = (id: ShortcutId) => {
+      const text = hintFor(id);
+
+      return text ? <ShortcutHintText hint={text} /> : undefined;
+    };
 
     const moreRef = useRef<HTMLDivElement>(null);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -343,16 +336,19 @@ export const SimHeaderActions = React.memo(
         icon: <Undo2 className={iconClass} />,
         onClick: undo,
         disabled: !canUndo,
+        trailing: hint('undo'),
       },
       {
         label: t('header.restart'),
         icon: <RotateCcw className={iconClass} />,
         onClick: restart,
+        trailing: hint('restart'),
       },
       {
         label: t('header.share'),
         icon: <Share2 className={iconClass} />,
         onClick: onShare,
+        trailing: hint('share'),
       },
       ...(isDesktop
         ? []
@@ -361,6 +357,7 @@ export const SimHeaderActions = React.memo(
               label: t('view.minimalView'),
               icon: <Maximize2 className={iconClass} />,
               onClick: () => setMinimalView(true),
+              trailing: hint('minimalView'),
             },
           ]),
       ...(fullscreen.supported
@@ -375,6 +372,7 @@ export const SimHeaderActions = React.memo(
                 <Expand className={iconClass} />
               ),
               onClick: fullscreen.toggle,
+              trailing: hint('fullscreen'),
             },
           ]
         : []),
@@ -384,6 +382,7 @@ export const SimHeaderActions = React.memo(
         icon: <LogOut className={iconClass} />,
         onClick: cancel,
         variant: 'danger',
+        trailing: hint('cancel'),
       },
     ];
 
@@ -397,6 +396,7 @@ export const SimHeaderActions = React.memo(
             aria-label={t('view.minimalView')}
             Icon={<Maximize2 className="size-5" />}
             onClick={() => setMinimalView(true)}
+            shortcut="minimalView"
           />
         )}
         <Button
@@ -407,6 +407,7 @@ export const SimHeaderActions = React.memo(
           className={isDesktop ? '!px-[18px] !text-[14.5px]' : '!w-[60px]'}
           Icon={<SlidersIcon className="size-6" />}
           onClick={openSetup}
+          shortcut="setup"
         >
           {isDesktop ? t('header.setup') : undefined}
         </Button>

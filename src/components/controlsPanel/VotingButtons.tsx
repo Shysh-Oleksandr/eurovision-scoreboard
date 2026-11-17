@@ -8,7 +8,6 @@ import Button from '../common/Button';
 
 import TelevoteInput from './TelevoteInput';
 
-import { useHotKey } from '@/hooks/useHotKey';
 import { useGeneralStore } from '@/state/generalStore';
 
 const VotingButtons = () => {
@@ -57,8 +56,6 @@ const VotingButtons = () => {
 
     finishTelevoteVotingRandomly();
   }, [isJuryVoting, finishJuryVotingRandomly, finishTelevoteVotingRandomly]);
-
-  useHotKey('f', finishRandomly);
 
   return (
     <div className="w-full pt-1 lg:pb-4 pb-3 rounded-md rounded-t-none">

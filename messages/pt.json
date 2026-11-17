@@ -674,7 +674,9 @@
       "restart": "Reiniciar",
       "undo": "Desfazer",
       "share": "Partilhar",
-      "setup": "Configuração"
+      "setup": "Configuração",
+      "restartConfirmation": "Reiniciar a simulação?",
+      "restartConfirmationDescription": "Os votos dados até agora serão perdidos."
     },
     "phaseActions": {
       "viewStats": "Estatísticas",
@@ -1603,6 +1605,8 @@
         "whiteHeartFlags2026": "Mostrar as bandeiras de coração no design de 2026 com contorno branco em vez do preto clássico.",
         "minimalFlags": "Usar formas de bandeira redondas e quadradas simplificadas em vez de bandeiras detalhadas.",
         "rankChange": "Mostrar uma seta a indicar se cada participante subiu ou desceu desde os últimos pontos atribuídos.",
+        "fullCountryNames": "Nunca trocar os nomes por códigos de três letras (NOR, SWE). No telemóvel, com duas colunas no quadro, um nome demasiado longo é cortado com reticências.",
+        "classicSimulationLayout": "Repõe o ecrã de simulação antigo, com os controlos por baixo do quadro. Já não é desenvolvido: as novidades e correções chegam só ao esquema atual, e o clássico pode ser removido numa próxima atualização.",
         "targetStages": "Mostrar para que fase avança cada qualificado.",
         "blurModal": "Desfocar o marcador por trás dos modais abertos para maior concentração.",
         "overrideFont": "Ignorar as fontes de cada tema (incluindo as carregadas) e usar sempre a que escolher abaixo, tanto na interface como no marcador.",
@@ -1741,6 +1745,8 @@
       "useHeartIconsForFlags": "Usar ícones de coração para bandeiras",
       "use2026WhiteHeartFlags": "Usar as bandeiras de coração de 2026 com contorno branco",
       "alwaysShowRankings": "Mostrar sempre classificações",
+      "alwaysShowFullCountryNames": "Mostrar sempre o nome completo dos países",
+      "enableClassicSimulationLayout": "Usar o esquema clássico da simulação",
       "showRankChangeIndicator": "Mostrar indicador de mudança de posição",
       "showQualifiersPopup": "Mostrar popup de qualificados",
       "showQualifierTargetStages": "Mostrar etapas de destino dos qualificados",
@@ -1819,7 +1825,43 @@
       "closeCustomizeTheme": "Fechar editor de temas",
       "cancelSimulation": "Cancelar simulação",
       "logout": "Terminar Sessão",
-      "createNewContest": "Criar novo concurso"
+      "createNewContest": "Criar novo concurso",
+      "restartSimulation": "Reiniciar simulação"
+    },
+    "shortcuts": {
+      "title": "Atalhos de teclado",
+      "blurb": "Controle a simulação pelo teclado, com as teclas que escolher.",
+      "enable": "Usar atalhos de teclado",
+      "enableDesc": "Uma só tecla carrega nos botões da simulação. Esperam enquanto escreve ou há uma janela aberta.",
+      "showHints": "Mostrar teclas nos botões",
+      "showHintsDesc": "A tecla no canto de cada botão que tenha uma.",
+      "changeHint": "Clique numa tecla e carregue na nova. Retrocesso remove-a, Escape cancela.",
+      "notSet": "Nenhuma",
+      "pressKey": "Carregue numa tecla…",
+      "movedTo": "A sua tecla passou para «{action}»",
+      "resetTo": "Repor {key}",
+      "resetAll": "Repor todas as teclas",
+      "keys": {
+        "space": "Espaço"
+      },
+      "actions": {
+        "random": "Aleatório",
+        "randomNext": "Próximos pontos ao acaso",
+        "randomVoter": "Voto completo ao acaso",
+        "randomAll": "Terminar a ronda ao acaso",
+        "present": "Apresentar / pausa",
+        "undo": "Desfazer",
+        "restart": "Reiniciar",
+        "continue": "Continuar / ver painel",
+        "setup": "Abrir a configuração",
+        "stats": "Abrir as estatísticas",
+        "minimalView": "Vista mínima",
+        "share": "Partilhar",
+        "fullscreen": "Ecrã completo",
+        "cancel": "Cancelar simulação",
+        "startStage": "Iniciar a fase (na sua janela)",
+        "shortcutsHelp": "Abrir estas definições"
+      }
     }
   },
   "graphics": {

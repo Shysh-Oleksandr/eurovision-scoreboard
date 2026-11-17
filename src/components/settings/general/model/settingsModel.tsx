@@ -1,4 +1,12 @@
-import { Eye, Flag, List, Shield, Sparkles, Volume2 } from 'lucide-react';
+import {
+  Eye,
+  Flag,
+  Keyboard,
+  List,
+  Shield,
+  Sparkles,
+  Volume2,
+} from 'lucide-react';
 import React from 'react';
 
 import { AppStoresItem } from '../custom/AppStoresItem';
@@ -6,6 +14,10 @@ import { ConfirmationsListItem } from '../custom/ConfirmationsListItem';
 import { DangerResetItem } from '../custom/DangerResetItem';
 import { HapticsLabLink } from '../custom/HapticsLabLink';
 import { HostingCountryDropdown } from '../custom/HostingCountryDropdown';
+import {
+  KeyboardShortcutsList,
+  SHORTCUT_ACTION_LABEL_KEYS,
+} from '../custom/KeyboardShortcutsList';
 import { LanguageItem } from '../custom/LanguageItem';
 import { PointsBlock } from '../custom/PointsBlock';
 
@@ -245,6 +257,13 @@ export const CATEGORIES: Category[] = [
       },
       {
         kind: 'switch',
+        id: 'alwaysShowFullCountryNames',
+        settingKey: 'alwaysShowFullCountryNames',
+        labelKey: 'settings.ui.alwaysShowFullCountryNames',
+        tipKey: 'settings.general2.tip.fullCountryNames',
+      },
+      {
+        kind: 'switch',
         id: 'showRankChangeIndicator',
         settingKey: 'showRankChangeIndicator',
         labelKey: 'settings.ui.showRankChangeIndicator',
@@ -299,6 +318,13 @@ export const CATEGORIES: Category[] = [
         id: 'enableIconButtonTooltips',
         settingKey: 'enableIconButtonTooltips',
         labelKey: 'settings.ui.enableIconButtonTooltips',
+      },
+      {
+        kind: 'switch',
+        id: 'enableClassicSimulationLayout',
+        settingKey: 'enableClassicSimulationLayout',
+        labelKey: 'settings.ui.enableClassicSimulationLayout',
+        tipKey: 'settings.general2.tip.classicSimulationLayout',
       },
       {
         kind: 'subhead',
@@ -468,6 +494,42 @@ export const CATEGORIES: Category[] = [
         minLabel: '0%',
         maxLabel: '100%',
         when: (env) => env.hasSimBg,
+      },
+    ],
+  },
+  {
+    id: 'shortcuts',
+    titleKey: 'settings.shortcuts.title',
+    blurbKey: 'settings.shortcuts.blurb',
+    icon: Keyboard,
+    // The website with a mouse or trackpad: the apps and touch screens have
+    // no hints to show (the keys still work with a keyboard attached).
+    when: (env) => env.hasFinePointer && !env.isNativeApp,
+    items: [
+      {
+        kind: 'switch',
+        id: 'enableKeyboardShortcuts',
+        settingKey: 'enableKeyboardShortcuts',
+        labelKey: 'settings.shortcuts.enable',
+        descKey: 'settings.shortcuts.enableDesc',
+        children: [
+          {
+            kind: 'switch',
+            id: 'showShortcutHints',
+            settingKey: 'showShortcutHints',
+            labelKey: 'settings.shortcuts.showHints',
+            descKey: 'settings.shortcuts.showHintsDesc',
+          },
+          {
+            kind: 'custom',
+            id: 'keyboardShortcutsList',
+            searchTextKeys: [
+              'settings.shortcuts.changeHint',
+              ...SHORTCUT_ACTION_LABEL_KEYS,
+            ],
+            render: ({ query }) => <KeyboardShortcutsList query={query} />,
+          },
+        ],
       },
     ],
   },

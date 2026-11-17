@@ -29,6 +29,7 @@ import { api } from '@/api/client';
 import { ContestType, resolveContestType } from '@/data/contestTypes';
 import { deleteLegacyCustomBgImage } from '@/helpers/indexedDB';
 import { BaseCountry, PointsItem } from '@/models';
+import type { ShortcutOverrides } from '@/shortcuts/actions';
 import { safeLocalStorage } from '@/state/safeLocalStorage';
 import { useAuthStore } from '@/state/useAuthStore';
 import { applyDocumentFonts } from '@/theme/customFonts';
@@ -65,6 +66,7 @@ export type GeneralSettingsCategoryId =
   | 'look'
   | 'effects'
   | 'audio'
+  | 'shortcuts'
   | 'confirmations';
 
 export const INITIAL_YEAR = '2026' as Year;
@@ -72,6 +74,8 @@ export const INITIAL_THEME_YEAR = '2026' as Year;
 
 const DEFAULT_SETTINGS: Settings = {
   alwaysShowRankings: true,
+  alwaysShowFullCountryNames: false,
+  enableClassicSimulationLayout: false,
   showQualificationModal: true,
   showQualifierTargetStages: true,
   showWinnerModal: true,
@@ -126,6 +130,9 @@ const DEFAULT_SETTINGS: Settings = {
   finalRevealLinearAnimation: false,
   overrideThemeFont: false,
   overrideThemeFontAlias: 'montserrat',
+  enableKeyboardShortcuts: true,
+  showShortcutHints: true,
+  keyboardShortcuts: {},
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -174,6 +181,18 @@ export const ASPECT_RATIO_PRESETS = {
 
 export interface Settings {
   alwaysShowRankings: boolean;
+  /**
+   * Phones, board in two columns: never three-letter codes ("NOR") or names
+   * cut short; when two columns can't hold every name whole, the board takes
+   * one (`BoardStage`'s phone fit).
+   */
+  alwaysShowFullCountryNames: boolean;
+  /**
+   * The old simulation screen (controls stacked under the board) instead of
+   * the column layout. Deprecated: kept for the few who prefer it, new work
+   * targets the column layout only (`useSimLayout`).
+   */
+  enableClassicSimulationLayout: boolean;
   showQualificationModal: boolean;
   showQualifierTargetStages: boolean;
   showWinnerModal: boolean;
@@ -248,6 +267,12 @@ export interface Settings {
   /** When true, ignore the active theme's font and use `overrideThemeFontAlias`. */
   overrideThemeFont: boolean;
   overrideThemeFontAlias: string;
+  /** Keyboard shortcuts in the simulation (`src/shortcuts/`). */
+  enableKeyboardShortcuts: boolean;
+  /** The key on buttons and menu rows (website, mouse or trackpad only). */
+  showShortcutHints: boolean;
+  /** Only the keys the user changed; the rest follow `SHORTCUT_ACTIONS`. */
+  keyboardShortcuts: ShortcutOverrides;
 }
 
 export interface PresentationSettings {

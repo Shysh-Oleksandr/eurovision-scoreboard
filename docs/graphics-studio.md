@@ -153,7 +153,11 @@ because it and `ElementView` are mutually recursive.
    placeholder drawn) triggers **one** re-capture with its resource cache
    invalidated. If snapdom throws, **html-to-image** runs as the fallback.
    `reconcile: true` is enabled only when the node contains a `<table>`
-   (text re-wrap check, ~2× capture time).
+   (text re-wrap check, ~2× capture time);
+4. the canvas becomes the data URL and is then shrunk to 0 × 0: WebKit keeps
+   a canvas's pixels until garbage collection and counts them against a
+   page-wide limit on iOS. The apps' crash reports get `export:` crumbs
+   (native-apps.md §14).
 
 This replaces the old five-attempt loop (two copies of it) that compared
 output sizes because it had no signal for a missing image. Results and

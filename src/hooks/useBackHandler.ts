@@ -12,11 +12,31 @@ import { IS_NATIVE_APP } from '@/native/platform';
 const stack: { run: () => void }[] = [];
 
 /**
+ * Open overlays that pause keyboard shortcuts, on every platform
+ * (`src/shortcuts/`): while a modal, menu or popover is open, the keys are
+ * its own.
+ */
+let shortcutBlockers = 0;
+
+interface BackHandlerOptions {
+  /**
+   * False for layers that are controls rather than overlays (the minimal
+   * view's stripe, the simulation's bottom sheet): shortcuts keep working
+   * while they're open. Default true.
+   */
+  blocksShortcuts?: boolean;
+}
+
+/**
  * Registers `handler` for the back button while `active`. Pass a no-op to
  * make an undismissable overlay swallow the press instead of letting it close
  * what lies below. The latest `handler` is called, so it need not be stable.
  */
-export function useBackHandler(active: boolean, handler: () => void): void {
+export function useBackHandler(
+  active: boolean,
+  handler: () => void,
+  { blocksShortcuts = true }: BackHandlerOptions = {},
+): void {
   const handlerRef = useRef(handler);
 
   handlerRef.current = handler;
@@ -34,6 +54,16 @@ export function useBackHandler(active: boolean, handler: () => void): void {
       if (index >= 0) stack.splice(index, 1);
     };
   }, [active]);
+
+  useEffect(() => {
+    if (!active || !blocksShortcuts) return undefined;
+
+    shortcutBlockers += 1;
+
+    return () => {
+      shortcutBlockers -= 1;
+    };
+  }, [active, blocksShortcuts]);
 }
 
 /** Runs the innermost handler; false when nothing is registered. */
@@ -52,4 +82,9 @@ export function runBackHandler(): boolean {
  */
 export function openOverlayCount(): number {
   return stack.length;
+}
+
+/** A modal, menu, popover or dialog is open: keyboard shortcuts wait. */
+export function hasShortcutBlockingOverlay(): boolean {
+  return shortcutBlockers > 0;
 }

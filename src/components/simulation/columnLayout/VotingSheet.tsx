@@ -73,6 +73,7 @@ export const RandomQuickButton = ({ voter }: { voter: VoterInfo }) => {
         quick.detail ? `${quick.label}, ${quick.detail}` : quick.label
       }`}
       onClick={quick.run}
+      shortcut="random"
     >
       <span className="flex flex-col items-start gap-[3px] leading-none">
         {t('random')}
@@ -169,6 +170,7 @@ const VotingSheet = ({
               aria-label={tPresentation('pause')}
               Icon={<Pause className="size-5" fill="currentColor" />}
               onClick={() => setPresentationSettings({ isPresenting: false })}
+              shortcut="present"
             />
           }
         />
@@ -248,6 +250,7 @@ export const PresentButton = ({ onPresent }: { onPresent: () => void }) => {
         onPresent();
         setPresentationSettings({ isPresenting: true });
       }}
+      shortcut="present"
     >
       {t('present')}
     </Button>

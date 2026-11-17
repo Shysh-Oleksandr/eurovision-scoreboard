@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { guardWrites } from './safeLocalStorage';
+import { describeValue, guardWrites } from './safeLocalStorage';
 
 const post = vi.fn(() => Promise.resolve({}));
 
@@ -72,5 +72,45 @@ describe('safeLocalStorage', () => {
         }),
       }),
     );
+  });
+});
+
+describe('describeValue', () => {
+  it("names the state's biggest fields and its biggest entry's fields", () => {
+    const stage = (countries: number) => ({
+      id: `stage-${countries}`,
+      countries: Array.from({ length: countries }, (_, i) => ({
+        code: `C${i}`,
+        name: 'x'.repeat(200),
+      })),
+      votingCountries: [],
+    });
+    const value = JSON.stringify({
+      state: {
+        eventStages: [stage(5), stage(40)],
+        currentStageId: 'stage-40',
+        predefinedVotes: {},
+      },
+      version: 0,
+    });
+
+    const described = describeValue(value)!;
+
+    expect(described.fields[0]).toMatchObject({ key: 'eventStages', items: 2 });
+    expect(described.fields.map((field) => field.key)).toEqual([
+      'eventStages',
+      'currentStageId',
+      'predefinedVotes',
+    ]);
+    // The 40-country stage, not the first one.
+    expect(described.biggestEntry![0]).toMatchObject({
+      key: 'countries',
+      items: 40,
+    });
+  });
+
+  it('gives up quietly on a value that is not JSON', () => {
+    expect(describeValue('not json')).toBeUndefined();
+    expect(describeValue('42')).toBeUndefined();
   });
 });

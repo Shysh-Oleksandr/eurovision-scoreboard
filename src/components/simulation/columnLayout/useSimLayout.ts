@@ -1,6 +1,9 @@
-import { useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
-const STORAGE_KEY = 'dp-sim-layout';
+import { useGeneralStore } from '@/state/generalStore';
+
+/** Where this device kept its choice before the setting existed. */
+const LEGACY_STORAGE_KEY = 'dp-sim-layout';
 
 export type SimLayout = 'classic' | 'column';
 
@@ -8,33 +11,42 @@ const isSimLayout = (value: string | null): value is SimLayout =>
   value === 'classic' || value === 'column';
 
 /**
- * Which simulation layout to render: the column layout, unless this device
- * opened the app with `?simLayout=classic` (`?simLayout=column` switches
- * back). The choice sticks on this device.
+ * `?simLayout=classic` / `?simLayout=column` in the URL still set the
+ * setting, and a choice this device stored before the setting existed moves
+ * into it once. Runs when this module loads, after the settings were read
+ * from storage and before anything renders, so the layout never flashes.
  */
-const readSimLayout = (): SimLayout => {
-  if (typeof window === 'undefined') return 'column';
+const adoptLegacyChoice = () => {
+  if (typeof window === 'undefined') return;
 
   try {
     const param = new URLSearchParams(window.location.search).get('simLayout');
+    const stored = window.localStorage.getItem(LEGACY_STORAGE_KEY);
+    const choice = isSimLayout(param) ? param : stored;
 
-    if (isSimLayout(param)) {
-      window.localStorage.setItem(STORAGE_KEY, param);
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
 
-      return param;
+    if (isSimLayout(choice)) {
+      useGeneralStore
+        .getState()
+        .setSettings({ enableClassicSimulationLayout: choice === 'classic' });
     }
-
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-
-    if (isSimLayout(stored)) return stored;
   } catch {
-    // Storage can be unavailable (private mode); fall through to the default.
+    // Storage can be unavailable (private mode); the setting stays as it is.
   }
-
-  return 'column';
 };
 
-export const useSimLayout = (): SimLayout => useState(readSimLayout)[0];
+adoptLegacyChoice();
+
+/**
+ * Which simulation layout to render: the column layout, unless the user
+ * turned on "Use the classic simulation layout" (Settings → Look & feel).
+ * The classic layout is deprecated: new work targets the column layout only.
+ */
+export const useSimLayout = (): SimLayout =>
+  useGeneralStore((state) => state.settings.enableClassicSimulationLayout)
+    ? 'classic'
+    : 'column';
 
 const DESKTOP_QUERY = '(min-width: 1024px)';
 

@@ -359,8 +359,8 @@ sentence case (`plainHeaders`).
 
 ### Simulation view (`columnLayout/`, `.dp-sim-*`)
 
-The default since 2026-11-14 (`?simLayout=classic` brings back the old
-layout on a device); the mechanics are in
+The default since 2026-11-14 (a setting brings back the old layout, which
+is deprecated: don't design for it); the mechanics are in
 `docs/simulation-column-layout.md`. Where the broadcast shows the
 spokesperson, the app shows the voter and their controls. The
 board rows and the theme's jury points strip (`VotingPointsInfo`) are drawn
@@ -439,6 +439,13 @@ by the theme and never restyled here, only sized.
   where the jury points strip sits; the split screen floats above them.
 - The accent fills only Present, Vote, Pause, Continue and View scoreboard;
   everything else is a `surface` button.
+- **Shortcut hints** (website, mouse or trackpad): the key in a button's
+  top-right corner is plain text, 10px bold in the button's own colour at
+  55%, never a keycap, chip or badge. Menu rows show it right-aligned, an
+  icon button in its tooltip. Space is drawn as ␣ and Enter as ↵: a
+  spelled-out "Leertaste" collides with the label in a narrow button. A hint never changes a fitted
+  layout: buttons of 40px and less make room with right padding
+  (docs/keyboard-shortcuts.md §3).
 
 ### Motion
 

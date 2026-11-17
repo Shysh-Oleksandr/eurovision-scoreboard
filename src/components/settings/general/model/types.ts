@@ -14,6 +14,8 @@ export interface SettingsEnv {
   fullscreenEnabled: boolean;
   hasSimBg: boolean;
   isNativeApp: boolean;
+  /** A mouse or trackpad is the main pointer (keyboard shortcuts). */
+  hasFinePointer: boolean;
 }
 
 export type SettingsPredicate = (env: SettingsEnv) => boolean;
@@ -116,4 +118,6 @@ export interface Category {
   blurbKey: string;
   icon: IconType;
   items: SettingsItem[];
+  /** Env-based visibility of the whole category (nav, search, panes). */
+  when?: SettingsPredicate;
 }

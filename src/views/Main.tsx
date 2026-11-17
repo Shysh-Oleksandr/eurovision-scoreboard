@@ -13,6 +13,7 @@ import Button from '@/components/common/Button';
 import GraphicsEditorHost from '@/graphics/components/GraphicsEditorHost';
 import { importSimulation } from '@/hooks/simulationChunkImports';
 import { useSimulationChunksPreload } from '@/hooks/useSimulationChunksPreload';
+import KeyboardShortcuts from '@/shortcuts/KeyboardShortcuts';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -38,6 +39,7 @@ const Main = () => {
 
   return (
     <PageWrapper>
+      <KeyboardShortcuts />
       <EventSetupModal />
       <GraphicsEditorHost />
       <SnowfallAnimation />

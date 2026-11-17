@@ -7,14 +7,10 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import ColorPicker from 'react-best-gradient-color-picker';
 import { createPortal } from 'react-dom';
 
 import { useThrottledEdit } from './hooks/useThrottledEdit';
-
-// Shields the picker from the swatch row's per-move re-renders; it re-renders
-// from its own internal drag state and the throttled prop value instead.
-const MemoColorPicker = React.memo(ColorPicker);
+import SafeColorPicker from './SafeColorPicker';
 
 import { CopyIcon } from '@/assets/icons/CopyIcon';
 import { UndoIcon } from '@/assets/icons/UndoIcon';
@@ -38,6 +34,12 @@ export const sanitizeGradient = (input: string): string => {
   );
   // Guard against NaN% stops
   out = out.replace(/NaN%/gi, '0%');
+  // The picker's angle field passes a typed "0 " through as is, giving
+  // "linear-gradient(0 deg, …", which its own parser then throws on while
+  // rendering (Safari users, 2026-04 to 10).
+  out = out.replace(/(\d)\s+deg\b/gi, '$1deg');
+  // Each angle edit also adds a space after the first comma.
+  out = out.replace(/,\s{2,}/g, ', ');
 
   return out;
 };
@@ -352,6 +354,7 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
   // change re-renders the picker's whole controlled subtree, so it gets the
   // 40 ms-throttled value while the swatch row shows the live echo.
   const pickerValue = getColorPickerValue(value || defaultValue || '#000000');
+  const fallbackPickerValue = getColorPickerValue(defaultValue || '#000000');
 
   const handleCopyButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -469,8 +472,9 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
                 left: `${pickerPosition.left}px`,
               }}
             >
-              <MemoColorPicker
+              <SafeColorPicker
                 value={pickerValue}
+                fallbackValue={fallbackPickerValue}
                 onChange={handleColorChange}
                 height={200}
                 hideColorTypeBtns={!enableGradient}

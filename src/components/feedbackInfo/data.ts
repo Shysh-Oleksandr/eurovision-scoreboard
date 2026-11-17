@@ -413,6 +413,11 @@ const OLD_WHATS_NEW = [
 
 const WEBSITE_UPDATES: UpdateItem[] = [
   {
+    date: '2026-11-17',
+    title:
+      '<list><item>Added keyboard shortcuts on desktop</item><item>Added an option to use the old simulation design</item><item>Added an option to always display full country names in the scoreboard</item><item>Bug fixes</item></list>',
+  },
+  {
     date: '2026-11-14',
     title:
       '<list><item>Redesigned the simulation UI</item><item>Added the Eurovision Asia 2026 data</item><item>Offline support for the mobile app</item><item>More contest entry stats</item><item>Bug fixes & small improvements</item></list>',
@@ -543,20 +548,16 @@ export const LATEST_UPDATE_KEY: string | null = WHATS_NEW[0]
 
 export const UPCOMING_FEATURES: UpdateItem[] = [
   {
-    approximateDates: { start: '2026-11-15', end: '2026-11-16' },
+    approximateDates: { start: '2026-11-18', end: '2026-11-22' },
     title: 'Eurovision Asia 2026 theme',
   },
   {
-    approximateDates: { start: '2026-11-15', end: '2026-11-22' },
+    approximateDates: { start: '2026-11-18', end: '2026-11-22' },
     title: 'Eurovision Asia 2026 winner reveal animation',
   },
   {
     approximateDates: { start: '2026-11-21', end: '2026-11-22' },
     title: "Override the country's official flag and name",
-  },
-  {
-    approximateDates: { start: '2026-11-21', end: '2026-11-22' },
-    title: 'Hotkeys support on desktop',
   },
   {
     approximateDates: { start: '2026-10-10', end: '2026-10-18' },

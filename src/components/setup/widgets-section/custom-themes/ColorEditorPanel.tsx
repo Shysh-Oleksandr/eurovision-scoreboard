@@ -1,7 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ColorPicker from 'react-best-gradient-color-picker';
 
 import {
   getColorDisplayValue,
@@ -9,14 +8,11 @@ import {
   sanitizeGradient,
 } from './ColorOverridePicker';
 import { useThrottledEdit } from './hooks/useThrottledEdit';
+import SafeColorPicker from './SafeColorPicker';
 
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import Button from '@/components/common/Button';
 import { parseColor } from '@/helpers/colorConversion';
-
-// Shields the picker from the panel's per-move re-renders (the live swatch and
-// value readout above it update at pointer-move frequency).
-const MemoColorPicker = React.memo(ColorPicker);
 
 interface ColorEditorPanelProps {
   label: string;
@@ -78,6 +74,7 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
   // the drag cross tracked by cheap component-local state inside it. Feeding
   // it per-move values tripled its render rate for no visible gain.
   const pickerValue = getColorPickerValue(value || defaultValue || '#000000');
+  const fallbackPickerValue = getColorPickerValue(defaultValue || '#000000');
 
   const handleColorChange = useCallback(
     (color: string) => {
@@ -133,8 +130,11 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
       </div>
 
       <div ref={pickerWrapRef} className="w-full">
-        <MemoColorPicker
+        {/* Memoized: shields the picker from the panel's per-move re-renders
+            (the live swatch and value readout above it). */}
+        <SafeColorPicker
           value={pickerValue}
+          fallbackValue={fallbackPickerValue}
           onChange={handleColorChange}
           width={pickerWidth}
           height={200}

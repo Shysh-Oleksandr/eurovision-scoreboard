@@ -1,5 +1,5 @@
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Checkbox } from '../Checkbox';
 
@@ -54,6 +54,40 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
     return null;
   }, [type]);
+
+  // Enter confirms, as a dialog's default button does (a restart asked for
+  // from the keyboard: R, then Enter), even when the focus stayed in a field
+  // underneath (the televote points). Not for danger dialogs, and not while
+  // keyboard focus sits on a button or the checkbox, which take it.
+  const confirmRef = useRef(() => onConfirm(doNotShowAgain));
+
+  confirmRef.current = () => onConfirm(doNotShowAgain);
+
+  useEffect(() => {
+    if (!isOpen || type === 'danger') return undefined;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter' || event.repeat || event.isComposing) return;
+
+      const target = event.target as Element | null;
+
+      if (
+        target?.closest?.('button, a[href], input[type="checkbox"]') &&
+        target.matches(':focus-visible')
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      confirmRef.current();
+    };
+
+    // Capture: ahead of the field's own Enter, which would ask again.
+    window.addEventListener('keydown', onKeyDown, true);
+
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [isOpen, type]);
 
   // Load the saved preference when modal opens
   useEffect(() => {

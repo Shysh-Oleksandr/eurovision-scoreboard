@@ -674,7 +674,9 @@
       "restart": "Uruchom ponownie",
       "undo": "Cofnij",
       "share": "Udostępnij",
-      "setup": "Ustawienia"
+      "setup": "Ustawienia",
+      "restartConfirmation": "Uruchomić symulację ponownie?",
+      "restartConfirmationDescription": "Przyznane dotąd głosy zostaną utracone."
     },
     "phaseActions": {
       "viewStats": "Statystyki",
@@ -1603,6 +1605,8 @@
         "whiteHeartFlags2026": "Pokazuj flagi-serca w projekcie z 2026 roku z białym konturem zamiast klasycznego czarnego.",
         "minimalFlags": "Używaj uproszczonych okrągłych i kwadratowych kształtów flag zamiast szczegółowych flag.",
         "rankChange": "Pokaż strzałkę wskazującą, czy uczestnik awansował lub spadł od ostatnio przyznanych punktów.",
+        "fullCountryNames": "Nigdy nie zamieniaj nazw na trzyliterowe kody (NOR, SWE). Jeśli na telefonie tablica ma dwie kolumny, zbyt długa nazwa zostanie ucięta wielokropkiem.",
+        "classicSimulationLayout": "Przywraca stary ekran symulacji z panelem sterowania pod tablicą. Nie jest już rozwijany: nowe funkcje i poprawki trafiają tylko do obecnego układu, a klasyczny może zostać usunięty w jednej z kolejnych aktualizacji.",
         "targetStages": "Pokaż, do którego etapu przechodzi każdy zakwalifikowany uczestnik.",
         "blurModal": "Rozmyj tablicę wyników za otwartymi oknami modalnymi dla lepszego skupienia.",
         "overrideFont": "Ignoruj czcionki każdego motywu (w tym przesłane) i zawsze używaj wybranej poniżej, zarówno w interfejsie, jak i na tablicy wyników.",
@@ -1741,6 +1745,8 @@
       "useHeartIconsForFlags": "Użyj ikon serc dla flag",
       "use2026WhiteHeartFlags": "Użyj flag-serc z 2026 roku z białym konturem",
       "alwaysShowRankings": "Zawsze pokazuj rankingi",
+      "alwaysShowFullCountryNames": "Zawsze pokazuj pełne nazwy krajów",
+      "enableClassicSimulationLayout": "Klasyczny układ symulacji",
       "showRankChangeIndicator": "Pokaż wskaźnik zmiany miejsca",
       "showQualifiersPopup": "Pokaż popup kwalifikantów",
       "showQualifierTargetStages": "Pokaż docelowe etapy kwalifikantów",
@@ -1819,7 +1825,43 @@
       "closeCustomizeTheme": "Zamknij edytor motywu",
       "cancelSimulation": "Anuluj symulację",
       "logout": "Wyloguj się",
-      "createNewContest": "Utwórz nowy konkurs"
+      "createNewContest": "Utwórz nowy konkurs",
+      "restartSimulation": "Ponowne uruchomienie symulacji"
+    },
+    "shortcuts": {
+      "title": "Skróty klawiszowe",
+      "blurb": "Steruj symulacją z klawiatury, klawiszami, które wybierzesz.",
+      "enable": "Używaj skrótów klawiszowych",
+      "enableDesc": "Pojedyncze klawisze naciskają przyciski symulacji. Czekają, gdy piszesz albo gdy otwarte jest okno.",
+      "showHints": "Pokazuj klawisze na przyciskach",
+      "showHintsDesc": "Klawisz w rogu każdego przycisku, który go ma.",
+      "changeHint": "Kliknij klawisz, a potem naciśnij nowy. Backspace go usuwa, Escape anuluje.",
+      "notSet": "Brak",
+      "pressKey": "Naciśnij klawisz…",
+      "movedTo": "Jego klawisz przejęło „{action}”",
+      "resetTo": "Przywróć {key}",
+      "resetAll": "Przywróć wszystkie klawisze",
+      "keys": {
+        "space": "Spacja"
+      },
+      "actions": {
+        "random": "Losowo",
+        "randomNext": "Następne punkty losowo",
+        "randomVoter": "Całe głosowanie losowo",
+        "randomAll": "Zakończ rundę losowo",
+        "present": "Prezentuj / pauza",
+        "undo": "Cofnij",
+        "restart": "Uruchom ponownie",
+        "continue": "Dalej / zobacz tablicę",
+        "setup": "Otwórz ustawienia konkursu",
+        "stats": "Otwórz statystyki",
+        "minimalView": "Widok minimalny",
+        "share": "Udostępnij",
+        "fullscreen": "Pełny ekran",
+        "cancel": "Anuluj symulację",
+        "startStage": "Rozpocznij etap (w jego oknie)",
+        "shortcutsHelp": "Otwórz te ustawienia"
+      }
     }
   },
   "graphics": {

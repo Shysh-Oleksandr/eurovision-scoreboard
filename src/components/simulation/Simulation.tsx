@@ -17,6 +17,7 @@ import { useReviewShowCounter } from './hooks/useReviewShowCounter';
 import { useSimulationHaptics } from './hooks/useSimulationHaptics';
 import { PhaseActions } from './PhaseActions';
 import { SimulationHeader } from './SimulationHeader';
+import SimulationShortcuts from './SimulationShortcuts';
 
 import {
   importJuryScaleRevealSimulation,
@@ -266,9 +267,17 @@ const Simulation = () => {
     </>
   );
 
+  const shortcuts = (
+    <SimulationShortcuts
+      isColumnLayout={useColumnLayout}
+      isScaleRevealActive={isScaleRevealActive}
+    />
+  );
+
   if (useColumnLayout) {
     return (
       <>
+        {shortcuts}
         <SimulationColumnLayout
           mode={isPickingQualifiers ? 'qualifiers' : 'vote'}
           revealData={revealData}
@@ -285,6 +294,7 @@ const Simulation = () => {
 
   return (
     <>
+      {shortcuts}
       <div className="lg:pt-8 md:pt-6 xs:pt-4 pt-2">
         <div className="sm:w-[min(90%,1024px)] xl:w-[min(88%,1100px)] w-[93%] mx-auto lg:pb-16 md:pb-12 pb-8 lg:pt-5 sm:pt-4 pt-2">
           <SimulationHeader phaseTitle={phaseTitle} />

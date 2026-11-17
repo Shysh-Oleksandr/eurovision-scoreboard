@@ -20,12 +20,12 @@ import SimHeader, { SimHeaderActions, SimHeaderTitle } from './SimHeader';
 import SimStripe from './SimStripe';
 import { useSimViewStore } from './simViewStore';
 import { DESKTOP_BOTTOM_GAP, useColumnFit } from './useColumnFit';
-import { useFinishRandomlyHotkey } from './useRandomActions';
 import { useIsDesktopLayout } from './useSimLayout';
 import VotingColumn from './VotingColumn';
 import VotingSheet from './VotingSheet';
 
 import { usePresentationLoop } from '@/components/presentationPanel/usePresentationLoop';
+import { useShortcut } from '@/shortcuts/registry';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -137,7 +137,6 @@ const SimulationColumnLayout = ({
   onBackToScoreboard,
 }: SimulationColumnLayoutProps) => {
   usePresentationLoop();
-  useFinishRandomlyHotkey();
 
   const isQualifiers = mode === 'qualifiers';
 
@@ -154,6 +153,8 @@ const SimulationColumnLayout = ({
   const [shareLoaded, setShareLoaded] = useState(false);
   const [floatingHeight, setFloatingHeight] = useState(0);
   const openShare = useCallback(() => setShareOpen(true), []);
+
+  useShortcut('share', openShare);
 
   const isShowMode = isPresenting && !isOver;
   const minimalView = useSimViewStore((state) => state.minimalView);

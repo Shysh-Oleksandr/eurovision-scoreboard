@@ -9,6 +9,7 @@ import { SidebarNav } from './general/SidebarNav';
 import { SubTabStrip } from './general/SubTabStrip';
 import { useSettingsSearch } from './general/useSettingsSearch';
 
+import { useHasFinePointer } from '@/hooks/useHasFinePointer';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { IS_NATIVE_APP } from '@/native/platform';
 import {
@@ -17,11 +18,7 @@ import {
 } from '@/state/generalStore';
 import { customThemeHasSimulationBackground } from '@/theme/customThemeHasAudio';
 
-const CATEGORY_IDS = new Set(CATEGORIES.map((category) => category.id));
 const DEFAULT_CATEGORY_ID = CATEGORIES[0].id;
-
-const resolveCategory = (id: string | undefined): string =>
-  id && CATEGORY_IDS.has(id) ? id : DEFAULT_CATEGORY_ID;
 
 export const GeneralSettings: React.FC = () => {
   const lastOpenedGeneralSettingsCategory = useGeneralStore(
@@ -34,6 +31,7 @@ export const GeneralSettings: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 720px)');
 
   const customTheme = useGeneralStore((s) => s.customTheme);
+  const hasFinePointer = useHasFinePointer();
   const env = useMemo(
     () => ({
       // The apps are full-screen already, and WKWebView has no Fullscreen API.
@@ -43,18 +41,31 @@ export const GeneralSettings: React.FC = () => {
         document.fullscreenEnabled,
       hasSimBg: customThemeHasSimulationBackground(customTheme),
       isNativeApp: IS_NATIVE_APP,
+      hasFinePointer,
     }),
-    [customTheme],
+    [customTheme, hasFinePointer],
   );
 
-  const search = useSettingsSearch(CATEGORIES, query, env);
+  // Categories this device has (Keyboard shortcuts: website, mouse only).
+  const categories = useMemo(
+    () => CATEGORIES.filter((category) => !category.when || category.when(env)),
+    [env],
+  );
+  const categoryIds = useMemo(
+    () => new Set(categories.map((category) => category.id)),
+    [categories],
+  );
+  const resolveCategory = (id: string | undefined): string =>
+    id && categoryIds.has(id) ? id : DEFAULT_CATEGORY_ID;
+
+  const search = useSettingsSearch(categories, query, env);
   const persistedCategory = resolveCategory(lastOpenedGeneralSettingsCategory);
   const activeCategory = searchHighlight ?? persistedCategory;
 
   const persistCategory = (id: string) => {
     setSearchHighlight(null);
 
-    if (!CATEGORY_IDS.has(id) || id === lastOpenedGeneralSettingsCategory) {
+    if (!categoryIds.has(id) || id === lastOpenedGeneralSettingsCategory) {
       return;
     }
 
@@ -80,8 +91,8 @@ export const GeneralSettings: React.FC = () => {
   }, [search, activeCategory]);
 
   const activeCat =
-    CATEGORIES.find((category) => category.id === activeCategory) ??
-    CATEGORIES[0];
+    categories.find((category) => category.id === activeCategory) ??
+    categories[0];
 
   const selectAndClear = (id: string) => {
     persistCategory(id);
@@ -109,7 +120,7 @@ export const GeneralSettings: React.FC = () => {
       ) : isMobile ? (
         <>
           <SubTabStrip
-            categories={CATEGORIES}
+            categories={categories}
             activeId={activeCategory}
             onSelect={persistCategory}
           />
@@ -118,7 +129,7 @@ export const GeneralSettings: React.FC = () => {
       ) : (
         <div className="grid grid-cols-[200px_1fr] items-start gap-[18px]">
           <SidebarNav
-            categories={CATEGORIES}
+            categories={categories}
             activeId={activeCategory}
             onSelect={persistCategory}
           />

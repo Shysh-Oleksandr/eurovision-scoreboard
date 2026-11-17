@@ -11,6 +11,8 @@ import { useShallow } from 'zustand/shallow';
 
 import FinalTelevoteReveal from '../FinalTelevoteReveal';
 
+import { createFramePassBudget, reportFitLoop } from './fitLoopGuard';
+import { allNamesFit, measureNames, namesReadWell } from './nameFit';
 import QualifierBoard from './QualifierBoard';
 import { PhoneBoardColumns, useSimViewStore } from './simViewStore';
 
@@ -21,6 +23,7 @@ import {
   BoardLayoutOverride,
 } from '@/components/board/BoardLayoutContext';
 import { getShortCodes } from '@/data/countries/shortCodes';
+import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 /** Narrowest column (in the board's own px) at which names still read well. */
@@ -117,7 +120,9 @@ const patchRowRects = (
  * would cut a name off it settles on one column after all (the board
  * scrolls a little) rather than shrinking names below the theme's size.
  * Two columns asked for keep them, with sports codes ("NOR") in place of
- * names when a name doesn't fit.
+ * names when the names don't read well enough (`namesReadWell`). With full
+ * names always wanted (`alwaysShowFullCountryNames`), names in two columns
+ * whatever they cut (`TWO_FULL_NAMES`).
  */
 const STEPS = {
   one: { columns: 1, names: 'normal' },
@@ -134,6 +139,14 @@ const STEP_ORDER: Record<PhoneBoardColumns, StepId[]> = {
   '2': ['two', 'twoCodes'],
 };
 
+/**
+ * Two columns with "Always show full country names": the owner's call is
+ * that these users want both, two columns and names, so names stay even
+ * when many end in an ellipsis (2026 theme on a narrow phone: "BELG…").
+ * Never codes, never one column.
+ */
+const TWO_FULL_NAMES: StepId[] = ['two'];
+
 /** Phones: rows grow into spare height up to a comfortable tap target. */
 const MAX_PHONE_ROW_HEIGHT = 44;
 /** Rows never spread further apart than this. */
@@ -143,36 +156,13 @@ const MAX_FLAG_GROWTH = 6;
 
 const ROW_SELECTOR = '.container-wrapping-flipper > div > .dp-scoreboard-font';
 
-/**
- * Whether a name's text is wider than its box. scrollWidth rounds to whole
- * pixels, so a 0.3px overflow (enough to draw an ellipsis) would pass; the
- * text's own range is measured instead. Wrapped names report their widest
- * line.
- */
-const nameOverflows = (name: HTMLElement) => {
-  const range = document.createRange();
-
-  range.selectNodeContents(name);
-
-  const style = getComputedStyle(name);
-  const box =
-    name.getBoundingClientRect().width -
-    parseFloat(style.paddingLeft) -
-    parseFloat(style.paddingRight);
-
-  return range.getBoundingClientRect().width > box + 0.01;
-};
-
-const overflowingNames = (root: HTMLElement) =>
-  Array.from(root.querySelectorAll<HTMLElement>('[data-entry-name]')).filter(
-    nameOverflows,
-  );
-
 interface PhoneFit {
   columns: 1 | 2;
   /**
-   * `wrap`: two columns, where a long name may take two lines. `code`: two
-   * columns showing short codes instead of names.
+   * `wrap`: two columns, where a long name may take two lines (and, two
+   * columns asked for, a few may end in an ellipsis; any number with full
+   * names always wanted). `code`: two columns showing short codes instead
+   * of names.
    */
   names: 'normal' | 'wrap' | 'code';
   /** Row height when there is spare height to give them, else undefined. */
@@ -190,7 +180,10 @@ interface PhoneFit {
  * readable), otherwise two columns so the last places stay in view, as long
  * as every name still fits at the theme's size (a long name may wrap to two
  * lines). If one doesn't (a narrow phone, a long single word), one column
- * after all: names never shrink. Rows then grow into the height left over.
+ * after all: names never shrink. Two columns asked for stay two columns:
+ * names while they read well enough, else short codes (with full names
+ * always wanted, names however much they're cut). Rows then grow into the
+ * height left over.
  * Re-measured when the line-up, the space or the fonts change, not on every
  * award. Names are styled from the board's `data-names`, never per row, so
  * rows remounted by a new entrance need no re-measuring.
@@ -202,6 +195,9 @@ const usePhoneColumnFit = (
   bottomReserve: number,
 ): PhoneFit => {
   const phoneColumns = useSimViewStore((state) => state.phoneColumns);
+  const fullNames = useGeneralStore(
+    (state) => state.settings.alwaysShowFullCountryNames,
+  );
   const [space, setSpace] = useState({ width: 0, height: 0 });
   const [fontsVersion, setFontsVersion] = useState(0);
 
@@ -255,9 +251,12 @@ const usePhoneColumnFit = (
     };
   }, [ref, enabled, bottomReserve]);
 
-  const order = STEP_ORDER[phoneColumns];
+  const order =
+    phoneColumns === '2' && fullNames
+      ? TWO_FULL_NAMES
+      : STEP_ORDER[phoneColumns];
   const lastStep = order.length - 1;
-  const key = `${lineupKey}|${space.width}|${space.height}|${phoneColumns}|${fontsVersion}`;
+  const key = `${lineupKey}|${space.width}|${space.height}|${phoneColumns}|${fullNames}|${fontsVersion}`;
   const [fit, setFit] = useState<{
     key: string;
     /** Index into `order`. */
@@ -279,10 +278,29 @@ const usePhoneColumnFit = (
     setFit({ key, step: 0, phase: 'rows' });
   }
 
+  // The layout the last finished fit chose, and a cap on passes per frame
+  // (./fitLoopGuard.ts): passes that keep restarting each other settle on
+  // that layout instead of crashing the app.
+  const lastDone = useRef<typeof fit | null>(null);
+  const [passBudget] = useState(() => createFramePassBudget());
+
   useLayoutEffect(() => {
     const el = ref.current;
 
+    if (fit.phase === 'done') lastDone.current = fit;
     if (!enabled || !el || fit.phase === 'done' || fit.key !== key) return;
+
+    if (!passBudget.spend()) {
+      reportFitLoop({
+        key,
+        fit,
+        lastDone: lastDone.current,
+        boardTop: Math.round(el.getBoundingClientRect().top),
+      });
+      setFit({ ...(lastDone.current ?? fit), key, phase: 'done' });
+
+      return;
+    }
 
     const board =
       el.querySelector<HTMLElement>('.container-wrapping-flipper > div') ?? el;
@@ -367,21 +385,25 @@ const usePhoneColumnFit = (
     }
 
     // Names, measured at the final row and flag sizes (two lines allowed):
-    // a name still cut off sends Auto back to one column, and two columns
-    // asked for on to codes.
-    if (
-      stepId === 'two' &&
-      fit.step < lastStep &&
-      overflowingNames(el).length > 0
-    ) {
-      // The next step's rows are sized afresh (one column has its own).
-      setFit({ key: fit.key, step: fit.step + 1, phase: 'rows' });
+    // a name still cut off sends Auto back to one column; two columns asked
+    // for go on to codes only when the names don't read well enough.
+    if (stepId === 'two' && fit.step < lastStep) {
+      const names = measureNames(el);
+      const keepNames =
+        order[fit.step + 1] === 'twoCodes'
+          ? namesReadWell(names)
+          : allNamesFit(names);
 
-      return;
+      if (!keepNames) {
+        // The next step's rows are sized afresh (one column has its own).
+        setFit({ key: fit.key, step: fit.step + 1, phase: 'rows' });
+
+        return;
+      }
     }
 
     setFit({ ...fit, phase: 'done' });
-  }, [enabled, fit, key, lastStep, order, ref, space.height]);
+  }, [enabled, fit, key, lastStep, order, ref, space.height, passBudget]);
 
   const step = STEPS[order[Math.min(fit.step, lastStep)]];
   const applied = fit.phase !== 'rows';

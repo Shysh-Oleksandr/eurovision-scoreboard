@@ -6,11 +6,7 @@ import React, { useId, useRef, useState } from 'react';
 import { useShallow } from 'zustand/shallow';
 
 import Popover from './Popover';
-import {
-  RandomAction,
-  useQuickRandomAction,
-  useRandomActions,
-} from './useRandomActions';
+import { RandomAction, useQuickRandomAction } from './useRandomActions';
 import { VoterInfo } from './useVoterInfo';
 
 import Button from '@/components/common/Button';
@@ -20,6 +16,8 @@ import {
 } from '@/components/presentationPanel/usePresentationLoop';
 import { StageId } from '@/models';
 import { playHaptic } from '@/native/haptics';
+import type { ShortcutId } from '@/shortcuts/actions';
+import { ShortcutHint, useAriaKeyShortcuts } from '@/shortcuts/hints';
 import {
   PresentationPointsGrouping,
   useGeneralStore,
@@ -278,6 +276,7 @@ export const PresentRow = ({
           )
         }
         onClick={() => setPresentationSettings({ isPresenting: !isPresenting })}
+        shortcut="present"
       >
         {isPresenting ? t('presentation.pause') : t('view.present')}
       </Button>
@@ -325,6 +324,13 @@ const RandomButtonLabel = ({ action }: { action: RandomAction }) => (
   </span>
 );
 
+/** Each scope's own key (N, V, F by default). */
+const RANDOM_SCOPE_SHORTCUTS: Record<RandomAction['id'], ShortcutId> = {
+  next: 'randomNext',
+  voter: 'randomVoter',
+  all: 'randomAll',
+};
+
 /** "At random" with one button per scope: next value / this voter / everyone. */
 export const AtRandomGroup = ({
   voter,
@@ -335,7 +341,7 @@ export const AtRandomGroup = ({
   onRun?: () => void;
 }) => {
   const t = useTranslations('simulation.view');
-  const actions = useRandomActions(voter);
+  const { actions, quick } = useQuickRandomAction(voter);
   const groupId = useId();
 
   return (
@@ -366,6 +372,13 @@ export const AtRandomGroup = ({
             aria-label={
               action.detail ? `${action.label}, ${action.detail}` : undefined
             }
+            // Space runs the scope the one-tap Random repeats; its hint
+            // moves there after a whole vote.
+            shortcut={
+              action.id === quick.id
+                ? 'random'
+                : RANDOM_SCOPE_SHORTCUTS[action.id]
+            }
           >
             <RandomButtonLabel action={action} />
           </Button>
@@ -384,6 +397,7 @@ export const AtRandomGroup = ({
 export const RandomSplitButton = ({ voter }: { voter: VoterInfo }) => {
   const t = useTranslations('simulation');
   const { actions, quick, isWholeVote } = useQuickRandomAction(voter);
+  const randomKeys = useAriaKeyShortcuts('random');
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const half =
@@ -403,6 +417,7 @@ export const RandomSplitButton = ({ voter }: { voter: VoterInfo }) => {
           aria-label={`${t('view.atRandom')}: ${
             quick.detail ? `${quick.label}, ${quick.detail}` : quick.label
           }`}
+          aria-keyshortcuts={randomKeys}
           className={`${half} gap-2 pl-3 pr-2.5 text-[13px] font-extrabold`}
         >
           <Dices className="size-[18px] shrink-0" />
@@ -414,6 +429,7 @@ export const RandomSplitButton = ({ voter }: { voter: VoterInfo }) => {
               </span>
             )}
           </span>
+          <ShortcutHint id="random" placement="inline" />
         </button>
         <span className="my-2 w-px shrink-0 bg-white/15" aria-hidden="true" />
         <button
@@ -458,6 +474,11 @@ export const RandomSplitButton = ({ voter }: { voter: VoterInfo }) => {
                 {action.detail}
               </span>
             )}
+            <ShortcutHint
+              id={RANDOM_SCOPE_SHORTCUTS[action.id]}
+              placement="inline"
+              className="ml-auto"
+            />
           </button>
         ))}
       </Popover>

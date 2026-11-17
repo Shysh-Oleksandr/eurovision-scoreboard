@@ -674,7 +674,9 @@
       "restart": "Riavvia",
       "undo": "Annulla",
       "share": "Condividi",
-      "setup": "Configurazione"
+      "setup": "Configurazione",
+      "restartConfirmation": "Riavviare la simulazione?",
+      "restartConfirmationDescription": "I voti dati finora andranno persi."
     },
     "phaseActions": {
       "viewStats": "Statistiche",
@@ -1603,6 +1605,8 @@
         "whiteHeartFlags2026": "Mostra le bandiere a cuore nel design 2026 con contorno bianco invece di quello nero classico.",
         "minimalFlags": "Usare forme di bandiera rotonde e quadrate semplificate invece di bandiere dettagliate.",
         "rankChange": "Mostrare una freccia che indica se ogni partecipante è salito o sceso dall’ultima assegnazione di punti.",
+        "fullCountryNames": "Non sostituire mai i nomi con codici di tre lettere (NOR, SWE). Sul telefono, con due colonne nel tabellone, un nome troppo lungo viene troncato con i puntini di sospensione.",
+        "classicSimulationLayout": "Riporta la vecchia schermata della simulazione, con i controlli sotto il tabellone. Non è più sviluppata: novità e correzioni arrivano solo nel layout attuale, e quello classico potrebbe essere rimosso in un prossimo aggiornamento.",
         "targetStages": "Mostrare a quale fase avanza ogni qualificato.",
         "blurModal": "Sfocare il tabellone dietro i modali aperti per maggiore concentrazione.",
         "overrideFont": "Ignorare i font di ogni tema (inclusi quelli caricati) e usare sempre quello scelto qui sotto, sia per l’interfaccia sia per il tabellone.",
@@ -1741,6 +1745,8 @@
       "useHeartIconsForFlags": "Usa icone a cuore per le bandiere",
       "use2026WhiteHeartFlags": "Usa le bandiere a cuore 2026 con contorno bianco",
       "alwaysShowRankings": "Mostra sempre le classifiche",
+      "alwaysShowFullCountryNames": "Mostra sempre il nome completo dei paesi",
+      "enableClassicSimulationLayout": "Usa il layout classico della simulazione",
       "showRankChangeIndicator": "Mostra indicatore cambio posizione",
       "showQualifiersPopup": "Mostra popup qualificati",
       "showQualifierTargetStages": "Mostra fasi obiettivo dei qualificati",
@@ -1819,7 +1825,43 @@
       "closeCustomizeTheme": "Chiudi editor del tema",
       "cancelSimulation": "Annulla simulazione",
       "logout": "Esci",
-      "createNewContest": "Creare un nuovo concorso"
+      "createNewContest": "Creare un nuovo concorso",
+      "restartSimulation": "Riavvia simulazione"
+    },
+    "shortcuts": {
+      "title": "Scorciatoie da tastiera",
+      "blurb": "Gestisci la simulazione dalla tastiera, con i tasti che preferisci.",
+      "enable": "Usa le scorciatoie da tastiera",
+      "enableDesc": "Un solo tasto preme i pulsanti della simulazione. Aspettano mentre scrivi o una finestra è aperta.",
+      "showHints": "Mostra i tasti sui pulsanti",
+      "showHintsDesc": "Il tasto nell’angolo di ogni pulsante che ne ha uno.",
+      "changeHint": "Fai clic su un tasto, poi premi quello nuovo. Backspace lo toglie, Esc annulla.",
+      "notSet": "Nessuno",
+      "pressKey": "Premi un tasto…",
+      "movedTo": "Il suo tasto è passato a «{action}»",
+      "resetTo": "Ripristina {key}",
+      "resetAll": "Ripristina tutti i tasti",
+      "keys": {
+        "space": "Spazio"
+      },
+      "actions": {
+        "random": "Casuale",
+        "randomNext": "Prossimi punti a caso",
+        "randomVoter": "Voto completo a caso",
+        "randomAll": "Termina il turno a caso",
+        "present": "Presenta / pausa",
+        "undo": "Annulla",
+        "restart": "Riavvia",
+        "continue": "Continua / vedi classifica",
+        "setup": "Apri la configurazione",
+        "stats": "Apri le statistiche",
+        "minimalView": "Vista minimale",
+        "share": "Condividi",
+        "fullscreen": "Schermo intero",
+        "cancel": "Annulla simulazione",
+        "startStage": "Avvia la fase (nella sua finestra)",
+        "shortcutsHelp": "Apri queste impostazioni"
+      }
     }
   },
   "graphics": {

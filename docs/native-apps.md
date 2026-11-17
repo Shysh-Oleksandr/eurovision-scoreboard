@@ -226,7 +226,10 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   `AnchoredMenu`, `OverflowMenu`, `VotingBarMenu`, the editor's `Dialog`
   and popovers already do; a custom overlay that doesn't is skipped and back
   closes whatever is under it. An overlay that must not close registers a
-  no-op (as `Modal` does without `onClose`). See §8.
+  no-op (as `Modal` does without `onClose`). See §8. On every platform the
+  same call also pauses keyboard shortcuts while the overlay is open; pass
+  `{ blocksShortcuts: false }` for layers that are controls, not overlays
+  (docs/keyboard-shortcuts.md §2).
 - **Safe areas: use `var(--safe-top)` etc.** (`src/styles.css` `:root`),
   never `env(safe-area-inset-*)` directly, also in Tailwind arbitrary values
   (`pt-[var(--safe-top)]`). Capacitor's Android `SystemBars` sets
@@ -1099,7 +1102,15 @@ apps. Each launch keeps `dp:app-session` in localStorage:
   path (query parameter names only), open overlays (`useBackHandler`),
   `role="dialog"` labels, graphics editor, stage, winner, theme, DOM nodes
   and canvases;
-- the DOM peak and the last 30 changes as crumbs.
+- the DOM peak and the last 30 changes as crumbs;
+- crumbs for steps the samples can't see, saved at once through `noteCrumb`
+  (`crumbs.ts`, a no-op on the website): image exports (`exportNode`:
+  `export:<w>x<h>@<scale>`, `export:done <size> <KB> <ms>`, `export:failed`)
+  and files handed to the system (`nativeShare.ts`: `share:file <KB>`,
+  `share:sheet`, `share:done|cancelled|failed`, `save:file`). Added
+  2026-11-17: every iOS report from 1.3 died on the winner screen with two
+  overlays open, mostly right after the app came back to the screen, which
+  looks like sharing the results image.
 
 At the next launch `assessPreviousSession()` (`core.ts`) decides what to
 report:

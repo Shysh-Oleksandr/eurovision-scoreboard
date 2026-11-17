@@ -16,6 +16,8 @@ import Button from '@/components/common/Button';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { BaseCountry } from '@/models';
 import { playHaptic } from '@/native/haptics';
+import { ShortcutHint, useAriaKeyShortcuts } from '@/shortcuts/hints';
+import { useShortcut } from '@/shortcuts/registry';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { playThemeSound } from '@/theme/playThemeSound';
@@ -438,6 +440,7 @@ export const QualifierRandomGroup = ({
           size="lg"
           className="min-w-0 justify-center !px-2"
           onClick={random.next}
+          shortcut="random"
         >
           <span className="truncate">
             {splitCount > 0
@@ -454,6 +457,7 @@ export const QualifierRandomGroup = ({
               random.all();
               onRunAll?.();
             }}
+            shortcut="randomAll"
           >
             <span className="truncate">
               {t('allLeft', { count: q.remaining })}
@@ -483,6 +487,7 @@ export const QualifierRandomQuickButton = ({ q }: { q: QualifiersState }) => {
           : t('view.nextQualifier')
       }`}
       onClick={random.next}
+      shortcut="random"
     >
       {t('random')}
     </Button>
@@ -496,6 +501,7 @@ export const QualifierRandomQuickButton = ({ q }: { q: QualifiersState }) => {
 export const QualifierRandomSplitButton = ({ q }: { q: QualifiersState }) => {
   const t = useTranslations('simulation');
   const random = useQualifierRandom();
+  const randomKeys = useAriaKeyShortcuts('random');
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const half =
@@ -518,10 +524,12 @@ export const QualifierRandomSplitButton = ({ q }: { q: QualifiersState }) => {
           type="button"
           onClick={random.next}
           aria-label={`${t('view.atRandom')}: ${nextLabel}`}
+          aria-keyshortcuts={randomKeys}
           className={`${half} gap-2 pl-3 pr-2.5 text-[13px] font-extrabold`}
         >
           <Dices className="size-[18px] shrink-0" />
           {t('random')}
+          <ShortcutHint id="random" placement="inline" />
         </button>
         <span className="my-2 w-px shrink-0 bg-white/15" aria-hidden="true" />
         <button
@@ -551,12 +559,17 @@ export const QualifierRandomSplitButton = ({ q }: { q: QualifiersState }) => {
           {t('view.atRandom')}
         </div>
         {[
-          { label: nextLabel, run: random.next },
+          {
+            label: nextLabel,
+            run: random.next,
+            shortcut: 'randomNext' as const,
+          },
           ...(q.remaining > 1
             ? [
                 {
                   label: t('view.allLeft', { count: q.remaining }),
                   run: random.all,
+                  shortcut: 'randomAll' as const,
                 },
               ]
             : []),
@@ -568,9 +581,14 @@ export const QualifierRandomSplitButton = ({ q }: { q: QualifiersState }) => {
               setOpen(false);
               action.run();
             }}
-            className="flex min-h-10 w-full items-center rounded-lg px-2.5 text-left text-[14px] font-bold hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none"
+            className="flex min-h-10 w-full items-center gap-2 rounded-lg px-2.5 text-left text-[14px] font-bold hover:bg-white/[0.08] focus-visible:bg-white/[0.08] focus-visible:outline-none"
           >
             <span className="min-w-0 truncate">{action.label}</span>
+            <ShortcutHint
+              id={action.shortcut}
+              placement="inline"
+              className="ml-auto"
+            />
           </button>
         ))}
       </Popover>
@@ -612,6 +630,8 @@ export const QualifierResultsActions = ({
   const t = useTranslations('simulation');
   const { canContinue, nextPhase, handleContinue } = usePhaseResults();
 
+  useShortcut('continue', handleContinue, canContinue);
+
   return (
     <div className="flex flex-col gap-3">
       {!compact && (
@@ -621,6 +641,7 @@ export const QualifierResultsActions = ({
           className="justify-center"
           Icon={<Share2 className="size-[18px]" />}
           onClick={onShare}
+          shortcut="share"
         >
           {t('header.share')}
         </Button>
@@ -631,6 +652,7 @@ export const QualifierResultsActions = ({
           size="xl"
           className="w-full justify-center gap-2"
           onClick={handleContinue}
+          shortcut="continue"
         >
           <span className="flex items-center gap-2">
             {t('phaseActions.continueTo', { nextPhase: nextPhase ?? '' })}

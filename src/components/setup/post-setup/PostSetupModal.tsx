@@ -25,8 +25,8 @@ import { PlayIcon } from '@/assets/icons/PlayIcon';
 import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
-import { useHotKey } from '@/hooks/useHotKey';
 import { EventStage, StageOverrides, StageVotingMode } from '@/models';
+import { useShortcut } from '@/shortcuts/registry';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { createCountriesComparator } from '@/state/scoreboard/helpers';
@@ -394,7 +394,8 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
 
   useEffectOnce(onLoaded);
 
-  useHotKey('s', handleSave);
+  // ⌘S / Ctrl+S starts the stage, also while typing (it stays mounted).
+  useShortcut('startStage', handleSave, isOpen);
 
   return (
     <Modal
@@ -427,6 +428,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
             saveButtonIcon={<PlayIcon className="size-4" />}
             saveButtonText={t('startStage', { stageName: stage.name })}
             saveButtonDisabled={!!channelError}
+            saveButtonShortcut="startStage"
           />
         </>
       }

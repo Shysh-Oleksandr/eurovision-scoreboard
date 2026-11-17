@@ -674,7 +674,9 @@
       "restart": "Neustart",
       "undo": "Rückgängig",
       "share": "Teilen",
-      "setup": "Setup"
+      "setup": "Setup",
+      "restartConfirmation": "Simulation neu starten?",
+      "restartConfirmationDescription": "Die bisher vergebenen Punkte gehen verloren."
     },
     "phaseActions": {
       "viewStats": "Statistiken",
@@ -1603,6 +1605,8 @@
         "whiteHeartFlags2026": "Herzflaggen im Design von 2026 mit weißem Rand statt des klassischen schwarzen anzeigen.",
         "minimalFlags": "Vereinfachte runde und quadratische Flaggenformen statt detaillierter Flaggen verwenden.",
         "rankChange": "Einen Pfeil anzeigen, ob sich ein Beitrag seit der letzten Punktevergabe verbessert oder verschlechtert hat.",
+        "fullCountryNames": "Ländernamen nie durch dreistellige Kürzel (NOR, SWE) ersetzen. Zeigt die Anzeigetafel auf dem Handy zwei Spalten, wird ein zu langer Name stattdessen mit Auslassungspunkten gekürzt.",
+        "classicSimulationLayout": "Bringt den alten Simulationsbildschirm mit den Steuerelementen unter der Anzeigetafel zurück. Er wird nicht mehr weiterentwickelt: Neue Funktionen und Korrekturen gibt es nur im aktuellen Layout, und das klassische kann in einem späteren Update entfallen.",
         "targetStages": "Anzeigen, in welche Phase jeder Qualifikant weiterkommt.",
         "blurModal": "Das Scoreboard hinter geöffneten Modals verwischen für mehr Fokus.",
         "overrideFont": "Die Schriftarten jedes Themes ignorieren (auch hochgeladene) und immer die unten gewählte für Interface und Scoreboard verwenden.",
@@ -1741,6 +1745,8 @@
       "useHeartIconsForFlags": "Herzsymbole für Flaggen verwenden",
       "use2026WhiteHeartFlags": "2026er Herzflaggen mit weißem Rand verwenden",
       "alwaysShowRankings": "Rangliste immer anzeigen",
+      "alwaysShowFullCountryNames": "Ländernamen immer ausschreiben",
+      "enableClassicSimulationLayout": "Klassisches Simulationslayout verwenden",
       "showRankChangeIndicator": "Rangänderung anzeigen",
       "showQualifiersPopup": "Qualifikanten-Popup anzeigen",
       "showQualifierTargetStages": "Qualifikations-Zielstufen anzeigen",
@@ -1819,7 +1825,43 @@
       "closeCustomizeTheme": "Theme-Editor schließen",
       "cancelSimulation": "Simulation abbrechen",
       "logout": "Abmelden",
-      "createNewContest": "Neuen Wettbewerb erstellen"
+      "createNewContest": "Neuen Wettbewerb erstellen",
+      "restartSimulation": "Simulation neu starten"
+    },
+    "shortcuts": {
+      "title": "Tastenkürzel",
+      "blurb": "Steuere die Simulation mit der Tastatur, mit Tasten deiner Wahl.",
+      "enable": "Tastenkürzel verwenden",
+      "enableDesc": "Einzelne Tasten drücken die Buttons der Simulation. Sie warten, während du tippst oder ein Fenster offen ist.",
+      "showHints": "Tasten auf Buttons anzeigen",
+      "showHintsDesc": "Die Taste in der Ecke jedes Buttons, der eine hat.",
+      "changeHint": "Klicke auf eine Taste und drücke dann die neue. Rücktaste entfernt sie, Escape bricht ab.",
+      "notSet": "Nicht belegt",
+      "pressKey": "Taste drücken…",
+      "movedTo": "Die Taste gehört jetzt zu „{action}“",
+      "resetTo": "Auf {key} zurücksetzen",
+      "resetAll": "Alle Tasten zurücksetzen",
+      "keys": {
+        "space": "Leertaste"
+      },
+      "actions": {
+        "random": "Zufällig",
+        "randomNext": "Nächste Punkte zufällig",
+        "randomVoter": "Ganze Wertung zufällig",
+        "randomAll": "Runde zufällig abschließen",
+        "present": "Präsentieren / Pause",
+        "undo": "Rückgängig",
+        "restart": "Neustart",
+        "continue": "Weiter / zur Anzeigetafel",
+        "setup": "Setup öffnen",
+        "stats": "Statistiken öffnen",
+        "minimalView": "Minimalansicht",
+        "share": "Teilen",
+        "fullscreen": "Vollbild",
+        "cancel": "Simulation abbrechen",
+        "startStage": "Runde starten (in ihrem Fenster)",
+        "shortcutsHelp": "Diese Einstellungen öffnen"
+      }
     }
   },
   "graphics": {

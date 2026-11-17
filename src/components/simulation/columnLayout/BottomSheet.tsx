@@ -57,7 +57,8 @@ const BottomSheet = ({
   const canExpand = !!body;
   const close = () => setOpen(false);
 
-  useBackHandler(open, close);
+  // The sheet holds the voting controls: shortcuts keep working while open.
+  useBackHandler(open, close, { blocksShortcuts: false });
 
   useEffect(() => setOpen(false), [resetKey]);
 

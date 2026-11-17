@@ -674,7 +674,9 @@
       "restart": "Reiniciar",
       "undo": "Deshacer",
       "share": "Compartir",
-      "setup": "Configuración"
+      "setup": "Configuración",
+      "restartConfirmation": "¿Reiniciar la simulación?",
+      "restartConfirmationDescription": "Se perderán los votos dados hasta ahora."
     },
     "phaseActions": {
       "viewStats": "Estadísticas",
@@ -1603,6 +1605,8 @@
         "whiteHeartFlags2026": "Mostrar las banderas de corazón con el diseño de 2026 y contorno blanco en lugar del clásico negro.",
         "minimalFlags": "Usar formas de bandera redondas y cuadradas simplificadas en lugar de banderas detalladas.",
         "rankChange": "Mostrar una flecha que indique si cada participante subió o bajó desde los últimos puntos otorgados.",
+        "fullCountryNames": "No cambiar nunca los nombres por códigos de tres letras (NOR, SWE). En el móvil, con dos columnas en el marcador, un nombre demasiado largo se recorta con puntos suspensivos.",
+        "classicSimulationLayout": "Recupera la pantalla de simulación antigua, con los controles bajo el marcador. Ya no se desarrolla: las novedades y correcciones llegan solo al diseño actual, y el clásico puede desaparecer en una próxima actualización.",
         "targetStages": "Mostrar a qué fase avanza cada clasificado.",
         "blurModal": "Desenfocar el marcador detrás de los modales abiertos para mayor concentración.",
         "overrideFont": "Ignorar las fuentes de cada tema (incluidas las subidas) y usar siempre la que elijas abajo, tanto en la interfaz como en el marcador.",
@@ -1741,6 +1745,8 @@
       "useHeartIconsForFlags": "Usar iconos de corazón para las banderas",
       "use2026WhiteHeartFlags": "Usar las banderas de corazón de 2026 con contorno blanco",
       "alwaysShowRankings": "Mostrar siempre las clasificaciones",
+      "alwaysShowFullCountryNames": "Mostrar siempre los nombres completos de los países",
+      "enableClassicSimulationLayout": "Usar el diseño clásico de la simulación",
       "showRankChangeIndicator": "Mostrar indicador de cambio de posición",
       "showQualifiersPopup": "Mostrar ventana de clasificados",
       "showQualifierTargetStages": "Mostrar etapas de destino de clasificados",
@@ -1819,7 +1825,43 @@
       "closeCustomizeTheme": "Cerrar editor de temas",
       "cancelSimulation": "Cancelar simulación",
       "logout": "Cerrar sesión",
-      "createNewContest": "Crear nuevo concurso"
+      "createNewContest": "Crear nuevo concurso",
+      "restartSimulation": "Reiniciar simulación"
+    },
+    "shortcuts": {
+      "title": "Atajos de teclado",
+      "blurb": "Controla la simulación con el teclado, con las teclas que elijas.",
+      "enable": "Usar atajos de teclado",
+      "enableDesc": "Una sola tecla pulsa los botones de la simulación. Esperan mientras escribes o hay una ventana abierta.",
+      "showHints": "Mostrar teclas en los botones",
+      "showHintsDesc": "La tecla en la esquina de cada botón que tenga una.",
+      "changeHint": "Haz clic en una tecla y pulsa la nueva. Retroceso la quita, Escape cancela.",
+      "notSet": "Sin asignar",
+      "pressKey": "Pulsa una tecla…",
+      "movedTo": "Su tecla pasó a «{action}»",
+      "resetTo": "Restablecer a {key}",
+      "resetAll": "Restablecer todas las teclas",
+      "keys": {
+        "space": "Espacio"
+      },
+      "actions": {
+        "random": "Aleatorio",
+        "randomNext": "Siguientes puntos al azar",
+        "randomVoter": "Voto completo al azar",
+        "randomAll": "Terminar la ronda al azar",
+        "present": "Presentar / pausar",
+        "undo": "Deshacer",
+        "restart": "Reiniciar",
+        "continue": "Continuar / ver marcador",
+        "setup": "Abrir configuración",
+        "stats": "Abrir estadísticas",
+        "minimalView": "Vista mínima",
+        "share": "Compartir",
+        "fullscreen": "Pantalla completa",
+        "cancel": "Cancelar simulación",
+        "startStage": "Empezar la fase (en su ventana)",
+        "shortcutsHelp": "Abrir estos ajustes"
+      }
     }
   },
   "graphics": {

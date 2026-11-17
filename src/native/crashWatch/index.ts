@@ -29,6 +29,7 @@ import {
   type SessionRecord,
   type SessionState,
 } from './core';
+import { setCrumbSink } from './crumbs';
 
 import { openOverlayCount } from '@/hooks/useBackHandler';
 import { LIVE_BUNDLE_VERSION, liveUpdateBoot } from '@/native/liveUpdate';
@@ -279,6 +280,11 @@ export function startCrashWatch(): void {
   };
   const previous = tracker.start(visibility());
   const sameWebView = checkSameWebView(previous, tracker.current());
+
+  setCrumbSink((label) => {
+    tracker.note(label);
+    debugLog('crumb', label);
+  });
 
   document.addEventListener('visibilitychange', () => setState(visibility()));
   // Unloads (reloads, live-update switches) are clean ends too.
