@@ -2,7 +2,7 @@
 /**
  * Live updates for the native apps (docs/native-apps.md §11).
  *
- *   yarn live-update publish [--mode silent|prompt|required] [--allow-dirty] [--dry-run] [--out <dir>]
+ *   yarn live-update publish [--mode silent|prompt|required] [--platform ios|android] [--allow-dirty] [--dry-run] [--out <dir>]
  *   yarn live-update store <ios|android> [--required <version|none>] [--recommended <version|none>] [--url <listing>] [--force] [--dry-run] [--out <dir>]
  *   yarn live-update status
  *   yarn live-update keygen
@@ -20,6 +20,10 @@
  * its own runtime. `--out <dir>` writes that layout to a directory instead of
  * uploading (local tests, with NEXT_PUBLIC_LIVE_UPDATE_URL pointing at a
  * server for it); `--dry-run` stops after building and signing.
+ *
+ * `--platform ios|android` publishes for one platform only: the bundle zip is
+ * shared, but only that platform's manifest is written, so the other
+ * platform's apps keep the bundle they have (default: both).
  *
  * `--mode` sets how urgently installed apps move to the bundle: `silent`
  * (default: next launch, or a resume after a long break), `prompt` (also a
@@ -296,6 +300,23 @@ function upload(baseUrl, relPath, file, contentType, cacheControl) {
   ]);
 }
 
+/** `--platform ios|android`: the platforms to publish for (default: both). */
+function publishPlatforms() {
+  if (!flag('--platform')) return PLATFORMS;
+
+  const platform = option('--platform');
+
+  if (!PLATFORMS.includes(platform)) {
+    fail(
+      `--platform must be one of ${PLATFORMS.join(', ')} (got "${
+        platform ?? ''
+      }").`,
+    );
+  }
+
+  return [platform];
+}
+
 async function publish() {
   const dryRun = flag('--dry-run');
   const outDir = option('--out');
@@ -305,6 +326,8 @@ async function publish() {
   if (!MODES.includes(mode)) {
     fail(`--mode must be one of ${MODES.join(', ')} (got "${mode}").`);
   }
+
+  const platforms = publishPlatforms();
 
   if (dirty && !flag('--allow-dirty')) {
     fail(
@@ -316,12 +339,12 @@ async function publish() {
   const version = newBundleVersion();
   const baseUrl = liveUpdateUrl();
   const runtimes = Object.fromEntries(
-    PLATFORMS.map((platform) => [platform, nativeRuntime(platform)]),
+    platforms.map((platform) => [platform, nativeRuntime(platform)]),
   );
   // Read before building, so an unreachable CDN fails fast.
   const previous = Object.fromEntries(
     await Promise.all(
-      PLATFORMS.map(async (platform) => [
+      platforms.map(async (platform) => [
         platform,
         await readPublished(
           baseUrl,
@@ -341,7 +364,7 @@ async function publish() {
     },
   });
 
-  for (const platform of PLATFORMS) {
+  for (const platform of platforms) {
     if (nativeRuntime(platform) !== runtimes[platform]) {
       fail(
         `The ${platform} native runtime changed during the build; publish again.`,
@@ -376,7 +399,7 @@ async function publish() {
   const commit = git('rev-parse', '--short', 'HEAD') + (dirty ? '-dirty' : '');
   const stagingRoot = outDir ? path.resolve(outDir) : workDir;
   const bundleFile = stage(stagingRoot, bundlePath(version), signed.encrypted);
-  const manifests = PLATFORMS.map((platform) => {
+  const manifests = platforms.map((platform) => {
     const manifest = {
       version,
       platform,
@@ -413,8 +436,11 @@ async function publish() {
   const sizeMb = (signed.encrypted.length / 1024 / 1024).toFixed(1);
 
   console.log(`\n[live-update] bundle ${version} (${commit}, ${sizeMb} MB)`);
-  for (const platform of PLATFORMS) {
+  for (const platform of platforms) {
     console.log(`  ${platform.padEnd(8)} runtime ${runtimes[platform]}`);
+  }
+  for (const platform of PLATFORMS.filter((p) => !platforms.includes(p))) {
+    console.log(`  ${platform.padEnd(8)} skipped (keeps its current bundle)`);
   }
   console.log(`  mode     ${mode}`);
 
@@ -638,7 +664,7 @@ switch (command) {
     break;
   default:
     console.log(
-      'Usage: yarn live-update <publish [--mode silent|prompt|required] [--allow-dirty] [--dry-run] [--out <dir>] | store <ios|android> [--required <v|none>] [--recommended <v|none>] [--url <listing>] [--force] | status | keygen>',
+      'Usage: yarn live-update <publish [--mode silent|prompt|required] [--platform ios|android] [--allow-dirty] [--dry-run] [--out <dir>] | store <ios|android> [--required <v|none>] [--recommended <v|none>] [--url <listing>] [--force] | status | keygen>',
     );
     process.exit(command ? 1 : 0);
 }

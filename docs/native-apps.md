@@ -779,6 +779,7 @@ bundle under the runtimes of the tree it builds from. So:
 npx wrangler login                     # once; needs access to the R2 bucket
 yarn live-update publish               # from a clean tree
 yarn live-update publish --mode prompt # or required (see Update levels)
+yarn live-update publish --platform ios # one platform only (see below)
 yarn live-update publish --dry-run     # build and sign, upload nothing
 yarn live-update store android --recommended 1.1
 yarn live-update store ios --required 1.2 --dry-run
@@ -798,6 +799,12 @@ session key, the update floors, size, commit and publish time. `publish`
 reads the current manifests before building (to carry the floors forward)
 and stops if the CDN can't be read.
 
+- **One platform only:** `--platform ios` (or `android`) uploads the bundle
+  zip but writes only that platform's manifest, so the other platform's apps
+  keep the bundle they have, and their floors stay as they were. The next
+  publish without `--platform` reaches both. Useful to ship to one store's
+  users first, or a fix that only matters on one platform. `status` still
+  shows both platforms.
 - **Rolling back** means publishing again from a good commit: it gets a new,
   newer version. Apps that already run the bad bundle move to the new one
   on their next launch after a check. Deleting a manifest only stops further
