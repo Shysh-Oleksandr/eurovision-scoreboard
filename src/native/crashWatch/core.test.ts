@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   assessPreviousSession,
   buildCrashReport,
+  buildRollbackReport,
   canSendReport,
   contextCrumbs,
   createSessionTracker,
@@ -18,6 +19,7 @@ import {
   SESSION_KEY,
   type KeyValueStorage,
   type LastExit,
+  type LiveUpdateRollback,
   type RendererGone,
   type SessionContext,
   type SessionRecord,
@@ -171,6 +173,55 @@ describe('buildCrashReport', () => {
       },
       foregroundAtExit: false,
       renderer: { didCrash: true, at: new Date(1_060_000).toISOString() },
+    });
+  });
+});
+
+describe('buildRollbackReport', () => {
+  const rollback: LiveUpdateRollback = {
+    failedBundle: '20261118.171120',
+    downloadedAt: '2026-11-18T17:34:53.143Z',
+    runningBundle: 'built-in',
+    platform: 'android',
+    runtime: 'be43745f2e9d268c',
+    appVersion: '1.3 (3)',
+  };
+
+  it('carries the session that ran the failed bundle', () => {
+    const report = buildRollbackReport(
+      rollback,
+      record({ bundle: '20261118.171120', crumbs: [[0, 'start:visible']] }),
+      { platform: 'Linux' },
+    );
+
+    expect(report.message).toBe('Live update rolled back');
+    expect(report.userDetails).toEqual({ platform: 'Linux' });
+    expect(report.generalInfo).toMatchObject({
+      kind: 'live-update-rollback',
+      failedBundle: '20261118.171120',
+      runningBundle: 'built-in',
+      appVersion: '1.3 (3)',
+      failedBundleRan: true,
+      previousSession: {
+        bundle: '20261118.171120',
+        crumbs: [[0, 'start:visible']],
+      },
+    });
+  });
+
+  it('says the bundle never ran when the last session was another bundle', () => {
+    const report = buildRollbackReport(rollback, record(), {});
+
+    expect(report.generalInfo).toMatchObject({
+      failedBundleRan: false,
+      previousSession: null,
+    });
+  });
+
+  it('copes with no session record at all', () => {
+    expect(buildRollbackReport(rollback, null, {}).generalInfo).toMatchObject({
+      failedBundleRan: false,
+      previousSession: null,
     });
   });
 });

@@ -128,6 +128,20 @@ export function assessPreviousSession(
 
 const iso = (ms: number) => new Date(ms).toISOString();
 
+/** A session record as it goes into a report. */
+function sessionSummary(previous: SessionRecord) {
+  return {
+    startedAt: iso(previous.startedAt),
+    lastSeenAt: iso(previous.updatedAt),
+    durationS: Math.round((previous.updatedAt - previous.startedAt) / 1000),
+    bundle: previous.bundle,
+    state: previous.state,
+    context: previous.ctx,
+    peakDomNodes: previous.peakDomNodes,
+    crumbs: previous.crumbs,
+  };
+}
+
 /** The `/errors` body for a crash `assessPreviousSession` found. */
 export function buildCrashReport(
   message: string,
@@ -142,18 +156,49 @@ export function buildCrashReport(
     userDetails,
     generalInfo: {
       kind: 'app-crash',
-      previousSession: previous && {
-        startedAt: iso(previous.startedAt),
-        lastSeenAt: iso(previous.updatedAt),
-        durationS: Math.round((previous.updatedAt - previous.startedAt) / 1000),
-        bundle: previous.bundle,
-        state: previous.state,
-        context: previous.ctx,
-        peakDomNodes: previous.peakDomNodes,
-        crumbs: previous.crumbs,
-      },
+      previousSession: previous && sessionSummary(previous),
       foregroundAtExit: exit.foreground,
       renderer: renderer && { ...renderer, at: iso(renderer.at) },
+    },
+  };
+}
+
+/** A live update the plugin rolled back: it never confirmed it had started. */
+export type LiveUpdateRollback = {
+  /** The bundle that was rolled back. */
+  failedBundle: string;
+  /** When this device downloaded it (ISO), if the plugin says. */
+  downloadedAt: string | null;
+  /** The bundle the app went back to and runs now (or `built-in`). */
+  runningBundle: string;
+  platform: string;
+  /** The native runtime fingerprint the bundle was published for. */
+  runtime: string;
+  /** The binary: version (build). */
+  appVersion: string | null;
+};
+
+/**
+ * The `/errors` body for a rolled-back live update. When the last session
+ * ran the failed bundle, its record comes along: the bundle's code started
+ * but the main view never mounted in time. When it didn't, the bundle never
+ * ran at all (a page that didn't load).
+ */
+export function buildRollbackReport(
+  rollback: LiveUpdateRollback,
+  previous: SessionRecord | null,
+  userDetails: Record<string, unknown>,
+): CreateErrorInput {
+  const failedBundleRan = previous?.bundle === rollback.failedBundle;
+
+  return {
+    message: 'Live update rolled back',
+    userDetails,
+    generalInfo: {
+      kind: 'live-update-rollback',
+      ...rollback,
+      failedBundleRan,
+      previousSession: failedBundleRan ? sessionSummary(previous) : null,
     },
   };
 }

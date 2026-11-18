@@ -238,7 +238,9 @@ export function liveUpdateBoot(): Promise<void> {
 }
 
 async function applyDownloadedBundle(state: BootState): Promise<void> {
-  if (!(await liveUpdateContext())) return;
+  const context = await liveUpdateContext();
+
+  if (!context) return;
 
   const { CapacitorUpdater } = await import('@capgo/capacitor-updater');
   const [failed, { bundles }] = await Promise.all([
@@ -246,11 +248,15 @@ async function applyDownloadedBundle(state: BootState): Promise<void> {
     CapacitorUpdater.list(),
   ]);
 
-  // The plugin rolled back a bundle that never confirmed: don't retry it.
+  // The plugin rolled back a bundle that never confirmed: don't retry it,
+  // and say so once, so a bundle failing for users shows up in /errors.
   if (failed?.bundle) {
     console.warn(
       `[live-update] bundle ${failed.bundle.version} was rolled back`,
     );
+    if (!failedVersions().includes(failed.bundle.version)) {
+      void reportRollback(context, failed.bundle);
+    }
     rememberFailedVersion(failed.bundle.version);
   }
 
@@ -272,6 +278,31 @@ async function applyDownloadedBundle(state: BootState): Promise<void> {
 
   state.switching = true;
   await switchToBundle(next);
+}
+
+/** Hands a rolled-back bundle to the crash reports (`crashWatch`). */
+async function reportRollback(
+  { platform, runtime }: LiveUpdateContext,
+  bundle: BundleInfo,
+): Promise<void> {
+  try {
+    const [{ App }, { reportLiveUpdateRollback }] = await Promise.all([
+      import('@capacitor/app'),
+      import('./crashWatch'),
+    ]);
+    const info = await App.getInfo().catch(() => null);
+
+    reportLiveUpdateRollback({
+      failedBundle: bundle.version,
+      downloadedAt: bundle.downloaded || null,
+      runningBundle: LIVE_BUNDLE_VERSION || 'built-in',
+      platform,
+      runtime,
+      appVersion: info ? `${info.version} (${info.build})` : null,
+    });
+  } catch (error) {
+    warn('rollback report', error);
+  }
 }
 
 /** Reloads the WebView into `bundle`, behind the splash. */

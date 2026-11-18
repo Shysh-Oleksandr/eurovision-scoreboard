@@ -15,6 +15,7 @@
 import {
   assessPreviousSession,
   buildCrashReport,
+  buildRollbackReport,
   canSendReport,
   createSessionTracker,
   NO_LAST_EXIT,
@@ -22,9 +23,11 @@ import {
   parseLastExit,
   queueReport,
   readPendingReports,
+  readSessionRecord,
   removePendingReport,
   type KeyValueStorage,
   type LastExit,
+  type LiveUpdateRollback,
   type SessionContext,
   type SessionRecord,
   type SessionState,
@@ -51,6 +54,8 @@ type DouzeDiagnosticsPlugin = {
 };
 
 let started = false;
+/** The record of the session before this launch, once started. */
+let previousRecord: SessionRecord | null = null;
 let sending = false;
 let waitingForReconnect = false;
 
@@ -258,6 +263,37 @@ async function reportPreviousSession(
   await sendPendingReports(storage);
 }
 
+/**
+ * Reports a live update the plugin rolled back (`liveUpdate.ts` calls it
+ * once per bundle version), sent like the crash reports: after this
+ * launch's live-update check, once online, within the daily cap. Without
+ * it, a bundle that fails on users' phones would go unnoticed: the failed
+ * page can't report anything itself.
+ */
+export function reportLiveUpdateRollback(rollback: LiveUpdateRollback): void {
+  if (!IS_NATIVE_APP || typeof window === 'undefined') return;
+
+  const storage = getStorage();
+
+  if (!storage) return;
+
+  // Before startCrashWatch() the saved record is still the last session's.
+  const previous = started ? previousRecord : readSessionRecord(storage);
+
+  queueReport(storage, {
+    id: `rollback:${rollback.failedBundle}`,
+    report: buildRollbackReport(rollback, previous, userDetails()),
+  });
+  debugLog('rollback', rollback);
+
+  void liveUpdateBoot()
+    .then(
+      () => new Promise((resolve) => window.setTimeout(resolve, SEND_DELAY_MS)),
+    )
+    .then(() => sendPendingReports(storage))
+    .catch((error) => debugLog('rollback report failed', error));
+}
+
 /** Starts this launch's session record (apps only, once per page load). */
 export function startCrashWatch(): void {
   if (started || !IS_NATIVE_APP || typeof window === 'undefined') return;
@@ -279,6 +315,8 @@ export function startCrashWatch(): void {
     debugLog('state', state);
   };
   const previous = tracker.start(visibility());
+
+  previousRecord = previous;
   const sameWebView = checkSameWebView(previous, tracker.current());
 
   setCrumbSink((label) => {

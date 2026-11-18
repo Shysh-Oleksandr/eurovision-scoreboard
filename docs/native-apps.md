@@ -671,7 +671,10 @@ plugins and anything the binary reads (`capacitor.config.ts`, `Info.plist`,
    bundle's first run on Android) is rolled back to the last bundle that
    worked and deleted. The next launch reads `getFailedUpdate()` and stores
    the version under localStorage `live-update-failed`, so that version is
-   never downloaded again on this device.
+   never downloaded again on this device. It also reports the rollback to
+   `/errors` once per version (`Live update rolled back`, §14), since the
+   failed page can't report anything itself: search for it after a
+   publish to see whether a bundle fails on users' phones.
 4. A store update drops all downloaded bundles (`resetWhenUpdate`, default),
    so the new binary starts from its own bundle.
 
@@ -1133,6 +1136,15 @@ report:
   loaded the page again: `App crash: web content process ended on screen`.
   That is Capacitor's reload on iOS (untested on a device);
 - otherwise nothing.
+
+A live update the plugin rolled back (§11, step 3) goes through the same
+queue as `Live update rolled back` (`reportLiveUpdateRollback()`, called by
+`liveUpdate.ts` once per bundle version per device).
+`generalInfo` holds the failed and the running bundle, the platform,
+runtime and binary version, and `failedBundleRan`: true with that
+session's record in `previousSession` when the bundle's code started but
+the main view didn't mount within `appReadyTimeout`; false when it never
+ran at all (a page that didn't load).
 
 The page's record alone is no evidence. Android's WebView reports `hidden`
 about 2 s after the app leaves the screen, and localStorage reaches the
