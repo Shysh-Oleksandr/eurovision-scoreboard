@@ -1,10 +1,18 @@
 import { BaseCountry, VotingCountry } from '../models';
 
 import { Year } from '@/config';
-import { CONTEST_KEY_PREFIXES, getContestKey } from '@/data/contestTypes';
+import {
+  CONTEST_KEY_PREFIXES,
+  getContestKey,
+  parseContestKey,
+} from '@/data/contestTypes';
 import { PointsItem } from '@/state/generalStore';
 import { getHostingCountryByYear } from '@/theme/hosting';
-import { ESC_YEARS_WITH_THEME, JUNIOR_YEARS_WITH_THEME } from '@/theme/themes';
+import {
+  ASIA_YEARS_WITH_THEME,
+  ESC_YEARS_WITH_THEME,
+  JUNIOR_YEARS_WITH_THEME,
+} from '@/theme/themes';
 
 export const SUPPORTED_YEARS = Array.from({ length: 24 }, (_, i) => 2004 + i);
 
@@ -22,6 +30,7 @@ export const JUNIOR_THEME_PREFIX = CONTEST_KEY_PREFIXES.jesc;
 export const ALL_THEMES = [
   ...SUPPORTED_YEARS,
   ...JUNIOR_SUPPORTED_YEARS.map((year) => `${JUNIOR_THEME_PREFIX}${year}`),
+  ...ASIA_SUPPORTED_YEARS.map((year) => getContestKey(year.toString(), 'asia')),
 ];
 
 export const ESC_YEAR_OPTIONS = SUPPORTED_YEARS.map((year) => ({
@@ -57,6 +66,10 @@ export const JESC_THEME_OPTIONS = JUNIOR_YEARS_WITH_THEME.map((year) => {
     label: yearNumber.toString(),
   };
 });
+export const ASIA_THEME_OPTIONS = ASIA_YEARS_WITH_THEME.map((key) => ({
+  value: key,
+  label: parseContestKey(key).year,
+}));
 
 export const POINTS_ARRAY = new Array(10).fill(0).map((_, index) => {
   const points = index + 1;

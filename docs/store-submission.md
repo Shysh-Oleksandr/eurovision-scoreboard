@@ -52,7 +52,7 @@ The facts every answer below rests on:
 |---|---|---|---|---|
 | Contact Info | Name | Yes | App Functionality | Google / Apple name, display name |
 | Contact Info | Email Address | Yes | App Functionality | Sign-in, account linking |
-| User Content | Photos or Videos | Yes | App Functionality | Profile pictures, theme backgrounds, design images, contest logos, flags |
+| User Content | Photos or Videos | Yes | App Functionality | Profile pictures, theme background images and videos, design images, contest logos, flags |
 | User Content | Audio Data | Yes | App Functionality | Theme sounds users upload |
 | User Content | Other User Content | Yes | App Functionality | Contests, themes, designs, fonts, custom entries, report notes |
 | Identifiers | User ID | Yes | App Functionality | Account ID, Google and Apple IDs |
@@ -88,6 +88,7 @@ Usage Data, Other Data), Data Not Linked to You (Diagnostics).
 | Personal info → Email address | Optional | App functionality, Account management | Sign-in codes, account linking |
 | Personal info → User IDs | Optional | App functionality, Account management | Account ID, Google and Apple IDs |
 | Photos and videos → Photos | Optional | App functionality | Uploaded images |
+| Photos and videos → Videos | Optional | App functionality | Theme background videos |
 | Audio → Other audio files | Optional | App functionality | Theme sounds |
 | Files and docs | Optional | App functionality | Uploaded fonts |
 | App activity → App interactions | Optional | App functionality | Likes, saves, follows |

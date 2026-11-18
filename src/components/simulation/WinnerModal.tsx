@@ -12,6 +12,7 @@ import { playHaptic } from '@/native/haptics';
 import { askForReviewSoon } from '@/native/review';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import { useCoversBackgroundVideo } from '@/theme/backgroundVideo/covers';
 
 const OPEN_DELAY_MS = 3000;
 const CLOSE_DURATION_MS = 280;
@@ -82,6 +83,9 @@ const WinnerModal = () => {
   const closeTimerRef = useRef<number | null>(null);
 
   const shouldShowWinnerModal = showModal && !!winnerCountry;
+
+  // The winner screen covers the board: the background video waits.
+  useCoversBackgroundVideo(shouldShowWinnerModal);
 
   useEffect(() => {
     if (winnerCountry && !isWinnerAnimationAlreadyDisplayed) {

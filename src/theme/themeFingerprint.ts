@@ -14,6 +14,8 @@ export interface ThemeContentInput {
   overrides?: Record<string, string> | null;
   /** Resolved background URL/key marker; empty string when none. */
   background?: string;
+  /** Background video URL/key marker; empty string when none. */
+  backgroundVideo?: string;
   pointsContainerShape?: string;
   uppercaseEntryName?: boolean;
   juryActivePointsUnderline?: boolean;
@@ -77,6 +79,10 @@ export const themeContentFingerprint = (input: ThemeContentInput): string =>
     fontId: input.fontId || null,
     scoreboardFontAlias: input.scoreboardFontAlias || null,
     scoreboardFontId: input.scoreboardFontId || null,
+    // Only present when set, mirroring the backend.
+    ...(input.backgroundVideo
+      ? { backgroundVideo: input.backgroundVideo }
+      : {}),
   });
 
 /**

@@ -18,19 +18,21 @@ import Button from '@/components/common/Button';
 import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import FeedbackInfoButton from '@/components/feedbackInfo/FeedbackInfoButton';
 import GuideButton from '@/components/guide/GuideButton';
-import { CONTEST_TYPE_NAMES, ContestType } from '@/data/contestTypes';
+import {
+  CONTEST_TYPE_NAMES,
+  CONTEST_TYPE_SHORT_NAMES,
+  parseContestKey,
+} from '@/data/contestTypes';
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 
-/** Short series names for the contest caption on phones. */
-const SERIES_SHORT_NAMES: Record<ContestType, string> = {
-  esc: 'ESC',
-  jesc: 'JESC',
-  asia: 'ESC Asia',
-};
+/** Built-in JESC / ESC Asia themes read "JESC 2025" instead of a bare year. */
+const themeDisplayLabel = (option: { value: string; label: string }) => {
+  const { contestType } = parseContestKey(option.value);
 
-/** Built-in JESC themes read "JESC 2025" instead of a bare year. */
-const themeDisplayLabel = (option: { value: string; label: string }) =>
-  option.value.startsWith('JESC-') ? `JESC ${option.label}` : option.label;
+  return contestType === 'esc'
+    ? option.label
+    : `${CONTEST_TYPE_SHORT_NAMES[contestType]} ${option.label}`;
+};
 
 /**
  * One row while everything fits at its natural width; otherwise the phone
@@ -72,7 +74,7 @@ export const SetupHubHeader: React.FC<SetupHubHeaderProps> = ({
   const contestCaption = contest.activeContest
     ? caption(t('common.custom'), t('setup.eventSetupModal.customContest'))
     : caption(
-        SERIES_SHORT_NAMES[contest.contestType],
+        CONTEST_TYPE_SHORT_NAMES[contest.contestType],
         CONTEST_TYPE_NAMES[contest.contestType],
       );
   const themeCaption = theme.customTheme

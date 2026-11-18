@@ -12,7 +12,7 @@ import {
 } from './legal/LegalPage';
 
 const PrivacyPolicy = () => (
-  <LegalPage title="Privacy Policy" updated="November 13, 2026">
+  <LegalPage title="Privacy Policy" updated="November 18, 2026">
     <p>
       This policy explains what information DouzePoints collects when you use
       the website at <A href="https://douzepoints.app">douzepoints.app</A> and
@@ -97,10 +97,10 @@ const PrivacyPolicy = () => (
     <p>
       When you save or publish content, we store it with your account: contests
       (their setup, results, name, description and logo), custom themes
-      (including the images, sounds and fonts you upload), graphics designs
-      (including uploaded images), fonts in your font library, custom entries
-      and their flags, folders, quick-select pins and the preferences you choose
-      to sync to your account.
+      (including the images, videos, sounds and fonts you upload), graphics
+      designs (including uploaded images), fonts in your font library, custom
+      entries and their flags, folders, quick-select pins and the preferences
+      you choose to sync to your account.
     </p>
 
     <H3>Activity</H3>
@@ -187,9 +187,9 @@ const PrivacyPolicy = () => (
         global leaderboard.
       </li>
       <li>
-        <Strong>Uploaded files</Strong> (images, sounds and fonts) are served
-        from a public content delivery network, so anyone who has a file&apos;s
-        link can open it, even if the item it belongs to is private.
+        <Strong>Uploaded files</Strong> (images, videos, sounds and fonts) are
+        served from a public content delivery network, so anyone who has a
+        file&apos;s link can open it, even if the item it belongs to is private.
       </li>
       <li>
         <Strong>Your email address is never shown.</Strong> Someone who already

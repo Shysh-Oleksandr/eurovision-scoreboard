@@ -1317,7 +1317,25 @@
         "pickForElement": "Pick the font for this element only. Other elements keep their own fonts."
       },
       "customCount": "{count} custom",
-      "savedCount": "{count} saved"
+      "savedCount": "{count} saved",
+      "backgroundVideo": {
+        "title": "Background video",
+        "badge": "Video",
+        "hint": "Plays silently on a loop behind the simulation, with the background image showing until it starts. MP4 or WebM, up to {maxSize} MB, {maxSeconds} seconds and 1080p. An uploaded video makes its first frame the background image.",
+        "pasteUrl": "Or paste a link to an .mp4 or .webm file",
+        "remove": "Remove video",
+        "reading": "Checking the video…",
+        "pickedFile": "{name} (uploads when you save)",
+        "uploading": "Uploading video… {percent}%",
+        "errorType": "Use an MP4 or WebM video. Videos from an iPhone (.mov) need converting to MP4 first.",
+        "errorSize": "The video is over {maxSize} MB.",
+        "errorDuration": "The video is longer than {maxSeconds} seconds.",
+        "errorResolution": "The video is bigger than 1080p (1920 pixels on the longer side).",
+        "errorUnplayable": "This video doesn’t play in this browser. Try an MP4 (H.264) video.",
+        "errorHttps": "Video links must start with https://",
+        "errorPageLink": "That’s a link to a video page. Paste a link to the video file itself (.mp4 or .webm).",
+        "errorLinkUnplayable": "This link doesn’t play as a video. Check that it opens the video file itself."
+      }
     },
     "sortBadges": {
       "latest": "Latest",
@@ -1613,7 +1631,8 @@
         "winter": "Add falling snow and festive touches across the app.",
         "finalReveal": "Reveal the final televote scores one country at a time with a dramatic animation.",
         "predictableReveal": "Reveal televote scores in a smooth, deterministic order with no random suspense.",
-        "haptics": "Feel every vote: a tap for each points award, a heartbeat for 12 points, the board climbing, the final reveal and the winner."
+        "haptics": "Feel every vote: a tap for each points award, a heartbeat for 12 points, the board climbing, the final reveal and the winner.",
+        "backgroundVideos": "Themes with a background video play it behind the simulation. Applies to this device only. When it’s off, or reduced motion is on in your system settings, you see the theme’s background image."
       }
     },
     "relations": {
@@ -1790,7 +1809,8 @@
       "themeSoundHudCloseControls": "Close volume controls",
       "themeSoundHudMuteAllShort": "Mute all",
       "themeSoundHudRestoreShort": "Restore",
-      "themeSoundHudStopSfxShort": "Stop clips"
+      "themeSoundHudStopSfxShort": "Stop clips",
+      "playBackgroundVideos": "Play background videos"
     },
     "contest": {
       "enterContestName": "Enter contest name...",

@@ -21,7 +21,7 @@ There are three tasks:
 | Select groups | `src/components/setup/hub/hooks/useContestField.ts` (`contestGroups`, `YEAR_OPTIONS`) | Groups are labelled "ESC", "JESC" and "ESC Asia". |
 | Lineup data | `public/data/countries/{countries,junior-countries,asia-countries}-<year>.json` | Fetched at runtime by `buildCountriesUrl` in `src/data/countries/countriesDataUrl.ts`. **These JSON files are the source of truth.** |
 | Hosting country and logo | `src/theme/hosting.ts`: `hostingLogosByYear`, `juniorHostingLogosByYear`, `asiaHostingLogosByYear` | Sets the select option icon and `settings.hostingCountryCode`. |
-| Built-in theme (optional) | `src/theme/themes.ts` | Keyed by contest key. If a year has no theme, "sync theme to contest" leaves the current theme in place. |
+| Built-in theme (optional) | `src/theme/themes.ts`: `escThemes`, `juniorThemes`, `asiaThemes` | Keyed by contest key. If a year has no theme, "sync theme to contest" leaves the current theme in place. Each record feeds its own theme-select group (`THEME_OPTIONS`, `JESC_THEME_OPTIONS`, `ASIA_THEME_OPTIONS` in `data.ts`) in the setup header, the theme editor's base theme and the graphics editor. |
 | `Year` type | `src/config/index.ts` (`years`) | Lists ESC years. Other series cast their year strings to `Year`. |
 
 Legacy data: settings and snapshots saved before `contestType` existed carry `isJuniorContest: boolean`. `resolveContestType()` maps that to `'jesc'` / `'esc'`. Never write `isJuniorContest` again.

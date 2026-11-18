@@ -10,6 +10,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { hideSplashWhenPainted } from '@/native/splash';
 import { useGeneralStore } from '@/state/generalStore';
+import { useCoversBackgroundVideo } from '@/theme/backgroundVideo/covers';
 
 export const ANIMATION_DURATION = 200;
 
@@ -93,6 +94,8 @@ const Modal: React.FC<ModalProps> = ({
   // Android back closes the modal like a backdrop tap; one without `onClose`
   // swallows the press so it can't close whatever is underneath.
   useBackHandler(isActive, () => onClose?.());
+  // The theme's background video pauses under any open modal.
+  useCoversBackgroundVideo(isActive);
 
   // A launch into a modal (usually Event Setup): it is the first screen.
   useEffect(() => {

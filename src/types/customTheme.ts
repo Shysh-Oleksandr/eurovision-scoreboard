@@ -36,6 +36,13 @@ export interface CustomTheme {
   overrides: Record<string, string>;
   backgroundImageUrl?: string;
   backgroundImageKey?: string;
+  /**
+   * Silent looping video behind the simulation (docs/background-video.md):
+   * an uploaded R2 file (`backgroundVideoKey` set) or an https link. The
+   * background image is its still.
+   */
+  backgroundVideoUrl?: string;
+  backgroundVideoKey?: string;
   themeSounds?: Partial<
     Record<ThemeSoundEventId, { url: string; key?: string; delayMs?: number }>
   >;

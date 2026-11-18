@@ -14,6 +14,8 @@ import {
 
 type ThemePreviewCountryItemProps = {
   backgroundImage: string | null;
+  backgroundVideo?: string | null;
+  onBackgroundVideoError?: () => void;
   overrides?: Record<string, string>;
   baseThemeYear: string;
   uppercaseEntryName?: boolean;
@@ -28,6 +30,8 @@ type ThemePreviewCountryItemProps = {
 
 const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   backgroundImage,
+  backgroundVideo,
+  onBackgroundVideoError,
   overrides = {},
   baseThemeYear,
   uppercaseEntryName = true,
@@ -70,6 +74,8 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
     <div className="sm:space-y-4">
       <ThemePreviewCountryItemCompact
         backgroundImage={backgroundImage}
+        backgroundVideo={backgroundVideo}
+        onBackgroundVideoError={onBackgroundVideoError}
         overrides={overrides}
         baseThemeYear={baseThemeYear}
         points={points}

@@ -8,6 +8,9 @@ import React, {
 } from 'react';
 import { toast } from 'react-toastify';
 
+import BackgroundVideoField, {
+  BACKGROUND_VIDEO_LINK_PROBLEM_KEYS,
+} from './BackgroundVideoField';
 import ColorOverridesSection from './ColorOverridesSection';
 import FontPickerField from './fonts/FontPickerField';
 import {
@@ -35,6 +38,7 @@ import {
   useThemeGroupsQuery,
   useUpdateThemeMutation,
   useUploadThemeBackgroundMutation,
+  useUploadThemeBackgroundVideoMutation,
   useUploadThemeSoundMutation,
 } from '@/api/themes';
 import { ArrowIcon } from '@/assets/icons/ArrowIcon';
@@ -51,15 +55,21 @@ import Tabs from '@/components/common/tabs/Tabs';
 import { TextareaField } from '@/components/common/TextareaField';
 import { Tooltip } from '@/components/common/Tooltip';
 import { Input } from '@/components/Input';
-import { JESC_THEME_OPTIONS, THEME_OPTIONS } from '@/data/data';
+import {
+  ASIA_THEME_OPTIONS,
+  JESC_THEME_OPTIONS,
+  THEME_OPTIONS,
+} from '@/data/data';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useThrottledValue } from '@/hooks/useThrottledValue';
 import { useIsOffline } from '@/state/connectivityStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
+import { checkBackgroundVideoLink } from '@/theme/backgroundVideo/backgroundVideoRules';
 import { normalizeFontAlias } from '@/theme/fontAliases';
 import { themeContentFingerprint } from '@/theme/themeFingerprint';
 import {
@@ -79,7 +89,11 @@ import {
   DouzePointsAnimationMode,
 } from '@/types/customTheme';
 
-const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
+const ALL_THEME_OPTIONS = [
+  ...THEME_OPTIONS,
+  ...JESC_THEME_OPTIONS,
+  ...ASIA_THEME_OPTIONS,
+];
 
 // The live-preview theme's timestamps are never rendered — only the visual
 // content is applied. Use a fixed value so rebuilding the preview object on
@@ -131,6 +145,14 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const [backgroundImageUrl, setBackgroundImageUrl] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  // Background video: a picked file (uploaded on save) or an https link.
+  const [backgroundVideoUrl, setBackgroundVideoUrl] = useState('');
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUploadPercent, setVideoUploadPercent] = useState<number | null>(
+    null,
+  );
+  const [videoLinkFailed, setVideoLinkFailed] = useState(false);
+  const [videoObjectUrl, setVideoObjectUrl] = useState<string | null>(null);
   const [overrides, setOverrides] = useState<Record<string, string>>({});
   // Fonts: the UI slot always carries a built-in alias as the fallback stack
   // (also the value saved as `fontAlias` when a custom font is chosen).
@@ -215,6 +237,29 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     useUploadThemeBackgroundMutation();
   const { mutateAsync: uploadThemeSound, isPending: isUploadingSounds } =
     useUploadThemeSoundMutation();
+  const { mutateAsync: uploadBackgroundVideo, isPending: isUploadingVideo } =
+    useUploadThemeBackgroundVideoMutation();
+
+  // The preview plays a picked file from an object URL, and a link once
+  // typing pauses (not one request per keystroke).
+  useEffect(() => {
+    if (!videoFile) {
+      setVideoObjectUrl(null);
+
+      return undefined;
+    }
+    const objectUrl = URL.createObjectURL(videoFile);
+
+    setVideoObjectUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [videoFile]);
+  const debouncedVideoUrl = useDebounce(backgroundVideoUrl.trim(), 500);
+  const videoPreviewSrc = videoFile
+    ? videoObjectUrl
+    : debouncedVideoUrl && !checkBackgroundVideoLink(debouncedVideoUrl)
+    ? debouncedVideoUrl
+    : null;
   const { mutateAsync: reportDuplicate } = useReportThemeDuplicateMutation();
   const user = useAuthStore((s) => s.user);
 
@@ -315,6 +360,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setIsPublic(isEditMode ? initialTheme.isPublic : false);
       setThemeGroupId(initialTheme.groupId || '');
       setBackgroundImageUrl(initialTheme.backgroundImageUrl || '');
+      setBackgroundVideoUrl(initialTheme.backgroundVideoUrl || '');
+      setVideoFile(null);
+      setVideoUploadPercent(null);
+      setVideoLinkFailed(false);
       setOverrides(initialTheme.overrides || {});
       setUploadedFile(null);
       applyThemeSpecificsFormState(resolvedInitialThemeSpecifics);
@@ -375,6 +424,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setHsva({ h: themeHue, s: 80, v: 60, a: 1 });
       setIsPublic(true);
       setBackgroundImageUrl('');
+      setBackgroundVideoUrl('');
+      setVideoFile(null);
+      setVideoUploadPercent(null);
+      setVideoLinkFailed(false);
       setOverrides({});
       setUploadedFile(null);
       applyThemeSpecificsFormState(
@@ -619,6 +672,20 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       }
     }
 
+    const videoLinkProblem = videoFile
+      ? null
+      : checkBackgroundVideoLink(backgroundVideoUrl);
+
+    if (videoLinkProblem) {
+      toast.error(
+        t(
+          `widgets.themes.backgroundVideo.${BACKGROUND_VIDEO_LINK_PROBLEM_KEYS[videoLinkProblem]}`,
+        ),
+      );
+
+      return;
+    }
+
     // Font fields as they will be saved (shared by the fingerprint and payload).
     const payloadFontAlias =
       uiFont.kind === 'builtin' ? uiFont.alias : uiFallbackAlias;
@@ -667,6 +734,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         shadeValue: hsva.v,
         overrides,
         background: uploadedFile ? '__file__' : backgroundImageUrl,
+        backgroundVideo: videoFile ? '__file__' : backgroundVideoUrl.trim(),
         pointsContainerShape,
         uppercaseEntryName,
         juryActivePointsUnderline,
@@ -688,6 +756,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         shadeValue: initialTheme.shadeValue ?? 60,
         overrides: initialTheme.overrides,
         background: initialTheme.backgroundImageUrl || '',
+        backgroundVideo: initialTheme.backgroundVideoUrl || '',
         pointsContainerShape: srcSpecifics.pointsContainerShape,
         uppercaseEntryName: srcSpecifics.uppercaseEntryName,
         juryActivePointsUnderline: srcSpecifics.juryActivePointsUnderline,
@@ -726,6 +795,22 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         overrides,
         fontAlias: payloadFontAlias,
       };
+
+      // Background video: a picked file is uploaded after the save (and
+      // replaces whatever was there); otherwise send the link only when it
+      // changed, '' removing it. Sending back an uploaded video's own URL
+      // would keep it too, but there's no need to.
+      if (!videoFile) {
+        const nextVideoUrl = backgroundVideoUrl.trim();
+
+        if (isUpdate && initialTheme) {
+          if (nextVideoUrl !== (initialTheme.backgroundVideoUrl || '')) {
+            payload.backgroundVideoUrl = nextVideoUrl;
+          }
+        } else if (nextVideoUrl) {
+          payload.backgroundVideoUrl = nextVideoUrl;
+        }
+      }
 
       if (isUpdate && initialTheme) {
         if (themeGroupId) {
@@ -1009,6 +1094,19 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           });
         }
 
+        if (videoFile) {
+          setVideoUploadPercent(0);
+          try {
+            updated = await uploadBackgroundVideo({
+              id: updated._id,
+              file: videoFile,
+              onUploadProgress: ({ percent }) => setVideoUploadPercent(percent),
+            });
+          } finally {
+            setVideoUploadPercent(null);
+          }
+        }
+
         for (const event of THEME_SOUND_EVENTS) {
           const f = soundFiles[event];
 
@@ -1061,6 +1159,19 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
             id: created._id,
             file: uploadedFile,
           });
+        }
+
+        if (videoFile) {
+          setVideoUploadPercent(0);
+          try {
+            created = await uploadBackgroundVideo({
+              id: created._id,
+              file: videoFile,
+              onUploadProgress: ({ percent }) => setVideoUploadPercent(percent),
+            });
+          } finally {
+            setVideoUploadPercent(null);
+          }
         }
 
         for (const event of THEME_SOUND_EVENTS) {
@@ -1128,6 +1239,27 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     }
   };
 
+  // An uploaded video sets the background image to its first frame; another
+  // image can still be picked afterwards.
+  const handlePickVideo = (file: File, firstFrame: File) => {
+    setVideoFile(file);
+    setBackgroundVideoUrl('');
+    setVideoLinkFailed(false);
+    void handleFileChange(firstFrame);
+  };
+
+  const handleVideoUrlChange = (url: string) => {
+    setBackgroundVideoUrl(url);
+    setVideoFile(null);
+    setVideoLinkFailed(false);
+  };
+
+  const handleRemoveVideo = () => {
+    setVideoFile(null);
+    setBackgroundVideoUrl('');
+    setVideoLinkFailed(false);
+  };
+
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -1156,7 +1288,11 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const isSaving =
-    isCreating || isUpdating || isUploadingBg || isUploadingSounds;
+    isCreating ||
+    isUpdating ||
+    isUploadingBg ||
+    isUploadingSounds ||
+    isUploadingVideo;
 
   const displayBg = uploadedFile ? imageUpload.base64 : backgroundImageUrl;
 
@@ -1198,6 +1334,10 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
   const previewItem = (
     <ThemePreviewCountryItem
       backgroundImage={displayBg}
+      backgroundVideo={videoPreviewSrc}
+      onBackgroundVideoError={() => {
+        if (!videoFile) setVideoLinkFailed(true);
+      }}
       // Debounced like the injected preview vars so the preview subtree (with
       // its countup/gsap children) re-renders ~25x/s while dragging a swatch,
       // not on every pointer-move. The swatch grid still uses live `overrides`.
@@ -1348,6 +1488,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     groups={[
                       { label: 'ESC', options: THEME_OPTIONS },
                       { label: 'JESC', options: JESC_THEME_OPTIONS },
+                      { label: 'ESC Asia', options: ASIA_THEME_OPTIONS },
                     ]}
                     value={baseThemeYear}
                     labelClassName="!text-base !font-medium mb-1"
@@ -1473,6 +1614,16 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     />
                   </div>
                 </div>
+
+                <BackgroundVideoField
+                  url={backgroundVideoUrl}
+                  file={videoFile}
+                  linkFailed={videoLinkFailed}
+                  uploadPercent={videoUploadPercent}
+                  onPickFile={handlePickVideo}
+                  onUrlChange={handleVideoUrlChange}
+                  onRemove={handleRemoveVideo}
+                />
               </div>
             )}
             {activeTab === 'visuals' && (

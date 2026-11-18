@@ -115,6 +115,7 @@ const DEFAULT_SETTINGS: Settings = {
   snowFallIntensity: 5, // 1-10
   enableHaptics: true,
   hapticsStrength: 1,
+  playBackgroundVideos: true,
   blurModalBackground: false,
   themeSoundVolume: 100,
   themeAmbienceVolume: 100,
@@ -251,6 +252,12 @@ export interface Settings {
   enableHaptics: boolean;
   /** Native apps only: scales every haptic, 0.3 (subtle) to 1 (as designed). */
   hapticsStrength: number;
+  /**
+   * Themes' background videos (docs/background-video.md). Per device on
+   * purpose, so it stays out of `SYNCED_SETTINGS_KEYS`: the same person may
+   * want it on a desktop and off on a phone.
+   */
+  playBackgroundVideos: boolean;
   blurModalBackground: boolean;
   themeSoundVolume: number;
   themeAmbienceVolume: number;

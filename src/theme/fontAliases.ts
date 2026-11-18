@@ -16,6 +16,7 @@ export const FONT_ALIAS_ALLOWLIST = [
   'antonio',
   'satoshi',
   'cabinet-grotesk',
+  'neulis-cursive',
 ] as const;
 
 export type FontAlias = (typeof FONT_ALIAS_ALLOWLIST)[number];
@@ -46,6 +47,7 @@ export const FONT_OPTION_LABELS: Record<FontAlias, string> = {
   antonio: 'Antonio',
   satoshi: 'Satoshi',
   'cabinet-grotesk': 'Cabinet Grotesk',
+  'neulis-cursive': 'Neulis Cursive',
 };
 
 export function getInterfaceFontSelectOptions(): Array<{
@@ -114,6 +116,8 @@ export function getFontFamilyStackCss(alias: string): string {
       return 'Satoshi, sans-serif';
     case 'zodiak':
       return 'Zodiak, serif';
+    case 'neulis-cursive':
+      return '"Neulis Cursive", montserrat, sans-serif';
     default:
       return 'montserrat, sans-serif';
   }

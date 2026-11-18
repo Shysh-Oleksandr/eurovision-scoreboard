@@ -153,7 +153,7 @@ as covered and never synthesises a faux bold. Custom-font scopes additionally se
 - Theme editor → Look tab: **Interface font** (`FontPickerField`) and a
   "Use the interface font on the scoreboard too" checkbox that reveals a
   **Scoreboard font** picker when unchecked.
-- `FontPickerModal` tabs: **Built-in** (13 aliases rendered in themselves),
+- `FontPickerModal` tabs: **Built-in** (14 aliases rendered in themselves),
   **My fonts** (search, select, Manage → `FontEditorCard`, delete with the
   409 → force flow), **Public fonts** (search/sort/date, creator, "Add to my
   library & use"), **Upload** (multi-file dropzone → immediate upload (public by
@@ -207,3 +207,25 @@ picker modal layout (built-in / mine / public / upload), and `api.upload()` with
 progress. A sound library would add a `sounds` module with the same service
 surface, swap the parser for audio metadata, and point `themeSounds.<event>` at
 a `soundId`.
+
+### 10. Adding a built-in font
+
+Built-in fonts ship with the app (`public/fonts/`, so they work offline in the
+native apps) and are picked by alias. A new one touches four places that must
+stay in sync:
+
+1. `src/theme/fontAliases.ts`: `FONT_ALIAS_ALLOWLIST`, `FONT_OPTION_LABELS`
+   and `getFontFamilyStackCss`. The FOUC script in `layout.tsx` and the
+   Built-in tab read the allowlist, so they need no change.
+2. `src/styles.css`: an `html[data-font='<alias>']` rule with the same stack,
+   and the `@font-face` rules. If only one weight exists, declare it once with
+   `font-weight: 100 900` so no weight gets a faux bold.
+3. The backend's `THEME_FONT_ALIASES` (`src/themes/theme-font-aliases.ts`).
+   It validates `fontAlias` / `scoreboardFontAlias` on theme create and update.
+   **Deploy the backend first:** a theme editor that offers the alias before the
+   API accepts it fails to save with a 400.
+4. A built-in theme that uses it sets `themeSpecifics.fontAlias`.
+
+Put a fallback that has the missing scripts second in the stack when the font
+lacks Cyrillic or Greek (the app ships Ukrainian and Greek): Neulis Cursive
+(ESC Asia 2026) uses `"Neulis Cursive", montserrat, sans-serif`.

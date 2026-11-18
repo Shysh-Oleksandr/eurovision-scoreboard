@@ -77,6 +77,7 @@ Read `docs/` before touching non-obvious subsystems:
 - `running-order-and-tiebreaking.md`
 - `contests-leaderboard-and-entry-stats.md`
 - `theme-animations-and-specifics.md`
+- `background-video.md` — custom themes' background video: the fields and `/themes/:id/background-video` (byte sniffing, R2 cleanup), client limits, the editor field and first-frame still, when it plays (`useBackgroundVideo`, covers, per-device setting, reduced motion) and the `<body>` z-index layer; read before touching theme backgrounds or adding a full-screen overlay
 - `rounded-country-layout-and-2026-theme.md`
 - `custom-fonts-and-font-library.md` — uploaded fonts, the per-user font library (fork-on-use, content-addressed R2 blobs), UI vs scoreboard font slots, weight fallback, FOUC script contract, R2 CORS prerequisite
 - `voting-simulation-engine-and-diaspora.md` — the random-vote (Plackett–Luce) engine, the diaspora/affinity layer, and the Phase 2 (v2) plan

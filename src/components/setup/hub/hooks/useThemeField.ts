@@ -8,7 +8,11 @@ import {
   OptionGroup,
 } from '@/components/common/customSelect/CustomSelect';
 import { useApplyCustomTheme } from '@/components/setup/widgets-section/custom-themes/hooks/useApplyCustomTheme';
-import { JESC_THEME_OPTIONS, THEME_OPTIONS } from '@/data/data';
+import {
+  ASIA_THEME_OPTIONS,
+  JESC_THEME_OPTIONS,
+  THEME_OPTIONS,
+} from '@/data/data';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import {
@@ -17,7 +21,11 @@ import {
 } from '@/theme/syncThemeToContest';
 import { buildPrimaryFromHsva } from '@/theme/themeUtils';
 
-const ALL_THEME_OPTIONS = [...THEME_OPTIONS, ...JESC_THEME_OPTIONS];
+const ALL_THEME_OPTIONS = [
+  ...THEME_OPTIONS,
+  ...JESC_THEME_OPTIONS,
+  ...ASIA_THEME_OPTIONS,
+];
 
 const swatchFor = (hue: number, shadeValue?: number) =>
   `hsl(${buildPrimaryFromHsva({ h: hue, s: 80, v: shadeValue ?? 60 })['700']})`;
@@ -99,6 +107,7 @@ export const useThemeField = () => {
     const groups: OptionGroup[] = [
       { label: 'ESC', options: THEME_OPTIONS },
       { label: 'JESC', options: JESC_THEME_OPTIONS },
+      { label: 'ESC Asia', options: ASIA_THEME_OPTIONS },
     ];
 
     if (quickSelectThemesData && quickSelectThemesData.length > 0) {

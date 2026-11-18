@@ -1,5 +1,6 @@
 import { CustomThemeSnapshot, DesignTheme } from './design';
 
+import { CONTEST_TYPE_SHORT_NAMES, parseContestKey } from '@/data/contestTypes';
 import { getFontCssVars } from '@/theme/customFonts';
 import {
   ActiveFonts,
@@ -7,7 +8,7 @@ import {
   resolveThemeFonts,
 } from '@/theme/fontResolution';
 import { getThemeInterfaceVars } from '@/theme/oklch';
-import { getThemeForYear, JUNIOR_YEARS_WITH_THEME } from '@/theme/themes';
+import { getThemeForYear } from '@/theme/themes';
 import { ThemeScopeValue } from '@/theme/ThemeScope';
 import { resolveThemeSpecificsForBaseThemeYear } from '@/theme/themeSpecifics';
 import {
@@ -23,8 +24,6 @@ import { CustomTheme } from '@/types/customTheme';
  * inline CSS variables that scope the Tailwind palette and the fonts to the
  * design node, and a display name.
  */
-
-const JUNIOR_PREFIX = 'JESC-';
 
 /** Keep only what rendering needs; drop sounds, stats, ownership. */
 export function toCustomThemeSnapshot(theme: CustomTheme): CustomTheme {
@@ -151,12 +150,11 @@ export function designThemeCssVars(theme: DesignTheme): Record<string, string> {
   };
 }
 
-/** "ESC 2026", "JESC 2024" or the custom theme's name. */
-export function yearThemeLabel(year: string): string {
-  if (year.startsWith(JUNIOR_PREFIX) || JUNIOR_YEARS_WITH_THEME.includes(year))
-    return `JESC ${year.replace(JUNIOR_PREFIX, '')}`;
+/** "ESC 2026", "JESC 2024", "ESC Asia 2026" or the custom theme's name. */
+export function yearThemeLabel(key: string): string {
+  const { year, contestType } = parseContestKey(key);
 
-  return `ESC ${year}`;
+  return `${CONTEST_TYPE_SHORT_NAMES[contestType]} ${year}`;
 }
 
 export function designThemeLabel(theme: DesignTheme): string {

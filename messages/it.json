@@ -1317,7 +1317,25 @@
         "pickForElement": "Scegli il font solo per questo elemento. Gli altri elementi mantengono i propri font."
       },
       "customCount": "{count} personalizzati",
-      "savedCount": "{count} salvati"
+      "savedCount": "{count} salvati",
+      "backgroundVideo": {
+        "title": "Video di sfondo",
+        "badge": "Video",
+        "hint": "Va in loop senza audio dietro la simulazione; finché non parte si vede l’immagine di sfondo. MP4 o WebM, fino a {maxSize} MB, {maxSeconds} secondi e 1080p. Per un video caricato, il primo fotogramma diventa l’immagine di sfondo.",
+        "pasteUrl": "Oppure incolla un link a un file .mp4 o .webm",
+        "remove": "Rimuovi video",
+        "reading": "Controllo del video…",
+        "pickedFile": "{name} (caricato al salvataggio)",
+        "uploading": "Caricamento del video… {percent}%",
+        "errorType": "Usa un video MP4 o WebM. I video da iPhone (.mov) vanno prima convertiti in MP4.",
+        "errorSize": "Il video supera {maxSize} MB.",
+        "errorDuration": "Il video dura più di {maxSeconds} secondi.",
+        "errorResolution": "Il video supera 1080p (1920 pixel sul lato più lungo).",
+        "errorUnplayable": "Questo video non si riproduce in questo browser. Prova con un video MP4 (H.264).",
+        "errorHttps": "I link ai video devono iniziare con https://",
+        "errorPageLink": "È un link a una pagina video. Incolla un link al file video vero e proprio (.mp4 o .webm).",
+        "errorLinkUnplayable": "Questo link non si riproduce come video. Controlla che apra direttamente il file video."
+      }
     },
     "sortBadges": {
       "latest": "Ultimi",
@@ -1613,7 +1631,8 @@
         "winter": "Aggiungere neve che cade e tocchi festivi in tutta l’app.",
         "finalReveal": "Rivelare i punteggi finali del televoto un paese alla volta con un’animazione drammatica.",
         "predictableReveal": "Rivelare i punteggi del televoto in un ordine fluido e deterministico, senza suspense casuale.",
-        "haptics": "Senti ogni voto: un tocco a ogni assegnazione di punti, un battito per i 12 punti, la scalata in classifica, la rivelazione finale e il vincitore."
+        "haptics": "Senti ogni voto: un tocco a ogni assegnazione di punti, un battito per i 12 punti, la scalata in classifica, la rivelazione finale e il vincitore.",
+        "backgroundVideos": "I temi con un video di sfondo lo riproducono dietro la simulazione. Vale solo per questo dispositivo. Se è disattivato, o se nelle impostazioni di sistema è attiva la riduzione del movimento, vedi l’immagine di sfondo del tema."
       }
     },
     "relations": {
@@ -1790,7 +1809,8 @@
       "themeSoundHudCloseControls": "Chiudi controlli di volume",
       "themeSoundHudMuteAllShort": "Silenzia tutto",
       "themeSoundHudRestoreShort": "Ripristina",
-      "themeSoundHudStopSfxShort": "Stoppa clips"
+      "themeSoundHudStopSfxShort": "Stoppa clips",
+      "playBackgroundVideos": "Riproduci i video di sfondo"
     },
     "contest": {
       "enterContestName": "Inserisci il nome del concorso...",

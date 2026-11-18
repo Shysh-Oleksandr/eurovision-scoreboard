@@ -8,13 +8,13 @@ export const MESSAGES_CATALOG: Record<
   SupportedLocale,
   { url: string; hash: string }
 > = {
-  en: { url: '/messages/en.bd3b92ed37.json', hash: 'bd3b92ed37' },
-  es: { url: '/messages/es.bce8c9cb49.json', hash: 'bce8c9cb49' },
-  fr: { url: '/messages/fr.3435b134a8.json', hash: '3435b134a8' },
-  uk: { url: '/messages/uk.4529c694c6.json', hash: '4529c694c6' },
-  de: { url: '/messages/de.adfbe4e1dd.json', hash: 'adfbe4e1dd' },
-  pl: { url: '/messages/pl.9eb7662e39.json', hash: '9eb7662e39' },
-  it: { url: '/messages/it.02c9bd7e46.json', hash: '02c9bd7e46' },
-  gr: { url: '/messages/gr.d1afc7d518.json', hash: 'd1afc7d518' },
-  pt: { url: '/messages/pt.d75761a8e8.json', hash: 'd75761a8e8' },
+  en: { url: '/messages/en.54e9ca72c7.json', hash: '54e9ca72c7' },
+  es: { url: '/messages/es.14e7673aaf.json', hash: '14e7673aaf' },
+  fr: { url: '/messages/fr.eeb41f9e10.json', hash: 'eeb41f9e10' },
+  uk: { url: '/messages/uk.26d1f598e0.json', hash: '26d1f598e0' },
+  de: { url: '/messages/de.3f229a70c8.json', hash: '3f229a70c8' },
+  pl: { url: '/messages/pl.c672d85a25.json', hash: 'c672d85a25' },
+  it: { url: '/messages/it.94920f09ba.json', hash: '94920f09ba' },
+  gr: { url: '/messages/gr.7224566165.json', hash: '7224566165' },
+  pt: { url: '/messages/pt.5bf54559c9.json', hash: '5bf54559c9' },
 };

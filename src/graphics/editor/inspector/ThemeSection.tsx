@@ -15,7 +15,11 @@ import { Field, Hint, OptionGroup, SelectInput } from '../ui/controls';
 
 import { useMyThemesListQuery } from '@/api/themes';
 import Button from '@/components/common/Button';
-import { JESC_THEME_OPTIONS, THEME_OPTIONS } from '@/data/data';
+import {
+  ASIA_THEME_OPTIONS,
+  JESC_THEME_OPTIONS,
+  THEME_OPTIONS,
+} from '@/data/data';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';
@@ -83,6 +87,13 @@ const ThemeSection: React.FC = () => {
     {
       label: 'JESC',
       options: JESC_THEME_OPTIONS.map((o) => ({
+        value: yearValue(o.value),
+        label: o.label,
+      })),
+    },
+    {
+      label: 'ESC Asia',
+      options: ASIA_THEME_OPTIONS.map((o) => ({
         value: yearValue(o.value),
         label: o.label,
       })),

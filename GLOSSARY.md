@@ -16,3 +16,21 @@ _Avoid_: hotkey, keybinding, accelerator
 The small gray text on a button, menu row or tooltip that names the button's
 keyboard shortcut. Only shown on the website with a mouse or trackpad.
 _Avoid_: key label, keycap, badge
+
+## Themes
+
+**Background image**:
+The still picture behind the app for a theme. Every theme has one; when the
+theme also has a background video, the image is that video's still and
+stands in for it wherever the video doesn't play.
+_Avoid_: wallpaper, backdrop, poster
+
+**Background video**:
+An optional silent, looping video a custom theme can play behind the
+simulation instead of showing its background image. It plays only while the
+simulation is on screen.
+_Avoid_: animated background, video wallpaper, live background
+
+**Background music**:
+The looping audio a custom theme can play while the simulation runs.
+_Avoid_: background sound, simulation background

@@ -1317,7 +1317,25 @@
         "pickForElement": "Wybierz czcionkę tylko dla tego elementu. Pozostałe elementy zachowują własne czcionki."
       },
       "customCount": "Własne: {count}",
-      "savedCount": "Zapisane: {count}"
+      "savedCount": "Zapisane: {count}",
+      "backgroundVideo": {
+        "title": "Wideo w tle",
+        "badge": "Wideo",
+        "hint": "Odtwarza się bez dźwięku w pętli za symulacją; do startu widać obraz tła. MP4 lub WebM, do {maxSize} MB, {maxSeconds} sekund i 1080p. Przy przesłanym wideo jego pierwsza klatka staje się obrazem tła.",
+        "pasteUrl": "Albo wklej link do pliku .mp4 lub .webm",
+        "remove": "Usuń wideo",
+        "reading": "Sprawdzanie wideo…",
+        "pickedFile": "{name} (zostanie przesłany przy zapisie)",
+        "uploading": "Przesyłanie wideo… {percent}%",
+        "errorType": "Użyj wideo MP4 lub WebM. Filmy z iPhone’a (.mov) trzeba najpierw przekonwertować do MP4.",
+        "errorSize": "Wideo ma ponad {maxSize} MB.",
+        "errorDuration": "Wideo trwa dłużej niż {maxSeconds} sekund.",
+        "errorResolution": "Wideo przekracza 1080p (1920 pikseli na dłuższym boku).",
+        "errorUnplayable": "To wideo nie odtwarza się w tej przeglądarce. Spróbuj wideo MP4 (H.264).",
+        "errorHttps": "Linki do wideo muszą zaczynać się od https://",
+        "errorPageLink": "To link do strony z wideo. Wklej link do samego pliku wideo (.mp4 lub .webm).",
+        "errorLinkUnplayable": "Ten link nie odtwarza się jako wideo. Sprawdź, czy otwiera bezpośrednio plik wideo."
+      }
     },
     "sortBadges": {
       "latest": "Najnowsze",
@@ -1613,7 +1631,8 @@
         "winter": "Dodaj padający śnieg i świąteczne akcenty w całej aplikacji.",
         "finalReveal": "Ujawniaj końcowe wyniki teległosowania po jednym kraju z dramatyczną animacją.",
         "predictableReveal": "Ujawniaj wyniki teległosowania w płynnej, deterministycznej kolejności bez losowej napięcia.",
-        "haptics": "Poczuj każdy głos: stuknięcie przy każdym przyznaniu punktów, bicie serca przy 12 punktach, awans w tabeli, finałowe odsłonięcie i zwycięzcę."
+        "haptics": "Poczuj każdy głos: stuknięcie przy każdym przyznaniu punktów, bicie serca przy 12 punktach, awans w tabeli, finałowe odsłonięcie i zwycięzcę.",
+        "backgroundVideos": "Motywy z wideo w tle odtwarzają je za symulacją. Dotyczy tylko tego urządzenia. Gdy opcja jest wyłączona albo w ustawieniach systemu włączone jest ograniczenie ruchu, widzisz obraz tła motywu."
       }
     },
     "relations": {
@@ -1790,7 +1809,8 @@
       "themeSoundHudCloseControls": "Zamknij kontrolki głośności",
       "themeSoundHudMuteAllShort": "Wycisz wszystko",
       "themeSoundHudRestoreShort": "Przywróć",
-      "themeSoundHudStopSfxShort": "Zatrzymaj efekty"
+      "themeSoundHudStopSfxShort": "Zatrzymaj efekty",
+      "playBackgroundVideos": "Odtwarzaj wideo w tle"
     },
     "contest": {
       "enterContestName": "Wpisz nazwę konkursu...",

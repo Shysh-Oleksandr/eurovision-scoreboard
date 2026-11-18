@@ -3,6 +3,7 @@
  * curve is tuned on, candidate accents per row, and the picks the lab and the
  * in-app palette panel share through localStorage.
  */
+import { CONTEST_TYPE_SHORT_NAMES, parseContestKey } from '@/data/contestTypes';
 import {
   ACCENT_KEYFRAMES,
   BUILTIN_INTERFACE_ACCENTS,
@@ -429,8 +430,10 @@ export function getCandidates(
 /* Labels                                                               */
 /* ------------------------------------------------------------------ */
 
-export function themeLabel(year: string): string {
-  return year.startsWith('JESC-') ? `JESC ${year.slice(5)}` : `ESC ${year}`;
+export function themeLabel(key: string): string {
+  const { year, contestType } = parseContestKey(key);
+
+  return `${CONTEST_TYPE_SHORT_NAMES[contestType]} ${year}`;
 }
 
 export const formatSpec = ({ h, l, c }: AccentSpec) =>

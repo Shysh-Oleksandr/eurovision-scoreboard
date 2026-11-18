@@ -32,6 +32,7 @@ import { BoxMap } from './useElementBoxes';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAuthStore } from '@/state/useAuthStore';
+import { useCoversBackgroundVideo } from '@/theme/backgroundVideo/covers';
 
 import './editor.css';
 
@@ -284,6 +285,9 @@ const GraphicsEditor: React.FC<Props> = ({ request, onClose }) => {
     else if (s.selectedIds.length) s.clearSelection();
     else window.history.back();
   });
+
+  // The editor fills the screen: the theme's background video waits.
+  useCoversBackgroundVideo(true);
 
   const onBoxes = useCallback((next: BoxMap) => setBoxes(next), []);
 

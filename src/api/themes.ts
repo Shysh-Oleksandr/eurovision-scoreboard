@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
-import { api } from './client';
+import { api, type UploadProgress } from './client';
 import { queryKeys } from './queryKeys';
 
 import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
@@ -28,6 +28,8 @@ export type CreateThemeInput = {
   shadeValue?: number;
   overrides?: Record<string, string>;
   backgroundImageUrl?: string;
+  /** https link to a video file; uploads go through `useUploadThemeBackgroundVideoMutation`. */
+  backgroundVideoUrl?: string;
   isPublic?: boolean;
   pointsContainerShape?: PointsContainerShape;
   uppercaseEntryName?: boolean;
@@ -58,6 +60,8 @@ export type UpdateThemeInput = {
   shadeValue?: number;
   overrides?: Record<string, string>;
   backgroundImageUrl?: string;
+  /** '' removes the video (and releases an uploaded file). */
+  backgroundVideoUrl?: string;
   isPublic?: boolean;
   pointsContainerShape?: PointsContainerShape | null;
   uppercaseEntryName?: boolean | null;
@@ -408,6 +412,37 @@ export function useUploadThemeBackgroundMutation() {
       });
 
       return data as CustomTheme;
+    },
+    onSuccess: () => {
+      refreshMyThemeLists(qc);
+    },
+  });
+}
+
+/** Background video upload (MP4/WebM, 15 MB): no timeout, with progress. */
+export function useUploadThemeBackgroundVideoMutation() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      file,
+      onUploadProgress,
+    }: {
+      id: string;
+      file: File;
+      onUploadProgress?: (progress: UploadProgress) => void;
+    }) => {
+      const formData = new FormData();
+
+      formData.append('file', file);
+      const { data } = await api.upload<CustomTheme>(
+        `/themes/${id}/background-video`,
+        formData,
+        { onUploadProgress },
+      );
+
+      return data;
     },
     onSuccess: () => {
       refreshMyThemeLists(qc);

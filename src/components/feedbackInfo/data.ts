@@ -413,6 +413,11 @@ const OLD_WHATS_NEW = [
 
 const WEBSITE_UPDATES: UpdateItem[] = [
   {
+    date: '2026-11-18',
+    title:
+      '<list><item>Added Eurovision Asia 2026 theme</item><item>Added an option to use a video background for a theme</item></list>',
+  },
+  {
     date: '2026-11-17',
     title:
       '<list><item>Added keyboard shortcuts on desktop</item><item>Added an option to use the old simulation design</item><item>Added an option to always display full country names in the scoreboard</item><item>Bug fixes</item></list>',

@@ -1317,7 +1317,25 @@
         "pickForElement": "Choisissez la police de cet élément uniquement. Les autres éléments conservent leurs propres polices."
       },
       "customCount": "{count} personnalisés",
-      "savedCount": "{count} enregistrés"
+      "savedCount": "{count} enregistrés",
+      "backgroundVideo": {
+        "title": "Vidéo d’arrière-plan",
+        "badge": "Vidéo",
+        "hint": "Lue en boucle et sans son derrière la simulation ; l’image d’arrière-plan s’affiche jusqu’à son démarrage. MP4 ou WebM, jusqu’à {maxSize} Mo, {maxSeconds} secondes et 1080p. Pour une vidéo téléversée, sa première image devient l’image d’arrière-plan.",
+        "pasteUrl": "Ou collez un lien vers un fichier .mp4 ou .webm",
+        "remove": "Retirer la vidéo",
+        "reading": "Vérification de la vidéo…",
+        "pickedFile": "{name} (téléversée à l’enregistrement)",
+        "uploading": "Téléversement de la vidéo… {percent} %",
+        "errorType": "Utilisez une vidéo MP4 ou WebM. Les vidéos d’iPhone (.mov) doivent d’abord être converties en MP4.",
+        "errorSize": "La vidéo dépasse {maxSize} Mo.",
+        "errorDuration": "La vidéo dure plus de {maxSeconds} secondes.",
+        "errorResolution": "La vidéo dépasse 1080p (1920 pixels sur le côté le plus long).",
+        "errorUnplayable": "Cette vidéo ne se lit pas dans ce navigateur. Essayez une vidéo MP4 (H.264).",
+        "errorHttps": "Les liens vidéo doivent commencer par https://",
+        "errorPageLink": "C’est un lien vers une page vidéo. Collez un lien vers le fichier vidéo lui-même (.mp4 ou .webm).",
+        "errorLinkUnplayable": "Ce lien ne se lit pas comme une vidéo. Vérifiez qu’il ouvre directement le fichier vidéo."
+      }
     },
     "sortBadges": {
       "latest": "Plus récent",
@@ -1613,7 +1631,8 @@
         "winter": "Ajouter de la neige qui tombe et des touches festives dans toute l’app.",
         "finalReveal": "Révéler les scores finaux du télévote pays par pays avec une animation dramatique.",
         "predictableReveal": "Révéler les scores du télévote dans un ordre fluide et déterministe, sans suspense aléatoire.",
-        "haptics": "Ressentez chaque vote : une pression à chaque attribution de points, un battement de cœur pour les 12 points, la montée au classement, la révélation finale et le vainqueur."
+        "haptics": "Ressentez chaque vote : une pression à chaque attribution de points, un battement de cœur pour les 12 points, la montée au classement, la révélation finale et le vainqueur.",
+        "backgroundVideos": "Les thèmes avec une vidéo d’arrière-plan la lisent derrière la simulation. Ne concerne que cet appareil. Désactivé, ou si la réduction des animations est activée dans le système, vous voyez l’image d’arrière-plan du thème."
       }
     },
     "relations": {
@@ -1790,7 +1809,8 @@
       "themeSoundHudCloseControls": "Fermer les contrôles de volume",
       "themeSoundHudMuteAllShort": "Couper tous",
       "themeSoundHudRestoreShort": "Restaurer",
-      "themeSoundHudStopSfxShort": "Arrêter les clips"
+      "themeSoundHudStopSfxShort": "Arrêter les clips",
+      "playBackgroundVideos": "Lire les vidéos d’arrière-plan"
     },
     "contest": {
       "enterContestName": "Entrez le nom du concours...",

@@ -4,6 +4,7 @@ import {
   Folder,
   Link2,
   Share2,
+  Video,
   Volume1,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -323,6 +324,12 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                   <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
                     <Volume1 className="size-[11px]" />
                     Audio
+                  </span>
+                )}
+                {!!theme.backgroundVideoUrl && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
+                    <Video className="size-[11px]" />
+                    {t('widgets.themes.backgroundVideo.badge')}
                   </span>
                 )}
                 {theme.hasCustomFonts && (

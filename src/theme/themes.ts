@@ -1260,15 +1260,103 @@ export const escThemes: Partial<ThemeRecord> = {
   },
 };
 
+// Eurovision Asia themes (merged under keys like ASIA-<year>)
+export const asiaThemes: Partial<ThemeRecord> = {
+  'ASIA-2026': {
+    colors: {
+      primary: {
+        700: 'hsl(230, 86%, 51%)',
+        750: 'hsl(230, 62%, 40%)',
+        800: 'hsl(230, 61%, 31%)',
+        900: 'hsl(230, 64%, 22%)',
+        950: 'hsl(230, 67%, 16%)',
+      },
+      gray: {
+        500: 'hsl(230, 26%, 52%)',
+        600: 'hsl(230, 21%, 36%)',
+        900: 'hsl(230, 31%, 22%)',
+      },
+      appBgColor: 'hsl(230, 61%, 31%)',
+      animatedBorder: 'hsl(0, 0%, 100%)',
+      countryItem: {
+        juryBg: 'hsl(0, 0%, 100%)',
+        juryCountryText: 'hsl(236, 65%, 17%)',
+        juryPointsBg: 'hsl(59, 98%, 59%)',
+        juryPointsText: 'hsl(236, 100%, 9%)',
+        juryLastPointsBg: 'hsl(308, 100%, 64%)',
+        juryLastPointsText: 'hsl(280, 96%, 19%)',
+        televoteUnfinishedBg: 'hsl(320, 100%, 99%)',
+        televoteUnfinishedText: 'hsl(236, 65%, 17%)',
+        televoteUnfinishedPointsBg: 'hsl(59, 94%, 56%)',
+        televoteUnfinishedPointsText: 'hsl(236, 100%, 9%)',
+        televoteActiveBg: 'hsl(0, 0%, 100%)',
+        televoteActiveText: 'hsl(236, 65%, 17%)',
+        televoteActivePointsBg: 'hsl(59, 94%, 56%)',
+        televoteActivePointsText: 'hsl(236, 100%, 9%)',
+        televoteOutline: 'hsl(265, 32%, 65%)',
+        televoteFinishedBg:
+          'linear-gradient(90deg, rgba(252,255,255,1) 0%, rgba(252,251,149,1) 56%, rgba(252,248,65,1) 100%)',
+        televoteFinishedText: 'hsl(236, 86%, 14%)',
+        televoteFinishedPointsBg: 'hsl(59, 94%, 56%)',
+        televoteFinishedPointsText: 'hsl(215, 41%, 8%)',
+        unqualifiedPointsBg: 'hsl(59, 94%, 56%)',
+        unqualifiedPointsText: 'hsl(236, 92%, 9%)',
+        televoteLastPointsBg: 'hsl(313, 100%, 49%)',
+        televoteLastPointsText: 'hsl(280, 96%, 19%)',
+        unqualifiedLastPointsBg: 'hsl(311, 100%, 62%)',
+        unqualifiedLastPointsText: 'hsl(279, 92%, 20%)',
+        televoteFinishedLastPointsBg: 'hsl(313, 100%, 49%)',
+        televoteFinishedLastPointsText: 'hsl(260, 69%, 25%)',
+        televoteActiveLastPointsBg: 'hsl(313, 100%, 49%)',
+        televoteActiveLastPointsText: 'hsl(280, 96%, 19%)',
+        douzePointsBg: 'hsl(308, 100%, 64%)',
+        douzePointsText: 'hsl(257, 92%, 19%)',
+        douzePointsBlock1: 'hsl(60, 100%, 50%)',
+        douzePointsBlock2: 'hsl(240, 100%, 50%)',
+        juryPlaceContainerBg: 'hsl(267, 67%, 34%)',
+        juryPlaceText: 'hsl(0, 0%, 100%)',
+        televoteUnfinishedPlaceContainerBg: 'hsl(266, 65%, 35%)',
+        televoteUnfinishedPlaceText: 'hsl(0, 0%, 100%)',
+        televoteActivePlaceContainerBg: 'hsl(306, 95%, 66%)',
+        televoteActivePlaceText: 'hsl(0, 0%, 100%)',
+        televoteFinishedPlaceContainerBg: 'hsl(267, 67%, 34%)',
+        televoteFinishedPlaceText: 'hsl(0, 0%, 100%)',
+        unqualifiedPlaceContainerBg: 'hsl(265, 64%, 32%)',
+        unqualifiedPlaceText: 'hsl(0, 0%, 100%)',
+        unqualifiedBg: 'hsl(0, 0%, 100%)',
+        unqualifiedText: 'hsl(236, 66%, 17%)',
+      },
+      panelInfo: {
+        activeBg: 'hsl(305, 74%, 59%)',
+        activeText: 'hsl(0, 0%, 100%)',
+        inactiveText: 'hsl(238, 93%, 16%)',
+        inactiveBg: 'hsl(177, 96%, 43%)',
+      },
+    },
+    backgroundImage: '/bgImages/BokehAsiaBg2026.webp',
+    themeSpecifics: {
+      pointsContainerShape: 'square',
+      boardAnimationMode: 'flip',
+      uppercaseEntryName: false,
+      juryActivePointsUnderline: false,
+      isJuryPointsPanelRounded: true,
+      roundedCountryContainer: true,
+      fontAlias: 'neulis-cursive',
+    },
+  },
+};
+
 // We only support several themes, with 2026 as fallback
 export const themes = {
   ...escThemes,
   ...juniorThemes,
+  ...asiaThemes,
 } as ThemeRecord;
 
 export const YEARS_WITH_THEME = Object.keys(themes);
 export const ESC_YEARS_WITH_THEME = Object.keys(escThemes);
 export const JUNIOR_YEARS_WITH_THEME = Object.keys(juniorThemes);
+export const ASIA_YEARS_WITH_THEME = Object.keys(asiaThemes);
 
 // Helper function to get theme for any year
 export function getThemeForYear(year: string) {
@@ -1281,6 +1369,10 @@ export function getThemeForYear(year: string) {
 
 // Helper function to get background image for a specific year
 export function getThemeBackground(themeYear: string): string {
+  if (asiaThemes[themeYear]?.backgroundImage) {
+    return asiaThemes[themeYear]!.backgroundImage;
+  }
+
   if (themeYear.includes('JESC')) {
     const juniorKey = themeYear;
     if (juniorThemes[juniorKey]?.backgroundImage) {

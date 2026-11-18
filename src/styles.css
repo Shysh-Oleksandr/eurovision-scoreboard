@@ -123,6 +123,11 @@ html[data-font='zodiak'] {
   --dp-font-family: Zodiak, serif;
 }
 
+/* Montserrat second: Neulis Cursive has no Cyrillic or Greek glyphs. */
+html[data-font='neulis-cursive'] {
+  --dp-font-family: 'Neulis Cursive', montserrat, sans-serif;
+}
+
 /* Canvas colour behind overscroll and any area the app does not cover. */
 html {
   background-color: var(--p-950);
@@ -696,6 +701,18 @@ h6 {
   font-style: normal;
   font-weight: 700;
   src: url('/fonts/zodiak-700.woff2') format('woff2');
+}
+
+/*
+ * Neulis Cursive (ESC Asia 2026): only the Bold face exists, so it covers
+ * every weight and the browser never synthesises a faux bold over it.
+ */
+@font-face {
+  font-display: swap;
+  font-family: 'Neulis Cursive';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url('/fonts/neulis-cursive-700.woff2') format('woff2');
 }
 
 #main {

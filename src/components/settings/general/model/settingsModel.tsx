@@ -368,6 +368,14 @@ export const CATEGORIES: Category[] = [
         labelKey: 'settings.ui.showJuryVotingProgressBar',
       },
       {
+        // Per device (not in SYNCED_SETTINGS_KEYS): docs/background-video.md.
+        kind: 'switch',
+        id: 'playBackgroundVideos',
+        settingKey: 'playBackgroundVideos',
+        labelKey: 'settings.ui.playBackgroundVideos',
+        tipKey: 'settings.general2.tip.backgroundVideos',
+      },
+      {
         kind: 'switch',
         id: 'enableWinterEffects',
         settingKey: 'enableWinterEffects',

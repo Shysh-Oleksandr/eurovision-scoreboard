@@ -44,6 +44,9 @@ const previewBadges = [
 
 type ThemePreviewCountryItemCompactProps = {
   backgroundImage: string | null;
+  /** The theme editor's preview only; lists show the still image. */
+  backgroundVideo?: string | null;
+  onBackgroundVideoError?: () => void;
   overrides?: Record<string, string>;
   baseThemeYear: string;
   points: number;
@@ -67,6 +70,8 @@ const ThemePreviewCountryItemCompact: React.FC<
   ThemePreviewCountryItemCompactProps
 > = ({
   backgroundImage,
+  backgroundVideo = null,
+  onBackgroundVideoError,
   overrides = {},
   baseThemeYear,
   points,
@@ -98,7 +103,9 @@ const ThemePreviewCountryItemCompact: React.FC<
         isListItem && !togglesBelow
           ? 'sm:min-w-[300px] md:min-w-[400px] max-w-[400px]'
           : ''
-      } ${onClick ? 'cursor-pointer' : ''}`}
+      } ${onClick ? 'cursor-pointer' : ''} ${
+        backgroundVideo ? 'relative isolate' : ''
+      }`}
       onClick={onClick}
       style={{
         backgroundImage: `url(${backgroundImage || baseBackgroundImage})`,
@@ -130,6 +137,25 @@ const ThemePreviewCountryItemCompact: React.FC<
         juryActivePointsUnderline={juryActivePointsUnderline}
         isRounded={isJuryPointsPanelRounded}
       />
+
+      {backgroundVideo && (
+        // Last child so `space-y` spacing above is unchanged; z -1 inside
+        // the isolated box puts it over the image and under the content.
+        <video
+          key={backgroundVideo}
+          src={backgroundVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          disablePictureInPicture
+          disableRemotePlayback
+          aria-hidden
+          tabIndex={-1}
+          onError={onBackgroundVideoError}
+          className="pointer-events-none absolute inset-0 -z-10 !m-0 h-full w-full rounded-[12px] object-cover"
+        />
+      )}
     </div>
   );
 
