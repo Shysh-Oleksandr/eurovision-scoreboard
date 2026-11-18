@@ -9,7 +9,7 @@ import React, {
 
 import { useShallow } from 'zustand/shallow';
 
-import FinalTelevoteReveal from '../FinalTelevoteReveal';
+import FinalReveal from '../FinalReveal';
 
 import { createFramePassBudget, reportFitLoop } from './fitLoopGuard';
 import { allNamesFit, measureNames, namesReadWell } from './nameFit';
@@ -24,6 +24,7 @@ import {
 } from '@/components/board/BoardLayoutContext';
 import { getShortCodes } from '@/data/countries/shortCodes';
 import { useGeneralStore } from '@/state/generalStore';
+import type { RevealData } from '@/state/scoreboard/types';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 /** Narrowest column (in the board's own px) at which names still read well. */
@@ -51,11 +52,7 @@ const THREE_COLUMNS_FROM = 32;
 const RELAYOUT_MS = 220;
 
 interface RevealProps {
-  revealData: {
-    leaderCode: string;
-    lastCode: string;
-    pointsNeeded: number;
-  } | null;
+  revealData: RevealData | null;
   isRevealAnimationComplete: boolean;
   onRevealComplete: () => void;
 }
@@ -802,16 +799,24 @@ const BoardStage = ({
       >
         {/* The teaser over the reveal; afterwards "View scoreboard" lives
             with the results (column, sheet or stripe). */}
-        {showRevealPanel && !isRevealAnimationComplete && (
-          <BoardHeader revealOnly revealActive />
-        )}
+        {/* The ladder style names the leader and the winner on its own tags. */}
+        {showRevealPanel &&
+          !isRevealAnimationComplete &&
+          revealData?.style !== 'ladder' && (
+            <BoardHeader revealOnly revealActive />
+          )}
         <BoardLayoutContext.Provider value={layout}>
           {showRevealPanel && revealData ? (
-            <FinalTelevoteReveal
+            <FinalReveal
+              style={revealData.style}
               leaderCountryCode={revealData.leaderCode}
               lastCountryCode={revealData.lastCode}
               pointsNeeded={revealData.pointsNeeded}
               onRevealComplete={onRevealComplete}
+              fit={{
+                layout: isDesktop ? 'desktop' : 'phone',
+                bottomReserve,
+              }}
             />
           ) : qualifiers ? (
             <QualifierBoard />

@@ -3,6 +3,7 @@ import React from 'react';
 import { SettingsEnv, SettingsItem, SwitchItem } from './model/types';
 import { FieldRow } from './rows/FieldRow';
 import { Note } from './rows/Note';
+import { SegmentedRow } from './rows/SegmentedRow';
 import { SelectRow } from './rows/SelectRow';
 import { SliderRow } from './rows/SliderRow';
 import { Subhead } from './rows/Subhead';
@@ -23,6 +24,8 @@ export const ItemControl: React.FC<ItemProps> = ({ item, query }) => {
       return <SwitchRow item={item} query={query} />;
     case 'select':
       return <SelectRow item={item} />;
+    case 'segmented':
+      return <SegmentedRow item={item} />;
     case 'slider':
       return <SliderRow item={item} />;
     case 'field':

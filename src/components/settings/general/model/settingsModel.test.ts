@@ -47,6 +47,7 @@ describe('general settings model', () => {
         item.kind === 'switch' ||
         item.kind === 'slider' ||
         item.kind === 'select' ||
+        item.kind === 'segmented' ||
         item.kind === 'field'
       ) {
         expect(
@@ -78,6 +79,9 @@ describe('general settings model', () => {
       }
       if (item.kind === 'custom') {
         item.searchTextKeys.forEach((key) => keys.add(key));
+      }
+      if (item.kind === 'segmented') {
+        item.options.forEach((option) => keys.add(option.labelKey));
       }
     }
 

@@ -688,7 +688,11 @@
     "finalReveal": {
       "currentLeader": "Aktualny lider",
       "needsPointsToWin": "Potrzebuje <span>{count, plural, =1 {# pkt} other {# pkt}}</span> do zwycięstwa",
-      "receivedPointsFromPublic": "Otrzymał(a) <span>{count, plural, =1 {# pkt} other {# pkt}}</span> od publiczności"
+      "receivedPointsFromPublic": "Otrzymał(a) <span>{count, plural, =1 {# pkt} other {# pkt}}</span> od publiczności",
+      "ladder": {
+        "pointsToWin": "+ <num>{points}</num> pkt do wygranej",
+        "winner": "Zwycięzca"
+      }
     },
     "finalStats": {
       "breakdown": "Rozbicie",
@@ -1776,6 +1780,9 @@
       "slow": "Wolno",
       "fast": "Szybko",
       "finalRevealLinearAnimation": "Płynna, przewidywalna animacja (bez losowości)",
+      "finalRevealStyle": "Styl ujawnienia",
+      "finalRevealStyleLadder": "Drabinka (ESCA 2026)",
+      "finalRevealStyleBar": "Pasek (ESC 2026)",
       "enableHaptics": "Wibracje",
       "hapticsStrength": "Siła wibracji",
       "hapticsSubtle": "Delikatna",

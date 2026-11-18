@@ -52,6 +52,13 @@ export interface SelectItem extends ItemBase {
   options: () => Option[];
 }
 
+/** A few choices side by side (a segmented control), labels from messages. */
+export interface SegmentedItem extends ItemBase {
+  kind: 'segmented';
+  settingKey: StringSettingKey;
+  options: { value: string; labelKey: string }[];
+}
+
 export interface SliderItem extends ItemBase {
   kind: 'slider';
   settingKey: NumberSettingKey;
@@ -105,6 +112,7 @@ export interface CustomItem extends ItemBase {
 export type SettingsItem =
   | SwitchItem
   | SelectItem
+  | SegmentedItem
   | SliderItem
   | FieldItem
   | TwoColItem

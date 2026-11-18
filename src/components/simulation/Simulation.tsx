@@ -12,7 +12,7 @@ import ControlsPanel from '../controlsPanel/ControlsPanel';
 
 import SimulationColumnLayout from './columnLayout/SimulationColumnLayout';
 import { useSimLayout } from './columnLayout/useSimLayout';
-import FinalTelevoteReveal from './FinalTelevoteReveal';
+import FinalReveal from './FinalReveal';
 import { useReviewShowCounter } from './hooks/useReviewShowCounter';
 import { useSimulationHaptics } from './hooks/useSimulationHaptics';
 import { PhaseActions } from './PhaseActions';
@@ -216,6 +216,10 @@ const Simulation = () => {
         leaderCode: info.leaderCode,
         lastCode: info.lastCode,
         pointsNeeded: info.pointsNeeded,
+        style:
+          useGeneralStore.getState().settings.finalRevealStyle === 'bar'
+            ? 'bar'
+            : 'ladder',
       });
     }, REVEAL_TRIGGER_DELAY_MS);
 
@@ -318,7 +322,8 @@ const Simulation = () => {
                   onBackToScoreboard={handleBackToScoreboard}
                 />
                 {showRevealPanel && revealData ? (
-                  <FinalTelevoteReveal
+                  <FinalReveal
+                    style={revealData.style}
                     leaderCountryCode={revealData.leaderCode}
                     lastCountryCode={revealData.lastCode}
                     pointsNeeded={revealData.pointsNeeded}

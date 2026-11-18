@@ -27,6 +27,7 @@ import VotingSheet from './VotingSheet';
 import { usePresentationLoop } from '@/components/presentationPanel/usePresentationLoop';
 import { useShortcut } from '@/shortcuts/registry';
 import { useGeneralStore } from '@/state/generalStore';
+import type { RevealData } from '@/state/scoreboard/types';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
 const ShareResultsModal = dynamic(() => import('../share/ShareResultsModal'), {
@@ -74,11 +75,7 @@ interface SimulationColumnLayoutProps {
    * is the line-up, the column the qualifiers so far).
    */
   mode?: 'vote' | 'qualifiers';
-  revealData: {
-    leaderCode: string;
-    lastCode: string;
-    pointsNeeded: number;
-  } | null;
+  revealData: RevealData | null;
   isRevealAnimationComplete: boolean;
   onRevealComplete: () => void;
   onBackToScoreboard: () => void;

@@ -51,6 +51,7 @@ const BoardHeader = ({
       givePredefinedTelevotePoints: state.givePredefinedTelevotePoints,
     })),
   );
+  const revealStyle = useScoreboardStore((state) => state.revealData?.style);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
   const contestName = useGeneralStore((state) => state.settings.contestName);
   const revealTelevoteLowestToHighest = useGeneralStore(
@@ -200,12 +201,17 @@ const BoardHeader = ({
     }
   };
 
-  const isTeaserShown =
+  const isRevealRunning =
     revealActive && isVotingOver && !revealAnimationComplete;
+  // The ladder style names the leader and the winner on its own tags, so it
+  // gets no teaser (and the winner stays hidden until it lands).
+  const isTeaserShown = isRevealRunning && revealStyle !== 'ladder';
 
-  let displayText: React.ReactNode = isTeaserShown
-    ? teaserText
-    : winnerText || votingText;
+  let displayText: React.ReactNode;
+
+  if (isTeaserShown) displayText = teaserText;
+  else if (isRevealRunning) displayText = null;
+  else displayText = winnerText || votingText;
 
   if (revealOnly && !isTeaserShown) displayText = null;
 

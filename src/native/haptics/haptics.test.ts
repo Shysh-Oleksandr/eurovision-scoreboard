@@ -47,6 +47,7 @@ const SAMPLE_CUES: Record<HapticCueId, HapticCue> = {
   revealFall: { id: 'revealFall' },
   revealHold: { id: 'revealHold' },
   revealWinnerFlash: { id: 'revealWinnerFlash' },
+  revealClimb: { id: 'revealClimb', closeness: 0.5 },
   winnerFireworks: { id: 'winnerFireworks' },
   winnerReveal: { id: 'winnerReveal' },
   winnerScore: { id: 'winnerScore', durationMs: 3000 },

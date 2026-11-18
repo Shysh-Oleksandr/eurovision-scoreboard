@@ -688,7 +688,11 @@
     "finalReveal": {
       "currentLeader": "Поточний лідер",
       "needsPointsToWin": "Потрібно <span>{count, plural, =1 {# бал} few {# бали} many {# балів} other {# балів}}</span> для перемоги",
-      "receivedPointsFromPublic": "Отримав(ла) <span>{count, plural, =1 {# бал} few {# бали} many {# балів} other {# балів}}</span> від глядачів"
+      "receivedPointsFromPublic": "Отримав(ла) <span>{count, plural, =1 {# бал} few {# бали} many {# балів} other {# балів}}</span> від глядачів",
+      "ladder": {
+        "pointsToWin": "+ <num>{points}</num> б. до перемоги",
+        "winner": "Переможець"
+      }
     },
     "finalStats": {
       "breakdown": "Детально",
@@ -1776,6 +1780,9 @@
       "slow": "Повільно",
       "fast": "Швидко",
       "finalRevealLinearAnimation": "Плавна, передбачувана анімація (без випадковості)",
+      "finalRevealStyle": "Стиль розкриття",
+      "finalRevealStyleLadder": "Драбина (ESCA 2026)",
+      "finalRevealStyleBar": "Шкала (ESC 2026)",
       "enableHaptics": "Тактильний відгук",
       "hapticsStrength": "Сила тактильного відгуку",
       "hapticsSubtle": "М’яко",

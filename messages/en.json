@@ -688,7 +688,11 @@
     "finalReveal": {
       "currentLeader": "Current Leader",
       "needsPointsToWin": "Needs <span>{count, plural, =1 {# point} other {# points}}</span> to win",
-      "receivedPointsFromPublic": "Received <span>{count, plural, =1 {# point} other {# points}}</span> from the public"
+      "receivedPointsFromPublic": "Received <span>{count, plural, =1 {# point} other {# points}}</span> from the public",
+      "ladder": {
+        "pointsToWin": "+ <num>{points}</num> P to win",
+        "winner": "Winner"
+      }
     },
     "finalStats": {
       "breakdown": "Breakdown",
@@ -1776,6 +1780,9 @@
       "slow": "Slow",
       "fast": "Fast",
       "finalRevealLinearAnimation": "Smooth, predictable reveal animation (no randomness)",
+      "finalRevealStyle": "Reveal style",
+      "finalRevealStyleLadder": "Ladder (ESCA 2026)",
+      "finalRevealStyleBar": "Bar (ESC 2026)",
       "enableHaptics": "Haptic feedback",
       "hapticsStrength": "Haptic strength",
       "hapticsSubtle": "Subtle",

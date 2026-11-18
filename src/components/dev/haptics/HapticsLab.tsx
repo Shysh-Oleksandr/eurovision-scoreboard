@@ -296,6 +296,22 @@ const GROUPS: { title: string; cues: LabCue[] }[] = [
         note: 'Gold flash on the last country.',
         build: () => ({ id: 'revealWinnerFlash' }),
       },
+      {
+        key: 'revealClimb',
+        label: 'Ladder: up a place',
+        note: 'The last country passes someone; closeness to first place.',
+        params: [
+          {
+            key: 'closeness',
+            label: 'Closeness',
+            min: 0,
+            max: 1,
+            step: 0.1,
+            initial: 0.5,
+          },
+        ],
+        build: (v) => ({ id: 'revealClimb', closeness: v.closeness }),
+      },
     ],
   },
   {

@@ -688,7 +688,11 @@
     "finalReveal": {
       "currentLeader": "Τρέχων Πρωτοπόρος",
       "needsPointsToWin": "Χρειάζεται <span>{count, plural, =1 {# βαθμό} other {# βαθμούς}}</span> για νίκη",
-      "receivedPointsFromPublic": "Έλαβε <span>{count, plural, =1 {# βαθμό} other {# βαθμούς}}</span> από το κοινό"
+      "receivedPointsFromPublic": "Έλαβε <span>{count, plural, =1 {# βαθμό} other {# βαθμούς}}</span> από το κοινό",
+      "ladder": {
+        "pointsToWin": "+ <num>{points}</num> β. για τη νίκη",
+        "winner": "Νικητής"
+      }
     },
     "finalStats": {
       "breakdown": "Ανάλυση",
@@ -1776,6 +1780,9 @@
       "slow": "Αργά",
       "fast": "Γρήγορα",
       "finalRevealLinearAnimation": "Ομαλό, προβλέψιμο animation (χωρίς τυχαιότητα)",
+      "finalRevealStyle": "Στυλ αποκάλυψης",
+      "finalRevealStyleLadder": "Σκάλα (ESCA 2026)",
+      "finalRevealStyleBar": "Μπάρα (ESC 2026)",
       "enableHaptics": "Απτική ανάδραση",
       "hapticsStrength": "Ένταση απτικής ανάδρασης",
       "hapticsSubtle": "Διακριτική",

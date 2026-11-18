@@ -2,6 +2,8 @@ import { shallow } from 'zustand/shallow';
 
 import { Country, EventStage, StageVotingMode } from '../../models';
 
+import { getFinalRevealPlaces } from './finalRevealPlaces';
+
 /**
  * Reuses the previous country objects (and the previous array, when nothing
  * changed at all) for entries whose fields did not change. Values are
@@ -131,21 +133,23 @@ export const getFinalRevealInfo = (
 
   if (!lastCountry) return null;
 
-  const otherCountries = stage.countries.filter(
-    (c) => c.code !== lastCountry.code,
+  // The leader and the points to win follow the board's tiebreak, so a tie
+  // on points counts as won when the last country's televote would beat the
+  // leader's (GLOSSARY: Points to win).
+  const places = getFinalRevealPlaces(
+    stage.countries,
+    lastCountry.code,
+    stage.runningOrder,
   );
 
-  if (otherCountries.length === 0) return null;
+  if (!places) return null;
 
-  const leaderCountry = otherCountries.reduce((best, c) =>
-    c.points > best.points ? c : best,
-  );
-  const pointsNeeded = leaderCountry.points - lastCountry.points + 1;
+  const pointsNeeded = places.winAt - lastCountry.points;
 
   if (pointsNeeded <= 0) return null;
 
   return {
-    leaderCode: leaderCountry.code,
+    leaderCode: places.leaderCode,
     lastCode: lastCountry.code,
     pointsNeeded,
   };

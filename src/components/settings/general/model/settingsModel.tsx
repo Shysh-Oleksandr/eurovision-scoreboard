@@ -403,6 +403,19 @@ export const CATEGORIES: Category[] = [
         tipKey: 'settings.general2.tip.finalReveal',
         children: [
           {
+            kind: 'segmented',
+            id: 'finalRevealStyle',
+            settingKey: 'finalRevealStyle',
+            labelKey: 'settings.ui.finalRevealStyle',
+            options: [
+              {
+                value: 'ladder',
+                labelKey: 'settings.ui.finalRevealStyleLadder',
+              },
+              { value: 'bar', labelKey: 'settings.ui.finalRevealStyleBar' },
+            ],
+          },
+          {
             kind: 'slider',
             id: 'finalRevealAnimationSpeed',
             settingKey: 'finalRevealAnimationSpeed',

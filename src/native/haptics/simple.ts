@@ -57,6 +57,7 @@ const SIMPLE: SimpleMap = {
   revealFall: click,
   revealHold: none,
   revealWinnerFlash: none,
+  revealClimb: none,
   // Winner.
   winnerFireworks: double,
   winnerReveal: click,

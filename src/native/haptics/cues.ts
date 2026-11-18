@@ -52,6 +52,11 @@ export type HapticCue =
   | { id: 'revealHold' }
   /** Final televote reveal: the new winner's badge turns gold. */
   | { id: 'revealWinnerFlash' }
+  /**
+   * Final reveal, ladder style: the last country moves up a place;
+   * `closeness` 0–1 to first place.
+   */
+  | { id: 'revealClimb'; closeness: number }
   /** The winner is known: confetti. */
   | { id: 'winnerFireworks' }
   /** The winner modal opens. */
@@ -614,6 +619,24 @@ export function buildHapticPattern(cue: HapticCue): HapticPattern {
         ],
         fallback: [{ at: 0, kind: 'success' }],
       };
+
+    case 'revealClimb': {
+      // useLadderRevealAnimation: the pill glides up a place in 240 ms; one
+      // light tick as it leaves, firmer near the top.
+      const c = clamp01(cue.closeness);
+
+      return {
+        priority: 1,
+        events: [
+          {
+            type: 'tap',
+            at: 0,
+            intensity: 0.25 + 0.35 * c,
+            sharpness: 0.7,
+          },
+        ],
+      };
+    }
 
     case 'winnerFireworks': {
       const events: HapticEvent[] = [];

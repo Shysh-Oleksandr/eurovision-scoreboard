@@ -17,6 +17,39 @@ The small gray text on a button, menu row or tooltip that names the button's
 keyboard shortcut. Only shown on the website with a mouse or trackpad.
 _Avoid_: key label, keycap, badge
 
+## Final reveal
+
+**Final reveal**:
+The Grand Final moment when every country but one has its televote, and the
+scoreboard gives way to a head-to-head between the leader and the last
+country, ending in the winner.
+_Avoid_: final televote reveal panel, winner reveal, showdown
+
+**Reveal style**:
+How the final reveal is drawn: **Ladder** (the last country climbs a column
+of places towards the leader) or **Bar** (the last country's points fill a
+bar towards the leader's mark). Ladder is the default.
+_Avoid_: gauge, reveal variant, reveal mode
+
+**Leader**:
+The country first on the scoreboard among those that already have their
+televote, when the final reveal starts.
+_Avoid_: current winner, top country
+
+**Last country**:
+The one country still waiting for its televote when the final reveal starts.
+_Avoid_: challenger, remaining country, pending country
+
+**Points to win**:
+The fewest televote points that would put the last country first,
+counting a tie as won or lost the same way the scoreboard breaks ties.
+_Avoid_: points needed, gap, target
+
+**Place**:
+A country's position on the scoreboard, 1 being first. The numbers on the
+ladder are places.
+_Avoid_: rank, position, standing
+
 ## Themes
 
 **Background image**:

@@ -60,6 +60,9 @@ export enum PresentationPointsGrouping {
 
 export type SettingsModalTab = 'General' | 'Odds' | 'Relations';
 
+/** GLOSSARY: Reveal style. `ladder` is the default. */
+export type FinalRevealStyle = 'ladder' | 'bar';
+
 export type GeneralSettingsCategoryId =
   | 'contest'
   | 'voting'
@@ -129,6 +132,7 @@ const DEFAULT_SETTINGS: Settings = {
   enableFinalReveal: true,
   finalRevealAnimationSpeed: 1.0,
   finalRevealLinearAnimation: false,
+  finalRevealStyle: 'ladder',
   overrideThemeFont: false,
   overrideThemeFontAlias: 'montserrat',
   enableKeyboardShortcuts: true,
@@ -271,6 +275,8 @@ export interface Settings {
   enableFinalReveal: boolean;
   finalRevealAnimationSpeed: number; // 0.5–1.5, default 1.0; divides phaseADuration
   finalRevealLinearAnimation: boolean;
+  /** How the final reveal is drawn (GLOSSARY: Reveal style). */
+  finalRevealStyle: FinalRevealStyle;
   /** When true, ignore the active theme's font and use `overrideThemeFontAlias`. */
   overrideThemeFont: boolean;
   overrideThemeFontAlias: string;

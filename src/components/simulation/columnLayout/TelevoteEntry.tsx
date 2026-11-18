@@ -81,7 +81,7 @@ const TelevoteEntry = ({
 
   const limitOptions = (
     <div className="flex flex-col gap-1.5">
-      <label className="flex items-center gap-2.5 text-[13px] font-semibold">
+      <label className="flex items-center gap-2.5 text-[13px] font-semibold text-white/80">
         <input
           type="checkbox"
           className="dp-sim-check size-[18px]"
@@ -90,7 +90,7 @@ const TelevoteEntry = ({
         />
         {t('simulation.disableLimitForThisVote')}
       </label>
-      <label className="flex items-center gap-2.5 text-[13px] font-semibold">
+      <label className="flex items-center gap-2.5 text-[13px] font-semibold text-white/80">
         <input
           type="checkbox"
           className="dp-sim-check size-[18px]"

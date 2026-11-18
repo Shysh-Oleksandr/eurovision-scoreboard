@@ -1,4 +1,5 @@
 import { BaseCountry, Country, EventStage } from '../../models';
+import type { FinalRevealStyle } from '../generalStore';
 
 export type Vote = {
   countryCode: string;
@@ -19,6 +20,11 @@ export type RevealData = {
   leaderCode: string;
   lastCode: string;
   pointsNeeded: number;
+  /**
+   * The reveal style, fixed when the reveal starts, so the panel and the
+   * header agree even if the setting changes mid-reveal.
+   */
+  style: FinalRevealStyle;
 };
 
 // Televote award for the last Grand Final country that has been buffered (not yet

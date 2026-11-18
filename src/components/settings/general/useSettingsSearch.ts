@@ -57,6 +57,9 @@ export function useSettingsSearch(
       if (item.kind === 'custom') {
         item.searchTextKeys.forEach((k) => parts.push(safeT(k)));
       }
+      if (item.kind === 'segmented') {
+        item.options.forEach((o) => parts.push(safeT(o.labelKey)));
+      }
 
       return parts
         .join(' ')

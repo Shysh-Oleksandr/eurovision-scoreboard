@@ -52,6 +52,7 @@ export const SYNCED_SETTINGS_KEYS = [
   'enableFinalReveal',
   'finalRevealAnimationSpeed',
   'finalRevealLinearAnimation',
+  'finalRevealStyle',
   // audio
   'disableAllThemeAudio',
   'hideThemeSoundVolumeHud',

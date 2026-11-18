@@ -20,7 +20,6 @@ const FinalTelevoteReveal = (props: FinalTelevoteRevealProps) => {
     leaderCountry,
     lastCountry,
     receivedLabelPts,
-    revealDoneRef,
     containerRef,
     gradientBarRef,
     fillBarRef,
@@ -44,8 +43,11 @@ const FinalTelevoteReveal = (props: FinalTelevoteRevealProps) => {
 
   if (!leaderCountry || !lastCountry) return null;
 
+  // Only once the outcome is shown: the store already holds the final totals
+  // while the fill is still climbing, and any re-render then must not change
+  // the bar's look for a winner.
   const fillBlendExclusion =
-    revealDoneRef.current && leaderCountry.points < lastCountry.points;
+    receivedLabelPts !== null && leaderCountry.points < lastCountry.points;
 
   const lastLabel =
     receivedLabelPts !== null

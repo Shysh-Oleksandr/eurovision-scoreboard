@@ -124,8 +124,9 @@ timeline each one tracks.
 | `undo` | the header's undo button | 1 |
 | `qualifierCards` | `SplitScreenQualifierModal` timeline start | 1 |
 | `qualifierLockIn`, `nonQualifiers` (600 ms after the last pick) | `pickQualifier`, `pickQualifierRandomly` | 2, 1 |
-| `revealBeat` (via `createHapticHeartbeat`) | `useRevealAnimation` phase 2a | 1 |
-| `revealCross` / `revealFall`, then `revealWinnerFlash` / `revealHold` 1 s later | `useRevealAnimation` timeline labels | 3 / 2 |
+| `revealBeat` (via `createHapticHeartbeat`) | `useRevealAnimation` phase 2a, through the climb's beats and a loss's verdict hold | 1 |
+| `revealCross` at the crossing, then `revealWinnerFlash` 1 s later; `revealFall` at a loss's verdict (after the hold, never at the stop), then `revealHold` 0.45 s later | `useRevealAnimation` timeline labels | 3 / 2 |
+| Ladder style: `revealBeat` on every beat of the chip's heartbeat (`closeness` = its intensity); `revealClimb` each time the pill moves up a place (firmer near first place); `revealCross` at the swap, `revealWinnerFlash` as it settles 0.49 s later; `revealHold` with the leader's WINNER tag when nobody overtakes | `useLadderRevealAnimation` (beat loop, `moveLast`, `swap`, `resolveNoWin`) | 1 / 1 / 3 / 2 |
 | `winnerFireworks` | `useSimulationHaptics`, on the confetti's gate | 3 |
 | `winnerReveal`, `winnerScore` | `WinnerModal` open and count-up | 3, 2 |
 
@@ -152,8 +153,9 @@ Measured in the 2026 theme (teleport) for a 12 to the last-placed country:
 1.64 s with the fade-in), `douzeBloom` at 2.07 s with the hearts, `nextJury`
 at 5.04 s when the board clears. In flip themes the overlay mounts with the
 award, so the bloom follows the hit and the row moves at 1 s. Final reveal:
-the heartbeat from the fill's start, the outcome at the end of phase 2a
-(9 s at speed 1), the gold flash 1 s later, the fireworks when the reveal
+the heartbeat from the fill's start, the outcome at the crossing or at a
+loss's verdict (about 6.5–13 s at speed 1, see `revealPath.ts`), the gold
+flash 1 s (win) or 0.45 s (loss) later, the fireworks when the reveal
 completes, the modal's ta-da 3 s after.
 
 **Rules for new call sites:**

@@ -4,6 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { BADGE_REST_PCT, MARK_PCT } from './constants';
+import {
+  evaluateRevealPath,
+  planRevealPath,
+  revealPathDuration,
+} from './revealPath';
 import { FinalTelevoteRevealProps } from './types';
 
 import {
@@ -14,13 +20,16 @@ import {
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
+/** After a loss's verdict, the leader's badge turns gold this much later. */
+const LOSS_FLASH_DELAY = 0.45;
+
 /**
  * Owns every ref and the full GSAP choreography for the reveal panel:
  * the entrance timeline, the points-driven reveal timeline (phases 2a/2b),
  * and the effect that watches for the last country's televote points.
  *
  * Returns the refs (to be attached by the presentational components) plus the
- * derived `receivedLabelPts` state and `revealDoneRef` used during render.
+ * derived `receivedLabelPts` state (set once the outcome is shown).
  */
 export const useRevealAnimation = ({
   leaderCountryCode,
@@ -93,9 +102,14 @@ export const useRevealAnimation = ({
   // country nears the mark (0 at the start, 1 at the points needed).
   const closenessRef = useRef(0);
   const heartbeatRef = useRef<HapticHeartbeat | null>(null);
+  const revealTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
+  // The reveal timeline is built outside useGSAP (it starts when the points
+  // arrive), so kill it here: an undo mid-reveal must not complete it later.
   useEffect(() => {
     return () => {
+      revealTimelineRef.current?.kill();
+      revealTimelineRef.current = null;
       heartbeatRef.current?.stop();
       heartbeatRef.current = null;
     };
@@ -131,134 +145,71 @@ export const useRevealAnimation = ({
       if (revealDoneRef.current) return;
       revealDoneRef.current = true;
 
-      const isWinner = receivedPoints >= pointsNeeded;
-      const cappedFillPct = Math.min((receivedPoints / pointsNeeded) * 70, 70);
       const initialLastPts = initialLastCountryPointsRef.current;
       const leaderPts = initialLeaderPointsRef.current;
       const finalLastPts = initialLastPts + receivedPoints;
 
+      // The climb is planned without the result (see revealPath.ts), so the
+      // fill's pace, beats and crawl are the same whoever wins.
+      const { path, isWinner, verdictHold } = planRevealPath({
+        pointsNeeded,
+        receivedPoints,
+        speed: finalRevealAnimationSpeedRef.current,
+        linear: finalRevealLinearAnimationRef.current,
+      });
+      const climbDuration = revealPathDuration(path);
+      const outcomeAt = isWinner ? climbDuration : climbDuration + verdictHold;
+
       // Freeze the badge at the pre-reveal score immediately. The store update that
       // fires when televote is given causes a React re-render (badge shows final total)
       // before this callback runs. Overwriting here ensures the user sees the correct
-      // starting value during the 0.5 s fill delay, with no backwards jump when GSAP starts.
+      // starting value during the fill delay, with no backwards jump when GSAP starts.
       if (lastBadgePointsRef.current) {
         lastBadgePointsRef.current.textContent = String(initialLastPts);
       }
 
-      const speed = finalRevealAnimationSpeedRef.current;
-      const isLinear = finalRevealLinearAnimationRef.current;
-      const phaseADuration = 9 / speed;
-      const phaseBDuration = isWinner ? 0.9 / speed : 0;
+      // Phase 2a: one cursor drives the fill, the badge, the count and the
+      // "Needs X" countdown from the same value, so they can't drift apart.
+      const setFillHeight = fillBarRef.current
+        ? gsap.quickSetter(fillBarRef.current, 'height', '%')
+        : null;
+      const setBadgeBottom = lastBadgeRef.current
+        ? gsap.quickSetter(lastBadgeRef.current, 'bottom', '%')
+        : null;
+      let shownGained = -1;
+      const renderClimb = (value: number) => {
+        const fillPct = value * MARK_PCT;
 
-      // --- Segment plan: equal thirds when linear, fully randomised otherwise
-      const countEndA = isWinner ? leaderPts : finalLastPts;
-      const targetNeeds = Math.max(0, pointsNeeded - receivedPoints);
-
-      type SegmentPlan = {
-        duration: number;
-        fillEnd: number;
-        countEnd: number;
-        needsEnd: number;
-        ease: string;
-      };
-
-      let segments: SegmentPlan[];
-
-      if (isLinear) {
-        const dur = phaseADuration / 3;
-
-        segments = [1 / 3, 2 / 3, 1].map((ratio) => ({
-          duration: dur,
-          fillEnd: cappedFillPct * ratio,
-          countEnd: initialLastPts + (countEndA - initialLastPts) * ratio,
-          needsEnd: pointsNeeded - (pointsNeeded - targetNeeds) * ratio,
-          ease: 'none',
-        }));
-      } else {
-        const EASING_POOL = [
-          'power1.in',
-          'power1.out',
-          'power1.inOut',
-          'power2.in',
-          'power2.out',
-          'power2.inOut',
-          'power3.in',
-          'power3.out',
-          'power3.inOut',
-          'power4.in',
-          'power4.out',
-          'expo.in',
-          'expo.out',
-          'sine.in',
-          'sine.out',
-          'sine.inOut',
-          'circ.out',
-          'none',
-        ];
-        const SEG_COUNT_WEIGHTS = [2, 3, 3, 4, 4, 5];
-        const segCount =
-          SEG_COUNT_WEIGHTS[
-            Math.floor(Math.random() * SEG_COUNT_WEIGHTS.length)
-          ]!;
-
-        // Durations: random values normalised to phaseADuration, with 8% minimum floor
-        const rawDurs = Array.from(
-          { length: segCount },
-          () => 0.2 + Math.random() * 0.8,
+        setFillHeight?.(fillPct);
+        // The badge starts a little above the empty bar and joins the fill's
+        // top over the first fifth of the climb.
+        setBadgeBottom?.(
+          fillPct + BADGE_REST_PCT * Math.max(0, 1 - value / 0.2),
         );
-        const rawTotal = rawDurs.reduce((s, v) => s + v, 0);
-        const minDur = phaseADuration * 0.08;
-        const floored = rawDurs.map((d) =>
-          Math.max((d / rawTotal) * phaseADuration, minDur),
-        );
-        const floeredTotal = floored.reduce((s, v) => s + v, 0);
-        const finalDurations = floored.map(
-          (d) => (d / floeredTotal) * phaseADuration,
+        closenessRef.current = value;
+
+        // Whole points only: the count passes the leader exactly at the mark.
+        const gained = Math.min(
+          pointsNeeded,
+          Math.floor(value * pointsNeeded + 1e-6),
         );
 
-        // Waypoints: segCount-1 random ratios sorted ascending, then append 1.0
-        const midRatios = Array.from({ length: segCount - 1 }, () =>
-          Math.random(),
-        ).sort((a, b) => a - b);
-        const ratios = [...midRatios, 1.0];
-
-        segments = ratios.map((ratio, i) => ({
-          duration: finalDurations[i]!,
-          fillEnd: cappedFillPct * ratio,
-          countEnd: initialLastPts + (countEndA - initialLastPts) * ratio,
-          needsEnd: pointsNeeded - (pointsNeeded - targetNeeds) * ratio,
-          ease:
-            EASING_POOL[Math.floor(Math.random() * EASING_POOL.length)] ??
-            'none',
-        }));
-      }
-
-      const countObjA = { value: initialLastPts };
-      const updateCountA = () => {
+        if (gained === shownGained) return;
+        shownGained = gained;
         if (lastBadgePointsRef.current) {
           lastBadgePointsRef.current.textContent = String(
-            Math.round(countObjA.value),
+            initialLastPts + gained,
           );
         }
-      };
-
-      const needsCountObj = { value: pointsNeeded };
-      const updateNeedsCount = () => {
-        closenessRef.current =
-          1 - needsCountObj.value / Math.max(1, pointsNeeded);
         if (needsCountdownRef.current) {
-          needsCountdownRef.current.textContent = String(
-            Math.round(needsCountObj.value),
-          );
+          needsCountdownRef.current.textContent = String(pointsNeeded - gained);
         }
       };
+      const cursor = { t: 0 };
 
       const fillDelay = 1;
 
-      // Swap label 300 ms after phase 2a finishes (accounting for fill delay)
-      setTimeout(() => {
-        setReceivedLabelPtsRef.current(receivedPoints);
-      }, (phaseADuration + fillDelay) * 1000 + 300);
+      revealTimelineRef.current?.kill();
 
       const tl = gsap.timeline({
         delay: fillDelay,
@@ -267,64 +218,45 @@ export const useRevealAnimation = ({
         },
       });
 
-      // Phase 2a — fill + badge + count-up + needs-countdown, N randomised segments
-      for (const seg of segments) {
-        tl.to(fillBarRef.current, {
-          height: `${seg.fillEnd}%`,
-          duration: seg.duration,
-          ease: seg.ease,
-        })
+      revealTimelineRef.current = tl;
+
+      if (climbDuration > 0) {
+        tl.to(cursor, {
+          t: climbDuration,
+          duration: climbDuration,
+          ease: 'none',
+          onUpdate: () => renderClimb(evaluateRevealPath(path, cursor.t).value),
+        });
+      }
+
+      // The moment the result is certain: the crossing for a winner; for a
+      // loser, the end of a still hold longer than any beat, as until then
+      // the stop could have been a pause.
+      tl.addLabel('revealOutcome', outcomeAt);
+
+      if (!isWinner) {
+        tl.call(
+          () => setReceivedLabelPtsRef.current(receivedPoints),
+          undefined,
+          'revealOutcome',
+        )
+          // Leader holds on — gold flash on the leader badge
           .to(
-            lastBadgeRef.current,
-            {
-              bottom: `${seg.fillEnd}%`,
-              duration: seg.duration,
-              ease: seg.ease,
-            },
-            '<',
+            leaderBadgeGoldOverlayRef.current,
+            { opacity: 1, duration: 0.35, ease: 'power2.out' },
+            `revealOutcome+=${LOSS_FLASH_DELAY}`,
           )
           .to(
-            countObjA,
-            {
-              value: seg.countEnd,
-              duration: seg.duration,
-              ease: seg.ease,
-              onUpdate: updateCountA,
-            },
-            '<',
-          )
-          .to(
-            needsCountObj,
-            {
-              value: seg.needsEnd,
-              duration: seg.duration,
-              ease: seg.ease,
-              onUpdate: updateNeedsCount,
-            },
+            leaderBadgePointsRef.current,
+            { color: '#000', duration: 0.25, ease: 'none' },
             '<',
           );
       }
 
-      // End of phase 2a, for the outcome's haptics (a label adds no time).
-      tl.addLabel('revealOutcome');
-
-      if (!isWinner) {
-        // Leader holds on — gold flash on the leader badge
-        tl.to(leaderBadgeGoldOverlayRef.current, {
-          opacity: 1,
-          duration: 0.35,
-          ease: 'power2.out',
-          delay: 1,
-        }).to(
-          leaderBadgePointsRef.current,
-          { color: '#000', duration: 0.25, ease: 'none' },
-          '<',
-        );
-      }
-
       if (isWinner) {
-        const newGradientPct = (leaderPts / finalLastPts) * 70;
-        const countObjB = { value: leaderPts };
+        const phaseBDuration = 0.9 / finalRevealAnimationSpeedRef.current;
+        const newGradientPct = (leaderPts / finalLastPts) * MARK_PCT;
+        const countObjB = { value: initialLastPts + pointsNeeded };
         const updateCountB = () => {
           if (lastBadgePointsRef.current) {
             lastBadgePointsRef.current.textContent = String(
@@ -333,15 +265,16 @@ export const useRevealAnimation = ({
           }
         };
 
-        // Label end of phase 2a so we can position the gold badge relative to it
-        tl.addLabel('phase2aEnd');
-
-        // Phase 2b — dramatic effects start immediately, no pause after phase 2a
-        tl.to(gradientBarRef.current, {
-          height: `${newGradientPct}%`,
-          duration: phaseBDuration,
-          ease: 'power3.in',
-        })
+        // Phase 2b — the surge starts as the fill crosses the mark
+        tl.to(
+          gradientBarRef.current,
+          {
+            height: `${newGradientPct}%`,
+            duration: phaseBDuration,
+            ease: 'power3.in',
+          },
+          'revealOutcome',
+        )
           .to(
             leaderBadgeRef.current,
             {
@@ -360,14 +293,26 @@ export const useRevealAnimation = ({
             },
             '<',
           )
-          .to(
+          .fromTo(
             fillBarRef.current,
-            { height: '82%', duration: 0.5, ease: 'power3.out' },
+            { height: `${MARK_PCT}%` },
+            {
+              height: '82%',
+              duration: 0.5,
+              ease: 'power3.out',
+              immediateRender: false,
+            },
             '<0.1',
           )
-          .to(
+          .fromTo(
             lastBadgeRef.current,
-            { bottom: '82%', duration: 0.5, ease: 'power3.out' },
+            { bottom: `${MARK_PCT}%` },
+            {
+              bottom: '82%',
+              duration: 0.5,
+              ease: 'power3.out',
+              immediateRender: false,
+            },
             '<',
           )
           .to(
@@ -380,11 +325,16 @@ export const useRevealAnimation = ({
             },
             '<',
           )
-          // Gold badge flash — 1 s after phase 2a ended, overlapping with the tail of phase 2b
+          .call(
+            () => setReceivedLabelPtsRef.current(receivedPoints),
+            undefined,
+            'revealOutcome+=0.3',
+          )
+          // Gold badge flash — 1 s after the crossing, overlapping the tail of phase 2b
           .to(
             lastBadgeGoldOverlayRef.current,
             { opacity: 1, duration: 0.35, ease: 'power2.out' },
-            'phase2aEnd+=1',
+            'revealOutcome+=1',
           )
           .to(
             lastBadgePointsRef.current,
@@ -394,9 +344,9 @@ export const useRevealAnimation = ({
       }
 
       // Haptics, placed at absolute positions inside the timeline so they
-      // never lengthen it: the heartbeat through phase 2a, then the outcome
-      // (crossing + surge, or the fill falling short) and, 1 s later, the
-      // gold flash on whoever won.
+      // never lengthen it: the heartbeat through the climb and any hold
+      // (a stop must not feel final before the verdict), then the outcome
+      // (crossing + surge, or falling short) and the gold flash on whoever won.
       heartbeatRef.current?.stop();
       closenessRef.current = 0;
       heartbeatRef.current = createHapticHeartbeat(() => closenessRef.current);
@@ -412,7 +362,7 @@ export const useRevealAnimation = ({
       tl.call(
         () => playHaptic({ id: isWinner ? 'revealWinnerFlash' : 'revealHold' }),
         undefined,
-        'revealOutcome+=1',
+        isWinner ? 'revealOutcome+=1' : `revealOutcome+=${LOSS_FLASH_DELAY}`,
       );
     },
     [pointsNeeded],
@@ -445,7 +395,7 @@ export const useRevealAnimation = ({
         xPercent: 70,
         x: 16,
         yPercent: 50,
-        bottom: '3.5%',
+        bottom: `${BADGE_REST_PCT}%`,
       });
       gsap.set(lastFlagRef.current, { scale: 0 });
       gsap.set(gradientBarRef.current, { height: 0 });
@@ -453,7 +403,7 @@ export const useRevealAnimation = ({
       gsap.set(markLineRef.current, {
         scaleX: 0,
         transformOrigin: 'left center',
-        bottom: '70%',
+        bottom: `${MARK_PCT}%`,
       });
 
       // Badge points are updated imperatively (GSAP onUpdate + triggerRevealAnimation)
@@ -527,7 +477,7 @@ export const useRevealAnimation = ({
         )
         .to(
           gradientBarRef.current,
-          { height: '70%', duration: 1.7, ease: 'power2.out' },
+          { height: `${MARK_PCT}%`, duration: 1.7, ease: 'power2.out' },
           initialDelay + 1.2,
         )
         .to(
@@ -585,7 +535,6 @@ export const useRevealAnimation = ({
     leaderCountry,
     lastCountry,
     receivedLabelPts,
-    revealDoneRef,
     containerRef,
     gradientBarRef,
     fillBarRef,
