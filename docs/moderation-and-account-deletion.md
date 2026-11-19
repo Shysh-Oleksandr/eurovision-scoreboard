@@ -90,13 +90,16 @@ or Apple ID. A ban list would need a new collection checked by
   `useBlockActions()` handles the confirmation (`block-user`, never "don't
   show again") and the toasts. Users block from the "…" on a profile
   header, or with "Also block" when reporting. They unblock from the same
-  menu, from the blocked-profile panel in `UserProfileModal`, or from Edit
-  profile → Blocked users (`BlockedUsersModal`). `FollowButton` hides
+  menu, from the blocked-profile panel in `UserProfileModal`, or from
+  Profile → Account → Blocked users (`BlockedUsersModal`). `FollowButton` hides
   itself for blocked users.
 
 ## 4. Account deletion
 
-Users delete their account from Edit profile → Account → Delete account.
+Users delete their account from Profile → Account → Delete account (the
+Profile modal's Account button opens `AccountModal`; until 2026-11-19 this
+lived at the bottom of Edit profile). The button is a quiet text button with
+red text; the danger dialog carries the warning.
 The confirmation key is `delete-account`. The app calls
 `useAuthStore.deleteAccount()`, which sends `DELETE /account`, clears the
 Keychain or Keystore token and Google session in the apps, and runs the

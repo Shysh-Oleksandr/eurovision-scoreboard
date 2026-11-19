@@ -86,3 +86,32 @@ export const markContestSetupClean = (): void => {
     loadedContestFingerprint: computeCurrentSetupFingerprint(),
   });
 };
+
+/**
+ * After a details-only save of the loaded contest (name, year, host,
+ * description; no snapshot): move those fields of the saved baseline to their
+ * new values, so "Unsaved changes" keeps tracking the setup edits that were
+ * not saved, and only those.
+ */
+export const rebaseLoadedContestGeneralInfo = (
+  generalInfo: Partial<ContestSetupFingerprintInput['generalInfo']>,
+): void => {
+  const { loadedContestFingerprint } = useGeneralStore.getState();
+
+  if (!loadedContestFingerprint) return;
+
+  try {
+    const baseline = JSON.parse(loadedContestFingerprint) as {
+      generalInfo?: Record<string, unknown>;
+    };
+
+    useGeneralStore.setState({
+      loadedContestFingerprint: stableStringify({
+        ...baseline,
+        generalInfo: { ...baseline.generalInfo, ...generalInfo },
+      }),
+    });
+  } catch {
+    // Not a fingerprint this version wrote: leave it, the next save resets it.
+  }
+};

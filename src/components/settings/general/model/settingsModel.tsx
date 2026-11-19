@@ -10,6 +10,7 @@ import {
 import React from 'react';
 
 import { AppStoresItem } from '../custom/AppStoresItem';
+import { ConfettiPreviewItem } from '../custom/ConfettiPreviewItem';
 import { ConfirmationsListItem } from '../custom/ConfirmationsListItem';
 import { DangerResetItem } from '../custom/DangerResetItem';
 import { HapticsLabLink } from '../custom/HapticsLabLink';
@@ -23,7 +24,13 @@ import { PointsBlock } from '../custom/PointsBlock';
 
 import { Category } from './types';
 
+import {
+  CONFETTI_AMOUNT_RANGE,
+  CONFETTI_DURATION_RANGE,
+  CONFETTI_SPEED_RANGE,
+} from '@/components/effects/confetti/confettiPlan';
 import { APP_STORES_LIVE } from '@/config/appStores';
+import { DISPLAY_SIZES } from '@/native/displaySize';
 import { getInterfaceFontSelectOptions } from '@/theme/fontAliases';
 
 /**
@@ -222,6 +229,20 @@ export const CATEGORIES: Category[] = [
         render: ({ query }) => <AppStoresItem query={query} />,
       },
       {
+        // Apps only, per device (not in SYNCED_SETTINGS_KEYS):
+        // src/native/displaySize.ts.
+        kind: 'segmented',
+        id: 'displaySize',
+        settingKey: 'displaySize',
+        labelKey: 'settings.ui.displaySize',
+        descKey: 'settings.general2.tip.displaySize',
+        when: (env) => env.displaySizeSupported,
+        options: DISPLAY_SIZES.map((size) => ({
+          value: size,
+          label: `${size}%`,
+        })),
+      },
+      {
         kind: 'subhead',
         id: 'sh-flags',
         labelKey: 'settings.general2.subhead.flagsRankings',
@@ -360,6 +381,69 @@ export const CATEGORIES: Category[] = [
         id: 'showWinnerConfetti',
         settingKey: 'showWinnerConfetti',
         labelKey: 'settings.ui.showWinnerConfetti',
+        children: [
+          {
+            kind: 'slider',
+            id: 'winnerConfettiAmount',
+            settingKey: 'winnerConfettiAmount',
+            ...CONFETTI_AMOUNT_RANGE,
+            step: 1,
+            displayValue: false,
+            labelKey: 'settings.ui.winnerConfettiAmount',
+            minLabelKey: 'settings.ui.low',
+            maxLabelKey: 'settings.ui.high',
+          },
+          {
+            kind: 'slider',
+            id: 'winnerConfettiDuration',
+            settingKey: 'winnerConfettiDuration',
+            ...CONFETTI_DURATION_RANGE,
+            step: 1,
+            labelKey: 'settings.ui.winnerConfettiDuration',
+            valueKey: 'settings.ui.secondsValue',
+          },
+          {
+            kind: 'slider',
+            id: 'winnerConfettiSpeed',
+            settingKey: 'winnerConfettiSpeed',
+            ...CONFETTI_SPEED_RANGE,
+            step: 1,
+            displayValue: false,
+            labelKey: 'settings.ui.winnerConfettiSpeed',
+            minLabelKey: 'settings.ui.slow',
+            maxLabelKey: 'settings.ui.fast',
+          },
+          {
+            kind: 'segmented',
+            id: 'winnerConfettiColors',
+            settingKey: 'winnerConfettiColors',
+            labelKey: 'settings.ui.winnerConfettiColors',
+            tipKey: 'settings.general2.tip.confettiColors',
+            options: [
+              {
+                value: 'rainbow',
+                labelKey: 'settings.ui.winnerConfettiColorsRainbow',
+              },
+              {
+                value: 'theme',
+                labelKey: 'settings.ui.winnerConfettiColorsTheme',
+              },
+              {
+                value: 'flag',
+                labelKey: 'settings.ui.winnerConfettiColorsFlag',
+              },
+            ],
+          },
+          {
+            kind: 'custom',
+            id: 'winnerConfettiPreview',
+            searchTextKeys: [
+              'settings.ui.winnerConfettiPreview',
+              'settings.ui.showWinnerConfetti',
+            ],
+            render: () => <ConfettiPreviewItem />,
+          },
+        ],
       },
       {
         kind: 'switch',

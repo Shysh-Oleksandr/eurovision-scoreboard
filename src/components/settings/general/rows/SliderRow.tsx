@@ -15,10 +15,16 @@ export const SliderRow: React.FC<SliderRowProps> = ({ item }) => {
   const value = useGeneralStore((s) => s.settings[item.settingKey]) as number;
   const setSettings = useGeneralStore((s) => s.setSettings);
 
+  const { valueKey } = item;
+  const formatValue = valueKey
+    ? (next: number) => t(valueKey, { value: next })
+    : undefined;
   const minLabel =
-    item.minLabel ?? (item.minLabelKey ? t(item.minLabelKey) : undefined);
+    item.minLabel ??
+    (item.minLabelKey ? t(item.minLabelKey) : formatValue?.(item.min));
   const maxLabel =
-    item.maxLabel ?? (item.maxLabelKey ? t(item.maxLabelKey) : undefined);
+    item.maxLabel ??
+    (item.maxLabelKey ? t(item.maxLabelKey) : formatValue?.(item.max));
 
   return (
     <div className="px-3 py-2">
@@ -33,6 +39,7 @@ export const SliderRow: React.FC<SliderRowProps> = ({ item }) => {
         max={item.max}
         step={item.step}
         displayValue={item.displayValue}
+        formatValue={formatValue}
         minLabel={minLabel}
         maxLabel={maxLabel}
       />

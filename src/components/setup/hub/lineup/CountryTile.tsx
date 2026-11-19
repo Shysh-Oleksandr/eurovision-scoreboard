@@ -93,7 +93,7 @@ export const TileFlag: React.FC<{
 };
 
 /** A stage tile's flag: the theme's scoreboard flag, sized like the board's. */
-const BoardFlag: React.FC<{
+export const BoardFlag: React.FC<{
   country: BaseCountry;
   look: BoardRowLook;
   eager?: boolean;
@@ -114,6 +114,38 @@ const BoardFlag: React.FC<{
       className={`flex-none object-cover bg-countryItem-juryBg ${flagClassName}`}
       onError={(e) => handleFlagError(e.currentTarget, country, look.flagShape)}
     />
+  );
+};
+
+/**
+ * A board row's points box in the theme's shape: the board's rounded wedge
+ * in front of it for triangle themes (room kept by the margin).
+ */
+export const BoardCap: React.FC<{
+  look: BoardRowLook;
+  children?: React.ReactNode;
+}> = ({ look, children }) => {
+  const wedge = look.pointsShape === 'triangle' && !look.rounded;
+
+  return (
+    <span
+      className={`${
+        BOARD_CAP_CLASS[look.pointsShape]
+      } relative bg-countryItem-juryPointsBg text-countryItem-juryPointsText ${
+        look.rounded ? 'rounded-r-full' : ''
+      } ${
+        wedge ? 'ml-[8px]' : ''
+      } self-stretch w-[28px] md:w-[32px] lg:w-[34px] flex-none grid place-items-center`}
+      aria-hidden="true"
+    >
+      {wedge && (
+        <RoundedTriangle
+          className="text-countryItem-juryPointsBg !z-[1]"
+          withTransition={false}
+        />
+      )}
+      {children}
+    </span>
   );
 };
 
@@ -140,8 +172,6 @@ const CountryTile: React.FC<CountryTileProps> = ({
     (state) => !!state.flash && state.flash.codes.includes(country.code),
   );
   const { openTileMenu } = useLineupActions();
-  const wedge =
-    !!boardRow && boardRow.pointsShape === 'triangle' && !boardRow.rounded;
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -196,24 +226,8 @@ const CountryTile: React.FC<CountryTileProps> = ({
           <Pin className="size-3.5 flex-none opacity-70" aria-hidden="true" />
         )}
         {/* The points box holds the menu chevron, or the checkbox while
-            selecting; the triangle is the board's rounded wedge in front of it
-            (room kept by the margin). */}
-        <span
-          className={`${
-            BOARD_CAP_CLASS[boardRow.pointsShape]
-          } relative bg-countryItem-juryPointsBg text-countryItem-juryPointsText ${
-            boardRow.rounded ? 'rounded-r-full' : ''
-          } ${
-            wedge ? 'ml-[8px]' : ''
-          } self-stretch w-[28px] md:w-[32px] lg:w-[34px] flex-none grid place-items-center`}
-          aria-hidden="true"
-        >
-          {wedge && (
-            <RoundedTriangle
-              className="text-countryItem-juryPointsBg !z-[1]"
-              withTransition={false}
-            />
-          )}
+            selecting. */}
+        <BoardCap look={boardRow}>
           {selectionMode ? (
             <span className="dp-board-check w-[17px] h-[17px] rounded-[5px] grid place-items-center">
               {isSelected && <Check className="size-3" strokeWidth={3} />}
@@ -221,7 +235,7 @@ const CountryTile: React.FC<CountryTileProps> = ({
           ) : (
             <ChevronDown className="size-[15px]" />
           )}
-        </span>
+        </BoardCap>
       </button>
     );
   }

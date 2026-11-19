@@ -33,7 +33,7 @@ Drag-and-drop only works on **Detailed**; dropping on other tabs is ignored. Acc
 
 | Location | Import | Export |
 |----------|--------|--------|
-| **Breakdown** tab header (`StatsHeader`) | — | Yes |
+| **Breakdown** tab, controls row (`FinalStatsModal`) | — | Yes (website only) |
 
 Export uses saved `predefinedVotes` for the selected finished stage. There is no import path from Final Stats.
 
@@ -218,8 +218,7 @@ Export fails with `export-unavailable` if there are no sections to write (edge c
 | `src/components/setup/voting-predefinition/VotingPredefinitionModal.tsx` | Drag-and-drop, toasts, button wiring |
 | `src/components/setup/voting-predefinition/VotingPredefinitionHeader.tsx` | Toolbar layout (`endContent` for buttons) |
 | `src/state/scoreboard/votesPredefinition.ts` | `buildCombinedBallotsFromJuryTelevote` for COMBINED import fallback |
-| `src/components/simulation/finalStats/FinalStatsModal.tsx` | Breakdown export only |
-| `src/components/simulation/finalStats/StatsHeader.tsx` | Export button on Breakdown tab |
+| `src/components/simulation/finalStats/FinalStatsModal.tsx` | Breakdown export only (button in the controls row) |
 
 ### Tests
 

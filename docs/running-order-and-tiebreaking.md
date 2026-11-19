@@ -79,8 +79,9 @@ The final stats modal has multiple sorts:
 
 Additional sorts inside tables were updated to match Eurovision-style expectations:
 
-- `SummaryStats.tsx`: jury/televote placement tie-break uses running order (fallback to name)
-- `SplitStats.tsx`:
+- `statsRankings.ts` (`buildStageRankings`, the modal's Summary and Split views): total ties go to the **televote**, then running order (fallback to name); jury/televote rankings use running order for ties (fallback to name). Independent of the Breakdown's Total / Jury / Televote switch.
+- `SummaryStats.tsx` (share image): jury/televote placement tie-break uses running order (fallback to name)
+- `SplitStats.tsx` (share image):
   - “Total” column breaks total ties by **televote**, then running order (fallback to name)
   - jury/televote columns use running order for ties (fallback to name)
 

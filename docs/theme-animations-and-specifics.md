@@ -12,7 +12,7 @@ Shared type in `src/theme/types.ts`:
   - `flagShape: FlagShape`
   - `pointsContainerShape: PointsContainerShape`
   - `boardAnimationMode: 'flip' | 'teleport'`
-  - `douzePointsAnimationMode: 'parallelograms' | 'heartsGrid'`
+  - `douzePointsAnimationMode: 'parallelograms' | 'heartsGrid' | 'year2022'` (`year2022` is spec-driven, §10)
   - `uppercaseEntryName: boolean`
   - `juryActivePointsUnderline: boolean`
   - `isJuryPointsPanelRounded: boolean`
@@ -129,10 +129,11 @@ Key consumers:
 
 ### 5. Douze Points animations
 
-Two variants, controlled by `ThemeSpecifics.douzePointsAnimationMode`:
+Three variants, controlled by `ThemeSpecifics.douzePointsAnimationMode`:
 
 - `'parallelograms'`: original overlay with moving parallelograms.
 - `'heartsGrid'`: hearts grid animation (default).
+- `'year2022'`: the 2022 broadcast animation, played from a spec (§10). `DouzePointsAnimation` renders nothing for spec modes; `DouzeRowOverlay` plays them instead.
 
 #### 5.1. Selection and rendering
 
@@ -333,3 +334,47 @@ This keeps the DB representation minimal, while allowing themes to move back and
 
 If you follow these patterns, adding new theme-specific visual behaviors (e.g. new Douze Points styles, additional board animations, or extra decorations) will integrate cleanly with both custom themes and default themes.
 
+
+---
+
+### 10. Spec-driven douze animations (`src/douze/`)
+
+Year animations recreated from broadcast footage are data, not components: a `DouzeAnimationSpec` (`model.ts`) is a list of layers placed against the row's parts, each with keyframes on one shared clock. The format is meant to be what a remix form, and later an editor, edits. The first one is `specs/year2022.ts` (the 2022 theme's default).
+
+**Anchors.** Layers are placed against `data-douze-anchor` parts: `row` (the main container in `CountryItemBase`), `flag`, `name` (`CountryItem`, `ThemePreviewCountryItemUI`), `lastPoints` and `total` (`PointsSection`, both layouts). Boxes are shares of the anchor's box plus lengths in row heights (`…Rh`), so one spec fits every breakpoint, the two-column board and the zoomed column layout. Anchors are measured with layout offsets (`anchors.ts`), which ignore transforms and the board's CSS zoom. Keep these attributes on any new row variant that should play spec animations.
+
+**Keyframes.** Each property is its own track: a keyframe that leaves a property out gets it interpolated in time between the nearest keyframes that set it, and before the first / after the last it holds (`fillKeyframes`). So give every layer an explicit `opacity` where it should start hidden, or it holds its first defined value back to t = 0. `x` is a move in row widths or a placement against a part (`{ on, at, align, offset }`: the layer's `align` edge on the part's `at` edge, plus row widths). Placements are resolved to distances first, so one track can mix them with numbers and still interpolate. Example: the 2022 beam's path ends "tip on the 12 box", wherever the theme puts it.
+
+**Layers.**
+- `rect`: a CSS background and shadow.
+- `effect`: SVG generated at the layer's size in `effects.ts` (torn bar, arc, ring, star, rays, strands, spear-shaped beam, cross lines). Seeded, so deterministic.
+- `clone`: a copy of a row part taken at the start. `hideSource` hides the real part until the end, which is how the 2022 12 box slides in. `glitch` tears it with an SVG displacement filter.
+- `canvas`: drawn every frame by a painter in `painters.ts` from the shared clock, for effects whose shape changes over time. `waveFlow` is the 2022 mesh: a lattice of waves flowing right at a set speed, pinched through a point that rides the beam and then sits on the 12 box. Its `pinch` and window come from keyframes (linear), and lines are erased softly around the pinch so they vanish into whatever white covers it. It is drawn at the zoomed size in the column layout.
+
+**Layer options.**
+- `clipTo: 'row'` clips a layer to the row in its shape: the clip wrapper takes the row's computed `border-radius`, so on rounded themes (the 2026 pill rows) nothing shows square corners past the pill's ends. Everything that sits inside the row is clipped: flag glitch copies, sweeps, waves, spear, wash, flash. Only soft glows (bloom, star, rays, spear glow) reach outside it. A `rect` with `radius: 'anchor'` takes its anchor's radius, so the halo is a pill on pill rows.
+- With `clipTo`, `windowLeft` / `windowRight` keyframes animate a clip window that stays put while the layer moves through it. The 2022 waves flow under an edge that sweeps after them.
+- `filter` is a static CSS filter. `brightness(0) invert(1)` on a clone gives a white silhouette in the part's own shape.
+- `cutBy` (with `clipTo`) cuts out of the layer whatever those row parts draw over the copied part (`buildCutMask`: each part's own box when it paints a background, with its corner radii, plus the filled shapes of its SVGs). The mask is measured on screen, divided by the board's zoom, and set on the static clip wrapper. Without it the 2022 12 box copies come out square: on the board the total's curved edge (its `RoundedTriangle`) covers the box's right end. With it, the box slides out from under the total and the white flash keeps both curved edges, whatever box shape the theme uses.
+- `blend` sets mix-blend-mode.
+- `heavy` layers are left out on low-performance and reduced-motion devices (`useIsLowPerfDevice`).
+
+Colours go through `var(--douze-<key>)`. With `flagPalette: true` (the 2022 spec), `c1`, `c2`, `c3` and `glow` come from the row's flag (`flagPalette.ts`), as in the broadcast: bar = first colour, second sweep = second, ring = third, and a two-colour flag reuses the first.
+- The flag image on the row is sampled at 96×64. Blends on stripe edges are dropped, and saturated colours count from 3 % of the flag (Korea's red and blue), whites and greys from 7 %.
+- Order: colours in reading order (top to bottom, then left to right), then neutrals, lightest first. So Serbia is red, blue, white, and Germany is red, gold, then black.
+- Very dark colours are lifted. Results are cached per image.
+- A flag the canvas can't read (another origin without CORS) keeps the spec's `palette`, and a flag still loading is read once it loads.
+
+**Player.** `DouzeSpecPlayer` renders an empty layer at the top-left of its positioned parent, next to the row rather than inside it: the row container clips, and the rays and halo reach past it. Every layer runs one Web Animation over the whole duration (`timeline.ts`). Canvas painters read that animation's `currentTime` on each frame. So `heldAtMs` freezes everything at any moment. Only transform, opacity and clip-path animate. Copies of row parts drop GSAP's in-flight inline styles (`cloneRowPart`), or the 12's label would be copied at opacity 0.
+
+**Motion.** Broadcast animations of this kind never stop moving until they end. In the 2022 one, the waves keep flowing right and drain into the 12 box while their trailing edge sweeps after them, and the wash arrives from the left. Holding a layer in place and fading it out reads as a slow-down. When rebuilding a year, check the second half in the lab at 50 ms steps (strip step, from, to).
+
+**Every 12 plays.** `useDouzePointsAnimation` returns a `runId` that grows with each new 12, and `CountryItem` / `ThemePreviewCountryItemUI` key the overlay (and the hearts) by it. A new 12 is the flag going up, or the country's total changing while the flag is still up: a whole jury vote given at once can set the flag again before it was cleared. Without the key, a country given 12 again before its previous overlay unmounted kept the finished one and showed nothing.
+
+**Board timing.** A spec with `reorder: 'after'` plays where the row is and the row climbs afterwards: `useDouzePointsAnimation` doesn't wait for the teleport, and `useBoardAnimations` waits `getDouzeMoveDelayMs` (duration + 150 ms) instead of 1000 ms before moving. Sound and the `douzeBloom` haptic fire when `DouzeRowOverlay` mounts.
+
+**Custom themes.** Any custom theme can pick a spec mode: the editor lists "Sound waves (ESC 2022)" next to the hearts and parallelograms, and the backend accepts it (`THEME_DOUZE_POINTS_ANIMATION_MODES` in `douze-points-backend/src/themes/theme-douze-modes.ts`, kept in sync with `DOUZE_POINTS_ANIMATION_MODES`). Spec modes colour themselves from each flag, so Colours hides the douze category for them. A theme saved with a mode an older app bundle doesn't know falls back to the hearts there (`sanitizeThemeSpecifics` drops unknown modes). Adding a mode means adding it in both lists, and deploying the backend first.
+
+**Dev lab.** `/dev/douze-lab` (dev builds only) plays a spec on a themed preview row, holds it at any moment (slider, ±1 frame), lays out a timeline of held frames and plays a local reference video next to it at the same time. To compare with footage, pull frames with ffmpeg at the same times and set the clips side by side.
+
+**Adding a year.** Read its broadcast clip frame by frame (two or three 12s, ideally different name lengths), write the spec in `specs/`, register it in `registry.ts`, add the mode to `DouzePointsAnimationMode` and `DOUZE_POINTS_ANIMATION_MODES`, set it in the year's `themeSpecifics`, add the label in every `messages/*.json` and the option in `CustomizeThemeModal`, and add the mode to the backend's `THEME_DOUZE_POINTS_ANIMATION_MODES` (deploy that first).

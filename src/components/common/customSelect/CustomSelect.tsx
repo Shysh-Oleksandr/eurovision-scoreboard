@@ -63,6 +63,17 @@ type CustomSelectProps = {
   caption?: React.ReactNode;
   /** `combo` only: the trigger's text for the selected option (default: its label). */
   getDisplayLabel?: (option: Option) => string;
+  /**
+   * `combo` with a `caption` hides its chevron on phones (the setup header is
+   * tight); form fields that have the room keep it.
+   */
+  chevronOnPhone?: boolean;
+  /**
+   * The field's name for assistive tech when no visible `label` is rendered
+   * (a `combo` names itself with its caption on desktop; the native select
+   * on touch devices needs this).
+   */
+  ariaLabel?: string;
 };
 
 const COMBO_TRIGGER_CLASSES =
@@ -84,6 +95,7 @@ const SelectDisplay: React.FC<{
   variant?: 'default' | 'combo';
   caption?: React.ReactNode;
   getDisplayLabel?: (option: Option) => string;
+  chevronOnPhone?: boolean;
 }> = ({
   value,
   options,
@@ -94,6 +106,7 @@ const SelectDisplay: React.FC<{
   variant = 'default',
   caption,
   getDisplayLabel,
+  chevronOnPhone = false,
 }) => {
   const selectedOption = options.find((option) => option.value === value);
 
@@ -105,7 +118,8 @@ const SelectDisplay: React.FC<{
             <img
               loading="lazy"
               src={selectedOption.imageUrl}
-              alt={selectedOption.label}
+              // The option's name follows as text.
+              alt=""
               className={`w-6 h-6 flex-none object-cover ${
                 getImageClassName?.(selectedOption, 'display') ?? ''
               }`}
@@ -140,7 +154,7 @@ const SelectDisplay: React.FC<{
         )}
         <ChevronDown
           className={`ml-auto size-4 flex-none text-white/40 ${
-            caption ? 'hidden 2cols:block' : ''
+            caption && !chevronOnPhone ? 'hidden 2cols:block' : ''
           }`}
         />
       </div>
@@ -189,12 +203,18 @@ const SelectDisplay: React.FC<{
 const SelectLabel: React.FC<{
   label?: string;
   id?: string;
+  /** Only the touch branch renders an element with `id` to point at. */
+  forTouchSelect?: boolean;
   className?: string;
-}> = ({ label, id, className }) => {
+}> = ({ label, id, forTouchSelect, className }) => {
   if (!label) return null;
 
   return (
-    <label htmlFor={id} className={`text-xs text-white ${className}`}>
+    <label
+      id={id ? `${id}-label` : undefined}
+      htmlFor={forTouchSelect ? id : undefined}
+      className={`text-xs text-white ${className}`}
+    >
       {label}
     </label>
   );
@@ -230,6 +250,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   variant = 'default',
   caption,
   getDisplayLabel,
+  chevronOnPhone,
+  ariaLabel,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const isCombo = variant === 'combo';
@@ -492,12 +514,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           variant={variant}
           caption={caption}
           getDisplayLabel={getDisplayLabel}
+          chevronOnPhone={chevronOnPhone}
         />
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="absolute top-0 left-0 w-full h-full opacity-0"
-          aria-label={label}
+          aria-label={ariaLabel ?? label}
           id={id}
         >
           {groups
@@ -548,7 +571,21 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         className="relative"
         role="button"
         tabIndex={0}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        // Named by the label above plus its own text (the selected option).
+        id={id && label ? `${id}-trigger` : undefined}
+        aria-labelledby={id && label ? `${id}-label ${id}-trigger` : undefined}
         onKeyDown={(e) => {
+          // Esc closes the list, not the dialog around it.
+          if (e.key === 'Escape' && isOpen) {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsOpen(false);
+            selectRef.current?.focus();
+
+            return;
+          }
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             setIsOpen((prev) => !prev);
@@ -598,6 +635,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             variant={variant}
             caption={caption}
             getDisplayLabel={getDisplayLabel}
+            chevronOnPhone={chevronOnPhone}
           />
         )}
         {isOpen &&
@@ -636,7 +674,12 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   return (
     <div className="flex flex-col">
-      <SelectLabel label={label} id={id} className={labelClassName} />
+      <SelectLabel
+        label={label}
+        id={id}
+        forTouchSelect={isTouchDevice}
+        className={labelClassName}
+      />
       {isTouchDevice ? renderTouchSelect() : renderDesktopSelect()}
     </div>
   );

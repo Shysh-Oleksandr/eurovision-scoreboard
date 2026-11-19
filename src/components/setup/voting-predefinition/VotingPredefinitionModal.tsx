@@ -1081,6 +1081,7 @@ const VotingPredefinitionModal = ({
               countriesOverride={sharePodiumCountries}
               titleOverride={shareTitleOverride}
               subtitleOverride={shareSubtitleOverride}
+              stageName={stage.name}
             />
             {shareStatsOpen && (
               <ShareStatsModal
@@ -1088,6 +1089,13 @@ const VotingPredefinitionModal = ({
                 onClose={() => setShareStatsOpen(null)}
                 onLoaded={() => {}}
                 activeTab={shareStatsOpen}
+                // The same tables as the share menu: no breakdown without votes.
+                tableOptions={[
+                  StatsTableType.SPLIT,
+                  StatsTableType.SUMMARY,
+                  ...(hasAnyVotes ? [StatsTableType.BREAKDOWN] : []),
+                ]}
+                onTableChange={setShareStatsOpen}
                 rankedCountries={shareRankedCountries}
                 selectedStageId={stage.id}
                 selectedVoteType="Total"

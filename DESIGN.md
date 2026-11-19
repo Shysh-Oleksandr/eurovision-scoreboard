@@ -179,7 +179,8 @@ section, and never a glow: no coloured drop shadows behind buttons or cards.
 `countryItem` jury colours (`bg-countryItem-juryBg`,
 `text-countryItem-juryCountryText`, `juryPointsBg`, place badge colours) and
 `getSpecialBackgroundStyle` for gradients. They are the only place the
-board's palette appears outside the board.
+board's palette appears outside the board, together with the custom entry
+editor's preview, which is a board row too.
 
 ## Typography
 
@@ -352,6 +353,69 @@ a press scales it to 0.985, focus shows a 2px accent outline. `surface` /
 `md` with `!h-[38px]` in toolbars. Toggles show state with `.is-on` (accent
 border and ring).
 
+Rare or destructive actions next to a surface button are **quiet**
+(`surface` + `dp-act--quiet`: no fill until hovered), so a row of them
+doesn't read as a wall of equal buttons: Remove beside Change, Undo, Delete
+account. A permanent action adds `dp-act--danger` (red text only); its
+confirmation dialog carries the alarm, never a filled red button on the
+screen. A quiet button at a column's edge shifts by its padding so its label
+lines up with the text or buttons around it. Legacy `tertiary` /
+`destructive` (gradient, shadow, all caps) don't belong on redesigned
+screens.
+
+### Forms and account screens (`EditProfileModal`, `AccountModal`)
+
+- **One commit model per screen.** A screen with Save holds only what Save
+  saves; actions that apply at once (sign-in methods, blocking, log out,
+  deletion) live on a screen with Close only. Never mix the two under one
+  Save bar.
+- **Save waits for a change** (`saveButtonDisabled`), and Enter in a text
+  field saves.
+- **Every field says where its value shows** in a one-line hint under it
+  (`InputField` `hint`), with format rules before they're broken; an error
+  replaces the hint, in the user's language, under the field it's about.
+  A fixed prefix that's part of how the value is shown ("@" for the
+  username) sits inside the field (`prefix`).
+- **Staged changes say so:** a picked or removed picture shows "Removed
+  when you save" and an Undo until Save.
+- Avatars without a picture use the theme's placeholder (`.dp-profile-ph`),
+  not the grey silhouette image.
+- Screens redesigned in the hub's style add `dp-flat` to the modal content
+  so their surface buttons lose the drop shadow, as in the hub.
+
+### Custom entry editor (`CustomCountryModal`, `setup/custom-entry/`)
+
+**The entry is shown as the board will draw it.** On top, the entry as the
+active theme's jury row (`EntryRowPreview`: `useBoardRowLook`, `BoardFlag`,
+`BoardCap` from `CountryTile`), with 12 in the points box: one full row,
+no short-code version (the Short code field's hint says where the code
+shows). It updates as you type and pick, so the flag is checked in the
+theme's flag shape, not in a loose rectangle.
+
+- **One flag picker, not one control per source.** The group's label line
+  holds Upload image (a `surface` button; on desktop an image dropped
+  anywhere on the modal does the same). Under it one hint line: the upload
+  rules, a staged upload with Undo, or the error. Then the simulation's
+  segmented well (`ShareSegmented`: Your flags, Presets, Countries) over one
+  grid of 3:2 tiles (`.dp-flag-tile`), the chosen one ringed in the accent.
+  Countries and long lists of your own flags get a search field; lists show
+  20 tiles until "Show all". An image link is the rare path: a quiet "Use an
+  image link" opens the field. Uploaded and preset flags never show up as a
+  URL.
+- **The last flag chosen wins:** a tile, an upload or a typed link replaces
+  the others. A new entry starts on the World preset, ringed.
+- **Saving never loses data.** A staged upload goes up after the entry is
+  saved and replaces the flag only once it has arrived; if it fails, the
+  hint line says the entry was saved without it and Save retries on the same
+  entry. A link that doesn't load an image blocks Save with an error under
+  the field.
+- **Footer** (`EntryActionBar`): Delete entry is quiet red text, and when
+  creating, an "Add another" check (kept for the session) sits there instead:
+  Save then clears the form and keeps the group. The bar is fitted: one row,
+  then Delete as its icon, then the leading action on its own row.
+- Each custom-entry group's header has a + that opens a new entry in that
+  group.
+
 ### Menus (`AnchoredMenu`)
 
 No entrance animation (a fade reads as a slow click). Section headers in
@@ -446,6 +510,76 @@ by the theme and never restyled here, only sized.
   spelled-out "Leertaste" collides with the label in a narrow button. A hint never changes a fitted
   layout: buttons of 40px and less make room with right padding
   (docs/keyboard-shortcuts.md §3).
+
+### Stats modal (`simulation/finalStats/`, `.dp-stats-*`)
+
+**Tables that keep their labels.** A finished stage's stats in three views:
+Summary (the one it opens on), Split and Breakdown. One flat `--p-950`
+surface; the views are the modal's own components (`SummaryView`,
+`SplitView`, `BreakdownView`), and the share image keeps drawing its own
+tables (`SummaryStats`, `SplitStats`, `StatsTable`), so changing one never
+changes the other.
+
+- **Header:** the views as the simulation's segmented well (`dp-sim-seg`),
+  Share (`cta`) and × on the right from `2cols`. Phones move Close and Share
+  to a bottom bar under the thumb.
+- **Controls row** under it, fitted by `useFitStep`: the stage's name as a
+  title (a combo with a "Stage" caption and a menu once two stages have
+  finished), then the Total / Jury / Televote switch (Breakdown; Split below
+  720px, where it picks the one list shown) and the website's Export. The
+  switch takes its own row when they don't fit.
+- **Tables:** hairlines between rows only, no vertical rules; numbers
+  right-aligned in tabular figures; headers in sentence case at 12.5px 700
+  (70%). Each view scrolls in its own box, so the header row stays on top
+  and the first column (place, flag, name) stays on the left.
+- **Summary** draws each entry's total against the winner's as a 4px bar
+  under the name, split into jury (white at 45%) and televote (the accent);
+  the same two swatches mark the column headers. Each channel shows points,
+  then the place in ordinal form (stacked below 560px).
+- **Split** groups the three rankings by spacing (32px between groups), not
+  rules. Pointing at an entry lights it in every list, its name in the
+  accent tint.
+- **Breakdown** codes the voters (ALB, ARM…) under their flags; below 560px
+  the frozen column shows codes instead of names. Shading is white, growing
+  with the points (26% at the top value, curved so high values stand out);
+  the top value (a 12, or 24 for a jury and televote 12 in Total) is in the
+  accent tint. A country's own cell is a dim "–". Pointing at or tapping a
+  cell lights its row and column, outlines the cell in the accent and says
+  the vote in the line above the table ("Croatia gave Israel 16 points: jury
+  8, televote 8"); a ramp on that line's right reads the shading.
+
+### Share image modal (`simulation/share/`, `.dp-share-*`)
+
+**The picture is the screen.** Most people never change an option, so the
+modal opens on the finished image and Save image is the only filled button.
+The mechanics are in docs/graphics-studio.md §6.
+
+- **One picture slot**, in a dark well with a hairline: the exported image,
+  made when the modal opens, and the live stage in its place once an option
+  has changed it (every change shows at once). Save makes the file again only
+  if something changed (a 2px accent line runs along the picture's top edge
+  meanwhile). Never a preview and a second "result" copy, and never a
+  Generate button. A corner button opens the current image at full size.
+- **Options beside it, never in front of it.** From 1024px a 336px column
+  next to the picture (the spokesperson column's idea); the well keeps its
+  size when the format changes, the picture fits inside it. Below 1024px the
+  picture comes first, then the primary option (Format, or Table for stats)
+  and one Customize row (title + what it holds, a chevron). Customize unfolds
+  the rest in place and the picture stays pinned above it, smaller, so every
+  change is visible.
+- **Choices, not parameters.** Groups have a sentence-case label (13px 700 at
+  70%) with Auto, or a Reset link in the accent tint, on its right. Segmented
+  choices use the simulation's well (`dp-sim-seg`) and fall back to one per
+  row when a label doesn't fit (`useFitStep`); Format shows each shape as an
+  outline above its name. Text fields carry their name as a caption inside the
+  frame (16px values for iOS). On/off options are pressed buttons with a check
+  (`dp-share-toggle`); numbers are steppers. Pixel sizes and paddings belong
+  to the graphics editor, reached by the last row.
+- **The action bar replaces the Close bar**: Save image (`cta`), Share where
+  the device can share, Copy image on desktop browsers, all 46px. On desktop
+  the file's format and size sit on the left ("JPG, 2400 × 1260"). Save turns
+  into "Preparing…" while it waits for the image and into "Saved" with a check
+  for two seconds after. × in the header closes.
 
 ### Motion
 

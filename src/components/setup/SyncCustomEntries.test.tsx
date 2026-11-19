@@ -15,6 +15,7 @@ const ownEntries: CustomEntry[] = [
     name: 'Ohio (renamed)',
     flagUrl: 'https://cdn.douzepoints.app/custom-entries/flags/u/ohio.png',
     userId: 'u',
+    shortCode: 'OHI',
     createdAt: '2026-10-09T00:00:00.000Z',
     updatedAt: '2026-10-21T00:00:00.000Z',
   },
@@ -74,6 +75,9 @@ describe('SyncCustomEntries', () => {
       ['custom-own1', 'Ohio (renamed)', false],
       ['custom-theirs1', 'Utah', true],
     ]);
+    // The picked short code comes with the entry
+    expect(customCountries[0].shortCode).toBe('OHI');
+    expect(customCountries[1]).not.toHaveProperty('shortCode');
   });
 
   it('keeps the persisted entries while signed in without the list (offline)', () => {

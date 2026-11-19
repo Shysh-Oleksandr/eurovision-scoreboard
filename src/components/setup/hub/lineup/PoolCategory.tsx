@@ -25,6 +25,7 @@ import { SaveIcon } from '@/assets/icons/SaveIcon';
 import Button from '@/components/common/Button';
 import SignInButtons from '@/components/common/SignInButtons';
 import { useGetCategoryLabel } from '@/components/setup/hooks/useGetCategoryLabel';
+import { collapsibleRows } from '@/helpers/collapsibleRows';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -55,7 +56,11 @@ const ImportedNotice: React.FC<{ codes: string[]; isSignedIn: boolean }> = ({
         const entries = codes
           .map((code) => byCode.get(code))
           .filter((c): c is NonNullable<typeof c> => !!c)
-          .map((country) => ({ name: country.name, flagUrl: country.flag! }));
+          .map((country) => ({
+            name: country.name,
+            flagUrl: country.flag!,
+            ...(country.shortCode ? { shortCode: country.shortCode } : {}),
+          }));
 
         bulkCreateMutation.mutate(
           { entries },
@@ -231,7 +236,7 @@ const PoolCategory: React.FC<PoolCategoryProps> = ({
       </div>
       <div
         className="grid transition-[grid-template-rows] duration-300 ease-in-out"
-        style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
+        style={{ gridTemplateRows: collapsibleRows(expanded) }}
       >
         <div className="min-h-0 overflow-hidden">
           {hasBeenOpened && (

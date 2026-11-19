@@ -202,6 +202,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
     const currentBlock = (
       <div
         data-points-current=""
+        data-douze-anchor="total"
         className={`${roundedCurrentPointsBlockClass} relative z-[23] rounded-full rounded-l-none overflow-hidden transition-all !duration-500 ${pointsBgClass} ${
           isTransparent ? '!bg-transparent' : ''
         }`}
@@ -254,6 +255,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
               only job was hiding these blocks. */}
           <div
             ref={lastPointsContainerRef}
+            data-douze-anchor="lastPoints"
             className={`${roundedLastPointsBlockClass} relative z-[20] overflow-hidden rounded-r-full opacity-0 transition-colors !duration-500 justify-center ${lastColumnBg} ${
               resolvedLastReceivedActive ? '' : 'pointer-events-none'
             }`}
@@ -284,6 +286,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
       {showLastPoints && (
         <div
           ref={lastPointsContainerRef}
+          data-douze-anchor="lastPoints"
           className={`absolute z-10 h-full opacity-0 transition-colors !duration-500 ${
             withTriangle
               ? `pr-[0.5rem] lg:right-[2.4rem] lg:w-[2.5rem] ${
@@ -316,6 +319,7 @@ const PointsSection: React.FC<PointsSectionProps> = ({
 
       {/* Points */}
       <div
+        data-douze-anchor="total"
         className={`${showLastPoints ? 'absolute right-0 top-0' : 'relative'} ${
           withTriangle
             ? `pr-1 lg:w-[2.4rem] ${

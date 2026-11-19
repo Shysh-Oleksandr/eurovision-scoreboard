@@ -22,6 +22,7 @@ export const queryKeys = {
       endDate?: string;
       hasCustomAudio?: boolean;
       hasCustomFonts?: boolean;
+      hasBackgroundVideo?: boolean;
       groupId?: string;
     }) => ['user', 'themes', 'me', filters] as const,
     themeById: (id: string) => ['user', 'theme', id] as const,
@@ -37,6 +38,7 @@ export const queryKeys = {
       endDate?: string;
       hasCustomAudio?: boolean;
       hasCustomFonts?: boolean;
+      hasBackgroundVideo?: boolean;
     }) => ['user', 'saved-themes', filters] as const,
     /** Prefix for invalidating all current-user font library queries */
     fonts: () => ['user', 'fonts'] as const,
@@ -140,6 +142,7 @@ export const queryKeys = {
       endDate?: string;
       hasCustomAudio?: boolean;
       hasCustomFonts?: boolean;
+      hasBackgroundVideo?: boolean;
     }) => ['public', 'themes', filters] as const,
     fonts: (filters: {
       page?: number;

@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "montserrat",
+        "createdAt": "2026-11-19T10:55:45.438Z",
+        "reason": "Claude: user-pickable interface-font slots (html[data-font] rules and their @font-face blocks); DESIGN.md makes the font the theme's/user's slot; lines predate this session and match existing lowercase ignores"
+      },
+      {
+        "rule": "overused-font",
+        "value": "geist sans",
+        "createdAt": "2026-11-19T10:55:45.478Z",
+        "reason": "Claude: user-pickable interface-font slots (html[data-font] rules and their @font-face blocks); DESIGN.md makes the font the theme's/user's slot; lines predate this session and match existing lowercase ignores"
+      },
+      {
+        "rule": "overused-font",
+        "value": "plus jakarta sans",
+        "createdAt": "2026-11-19T10:55:45.503Z",
+        "reason": "Claude: user-pickable interface-font slots (html[data-font] rules and their @font-face blocks); DESIGN.md makes the font the theme's/user's slot; lines predate this session and match existing lowercase ignores"
+      }
+    ]
+  }
+}

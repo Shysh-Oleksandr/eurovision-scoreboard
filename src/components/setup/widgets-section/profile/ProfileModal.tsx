@@ -1,6 +1,7 @@
 'use client';
+import { UserCog } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
@@ -10,19 +11,21 @@ import UserProfileHeader from '../user-profile/UserProfileHeader';
 
 import FollowingFeedSection from './FollowingFeedSection';
 
-import { LogoutIcon } from '@/assets/icons/LogoutIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import SignInButtons from '@/components/common/SignInButtons';
 import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
-import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useIsOffline } from '@/state/connectivityStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 const EditProfileModal = dynamic(() => import('./EditProfileModal'), {
+  ssr: false,
+});
+
+const AccountModal = dynamic(() => import('./AccountModal'), {
   ssr: false,
 });
 
@@ -44,16 +47,19 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 }) => {
   const t = useTranslations('widgets.profile');
   const tOffline = useTranslations('offline');
-  const { user, logout: storeLogout, isBusy } = useAuthStore();
+  const tModeration = useTranslations('moderation');
+  const user = useAuthStore((s) => s.user);
   // Offline the account stays on screen from this device's copy; editing it
-  // and signing out (which revokes the session on the server) wait.
+  // and the account settings (signing out revokes the session on the
+  // server) wait.
   const offline = useIsOffline();
 
   const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isEditProfileModalLoaded, setIsEditProfileModalLoaded] =
     useState(false);
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
+  const [isAccountModalLoaded, setIsAccountModalLoaded] = useState(false);
 
-  const { confirm } = useConfirmation();
   const [activeTab, setActiveTab] = useState<ProfileTab>(
     ProfileTab.YOUR_PROFILE,
   );
@@ -61,16 +67,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const onLoadContest = useLoadContest();
 
   const isAuthenticated = !!user;
-
-  const handleLogout = useCallback(async () => {
-    confirm({
-      key: 'logout',
-      title: t('areYouSureYouWantToLogout'),
-      onConfirm: () => {
-        storeLogout();
-      },
-    });
-  }, [confirm, storeLogout, t]);
 
   const tabs = useMemo(
     () => [
@@ -94,8 +90,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                 <UserProfileHeader
                   user={user}
                   additionalContent={
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-1.5 min-w-0">
+                      {/* Two buttons: when both don't fit (long
+                          translations on phones), Account goes under Edit
+                          profile. */}
+                      <div className="flex flex-wrap items-center gap-2">
                         <Button
                           label={t('editProfile')}
                           variant="primary"
@@ -104,11 +103,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                           Icon={<PencilIcon className="w-5 h-5" />}
                         />
                         <Button
-                          label={isBusy ? t('loggingOut') : t('logout')}
-                          variant="destructive"
-                          onClick={handleLogout}
-                          disabled={isBusy || offline}
-                          Icon={<LogoutIcon className="w-5 h-5 flex-none" />}
+                          label={tModeration('account')}
+                          variant="primary"
+                          onClick={() => setIsAccountModalOpen(true)}
+                          disabled={offline}
+                          Icon={<UserCog className="w-5 h-5 flex-none" />}
                         />
                       </div>
                       {offline && (
@@ -133,7 +132,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         content: <FollowingFeedSection onLoadContest={onLoadContest} />,
       },
     ],
-    [tabs, user, t, tOffline, offline, isBusy, handleLogout, onLoadContest],
+    [tabs, user, t, tModeration, tOffline, offline, onLoadContest],
   );
 
   useEffectOnce(() => {
@@ -181,6 +180,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           isOpen={isEditProfileModalOpen}
           onClose={() => setIsEditProfileModalOpen(false)}
           onLoaded={() => setIsEditProfileModalLoaded(true)}
+        />
+      )}
+
+      {isAuthenticated && (isAccountModalOpen || isAccountModalLoaded) && (
+        <AccountModal
+          isOpen={isAccountModalOpen}
+          onClose={() => setIsAccountModalOpen(false)}
+          onLoaded={() => setIsAccountModalLoaded(true)}
         />
       )}
     </Modal>

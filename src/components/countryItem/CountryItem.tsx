@@ -31,6 +31,8 @@ import {
   roundedGlowStyle,
   splitRoundedCountryItemSurfaceClasses,
 } from '@/components/countryItem/utils/roundedCountryItemGlow';
+import DouzeRowOverlay from '@/douze/DouzeRowOverlay';
+import { getDouzeSpec } from '@/douze/registry';
 import { useIsLowPerfDevice } from '@/hooks/useIsLowPerfDevice';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 import { ItemState } from '@/theme/types';
@@ -99,12 +101,17 @@ const CountryItem = ({
     !!isVotingOver,
   );
 
-  const { shouldRender: showDouzePointsAnimationHook, points: douzePoints } =
-    useDouzePointsAnimation(
-      !!country.showDouzePointsAnimation,
-      country.code,
-      country.lastReceivedPoints,
-    );
+  const {
+    shouldRender: showDouzePointsAnimationHook,
+    points: douzePoints,
+    runId: douzeRunId,
+  } = useDouzePointsAnimation(
+    !!country.showDouzePointsAnimation,
+    country.code,
+    country.lastReceivedPoints,
+    false,
+    country.points,
+  );
 
   const douzePointsContainerRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
@@ -153,7 +160,9 @@ const CountryItem = ({
     flagShape,
     pointsContainerShape,
     roundedCountryContainer,
+    douzePointsAnimationMode,
   } = useThemeSpecifics();
+  const hasDouzeSpec = !!getDouzeSpec(douzePointsAnimationMode);
 
   const { lastPointsContainerRef, lastPointsTextRef } = useAnimatePoints({
     shouldShowLastPoints:
@@ -305,6 +314,7 @@ const CountryItem = ({
       renderDouzePointsAnimation={() =>
         showDouzePointsAnimationHook ? (
           <DouzePointsAnimation
+            key={douzeRunId}
             refs={{
               containerRef: douzePointsContainerRef,
               parallelogramBlueRef: douzePointsParallelogramBlueRef,
@@ -319,10 +329,22 @@ const CountryItem = ({
           />
         ) : null
       }
+      renderOverlay={
+        hasDouzeSpec && showDouzePointsAnimationHook
+          ? () => (
+              <DouzeRowOverlay
+                key={douzeRunId}
+                mode={douzePointsAnimationMode}
+                pointsAmount={douzePoints ?? 0}
+              />
+            )
+          : undefined
+      }
       renderFlag={
         flagShape !== 'none'
           ? () => (
               <img
+                data-douze-anchor="flag"
                 src={getFlagPath(country, flagShape, enableMinimalisticFlags)}
                 onError={(e) =>
                   handleFlagError(e.currentTarget, country, flagShape)
@@ -337,7 +359,12 @@ const CountryItem = ({
           : undefined
       }
       renderName={() => (
-        <h4 ref={nameRef} className={nameClassName} data-entry-name="">
+        <h4
+          ref={nameRef}
+          className={nameClassName}
+          data-entry-name=""
+          data-douze-anchor="name"
+        >
           {shortCode ? (
             <>
               <span aria-hidden="true">{shortCode}</span>

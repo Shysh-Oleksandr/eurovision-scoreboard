@@ -1,16 +1,28 @@
+import { Check, Link2, Trash2, Upload, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { UploadIcon } from '../../assets/icons/UploadIcon';
 import { BaseCountry } from '../../models';
+import Button from '../common/Button';
 import CustomSelect from '../common/customSelect/CustomSelect';
 import Modal from '../common/Modal/Modal';
-import ModalBottomContent from '../common/Modal/ModalBottomContent';
 import { Input } from '../Input';
 
+import EntryActionBar from './custom-entry/EntryActionBar';
+import EntryRowPreview from './custom-entry/EntryRowPreview';
+import FlagPicker, { FlagTab } from './custom-entry/FlagPicker';
+import {
+  collectYourFlags,
+  DEFAULT_FLAG,
+  isCountryFlag,
+  isImageLink,
+  isPresetFlag,
+  toPickerFlag,
+} from './custom-entry/flags';
 import { getCustomEntryId } from './utils/getCustomEntryId';
 
+import { isNetworkError } from '@/api/client';
 import {
   useCreateCustomEntryMutation,
   useCustomEntryGroupsQuery,
@@ -18,9 +30,13 @@ import {
   useUpdateCustomEntryMutation,
   useUploadCustomEntryFlagMutation,
 } from '@/api/customEntries';
-import { getFlagPath } from '@/helpers/getFlagPath';
+import {
+  normalizeShortCode,
+  suggestShortCode,
+} from '@/data/countries/shortCodes';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
@@ -28,41 +44,79 @@ interface CustomCountryModalProps {
   isOpen: boolean;
   onClose: () => void;
   countryToEdit?: BaseCountry;
+  /** A new entry starts in this group (the + on a group's header). */
+  initialGroupId?: string;
 }
 
-// These are stored in `https://cdn.douzepoints.app/custom-entries/presets/{name}`, e.g. `https://cdn.douzepoints.app/custom-entries/presets/earth.svg`
-const PRESET_IMAGES = [
-  '/flags/earth.svg',
-  '/flags/world.svg',
-  '/flags/floptropica.svg',
-  '/flags/neutral.svg',
-  '/flags/lgbt.svg',
-  '/flags/neutrois.svg',
-  '/flags/aromantic.svg',
-];
+const ACCEPTED_IMAGES = 'image/png, image/jpeg, image/webp, image/svg+xml';
+const ERROR_TEXT =
+  'text-sm leading-snug text-balance text-[color:var(--badge-red-ink)]';
 
+/** "Add another" stays on for the rest of the session once a host turns it on. */
+let addAnotherPreference = false;
+
+interface EntryDraft {
+  name: string;
+  shortCode: string;
+  groupId: string;
+  /** The picker's name for the flag (see `toPickerFlag`). */
+  flag: string;
+}
+
+const draftFor = (country?: BaseCountry, groupId?: string): EntryDraft =>
+  country
+    ? {
+        name: country.name,
+        shortCode: country.shortCode ?? '',
+        groupId: country.groupId ?? '',
+        flag: toPickerFlag(country.flag),
+      }
+    : { name: '', shortCode: '', groupId: groupId ?? '', flag: DEFAULT_FLAG };
+
+/** The picker opens where the entry's flag is. */
+const tabFor = (country: BaseCountry | undefined, hasYourFlags: boolean) => {
+  if (!country) return hasYourFlags ? 'yours' : 'presets';
+
+  const flag = toPickerFlag(country.flag);
+
+  if (isPresetFlag(flag)) return 'presets';
+  if (isCountryFlag(flag)) return 'countries';
+
+  return 'yours';
+};
+
+/** The translated network message, or the fallback for anything else. */
+const errorText = (error: unknown, fallback: string) =>
+  isNetworkError(error)
+    ? (error as { response?: { data?: { message?: string } } }).response?.data
+        ?.message ?? fallback
+    : fallback;
+
+/**
+ * Create or edit a custom entry: the entry drawn as the theme's board row on
+ * top, then name and short code, one flag picker, and the group.
+ */
 const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   isOpen,
   onClose,
   countryToEdit,
+  initialGroupId,
 }) => {
-  const t = useTranslations();
+  const t = useTranslations('setup.customCountryModal');
+  const tCommon = useTranslations('common');
+  const tConfirm = useTranslations('settings.confirmations');
+  const { confirm } = useConfirmation();
 
   const isEditMode = !!countryToEdit;
-  const user = useAuthStore((s) => s.user);
-  const isAuthenticated = !!user;
-
-  const [name, setName] = useState('');
-  const [flagUrl, setFlagUrl] = useState('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [selectedStandardCountry, setSelectedStandardCountry] = useState('');
-  const [selectedCustomEntry, setSelectedCustomEntry] = useState('');
-  const [groupId, setGroupId] = useState<string>('');
-  const [failedToLoadFlag, setFailedToLoadFlag] = useState(false);
+  const isAuthenticated = useAuthStore((s) => !!s.user);
+  const customEntries = useCountriesStore((state) => state.customCountries);
+  const yourFlags = useMemo(
+    () => collectYourFlags(customEntries),
+    [customEntries],
+  );
 
   const { data: customEntryGroups = [] } =
     useCustomEntryGroupsQuery(isAuthenticated);
-
   const { mutateAsync: createEntry, isPending: isCreating } =
     useCreateCustomEntryMutation();
   const { mutateAsync: updateEntry, isPending: isUpdating } =
@@ -71,263 +125,250 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     useDeleteCustomEntryMutation();
   const { mutateAsync: uploadFlag, isPending: isUploadingFlag } =
     useUploadCustomEntryFlagMutation();
+  const isSaving = isCreating || isUpdating || isDeleting || isUploadingFlag;
 
   const imageUpload = useImageUpload({ maxSizeInMB: 0.5 });
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const canDrop = useMediaQuery('(pointer: fine)');
+
+  const [initial, setInitial] = useState(() =>
+    draftFor(countryToEdit, initialGroupId),
+  );
+  const [name, setName] = useState(initial.name);
+  const [shortCode, setShortCode] = useState(initial.shortCode);
+  const [groupId, setGroupId] = useState(initial.groupId);
+  const [flag, setFlag] = useState(initial.flag);
+  const [file, setFile] = useState<File | null>(null);
+  const [tab, setTab] = useState<FlagTab>(() =>
+    tabFor(countryToEdit, yourFlags.length > 0),
+  );
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkValue, setLinkValue] = useState('');
+  const [linkTouched, setLinkTouched] = useState(false);
+  const [brokenLink, setBrokenLink] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [flagError, setFlagError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [addAnother, setAddAnother] = useState(addAnotherPreference);
 
-  const customEntries = useCountriesStore((state) => state.customCountries);
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  /** Set once a new entry exists, so a retry updates it instead of making a second one. */
+  const createdIdRef = useRef<string | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const linkInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const focusLinkRef = useRef(false);
+  const dragDepthRef = useRef(0);
 
-  const { confirm } = useConfirmation();
-
-  // Validate if displayFlag is a valid image URL for Next.js Image component
-  const isValidImageUrl = (url: string | null | undefined): boolean => {
-    if (!url) return false;
-
-    // Must start with / for relative paths, or http:///https:// for absolute URLs
-    // Also allow data: URLs for base64 images
-    return (
-      url.startsWith('/') ||
-      url.startsWith('http://') ||
-      url.startsWith('https://') ||
-      url.startsWith('data:')
-    );
+  const clearFile = () => {
+    setFile(null);
+    imageUpload.clear();
   };
 
-  const displayFlag = uploadedFile ? imageUpload.base64 : flagUrl || '';
+  const closeLink = () => {
+    setLinkOpen(false);
+    setLinkValue('');
+    setLinkTouched(false);
+  };
 
-  const previewFlag: string =
-    displayFlag && isValidImageUrl(displayFlag) && !failedToLoadFlag
-      ? displayFlag
-      : PRESET_IMAGES[1];
+  const resetTo = (draft: EntryDraft) => {
+    setName(draft.name);
+    setShortCode(draft.shortCode);
+    setGroupId(draft.groupId);
+    setFlag(draft.flag);
+    clearFile();
+    closeLink();
+    setBrokenLink(null);
+    setNameError(null);
+    setFlagError(null);
+    createdIdRef.current = null;
+  };
 
-  // Filter custom entries that are not from PRESET_IMAGES
-  const reusableCustomEntries = useMemo(() => {
-    const seenFlags = new Set<string>();
+  // A modal kept mounted starts again from the entry each time it opens.
+  const wasOpenRef = useRef(isOpen);
 
-    return customEntries.filter((entry) => {
-      if (
-        !entry.flag ||
-        entry.flag.includes('/custom-entries/presets/') ||
-        seenFlags.has(entry.flag)
-      ) {
-        return false;
-      }
-      seenFlags.add(entry.flag);
+  useEffect(() => {
+    const justOpened = isOpen && !wasOpenRef.current;
 
-      return true;
-    });
-  }, [customEntries]);
+    wasOpenRef.current = isOpen;
+    if (!justOpened) return;
 
-  // Get last 7 custom entries for horizontal display
-  const recentCustomEntries = useMemo(() => {
-    return [...reusableCustomEntries]
-      .sort((a, b) =>
-        b.updatedAt && a.updatedAt
-          ? new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-          : 0,
-      )
-      .slice(0, 7);
-  }, [reusableCustomEntries]);
+    const draft = draftFor(countryToEdit, initialGroupId);
 
-  // Standard countries options
-  const standardCountryOptions = useMemo(() => {
-    return getAllCountries(false).map((country) => ({
-      label: country.name,
-      value: country.code,
-      imageUrl: getFlagPath(country),
-    }));
-  }, [getAllCountries]);
+    setInitial(draft);
+    resetTo(draft);
+    setTab(tabFor(countryToEdit, yourFlags.length > 0));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, countryToEdit, initialGroupId]);
 
-  // Custom entries options for select
-  const customEntryOptions = useMemo(() => {
-    return reusableCustomEntries.map((entry) => {
-      // Ensure we always have a valid URL for Next.js Image
-      let entryFlagSrc = getFlagPath('ww'); // Default fallback
+  useEffect(() => {
+    if (!linkOpen || !focusLinkRef.current) return;
 
-      if (entry.flag && isValidImageUrl(entry.flag)) {
-        entryFlagSrc = entry.flag;
-      }
+    focusLinkRef.current = false;
+    linkInputRef.current?.focus();
+  }, [linkOpen]);
 
-      return {
-        label: entry.name,
-        value: entry.flag || '',
-        imageUrl: entryFlagSrc,
-      };
-    });
-  }, [reusableCustomEntries]);
+  // What the entry would be saved with.
+  const trimmedName = name.trim();
+  const linkUrl = linkOpen ? linkValue.trim() : '';
+  const usesLink = !!linkUrl && !file;
+  const linkIsValid = isImageLink(linkUrl);
+  const chosenFlag = usesLink ? linkUrl : flag;
+  const previewFlag = file
+    ? imageUpload.base64 ?? ''
+    : usesLink && linkIsValid
+    ? linkUrl
+    : flag;
+  const flagChanged = !!file || chosenFlag !== initial.flag;
+  const hasChanges = isEditMode
+    ? trimmedName !== initial.name ||
+      shortCode !== initial.shortCode ||
+      groupId !== initial.groupId ||
+      flagChanged
+    : trimmedName !== '';
 
-  const customEntryGroupOptions = useMemo(() => {
-    return [
-      {
-        label: t('setup.customCountryModal.noGroup'),
-        value: '',
-      },
+  const linkError =
+    !usesLink || !linkTouched
+      ? null
+      : !linkIsValid
+      ? t('linkInvalid')
+      : brokenLink === linkUrl
+      ? t('linkBroken')
+      : null;
+
+  const groupOptions = useMemo(
+    () => [
+      { label: t('noGroup'), value: '' },
       ...customEntryGroups.map((group) => ({
         label: group.name,
         value: group._id,
       })),
-    ];
-  }, [customEntryGroups, t]);
+    ],
+    [customEntryGroups, t],
+  );
 
-  useEffect(() => {
-    if (countryToEdit) {
-      setName(countryToEdit.name);
-      setGroupId(countryToEdit.groupId ?? '');
-
-      const currentFlagUrl = countryToEdit.flag || '';
-
-      setFlagUrl(currentFlagUrl);
-      setUploadedFile(null);
-      setFailedToLoadFlag(false);
-      // Sync select states based on current flagUrl
-      // Check if it's a standard country flag
-      const standardCountry = getAllCountries(false).find((c) => {
-        const countryFlagUrl = getFlagPath(c);
-
-        return countryFlagUrl === currentFlagUrl;
-      });
-
-      if (standardCountry) {
-        setSelectedStandardCountry(standardCountry.code);
-        setSelectedCustomEntry('');
-      } else {
-        // Check if it's a custom entry flag
-        const customEntry = reusableCustomEntries.find(
-          (entry) => entry.flag === currentFlagUrl,
-        );
-
-        if (customEntry) {
-          setSelectedCustomEntry(currentFlagUrl);
-          setSelectedStandardCountry('');
-        } else {
-          setSelectedStandardCountry('');
-          setSelectedCustomEntry('');
-        }
-      }
-    } else {
-      setName('');
-      setFlagUrl('');
-      setUploadedFile(null);
-      setFailedToLoadFlag(false);
-      setSelectedStandardCountry('');
-      setSelectedCustomEntry('');
-      setGroupId('');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countryToEdit, isOpen, reusableCustomEntries]);
-
-  // Handle standard country selection
-  const handleStandardCountryChange = (countryCode: string) => {
-    const country = getAllCountries(false).find((c) => c.code === countryCode);
-
-    if (country) {
-      const flagUrl = getFlagPath(country);
-
-      setFlagUrl(flagUrl);
-      setUploadedFile(null);
-      imageUpload.clear();
-      setSelectedStandardCountry(countryCode);
-      setFailedToLoadFlag(false);
-      setSelectedCustomEntry('');
-    }
+  const pickFlag = (next: string) => {
+    setFlag(next);
+    clearFile();
+    closeLink();
+    setFlagError(null);
   };
 
-  // Handle custom entry selection from select
-  const handleCustomEntrySelectChange = (flagUrl: string) => {
-    setFlagUrl(flagUrl);
-    setUploadedFile(null);
-    imageUpload.clear();
-    setSelectedCustomEntry(flagUrl);
-    setSelectedStandardCountry('');
-    setFailedToLoadFlag(false);
-  };
+  const takeFile = async (next: File | null) => {
+    if (!next) return;
 
-  // Handle custom entry click from horizontal list
-  const handleCustomEntryClick = (flagUrl: string) => {
-    setFlagUrl(flagUrl);
-    setUploadedFile(null);
-    imageUpload.clear();
-    setSelectedCustomEntry(flagUrl);
-    setSelectedStandardCountry('');
-    setFailedToLoadFlag(false);
-  };
+    const { isValid, error } = await imageUpload.validateAndSetFile(next);
 
-  const handleSave = async () => {
-    if (!isAuthenticated) {
-      toast(t('setup.customCountryModal.pleaseSignInToCreateCustomEntries'), {
-        type: 'error',
-      });
+    if (!isValid) {
+      setFlagError(error);
 
       return;
     }
 
-    if (name.trim() === '') {
-      toast(t('setup.customCountryModal.entryNameIsRequired'), {
-        type: 'error',
-      });
+    setFile(next);
+    closeLink();
+    setFlagError(null);
+    setTab('yours');
+  };
+
+  const openLink = () => {
+    focusLinkRef.current = true;
+    setLinkOpen(true);
+  };
+
+  /** After a save with "Add another" on: a fresh entry in the same group. */
+  const startNext = () => {
+    resetTo({ ...draftFor(undefined, groupId) });
+    contentRef.current?.closest('.overflow-y-auto')?.scrollTo({ top: 0 });
+    nameInputRef.current?.focus();
+  };
+
+  const handleSave = async () => {
+    if (isSaving) return;
+
+    if (!trimmedName) {
+      setNameError(t('nameRequired'));
+      nameInputRef.current?.focus();
+
+      return;
+    }
+
+    if (usesLink && (!linkIsValid || brokenLink === linkUrl)) {
+      setLinkTouched(true);
+      linkInputRef.current?.focus();
+
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error(t('pleaseSignInToCreateCustomEntries'));
+
+      return;
+    }
+
+    let entryId = countryToEdit
+      ? getCustomEntryId(countryToEdit.code)
+      : createdIdRef.current;
+
+    if (countryToEdit && !entryId) {
+      toast.error(t('saveFailed'));
 
       return;
     }
 
     try {
-      const urlToUpload = uploadedFile ? '' : previewFlag;
-
-      if (isEditMode) {
-        const entryId = getCustomEntryId(countryToEdit?.code || '');
-
-        if (!entryId) {
-          toast('Invalid entry ID', { type: 'error' });
-
-          return;
-        }
-
-        // Update entry
+      if (entryId) {
+        // A staged upload replaces the flag only once it has arrived, so
+        // a failed upload never leaves the entry without its old one.
         await updateEntry({
           id: entryId,
-          name,
-          flagUrl: urlToUpload,
+          name: trimmedName,
           groupId: groupId || null,
+          shortCode: shortCode || null,
+          ...(flagChanged && !file ? { flagUrl: chosenFlag } : {}),
         });
-
-        // Upload file if provided
-        if (uploadedFile) {
-          await uploadFlag({ id: entryId, file: uploadedFile });
-        }
       } else {
-        // Create new entry
-        const newEntry = await createEntry({
-          name,
-          flagUrl: urlToUpload,
+        const created = await createEntry({
+          name: trimmedName,
+          flagUrl: file ? undefined : chosenFlag || DEFAULT_FLAG,
           groupId: groupId || undefined,
+          shortCode: shortCode || undefined,
         });
 
-        // Upload file if provided
-        if (uploadedFile) {
-          await uploadFlag({ id: newEntry._id, file: uploadedFile });
-        }
+        entryId = created._id;
+        createdIdRef.current = created._id;
       }
+    } catch (error) {
+      toast.error(errorText(error, t('saveFailed')));
 
-      toast(t('setup.customCountryModal.customEntrySavedSuccessfully'), {
-        type: 'success',
-      });
-
-      onClose();
-    } catch (error: any) {
-      toast(error?.response?.data?.message || 'Failed to save entry', {
-        type: 'error',
-      });
+      return;
     }
+
+    if (file && entryId) {
+      try {
+        await uploadFlag({ id: entryId, file });
+      } catch {
+        setFlagError(t('savedWithoutFlag', { name: trimmedName }));
+
+        return;
+      }
+    }
+
+    toast.success(t('entrySaved', { name: trimmedName }));
+
+    if (!isEditMode && addAnother) {
+      startNext();
+
+      return;
+    }
+
+    onClose();
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!countryToEdit) return;
 
     if (!isAuthenticated) {
-      toast(t('setup.customCountryModal.pleaseSignInToDeleteCustomEntries'), {
-        type: 'error',
-      });
+      toast.error(t('pleaseSignInToDeleteCustomEntries'));
 
       return;
     }
@@ -335,79 +376,114 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     confirm({
       key: 'delete-custom-country',
       type: 'danger',
-      title: t('settings.confirmations.deleteItem', {
-        name: countryToEdit.name,
-      }),
-      description: t('settings.confirmations.actionCannotBeUndone'),
+      title: tConfirm('deleteItem', { name: countryToEdit.name }),
+      description: tConfirm('actionCannotBeUndone'),
       onConfirm: async () => {
+        const entryId = getCustomEntryId(countryToEdit.code);
+
         try {
-          const entryId = getCustomEntryId(countryToEdit.code);
-
-          if (!entryId) {
-            toast('Invalid entry ID', { type: 'error' });
-
-            return;
-          }
-
+          if (!entryId) throw new Error('Invalid entry ID');
           await deleteEntry(entryId);
-          toast(t('setup.customCountryModal.entryDeletedSuccessfully'), {
-            type: 'success',
-          });
-
+          toast.success(t('entryDeleted', { name: countryToEdit.name }));
           onClose();
-        } catch (error: any) {
-          toast(error?.response?.data?.message || 'Failed to delete entry', {
-            type: 'error',
-          });
+        } catch (error) {
+          toast.error(errorText(error, t('deleteFailed')));
         }
       },
     });
   };
 
-  const handleFileChange = async (file: File | null) => {
-    if (!file) return;
+  // Enter in Name or Short code saves, like any form.
+  const onFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+    if (!(e.target instanceof HTMLInputElement)) return;
 
-    const { isValid, error } = await imageUpload.validateAndSetFile(file);
-
-    if (isValid) {
-      setUploadedFile(file);
-      setFlagUrl(''); // Clear URL input when file is selected
-    } else if (error) {
-      toast(error, { type: 'error' });
-    }
-  };
-
-  const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
+    void handleSave();
   };
 
-  const handleDragIn = (e: React.DragEvent) => {
-    handleDrag(e);
-    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-      setIsDragOver(true);
-    }
-  };
+  // Desktop: an image dropped anywhere on the modal becomes the flag.
+  const hasFiles = (e: React.DragEvent) =>
+    Array.from(e.dataTransfer.types).includes('Files');
+  const dropHandlers = canDrop
+    ? {
+        onDragEnter: (e: React.DragEvent) => {
+          if (!hasFiles(e)) return;
+          e.preventDefault();
+          dragDepthRef.current += 1;
+          setIsDragOver(true);
+        },
+        onDragLeave: (e: React.DragEvent) => {
+          if (!hasFiles(e)) return;
+          dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+          if (dragDepthRef.current === 0) setIsDragOver(false);
+        },
+        onDragOver: (e: React.DragEvent) => {
+          if (hasFiles(e)) e.preventDefault();
+        },
+        onDrop: (e: React.DragEvent) => {
+          if (!hasFiles(e)) return;
+          e.preventDefault();
+          dragDepthRef.current = 0;
+          setIsDragOver(false);
+          void takeFile(e.dataTransfer.files?.[0] ?? null);
+        },
+      }
+    : {};
 
-  const handleDragOut = (e: React.DragEvent) => {
-    handleDrag(e);
-    setIsDragOver(false);
-  };
+  const flagStatus = flagError ? (
+    <p className={ERROR_TEXT}>{flagError}</p>
+  ) : file ? (
+    <p className="flex items-baseline gap-2 text-sm leading-snug text-white/70 min-w-0">
+      <span className="min-w-0 break-words">
+        {t('uploadStaged', { fileName: file.name })}
+      </span>
+      <button
+        type="button"
+        onClick={clearFile}
+        className="flex-none font-bold text-white underline-offset-[3px] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent rounded"
+      >
+        {t('undo')}
+      </button>
+    </p>
+  ) : (
+    <p className="text-sm leading-snug text-balance text-white/60">
+      {canDrop ? t('uploadHintDrop') : t('uploadHint')}
+    </p>
+  );
 
-  const handleDrop = (e: React.DragEvent) => {
-    handleDrag(e);
-    setIsDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileChange(e.dataTransfer.files[0]);
-      e.dataTransfer.clearData();
-    }
-  };
-
-  const handleBrowseClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const isSaving = isCreating || isUpdating || isDeleting || isUploadingFlag;
+  const leadingAction = isEditMode ? (
+    <Button
+      variant="surface"
+      size="lg"
+      className="dp-act--quiet dp-act--danger -ml-2.5"
+      Icon={<Trash2 className="size-[18px]" />}
+      onClick={handleDelete}
+      aria-label={t('deleteEntry')}
+    >
+      <span className="dp-entry-bar-label">{t('deleteEntry')}</span>
+    </Button>
+  ) : (
+    <button
+      type="button"
+      aria-pressed={addAnother}
+      onClick={() => {
+        addAnotherPreference = !addAnother;
+        setAddAnother(!addAnother);
+      }}
+      className="flex items-center gap-2 h-[46px] -ml-2.5 px-2.5 rounded-xl text-[13px] font-bold whitespace-nowrap text-white/80 hover:text-white hover:bg-white/[.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+    >
+      <span
+        className={`dp-check ${
+          addAnother ? 'is-on' : ''
+        } w-[17px] h-[17px] rounded-[5px] grid place-items-center flex-none`}
+        aria-hidden="true"
+      >
+        <Check className="size-3" strokeWidth={3} />
+      </span>
+      {t('addAnother')}
+    </button>
+  );
 
   return (
     <Modal
@@ -415,221 +491,247 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
       onClose={onClose}
       overlayClassName="!z-[1001]"
       containerClassName="!w-[min(100%,500px)]"
-      withBlur
+      contentClassName="text-white narrow-scrollbar dp-flat"
+      fullScreenOnPhone
+      ariaLabelledBy="entryModal-title"
       bottomContent={
-        <ModalBottomContent
-          onClose={onClose}
+        <EntryActionBar
+          leading={leadingAction}
+          onCancel={onClose}
           onSave={handleSave}
-          onDelete={countryToEdit ? handleDelete : undefined}
           isSaving={isSaving}
+          saveDisabled={!hasChanges}
         />
       }
     >
-      <div className="flex flex-col gap-4 p-2">
-        <h2 className="text-xl font-bold text-white">
-          {t(
-            isEditMode
-              ? 'setup.customCountryModal.editCustomEntry'
-              : 'setup.customCountryModal.createCustomEntry',
-          )}
+      <div ref={contentRef} className="flex flex-col" {...dropHandlers}>
+        <h2 id="entryModal-title" className="text-2xl font-bold mb-4">
+          {isEditMode ? t('editEntry') : t('newEntry')}
         </h2>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="countryName" className="text-white">
-            {t('common.name')}
-          </label>
-          <Input
-            id="countryName"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder={t('common.enterName')}
+
+        <EntryRowPreview
+          name={trimmedName}
+          flag={previewFlag}
+          placeholder={t('previewName')}
+        />
+
+        <form
+          className="mt-6 flex flex-col gap-2"
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            void handleSave();
+          }}
+          onKeyDown={onFormKeyDown}
+        >
+          {/* Fields line up even when a long label ("Código curto") wraps. */}
+          <div className="flex items-end gap-2.5">
+            <div className="flex flex-col gap-2 flex-1 min-w-0">
+              <label htmlFor="entryName" className="text-white font-medium">
+                {tCommon('name')}
+              </label>
+              <Input
+                id="entryName"
+                ref={nameInputRef}
+                type="text"
+                value={name}
+                maxLength={100}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  if (e.target.value.trim()) setNameError(null);
+                }}
+                placeholder={tCommon('enterName')}
+                autoComplete="off"
+                aria-invalid={nameError ? true : undefined}
+                aria-describedby={nameError ? 'entryName-error' : undefined}
+                className="h-12"
+              />
+            </div>
+            <div className="flex flex-col gap-2 flex-none w-[6.5rem]">
+              <label
+                htmlFor="entryShortCode"
+                className="text-white font-medium"
+              >
+                {t('shortCode')}
+              </label>
+              <Input
+                id="entryShortCode"
+                type="text"
+                value={shortCode}
+                onChange={(e) =>
+                  setShortCode(normalizeShortCode(e.target.value))
+                }
+                placeholder={suggestShortCode(name)}
+                autoCapitalize="characters"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-describedby="entryShortCode-hint"
+                className="h-12 font-semibold tracking-wider placeholder:font-normal"
+              />
+            </div>
+          </div>
+          {nameError && (
+            <span id="entryName-error" className={ERROR_TEXT}>
+              {nameError}
+            </span>
+          )}
+          <span
+            id="entryShortCode-hint"
+            className="text-white/60 text-sm leading-snug text-balance"
+          >
+            {t('shortCodeHint')}
+          </span>
+        </form>
+
+        <section
+          aria-labelledby="entryFlag-label"
+          className="relative mt-7 flex flex-col gap-3"
+        >
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-3">
+              <h3 id="entryFlag-label" className="text-white font-medium">
+                {t('flag')}
+              </h3>
+              <Button
+                variant="surface"
+                size="md"
+                className="ml-auto"
+                Icon={<Upload className="size-4" />}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {t('uploadImage')}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED_IMAGES}
+                className="hidden"
+                onChange={(e) => {
+                  const picked = e.target.files?.[0] ?? null;
+
+                  // Let the same file be picked again after an Undo.
+                  e.currentTarget.value = '';
+                  void takeFile(picked);
+                }}
+              />
+            </div>
+            <div aria-live="polite">{flagStatus}</div>
+          </div>
+
+          <FlagPicker
+            tab={tab}
+            onTabChange={setTab}
+            selected={file || usesLink ? null : flag}
+            onPick={pickFlag}
+            yourFlags={yourFlags}
+            staged={file ? imageUpload.base64 : null}
           />
-        </div>
-        <div className="flex flex-col gap-1">
+
+          {linkOpen ? (
+            <div className="flex flex-col gap-2">
+              <label htmlFor="entryFlagLink" className="text-white font-medium">
+                {t('imageLink')}
+              </label>
+              <div className="relative">
+                <Input
+                  id="entryFlagLink"
+                  ref={linkInputRef}
+                  type="url"
+                  inputMode="url"
+                  value={linkValue}
+                  onChange={(e) => {
+                    setLinkValue(e.target.value);
+                    setLinkTouched(false);
+                    setFlagError(null);
+                    // The last flag chosen wins: a typed link replaces a
+                    // staged upload, as a picked tile does.
+                    if (e.target.value.trim() && file) clearFile();
+                  }}
+                  onBlur={() => setLinkTouched(true)}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+                    e.preventDefault();
+                    void handleSave();
+                  }}
+                  placeholder="https://"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  aria-invalid={linkError ? true : undefined}
+                  aria-describedby={
+                    linkError ? 'entryFlagLink-error' : 'entryFlagLink-hint'
+                  }
+                  className="h-12 !pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={closeLink}
+                  aria-label={t('removeLink')}
+                  title={t('removeLink')}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              {linkError ? (
+                <span id="entryFlagLink-error" className={ERROR_TEXT}>
+                  {linkError}
+                </span>
+              ) : (
+                <span
+                  id="entryFlagLink-hint"
+                  className="text-white/60 text-sm leading-snug text-balance"
+                >
+                  {t('linkHint')}
+                </span>
+              )}
+              {usesLink && linkIsValid && (
+                // Finds out whether the link is an image the board can draw.
+                <img
+                  key={linkUrl}
+                  src={linkUrl}
+                  alt=""
+                  hidden
+                  onLoad={() =>
+                    setBrokenLink((broken) =>
+                      broken === linkUrl ? null : broken,
+                    )
+                  }
+                  onError={() => setBrokenLink(linkUrl)}
+                />
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={openLink}
+              className="self-start flex items-center gap-2 -ml-2 px-2 py-1.5 rounded-lg text-[13px] font-bold text-white/70 hover:text-white hover:bg-white/[.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <Link2 className="size-4" aria-hidden="true" />
+              {t('useImageLink')}
+            </button>
+          )}
+
+          {isDragOver && (
+            <div className="dp-flag-drop pointer-events-none absolute -inset-2.5 rounded-[14px] grid place-items-center text-[15px] font-bold">
+              {t('dropToUpload')}
+            </div>
+          )}
+        </section>
+
+        <div className="mt-7 flex flex-col">
           <CustomSelect
-            options={customEntryGroupOptions}
+            options={groupOptions}
             value={groupId}
             onChange={setGroupId}
-            label={t('setup.customCountryModal.group')}
+            label={t('group')}
             id="entry-group-select"
             withIndicator={false}
             selectClassName="!shadow-none"
-            labelClassName="!text-base mb-1"
+            labelClassName="!text-base font-medium mb-2 inline-block"
           />
-        </div>
-        <div className="flex flex-col gap-3">
-          <label className="text-white">{t('common.image')}</label>
-
-          <Input
-            id="flagUrl"
-            type="text"
-            value={
-              uploadedFile ? '' : flagUrl.startsWith('/flags/') ? '' : flagUrl
-            }
-            onChange={(e) => {
-              setFlagUrl(e.target.value);
-              setUploadedFile(null);
-              imageUpload.clear();
-              setSelectedStandardCountry('');
-              setSelectedCustomEntry('');
-              setFailedToLoadFlag(false);
-            }}
-            className="lg:text-[0.95rem] text-sm"
-            placeholder={t('common.pasteImageUrl')}
-            disabled={!!uploadedFile}
-          />
-          <div
-            onDragEnter={handleDragIn}
-            onDragLeave={handleDragOut}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            onClick={handleBrowseClick}
-            className={`flex  items-center justify-center gap-2 border-2 border-dashed rounded-md p-3 cursor-pointer transition-colors ${
-              isDragOver ? 'border-white bg-primary-700/50' : 'border-white/40'
-            }`}
-          >
-            <input
-              ref={fileInputRef}
-              id="flagUpload"
-              type="file"
-              accept="image/png, image/jpeg, image/webp, image/svg+xml"
-              onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
-              className="hidden"
-            />
-            <UploadIcon className="w-6 h-6 text-white pointer-events-none" />
-            <p className="text-white text-sm pointer-events-none">
-              {t('common.dragAndDropOrClickToUpload')}
-            </p>
-          </div>
-
-          <h4 className="middle-line text-white text-sm">
-            {t('common.orSelectExisting')}
-          </h4>
-
-          {/* Standard Countries and Custom Entries Selects */}
-          <div className="flex gap-2 flex-wrap">
-            <div className="flex-1 min-w-[200px]">
-              <CustomSelect
-                options={standardCountryOptions}
-                value={selectedStandardCountry}
-                onChange={handleStandardCountryChange}
-                label={t('setup.customCountryModal.standardCountries')}
-                id="standard-country-select"
-                getImageClassName={() => 'w-8 h-6 !object-cover'}
-                selectClassName="!shadow-none [&>div>span]:hidden"
-              />
-            </div>
-            {customEntryOptions.length > 0 && (
-              <div className="flex-1 min-w-[200px]">
-                <CustomSelect
-                  options={customEntryOptions}
-                  value={selectedCustomEntry}
-                  onChange={handleCustomEntrySelectChange}
-                  label={t('setup.customCountryModal.customEntries')}
-                  id="custom-entry-select"
-                  getImageClassName={() => 'w-8 h-6 !object-cover'}
-                  selectClassName="!shadow-none [&>div>span]:hidden"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Recent Custom Entries Horizontal List */}
-          {recentCustomEntries.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <p className="text-white text-sm">
-                {t('setup.customCountryModal.recentCustomEntries')}:
-              </p>
-              <div className="flex gap-2 overflow-x-auto">
-                {recentCustomEntries.map((entry) => {
-                  // Ensure we always have a valid URL for Next.js Image
-                  let entryFlagSrc = getFlagPath('ww'); // Default fallback
-
-                  if (entry.flag && isValidImageUrl(entry.flag)) {
-                    entryFlagSrc = entry.flag;
-                  }
-
-                  return (
-                    <img
-                      loading="lazy"
-                      key={entry.code}
-                      src={entryFlagSrc}
-                      width={50}
-                      height={37}
-                      alt={entry.name}
-                      className={`cursor-pointer flex-none w-[50px] h-[37px] object-cover rounded-md border-2 ${
-                        flagUrl === entry.flag
-                          ? 'border-white'
-                          : 'border-transparent'
-                      }`}
-                      onClick={() => handleCustomEntryClick(entry.flag || '')}
-                      onError={(e) => {
-                        // Fallback to default flag if image fails to load
-                        const fallbackSrc = getFlagPath('ww');
-
-                        if (isValidImageUrl(fallbackSrc)) {
-                          e.currentTarget.src = fallbackSrc;
-                        }
-                      }}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Preset Images */}
-          <div className="flex flex-col gap-1">
-            <p className="text-white text-sm">
-              {t('setup.customCountryModal.presets')}:
-            </p>
-            <div className="flex gap-2 overflow-x-auto">
-              {PRESET_IMAGES.map((preset) => (
-                <img
-                  loading="lazy"
-                  key={preset}
-                  src={preset}
-                  width={50}
-                  height={37}
-                  alt="Preset Flag"
-                  className={`cursor-pointer flex-none w-[50px] h-[37px] object-cover rounded-md border-2 ${
-                    flagUrl === preset ? 'border-white' : 'border-transparent'
-                  }`}
-                  onError={(e) => {
-                    e.currentTarget.src = getFlagPath('ww');
-                  }}
-                  onClick={() => {
-                    setFlagUrl(preset);
-                    setUploadedFile(null);
-                    imageUpload.clear();
-                    setSelectedStandardCountry('');
-                    setFailedToLoadFlag(false);
-                    setSelectedCustomEntry('');
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="">
-            <h4 className="middle-line text-white text-sm mb-1">
-              {t('common.preview')}
-            </h4>
-
-            <img
-              loading="lazy"
-              src={previewFlag}
-              alt="Selected flag"
-              className="rounded-md object-cover w-[100px] h-[70px]"
-              width={100}
-              height={70}
-              onError={(e) => {
-                e.currentTarget.src = getFlagPath('ww');
-                setFailedToLoadFlag(true);
-              }}
-              onLoad={() => setFailedToLoadFlag(false)}
-            />
-          </div>
         </div>
       </div>
     </Modal>

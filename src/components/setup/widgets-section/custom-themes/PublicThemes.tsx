@@ -37,6 +37,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
   const [hasCustomAudio, setHasCustomAudio] = useState(false);
   const [hasCustomFonts, setHasCustomFonts] = useState(false);
+  const [hasBackgroundVideo, setHasBackgroundVideo] = useState(false);
   const debouncedSearch = useDebounce(search, 400);
 
   const serverSortBy =
@@ -58,6 +59,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
     endDate: dateRange?.endDate,
     hasCustomAudio,
     hasCustomFonts,
+    hasBackgroundVideo,
   });
   const { data } = publicThemesQuery;
   const view = useQueryView(publicThemesQuery);
@@ -122,6 +124,16 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
             checked={hasCustomFonts}
             onChange={(v) => {
               setHasCustomFonts(v.target.checked);
+              setPage(1);
+            }}
+            labelClassName="!mr-0"
+          />
+          <Checkbox
+            id="public-themes-video-filter"
+            label={t('widgets.themes.backgroundVideo.filterWithVideo')}
+            checked={hasBackgroundVideo}
+            onChange={(v) => {
+              setHasBackgroundVideo(v.target.checked);
               setPage(1);
             }}
             labelClassName="!mr-0"

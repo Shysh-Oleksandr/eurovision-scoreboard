@@ -2,8 +2,8 @@
 
 One account can sign in with up to three methods: Google, Apple and email
 codes, at most one of each (added 2026-11-06). Signed-in users see and
-change them in Edit profile → Sign-in methods, on the website and in both
-apps. Accounts are never merged: a method that already opens another
+change them in Profile → Account → Sign-in methods, on the website and in
+both apps. Accounts are never merged: a method that already opens another
 account is refused.
 
 Before this, accounts were only joined by address: an email code opened a
@@ -140,10 +140,13 @@ Apple ID is already connected (so it can be removed).
 
 ## 6. UI
 
-- `SignInMethodsSection` (in `EditProfileModal`, above Account): one row per
-  method with its address or "Not connected", and Connect, Add / Change and
-  Remove. Remove is hidden for the last method and asks for confirmation
-  (`useConfirmation`, key `remove-sign-in-method`).
+- `SignInMethodsSection` (the first section of `AccountModal`, which the
+  Profile modal's Account button opens): one row per method with its
+  address or "Not connected", and Connect, Add / Change and Remove (a quiet
+  text button). Remove is hidden for the last method and asks for
+  confirmation (`useConfirmation`, key `remove-sign-in-method`). It used to
+  sit in Edit profile; it moved on 2026-11-19 so the screen with a Save
+  button only holds what Save saves.
 - **Fit steps** (`useFitStep`, `.dp-signin-list` in `styles.css`): the
   actions sit beside each method while every address fits uncut, otherwise
   they move under the text for the whole list.

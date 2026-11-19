@@ -40,7 +40,8 @@ export interface LineupActions {
   openMoveAllMenu: (listId: ListId, anchor: HTMLElement) => void;
   onEditCustomEntry: (country: BaseCountry) => void;
   onEditStage: (stage: EventStage) => void;
-  onCreateCustomEntry: () => void;
+  /** Opens a new custom entry, in `groupId` when given (a group's +). */
+  onCreateCustomEntry: (groupId?: string) => void;
   onCreateGroup: () => void;
   onEditGroup: (group: CustomEntryGroup) => void;
 }
@@ -96,7 +97,7 @@ interface LineupProviderProps {
   assignMany: (codes: string[], group: string) => void;
   onEditCustomEntry: (country: BaseCountry) => void;
   onEditStage: (stage: EventStage) => void;
-  onCreateCustomEntry: () => void;
+  onCreateCustomEntry: (groupId?: string) => void;
   children: React.ReactNode;
 }
 

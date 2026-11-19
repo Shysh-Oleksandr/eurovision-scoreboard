@@ -58,6 +58,13 @@ interface ModalProps {
    * reopened often doesn't rebuild its whole tree each time.
    */
   keepMounted?: boolean;
+  /**
+   * Marks the box as a modal dialog for assistive tech (`role="dialog"`,
+   * `aria-modal`), named by this element id (usually the title). The box is
+   * then focusable (`tabIndex=-1`) so the caller can move focus into it.
+   */
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -80,6 +87,8 @@ const Modal: React.FC<ModalProps> = ({
   unstyledSurface = false,
   fullScreenOnPhone = false,
   keepMounted = false,
+  ariaLabelledBy,
+  ariaDescribedBy,
 }) => {
   const enableWinterEffects = useGeneralStore(
     (state) => state.settings.enableWinterEffects,
@@ -194,6 +203,14 @@ const Modal: React.FC<ModalProps> = ({
         } ${containerClassName}`}
         onClick={(e) => e.stopPropagation()}
         ref={ref}
+        role={ariaLabelledBy ? 'dialog' : undefined}
+        aria-modal={ariaLabelledBy ? true : undefined}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
+        // No outline class here: the global `:focus { outline: none }` hides
+        // the ring, and an `outline-*` class would make the box's
+        // `transition-all` flash a white ring on every focus change inside.
+        tabIndex={ariaLabelledBy ? -1 : undefined}
       >
         {topContent}
         <div

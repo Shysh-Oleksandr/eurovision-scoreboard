@@ -66,35 +66,61 @@ export async function shareImage(
   }
 }
 
-export async function copyImage(
-  dataUrl: string,
-  messages: ImageActionMessages,
+/** Whether this browser can put an image on the clipboard. */
+export const canCopyImages = (): boolean =>
+  typeof ClipboardItem !== 'undefined' &&
+  typeof navigator !== 'undefined' &&
+  !!navigator.clipboard?.write;
+
+// Clipboards accept PNG only: re-encode JPEG exports.
+const toPngBlob = async (dataUrl: string): Promise<Blob> => {
+  const blob = await dataUrlToBlob(dataUrl);
+
+  if (blob.type === 'image/png') return blob;
+  const bitmap = await createImageBitmap(blob);
+  const canvas = document.createElement('canvas');
+
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  canvas.getContext('2d')?.drawImage(bitmap, 0, 0);
+
+  return new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error('encode'))),
+      'image/png',
+    ),
+  );
+};
+
+/**
+ * Copies an image that may still be on its way (a share modal's export).
+ * The `ClipboardItem` is created in the click itself with a promise of the
+ * PNG: Safari rejects a clipboard write that only starts after an await.
+ */
+export async function copyImageFrom(
+  source: () => Promise<string | null>,
+  messages: Pick<ImageActionMessages, 'copied' | 'copyFailed'>,
 ): Promise<void> {
   try {
-    if (typeof ClipboardItem === 'undefined' || !navigator.clipboard?.write) {
-      throw new Error('clipboard-unsupported');
-    }
-    let blob = await dataUrlToBlob(dataUrl);
+    if (!canCopyImages()) throw new Error('clipboard-unsupported');
+    const png = source().then((dataUrl) => {
+      if (!dataUrl) throw new Error('no-image');
 
-    // Clipboards accept PNG only: re-encode JPEG exports.
-    if (blob.type !== 'image/png') {
-      const bitmap = await createImageBitmap(blob);
-      const canvas = document.createElement('canvas');
+      return toPngBlob(dataUrl);
+    });
 
-      canvas.width = bitmap.width;
-      canvas.height = bitmap.height;
-      canvas.getContext('2d')?.drawImage(bitmap, 0, 0);
-      blob = await new Promise<Blob>((resolve, reject) =>
-        canvas.toBlob(
-          (b) => (b ? resolve(b) : reject(new Error('encode'))),
-          'image/png',
-        ),
-      );
-    }
-    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    // Handled by the write below; keeps a failed export from also being
+    // reported as an unhandled rejection.
+    png.catch(() => undefined);
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
     toast.success(messages.copied);
   } catch (err) {
     console.error('Copy failed:', err);
     toast.error(messages.copyFailed);
   }
 }
+
+export const copyImage = (
+  dataUrl: string,
+  messages: ImageActionMessages,
+): Promise<void> => copyImageFrom(async () => dataUrl, messages);

@@ -245,7 +245,8 @@ yarn cap:dev ios --lan          # real iPhone on the same Wi-Fi
   zooms into every focused input under 16px and stays zoomed, and the
   WKWebView honours the limits (it also stops pinch-zoom; Android's WebView
   never had it, `zoomEnabled` is off). Inputs can keep any font size. The
-  website keeps zoom.
+  website keeps zoom. The one scale the apps change is the Display size
+  setting (§8), which pins all three scales to its zoom.
 - **Offline is a normal state** ([offline-mode.md](offline-mode.md)). A
   list backed by the API renders through `useQueryView` + `QueryNotice`,
   never a bare `isLoading` spinner; an account action is disabled while
@@ -558,6 +559,42 @@ Google, including iPhone users who signed in with Apple. Details:
     `localStorage['dp-review-debug'] = '1'` makes every moment ask
     regardless of the rules and logs each decision as `[review]`. Clear
     `review-prompt-storage` to start over.
+- **Display size** (`src/native/displaySize.ts`, added 2026-11-19): Look &
+  feel → "Display size", 75% / 85% / 100%, per device (`displaySize`, not
+  synced). It makes the whole app smaller the way Safari's page zoom does a
+  website; a user compared the app with the website at Safari's 75% and
+  found the website denser. At 75% a 402pt phone lays the page out 536px
+  wide, so breakpoints and every measured layout see the wider viewport
+  (the setup hub gets three columns).
+  - **How:** the viewport tag gets `initial-`, `minimum-` and
+    `maximum-scale` set to the zoom; both engines then widen the layout to
+    the screen width divided by the zoom. Not CSS `zoom` (`vh`/`dvh` and
+    measurements would stay at 100%), and not WKWebView's `pageZoom`
+    (tested: it scales the page but keeps the 402px layout, so the page
+    fills only 75% of the screen). Next renders the tag again when it
+    renders the head, so a MutationObserver keeps the scaled one.
+    `startDisplaySizeSync` (`app-bootstrap.tsx`, module scope) applies the
+    saved size before the first render and follows the setting.
+  - **Platforms:** every iOS binary (WKWebView honours the tag), so iOS
+    gets it with a live update. Android's WebView ignores the tag's scales
+    unless the wide viewport is on (the layout widens but stays at 100%,
+    cropped), so it needs the `DouzeDisplay` plugin
+    (`DouzeDisplayPlugin.java`, turns on `setUseWideViewPort`, no
+    methods); the setting shows only where `isDisplaySizeSupported()`
+    finds it. The plugin waits on the `android-display-plugin` branch
+    (one commit) so master keeps the Android runtime of the store build and
+    its live updates still reach current Android users: build the next
+    Android store release from that branch merged with master, and merge it
+    into master once that build is live.
+  - **Safe areas:** `env(safe-area-inset-*)` and Capacitor's
+    `--safe-area-inset-*` stay in unscaled CSS px, so `--safe-*` divide
+    by `--dp-display-zoom` (`styles.css`); checked on the iOS 26 simulator
+    (62/34pt insets → 82.7/45.3px at 75%).
+  - **WebKit relayout:** a grid row of bare `1fr` keeps its old height
+    when the page gets wider (also on rotation and Safari window resizes),
+    leaving an empty band under the setup hub's lineups. Collapsible
+    sections use `collapsibleRows()` (`minmax(0, 1fr)`, which animates the
+    same).
 - **Keyboard:** no plugin. Android resizes the WebView for the keyboard
   (Capacitor's insets handling) and focused inputs stay visible (checked in
   Event Setup's country search); iOS keeps WKWebView's default scrolling.

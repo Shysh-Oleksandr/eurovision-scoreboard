@@ -241,6 +241,7 @@ const EventSetupModal = () => {
   const {
     isCustomCountryModalOpen,
     countryToEdit,
+    initialGroupId,
     handleOpenCreateModal,
     handleOpenEditModal,
     handleCloseModal,
@@ -632,6 +633,7 @@ const EventSetupModal = () => {
             isOpen={isCustomCountryModalOpen}
             onClose={handleCloseModal}
             countryToEdit={countryToEdit}
+            initialGroupId={initialGroupId}
           />
         )}
         {isEventStageModalOpen && (

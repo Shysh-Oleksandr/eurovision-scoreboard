@@ -24,6 +24,7 @@ import { normalizeLocale } from '@/i18n/catalog';
 import { getStoredLocale } from '@/i18n/nativeLocale';
 import { installAppLinkHandler } from '@/native/appLinks';
 import { installBackButtonHandler } from '@/native/backButton';
+import { startDisplaySizeSync } from '@/native/displaySizeSync';
 import { liveUpdateBoot, startLiveUpdateChecks } from '@/native/liveUpdate';
 import { IS_NATIVE_APP } from '@/native/platform';
 import {
@@ -60,6 +61,10 @@ const WhatsNewToast = IS_NATIVE_APP
       ssr: false,
     })
   : null;
+
+// The apps' Display size, before anything renders: the first screen lays
+// out at the saved size (src/native/displaySize.ts).
+if (IS_NATIVE_APP && typeof window !== 'undefined') startDisplaySizeSync();
 
 export default function AppBootstrap() {
   useFullscreen();

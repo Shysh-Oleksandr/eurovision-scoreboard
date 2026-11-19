@@ -21,11 +21,13 @@ import { useSimulationActions } from '../hooks/useSimulationActions';
 import { useSimViewStore } from './simViewStore';
 import { DRAG_THRESHOLD, useSheetDrag } from './useSheetDrag';
 
+import { SaveIcon } from '@/assets/icons/SaveIcon';
 import { SlidersIcon } from '@/assets/icons/SlidersIcon';
 import AnchoredMenu, {
   AnchoredMenuEntry,
 } from '@/components/common/AnchoredMenu';
 import Button from '@/components/common/Button';
+import { useContestSave } from '@/components/setup/widgets-section/contests/useContestSave';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import type { ShortcutId } from '@/shortcuts/actions';
@@ -307,13 +309,14 @@ interface SimHeaderActionsProps {
 
 /**
  * Minimal view, Setup (labelled: the one action used all the time) and ⋯
- * for undo, restart, share, fullscreen and cancel. Phones keep Setup and ⋯
- * as icons; ⋯ opens a quick-action sheet.
+ * for undo, restart, save, share, fullscreen and cancel. Phones keep Setup
+ * and ⋯ as icons; ⋯ opens a quick-action sheet.
  */
 export const SimHeaderActions = React.memo(
   ({ isDesktop, onShare }: SimHeaderActionsProps) => {
     const t = useTranslations('simulation');
     const tSettings = useTranslations('settings.ui');
+    const tRoot = useTranslations();
     const { canUndo, undo, restart, cancel, openSetup } =
       useSimulationActions();
     const setMinimalView = useSimViewStore((state) => state.setMinimalView);
@@ -328,6 +331,12 @@ export const SimHeaderActions = React.memo(
 
     const moreRef = useRef<HTMLDivElement>(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    // Same as Save on the setup's contest card: results included, one tap on
+    // a contest the user already saved, the save dialog otherwise.
+    const contestSave = useContestSave({
+      returnFocusTo: () =>
+        moreRef.current?.firstElementChild as HTMLElement | null,
+    });
 
     const iconClass = 'size-[18px]';
     const items: AnchoredMenuEntry[] = [
@@ -343,6 +352,17 @@ export const SimHeaderActions = React.memo(
         icon: <RotateCcw className={iconClass} />,
         onClick: restart,
         trailing: hint('restart'),
+      },
+      {
+        label: contestSave.isCopy
+          ? tRoot('widgets.contests.saveDialog.buttonCopy')
+          : tRoot('widgets.contests.saveDialog.buttonSave'),
+        icon: <SaveIcon className={iconClass} />,
+        onClick: contestSave.save,
+        disabled: contestSave.offline || contestSave.isSaving,
+        description: contestSave.offline
+          ? tRoot('offline.needsConnection')
+          : undefined,
       },
       {
         label: t('header.share'),
@@ -442,6 +462,7 @@ export const SimHeaderActions = React.memo(
             items={items}
           />
         )}
+        {contestSave.dialogElement}
       </div>
     );
   },

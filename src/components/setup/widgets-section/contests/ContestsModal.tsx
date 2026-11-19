@@ -158,12 +158,13 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
         />
       </Modal>
 
-      {/* Customize Contest Modal */}
+      {/* Save the open contest as a new one, or edit a contest's details */}
       {isCustomizeModalOpen && (
         <CreateContestModal
           isOpen={isCustomizeModalOpen}
           onClose={handleCloseCustomize}
-          initialContest={initialContest}
+          mode={initialContest ? 'details' : 'new'}
+          contest={initialContest}
         />
       )}
     </>

@@ -15,6 +15,8 @@ import { LineupPoolGroup } from './useLineupModel';
 import { useListExpanded } from './useLineupSearch';
 
 import { PencilIcon } from '@/assets/icons/PencilIcon';
+import { PlusIcon } from '@/assets/icons/PlusIcon';
+import { collapsibleRows } from '@/helpers/collapsibleRows';
 
 interface CustomGroupSectionProps {
   group: LineupPoolGroup;
@@ -28,7 +30,8 @@ const CustomGroupSection: React.FC<CustomGroupSectionProps> = ({
 }) => {
   const t = useTranslations();
   const { DropZone } = useDndComponents();
-  const { openMoveAllMenu, onEditGroup } = useLineupActions();
+  const { openMoveAllMenu, onEditGroup, onCreateCustomEntry } =
+    useLineupActions();
   const isUngrouped = group.id === UNGROUPED_ID;
   // Every group, "No group" included, starts collapsed.
   const expanded = useListExpanded(group.listId, false, group.codes, matches);
@@ -75,6 +78,22 @@ const CustomGroupSection: React.FC<CustomGroupSectionProps> = ({
             ariaLabel={t('setup.eventSetupModal.moveAllTo')}
             onClick={(e) => openMoveAllMenu(group.listId, e.currentTarget)}
           />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCreateCustomEntry(isUngrouped ? undefined : group.id);
+            }}
+            aria-label={t('setup.eventSetupModal.newEntryInGroup', {
+              group: title,
+            })}
+            title={t('setup.eventSetupModal.newEntryInGroup', {
+              group: title,
+            })}
+            className="dp-icon-btn w-[30px] h-[30px] rounded-lg grid place-items-center"
+          >
+            <PlusIcon className="size-[15px]" />
+          </button>
           {!isUngrouped && (
             <button
               type="button"
@@ -93,7 +112,7 @@ const CustomGroupSection: React.FC<CustomGroupSectionProps> = ({
       </div>
       <div
         className="grid transition-[grid-template-rows] duration-300 ease-in-out"
-        style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
+        style={{ gridTemplateRows: collapsibleRows(expanded) }}
       >
         <div className="min-h-0 overflow-hidden">
           {hasBeenOpened && (

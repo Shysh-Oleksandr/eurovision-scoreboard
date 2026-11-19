@@ -12,6 +12,7 @@ import {
   buildBackgroundColorLookup,
   getSpecialBackgroundStyle,
 } from '@/components/countryItem/utils/gradientUtils';
+import { getDouzeSpec } from '@/douze/registry';
 import { playHaptic } from '@/native/haptics';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -304,9 +305,9 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   );
 };
 
-const DOUZE_POINTS_VARIANTS: Record<
-  DouzePointsAnimationMode,
-  React.FC<BaseVariantProps>
+/** Spec-driven modes (src/douze/) render through `DouzeRowOverlay` instead. */
+const DOUZE_POINTS_VARIANTS: Partial<
+  Record<DouzePointsAnimationMode, React.FC<BaseVariantProps>>
 > = {
   parallelograms: LegacyParallelogramsAnimation,
   heartsGrid: HeartsGridAnimation,
@@ -337,6 +338,9 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
 
   const resolvedDouzePointsAnimationMode =
     douzePointsAnimationModeOverride ?? douzePointsAnimationMode;
+  const isSpecDouzePointsAnimationMode = !!getDouzeSpec(
+    resolvedDouzePointsAnimationMode,
+  );
   const isKnownDouzePointsAnimationMode =
     resolvedDouzePointsAnimationMode in DOUZE_POINTS_VARIANTS;
   const activeDouzePointsAnimationMode = isKnownDouzePointsAnimationMode
@@ -363,9 +367,11 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
       (point) => point.showDouzePoints && point.value === pointsAmount,
     );
 
-  if (!isDouzePoints) return null;
+  if (!isDouzePoints || isSpecDouzePointsAnimationMode) return null;
 
-  const SelectedVariant = DOUZE_POINTS_VARIANTS[activeDouzePointsAnimationMode];
+  const SelectedVariant =
+    DOUZE_POINTS_VARIANTS[activeDouzePointsAnimationMode] ??
+    HeartsGridAnimation;
 
   return (
     <SelectedVariant

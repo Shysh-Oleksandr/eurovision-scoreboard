@@ -46,7 +46,6 @@ not used yet; Phase 3 turns them into user-publishable templates.
 | `render/fills.tsx` | fill → style/class + `image` (rendered as `<img>` via `FillImg`, see §4); background `FillLayers` |
 | `export/exportNode.ts` | deterministic DOM → image (see §4) |
 | `export/useDesignExport.ts` | hook: `nodeRef`, `generate(size)`, `isGenerating` |
-| `components/DesignPreview.tsx` | preview + "Generate image" used by the share modals |
 | `templates/results.ts` | `buildResultsDesign` (share results / running order) |
 | `templates/stats.ts` | `buildStatsDesign` (share stats; content-sized) |
 | `templates/editor.ts` | built-in templates (Blank, Results, Running order, Qualifiers, Top 10, Announcement poster, Stats) with their `templateFields`, and `toEditableDesign` for "Open in editor" |
@@ -176,27 +175,64 @@ replace them with explicit export sizes.
 the fill-canvas stack at `max-content`, measures it with a ResizeObserver,
 sizes its own scaled wrapper from the measurement (not from the design's
 minimum, or the preview would be clipped), reports it (`onMeasured`), and
-`DesignPreview` uses the measured size for the preview scale and the export.
-The preview scale itself follows the container width through a second
-ResizeObserver, so it tracks window resizes. Until a measurement has been
-stable for 150 ms the stage stays `visibility: hidden` and the fit runs in a
-layout effect, so the user never sees the preview fitted to the
-pre-measurement minimum (it used to flash wide, then snap back).
+the share modal (`useShareExport`) uses the measured size for the picture's
+fit and the export. The fit itself follows the picture's box through a
+second ResizeObserver, so it tracks window resizes. Until a measurement has
+been stable for 150 ms the stage stays `visibility: hidden` and nothing is
+exported, so the user never sees the picture fitted to the pre-measurement
+minimum (it used to flash wide, then snap back).
 `buildStatsDesign` also needs the measured width for the title/branding
 font sizes (clamped 22–42 px and 16–22 px at 4 % / 2.5 % of width, as
 before), so `ShareStatsModal` keeps a `measuredWidth` state and rebuilds the
-design when it changes by more than 10 px. Auto-generation waits 300 ms
-after the measurement settles.
+design when it changes by more than 10 px.
 
 ## 6. Share modals (simple mode)
 
-`ShareResultsModal` and `ShareStatsModal` keep their forms and stores
-(`imageCustomization` in generalStore, `statsCustomizationStore`). They build
-a design from the form state and render
-`<DesignDataProvider><DesignPreview/></DesignDataProvider>`. Download and
-Web Share are unchanged. `DesignPreview` auto-generates when its host is
-open and `autoGenerateKey` changes (stage id / stats tab), never on settings
-edits — the user presses "Generate image" for those, as before.
+`ShareResultsModal` (results and running order) and `ShareStatsModal` build a
+design from their stores (`imageCustomization` in generalStore,
+`statsCustomizationStore`) and hand it to `ShareImageModal`
+(`src/components/simulation/share/`), the shared frame described in
+DESIGN.md "Share image modal": the picture, the options (a column beside it
+from 1024px, else a Customize section under it) and the action bar (Save
+image, Share, Copy image).
+
+- **No Generate step, and no export per edit.** `useShareExport` exports
+  once when the modal opens (120 ms after the stage has painted and, for
+  stats, been measured). That "opening" follows the design until the user's
+  first edit (`markEdited`, from click and input events inside the options),
+  since the design still changes by itself at first: the modal resetting its
+  title and layout, a table being measured. After that, edits only redraw
+  the live stage; Save, Share and Copy call `request()`, which reuses the
+  image while it is current and exports a new one otherwise (Save says
+  "Preparing…", a 2px accent line runs along the picture's top edge). An
+  image is current while its `design` object and the modal's `contentKey`
+  (the rows behind the design, plus the stats store values the tables read:
+  grid lines, voter names) are the ones it was made from. `SharePicture`
+  shows the exported `<img>` while it is current, so long-press save,
+  right-click copy and drag-out work on it, and the live stage once it is
+  stale. A failed opening export shows "Try again".
+- **Exports are 2×** on every device: JPEG 0.9 for results (2400 × 1260 for
+  Wide), PNG for stats. The old High quality toggle (4× on retina desktops)
+  and "Generate on open" are gone.
+- **Results options are choices.** Format (Wide 1200 × 630 / Square /
+  Tall), text, countries (All / Top 10 / a custom number), Places / Points /
+  Short names, and Layout: columns and row size start on Auto
+  (`getAutoShareLayout` in `share/autoLayout.ts`, presets by row count and
+  format) until stepped, then "Reset" brings Auto back. Title, subtitle and
+  branding sizes and the paddings always follow Auto; changing them is the
+  graphics editor's job ("Open in the graphics editor"). Every open starts
+  from the stage's title, all countries and the auto layout; the format and
+  the Show toggles carry over. A running order always shows every country.
+- **Stats** offer the Table switch when the caller passes `tableOptions` +
+  `onTableChange` (the final-stats modal moves its own tab with it; voting
+  predefinition offers Breakdown only once there are votes), Background
+  picture Off / Faint (0.3) / Strong (0.65), Grid lines Faint (0.5) / Strong
+  (1, `borderOpacity`) and, for Breakdown, voter names.
+- **Copy** builds the `ClipboardItem` in the click with a promise of the PNG
+  (`copyImageFrom` in `export/imageActions.ts`): Safari refuses a clipboard
+  write that only starts after an await. **Share** only shows where it works
+  (the apps, or `navigator.canShare` with a file); if the browser refuses
+  the share sheet after waiting for an export, a toast asks for a second tap.
 
 ## 7. Image sources
 

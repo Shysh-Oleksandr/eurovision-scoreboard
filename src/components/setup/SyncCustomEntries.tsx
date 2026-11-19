@@ -25,6 +25,7 @@ export const SyncCustomEntries: React.FC = () => {
         flag: entry.flagUrl,
         updatedAt: entry.updatedAt,
         groupId: entry.groupId ?? undefined,
+        ...(entry.shortCode ? { shortCode: entry.shortCode } : {}),
       }));
       const ownCodes = new Set(userCustomEntries.map((c) => c.code));
 

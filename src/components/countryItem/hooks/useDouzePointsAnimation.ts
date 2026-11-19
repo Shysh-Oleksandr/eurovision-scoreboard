@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { ANIMATION_DURATION } from '@/data/data';
+import { doesDouzePlayBeforeMove } from '@/douze/registry';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
@@ -9,6 +10,12 @@ const useDouzePointsAnimation = (
   countryCode: string,
   initialPoints: number | null,
   ignoreBoardTeleportDelay = false,
+  /**
+   * Changes with every award (the country's total). A whole jury vote given
+   * at once can leave the 12 flag up from one jury to the next, so a new 12
+   * shows as the total changing while the flag stays true.
+   */
+  awardKey?: number,
 ) => {
   const hideDouzePointsAnimation = useScoreboardStore(
     (state) => state.hideDouzePointsAnimation,
@@ -16,7 +23,25 @@ const useDouzePointsAnimation = (
 
   const [shouldRender, setShouldRender] = useState(false);
   const [animationPoints, setAnimationPoints] = useState<number | null>(null);
+  /**
+   * Bumped by every new 12. The overlay is keyed by it, so a country that
+   * gets 12 again before the previous overlay unmounted (the next jury, a
+   * fast presentation) plays it again instead of keeping the finished one.
+   */
+  const [runId, setRunId] = useState(0);
+  const lastAwardRef = useRef<{ isDouze: boolean; key?: number }>({
+    isDouze: false,
+  });
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const last = lastAwardRef.current;
+
+    if (isDouzePoints && (!last.isDouze || awardKey !== last.key)) {
+      setRunId((id) => id + 1);
+    }
+    lastAwardRef.current = { isDouze: isDouzePoints, key: awardKey };
+  }, [isDouzePoints, awardKey]);
 
   // Only track the board-wide teleport flag while this item's overlay is (or
   // is about to be) active — otherwise every item re-rendered twice per
@@ -26,7 +51,10 @@ const useDouzePointsAnimation = (
       ? state.isBoardTeleportAnimationRunning
       : false,
   );
-  const { boardAnimationMode } = useThemeSpecifics();
+  const { boardAnimationMode, douzePointsAnimationMode } = useThemeSpecifics();
+  // Spec animations that play before the move (2022) start at once; the
+  // board waits for them instead (useBoardAnimations' move delay).
+  const playsBeforeMove = doesDouzePlayBeforeMove(douzePointsAnimationMode);
 
   useEffect(() => {
     if (timerRef.current) {
@@ -35,6 +63,7 @@ const useDouzePointsAnimation = (
 
     const shouldDelayForTeleport =
       !ignoreBoardTeleportDelay &&
+      !playsBeforeMove &&
       boardAnimationMode === 'teleport' &&
       isBoardTeleportAnimationRunning;
 
@@ -65,9 +94,12 @@ const useDouzePointsAnimation = (
     ignoreBoardTeleportDelay,
     isBoardTeleportAnimationRunning,
     boardAnimationMode,
+    playsBeforeMove,
+    // A new 12 with the flag still up restarts the timers too.
+    awardKey,
   ]);
 
-  return { shouldRender, points: animationPoints };
+  return { shouldRender, points: animationPoints, runId };
 };
 
 export default useDouzePointsAnimation;

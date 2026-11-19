@@ -50,7 +50,7 @@ The app is essentially a **single-page application** -- everything happens at `/
   - Voting mode per stage: **Jury + Televote** (two separate rounds), **Televote only**, **Jury only**, **Combined** (both in one round per country)
   - Qualifier targets: count-based (N entries advance) or rank-based (different rank ranges go to different follow-up stages)
 - **Stage reordering** (`StageReorderModal`): Drag-and-drop reorder of stages
-- **Custom country/entry creation** (`CustomCountryModal`): Add fictional or non-standard entries with custom flags, reuse existing flags
+- **Custom country/entry creation** (`CustomCountryModal`, `setup/custom-entry/`): Add fictional or non-standard entries; a live preview draws the entry as the theme's board row; one flag picker (your flags, presets, country flags, an upload or an image link); "Add another" for making many in a row; the + on a group's header starts an entry in that group. Design rules in DESIGN.md "Custom entry editor"
 - **Custom entry categories**: Organize custom entries into groups
 - **Bulk selection**: Multi-select entries in a section and move them in bulk to another stage (`SectionMultiselectContext`)
 - **Not Participating section**: Manage excluded countries, create custom entries
@@ -75,7 +75,8 @@ avatar, name and followers count; "Sign in" when signed out).
 - **Profile modal** with two tabs:
   - **Your Profile**: View profile header (avatar, display name, follower count), your custom themes, your contests
   - **Following feed**: Activity feed from followed users
-- **Edit Profile modal**: Change display name, profile picture
+- **Edit profile modal**: what other fans see (picture, name, @username, country), saved with Save; hints under each field, errors in all nine languages
+- **Account modal** (Profile → Account): sign-in methods, blocked users, Log out, Delete account; every action applies at once, so it has Close but no Save
 - **User Profile modal** (other users): View public themes, contests, follow/unfollow
 
 #### Themes Widget
@@ -167,28 +168,24 @@ avatar, name and followers count; "Sign in" when signed out).
 
 - **Winner celebration**:
   - **Winner Modal** (`WinnerModal.tsx`): Sparkle effects, flag display, points, delay-open animation
-  - **Winner Confetti** (`WinnerConfetti.tsx`): Canvas confetti animation
+  - **Winner Confetti** (`WinnerConfetti.tsx` → `effects/confetti/ConfettiShower.tsx`): canvas confetti drawn with the user's amount, duration, fall speed and colours (Rainbow, the theme's accents, or the winner's flag read off its image by `confettiColors.ts`); `confettiPlan.ts` maps the settings to react-confetti options. It marks `isWinnerAnimationAlreadyDisplayed` once the last piece has fallen
 
-- **Final Stats** (`finalStats/`):
-  - **Breakdown tab**: Full voting breakdown table (who gave what to whom)
-  - **Split Stats tab**: Jury vs Televote comparison
-  - **Summary Stats tab**: Aggregate statistics
-  - **Share Stats** as image
+- **Final Stats** (`finalStats/`, `FinalStatsModal`; look in DESIGN.md "Stats modal"):
+  - **Summary** (opens first, `SummaryView`): the result with total, jury and televote points and places, and a jury / televote bar under each name
+  - **Split** (`SplitView`): the total, jury and televote rankings side by side (one at a time below 720px); pointing at an entry lights it in all three
+  - **Breakdown** (`BreakdownView`): every voter × every entry with Total / Jury / Televote; frozen header row and country column, shading by points, a crosshair and a line that spells out the hovered or tapped vote; spreadsheet Export on the website
+  - Stage picker once two stages have finished; rankings for Summary and Split in `statsRankings.ts`
+  - **Share Stats** as image (the share image draws its own tables: `SummaryStats`, `SplitStats`, `StatsTable`)
 
 - **Share Results** (`share/`):
-  - **ShareResultsModal**: Generate a customizable screenshot of the scoreboard with:
-    - Custom title/subtitle
-    - Column layout (1-4 columns)
-    - Max countries shown
-    - Show/hide rankings, points
-    - Short country names
-    - Multiple aspect ratios (Landscape 16:9, Square 1:1, Portrait 3:4)
-    - Font size controls (title, subtitle, branding)
-    - Padding controls
-    - High-quality toggle
-    - Download as PNG
-    - Native share API
-  - **ShareStatsModal**: Share stats as generated image
+  - **ShareResultsModal**: the scoreboard (or a running order) as an image, ready to save when the modal opens:
+    - Format: Wide (1200 × 630), Square, Tall
+    - Title and subtitle, all countries / top 10 / a custom number
+    - Places, points and short names on or off
+    - Columns and row size, Auto by default
+    - Save image, Share (system sheet), Copy image (desktop browsers)
+    - "Open in the graphics editor" for fonts, sizes and spacing
+  - **ShareStatsModal**: the same modal for the stats tables (table switch, background picture, grid lines). Both share one frame, `ShareImageModal`; see `docs/graphics-studio.md` §6
 
 - **Keyboard shortcuts** (`src/shortcuts/`, `SimulationShortcuts.tsx`): Space for Random, N / V / F for the random scopes, ⌘Z / Ctrl+Z undo, R restart (asks first), Enter continue, S setup, P present, M minimal view, T stats, ? for their settings, ⌘S / Ctrl+S to start a stage. Buttons show the key in a corner on the website with a mouse or trackpad; Settings → Keyboard shortcuts changes any key or turns them off. See `docs/keyboard-shortcuts.md`.
 
@@ -224,7 +221,7 @@ Two tabs: **General** and **Odds**
 - Rank change indicator
 - Qualifiers popup toggle
 - Winner popup toggle
-- Winner confetti toggle
+- Winner confetti toggle, with amount, duration, fall speed, colours and a Preview button
 - Fullscreen mode
 - Jury voting progress bar
 - Blur modal background

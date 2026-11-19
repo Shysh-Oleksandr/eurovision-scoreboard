@@ -2,18 +2,21 @@
 import {
   Check,
   CopyCheck,
+  CopyPlus,
   Dices,
   Globe,
   Lock,
   MonitorSmartphone,
   MoreHorizontal,
+  PencilLine,
   Users,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo, useRef, useState } from 'react';
 
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
+
+import { useContestSave } from './useContestSave';
 
 import { api } from '@/api/client';
 import { ArrowDownAndUpIcon } from '@/assets/icons/ArrowDownAndUpIcon';
@@ -35,10 +38,6 @@ import { languageTag } from '@/i18n/catalog';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
-
-const CreateContestModal = dynamic(() => import('./CreateContestModal'), {
-  ssr: false,
-});
 
 /**
  * Layouts from roomiest to tightest, picked by `useFitStep` (see
@@ -110,9 +109,20 @@ const ContestCard: React.FC<ContestCardProps> = ({
     shouldUse2026WhiteHeartFlags,
   );
 
-  const [isContestsModalOpen, setIsContestsModalOpen] = useState(false);
-  const [isContestsModalLoaded, setIsContestsModalLoaded] = useState(false);
   const [moreAnchor, setMoreAnchor] = useState<HTMLElement | null>(null);
+  const moreRef = useRef<HTMLSpanElement>(null);
+  // Save on a contest the user already saved stores it in one tap; anything
+  // else (not saved yet, someone else's) opens the save dialog.
+  const {
+    save: onSaveClick,
+    openDialog: openSaveDialog,
+    ownsOpenContest,
+    isSaving,
+    offline,
+    dialogElement: saveDialogElement,
+  } = useContestSave({
+    returnFocusTo: () => moreRef.current?.querySelector('button'),
+  });
 
   const { confirm: confirmResetContest } = useConfirmation();
 
@@ -163,7 +173,25 @@ const ContestCard: React.FC<ContestCardProps> = ({
 
   const secondaryInMenu = step.tools !== 'all';
   const drawInMenu = step.draw === 'menu';
-  const moreItems: AnchoredMenuEntry[] = [
+  const saveItems: AnchoredMenuEntry[] = ownsOpenContest
+    ? [
+        {
+          label: t('widgets.contests.saveDialog.menuEditDetails'),
+          icon: <PencilLine className="size-4" />,
+          description: offline ? t('offline.needsConnection') : undefined,
+          disabled: offline,
+          onClick: () => openSaveDialog('details'),
+        },
+        {
+          label: t('widgets.contests.saveDialog.menuSaveAsNew'),
+          icon: <CopyPlus className="size-4" />,
+          description: offline ? t('offline.needsConnection') : undefined,
+          disabled: offline,
+          onClick: () => openSaveDialog('new'),
+        },
+      ]
+    : [];
+  const toolItems: AnchoredMenuEntry[] = [
     ...(drawInMenu
       ? [
           {
@@ -206,6 +234,11 @@ const ContestCard: React.FC<ContestCardProps> = ({
         ]
       : []),
   ];
+  const moreItems: AnchoredMenuEntry[] = [
+    ...saveItems,
+    ...(saveItems.length && toolItems.length ? ['hr' as const] : []),
+    ...toolItems,
+  ];
 
   return (
     <>
@@ -216,6 +249,8 @@ const ContestCard: React.FC<ContestCardProps> = ({
           ref={cardRef}
           className="dp-cc-layout"
           {...fitStepAttributes(step)}
+          // The ⋯ menu holds Edit details / Save as new: shown at every step.
+          data-save-menu={ownsOpenContest ? '' : undefined}
         >
           <div className="dp-cc-head flex items-center gap-2.5 2cols:gap-[13px] min-w-0">
             {showHostingCountryLogo && (
@@ -323,22 +358,20 @@ const ContestCard: React.FC<ContestCardProps> = ({
             <span className="dp-cc-end">
               <DrawToggleButton className={`dp-cc-draw ${TOOL_CLASS}`} />
               <Button
-                onClick={() => setIsContestsModalOpen(true)}
+                onClick={onSaveClick}
                 variant="surfaceStrong"
                 size="md"
-                title={
-                  user ? t('common.save') : t('common.authenticationRequired')
-                }
-                aria-label={t('common.save')}
+                title={offline ? t('offline.needsConnection') : undefined}
                 Icon={<SaveIcon className="size-[17px]" />}
                 snowEffect="right"
                 snowEffectClassName="dp-fit-ignore"
-                disabled={!user}
+                disabled={offline}
+                isLoading={isSaving}
                 className={TOOL_CLASS}
               >
                 {t('common.save')}
               </Button>
-              <span className="dp-cc-more relative">
+              <span ref={moreRef} className="dp-cc-more relative">
                 <Button
                   variant="surface"
                   size="md"
@@ -372,14 +405,7 @@ const ContestCard: React.FC<ContestCardProps> = ({
         </div>
       </div>
 
-      {(isContestsModalOpen || isContestsModalLoaded) && (
-        <CreateContestModal
-          isOpen={isContestsModalOpen}
-          onClose={() => setIsContestsModalOpen(false)}
-          onLoaded={() => setIsContestsModalLoaded(true)}
-          initialContest={isOwner && activeContest ? activeContest : undefined}
-        />
-      )}
+      {saveDialogElement}
     </>
   );
 };

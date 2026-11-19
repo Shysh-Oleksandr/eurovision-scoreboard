@@ -107,7 +107,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({
         userId={user._id}
       />
 
-      <div className="flex flex-wrap items-center gap-2 flex-shrink-0 ml-auto">
+      <div className="flex flex-wrap items-center gap-2 flex-shrink-0 max-w-full ml-auto">
         <FollowButton userId={user._id} variant="md" />
         <Button
           variant="tertiary"

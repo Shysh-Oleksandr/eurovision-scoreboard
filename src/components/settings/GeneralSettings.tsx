@@ -11,6 +11,7 @@ import { useSettingsSearch } from './general/useSettingsSearch';
 
 import { useHasFinePointer } from '@/hooks/useHasFinePointer';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { isDisplaySizeSupported } from '@/native/displaySize';
 import { IS_NATIVE_APP } from '@/native/platform';
 import {
   GeneralSettingsCategoryId,
@@ -42,6 +43,7 @@ export const GeneralSettings: React.FC = () => {
       hasSimBg: customThemeHasSimulationBackground(customTheme),
       isNativeApp: IS_NATIVE_APP,
       hasFinePointer,
+      displaySizeSupported: isDisplaySizeSupported(),
     }),
     [customTheme, hasFinePointer],
   );

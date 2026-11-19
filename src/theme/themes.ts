@@ -952,6 +952,9 @@ export const escThemes: Partial<ThemeRecord> = {
       },
     },
     backgroundImage: '/bgImages/DarkRedBg2022.webp',
+    themeSpecifics: {
+      douzePointsAnimationMode: 'year2022',
+    },
   },
   '2023': {
     colors: {

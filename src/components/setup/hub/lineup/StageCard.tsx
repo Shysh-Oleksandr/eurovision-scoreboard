@@ -22,6 +22,7 @@ import { useListExpanded } from './useLineupSearch';
 
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import { PlusIcon } from '@/assets/icons/PlusIcon';
+import { collapsibleRows } from '@/helpers/collapsibleRows';
 import { EventStage } from '@/models';
 
 export interface StageCardProps {
@@ -204,7 +205,7 @@ const StageCard: React.FC<StageCardProps> = ({
 
       <div
         className="grid transition-[grid-template-rows] duration-300 ease-in-out"
-        style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
+        style={{ gridTemplateRows: collapsibleRows(expanded) }}
       >
         <div
           className={`min-h-0 ${!expanded || sliding ? 'overflow-hidden' : ''}`}

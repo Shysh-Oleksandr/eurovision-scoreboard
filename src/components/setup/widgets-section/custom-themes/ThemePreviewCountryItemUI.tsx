@@ -16,6 +16,8 @@ import {
   splitRoundedCountryItemSurfaceClasses,
 } from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
+import DouzeRowOverlay from '@/douze/DouzeRowOverlay';
+import { getDouzeSpec } from '@/douze/registry';
 import { getSpecialColorStyle } from '@/helpers/colorConversion';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import useAnimatePoints from '@/hooks/useAnimatePoints';
@@ -110,12 +112,13 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     roundedCountryContainer ? 'mr-2' : ''
   }`;
 
-  const { shouldRender: showDouzePointsAnimationHook } =
+  const { shouldRender: showDouzePointsAnimationHook, runId: douzeRunId } =
     useDouzePointsAnimation(
       showDouzePointsAnimation,
       previewCountry.code,
       lastPoints,
       true,
+      points,
     );
 
   const douzePointsRefs = showDouzePointsAnimationHook
@@ -340,6 +343,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       renderDouzePointsAnimation={() =>
         showDouzePointsAnimationHook ? (
           <DouzePointsAnimation
+            key={douzeRunId}
             refs={{
               containerRef: douzePointsContainerRef,
               parallelogramBlueRef: douzePointsParallelogramBlueRef,
@@ -355,11 +359,24 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
           />
         ) : null
       }
+      renderOverlay={
+        showDouzePointsAnimationHook && getDouzeSpec(douzePointsAnimationMode)
+          ? () => (
+              <DouzeRowOverlay
+                key={douzeRunId}
+                mode={douzePointsAnimationMode}
+                pointsAmount={lastPoints ?? 12}
+                isThemePreview
+              />
+            )
+          : undefined
+      }
       renderFlag={
         flagShape === 'none'
           ? undefined
           : () => (
               <img
+                data-douze-anchor="flag"
                 loading="lazy"
                 src={mockCountry.flag || '/flags/ww.svg'}
                 alt={`${mockCountry.name} flag`}
@@ -373,7 +390,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
             )
       }
       renderName={() => (
-        <h4 ref={nameRef} className={nameClassName}>
+        <h4 ref={nameRef} className={nameClassName} data-douze-anchor="name">
           {mockCountry.name}
         </h4>
       )}

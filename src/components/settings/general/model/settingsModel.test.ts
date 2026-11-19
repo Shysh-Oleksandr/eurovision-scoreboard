@@ -76,12 +76,15 @@ describe('general settings model', () => {
       if (item.kind === 'slider') {
         if (item.minLabelKey) keys.add(item.minLabelKey);
         if (item.maxLabelKey) keys.add(item.maxLabelKey);
+        if (item.valueKey) keys.add(item.valueKey);
       }
       if (item.kind === 'custom') {
         item.searchTextKeys.forEach((key) => keys.add(key));
       }
       if (item.kind === 'segmented') {
-        item.options.forEach((option) => keys.add(option.labelKey));
+        item.options.forEach((option) => {
+          if (option.labelKey) keys.add(option.labelKey);
+        });
       }
     }
 

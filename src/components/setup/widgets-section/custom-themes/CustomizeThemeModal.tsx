@@ -1718,6 +1718,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                         ),
                         value: 'heartsGrid',
                       },
+                      {
+                        label: t(
+                          'widgets.themes.visualDetails.douzePointsAnimations.year2022',
+                        ),
+                        value: 'year2022',
+                      },
                     ]}
                     value={douzePointsAnimationMode}
                     labelClassName="!text-base !font-medium mb-1"

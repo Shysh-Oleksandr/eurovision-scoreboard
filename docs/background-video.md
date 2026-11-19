@@ -28,6 +28,12 @@ The URL is either our CDN (upload) or any https link.
   which go through it) deletes the uploaded video.
 - `POST /themes/:id/background` (images) now checks the bytes too: PNG, JPEG
   or WebP up to 2 MB (the client limit is 1.5 MB). SVG is refused.
+- Theme lists (`/themes/public`, `/themes/me`, `/themes/me/saved`, a user's
+  public themes) take `hasBackgroundVideo=true`, the "With video" filter next
+  to "With audio" in Public themes. It matches `backgroundVideoUrl: {$exists:
+  true}` (`THEME_HAS_BACKGROUND_VIDEO_FILTER`): the URL is never stored empty,
+  so there's no denormalized flag to keep in sync, and a partial index on
+  `backgroundVideoUrl` holds only the themes that have one.
 - The content fingerprints (backend `theme-fingerprint.ts`, frontend
   `themeFingerprint.ts`) include `backgroundVideo` only when set, so existing
   themes keep their fingerprint.

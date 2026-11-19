@@ -1,35 +1,21 @@
 import { useTranslations } from 'next-intl';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { toast } from 'react-toastify';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import Image from 'next/image';
-
-import Button from '../../common/Button';
-import { Checkbox } from '../../common/Checkbox';
-import { CollapsibleSection } from '../../common/CollapsibleSection';
-import Modal from '../../common/Modal/Modal';
-import { Input } from '../../Input';
-
-import { DownloadIcon } from '@/assets/icons/DownloadIcon';
-import { PencilIcon } from '@/assets/icons/PencilIcon';
-import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
-import DesignPreview from '@/graphics/components/DesignPreview';
 import {
-  DesignDataProvider,
-  StatsSource,
-} from '@/graphics/render/DesignDataContext';
+  ShareGroup,
+  ShareLinkButton,
+  ShareSegmented,
+  ShareTextField,
+  ShareToggle,
+} from './controls';
+import ShareImageModal from './ShareImageModal';
+
+import { StatsSource } from '@/graphics/render/DesignDataContext';
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { toEditableDesign } from '@/graphics/templates/editor';
 import { buildStatsDesign, STATS_MIN_WIDTH } from '@/graphics/templates/stats';
-import { saveFile } from '@/helpers/fileActions';
+import { buildShareUrl } from '@/helpers/shareUrl';
 import { Country, EventStage, StageVotingType, StatsTableType } from '@/models';
-import { askForReviewSoon } from '@/native/review';
 import { useGeneralStore } from '@/state/generalStore';
 import { useStatsCustomizationStore } from '@/state/statsCustomizationStore';
 
@@ -37,6 +23,12 @@ interface ShareStatsModalProps {
   isOpen: boolean;
   onClose: () => void;
   activeTab: StatsTableType;
+  /**
+   * The tables the modal's Table switch offers (with `onTableChange`); the
+   * caller feeds the data for the one picked through `activeTab`.
+   */
+  tableOptions?: StatsTableType[];
+  onTableChange?: (table: StatsTableType) => void;
   rankedCountries: (Country & { rank: number })[];
   selectedStageId: string | null;
   selectedVoteType: StageVotingType | 'Total';
@@ -55,10 +47,30 @@ interface ShareStatsModalProps {
   aggregateOnly?: boolean;
 }
 
+/** PNG at 2× the measured table: sharp text without a 3× file on phones. */
+const EXPORT_OPTIONS = { scale: 2, format: 'png' as const };
+
+type BackgroundLevel = 'off' | 'faint' | 'strong';
+type GridLevel = 'faint' | 'strong';
+
+const BACKGROUND_OPACITY: Record<Exclude<BackgroundLevel, 'off'>, number> = {
+  faint: 0.3,
+  strong: 0.65,
+};
+const GRID_OPACITY: Record<GridLevel, number> = { faint: 0.5, strong: 1 };
+
+const TABLE_LABEL_KEYS = {
+  [StatsTableType.BREAKDOWN]: 'breakdown',
+  [StatsTableType.SPLIT]: 'split',
+  [StatsTableType.SUMMARY]: 'summary',
+} as const;
+
 const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
   isOpen,
   onClose,
   activeTab,
+  tableOptions,
+  onTableChange,
   rankedCountries,
   selectedStageId,
   selectedVoteType,
@@ -69,38 +81,36 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
   onLoaded,
   aggregateOnly = false,
 }) => {
-  const t = useTranslations();
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
-    null,
-  );
-  const [lastGeneratedImageType, setLastGeneratedImageType] =
-    useState<StatsTableType | null>(null);
-
-  const { settings, setSettings, resetSettings } = useStatsCustomizationStore();
-  const openEditor = useGraphicsStudioStore((state) => state.openEditor);
+  const t = useTranslations('share');
+  const tc = useTranslations('common');
   const tg = useTranslations('graphics.share');
+  const tStats = useTranslations('simulation.finalStats');
+
+  const { settings, setSettings } = useStatsCustomizationStore();
+  const openEditor = useGraphicsStudioStore((state) => state.openEditor);
   const contestName = useGeneralStore((state) => state.settings.contestName);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
+  const activeContest = useGeneralStore((state) => state.activeContest);
 
   const stageName = selectedStage?.name || 'Unknown Stage';
   const defaultTitle = `${contestName} ${contestYear} - ${stageName}`;
-  const voteTypeText =
-    selectedVoteType === 'Total' ? 'Total' : selectedVoteType;
   const tableTypeText =
     activeTab === StatsTableType.BREAKDOWN
       ? 'Breakdown'
       : activeTab === StatsTableType.SPLIT
       ? 'Split'
       : 'Summary';
+  const voteTypeText =
+    selectedVoteType === 'Total' ? 'Total' : selectedVoteType;
 
-  const handleImageGenerated = useCallback(
-    (dataUrl: string) => {
-      setGeneratedImageUrl(dataUrl);
-      setLastGeneratedImageType(activeTab);
-    },
-    [activeTab],
-  );
+  useEffect(() => {
+    if (isOpen) setSettings({ title: defaultTitle });
+  }, [isOpen, defaultTitle, setSettings]);
+
+  useEffect(() => {
+    if (isOpen) onLoaded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   // Content-sized canvas: the measured width feeds the title/branding font
   // sizes on the next render (docs/graphics-studio.md).
@@ -110,6 +120,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       Math.abs(prev - size.width) > 10 ? size.width : prev,
     );
   }, []);
+
   const statsSource = useMemo<StatsSource>(
     () => ({
       rankedCountries,
@@ -132,6 +143,7 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       aggregateOnly,
     ],
   );
+
   const design = useMemo(
     () =>
       buildStatsDesign({
@@ -149,258 +161,159 @@ const ShareStatsModal: React.FC<ShareStatsModalProps> = ({
       measuredWidth,
     ],
   );
-  const exportOptions = useMemo(
+
+  // The tables read the grid lines and voter names from the store, so they
+  // count as content: a change re-exports the image.
+  const contentKey = useMemo(
     () => ({
-      // Parity with the old exporter, which used html-to-image's default
-      // pixel ratio (the device's).
-      scale: Math.min(3, Math.max(1, window.devicePixelRatio || 1)),
-      format: 'png' as const,
+      statsSource,
+      borderOpacity: settings.borderOpacity,
+      showVotingCountriesNames: settings.showVotingCountriesNames,
     }),
-    [],
+    [statsSource, settings.borderOpacity, settings.showVotingCountriesNames],
   );
 
-  const handleDownload = async () => {
-    if (!generatedImageUrl) return;
+  const backgroundLevel: BackgroundLevel = !settings.showBackgroundImage
+    ? 'off'
+    : settings.backgroundOpacity > 0.45
+    ? 'strong'
+    : 'faint';
+  const gridLevel: GridLevel =
+    settings.borderOpacity > 0.75 ? 'strong' : 'faint';
 
-    const filename = `${defaultTitle} - ${tableTypeText} - ${voteTypeText} - DouzePoints.app - ${Date.now()}.png`;
+  const tables = tableOptions ?? [];
 
-    try {
-      const result = await saveFile(generatedImageUrl, filename);
+  const primaryOptions =
+    onTableChange && tables.length > 1 ? (
+      <ShareGroup label={t('table')}>
+        <ShareSegmented
+          ariaLabel={t('table')}
+          value={activeTab}
+          onChange={onTableChange}
+          options={tables.map((table) => ({
+            value: table,
+            label: tStats(TABLE_LABEL_KEYS[table]),
+          }))}
+        />
+      </ShareGroup>
+    ) : undefined;
 
-      if (result.kind === 'saved') {
-        toast.success(t('common.savedTo', { folder: result.folder }));
-      }
-      if (result.kind !== 'cancelled') askForReviewSoon('image-shared');
-    } catch (err) {
-      console.error('Save failed:', err);
-      toast.error('Failed to share');
-    }
-  };
+  const moreOptions = (
+    <>
+      <ShareGroup
+        label={t('text')}
+        aside={
+          settings.title !== defaultTitle && (
+            <ShareLinkButton
+              onClick={() => setSettings({ title: defaultTitle })}
+            >
+              {tc('reset')}
+            </ShareLinkButton>
+          )
+        }
+      >
+        <ShareTextField
+          label={tc('title')}
+          value={settings.title}
+          maxLength={100}
+          onChange={(value) => setSettings({ title: value })}
+        />
+      </ShareGroup>
 
-  const updateSetting = (key: keyof typeof settings, value: any) => {
-    setSettings({ [key]: value });
-  };
+      <ShareGroup label={t('backgroundPicture')}>
+        <ShareSegmented
+          ariaLabel={t('backgroundPicture')}
+          value={backgroundLevel}
+          onChange={(level) =>
+            setSettings(
+              level === 'off'
+                ? { showBackgroundImage: false }
+                : {
+                    showBackgroundImage: true,
+                    backgroundOpacity: BACKGROUND_OPACITY[level],
+                  },
+            )
+          }
+          options={[
+            { value: 'off', label: t('off') },
+            { value: 'faint', label: t('faint') },
+            { value: 'strong', label: t('strong') },
+          ]}
+        />
+      </ShareGroup>
 
-  useEffect(() => {
-    if (isOpen) {
-      setSettings({
-        title: defaultTitle,
-      });
-      onLoaded();
-    }
-    if (
-      isOpen &&
-      settings.generateOnOpen &&
-      (!generatedImageUrl || lastGeneratedImageType !== activeTab)
-    ) {
-      setGeneratedImageUrl(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isOpen,
-    defaultTitle,
-    setSettings,
-    settings.generateOnOpen,
-    generatedImageUrl,
-    lastGeneratedImageType,
-    activeTab,
-  ]);
+      <ShareGroup label={t('gridLines')}>
+        <ShareSegmented
+          ariaLabel={t('gridLines')}
+          value={gridLevel}
+          onChange={(level) =>
+            setSettings({ borderOpacity: GRID_OPACITY[level] })
+          }
+          options={[
+            { value: 'faint', label: t('faint') },
+            { value: 'strong', label: t('strong') },
+          ]}
+        />
+      </ShareGroup>
+
+      {activeTab === StatsTableType.BREAKDOWN && (
+        <ShareGroup label={t('show')}>
+          <div className="grid grid-cols-2 gap-1.5">
+            <ShareToggle
+              label={t('voterNames')}
+              pressed={settings.showVotingCountriesNames}
+              onChange={(on) => setSettings({ showVotingCountriesNames: on })}
+            />
+          </div>
+        </ShareGroup>
+      )}
+    </>
+  );
+
+  const fileTitle = settings.title || defaultTitle;
 
   return (
-    <Modal
-      ref={modalRef}
+    <ShareImageModal
       isOpen={isOpen}
       onClose={onClose}
-      containerClassName="!w-[min(100%,_95vw)]"
-      fullScreenOnPhone
-      contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
-      overlayClassName="!z-[1001]"
-      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
-    >
-      <div className="sm:space-y-6 space-y-4 sm:py-2 py-1">
-        <div className="sm:mx-3 mx-2">
-          <CollapsibleSection
-            title={t('share.customization')}
-            isExpanded={settings.isCustomizationExpanded}
-            onToggle={() => {
-              setSettings({
-                isCustomizationExpanded: !settings.isCustomizationExpanded,
-              });
-            }}
-            contentClassName="lg:px-6 sm:px-4 px-3"
-            extraContent={
-              <Button
-                className="h-10 !py-2 ml-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  resetSettings();
-                  setSettings({ title: defaultTitle });
-                }}
-              >
-                {t('common.reset')}
-              </Button>
-            }
-          >
-            <div className="sm:space-y-4 space-y-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 gap-2 items-center">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('common.title')}
-                  </label>
-                  <Input
-                    type="text"
-                    className="pr-2"
-                    value={settings.title}
-                    onChange={(e) => updateSetting('title', e.target.value)}
-                    placeholder={t('common.enterTitle')}
-                    maxLength={100}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.borderOpacity')}
-                  </label>
-                  <Input
-                    type="number"
-                    className="pr-3"
-                    value={settings.borderOpacity}
-                    onChange={(e) =>
-                      updateSetting(
-                        'borderOpacity',
-                        parseFloat(e.target.value) ?? 1,
-                      )
-                    }
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    placeholder="1"
-                  />
-                </div>
-
-                <Checkbox
-                  id="showBackgroundImage"
-                  label={t('share.showBackgroundImage')}
-                  checked={settings.showBackgroundImage}
-                  onChange={(e) =>
-                    updateSetting('showBackgroundImage', e.target.checked)
-                  }
-                />
-
-                {settings.showBackgroundImage && (
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      {t('share.backgroundOpacity')}
-                    </label>
-                    <Input
-                      type="number"
-                      className="pr-3"
-                      value={settings.backgroundOpacity}
-                      onChange={(e) =>
-                        updateSetting(
-                          'backgroundOpacity',
-                          parseFloat(e.target.value) || 0.3,
-                        )
-                      }
-                      min="0"
-                      max="1"
-                      step="0.1"
-                      placeholder="0.3"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-wrap gap-1">
-                {activeTab === StatsTableType.BREAKDOWN && (
-                  <Checkbox
-                    id="showVotingCountriesNames"
-                    label={t('share.showVotingCountriesNames')}
-                    checked={settings.showVotingCountriesNames}
-                    onChange={(e) =>
-                      updateSetting(
-                        'showVotingCountriesNames',
-                        e.target.checked,
-                      )
-                    }
-                  />
-                )}
-
-                <Checkbox
-                  id="generateOnOpen"
-                  label={t('share.generateOnOpen')}
-                  checked={settings.generateOnOpen}
-                  onChange={(e) =>
-                    updateSetting('generateOnOpen', e.target.checked)
-                  }
-                />
-              </div>
-            </div>
-          </CollapsibleSection>
-        </div>
-
-        {/* Stats Image Preview */}
-        <DesignDataProvider binding={design.data} stats={statsSource}>
-          <DesignPreview
-            design={design}
-            exportOptions={exportOptions}
-            autoGenerate={settings.generateOnOpen}
-            autoGenerateKey={activeTab}
-            active={isOpen}
-            onImageGenerated={handleImageGenerated}
-            onMeasured={handleMeasured}
-            scrollTargetRef={modalRef}
-            extraActions={
-              <Button
-                variant="tertiary"
-                Icon={<PencilIcon className="w-[20px] h-[20px]" />}
-                onClick={() => {
-                  // The editor computes the tables itself from the live
-                  // stage this modal shows (statsAccessors), so the design
-                  // binds to that stage rather than to a frozen copy.
-                  onClose();
-                  openEditor({
-                    design: toEditableDesign(design, {
-                      name: tg('statsDesign'),
-                      liveStageId: selectedStageId,
-                    }),
-                    draftId: null,
-                    selectId: 'stats',
-                  });
-                }}
-              >
-                {tg('openInEditor')}
-              </Button>
-            }
-          />
-        </DesignDataProvider>
-
-        {/* Generated Image Result */}
-        {generatedImageUrl && (
-          <div>
-            <h3 className="text-lg font-semibold mb-2 ml-2">
-              {t('share.result')}:
-            </h3>
-
-            <Image
-              src={generatedImageUrl}
-              alt="Generated stats image"
-              className="max-w-full h-auto border rounded-sm"
-              width={1024}
-              height={768}
-            />
-            <Button
-              onClick={handleDownload}
-              className="mt-4 w-full justify-center"
-              variant="tertiary"
-              Icon={<DownloadIcon className="w-[20px] h-[20px]" />}
-            >
-              {t('share.downloadImage')}
-            </Button>
-          </div>
-        )}
-      </div>
-    </Modal>
+      title={t('titleStats')}
+      caption={selectedStage?.name}
+      design={design}
+      contentKey={contentKey}
+      data={{ binding: design.data, stats: statsSource }}
+      exportOptions={EXPORT_OPTIONS}
+      onMeasured={handleMeasured}
+      primaryOptions={primaryOptions}
+      moreOptions={moreOptions}
+      customizeSummary={t('customizeSummaryStats')}
+      customizeOpen={settings.isCustomizationExpanded}
+      onCustomizeOpenChange={(open) =>
+        setSettings({ isCustomizationExpanded: open })
+      }
+      onOpenEditor={() => {
+        // The editor computes the tables itself from the live stage this
+        // modal shows (statsAccessors), so the design binds to that stage
+        // rather than to a frozen copy.
+        onClose();
+        openEditor({
+          design: toEditableDesign(design, {
+            name: tg('statsDesign'),
+            liveStageId: selectedStageId,
+          }),
+          draftId: null,
+          selectId: 'stats',
+        });
+      }}
+      saveFileName={() =>
+        `${fileTitle} - ${tableTypeText} - ${voteTypeText} - DouzePoints.app - ${Date.now()}.png`
+      }
+      share={{
+        fileName: `${fileTitle} - DouzePoints.app.png`,
+        title: fileTitle,
+        text: tStats(TABLE_LABEL_KEYS[activeTab]),
+        url: buildShareUrl(activeContest ? { contest: activeContest._id } : {}),
+      }}
+    />
   );
 };
 

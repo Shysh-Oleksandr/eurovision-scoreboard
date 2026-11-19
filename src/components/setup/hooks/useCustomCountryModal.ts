@@ -8,11 +8,20 @@ export const useCustomCountryModal = () => {
   const [countryToEdit, setCountryToEdit] = useState<BaseCountry | undefined>(
     undefined,
   );
+  const [initialGroupId, setInitialGroupId] = useState<string | undefined>(
+    undefined,
+  );
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleOpenCreateModal = () => {
+  /** A new entry; `groupId` when it was started from a group's +. */
+  const handleOpenCreateModal = (groupId?: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     setCountryToEdit(undefined);
+    setInitialGroupId(typeof groupId === 'string' ? groupId : undefined);
     setIsCustomCountryModalOpen(true);
   };
 
@@ -22,6 +31,7 @@ export const useCustomCountryModal = () => {
     }
 
     setCountryToEdit(country);
+    setInitialGroupId(undefined);
     setIsCustomCountryModalOpen(true);
   };
 
@@ -41,6 +51,7 @@ export const useCustomCountryModal = () => {
   return {
     isCustomCountryModalOpen,
     countryToEdit,
+    initialGroupId,
     handleOpenCreateModal,
     handleOpenEditModal,
     handleCloseModal,

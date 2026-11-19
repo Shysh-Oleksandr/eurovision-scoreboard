@@ -6,6 +6,7 @@ import ColorOverridePicker, {
   ColorFieldDefinition,
 } from './ColorOverridePicker';
 
+import { getDouzeSpec } from '@/douze/registry';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ThemeColors } from '@/theme/types';
 import { DouzePointsAnimationMode } from '@/types/customTheme';
@@ -312,12 +313,18 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       colors: juryColors,
       groupKey: 'countryItem',
     },
-    {
-      id: 'douze',
-      label: t('douzePointsAnimationColors'),
-      colors: allDouzePointsColors,
-      groupKey: 'countryItem',
-    },
+    // Spec-driven animations (the 2022 one) take their colours from each
+    // country's flag, so these overrides would do nothing.
+    ...(getDouzeSpec(douzePointsAnimationMode)
+      ? []
+      : [
+          {
+            id: 'douze',
+            label: t('douzePointsAnimationColors'),
+            colors: allDouzePointsColors,
+            groupKey: 'countryItem' as const,
+          },
+        ]),
     {
       id: 'televote',
       label: t('televoteColors'),

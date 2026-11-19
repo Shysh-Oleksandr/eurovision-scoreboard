@@ -1,30 +1,15 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-
-import dynamic from 'next/dynamic';
+import React from 'react';
 
 import { useScoreboardStore } from '../../state/scoreboardStore';
+import ConfettiShower from '../effects/confetti/ConfettiShower';
 
 import { useGeneralStore } from '@/state/generalStore';
 
-const LazyConfetti = dynamic(() => import('react-confetti'), {
-  ssr: false,
-});
-
-const PIECES = 300;
-const CONFETTI_TIMEOUT = 10 * 1000;
-
-const CONFETTI_COLORS = [
-  '#FFD700', // Gold
-  '#FF6B6B', // Red
-  '#4ECDC4', // Teal
-  '#45B7D1', // Blue
-  '#96CEB4', // Green
-  '#FFEAA7', // Yellow
-  '#DDA0DD', // Plum
-  '#98D8C8', // Mint
-];
-
+/**
+ * The winner's confetti, drawn with the settings in Settings → Effects. Once
+ * it has fallen, it's marked as shown so it doesn't play again on a reload.
+ */
 const WinnerConfetti: React.FC = () => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const isWinnerAnimationAlreadyDisplayed = useScoreboardStore(
@@ -36,59 +21,19 @@ const WinnerConfetti: React.FC = () => {
   const showWinnerConfetti = useGeneralStore(
     (state) => state.settings.showWinnerConfetti,
   );
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [shouldRecycle, setShouldRecycle] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowDimensions({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    if (winnerCountry) {
-      setShowConfetti(true);
-      setShouldRecycle(true);
-
-      const timer = setTimeout(() => {
-        setShouldRecycle(false);
-
-        setTimeout(() => {
-          setIsWinnerAnimationAlreadyDisplayed(true);
-        }, CONFETTI_TIMEOUT);
-      }, CONFETTI_TIMEOUT);
-
-      return () => clearTimeout(timer);
-    }
-    setShowConfetti(false);
-    setShouldRecycle(false);
-  }, [winnerCountry, setIsWinnerAnimationAlreadyDisplayed]);
-
-  const shouldRender =
-    showConfetti && showWinnerConfetti && !isWinnerAnimationAlreadyDisplayed;
-
-  if (!shouldRender) return null;
+  if (
+    !winnerCountry ||
+    !showWinnerConfetti ||
+    isWinnerAnimationAlreadyDisplayed
+  )
+    return null;
 
   return (
-    <LazyConfetti
-      width={windowDimensions.width}
-      height={windowDimensions.height}
-      recycle={shouldRecycle}
-      numberOfPieces={PIECES}
-      gravity={0.1}
-      colors={CONFETTI_COLORS}
-      style={{ zIndex: 1000 }}
+    <ConfettiShower
+      key={winnerCountry.code}
+      country={winnerCountry}
+      onComplete={() => setIsWinnerAnimationAlreadyDisplayed(true)}
     />
   );
 };

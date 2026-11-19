@@ -17,6 +17,8 @@ interface ModalBottomContentProps {
   saveButtonDisabled?: boolean;
   /** Shows its key on the save button (the caller registers it). */
   saveButtonShortcut?: ShortcutId;
+  /** Replaces the bar's default surface (`bg-primary-900`). */
+  className?: string;
 }
 
 const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
@@ -29,11 +31,14 @@ const ModalBottomContent: React.FC<ModalBottomContentProps> = ({
   saveButtonIcon,
   saveButtonDisabled,
   saveButtonShortcut,
+  className = 'bg-primary-900',
 }) => {
   const t = useTranslations('common');
 
   return (
-    <div className="flex items-center gap-2.5 bg-primary-900 px-3.5 pt-[10px] pb-[calc(10px+var(--modal-safe-bottom,0px))] 2cols:px-5 z-30">
+    <div
+      className={`flex items-center gap-2.5 ${className} px-3.5 pt-[10px] pb-[calc(10px+var(--modal-safe-bottom,0px))] 2cols:px-5 z-30`}
+    >
       {onDelete && (
         <Button
           variant="destructive"

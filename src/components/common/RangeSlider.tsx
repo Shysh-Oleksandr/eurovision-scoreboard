@@ -17,6 +17,8 @@ interface RangeSliderProps {
   delay?: number;
   step?: number;
   displayValue?: boolean;
+  /** How the value reads next to the label ("10 s"); the bare number by default. */
+  formatValue?: (value: number) => string;
   containerClassName?: string;
 }
 
@@ -32,6 +34,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
   delay = 400,
   step,
   displayValue = true,
+  formatValue,
   containerClassName = '',
 }) => {
   const [internalValue, setInternalValue] = useState(value);
@@ -69,7 +72,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
           {displayValue && ': '}
           {displayValue && (
             <span className="text-white/90 font-semibold text-base">
-              {internalValue}
+              {formatValue ? formatValue(internalValue) : internalValue}
             </span>
           )}
         </label>

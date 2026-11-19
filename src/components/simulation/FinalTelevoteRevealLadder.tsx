@@ -35,9 +35,13 @@ import { useLadderRevealAnimation } from './finalTelevoteReveal/ladder/useLadder
 import { useLadderStyles } from './finalTelevoteReveal/ladder/useLadderStyles';
 import { FinalTelevoteRevealProps } from './finalTelevoteReveal/types';
 
-import { getShortCodes } from '@/data/countries/shortCodes';
+import {
+  getChosenShortCodes,
+  getShortCodes,
+} from '@/data/countries/shortCodes';
 import { Country } from '@/models';
 import { IS_NATIVE_APP } from '@/native/platform';
+import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import {
   FinalRevealPlaces,
@@ -84,7 +88,10 @@ const takeSnapshot = (lastCode: string): LadderSnapshot | null => {
     places,
     leader,
     last,
-    shortCodes: getShortCodes(stage.countries),
+    shortCodes: getShortCodes(
+      stage.countries,
+      getChosenShortCodes(useCountriesStore.getState().customCountries),
+    ),
   };
 };
 

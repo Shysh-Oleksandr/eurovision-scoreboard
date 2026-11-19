@@ -16,6 +16,8 @@ export interface SettingsEnv {
   isNativeApp: boolean;
   /** A mouse or trackpad is the main pointer (keyboard shortcuts). */
   hasFinePointer: boolean;
+  /** The app can change its Display size (src/native/displaySize.ts). */
+  displaySizeSupported: boolean;
 }
 
 export type SettingsPredicate = (env: SettingsEnv) => boolean;
@@ -52,11 +54,18 @@ export interface SelectItem extends ItemBase {
   options: () => Option[];
 }
 
-/** A few choices side by side (a segmented control), labels from messages. */
+/**
+ * A few choices side by side (a segmented control). Labels come from
+ * messages, or as they are (`label`) for ones that need no translation,
+ * such as "75%".
+ */
 export interface SegmentedItem extends ItemBase {
   kind: 'segmented';
   settingKey: StringSettingKey;
-  options: { value: string; labelKey: string }[];
+  options: ({ value: string } & (
+    | { labelKey: string; label?: never }
+    | { label: string; labelKey?: never }
+  ))[];
 }
 
 export interface SliderItem extends ItemBase {
@@ -70,6 +79,11 @@ export interface SliderItem extends ItemBase {
   minLabel?: string;
   maxLabel?: string;
   displayValue?: boolean;
+  /**
+   * Message formatting the value (`{value}`, e.g. "{value} s"), for the value
+   * next to the label and the min/max labels when no other is given.
+   */
+  valueKey?: string;
 }
 
 export interface FieldItem extends ItemBase {

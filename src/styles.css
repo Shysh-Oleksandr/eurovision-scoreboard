@@ -43,11 +43,27 @@ aside {
    * Android app, Capacitor sets --safe-area-inset-* on <html> (0 when it pads
    * the WebView itself), because WebViews older than 140 report wrong env()
    * values edge to edge. Everywhere else these are the env() values.
+   *
+   * Both come in CSS px at scale 1, so the apps' Display size
+   * (src/native/displaySize.ts) divides them by its zoom: at 75% a 62px
+   * inset needs 83px to cover the same strip of screen.
    */
-  --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top));
-  --safe-right: var(--safe-area-inset-right, env(safe-area-inset-right));
-  --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
-  --safe-left: var(--safe-area-inset-left, env(safe-area-inset-left));
+  --safe-top: calc(
+    var(--safe-area-inset-top, env(safe-area-inset-top)) /
+      var(--dp-display-zoom, 1)
+  );
+  --safe-right: calc(
+    var(--safe-area-inset-right, env(safe-area-inset-right)) /
+      var(--dp-display-zoom, 1)
+  );
+  --safe-bottom: calc(
+    var(--safe-area-inset-bottom, env(safe-area-inset-bottom)) /
+      var(--dp-display-zoom, 1)
+  );
+  --safe-left: calc(
+    var(--safe-area-inset-left, env(safe-area-inset-left)) /
+      var(--dp-display-zoom, 1)
+  );
 
   /*
    * Bottom padding for a bar whose background runs to the screen's bottom
@@ -67,7 +83,10 @@ aside {
  */
 @supports (-webkit-touch-callout: none) {
   :root {
-    --safe-bottom-bar: min(var(--safe-bottom), 14px);
+    --safe-bottom-bar: min(
+      var(--safe-bottom),
+      calc(14px / var(--dp-display-zoom, 1))
+    );
   }
 }
 
@@ -1302,9 +1321,21 @@ html:root {
   border-color: theme('colors.primary-700');
 }
 
+/* Visually hidden but still focusable and announced (`visibility: hidden`
+   took it out of the tab order and the accessibility tree); the ring goes on
+   the drawn box. */
 .checkbox-wrapper .inp-cbx {
   position: absolute;
-  visibility: hidden;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+}
+
+.checkbox-wrapper .inp-cbx:focus-visible + .cbx span:first-child {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .checkbox-wrapper .inp-cbx:checked + .cbx span:first-child {
@@ -1897,6 +1928,11 @@ html:root {
       box-shadow 0.14s;
   }
 
+  .dp-act:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
   .dp-act:hover:not(:disabled) {
     transform: translateY(-1px);
     filter: brightness(1.14);
@@ -1931,9 +1967,32 @@ html:root {
       0 0 0 2px color-mix(in oklch, var(--accent) 34%, transparent);
   }
 
-  /* The setup hub is flat: no drop shadows on its buttons. */
-  .dp-hub .dp-act:not(.is-on) {
+  /* The setup hub is flat: no drop shadows on its buttons. So are the
+     screens redesigned in its style (`dp-flat`: Edit profile, Account). */
+  .dp-hub .dp-act:not(.is-on),
+  .dp-flat .dp-act:not(.is-on) {
     box-shadow: none;
+  }
+
+  /* A text-weight action (Remove, Delete account): no fill until hovered,
+     so it sits below the surface buttons beside it. */
+  .dp-act--quiet {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .dp-act--quiet:hover:not(:disabled) {
+    background: rgb(255 255 255 / 8%);
+    transform: none;
+    filter: none;
+  }
+
+  /* Destructive and permanent (Delete account): the red is in the text
+     only; the confirmation dialog carries the alarm. */
+  .dp-act.dp-act--danger {
+    /* Doubled class: beats the surface variant's `text-white` utility. */
+    color: var(--badge-red-ink);
   }
 
   .dp-dot {
@@ -2166,7 +2225,52 @@ html:root {
     white-space: nowrap;
   }
 
-  /* --- Sign-in methods (Edit profile, SignInMethodsSection): the actions
+  /* --- Edit profile's picture (EditProfileModal): the avatar is itself the
+     "change" button; its two actions sit in a row while they fit, else one
+     under the other (useFitStep). --- */
+  .dp-avatar-edit {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex: none;
+    border-radius: 999px;
+    overflow: hidden;
+    transition: filter 0.14s;
+  }
+
+  .dp-avatar-edit img,
+  .dp-avatar-edit .dp-profile-ph {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .dp-avatar-edit:hover {
+    filter: brightness(0.88);
+  }
+
+  .dp-avatar-edit:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dp-avatar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dp-avatar-actions > * {
+    flex: none;
+  }
+
+  .dp-avatar-actions[data-layout='stack'] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  /* --- Sign-in methods (Account, SignInMethodsSection): the actions
      sit beside each method while every address fits, else under them for
      the whole list (useFitStep measures the cut addresses). --- */
   .dp-signin-row {
@@ -2202,6 +2306,19 @@ html:root {
 
   .dp-signin-list[data-layout='stack'] > .dp-signin-row + .dp-signin-row {
     margin-top: 18px;
+  }
+
+  /* At the row's end, a quiet Remove's label lines up with the edge of the
+     buttons below it (Manage). */
+  .dp-signin-list:not([data-layout='stack'])
+    .dp-signin-actions
+    > .dp-act--quiet:last-child {
+    margin-right: -10.5px;
+  }
+
+  /* Under the address, a quiet Remove's label lines up with the text. */
+  .dp-signin-list[data-layout='stack'] .dp-signin-actions > .dp-act--quiet:first-child {
+    margin-left: -10.5px;
   }
 
   /* --- Contest card --- */
@@ -2553,6 +2670,55 @@ html:root {
     background: transparent !important;
   }
 
+  /* ---------- Custom entry editor (CustomCountryModal) ----------
+     The entry drawn as the theme's board row on top (EntryRowPreview), one
+     flag picker of 3:2 tiles (FlagPicker), a fitted footer (EntryActionBar). */
+  .dp-entry-row {
+    box-shadow: 0 2px 6px rgb(0 0 0 / 18%);
+  }
+
+  .dp-flag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    gap: 8px;
+  }
+
+  .dp-flag-tile {
+    display: block;
+    aspect-ratio: 3 / 2;
+    border-radius: 3px; /* the board-row-square step, as the pool tiles' flags */
+    background: rgb(255 255 255 / 6%);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition: outline-color 0.13s, filter 0.13s;
+  }
+
+  .dp-flag-tile > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  .dp-flag-tile:hover {
+    filter: brightness(1.08);
+  }
+
+  .dp-flag-tile.is-on {
+    outline-color: var(--accent);
+  }
+
+  .dp-flag-tile:focus-visible {
+    outline-color: var(--ink);
+  }
+
+  /* While an image is dragged over the modal (desktop). */
+  .dp-flag-drop {
+    background: color-mix(in oklch, var(--p-800) 94%, transparent);
+    outline: 2px solid var(--accent);
+    color: var(--ink);
+  }
+
   /* ---------- Fitted layouts (useFitStep) ----------
      Each `data-*` value is one step of a component's layout, roomiest
      first; `data-fit-measuring` is on while the hook tries the steps, and
@@ -2608,7 +2774,7 @@ html:root {
   }
 
   .dp-cc-layout[data-layout='stack'] .dp-cc-divider,
-  .dp-cc-layout[data-tools='all'] .dp-cc-more,
+  .dp-cc-layout[data-tools='all']:not([data-save-menu]) .dp-cc-more,
   .dp-cc-layout:not([data-tools='all']) .dp-cc-secondary,
   .dp-cc-layout[data-tools='compact'] .dp-cc-select-label,
   .dp-cc-layout[data-draw='menu'] .dp-cc-draw,
@@ -2688,10 +2854,86 @@ html:root {
     flex: none !important;
   }
 
+  /* Custom entry editor footer (EntryActionBar): one row; then Delete as
+     its icon; then the leading action on a row of its own above Cancel and
+     Save. */
+  .dp-entry-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dp-entry-bar-lead {
+    display: flex;
+    min-width: 0;
+  }
+
+  .dp-entry-bar-main {
+    display: flex;
+    flex: 1 1 0%;
+    min-width: 0;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .dp-entry-bar[data-bar='icon'] .dp-entry-bar-label {
+    display: none;
+  }
+
+  .dp-entry-bar[data-bar='stack'] {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .dp-entry-bar[data-bar='stack'] > .dp-entry-bar-lead {
+    align-self: flex-start;
+  }
+
+  .dp-entry-bar[data-fit-measuring] > .dp-entry-bar-lead,
+  .dp-entry-bar[data-fit-measuring] > .dp-entry-bar-main,
+  .dp-entry-bar[data-fit-measuring] .dp-entry-bar-btn {
+    flex: none;
+  }
+
   .dp-dialog {
     background: linear-gradient(160deg, var(--p-800), var(--p-900));
     border: 1px solid var(--hair-2);
     box-shadow: 0 24px 60px rgb(0 0 0 / 55%);
+  }
+
+  /* --- Form fields in dp dialogs (the save contest dialog): a recessed well
+     with the field's name as a caption inside, like the header combos. The
+     focus ring goes on the well, not on the bare input or select trigger. --- */
+  .dp-field {
+    background: rgb(0 0 0 / 22%);
+    border: 1px solid var(--hair-2);
+    transition: border-color 0.14s;
+  }
+
+  .dp-field:hover {
+    border-color: rgb(255 255 255 / 26%);
+  }
+
+  .dp-field:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .dp-field :focus {
+    outline: none;
+  }
+
+  .dp-field[data-invalid] {
+    border-color: var(--badge-red-ink);
+  }
+
+  /* Tinted from the theme's hue (not a gray white-on-colour), 4.5:1+ on the
+     well. */
+  .dp-field input::placeholder,
+  .dp-field textarea::placeholder {
+    color: color-mix(in oklch, white 62%, var(--p-700));
+    font-weight: 600;
   }
 
   .dp-choice {
@@ -3312,6 +3554,602 @@ html:root {
     .dp-sim-progress > i,
     .dp-sim-edge-progress > i {
       transition: none;
+    }
+  }
+
+  /* ---------- Final stats modal (finalStats/) ----------
+     One flat --p-950 surface. Tables have hairlines between rows only and
+     right-aligned tabular numbers; each view scrolls in its own box, so the
+     header row (and the Breakdown's country column) stays in place. The
+     share image draws its own tables (SummaryStats, SplitStats, StatsTable). */
+  .dp-stats-surface {
+    background: var(--p-950);
+    border: 1px solid var(--hair);
+  }
+
+  .dp-stats-head {
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .dp-stats-foot {
+    background: var(--p-950);
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-stats {
+    container: dp-stats / inline-size;
+  }
+
+  /* Controls row (useFitStep): the stage on the left, the switch and the
+     export on the right; when that doesn't fit, the switch gets a row. */
+  .dp-stats-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px 10px;
+    min-height: 46px;
+  }
+
+  .dp-stats-controls > .dp-stats-stage {
+    margin-right: auto;
+  }
+
+  .dp-stats-controls[data-fit-measuring]
+    > :is(.dp-stats-stage, .dp-stats-switch, .dp-stats-export) {
+    flex: none;
+  }
+
+  .dp-stats-controls[data-layout='stack'] {
+    flex-wrap: wrap;
+  }
+
+  .dp-stats-controls[data-layout='stack'] > .dp-stats-switch {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .dp-stats-scroll {
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .dp-stats-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dp-stats-table th,
+  .dp-stats-table td {
+    border-bottom: 1px solid var(--hair);
+    font-weight: 600;
+  }
+
+  .dp-stats-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 6px 10px 8px;
+    background: var(--p-950);
+    border-bottom-color: var(--hair-2);
+    color: var(--ink-70);
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    vertical-align: bottom;
+  }
+
+  .dp-stats-table tbody tr:last-child > :is(th, td) {
+    border-bottom: 0;
+  }
+
+  .dp-stats-table .dp-stats-num {
+    width: 1%;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  /* The row's label: place, flag, name. Frozen on the left. */
+  .dp-stats-table .dp-stats-rowhead {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    padding: 0;
+    background: var(--p-950);
+    text-align: left;
+  }
+
+  .dp-stats-matrix .dp-stats-rowhead {
+    box-shadow: inset -1px 0 0 var(--hair-2);
+  }
+
+  .dp-stats-table thead .dp-stats-rowhead {
+    z-index: 3;
+  }
+
+  .dp-stats-rowhead-in {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px 0 14px;
+  }
+
+  .dp-stats-table thead .dp-stats-rowhead-in {
+    padding-bottom: 8px;
+  }
+
+  .dp-stats-place {
+    flex: none;
+    width: 22px;
+    color: var(--ink-55);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .dp-stats-name {
+    min-width: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+
+  @media (hover: hover) {
+    .dp-stats-summary tbody tr:hover > :is(th, td),
+    .dp-stats-split tbody tr:hover > .dp-stats-split-place {
+      box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 5%);
+    }
+  }
+
+  /* Breakdown: voters across, entries down. */
+  .dp-stats-matrix tbody > tr > :is(th, td) {
+    height: 44px;
+  }
+
+  .dp-stats-matrix td {
+    width: 44px;
+    min-width: 44px;
+    padding: 0 2px;
+    background-color: rgb(255 255 255 / calc(var(--shade, 0) * 1%));
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .dp-stats-matrix td.is-strong {
+    font-weight: 700;
+  }
+
+  .dp-stats-matrix td.is-top {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+    font-weight: 800;
+  }
+
+  .dp-stats-matrix td.is-self {
+    color: var(--ink-25);
+  }
+
+  .dp-stats-table .dp-stats-voter {
+    width: 44px;
+    min-width: 44px;
+    padding: 8px 2px 7px;
+    text-align: center;
+  }
+
+  .dp-stats-voter-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dp-stats-voter-code {
+    color: var(--ink-70);
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .dp-stats-matrix .dp-stats-rowname {
+    display: -webkit-box;
+    overflow: hidden;
+    flex: none;
+    width: 128px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .dp-stats-matrix .dp-stats-rowcode {
+    display: none;
+    flex: none;
+    width: 34px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .dp-stats-rowtotal {
+    min-width: 3ch;
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 800;
+    text-align: right;
+  }
+
+  /* The crosshair (BreakdownView toggles `is-hl`): its row and column lit,
+     the cell outlined in the accent. */
+  .dp-stats-matrix tr.is-hl > :is(th, td),
+  .dp-stats-matrix :is(td, th).is-hl {
+    box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 7%);
+  }
+
+  .dp-stats-matrix tr.is-hl > .dp-stats-rowhead {
+    box-shadow: inset -1px 0 0 var(--hair-2),
+      inset 0 0 0 100vmax rgb(255 255 255 / 7%);
+  }
+
+  .dp-stats-matrix .is-hl > .is-hl {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 12%);
+  }
+
+  .dp-stats-voter.is-hl .dp-stats-voter-code {
+    color: var(--ink);
+  }
+
+  .dp-stats-ramp {
+    background: linear-gradient(
+      90deg,
+      rgb(255 255 255 / 3%),
+      rgb(255 255 255 / 26%)
+    );
+    box-shadow: inset 0 0 0 1px var(--hair);
+  }
+
+  .dp-stats-hint-hover {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .dp-stats-hint-hover {
+      display: inline;
+    }
+
+    .dp-stats-hint-tap {
+      display: none;
+    }
+  }
+
+  /* Summary: total, then jury and televote (points and place). */
+  .dp-stats-summary {
+    width: 100%;
+  }
+
+  .dp-stats-summary tbody > tr > :is(th, td) {
+    height: 54px;
+  }
+
+  .dp-stats-summary td {
+    padding: 0 14px;
+  }
+
+  .dp-stats-summary td:last-child,
+  .dp-stats-summary th:last-child {
+    padding-right: 18px;
+  }
+
+  .dp-stats-table .dp-stats-total {
+    font-size: 17px;
+    font-weight: 800;
+  }
+
+  .dp-stats-pp,
+  .dp-stats-sub {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .dp-stats-pp-head {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+  }
+
+  .dp-stats-pts,
+  .dp-stats-sub > :first-child {
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .dp-stats-pts {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .dp-stats-plc,
+  .dp-stats-sub > :last-child {
+    min-width: 44px;
+    text-align: left;
+  }
+
+  .dp-stats-plc {
+    color: var(--ink-55);
+    font-size: 13px;
+  }
+
+  .dp-stats-sub {
+    color: var(--ink-55);
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+
+  .dp-stats-swatch {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+  }
+
+  /* Total against the winner's, split into jury and televote. */
+  .dp-stats-bar {
+    display: flex;
+    overflow: hidden;
+    height: 4px;
+    gap: 1px;
+    border-radius: 2px;
+  }
+
+  .dp-stats-bar > i {
+    min-width: 0;
+    flex-basis: 0;
+  }
+
+  .dp-stats-bar > .is-jury,
+  .dp-stats-swatch.is-jury {
+    background: rgb(255 255 255 / 45%);
+  }
+
+  .dp-stats-bar > .is-tele,
+  .dp-stats-swatch.is-tele {
+    background: var(--accent);
+  }
+
+  /* Split: three rankings side by side, one on narrow screens. */
+  .dp-stats-split {
+    width: 100%;
+  }
+
+  .dp-stats-split tbody > tr > :is(th, td) {
+    height: 46px;
+  }
+
+  .dp-stats-table.dp-stats-split td {
+    padding: 0 10px;
+  }
+
+  .dp-stats-table .dp-stats-split-place {
+    padding-right: 4px;
+    padding-left: 14px;
+    color: var(--ink-55);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .dp-stats-table .dp-stats-split-pts {
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .dp-stats-split td.is-hl {
+    box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 9%);
+  }
+
+  .dp-stats-split td.is-hl .dp-stats-name {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  @container dp-stats (width >= 720px) {
+    /* Beats the switch's own `flex` utility. */
+    .dp-stats-controls > .dp-stats-split-switch {
+      display: none;
+    }
+
+    .dp-stats-split :is(td, th)[data-g='jury']:not(.dp-stats-split-pts),
+    .dp-stats-split :is(td, th)[data-g='televote']:not(.dp-stats-split-pts) {
+      padding-left: 32px;
+    }
+  }
+
+  @container dp-stats (width < 720px) {
+    .dp-stats-split[data-show='total'] [data-g]:not([data-g='total']),
+    .dp-stats-split[data-show='jury'] [data-g]:not([data-g='jury']),
+    .dp-stats-split[data-show='televote'] [data-g]:not([data-g='televote']) {
+      display: none;
+    }
+  }
+
+  /* Phones: the Breakdown's frozen column keeps place, flag, code and
+     points (the name stays for screen readers); Summary stacks each
+     channel's place under its points. */
+  @container dp-stats (width < 560px) {
+    .dp-stats-rowhead-in {
+      gap: 8px;
+      padding: 0 8px 0 10px;
+    }
+
+    .dp-stats-matrix .dp-stats-rowname {
+      position: absolute;
+      overflow: hidden;
+      width: 1px;
+      height: 1px;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .dp-stats-matrix .dp-stats-rowcode {
+      display: block;
+    }
+
+    .dp-stats-matrix td,
+    .dp-stats-table .dp-stats-voter {
+      width: 42px;
+      min-width: 42px;
+    }
+
+    .dp-stats-summary td {
+      padding: 0 8px;
+    }
+
+    .dp-stats-summary td:last-child,
+    .dp-stats-summary th:last-child {
+      padding-right: 12px;
+    }
+
+    .dp-stats-table .dp-stats-total {
+      font-size: 16px;
+    }
+
+    .dp-stats-pp {
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
+    }
+
+    .dp-stats-pts,
+    .dp-stats-plc {
+      min-width: 0;
+      text-align: right;
+    }
+
+    .dp-stats-plc {
+      font-size: 12px;
+    }
+
+    .dp-stats-sub {
+      display: none;
+    }
+  }
+
+  /* ---------- Share image modal (simulation/share/) ----------
+     The picture is the screen: one flat surface, the picture in a dark well,
+     options as quiet controls. Save is the only accent fill. */
+  .dp-share-surface {
+    background: var(--p-950);
+    border: 1px solid var(--hair-2);
+    box-shadow: 0 30px 80px rgb(0 0 0 / 55%);
+  }
+
+  .dp-share-well {
+    background: rgb(0 0 0 / 24%);
+    border: 1px solid var(--hair);
+  }
+
+  .dp-share-pic {
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 12%);
+  }
+
+  /* The image is being made again: a 2px accent line runs along its top. */
+  .dp-share-busy {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  .dp-share-busy > i {
+    display: block;
+    width: 40%;
+    height: 100%;
+    background: var(--accent);
+    animation: dp-share-busy 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes dp-share-busy {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(250%);
+    }
+  }
+
+  /* A segmented choice whose labels don't fit one row (useFitStep). */
+  .dp-share-seg[data-seg='stack'] {
+    flex-direction: column;
+  }
+
+  /* `flex: 1` in a column sizes the options by their text, not their
+     height: each keeps its row height instead. */
+  .dp-share-seg[data-seg='stack'] > button {
+    flex: none;
+  }
+
+  .dp-share-field {
+    background: rgb(0 0 0 / 28%);
+    border: 1px solid var(--hair-2);
+    transition: border-color 0.14s, box-shadow 0.14s;
+  }
+
+  .dp-share-field:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 30%, transparent);
+  }
+
+  .dp-share-toggle {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    color: var(--ink-70);
+    transition: background 0.14s, border-color 0.14s, color 0.14s;
+  }
+
+  .dp-share-toggle:hover {
+    background: rgb(255 255 255 / 10%);
+    color: var(--ink);
+  }
+
+  .dp-share-toggle.is-on {
+    background: var(--p-800);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .dp-share-row {
+    background: rgb(255 255 255 / 6%);
+    transition: background 0.14s;
+  }
+
+  .dp-share-row:hover {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  .dp-share-corner {
+    background: rgb(0 0 0 / 50%);
+    border: 1px solid var(--hair-2);
+    color: var(--ink);
+    transition: background 0.14s;
+  }
+
+  .dp-share-corner:hover {
+    background: rgb(0 0 0 / 70%);
+  }
+
+  .dp-share-chip {
+    background: var(--p-950);
+    border: 1px solid var(--hair-2);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dp-share-busy > i {
+      width: 100%;
+      animation: none;
+      opacity: 0.6;
     }
   }
 }

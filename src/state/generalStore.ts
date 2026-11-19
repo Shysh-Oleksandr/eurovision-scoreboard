@@ -29,6 +29,7 @@ import { api } from '@/api/client';
 import { ContestType, resolveContestType } from '@/data/contestTypes';
 import { deleteLegacyCustomBgImage } from '@/helpers/indexedDB';
 import { BaseCountry, PointsItem } from '@/models';
+import { DEFAULT_DISPLAY_SIZE } from '@/native/displaySize';
 import type { ShortcutOverrides } from '@/shortcuts/actions';
 import { safeLocalStorage } from '@/state/safeLocalStorage';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -63,6 +64,12 @@ export type SettingsModalTab = 'General' | 'Odds' | 'Relations';
 /** GLOSSARY: Reveal style. `ladder` is the default. */
 export type FinalRevealStyle = 'ladder' | 'bar';
 
+/**
+ * Where the winner confetti takes its colours: the original multicolour mix,
+ * the active theme's accents, or the winner's flag.
+ */
+export type WinnerConfettiColors = 'rainbow' | 'theme' | 'flag';
+
 export type GeneralSettingsCategoryId =
   | 'contest'
   | 'voting'
@@ -83,6 +90,10 @@ const DEFAULT_SETTINGS: Settings = {
   showQualifierTargetStages: true,
   showWinnerModal: true,
   showWinnerConfetti: true,
+  winnerConfettiAmount: 5,
+  winnerConfettiDuration: 10,
+  winnerConfettiSpeed: 5,
+  winnerConfettiColors: 'rainbow',
   enableFullscreen: false,
   showRankChangeIndicator: true,
   showHostingCountryLogo: true,
@@ -119,6 +130,7 @@ const DEFAULT_SETTINGS: Settings = {
   enableHaptics: true,
   hapticsStrength: 1,
   playBackgroundVideos: true,
+  displaySize: DEFAULT_DISPLAY_SIZE,
   blurModalBackground: false,
   themeSoundVolume: 100,
   themeAmbienceVolume: 100,
@@ -174,7 +186,6 @@ export const DEFAULT_IMAGE_CUSTOMIZATION: ImageCustomizationSettings = {
   brandingFontSize: 20, // font size in px for branding text
   verticalPadding: 64, // vertical padding in px
   horizontalPadding: 80, // horizontal padding in px
-  highQuality: true,
 };
 
 // Predefined aspect ratio presets for image customization
@@ -202,6 +213,16 @@ export interface Settings {
   showQualifierTargetStages: boolean;
   showWinnerModal: boolean;
   showWinnerConfetti: boolean;
+  /**
+   * Winner confetti (`components/effects/confetti/confettiPlan.ts`): 1–10,
+   * 5 is the original 300 pieces.
+   */
+  winnerConfettiAmount: number;
+  /** Seconds new confetti keeps falling before the rest drifts away (5–30). */
+  winnerConfettiDuration: number;
+  /** 1–10, 5 is the original fall speed. */
+  winnerConfettiSpeed: number;
+  winnerConfettiColors: WinnerConfettiColors;
   enableFullscreen: boolean;
   showRankChangeIndicator: boolean;
   shouldShowHeartFlagIcon: boolean;
@@ -262,6 +283,12 @@ export interface Settings {
    * want it on a desktop and off on a phone.
    */
   playBackgroundVideos: boolean;
+  /**
+   * Apps only: the page zoom, as a percentage string ('75' | '85' | '100';
+   * src/native/displaySize.ts). Per device, so it stays out of
+   * `SYNCED_SETTINGS_KEYS`: a size that suits a phone doesn't suit a tablet.
+   */
+  displaySize: string;
   blurModalBackground: boolean;
   themeSoundVolume: number;
   themeAmbienceVolume: number;
@@ -297,6 +324,7 @@ export interface PresentationSettings {
 }
 
 export interface ImageCustomizationSettings {
+  /** The share modal's Customize section, open (phones and tablets). */
   isCustomizationExpanded: boolean;
   title: string;
   subtitle: string;
@@ -313,7 +341,6 @@ export interface ImageCustomizationSettings {
   brandingFontSize: number; // font size in px for branding text
   verticalPadding: number; // vertical padding in px
   horizontalPadding: number; // horizontal padding in px
-  highQuality: boolean;
 }
 
 export type { PointsItem };

@@ -12,6 +12,8 @@ import { POOL_ROOT_LIST } from './listIds';
 import PoolCategory from './PoolCategory';
 import { useLineupSearch } from './useLineupSearch';
 
+import { collapsibleRows } from '@/helpers/collapsibleRows';
+
 interface CountryPoolProps {
   isSignedIn: boolean;
 }
@@ -93,7 +95,7 @@ const CountryPool: React.FC<CountryPoolProps> = ({ isSignedIn }) => {
 
       <div
         className="grid transition-[grid-template-rows] duration-300 ease-in-out"
-        style={{ gridTemplateRows: open ? '1fr' : '0fr' }}
+        style={{ gridTemplateRows: collapsibleRows(open) }}
       >
         <div className="min-h-0 overflow-hidden">
           {hasBeenOpened && (

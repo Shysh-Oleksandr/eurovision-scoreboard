@@ -14,6 +14,7 @@ import { useCountryDisplay } from './hooks/useCountryDisplay';
 import { useCountrySorter } from './hooks/useCountrySorter';
 import { useVoting } from './hooks/useVoting';
 
+import { getDouzeMoveDelayMs } from '@/douze/registry';
 import { MIN_COUNTRIES_FOR_3_COLUMNS } from '@/hooks/useReorderCountries';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -42,6 +43,7 @@ const Board = (): JSX.Element => {
     boardAnimationMode: defaultBoardAnimationMode,
     roundedCountryContainer,
     pointsContainerShape,
+    douzePointsAnimationMode,
   } = useThemeSpecifics();
 
   const countryItemLayoutKey = `${themeYear}:${customThemeId}:${roundedCountryContainer}:${pointsContainerShape}`;
@@ -97,6 +99,7 @@ const Board = (): JSX.Element => {
     isDouzePointsAwarded,
     boardItemAnimationMode,
     layoutOverride?.appearReady,
+    getDouzeMoveDelayMs(douzePointsAnimationMode),
   );
 
   const renderItem = useCallback(

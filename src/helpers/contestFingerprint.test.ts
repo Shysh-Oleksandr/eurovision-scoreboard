@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest';
 import {
   contestSetupFingerprint,
   ContestSetupFingerprintInput,
+  rebaseLoadedContestGeneralInfo,
   stableStringify,
 } from './contestFingerprint';
+
+import { useGeneralStore } from '@/state/generalStore';
 
 const base = (): ContestSetupFingerprintInput => ({
   setup: {
@@ -90,5 +93,38 @@ describe('contestSetupFingerprint', () => {
     expect(contestSetupFingerprint(info)).not.toBe(
       contestSetupFingerprint(base()),
     );
+  });
+});
+
+describe('rebaseLoadedContestGeneralInfo', () => {
+  it('moves only the general info of the saved baseline', () => {
+    const saved = base();
+    const renamed = {
+      ...saved,
+      generalInfo: { ...saved.generalInfo, contestName: 'Eurovision Asia' },
+    };
+    const editedSetup = {
+      ...renamed,
+      setup: { ...renamed.setup, baseYear: '2025' },
+    };
+
+    useGeneralStore.setState({
+      loadedContestFingerprint: contestSetupFingerprint(saved),
+    });
+    rebaseLoadedContestGeneralInfo({ contestName: 'Eurovision Asia' });
+
+    const baseline = useGeneralStore.getState().loadedContestFingerprint;
+
+    // A details-only save of the name leaves the setup clean...
+    expect(baseline).toBe(contestSetupFingerprint(renamed));
+    // ...and setup edits that weren't saved still show as unsaved.
+    expect(baseline).not.toBe(contestSetupFingerprint(editedSetup));
+  });
+
+  it('does nothing without a loaded contest', () => {
+    useGeneralStore.setState({ loadedContestFingerprint: null });
+    rebaseLoadedContestGeneralInfo({ contestName: 'X' });
+
+    expect(useGeneralStore.getState().loadedContestFingerprint).toBeNull();
   });
 });

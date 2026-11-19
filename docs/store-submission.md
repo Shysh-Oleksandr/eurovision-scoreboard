@@ -201,9 +201,9 @@ notes' order:
    cancel. On a creator's profile, "…" → Report user and Block user, and
    cancel those too; real reports and blocks would reach the queue and the
    shared review account.
-7. Edit Profile → the profile picture → Take Photo: the camera prompt shows,
+7. Edit profile → the profile picture → Take Photo: the camera prompt shows,
    then cancel.
-8. Edit Profile → Account → Delete account → confirm. Last, because it ends
+8. Account → Delete account → confirm. Last, because it ends
    the session; the next sign-in creates the account again.
 
 ```text
@@ -222,7 +222,7 @@ No account is needed for the main feature. The Event Setup screen opens at launc
 Signing in saves contests, themes and designs to an account and lets users publish them.
 * Tap Sign in at the top of Event Setup and choose Apple, Google or email.
 * Demo account: choose "Continue with email", enter the user name from the sign-in information, then the password as the 6-digit code. No email is sent for this address. Sign in with Apple also works with any Apple ID.
-* Account deletion: tap the profile button at the top of Event Setup → Edit Profile → Account → Delete account.
+* Account deletion: tap the profile button at the top of Event Setup → Account → Delete account.
 
 4. USER-GENERATED CONTENT AND MODERATION
 Users' public content appears under Themes → Public Themes, Contests → Public Contests, Graphics → Explore, and Public fonts in the theme editor's font picker.

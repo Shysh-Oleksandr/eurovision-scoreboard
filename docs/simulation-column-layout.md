@@ -114,6 +114,15 @@ SimulationColumnLayout          usePresentationLoop(), the Share shortcut
   random scope from the open sheet closes it. The presentation options show
   in it only while presenting; otherwise just Present.
 - The **"presentation mode" setting** hides Present and its options.
+- **⋯ → "Save contest"** is the setup's contest-card Save
+  (`useContestSave`, docs/event-setup-hub-and-design-tokens.md §4). It saves
+  the results so far too:
+  - one tap on the user's own saved contest;
+  - the save dialog otherwise;
+  - labelled "Save a copy" on someone else's contest.
+
+  Saving never reloads the snapshot into the stores, so the board and a
+  running vote carry on as they were.
 - **⋯ → "Enable fullscreen mode"** toggles the same `enableFullscreen`
   setting as Settings (`useFullscreen` applies it), shown only where
   `document.fullscreenEnabled` and not in the apps (so not on iPhone Safari).
@@ -273,11 +282,19 @@ only when the line-up, the space or the fonts change (never on awards):
    Northern Ireland, Macao, Guadeloupe, French Polynesia; ROW for the Rest
    of the World), a map keyed by `code` rather than a field on the countries
    (those are copied into saved contests and line-ups, and contests saved
-   before would lack it). Custom entries get one from the name
-   (`getShortCodes`): initials of three or more words, else the first three
-   letters, else first letter + two consonants…, free of every other code
-   in the event (all stages, so it stays the same across them); a number as
-   the last resort. `BoardStage` passes them through
+   before would lack it). A custom entry uses the code its owner picked in
+   the custom entry editor ("Short code": 1–3 letters or digits,
+   upper-cased, stored on the entry as `shortCode` and copied into
+   `customEntriesUsed` when a contest is saved), kept even if another entry
+   has the same one. Callers pass these as `getShortCodes`' `chosen` map
+   (`useChosenShortCodes` / `getChosenShortCodes`), read from
+   `customCountries`, not from the line-up's copies, so voters and copies
+   made before an edit get it too. Every other custom entry gets one from
+   the name (`getShortCodes`): initials of three or more words, else the
+   first three letters, else first letter + two consonants…, free of every
+   other code in the event (all stages, so it stays the same across them);
+   a number as the last resort. The editor shows that code as the field's
+   placeholder (`suggestShortCode`). `BoardStage` passes them through
    `BoardLayoutOverride.shortCodes`; `CountryItem` shows the code (the name
    stays for screen readers) and the douze overlay follows. A code is never
    cut: it may run into the name's right margin, so it fits from a 345px

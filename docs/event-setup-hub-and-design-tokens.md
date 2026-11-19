@@ -312,13 +312,61 @@ pool root). Hovering a collapsed zone for 600ms expands it. Dragging a selected
 tile in selection mode moves the whole selection; dropping on a custom group
 also regroups the entries.
 
-## 4. "Unsaved changes"
+## 4. Saving and "Unsaved changes"
+
+**Save on the contest card** (`ContestCard`) depends on whose contest is
+loaded. The simulation's ⋯ menu has the same Save. Both use
+`useContestSave` (`contests/useContestSave.tsx`), which also renders the
+dialog:
+
+- **The signed-in user's own saved contest**: no dialog.
+  `useSaveOpenContest` sends one PATCH with the snapshot, the theme
+  (`getContestThemePayload` in `contests/saveContest.ts`) and the
+  name/year/host/description from `settings`. The new baseline is the
+  fingerprint taken *before* the request, so edits made while it runs stay
+  unsaved. The card's ⋯ menu (always shown then, `data-save-menu`) holds
+  "Edit details" and "Save as a new contest".
+- **Anything else** opens `CreateContestModal` in mode `new`, which reads
+  the open contest when it mounts:
+  - "Save contest" when nothing is loaded ("On this device").
+  - "Save as a new contest" for the user's own contest.
+  - "Save a copy" for someone else's. It says "Based on X by Y", but nothing
+    stores that link yet.
+
+  It creates the contest with the snapshot and theme, then makes it the
+  loaded contest. It only writes the typed general info into `settings`; it
+  never reloads the snapshot into the stores, because that would reset the
+  board in the middle of a simulation.
+
+**From the contest list:**
+
+- The list's Create opens mode `new`.
+- Edit (in the list, on a profile or from a share link) opens mode
+  `details`.
+
+**`details` mode** changes the name, year, host, visibility, group,
+description, venue, hosts and logo only. It never sends a snapshot or a
+theme. When the edited contest is the loaded one, it also writes the general
+info into `settings`. `rebaseLoadedContestGeneralInfo()` then moves the
+baseline's general info to the new values, so the badge keeps showing only
+the setup edits that weren't saved.
+
+**Details of the dialog:**
+
+- Cleared description, venue and hosts are sent as `''` (the backend only
+  writes strings).
+- A create whose later step fails (logo upload, loading it) is remembered,
+  so Save again updates that contest instead of creating a second one.
+- The parents remount the dialog per open (`key`), so its form always starts
+  from the current state.
+- Signed out, Save shows a sign-in toast. Offline it is disabled with "Needs
+  a connection".
 
 `generalStore.loadedContestFingerprint` holds the fingerprint of the setup as
 last loaded from / saved to `activeContest`. `markContestSetupClean()`
 (`src/helpers/contestFingerprint.ts`) is called after a snapshot is applied
-(`EventSetupModal.handleConfirmLoadContest`, `CreateContestModal` save) and
-the field is cleared by `setYear` / `setActiveContest(null)`.
+(`EventSetupModal.handleConfirmLoadContest`, a new contest saved from the
+dialog) and the field is cleared by `setYear` / `setActiveContest(null)`.
 `useContestDirtyState()` recomputes the fingerprint from the stores (deferred)
 and the badge shows only while a saved contest is active and the two differ.
 The fingerprint covers the snapshot `setup` section (stages sorted by order,

@@ -29,7 +29,8 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
 
 interface SegmentedProps<T extends string> {
   value: T;
-  options: { value: T; label: string }[];
+  /** `icon`: drawn before the label (decorative; the label names it). */
+  options: { value: T; label: string; icon?: React.ReactNode }[];
   onChange: (value: T) => void;
   ariaLabel: string;
 }
@@ -63,7 +64,16 @@ export function Segmented<T extends string>({
               isOn ? 'is-on' : 'text-white/70 hover:text-white'
             } h-11 min-h-[44px] min-w-0 flex-1 truncate rounded-lg px-2 text-[13px] font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent`}
           >
-            {option.label}
+            {option.icon ? (
+              <span className="flex items-center justify-center gap-1.5 min-w-0">
+                <span aria-hidden="true" className="flex flex-none">
+                  {option.icon}
+                </span>
+                <span className="truncate">{option.label}</span>
+              </span>
+            ) : (
+              option.label
+            )}
           </button>
         );
       })}

@@ -9,8 +9,9 @@
  * A map rather than a field on the countries: country objects are copied
  * into saved contests and line-ups, which then wouldn't carry it (or would
  * carry it into the backend); looking up by `code` also covers contests
- * saved before. Everything else (custom entries) gets a code made from its
- * name (`getShortCodes`).
+ * saved before. Custom entries use the code their owner picked
+ * (`BaseCountry.shortCode`, saved with the entry and in contests), else one
+ * made from the name (`getShortCodes`).
  */
 export const SHORT_CODES: Record<string, string> = {
   // Eurovision participants
@@ -270,14 +271,59 @@ const candidatesFor = (name: string): string[] => {
   return Array.from(new Set(list));
 };
 
+/** What a custom entry's own code may be: up to 3 letters or digits. */
+const SHORT_CODE_PATTERN = /^[\p{L}\p{N}]{1,3}$/u;
+
 /**
- * Short codes for a line-up, keyed by `code`: the sports codes above, and
- * for everything else (custom entries) a code from the name that no other
- * entry in the line-up uses ("Floptropica" → FLO, a second "Flopland" → FLP).
- * Deterministic for the same line-up in the same order.
+ * A typed code as it is stored: composed accents, upper case, letters and
+ * digits only, at most 3 ("fl o!" → "FLO"). The backend checks the same.
+ */
+export const normalizeShortCode = (value: string): string =>
+  Array.from(
+    value
+      .normalize('NFC')
+      .toUpperCase()
+      .replace(/[^\p{L}\p{N}]/gu, ''),
+  )
+    .slice(0, 3)
+    .join('');
+
+/** The code a name makes on its own ("Floptropica" → FLO), or "". */
+export const suggestShortCode = (name: string): string =>
+  candidatesFor(name)[0] ?? '';
+
+/**
+ * The codes users picked for custom entries, keyed by `code`, for
+ * `getShortCodes`. Read from the custom entries (the user's own and a loaded
+ * contest's), not the line-up's copies: voters and copies made before an
+ * edit don't carry it. Anything that isn't a valid code (a hand-made
+ * contest file) is left out.
+ */
+export const getChosenShortCodes = (
+  entries: readonly { code: string; shortCode?: string }[],
+): Record<string, string> => {
+  const chosen: Record<string, string> = {};
+
+  entries.forEach(({ code, shortCode }) => {
+    if (shortCode && SHORT_CODE_PATTERN.test(shortCode)) {
+      chosen[code] = shortCode;
+    }
+  });
+
+  return chosen;
+};
+
+/**
+ * Short codes for a line-up, keyed by `code`: the sports codes above, the
+ * codes picked for custom entries (`chosen`, kept even if another entry uses
+ * the same one: the owner asked for it), and for every other custom entry a
+ * code from the name that no other entry in the line-up uses ("Floptropica"
+ * → FLO, a second "Flopland" → FLP). Deterministic for the same line-up in
+ * the same order.
  */
 export const getShortCodes = (
   countries: readonly { code: string; name: string }[],
+  chosen: Readonly<Record<string, string>> = {},
 ): Record<string, string> => {
   const codes: Record<string, string> = {};
   const taken = new Set<string>();
@@ -286,7 +332,8 @@ export const getShortCodes = (
   countries.forEach((country) => {
     if (country.code in codes) return;
 
-    const known = SHORT_CODES[country.code.toUpperCase()];
+    const known =
+      SHORT_CODES[country.code.toUpperCase()] ?? chosen[country.code];
 
     if (known) {
       codes[country.code] = known;

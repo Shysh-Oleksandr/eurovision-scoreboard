@@ -9,7 +9,6 @@ export interface StatsCustomizationSettings {
   showBackgroundImage: boolean;
   backgroundOpacity: number;
   borderOpacity: number;
-  generateOnOpen: boolean;
   isCustomizationExpanded: boolean;
   showVotingCountriesNames: boolean;
 }
@@ -25,7 +24,6 @@ const DEFAULT_STATS_CUSTOMIZATION: StatsCustomizationSettings = {
   showBackgroundImage: true,
   backgroundOpacity: 0.3,
   borderOpacity: 0.5,
-  generateOnOpen: true,
   isCustomizationExpanded: false,
   showVotingCountriesNames: false,
 };

@@ -17,7 +17,11 @@ export const DEFAULT_THEME_SPECIFICS: ThemeSpecifics = {
 };
 
 const BOARD_ANIMATION_MODES = ['flip', 'teleport'] as const;
-const DOUZE_POINTS_ANIMATION_MODES = ['parallelograms', 'heartsGrid'] as const;
+const DOUZE_POINTS_ANIMATION_MODES = [
+  'parallelograms',
+  'heartsGrid',
+  'year2022',
+] as const;
 
 const isBoardAnimationMode = (
   value: unknown,

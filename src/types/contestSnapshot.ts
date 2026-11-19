@@ -138,7 +138,12 @@ export interface ContestSnapshot {
     };
     countriesStateByStage: Record<string, CountriesStateItem[]>;
   };
-  customEntriesUsed: Array<{ code: string; name: string; flag: string }>;
+  customEntriesUsed: Array<{
+    code: string;
+    name: string;
+    flag: string;
+    shortCode?: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }

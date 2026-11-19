@@ -177,6 +177,8 @@ export const useBoardAnimations = (
    * once it is true, instead of the whole board fading in on mount.
    */
   hostAppearReady?: boolean,
+  /** How long the board waits before moving after a 12 (the douze mode's). */
+  douzeMoveDelayMs = 1000,
 ) => {
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const getCurrentStage = useScoreboardStore((state) => state.getCurrentStage);
@@ -255,8 +257,13 @@ export const useBoardAnimations = (
   const flipMoveDelay = useMemo(() => {
     if (!wasTheFirstPointsAwarded || isVotingOver) return 0;
 
-    return isDouzePointsAwarded ? 1000 : 500;
-  }, [isDouzePointsAwarded, wasTheFirstPointsAwarded, isVotingOver]);
+    return isDouzePointsAwarded ? douzeMoveDelayMs : 500;
+  }, [
+    isDouzePointsAwarded,
+    wasTheFirstPointsAwarded,
+    isVotingOver,
+    douzeMoveDelayMs,
+  ]);
 
   useEffect(() => {
     displayOrderRef.current = displayOrder;

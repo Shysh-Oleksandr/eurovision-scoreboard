@@ -24,12 +24,15 @@ export const SegmentedRow: React.FC<SegmentedRowProps> = ({ item }) => {
           {label}
         </div>
       )}
+      {item.descKey && (
+        <p className="mb-2 text-[12.5px] text-white/50">{t(item.descKey)}</p>
+      )}
       <Segmented
         ariaLabel={label}
         value={value}
         options={item.options.map((option) => ({
           value: option.value,
-          label: t(option.labelKey),
+          label: option.labelKey ? t(option.labelKey) : option.label ?? '',
         }))}
         onChange={(next) =>
           setSettings({ [item.settingKey]: next } as Partial<Settings>)

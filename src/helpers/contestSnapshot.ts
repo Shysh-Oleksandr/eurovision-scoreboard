@@ -293,7 +293,12 @@ export function buildContestSnapshotFromStores() {
 
   const customEntriesUsed = countriesStore.customCountries
     .filter((c) => customCodes.has(c.code))
-    .map((c) => ({ code: c.code, name: c.name, flag: c.flag || '' }));
+    .map((c) => ({
+      code: c.code,
+      name: c.name,
+      flag: c.flag || '',
+      ...(c.shortCode ? { shortCode: c.shortCode } : {}),
+    }));
 
   // Compact odds for setup participants (includes custom entries)
   const participantCodes = Array.from(
@@ -731,6 +736,7 @@ export async function applyContestSnapshotToStores(
       name: e.name,
       category: 'Custom',
       flag: e.flag,
+      ...(e.shortCode ? { shortCode: e.shortCode } : {}),
       isImported: true,
     }));
 

@@ -28,6 +28,11 @@ export interface CountryItemBaseProps {
   renderDouzePointsAnimation?: (
     country: Country | BaseCountry,
   ) => React.ReactNode;
+  /**
+   * Drawn next to the main container rather than inside it (the container
+   * clips): spec-driven douze animations (src/douze/) reach past the row.
+   */
+  renderOverlay?: () => React.ReactNode;
 
   // Container options
   as?: 'button' | 'div';
@@ -55,6 +60,7 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
   renderName,
   renderPoints,
   renderDouzePointsAnimation,
+  renderOverlay,
   as = 'div',
   showPlaceNumber = false,
   useInlineContentLayout = false,
@@ -85,6 +91,7 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
 
       {/* Main Container */}
       <Container
+        data-douze-anchor="row"
         className={`relative ${
           useInlineContentLayout ? 'flex flex-row items-stretch min-h-0 ' : ''
         }${containerClassName}`}
@@ -126,6 +133,8 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
           {renderPoints && renderPoints(country)}
         </div>
       </Container>
+
+      {renderOverlay?.()}
     </div>
   );
 };

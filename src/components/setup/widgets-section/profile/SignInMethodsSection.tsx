@@ -36,13 +36,20 @@ interface Row {
 const iconClass = 'size-5 flex-none';
 
 /**
- * Edit profile → Sign-in methods (docs/sign-in-methods.md): which of Google,
+ * Account → Sign-in methods (docs/sign-in-methods.md): which of Google,
  * Apple and email codes open this account, with Connect / Add / Change /
  * Remove. The last method can't be removed. Apple isn't offered in the
  * Android app (no Sign in with Apple there), but an Apple ID already
  * connected still shows, so it can be removed.
  */
-const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
+const SignInMethodsSection: React.FC<{
+  isOpen: boolean;
+  /** The section's wrapper; the default sets it off from content above. */
+  className?: string;
+}> = ({
+  isOpen,
+  className = 'mt-6 pt-5 border-t border-white/10 space-y-4',
+}) => {
   const t = useTranslations('widgets.profile.signInMethods');
   const isSignedIn = useAuthStore((s) => !!s.user);
   const { data, isLoading, isError, refetch } = useSignInMethodsQuery(
@@ -122,14 +129,14 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
 
   if (!data) {
     return (
-      <section className="mt-6 pt-5 border-t border-white/10 space-y-4">
+      <section className={className}>
         {header}
         {offline ? (
           <OfflineNotice className="py-2" />
         ) : isError && !isLoading ? (
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <p className="text-white/70 text-sm">{t('loadFailed')}</p>
-            <Button variant="tertiary" size="md" onClick={() => refetch()}>
+            <Button variant="surface" size="md" onClick={() => refetch()}>
               {t('retry')}
             </Button>
           </div>
@@ -178,7 +185,7 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
       actions.push(
         <Button
           key="email"
-          variant="tertiary"
+          variant="surface"
           size="md"
           disabled={!!busy || offline}
           onClick={openEmailLink}
@@ -190,7 +197,7 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
       actions.push(
         <Button
           key="connect"
-          variant="tertiary"
+          variant="surface"
           size="md"
           disabled={!!busy || offline}
           isLoading={busy === row.method}
@@ -204,8 +211,9 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
       actions.push(
         <Button
           key="remove"
-          variant="tertiary"
+          variant="surface"
           size="md"
+          className="dp-act--quiet"
           disabled={!!busy || offline}
           isLoading={busy === row.method}
           onClick={() => remove(row, data)}
@@ -219,7 +227,7 @@ const SignInMethodsSection: React.FC<{ isOpen: boolean }> = ({ isOpen }) => {
   };
 
   return (
-    <section className="mt-6 pt-5 border-t border-white/10 space-y-4">
+    <section className={className}>
       {header}
       <MethodList
         rows={visibleRows}

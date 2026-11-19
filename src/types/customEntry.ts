@@ -4,6 +4,8 @@ export interface CustomEntry {
   flagUrl: string;
   userId: string;
   groupId?: string | null;
+  /** Up to 3 letters or digits, upper-cased; absent = made from the name. */
+  shortCode?: string;
   createdAt: string;
   updatedAt: string;
 }

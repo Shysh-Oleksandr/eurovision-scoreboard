@@ -9,7 +9,11 @@ export type FlagShape =
   | 'round-border'
   | 'none';
 export type BoardAnimationMode = 'flip' | 'teleport';
-export type DouzePointsAnimationMode = 'parallelograms' | 'heartsGrid';
+/** `year2022` and later year modes are played from specs in src/douze/. */
+export type DouzePointsAnimationMode =
+  | 'parallelograms'
+  | 'heartsGrid'
+  | 'year2022';
 
 export interface ThemeSpecifics {
   flagShape: FlagShape;

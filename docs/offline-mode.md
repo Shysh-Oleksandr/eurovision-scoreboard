@@ -59,8 +59,8 @@ launch). Queries pause while offline and refetch on reconnect.
   refresh token rotates, so two refreshes with the same token could end
   the session.
 - Native `logout()` is all or nothing: offline it throws before touching
-  the stored token. The profile disables Edit profile and Sign out offline
-  ("Needs a connection").
+  the stored token. The profile disables Edit profile and Account (which
+  holds Log out) offline ("Needs a connection").
 
 ## 4. UI
 
@@ -79,7 +79,8 @@ launch). Queries pause while offline and refetch on reconnect.
   …") only show with data.
 - **Sign-in**: `SignInButtons` renders `OfflineNotice` ("You can sign in
   once you're back online") offline, which covers every sign-in prompt.
-- **Disabled offline**: Edit profile, Sign out, follow, theme and contest
+- **Disabled offline**: Edit profile, Account (Log out, sign-in methods,
+  blocked users, deletion), follow, theme and contest
   like / save / edit, contest Load (needs the snapshot), sign-in method
   changes, theme and contest Save in their editors. Anything else that
   needs the API fails fast with the translated toast.

@@ -26,6 +26,8 @@ export interface BaseCountry {
   flag?: string;
   updatedAt?: string; // For custom entries
   groupId?: string | null; // custom entry group id
+  /** The code the user picked for a custom entry (`getShortCodes`). */
+  shortCode?: string;
 }
 
 export type SemiFinalGroup = 'SF1' | 'SF2';

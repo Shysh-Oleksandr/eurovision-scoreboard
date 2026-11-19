@@ -93,6 +93,8 @@ export type PublicThemesQueryParams = {
   hasCustomAudio?: boolean;
   /** When true, only themes using an uploaded font (server flag). */
   hasCustomFonts?: boolean;
+  /** When true, only themes with a background video. */
+  hasBackgroundVideo?: boolean;
   enabled?: boolean;
 };
 
@@ -106,6 +108,7 @@ export type MyThemesListQueryParams = {
   endDate?: string;
   hasCustomAudio?: boolean;
   hasCustomFonts?: boolean;
+  hasBackgroundVideo?: boolean;
   /** Passed to GET /themes/me only */
   groupId?: string;
   enabled?: boolean;
@@ -134,6 +137,9 @@ function buildThemesListQueryParams(
   if (params.hasCustomFonts === true) {
     searchParams.append('hasCustomFonts', 'true');
   }
+  if (params.hasBackgroundVideo === true) {
+    searchParams.append('hasBackgroundVideo', 'true');
+  }
   if (params.groupId) searchParams.append('groupId', params.groupId);
 
   return searchParams.toString();
@@ -149,6 +155,7 @@ export function useMyThemesListQuery({
   endDate,
   hasCustomAudio,
   hasCustomFonts,
+  hasBackgroundVideo,
   groupId,
   enabled = true,
 }: MyThemesListQueryParams) {
@@ -162,6 +169,7 @@ export function useMyThemesListQuery({
     endDate,
     hasCustomAudio,
     hasCustomFonts,
+    hasBackgroundVideo,
     groupId,
   };
 
@@ -188,6 +196,7 @@ export function useSavedThemesListQuery({
   endDate,
   hasCustomAudio,
   hasCustomFonts,
+  hasBackgroundVideo,
   enabled = true,
 }: MyThemesListQueryParams) {
   const filters = {
@@ -200,6 +209,7 @@ export function useSavedThemesListQuery({
     endDate,
     hasCustomAudio,
     hasCustomFonts,
+    hasBackgroundVideo,
   };
 
   return useQuery<ThemeListResponse>({
@@ -224,6 +234,7 @@ export function usePublicThemesQuery({
   endDate,
   hasCustomAudio,
   hasCustomFonts,
+  hasBackgroundVideo,
   enabled = true,
 }: PublicThemesQueryParams) {
   return useQuery<ThemeListResponse>({
@@ -236,6 +247,7 @@ export function usePublicThemesQuery({
       endDate,
       hasCustomAudio,
       hasCustomFonts,
+      hasBackgroundVideo,
     }),
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -249,6 +261,9 @@ export function usePublicThemesQuery({
       if (endDate) params.append('endDate', endDate);
       if (hasCustomAudio === true) params.append('hasCustomAudio', 'true');
       if (hasCustomFonts === true) params.append('hasCustomFonts', 'true');
+      if (hasBackgroundVideo === true) {
+        params.append('hasBackgroundVideo', 'true');
+      }
 
       const { data } = await api.get(`/themes/public?${params.toString()}`);
 

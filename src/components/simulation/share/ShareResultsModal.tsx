@@ -1,39 +1,33 @@
-import { PencilLine, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
-
-import Image from 'next/image';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
-  ASPECT_RATIO_PRESETS,
-  getInitialAspectRatio,
-  ShareImageAspectRatio,
-  useGeneralStore,
-} from '../../../state/generalStore';
-import { useScoreboardStore } from '../../../state/scoreboardStore';
-import Button from '../../common/Button';
-import { Checkbox } from '../../common/Checkbox';
-import { CollapsibleSection } from '../../common/CollapsibleSection';
-import Modal from '../../common/Modal/Modal';
-import Select from '../../common/Select';
-import { Input } from '../../Input';
+  AutoShareLayout,
+  getAutoShareLayout,
+  SHARE_ITEM_SIZES,
+  SHARE_MAX_COLUMNS,
+} from './autoLayout';
+import {
+  FormatShape,
+  ShareAutoNote,
+  ShareGroup,
+  ShareLinkButton,
+  ShareSegmented,
+  ShareStepper,
+  ShareTextField,
+  ShareToggle,
+} from './controls';
+import ShareImageModal from './ShareImageModal';
 
-import { DownloadIcon } from '@/assets/icons/DownloadIcon';
-import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { useCountryDisplay, useCountrySorter } from '@/components/board/hooks';
-import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
-import DesignPreview from '@/graphics/components/DesignPreview';
-import { DesignDataProvider } from '@/graphics/render/DesignDataContext';
 import { useGraphicsStudioStore } from '@/graphics/state/graphicsStudioStore';
 import { toEditableDesign } from '@/graphics/templates/editor';
 import { buildResultsDesign } from '@/graphics/templates/results';
-import { saveFile, shareFile } from '@/helpers/fileActions';
 import { buildShareUrl } from '@/helpers/shareUrl';
-import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { Country, StageId, StageVotingMode } from '@/models';
-import { askForReviewSoon } from '@/native/review';
 import { useCountriesStore } from '@/state/countriesStore';
+import { ShareImageAspectRatio, useGeneralStore } from '@/state/generalStore';
+import { useScoreboardStore } from '@/state/scoreboardStore';
 
 interface ShareResultsModalProps {
   isOpen: boolean;
@@ -43,8 +37,41 @@ interface ShareResultsModalProps {
   countriesOverride?: Country[];
   titleOverride?: string;
   subtitleOverride?: string;
+  /** The stage named in the modal's header; the viewed stage by default. */
+  stageName?: string;
   isRunningOrder?: boolean;
 }
+
+/** Every export is 2× the design: 2400 × 1260 for Wide, on every device. */
+const EXPORT_OPTIONS = {
+  scale: 2,
+  format: 'jpeg' as const,
+  quality: 0.9,
+};
+
+/** Clothing sizes read the same in every language. */
+const ROW_SIZE_LABELS = {
+  sm: 'S',
+  md: 'M',
+  lg: 'L',
+  xl: 'XL',
+  '2xl': 'XXL',
+} as const;
+
+type CountriesMode = 'all' | 'top10' | 'custom';
+
+const TOP_PRESET = 10;
+
+/** The auto layout without the parts a manual layout keeps. */
+const withoutLayout = (auto: AutoShareLayout): Partial<AutoShareLayout> => {
+  const rest: Partial<AutoShareLayout> = { ...auto };
+
+  delete rest.layout;
+  delete rest.itemSize;
+  delete rest.shortCountryNames;
+
+  return rest;
+};
 
 const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   isOpen,
@@ -53,13 +80,12 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   countriesOverride,
   titleOverride,
   subtitleOverride,
+  stageName,
   isRunningOrder = false,
 }) => {
-  const t = useTranslations();
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(
-    null,
-  );
+  const t = useTranslations('share');
+  const tc = useTranslations('common');
+  const tg = useTranslations('graphics.share');
 
   const imageCustomization = useGeneralStore(
     (state) => state.imageCustomization,
@@ -80,14 +106,12 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   const televotingProgress = useScoreboardStore(
     (state) => state.televotingProgress,
   );
-
   const getVotingCountriesLength = useCountriesStore(
     (state) => state.getVotingCountriesLength,
   );
+  const openEditor = useGraphicsStudioStore((state) => state.openEditor);
+
   const currentStage = eventStages.find((stage) => stage.id === currentStageId);
-
-  const isTouchDevice = useTouchDevice();
-
   const { id, name, isOver, isJuryVoting, votingMode, countries } =
     currentStage || {};
 
@@ -105,11 +129,10 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       title = `${contestName} ${contestYear} - ${name}`;
 
       if (isJuryVoting) {
-        if (votingCountryIndex === 0) {
-          subtitle = name;
-        }
-
-        subtitle = `${votingCountryIndex} of ${getVotingCountriesLength()} countries voted`;
+        subtitle =
+          votingCountryIndex === 0
+            ? name
+            : `${votingCountryIndex} of ${getVotingCountriesLength()} countries voted`;
       } else if (
         (votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
           votingMode === StageVotingMode.COMBINED) &&
@@ -121,7 +144,7 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
       }
     }
 
-    return { title, subtitle };
+    return { title, subtitle: subtitle ?? '' };
   }, [
     titleOverride,
     subtitleOverride,
@@ -141,748 +164,359 @@ const ShareResultsModal: React.FC<ShareResultsModalProps> = ({
   const allCountriesToDisplay = useCountryDisplay();
   const sortedCountriesFromBoard = useCountrySorter(allCountriesToDisplay);
   const sortedCountries = countriesOverride ?? sortedCountriesFromBoard;
-  const limitedCountries =
-    (imageCustomization.maxCountries || 0) > 0
-      ? sortedCountries.slice(0, imageCustomization.maxCountries as number)
-      : sortedCountries;
+  const total = sortedCountries.length;
 
-  const handleImageGenerated = (dataUrl: string) => {
-    setGeneratedImageUrl(dataUrl);
-  };
+  const {
+    aspectRatio,
+    maxCountries,
+    layout,
+    itemSize,
+    showRankings,
+    shortCountryNames,
+  } = imageCustomization;
+  const showPoints = isRunningOrder
+    ? imageCustomization.showPointsForRunningOrder
+    : imageCustomization.showPoints;
+  // A running order always shows every country.
+  const limit =
+    !isRunningOrder && maxCountries > 0 && maxCountries < total
+      ? maxCountries
+      : 0;
+  const shownCount = limit || total;
+  const auto = getAutoShareLayout(shownCount, aspectRatio);
+  const isAutoLayout = layout === auto.layout && itemSize === auto.itemSize;
 
-  // "Open in editor": the same design, made self-contained (running-order
-  // rows become a manual list) and opened in the graphics studio.
-  const openEditor = useGraphicsStudioStore((state) => state.openEditor);
-
-  // The share image as a design document (docs/graphics-studio.md).
+  // The share image as a design document (docs/graphics-studio.md). Keyed
+  // on what the image shows, so opening Customize doesn't re-export it.
+  const {
+    title,
+    subtitle,
+    titleFontSize,
+    subtitleFontSize,
+    brandingFontSize,
+    verticalPadding,
+    horizontalPadding,
+  } = imageCustomization;
   const design = useMemo(
     () =>
       buildResultsDesign({
-        settings: imageCustomization,
-        showPoints: isRunningOrder
-          ? imageCustomization.showPointsForRunningOrder
-          : imageCustomization.showPoints,
+        settings: {
+          ...useGeneralStore.getState().imageCustomization,
+          aspectRatio,
+          title,
+          subtitle,
+          titleFontSize,
+          subtitleFontSize,
+          brandingFontSize,
+          verticalPadding,
+          horizontalPadding,
+          layout,
+          itemSize,
+          showRankings,
+          shortCountryNames,
+          maxCountries: limit,
+        },
+        showPoints,
         statusMode: countriesOverride ? 'uniform' : 'live',
         dataSource: countriesOverride ? 'provided' : 'live',
       }),
-    [imageCustomization, isRunningOrder, countriesOverride],
+    [
+      aspectRatio,
+      title,
+      subtitle,
+      titleFontSize,
+      subtitleFontSize,
+      brandingFontSize,
+      verticalPadding,
+      horizontalPadding,
+      layout,
+      itemSize,
+      showRankings,
+      shortCountryNames,
+      limit,
+      showPoints,
+      countriesOverride,
+    ],
   );
-  const exportOptions = useMemo(
-    () => ({
-      // Parity with the old exporter: html-to-image multiplied the requested
-      // canvas size by the device pixel ratio on top of the quality factor.
-      scale:
-        (imageCustomization.highQuality && !isTouchDevice ? 2 : 1) *
-        Math.min(2, window.devicePixelRatio || 1),
-      format: 'jpeg' as const,
-      quality: 0.9,
-    }),
-    [imageCustomization.highQuality, isTouchDevice],
-  );
 
-  const handleDownload = async () => {
-    if (!generatedImageUrl) return;
-
-    try {
-      const result = await saveFile(
-        generatedImageUrl,
-        `${defaultTitle} - ${defaultSubtitle} - DouzePoints.app - ${Date.now()}.jpg`,
-      );
-
-      if (result.kind === 'saved') {
-        toast.success(t('common.savedTo', { folder: result.folder }));
-      }
-      if (result.kind !== 'cancelled') askForReviewSoon('image-shared');
-    } catch (err) {
-      console.error('Save failed:', err);
-      toast.error('Failed to share');
-    }
-  };
-
-  const handleShareImage = async () => {
-    if (!generatedImageUrl) return;
-
-    try {
-      const result = await shareFile({
-        data: generatedImageUrl,
-        fileName: `${defaultTitle} - DouzePoints.app.jpg`,
-        title: defaultTitle,
-        text: defaultSubtitle,
-        url: buildShareUrl(activeContest ? { contest: activeContest._id } : {}),
-      });
-
-      if (result === 'unsupported') {
-        toast.error('Sharing is not supported on this device.');
-      }
-      if (result === 'shared') askForReviewSoon('image-shared');
-    } catch (err: any) {
-      console.error('Share failed:', err);
-      toast.error('Failed to share');
-    }
-  };
-
-  const updateImageSetting = (key: string, value: any) => {
-    setImageCustomization({
-      [key]: value,
-    });
-  };
-
-  const getCurrentAspectRatioLabel = () => {
-    const preset = ASPECT_RATIO_PRESETS[imageCustomization.aspectRatio];
-
-    return preset ? preset.label : 'Landscape (16:9)';
-  };
-
-  const layoutOptions = useMemo(() => {
-    return Array.from({ length: 8 }, (_, index) => ({
-      value: index + 1,
-      label: t('share.nColumns', { count: index + 1 }),
-    }));
-  }, [t]);
-
-  const getAutoSettingsByCount = (
-    count: number,
-    newAspectRatio?: ShareImageAspectRatio,
-  ) => {
-    const currentAspectRatio = newAspectRatio || imageCustomization.aspectRatio;
-    const isLandscape = currentAspectRatio === '1200x630';
-    const isSquare = currentAspectRatio === '800x800';
-    const isPortrait = currentAspectRatio === '750x1000';
-
-    if (count <= 6) {
-      return {
-        layout: 1,
-        itemSize: '2xl' as const,
-        shortCountryNames: false,
-        titleFontSize: 42,
-        subtitleFontSize: 26,
-        brandingFontSize: 22,
-        verticalPadding: isPortrait ? 40 : 20,
-        horizontalPadding: isLandscape ? 130 : 100,
-      };
-    }
-
-    if (count <= 12) {
-      return {
-        layout: isPortrait ? 1 : 2,
-        itemSize: 'xl' as const,
-        shortCountryNames: false,
-        titleFontSize: 48,
-        subtitleFontSize: 28,
-        brandingFontSize: 22,
-        verticalPadding: isPortrait ? 64 : 40,
-        horizontalPadding: isLandscape ? 88 : 50,
-      };
-    }
-
-    if (count <= 16) {
-      return {
-        layout: 2,
-        itemSize: 'xl' as const,
-        shortCountryNames: false,
-        titleFontSize: 42,
-        subtitleFontSize: 26,
-        brandingFontSize: 20,
-        verticalPadding: isPortrait ? 46 : 16,
-        horizontalPadding: isLandscape ? 90 : 50,
-      };
-    }
-
-    if (count <= 27) {
-      return {
-        layout: isLandscape ? 3 : 2,
-        itemSize: 'lg' as const,
-        shortCountryNames: false,
-        titleFontSize: 36,
-        subtitleFontSize: 24,
-        brandingFontSize: 20,
-        verticalPadding: isPortrait ? 46 : 16,
-        horizontalPadding: isLandscape ? 72 : 50,
-      };
-    }
-
-    if (count <= 48) {
-      return {
-        layout: isLandscape ? 4 : isSquare ? 3 : 2,
-        itemSize: count <= 32 ? ('lg' as const) : ('md' as const),
-        shortCountryNames: count <= 32 && isSquare,
-        titleFontSize: 34,
-        subtitleFontSize: 22,
-        brandingFontSize: 18,
-        verticalPadding: 15,
-        horizontalPadding: 64,
-      };
-    }
-
-    if (count <= 65) {
-      return {
-        layout: isLandscape ? 5 : isSquare ? 4 : 3,
-        itemSize: 'md' as const,
-        shortCountryNames: isSquare,
-        titleFontSize: 32,
-        subtitleFontSize: 20,
-        brandingFontSize: 18,
-        verticalPadding: 8,
-        horizontalPadding: isPortrait ? 36 : 56,
-      };
-    }
-
-    if (count <= 80) {
-      return {
-        layout: isLandscape ? 5 : isSquare ? 4 : 3,
-        itemSize: 'sm' as const,
-        shortCountryNames: isSquare,
-        titleFontSize: 32,
-        subtitleFontSize: 20,
-        brandingFontSize: 18,
-        verticalPadding: isPortrait ? 10 : 2,
-        horizontalPadding: isPortrait ? 36 : 40,
-      };
-    }
-
-    if (count <= 100) {
-      return {
-        layout: isLandscape ? 6 : isSquare ? 5 : 4,
-        itemSize: 'sm' as const,
-        shortCountryNames: isSquare,
-        titleFontSize: 32,
-        subtitleFontSize: 20,
-        brandingFontSize: 18,
-        verticalPadding: isPortrait ? 10 : 0,
-        horizontalPadding: isPortrait ? 24 : 40,
-      };
-    }
-
-    return {
-      layout: isLandscape ? (count <= 112 ? 7 : 8) : isSquare ? 5 : 5,
-      itemSize: 'sm' as const,
-      shortCountryNames: true,
-      titleFontSize: 32,
-      subtitleFontSize: 20,
-      brandingFontSize: 18,
-      verticalPadding: isPortrait ? 10 : 0,
-      horizontalPadding: isPortrait ? 20 : 40,
-    };
-  };
-
-  const applyAutoSettings = (newAspectRatio?: ShareImageAspectRatio) => {
-    const count = limitedCountries.length;
-    const auto = getAutoSettingsByCount(count, newAspectRatio);
-
-    setImageCustomization({
-      ...auto,
-      ...(newAspectRatio ? { aspectRatio: newAspectRatio as any } : {}),
-    });
-  };
+  // A fresh image for every open: the stage's own title, all countries, the
+  // auto layout. The format and the Show toggles carry over.
+  const [customCountries, setCustomCountries] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      setCustomCountries(false);
       setImageCustomization({
         title: defaultTitle,
         subtitle: defaultSubtitle,
+        maxCountries: 0,
+        ...getAutoShareLayout(
+          total,
+          useGeneralStore.getState().imageCustomization.aspectRatio,
+        ),
       });
-
-      applyAutoSettings();
       onLoaded();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  return (
-    <Modal
-      ref={modalRef}
-      isOpen={isOpen}
-      onClose={onClose}
-      containerClassName="!w-[min(100%,_95vw)]"
-      fullScreenOnPhone
-      contentClassName="!py-4 !px-2 text-white h-[85vh] narrow-scrollbar"
-      overlayClassName={countriesOverride ? '!z-[1003]' : '!z-[1001]'}
-      withBlur
-      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
-    >
-      <div className="sm:space-y-6 space-y-4 sm:py-2 py-1">
-        <div className="sm:mx-3 mx-2">
-          <CollapsibleSection
-            title={t('share.customization')}
-            isExpanded={imageCustomization.isCustomizationExpanded}
-            onToggle={() => {
-              setImageCustomization({
-                isCustomizationExpanded:
-                  !imageCustomization.isCustomizationExpanded,
-              });
-            }}
-            contentClassName="lg:px-6 sm:px-4 px-3"
-          >
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('common.title')}
-                  </label>
-                  <Input
-                    type="text"
-                    className="pr-2"
-                    value={imageCustomization.title}
-                    onChange={(e) =>
-                      updateImageSetting('title', e.target.value)
-                    }
-                    placeholder={t('common.enterTitle')}
-                  />
-                </div>
+  const setFormat = (ratio: ShareImageAspectRatio) =>
+    setImageCustomization({
+      aspectRatio: ratio,
+      ...getAutoShareLayout(shownCount, ratio),
+    });
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('common.subtitle')}
-                  </label>
-                  <Input
-                    type="text"
-                    className="pr-2"
-                    value={imageCustomization.subtitle}
-                    onChange={(e) =>
-                      updateImageSetting('subtitle', e.target.value)
-                    }
-                    placeholder={t('common.enterSubtitle')}
-                  />
-                </div>
+  /** A new number of rows keeps a manual layout, else re-fits it. */
+  const setLimit = (next: number, custom: boolean) => {
+    const nextLimit = next > 0 && next < total ? next : 0;
+    const nextAuto = getAutoShareLayout(nextLimit || total, aspectRatio);
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.aspectRatio')}
-                  </label>
-                  <Select
-                    value={imageCustomization.aspectRatio}
-                    onChange={(e) => {
-                      const newAspectRatio = e.target
-                        .value as ShareImageAspectRatio;
+    setCustomCountries(custom);
+    setImageCustomization({
+      maxCountries: nextLimit,
+      ...(isAutoLayout ? nextAuto : withoutLayout(nextAuto)),
+    });
+  };
 
-                      applyAutoSettings(newAspectRatio);
-                    }}
-                    options={Object.entries(ASPECT_RATIO_PRESETS).map(
-                      ([key, preset]) => ({
-                        value: key as ShareImageAspectRatio,
-                        label: preset.label,
-                      }),
-                    )}
-                    className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
-                    arrowClassName="!w-6 !h-6"
-                  >
-                    <span className="flex-1">
-                      {getCurrentAspectRatioLabel()}
-                    </span>
-                  </Select>
-                </div>
+  const countriesMode: CountriesMode =
+    limit === 0
+      ? 'all'
+      : limit === TOP_PRESET && !customCountries
+      ? 'top10'
+      : 'custom';
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.layout')}
-                  </label>
-                  <Select
-                    value={imageCustomization.layout}
-                    onChange={(e) => {
-                      updateImageSetting('layout', parseInt(e.target.value));
-                    }}
-                    options={layoutOptions}
-                    className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
-                    arrowClassName="!w-6 !h-6"
-                  >
-                    <span className="flex-1">
-                      {t('share.nColumns', {
-                        count: imageCustomization.layout,
-                      })}
-                    </span>
-                  </Select>
-                </div>
+  const setCountriesMode = (mode: CountriesMode) => {
+    if (mode === 'all') setLimit(0, false);
+    if (mode === 'top10') setLimit(TOP_PRESET, false);
+    if (mode === 'custom') {
+      setLimit(limit || Math.min(5, total - 1), true);
+    }
+  };
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.itemSize')}
-                  </label>
-                  <Select
-                    value={imageCustomization.itemSize}
-                    onChange={(e) =>
-                      updateImageSetting('itemSize', e.target.value)
-                    }
-                    options={[
-                      { value: 'sm', label: 'Small' },
-                      { value: 'md', label: 'Medium' },
-                      { value: 'lg', label: 'Large' },
-                      { value: 'xl', label: 'Extra Large' },
-                      { value: '2xl', label: '2X Large' },
-                    ]}
-                    className="w-full h-12 py-2.5 pl-3 pr-4 bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/60 lg:text-[0.95rem] text-sm hover:bg-primary-800"
-                    arrowClassName="!w-6 !h-6"
-                  >
-                    <span className="flex-1">
-                      {imageCustomization.itemSize === 'sm' && 'Small'}
-                      {imageCustomization.itemSize === 'md' && 'Medium'}
-                      {imageCustomization.itemSize === 'lg' && 'Large'}
-                      {imageCustomization.itemSize === 'xl' && 'Extra Large'}
-                      {imageCustomization.itemSize === '2xl' && '2X Large'}
-                    </span>
-                  </Select>
-                </div>
+  const sizeIndex = Math.max(0, SHARE_ITEM_SIZES.indexOf(itemSize));
+  const maxColumns = Math.min(SHARE_MAX_COLUMNS, shownCount);
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.maxCountries')}
-                  </label>
-                  <Input
-                    type="number"
-                    className="pr-3"
-                    value={imageCustomization.maxCountries || ''}
-                    onChange={(e) => {
-                      const { value } = e.target;
+  const isDefaultText = title === defaultTitle && subtitle === defaultSubtitle;
 
-                      if (value === '') {
-                        updateImageSetting('maxCountries', null);
-                      } else {
-                        const numValue = parseInt(value);
+  const primaryOptions = (
+    <ShareGroup label={t('format')}>
+      <ShareSegmented
+        ariaLabel={t('format')}
+        value={aspectRatio}
+        onChange={setFormat}
+        options={[
+          {
+            value: ShareImageAspectRatio.LANDSCAPE,
+            label: t('formatWide'),
+            icon: <FormatShape kind="wide" />,
+          },
+          {
+            value: ShareImageAspectRatio.SQUARE,
+            label: t('formatSquare'),
+            icon: <FormatShape kind="square" />,
+          },
+          {
+            value: ShareImageAspectRatio.PORTRAIT,
+            label: t('formatTall'),
+            icon: <FormatShape kind="tall" />,
+          },
+        ]}
+      />
+    </ShareGroup>
+  );
 
-                        if (!isNaN(numValue)) {
-                          updateImageSetting('maxCountries', numValue);
-                        }
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const { value } = e.target;
+  const moreOptions = (
+    <>
+      <ShareGroup
+        label={t('text')}
+        aside={
+          !isDefaultText && (
+            <ShareLinkButton
+              onClick={() =>
+                setImageCustomization({
+                  title: defaultTitle,
+                  subtitle: defaultSubtitle,
+                })
+              }
+            >
+              {tc('reset')}
+            </ShareLinkButton>
+          )
+        }
+      >
+        <ShareTextField
+          label={tc('title')}
+          value={title}
+          onChange={(value) => setImageCustomization({ title: value })}
+        />
+        <ShareTextField
+          label={tc('subtitle')}
+          value={subtitle}
+          onChange={(value) => setImageCustomization({ subtitle: value })}
+        />
+      </ShareGroup>
 
-                      if (value === '' || isNaN(parseInt(value))) {
-                        updateImageSetting('maxCountries', 0);
-                      }
-                    }}
-                    placeholder={t('share.allByDefault')}
-                  />
-                </div>
-              </div>
+      {!isRunningOrder && total > 1 && (
+        <ShareGroup label={t('countries')}>
+          <ShareSegmented
+            ariaLabel={t('countries')}
+            value={countriesMode}
+            onChange={setCountriesMode}
+            options={[
+              { value: 'all', label: t('allCountries', { count: total }) },
+              ...(total > TOP_PRESET
+                ? [
+                    {
+                      value: 'top10' as const,
+                      label: t('topCountries', { count: TOP_PRESET }),
+                    },
+                  ]
+                : []),
+              { value: 'custom', label: t('customCount') },
+            ]}
+          />
+          {countriesMode === 'custom' && (
+            <ShareStepper
+              label={t('showTheTop')}
+              number={{
+                value: limit,
+                min: 1,
+                max: total - 1,
+                onChange: (n) => setLimit(n, true),
+              }}
+              onDecrease={() => setLimit(limit - 1, true)}
+              onIncrease={() => setLimit(limit + 1, true)}
+              canDecrease={limit > 1}
+              canIncrease={limit < total - 1}
+              decreaseLabel={t('fewerCountries')}
+              increaseLabel={t('moreCountries')}
+            />
+          )}
+        </ShareGroup>
+      )}
 
-              <div className="h-px bg-primary-800 w-full" />
-
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                <div className="flex flex-col justify-end">
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.titleSize')} (px)
-                  </label>
-                  <Input
-                    type="number"
-                    className="pr-3"
-                    value={imageCustomization.titleFontSize || ''}
-                    onChange={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '') {
-                        updateImageSetting('titleFontSize', null);
-                      } else {
-                        const numValue = parseInt(value);
-
-                        if (!isNaN(numValue)) {
-                          updateImageSetting('titleFontSize', numValue);
-                        }
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '' || isNaN(parseInt(value))) {
-                        updateImageSetting('titleFontSize', 36);
-                      }
-                    }}
-                    placeholder="36"
-                    min="24"
-                    max="100"
-                  />
-                </div>
-
-                <div className="flex flex-col justify-end">
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.subtitleSize')} (px)
-                  </label>
-                  <Input
-                    type="number"
-                    className="pr-3"
-                    value={imageCustomization.subtitleFontSize || ''}
-                    onChange={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '') {
-                        updateImageSetting('subtitleFontSize', null);
-                      } else {
-                        const numValue = parseInt(value);
-
-                        if (!isNaN(numValue)) {
-                          updateImageSetting('subtitleFontSize', numValue);
-                        }
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '' || isNaN(parseInt(value))) {
-                        updateImageSetting('subtitleFontSize', 24);
-                      }
-                    }}
-                    placeholder="24"
-                    min="16"
-                    max="60"
-                  />
-                </div>
-
-                <div className="flex flex-col justify-end">
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.brandingSize')} (px)
-                  </label>
-                  <Input
-                    type="number"
-                    className="pr-3"
-                    value={imageCustomization.brandingFontSize || ''}
-                    onChange={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '') {
-                        updateImageSetting('brandingFontSize', null);
-                      } else {
-                        const numValue = parseInt(value);
-
-                        if (!isNaN(numValue)) {
-                          updateImageSetting('brandingFontSize', numValue);
-                        }
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const { value } = e.target;
-
-                      if (
-                        value === '' ||
-                        isNaN(parseInt(value)) ||
-                        parseInt(value) < 14
-                      ) {
-                        updateImageSetting('brandingFontSize', 20);
-                      }
-                    }}
-                    placeholder="20"
-                    min="14"
-                    max="32"
-                  />
-                </div>
-
-                <div className="flex flex-col justify-end">
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.verticalPadding')} (px)
-                  </label>
-                  <Input
-                    type="number"
-                    className="pr-3"
-                    value={imageCustomization.verticalPadding || ''}
-                    onChange={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '') {
-                        updateImageSetting('verticalPadding', null);
-                      } else {
-                        const numValue = parseInt(value);
-
-                        if (!isNaN(numValue)) {
-                          updateImageSetting('verticalPadding', numValue);
-                        }
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '' || isNaN(parseInt(value))) {
-                        updateImageSetting('verticalPadding', 20);
-                      }
-                    }}
-                    placeholder="20"
-                    min="0"
-                    max="150"
-                  />
-                </div>
-
-                <div className="flex flex-col justify-end">
-                  <label className="block text-sm font-medium mb-2">
-                    {t('share.horizontalPadding')} (px)
-                  </label>
-                  <Input
-                    type="number"
-                    className="pr-3"
-                    value={imageCustomization.horizontalPadding || ''}
-                    onChange={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '') {
-                        updateImageSetting('horizontalPadding', null);
-                      } else {
-                        const numValue = parseInt(value);
-
-                        if (!isNaN(numValue)) {
-                          updateImageSetting('horizontalPadding', numValue);
-                        }
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const { value } = e.target;
-
-                      if (value === '' || isNaN(parseInt(value))) {
-                        updateImageSetting('horizontalPadding', 80);
-                      }
-                    }}
-                    placeholder="80"
-                    min="20"
-                    max="400"
-                  />
-                </div>
-              </div>
-
-              <div className="h-px bg-primary-800 w-full" />
-
-              <div className="flex flex-wrap">
-                <Checkbox
-                  id="showRankings"
-                  label={t('share.showRankings')}
-                  checked={imageCustomization.showRankings}
-                  onChange={(e) =>
-                    updateImageSetting('showRankings', e.target.checked)
-                  }
-                />
-
-                <Checkbox
-                  id="shortCountryNames"
-                  label={t('share.shortCountryNames')}
-                  checked={imageCustomization.shortCountryNames}
-                  onChange={(e) =>
-                    updateImageSetting('shortCountryNames', e.target.checked)
-                  }
-                />
-
-                <Checkbox
-                  id="showPoints"
-                  label={t('share.showPoints')}
-                  checked={
-                    isRunningOrder
-                      ? imageCustomization.showPointsForRunningOrder
-                      : imageCustomization.showPoints
-                  }
-                  onChange={(e) =>
-                    updateImageSetting(
-                      isRunningOrder
-                        ? 'showPointsForRunningOrder'
-                        : 'showPoints',
-                      e.target.checked,
-                    )
-                  }
-                />
-
-                {!isTouchDevice && (
-                  <Checkbox
-                    id="highQuality"
-                    label={t('share.highQuality')}
-                    checked={imageCustomization.highQuality}
-                    onChange={(e) =>
-                      updateImageSetting('highQuality', e.target.checked)
-                    }
-                  />
-                )}
-              </div>
-
-              <Button
-                variant="tertiary"
-                className="w-full justify-center"
-                Icon={<RestartIcon className="w-[20px] h-[20px]" />}
-                onClick={() => {
-                  const count = sortedCountries.length;
-                  const auto = getAutoSettingsByCount(
-                    count,
-                    ShareImageAspectRatio.LANDSCAPE,
-                  );
-
-                  setImageCustomization({
-                    ...auto,
-                    title: defaultTitle,
-                    subtitle: defaultSubtitle,
-                    aspectRatio: getInitialAspectRatio(),
-                    maxCountries: 0,
-                    showRankings: true,
-                    showPoints: true,
-                  });
-                }}
-              >
-                {t('common.reset')}
-              </Button>
-            </div>
-          </CollapsibleSection>
-        </div>
-        {/* Image Generation */}
-        <DesignDataProvider
-          binding={design.data}
-          providedCountries={countriesOverride}
-        >
-          <DesignPreview
-            design={design}
-            exportOptions={exportOptions}
-            autoGenerate
-            autoGenerateKey={currentStageId ?? null}
-            active={isOpen}
-            onImageGenerated={handleImageGenerated}
-            scrollTargetRef={modalRef}
-            extraActions={
-              <Button
-                variant="tertiary"
-                className="justify-center"
-                Icon={<PencilLine className="size-5" />}
-                onClick={() =>
-                  openEditor({
-                    design: toEditableDesign(design, {
-                      name: isRunningOrder
-                        ? t('graphics.share.runningOrderDesign')
-                        : t('graphics.share.resultsDesign'),
-                      providedCountries: countriesOverride,
-                    }),
-                    draftId: null,
-                    selectId: 'scoreboard',
-                  })
-                }
-              >
-                <span className="hidden sm:inline">
-                  {t('graphics.share.openInEditor')}
-                </span>
-              </Button>
+      <ShareGroup label={t('show')}>
+        <div className="grid grid-cols-3 gap-1.5">
+          <ShareToggle
+            label={t('places')}
+            pressed={showRankings}
+            onChange={(on) => setImageCustomization({ showRankings: on })}
+          />
+          <ShareToggle
+            label={t('points')}
+            pressed={showPoints}
+            onChange={(on) =>
+              setImageCustomization(
+                isRunningOrder
+                  ? { showPointsForRunningOrder: on }
+                  : { showPoints: on },
+              )
             }
           />
-        </DesignDataProvider>
+          <ShareToggle
+            label={t('shortNames')}
+            pressed={shortCountryNames}
+            onChange={(on) => setImageCustomization({ shortCountryNames: on })}
+          />
+        </div>
+      </ShareGroup>
 
-        {generatedImageUrl && (
-          <div>
-            <h3 className="text-lg font-semibold mb-2 ml-2">
-              {t('share.result')}:
-            </h3>
+      <ShareGroup
+        label={t('layout')}
+        aside={
+          isAutoLayout ? (
+            <ShareAutoNote>{t('auto')}</ShareAutoNote>
+          ) : (
+            <ShareLinkButton onClick={() => setImageCustomization(auto)}>
+              {tc('reset')}
+            </ShareLinkButton>
+          )
+        }
+      >
+        <div className="grid grid-cols-2 gap-1.5">
+          <ShareStepper
+            label={t('columns')}
+            value={String(layout)}
+            onDecrease={() => setImageCustomization({ layout: layout - 1 })}
+            onIncrease={() => setImageCustomization({ layout: layout + 1 })}
+            canDecrease={layout > 1}
+            canIncrease={layout < maxColumns}
+            decreaseLabel={t('fewerColumns')}
+            increaseLabel={t('moreColumns')}
+          />
+          <ShareStepper
+            label={t('rowSize')}
+            value={ROW_SIZE_LABELS[SHARE_ITEM_SIZES[sizeIndex]]}
+            onDecrease={() =>
+              setImageCustomization({
+                itemSize: SHARE_ITEM_SIZES[sizeIndex - 1],
+              })
+            }
+            onIncrease={() =>
+              setImageCustomization({
+                itemSize: SHARE_ITEM_SIZES[sizeIndex + 1],
+              })
+            }
+            canDecrease={sizeIndex > 0}
+            canIncrease={sizeIndex < SHARE_ITEM_SIZES.length - 1}
+            decreaseLabel={t('smallerRows')}
+            increaseLabel={t('biggerRows')}
+          />
+        </div>
+      </ShareGroup>
+    </>
+  );
 
-            <Image
-              src={generatedImageUrl}
-              alt="Generated scoreboard"
-              className="max-w-full h-auto border rounded-sm"
-              width={1024}
-              height={768}
-            />
-            <div className="mt-4 flex gap-2">
-              <Button
-                onClick={handleDownload}
-                className="flex-1 justify-center"
-                variant="tertiary"
-                Icon={<DownloadIcon className="w-[20px] h-[20px]" />}
-              >
-                {t('share.downloadImage')}
-              </Button>
-              <Button
-                onClick={handleShareImage}
-                className="justify-center !px-8 !text-base"
-                variant="tertiary"
-                Icon={<Share2 className="size-6" />}
-              ></Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </Modal>
+  const fileTitle = title || defaultTitle;
+
+  return (
+    <ShareImageModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isRunningOrder ? t('titleRunningOrder') : t('titleResults')}
+      caption={stageName ?? name}
+      overlayClassName={countriesOverride ? '!z-[1003]' : '!z-[1001]'}
+      design={design}
+      contentKey={sortedCountries}
+      data={{ binding: design.data, providedCountries: countriesOverride }}
+      exportOptions={EXPORT_OPTIONS}
+      primaryOptions={primaryOptions}
+      moreOptions={moreOptions}
+      customizeSummary={
+        isRunningOrder
+          ? t('customizeSummaryRunningOrder')
+          : t('customizeSummaryResults')
+      }
+      customizeOpen={imageCustomization.isCustomizationExpanded}
+      onCustomizeOpenChange={(open) =>
+        setImageCustomization({ isCustomizationExpanded: open })
+      }
+      // "Open in editor": the same design, made self-contained (running-order
+      // rows become a manual list) and opened in the graphics studio.
+      onOpenEditor={() =>
+        openEditor({
+          design: toEditableDesign(design, {
+            name: isRunningOrder
+              ? tg('runningOrderDesign')
+              : tg('resultsDesign'),
+            providedCountries: countriesOverride,
+          }),
+          draftId: null,
+          selectId: 'scoreboard',
+        })
+      }
+      saveFileName={() =>
+        `${fileTitle} - ${
+          subtitle || defaultSubtitle
+        } - DouzePoints.app - ${Date.now()}.jpg`
+      }
+      share={{
+        fileName: `${fileTitle} - DouzePoints.app.jpg`,
+        title: fileTitle,
+        text: subtitle || defaultSubtitle,
+        url: buildShareUrl(activeContest ? { contest: activeContest._id } : {}),
+      }}
+    />
   );
 };
 

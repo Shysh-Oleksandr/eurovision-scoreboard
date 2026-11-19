@@ -378,29 +378,8 @@ const UserContests: React.FC<UserContestsProps> = ({
             setSearch(value);
             setPage(1);
           }}
-          onCreateNew={() => {
-            if (
-              !activeContest ||
-              activeContest.userId.toString() !== user?._id
-            ) {
-              onCreateNew();
-
-              return;
-            }
-            confirm({
-              key: 'create-new-contest',
-              title: t('widgets.contests.confirmCreateNewContest'),
-              description: t(
-                'widgets.contests.confirmCreateNewContestDescription',
-                {
-                  name: activeContest.name,
-                },
-              ),
-              onConfirm: () => {
-                onCreateNew();
-              },
-            });
-          }}
+          // The dialog says what it saves (the open contest, as a new one).
+          onCreateNew={onCreateNew}
           placeholder={t('widgets.contests.searchContests')}
           extraActions={
             <Button

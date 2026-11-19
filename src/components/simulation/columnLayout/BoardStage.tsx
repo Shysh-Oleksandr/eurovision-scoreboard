@@ -23,6 +23,7 @@ import {
   BoardLayoutOverride,
 } from '@/components/board/BoardLayoutContext';
 import { getShortCodes } from '@/data/countries/shortCodes';
+import { useChosenShortCodes } from '@/hooks/useChosenShortCodes';
 import { useGeneralStore } from '@/state/generalStore';
 import type { RevealData } from '@/state/scoreboard/types';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -541,6 +542,7 @@ const BoardStage = ({
           .join('\u0001')
       : '',
   );
+  const chosenShortCodes = useChosenShortCodes();
   const shortCodes = useMemo(
     () =>
       eventEntries
@@ -550,9 +552,10 @@ const BoardStage = ({
 
               return { code, name };
             }),
+            chosenShortCodes,
           )
         : undefined,
-    [eventEntries],
+    [eventEntries, chosenShortCodes],
   );
   const layout = useMemo<BoardLayoutOverride>(
     () => ({ columns, appearReady, shortCodes }),
