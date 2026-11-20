@@ -69,6 +69,13 @@ export interface DouzeOptionsSupport {
   veilColor: boolean;
   /** The animation can be drawn over the flag too (`coverFlag`). */
   coverFlag: boolean;
+  /** How many custom colours it uses (the editor's swatches; 2026: one). */
+  customColors: number;
+  /**
+   * With theme colours, some come from the Colors step (the 12 box and the
+   * name text, 2022), which the editor says.
+   */
+  themeColorsHint: boolean;
 }
 
 export const DOUZE_COLOR_SOURCES: DouzeColorSource[] = [

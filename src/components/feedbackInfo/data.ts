@@ -413,6 +413,11 @@ const OLD_WHATS_NEW = [
 
 const WEBSITE_UPDATES: UpdateItem[] = [
   {
+    date: '2026-11-20',
+    title:
+      '<list><item>Added the ESC 2026 douze points animation (gold sweep) to the 2026 theme. Custom themes can use it too</item><item>Customize the douze points animation in your custom themes: colours (flag, theme or your own), speed, which parts play and how strong the glow is. Find it in the theme editor’s Visuals tab, under Customize animation</item></list>',
+  },
+  {
     date: '2026-11-19',
     title:
       '<list><item>Added the ESC 2022 douze points animation (sound waves) to the 2022 theme. Custom themes can use it too</item><item>Redesigned the stats: they open on a summary, and in the breakdown you can tap a cell to see who gave the points</item><item>Redesigned image sharing: the picture is ready as soon as you open it, with fewer, simpler options</item><item>Save the contest you have open in one tap, from the contest card or the simulation menu. Save a copy and Edit details are in the contest menu</item><item>Winner confetti settings: amount, duration, fall speed and colours (rainbow, theme or the winner’s flag), with a preview. Find them in Settings → Effects & motion</item><item>Redesigned the profile editing. Sign-in methods, blocked users, logging out and deleting your account moved to the new Account screen</item><item>Choose a short code for custom entries, shown where the name doesn’t fit</item><item>Added the "With video" filter to public themes</item><item>Added a Display size setting to the iPhone and iPad app</item><item>Bug fixes & small improvements</item></list>',

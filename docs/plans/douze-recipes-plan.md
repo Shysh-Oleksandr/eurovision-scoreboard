@@ -11,7 +11,9 @@
 > fully opaque). Same day, owner asks: speed is a 0.5–2× slider, the veil's
 > colour can change, and the hearts and parallelograms got options too
 > (flag colours, speed, parts) without being ported to specs. "Later"
-> below is still open.
+> below is still open. The 2026 gold sweep (`year2026`, 2026-11-20) uses
+> it as built: one custom colour (`customColors`), theme colours = the
+> douze colour (the spec's `themeColors`), part "Gold points" (the 12 box on pill rows, the total on square ones), glow.
 
 ## Goal
 

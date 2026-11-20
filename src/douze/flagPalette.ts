@@ -220,5 +220,72 @@ export const paletteFromColors = (
     c2: toHex(lifted(second)),
     c3: toHex(lifted(third)),
     glow: toHex(mix(lifted(first), [255, 255, 255], 0.65)),
+    ...sheenAndShade(lifted(first)),
+    ink: inkOn(lifted(first)),
   };
+};
+
+const toHsl = ([r, g, b]: Rgb): [number, number, number] => {
+  const [rr, gg, bb] = [r / 255, g / 255, b / 255];
+  const max = Math.max(rr, gg, bb);
+  const min = Math.min(rr, gg, bb);
+  const l = (max + min) / 2;
+  const d = max - min;
+
+  if (d === 0) return [0, 0, l];
+
+  const s = d / (1 - Math.abs(2 * l - 1));
+  let h: number;
+
+  if (max === rr) h = ((gg - bb) / d) % 6;
+  else if (max === gg) h = (bb - rr) / d + 2;
+  else h = (rr - gg) / d + 4;
+
+  return [(h * 60 + 360) % 360, s, l];
+};
+
+const fromHsl = ([h, s, l]: [number, number, number]): Rgb => {
+  const a = s * Math.min(l, 1 - l);
+  const channel = (n: number) => {
+    const k = (n + h / 30) % 12;
+
+    return 255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)));
+  };
+
+  return [channel(0), channel(8), channel(4)];
+};
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
+/**
+ * A metallic sheen's light band and dark band for a fill of `color`: richer
+ * and lighter, richer and darker (the 2026 gold's are #fcc562 and #d98c08).
+ */
+export const sheenAndShade = (color: Rgb) => {
+  const [h, s, l] = toHsl(color);
+  // Greys stay grey (silver), not tinted red.
+  const richer = (by: number) => (s < 0.05 ? s : clamp(s + by, 0, 1));
+
+  return {
+    sheen: toHex(fromHsl([h, richer(0.13), clamp(l + 0.14, 0, 0.94)])),
+    shade: toHex(fromHsl([h, richer(0.1), clamp(l - 0.11, 0.08, 1)])),
+  };
+};
+
+/** sRGB channel (0–255) to linear light. */
+const linear = (channel: number) => {
+  const c = channel / 255;
+
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+};
+
+/**
+ * Black or white, whichever contrasts more with `color` (WCAG relative
+ * luminance): text on a fill of that colour (the 2026 name over its gold).
+ */
+export const inkOn = ([r, g, b]: Rgb): string => {
+  const l = 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+
+  return (l + 0.05) / 0.05 >= 1.05 / (l + 0.05) ? '#000000' : '#ffffff';
 };

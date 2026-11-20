@@ -5,12 +5,15 @@ import {
   withDouzeOptions,
 } from './options';
 import { year2022Douze } from './specs/year2022';
+import { year2026Douze } from './specs/year2026';
+import { DEFAULT_THEME_COLORS } from './themePalette';
 
 import type { DouzePointsAnimationMode } from '@/theme/types';
 
 /** Douze modes played from a spec (the rest are the hand-written variants). */
 const SPECS: Partial<Record<DouzePointsAnimationMode, DouzeAnimationSpec>> = {
   year2022: year2022Douze,
+  year2026: year2026Douze,
 };
 
 /** Modes with a spec (tests check each one; the lab lists its own). */
@@ -49,6 +52,8 @@ const HAND_WRITTEN_SUPPORT: Partial<
     strengths: [],
     veilColor: false,
     coverFlag: true,
+    customColors: 0,
+    themeColorsHint: false,
   },
   parallelograms: {
     colors: ['theme', 'flag'],
@@ -79,7 +84,26 @@ const HAND_WRITTEN_SUPPORT: Partial<
     veilColor: false,
     // Its overlay already spans the whole row.
     coverFlag: false,
+    customColors: 0,
+    themeColorsHint: false,
   },
+};
+
+/**
+ * How many of `c1`–`c3` the spec's layers use (the custom colours the
+ * editor shows): the highest one referenced. The derived keys (`glow`,
+ * `sheen`, `shade`, `ink`) come from c1.
+ */
+const usedColorCount = (spec: DouzeAnimationSpec): number => {
+  const text = JSON.stringify(spec.layers);
+  const used = [...text.matchAll(/var\(--douze-c([123])\)/g)].map((match) =>
+    Number(match[1]),
+  );
+
+  return Math.max(
+    /var\(--douze-(glow|sheen|shade|ink)\)/.test(text) ? 1 : 0,
+    ...used,
+  );
 };
 
 /**
@@ -99,6 +123,12 @@ export const getDouzeOptionsSupport = (
   const strengths = (['glow', 'wash'] as const).filter((key) =>
     spec.layers.some((layer) => layer.intensity === key),
   );
+  const customColors = usedColorCount(spec);
+  // The theme colours the used keys come from with theme colours.
+  const themeKeys = (spec.themeColors ?? DEFAULT_THEME_COLORS).slice(
+    0,
+    customColors,
+  );
 
   return {
     colors: [
@@ -109,11 +139,17 @@ export const getDouzeOptionsSupport = (
     ],
     // With the theme's colours, the douze colour is one of them
     // (themePalette.ts; the 12 box and name colours are row colours).
-    themeColors: [{ key: 'douzePointsBg', label: 'douze', when: 'theme' }],
+    themeColors: themeKeys.includes('douzePointsBg')
+      ? [{ key: 'douzePointsBg', label: 'douze', when: 'theme' }]
+      : [],
     parts: spec.parts ?? [],
     strengths,
     veilColor: strengths.includes('wash') && 'veil' in spec.palette,
     coverFlag: false,
+    customColors,
+    themeColorsHint: themeKeys.some(
+      (key) => key === 'juryLastPointsBg' || key === 'juryCountryText',
+    ),
   };
 };
 

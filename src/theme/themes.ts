@@ -1259,6 +1259,7 @@ export const escThemes: Partial<ThemeRecord> = {
       roundedCountryContainer: true,
       isJuryPointsPanelRounded: true,
       fontAlias: 'gotham',
+      douzePointsAnimationMode: 'year2026',
     },
   },
 };

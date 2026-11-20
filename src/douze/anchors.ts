@@ -3,6 +3,7 @@ import type { AnchorRects, PxRect } from './timeline';
 
 export const DOUZE_ANCHORS: DouzeAnchor[] = [
   'row',
+  'strip',
   'flag',
   'name',
   'lastPoints',
@@ -29,34 +30,84 @@ const ENTRANCE_PROPERTIES = [
   'visibility',
 ];
 
+/** The translation in a computed `transform` (px), or none. */
+const translationOf = (transform: string): [number, number] => {
+  const values = /^matrix(3d)?\((.+)\)$/.exec(transform.trim());
+
+  if (!values) return [0, 0];
+
+  const numbers = values[2].split(',').map(Number);
+
+  return values[1]
+    ? [numbers[12] || 0, numbers[13] || 0]
+    : [numbers[4] || 0, numbers[5] || 0];
+};
+
+/**
+ * `el`'s box on screen, from the browser's own method: the column layout
+ * gives each board row (`[data-flip-id]`, the player's parent) one that
+ * divides by the zoom (BoardStage's `patchRowRects`, for FLIP moves), and
+ * mixing the two would place the layers off by the zoom.
+ */
+const screenRect = (el: Element): DOMRect =>
+  Element.prototype.getBoundingClientRect.call(el);
+
+/**
+ * The CSS zoom `el` is drawn at (the column layout zooms the board), from
+ * `currentCSSZoom` where the browser has it, else from its drawn width
+ * over its own (both to the fraction of a pixel; `offsetWidth` rounds).
+ */
+const zoomOf = (el: HTMLElement, drawn: DOMRect): number => {
+  const css = (el as HTMLElement & { currentCSSZoom?: number }).currentCSSZoom;
+
+  if (typeof css === 'number' && css > 0) return css;
+
+  const style = getComputedStyle(el);
+  const width =
+    style.boxSizing === 'border-box' ? parseFloat(style.width) : el.offsetWidth;
+
+  return width > 0 && drawn.width > 0 ? drawn.width / width : 1;
+};
+
 /**
  * `el`'s box relative to `ancestor`'s padding box, in the elements' own CSS
- * px. Layout offsets ignore transforms and an ancestor's CSS zoom (the column
- * layout zooms the board), unlike getBoundingClientRect.
+ * px, to the fraction of a pixel: copies laid over the row's parts (the
+ * 2026 name over the gold) must sit exactly on them, and layout offsets
+ * round each step to whole pixels. Measured on screen, then divided by the
+ * zoom (the column layout zooms the board) and without the moves of the
+ * part and its parents up to `ancestor` (a part mid-entrance, the 12 box's
+ * GSAP slide, is placed where it comes to rest). Null when `el` is not
+ * inside `ancestor`.
  */
-export const offsetRectWithin = (
+export const rectWithin = (
   el: HTMLElement,
   ancestor: HTMLElement,
 ): PxRect | null => {
-  let x = 0;
-  let y = 0;
-  let node: HTMLElement = el;
+  if (el === ancestor || !ancestor.contains(el)) return null;
 
-  while (node !== ancestor) {
-    x += node.offsetLeft;
-    y += node.offsetTop;
+  const frame = screenRect(ancestor);
+  const rect = screenRect(el);
+  const zoom = zoomOf(ancestor, frame);
+  let tx = 0;
+  let ty = 0;
 
-    const parent = node.offsetParent as HTMLElement | null;
+  for (
+    let node: HTMLElement | null = el;
+    node && node !== ancestor;
+    node = node.parentElement
+  ) {
+    const [x, y] = translationOf(getComputedStyle(node).transform);
 
-    if (!parent || !ancestor.contains(parent)) return null;
-    if (parent !== ancestor) {
-      x += parent.clientLeft;
-      y += parent.clientTop;
-    }
-    node = parent;
+    tx += x;
+    ty += y;
   }
 
-  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+  return {
+    x: (rect.left - frame.left) / zoom - ancestor.clientLeft - tx,
+    y: (rect.top - frame.top) / zoom - ancestor.clientTop - ty,
+    w: rect.width / zoom,
+    h: rect.height / zoom,
+  };
 };
 
 export const findAnchor = (
@@ -74,7 +125,7 @@ export const measureAnchors = (ancestor: HTMLElement): AnchorRects => {
 
     if (!el || el.offsetWidth === 0) return;
 
-    const rect = offsetRectWithin(el, ancestor);
+    const rect = rectWithin(el, ancestor);
 
     if (rect) rects[anchor] = rect;
   });
@@ -101,12 +152,80 @@ export const measureAnchorRadii = (
   return radii;
 };
 
+/**
+ * Repaints a copy (a clone layer's `paint`): its background and the fill
+ * of its SVG shapes, and the colour of all its text.
+ */
+export const paintCopy = (
+  copy: HTMLElement,
+  paint: { fill?: string; text?: string },
+) => {
+  if (paint.fill) {
+    copy.style.background = paint.fill;
+    copy
+      .querySelectorAll<SVGElement>('path, polygon, rect')
+      .forEach((shape) => {
+        shape.style.fill = paint.fill!;
+      });
+  }
+  if (paint.text) {
+    [copy, ...Array.from(copy.querySelectorAll<HTMLElement>('*'))].forEach(
+      (node) => {
+        node.style?.setProperty('color', paint.text!);
+      },
+    );
+  }
+};
+
+const textNodes = (root: Node): Text[] => {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes: Text[] = [];
+
+  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+
+  return nodes;
+};
+
+/**
+ * Keeps a copy's text in step with its part while the animation runs: a
+ * total copied at the award is still counting up. Returns the stop.
+ */
+export const mirrorText = (
+  source: HTMLElement,
+  copy: HTMLElement,
+): (() => void) => {
+  const sync = () => {
+    const from = textNodes(source);
+    const to = textNodes(copy);
+
+    // A different structure (the NQ label) isn't the same text any more.
+    if (from.length !== to.length) return;
+    from.forEach((node, index) => {
+      if (to[index].data !== node.data) to[index].data = node.data;
+    });
+  };
+  const observer = new MutationObserver(sync);
+
+  observer.observe(source, {
+    characterData: true,
+    childList: true,
+    subtree: true,
+  });
+
+  return () => observer.disconnect();
+};
+
 /** A static copy of a row part, sized to fill its layer. */
 export const cloneRowPart = (source: HTMLElement): HTMLElement => {
   const copy = source.cloneNode(true) as HTMLElement;
 
   [copy, ...Array.from(copy.querySelectorAll<HTMLElement>('*'))].forEach(
     (node) => {
+      // Host rules that restyle the board's names (the phone's two-line
+      // names in styles.css) match a copy's `data-douze-name` too.
+      if (node.hasAttribute('data-entry-name')) {
+        node.setAttribute('data-douze-name', '');
+      }
       MEASURED_ATTRIBUTES.forEach((attribute) =>
         node.removeAttribute(attribute),
       );
@@ -118,10 +237,16 @@ export const cloneRowPart = (source: HTMLElement): HTMLElement => {
     },
   );
 
+  // The part's own text size and leading, whatever set them (a host may
+  // size the board's names past their classes), as the hearts' name does.
+  const { fontSize, lineHeight } = getComputedStyle(source);
+
   // GSAP leaves inline transforms/opacity on the source; the copy sits in its
   // layer's box, which the player moves instead.
   copy.removeAttribute('style');
   Object.assign(copy.style, {
+    fontSize,
+    lineHeight,
     position: 'absolute',
     left: '0',
     top: '0',
@@ -137,6 +262,79 @@ export const cloneRowPart = (source: HTMLElement): HTMLElement => {
   copy.setAttribute('aria-hidden', 'true');
 
   return copy;
+};
+
+/**
+ * The stacking level a branch of the tree paints at, below `from`'s parent:
+ * the z-index of its outermost element that has one (positioned, or a flex
+ * or grid item), as that element's whole subtree paints at it; else 0 for a
+ * positioned branch and -1 for plain in-flow content, which paints first.
+ */
+const branchLevel = (chain: HTMLElement[]): number => {
+  let positioned = false;
+
+  for (const el of chain) {
+    const style = getComputedStyle(el);
+    const z = parseInt(style.zIndex, 10);
+    const parentDisplay = el.parentElement
+      ? getComputedStyle(el.parentElement).display
+      : '';
+    const isItem = /flex|grid/.test(parentDisplay);
+
+    if (style.position !== 'static') positioned = true;
+    if (Number.isFinite(z) && (style.position !== 'static' || isItem)) {
+      return z;
+    }
+  }
+
+  return positioned ? 0 : -1;
+};
+
+/**
+ * Whether `cover` paints over `part` in the row: a part inside the other
+ * paints over it; otherwise the branches' stacking levels under their
+ * closest common ancestor decide, then the tree order (later on top). Good
+ * enough for a row's parts (the 2026 strip, z-21, over the points, z-15;
+ * the total over the 12 box in both layouts), not every CSS case.
+ */
+export const drawsOver = (cover: HTMLElement, part: HTMLElement): boolean => {
+  if (cover === part) return false;
+  if (part.contains(cover)) return true;
+  if (cover.contains(part)) return false;
+
+  const ancestors = (el: HTMLElement) => {
+    const chain: HTMLElement[] = [];
+
+    for (let node: HTMLElement | null = el; node; node = node.parentElement) {
+      chain.unshift(node);
+    }
+
+    return chain;
+  };
+  const a = ancestors(cover);
+  const b = ancestors(part);
+  let common = 0;
+
+  while (a[common] && a[common] === b[common]) common += 1;
+
+  const coverBranch = a.slice(common);
+  const partBranch = b.slice(common);
+  const coverLevel = branchLevel(coverBranch);
+  const partLevel = branchLevel(partBranch);
+
+  if (coverLevel !== partLevel) return coverLevel > partLevel;
+
+  const [coverTop] = coverBranch;
+  const [partTop] = partBranch;
+
+  return (
+    !!coverTop &&
+    !!partTop &&
+    !!(
+      partTop.compareDocumentPosition(coverTop) &
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
+  );
 };
 
 type Local = { x: number; y: number; w: number; h: number };
@@ -203,7 +401,7 @@ export const buildCutMask = (
   wrapper: HTMLElement,
   covers: HTMLElement[],
 ): string | null => {
-  const frame = wrapper.getBoundingClientRect();
+  const frame = screenRect(wrapper);
   const w = wrapper.offsetWidth;
   const h = wrapper.offsetHeight;
 
@@ -222,7 +420,15 @@ export const buildCutMask = (
 
   covers.forEach((cover) => {
     const style = getComputedStyle(cover);
-    const box = local(cover.getBoundingClientRect());
+    // Where the part comes to rest: one mid-entrance (the 12 box's GSAP
+    // slide) is measured without its own move.
+    const [tx, ty] = translationOf(style.transform);
+    const atRest = (rect: DOMRect): Local => {
+      const box = local(rect);
+
+      return { ...box, x: box.x - tx, y: box.y - ty };
+    };
+    const box = atRest(screenRect(cover));
 
     if (paints(style) && overlaps(box)) {
       holes.push(
@@ -237,7 +443,7 @@ export const buildCutMask = (
 
     cover.querySelectorAll('svg').forEach((svgEl) => {
       const viewBox = svgEl.viewBox?.baseVal;
-      const rect = local(svgEl.getBoundingClientRect());
+      const rect = atRest(screenRect(svgEl));
 
       if (!viewBox || viewBox.width === 0 || viewBox.height === 0) return;
       if (!overlaps(rect) || getComputedStyle(svgEl).visibility === 'hidden') {

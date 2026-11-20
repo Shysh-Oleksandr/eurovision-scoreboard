@@ -53,6 +53,7 @@ const ANIMATED_PROPS: AnimatedProp[] = [
   'scaleY',
   'rotate',
   'reveal',
+  'revealX',
   'windowLeft',
   'windowRight',
   'pinch',
@@ -67,6 +68,7 @@ const DEFAULTS: Required<Pick<DouzeKeyframe, AnimatedProp>> = {
   scaleY: 1,
   rotate: 0,
   reveal: 1,
+  revealX: 0,
   windowLeft: 0,
   windowRight: 0,
   pinch: 0,
@@ -154,7 +156,8 @@ const resolveX = (
   return (
     edgeOf(target, x.at ?? 'left') -
     edgeOf(layerBox, x.align ?? 'left') +
-    (x.offset ?? 0) * rowW
+    (x.offset ?? 0) * rowW +
+    (x.offsetRh ?? 0) * (anchors.row?.h ?? 0)
   );
 };
 
@@ -169,7 +172,12 @@ const resolvePosition = (x: DouzeX, anchors: AnchorRects): number => {
 
   if (!target) return 0;
 
-  return edgeOf(target, x.at ?? 'left') - row.x + (x.offset ?? 0) * row.w;
+  return (
+    edgeOf(target, x.at ?? 'left') -
+    row.x +
+    (x.offset ?? 0) * row.w +
+    (x.offsetRh ?? 0) * row.h
+  );
 };
 
 /** The state a canvas painter needs at time `t` (linear between keyframes). */
@@ -237,17 +245,27 @@ export const toWebKeyframes = (
   const rowW = anchors.row?.w || 1;
   // Placements become row widths first, so the track interpolates.
   const frames = fillKeyframes(
-    layer.keyframes.map((k) =>
-      k.x === undefined || typeof k.x === 'number'
-        ? k
-        : { ...k, x: resolveX(k.x, layerBox, anchors) / rowW },
-    ),
+    layer.keyframes.map((k) => {
+      const resolved = { ...k };
+
+      if (k.x !== undefined && typeof k.x !== 'number') {
+        resolved.x = resolveX(k.x, layerBox, anchors) / rowW;
+      }
+      if (k.revealX !== undefined && typeof k.revealX !== 'number') {
+        resolved.revealX = resolvePosition(k.revealX, anchors) / rowW;
+      }
+
+      return resolved;
+    }),
   );
 
   if (frames.length === 0) return [];
 
-  const usesReveal = layer.keyframes.some((k) => k.reveal !== undefined);
+  const usesRevealX = layer.keyframes.some((k) => k.revealX !== undefined);
+  const usesReveal =
+    !usesRevealX && layer.keyframes.some((k) => k.reveal !== undefined);
   const rowH = anchors.row?.h ?? 0;
+  const revealEdgeClip = edgeClip(layer, layerBox, anchors);
 
   const toWeb = (
     frame: (typeof frames)[number],
@@ -274,10 +292,48 @@ export const toWebKeyframes = (
           : `inset(0 ${hidden}% 0 0)`;
     }
 
+    if (usesRevealX) {
+      web.clipPath = revealEdgeClip((frame.revealX as number) * rowW);
+    }
+
     return web;
   };
 
   return spanWholeDuration(frames, durationMs, toWeb);
+};
+
+/**
+ * The clip for a `revealX` edge at `edgeX` (px from the row's left edge):
+ * in the row's frame (its height, from its left or to its right end), so
+ * every layer on the same track is cut along the same line whatever its
+ * own box. Insets aren't clamped, so the edge interpolates in step on every
+ * layer (an inset past the box hides it all).
+ */
+const edgeClip = (
+  layer: DouzeLayer,
+  box: PxRect,
+  anchors: AnchorRects,
+): ((edgeX: number) => string) => {
+  const row = anchors.row ?? box;
+  const top = round(row.y - box.y);
+  const bottom = round(box.y + box.h - (row.y + row.h));
+  const r = layer.revealEdge === 'round' ? round(row.h / 2) : 0;
+
+  if (layer.revealFrom === 'right') {
+    const right = round(box.x + box.w - (row.x + row.w));
+
+    return (edgeX) =>
+      `inset(${top}px ${right}px ${bottom}px ${round(
+        row.x + edgeX - box.x,
+      )}px round ${r}px 0 0 ${r}px)`;
+  }
+
+  const left = round(row.x - box.x);
+
+  return (edgeX) =>
+    `inset(${top}px ${round(
+      box.x + box.w - (row.x + edgeX),
+    )}px ${bottom}px ${left}px round 0 ${r}px ${r}px 0)`;
 };
 
 /**

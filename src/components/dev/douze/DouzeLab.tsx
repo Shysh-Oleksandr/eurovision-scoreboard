@@ -10,23 +10,36 @@ import {
   withDouzeOptions,
 } from '@/douze/options';
 import { year2022Douze } from '@/douze/specs/year2022';
+import { year2026Douze } from '@/douze/specs/year2026';
 import { getThemeBackground } from '@/theme/themes';
 import { resolveThemeSpecificsForBaseThemeYear } from '@/theme/themeSpecifics';
+import type { FlagShape } from '@/theme/types';
 
 const SPECS: { label: string; year: string; spec: DouzeAnimationSpec }[] = [
   { label: '2022', year: '2022', spec: year2022Douze },
+  { label: '2026', year: '2026', spec: year2026Douze },
 ];
 
 /** Base themes to try a spec on (2026: rounded pill rows). */
 const BASE_YEARS = ['2022', '2025', '2026'];
 
-const COUNTRIES = ['UA', 'RS', 'AZ', 'IT', 'GB', 'MK'];
+const COUNTRIES = ['UA', 'RS', 'AZ', 'IT', 'GB', 'MK', 'IL', 'DK'];
 const WIDTHS = [
   { label: 'Board (416)', value: 416 },
   { label: 'Phone (320)', value: 320 },
   { label: 'Wide (560)', value: 560 },
 ];
 const FRAME_MS = 1000 / 30;
+
+/** Flag shapes to try a spec with (the base theme's own by default). */
+const FLAG_SHAPES: FlagShape[] = [
+  'big-rectangle',
+  'small-rectangle',
+  'square',
+  'round',
+  'round-border',
+  'none',
+];
 
 /** A row with the player held at `heldAtMs` (or playing when null). */
 const LabRow: React.FC<{
@@ -38,6 +51,7 @@ const LabRow: React.FC<{
   runKey: number;
   playbackRate: number;
   lite: boolean;
+  flagShape: FlagShape | null;
   label?: string;
 }> = ({
   spec,
@@ -48,6 +62,7 @@ const LabRow: React.FC<{
   runKey,
   playbackRate,
   lite,
+  flagShape,
   label,
 }) => {
   const specifics = resolveThemeSpecificsForBaseThemeYear(year);
@@ -69,7 +84,7 @@ const LabRow: React.FC<{
           showDouzePointsAnimation={false}
           previewCountryCode={countryCode}
           uppercaseEntryName={specifics.uppercaseEntryName}
-          flagShape={specifics.flagShape}
+          flagShape={flagShape ?? specifics.flagShape}
           pointsContainerShape={specifics.pointsContainerShape}
           roundedCountryContainer={specifics.roundedCountryContainer}
         />
@@ -93,6 +108,7 @@ const DouzeLab: React.FC = () => {
   const [runKey, setRunKey] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [lite, setLite] = useState(false);
+  const [flagShape, setFlagShape] = useState<FlagShape | null>(null);
   const [options, setOptions] = useState<DouzeOptions | null>(null);
   const [zoom, setZoom] = useState(1.5);
   const [stepMs, setStepMs] = useState(100);
@@ -209,6 +225,19 @@ const DouzeLab: React.FC = () => {
             <option key={w.value} value={w.value}>
               {w.label}
             </option>
+          ))}
+        </select>
+        <select
+          className="rounded bg-black/50 px-2 py-1"
+          data-lab-flag=""
+          value={flagShape ?? ''}
+          onChange={(e) =>
+            setFlagShape((e.target.value || null) as FlagShape | null)
+          }
+        >
+          <option value="">Theme's flag</option>
+          {FLAG_SHAPES.map((shape) => (
+            <option key={shape}>{shape}</option>
           ))}
         </select>
         <label className="flex items-center gap-1">
@@ -407,7 +436,7 @@ const DouzeLab: React.FC = () => {
       <div className="flex flex-wrap items-start gap-8">
         <div style={{ zoom }} data-lab-main="">
           <LabRow
-            key={`${countryCode}-${width}-${specIndex}-${year}`}
+            key={`${countryCode}-${width}-${specIndex}-${year}-${flagShape}`}
             spec={spec}
             year={year}
             countryCode={countryCode}
@@ -416,6 +445,7 @@ const DouzeLab: React.FC = () => {
             runKey={runKey}
             playbackRate={playbackRate}
             lite={lite}
+            flagShape={flagShape}
           />
         </div>
         {videoUrl && (
@@ -439,7 +469,7 @@ const DouzeLab: React.FC = () => {
       >
         {timeline.map((t) => (
           <LabRow
-            key={`${t}-${countryCode}-${width}-${specIndex}-${year}`}
+            key={`${t}-${countryCode}-${width}-${specIndex}-${year}-${flagShape}`}
             spec={spec}
             year={year}
             countryCode={countryCode}
@@ -448,6 +478,7 @@ const DouzeLab: React.FC = () => {
             runKey={0}
             playbackRate={1}
             lite={lite}
+            flagShape={flagShape}
             label={`${t}`}
           />
         ))}

@@ -1328,7 +1328,8 @@
         "douzePointsAnimations": {
           "parallelograms": "Parallélogrammes (ESC 2023)",
           "heartsGrid": "Κάδος Βαθμών Herzen (ESC 2025)",
-          "year2022": "Ηχητικά κύματα (ESC 2022)"
+          "year2022": "Ηχητικά κύματα (ESC 2022)",
+          "year2026": "Χρυσό σάρωμα (ESC 2026)"
         },
         "douzeOptions": {
           "title": "Προσαρμογή κίνησης",
@@ -1342,6 +1343,7 @@
             "custom": "Δικά σου"
           },
           "customColor": "Χρώμα {number}",
+          "customColorOnly": "Χρώμα",
           "colorFields": {
             "hearts": "Καρδιές",
             "name": "Όνομα χώρας",
@@ -1365,7 +1367,8 @@
             "wash": "Πέπλο",
             "name": "Όνομα χώρας",
             "blocks": "Κινούμενα μπλοκ",
-            "label": "Κείμενο βαθμών"
+            "label": "Κείμενο βαθμών",
+            "points": "Χρυσοί βαθμοί"
           },
           "coverFlag": "Καρδιές πάνω από τη σημαία",
           "glow": "Ένταση λάμψης",

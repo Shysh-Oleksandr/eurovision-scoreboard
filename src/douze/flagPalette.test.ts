@@ -94,4 +94,25 @@ describe('paletteFromColors', () => {
   it('keeps colours picked by hand as they are', () => {
     expect(paletteFromColors(['#000000'], { lift: false }).c1).toBe('#000000');
   });
+
+  it('gives text a colour that reads on the first one', () => {
+    expect(paletteFromColors(['#eba52c']).ink).toBe('#000000');
+    expect(paletteFromColors(['#0038b8']).ink).toBe('#ffffff');
+    expect(paletteFromColors(['#c8102e']).ink).toBe('#ffffff');
+  });
+
+  it('mixes a sheen and a shade from the first one, keeping greys grey', () => {
+    // The 2026 broadcast's gold and its bands.
+    expect(paletteFromColors(['#eba52c'])).toMatchObject({
+      sheen: '#fcc463',
+      shade: '#d78b08',
+    });
+
+    const { sheen, shade } = paletteFromColors(['#ffffff']);
+
+    [sheen, shade].forEach((grey) => {
+      expect(grey.slice(1, 3)).toBe(grey.slice(3, 5));
+      expect(grey.slice(3, 5)).toBe(grey.slice(5, 7));
+    });
+  });
 });

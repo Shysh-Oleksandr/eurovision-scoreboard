@@ -23,6 +23,8 @@ One clip is enough to start. The second tells design from noise: what repeats in
 
 Done when: the clips are in place and `ffprobe` gives their frame rate.
 
+Screen recordings are often variable frame rate (`avg_frame_rate` well below `r_frame_rate`; 2026's: a 25 fps broadcast captured at 60 Hz). `ref` maps t to frame numbers with `r_frame_rate`, so first make a constant-rate copy and read that: `ffmpeg -i Douze<year>_1.mov -vf fps=60 -c:v libx264 -crf 8 -pix_fmt yuv420p $S/cfr1.mp4`.
+
 ## 2. Read the frames
 
 ```sh
@@ -35,6 +37,8 @@ $F ref <clip> --crop W:H:X:Y --t0 <n> --step 50 --from <mid> --to <end> $S/ref50
 
 t0 is the first frame where anything changes (2022's Serbia clip: n = 3). Read every sheet frame by frame; for small details, crop a frame tighter and scale it 2× with ffmpeg (`scale=iw*2:-1:flags=lanczos`).
 
+For an edge that sweeps (a fill, a wipe), measure it instead of eyeballing: read one pixel line through the row from each frame (`ffmpeg … -vf "select=…,format=rgb24,crop=W:1:X:Y" -f rawvideo -`), find the edge by colour, and fit a `cubic-bezier` to the first frame of each new position (2026's fill and exit are fitted that way).
+
 Done when, for every element you can see, you've written down its start and end time, its place as a share of the row's width (flag, name, last-points box, total), where its colour comes from, and how it moves: direction, speed, ease, whether it stops.
 
 ## 3. Breakdown and questions
@@ -44,7 +48,8 @@ Write `$S/breakdown.md` with the 2022 breakdown's sections: a `Status:` line, so
 Then ask the owner (AskUserQuestion) what the footage can't answer:
 - Colours: a fixed palette or each country's flag colours (`paletteFrom: 'flag'`)?
 - The 12 box: does the animation own its entrance (a copy with `hideSource` slides in, as in 2022), or does it play over the theme's usual slide?
-- Board order: does the row climb after the animation (`reorder: 'after'`) or before?
+- Board order: does the row climb after the animation (`reorder: 'after'`) or keep the board's own order (`'before'`)? With `before`, a teleporting board (the default) moves the row first and the animation plays at its new place; a flipping board moves it 1 s in, under the animation. Describe both cases when you ask.
+- Parts of the row the app animates on its own: the 12 box enters with every award, so with `before` on a teleporting board it is already out when the animation starts. Restaging its entrance there makes it vanish and come back (2026 sweeps the gold into the box instead).
 - The editor label: "<what it looks like> (ESC <year>)", like "Sound waves (ESC 2022)".
 
 Done when: the answers are recorded in the breakdown.
@@ -66,6 +71,8 @@ Build in the order the clip plays, comparing as you go (step 5). The **lessons**
 - **Deterministic.** Effects are seeded (`mulberry32` in `effects.ts`) and painters are pure functions of the clock, so a held frame matches the playing one.
 - **Cheap to play.** Animate only transform, opacity and clip-path. Mark costly layers `heavy`: blurred glows, canvas painters and glitch filters. With Lite on, what's left must still read as the animation, and the parts it takes over (the 12 box) stay.
 - **Customizable.** Give every layer that isn't core a `group` and list the groups as the spec's `parts`, in the order the editor should show them; reuse 2022's ids where the meaning matches (`glitch`, `sweeps`, `burst`, `waves`, `flash`, `wash`). Tag glows `intensity: 'glow'` and a white veil `intensity: 'wash'`; give the veil's fill `var(--douze-veil)` and the palette `veil: '#ffffff'`, so its colour can be changed. Try the combinations with the lab's option controls (each part off, Glow and Veil at 0, both speeds' ends).
+- **Colours from one.** When the broadcast uses one colour for every country, give the spec a fixed palette and build everything from `c1` and the keys mixed from it (`sheen`, `shade`, `glow`, `ink`), so flag, theme and custom colours keep the look and the editor shows one custom swatch. Set `themeColors` when the theme colour the animation should take isn't the 12 box (2026: the douze colour).
+- **Layouts.** Rounded and square rows stack their parts differently (the strip over the points, or under them). Use `cutBy` for every part that may cover the layer's part: only those that do, by paint order, are cut. Check base 2022 in the lab, not only 2026.
 - **Reuse.** Shared helpers (`flash`, `veil`, placements in `year2022.ts`) move to `src/douze/specs/helpers.ts` once a second spec needs them. A new effect, painter or layer option goes in `effects.ts`, `painters.ts` or model + timeline + player, with a test in `timeline.test.ts` and a line in §10.
 
 Done when: the spec plays from t = 0 to its end in the lab and every element in the breakdown has a layer.
@@ -101,7 +108,7 @@ Done when: every pair matches its reference within a frame in place, colour and 
 
 Run a real simulation on the year's theme. Choose it through a custom theme with this mode, or set the year's `themeSpecifics` early (step 8).
 
-Record with the MCP's `screencast_start` / `screencast_stop` into `$S/board.mp4`, plus a slowed copy (`ffmpeg -i board.mp4 -vf setpts=4*PTS board-slow4x.mp4`). Cover these cases:
+Record with the MCP's `screencast_start` / `screencast_stop` into `$S/board.mp4`, plus a slowed copy (`ffmpeg -i board.mp4 -vf setpts=4*PTS board-slow4x.mp4`). The screencast gets no frames while an `evaluate_script` is running or the tab is in the background: start the clicks from an `evaluate_script` that schedules them and returns at once, then start the screencast, and wait with a Bash `node -e 'setTimeout(() => {}, 15000)'`. For timing, sample the row and the player (`data-douze-layer` nodes, their `getAnimations()[0].currentTime`) from inside the page. The 2026 theme's board teleports; to check a flipping board, set `boardAnimationMode: 'flip'` on the year's `themeSpecifics` for the test and revert it. Cover these cases:
 - a 12 to a low row;
 - the same country given 12 twice in a row;
 - a jury vote given all at once.

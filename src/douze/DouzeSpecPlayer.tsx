@@ -11,9 +11,12 @@ import React, {
 import {
   buildCutMask,
   cloneRowPart,
+  drawsOver,
   findAnchor,
   measureAnchorRadii,
   measureAnchors,
+  mirrorText,
+  paintCopy,
 } from './anchors';
 import { renderEffect } from './effects';
 import { paletteFromColors, sampleFlagColors } from './flagPalette';
@@ -124,9 +127,14 @@ const DouzeSpecPlayer: React.FC<Props> = ({
 
     const anchors = measureAnchors(parent);
     const boxes = new Map<string, PxRect>();
+    // Layers for another row layout get no box, so they aren't drawn.
+    const layout = findAnchor(parent, 'row')?.dataset.douzeLayout;
 
     layers.forEach((layer) => {
-      const box = resolveBox(layer.box, anchors);
+      const box =
+        layer.layout && layer.layout !== layout
+          ? null
+          : resolveBox(layer.box, anchors);
 
       if (box) boxes.set(layer.id, box);
     });
@@ -148,7 +156,7 @@ const DouzeSpecPlayer: React.FC<Props> = ({
         });
       }
     } else if (spec.paletteFrom === 'theme') {
-      colors = readThemeColors(parent);
+      colors = readThemeColors(parent, spec.themeColors);
     }
 
     setGeometry({
@@ -161,7 +169,14 @@ const DouzeSpecPlayer: React.FC<Props> = ({
     });
 
     return () => loading.abort();
-  }, [layers, runKey, spec.paletteFrom, spec.palette, flagLoads]);
+  }, [
+    layers,
+    runKey,
+    spec.paletteFrom,
+    spec.themeColors,
+    spec.palette,
+    flagLoads,
+  ]);
 
   useLayoutEffect(() => {
     const parent = rootRef.current?.offsetParent as HTMLElement | null;
@@ -170,8 +185,10 @@ const DouzeSpecPlayer: React.FC<Props> = ({
 
     const hidden: { el: HTMLElement; visibility: string }[] = [];
     const copies: HTMLElement[] = [];
+    const stopMirrors: (() => void)[] = [];
+    // Latest first: two copies hiding the same part restore its own value.
     const restore = () => {
-      hidden.forEach(({ el, visibility }) => {
+      [...hidden].reverse().forEach(({ el, visibility }) => {
         el.style.visibility = visibility;
       });
       hidden.length = 0;
@@ -187,22 +204,34 @@ const DouzeSpecPlayer: React.FC<Props> = ({
 
       const copy = cloneRowPart(source);
 
+      if (layer.paint) paintCopy(copy, layer.paint);
       node.appendChild(copy);
       copies.push(copy);
+      // A total still counting up keeps counting on its copy.
+      stopMirrors.push(mirrorText(source, copy));
     });
 
     // Cut what covers a part in the row out of its copies (the 2022
     // total's curved edge over the 12 box), measured before any part is
-    // hidden. The mask goes on the static clip wrapper, so it stays put
-    // while the copy moves under it.
+    // hidden. Only parts that paint over the copied (or clipping) part
+    // count: the 2026 strip lies over the total on rounded rows and under
+    // it on square ones. The mask goes on the static clip wrapper, so it
+    // stays put while the copy moves under it.
     layers.forEach((layer) => {
       const wrapper = windowNodesRef.current.get(layer.id);
 
       if (!layer.cutBy || !wrapper) return;
 
+      const reference = findAnchor(
+        parent,
+        layer.kind === 'clone' ? layer.source : layer.clipTo ?? 'row',
+      );
       const covers = layer.cutBy
         .map((anchor) => findAnchor(parent, anchor))
-        .filter((el): el is HTMLElement => el !== null);
+        .filter(
+          (el): el is HTMLElement =>
+            el !== null && (!reference || drawsOver(el, reference)),
+        );
       const mask = buildCutMask(wrapper, covers);
 
       if (!mask) return;
@@ -216,7 +245,13 @@ const DouzeSpecPlayer: React.FC<Props> = ({
     });
 
     layers.forEach((layer) => {
-      if (layer.kind !== 'clone' || !layer.hideSource) return;
+      if (
+        layer.kind !== 'clone' ||
+        !layer.hideSource ||
+        !geometry.boxes.has(layer.id)
+      ) {
+        return;
+      }
 
       const source = findAnchor(parent, layer.source);
 
@@ -366,6 +401,7 @@ const DouzeSpecPlayer: React.FC<Props> = ({
       animations.forEach((animation) => animation.cancel());
       animationsRef.current = [];
       paintersRef.current = [];
+      stopMirrors.forEach((stop) => stop());
       copies.forEach((copy) => copy.remove());
       restore();
     };
@@ -460,6 +496,8 @@ const DouzeSpecPlayer: React.FC<Props> = ({
               clipRadius={
                 layer.clipTo ? geometry.radii[layer.clipTo] : undefined
               }
+              row={geometry.anchors.row}
+              rowRadius={geometry.radii.row}
               anchorRadius={geometry.radii[layer.box.anchor]}
               filterId={
                 layer.kind === 'clone' && layer.glitch
@@ -488,6 +526,9 @@ const LayerView: React.FC<{
   clip?: PxRect;
   /** The clip part's corner radii (a pill row clips round). */
   clipRadius?: string;
+  /** The row, which also clips a layer clipped to another part. */
+  row?: PxRect;
+  rowRadius?: string;
   /** The layer's anchor's corner radii, for `radius: 'anchor'`. */
   anchorRadius?: string;
   filterId?: string;
@@ -498,6 +539,8 @@ const LayerView: React.FC<{
   box,
   clip,
   clipRadius,
+  row,
+  rowRadius,
   anchorRadius,
   filterId,
   nodeRef,
@@ -524,6 +567,7 @@ const LayerView: React.FC<{
     opacity: initialOpacity,
     mixBlendMode: layer.blend ?? 'normal',
     transformOrigin: layer.origin,
+    clipPath: layer.clipPath,
     willChange: 'transform, opacity',
   };
 
@@ -563,15 +607,19 @@ const LayerView: React.FC<{
 
   if (!clip) return view;
 
+  // The row clips its content, so a part other than the row shows only
+  // inside the row's shape too (the strip's left end is the pill's).
+  const outer = row && clip !== row ? row : null;
+
   // overflow: hidden makes no stacking context, so blend modes still reach
   // the row below.
-  return (
+  const clipped = (
     <div
       ref={windowRef}
       style={{
         position: 'absolute',
-        left: clip.x,
-        top: clip.y,
+        left: clip.x - (outer?.x ?? 0),
+        top: clip.y - (outer?.y ?? 0),
         width: clip.w,
         height: clip.h,
         overflow: 'hidden',
@@ -579,6 +627,24 @@ const LayerView: React.FC<{
       }}
     >
       {view}
+    </div>
+  );
+
+  if (!outer) return clipped;
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: outer.x,
+        top: outer.y,
+        width: outer.w,
+        height: outer.h,
+        overflow: 'hidden',
+        borderRadius: rowRadius,
+      }}
+    >
+      {clipped}
     </div>
   );
 };

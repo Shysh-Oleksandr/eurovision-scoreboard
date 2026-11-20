@@ -1328,7 +1328,8 @@
         "douzePointsAnimations": {
           "parallelograms": "Parallelogramy (ESC 2023)",
           "heartsGrid": "Serca (ESC 2025)",
-          "year2022": "Fale dźwiękowe (ESC 2022)"
+          "year2022": "Fale dźwiękowe (ESC 2022)",
+          "year2026": "Złota fala (ESC 2026)"
         },
         "douzeOptions": {
           "title": "Dostosuj animację",
@@ -1342,6 +1343,7 @@
             "custom": "Własne"
           },
           "customColor": "Kolor {number}",
+          "customColorOnly": "Kolor",
           "colorFields": {
             "hearts": "Serca",
             "name": "Nazwa kraju",
@@ -1365,7 +1367,8 @@
             "wash": "Welon",
             "name": "Nazwa kraju",
             "blocks": "Przesuwane bloki",
-            "label": "Tekst punktów"
+            "label": "Tekst punktów",
+            "points": "Złote punkty"
           },
           "coverFlag": "Serca na fladze",
           "glow": "Siła poświaty",

@@ -15,7 +15,8 @@ export type BoardAnimationMode = 'flip' | 'teleport';
 export type DouzePointsAnimationMode =
   | 'parallelograms'
   | 'heartsGrid'
-  | 'year2022';
+  | 'year2022'
+  | 'year2026';
 
 export interface ThemeSpecifics {
   flagShape: FlagShape;

@@ -9,8 +9,19 @@
  * options (options.ts: colours, speed, parts, strength).
  */
 
-/** Row parts a layer can be placed against: `data-douze-anchor` values. */
-export type DouzeAnchor = 'row' | 'flag' | 'name' | 'lastPoints' | 'total';
+/**
+ * Row parts a layer can be placed against: `data-douze-anchor` values.
+ * `strip` is the flag and name's background: on rounded rows (2026) a strip
+ * whose round end lies over the total, on square rows the whole row, under
+ * the points.
+ */
+export type DouzeAnchor =
+  | 'row'
+  | 'strip'
+  | 'flag'
+  | 'name'
+  | 'lastPoints'
+  | 'total';
 
 /**
  * A layer's box. `x`/`y`/`w`/`h` are shares of the anchor's box (they may go
@@ -35,9 +46,11 @@ export interface DouzeBox {
 /**
  * A horizontal move: a share of the row's width, or a placement against a
  * part: the layer's `align` edge on the part's `at` edge, plus `offset` row
- * widths (the 2022 box starts just past the row's right edge; the beam's tip
- * meets the 12 box). Placements resolve to distances first, so a track can
- * mix them with plain numbers and still interpolate.
+ * widths and `offsetRh` row heights (the 2022 box starts just past the
+ * row's right edge; the beam's tip meets the 12 box; the 2026 round edge
+ * rests a row height past the row's end, clear of its corners on any
+ * width). Placements resolve to distances first, so a track can mix them
+ * with plain numbers and still interpolate.
  */
 export type DouzeX =
   | number
@@ -46,6 +59,7 @@ export type DouzeX =
       at?: 'left' | 'centre' | 'right';
       align?: 'left' | 'centre' | 'right';
       offset?: number;
+      offsetRh?: number;
     };
 
 export interface DouzeKeyframe {
@@ -63,6 +77,14 @@ export interface DouzeKeyframe {
   rotate?: number;
   /** Share of the layer shown, growing from `revealFrom` (a clip). */
   reveal?: number;
+  /**
+   * The reveal's edge as a position in the row (row widths from its left
+   * edge, or a placement against a part) instead of a share of the layer.
+   * The clip spans the row's height, so layers revealed on one track keep
+   * one edge, whatever their boxes (the 2026 gold and the name over it).
+   * Shown left of the edge (`revealFrom` right: right of it).
+   */
+  revealX?: DouzeX;
   /**
    * With `clipTo`: shares of the clip box hidden from its left / right. Unlike
    * `reveal` the window stays put while the layer moves through it (the 2022
@@ -124,8 +146,15 @@ interface DouzeLayerBase {
   /** Where `reveal` grows from. Default left. */
   revealFrom?: 'left' | 'right';
   /**
+   * With `revealX`: `round` gives the moving edge a half circle the row's
+   * height across (the 2026 gold's edge, the shape of the strip's end).
+   */
+  revealEdge?: 'straight' | 'round';
+  /**
    * Clipped to this part's box, in its shape (corner radii included: on a
    * rounded theme the row is a pill). Broadcast graphics stay inside the row.
+   * A part other than the row is clipped by the row too, as the row clips
+   * its content (the strip's left end is the pill's round end).
    */
   clipTo?: DouzeAnchor;
   /**
@@ -135,9 +164,12 @@ interface DouzeLayerBase {
    */
   filter?: string;
   /**
-   * With `clipTo`: row parts drawn over the copied part in the row (the
-   * total's curved edge over the 12 box). Their shapes are cut out of the
-   * layer, so a copy keeps the shape the row shows.
+   * With `clipTo`: row parts that may be drawn over the copied part (or the
+   * part the layer is clipped to) in the row: the total's curved edge over
+   * the 12 box. Those that do draw over it (paint order, measured on the
+   * row) are cut out of the layer, so a copy keeps the shape the row shows.
+   * One spec fits both layouts: the total lies over the strip on square
+   * rows and under it on rounded ones.
    */
   cutBy?: DouzeAnchor[];
   /** Left out on low-performance and reduced-motion devices. */
@@ -150,7 +182,22 @@ interface DouzeLayerBase {
   group?: string;
   /** Which strength option scales this layer's opacity (options.ts). */
   intensity?: 'glow' | 'wash';
+  /**
+   * Only on rows of this layout (the row's `data-douze-layout`): rounded
+   * pill rows (2026), where the strip lies over the points, or square rows,
+   * where the points lie over it. The 2026 gold takes the 12 box on pill
+   * rows and the total on square ones.
+   */
+  layout?: DouzeRowLayout;
+  /**
+   * A static CSS clip-path (layers with `reveal` or `revealX` animate their
+   * own). The 2026 halo cuts a notch on its left, at the row's height, so
+   * it doesn't lighten the 12 box's left part.
+   */
+  clipPath?: string;
 }
+
+export type DouzeRowLayout = 'rounded' | 'square';
 
 export interface DouzeRectLayer extends DouzeLayerBase {
   kind: 'rect';
@@ -178,6 +225,12 @@ export interface DouzeCloneLayer extends DouzeLayerBase {
   source: Exclude<DouzeAnchor, 'row'>;
   hideSource?: boolean;
   glitch?: { seed: number; scale: number; frequency?: string };
+  /**
+   * Repaints the copy: `fill` its background and the fill of its SVG
+   * shapes (a CSS colour), `text` the colour of all its text. The 2026 12
+   * box turns gold, the name over the gold takes `--douze-ink`.
+   */
+  paint?: { fill?: string; text?: string };
 }
 
 /**
@@ -225,6 +278,13 @@ export type DouzeLayer =
   | DouzeCloneLayer
   | DouzeCanvasLayer;
 
+/** Theme colours a spec can take its palette from (`themeColors`). */
+export type DouzeThemeColorKey =
+  | 'juryLastPointsBg'
+  | 'douzePointsBg'
+  | 'juryCountryText'
+  | 'douzePointsText';
+
 export interface DouzeAnimationSpec {
   id: string;
   durationMs: number;
@@ -234,17 +294,25 @@ export interface DouzeAnimationSpec {
    */
   reorder: 'after' | 'before';
   /**
-   * Values for `var(--douze-<key>)` in the layers. With `paletteFrom`, `c1`,
-   * `c2`, `c3` and `glow` come from the row instead, and these are the
-   * fallback when it can't be read.
+   * Values for `var(--douze-<key>)` in the layers. With `paletteFrom` (or a
+   * custom theme's colours), `c1`, `c2`, `c3`, `glow` (a tint of c1) and
+   * `ink` (black or white, whichever reads on c1) come from there instead,
+   * and these are the fallback when they can't be read.
    */
   palette: Record<string, string>;
   /**
    * `flag`: the country's own colours, read from the row's flag
-   * (flagPalette.ts). `theme`: the theme's 12 box, douze and name colours
-   * (themePalette.ts). Absent: the fixed `palette`.
+   * (flagPalette.ts). `theme`: the theme's colours (themePalette.ts, see
+   * `themeColors`). Absent: the fixed `palette`.
    */
   paletteFrom?: 'flag' | 'theme';
+  /**
+   * The theme colours `c1`, `c2` and `c3` come from with theme colours
+   * (`--twc-countryItem-<key>`, in order). Default: the 12 box, the douze
+   * colour and the name text (2022: the sweeps take the box's colour). The
+   * 2026 gold is the theme's douze colour.
+   */
+  themeColors?: DouzeThemeColorKey[];
   /**
    * The parts a custom theme can switch off (layers' `group`), in the order
    * the theme editor lists them. Each has a label under

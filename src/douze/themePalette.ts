@@ -1,15 +1,18 @@
+import type { DouzeThemeColorKey } from './model';
+
 /**
  * A theme's own colours for a douze animation (`paletteFrom: 'theme'`, the
- * "Theme colors" option): its 12 box, its douze colour and its row text, in
- * that order, so the sweeps take the box's colour and the ring the text's.
- * Read from the row's CSS variables, so a custom theme's overrides and the
- * theme editor's preview count.
+ * "Theme colors" option), in the spec's `themeColors` order. By default its
+ * 12 box, its douze colour and its row text, so the 2022 sweeps take the
+ * box's colour and the ring the text's; the 2026 gold takes the douze
+ * colour. Read from the row's CSS variables, so a custom theme's overrides
+ * and the theme editor's preview count.
  */
 
-const THEME_COLOR_VARS = [
-  '--twc-countryItem-juryLastPointsBg',
-  '--twc-countryItem-douzePointsBg',
-  '--twc-countryItem-juryCountryText',
+export const DEFAULT_THEME_COLORS: DouzeThemeColorKey[] = [
+  'juryLastPointsBg',
+  'douzePointsBg',
+  'juryCountryText',
 ];
 
 const toHex2 = (value: number) =>
@@ -54,10 +57,13 @@ export const themeColorToHex = (raw: string): string | null => {
 };
 
 /** The theme's colours on `el`'s row, or null when none can be read. */
-export const readThemeColors = (el: Element): string[] | null => {
+export const readThemeColors = (
+  el: Element,
+  keys: DouzeThemeColorKey[] = DEFAULT_THEME_COLORS,
+): string[] | null => {
   const style = getComputedStyle(el);
-  const colors = THEME_COLOR_VARS.map((name) =>
-    themeColorToHex(style.getPropertyValue(name)),
+  const colors = keys.map((key) =>
+    themeColorToHex(style.getPropertyValue(`--twc-countryItem-${key}`)),
   );
   const [first] = colors.filter((color): color is string => color !== null);
 

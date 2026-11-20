@@ -171,11 +171,16 @@ const DouzeOptionsSection: React.FC<Props> = ({
         },
       };
     });
+  // Only the colours the animation uses (2026: one gold); all three are
+  // stored either way.
   const customColorFields: ColorField[] =
     colorChoice === 'custom'
-      ? [0, 1, 2].map((index) => ({
+      ? [0, 1, 2].slice(0, support.customColors).map((index) => ({
           id: `custom-${index}`,
-          label: t('customColor', { number: index + 1 }),
+          label:
+            support.customColors === 1
+              ? t('customColorOnly')
+              : t('customColor', { number: index + 1 }),
           value: customColors[index],
           defaultValue: specColors[index],
           onChange: (value) => {
@@ -297,7 +302,7 @@ const DouzeOptionsSection: React.FC<Props> = ({
             {customColorFields.map(picker)}
           </div>
         )}
-        {spec && colorChoice === 'theme' && (
+        {support.themeColorsHint && colorChoice === 'theme' && (
           <p className="m-0 text-[12.5px] font-semibold text-white/60">
             {t('themeColorsHint')}
           </p>

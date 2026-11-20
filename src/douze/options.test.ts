@@ -293,6 +293,19 @@ describe('the registry with options', () => {
       strengths: ['glow', 'wash'],
       veilColor: true,
       coverFlag: false,
+      customColors: 3,
+      themeColorsHint: true,
+    });
+    // One gold (c1, its sheen mixed from it), the theme's douze colour.
+    expect(getDouzeOptionsSupport('year2026')).toEqual({
+      colors: ['original', 'flag', 'theme', 'custom'],
+      themeColors: [{ key: 'douzePointsBg', label: 'douze', when: 'theme' }],
+      parts: ['points'],
+      strengths: ['glow'],
+      veilColor: false,
+      coverFlag: false,
+      customColors: 1,
+      themeColorsHint: false,
     });
     expect(getDouzeOptionsSupport('parallelograms')?.parts).toEqual([
       'blocks',

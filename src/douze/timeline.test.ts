@@ -169,4 +169,54 @@ describe('toWebKeyframes', () => {
       'inset(0 0 0 0%)',
     ]);
   });
+
+  it('reveals up to an edge in the row, the same line on every layer', () => {
+    const keyframes = [
+      { t: 0, revealX: { on: 'flag', at: 'right' } as const },
+      { t: 100, revealX: { on: 'total', at: 'left' } as const },
+    ];
+    // A box narrower and lower than the row: the clip still spans the
+    // row's height and starts at its left edge, with a round end.
+    const box = { x: 100, y: 18, w: 200, h: 24 };
+    const web = toWebKeyframes(
+      rect({ revealEdge: 'round', keyframes }),
+      box,
+      anchors,
+      100,
+    );
+
+    // Edge at the flag's right edge (90), then the total's left (366).
+    expect(web.map((k) => k.clipPath)).toEqual([
+      'inset(-8px 210px -8px -60px round 0 20px 20px 0)',
+      'inset(-8px -66px -8px -60px round 0 20px 20px 0)',
+    ]);
+
+    const whole = toWebKeyframes(
+      rect({ keyframes }),
+      anchors.row!,
+      anchors,
+      100,
+    );
+
+    expect(whole[0].clipPath).toBe(
+      'inset(0px 350px 0px 0px round 0 0px 0px 0)',
+    );
+
+    // Row heights past the row's end (a round edge clear of its corners).
+    const past = toWebKeyframes(
+      rect({
+        revealEdge: 'round',
+        keyframes: [
+          { t: 0, revealX: { on: 'row', at: 'right', offsetRh: 0.6 } },
+        ],
+      }),
+      anchors.row!,
+      anchors,
+      100,
+    );
+
+    expect(past[0].clipPath).toBe(
+      'inset(0px -24px 0px 0px round 0 20px 20px 0)',
+    );
+  });
 });

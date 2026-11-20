@@ -27,6 +27,7 @@ export const DOUZE_POINTS_ANIMATION_MODES = [
   'parallelograms',
   'heartsGrid',
   'year2022',
+  'year2026',
 ] as const satisfies readonly DouzePointsAnimationMode[];
 
 const isBoardAnimationMode = (

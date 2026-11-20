@@ -1328,7 +1328,8 @@
         "douzePointsAnimations": {
           "parallelograms": "Parallelogramme (ESC 2023)",
           "heartsGrid": "Herzen-Gitter (ESC 2025)",
-          "year2022": "Schallwellen (ESC 2022)"
+          "year2022": "Schallwellen (ESC 2022)",
+          "year2026": "Goldwelle (ESC 2026)"
         },
         "douzeOptions": {
           "title": "Animation anpassen",
@@ -1342,6 +1343,7 @@
             "custom": "Eigene"
           },
           "customColor": "Farbe {number}",
+          "customColorOnly": "Farbe",
           "colorFields": {
             "hearts": "Herzen",
             "name": "Ländername",
@@ -1365,7 +1367,8 @@
             "wash": "Schleier",
             "name": "Ländername",
             "blocks": "Gleitende Blöcke",
-            "label": "Punktetext"
+            "label": "Punktetext",
+            "points": "Goldene Punkte"
           },
           "coverFlag": "Herzen über der Flagge",
           "glow": "Leuchtstärke",

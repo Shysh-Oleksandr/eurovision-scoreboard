@@ -92,6 +92,8 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
       {/* Main Container */}
       <Container
         data-douze-anchor="row"
+        // Douze specs place some layers by it (douze/model.ts `layout`).
+        data-douze-layout={useInlineContentLayout ? 'rounded' : 'square'}
         className={`relative ${
           useInlineContentLayout ? 'flex flex-row items-stretch min-h-0 ' : ''
         }${containerClassName}`}
@@ -104,8 +106,9 @@ const CountryItemBase: React.FC<CountryItemBaseProps> = ({
         {/* Douze Points Animation */}
         {renderDouzePointsAnimation && renderDouzePointsAnimation(country)}
 
-        {/* Content */}
+        {/* Content: the flag and name's strip */}
         <div
+          data-douze-anchor="strip"
           className={
             useInlineContentLayout
               ? `flex items-center overflow-hidden flex-1 min-w-0 h-full relative ${

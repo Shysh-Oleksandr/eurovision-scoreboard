@@ -1328,7 +1328,8 @@
         "douzePointsAnimations": {
           "parallelograms": "Паралелограми (ESC 2023)",
           "heartsGrid": "Серця (ESC 2025)",
-          "year2022": "Звукові хвилі (ESC 2022)"
+          "year2022": "Звукові хвилі (ESC 2022)",
+          "year2026": "Золотий слід (ESC 2026)"
         },
         "douzeOptions": {
           "title": "Налаштувати анімацію",
@@ -1342,6 +1343,7 @@
             "custom": "Власні"
           },
           "customColor": "Колір {number}",
+          "customColorOnly": "Колір",
           "colorFields": {
             "hearts": "Серця",
             "name": "Назва країни",
@@ -1365,7 +1367,8 @@
             "wash": "Вуаль",
             "name": "Назва країни",
             "blocks": "Рухомі блоки",
-            "label": "Текст балів"
+            "label": "Текст балів",
+            "points": "Золоті бали"
           },
           "coverFlag": "Серця поверх прапора",
           "glow": "Сила сяйва",
