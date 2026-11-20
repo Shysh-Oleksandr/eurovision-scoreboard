@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'react';
 
 import { useGSAP } from '@gsap/react';
 
+import { type DouzeOptions, douzeDurationScale } from '@/douze/options';
 import { useOnLayoutKeyChange } from '@/hooks/useOnLayoutKeyChange';
 import { playHaptic } from '@/native/haptics';
 import { playThemeSound } from '@/theme/playThemeSound';
@@ -30,6 +31,7 @@ const useAnimatePoints = ({
   isDouzePoints,
   douzePointsRefs,
   douzePointsAnimationModeOverride,
+  douzeOptionsOverride,
   isThemePreview = false,
   lastPointsAnimationDirection = 'right-to-left',
   pointsLayoutKey = '',
@@ -42,6 +44,8 @@ const useAnimatePoints = ({
     parallelogramYellowRef: React.RefObject<HTMLDivElement | null>;
   } | null;
   douzePointsAnimationModeOverride?: DouzePointsAnimationMode;
+  /** The theme editor's animation options (null: none); otherwise the theme's. */
+  douzeOptionsOverride?: DouzeOptions | null;
   /** When true, skip custom theme sounds (e.g. customize-theme modal preview). */
   isThemePreview?: boolean;
   /**
@@ -64,9 +68,13 @@ const useAnimatePoints = ({
   const hasShownLastPointsRef = useRef(false);
   /** Avoids playing douze SFX on every useGSAP re-run (e.g. Strict Mode or ref churn). */
   const douzePointsSoundPlayedForParallelogramsRef = useRef(false);
-  const { douzePointsAnimationMode } = useThemeSpecifics();
+  const { douzePointsAnimationMode, douzeOptions } = useThemeSpecifics();
   const resolvedDouzePointsAnimationMode =
     douzePointsAnimationModeOverride ?? douzePointsAnimationMode;
+  // "Customize animation" speed: the parallelograms' tweens stretch with it.
+  const slow = douzeDurationScale(
+    douzeOptionsOverride !== undefined ? douzeOptionsOverride : douzeOptions,
+  );
 
   useGSAP(
     () => {
@@ -97,28 +105,28 @@ const useAnimatePoints = ({
         }
         gsap.to(containerRef.current, {
           opacity: 1,
-          duration: 0.4,
-          delay: 0.2,
+          duration: 0.4 * slow,
+          delay: 0.2 * slow,
           ease: 'cubic.inOut',
         });
         gsap.to(parallelogramBlueRef.current, {
           left: '120%',
           transform: 'skewX(-45deg)',
-          duration: 1,
+          duration: 1 * slow,
           ease: 'cubic.inOut',
         });
         gsap.to(parallelogramYellowRef.current, {
           left: '120%',
           transform: 'skewX(-45deg)',
-          duration: 1,
+          duration: 1 * slow,
           ease: 'cubic.inOut',
         });
       } else {
         douzePointsSoundPlayedForParallelogramsRef.current = false;
         gsap.to(containerRef.current, {
           opacity: 0,
-          duration: 0.5,
-          delay: 0.4,
+          duration: 0.5 * slow,
+          delay: 0.4 * slow,
           ease: 'cubic.inOut',
         });
         gsap.fromTo(
@@ -127,7 +135,7 @@ const useAnimatePoints = ({
           {
             left: '-20%',
             transform: 'skewX(45deg)',
-            duration: 1,
+            duration: 1 * slow,
             ease: 'cubic.inOut',
           },
         );
@@ -137,7 +145,7 @@ const useAnimatePoints = ({
           {
             left: '-50%',
             transform: 'skewX(45deg)',
-            duration: 1,
+            duration: 1 * slow,
             ease: 'cubic.inOut',
           },
         );
@@ -149,6 +157,7 @@ const useAnimatePoints = ({
         douzePointsRefs,
         resolvedDouzePointsAnimationMode,
         isThemePreview,
+        slow,
       ],
       scope: douzePointsRefs?.containerRef,
     },

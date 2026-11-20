@@ -1330,6 +1330,48 @@
           "heartsGrid": "Hearts grid (ESC 2025)",
           "year2022": "Sound waves (ESC 2022)"
         },
+        "douzeOptions": {
+          "title": "Customize animation",
+          "reset": "Reset",
+          "hint": "Every change plays on the preview.",
+          "colors": "Colors",
+          "colorSources": {
+            "original": "Original",
+            "flag": "Flag colors",
+            "theme": "Theme colors",
+            "custom": "Custom"
+          },
+          "customColor": "Color {number}",
+          "colorFields": {
+            "hearts": "Hearts",
+            "name": "Country name",
+            "background": "Background",
+            "text": "Text",
+            "block1": "Block 1",
+            "block2": "Block 2",
+            "douze": "Douze color"
+          },
+          "themeColorsHint": "The 12 box and name colors come from the Colors step.",
+          "speed": "Speed",
+          "slower": "Slower",
+          "faster": "Faster",
+          "partsTitle": "Parts",
+          "parts": {
+            "glitch": "Flag glitch",
+            "sweeps": "Light sweeps",
+            "burst": "Light burst",
+            "waves": "Waves",
+            "flash": "12 box flash",
+            "wash": "Veil",
+            "name": "Country name",
+            "blocks": "Sweeping blocks",
+            "label": "Points text"
+          },
+          "coverFlag": "Hearts over the flag",
+          "glow": "Glow strength",
+          "wash": "Veil strength",
+          "veilColor": "Veil color"
+        },
         "pointsContainerShapes": {
           "title": "Points container shape",
           "curvedEdge": "Curved edge",

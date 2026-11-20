@@ -9,6 +9,7 @@ import {
 import { api, type UploadProgress } from './client';
 import { queryKeys } from './queryKeys';
 
+import type { DouzeOptions } from '@/douze/options';
 import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 import { FlagShape, PointsContainerShape } from '@/theme/types';
 import type {
@@ -40,6 +41,7 @@ export type CreateThemeInput = {
   roundedCountryContainer?: boolean;
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
+  douzeOptions?: DouzeOptions;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
   groupId?: string;
   fontAlias?: string;
@@ -72,6 +74,8 @@ export type UpdateThemeInput = {
   roundedCountryContainer?: boolean | null;
   boardAnimationMode?: BoardAnimationMode | null;
   douzePointsAnimationMode?: DouzePointsAnimationMode | null;
+  /** null removes the theme's animation options. */
+  douzeOptions?: DouzeOptions | null;
   themeSounds?: Record<string, { url: string; delayMs?: number } | null>;
   groupId?: string | null;
   fontAlias?: string | null;

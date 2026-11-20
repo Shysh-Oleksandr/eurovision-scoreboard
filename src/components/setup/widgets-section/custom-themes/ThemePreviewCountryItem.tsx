@@ -1,11 +1,12 @@
 import { useTranslations } from 'next-intl';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import ThemePreviewCountryItemCompact from './ThemePreviewCountryItemCompact';
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { SparklesIcon } from '@/assets/icons/SparklesIcon';
 import Button from '@/components/common/Button';
+import { type DouzeOptions, douzeDurationScale } from '@/douze/options';
 import {
   DouzePointsAnimationMode,
   FlagShape,
@@ -26,6 +27,9 @@ type ThemePreviewCountryItemProps = {
   usePointsCountUpAnimation?: boolean;
   roundedCountryContainer?: boolean;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
+  douzeOptions?: DouzeOptions | null;
+  /** Gives the row a 12 whenever it changes (not on mount): the animation's options were changed. */
+  replayDouzeKey?: number;
 };
 
 const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
@@ -42,6 +46,8 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   usePointsCountUpAnimation = true,
   roundedCountryContainer = false,
   douzePointsAnimationMode = 'heartsGrid',
+  douzeOptions,
+  replayDouzeKey,
 }) => {
   const t = useTranslations('widgets.themes');
 
@@ -49,6 +55,9 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
   const [lastPoints, setLastPoints] = useState<number | null>(12);
   const [showDouzePointsAnimation, setShowDouzePointsAnimation] =
     useState(false);
+  const douzeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   const handleAwardPoints = (value: number) => {
     setLastPoints(value);
@@ -57,12 +66,37 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
     // Trigger douze points animation for 12 points
     if (value === 12) {
       setShowDouzePointsAnimation(true);
-      // Reset animation state after animation completes
-      setTimeout(() => {
-        setShowDouzePointsAnimation(false);
-      }, 3000); // Animation duration
+      // Reset animation state after animation completes (a newer 12 keeps
+      // it up for its own run).
+      clearTimeout(douzeTimerRef.current);
+      douzeTimerRef.current = setTimeout(
+        () => {
+          setShowDouzePointsAnimation(false);
+        },
+        3000 * douzeDurationScale(douzeOptions), // Animation duration
+      );
     }
   };
+
+  useEffect(() => () => clearTimeout(douzeTimerRef.current), []);
+
+  // Every change to the animation's options plays it again, so the change
+  // is seen in motion: once the changes settle (a colour being dragged, a
+  // few quick taps), not on each one.
+  const replayedKeyRef = useRef(replayDouzeKey);
+  const awardRef = useRef(handleAwardPoints);
+
+  awardRef.current = handleAwardPoints;
+  useEffect(() => {
+    if (replayDouzeKey === replayedKeyRef.current) return undefined;
+
+    const timer = setTimeout(() => {
+      replayedKeyRef.current = replayDouzeKey;
+      awardRef.current(12);
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [replayDouzeKey]);
 
   const handleReset = () => {
     setPoints(0);
@@ -90,6 +124,7 @@ const ThemePreviewCountryItem: React.FC<ThemePreviewCountryItemProps> = ({
         usePointsCountUpAnimation={usePointsCountUpAnimation}
         roundedCountryContainer={roundedCountryContainer}
         douzePointsAnimationMode={douzePointsAnimationMode}
+        douzeOptions={douzeOptions}
       />
 
       {/* Actions */}

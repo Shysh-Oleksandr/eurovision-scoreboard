@@ -32,6 +32,7 @@ import OverflowMenu, {
   type OverflowMenuEntry,
 } from '@/components/common/OverflowMenu';
 import UserInfo from '@/components/common/UserInfo';
+import { douzeDurationScale } from '@/douze/options';
 import { buildShareUrl } from '@/helpers/shareUrl';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
@@ -103,7 +104,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
     setLastPoints(value);
     setPoints((prev) => prev + value);
     setShowDouzePointsAnimation(true);
-    setTimeout(() => setShowDouzePointsAnimation(false), 3000);
+    setTimeout(
+      () => setShowDouzePointsAnimation(false),
+      3000 * douzeDurationScale(themeSpecifics.douzeOptions),
+    );
   };
 
   const handleQuickSelect = async () => {
@@ -300,6 +304,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             usePointsCountUpAnimation={themeSpecifics.usePointsCountUpAnimation}
             roundedCountryContainer={themeSpecifics.roundedCountryContainer}
             douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
+            douzeOptions={themeSpecifics.douzeOptions}
             togglesBelow
           />
         </div>

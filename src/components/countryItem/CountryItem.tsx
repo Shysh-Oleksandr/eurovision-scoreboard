@@ -161,6 +161,7 @@ const CountryItem = ({
     pointsContainerShape,
     roundedCountryContainer,
     douzePointsAnimationMode,
+    douzeOptions,
   } = useThemeSpecifics();
   const hasDouzeSpec = !!getDouzeSpec(douzePointsAnimationMode);
 
@@ -335,6 +336,7 @@ const CountryItem = ({
               <DouzeRowOverlay
                 key={douzeRunId}
                 mode={douzePointsAnimationMode}
+                options={douzeOptions}
                 pointsAmount={douzePoints ?? 0}
               />
             )

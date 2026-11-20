@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { dominantColors, paletteFromFlag } from './flagPalette';
+import { dominantColors, paletteFromColors } from './flagPalette';
 
 type Rgb = [number, number, number];
 
@@ -77,9 +77,9 @@ describe('dominantColors', () => {
   });
 });
 
-describe('paletteFromFlag', () => {
+describe('paletteFromColors', () => {
   it('maps the colours to the spec keys, reusing the first for a third', () => {
-    const palette = paletteFromFlag(['#005bbb', '#ffd500']);
+    const palette = paletteFromColors(['#005bbb', '#ffd500']);
 
     expect(palette.c1).toBe('#005bbb');
     expect(palette.c2).toBe('#ffd500');
@@ -88,6 +88,10 @@ describe('paletteFromFlag', () => {
   });
 
   it('lifts very dark colours so they show on the dark rows', () => {
-    expect(paletteFromFlag(['#000000']).c1).toBe('#666666');
+    expect(paletteFromColors(['#000000']).c1).toBe('#666666');
+  });
+
+  it('keeps colours picked by hand as they are', () => {
+    expect(paletteFromColors(['#000000'], { lift: false }).c1).toBe('#000000');
   });
 });

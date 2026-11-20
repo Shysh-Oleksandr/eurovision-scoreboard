@@ -1330,6 +1330,48 @@
           "heartsGrid": "Grelha de corações (ESC 2025)",
           "year2022": "Ondas sonoras (ESC 2022)"
         },
+        "douzeOptions": {
+          "title": "Personalizar animação",
+          "reset": "Repor",
+          "hint": "Cada alteração é reproduzida na pré-visualização.",
+          "colors": "Cores",
+          "colorSources": {
+            "original": "Originais",
+            "flag": "Cores da bandeira",
+            "theme": "Cores do tema",
+            "custom": "Personalizadas"
+          },
+          "customColor": "Cor {number}",
+          "colorFields": {
+            "hearts": "Corações",
+            "name": "Nome do país",
+            "background": "Fundo",
+            "text": "Texto",
+            "block1": "Bloco 1",
+            "block2": "Bloco 2",
+            "douze": "Cor douze"
+          },
+          "themeColorsHint": "As cores da caixa do 12 e do nome vêm do passo Cores.",
+          "speed": "Velocidade",
+          "slower": "Mais lento",
+          "faster": "Mais rápido",
+          "partsTitle": "Partes",
+          "parts": {
+            "glitch": "Glitch da bandeira",
+            "sweeps": "Rastos de luz",
+            "burst": "Explosão de luz",
+            "waves": "Ondas",
+            "flash": "Clarão do 12",
+            "wash": "Véu",
+            "name": "Nome do país",
+            "blocks": "Blocos deslizantes",
+            "label": "Texto dos pontos"
+          },
+          "coverFlag": "Corações sobre a bandeira",
+          "glow": "Intensidade do brilho",
+          "wash": "Intensidade do véu",
+          "veilColor": "Cor do véu"
+        },
         "pointsContainerShapes": {
           "title": "Forma do contentor de pontos",
           "curvedEdge": "Borda curva",

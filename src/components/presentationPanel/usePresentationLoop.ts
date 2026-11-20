@@ -2,10 +2,12 @@ import { useEffect, useRef } from 'react';
 
 import { useShallow } from 'zustand/shallow';
 
+import { douzeDurationScale } from '@/douze/options';
 import { EventStage, StageId } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { isJuryScaleRevealActive } from '@/state/scoreboard/juryScaleReveal';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+import { resolveThemeSpecificsForGeneralState } from '@/theme/themeSpecifics';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 export const MIN_SPEED_SECONDS = 0.5;
@@ -130,8 +132,19 @@ export const usePresentationLoop = () => {
 
       const getNextDelayMs = (awardedAnimated: boolean) => {
         const baseSeconds = MAX_SPEED_SECONDS - presentationSpeedSeconds;
+        // A theme that slows its douze animation down ("Customize
+        // animation") gets a longer pause, so the next point waits for it.
+        const douzeStretch = Math.max(
+          1,
+          douzeDurationScale(
+            resolveThemeSpecificsForGeneralState(generalStore).douzeOptions,
+          ),
+        );
         const delayAfterAnimation = pauseAfterAnimatedPoints
-          ? Math.max(boardAnimationMode === 'teleport' ? 6 : 4.5, baseSeconds)
+          ? Math.max(
+              (boardAnimationMode === 'teleport' ? 6 : 4.5) * douzeStretch,
+              baseSeconds,
+            )
           : baseSeconds;
         const nextDelaySeconds = awardedAnimated
           ? delayAfterAnimation

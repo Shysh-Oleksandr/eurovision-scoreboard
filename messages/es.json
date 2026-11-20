@@ -1330,6 +1330,48 @@
           "heartsGrid": "Cuadrícula de corazones (ESC 2025)",
           "year2022": "Ondas sonoras (ESC 2022)"
         },
+        "douzeOptions": {
+          "title": "Personalizar animación",
+          "reset": "Restablecer",
+          "hint": "Cada cambio se reproduce en la vista previa.",
+          "colors": "Colores",
+          "colorSources": {
+            "original": "Original",
+            "flag": "Colores de la bandera",
+            "theme": "Colores del tema",
+            "custom": "Personalizados"
+          },
+          "customColor": "Color {number}",
+          "colorFields": {
+            "hearts": "Corazones",
+            "name": "Nombre del país",
+            "background": "Fondo",
+            "text": "Texto",
+            "block1": "Bloque 1",
+            "block2": "Bloque 2",
+            "douze": "Color douze"
+          },
+          "themeColorsHint": "Los colores de la casilla del 12 y del nombre vienen del paso Colores.",
+          "speed": "Velocidad",
+          "slower": "Más lento",
+          "faster": "Más rápido",
+          "partsTitle": "Partes",
+          "parts": {
+            "glitch": "Glitch de la bandera",
+            "sweeps": "Barridos de luz",
+            "burst": "Estallido de luz",
+            "waves": "Ondas",
+            "flash": "Destello del 12",
+            "wash": "Velo",
+            "name": "Nombre del país",
+            "blocks": "Bloques en movimiento",
+            "label": "Texto de puntos"
+          },
+          "coverFlag": "Corazones sobre la bandera",
+          "glow": "Intensidad del brillo",
+          "wash": "Intensidad del velo",
+          "veilColor": "Color del velo"
+        },
         "pointsContainerShapes": {
           "title": "Forma del contenedor de puntos",
           "curvedEdge": "Borde curvado",

@@ -1330,6 +1330,48 @@
           "heartsGrid": "Herzen-Gitter (ESC 2025)",
           "year2022": "Schallwellen (ESC 2022)"
         },
+        "douzeOptions": {
+          "title": "Animation anpassen",
+          "reset": "Zurücksetzen",
+          "hint": "Jede Änderung wird in der Vorschau abgespielt.",
+          "colors": "Farben",
+          "colorSources": {
+            "original": "Original",
+            "flag": "Flaggenfarben",
+            "theme": "Themenfarben",
+            "custom": "Eigene"
+          },
+          "customColor": "Farbe {number}",
+          "colorFields": {
+            "hearts": "Herzen",
+            "name": "Ländername",
+            "background": "Hintergrund",
+            "text": "Text",
+            "block1": "Block 1",
+            "block2": "Block 2",
+            "douze": "Douze-Farbe"
+          },
+          "themeColorsHint": "Die Farben der 12er-Box und des Namens kommen aus dem Schritt Farben.",
+          "speed": "Tempo",
+          "slower": "Langsamer",
+          "faster": "Schneller",
+          "partsTitle": "Teile",
+          "parts": {
+            "glitch": "Flaggen-Glitch",
+            "sweeps": "Lichtstreifen",
+            "burst": "Lichtblitz",
+            "waves": "Wellen",
+            "flash": "Aufblitzen der 12",
+            "wash": "Schleier",
+            "name": "Ländername",
+            "blocks": "Gleitende Blöcke",
+            "label": "Punktetext"
+          },
+          "coverFlag": "Herzen über der Flagge",
+          "glow": "Leuchtstärke",
+          "wash": "Schleierstärke",
+          "veilColor": "Schleierfarbe"
+        },
         "pointsContainerShapes": {
           "title": "Punktecontainer-Form",
           "curvedEdge": "Gekrümmte Kante",

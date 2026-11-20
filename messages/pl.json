@@ -1330,6 +1330,48 @@
           "heartsGrid": "Serca (ESC 2025)",
           "year2022": "Fale dźwiękowe (ESC 2022)"
         },
+        "douzeOptions": {
+          "title": "Dostosuj animację",
+          "reset": "Resetuj",
+          "hint": "Każda zmiana odtwarza się w podglądzie.",
+          "colors": "Kolory",
+          "colorSources": {
+            "original": "Oryginalne",
+            "flag": "Kolory flagi",
+            "theme": "Kolory motywu",
+            "custom": "Własne"
+          },
+          "customColor": "Kolor {number}",
+          "colorFields": {
+            "hearts": "Serca",
+            "name": "Nazwa kraju",
+            "background": "Tło",
+            "text": "Tekst",
+            "block1": "Blok 1",
+            "block2": "Blok 2",
+            "douze": "Kolor douze"
+          },
+          "themeColorsHint": "Kolory pola z dwunastką i nazwy pochodzą z kroku Kolory.",
+          "speed": "Tempo",
+          "slower": "Wolniej",
+          "faster": "Szybciej",
+          "partsTitle": "Elementy",
+          "parts": {
+            "glitch": "Glitch flagi",
+            "sweeps": "Smugi światła",
+            "burst": "Rozbłysk",
+            "waves": "Fale",
+            "flash": "Błysk dwunastki",
+            "wash": "Welon",
+            "name": "Nazwa kraju",
+            "blocks": "Przesuwane bloki",
+            "label": "Tekst punktów"
+          },
+          "coverFlag": "Serca na fladze",
+          "glow": "Siła poświaty",
+          "wash": "Siła welonu",
+          "veilColor": "Kolor welonu"
+        },
         "pointsContainerShapes": {
           "title": "Forma kontenera punktów",
           "curvedEdge": "Zakrzywiona krawędź",

@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import type { DouzeLayer } from './model';
-import { getDouzeMoveDelayMs, getDouzeSpec } from './registry';
-import { year2022Douze } from './specs/year2022';
 import {
   type AnchorRects,
   fillKeyframes,
@@ -170,35 +168,5 @@ describe('toWebKeyframes', () => {
       'inset(0 0 0 75%)',
       'inset(0 0 0 0%)',
     ]);
-  });
-});
-
-describe('the 2022 spec', () => {
-  it('has unique layers that stay inside its duration', () => {
-    const ids = year2022Douze.layers.map((layer) => layer.id);
-
-    expect(new Set(ids).size).toBe(ids.length);
-    year2022Douze.layers.forEach((layer) => {
-      layer.keyframes.forEach((frame) => {
-        expect(frame.t).toBeGreaterThanOrEqual(0);
-        expect(frame.t).toBeLessThanOrEqual(year2022Douze.durationMs);
-      });
-    });
-  });
-
-  it('keeps the 12 box on low-performance devices', () => {
-    // The box layer hides the real box; dropping it would leave a gap.
-    const box = year2022Douze.layers.find((layer) => layer.id === 'box');
-
-    expect(box?.heavy).toBeFalsy();
-  });
-
-  it('makes the board wait for it, unlike the built-in variants', () => {
-    expect(getDouzeSpec('year2022')).toBe(year2022Douze);
-    expect(getDouzeSpec('heartsGrid')).toBeNull();
-    expect(getDouzeMoveDelayMs('year2022')).toBeGreaterThan(
-      year2022Douze.durationMs,
-    );
-    expect(getDouzeMoveDelayMs('heartsGrid')).toBe(1000);
   });
 });

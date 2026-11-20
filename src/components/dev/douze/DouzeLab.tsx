@@ -4,6 +4,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import ThemePreviewCountryItemUI from '@/components/setup/widgets-section/custom-themes/ThemePreviewCountryItemUI';
 import DouzeSpecPlayer from '@/douze/DouzeSpecPlayer';
 import type { DouzeAnimationSpec } from '@/douze/model';
+import {
+  type DouzeOptions,
+  sanitizeDouzeOptions,
+  withDouzeOptions,
+} from '@/douze/options';
 import { year2022Douze } from '@/douze/specs/year2022';
 import { getThemeBackground } from '@/theme/themes';
 import { resolveThemeSpecificsForBaseThemeYear } from '@/theme/themeSpecifics';
@@ -54,7 +59,8 @@ const LabRow: React.FC<{
           {label}
         </span>
       )}
-      <div className="relative" style={{ width }}>
+      {/* data-lab-t: the strip rows' boxes, for scripts/douze-frames.mjs compare. */}
+      <div className="relative" style={{ width }} data-lab-t={label}>
         <ThemePreviewCountryItemUI
           baseThemeYear={year}
           state="jury"
@@ -87,7 +93,7 @@ const DouzeLab: React.FC = () => {
   const [runKey, setRunKey] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [lite, setLite] = useState(false);
-  const [flagColors, setFlagColors] = useState(true);
+  const [options, setOptions] = useState<DouzeOptions | null>(null);
   const [zoom, setZoom] = useState(1.5);
   const [stepMs, setStepMs] = useState(100);
   const [stripFrom, setStripFrom] = useState(0);
@@ -103,10 +109,13 @@ const DouzeLab: React.FC = () => {
   const { spec: baseSpec, year: specYear } = SPECS[specIndex];
   const [baseYear, setBaseYear] = useState<string | null>(null);
   const year = baseYear ?? specYear;
+  // The spec as a custom theme with these options would play it.
   const spec = useMemo(
-    () => ({ ...baseSpec, flagPalette: baseSpec.flagPalette && flagColors }),
-    [baseSpec, flagColors],
+    () => withDouzeOptions(baseSpec, options),
+    [baseSpec, options],
   );
+  const setOption = (patch: Partial<DouzeOptions>) =>
+    setOptions((current) => sanitizeDouzeOptions({ ...current, ...patch }));
   const timeline = useMemo(() => {
     const from = Math.max(0, stripFrom);
     const to = Math.min(spec.durationMs, stripTo ?? spec.durationMs);
@@ -221,15 +230,82 @@ const DouzeLab: React.FC = () => {
           />
           Lite
         </label>
+        <select
+          className="rounded bg-black/50 px-2 py-1"
+          data-lab-colors=""
+          value={options?.colors ?? ''}
+          onChange={(e) =>
+            setOption(
+              e.target.value === 'custom'
+                ? {
+                    colors: 'custom',
+                    custom: ['#ff2d6f', '#2de1ff', '#ffd23f'],
+                  }
+                : {
+                    colors: (e.target.value || undefined) as
+                      | DouzeOptions['colors']
+                      | undefined,
+                    custom: undefined,
+                  },
+            )
+          }
+        >
+          <option value="">Own colours</option>
+          <option value="flag">Flag colours</option>
+          <option value="theme">Theme colours</option>
+          <option value="custom">Custom (pink, cyan, gold)</option>
+        </select>
         <label className="flex items-center gap-1">
+          speed
           <input
-            type="checkbox"
-            data-lab-flag-colors=""
-            checked={flagColors}
-            onChange={(e) => setFlagColors(e.target.checked)}
+            type="number"
+            data-lab-speed=""
+            step={0.05}
+            min={0.5}
+            max={2}
+            className="w-16 rounded bg-black/50 px-1"
+            value={options?.speed ?? 1}
+            onChange={(e) => setOption({ speed: Number(e.target.value) })}
           />
-          Flag colours
         </label>
+        <label className="flex items-center gap-1">
+          veil
+          <input
+            type="color"
+            value={options?.veil ?? '#ffffff'}
+            onChange={(e) => setOption({ veil: e.target.value })}
+          />
+        </label>
+        {baseSpec.parts?.map((part) => (
+          <label key={part} className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={!options?.off?.includes(part)}
+              onChange={(e) =>
+                setOption({
+                  off: e.target.checked
+                    ? options?.off?.filter((id) => id !== part)
+                    : [...(options?.off ?? []), part],
+                })
+              }
+            />
+            {part}
+          </label>
+        ))}
+        {(['glow', 'wash'] as const).map((key) => (
+          <label key={key} className="flex items-center gap-1">
+            {key}
+            <input
+              type="number"
+              step={0.1}
+              min={0}
+              max={1}
+              className="w-14 rounded bg-black/50 px-1"
+              value={options?.[key] ?? 1}
+              onChange={(e) => setOption({ [key]: Number(e.target.value) })}
+            />
+          </label>
+        ))}
         <button
           type="button"
           className="rounded bg-white/15 px-2 py-1"

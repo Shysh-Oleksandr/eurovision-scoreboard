@@ -12,6 +12,7 @@ import BackgroundVideoField, {
   BACKGROUND_VIDEO_LINK_PROBLEM_KEYS,
 } from './BackgroundVideoField';
 import ColorOverridesSection from './ColorOverridesSection';
+import DouzeOptionsSection from './DouzeOptionsSection';
 import FontPickerField from './fonts/FontPickerField';
 import {
   builtinSelection,
@@ -60,6 +61,8 @@ import {
   JESC_THEME_OPTIONS,
   THEME_OPTIONS,
 } from '@/data/data';
+import { type DouzeOptions, restrictDouzeOptions } from '@/douze/options';
+import { getDouzeOptionsSupport } from '@/douze/registry';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
@@ -77,6 +80,7 @@ import {
   type ThemeSoundEventId,
 } from '@/theme/themeSoundEvents';
 import {
+  DOUZE_POINTS_ANIMATION_MODES,
   resolveThemeSpecificsForBaseThemeYear,
   resolveThemeSpecificsForCustomTheme,
 } from '@/theme/themeSpecifics';
@@ -194,6 +198,19 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
     useState<BoardAnimationMode>('flip');
   const [douzePointsAnimationMode, setDouzePointsAnimationMode] =
     useState<DouzePointsAnimationMode>('heartsGrid');
+  const [douzeOptions, setDouzeOptions] = useState<DouzeOptions | null>(null);
+  /** Bumped by every change to the options: the preview plays the 12 again. */
+  const [douzeReplay, setDouzeReplay] = useState(0);
+  // What is saved and played: only what the chosen animation offers (the
+  // state keeps the rest, so switching back restores it).
+  const activeDouzeOptions = useMemo(
+    () =>
+      restrictDouzeOptions(
+        douzeOptions,
+        getDouzeOptionsSupport(douzePointsAnimationMode),
+      ),
+    [douzeOptions, douzePointsAnimationMode],
+  );
   const [roundedCountryContainer, setRoundedCountryContainer] = useState(false);
   const [soundUrls, setSoundUrls] =
     useState<Record<ThemeSoundEventId, string>>(emptySoundUrlState);
@@ -309,6 +326,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       setRoundedCountryContainer(specifics.roundedCountryContainer);
       setBoardAnimationMode(specifics.boardAnimationMode);
       setDouzePointsAnimationMode(specifics.douzePointsAnimationMode);
+      setDouzeOptions(specifics.douzeOptions ?? null);
       // Base-theme defaults reset both font slots (custom picks are re-applied
       // by the init effect when editing an existing theme).
       const alias = normalizeFontAlias(specifics.fontAlias);
@@ -744,6 +762,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         roundedCountryContainer,
         boardAnimationMode,
         douzePointsAnimationMode,
+        douzeOptions: activeDouzeOptions,
         themeSounds: formSounds,
         fontAlias: payloadFontAlias,
         fontId: payloadFontId,
@@ -766,6 +785,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         roundedCountryContainer: srcSpecifics.roundedCountryContainer,
         boardAnimationMode: srcSpecifics.boardAnimationMode,
         douzePointsAnimationMode: srcSpecifics.douzePointsAnimationMode,
+        douzeOptions: srcSpecifics.douzeOptions,
         themeSounds: initialTheme.themeSounds,
         fontAlias: normalizeFontAlias(srcSpecifics.fontAlias),
         fontId: initialTheme.fontId,
@@ -1002,6 +1022,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
         ) {
           payload.douzePointsAnimationMode = douzePointsAnimationMode;
         }
+
+        if (activeDouzeOptions) {
+          payload.douzeOptions = activeDouzeOptions;
+        } else if (initialTheme.douzeOptions) {
+          payload.douzeOptions = null;
+        }
       } else {
         // For creates, only include if different from defaults
         if (
@@ -1047,6 +1073,9 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
           defaultThemeSpecifics.douzePointsAnimationMode
         ) {
           payload.douzePointsAnimationMode = douzePointsAnimationMode;
+        }
+        if (activeDouzeOptions) {
+          payload.douzeOptions = activeDouzeOptions;
         }
       }
 
@@ -1351,6 +1380,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       usePointsCountUpAnimation={usePointsCountUpAnimation}
       roundedCountryContainer={roundedCountryContainer}
       douzePointsAnimationMode={douzePointsAnimationMode}
+      douzeOptions={activeDouzeOptions}
+      replayDouzeKey={douzeReplay}
     />
   );
 
@@ -1705,26 +1736,12 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     withIndicator={false}
                   />
                   <CustomSelect
-                    options={[
-                      {
-                        label: t(
-                          'widgets.themes.visualDetails.douzePointsAnimations.parallelograms',
-                        ),
-                        value: 'parallelograms',
-                      },
-                      {
-                        label: t(
-                          'widgets.themes.visualDetails.douzePointsAnimations.heartsGrid',
-                        ),
-                        value: 'heartsGrid',
-                      },
-                      {
-                        label: t(
-                          'widgets.themes.visualDetails.douzePointsAnimations.year2022',
-                        ),
-                        value: 'year2022',
-                      },
-                    ]}
+                    options={DOUZE_POINTS_ANIMATION_MODES.map((mode) => ({
+                      label: t(
+                        `widgets.themes.visualDetails.douzePointsAnimations.${mode}`,
+                      ),
+                      value: mode,
+                    }))}
                     value={douzePointsAnimationMode}
                     labelClassName="!text-base !font-medium mb-1"
                     onChange={(value) =>
@@ -1822,6 +1839,22 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                     withIndicator={false}
                   />
                 </div>
+
+                <DouzeOptionsSection
+                  key={douzePointsAnimationMode}
+                  mode={douzePointsAnimationMode}
+                  options={douzeOptions}
+                  onChange={(next) => {
+                    setDouzeOptions(next);
+                    setDouzeReplay((n) => n + 1);
+                  }}
+                  overrides={overrides}
+                  defaultColors={defaultColors}
+                  onOverridesChange={(next) => {
+                    setOverrides(next);
+                    setDouzeReplay((n) => n + 1);
+                  }}
+                />
               </div>
             )}
             {activeTab === 'colors' && (
@@ -1829,7 +1862,6 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 defaultColors={defaultColors}
                 overrides={overrides}
                 onChange={setOverrides}
-                douzePointsAnimationMode={douzePointsAnimationMode}
               />
             )}
             {activeTab === 'sound' && (

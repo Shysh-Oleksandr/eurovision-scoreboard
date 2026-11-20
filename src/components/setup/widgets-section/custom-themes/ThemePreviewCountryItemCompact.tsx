@@ -11,6 +11,7 @@ import ThemePreviewCountryItemUI from './ThemePreviewCountryItemUI';
 
 import Badge from '@/components/common/Badge';
 import VotingPointsInfo from '@/components/controlsPanel/VotingPointsInfo';
+import type { DouzeOptions } from '@/douze/options';
 import { getThemeBackground } from '@/theme/themes';
 import {
   DouzePointsAnimationMode,
@@ -63,6 +64,7 @@ type ThemePreviewCountryItemCompactProps = {
   usePointsCountUpAnimation?: boolean;
   roundedCountryContainer?: boolean;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
+  douzeOptions?: DouzeOptions | null;
   togglesBelow?: boolean;
 };
 
@@ -88,6 +90,7 @@ const ThemePreviewCountryItemCompact: React.FC<
   usePointsCountUpAnimation = true,
   roundedCountryContainer = false,
   douzePointsAnimationMode = 'heartsGrid',
+  douzeOptions,
   togglesBelow = false,
 }) => {
   const t = useTranslations('widgets.themes.previewCountryItemStates');
@@ -128,6 +131,7 @@ const ThemePreviewCountryItemCompact: React.FC<
         usePointsCountUpAnimation={usePointsCountUpAnimation}
         roundedCountryContainer={roundedCountryContainer}
         douzePointsAnimationMode={douzePointsAnimationMode}
+        douzeOptions={douzeOptions}
       />
 
       <VotingPointsInfo

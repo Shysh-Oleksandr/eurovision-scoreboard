@@ -1330,6 +1330,48 @@
           "heartsGrid": "Griglia di Corazioni (ESC 2025)",
           "year2022": "Onde sonore (ESC 2022)"
         },
+        "douzeOptions": {
+          "title": "Personalizza animazione",
+          "reset": "Ripristina",
+          "hint": "Ogni modifica viene riprodotta nell’anteprima.",
+          "colors": "Colori",
+          "colorSources": {
+            "original": "Originali",
+            "flag": "Colori della bandiera",
+            "theme": "Colori del tema",
+            "custom": "Personalizzati"
+          },
+          "customColor": "Colore {number}",
+          "colorFields": {
+            "hearts": "Cuori",
+            "name": "Nome del paese",
+            "background": "Sfondo",
+            "text": "Testo",
+            "block1": "Blocco 1",
+            "block2": "Blocco 2",
+            "douze": "Colore douze"
+          },
+          "themeColorsHint": "I colori del box del 12 e del nome vengono dal passaggio Colori.",
+          "speed": "Velocità",
+          "slower": "Più lento",
+          "faster": "Più veloce",
+          "partsTitle": "Parti",
+          "parts": {
+            "glitch": "Glitch della bandiera",
+            "sweeps": "Scie di luce",
+            "burst": "Esplosione di luce",
+            "waves": "Onde",
+            "flash": "Lampo del 12",
+            "wash": "Velo",
+            "name": "Nome del paese",
+            "blocks": "Blocchi in movimento",
+            "label": "Testo dei punti"
+          },
+          "coverFlag": "Cuori sopra la bandiera",
+          "glow": "Intensità del bagliore",
+          "wash": "Intensità del velo",
+          "veilColor": "Colore del velo"
+        },
         "pointsContainerShapes": {
           "title": "Forma Contenitore Punti",
           "curvedEdge": "Bordo Curvo",

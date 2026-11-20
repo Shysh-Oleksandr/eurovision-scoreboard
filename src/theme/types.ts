@@ -1,5 +1,7 @@
 import { Year } from '../config';
 
+import type { DouzeOptions } from '@/douze/options';
+
 export type PointsContainerShape = 'triangle' | 'square' | 'transparent';
 export type FlagShape =
   | 'big-rectangle'
@@ -29,6 +31,8 @@ export interface ThemeSpecifics {
   fontAlias?: string;
   /** Built-in font for scoreboard surfaces only; absent means "same as `fontAlias`". */
   scoreboardFontAlias?: string;
+  /** A custom theme's changes to its spec douze animation (douze/options.ts). */
+  douzeOptions?: DouzeOptions;
 }
 
 export type ItemState =

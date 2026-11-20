@@ -93,6 +93,7 @@ avatar, name and followers count; "Sign in" when signed out).
   - Jury points panel rounding, underline removal
   - Uppercase entry names toggle
   - Hover effect customization
+  - Douze points animation, and **Customize animation** for each of them: its colours (the douze colours live here, not in Colors; flag colours; custom for ESC 2022), speed (0.5–2×), which parts play, hearts over the flag, and for ESC 2022 glow and veil strength and the veil's colour; every change replays on the preview — see `theme-animations-and-specifics.md` §10
   - **Sound effects**: Custom sounds for point reveals with delay control
   - **Simulation background audio**
   - Interface font + optional separate scoreboard font, from built-in fonts or the **font library** (upload your own WOFF2/WOFF/TTF/OTF, reuse across themes, add other users' public fonts) — see `custom-fonts-and-font-library.md`

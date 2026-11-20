@@ -142,9 +142,12 @@
    Declared on :root AND on `.dp-palette-scope`: a custom property that reads
    other variables is resolved where it is declared, so an element that sets
    its own bare numbers (Palette Lab previews) must re-declare the palette to
-   see them. */
+   see them. The theme editor's `custom-preview` scope sets the edited
+   theme's numbers (applyCustomTheme), so it re-declares them too; otherwise
+   its accents and surfaces would stay the active theme's. */
 :root,
-.dp-palette-scope {
+.dp-palette-scope,
+[data-theme='custom-preview'] {
   /* Five surface levels. The base level follows the theme's own lightness
      (clamped so text stays readable) and each level above it adds a fixed
      4.2 L% step, so a light or pastel theme yields a lighter modal and a dark

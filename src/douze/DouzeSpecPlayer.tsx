@@ -16,7 +16,7 @@ import {
   measureAnchors,
 } from './anchors';
 import { renderEffect } from './effects';
-import { paletteFromFlag, sampleFlagColors } from './flagPalette';
+import { paletteFromColors, sampleFlagColors } from './flagPalette';
 import type {
   DouzeAnchor,
   DouzeAnimationSpec,
@@ -24,6 +24,7 @@ import type {
   DouzeLayer,
 } from './model';
 import { paint } from './painters';
+import { readThemeColors } from './themePalette';
 import {
   type AnchorRects,
   fillKeyframes,
@@ -130,31 +131,37 @@ const DouzeSpecPlayer: React.FC<Props> = ({
       if (box) boxes.set(layer.id, box);
     });
 
-    // The country's own colours, read from the flag on the row. A flag
-    // still loading (lazy images) is read again once it has loaded.
-    const flag = spec.flagPalette ? findAnchor(parent, 'flag') : null;
-    const flagColors =
-      flag instanceof HTMLImageElement ? sampleFlagColors(flag) : null;
+    // The country's own colours, read from the flag on the row (a flag
+    // still loading, as lazy images do, is read again once it has loaded),
+    // or the theme's, read from the row's colour variables.
+    const flag =
+      spec.paletteFrom === 'flag' ? findAnchor(parent, 'flag') : null;
     const loading = new AbortController();
+    let colors: string[] | null = null;
 
-    if (flag instanceof HTMLImageElement && !flag.complete) {
-      flag.addEventListener('load', () => setFlagLoads((n) => n + 1), {
-        once: true,
-        signal: loading.signal,
-      });
+    if (flag instanceof HTMLImageElement) {
+      colors = sampleFlagColors(flag);
+      if (!flag.complete) {
+        flag.addEventListener('load', () => setFlagLoads((n) => n + 1), {
+          once: true,
+          signal: loading.signal,
+        });
+      }
+    } else if (spec.paletteFrom === 'theme') {
+      colors = readThemeColors(parent);
     }
 
     setGeometry({
       anchors,
       radii: measureAnchorRadii(parent),
       boxes,
-      palette: flagColors
-        ? { ...spec.palette, ...paletteFromFlag(flagColors) }
+      palette: colors
+        ? { ...spec.palette, ...paletteFromColors(colors) }
         : spec.palette,
     });
 
     return () => loading.abort();
-  }, [layers, runKey, spec.flagPalette, spec.palette, flagLoads]);
+  }, [layers, runKey, spec.paletteFrom, spec.palette, flagLoads]);
 
   useLayoutEffect(() => {
     const parent = rootRef.current?.offsetParent as HTMLElement | null;

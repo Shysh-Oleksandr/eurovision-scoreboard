@@ -1330,6 +1330,48 @@
           "heartsGrid": "Grille de cœurs (ESC 2025)",
           "year2022": "Ondes sonores (ESC 2022)"
         },
+        "douzeOptions": {
+          "title": "Personnaliser l’animation",
+          "reset": "Réinitialiser",
+          "hint": "Chaque modification est jouée dans l’aperçu.",
+          "colors": "Couleurs",
+          "colorSources": {
+            "original": "D’origine",
+            "flag": "Couleurs du drapeau",
+            "theme": "Couleurs du thème",
+            "custom": "Personnalisées"
+          },
+          "customColor": "Couleur {number}",
+          "colorFields": {
+            "hearts": "Cœurs",
+            "name": "Nom du pays",
+            "background": "Fond",
+            "text": "Texte",
+            "block1": "Bloc 1",
+            "block2": "Bloc 2",
+            "douze": "Couleur douze"
+          },
+          "themeColorsHint": "Les couleurs de la case du 12 et du nom viennent de l’étape Couleurs.",
+          "speed": "Vitesse",
+          "slower": "Plus lent",
+          "faster": "Plus rapide",
+          "partsTitle": "Éléments",
+          "parts": {
+            "glitch": "Glitch du drapeau",
+            "sweeps": "Balayages lumineux",
+            "burst": "Éclat de lumière",
+            "waves": "Ondes",
+            "flash": "Flash du 12",
+            "wash": "Voile",
+            "name": "Nom du pays",
+            "blocks": "Blocs glissants",
+            "label": "Texte des points"
+          },
+          "coverFlag": "Cœurs sur le drapeau",
+          "glow": "Intensité de la lueur",
+          "wash": "Intensité du voile",
+          "veilColor": "Couleur du voile"
+        },
         "pointsContainerShapes": {
           "title": "Forme du conteneur de points",
           "curvedEdge": "Bord curvé",

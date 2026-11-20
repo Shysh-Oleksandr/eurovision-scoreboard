@@ -448,14 +448,17 @@ const ColorOverridePicker: React.FC<ColorOverridePickerProps> = ({
             Icon={<UndoIcon className="w-4 h-4" />}
           ></Button>
         )}
-        <div ref={copyButtonRef}>
-          <Button
-            variant="tertiary"
-            onClick={handleCopyButtonClick}
-            className="!px-2.5 !py-1.5"
-            Icon={<CopyIcon className="w-4 h-4" />}
-          ></Button>
-        </div>
+        {/* Copying needs other fields to copy to (the Colors step). */}
+        {onBulkChange && (
+          <div ref={copyButtonRef}>
+            <Button
+              variant="tertiary"
+              onClick={handleCopyButtonClick}
+              className="!px-2.5 !py-1.5"
+              Icon={<CopyIcon className="w-4 h-4" />}
+            ></Button>
+          </div>
+        )}
       </div>
 
       {showPicker &&

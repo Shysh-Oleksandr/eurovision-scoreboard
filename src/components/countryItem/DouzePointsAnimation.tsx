@@ -12,7 +12,13 @@ import {
   buildBackgroundColorLookup,
   getSpecialBackgroundStyle,
 } from '@/components/countryItem/utils/gradientUtils';
-import { getDouzeSpec } from '@/douze/registry';
+import {
+  type DouzeOptions,
+  douzeDurationScale,
+  restrictDouzeOptions,
+} from '@/douze/options';
+import { getDouzeOptionsSupport, getDouzeSpec } from '@/douze/registry';
+import { useRowFlagColors } from '@/douze/useRowFlagColors';
 import { playHaptic } from '@/native/haptics';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -42,6 +48,8 @@ type DouzePointsAnimationProps = {
   sourceNameRef?: React.RefObject<HTMLHeadingElement | null>;
   isThemePreview?: boolean;
   douzePointsAnimationModeOverride?: DouzePointsAnimationMode;
+  /** The theme editor's options (null: none); otherwise the theme's. */
+  douzeOptionsOverride?: DouzeOptions | null;
 };
 
 const DOUZE_VISIBLE_ROWS = 3;
@@ -72,6 +80,14 @@ type BaseVariantProps = {
   sourceNameRef?: React.RefObject<HTMLHeadingElement | null>;
   heartsFillColor?: string;
   isThemePreview?: boolean;
+  /** How much longer than built it runs (1 / the options' speed). */
+  durationScale: number;
+  /** Colour from the row's flag ("Flag colors") instead of the theme's. */
+  useFlagColors: boolean;
+  /** Parts switched off ("Customize animation"). */
+  off: ReadonlySet<string>;
+  /** The hearts cover the flag too ("Customize animation"). */
+  coverFlag: boolean;
 };
 
 const LegacyParallelogramsAnimation: React.FC<BaseVariantProps> = ({
@@ -79,23 +95,39 @@ const LegacyParallelogramsAnimation: React.FC<BaseVariantProps> = ({
   pointsAmount,
   containerClass,
   specialStyle,
+  useFlagColors,
+  off,
 }) => {
+  const flagColors = useRowFlagColors(refs.containerRef, useFlagColors);
+  // The blocks stay mounted when switched off: useAnimatePoints' timeline
+  // needs them to show the container.
+  const blockStyle = (index: number): React.CSSProperties => ({
+    ...(flagColors && {
+      backgroundColor: flagColors[index] ?? flagColors[0],
+    }),
+    ...(off.has('blocks') && { visibility: 'hidden' }),
+  });
+
   return (
     <div
       ref={refs.containerRef}
       className={`${containerClass} left-0 justify-center bg-countryItem-douzePointsBg`}
       style={specialStyle}
     >
-      <h4 className="text-countryItem-douzePointsText lg:text-xl md:text-lg xs:text-base text-sm font-bold uppercase">
-        {pointsAmount} {pointsAmount === 1 ? 'point' : 'points'}
-      </h4>
+      {!off.has('label') && (
+        <h4 className="text-countryItem-douzePointsText lg:text-xl md:text-lg xs:text-base text-sm font-bold uppercase">
+          {pointsAmount} {pointsAmount === 1 ? 'point' : 'points'}
+        </h4>
+      )}
       <div
         ref={refs.parallelogramBlueRef}
         className="absolute h-full w-[25%] -translate-x-32 bg-countryItem-douzePointsBlock1 z-50"
+        style={blockStyle(0)}
       />
       <div
         ref={refs.parallelogramYellowRef}
         className="absolute -translate-x-56 h-full w-[25%] bg-countryItem-douzePointsBlock2 z-50"
+        style={blockStyle(1)}
       />
     </div>
   );
@@ -111,8 +143,14 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   sourceNameRef,
   heartsFillColor,
   isThemePreview = false,
+  durationScale,
+  useFlagColors,
+  off,
+  coverFlag,
 }) => {
   const [columns, setColumns] = useState(DOUZE_POINTS_TARGET_COLUMNS);
+  // Flag colours run in bands across the row, in the flag's reading order.
+  const flagColors = useRowFlagColors(refs.containerRef, useFlagColors);
   const [sourceName, setSourceName] = useState<{
     width: number;
     style: React.CSSProperties;
@@ -220,32 +258,49 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
       { length: columns },
       (_, column) =>
         ({
-          '--douze-grow-delay': `${(columns - 1 - column) * growStagger}s`,
+          '--douze-grow-delay': `${
+            (columns - 1 - column) * growStagger * durationScale
+          }s`,
           '--douze-shrink-delay': `${
-            HEARTS_SHRINK_PHASE_START_SECONDS + column * shrinkStagger
+            (HEARTS_SHRINK_PHASE_START_SECONDS + column * shrinkStagger) *
+            durationScale
           }s`,
           '--douze-heart-scale': String(
             maxScale * (Math.random() * 0.2 + 0.95),
           ),
+          ...(flagColors && {
+            color:
+              flagColors[
+                Math.min(
+                  flagColors.length - 1,
+                  Math.floor((column * flagColors.length) / columns),
+                )
+              ],
+          }),
         } as React.CSSProperties),
     );
-  }, [columns]);
+  }, [columns, durationScale, flagColors]);
 
   const hearts = useMemo(() => {
     return Array.from({ length: heartsCount }, (_, index) => index);
   }, [heartsCount]);
 
+  // An invisible copy of the row's flag, so the name sits on the row's name.
+  const flagSpacer = flagClassName && (
+    <div
+      aria-hidden
+      data-douze-flag=""
+      className={`${flagClassName} invisible shrink-0`}
+    />
+  );
+
   return (
     // Mirrors the row's content layout (flag, then name) so the name lands on
     // the row's name to the pixel and the hearts start at the flag's edge.
+    // Covering the flag, the flag's stand-in moves inside the hearts' box:
+    // the hearts span the whole row and the name keeps its place.
     <div className={`${containerClass} left-0 p-0 !opacity-100`}>
-      {flagClassName && (
-        <div
-          aria-hidden
-          data-douze-flag=""
-          className={`${flagClassName} invisible shrink-0`}
-        />
-      )}
+      {!coverFlag && flagSpacer}
       <div
         ref={refs.containerRef}
         className="relative self-stretch flex-1 min-w-0 overflow-hidden flex items-center"
@@ -263,8 +318,12 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
               height: `${(DOUZE_POINTS_ROWS / DOUZE_VISIBLE_ROWS) * 100}%`,
               gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
               gridTemplateRows: `repeat(${DOUZE_POINTS_ROWS}, minmax(0, 1fr))`,
-              '--douze-grow-duration': `${HEARTS_GROW_COLUMN_DURATION_SECONDS}s`,
-              '--douze-shrink-duration': `${HEARTS_SHRINK_COLUMN_DURATION_SECONDS}s`,
+              '--douze-grow-duration': `${
+                HEARTS_GROW_COLUMN_DURATION_SECONDS * durationScale
+              }s`,
+              '--douze-shrink-duration': `${
+                HEARTS_SHRINK_COLUMN_DURATION_SECONDS * durationScale
+              }s`,
             } as React.CSSProperties
           }
         >
@@ -276,30 +335,44 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
             >
               <HeartIcon
                 className={`w-full h-full ${
-                  heartsFillColor ? '' : 'fill-countryItem-douzePointsBg'
+                  heartsFillColor || flagColors
+                    ? ''
+                    : 'fill-countryItem-douzePointsBg'
                 }`}
-                style={heartsFillColor ? { color: heartsFillColor } : undefined}
+                // With flag colours, the column's colour comes from its cell.
+                style={
+                  heartsFillColor && !flagColors
+                    ? { color: heartsFillColor }
+                    : undefined
+                }
               />
             </div>
           ))}
         </div>
-        <h4
-          key={`douze-name-${columns}`}
-          style={
-            {
-              '--douze-name-out-delay': `${HEARTS_SHRINK_PHASE_START_SECONDS}s`,
-              ...(sourceName !== null && {
-                ...sourceName.style,
-                flex: 'none',
-                width: sourceName.width,
-              }),
-            } as React.CSSProperties
-          }
-          data-douze-name=""
-          className={`douze-country-name-animated relative z-50 text-countryItem-douzePointsText ${nameClassName}`}
-        >
-          {countryName}
-        </h4>
+        {coverFlag && flagSpacer}
+        {!off.has('name') && (
+          <h4
+            key={`douze-name-${columns}`}
+            style={
+              {
+                '--douze-name-in-delay': `${0.3 * durationScale}s`,
+                '--douze-name-fade': `${0.4 * durationScale}s`,
+                '--douze-name-out-delay': `${
+                  HEARTS_SHRINK_PHASE_START_SECONDS * durationScale
+                }s`,
+                ...(sourceName !== null && {
+                  ...sourceName.style,
+                  flex: 'none',
+                  width: sourceName.width,
+                }),
+              } as React.CSSProperties
+            }
+            data-douze-name=""
+            className={`douze-country-name-animated relative z-50 text-countryItem-douzePointsText ${nameClassName}`}
+          >
+            {countryName}
+          </h4>
+        )}
       </div>
     </div>
   );
@@ -323,6 +396,7 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   sourceNameRef,
   isThemePreview = false,
   douzePointsAnimationModeOverride,
+  douzeOptionsOverride,
 }) => {
   const globalPointsSystem = useGeneralStore((state) => state.pointsSystem);
   const stageJuryOverride = useScoreboardStore((state) => {
@@ -334,7 +408,7 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   const themeYear = useGeneralStore(
     (state) => state.customTheme?.baseThemeYear ?? state.themeYear,
   );
-  const { douzePointsAnimationMode } = useThemeSpecifics();
+  const { douzePointsAnimationMode, douzeOptions } = useThemeSpecifics();
 
   const resolvedDouzePointsAnimationMode =
     douzePointsAnimationModeOverride ?? douzePointsAnimationMode;
@@ -346,6 +420,11 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   const activeDouzePointsAnimationMode = isKnownDouzePointsAnimationMode
     ? resolvedDouzePointsAnimationMode
     : DEFAULT_THEME_SPECIFICS.douzePointsAnimationMode;
+  // "Customize animation": only what this animation offers.
+  const options = restrictDouzeOptions(
+    douzeOptionsOverride !== undefined ? douzeOptionsOverride : douzeOptions,
+    getDouzeOptionsSupport(activeDouzePointsAnimationMode),
+  );
 
   const containerClass = `absolute overflow-hidden right-0 top-0 bottom-0 z-40 flex items-center opacity-0`;
   const specialStyle = getSpecialBackgroundStyle(
@@ -385,6 +464,10 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
       sourceNameRef={sourceNameRef}
       heartsFillColor={heartsFillColor}
       isThemePreview={isThemePreview}
+      durationScale={douzeDurationScale(options)}
+      useFlagColors={options?.colors === 'flag'}
+      off={new Set(options?.off)}
+      coverFlag={!!options?.coverFlag}
     />
   );
 };

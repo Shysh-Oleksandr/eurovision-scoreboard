@@ -1,3 +1,4 @@
+import type { DouzeOptions } from '@/douze/options';
 import type { ThemeSoundEventId } from '@/theme/themeSoundEvents';
 import {
   BoardAnimationMode,
@@ -56,6 +57,8 @@ export interface CustomTheme {
   roundedCountryContainer?: boolean;
   boardAnimationMode?: BoardAnimationMode;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
+  /** "Customize animation": changes to a spec douze animation (douze/options.ts). */
+  douzeOptions?: DouzeOptions | null;
   themeSpecifics?: Partial<ThemeSpecifics>;
   /** e.g. `montserrat` | `geist` | `dm-sans` — see `normalizeFontAlias` */
   fontAlias?: string;

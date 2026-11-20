@@ -44,6 +44,7 @@ const Board = (): JSX.Element => {
     roundedCountryContainer,
     pointsContainerShape,
     douzePointsAnimationMode,
+    douzeOptions,
   } = useThemeSpecifics();
 
   const countryItemLayoutKey = `${themeYear}:${customThemeId}:${roundedCountryContainer}:${pointsContainerShape}`;
@@ -99,7 +100,7 @@ const Board = (): JSX.Element => {
     isDouzePointsAwarded,
     boardItemAnimationMode,
     layoutOverride?.appearReady,
-    getDouzeMoveDelayMs(douzePointsAnimationMode),
+    getDouzeMoveDelayMs(douzePointsAnimationMode, douzeOptions),
   );
 
   const renderItem = useCallback(

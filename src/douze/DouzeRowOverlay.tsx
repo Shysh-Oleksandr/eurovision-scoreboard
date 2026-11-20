@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 
 import DouzeSpecPlayer from './DouzeSpecPlayer';
+import type { DouzeOptions } from './options';
 import { getDouzeSpec } from './registry';
 
 import { useIsLowPerfDevice } from '@/hooks/useIsLowPerfDevice';
@@ -13,6 +14,8 @@ import type { DouzePointsAnimationMode } from '@/theme/types';
 
 type Props = {
   mode: DouzePointsAnimationMode;
+  /** A custom theme's changes to the animation ("Customize animation"). */
+  options?: DouzeOptions | null;
   /** The points just received (a 12 only counts if the points system says so). */
   pointsAmount: number;
   isThemePreview?: boolean;
@@ -25,10 +28,11 @@ type Props = {
  */
 const DouzeRowOverlay: React.FC<Props> = ({
   mode,
+  options,
   pointsAmount,
   isThemePreview = false,
 }) => {
-  const spec = getDouzeSpec(mode);
+  const spec = getDouzeSpec(mode, options);
   const isLowPerfDevice = useIsLowPerfDevice();
   const globalPointsSystem = useGeneralStore((state) => state.pointsSystem);
   const stageJuryOverride = useScoreboardStore((state) =>

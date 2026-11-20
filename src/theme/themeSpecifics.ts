@@ -1,7 +1,8 @@
 import { normalizeFontAlias } from './fontAliases';
 import { getThemeForYear } from './themes';
-import { ThemeSpecifics } from './types';
+import { DouzePointsAnimationMode, ThemeSpecifics } from './types';
 
+import { sanitizeDouzeOptions } from '@/douze/options';
 import { CustomTheme } from '@/types/customTheme';
 
 export const DEFAULT_THEME_SPECIFICS: ThemeSpecifics = {
@@ -17,11 +18,16 @@ export const DEFAULT_THEME_SPECIFICS: ThemeSpecifics = {
 };
 
 const BOARD_ANIMATION_MODES = ['flip', 'teleport'] as const;
-const DOUZE_POINTS_ANIMATION_MODES = [
+
+/**
+ * Douze animations a theme may use, in the custom-theme editor's order.
+ * Mirrored by the backend's THEME_DOUZE_POINTS_ANIMATION_MODES.
+ */
+export const DOUZE_POINTS_ANIMATION_MODES = [
   'parallelograms',
   'heartsGrid',
   'year2022',
-] as const;
+] as const satisfies readonly DouzePointsAnimationMode[];
 
 const isBoardAnimationMode = (
   value: unknown,
@@ -95,6 +101,12 @@ const sanitizeThemeSpecifics = (
     );
   }
 
+  const douzeOptions = sanitizeDouzeOptions(specifics.douzeOptions);
+
+  if (douzeOptions) {
+    sanitized.douzeOptions = douzeOptions;
+  }
+
   return sanitized;
 };
 
@@ -117,6 +129,7 @@ const mapLegacyCustomThemeSpecifics = (
     roundedCountryContainer: customTheme.roundedCountryContainer,
     fontAlias: customTheme.fontAlias,
     scoreboardFontAlias: customTheme.scoreboardFontAlias,
+    douzeOptions: customTheme.douzeOptions ?? undefined,
   };
 };
 

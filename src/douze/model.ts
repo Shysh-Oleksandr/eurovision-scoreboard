@@ -5,8 +5,8 @@
  * row itself, its flag, name, last-points box and total). Every layer has
  * keyframes on one shared clock, so `DouzeSpecPlayer` can play the whole
  * animation or hold it at any moment (the dev lab at /dev/douze-lab).
- * Built-in specs live in `specs/`; the format is meant to be what a remix
- * form, and later an editor, edits.
+ * Built-in specs live in `specs/`. A custom theme changes one through its
+ * options (options.ts: colours, speed, parts, strength).
  */
 
 /** Row parts a layer can be placed against: `data-douze-anchor` values. */
@@ -142,6 +142,14 @@ interface DouzeLayerBase {
   cutBy?: DouzeAnchor[];
   /** Left out on low-performance and reduced-motion devices. */
   heavy?: boolean;
+  /**
+   * The part of the animation the layer belongs to (one of the spec's
+   * `parts`), which a custom theme can switch off. Layers without one
+   * always play (the 2022 box slide takes over the real 12 box).
+   */
+  group?: string;
+  /** Which strength option scales this layer's opacity (options.ts). */
+  intensity?: 'glow' | 'wash';
 }
 
 export interface DouzeRectLayer extends DouzeLayerBase {
@@ -226,11 +234,22 @@ export interface DouzeAnimationSpec {
    */
   reorder: 'after' | 'before';
   /**
-   * Values for `var(--douze-<key>)` in the layers. With `flagPalette`, `c1`,
-   * `c2`, `c3` and `glow` come from the row's flag instead (flagPalette.ts),
-   * and these are the fallback for flags that can't be read.
+   * Values for `var(--douze-<key>)` in the layers. With `paletteFrom`, `c1`,
+   * `c2`, `c3` and `glow` come from the row instead, and these are the
+   * fallback when it can't be read.
    */
   palette: Record<string, string>;
-  flagPalette?: boolean;
+  /**
+   * `flag`: the country's own colours, read from the row's flag
+   * (flagPalette.ts). `theme`: the theme's 12 box, douze and name colours
+   * (themePalette.ts). Absent: the fixed `palette`.
+   */
+  paletteFrom?: 'flag' | 'theme';
+  /**
+   * The parts a custom theme can switch off (layers' `group`), in the order
+   * the theme editor lists them. Each has a label under
+   * `widgets.themes.visualDetails.douzeOptions.parts`.
+   */
+  parts?: string[];
   layers: DouzeLayer[];
 }

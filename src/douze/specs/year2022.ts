@@ -14,6 +14,9 @@ import type { DouzeAnimationSpec, DouzeKeyframe } from '../model';
  *
  * Colours come from each country's flag, as in the broadcast (bar = first
  * colour, second sweep = second, ring = third; flagPalette.ts).
+ *
+ * `parts` are what a custom theme can switch off (options.ts); the 12 box
+ * slide has no part, as it takes over the real box.
  */
 
 /** Visible from `from` to `to`, switching instantly (the glitch frames). */
@@ -70,18 +73,22 @@ export const year2022Douze: DouzeAnimationSpec = {
   reorder: 'after',
   // Each country in its own flag's colours, as in the broadcast; this
   // palette stays for flags that can't be read.
-  flagPalette: true,
+  paletteFrom: 'flag',
+  parts: ['glitch', 'sweeps', 'burst', 'waves', 'flash', 'wash'],
   palette: {
     c1: '#5ad8ff',
     c2: '#ff4f9a',
     c3: '#ffffff',
     glow: '#ffd6ea',
+    // The wash; a custom theme can tint it (options.ts `veil`).
+    veil: '#ffffff',
   },
   layers: [
     // 0–170 ms: the flag tears. A displaced copy smears up out of it and
     // three torn copies take turns over it.
     {
       id: 'smear',
+      group: 'glitch',
       kind: 'clone',
       source: 'flag',
       heavy: true,
@@ -99,6 +106,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'tearA',
+      group: 'glitch',
       kind: 'clone',
       source: 'flag',
       heavy: true,
@@ -109,6 +117,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'tearB',
+      group: 'glitch',
       kind: 'clone',
       source: 'flag',
       heavy: true,
@@ -119,6 +128,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'tearC',
+      group: 'glitch',
       kind: 'clone',
       source: 'flag',
       heavy: true,
@@ -157,10 +167,13 @@ export const year2022Douze: DouzeAnimationSpec = {
     // the longest), then the whole veil fades.
     {
       id: 'wash',
+      group: 'wash',
+      intensity: 'wash',
       kind: 'rect',
-      // White for the first 1.3 row widths, then a soft edge; the layer's
-      // left end never comes past the row's, so the flag stays covered.
-      fill: 'linear-gradient(90deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.5) 55%, rgba(255,255,255,0) 62%)',
+      // White (the veil colour) at half strength for the first 1.3 row
+      // widths, then a soft edge; the layer's left end never comes past the
+      // row's, so the flag stays covered.
+      fill: 'linear-gradient(90deg, color-mix(in srgb, var(--douze-veil) 50%, transparent) 0%, color-mix(in srgb, var(--douze-veil) 50%, transparent) 55%, transparent 62%)',
       clipTo: 'row',
       box: { anchor: 'row', w: 2.4 },
       keyframes: [
@@ -174,6 +187,8 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'halo',
+      group: 'wash',
+      intensity: 'glow',
       kind: 'rect',
       heavy: true,
       fill: 'transparent',
@@ -188,6 +203,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     // 0–125 ms: bar 1 appears mid-row and sweeps to the right edge.
     {
       id: 'bar',
+      group: 'sweeps',
       kind: 'effect',
       effect: { type: 'tornBar', color: 'var(--douze-c1)', seed: 2022 },
       clipTo: 'row',
@@ -203,6 +219,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     // the right edge (about 17 % of the row a frame), trailing colour.
     {
       id: 'trail',
+      group: 'sweeps',
       kind: 'rect',
       heavy: true,
       fill: 'linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--douze-c2) 30%, transparent) 70%, color-mix(in srgb, var(--douze-c2) 45%, transparent) 92%, transparent 100%)',
@@ -218,6 +235,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'sweep2',
+      group: 'sweeps',
       kind: 'effect',
       effect: { type: 'arc', color: 'var(--douze-c2)', bend: 0.35, width: 2 },
       clipTo: 'row',
@@ -236,6 +254,8 @@ export const year2022Douze: DouzeAnimationSpec = {
     // 80–720 ms: the burst where the flag meets the name, with rays.
     {
       id: 'bloom',
+      group: 'burst',
+      intensity: 'glow',
       kind: 'rect',
       fill: 'radial-gradient(closest-side, rgba(255,255,255,0.95) 0%, color-mix(in srgb, var(--douze-glow) 70%, transparent) 32%, color-mix(in srgb, var(--douze-c2) 25%, transparent) 62%, transparent 100%)',
       box: {
@@ -263,6 +283,8 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'rays',
+      group: 'burst',
+      intensity: 'glow',
       kind: 'effect',
       heavy: true,
       effect: {
@@ -291,6 +313,8 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'star',
+      group: 'burst',
+      intensity: 'glow',
       kind: 'effect',
       effect: { type: 'star', color: '#ffffff' },
       box: {
@@ -317,6 +341,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     // stops until the waves have drained past the total.
     {
       id: 'waves',
+      group: 'waves',
       kind: 'canvas',
       heavy: true,
       painter: {
@@ -372,6 +397,8 @@ export const year2022Douze: DouzeAnimationSpec = {
     {
       // The pink glow at the train's front edge.
       id: 'front',
+      group: 'waves',
+      intensity: 'glow',
       kind: 'rect',
       heavy: true,
       fill: 'radial-gradient(closest-side, color-mix(in srgb, var(--douze-c2) 55%, transparent) 0%, color-mix(in srgb, var(--douze-c2) 20%, transparent) 55%, transparent 100%)',
@@ -391,6 +418,8 @@ export const year2022Douze: DouzeAnimationSpec = {
     // 12 box, inside a soft white glow.
     {
       id: 'beamGlow',
+      group: 'waves',
+      intensity: 'glow',
       kind: 'rect',
       fill: 'radial-gradient(closest-side, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 45%, color-mix(in srgb, var(--douze-glow) 25%, transparent) 75%, transparent 100%)',
       box: { anchor: 'row', w: 0.34, y: -0.4, h: 1.8 },
@@ -399,6 +428,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'beam',
+      group: 'waves',
       kind: 'effect',
       effect: { type: 'beam', core: '#ffffff', edge: 'var(--douze-c2)' },
       clipTo: 'row',
@@ -411,6 +441,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     // the way.
     {
       id: 'ring',
+      group: 'sweeps',
       kind: 'effect',
       effect: { type: 'ring', color: 'var(--douze-c3)', width: 1.6 },
       clipTo: 'row',
@@ -438,6 +469,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     },
     {
       id: 'sweep3',
+      group: 'sweeps',
       kind: 'effect',
       effect: { type: 'arc', color: 'var(--douze-c3)', bend: 0.35, width: 2 },
       clipTo: 'row',
@@ -459,6 +491,7 @@ export const year2022Douze: DouzeAnimationSpec = {
     // and holds while the waves drain into it.
     {
       id: 'boxFlash',
+      group: 'flash',
       kind: 'clone',
       source: 'lastPoints',
       filter: 'brightness(0) invert(1)',

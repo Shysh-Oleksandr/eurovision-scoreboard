@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { ANIMATION_DURATION } from '@/data/data';
+import { type DouzeOptions, douzeDurationScale } from '@/douze/options';
 import { doesDouzePlayBeforeMove } from '@/douze/registry';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
@@ -16,6 +17,8 @@ const useDouzePointsAnimation = (
    * shows as the total changing while the flag stays true.
    */
   awardKey?: number,
+  /** The theme editor's animation options (null: none); otherwise the theme's. */
+  douzeOptionsOverride?: DouzeOptions | null,
 ) => {
   const hideDouzePointsAnimation = useScoreboardStore(
     (state) => state.hideDouzePointsAnimation,
@@ -51,7 +54,13 @@ const useDouzePointsAnimation = (
       ? state.isBoardTeleportAnimationRunning
       : false,
   );
-  const { boardAnimationMode, douzePointsAnimationMode } = useThemeSpecifics();
+  const { boardAnimationMode, douzePointsAnimationMode, douzeOptions } =
+    useThemeSpecifics();
+  // The overlay stays up as long as the animation runs ("Customize
+  // animation" speed: longer when slower, shorter when faster).
+  const slow = douzeDurationScale(
+    douzeOptionsOverride !== undefined ? douzeOptionsOverride : douzeOptions,
+  );
   // Spec animations that play before the move (2022) start at once; the
   // board waits for them instead (useBoardAnimations' move delay).
   const playsBeforeMove = doesDouzePlayBeforeMove(douzePointsAnimationMode);
@@ -72,12 +81,12 @@ const useDouzePointsAnimation = (
       setAnimationPoints(initialPoints);
       timerRef.current = setTimeout(() => {
         hideDouzePointsAnimation(countryCode);
-      }, ANIMATION_DURATION);
+      }, ANIMATION_DURATION * slow);
     } else if (shouldRender) {
       timerRef.current = setTimeout(() => {
         setShouldRender(false);
         setAnimationPoints(null);
-      }, ANIMATION_DURATION / 2);
+      }, (ANIMATION_DURATION / 2) * slow);
     }
 
     return () => {
@@ -97,6 +106,7 @@ const useDouzePointsAnimation = (
     playsBeforeMove,
     // A new 12 with the flag still up restarts the timers too.
     awardKey,
+    slow,
   ]);
 
   return { shouldRender, points: animationPoints, runId };

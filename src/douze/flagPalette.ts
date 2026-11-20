@@ -200,21 +200,25 @@ export const sampleFlagColors = (img: HTMLImageElement): string[] | null => {
 };
 
 /**
- * The spec palette's keys from a flag's colours: `c1`, `c2`, `c3` are the
- * first three colours (a two-colour flag reuses the first for the third),
- * `glow` a pale tint of the first. Very dark colours are lifted so they
- * still read on the dark rows.
+ * The spec palette's keys from up to three `#rrggbb` colours (a flag's, the
+ * theme's or a custom theme's own): `c1`, `c2`, `c3` in order (with fewer,
+ * the first fills in), `glow` a pale tint of the first. With `lift` (the
+ * default), very dark colours are lightened so they still read on the dark
+ * rows; colours someone picked by hand are kept as they are.
  */
-export const paletteFromFlag = (colors: string[]): Record<string, string> => {
+export const paletteFromColors = (
+  colors: string[],
+  { lift = true }: { lift?: boolean } = {},
+): Record<string, string> => {
   const rgb = colors.map(fromHex);
-  const lift = (color: Rgb) =>
-    luminance(color) < 0.12 ? mix(color, [255, 255, 255], 0.4) : color;
+  const lifted = (color: Rgb) =>
+    lift && luminance(color) < 0.12 ? mix(color, [255, 255, 255], 0.4) : color;
   const [first, second = first, third = first] = rgb;
 
   return {
-    c1: toHex(lift(first)),
-    c2: toHex(lift(second)),
-    c3: toHex(lift(third)),
-    glow: toHex(mix(lift(first), [255, 255, 255], 0.65)),
+    c1: toHex(lifted(first)),
+    c2: toHex(lifted(second)),
+    c3: toHex(lifted(third)),
+    glow: toHex(mix(lifted(first), [255, 255, 255], 0.65)),
   };
 };

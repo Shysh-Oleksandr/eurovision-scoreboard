@@ -6,10 +6,8 @@ import ColorOverridePicker, {
   ColorFieldDefinition,
 } from './ColorOverridePicker';
 
-import { getDouzeSpec } from '@/douze/registry';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ThemeColors } from '@/theme/types';
-import { DouzePointsAnimationMode } from '@/types/customTheme';
 
 type ColorField = Omit<ColorFieldDefinition, 'groupKey'>;
 
@@ -17,7 +15,6 @@ interface ColorOverridesSectionProps {
   defaultColors: ThemeColors;
   overrides: Record<string, string>;
   onChange: (overrides: Record<string, string>) => void;
-  douzePointsAnimationMode: DouzePointsAnimationMode;
 }
 
 type EditingColor = {
@@ -32,7 +29,6 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
   defaultColors,
   overrides,
   onChange,
-  douzePointsAnimationMode,
 }) => {
   const t = useTranslations('widgets.themes.colorOverrides');
 
@@ -93,27 +89,6 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       enableOpacity: true,
     },
     { key: 'juryPlaceText', label: t('juryPlaceText') },
-  ];
-
-  const douzePointsColors: ColorField[] = [
-    {
-      key: 'douzePointsBg',
-      label: t('douzePointsBg'),
-      enableGradient: douzePointsAnimationMode === 'parallelograms',
-      enableOpacity: true,
-    },
-    { key: 'douzePointsText', label: t('douzePointsText') },
-  ];
-  const douzePointsParallelogramOnlyColors: ColorField[] =
-    douzePointsAnimationMode === 'parallelograms'
-      ? [
-          { key: 'douzePointsBlock1', label: t('douzePointsBlock1') },
-          { key: 'douzePointsBlock2', label: t('douzePointsBlock2') },
-        ]
-      : [];
-  const allDouzePointsColors = [
-    ...douzePointsColors,
-    ...douzePointsParallelogramOnlyColors,
   ];
 
   const televoteColors: ColorField[] = [
@@ -289,7 +264,6 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
 
     // Add all fields from each group
     addFields(juryColors, 'countryItem');
-    addFields(allDouzePointsColors, 'countryItem');
     addFields(televoteColors, 'countryItem');
     addFields(televoteActiveColors, 'countryItem');
     addFields(finishedColors, 'countryItem');
@@ -313,18 +287,8 @@ const ColorOverridesSection: React.FC<ColorOverridesSectionProps> = ({
       colors: juryColors,
       groupKey: 'countryItem',
     },
-    // Spec-driven animations (the 2022 one) take their colours from each
-    // country's flag, so these overrides would do nothing.
-    ...(getDouzeSpec(douzePointsAnimationMode)
-      ? []
-      : [
-          {
-            id: 'douze',
-            label: t('douzePointsAnimationColors'),
-            colors: allDouzePointsColors,
-            groupKey: 'countryItem' as const,
-          },
-        ]),
+    // The douze animation's colours are edited with the animation, under
+    // Visuals ("Customize animation", DouzeOptionsSection).
     {
       id: 'televote',
       label: t('televoteColors'),

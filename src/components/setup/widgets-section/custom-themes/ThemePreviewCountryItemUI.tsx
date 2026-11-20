@@ -17,6 +17,7 @@ import {
 } from '@/components/countryItem/utils/roundedCountryItemGlow';
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
 import DouzeRowOverlay from '@/douze/DouzeRowOverlay';
+import type { DouzeOptions } from '@/douze/options';
 import { getDouzeSpec } from '@/douze/registry';
 import { getSpecialColorStyle } from '@/helpers/colorConversion';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
@@ -57,6 +58,7 @@ type ThemePreviewCountryItemUIProps = {
   usePointsCountUpAnimation?: boolean;
   roundedCountryContainer?: boolean;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
+  douzeOptions?: DouzeOptions | null;
 };
 
 const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
@@ -73,6 +75,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
   usePointsCountUpAnimation = true,
   roundedCountryContainer = false,
   douzePointsAnimationMode = 'heartsGrid',
+  douzeOptions,
 }) => {
   const { user } = useAuthStore();
   const enableMinimalisticFlags = useGeneralStore(
@@ -119,6 +122,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
       lastPoints,
       true,
       points,
+      douzeOptions ?? null,
     );
 
   const douzePointsRefs = showDouzePointsAnimationHook
@@ -159,6 +163,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
     isDouzePoints: showDouzePointsAnimation,
     douzePointsRefs,
     douzePointsAnimationModeOverride: douzePointsAnimationMode,
+    douzeOptionsOverride: douzeOptions ?? null,
     isThemePreview: true,
     lastPointsAnimationDirection: roundedCountryContainer
       ? 'left-to-right'
@@ -356,6 +361,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
             sourceNameRef={nameRef}
             isThemePreview
             douzePointsAnimationModeOverride={douzePointsAnimationMode}
+            douzeOptionsOverride={douzeOptions ?? null}
           />
         ) : null
       }
@@ -365,6 +371,7 @@ const ThemePreviewCountryItemUI: React.FC<ThemePreviewCountryItemUIProps> = ({
               <DouzeRowOverlay
                 key={douzeRunId}
                 mode={douzePointsAnimationMode}
+                options={douzeOptions}
                 pointsAmount={lastPoints ?? 12}
                 isThemePreview
               />

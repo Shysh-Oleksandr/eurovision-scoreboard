@@ -20,6 +20,8 @@ interface ColorEditorPanelProps {
   defaultValue: string;
   onChange: (value: string | undefined) => void;
   onBack: () => void;
+  /** Where Back returns to; the Colors step's grid by default. */
+  backLabel?: string;
   enableGradient?: boolean;
   enableOpacity?: boolean;
 }
@@ -35,6 +37,7 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
   defaultValue,
   onChange,
   onBack,
+  backLabel,
   enableGradient = false,
   enableOpacity = false,
 }) => {
@@ -102,7 +105,7 @@ const ColorEditorPanel: React.FC<ColorEditorPanelProps> = ({
           onClick={onBack}
           className="!py-1.5 !px-3 text-sm shrink-0"
         >
-          ← {t('colorOverrides.colors')}
+          ← {backLabel ?? t('colorOverrides.colors')}
         </Button>
       </div>
 

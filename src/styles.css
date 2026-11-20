@@ -1773,10 +1773,12 @@ html:root {
   opacity: 0;
 
   /* Fade-in at 0.3s; fade-out when the shrink phase starts (delay from TSX).
-     Eases: power1.out in, power1.in out. */
-  animation: douze-fade-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both,
-    douze-fade-out 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53)
-      var(--douze-name-out-delay) forwards;
+     Eases: power1.out in, power1.in out. A custom theme's speed scales all
+     three times (DouzePointsAnimation.tsx). */
+  animation: douze-fade-in var(--douze-name-fade, 0.4s)
+      cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--douze-name-in-delay, 0.3s) both,
+    douze-fade-out var(--douze-name-fade, 0.4s)
+      cubic-bezier(0.55, 0.085, 0.68, 0.53) var(--douze-name-out-delay) forwards;
 }
 
 /* Voter chips: the overhanging badge row is a size container so the channel

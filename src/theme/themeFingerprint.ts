@@ -7,6 +7,8 @@
  * douze-points-backend/src/themes/theme-fingerprint.ts. Intentionally EXCLUDES
  * name, description, visibility and other metadata — only visual content.
  */
+import { sanitizeDouzeOptions } from '@/douze/options';
+
 export interface ThemeContentInput {
   baseThemeYear?: string;
   hue?: number;
@@ -25,6 +27,8 @@ export interface ThemeContentInput {
   roundedCountryContainer?: boolean;
   boardAnimationMode?: string;
   douzePointsAnimationMode?: string;
+  /** "Customize animation" (douze/options.ts); any shape, sanitized here. */
+  douzeOptions?: unknown;
   themeSounds?: Record<
     string,
     { url?: string; delayMs?: number } | null | undefined
@@ -57,6 +61,16 @@ const normalizedSounds = (
     })
     .sort(([a], [b]) => a.localeCompare(b));
 
+/**
+ * The animation options in canonical form (sorted parts, rounded numbers,
+ * defaults left out), only when there are any, mirroring the backend.
+ */
+const douzeOptionsEntry = (options: unknown) => {
+  const canonical = sanitizeDouzeOptions(options);
+
+  return canonical ? { douzeOptions: canonical } : {};
+};
+
 /** Stable, order-independent canonical JSON string for content comparison. */
 export const themeContentFingerprint = (input: ThemeContentInput): string =>
   JSON.stringify({
@@ -83,6 +97,7 @@ export const themeContentFingerprint = (input: ThemeContentInput): string =>
     ...(input.backgroundVideo
       ? { backgroundVideo: input.backgroundVideo }
       : {}),
+    ...douzeOptionsEntry(input.douzeOptions),
   });
 
 /**
