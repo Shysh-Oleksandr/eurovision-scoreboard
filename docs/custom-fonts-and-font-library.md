@@ -34,7 +34,7 @@ Backend: `douze-points-backend/src/fonts/`. Frontend: `src/theme/fontResolution.
 - `scoreboardFontId?` — custom scoreboard font.
 - Both scoreboard fields absent ⇒ the scoreboard inherits the interface font.
 - `hasCustomFonts` — denormalized (`fontId || scoreboardFontId`), indexed, used
-  by the "With custom fonts" filter in Public Themes.
+  by Includes → Custom fonts in Themes → Community.
 - `customFonts?: { ui?, scoreboard? }` — **attached on read** (`FontsService.attachThemeFonts`,
   called from `ThemesService.hydrateThemes` on every read and mutation response).
   Each entry is a `ThemeFontSnapshot`: `{ _id, name, isVariable, faces: [{ url, format, weight, weightRange }] }`.
@@ -163,7 +163,7 @@ as covered and never synthesises a faux bold. Custom-font scopes additionally se
   variable coverage, per-file slot reassignment, add/remove weight, preview at
   all four weights, "Use this font".
 - Theme cards show a **Font** badge (`hasCustomFonts`) and render their preview
-  in the theme's scoreboard font; Public Themes has a "With custom fonts" filter.
+  in the theme's scoreboard font; Themes → Community can be narrowed with Includes → Custom fonts.
 
 Editor payload rules: `fontAlias` is always sent (the built-in fallback);
 `fontId`, `scoreboardFontAlias`, `scoreboardFontId` are sent when set on

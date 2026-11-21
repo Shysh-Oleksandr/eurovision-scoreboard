@@ -1,8 +1,8 @@
 import { useTranslations } from 'next-intl';
 import { useCallback } from 'react';
-import { toast } from 'react-toastify';
 
 import { useBlockUserMutation, useUnblockUserMutation } from '@/api/blocks';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 
 export interface BlockableUser {

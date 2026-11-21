@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  getOpenPlacesInActiveSection,
+  getQualifierSections,
   getQualifierTargetStageId,
   getTotalQualifiersAmount,
+  groupQualifiersBySection,
   qualifiesOnlyToGrandFinal,
   resolveTargetStageIdForRank,
   shouldShowQualifierTargetLabels,
@@ -138,6 +141,97 @@ describe('qualifierTargetResolution', () => {
           true,
         ),
       ).toBe(false);
+    });
+  });
+
+  describe('qualifier sections', () => {
+    const stages = [
+      { id: 'gf', name: 'Grand Final' },
+      { id: 'sf2', name: 'Wildcard round' },
+    ] as EventStage[];
+
+    it('splits amount-based places in the order they are listed', () => {
+      expect(getQualifierSections(amountBasedTargets, stages)).toEqual([
+        { targetStageId: 'gf', stageName: 'Grand Final', start: 0, size: 5 },
+        {
+          targetStageId: 'sf2',
+          stageName: 'Wildcard round',
+          start: 5,
+          size: 5,
+        },
+      ]);
+    });
+
+    it('splits rank ranges in rank order, whatever order they are listed', () => {
+      const sections = getQualifierSections(
+        [...rankBasedTargets].reverse(),
+        stages,
+      );
+
+      expect(
+        sections.map(({ targetStageId, start, size }) => [
+          targetStageId,
+          start,
+          size,
+        ]),
+      ).toEqual([
+        ['gf', 0, 10],
+        ['sf2', 10, 5],
+      ]);
+    });
+
+    it('skips empty targets and names a missing stage with nothing', () => {
+      expect(
+        getQualifierSections(
+          [
+            { targetStageId: 'gf', amount: 0 },
+            { targetStageId: 'gone', amount: 3 },
+          ],
+          stages,
+        ),
+      ).toEqual([{ targetStageId: 'gone', stageName: '', start: 0, size: 3 }]);
+    });
+
+    it('counts the open places of the target stage being filled', () => {
+      expect(getOpenPlacesInActiveSection(rankBasedTargets, 0)).toBe(10);
+      expect(getOpenPlacesInActiveSection(rankBasedTargets, 7)).toBe(3);
+      expect(getOpenPlacesInActiveSection(rankBasedTargets, 10)).toBe(5);
+      expect(getOpenPlacesInActiveSection(rankBasedTargets, 14)).toBe(1);
+      expect(getOpenPlacesInActiveSection(rankBasedTargets, 15)).toBe(0);
+      expect(getOpenPlacesInActiveSection(undefined, 0)).toBe(0);
+    });
+
+    it('groups qualifiers by their place, keeping their order', () => {
+      const sections = getQualifierSections(
+        [
+          { targetStageId: 'gf', amount: 2 },
+          { targetStageId: 'sf2', amount: 2 },
+        ],
+        stages,
+      );
+      const rank: Record<string, number> = { a: 3, b: 0, c: 2, d: 1 };
+
+      expect(
+        groupQualifiersBySection(
+          sections,
+          ['a', 'b', 'c', 'd'],
+          (code) => rank[code],
+        ),
+      ).toEqual([
+        ['b', 'd'],
+        ['a', 'c'],
+      ]);
+      // By pick order; one past the places lands in the last section.
+      expect(
+        groupQualifiersBySection(
+          sections,
+          ['a', 'b', 'c', 'd', 'e'],
+          (_, index) => index,
+        ),
+      ).toEqual([
+        ['a', 'b'],
+        ['c', 'd', 'e'],
+      ]);
     });
   });
 });

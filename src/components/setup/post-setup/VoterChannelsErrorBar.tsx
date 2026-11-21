@@ -4,48 +4,63 @@ import React from 'react';
 interface VoterChannelsErrorBarProps {
   /** The channel that has no eligible voter. */
   channel: 'jury' | 'televote';
-  onFix: () => void;
+  /** Every voter back to both channels. */
+  onGiveAllBoth: () => void;
+  /** Switch the stage to the one channel that has voters. */
+  onSwitchMode: () => void;
 }
 
 /**
- * Inline validation docked between the modal body and its footer while a
- * Jury and Televote stage has no voter for one of its channels. Stays until
- * resolved; the "Give all voters both" action resets every voter to the default.
+ * Inline validation docked between the tabs and the footer while a Jury and
+ * Televote stage has no voter for one of its channels; Start waits until it
+ * is resolved. Both fixes are right here: every voter back to both channels,
+ * or the stage switched to the channel that has voters.
  */
 export const VoterChannelsErrorBar: React.FC<VoterChannelsErrorBarProps> = ({
   channel,
-  onFix,
+  onGiveAllBoth,
+  onSwitchMode,
 }) => {
-  const t = useTranslations('setup.eventStageModal');
+  const t = useTranslations('setup');
 
   return (
     <div
       role="alert"
-      className="flex flex-wrap items-center gap-x-[11px] gap-y-2 mx-3 xs:mx-5 md:mx-6 mb-3 px-3.5 py-3 rounded-xl text-[13.5px] font-bold leading-[1.4] text-[#ffe2dc]"
-      style={{
-        background:
-          'linear-gradient(var(--badge-red-bg), var(--badge-red-bg)), #120704',
-        border: '1px solid var(--badge-red-bd)',
-      }}
+      className="dp-ss-error mx-3.5 mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl px-3.5 py-2.5 text-[13.5px] font-bold leading-[1.4] 2cols:mx-5"
     >
       <span
-        aria-hidden
-        className="flex-none w-5 h-5 rounded-full grid place-items-center text-xs font-extrabold leading-none text-white bg-[rgb(255,84,104)]"
+        aria-hidden="true"
+        className="dp-ss-error-dot grid size-5 flex-none place-items-center rounded-full text-[12px] font-extrabold leading-none"
       >
         !
       </span>
-      <span className="flex-1 min-w-[200px]">
-        {t.rich(channel === 'jury' ? 'noJuryVoter' : 'noTelevoteVoter', {
-          b: (chunks) => <b className="text-white font-extrabold">{chunks}</b>,
-        })}
+      <span className="min-w-[200px] flex-1 text-pretty">
+        {t(
+          channel === 'jury'
+            ? 'stageSetup.noJuryVoter'
+            : 'stageSetup.noTelevoteVoter',
+        )}
       </span>
-      <button
-        type="button"
-        onClick={onFix}
-        className="ml-auto flex-none px-[11px] py-[7px] rounded-lg bg-white/[0.12] border border-white/20 text-[12.5px] font-extrabold text-white whitespace-nowrap transition-colors hover:bg-white/20"
-      >
-        {t('giveAllVotersBoth')}
-      </button>
+      <span className="ml-auto flex flex-none flex-wrap gap-1.5">
+        <button
+          type="button"
+          onClick={onGiveAllBoth}
+          className="dp-ss-error-act h-9 rounded-lg px-3 text-[13px] font-extrabold"
+        >
+          {t('eventStageModal.giveAllVotersBoth')}
+        </button>
+        <button
+          type="button"
+          onClick={onSwitchMode}
+          className="dp-ss-error-act h-9 rounded-lg px-3 text-[13px] font-extrabold"
+        >
+          {t(
+            channel === 'jury'
+              ? 'stageSetup.makeTelevoteOnly'
+              : 'stageSetup.makeJuryOnly',
+          )}
+        </button>
+      </span>
     </div>
   );
 };

@@ -110,7 +110,6 @@ const DEFAULT_SETTINGS: Settings = {
   randomnessLevel: 50, // 0-100
   pointsSpread: 50, // 0-100; controls the points gap between winners and losers
   diaspora: DEFAULT_DIASPORA_SETTINGS,
-  oddsRankLayout: 'grid',
   votingRankLayout: 'grid',
   lastOpenedSettingsTab: 'General',
   lastOpenedGeneralSettingsCategory: 'contest',
@@ -242,8 +241,6 @@ export interface Settings {
   pointsSpread: number;
   /** Diaspora / country-affinity realism layer for random votes. */
   diaspora: DiasporaSettings;
-  /** Odds rank view: list vs grid layout. */
-  oddsRankLayout: 'list' | 'grid';
   /** Voting predefinition rank view: list vs grid layout. */
   votingRankLayout: 'list' | 'grid';
   /** Last Settings modal tab (General / Odds / Relations). */

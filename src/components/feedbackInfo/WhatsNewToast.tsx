@@ -1,8 +1,8 @@
 'use client';
 
+import { Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
@@ -14,6 +14,7 @@ import {
 import { LATEST_UPDATE_KEY } from './data';
 
 import { ActionToast } from '@/components/common/ActionToast';
+import { toast } from '@/helpers/toast';
 import { getLiveUpdateNotices, liveUpdateBoot } from '@/native/liveUpdate';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -78,7 +79,12 @@ export default function WhatsNewToast() {
             }}
             onLater={() => toast.dismiss(TOAST_ID)}
           />,
-          { toastId: TOAST_ID, autoClose: AUTO_CLOSE_MS, closeOnClick: false },
+          {
+            toastId: TOAST_ID,
+            icon: <Sparkles />,
+            autoClose: AUTO_CLOSE_MS,
+            closeOnClick: false,
+          },
         );
       }, SHOW_DELAY_MS);
     });

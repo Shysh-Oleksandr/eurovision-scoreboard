@@ -1,5 +1,4 @@
 import { useTranslations } from 'next-intl';
-import { toast } from 'react-toastify';
 
 import { useApplyCustomTheme } from './useApplyCustomTheme';
 
@@ -7,6 +6,7 @@ import {
   useToggleLikeThemeMutation,
   useToggleSaveThemeMutation,
 } from '@/api/themes';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 
 export function usePublicThemeActions() {
@@ -18,15 +18,10 @@ export function usePublicThemeActions() {
 
   const handleLike = async (id: string) => {
     try {
-      const res = await toggleLike(id);
-
-      toast.success(
-        res.liked
-          ? t('widgets.themes.themeLikedSuccessfully')
-          : t('widgets.themes.themeUnlikedSuccessfully'),
-      );
+      // The thumb's own state confirms it.
+      await toggleLike(id);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to like theme');
+      toast.error(error?.response?.data?.message || t('common.didntGoThrough'));
     }
   };
 
@@ -60,7 +55,7 @@ export function usePublicThemeActions() {
         );
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save theme');
+      toast.error(error?.response?.data?.message || t('common.didntGoThrough'));
     }
   };
 

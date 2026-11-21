@@ -124,7 +124,13 @@ export const BoardFlag: React.FC<{
 export const BoardCap: React.FC<{
   look: BoardRowLook;
   children?: React.ReactNode;
-}> = ({ look, children }) => {
+  /** The box's width; the board's points box by default. */
+  widthClassName?: string;
+}> = ({
+  look,
+  children,
+  widthClassName = 'w-[28px] md:w-[32px] lg:w-[34px]',
+}) => {
   const wedge = look.pointsShape === 'triangle' && !look.rounded;
 
   return (
@@ -135,7 +141,7 @@ export const BoardCap: React.FC<{
         look.rounded ? 'rounded-r-full' : ''
       } ${
         wedge ? 'ml-[8px]' : ''
-      } self-stretch w-[28px] md:w-[32px] lg:w-[34px] flex-none grid place-items-center`}
+      } self-stretch ${widthClassName} flex-none grid place-items-center`}
       aria-hidden="true"
     >
       {wedge && (

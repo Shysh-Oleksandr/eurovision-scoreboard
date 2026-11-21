@@ -54,6 +54,11 @@ type Props = {
   spec: DouzeAnimationSpec;
   /** Leave out the heavy layers (low-performance / reduced-motion devices). */
   lite?: boolean;
+  /**
+   * A custom entry's chosen colours (`BaseCountry.colors`): with
+   * `paletteFrom: 'flag'` they're used instead of reading the row's flag.
+   */
+  entryColors?: readonly string[] | null;
   /** Hold the animation at this moment (ms) instead of playing it (the lab). */
   heldAtMs?: number | null;
   playbackRate?: number;
@@ -84,6 +89,7 @@ type Geometry = {
 const DouzeSpecPlayer: React.FC<Props> = ({
   spec,
   lite = false,
+  entryColors = null,
   heldAtMs = null,
   playbackRate = 1,
   runKey = 0,
@@ -139,13 +145,20 @@ const DouzeSpecPlayer: React.FC<Props> = ({
       if (box) boxes.set(layer.id, box);
     });
 
-    // The country's own colours, read from the flag on the row (a flag
-    // still loading, as lazy images do, is read again once it has loaded),
-    // or the theme's, read from the row's colour variables.
+    // The country's own colours: a custom entry's chosen ones, or read from
+    // the flag on the row (a flag still loading, as lazy images do, is read
+    // again once it has loaded); or the theme's, read from the row's colour
+    // variables.
+    const ownColors =
+      spec.paletteFrom === 'flag' && entryColors?.length
+        ? [...entryColors]
+        : null;
     const flag =
-      spec.paletteFrom === 'flag' ? findAnchor(parent, 'flag') : null;
+      spec.paletteFrom === 'flag' && !ownColors
+        ? findAnchor(parent, 'flag')
+        : null;
     const loading = new AbortController();
-    let colors: string[] | null = null;
+    let colors: string[] | null = ownColors;
 
     if (flag instanceof HTMLImageElement) {
       colors = sampleFlagColors(flag);
@@ -175,6 +188,7 @@ const DouzeSpecPlayer: React.FC<Props> = ({
     spec.paletteFrom,
     spec.themeColors,
     spec.palette,
+    entryColors,
     flagLoads,
   ]);
 

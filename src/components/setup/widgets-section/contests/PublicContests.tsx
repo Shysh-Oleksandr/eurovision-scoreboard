@@ -1,58 +1,76 @@
 import { ChartColumn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { DateRangeFilter } from '../utils/getFilterDateRange';
+import {
+  DEFAULT_SORT,
+  isFilterSet,
+  resetFilter,
+  contestServerSort,
+  useCreatedFilter,
+  useSortFilter,
+} from '../library/libraryFilters';
+import {
+  LibraryEmpty,
+  LibraryLink,
+  LibraryListHeader,
+  LibraryPlaceLayout,
+} from '../library/LibraryLayout';
+import LibraryToolbar from '../library/LibraryToolbar';
 import WidgetPager from '../WidgetPager';
-import WidgetSearchHeader from '../WidgetSearchHeader';
-import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
+import type { PublicSortKey } from '../WidgetSortBadges';
 
 import ContestListItem from './ContestListItem';
 import GlobalLeaderboardModal from './GlobalLeaderboardModal';
 import { usePublicContestActions } from './hooks/usePublicContestActions';
 
 import { useContestsStateQuery, usePublicContestsQuery } from '@/api/contests';
-import Button from '@/components/common/Button';
 import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useQueryView } from '@/hooks/useQueryView';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { Contest } from '@/types/contest';
 
 interface PublicContestsProps {
-  onLoaded?: () => void;
   onEdit: (contest: Contest) => void;
   onLoad: (contest: Contest) => void;
 }
 
-const PublicContests: React.FC<PublicContestsProps> = ({
-  onLoaded,
-  onEdit,
-  onLoad,
-}) => {
+/**
+ * The Contests library's Community place: everyone's public contests, with
+ * the country leaderboard they add up to on the count line.
+ */
+const PublicContests: React.FC<PublicContestsProps> = ({ onEdit, onLoad }) => {
   const t = useTranslations();
   const activeContest = useGeneralStore((state) => state.activeContest);
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] =
-    useState<Exclude<PublicSortKey, 'copies'>>('latest');
+  const [sortKey, setSortKey] = useState<PublicSortKey>(DEFAULT_SORT);
   const [page, setPage] = useState(1);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
   const debouncedSearch = useDebounce(search, 400);
+  const { sortBy, sortOrder } = contestServerSort(sortKey);
 
-  const serverSortBy =
-    sortKey === 'likes' ? 'likes' : sortKey === 'saves' ? 'saves' : 'createdAt';
-  const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
+  const toFirstPage = useCallback(() => setPage(1), []);
+  const { filter: createdFilter, range } = useCreatedFilter(toFirstPage);
+  const sortFilter = useSortFilter(
+    sortKey,
+    (next) => {
+      setSortKey(next);
+      setPage(1);
+    },
+    { remixable: false },
+  );
+  const narrowed = isFilterSet(createdFilter);
+  const clearFilters = () => resetFilter(createdFilter);
 
   const publicContestsQuery = usePublicContestsQuery({
     page,
     search: debouncedSearch,
-    sortBy: serverSortBy,
-    sortOrder: serverSortOrder,
-    startDate: dateRange?.startDate,
-    endDate: dateRange?.endDate,
+    sortBy,
+    sortOrder,
+    startDate: range?.startDate,
+    endDate: range?.endDate,
   });
   const { data } = publicContestsQuery;
   const view = useQueryView(publicContestsQuery);
@@ -69,97 +87,107 @@ const PublicContests: React.FC<PublicContestsProps> = ({
     !!contestIds.length && !!user,
   );
 
-  useEffectOnce(onLoaded);
+  const contests = data?.contests ?? [];
+  const totalPages = data?.totalPages ?? 0;
+  const searching = !!debouncedSearch.trim();
 
   return (
-    <div className="sm:space-y-4 space-y-2">
-      <div className="sm:space-y-3 space-y-2">
-        <WidgetSearchHeader
-          search={search}
-          onSearchChange={(s: string) => {
-            setSearch(s);
-            setPage(1);
-          }}
-          placeholder={t('widgets.contests.searchContests')}
-          extraActions={
-            <Button
+    <>
+      <LibraryPlaceLayout
+        scrollKey={`${page}|${debouncedSearch}|${sortKey}|${createdFilter.value}`}
+        toolbar={
+          <LibraryToolbar
+            search={search}
+            onSearchChange={(value) => {
+              setSearch(value);
+              setPage(1);
+            }}
+            searchPlaceholder={t('widgets.contests.searchCommunity')}
+            shortSearchPlaceholder={t('widgets.library.search')}
+            filters={[sortFilter, createdFilter]}
+          />
+        }
+      >
+        <LibraryListHeader
+          label={
+            view === 'ready'
+              ? t('widgets.contests.nContests', { count: data?.total ?? 0 })
+              : undefined
+          }
+          onClearFilters={narrowed ? clearFilters : undefined}
+          trailing={
+            <LibraryLink
+              icon={<ChartColumn className="size-4" aria-hidden="true" />}
+              label={t('widgets.contests.leaderboard.chartButtonTitle')}
               onClick={() => setLeaderboardOpen(true)}
-              Icon={<ChartColumn className="w-6 h-6" />}
-              className="justify-center whitespace-nowrap !p-[12.5px]"
-              title={t('widgets.contests.leaderboard.chartButtonTitle')}
             />
           }
         />
-        <WidgetSortBadges
-          value={sortKey}
-          onChange={(k) => {
-            setSortKey(k as any);
-            setPage(1);
-          }}
-          hideCopies
-          dateRange={dateRange}
-          onDateRangeChange={(range) => {
-            setDateRange(range);
-            setPage(1);
-          }}
-        />
-      </div>
+        {view !== 'ready' ? (
+          <QueryNotice
+            view={view}
+            onRetry={() => publicContestsQuery.refetch()}
+            className="py-8"
+          />
+        ) : contests.length > 0 ? (
+          <>
+            <div className="grid gap-4">
+              {contests.map((contest) => (
+                <ContestListItem
+                  key={contest._id}
+                  contest={contest}
+                  variant="public"
+                  onLike={handleLike}
+                  onSave={handleSave}
+                  onLoad={onLoad}
+                  onEdit={onEdit}
+                  isActive={activeContest?._id === contest._id}
+                  likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
+                  savedByMe={!!contestsState?.savedIds?.includes(contest._id)}
+                  quickSelectedByMe={
+                    !!contestsState?.quickSelectedIds?.includes(contest._id)
+                  }
+                />
+              ))}
+            </div>
 
-      {view === 'ready' && (
-        <h3 className="text-white text-lg font-bold">
-          {`Found ${data?.total ?? 0} contests`}
-        </h3>
-      )}
-
-      {view !== 'ready' ? (
-        <QueryNotice
-          view={view}
-          onRetry={() => publicContestsQuery.refetch()}
-        />
-      ) : data && data.contests.length > 0 ? (
-        <>
-          <div className="grid gap-4">
-            {data.contests.map((contest) => (
-              <ContestListItem
-                key={contest._id}
-                contest={contest}
-                variant="public"
-                onLike={handleLike}
-                onSave={handleSave}
-                onLoad={onLoad}
-                onEdit={onEdit}
-                isActive={activeContest?._id === contest._id}
-                likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
-                savedByMe={!!contestsState?.savedIds?.includes(contest._id)}
-                quickSelectedByMe={
-                  !!contestsState?.quickSelectedIds?.includes(contest._id)
-                }
+            {totalPages > 1 && (
+              <WidgetPager
+                page={page}
+                totalPages={totalPages}
+                onPrev={() => setPage((p) => Math.max(1, p - 1))}
+                onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
               />
-            ))}
-          </div>
-
-          {data.totalPages > 1 && (
-            <WidgetPager
-              page={page}
-              totalPages={data.totalPages}
-              onPrev={() => setPage((p) => Math.max(1, p - 1))}
-              onNext={() => setPage((p) => Math.min(data.totalPages, p + 1))}
-            />
-          )}
-        </>
-      ) : (
-        <div className="text-center sm:py-12 py-8">
-          <p className="text-white/70">
-            {t('widgets.contests.noContestsFoundMatchingYourSearch')}
-          </p>
-        </div>
-      )}
+            )}
+          </>
+        ) : (
+          <LibraryEmpty
+            message={t('widgets.contests.noContestsFoundMatchingYourSearch')}
+            action={
+              narrowed
+                ? {
+                    label: t('widgets.library.clearFilters'),
+                    onClick: clearFilters,
+                  }
+                : searching
+                ? {
+                    label: t('widgets.library.clearSearch'),
+                    onClick: () => {
+                      setSearch('');
+                      setPage(1);
+                    },
+                  }
+                : undefined
+            }
+          />
+        )}
+      </LibraryPlaceLayout>
 
       <GlobalLeaderboardModal
         isOpen={leaderboardOpen}
         onClose={() => setLeaderboardOpen(false)}
       />
-    </div>
+    </>
   );
 };
 

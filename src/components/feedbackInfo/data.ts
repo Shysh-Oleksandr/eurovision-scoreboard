@@ -413,6 +413,11 @@ const OLD_WHATS_NEW = [
 
 const WEBSITE_UPDATES: UpdateItem[] = [
   {
+    date: '2026-11-21',
+    title:
+      '<list><item>Added the Next year button: when a contest is over, start the next edition from it.</item><item>Custom entries can have their own colours (up to three), used by the douze points animation and the winner’s confetti</item><item>Redesigned the predefined voting table: pick the points from the bar under the table, tap a voter’s flag to give its whole vote at once, and use "Fill the rest" to randomize only the missing votes</item><item>When a semi-final sends entries to more than one stage (e.g., places 1–10 to the final and 11–16 to a wildcard round), the qualifiers you pick fill those stages in order, and the list shows who goes where. The qualifiers’ flags now fill their space without gaps</item><item>Redesigned the Themes and Contests libraries: Yours, Saved and Community, simpler filters and cleaner cards</item><item>Redesigned the profiles, yours and other fans’</item><item>Redesigned the stage setup that opens before each stage: the running order as scoreboard rows, an Add voters list next to the voters, and Undo for bulk changes</item><item>Redesigned the stage editor: choose "How many" or "Which places" go through, with a one-line summary that points out gaps and overlaps as you type</item><item>Redesigned the Odds settings: a table with the controls beside it, the ranking shown as scoreboard rows with the real odds, a "Set all odds" menu and Undo</item><item>Redesigned the notifications: they show at the top, and there are fewer of them</item><item>Fixed the douze points animation covering the total on some custom themes</item></list>',
+  },
+  {
     date: '2026-11-20',
     title:
       '<list><item>Added the ESC 2026 douze points animation (gold sweep) to the 2026 theme. Custom themes can use it too</item><item>Customize the douze points animation in your custom themes: colours (flag, theme or your own), speed, which parts play and how strong the glow is. Find it in the theme editor’s Visuals tab, under Customize animation</item></list>',
@@ -563,8 +568,12 @@ export const LATEST_UPDATE_KEY: string | null = WHATS_NEW[0]
 
 export const UPCOMING_FEATURES: UpdateItem[] = [
   {
-    approximateDates: { start: '2026-11-21', end: '2026-11-22' },
+    approximateDates: { start: '2026-11-22', end: '2026-11-23' },
     title: "Override the country's official flag and name",
+  },
+  {
+    approximateDates: { start: '2026-11-22', end: '2026-11-23' },
+    title: "New Douze Points animations",
   },
   {
     approximateDates: { start: '2026-10-10', end: '2026-10-18' },

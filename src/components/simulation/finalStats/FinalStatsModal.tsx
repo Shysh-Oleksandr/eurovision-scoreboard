@@ -8,7 +8,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
@@ -29,6 +28,7 @@ import {
   downloadVoteSpreadsheet,
 } from '@/components/setup/voting-predefinition/voteSpreadsheet';
 import { VoteSpreadsheetButtons } from '@/components/setup/voting-predefinition/VoteSpreadsheetButtons';
+import { toast } from '@/helpers/toast';
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 import { Country, StageVotingType, StatsTableType } from '@/models';
 import { playHaptic } from '@/native/haptics';

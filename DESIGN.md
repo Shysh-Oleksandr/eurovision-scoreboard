@@ -383,6 +383,138 @@ screens.
 - Screens redesigned in the hub's style add `dp-flat` to the modal content
   so their surface buttons lose the drop shadow, as in the hub.
 
+### Profile modals (`ProfileModal`, `UserProfileModal`, `.dp-profile-*`)
+
+**Who it is stays beside what they made.** From 1024px the person sits in
+a 290px column left of the list (the spokesperson column's idea): flat
+`--p-950`, hairline, 16px radius, sticky while the list scrolls; the modal
+widens to 1040px. Below that the same block is a band above the list that
+scrolls away. The frame is the libraries': a header with "Profile", your
+own profile's two views beside it, and × to close; no Close bar. On phones
+the views move to a bar at the bottom.
+
+- **Identity:** avatar (88px in the column, 64px in the band; the theme's
+  placeholder without a picture), the name (22px / 19px, 800) with the
+  heart flag, @username, the joined date, then one hairline-framed line of
+  plain stats: "128 followers ›" (opens the list) and "12 public items".
+  No big-number stat blocks.
+- **Actions** (`ProfileActions`): a stack of 46px buttons in the column; on
+  phones one row, the first stretching and the others dropping their
+  labels when they don't fit (`dp-act-label`). Another fan: Follow is the
+  one accent fill (a surface "Following" once followed; signed out the
+  disabled button says "Sign in to follow"), then Share profile and Entry
+  leaderboard; report and block sit in the ⋯ in the corner. Your own:
+  Edit profile, Account, Share profile, all surface buttons, left-aligned
+  in the column.
+- **Your profile / Following feed** are tabs in the segmented well, like
+  the libraries' places: in the header from `2cols`, in the bottom bar on
+  phones (44px segments that share its width). Both views stay mounted.
+- **The list's toolbar** (`ContentListToolbar`): All / Themes / Contests /
+  Designs as a segmented well (`ContentTypeBadges`: icons, then labels
+  only, then two rows) beside the search while both fit, else above it;
+  under them Sort by and Created as caption selects (`WidgetSortBadges`,
+  `CaptionSelect`: the name in small type over the value, a menu with the
+  choice checked) and "Found 12 items" at the row's end, or under the
+  selects when it doesn't fit. Never rows of filter chips.
+- Theme, contest and design cards are the libraries' own; neighbouring
+  designs share one gallery grid, so they sit two to a row. Previous /
+  Next (`WidgetPager`) are quiet buttons with chevrons, sentence case.
+
+### Libraries: Themes and Contests (`widgets-section/library/`, `.dp-lib-*`)
+
+**The list gets the screen.** One frame for both modals (`LibraryModal`):
+a flat `--p-950` surface, the title with the three places beside it,
+**Yours / Saved / Community** (the simulation's segmented well, real tabs
+with arrow keys), and × to close. Saved is a place of its own, as in the
+Graphics library. On phones the places move to a bar at the bottom where
+Close used to be; × stays at the top. Each place mounts on its first
+visit and keeps its search, sort and page.
+
+- **Toolbar** (`LibraryToolbar`, fitted): the search (a recessed frame,
+  16px text on phones), then Sort by, Created (Community) and Includes
+  (themes' Community: audio, custom fonts, background video, any mix) as
+  caption selects (`CaptionSelect`, `LibraryMultiSelect`), then the place's
+  one action as a surface button (New theme, Save current contest). When
+  the row doesn't fit, the selects share a row under the search. Phones
+  keep one row: the search, a Sort button that names the current sort (an
+  accent dot when a filter is also set) and opens Sort and filter as the
+  simulation's sheet (choices as tiles, Clear, Done), and the action as an
+  icon.
+- **Groups** (`LibraryFolderRail`, Yours): one row of pills that scrolls
+  sideways and fades at its edges; the chosen one is followed by its Edit
+  button, then a quiet New group.
+- **The toolbar and groups scroll away with the list** (they're used less
+  than the height is needed); the header with the places stays. Previous /
+  Next scroll back to the top.
+- **One quiet line over the list** (`LibraryListHeader`, 13px 700 at 70%):
+  the count ("21,895 themes", grouped by the locale), Clear filters in the
+  accent tint while Created or Includes is set, and the list's stats as a
+  labelled link at the end (Your entry stats, Country leaderboard). Never an
+  unlabelled chart icon.
+- **In use**: the applied theme / loaded contest heads Yours under its own
+  line on page 1 while nothing narrows the list.
+- **Empty states** say what would be here and offer one action: New
+  theme / Save current contest, Clear search, Clear filters, or Browse the
+  community from an empty Saved.
+- **Cards** keep their layout, never a tracked-caps kicker or chips. A
+  theme card: the name with its date on the right, then one line of facts
+  with small icons: Private / Public (your own only), the group, what it
+  adds (Audio, Custom fonts, Background video). A contest card's name lives
+  in the host panel; its right column ranks the facts by type instead of
+  giving each an icon: the description, then the stages (14px 700, white),
+  the entries ("137 participants, 25 finalists", 13px, 75%), then the rest
+  quietly (12.5px, 55%, at most two lines, each fact kept whole): the date,
+  Private / Public, the group, custom entries, theme, venue, hosts, points
+  system. The status (winner, In progress, Not started yet) is one neutral
+  pill in the host panel. Load is the flat `cta`, like Apply. Your own
+  items skip the creator row. Theme cards keep the theme's own surface and
+  accent; contest cards are flat `--p-900`.
+- **A theme preview's state** (Jury, Televote, Active, Finished,
+  Unqualified) sits in the preview's top-left corner as a quiet tint, never
+  a row of five: ‹ › step through the states (round the end, the arrows
+  first so they stay put), the name opens them all as a menu. No
+  translation outgrows it, and the card loses a row. A tap on the row
+  still awards 12.
+- Counts drop the locale's no-break space ("21 903 теми"): Gotham draws it
+  25em wide.
+
+### Settings modal and Odds (`settings/`, `.dp-settings-*`, `.dp-odds-*`)
+
+**The libraries' frame, the simulation's layout.** Settings uses the
+libraries' frame (`SettingsModal`, `SegmentedTabs`): the title with
+General / Odds / Relations beside it and × in the header; on phones the
+tabs sit in a bar at the bottom. Each tab scrolls on its own and is
+remembered. General and Relations keep their own content inside it.
+
+- **Odds is the board with its column** (`OddsSettings`): the countries on
+  the left, one 288px column of controls on the right that stays put
+  (sticky) while the list scrolls under its sticky header. In order: Numbers
+  / Ranking, Jury / Televote (Ranking), one line of help or the last
+  change's line with Undo, Set all odds, then Randomness and Points spread
+  under a hairline. Narrower than 700px (a container query, so the stage
+  setup's Odds tab gets it on narrow windows too) the column folds above the list: Numbers
+  / Ranking shares a row with "Set all", and the two sliders become caption
+  combos (name over value) that open their slider in place.
+- **Numbers is a table that keeps its labels** (`OddsTable`): flag, name,
+  then Jury and Televote fields under column headers with the stats
+  Summary's swatches (white 45%, accent). Headers sort on click (A–Z,
+  highest first), never while typing. Fields are text with the decimal
+  keypad, right-aligned tabular figures in the language's decimal mark;
+  Enter / ↓ / ↑ move down and up a column; empty shows a faint 50; over
+  1000 is outlined red while typed and becomes 1000.
+- **Ranking is the scoreboard it predicts** (`OddsRankList`): the theme's
+  jury rows (`BoardFlag`, `BoardCap` widened for "83.5") with the country's
+  real odds in the points box, places in their own column that stays put
+  while a row is dragged. No medal colours, no coloured side bars. A drop
+  re-spaces the channel; the help line says so before, and the change's
+  line with Undo after, while the dropped row keeps an accent ring.
+  Keyboard: Space picks a row up, arrows move it, Space puts it down.
+- **Bulk changes are one menu that names outcomes** (Set all odds): Default
+  odds ("Based on the real 2026 results"), Even odds, Random odds, the two
+  copy directions, and in a stage's override Global odds first. Each leaves
+  a line ("Every country is at 50. Undo") until the next change; never a
+  row of equal uppercase buttons.
+
 ### Custom entry editor (`CustomCountryModal`, `setup/custom-entry/`)
 
 **The entry is shown as the board will draw it.** On top, the entry as the
@@ -409,6 +541,16 @@ theme's flag shape, not in a loose rectangle.
   hint line says the entry was saved without it and Save retries on the same
   entry. A link that doesn't load an image blocks Save with an error under
   the field.
+- **Colors** (`EntryColorsField`) sit under the flag: the same segmented
+  well (From the flag, Custom) and, for Custom, up to three 46px swatches
+  (main colour first) and a quiet + tile. Custom starts from the colours
+  read from the chosen flag (one white swatch with the picker open when it
+  can't be read). A tapped swatch takes the accent ring and opens the
+  Colors step's picker inline under the row (no popover: the modal is full
+  screen on phones), its presets the flag's colours, then common flag
+  colours; Remove color (quiet) and Done under it. The swatches show the
+  entry's own data, so they're the one place here with colours that aren't
+  the theme's.
 - **Footer** (`EntryActionBar`): Delete entry is quiet red text, and when
   creating, an "Add another" check (kept for the session) sits there instead:
   Save then clears the form and keeps the group. The bar is fitted: one row,
@@ -416,10 +558,118 @@ theme's flag shape, not in a loose rectangle.
 - Each custom-entry group's header has a + that opens a new entry in that
   group.
 
+### Stage editor (`EventStageModal`, `setup/event-stage/`)
+
+**Say where everyone goes, in places.** A stage ends as a ranking, so "Who
+goes through" is written in its terms: one line under the rows reads the
+result back ("10 of 15 entries go through.", "Places 1–10: Grand Final,
+11–14: Semi-Final 2, 15: out."), with the stage's size only when it's known
+(not while earlier stages still send entries in).
+
+- **Name and Voting mode are wells with their caption inside**
+  (`dialogFields` `Field`; the voting well covers a native select), and the
+  selected voting mode explains itself in one hint line.
+- **Two ways to set qualifiers are one segmented well** (How many / Which
+  places), not a switch: switching converts the numbers both ways.
+- **One row per stage in running order** (`.dp-qual-row`): the stage being
+  edited is an outlined row marked "This stage", stages that run earlier
+  say "Runs earlier" instead of showing disabled controls, and later stages
+  get −/count/+ or a first–last place pair. A row's × appears only when it
+  has a value, in a slot kept so the fields never shift. Names wrap to two
+  lines; when the list is too narrow for a readable name beside the fields
+  (a container query), the fields move under the name.
+- **Errors name the rows** while you type ("Place 8 goes to two stages: …",
+  "Place 11 has no stage yet.") and outline only the fields involved; a
+  half-typed range waits until you leave its row. An empty first field
+  shows the next free place as its placeholder.
+- **Order is dragged by the grip** (`SortableKnob`, so rows scroll on
+  touch). A move that leaves a target running earlier says so under the
+  rows, with Undo.
+- Save waits for a change; Enter in any field saves; Delete stage is quiet
+  red text in `EntryActionBar`.
+
+### Stage setup (`PostSetupModal`, `setup/post-setup/`, `.dp-ss-*`)
+
+**The last look before the show.** Start opens it before each stage. The
+libraries' frame at 1040 × 740: the stage's name as the title, Running order
+/ Voters / Odds / General as the segmented well beside it (under it when they
+don't fit, fitted with `useFitStep`: then the short "Order" label, then less
+padding; always under it on phones), × to close. The footer reads the stage
+back ("15 entries, 17 voters", a hairline, the voting mode) beside a quiet
+Cancel and Start, the one filled button; phones keep only Start. Closing asks
+first only when something differs from what the modal opened with (Undo back
+to the start counts as nothing). Each tab mounts on its first visit and
+scrolls on its own.
+
+- **Bulk changes are one menu that names outcomes**, as in Odds: the running
+  order's Order (A to Z, Z to A, Shuffle, Draw halves with its explanation,
+  Remove halves, Back to the saved order) and the voters' Set voters
+  ("Replace the list with": the year's real voters, this stage's entries,
+  entries from other stages, every entry; then the sorts, then Clear all in
+  red text). Each leaves a line under the toolbar with Undo; the line is the
+  tab's help until then. No rows of unlabeled icons.
+- **The running order is the board before the first vote**: the theme's jury
+  rows (`useBoardRowLook`, `BoardFlag`, `BoardCap`), numbered outside the row,
+  in two columns that read down from 600px (one on phones). Drawn halves are
+  the two columns; the points box of each row moves it to the other half.
+  Share is a surface button in the toolbar.
+- **Voters are numbered**, because the order is the spokespersons' order, as
+  quiet tiles with a quiet line under the name only for exceptions (Auto-Q,
+  the stage a voter performs in, Jury only); one column on phones so names
+  never become stubs. Add voters is a 336px column beside them (search, one
+  Group caption select, the group's countries with their stage, "18
+  countries" with Add all) and the simulation's sheet behind Add on phones.
+- **Channels is a labelled toggle** that turns the voters into a table that
+  keeps its labels: Jury and Televote columns with the stats' swatches and
+  the counts in the headers, 44px check buttons, the last channel locked.
+  No channel empty: the error bar above the footer offers both fixes in place.
+- **General** is the stage editor's voting well with its hint, then pressed
+  toggles with a check (`StageToggle`) whose hint says whether the stage
+  follows Settings, then Points with "Same as Settings." or "Only this
+  stage. Use Settings' points", a preset well, and each points system as a
+  strip of tiles in a well: the value as a field, its star (the douze
+  animation) and × inside the tile, a dashed + tile, a legend under it.
+- Buttons inside sortable rows use `noDrag` so a tap never starts a drag; a
+  dragged row lives in `<body>` (`dp-ss-dragged`, above the modal).
+
 ### Menus (`AnchoredMenu`)
 
 No entrance animation (a fade reads as a slow click). Section headers in
 sentence case (`plainHeaders`).
+
+### Toasts (`src/app/toast-root.tsx`, `src/helpers/toast.ts`, `.dp-toast`)
+
+**The answer, not an interruption.** A toast says what just happened when
+the place it happened can't (a menu closed, a dialog saved and left, a
+background event). When the answer can sit where the user is looking, it
+goes there instead: a field's error under the field, a toggle's new state
+on the toggle (likes and follows have no success toast).
+
+- **Top centre, as wide as the text** (up to 420px): every header keeps its
+  actions top right, and the centre is free on all of them. Phones: a card
+  8px under the status bar (and the offline strip), never a full-width band.
+  Newest on top, 8px apart, three at most.
+- **The menus' material:** `.dp-menu`'s dark gradient, `--hair-2` border,
+  14px corners, a shadow (toasts float), the theme's interface font at
+  13.5px/700, 46px minimum height. No fills by status and no countdown bar.
+- **Status is the icon's colour only:** the accent for done, the ballot dots'
+  fixed hues for warnings (#e6b23c) and errors (#ff5d70, plus a faint red
+  border), `--ink-70` for information and decisions.
+- **One action at most**, as text in the accent tint (`toastWithAction`):
+  it follows the message, or moves under it with its label lined up with the
+  text when both don't fit. It answers in place ("Copied") and the toast
+  leaves 1.2s later; it never raises a second toast. A decision (update
+  ready, What's new: `ActionToast`) is the only toast with a CTA, beside a
+  quiet Later, and stays until answered.
+- **Timing by reading time** (`toastDuration`): confirmations 2–6s, a toast
+  with an action 6s, errors and warnings 5–10s with a close button. All pause
+  while hovered. Dismiss: tap, or swipe up.
+- **Screen readers:** confirmations are `role="status"`, only errors
+  `alert`. The same text of the same type isn't stacked twice.
+- **Motion:** rises 12px from the top edge and settles (320ms, ease-out),
+  leaves by lifting 8px and fading (180ms); a fade under reduced motion.
+- Import `toast` from `@/helpers/toast`, not from react-toastify, so these
+  defaults apply. Text is always translated; English only for admin pages.
 
 ### Simulation view (`columnLayout/`, `.dp-sim-*`)
 
@@ -547,6 +797,37 @@ changes the other.
   cell lights its row and column, outlines the cell in the accent and says
   the vote in the line above the table ("Croatia gave Israel 16 points: jury
   8, televote 8"); a ramp on that line's right reads the shading.
+
+### Voting predefinition (`setup/voting-predefinition/`, `.dp-vp-*`)
+
+**The matrix is the Breakdown, made editable.** The Detailed tab draws the
+stats Breakdown's table (codes under the voters' flags with each vote's
+status dot, hairlines between rows only, white shading, the top value in the
+accent tint, "–" for a country's own cell, codes in the frozen column below
+560px) in a flat `--p-950` well. The mechanics are in
+docs/voting-predefinition.md §3.1.
+
+- **The modal fits the matrix.** From `md` it grows, measured, until the
+  whole table shows (up to the viewport), never below its usual 64rem ×
+  720px, and keeps that size on every tab.
+- **One selected cell**, outlined in the accent, its voter's code and
+  country's name in the accent tint, its row and column lit. With a mouse
+  cells are fields; on touch they are 40px buttons, and no keyboard opens.
+- **The points bar** sits under the matrix: one line (the voter's flag, the
+  readout or a notice, quiet actions on the right, labels dropping to icons
+  when they don't fit) over the voter's points as chips in balanced rows
+  (10 chips are one row or two of 5, never 9 and 1). Free chips are quiet
+  fills; a used one is a hairline outline with its holder's code under the
+  value; the cell's own one is ringed in the accent; in a whole vote the
+  next value is the accent fill. With nothing selected the chips are a
+  disabled legend, so the bar's height never jumps.
+- **A whole vote** lights the voter's column (white tint, its header
+  outlined in the accent like a selected cell) and shows the next value
+  faintly in an empty field on hover.
+- **Header:** fitted (one row; the tab's controls on a second row; on
+  phones stretched tabs, Reset only in ⋯, icon-only Share and Randomize).
+  "Predefine votes" is a sentence-case caption before the stage name, left
+  out on phones.
 
 ### Share image modal (`simulation/share/`, `.dp-share-*`)
 

@@ -48,15 +48,17 @@ The app is essentially a **single-page application** -- everything happens at `/
 - **Flexible stage creation** (`EventStageModal`): Create unlimited custom stages (Heats, Quarter-finals, etc.) with:
   - Custom stage name
   - Voting mode per stage: **Jury + Televote** (two separate rounds), **Televote only**, **Jury only**, **Combined** (both in one round per country)
-  - Qualifier targets: count-based (N entries advance) or rank-based (different rank ranges go to different follow-up stages)
+  - Who goes through (qualifier targets): "How many" (N entries advance) or "Which places" (different place ranges go to different follow-up stages); the editor reads the result back in one line and names gaps and overlaps while you type
 - **Stage reordering** (`StageReorderModal`): Drag-and-drop reorder of stages
-- **Custom country/entry creation** (`CustomCountryModal`, `setup/custom-entry/`): Add fictional or non-standard entries; a live preview draws the entry as the theme's board row; one flag picker (your flags, presets, country flags, an upload or an image link); "Add another" for making many in a row; the + on a group's header starts an entry in that group. Design rules in DESIGN.md "Custom entry editor"
+- **Custom country/entry creation** (`CustomCountryModal`, `setup/custom-entry/`): Add fictional or non-standard entries; a live preview draws the entry as the theme's board row; one flag picker (your flags, presets, country flags, an upload or an image link); its colours ("From the flag", or up to three picked by hand, used by the douze animations' flag colours and the winner confetti: `data/countries/entryColors.ts`); "Add another" for making many in a row; the + on a group's header starts an entry in that group. Design rules in DESIGN.md "Custom entry editor"
 - **Custom entry categories**: Organize custom entries into groups
 - **Bulk selection**: Multi-select entries in a section and move them in bulk to another stage (`SectionMultiselectContext`)
 - **Not Participating section**: Manage excluded countries, create custom entries
-- **Post-Setup Modal** with two tabs:
-  - **Running order**: Drag-and-drop reorder, quick sort options, share running order as image
-  - **Voters**: Select/manage which countries vote in each stage, including "Rest of the World"
+- **Stage setup** (`PostSetupModal`, `setup/post-setup/`), opened by Start before each stage, in the libraries' frame (the stage's name, four tabs, ×; the footer reads the stage back beside Start, and closing asks only when something changed). Design rules in DESIGN.md "Stage setup":
+  - **Running order**: the theme's board rows in two columns reading down; drag to reorder; the Order menu (A to Z, Z to A, Shuffle, Draw / Remove halves, Back to the saved order) leaves a line with Undo; halves are the two columns; Share opens the running order as an image
+  - **Voters**: numbered in spokesperson order, with an Add voters column (search, groups) beside them or a sheet on phones; Set voters replaces the list (the year's real voters, this stage's entries, other stages', every entry), sorts or clears it, with Undo; Channels turns the list into a Jury / Televote table (`docs/voter-channels.md`); "Rest of the World" can be added
+  - **Odds**: Settings' Odds tab on a per-stage draft (`docs/stage-odds-override.md`)
+  - **General**: voting mode (with its hint), predefined votes for the stage, and the stage's points (says whether they're Settings' or its own)
 - **Voting Predefinition** (`VotingPredefinitionModal`): Pre-define all votes before simulation, with:
   - Full voting table (voter x country matrix) — used to actually run the simulation
   - Totals tab (enter total points per country directly) — share-only, not usable for simulation
@@ -80,9 +82,10 @@ avatar, name and followers count; "Sign in" when signed out).
 - **User Profile modal** (other users): View public themes, contests, follow/unfollow
 
 #### Themes Widget
-- **Themes modal** with tabs:
-  - **Your Themes**: List of user-created custom themes
-  - **Public Themes**: Browse community-shared themes
+- **Themes modal** (`widgets-section/library/` frame, see DESIGN.md "Libraries") with three places:
+  - **Yours**: your custom themes, in groups, with the theme in use on top and New theme
+  - **Saved**: other people's themes you saved
+  - **Community**: everyone's public themes; Sort by, Created and Includes (audio, custom fonts, background video)
 - **Custom Theme Builder** (`CustomizeThemeModal` - 1405 lines!): Extensive customization:
   - Primary hue/shade color picker
   - Background image URL
@@ -103,9 +106,10 @@ avatar, name and followers count; "Sign in" when signed out).
 - **Like/save themes**
 
 #### Contests Widget
-- **Contests modal** with tabs:
-  - **Your Contests**: User's saved contests
-  - **Public Contests**: Browse community contests
+- **Contests modal** (same frame) with three places:
+  - **Yours**: your saved contests, in groups, with the loaded contest on top, Save current contest and Your entry stats
+  - **Saved**: other people's contests you saved
+  - **Community**: everyone's public contests; Sort by and Created, and the Country leaderboard
 - **Create Contest modal**: Save current simulation setup + results as a contest with:
   - Name, description, year, venue, hosts
   - Hosting country selection
@@ -169,7 +173,7 @@ avatar, name and followers count; "Sign in" when signed out).
 
 - **Winner celebration**:
   - **Winner Modal** (`WinnerModal.tsx`): Sparkle effects, flag display, points, delay-open animation
-  - **Winner Confetti** (`WinnerConfetti.tsx` → `effects/confetti/ConfettiShower.tsx`): canvas confetti drawn with the user's amount, duration, fall speed and colours (Rainbow, the theme's accents, or the winner's flag read off its image by `confettiColors.ts`); `confettiPlan.ts` maps the settings to react-confetti options. It marks `isWinnerAnimationAlreadyDisplayed` once the last piece has fallen
+  - **Winner Confetti** (`WinnerConfetti.tsx` → `effects/confetti/ConfettiShower.tsx`): canvas confetti drawn with the user's amount, duration, fall speed and colours (Rainbow, the theme's accents, or the winner's flag read off its image by `confettiColors.ts`, or a custom entry's own colours); `confettiPlan.ts` maps the settings to react-confetti options. It marks `isWinnerAnimationAlreadyDisplayed` once the last piece has fallen
 
 - **Final Stats** (`finalStats/`, `FinalStatsModal`; look in DESIGN.md "Stats modal"):
   - **Summary** (opens first, `SummaryView`): the result with total, jury and televote points and places, and a jury / televote bar under each name
@@ -192,7 +196,7 @@ avatar, name and followers count; "Sign in" when signed out).
 
 ### 4. Settings (`components/settings/`)
 
-Two tabs: **General** and **Odds**
+Three tabs: **General**, **Odds** and **Relations**, in the libraries' frame: the title with the tabs beside it and × in the header; on phones the tabs sit in a bar at the bottom (`SettingsModal.tsx`, `common/SegmentedTabs.tsx`).
 
 #### General Settings - Contest Section
 - Contest name (Eurovision / Junior Eurovision)
@@ -239,10 +243,13 @@ Two tabs: **General** and **Odds**
 #### General Settings - Confirmations
 - Per-action confirmation toggles
 
-#### Odds Settings
-- Per-country jury and televote odds
-- Year-based odds presets (based on actual results)
-- Odds import/export
+#### Odds Settings (`OddsSettings.tsx`, `settings/odds/`)
+- Laid out like the simulation: the countries on the left, one column of controls on the right that stays put; below 700px the column folds above the list and the two sliders into combos
+- **Numbers**: a table with Jury and Televote columns; headers sort (A–Z, highest first) on click; Enter / ↓ / ↑ move down and up a column; either decimal mark; empty counts as 50; values over 1000 become 1000
+- **Ranking**: the countries as the theme's board rows with their real odds in the points box; dragging one (or Space, arrows, Space) re-spaces that channel's odds by the order and Points spread
+- **Set all odds** menu: Default odds (the year's, from the real results), Even odds (all 50), Random odds, copy jury ↔ televote; every bulk change and every drop can be undone from the line it leaves
+- Randomness and Points spread sliders
+- The same tab is Edit stage → Odds on a per-stage draft, where "Global odds" leads the menu (`docs/stage-odds-override.md`)
 
 ### 5. Feedback & Info (`components/feedbackInfo/`, `components/guide/`)
 

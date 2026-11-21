@@ -154,24 +154,27 @@ export const measureAnchorRadii = (
 
 /**
  * Repaints a copy (a clone layer's `paint`): its background and the fill
- * of its SVG shapes, and the colour of all its text.
+ * of its SVG shapes, and the colour of all its text. Important, so the
+ * copy takes them over the part's own `!` classes too: a custom theme's
+ * transparent points (`!bg-transparent`) would keep a gold copy clear, and
+ * its ink text would sit on the page.
  */
 export const paintCopy = (
   copy: HTMLElement,
   paint: { fill?: string; text?: string },
 ) => {
   if (paint.fill) {
-    copy.style.background = paint.fill;
+    copy.style.setProperty('background', paint.fill, 'important');
     copy
       .querySelectorAll<SVGElement>('path, polygon, rect')
       .forEach((shape) => {
-        shape.style.fill = paint.fill!;
+        shape.style.setProperty('fill', paint.fill!, 'important');
       });
   }
   if (paint.text) {
     [copy, ...Array.from(copy.querySelectorAll<HTMLElement>('*'))].forEach(
       (node) => {
-        node.style?.setProperty('color', paint.text!);
+        node.style?.setProperty('color', paint.text!, 'important');
       },
     );
   }
@@ -360,15 +363,6 @@ const radiusPx = (value: string, size: number) =>
     ? (parseFloat(value) / 100) * size
     : parseFloat(value) || 0;
 
-const paints = (style: CSSStyleDeclaration) => {
-  const alpha = /rgba?\([^)]*?,\s*([\d.]+)\)$/.exec(style.backgroundColor);
-  const transparent =
-    style.backgroundColor === 'transparent' ||
-    (alpha !== null && parseFloat(alpha[1]) === 0);
-
-  return !transparent || style.backgroundImage !== 'none';
-};
-
 /** SVG shape elements as path data. */
 const shapePath = (shape: SVGElement): string | null => {
   const tag = shape.tagName.toLowerCase();
@@ -392,10 +386,17 @@ const shapePath = (shape: SVGElement): string | null => {
 
 /**
  * A CSS mask (`url(...)`) for `wrapper` that hides what `covers` draw over
- * it in the row: each cover's own box when it paints a background (with its
- * corner radii) and the filled shapes of its SVGs (the 2022 total's curved
- * edge). Measured on screen and divided by the zoom, so it holds on the
- * column layout's zoomed board. Null when nothing overlaps.
+ * it in the row: each cover's own box (with its corner radii) and the
+ * filled shapes of its SVGs (the 2022 total's curved edge). Measured on
+ * screen and divided by the zoom, so it holds on the column layout's zoomed
+ * board. Null when nothing overlaps.
+ *
+ * A cover's box is cut whatever its background. A custom theme's
+ * transparent points still hold their text there, which a layer passing
+ * under them must not hide (the 2026 gold over a square row's 12 box), and
+ * the row's own colour shows through them instead. Reading the colour
+ * instead went wrong: an `rgb(r, g, 0)` total (dark red, any yellow) parsed
+ * as clear, so the 12 box copies covered the total's round end.
  */
 export const buildCutMask = (
   wrapper: HTMLElement,
@@ -430,7 +431,7 @@ export const buildCutMask = (
     };
     const box = atRest(screenRect(cover));
 
-    if (paints(style) && overlaps(box)) {
+    if (overlaps(box)) {
       holes.push(
         `<path d="${roundedRectPath(box, [
           radiusPx(style.borderTopLeftRadius, box.w),

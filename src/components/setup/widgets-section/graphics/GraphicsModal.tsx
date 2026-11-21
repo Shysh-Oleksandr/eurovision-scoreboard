@@ -29,7 +29,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { toast } from 'react-toastify';
 
 import WidgetPager from '../WidgetPager';
 
@@ -70,6 +69,7 @@ import {
 import { EDITOR_TEMPLATES, EditorTemplate } from '@/graphics/templates/editor';
 import { saveFile } from '@/helpers/fileActions';
 import { buildShareUrl } from '@/helpers/shareUrl';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useEffectOnce } from '@/hooks/useEffectOnce';

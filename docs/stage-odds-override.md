@@ -122,17 +122,15 @@ export interface OddsController {
 
 ### `src/components/settings/OddsSettings.tsx`
 
-Refactored from reading `generalStore`/`countriesStore` directly to accepting a
-`controller: OddsController` prop (plus `countries`, `onLoaded`). Every odds read/write goes
-through the controller. `oddsRankLayout` stays a global UI preference (read/written on
-`generalStore` directly — it is **not** part of the override).
+Accepts a `controller: OddsController` prop (plus `countries`, `onLoaded`, and for the stage
+tab `note` and `onUseGlobal`). Every odds read/write goes through the controller, including
+Undo, which writes back a snapshot of the odds, randomness and spread.
 
-### Other UI pieces
+### Other UI pieces (`src/components/settings/odds/`)
 
-- `src/components/settings/CountryRankList.tsx` — gained an optional `oddsSource?: CountryOdds`
-  prop. It seeds its rank order from `oddsSource` when provided (the draft map), else from the
-  global store — so the drag-to-rank view reflects the draft's odds.
-- `src/components/settings/CountryOddsItem.tsx` — unchanged (already fully prop-driven).
+- `OddsTable.tsx` / `OddsField.tsx` — Numbers; reads `controller.countryOdds`.
+- `OddsRankList.tsx` — Ranking; seeds its order from the odds it's given (the draft map in the
+  stage tab), so the drag-to-rank view reflects the draft's odds.
 - `src/state/countriesStore.ts` — the `loadYearOdds` logic was extracted into a shared pure
   helper `resolveYearOddsFor(countries, allCountriesForYear)`, reused by the store's
   `loadYearOdds` and by the draft's "Load year data".
@@ -158,12 +156,12 @@ Manages the local draft for the Odds tab, mirroring `useStagePointsOverrideDraft
   `StageOddsOverride` whose `countryOdds` is restricted to (and explicit for) the stage's
   countries.
 
-`isOverridden` gates the **Reset to global** button, and `resetToGlobal()` reseeds the draft
+`isOverridden` gates the **Global odds** menu item, and `resetToGlobal()` reseeds the draft
 from the current globals. Because the reset only touches the draft, the override is actually
 cleared on **Save**: with the draft back to global, `getOddsOverride()` returns `undefined`, so
 `buildOverrides()` omits `odds` and the stored `stage.overrides.odds` is dropped — the stage
 resumes following the global odds. (This is the recovery path for the all-or-nothing model: once
-a stage has an override it no longer tracks later global-odds edits, so Reset to global is how
+a stage has an override it no longer tracks later global-odds edits, so Global odds is how
 you re-link it.)
 
 ---
@@ -172,8 +170,10 @@ you re-link it.)
 
 ### `src/components/setup/post-setup/PostSetupModal.tsx`
 
-The modal has four tabs in order: **Running Order**, **Voters**, **Odds**, **General**. The
-Odds tab is lazy-mounted (like Voters) because it mounts one `CountryOddsItem` per country.
+The modal has four tabs in order: **Running order**, **Voters**, **Odds**, **General**. Each
+tab mounts on its first visit and then stays; the Odds tab especially, because it mounts
+one table row per country. Every edit goes through `touch()` (the controllers are wrapped),
+so closing asks first only when something differs from the opened state.
 
 ```
 useStageOddsOverrideDraft(stage, isOpen) → { controller, getOddsOverride }
@@ -193,17 +193,17 @@ The assembled `overrides` object is written to both `configuredEventStages` and 
 
 ### `src/components/setup/post-setup/StageOddsTab.tsx`
 
-A thin wrapper: a note ("These odds apply to this stage only — the persistent global contest
-odds are set in Settings") above `<OddsSettings controller={...} countries={stage.countries} />`.
-When the stage differs from global (`isOverridden`), a **Reset to global** button is shown next
-to the note (it calls the draft's `resetToGlobal`); it doubles as the only signal that the stage
-carries a custom-odds override. There is intentionally no coloured banner or tab indicator dot.
+A thin wrapper: `<OddsSettings controller={...} countries={stage.countries} note={…}
+onUseGlobal={…} />`. The note ("These odds apply to this stage only…") sits on top of the
+controls column. When the stage differs from global (`isOverridden`), **Global odds** ("The
+contest's odds, randomness and spread from Settings") leads the Set all odds menu; it calls the
+draft's `resetToGlobal` and can be undone like the other bulk changes. Its presence in the menu
+is the only signal that the stage carries a custom-odds override; there is intentionally no
+coloured banner or tab indicator dot.
 
-i18n keys (under `setup.eventStageModal`, English base; other locales fall back to English via
-`deepMergeMessages` in `src/i18n/request.ts`):
-- `odds` — tab label
-- `oddsOverrideNote` — the per-stage note
-- `resetToGlobalOdds` — the reset button label
+i18n keys: `setup.eventStageModal.odds` (tab label), `setup.eventStageModal.oddsOverrideNote`
+(the note), `settings.odds.setGlobal` / `setGlobalHint` / `doneGlobal` (the menu item and its
+Undo line).
 
 ---
 

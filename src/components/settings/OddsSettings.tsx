@@ -1,59 +1,73 @@
-import { Copy, LayoutGrid, List } from 'lucide-react';
+'use client';
+import { ChevronDown, Copy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 
-import Badge from '../common/Badge';
-import Button from '../common/Button';
-import { RangeSlider } from '../common/RangeSlider';
-import { RankModeToggle } from '../common/rank/RankModeToggle';
-import Tabs from '../common/tabs/Tabs';
-import { Tooltip } from '../common/Tooltip';
+import AnchoredMenu, { AnchoredMenuEntry } from '../common/AnchoredMenu';
 
-import { CountryOddsItem } from './CountryOddsItem';
-import { CountryRankList } from './CountryRankList';
+import {
+  DEFAULT_ODDS,
+  OddsChannel,
+  OddsSort,
+  oddsKey,
+} from './odds/oddsFormat';
+import OddsRankList from './odds/OddsRankList';
+import OddsSegmented from './odds/OddsSegmented';
+import OddsSlider from './odds/OddsSlider';
+import OddsTable from './odds/OddsTable';
 import { OddsController } from './useGlobalOddsController';
 
+import { useHasFinePointer } from '@/hooks/useHasFinePointer';
 import { BaseCountry } from '@/models';
+import { playHaptic } from '@/native/haptics';
+import { CountryOdds, useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { rankOrderToOdds } from '@/state/scoreboard/rankToOdds';
 
-type OddsViewMode = 'numbers' | 'rank';
-type RankDimension = 'jury' | 'televote';
-type RankLayout = 'list' | 'grid';
+type OddsView = 'numbers' | 'rank';
+type SliderId = 'randomness' | 'spread';
 
-const layoutTabs = [
-  {
-    value: 'grid',
-    label: <LayoutGrid className="w-6 h-6" />,
-  },
-  {
-    value: 'list',
-    label: <List className="w-6 h-6" />,
-  },
-];
+/** What a change replaced, so Undo can put it back. */
+interface Snapshot {
+  odds: CountryOdds;
+  randomnessLevel: number;
+  pointsSpread: number;
+}
 
-const LABELS = [
-  {
-    label: 'jury',
-    color: 'bg-primary-700/80',
-  },
-
-  {
-    label: 'televote',
-    color: 'bg-primary-800',
-  },
-];
+/** The last bulk change or drop: its line ("… Undo") and the dropped row. */
+interface LastAction {
+  message: string;
+  snapshot: Snapshot;
+  movedCode: string | null;
+}
 
 interface OddsSettingsProps {
   controller: OddsController;
   countries: BaseCountry[];
   onLoaded?: () => void;
+  /** Stage override: the line on top of the controls. */
+  note?: string;
+  /** Stage override: "Global odds" first in Set all odds (when it differs). */
+  onUseGlobal?: () => void;
 }
 
+/**
+ * The odds of the participating countries, laid out like the simulation:
+ * the countries on the left (Numbers: a table with Jury / Televote columns;
+ * Ranking: the theme's board rows to drag), one column of controls on the
+ * right that stays put. Narrower than 700px the column folds above the list
+ * and the sliders into two combos. Every bulk change and every drop leaves a
+ * line with Undo until the next change.
+ *
+ * Driven by an `OddsController`: the global odds in Settings, or a stage's
+ * draft in Edit stage → Odds.
+ */
 const OddsSettings: React.FC<OddsSettingsProps> = ({
   controller,
   countries,
   onLoaded,
+  note,
+  onUseGlobal,
 }) => {
   const t = useTranslations();
   const {
@@ -66,135 +80,177 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({
     setPointsSpread,
     loadYearOdds,
   } = controller;
+  const baseId = useId();
+  const hasFinePointer = useHasFinePointer();
+  const year = useGeneralStore((state) => state.year);
+  const yearHasOdds = useCountriesStore((state) =>
+    state.allCountriesForYear.some(
+      (c) =>
+        typeof c.juryOdds === 'number' || typeof c.televoteOdds === 'number',
+    ),
+  );
 
-  // Rank layout is a global UI preference (not part of the odds override).
-  const rankLayout = useGeneralStore((state) => state.settings.oddsRankLayout);
-  const setSettings = useGeneralStore((state) => state.setSettings);
+  const [view, setView] = useState<OddsView>('numbers');
+  const [channel, setChannel] = useState<OddsChannel>('jury');
+  const [sort, setSort] = useState<OddsSort>('name');
+  const [resortKey, setResortKey] = useState(0);
+  const [lastAction, setLastAction] = useState<LastAction | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuAnchorRef = useRef<HTMLButtonElement>(null);
+  const [openSlider, setOpenSlider] = useState<SliderId | null>(null);
+  const [liveRandomness, setLiveRandomness] = useState(randomnessLevel);
+  const [liveSpread, setLiveSpread] = useState(pointsSpread);
 
-  const [rankDimension, setRankDimension] = useState<RankDimension>('jury');
-  const [viewMode, setViewMode] = useState<'numbers' | 'rank'>('numbers');
-
-  const handleCopyRanks = () => {
-    const fromKey = rankDimension === 'jury' ? 'juryOdds' : 'televoteOdds';
-    const toKey = rankDimension === 'jury' ? 'televoteOdds' : 'juryOdds';
-    const payload: Record<
-      string,
-      { juryOdds?: number; televoteOdds?: number }
-    > = {};
-
-    countries.forEach((country) => {
-      const existing = countryOdds[country.code] || {};
-
-      payload[country.code] = {
-        ...existing,
-        [toKey]: existing[fromKey] ?? 50,
-      };
-    });
-
-    setBulkCountryOdds(payload);
-  };
-
-  const handleRankReorder = (orderedCodes: string[]) => {
-    const generated = rankOrderToOdds(orderedCodes, pointsSpread);
-    const payload: Record<
-      string,
-      { juryOdds?: number; televoteOdds?: number }
-    > = {};
-
-    orderedCodes.forEach((code) => {
-      const existing = countryOdds[code] || {};
-
-      payload[code] =
-        rankDimension === 'jury'
-          ? {
-              juryOdds: generated[code],
-              televoteOdds: existing.televoteOdds ?? 50,
-            }
-          : {
-              juryOdds: existing.juryOdds ?? 50,
-              televoteOdds: generated[code],
-            };
-    });
-
-    setBulkCountryOdds(payload);
-  };
-
-  const handleOddsChange = (
-    countryCode: string,
-    oddType: 'jury' | 'televote',
-    value?: number,
-  ) => {
-    const countryToUpdate = countries.find((c) => c.code === countryCode);
-
-    if (!countryToUpdate) return;
-
-    const { juryOdds, televoteOdds } = countryOdds[countryCode] || {};
-
-    if (oddType === 'jury') {
-      updateCountryOdds(countryCode, {
-        juryOdds: value,
-        televoteOdds,
-      });
-    } else {
-      updateCountryOdds(countryCode, {
-        juryOdds,
-        televoteOdds: value,
-      });
-    }
-  };
-
-  const handleRandomize = () => {
-    const newOdds: Record<
-      string,
-      { juryOdds?: number; televoteOdds?: number }
-    > = {};
-
-    countries.forEach((country) => {
-      const juryOdds = Math.floor(Math.random() * 101);
-      const minTelevote = Math.max(1, juryOdds - 50);
-      const maxTelevote = Math.min(99, juryOdds + 50);
-
-      let televoteOdds =
-        Math.floor(Math.random() * (maxTelevote - minTelevote + 1)) +
-        minTelevote;
-
-      while (televoteOdds === juryOdds) {
-        televoteOdds =
-          Math.floor(Math.random() * (maxTelevote - minTelevote + 1)) +
-          minTelevote;
-      }
-      newOdds[country.code] = { juryOdds, televoteOdds };
-    });
-    setBulkCountryOdds(newOdds);
-  };
-
-  const handleLoadYearData = () => {
-    loadYearOdds(countries);
-  };
-
-  const handleReset = () => {
-    const newOdds: Record<
-      string,
-      { juryOdds?: number; televoteOdds?: number }
-    > = {};
-
-    countries.forEach((country) => {
-      newOdds[country.code] = { juryOdds: 50, televoteOdds: 50 };
-    });
-    setBulkCountryOdds(newOdds);
-  };
+  useEffect(() => setLiveRandomness(randomnessLevel), [randomnessLevel]);
+  useEffect(() => setLiveSpread(pointsSpread), [pointsSpread]);
 
   useEffect(() => {
     onLoaded?.();
   }, [onLoaded]);
 
+  const takeSnapshot = (): Snapshot => {
+    const odds: CountryOdds = {};
+
+    countries.forEach((country) => {
+      odds[country.code] = { ...(countryOdds[country.code] || {}) };
+    });
+
+    return { odds, randomnessLevel, pointsSpread };
+  };
+
+  const runBulk = (message: string, apply: () => void) => {
+    const snapshot = takeSnapshot();
+
+    apply();
+    setLastAction({ message, snapshot, movedCode: null });
+    setResortKey((key) => key + 1);
+  };
+
+  const undo = () => {
+    if (!lastAction) return;
+    const { snapshot } = lastAction;
+
+    setBulkCountryOdds(snapshot.odds);
+    if (snapshot.randomnessLevel !== randomnessLevel) {
+      setRandomnessLevel(snapshot.randomnessLevel);
+    }
+    if (snapshot.pointsSpread !== pointsSpread) {
+      setPointsSpread(snapshot.pointsSpread);
+    }
+    setLastAction(null);
+    setResortKey((key) => key + 1);
+    playHaptic({ id: 'undo' });
+  };
+
+  const setDefaultOdds = () =>
+    runBulk(t('settings.odds.doneDefault'), () => loadYearOdds(countries));
+
+  const setEvenOdds = () =>
+    runBulk(t('settings.odds.doneEven'), () => {
+      const payload: CountryOdds = {};
+
+      countries.forEach((country) => {
+        payload[country.code] = {
+          juryOdds: DEFAULT_ODDS,
+          televoteOdds: DEFAULT_ODDS,
+        };
+      });
+      setBulkCountryOdds(payload);
+    });
+
+  const setRandomOdds = () =>
+    runBulk(t('settings.odds.doneRandom'), () => {
+      const payload: CountryOdds = {};
+
+      // Televote within 50 of the jury, and never equal to it.
+      countries.forEach((country) => {
+        const juryOdds = Math.floor(Math.random() * 101);
+        const minTelevote = Math.max(1, juryOdds - 50);
+        const maxTelevote = Math.min(99, juryOdds + 50);
+        const draw = () =>
+          Math.floor(Math.random() * (maxTelevote - minTelevote + 1)) +
+          minTelevote;
+        let televoteOdds = draw();
+
+        while (televoteOdds === juryOdds) televoteOdds = draw();
+        payload[country.code] = { juryOdds, televoteOdds };
+      });
+      setBulkCountryOdds(payload);
+    });
+
+  const copyOdds = (from: OddsChannel) =>
+    runBulk(
+      t(
+        from === 'jury'
+          ? 'settings.odds.doneCopyJury'
+          : 'settings.odds.doneCopyTelevote',
+      ),
+      () => {
+        const fromKey = oddsKey(from);
+        const toKey = oddsKey(from === 'jury' ? 'televote' : 'jury');
+        const payload: CountryOdds = {};
+
+        countries.forEach((country) => {
+          const existing = countryOdds[country.code] || {};
+
+          payload[country.code] = {
+            ...existing,
+            [toKey]: existing[fromKey] ?? DEFAULT_ODDS,
+          };
+        });
+        setBulkCountryOdds(payload);
+      },
+    );
+
+  const handleCommit = (
+    code: string,
+    fieldChannel: OddsChannel,
+    value: number | undefined,
+  ) => {
+    updateCountryOdds(code, { [oddsKey(fieldChannel)]: value });
+    setLastAction(null);
+  };
+
+  // A drop re-spaces the whole channel by the new order and Points spread.
+  const handleDrop = (order: string[], movedCode: string) => {
+    const snapshot = takeSnapshot();
+    const generated = rankOrderToOdds(order, pointsSpread);
+    const key = oddsKey(channel);
+    const payload: CountryOdds = {};
+
+    order.forEach((code) => {
+      payload[code] = { ...(countryOdds[code] || {}), [key]: generated[code] };
+    });
+    setBulkCountryOdds(payload);
+    setLastAction({
+      message: t(
+        channel === 'jury'
+          ? 'settings.odds.doneRankJury'
+          : 'settings.odds.doneRankTelevote',
+      ),
+      snapshot,
+      movedCode,
+    });
+    setResortKey((key) => key + 1);
+  };
+
+  const changeRandomness = (value: number) => {
+    setRandomnessLevel(value);
+    setLastAction(null);
+  };
+
+  const changeSpread = (value: number) => {
+    setPointsSpread(value);
+    setLastAction(null);
+  };
+
   if (countries.length === 0) {
     return (
-      <div className="text-center space-y-1 mt-10">
-        <p className="font-medium text-white text-xl">
+      <div className="mx-auto max-w-[420px] py-12 text-center">
+        <p className="text-[17px] font-extrabold tracking-[-0.015em] text-white">
           {t('settings.odds.noParticipatingCountriesSelectedYet')}
         </p>
-        <p className="text-white/60 text-base">
+        <p className="mt-1.5 text-[13.5px] font-semibold text-white/60 text-balance">
           {t(
             'settings.odds.goBackToSetupAndSelectCountriesForEventToSetTheirOdds',
           )}
@@ -203,182 +259,284 @@ const OddsSettings: React.FC<OddsSettingsProps> = ({
     );
   }
 
-  return (
-    <>
-      <div className="relative border-b border-white/10 mb-3.5">
-        <RankModeToggle
-          tabs={(['numbers', 'rank'] as OddsViewMode[]).map((mode) => ({
-            value: mode,
-            label: t(`settings.odds.${mode}View`),
-          }))}
-          activeTab={viewMode}
-          onChange={setViewMode}
-        />
-        <div className="absolute top-0 right-0 z-10">
-          <Tooltip
-            position="right"
-            content={
-              <div className="space-y-2 font-medium">
-                <p>
-                  {t.rich('settings.odds.oddsTooltip', {
-                    br: () => <br />,
-                    span: (chunks) => (
-                      <span className="font-bold">{chunks}</span>
-                    ),
-                  })}
-                </p>
-                <p>
-                  {t.rich('settings.odds.randomnessLevelTooltip', {
-                    br: () => <br />,
-                    span: (chunks) => (
-                      <span className="font-bold">{chunks}</span>
-                    ),
-                  })}
-                </p>
-                <p>
-                  {t.rich('settings.odds.pointsSpreadTooltip', {
-                    br: () => <br />,
-                    span: (chunks) => (
-                      <span className="font-bold">{chunks}</span>
-                    ),
-                  })}
-                </p>
-              </div>
-            }
-          />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-6 mb-4">
-        <RangeSlider
-          id="randomness"
-          label={t('settings.odds.randomnessLevel')}
-          min={0}
-          max={100}
-          value={randomnessLevel}
-          onChange={(value) => setRandomnessLevel(value)}
-          minLabel={t('settings.odds.predictable')}
-          maxLabel={t('settings.odds.chaotic')}
-        />
+  const menuItems: AnchoredMenuEntry[] = [
+    ...(onUseGlobal
+      ? ([
+          {
+            label: t('settings.odds.setGlobal'),
+            description: t('settings.odds.setGlobalHint'),
+            onClick: () => runBulk(t('settings.odds.doneGlobal'), onUseGlobal),
+          },
+          'hr',
+        ] as AnchoredMenuEntry[])
+      : []),
+    {
+      label: t('settings.odds.setDefault'),
+      description: yearHasOdds
+        ? t('settings.odds.setDefaultHint', { year })
+        : t('settings.odds.setDefaultNone', { year }),
+      onClick: setDefaultOdds,
+    },
+    {
+      label: t('settings.odds.setEven'),
+      description: t('settings.odds.setEvenHint'),
+      onClick: setEvenOdds,
+    },
+    {
+      label: t('settings.odds.setRandom'),
+      description: t('settings.odds.setRandomHint'),
+      onClick: setRandomOdds,
+    },
+    'hr',
+    {
+      label: t('settings.odds.copyJuryToTelevote'),
+      icon: <Copy className="size-[17px]" />,
+      onClick: () => copyOdds('jury'),
+    },
+    {
+      label: t('settings.odds.copyTelevoteToJury'),
+      icon: <Copy className="size-[17px]" />,
+      onClick: () => copyOdds('televote'),
+    },
+  ];
 
-        <RangeSlider
-          containerClassName="mt-3 sm:mt-0"
-          id="points-spread"
-          label={t('settings.odds.pointsSpread')}
-          min={0}
-          max={100}
-          value={pointsSpread}
-          onChange={(value) => setPointsSpread(value)}
-          minLabel={t('settings.odds.tight')}
-          maxLabel={t('settings.odds.wide')}
-        />
-      </div>
-      {viewMode === 'numbers' ? (
-        <>
-          <div className="flex sm:items-end items-start gap-4 mb-4 justify-between flex-wrap sm:flex-row flex-col-reverse">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Button
-                className="md:text-base text-sm"
-                onClick={handleRandomize}
-              >
-                {t('common.randomize')}
-              </Button>
-              <Button
-                variant="tertiary"
-                className="md:text-base text-sm"
-                onClick={handleLoadYearData}
-              >
-                {t('common.loadYearData')}
-              </Button>
-              <Button
-                variant="secondary"
-                className="md:text-base text-sm"
-                onClick={handleReset}
-              >
-                {t('common.reset')}
-              </Button>
-            </div>
-            <div className="flex items-center gap-2 justify-end">
-              {LABELS.map((label) => (
-                <div className="flex items-center gap-2" key={label.label}>
-                  <div className={`w-3 h-3 rounded-full ${label.color}`}></div>
-                  <span>{t(`simulation.finalStats.${label.label}`)}</span>
-                </div>
-              ))}
-            </div>
+  const hint =
+    view === 'numbers'
+      ? t('settings.odds.hintNumbers')
+      : `${t(
+          hasFinePointer
+            ? 'settings.odds.hintRank'
+            : 'settings.odds.hintRankTouch',
+        )} ${t(
+          channel === 'jury'
+            ? 'settings.odds.rankDropJury'
+            : 'settings.odds.rankDropTelevote',
+        )}`;
+
+  const sliders: Record<
+    SliderId,
+    {
+      label: string;
+      value: number;
+      live: number;
+      onChange: (value: number) => void;
+      onLive: (value: number) => void;
+      minLabel: string;
+      maxLabel: string;
+    }
+  > = {
+    randomness: {
+      label: t('settings.odds.randomnessLevel'),
+      value: randomnessLevel,
+      live: liveRandomness,
+      onChange: changeRandomness,
+      onLive: setLiveRandomness,
+      minLabel: t('settings.odds.predictable'),
+      maxLabel: t('settings.odds.chaotic'),
+    },
+    spread: {
+      label: t('settings.odds.pointsSpread'),
+      value: pointsSpread,
+      live: liveSpread,
+      onChange: changeSpread,
+      onLive: setLiveSpread,
+      minLabel: t('settings.odds.tight'),
+      maxLabel: t('settings.odds.wide'),
+    },
+  };
+  const sliderIds: SliderId[] = ['randomness', 'spread'];
+  const popId = `${baseId}-slider`;
+
+  return (
+    <div className="dp-odds dp-flat">
+      <div className="dp-odds-layout">
+        <div className="dp-odds-side">
+          {note && (
+            <p className="text-[13px] font-semibold leading-[1.5] text-white/70">
+              {note}
+            </p>
+          )}
+
+          <div className="dp-odds-toprow">
+            <OddsSegmented<OddsView>
+              className="dp-odds-view"
+              ariaLabel={t('settings.odds.viewLabel')}
+              value={view}
+              onChange={setView}
+              options={[
+                { value: 'numbers', label: t('settings.odds.numbersView') },
+                { value: 'rank', label: t('settings.odds.rankView') },
+              ]}
+            />
+            <button
+              ref={menuAnchorRef}
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((open) => !open)}
+              className={`dp-odds-setall dp-act ${
+                menuOpen ? 'is-on' : ''
+              } flex flex-none items-center gap-2 rounded-xl pl-3.5 pr-3 text-[13.5px] font-extrabold normal-case`}
+            >
+              <span className="dp-odds-setall-long min-w-0 flex-1 truncate text-left">
+                {t('settings.odds.setAll')}
+              </span>
+              <span className="dp-odds-setall-short">
+                {t('settings.odds.setAllShort')}
+              </span>
+              <ChevronDown
+                aria-hidden="true"
+                className="size-4 flex-none text-white/70"
+              />
+            </button>
           </div>
-          <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-            {countries.map((country) => {
-              const odds = countryOdds[country.code] || {};
-              const countryWithOdds = {
-                ...country,
-                juryOdds: odds.juryOdds,
-                televoteOdds: odds.televoteOdds,
-              };
+
+          {view === 'rank' && (
+            <OddsSegmented<OddsChannel>
+              className="dp-odds-chan"
+              ariaLabel={t('settings.odds.rankChannel')}
+              value={channel}
+              onChange={setChannel}
+              options={[
+                { value: 'jury', label: t('simulation.finalStats.jury') },
+                {
+                  value: 'televote',
+                  label: t('simulation.finalStats.televote'),
+                },
+              ]}
+            />
+          )}
+
+          <div className="dp-odds-combos">
+            {sliderIds.map((id) => {
+              const slider = sliders[id];
+              const open = openSlider === id;
 
               return (
-                <CountryOddsItem
-                  key={country.code}
-                  country={countryWithOdds}
-                  onOddsChange={(oddType, value) =>
-                    handleOddsChange(country.code, oddType, value)
-                  }
-                />
+                <button
+                  key={id}
+                  type="button"
+                  aria-expanded={open}
+                  aria-controls={open ? popId : undefined}
+                  onClick={() => setOpenSlider(open ? null : id)}
+                  className={`dp-act ${
+                    open ? 'is-on' : ''
+                  } flex h-[46px] min-w-0 items-center gap-2 rounded-xl pl-3 pr-2.5 text-left normal-case`}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span
+                      id={`${baseId}-${id}-caption`}
+                      className="block truncate text-[11.5px] font-semibold leading-[1.15] text-white/55"
+                    >
+                      {slider.label}
+                    </span>
+                    <span className="block text-[14.5px] font-bold leading-[1.35] tabular-nums">
+                      {slider.live}
+                    </span>
+                  </span>
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={`size-4 flex-none text-white/55 transition-transform ${
+                      open ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
               );
             })}
           </div>
-        </>
-      ) : (
-        <>
-          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-            <div className="flex items-center gap-2">
-              {(['jury', 'televote'] as RankDimension[]).map((dim) => (
-                <Badge
-                  key={dim}
-                  label={t(`simulation.finalStats.${dim}`)}
-                  isActive={rankDimension === dim}
-                  onClick={() => setRankDimension(dim)}
-                />
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="tertiary"
-                className="!p-2.5"
-                onClick={handleCopyRanks}
-                title={t(
-                  rankDimension === 'jury'
-                    ? 'settings.odds.copyRanksToTelevote'
-                    : 'settings.odds.copyRanksToJury',
-                )}
-              >
-                <Copy className="w-5 h-5" />
-              </Button>
-              <Tabs
-                tabs={layoutTabs}
-                activeTab={rankLayout}
-                setActiveTab={(tab) =>
-                  setSettings({ oddsRankLayout: tab as RankLayout })
-                }
-                containerClassName="!p-[3px] !overflow-hidden !h-11 !w-[112px]"
-                overlayClassName="!inset-y-[2px]"
-                buttonClassName="!py-0 !px-0 h-full"
+
+          {openSlider && (
+            <div
+              id={popId}
+              className="dp-odds-pop rounded-[14px] px-3.5 pb-3 pt-4"
+            >
+              <OddsSlider
+                key={openSlider}
+                id={`${baseId}-pop`}
+                ariaLabelledBy={`${baseId}-${openSlider}-caption`}
+                value={sliders[openSlider].value}
+                onChange={sliders[openSlider].onChange}
+                onLive={sliders[openSlider].onLive}
+                minLabel={sliders[openSlider].minLabel}
+                maxLabel={sliders[openSlider].maxLabel}
               />
             </div>
+          )}
+
+          <div className="dp-odds-msg">
+            {lastAction ? (
+              <p className="text-[13px] font-semibold leading-[1.5] text-white/75">
+                {lastAction.message}{' '}
+                <button
+                  type="button"
+                  onClick={undo}
+                  className="dp-odds-undo rounded font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                >
+                  {t('settings.odds.undo')}
+                </button>
+              </p>
+            ) : (
+              <p className="text-[13px] font-semibold leading-[1.5] text-white/55">
+                {hint}
+              </p>
+            )}
           </div>
-          <p className="text-[12.5px] text-white/40 mt-1 mb-2">
-            {t('settings.odds.dragToRankHint')}
-          </p>
-          <CountryRankList
-            countries={countries}
-            dimension={rankDimension}
-            pointsSpread={pointsSpread}
-            layout={rankLayout}
-            oddsSource={countryOdds}
-            onReorder={handleRankReorder}
-          />
-        </>
-      )}
-    </>
+
+          <div className="dp-odds-sliders">
+            {sliderIds.map((id) => (
+              <OddsSlider
+                key={id}
+                id={`${baseId}-${id}`}
+                label={sliders[id].label}
+                value={sliders[id].value}
+                onChange={sliders[id].onChange}
+                minLabel={sliders[id].minLabel}
+                maxLabel={sliders[id].maxLabel}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="dp-odds-list min-w-0">
+          {view === 'numbers' ? (
+            <OddsTable
+              countries={countries}
+              countryOdds={countryOdds}
+              sort={sort}
+              onSortChange={(next) => {
+                setSort(next);
+                setResortKey((key) => key + 1);
+              }}
+              resortKey={resortKey}
+              onCommit={handleCommit}
+            />
+          ) : (
+            <OddsRankList
+              countries={countries}
+              channel={channel}
+              countryOdds={countryOdds}
+              onDrop={handleDrop}
+              movedCode={lastAction?.movedCode ?? null}
+            />
+          )}
+        </div>
+      </div>
+
+      <p aria-live="polite" className="sr-only">
+        {lastAction?.message ?? ''}
+      </p>
+
+      <AnchoredMenu
+        open={menuOpen}
+        anchor={menuAnchorRef.current}
+        onClose={() => setMenuOpen(false)}
+        items={menuItems}
+        placement="bottom-end"
+        className="min-w-[288px]"
+        ariaLabel={t('settings.odds.setAll')}
+        plainHeaders
+      />
+    </div>
   );
 };
 

@@ -1,11 +1,14 @@
-import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 
 import { shareLink } from '@/helpers/fileActions';
 import { buildShareUrl } from '@/helpers/shareUrl';
+import { toast } from '@/helpers/toast';
 
 type ShareableItem = 'theme' | 'contest' | 'profile' | 'design';
 
 export const useHandleShare = () => {
+  const t = useTranslations('graphics');
+
   const handleShare = async (
     queryParamKey: ShareableItem,
     queryParamValue: string,
@@ -17,10 +20,10 @@ export const useHandleShare = () => {
         title,
       );
 
-      // Not translated because in theory it shouldn't be displayed
-      if (result === 'copied') toast.success('Link copied to clipboard!');
+      // Browsers without the share sheet (desktop Firefox) copy instead.
+      if (result === 'copied') toast.success(t('gallery.toast.linkCopied'));
       if (result === 'unsupported') {
-        toast.error('Sharing is not supported on this device.');
+        toast.error(t('export.toast.shareUnsupported'));
       }
     } catch (error: any) {
       console.error('Failed to share theme:', error);

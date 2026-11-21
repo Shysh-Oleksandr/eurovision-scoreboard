@@ -1,16 +1,28 @@
-import { ChartColumn, User } from 'lucide-react';
+import { ChartColumn, Save } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
+import {
+  DEFAULT_SORT,
+  contestServerSort,
+  useSortFilter,
+} from '../library/libraryFilters';
+import LibraryFolderRail from '../library/LibraryFolderRail';
+import {
+  LibraryEmpty,
+  LibraryLink,
+  LibraryListHeader,
+  LibraryPlaceLayout,
+  LibrarySignIn,
+} from '../library/LibraryLayout';
+import LibraryToolbar from '../library/LibraryToolbar';
 import WidgetPager from '../WidgetPager';
-import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
-import WidgetSearchHeader from '../WidgetSearchHeader';
-import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
+import type { PublicSortKey } from '../WidgetSortBadges';
 
 import ContestListItem from './ContestListItem';
+import { usePublicContestActions } from './hooks/usePublicContestActions';
 
 import {
   useContestGroupsQuery,
@@ -20,20 +32,11 @@ import {
   useDeleteContestMutation,
   useMyContestsListQuery,
   useSavedContestsListQuery,
-  useToggleLikeContestMutation,
-  useToggleSaveContestMutation,
   useUpdateContestGroupMutation,
 } from '@/api/contests';
-import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
-import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
-import { PinIcon } from '@/assets/icons/PinIcon';
-import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
-import Badge from '@/components/common/Badge';
-import Button from '@/components/common/Button';
-import SignInButtons from '@/components/common/SignInButtons';
 import { QueryNotice } from '@/components/offline/OfflineNotice';
 import UserResourceGroupModal from '@/components/setup/UserResourceGroupModal';
-import { useConfirmation } from '@/hooks/useConfirmation';
+import { toast } from '@/helpers/toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryView } from '@/hooks/useQueryView';
 import { useIsOffline } from '@/state/connectivityStore';
@@ -50,296 +53,216 @@ const CountryStatsModal = dynamic(() => import('./CountryStatsModal'), {
 
 const PAGE_SIZE = 10;
 
-type ContestSortKey = Exclude<PublicSortKey, 'copies'>;
-
 interface UserContestsProps {
-  onLoaded?: () => void;
+  /** Yours: the contests you saved, in groups; Saved: others' you kept. */
+  place: 'yours' | 'saved';
+  /** Saves the open contest as a new one (the dialog says so). */
   onCreateNew: () => void;
   onEdit?: (contest: Contest) => void;
   onLoad: (contest: Contest) => void;
+  /** Saved, empty: go and find some. */
+  onBrowseCommunity?: () => void;
 }
 
+/**
+ * The Contests library's Yours and Saved places. Yours opens on the
+ * contest in use (when the list isn't narrowed), then your contests, by
+ * group, with your entry stats on the count line.
+ */
 const UserContests: React.FC<UserContestsProps> = ({
+  place,
   onCreateNew,
   onEdit,
   onLoad,
+  onBrowseCommunity,
 }) => {
   const t = useTranslations();
   const user = useAuthStore((state) => state.user);
   const offline = useIsOffline();
   const activeContest = useGeneralStore((state) => state.activeContest);
   const setActiveContest = useGeneralStore((state) => state.setActiveContest);
+  const isYours = place === 'yours';
 
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<ContestSortKey>('latest');
-  const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
+  const [sortKey, setSortKey] = useState<PublicSortKey>(DEFAULT_SORT);
   const [page, setPage] = useState(1);
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [groupToEdit, setGroupToEdit] = useState<{
+    _id: string;
+    name: string;
+  } | null>(null);
   const [myLeaderboardOpen, setMyLeaderboardOpen] = useState(false);
   const [entryStatsOpen, setEntryStatsOpen] = useState(false);
   const [entryStatsCode, setEntryStatsCode] = useState<string | null>(null);
   const [entryStatsGroupId, setEntryStatsGroupId] = useState<string | null>(
     null,
   );
-  const [selectedContestGroupId, setSelectedContestGroupId] = useState<
-    string | null
-  >(null);
-  const [contestGroupModalOpen, setContestGroupModalOpen] = useState(false);
-  const [contestGroupToEdit, setContestGroupToEdit] = useState<{
-    _id: string;
-    name: string;
-  } | null>(null);
 
   const debouncedSearch = useDebounce(search, 400);
+  const { sortBy, sortOrder } = contestServerSort(sortKey);
 
-  const serverSortBy =
-    sortKey === 'likes' ? 'likes' : sortKey === 'saves' ? 'saves' : 'createdAt';
-  const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
+  const { data: groups = [] } = useContestGroupsQuery(!!user && isYours);
 
-  const { data: contestGroups = [] } = useContestGroupsQuery(
-    !!user && view === 'yours',
-  );
-
-  const { mutateAsync: createContestGroup, isPending: isCreatingContestGroup } =
+  const { mutateAsync: createGroup, isPending: isCreatingGroup } =
     useCreateContestGroupMutation();
-  const { mutateAsync: updateContestGroup, isPending: isUpdatingContestGroup } =
+  const { mutateAsync: updateGroup, isPending: isUpdatingGroup } =
     useUpdateContestGroupMutation();
-  const { mutateAsync: deleteContestGroup, isPending: isDeletingContestGroup } =
+  const { mutateAsync: deleteGroup, isPending: isDeletingGroup } =
     useDeleteContestGroupMutation();
 
+  // A deleted group can't stay picked.
   useEffect(() => {
-    if (
-      selectedContestGroupId &&
-      !contestGroups.some((g) => g._id === selectedContestGroupId)
-    ) {
-      setSelectedContestGroupId(null);
-    }
-  }, [contestGroups, selectedContestGroupId]);
+    if (groupId && !groups.some((g) => g._id === groupId)) setGroupId(null);
+  }, [groups, groupId]);
 
+  const listParams = {
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedSearch,
+    sortBy,
+    sortOrder,
+  };
   const myContestsQuery = useMyContestsListQuery({
-    page,
-    limit: PAGE_SIZE,
-    search: debouncedSearch,
-    sortBy: serverSortBy,
-    sortOrder: serverSortOrder,
-    groupId: selectedContestGroupId ?? undefined,
-    enabled: !!user && view === 'yours',
+    ...listParams,
+    groupId: groupId ?? undefined,
+    enabled: !!user && isYours,
   });
-
   const savedContestsQuery = useSavedContestsListQuery({
-    page,
-    limit: PAGE_SIZE,
-    search: debouncedSearch,
-    sortBy: serverSortBy,
-    sortOrder: serverSortOrder,
-    enabled: !!user && view === 'saved',
+    ...listParams,
+    enabled: !!user && !isYours,
   });
+  const listQuery = isYours ? myContestsQuery : savedContestsQuery;
+  const listView = useQueryView(listQuery);
+  const listData = listQuery.data;
 
   const { mutateAsync: deleteContest } = useDeleteContestMutation();
-  const { mutateAsync: toggleSave } = useToggleSaveContestMutation();
-  const { mutateAsync: toggleLike } = useToggleLikeContestMutation();
+  const { handleLike, handleSave } = usePublicContestActions();
 
-  const { confirm } = useConfirmation();
-
-  const listData =
-    view === 'yours'
-      ? myContestsQuery.data
-      : view === 'saved'
-      ? savedContestsQuery.data
-      : undefined;
-
-  const activeListQuery =
-    view === 'yours'
-      ? myContestsQuery
-      : view === 'saved'
-      ? savedContestsQuery
+  // The contest in use heads Yours while the list shows everything from the top.
+  const inUse =
+    isYours && page === 1 && !debouncedSearch.trim() && groupId === null
+      ? activeContest
       : null;
-  const listView = useQueryView(
-    activeListQuery ?? { data: null, status: 'success', fetchStatus: 'idle' },
-  );
+  const inUseIsMine = !!inUse && inUse.userId.toString() === user?._id;
 
-  const contestIdsForState =
-    view === 'current' && activeContest
-      ? [activeContest._id]
-      : listData?.contests.map((c) => c._id) ?? [];
-
+  const contestsOnPage = listData?.contests ?? [];
+  const stateIds = [
+    ...(inUse ? [inUse._id] : []),
+    ...contestsOnPage.map((contest) => contest._id),
+  ];
   const { data: contestsState } = useContestsStateQuery(
-    contestIdsForState,
-    !!contestIdsForState.length && !!user,
+    stateIds,
+    !!stateIds.length && !!user,
   );
 
   const handleDelete = async (id: string) => {
     try {
-      const isActive = activeContest?._id === id;
-
-      if (isActive) {
-        setActiveContest(null);
-      }
+      if (activeContest?._id === id) setActiveContest(null);
 
       await deleteContest(id);
-      toast.success('Contest deleted successfully');
+      toast.success(t('widgets.contests.contestDeleted'));
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to delete contest');
-    }
-  };
-
-  const handleLike = async (id: string) => {
-    try {
-      const res = await toggleLike(id);
-
-      toast.success(
-        res.liked
-          ? 'Contest liked successfully'
-          : 'Contest unliked successfully',
+      toast.error(
+        error?.response?.data?.message || t('widgets.contests.deleteFailed'),
       );
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to like contest');
     }
   };
 
-  const handleSave = async (id: string, savedByMe: boolean) => {
-    try {
-      if (savedByMe) {
-        confirm({
-          key: 'remove-saved-contest',
-          title: t('widgets.contests.confirmRemoveSavedContest'),
-          onConfirm: async () => {
-            const res = await toggleSave(id);
-
-            toast.success(
-              t(
-                res.saved
-                  ? 'widgets.contests.contestSavedSuccessfully'
-                  : 'widgets.contests.contestRemovedFromSaved',
-              ),
-            );
-          },
-        });
-      } else {
-        const res = await toggleSave(id);
-
-        toast.success(
-          t(
-            res.saved
-              ? 'widgets.contests.contestSavedSuccessfully'
-              : 'widgets.contests.contestRemovedFromSaved',
-          ),
-        );
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save contest');
-    }
-  };
-
-  const setViewAndResetPage = (next: 'yours' | 'saved' | 'current') => {
-    setView(next);
-    setPage(1);
-  };
-
-  const contestGroupModalSaving =
-    isCreatingContestGroup || isUpdatingContestGroup || isDeletingContestGroup;
+  const sortFilter = useSortFilter(
+    sortKey,
+    (next) => {
+      setSortKey(next);
+      setPage(1);
+    },
+    { remixable: false },
+  );
 
   if (!user) {
     return (
-      <div className="text-white text-center sm:py-8 py-4 flex flex-col items-center gap-4">
-        <p className="text-white/70">
-          {t('widgets.contests.authenticateToViewAndCreateYourOwnContests')}
-        </p>
-        <SignInButtons />
-      </div>
+      <LibrarySignIn
+        message={t(
+          'widgets.contests.authenticateToViewAndCreateYourOwnContests',
+        )}
+      />
     );
   }
 
   const total = listData?.total ?? 0;
-  const contestsOnPage = listData?.contests ?? [];
   const totalPages = listData?.totalPages ?? 0;
+  const searching = !!debouncedSearch.trim();
 
-  const headerLabel = search.trim()
-    ? t('widgets.contests.foundNContests', { count: total })
-    : view === 'yours'
-    ? t('widgets.contests.youHaveNContests', { count: total })
-    : view === 'saved'
-    ? t('widgets.contests.youSavedNContests', { count: total })
-    : '';
+  const renderContest = (contest: Contest, mine: boolean) => (
+    <ContestListItem
+      key={contest._id}
+      contest={contest}
+      variant={mine ? 'user' : 'public'}
+      onLoad={onLoad}
+      onEdit={onEdit}
+      onDelete={mine ? handleDelete : undefined}
+      onLike={mine ? undefined : handleLike}
+      onSave={mine ? undefined : handleSave}
+      isActive={activeContest?._id === contest._id}
+      likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
+      savedByMe={!!contestsState?.savedIds?.includes(contest._id)}
+      quickSelectedByMe={
+        !!contestsState?.quickSelectedIds?.includes(contest._id)
+      }
+    />
+  );
 
-  let content: React.ReactNode = null;
+  const saveCurrent = {
+    label: t('widgets.contests.saveCurrentContest'),
+    icon: <Save className="size-[18px]" aria-hidden="true" />,
+    onClick: onCreateNew,
+    disabled: offline,
+    title: offline ? t('offline.needsConnection') : undefined,
+  };
 
-  if (view === 'current') {
-    const isOwnedByUser = activeContest?.userId.toString() === user?._id;
+  let list: React.ReactNode;
 
-    content = activeContest ? (
-      <div className="grid gap-4">
-        <ContestListItem
-          key={activeContest._id}
-          contest={activeContest}
-          variant={isOwnedByUser ? 'user' : 'public'}
-          onLoad={onLoad}
-          onEdit={isOwnedByUser ? onEdit : undefined}
-          onDelete={isOwnedByUser ? handleDelete : undefined}
-          onLike={!isOwnedByUser ? handleLike : undefined}
-          onSave={!isOwnedByUser ? handleSave : undefined}
-          isActive
-          likedByMe={
-            !isOwnedByUser
-              ? !!contestsState?.likedIds?.includes(activeContest._id)
-              : undefined
-          }
-          savedByMe={
-            !isOwnedByUser
-              ? !!contestsState?.savedIds?.includes(activeContest._id)
-              : undefined
-          }
-          quickSelectedByMe={
-            !!contestsState?.quickSelectedIds?.includes(activeContest._id)
-          }
-        />
-      </div>
-    ) : null;
-  } else if (listView !== 'ready') {
-    content = (
+  if (listView !== 'ready') {
+    list = (
       <QueryNotice
         view={listView}
-        onRetry={() => activeListQuery?.refetch()}
+        onRetry={() => listQuery.refetch()}
         className="py-8"
       />
     );
-  } else if (contestsOnPage.length > 0) {
-    content = (
+  } else if (contestsOnPage.length === 0) {
+    list = searching ? (
+      <LibraryEmpty
+        message={t('widgets.contests.noContestsFoundMatchingYourSearch')}
+        action={{
+          label: t('widgets.library.clearSearch'),
+          onClick: () => {
+            setSearch('');
+            setPage(1);
+          },
+        }}
+      />
+    ) : isYours ? (
+      <LibraryEmpty
+        message={t('widgets.contests.noContestsYet')}
+        action={saveCurrent}
+      />
+    ) : (
+      <LibraryEmpty
+        message={t('widgets.contests.savedEmpty')}
+        action={
+          onBrowseCommunity && {
+            label: t('widgets.library.browseCommunity'),
+            onClick: onBrowseCommunity,
+          }
+        }
+      />
+    );
+  } else {
+    list = (
       <>
         <div className="grid gap-4">
-          {view === 'yours'
-            ? contestsOnPage.map((contest) => (
-                <ContestListItem
-                  key={contest._id}
-                  contest={contest}
-                  variant="user"
-                  onLoad={onLoad}
-                  onEdit={onEdit}
-                  onDelete={handleDelete}
-                  isActive={activeContest?._id === contest._id}
-                  quickSelectedByMe={
-                    !!contestsState?.quickSelectedIds?.includes(contest._id)
-                  }
-                />
-              ))
-            : contestsOnPage.map((contest) => (
-                <ContestListItem
-                  key={contest._id}
-                  contest={contest}
-                  variant="public"
-                  onLoad={onLoad}
-                  onEdit={onEdit}
-                  onLike={handleLike}
-                  onSave={handleSave}
-                  isActive={activeContest?._id === contest._id}
-                  likedByMe={!!contestsState?.likedIds?.includes(contest._id)}
-                  savedByMe={!!contestsState?.savedIds?.includes(contest._id)}
-                  quickSelectedByMe={
-                    !!contestsState?.quickSelectedIds?.includes(contest._id)
-                  }
-                />
-              ))}
+          {contestsOnPage.map((contest) => renderContest(contest, isYours))}
         </div>
-
         {totalPages > 1 && (
           <WidgetPager
             page={page}
@@ -350,174 +273,131 @@ const UserContests: React.FC<UserContestsProps> = ({
         )}
       </>
     );
-  } else {
-    content = (
-      <div className="text-center py-12">
-        <p className="text-white/70 mb-4">
-          {debouncedSearch.trim()
-            ? t('widgets.contests.noContestsFoundMatchingYourSearch')
-            : view === 'yours'
-            ? t('widgets.contests.noContestsYetCreateYourFirstContest')
-            : t('widgets.contests.noSavedContestsYet')}
-        </p>
-        {view === 'yours' && !debouncedSearch.trim() && (
-          <Button variant="tertiary" onClick={onCreateNew}>
-            {t('widgets.contests.createContest')}
-          </Button>
-        )}
-      </div>
-    );
   }
 
   return (
-    <div className="sm:space-y-4 space-y-2">
-      <div className="sm:space-y-3 space-y-2">
-        <WidgetSearchHeader
-          search={search}
-          onSearchChange={(value) => {
-            setSearch(value);
-            setPage(1);
-          }}
-          // The dialog says what it saves (the open contest, as a new one).
-          onCreateNew={onCreateNew}
-          placeholder={t('widgets.contests.searchContests')}
-          extraActions={
-            <Button
-              onClick={() => setMyLeaderboardOpen(true)}
-              Icon={<ChartColumn className="w-6 h-6" />}
-              className="justify-center whitespace-nowrap !p-[12.5px]"
-              title={t('widgets.contests.entryStats.pickerTitle')}
-            />
-          }
-        />
-
-        <div className="flex items-center flex-wrap justify-start gap-2">
-          <Badge
-            label={t('widgets.contests.yourContests')}
-            onClick={() => setViewAndResetPage('yours')}
-            isActive={view === 'yours'}
-            Icon={<User className="w-4 h-4 flex-none" />}
+    <>
+      <LibraryPlaceLayout
+        scrollKey={`${page}|${debouncedSearch}|${sortKey}|${groupId}`}
+        toolbar={
+          <LibraryToolbar
+            search={search}
+            onSearchChange={(value) => {
+              setSearch(value);
+              setPage(1);
+            }}
+            searchPlaceholder={
+              isYours
+                ? t('widgets.contests.searchYours')
+                : t('widgets.contests.searchSaved')
+            }
+            shortSearchPlaceholder={t('widgets.library.search')}
+            filters={[sortFilter]}
+            action={isYours ? saveCurrent : undefined}
           />
-          <Badge
-            label={t('widgets.saved')}
-            onClick={() => setViewAndResetPage('saved')}
-            isActive={view === 'saved'}
-            Icon={
-              view === 'saved' ? (
-                <BookmarkCheckIcon className="w-4 h-4 flex-none" />
-              ) : (
-                <BookmarkIcon className="w-4 h-4 flex-none" />
+        }
+        rail={
+          isYours && (
+            <LibraryFolderRail
+              groups={groups}
+              selectedId={groupId}
+              onSelect={(id) => {
+                setGroupId(id);
+                setPage(1);
+              }}
+              onAdd={() => {
+                setGroupToEdit(null);
+                setGroupModalOpen(true);
+              }}
+              onEdit={(group) => {
+                setGroupToEdit(group);
+                setGroupModalOpen(true);
+              }}
+              allLabel={t('widgets.contests.groups.allContests')}
+              addLabel={t('widgets.contests.groups.newGroup')}
+              editLabel={t('widgets.contests.groups.editGroupAria')}
+            />
+          )
+        }
+      >
+        {inUse && (
+          <>
+            <LibraryListHeader label={t('widgets.library.inUse')} />
+            {renderContest(inUse, inUseIsMine)}
+          </>
+        )}
+        {(listView === 'ready' || isYours) && (
+          <LibraryListHeader
+            className={inUse ? 'mt-3' : ''}
+            label={
+              listView === 'ready'
+                ? t('widgets.contests.nContests', { count: total })
+                : undefined
+            }
+            trailing={
+              isYours && (
+                <LibraryLink
+                  icon={<ChartColumn className="size-4" aria-hidden="true" />}
+                  label={t('widgets.contests.entryStats.pickerTitle')}
+                  onClick={() => setMyLeaderboardOpen(true)}
+                />
               )
             }
           />
-          {!!activeContest && (
-            <Badge
-              label={t('widgets.active')}
-              onClick={() => setViewAndResetPage('current')}
-              isActive={view === 'current'}
-              Icon={
-                view === 'current' ? (
-                  <PinSolidIcon className="w-4 h-4 flex-none" />
-                ) : (
-                  <PinIcon className="w-4 h-4 flex-none" />
-                )
-              }
-            />
-          )}
-        </div>
-      </div>
-
-      {view !== 'current' && (
-        <div className="space-y-1">
-          {listView === 'ready' && (
-            <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
-          )}
-          {listView === 'ready' && offline && (
-            <p className="text-xs text-white/55">{t('offline.cachedCopy')}</p>
-          )}
-          <WidgetSortBadges
-            value={sortKey}
-            onChange={(k: PublicSortKey) => {
-              setSortKey(k as ContestSortKey);
-              setPage(1);
-            }}
-            hideCopies
-          />
-          {view === 'yours' && (
-            <WidgetResourceGroupBadges
-              groups={contestGroups}
-              selectedGroupId={selectedContestGroupId}
-              onSelectAll={() => {
-                setSelectedContestGroupId(null);
-                setPage(1);
-              }}
-              onSelectGroup={(id) => {
-                setSelectedContestGroupId(id);
-                setPage(1);
-              }}
-              onAddGroup={() => {
-                setContestGroupToEdit(null);
-                setContestGroupModalOpen(true);
-              }}
-              onEditGroup={(g) => {
-                setContestGroupToEdit(g);
-                setContestGroupModalOpen(true);
-              }}
-              allLabel={t('widgets.contests.groups.all')}
-              addGroupAriaLabel={t('widgets.contests.groups.addGroupAria')}
-              editGroupAriaLabel={t('widgets.contests.groups.editGroupAria')}
-              className="pt-1"
-            />
-          )}
-        </div>
-      )}
-
-      {/* Content by view */}
-      {content}
-
-      <UserResourceGroupModal
-        isOpen={contestGroupModalOpen}
-        onClose={() => {
-          setContestGroupModalOpen(false);
-          setContestGroupToEdit(null);
-        }}
-        groupToEdit={contestGroupToEdit}
-        isSaving={contestGroupModalSaving}
-        confirmDeleteKey="delete-contest-group"
-        confirmDeleteTitle={
-          contestGroupToEdit
-            ? t('settings.confirmations.deleteItem', {
-                name: contestGroupToEdit.name,
-              })
-            : ''
-        }
-        confirmDeleteDescription={t(
-          'widgets.contests.groups.deleteGroupConfirmDescription',
         )}
-        labels={{
-          createTitle: t('widgets.contests.groups.createTitle'),
-          editTitle: t('widgets.contests.groups.editTitle'),
-          nameRequired: t('widgets.contests.groups.nameRequired'),
-          createdSuccess: t('widgets.contests.groups.createdSuccess'),
-          updatedSuccess: t('widgets.contests.groups.updatedSuccess'),
-          deletedSuccess: t('widgets.contests.groups.deletedSuccess'),
-          failedSave: t('widgets.contests.groups.failedSave'),
-          failedDelete: t('widgets.contests.groups.failedDelete'),
-          nameLabel: t('common.name'),
-          namePlaceholder: t('common.enterName'),
-        }}
-        onCreate={(name) => createContestGroup({ name })}
-        onUpdate={(id, name) => updateContestGroup({ id, name })}
-        onDelete={(id) => deleteContestGroup(id)}
-      />
+        {listView === 'ready' && offline && (
+          <p className="-mt-1 pb-2.5 text-[12.5px] font-semibold text-white/55">
+            {t('offline.cachedCopy')}
+          </p>
+        )}
+        {list}
+      </LibraryPlaceLayout>
+
+      {isYours && (
+        <UserResourceGroupModal
+          isOpen={groupModalOpen}
+          onClose={() => {
+            setGroupModalOpen(false);
+            setGroupToEdit(null);
+          }}
+          groupToEdit={groupToEdit}
+          isSaving={isCreatingGroup || isUpdatingGroup || isDeletingGroup}
+          confirmDeleteKey="delete-contest-group"
+          confirmDeleteTitle={
+            groupToEdit
+              ? t('settings.confirmations.deleteItem', {
+                  name: groupToEdit.name,
+                })
+              : ''
+          }
+          confirmDeleteDescription={t(
+            'widgets.contests.groups.deleteGroupConfirmDescription',
+          )}
+          labels={{
+            createTitle: t('widgets.contests.groups.createTitle'),
+            editTitle: t('widgets.contests.groups.editTitle'),
+            nameRequired: t('widgets.contests.groups.nameRequired'),
+            createdSuccess: t('widgets.contests.groups.createdSuccess'),
+            updatedSuccess: t('widgets.contests.groups.updatedSuccess'),
+            deletedSuccess: t('widgets.contests.groups.deletedSuccess'),
+            failedSave: t('widgets.contests.groups.failedSave'),
+            failedDelete: t('widgets.contests.groups.failedDelete'),
+            nameLabel: t('common.name'),
+            namePlaceholder: t('common.enterName'),
+          }}
+          onCreate={(name) => createGroup({ name })}
+          onUpdate={(id, name) => updateGroup({ id, name })}
+          onDelete={(id) => deleteGroup(id)}
+        />
+      )}
 
       {myLeaderboardOpen && (
         <MyLeaderboardModal
           isOpen={myLeaderboardOpen}
           onClose={() => setMyLeaderboardOpen(false)}
-          onSelectEntry={(code, groupId) => {
+          onSelectEntry={(code, selectedGroupId) => {
             setEntryStatsCode(code);
-            setEntryStatsGroupId(groupId);
+            setEntryStatsGroupId(selectedGroupId);
             setEntryStatsOpen(true);
           }}
         />
@@ -535,7 +415,7 @@ const UserContests: React.FC<UserContestsProps> = ({
           initialGroupId={entryStatsGroupId}
         />
       )}
-    </div>
+    </>
   );
 };
 

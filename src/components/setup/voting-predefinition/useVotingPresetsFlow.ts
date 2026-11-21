@@ -1,7 +1,6 @@
 import { useTranslations } from 'next-intl';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import {
   applyDetailedPresetToStageVotes,
@@ -9,6 +8,7 @@ import {
   hasAnyStageVotes,
 } from './presetMappers';
 
+import { toast } from '@/helpers/toast';
 import type { EventStage } from '@/models';
 import type { PointsItem } from '@/state/generalStore';
 import type {

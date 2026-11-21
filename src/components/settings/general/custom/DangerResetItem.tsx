@@ -1,11 +1,11 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { RestartIcon } from '@/assets/icons/RestartIcon';
 import { TriangleAlertIcon } from '@/assets/icons/TriangleAlertIcon';
 import Button from '@/components/common/Button';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 

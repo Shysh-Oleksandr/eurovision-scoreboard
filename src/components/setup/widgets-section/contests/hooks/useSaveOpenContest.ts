@@ -1,13 +1,16 @@
 import { useTranslations } from 'next-intl';
 import { useCallback, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
-import { getContestThemePayload, parseContestYear } from '../saveContest';
+import {
+  getContestThemePayload,
+  parseContestYear,
+  toastContestSaveError,
+} from '../saveContest';
 
 import { useUpdateContestMutation } from '@/api/contests';
 import { computeCurrentSetupFingerprint } from '@/helpers/contestFingerprint';
 import { buildContestSnapshotFromStores } from '@/helpers/contestSnapshot';
-import { toastAxiosError } from '@/helpers/parseAxiosError';
+import { toast } from '@/helpers/toast';
 import { useGeneralStore } from '@/state/generalStore';
 
 /**
@@ -60,7 +63,7 @@ export function useSaveOpenContest() {
         }),
       );
     } catch (error) {
-      toastAxiosError(error, t('widgets.contests.failedToSaveContest'));
+      toastContestSaveError(error, t);
     } finally {
       savingRef.current = false;
       setIsSaving(false);

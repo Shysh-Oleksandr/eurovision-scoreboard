@@ -4,17 +4,40 @@ import { ReactNode, useCallback, useMemo } from 'react';
 
 import { useShallow } from 'zustand/shallow';
 
-import { useQualifierTargetStageNames } from '../qualification/useQualifierTargetStageNames';
+import { useQualifierSections } from '../qualification/useQualifierSections';
 
 import {
   getQualifierTargetStageNames,
   getTotalQualifiersAmount,
   qualifiesOnlyToGrandFinal,
-  shouldShowQualifierTargetLabels,
 } from '@/helpers/qualifierTargetResolution';
 import { BaseCountry } from '@/models';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
+
+/** The places of one target stage (or of all of them, `useQualifiers`). */
+export interface QualifierPlaces {
+  key: string;
+  /** "Qualified for the Grand Final". */
+  heading: ReactNode;
+  /** The target stage's name; empty for all the places together. */
+  stageName: string;
+  /** Its first place among all the places (0-based). */
+  start: number;
+  size: number;
+  /** By place: the qualifier, or undefined while the place is open. */
+  places: (BaseCountry | undefined)[];
+  filled: number;
+}
+
+// The headings' line breaks flattened.
+const rich = { br: () => ' ', span: (chunks: ReactNode) => chunks };
+
+const toPlaces = (qualifiers: BaseCountry[], size: number) =>
+  Array.from(
+    { length: Math.max(size, qualifiers.length) },
+    (_, index): BaseCountry | undefined => qualifiers[index],
+  );
 
 /**
  * Pick qualifiers mode, as the column layout shows it: who qualified so far
@@ -22,6 +45,11 @@ import { useScoreboardStore } from '@/state/scoreboardStore';
  * qualifier (the window's), the split screen's candidates while it is open,
  * and the heading ("Qualified for the Grand Final", "…for Semi-Final 3", or
  * "Qualified entries" when they go to different stages).
+ *
+ * With several target stages (and "Show qualifier target stages" on) the
+ * places come in `sections`, one per target stage: the picks fill them one
+ * after another (the store keeps it so), and once the stage is over each
+ * qualifier sits where its rank sends it.
  */
 export const useQualifiers = () => {
   const t = useTranslations('simulation');
@@ -58,21 +86,10 @@ export const useQualifiers = () => {
       .sort((a, b) => (order[a.code] ?? 0) - (order[b.code] ?? 0));
   }, [stage, qualificationOrder]);
 
-  const qualifiedCodes = useMemo(
-    () => qualified.map((country) => country.code),
-    [qualified],
-  );
-  const targetNames = useQualifierTargetStageNames(stage, qualifiedCodes);
-  const showTargetLabels =
-    isOver &&
-    shouldShowQualifierTargetLabels(
-      stage?.qualifiesTo,
-      eventStages,
-      showQualifierTargetStages,
-    );
+  const groups = useQualifierSections(stage, qualified, !isOver);
+  const split = showQualifierTargetStages && groups.length > 1;
 
   const heading = useMemo(() => {
-    const rich = { br: () => ' ', span: (chunks: ReactNode) => chunks };
     const names = getQualifierTargetStageNames(stage?.qualifiesTo, eventStages);
 
     if (
@@ -89,6 +106,37 @@ export const useQualifiers = () => {
     return t.rich('qualifiedEntries', rich);
   }, [t, stage?.qualifiesTo, eventStages, showQualifierTargetStages]);
 
+  const sections = useMemo((): QualifierPlaces[] => {
+    if (!split) {
+      return [
+        {
+          key: 'all',
+          heading,
+          stageName: '',
+          start: 0,
+          size: total,
+          places: toPlaces(qualified, total),
+          filled: qualified.length,
+        },
+      ];
+    }
+
+    return groups.map((group) => ({
+      key: `${group.targetStageId}-${group.start}`,
+      heading: t.rich('qualifiedForStage', {
+        ...rich,
+        stageName: group.stageName,
+      }),
+      stageName: group.stageName,
+      start: group.start,
+      size: group.size,
+      places: toPlaces(group.qualifiers, group.size),
+      filled: group.qualifiers.length,
+    }));
+  }, [split, groups, heading, total, qualified, t]);
+
+  const latest = qualified[qualified.length - 1] as BaseCountry | undefined;
+
   const splitCandidates: BaseCountry[] =
     splitScreenEnabled && splitOpen && !isOver ? candidates : [];
 
@@ -97,13 +145,25 @@ export const useQualifiers = () => {
     isOver,
     total,
     qualified,
-    latest: qualified[qualified.length - 1] as BaseCountry | undefined,
+    latest,
     remaining: Math.max(total - qualified.length, 0),
     /** 0-1: the places filled. */
     progress: total ? Math.min(qualified.length / total, 1) : 0,
     heading,
-    targetNameFor: (code: string) =>
-      showTargetLabels ? targetNames.get(code) : undefined,
+    /** The places, one section per target stage when `split`. */
+    sections,
+    /** The places are split by target stage. */
+    split,
+    /** The place the next pick takes (0-based); null once it's over. */
+    nextPlace: isOver ? null : qualified.length,
+    /** The target stage the next pick goes to. */
+    activeSection: isOver
+      ? undefined
+      : sections.find((section) => section.filled < section.size),
+    /** The target stage the latest qualifier goes to. */
+    latestSection: latest
+      ? sections.find((section) => section.places.includes(latest))
+      : undefined,
     /** The split screen's candidates while it shows; empty otherwise. */
     splitCandidates,
   };

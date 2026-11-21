@@ -1,15 +1,22 @@
 import { ChevronRight, CloudOff, Globe, Lock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import Image from 'next/image';
 
 import { showContestSavedToast } from './contestSavedToast';
 import {
+  Field,
+  FieldError,
+  hostingOptionImageClassName,
+  INPUT_CLASS,
+  useHostingCountryOptions,
+} from './dialogFields';
+import {
   countSnapshotLineup,
   getContestThemePayload,
   parseContestYear,
+  toastContestSaveError,
 } from './saveContest';
 
 import {
@@ -22,9 +29,7 @@ import {
 } from '@/api/contests';
 import { UploadIcon } from '@/assets/icons/UploadIcon';
 import Button from '@/components/common/Button';
-import CustomSelect, {
-  Option,
-} from '@/components/common/customSelect/CustomSelect';
+import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { Segmented } from '@/components/simulation/columnLayout/controls';
@@ -34,14 +39,13 @@ import {
   rebaseLoadedContestGeneralInfo,
 } from '@/helpers/contestFingerprint';
 import { buildContestSnapshotFromStores } from '@/helpers/contestSnapshot';
-import { toastAxiosError } from '@/helpers/parseAxiosError';
+import { toast } from '@/helpers/toast';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useIsOffline } from '@/state/connectivityStore';
-import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
+import { getChainDefaults } from '@/state/nextYearStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
 import { Contest } from '@/types/contest';
 
 /**
@@ -72,45 +76,6 @@ interface CreateContestModalProps {
 const contestLabel = (contest: Pick<Contest, 'name' | 'year'>) =>
   [contest.name, contest.year].filter(Boolean).join(' ');
 
-/** A form field: a recessed well with its name as a caption inside. */
-const Field = ({
-  label,
-  htmlFor,
-  invalid,
-  className = '',
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  invalid?: boolean;
-  className?: string;
-  children: React.ReactNode;
-}) => (
-  <label
-    htmlFor={htmlFor}
-    data-invalid={invalid || undefined}
-    className={`dp-field flex flex-col justify-center gap-[3px] min-h-[48px] rounded-xl px-3 py-1.5 cursor-text ${className}`}
-  >
-    <span className="text-[12px] font-semibold leading-none text-white/75">
-      {label}
-    </span>
-    {children}
-  </label>
-);
-
-const INPUT_CLASS =
-  'w-full min-w-0 bg-transparent p-0 border-0 outline-none text-[16px] md:text-[14.5px] font-bold leading-[1.3] text-white';
-
-const FieldError = ({ id, children }: { id: string; children: string }) => (
-  <p
-    id={id}
-    role="alert"
-    className="-mt-1 px-1 text-[12.5px] font-bold text-[var(--badge-red-ink)]"
-  >
-    {children}
-  </p>
-);
-
 const CreateContestModal: React.FC<CreateContestModalProps> = ({
   isOpen,
   onClose,
@@ -124,10 +89,6 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const ids = useId();
 
   const user = useAuthStore((s) => s.user);
-  const shouldUse2026WhiteHeartFlags = useGeneralStore(
-    (state) => state.settings.shouldUse2026WhiteHeartFlags,
-  );
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const offline = useIsOffline();
 
   // What this dialog does is fixed when it opens (the parents mount it per
@@ -147,6 +108,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
     // name/year/host edits made since it was loaded.
     const fromSettings = !isDetails || editsOpenContest;
     const source = isDetails ? contest : kind === 'save' ? null : activeContest;
+    // A contest Next year started saves where last year's went.
+    const chain = kind === 'save' ? getChainDefaults(settings) : null;
 
     return {
       kind,
@@ -173,11 +136,11 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
         isPublic:
           kind === 'details' || kind === 'saveAsNew'
             ? !!source?.isPublic
-            : true,
+            : chain?.isPublic ?? true,
         groupId:
           kind === 'details' || kind === 'saveAsNew'
             ? source?.groupId ?? ''
-            : '',
+            : chain?.groupId ?? '',
         logoUrl: isDetails ? contest!.logoUrl ?? '' : '',
       },
     };
@@ -193,7 +156,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const [venue, setVenue] = useState(setup.form.venue);
   const [hosts, setHosts] = useState(setup.form.hosts);
   const [isPublic, setIsPublic] = useState(setup.form.isPublic);
-  const [groupId, setGroupId] = useState(setup.form.groupId);
+  const [groupChoice, setGroupId] = useState(setup.form.groupId);
   const [logoUrl, setLogoUrl] = useState(setup.form.logoUrl);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [logoCleared, setLogoCleared] = useState(false);
@@ -225,7 +188,16 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
   const { mutateAsync: uploadContestLogo } = useUploadContestLogoMutation();
   const { mutateAsync: clearContestLogo } = useClearContestLogoMutation();
   const { mutateAsync: applyContestToProfile } = useApplyContestMutation();
-  const { data: contestGroups = [] } = useContestGroupsQuery(!!user && isOpen);
+  const { data: contestGroups = [], isSuccess: groupsLoaded } =
+    useContestGroupsQuery(!!user && isOpen);
+  // A group remembered by Next year that was deleted since: none.
+  const groupId =
+    groupChoice &&
+    groupsLoaded &&
+    kind === 'save' &&
+    !contestGroups.some((group) => group._id === groupChoice)
+      ? ''
+      : groupChoice;
 
   useEffectOnce(onLoaded);
 
@@ -262,24 +234,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, onClose]);
 
-  const hostingCountryOptions = useMemo(
-    () =>
-      getAllCountries(false).map((country) => {
-        const { logo, isExisting } = getHostingCountryLogo(
-          country,
-          true,
-          shouldUse2026WhiteHeartFlags,
-        );
-
-        return {
-          label: country.name,
-          value: country.code,
-          imageUrl: logo,
-          isExisting,
-        };
-      }),
-    [getAllCountries, shouldUse2026WhiteHeartFlags],
-  );
+  const hostingCountryOptions = useHostingCountryOptions();
 
   const groupOptions = useMemo(
     () => [
@@ -448,12 +403,12 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
         { _id: saved._id, isPublic: madePublic },
         {
           copyLink: t('widgets.copyLink'),
-          linkCopied: t('graphics.gallery.toast.linkCopied'),
+          copied: t('widgets.copied'),
         },
       );
       onClose();
     } catch (error) {
-      toastAxiosError(error, t('widgets.contests.failedToSaveContest'));
+      toastContestSaveError(error, t);
     } finally {
       setSubmitting(false);
     }
@@ -586,15 +541,7 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
                 value={hostingCountryCode}
                 onChange={setHostingCountryCode}
                 id={`${ids}-host`}
-                getImageClassName={(option: Option, type) =>
-                  type === 'display'
-                    ? option.isExisting
-                      ? '!object-contain'
-                      : '!h-4 rounded-[2px]'
-                    : option.isExisting
-                    ? 'w-8 h-8 !object-contain'
-                    : 'w-8 h-6'
-                }
+                getImageClassName={hostingOptionImageClassName}
               />
             </div>
             <Field

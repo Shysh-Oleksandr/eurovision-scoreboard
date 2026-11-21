@@ -1,5 +1,6 @@
 'use client';
 import {
+  CalendarPlus,
   Expand,
   LogOut,
   Maximize2,
@@ -27,12 +28,14 @@ import AnchoredMenu, {
   AnchoredMenuEntry,
 } from '@/components/common/AnchoredMenu';
 import Button from '@/components/common/Button';
+import { useCanStartNextYear } from '@/components/nextYear/useCanStartNextYear';
 import { useContestSave } from '@/components/setup/widgets-section/contests/useContestSave';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import type { ShortcutId } from '@/shortcuts/actions';
 import { ShortcutHintText, useShortcutHintFormatter } from '@/shortcuts/hints';
 import { useGeneralStore } from '@/state/generalStore';
+import { openNextYear } from '@/state/nextYearStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
 
@@ -319,6 +322,7 @@ export const SimHeaderActions = React.memo(
     const tRoot = useTranslations();
     const { canUndo, undo, restart, cancel, openSetup } =
       useSimulationActions();
+    const canStartNextYear = useCanStartNextYear();
     const setMinimalView = useSimViewStore((state) => state.setMinimalView);
     const fullscreen = useFullscreenToggle();
     // The keys show at the end of the menu rows (website, mouse only).
@@ -364,6 +368,16 @@ export const SimHeaderActions = React.memo(
           ? tRoot('offline.needsConnection')
           : undefined,
       },
+      // Next year placement 3 of 4 (docs/event-setup-hub-and-design-tokens.md §8).
+      ...(canStartNextYear
+        ? [
+            {
+              label: tRoot('nextYear.button'),
+              icon: <CalendarPlus className={iconClass} />,
+              onClick: () => openNextYear('menu'),
+            },
+          ]
+        : []),
       {
         label: t('header.share'),
         icon: <Share2 className={iconClass} />,

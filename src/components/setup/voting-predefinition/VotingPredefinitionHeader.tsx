@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 
 import { cn } from '@/helpers/utils';
+import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 import { useReadableForegroundFromCssVar } from '@/theme/useReadableForegroundFromCssVar';
 
 export type PredefinitionMode = 'detailed' | 'rank' | 'totals';
@@ -24,8 +25,16 @@ type Props = {
 };
 
 /**
- * The modal's fixed shell header: a wrapping command bar (mode tabs, per-tab
- * controls, Share, overflow) above a hero row naming the stage being authored.
+ * Command bar steps, roomiest first: one row; the tab's own controls on a
+ * second row; then (phones) tabs stretched, Reset left to the ⋯ menu where
+ * it also lives, and Share / Randomize as their icons.
+ */
+const BAR_STEPS = [{ bar: 'one' }, { bar: 'two' }, { bar: 'compact' }] as const;
+const COMPACT_STEP = 2;
+
+/**
+ * The modal's fixed shell header: the command bar (mode tabs, per-tab
+ * controls, Share, overflow) above the stage being authored.
  */
 export const VotingPredefinitionHeader: React.FC<Props> = ({
   modeTabs,
@@ -38,6 +47,8 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
   title,
   titleAdornment,
 }) => {
+  const barRef = useRef<HTMLDivElement>(null);
+  const step = useFitStep(barRef, BAR_STEPS);
   const tabsRef = useRef<HTMLDivElement>(null);
   const activeTabColor = useReadableForegroundFromCssVar(
     tabsRef,
@@ -46,12 +57,16 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
 
   return (
     <div className="flex-none px-4 pt-4 sm:px-5">
-      <div className="flex flex-wrap items-center gap-[9px]">
+      <div
+        ref={barRef}
+        className="dp-vp-head"
+        {...fitStepAttributes(BAR_STEPS[step])}
+      >
         <div
           ref={tabsRef}
           role="tablist"
           aria-label={kicker}
-          className="flex flex-wrap mr-auto flex-none gap-0.5 rounded-xl border border-white/10 bg-black/[0.26] p-1"
+          className="dp-vp-head-tabs rounded-xl border border-white/10 bg-black/[0.26] p-1"
         >
           {modeTabs.map((tab) => {
             const isActive = tab.value === activeMode;
@@ -78,16 +93,22 @@ export const VotingPredefinitionHeader: React.FC<Props> = ({
           })}
         </div>
 
-        {contextualControls}
-        {shareMenu}
-        {overflowMenu}
+        <div className="dp-vp-head-ctx">{contextualControls}</div>
+        <div className="dp-vp-head-end">
+          {shareMenu}
+          {overflowMenu}
+        </div>
       </div>
 
-      <div className="mb-3 mt-3.5 flex flex-wrap items-baseline gap-3">
-        <span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/40">
-          {kicker}
-        </span>
-        <h1 className="text-[21px] font-extrabold tracking-[-0.025em] sm:text-[25px]">
+      <div className="mb-3 mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        {/* On phones the stage name says enough; the modal's purpose is
+            the tab group's accessible name either way. */}
+        {step !== COMPACT_STEP && (
+          <span className="text-[13px] font-semibold text-white/60">
+            {kicker}
+          </span>
+        )}
+        <h1 className="text-[20px] font-extrabold tracking-[-0.024em] sm:text-[24px]">
           {title}
         </h1>
         {titleAdornment}

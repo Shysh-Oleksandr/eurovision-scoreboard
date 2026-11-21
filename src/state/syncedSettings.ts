@@ -48,7 +48,6 @@ export const SYNCED_SETTINGS_KEYS = [
   'enableKeyboardShortcuts',
   'showShortcutHints',
   'keyboardShortcuts',
-  'oddsRankLayout',
   'enableWinterEffects',
   'snowFallIntensity',
   'overrideThemeFont',

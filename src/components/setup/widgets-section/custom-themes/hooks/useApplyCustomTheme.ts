@@ -1,10 +1,10 @@
 import { useTranslations } from 'next-intl';
-import { toast } from 'react-toastify';
 
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 
 import { api, isNetworkError } from '@/api/client';
 import { useApplyThemeMutation } from '@/api/themes';
+import { toast } from '@/helpers/toast';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';

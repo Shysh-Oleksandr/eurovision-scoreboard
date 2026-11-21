@@ -1,6 +1,5 @@
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
-import { toast } from 'react-toastify';
 
 import { useQuickSelectThemesQuery } from '@/api/quickSelect';
 import {
@@ -13,6 +12,7 @@ import {
   JESC_THEME_OPTIONS,
   THEME_OPTIONS,
 } from '@/data/data';
+import { toast } from '@/helpers/toast';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import {

@@ -27,6 +27,7 @@ import AnchoredMenu, {
   AnchoredMenuEntry,
 } from '@/components/common/AnchoredMenu';
 import Button from '@/components/common/Button';
+import { Tooltip } from '@/components/common/Tooltip';
 import DrawToggleButton, {
   useDrawToggle,
 } from '@/components/setup/allocation-draw/DrawToggleButton';
@@ -80,8 +81,8 @@ const ContestCard: React.FC<ContestCardProps> = ({
   const user = useAuthStore((state) => state.user);
   const contestName = useGeneralStore((state) => state.settings.contestName);
   const contestYear = useGeneralStore((state) => state.settings.contestYear);
-  const contestDescription = useGeneralStore(
-    (state) => state.settings.contestDescription,
+  const description = useGeneralStore((state) =>
+    state.settings.contestDescription.trim(),
   );
   const showHostingCountryLogo = useGeneralStore(
     (state) => state.settings.showHostingCountryLogo,
@@ -271,12 +272,29 @@ const ContestCard: React.FC<ContestCardProps> = ({
               />
             )}
             <div className="min-w-0">
-              <h5
-                className="dp-cc-title text-[17px] 2cols:text-[22px] lg:text-2xl font-extrabold tracking-[-.022em] leading-tight line-clamp-2 text-balance"
-                title={contestDescription || undefined}
-              >
-                {contestName} {contestYear}
-              </h5>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <h5 className="dp-cc-title min-w-0 text-[17px] 2cols:text-[22px] lg:text-2xl font-extrabold tracking-[-.022em] leading-tight line-clamp-2 text-balance">
+                  {contestName} {contestYear}
+                </h5>
+                {description && (
+                  <div className="dp-cc-desc flex-none">
+                    <Tooltip
+                      position="center"
+                      className="!w-max !max-w-[min(300px,80vw)]"
+                      classNameIcon="!mt-0 !w-4 !h-4 2cols:!w-[18px] 2cols:!h-[18px] !text-white/55 hover:!text-white/85 transition-colors"
+                      content={
+                        <p className="font-medium whitespace-pre-line break-words">
+                          {description}
+                        </p>
+                      }
+                    >
+                      <span className="sr-only">
+                        {t('common.description')}: {description}
+                      </span>
+                    </Tooltip>
+                  </div>
+                )}
+              </div>
               <p className="dp-cc-meta flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1 text-[12.5px] 2cols:text-[13px] font-semibold text-white/80">
                 <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                   {where.icon}

@@ -1,13 +1,16 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import Modal from '../../common/Modal/Modal';
-import ModalBottomContent from '../../common/Modal/ModalBottomContent';
-import Tabs, { TabContent } from '../../common/tabs/Tabs';
 
-import EventStageVoters from './EventStageVoters';
 import {
   PostSetupFormContext,
   usePostSetupStageForm,
@@ -17,13 +20,18 @@ import {
 import { useStageOddsOverrideDraft } from './hooks/useStageOddsOverrideDraft';
 import { useStagePointsOverrideDraft } from './hooks/useStagePointsOverrideDraft';
 import { RunningOrderTab, useRunningOrder } from './running-order';
-import StageGeneralTab from './StageGeneralTab';
+import StageGeneralTab, { VOTING_MODE_LABEL_KEYS } from './StageGeneralTab';
 import StageOddsTab from './StageOddsTab';
+import StageSetupFooter from './StageSetupFooter';
+import StageSetupHeader from './StageSetupHeader';
 import { VoterChannelsErrorBar } from './VoterChannelsErrorBar';
+import VotersTab from './voters/VotersTab';
 
-import { PlayIcon } from '@/assets/icons/PlayIcon';
+import { PointsSystemController } from '@/components/settings/pointsSystem/useGlobalPointsSystemController';
+import { OddsController } from '@/components/settings/useGlobalOddsController';
 import ShareResultsModal from '@/components/simulation/share/ShareResultsModal';
-import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
+import { toast } from '@/helpers/toast';
+import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { EventStage, StageOverrides, StageVotingMode } from '@/models';
 import { useShortcut } from '@/shortcuts/registry';
@@ -36,12 +44,9 @@ import {
 } from '@/state/scoreboard/voterChannels';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
-enum PostSetupModalTab {
-  RUNNING_ORDER = 'Running Order',
-  VOTERS = 'Voters',
-  GENERAL = 'General',
-  ODDS = 'Odds',
-}
+const TABS = ['runningOrder', 'voters', 'odds', 'general'] as const;
+
+type StageTab = (typeof TABS)[number];
 
 interface PostSetupModalProps {
   isOpen: boolean;
@@ -51,6 +56,13 @@ interface PostSetupModalProps {
   onSave: () => void;
 }
 
+/**
+ * Stage setup, opened by Start before each stage: the libraries' frame (the
+ * stage's name, Running order / Voters / Odds / General as a segmented
+ * well, ×) and a footer that reads the stage back beside Start. Every tab
+ * edits a draft; Start saves them all, and closing asks first only when
+ * something changed.
+ */
 const PostSetupModal: React.FC<PostSetupModalProps> = ({
   isOpen,
   onClose,
@@ -59,19 +71,23 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
   onSave,
 }) => {
   const t = useTranslations('setup.eventStageModal');
-  const { onClickOutside } = useConfirmModalClose({
-    onClose,
-    confirmKey: 'close-post-setup',
-    title: t('confirmCloseTitle'),
-    description: t('confirmCloseDescription'),
-  });
-  const [activeTab, setActiveTab] = useState(PostSetupModalTab.RUNNING_ORDER);
+  const tSetup = useTranslations('setup.stageSetup');
+  const { confirm } = useConfirmation();
+  const baseId = useId();
+  const titleId = `${baseId}-title`;
+
+  const [activeTab, setActiveTab] = useState<StageTab>('runningOrder');
+  const [visited, setVisited] = useState<StageTab[]>([activeTab]);
+
+  if (!visited.includes(activeTab)) setVisited([...visited, activeTab]);
+
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  // Each open starts the tabs' own state afresh (lines, menus, channels).
+  const [openCount, setOpenCount] = useState(0);
 
-  const [isVotersLoaded, setIsVotersLoaded] = useState(false);
-  const [isOddsLoaded, setIsOddsLoaded] = useState(false);
-
-  const [selectedLayout, setSelectedLayout] = useState<'list' | 'grid'>('grid');
+  useEffect(() => {
+    if (isOpen) setOpenCount((count) => count + 1);
+  }, [isOpen]);
 
   const [localVotingMode, setLocalVotingMode] = useState<StageVotingMode>(
     stage.votingMode,
@@ -105,41 +121,14 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     [configuredEventStages, stage.id],
   );
 
-  const tDraw = useTranslations('setup.allocationDraw');
-  const {
-    orderedCodes,
-    orderedCountries,
-    firstHalfSize,
-    handleRunningOrderSortEnd,
-    handleQuickSort,
-    handleDrawHalves,
-    handleRemoveHalves,
-    handleMoveToOtherHalf,
-  } = useRunningOrder({
+  const ro = useRunningOrder({
     isOpen,
     stageId: stage.id,
     stageCountries: stage.countries,
     savedRunningOrder: configuredStage?.runningOrder,
     savedFirstHalfSize: configuredStage?.firstHalfSize,
   });
-
-  const onRunningOrderSortEnd = useCallback(
-    (oldIndex: number, newIndex: number) => {
-      const movedToHalf = handleRunningOrderSortEnd(oldIndex, newIndex);
-
-      if (movedToHalf) {
-        toast.info(
-          tDraw('roMovedToHalf', {
-            name: orderedCountries[oldIndex]?.name ?? '',
-            half: movedToHalf === 1 ? 'first' : 'second',
-          }),
-        );
-      }
-    },
-    // handleRunningOrderSortEnd is recreated every render (it closes over state).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [orderedCountries, firstHalfSize, tDraw],
-  );
+  const { orderedCodes, orderedCountries, firstHalfSize } = ro;
 
   const form = usePostSetupStageForm({
     stage,
@@ -167,10 +156,12 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     return null;
   }, [localVotingMode, watchedVotingCountries, watchedVoterChannels]);
 
-  const { controller, getOverride } = useStagePointsOverrideDraft(
-    stage,
-    isOpen,
-  );
+  const {
+    controller: pointsController,
+    getOverride,
+    isOverridden: isPointsOverridden,
+    resetToGlobal: resetPointsToGlobal,
+  } = useStagePointsOverrideDraft(stage, isOpen);
 
   const {
     controller: oddsController,
@@ -179,15 +170,107 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     resetToGlobal: resetOddsToGlobal,
   } = useStageOddsOverrideDraft(stage, isOpen);
 
-  const tabs = useMemo(
-    () => [
-      { value: PostSetupModalTab.RUNNING_ORDER, label: t('runningOrder') },
-      { value: PostSetupModalTab.VOTERS, label: t('voters') },
-      { value: PostSetupModalTab.ODDS, label: t('odds') },
-      { value: PostSetupModalTab.GENERAL, label: t('general') },
-    ],
-    [t],
-  );
+  // ----- what changed since opening -----
+
+  // Taken just before the first change of an open, so closing can tell
+  // whether anything is different (Undo back to the start counts as none).
+  const openedFingerprintRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) openedFingerprintRef.current = null;
+  }, [isOpen]);
+
+  const fingerprint = () => {
+    const voters = form.getVotingCountries();
+
+    return JSON.stringify([
+      orderedCodes,
+      firstHalfSize,
+      voters.map((voter) => voter.code),
+      normalizeVoterChannels(voters, form.getVoterChannels()) ?? null,
+      localVotingMode,
+      localEnablePredefined ?? null,
+      getOverride() ?? null,
+      getOddsOverride() ?? null,
+    ]);
+  };
+
+  const touch = () => {
+    if (openedFingerprintRef.current === null) {
+      openedFingerprintRef.current = fingerprint();
+    }
+  };
+
+  const isDirty = () =>
+    openedFingerprintRef.current !== null &&
+    openedFingerprintRef.current !== fingerprint();
+
+  const requestClose = () => {
+    if (!isDirty()) {
+      onClose();
+
+      return;
+    }
+    confirm({
+      key: 'close-post-setup',
+      type: 'alert',
+      title: t('confirmCloseTitle'),
+      description: t('confirmCloseDescription'),
+      onConfirm: onClose,
+    });
+  };
+
+  // The tabs' controllers, touching before each change.
+  const touchedPoints: PointsSystemController = {
+    ...pointsController,
+    setPointsSystem: (points) => {
+      touch();
+      pointsController.setPointsSystem(points);
+    },
+    setTelevotePointsSystem: (points) => {
+      touch();
+      pointsController.setTelevotePointsSystem(points);
+    },
+    setSplitPointsSystem: (value) => {
+      touch();
+      pointsController.setSplitPointsSystem(value);
+    },
+    setAllowMultiplePointsToSameEntry: (value) => {
+      touch();
+      pointsController.setAllowMultiplePointsToSameEntry(value);
+    },
+  };
+
+  const touchedOdds: OddsController = {
+    ...oddsController,
+    updateCountryOdds: (...args) => {
+      touch();
+      oddsController.updateCountryOdds(...args);
+    },
+    setBulkCountryOdds: (...args) => {
+      touch();
+      oddsController.setBulkCountryOdds(...args);
+    },
+    setRandomnessLevel: (...args) => {
+      touch();
+      oddsController.setRandomnessLevel(...args);
+    },
+    setPointsSpread: (...args) => {
+      touch();
+      oddsController.setPointsSpread(...args);
+    },
+    loadYearOdds: (...args) => {
+      touch();
+      oddsController.loadYearOdds(...args);
+    },
+  };
+
+  const changeVotingMode = (mode: StageVotingMode) => {
+    touch();
+    setLocalVotingMode(mode);
+  };
+
+  // ----- start -----
 
   const handleSave = useCallback(() => {
     const votingCountries = form.getVotingCountries();
@@ -203,13 +286,10 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
       return;
     }
 
-    // The footer button is disabled while the error bar is up; this guards the
-    // "s" hotkey path with the same copy.
+    // Start is disabled while the error bar is up; this guards the ⌘S path.
     if (channelError) {
       toast.error(
-        t.rich(channelError === 'jury' ? 'noJuryVoter' : 'noTelevoteVoter', {
-          b: (chunks) => <b>{chunks}</b>,
-        }),
+        tSetup(channelError === 'jury' ? 'noJuryVoter' : 'noTelevoteVoter'),
       );
 
       return;
@@ -281,6 +361,7 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     }, 300);
   }, [
     t,
+    tSetup,
     form,
     channelError,
     onClose,
@@ -299,119 +380,125 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
     localVotingMode,
   ]);
 
-  const shareTitleOverride = `${contestName} ${contestYear} - ${stage.name}`;
-  const shareSubtitleOverride = t('runningOrder');
-
-  const renderContent = () => {
-    const tabsWithContent = [
-      {
-        ...tabs[0],
-        content: (
-          <RunningOrderTab
-            stageId={stage.id}
-            orderedCountries={orderedCountries}
-            firstHalfSize={firstHalfSize}
-            selectedLayout={selectedLayout}
-            setSelectedLayout={setSelectedLayout}
-            onSortEnd={onRunningOrderSortEnd}
-            onDrawHalves={() => {
-              const sizes = handleDrawHalves();
-
-              toast.success(tDraw('roHalvesDrawn', sizes));
-            }}
-            onRemoveHalves={handleRemoveHalves}
-            onMoveToOtherHalf={(code) => {
-              const half = handleMoveToOtherHalf(code);
-
-              if (half) {
-                toast.info(
-                  tDraw('roMovedToHalf', {
-                    name:
-                      orderedCountries.find((c) => c.code === code)?.name ?? '',
-                    half: half === 1 ? 'first' : 'second',
-                  }),
-                );
-              }
-            }}
-            onQuickSort={handleQuickSort}
-            onShare={() => setIsShareModalOpen(true)}
-          />
-        ),
-      },
-      {
-        ...tabs[1],
-        content: (
-          <>
-            {(activeTab === PostSetupModalTab.VOTERS || isVotersLoaded) && (
-              <EventStageVoters
-                stage={stage}
-                votingMode={localVotingMode}
-                onLoaded={() => setIsVotersLoaded(true)}
-              />
-            )}
-          </>
-        ),
-      },
-      {
-        ...tabs[2],
-        content: (
-          <>
-            {(activeTab === PostSetupModalTab.ODDS || isOddsLoaded) && (
-              <StageOddsTab
-                controller={oddsController}
-                stage={stage}
-                isOverridden={isOddsOverridden}
-                onResetToGlobal={resetOddsToGlobal}
-                onLoaded={() => setIsOddsLoaded(true)}
-              />
-            )}
-          </>
-        ),
-      },
-      {
-        ...tabs[3],
-        content: (
-          <StageGeneralTab
-            controller={controller}
-            votingMode={localVotingMode}
-            onVotingModeChange={setLocalVotingMode}
-            enablePredefinedVotes={localEnablePredefined}
-            globalEnablePredefinedVotes={globalEnablePredefined}
-            onEnablePredefinedVotesChange={setLocalEnablePredefined}
-          />
-        ),
-      },
-    ];
-
-    return (
-      <TabContent
-        tabs={tabsWithContent}
-        activeTab={activeTab}
-        preserveContent
-      />
-    );
-  };
-
   useEffectOnce(onLoaded);
 
   // ⌘S / Ctrl+S starts the stage, also while typing (it stays mounted).
   useShortcut('startStage', handleSave, isOpen);
 
+  // ----- layout -----
+
+  const tabs = useMemo(
+    () => [
+      {
+        value: 'runningOrder' as const,
+        label: (
+          <>
+            <span className="dp-ss-tab-long">{t('runningOrder')}</span>
+            <span className="dp-ss-tab-short">
+              {tSetup('tabRunningOrderShort')}
+            </span>
+          </>
+        ),
+      },
+      { value: 'voters' as const, label: t('voters') },
+      { value: 'odds' as const, label: t('odds') },
+      { value: 'general' as const, label: t('general') },
+    ],
+    [t, tSetup],
+  );
+
+  const tabId = (tab: StageTab) => `${baseId}-tab-${tab}`;
+  const panelId = (tab: StageTab) => `${baseId}-panel-${tab}`;
+
+  const scrollPanel =
+    'min-h-0 flex-1 overflow-y-auto overscroll-contain narrow-scrollbar';
+
+  const renderTab = (tab: StageTab) => {
+    switch (tab) {
+      case 'runningOrder':
+        return (
+          <div className={scrollPanel}>
+            <div className="px-3.5 pb-6 pt-3 2cols:px-[22px] 2cols:pt-4">
+              <RunningOrderTab
+                key={openCount}
+                ro={ro}
+                onTouch={touch}
+                onShare={() => setIsShareModalOpen(true)}
+              />
+            </div>
+          </div>
+        );
+      case 'voters':
+        return (
+          <VotersTab
+            key={openCount}
+            stage={stage}
+            votingMode={localVotingMode}
+            onTouch={touch}
+          />
+        );
+      case 'odds':
+        return (
+          <div className={scrollPanel}>
+            <div className="px-3.5 pb-5 2cols:px-[22px]">
+              <StageOddsTab
+                controller={touchedOdds}
+                stage={stage}
+                isOverridden={isOddsOverridden}
+                onResetToGlobal={() => {
+                  touch();
+                  resetOddsToGlobal();
+                }}
+              />
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className={scrollPanel}>
+            <div className="px-3.5 pb-6 pt-4 2cols:px-[22px] 2cols:pt-5">
+              <StageGeneralTab
+                controller={touchedPoints}
+                pointsOverridden={isPointsOverridden}
+                onUseSettingsPoints={() => {
+                  touch();
+                  resetPointsToGlobal();
+                }}
+                votingMode={localVotingMode}
+                onVotingModeChange={changeVotingMode}
+                enablePredefinedVotes={localEnablePredefined}
+                globalEnablePredefinedVotes={globalEnablePredefined}
+                onEnablePredefinedVotesChange={(value) => {
+                  touch();
+                  setLocalEnablePredefined(value);
+                }}
+              />
+            </div>
+          </div>
+        );
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClickOutside}
-      onClosed={onClose}
-      overlayClassName="!z-[1002]"
-      containerClassName="!w-[min(100%,800px)]"
+      onClose={requestClose}
+      unstyledSurface
       fullScreenOnPhone
-      contentClassName="h-[70vh] narrow-scrollbar !pt-2"
+      ariaLabelledBy={titleId}
+      overlayClassName="!z-[1002]"
+      containerClassName="dp-flat dp-ss-surface 2cols:!w-[min(100%,1040px)] 2cols:!max-w-[1040px] 2cols:!rounded-2xl"
+      contentClassName="!p-0 !overflow-hidden flex flex-col text-white 2cols:!h-[calc(100dvh-240px)] 2cols:!max-h-[600px] 2cols:!min-h-[360px]"
       topContent={
-        <Tabs
+        <StageSetupHeader
+          title={stage.name}
+          titleId={titleId}
           tabs={tabs}
-          activeTab={activeTab}
-          setActiveTab={(tab) => setActiveTab(tab as PostSetupModalTab)}
-          containerClassName="!rounded-none"
+          value={activeTab}
+          onChange={setActiveTab}
+          tabId={tabId}
+          panelId={panelId}
+          onClose={requestClose}
         />
       }
       bottomContent={
@@ -419,33 +506,54 @@ const PostSetupModal: React.FC<PostSetupModalProps> = ({
           {channelError && (
             <VoterChannelsErrorBar
               channel={channelError}
-              onFix={() => form.setVoterChannels(undefined)}
+              onGiveAllBoth={() => {
+                touch();
+                form.setVoterChannels(undefined);
+              }}
+              onSwitchMode={() =>
+                changeVotingMode(
+                  channelError === 'jury'
+                    ? StageVotingMode.TELEVOTE_ONLY
+                    : StageVotingMode.JURY_ONLY,
+                )
+              }
             />
           )}
-          <ModalBottomContent
-            onClose={onClose}
-            onSave={handleSave}
-            saveButtonIcon={<PlayIcon className="size-4" />}
-            saveButtonText={t('startStage', { stageName: stage.name })}
-            saveButtonDisabled={!!channelError}
-            saveButtonShortcut="startStage"
+          <StageSetupFooter
+            stageName={stage.name}
+            entries={orderedCountries.length}
+            voters={watchedVotingCountries.length}
+            votingModeLabel={t(VOTING_MODE_LABEL_KEYS[localVotingMode])}
+            onCancel={requestClose}
+            onStart={handleSave}
+            startDisabled={!!channelError}
           />
         </>
       }
     >
-      <h3 className="text-xl font-semibold text-white middle-line after:bg-primary-800 before:bg-primary-800">
-        {stage.name}
-      </h3>
       <PostSetupFormContext.Provider value={form}>
-        {renderContent()}
+        {TABS.map((tab) => (
+          <div
+            key={tab}
+            id={panelId(tab)}
+            role="tabpanel"
+            aria-labelledby={tabId(tab)}
+            hidden={tab !== activeTab}
+            className={
+              tab === activeTab ? 'flex min-h-0 flex-1 flex-col' : undefined
+            }
+          >
+            {visited.includes(tab) && renderTab(tab)}
+          </div>
+        ))}
       </PostSetupFormContext.Provider>
       <ShareResultsModal
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}
         onLoaded={() => {}}
         countriesOverride={orderedCountries}
-        titleOverride={shareTitleOverride}
-        subtitleOverride={shareSubtitleOverride}
+        titleOverride={`${contestName} ${contestYear} - ${stage.name}`}
+        subtitleOverride={t('runningOrder')}
         stageName={stage.name}
         isRunningOrder
       />

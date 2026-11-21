@@ -8,6 +8,7 @@ import { queryClient } from '@/api/queryClient';
 import EmailSignInHost from '@/components/auth/EmailSignInHost';
 import { ConfirmationProvider } from '@/components/common/ConfirmationProvider';
 import ReportDialogHost from '@/components/moderation/ReportDialogHost';
+import NextYearHost from '@/components/nextYear/NextYearHost';
 import { SyncUserPreferences } from '@/components/SyncUserPreferences';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <ConfirmationProvider>{children}</ConfirmationProvider>
       <ReportDialogHost />
       <EmailSignInHost />
+      <NextYearHost />
     </QueryClientProvider>
   );
 }

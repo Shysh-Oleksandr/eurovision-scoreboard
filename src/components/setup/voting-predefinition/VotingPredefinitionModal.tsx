@@ -6,11 +6,14 @@ import {
   Columns2,
   Dices,
   Download,
+  Eraser,
   FolderOpen,
   HelpCircle,
   Image as ImageIcon,
   LayoutGrid,
   List,
+  ListChecks,
+  ListOrdered,
   MoreHorizontal,
   RotateCcw,
   Save,
@@ -22,11 +25,23 @@ import {
   Upload,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import dynamic from 'next/dynamic';
 
+import {
+  ballotChips,
+  CellOutcome,
+  isBallotComplete,
+  nextFreePoint,
+} from './ballotEdits';
 import { TotalsPredefinitionView } from './TotalsPredefinitionView';
 import { useVotingPredefinition } from './useVotingPredefinition';
 import type { VoteSpreadsheetActionResult } from './useVotingPredefinition';
@@ -44,12 +59,16 @@ import {
   VotingMenuSeparator,
 } from './VotingBarMenu';
 import { VotingCallout } from './VotingCallout';
+import { type PointsChip, VotingPointsBar } from './VotingPointsBar';
 import {
   VotingPredefinitionHeader,
   type PredefinitionMode,
 } from './VotingPredefinitionHeader';
 import { VotingPredefinitionPresetModals } from './VotingPredefinitionPresetModals';
-import { VotingPredefinitionTable } from './VotingPredefinitionTable';
+import {
+  type MatrixCell,
+  VotingPredefinitionTable,
+} from './VotingPredefinitionTable';
 import { VotingRankView } from './VotingRankView';
 
 import { ArrowDown10 } from '@/assets/icons/ArrowDown10';
@@ -57,12 +76,17 @@ import SortAZIcon from '@/assets/icons/SortAZIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import { Tooltip } from '@/components/common/Tooltip';
+import { getShortCodes } from '@/data/countries/shortCodes';
 import { PREDEFINED_SYSTEMS_MAP } from '@/data/data';
+import { toast } from '@/helpers/toast';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
+import { useBackHandler } from '@/hooks/useBackHandler';
+import { useChosenShortCodes } from '@/hooks/useChosenShortCodes';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { EventStage, StageVotingType, StatsTableType } from '@/models';
+import { playHaptic } from '@/native/haptics';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { useGeneralStore } from '@/state/generalStore';
 import {
@@ -100,6 +124,12 @@ type CellKey = `${string}:${string}`; // participant:voter
 /** How many offending voters the "can't save yet" callout names before eliding. */
 const MAX_LISTED_INVALID_VOTERS = 6;
 
+/** How long a notice ("Moved 12 points from Norway") stays in the bar. */
+const NOTICE_MS = 5000;
+
+/** From this viewport width the modal grows to fit the matrix (`md`). */
+const FIT_MIN_VIEWPORT = 768;
+
 const VotingPredefinitionModal = ({
   isOpen,
   onClose,
@@ -122,11 +152,8 @@ const VotingPredefinitionModal = ({
   const contestYear = useGeneralStore((s) => s.settings.contestYear);
   const rankLayout = useGeneralStore((s) => s.settings.votingRankLayout);
   const setSettings = useGeneralStore((s) => s.setSettings);
-  const shouldShowHeartFlagIcon = useGeneralStore(
-    (s) => s.settings.shouldShowHeartFlagIcon,
-  );
-  const shouldUse2026WhiteHeartFlags = useGeneralStore(
-    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  const alwaysShowFullCountryNames = useGeneralStore(
+    (s) => s.settings.alwaysShowFullCountryNames,
   );
 
   const {
@@ -146,6 +173,16 @@ const VotingPredefinitionModal = ({
     randomizeAll,
     resetVotes,
     applyInputValue,
+    pickPoint,
+    clearCellPoints,
+    giveNext,
+    clearBallot,
+    fillVotesRandomly,
+    hasVotesInScope,
+    activePointsSystem,
+    isCombinedVoting,
+    cellTop,
+    getBallot,
     getVoterValidity,
     getTotalPointsForCountry,
     getCellValue,
@@ -189,6 +226,277 @@ const VotingPredefinitionModal = ({
   const clearDetailedCellEditing = useCallback(() => {
     setEditing({});
   }, []);
+
+  const dropEditing = (cell: MatrixCell) =>
+    setEditing((prev) => {
+      const key: CellKey = `${cell.p}:${cell.v}`;
+
+      if (!(key in prev)) return prev;
+
+      const next = { ...prev };
+
+      delete next[key];
+
+      return next;
+    });
+
+  // --- The points bar: the selected cell, or the voter whose whole vote is
+  // being given (each tap on a row then gives the next value).
+  const [selected, setSelected] = useState<MatrixCell | null>(null);
+  const [ballotVoter, setBallotVoter] = useState<string | null>(null);
+  /** Whole-vote mode: a free value picked to go next instead of the top one. */
+  const [preferredNextId, setPreferredNextId] = useState<number | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const noticeTimer = useRef<number | undefined>(undefined);
+
+  const showNotice = useCallback((text: string | null) => {
+    window.clearTimeout(noticeTimer.current);
+    setNotice(text);
+    if (text) {
+      noticeTimer.current = window.setTimeout(() => setNotice(null), NOTICE_MS);
+    }
+  }, []);
+
+  useEffect(() => () => window.clearTimeout(noticeTimer.current), []);
+
+  const chosenShortCodes = useChosenShortCodes();
+  const codes = useMemo(
+    () =>
+      getShortCodes(
+        [...(stage.countries as any[]), ...allVotingCountries],
+        chosenShortCodes,
+      ),
+    [stage.countries, allVotingCountries, chosenShortCodes],
+  );
+
+  const nameOf = (code: string) =>
+    (stage.countries as any[]).find((c) => c.code === code)?.name ??
+    allVotingCountries.find((c) => c.code === code)?.name ??
+    code;
+
+  const exitBallot = useCallback(() => {
+    setBallotVoter(null);
+    setPreferredNextId(null);
+  }, []);
+
+  useBackHandler(ballotVoter !== null, exitBallot);
+
+  useEffect(() => {
+    if (!ballotVoter) return undefined;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') exitBallot();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [ballotVoter, exitBallot]);
+
+  // Another channel or tab: whole-vote mode ends, notices are stale.
+  useEffect(() => {
+    exitBallot();
+    showNotice(null);
+  }, [selectedType, activeMode, exitBallot, showNotice]);
+
+  // Another stage (the modal stays mounted between stages): nothing selected.
+  useEffect(() => {
+    setSelected(null);
+    exitBallot();
+  }, [stage.id, exitBallot]);
+
+  const describeOutcome = (outcome: CellOutcome | null) => {
+    switch (outcome?.kind) {
+      case 'moved':
+        return tSetup('noticeMoved', {
+          points: outcome.points,
+          from: nameOf(outcome.from),
+        });
+      case 'notInSystem':
+        return tSetup('noticeNotInSystem', {
+          value: outcome.raw,
+          points: pointsSummary,
+        });
+      case 'unreachable':
+        return tSetup('noticeUnreachable', { value: outcome.value });
+      default:
+        return null;
+    }
+  };
+
+  const handleCommitCell = (cell: MatrixCell, value: string) => {
+    const outcome = applyInputValue(cell.p, cell.v, value);
+
+    dropEditing(cell);
+    if (outcome && outcome.kind !== 'unchanged')
+      showNotice(describeOutcome(outcome));
+  };
+
+  const handleSelectCell = (cell: MatrixCell) => {
+    setSelected(cell);
+    if (ballotVoter && ballotVoter !== cell.v) exitBallot();
+  };
+
+  const handlePick = (pointsId: number) => {
+    if (IS_NATIVE_APP) playHaptic({ id: 'selection' });
+
+    if (ballotVoter) {
+      // Whole-vote mode: a free value goes next; a given one is taken back
+      // (as a second tap on its row does) and goes next.
+      const holder = getBallot(ballotVoter).find(
+        (vote) => vote.pointsId === pointsId,
+      );
+
+      if (holder) pickPoint(holder.countryCode, ballotVoter, pointsId);
+      setPreferredNextId((prev) =>
+        prev === pointsId && !holder ? null : pointsId,
+      );
+      showNotice(null);
+
+      return;
+    }
+    if (!selected) return;
+
+    dropEditing(selected);
+    showNotice(describeOutcome(pickPoint(selected.p, selected.v, pointsId)));
+  };
+
+  const handleClearCell = () => {
+    if (!selected) return;
+
+    dropEditing(selected);
+    clearCellPoints(selected.p, selected.v);
+    showNotice(null);
+  };
+
+  const startBallot = (voterCode: string) => {
+    if (ballotVoter === voterCode) {
+      exitBallot();
+
+      return;
+    }
+
+    setBallotVoter(voterCode);
+    setPreferredNextId(null);
+    setSelected(null);
+    showNotice(null);
+  };
+
+  /** After a vote is complete: the next voter (in column order) who isn't. */
+  const advanceBallot = (fromVoter: string) => {
+    const order = votingCountries.map((voter) => voter.code);
+    const start = order.indexOf(fromVoter);
+    const next = [...order.slice(start + 1), ...order.slice(0, start)].find(
+      (code) => !isBallotComplete(getBallot(code), activePointsSystem),
+    );
+
+    setPreferredNextId(null);
+    if (next) {
+      setBallotVoter(next);
+      showNotice(tSetup('noticeBallotDone', { voter: nameOf(fromVoter) }));
+    } else {
+      exitBallot();
+      showNotice(tSetup('noticeAllComplete'));
+    }
+  };
+
+  const handleBallotTap = (participantCode: string) => {
+    if (!ballotVoter || participantCode === ballotVoter) return;
+    if (IS_NATIVE_APP) playHaptic({ id: 'selection' });
+
+    const ballot = giveNext(participantCode, ballotVoter, preferredNextId);
+
+    setPreferredNextId(null);
+    showNotice(null);
+    if (isBallotComplete(ballot, activePointsSystem))
+      advanceBallot(ballotVoter);
+  };
+
+  const handleFillBallot = () => {
+    if (!ballotVoter) return;
+
+    fillVotesRandomly(ballotVoter);
+    advanceBallot(ballotVoter);
+  };
+
+  const handleClearBallot = () => {
+    if (!ballotVoter) return;
+
+    clearBallot(ballotVoter);
+    setPreferredNextId(null);
+    showNotice(null);
+  };
+
+  // Whole-vote mode moving to another voter brings their column into view.
+  const [tableEl, setTableEl] = useState<HTMLTableElement | null>(null);
+
+  useEffect(() => {
+    if (!ballotVoter || !tableEl) return;
+
+    const index = votingCountries.findIndex((v) => v.code === ballotVoter);
+
+    tableEl
+      .querySelector(`thead th[data-c="${index}"]`)
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ballotVoter, tableEl]);
+
+  // --- Size: from `md`, the modal grows (up to the viewport) until the whole
+  // matrix fits, measured; never smaller than its usual size. Kept while the
+  // Rank and Totals tabs are open, so switching tabs doesn't resize it.
+  const modalRef = useRef<HTMLDivElement>(null);
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const container = modalRef.current;
+    const scroller = scrollerRef.current;
+
+    if (!tableEl || !container || !scroller) return undefined;
+
+    const fit = () => {
+      if (window.innerWidth < FIT_MIN_VIEWPORT) {
+        container.style.removeProperty('--vp-w');
+        container.style.removeProperty('--vp-h');
+
+        return;
+      }
+
+      // Layout sizes, not bounding rects: the modal opens scaled (95%), and
+      // a transform doesn't resize anything, so nothing would measure again.
+      let naturalWidth = 0;
+
+      tableEl
+        .querySelectorAll<HTMLElement>('thead th:not(.dp-vp-filler)')
+        .forEach((th) => {
+          naturalWidth += th.offsetWidth;
+        });
+
+      // What the modal needs = its chrome around the scroll box + the table.
+      const width =
+        container.offsetWidth - scroller.clientWidth + naturalWidth + 2;
+      const height =
+        container.offsetHeight -
+        scroller.clientHeight +
+        tableEl.offsetHeight +
+        2;
+
+      container.style.setProperty('--vp-w', `${Math.ceil(width)}px`);
+      container.style.setProperty('--vp-h', `${Math.ceil(height)}px`);
+    };
+
+    fit();
+
+    const observer = new ResizeObserver(fit);
+
+    observer.observe(tableEl);
+    observer.observe(scroller);
+    window.addEventListener('resize', fit);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', fit);
+    };
+  }, [tableEl]);
 
   const showSpreadsheetResultToast = useCallback(
     (result: VoteSpreadsheetActionResult) => {
@@ -557,9 +865,30 @@ const VotingPredefinitionModal = ({
 
         resetVotes();
         setEditing({});
+        setSelected(null);
+        exitBallot();
+        showNotice(null);
         toast.success(tSetup('toastMatrixCleared'));
       },
     });
+  };
+
+  const handleRandomizeAll = () => {
+    randomizeAll();
+    setEditing({});
+    exitBallot();
+    showNotice(null);
+    toast.success(tSetup('toastVotesRandomized'));
+  };
+
+  const handleFillAll = () => {
+    const changed = fillVotesRandomly();
+
+    setEditing({});
+    exitBallot();
+    showNotice(null);
+    if (changed > 0) toast.success(tSetup('toastVotesFilled'));
+    else toast.info(tSetup('toastNothingToFill'));
   };
 
   const sortToggle = (isByPoints: boolean, onToggle: () => void) => (
@@ -598,22 +927,66 @@ const VotingPredefinitionModal = ({
           {sortToggle(isSorting, () => setIsSorting(!isSorting))}
           <VotingBarButton
             variant="ghost"
+            className="dp-vp-reset"
             onClick={confirmReset}
             icon={<RotateCcw className="h-4 w-4" />}
           >
             {t('common.reset')}
           </VotingBarButton>
-          <VotingBarButton
-            variant="primary"
-            onClick={() => {
-              randomizeAll();
-              setEditing({});
-              toast.success(tSetup('toastVotesRandomized'));
-            }}
-            icon={<Shuffle className="h-4 w-4" />}
-          >
-            {t('common.randomize')}
-          </VotingBarButton>
+          {/* With votes on the tab, Randomize asks what to keep: filling
+              only what's missing is the common case once some ballots are
+              typed in by hand. */}
+          {hasVotesInScope() ? (
+            <VotingBarMenu
+              align="end"
+              panelClassName="min-w-[280px]"
+              renderTrigger={({ ref, onClick }) => (
+                <VotingBarButton
+                  ref={ref}
+                  variant="primary"
+                  collapsible
+                  onClick={onClick}
+                  icon={<Shuffle className="h-4 w-4" />}
+                >
+                  {t('common.randomize')}
+                </VotingBarButton>
+              )}
+            >
+              {(close) => (
+                <>
+                  <VotingMenuRow
+                    icon={<ListChecks className="h-[17px] w-[17px]" />}
+                    sub={tSetup('randomizeFillSub')}
+                    onClick={() => {
+                      close();
+                      handleFillAll();
+                    }}
+                  >
+                    {tSetup('randomizeFill')}
+                  </VotingMenuRow>
+                  <VotingMenuRow
+                    icon={<Shuffle className="h-[17px] w-[17px]" />}
+                    sub={tSetup('randomizeAllSub')}
+                    onClick={() => {
+                      close();
+                      handleRandomizeAll();
+                    }}
+                  >
+                    {tSetup('randomizeAll')}
+                  </VotingMenuRow>
+                </>
+              )}
+            </VotingBarMenu>
+          ) : (
+            <VotingBarButton
+              variant="primary"
+              collapsible
+              onClick={handleRandomizeAll}
+              icon={<Shuffle className="h-4 w-4" />}
+            >
+              {t('common.randomize')}
+            </VotingBarButton>
+          )}
         </>
       )}
 
@@ -640,6 +1013,7 @@ const VotingPredefinitionModal = ({
           />
           <VotingBarButton
             variant="ghost"
+            collapsible
             onClick={() => {
               randomizeRankOrder();
               toast.success(tSetup('toastRankingRandomized'));
@@ -650,6 +1024,7 @@ const VotingPredefinitionModal = ({
           </VotingBarButton>
           <VotingBarButton
             variant="primary"
+            collapsible
             onClick={() => {
               randomizeRankPoints();
               toast.success(tSetup('toastRankPointsGenerated'));
@@ -683,6 +1058,7 @@ const VotingPredefinitionModal = ({
       renderTrigger={({ ref, onClick }) => (
         <VotingBarButton
           ref={ref}
+          collapsible
           onClick={onClick}
           icon={<Share2 className="h-4 w-4" />}
         >
@@ -860,6 +1236,212 @@ const VotingPredefinitionModal = ({
     </VotingBarMenu>
   );
 
+  // --- What the points bar shows.
+  const isEditable = !isTotalOrCombinedVoteType;
+  const selectedVoter = selected
+    ? votingCountries.find((voter) => voter.code === selected.v)
+    : undefined;
+  const activeCell =
+    selected && selectedVoter && selected.p !== selected.v ? selected : null;
+  const ballotVoterCountry = ballotVoter
+    ? votingCountries.find((voter) => voter.code === ballotVoter)
+    : undefined;
+  const ballotVotes = ballotVoter ? getBallot(ballotVoter) : [];
+  const ballotNext = ballotVoter
+    ? activePointsSystem.find(
+        (item) =>
+          item.id === preferredNextId &&
+          !ballotVotes.some((vote) => vote.pointsId === item.id),
+      ) ?? nextFreePoint(ballotVotes, activePointsSystem)
+    : null;
+
+  const channelPoints = (
+    channel: 'jury' | 'televote' | 'combined',
+    participant: string,
+    voter: string,
+  ) =>
+    (votes?.[channel]?.[voter] ?? []).reduce(
+      (sum, vote) =>
+        vote.countryCode === participant ? sum + vote.points : sum,
+      0,
+    );
+
+  const hint = (fine: string, touch: string) => (
+    <>
+      <span className="dp-stats-hint-hover">{fine}</span>
+      <span className="dp-stats-hint-tap">{touch}</span>
+    </>
+  );
+
+  const barAction = (
+    label: string,
+    icon: React.ReactNode,
+    onClick: () => void,
+    options: { quiet?: boolean; disabled?: boolean } = {},
+  ) => (
+    <Button
+      variant="surface"
+      size="sm"
+      className={options.quiet ? 'dp-act--quiet' : undefined}
+      Icon={icon}
+      aria-label={label}
+      disabled={options.disabled}
+      onClick={onClick}
+    >
+      <span className="dp-vp-lbl">{label}</span>
+    </Button>
+  );
+
+  const pointsBar: React.ComponentProps<typeof VotingPointsBar> = (() => {
+    const chipsLabel = tSetup('pointsLegend');
+
+    if (!isEditable) {
+      if (activeCell && selectedVoter) {
+        const names = {
+          voter: selectedVoter.name,
+          country: nameOf(activeCell.p),
+        };
+        const points = getCellValue(activeCell.p, activeCell.v);
+        const text = !points
+          ? tSetup('cellNothing', names)
+          : !isCombinedVoting && voteTypeOptions.length > 0
+          ? tSetup('cellGivesSplit', {
+              ...names,
+              points,
+              jury: channelPoints('jury', activeCell.p, activeCell.v),
+              televote: channelPoints('televote', activeCell.p, activeCell.v),
+            })
+          : tSetup('cellGives', { ...names, points });
+
+        return { voter: selectedVoter, text, chips: null, chipsLabel };
+      }
+
+      return {
+        voter: null,
+        text: hint(tSetup('barHintTotal'), tSetup('barHintTotalTap')),
+        chips: null,
+        chipsLabel,
+      };
+    }
+
+    if (ballotVoter && ballotVoterCountry) {
+      const chips: PointsChip[] = ballotChips(
+        ballotVotes,
+        activePointsSystem,
+      ).map(({ item, holder }) => ({
+        id: item.id,
+        value: item.value,
+        holder: holder ? codes[holder] ?? holder : null,
+        label: holder
+          ? tSetup('chipUsed', { points: item.value, country: nameOf(holder) })
+          : tSetup('chipFree', { points: item.value }),
+        state: holder ? 'used' : item.id === ballotNext?.id ? 'next' : 'free',
+      }));
+      const prompt = ballotNext
+        ? tSetup('ballotPrompt', {
+            voter: ballotVoterCountry.name,
+            points: ballotNext.value,
+          })
+        : tSetup('ballotComplete', { voter: ballotVoterCountry.name });
+
+      return {
+        voter: ballotVoterCountry,
+        text: notice ? `${notice} ${prompt}` : prompt,
+        chips,
+        chipsLabel,
+        onPick: handlePick,
+        actions: (
+          <>
+            {barAction(
+              tSetup('fillBallot'),
+              <Shuffle className="size-4" />,
+              handleFillBallot,
+              { disabled: !ballotNext },
+            )}
+            {barAction(
+              tSetup('clearBallot'),
+              <Eraser className="size-4" />,
+              handleClearBallot,
+              { quiet: true, disabled: ballotVotes.length === 0 },
+            )}
+            <Button
+              variant="surfaceStrong"
+              size="sm"
+              Icon={<Check className="size-4" />}
+              onClick={exitBallot}
+            >
+              {tSetup('doneBallot')}
+            </Button>
+          </>
+        ),
+      };
+    }
+
+    if (activeCell && selectedVoter) {
+      const ballot = getBallot(activeCell.v);
+      const points = getCellValue(activeCell.p, activeCell.v);
+      const names = {
+        voter: selectedVoter.name,
+        country: nameOf(activeCell.p),
+      };
+      const chips: PointsChip[] = ballotChips(ballot, activePointsSystem).map(
+        ({ item, holder }) => ({
+          id: item.id,
+          value: item.value,
+          holder: holder ? codes[holder] ?? holder : null,
+          label: holder
+            ? tSetup('chipUsed', {
+                points: item.value,
+                country: nameOf(holder),
+              })
+            : tSetup('chipFree', { points: item.value }),
+          state: holder === activeCell.p ? 'here' : holder ? 'used' : 'free',
+        }),
+      );
+
+      return {
+        voter: selectedVoter,
+        text:
+          notice ??
+          (points
+            ? tSetup('cellGives', { ...names, points })
+            : tSetup('cellNothing', names)),
+        chips,
+        chipsLabel,
+        onPick: handlePick,
+        actions: (
+          <>
+            {points > 0 &&
+              barAction(
+                tSetup('clearCell'),
+                <Eraser className="size-4" />,
+                handleClearCell,
+                { quiet: true },
+              )}
+            {barAction(
+              tSetup('enterBallot'),
+              <ListOrdered className="size-4" />,
+              () => startBallot(activeCell.v),
+            )}
+          </>
+        ),
+      };
+    }
+
+    return {
+      voter: null,
+      text: notice ?? hint(tSetup('barHintEdit'), tSetup('barHintEditTap')),
+      chips: ballotChips([], activePointsSystem).map(({ item }) => ({
+        id: item.id,
+        value: item.value,
+        holder: null,
+        label: tSetup('chipFree', { points: item.value }),
+        state: 'legend',
+      })),
+      chipsLabel,
+    };
+  })();
+
   // 37 voters worth of names would bury the instruction that follows, so the
   // callout names the first few and counts the rest.
   const invalidVoterNames = saveValidation.errors.map((e) => e.label);
@@ -874,12 +1456,14 @@ const VotingPredefinitionModal = ({
   return (
     <>
       <Modal
+        ref={modalRef}
         isOpen={isOpen}
         onClose={onClickOutside}
         overlayClassName="!z-[1000]"
         // Fixed-height shell: the header and footer are pinned and only the body
-        // between them scrolls. Full-bleed on phones, per the design.
-        containerClassName="!flex !flex-col !h-[min(720px,92vh)]"
+        // between them scrolls. Full-bleed on phones, per the design. From
+        // `md` it grows to fit the matrix (`--vp-w` / `--vp-h`, measured).
+        containerClassName="!flex !flex-col !h-[min(max(720px,var(--vp-h,0px)),92vh)] md:!max-w-[min(max(56rem,var(--vp-w,0px)),100vw_-_5rem)] lg:!max-w-[min(max(64rem,var(--vp-w,0px)),100vw_-_5rem)]"
         fullScreenOnPhone
         contentClassName="!flex-1 !min-h-0 !px-4 sm:!px-5 !pt-0 !pb-1 text-white flex flex-col"
         topContent={
@@ -957,7 +1541,7 @@ const VotingPredefinitionModal = ({
         />
 
         <div
-          className="relative flex min-h-0 flex-1 flex-col gap-3.5"
+          className="dp-vp relative flex min-h-0 flex-1 flex-col gap-3"
           onDragOver={handleSpreadsheetDragOver}
           onDragLeave={handleSpreadsheetDragLeave}
           onDrop={handleSpreadsheetDrop}
@@ -980,56 +1564,58 @@ const VotingPredefinitionModal = ({
                 variant="warn"
                 icon={<AlertTriangle className="h-[18px] w-[18px]" />}
               >
-                {tSetup.rich('saveBlockedCallout', {
-                  voters: listedInvalidVoters,
-                  b: (chunks) => <b>{chunks}</b>,
-                })}
+                <span className="dp-vp-callout-long">
+                  {tSetup.rich('saveBlockedCallout', {
+                    voters: listedInvalidVoters,
+                    b: (chunks) => <b>{chunks}</b>,
+                  })}
+                </span>
+                <span className="dp-vp-callout-short">
+                  {tSetup('saveBlockedCalloutShort', {
+                    count: invalidVoterNames.length,
+                  })}
+                </span>
               </VotingCallout>
             )}
 
           {activeMode === 'detailed' && (
-            <VotingPredefinitionTable
-              rankedCountries={rankedCountries as any}
-              votingCountries={votingCountries as any}
-              shouldShowHeartFlagIcon={shouldShowHeartFlagIcon}
-              shouldUse2026WhiteHeartFlags={shouldUse2026WhiteHeartFlags}
-              isTotalOrCombinedVoteType={isTotalOrCombinedVoteType}
-              getVoterValidity={getVoterValidity as any}
-              getTotalPointsForCountry={getTotalPointsForCountry}
-              getCellClassName={getCellClassName}
-              getCellValue={getCellValue}
-              isSameCountry={(participant, voter) => participant === voter}
-              isTotalOrCombinedDisabled={(participant, voter) =>
-                isTotalOrCombinedVoteType || participant === voter
-              }
-              valueForCell={(participant, voter) => {
-                const key: CellKey = `${participant}:${voter}`;
-                const displayValue = toFixedIfDecimalFloat(
-                  getCellValue(participant, voter),
-                );
-                const fallback = String(displayValue || '');
+            <>
+              <VotingPredefinitionTable
+                rankedCountries={rankedCountries as any}
+                votingCountries={votingCountries as any}
+                codes={codes}
+                isEditable={!isTotalOrCombinedVoteType}
+                showFullNames={alwaysShowFullCountryNames}
+                cellTop={cellTop}
+                getVoterValidity={getVoterValidity as any}
+                getTotalPointsForCountry={getTotalPointsForCountry}
+                getCellValue={getCellValue}
+                valueForCell={(participant, voter) => {
+                  const key: CellKey = `${participant}:${voter}`;
+                  const displayValue = toFixedIfDecimalFloat(
+                    getCellValue(participant, voter),
+                  );
+                  const fallback = String(displayValue || '');
 
-                return (editing[key] ?? fallback) as string;
-              }}
-              onChangeCell={(participant, voter, val) => {
-                const key: CellKey = `${participant}:${voter}`;
+                  return (editing[key] ?? fallback) as string;
+                }}
+                onChangeCell={(cell, val) => {
+                  const key: CellKey = `${cell.p}:${cell.v}`;
 
-                setEditing((s) => ({ ...s, [key]: val }));
-              }}
-              onBlurCell={(participant, voter, val) => {
-                const key: CellKey = `${participant}:${voter}`;
-
-                applyInputValue(participant, voter, val);
-
-                setEditing((s) => {
-                  const next = { ...s } as Record<CellKey, string>;
-
-                  delete next[key];
-
-                  return next;
-                });
-              }}
-            />
+                  setEditing((prev) => ({ ...prev, [key]: val }));
+                }}
+                onCommitCell={handleCommitCell}
+                selected={selected}
+                onSelectCell={handleSelectCell}
+                ballotVoter={ballotVoter}
+                nextPoints={ballotNext?.value ?? null}
+                onVoterClick={startBallot}
+                onBallotTap={handleBallotTap}
+                tableRef={setTableEl}
+                scrollerRef={scrollerRef}
+              />
+              <VotingPointsBar {...pointsBar} />
+            </>
           )}
 
           {activeMode === 'rank' && (

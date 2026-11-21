@@ -2,7 +2,6 @@
 import { ArrowLeftRight, Dices, TriangleAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
-import { toast } from 'react-toastify';
 
 import { useAllocationDrawContext } from './AllocationDrawContext';
 import { errorCopy, useDrawCopy } from './drawCopy';
@@ -14,6 +13,7 @@ import { useLineupModelContext } from '@/components/setup/hub/lineup/LineupProvi
 import { TO_BE_DRAWN_LIST } from '@/components/setup/hub/lineup/listIds';
 import StageCard from '@/components/setup/hub/lineup/StageCard';
 import TileGrid from '@/components/setup/hub/lineup/TileGrid';
+import { toast } from '@/helpers/toast';
 import { useCountriesStore } from '@/state/countriesStore';
 
 interface ToBeDrawnCardProps {

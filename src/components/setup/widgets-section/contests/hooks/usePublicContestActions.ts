@@ -1,10 +1,10 @@
 import { useTranslations } from 'next-intl';
-import { toast } from 'react-toastify';
 
 import {
   useToggleLikeContestMutation,
   useToggleSaveContestMutation,
 } from '@/api/contests';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 
 export function usePublicContestActions() {
@@ -15,15 +15,10 @@ export function usePublicContestActions() {
 
   const handleLike = async (id: string) => {
     try {
-      const res = await toggleLike(id);
-
-      toast.success(
-        res.liked
-          ? 'Contest liked successfully'
-          : 'Contest unliked successfully',
-      );
+      // The thumb's own state confirms it.
+      await toggleLike(id);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to like contest');
+      toast.error(error?.response?.data?.message || t('common.didntGoThrough'));
     }
   };
 
@@ -57,7 +52,7 @@ export function usePublicContestActions() {
         );
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save contest');
+      toast.error(error?.response?.data?.message || t('common.didntGoThrough'));
     }
   };
 

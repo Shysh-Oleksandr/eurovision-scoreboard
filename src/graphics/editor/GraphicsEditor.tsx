@@ -2,7 +2,6 @@
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { toast } from 'react-toastify';
 
 import { MissingAssetError, syncPublishedDesign } from '../cloud/publishDesign';
 import { DesignDataProvider, useDesignData } from '../render/DesignDataContext';
@@ -29,6 +28,7 @@ import { useEditorExport } from './useEditorExport';
 import { useEditorKeyboard } from './useEditorKeyboard';
 import { BoxMap } from './useElementBoxes';
 
+import { toast } from '@/helpers/toast';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAuthStore } from '@/state/useAuthStore';

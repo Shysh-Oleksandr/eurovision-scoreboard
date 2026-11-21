@@ -1,17 +1,14 @@
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useRef, useState } from 'react';
 
 import ThemePreviewCountryItemUI from './ThemePreviewCountryItemUI';
 
+import AnchoredMenu from '@/components/common/AnchoredMenu';
 import Badge from '@/components/common/Badge';
 import VotingPointsInfo from '@/components/controlsPanel/VotingPointsInfo';
 import type { DouzeOptions } from '@/douze/options';
+import { playHaptic } from '@/native/haptics';
 import { getThemeBackground } from '@/theme/themes';
 import {
   DouzePointsAnimationMode,
@@ -65,7 +62,12 @@ type ThemePreviewCountryItemCompactProps = {
   roundedCountryContainer?: boolean;
   douzePointsAnimationMode?: DouzePointsAnimationMode;
   douzeOptions?: DouzeOptions | null;
-  togglesBelow?: boolean;
+  /**
+   * Lists: the state is picked from a small menu in the preview's top
+   * corner ("Jury ▾") instead of a row of five, which no translation can
+   * outgrow and which costs the card no height.
+   */
+  stateMenu?: boolean;
 };
 
 const ThemePreviewCountryItemCompact: React.FC<
@@ -91,19 +93,41 @@ const ThemePreviewCountryItemCompact: React.FC<
   roundedCountryContainer = false,
   douzePointsAnimationMode = 'heartsGrid',
   douzeOptions,
-  togglesBelow = false,
+  stateMenu = false,
 }) => {
   const t = useTranslations('widgets.themes.previewCountryItemStates');
+  const tThemes = useTranslations('widgets.themes');
 
   const [state, setState] = useState<ItemState>('jury');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuAnchorRef = useRef<HTMLButtonElement>(null);
+  const stateIndex = Math.max(
+    previewBadges.findIndex((badge) => badge.key === state),
+    0,
+  );
+  const stateLabel = t(previewBadges[stateIndex].key);
+
+  /** The arrows: the previous or next state, round the end. */
+  const stepState = (by: number) => {
+    const next =
+      previewBadges[
+        (stateIndex + by + previewBadges.length) % previewBadges.length
+      ];
+
+    playHaptic({ id: 'selection' });
+    setState(next.key as ItemState);
+  };
 
   // Fallback background: base theme background image for the selected year
   const baseBackgroundImage = getThemeBackground(baseThemeYear);
 
   const preview = (
     <div
-      className={`sm:space-y-4 space-y-2 px-4 sm:py-8 py-6 w-full h-full flex flex-col justify-center rounded-[12px] ${
-        isListItem && !togglesBelow
+      className={`sm:space-y-4 space-y-2 px-4 w-full h-full flex flex-col justify-center rounded-[12px] ${
+        // The state menu sits in the top corner, clear of the row.
+        stateMenu ? 'relative pt-[42px] pb-6 sm:pb-8' : 'sm:py-8 py-6'
+      } ${
+        isListItem && !stateMenu
           ? 'sm:min-w-[300px] md:min-w-[400px] max-w-[400px]'
           : ''
       } ${onClick ? 'cursor-pointer' : ''} ${
@@ -142,6 +166,46 @@ const ThemePreviewCountryItemCompact: React.FC<
         isRounded={isJuryPointsPanelRounded}
       />
 
+      {/* After the row in the DOM, so `space-y` leaves the row alone. */}
+      {stateMenu && (
+        // The preview itself awards points on a tap: clicks stop here.
+        <div
+          role="group"
+          aria-label={tThemes('previewState')}
+          onClick={(e) => e.stopPropagation()}
+          className="dp-preview-state absolute left-2 top-2 !m-0 z-20 flex h-7 max-w-[calc(100%-16px)] items-center rounded-full text-[12px] font-bold"
+        >
+          {/* The arrows first: they stay put while the name changes. */}
+          <button
+            type="button"
+            onClick={() => stepState(-1)}
+            aria-label={tThemes('previousState')}
+            className="dp-preview-step grid h-7 w-[26px] place-items-center rounded-full pl-0.5"
+          >
+            <ChevronLeft className="size-3.5" aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={() => stepState(1)}
+            aria-label={tThemes('nextState')}
+            className="dp-preview-step -ml-1 grid h-7 w-[26px] place-items-center rounded-full"
+          >
+            <ChevronRight className="size-3.5" aria-hidden />
+          </button>
+          <button
+            ref={menuAnchorRef}
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-label={`${tThemes('previewState')}: ${stateLabel}`}
+            onClick={() => setMenuOpen((open) => !open)}
+            className="dp-preview-label h-7 min-w-0 truncate rounded-full pl-1 pr-3"
+          >
+            {stateLabel}
+          </button>
+        </div>
+      )}
+
       {backgroundVideo && (
         // Last child so `space-y` spacing above is unchanged; z -1 inside
         // the isolated box puts it over the image and under the content.
@@ -163,112 +227,30 @@ const ThemePreviewCountryItemCompact: React.FC<
     </div>
   );
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const toggleRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [toggleDimensions, setToggleDimensions] = useState<
-    { width: number; left: number }[]
-  >([]);
-  const [isOverlayReady, setIsOverlayReady] = useState(false);
-
-  const measureToggles = useCallback(() => {
-    const dimensions = toggleRefs.current.map((ref) => {
-      if (!ref) return { width: 0, left: 0 };
-
-      return { width: ref.offsetWidth, left: ref.offsetLeft };
-    });
-
-    setToggleDimensions(dimensions);
-    setIsOverlayReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!togglesBelow) return;
-
-    measureToggles();
-
-    let cancelled = false;
-
-    if (document.fonts && typeof document.fonts.ready?.then === 'function') {
-      document.fonts.ready.then(() => {
-        if (!cancelled) {
-          requestAnimationFrame(() => measureToggles());
-        }
-      });
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [togglesBelow, measureToggles]);
-
-  useEffect(() => {
-    if (!togglesBelow) return;
-
-    const containerEl = containerRef.current;
-
-    if (!containerEl || typeof ResizeObserver === 'undefined') return;
-
-    const observer = new ResizeObserver(() => {
-      requestAnimationFrame(() => measureToggles());
-    });
-
-    observer.observe(containerEl);
-    toggleRefs.current.forEach((ref) => ref && observer.observe(ref));
-
-    return () => observer.disconnect();
-  }, [togglesBelow, measureToggles]);
-
-  const activeToggleStyle = useMemo(() => {
-    const activeIndex = previewBadges.findIndex((badge) => badge.key === state);
-    const { width = 0, left = 0 } = toggleDimensions[activeIndex] || {};
-
-    return {
-      width: width || 0,
-      left: `${left}px`,
-    };
-  }, [state, toggleDimensions]);
-
-  if (togglesBelow) {
+  if (stateMenu) {
     return (
       <>
         {preview}
-        {/* Segmented state toggles below the preview */}
-        <div
-          ref={containerRef}
-          className="relative mt-auto flex flex-nowrap bg-black/25 border border-solid border-white/10 rounded-[10px] p-1 gap-[3px]"
-        >
-          {isOverlayReady && (
-            <div
-              className="absolute top-1 bottom-1 rounded-[7px] border shadow-md transition-all duration-[400ms] ease-in-out pointer-events-none"
-              style={{
-                ...activeToggleStyle,
-                // Selected-state tint (as .dp-icon-btn.is-on): the accent's hue
-                // without competing with the solid Apply CTA beside it.
-                background:
-                  'color-mix(in oklch, var(--accent) 42%, transparent)',
-                borderColor:
-                  'color-mix(in oklch, var(--accent) 65%, transparent)',
-              }}
-            />
-          )}
-          {previewBadges.map((badge, index) => (
-            <button
-              key={badge.key}
-              ref={(el) => {
-                toggleRefs.current[index] = el;
-              }}
-              type="button"
-              onClick={() => setState(badge.key as ItemState)}
-              className={`relative z-10 flex-1 text-xs font-bold py-2.5 rounded-[7px] text-center leading-tight tracking-tight whitespace-nowrap transition-colors duration-300 ${
-                state === badge.key
-                  ? 'text-white'
-                  : 'text-white/55 hover:text-white'
-              }`}
-            >
-              {t(badge.key)}
-            </button>
-          ))}
-        </div>
+        {/* Outside the preview: a pick in the menu must not award points. */}
+        <AnchoredMenu
+          open={menuOpen}
+          anchor={menuAnchorRef.current}
+          onClose={() => setMenuOpen(false)}
+          placement="bottom-start"
+          ariaLabel={tThemes('previewState')}
+          plainHeaders
+          items={[
+            { variant: 'header', label: tThemes('previewState') },
+            ...previewBadges.map((badge) => ({
+              label: t(badge.key),
+              onClick: () => setState(badge.key as ItemState),
+              trailing:
+                badge.key === state ? (
+                  <Check className="size-4 text-accent" aria-hidden />
+                ) : undefined,
+            })),
+          ]}
+        />
       </>
     );
   }

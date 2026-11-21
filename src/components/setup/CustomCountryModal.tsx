@@ -1,7 +1,6 @@
 import { Check, Link2, Trash2, Upload, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { BaseCountry } from '../../models';
 import Button from '../common/Button';
@@ -10,6 +9,7 @@ import Modal from '../common/Modal/Modal';
 import { Input } from '../Input';
 
 import EntryActionBar from './custom-entry/EntryActionBar';
+import EntryColorsField from './custom-entry/EntryColorsField';
 import EntryRowPreview from './custom-entry/EntryRowPreview';
 import FlagPicker, { FlagTab } from './custom-entry/FlagPicker';
 import {
@@ -34,6 +34,7 @@ import {
   normalizeShortCode,
   suggestShortCode,
 } from '@/data/countries/shortCodes';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -61,6 +62,8 @@ interface EntryDraft {
   groupId: string;
   /** The picker's name for the flag (see `toPickerFlag`). */
   flag: string;
+  /** Picked colours, main first; null: read from the flag. */
+  colors: string[] | null;
 }
 
 const draftFor = (country?: BaseCountry, groupId?: string): EntryDraft =>
@@ -70,8 +73,18 @@ const draftFor = (country?: BaseCountry, groupId?: string): EntryDraft =>
         shortCode: country.shortCode ?? '',
         groupId: country.groupId ?? '',
         flag: toPickerFlag(country.flag),
+        colors: country.colors?.length ? country.colors : null,
       }
-    : { name: '', shortCode: '', groupId: groupId ?? '', flag: DEFAULT_FLAG };
+    : {
+        name: '',
+        shortCode: '',
+        groupId: groupId ?? '',
+        flag: DEFAULT_FLAG,
+        colors: null,
+      };
+
+const sameColors = (a: string[] | null, b: string[] | null) =>
+  (a ?? []).join() === (b ?? []).join();
 
 /** The picker opens where the entry's flag is. */
 const tabFor = (country: BaseCountry | undefined, hasYourFlags: boolean) => {
@@ -94,7 +107,8 @@ const errorText = (error: unknown, fallback: string) =>
 
 /**
  * Create or edit a custom entry: the entry drawn as the theme's board row on
- * top, then name and short code, one flag picker, and the group.
+ * top, then name and short code, one flag picker, its colours, and the
+ * group.
  */
 const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   isOpen,
@@ -137,6 +151,9 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   const [shortCode, setShortCode] = useState(initial.shortCode);
   const [groupId, setGroupId] = useState(initial.groupId);
   const [flag, setFlag] = useState(initial.flag);
+  const [colors, setColors] = useState(initial.colors);
+  /** Bumped on every reset, so the colours field starts again too. */
+  const [formKey, setFormKey] = useState(0);
   const [file, setFile] = useState<File | null>(null);
   const [tab, setTab] = useState<FlagTab>(() =>
     tabFor(countryToEdit, yourFlags.length > 0),
@@ -175,6 +192,8 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     setShortCode(draft.shortCode);
     setGroupId(draft.groupId);
     setFlag(draft.flag);
+    setColors(draft.colors);
+    setFormKey((key) => key + 1);
     clearFile();
     closeLink();
     setBrokenLink(null);
@@ -223,6 +242,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
     ? trimmedName !== initial.name ||
       shortCode !== initial.shortCode ||
       groupId !== initial.groupId ||
+      !sameColors(colors, initial.colors) ||
       flagChanged
     : trimmedName !== '';
 
@@ -324,6 +344,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           name: trimmedName,
           groupId: groupId || null,
           shortCode: shortCode || null,
+          colors,
           ...(flagChanged && !file ? { flagUrl: chosenFlag } : {}),
         });
       } else {
@@ -332,6 +353,7 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
           flagUrl: file ? undefined : chosenFlag || DEFAULT_FLAG,
           groupId: groupId || undefined,
           shortCode: shortCode || undefined,
+          ...(colors ? { colors } : {}),
         });
 
         entryId = created._id;
@@ -720,6 +742,13 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
             </div>
           )}
         </section>
+
+        <EntryColorsField
+          key={formKey}
+          value={colors}
+          onChange={setColors}
+          flag={previewFlag}
+        />
 
         <div className="mt-7 flex flex-col">
           <CustomSelect

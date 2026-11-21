@@ -2,12 +2,12 @@
 import { ArrowLeft, Check, Minus, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { DrawFlag } from './DrawWindowParts';
 
 import AnchoredMenu from '@/components/common/AnchoredMenu';
 import Button from '@/components/common/Button';
+import { toast } from '@/helpers/toast';
 import { EventStage } from '@/models';
 import { sizesFor } from '@/state/allocationDraw/engine';
 import type {

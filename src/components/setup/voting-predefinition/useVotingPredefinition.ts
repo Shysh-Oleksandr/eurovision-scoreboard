@@ -1,5 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import {
+  BallotEdit,
+  CellOutcome,
+  clearCell,
+  giveNextPoint,
+  pickCellPoint,
+  typeCellValue,
+} from './ballotEdits';
 import {
   buildExportSectionsForStageVotes,
   downloadVoteSpreadsheet,
@@ -31,7 +39,11 @@ import {
   TargetAdjustment,
   TargetField,
 } from '@/state/scoreboard/totalsToStageVotes';
-import { ManualShareTotalsRow, StageVotes } from '@/state/scoreboard/types';
+import {
+  ManualShareTotalsRow,
+  StageVotes,
+  Vote,
+} from '@/state/scoreboard/types';
 import {
   filterVotersByChannel,
   getEffectiveVoterChannels,
@@ -39,6 +51,7 @@ import {
 } from '@/state/scoreboard/voterChannels';
 import {
   buildCombinedBallotsFromJuryTelevote,
+  completeStageVotes,
   predefineStageVotes,
 } from '@/state/scoreboard/votesPredefinition';
 import { useScoreboardStore } from '@/state/scoreboardStore';
@@ -639,158 +652,197 @@ export const useVotingPredefinition = ({
     setTotalsAchieved({});
   };
 
+  // Edits read and write through a ref as well as state, so two edits in one
+  // tick (a commit on blur, then a pick) never work from a stale matrix.
+  const votesRef = useRef(votes);
+
+  votesRef.current = votes;
+
+  const activeSource = getActiveSource();
+  /** The points of the channel being edited (the bar's chips). */
+  const activePointsSystem = activeSource
+    ? getPointsSystemForSource(activeSource)
+    : displayPointsSystem;
+  /** Several points per entry apply to the jury only. */
+  const isMultipleActive =
+    allowMultiplePointsToSameEntry && activeSource === 'jury';
+
+  /**
+   * The most one cell can show, for the shading: the channel's top value, or
+   * a jury and a televote top value summed on Total.
+   */
+  const maxValue = (system: readonly { value: number }[]) =>
+    Math.max(0, ...system.map((item) => item.value));
+  const cellTop = activeSource
+    ? maxValue(activePointsSystem)
+    : effectiveVotingMode === StageVotingMode.JURY_AND_TELEVOTE
+    ? maxValue(pointsSystem) + maxValue(effectiveTelevotePointsSystem)
+    : maxValue(pointsSystem);
+
+  /** `voterCode`'s ballot in the channel being edited. */
+  const getBallot = (voterCode: string): Vote[] =>
+    (activeSource && votesRef.current?.[activeSource]?.[voterCode]) || [];
+
+  /**
+   * Runs one ballot edit on the channel being edited and returns what
+   * happened (null on the read-only Total tab).
+   */
+  const editBallot = (
+    voterCode: string,
+    edit: (ballot: Vote[]) => BallotEdit,
+  ): BallotEdit | null => {
+    const source = getActiveSource();
+
+    if (!source) return null;
+
+    const prev = votesRef.current;
+    const result = edit(prev?.[source]?.[voterCode] || []);
+
+    if (result.outcome.kind === 'unchanged') return result;
+
+    const next: Partial<StageVotes> = {
+      ...(prev ?? {}),
+      [source]: { ...(prev?.[source] ?? {}), [voterCode]: result.ballot },
+    };
+
+    votesRef.current = next;
+    setVotes(next);
+
+    return result;
+  };
+
+  /** Typing into a cell: see `typeCellValue`. */
   const applyInputValue = (
     participantCode: string,
     voterCode: string,
     rawValue: string,
-  ) => {
+  ): CellOutcome | null =>
+    editBallot(voterCode, (ballot) =>
+      typeCellValue(
+        ballot,
+        participantCode,
+        rawValue,
+        activePointsSystem,
+        isMultipleActive,
+      ),
+    )?.outcome ?? null;
+
+  /** A chip picked in the points bar: see `pickCellPoint`. */
+  const pickPoint = (
+    participantCode: string,
+    voterCode: string,
+    pointsId: number,
+  ): CellOutcome | null =>
+    editBallot(voterCode, (ballot) =>
+      pickCellPoint(
+        ballot,
+        participantCode,
+        pointsId,
+        activePointsSystem,
+        isMultipleActive,
+      ),
+    )?.outcome ?? null;
+
+  const clearCellPoints = (participantCode: string, voterCode: string) =>
+    editBallot(voterCode, (ballot) => clearCell(ballot, participantCode))
+      ?.outcome ?? null;
+
+  /**
+   * "Whole vote" mode: a tap on a row gives the voter's next value (or takes
+   * back what the row has). Returns the ballot after the tap.
+   */
+  const giveNext = (
+    participantCode: string,
+    voterCode: string,
+    preferredId: number | null,
+  ): Vote[] =>
+    editBallot(voterCode, (ballot) =>
+      giveNextPoint(
+        ballot,
+        participantCode,
+        activePointsSystem,
+        isMultipleActive,
+        preferredId,
+      ),
+    )?.ballot ?? getBallot(voterCode);
+
+  const clearBallot = (voterCode: string) => {
+    const source = getActiveSource();
+    const prev = votesRef.current;
+
+    if (!source || !prev?.[source]?.[voterCode]) return;
+
+    const rest = { ...prev[source] };
+
+    delete rest[voterCode];
+
+    const next = { ...prev, [source]: rest };
+
+    votesRef.current = next;
+    setVotes(next);
+  };
+
+  /** The channels the open tab shows: one, or all the mode uses on Total. */
+  const getScopeChannels = (): Array<'jury' | 'televote'> => {
     const source = getActiveSource();
 
-    if (!source) return; // Total tab is non-editable
+    if (source) return [source];
 
-    const sourcePointsSystem = getPointsSystemForSource(source);
+    return effectiveVotingMode === StageVotingMode.JURY_ONLY
+      ? ['jury']
+      : effectiveVotingMode === StageVotingMode.TELEVOTE_ONLY
+      ? ['televote']
+      : ['jury', 'televote'];
+  };
 
-    setVotes((prev) => {
-      const nextVotes: Partial<StageVotes> = prev ? { ...prev } : {};
-      const sourceMap: Record<string, any[]> = (nextVotes as any)[source] || {};
-      const arr: any[] = [...(sourceMap[voterCode] || [])];
+  /** Whether the open tab's channels hold any points yet. */
+  const hasVotesInScope = () =>
+    getScopeChannels().some((channel) =>
+      Object.values(votesRef.current?.[channel] ?? {}).some(
+        (ballot) => ballot.length > 0,
+      ),
+    );
 
-      const parsed = Number(rawValue);
-
-      // When multiple tokens per entry is enabled (jury only), the cell represents
-      // the total points to award to this participant. We clear all existing tokens
-      // for them and use a greedy subset-sum on the remaining pool to reach the total.
-      if (allowMultiplePointsToSameEntry && source === 'jury') {
-        const retained = arr.filter((v) => v.countryCode !== participantCode);
-
-        if (!rawValue || !Number.isFinite(parsed) || parsed <= 0) {
-          (nextVotes as any)[source] = {
-            ...sourceMap,
-            [voterCode]: retained,
-          };
-
-          return nextVotes;
-        }
-
-        const usedIds = new Set(retained.map((v) => v.pointsId as number));
-        const available = [...pointsSystem]
-          .filter((p) => !usedIds.has(p.id))
-          .sort((a, b) => b.value - a.value);
-
-        const chosen: typeof pointsSystem = [];
-        let remaining = parsed;
-
-        for (const p of available) {
-          if (p.value <= remaining) {
-            chosen.push(p);
-            remaining -= p.value;
-          }
-          if (remaining === 0) break;
-        }
-
-        if (remaining !== 0) {
-          // Exact total not achievable from the available pool — reject
-          return prev;
-        }
-
-        const newEntries = chosen.map((p) => ({
-          countryCode: participantCode,
-          points: p.value,
-          pointsId: p.id,
-          showDouzePointsAnimation: !!p.showDouzePoints,
-        }));
-
-        (nextVotes as any)[source] = {
-          ...sourceMap,
-          [voterCode]: [...retained, ...newEntries],
-        };
-
-        return nextVotes;
-      }
-
-      const idx = arr.findIndex((v) => v.countryCode === participantCode);
-
-      if (!rawValue || !Number.isFinite(parsed)) {
-        if (idx !== -1) {
-          arr.splice(idx, 1);
-        }
-      } else {
-        const matchingPoints = sourcePointsSystem.filter(
-          (p) => p.value === parsed,
-        );
-
-        if (matchingPoints.length === 0) {
-          if (idx !== -1) {
-            arr.splice(idx, 1);
-          }
-        } else {
-          // Allowed ids for this points value (may contain duplicates like two 6's with distinct ids)
-          const allowedIds = matchingPoints.map((p) => p.id);
-
-          // Collect used ids by other assignments for this voter (exclude current participant if present)
-          const usedIds: number[] = arr
-            .filter((_, i) => i !== idx)
-            .map((item) => item.pointsId as number);
-          const usedSet = new Set(usedIds);
-
-          // Prefer keeping current id if value unchanged AND it's not used by someone else
-          const currentEntry = idx !== -1 ? (arr[idx] as any) : null;
-          const currentIdIfSameValue =
-            currentEntry &&
-            currentEntry.points === parsed &&
-            allowedIds.includes(currentEntry.pointsId)
-              ? (currentEntry.pointsId as number)
-              : undefined;
-
-          let chosenId: number | undefined;
-
-          if (
-            currentIdIfSameValue !== undefined &&
-            !usedSet.has(currentIdIfSameValue)
-          ) {
-            chosenId = currentIdIfSameValue;
-          } else {
-            chosenId = allowedIds.find((id) => !usedSet.has(id));
-          }
-
-          // If no available id for this value, transfer an existing id from another participant
-          if (chosenId === undefined) {
-            const donorIndex = arr.findIndex(
-              (other, i) =>
-                i !== idx && allowedIds.includes(other.pointsId as number),
-            );
-
-            if (donorIndex !== -1) {
-              chosenId = arr[donorIndex].pointsId as number;
-              // Remove donor assignment to free the id
-              arr.splice(donorIndex, 1);
-            }
-          }
-
-          if (chosenId !== undefined) {
-            const chosenPoint = sourcePointsSystem.find(
-              (p) => p.id === chosenId,
-            );
-            const entry = {
-              countryCode: participantCode,
-              points: parsed,
-              pointsId: chosenId,
-              showDouzePointsAnimation: !!chosenPoint?.showDouzePoints,
-            };
-
-            if (idx !== -1) {
-              arr[idx] = entry;
-            } else {
-              arr.push(entry);
-            }
-          }
-        }
-      }
-
-      (nextVotes as any)[source] = { ...sourceMap, [voterCode]: arr };
-
-      return nextVotes;
+  /**
+   * "Fill the rest": gives every incomplete ballot on the open tab (or just
+   * `voterCode`'s) its missing points at random, keeping every point already
+   * given. Returns how many ballots changed.
+   */
+  const fillVotesRandomly = (voterCode?: string): number => {
+    const channels = getScopeChannels();
+    const prev = votesRef.current;
+    const next = completeStageVotes({
+      votes: prev,
+      channels,
+      voterCodes: voterCode ? [voterCode] : undefined,
+      completeCombined: !getActiveSource(),
+      stageCountries: stage.countries,
+      votingCountries,
+      votingMode: effectiveVotingMode,
+      countryOdds,
+      randomnessLevel,
+      pointsSpread,
+      juryPointsSystem: pointsSystem,
+      televotePointsSystem: effectiveTelevotePointsSystem,
+      allowMultiplePointsToSameEntry,
+      diaspora: resolveDiaspora(diasporaSettings),
+      voterChannels,
     });
+    const changed = (['jury', 'televote', 'combined'] as const).reduce(
+      (count, channel) =>
+        count +
+        Object.keys(next[channel] ?? {}).filter(
+          (code) => next[channel]![code] !== prev?.[channel]?.[code],
+        ).length,
+      0,
+    );
+
+    if (changed > 0) {
+      votesRef.current = next;
+      setVotes(next);
+    }
+
+    return changed;
   };
 
   const getVoterValidity = (voterCode: string) => {
@@ -1191,6 +1243,18 @@ export const useVotingPredefinition = ({
     randomizeAll,
     resetVotes,
     applyInputValue,
+    pickPoint,
+    clearCellPoints,
+    giveNext,
+    clearBallot,
+    fillVotesRandomly,
+    hasVotesInScope,
+    // editing
+    activeSource,
+    activePointsSystem,
+    isMultipleActive,
+    cellTop,
+    getBallot,
     // getters
     getVoterValidity,
     getTotalPointsForCountry,

@@ -163,15 +163,8 @@ export const dominantColors = (
     .map((cluster) => toHex(cluster.color));
 };
 
-/** The flag's main colours, or null when it can't be read. Cached per image. */
-export const sampleFlagColors = (img: HTMLImageElement): string[] | null => {
-  const src = img.currentSrc || img.src;
-
-  if (!src || !img.complete) return null;
-  if (cache.has(src)) return cache.get(src)!;
-
-  let colors: string[] | null = null;
-
+/** An image's main colours, or null when the canvas can't read it. */
+const readImageColors = (img: HTMLImageElement): string[] | null => {
   try {
     const canvas = document.createElement('canvas');
 
@@ -180,24 +173,56 @@ export const sampleFlagColors = (img: HTMLImageElement): string[] | null => {
 
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-    if (ctx) {
-      ctx.drawImage(img, 0, 0, SAMPLE_W, SAMPLE_H);
+    if (!ctx) return null;
 
-      const found = dominantColors(
-        ctx.getImageData(0, 0, SAMPLE_W, SAMPLE_H).data,
-      );
+    ctx.drawImage(img, 0, 0, SAMPLE_W, SAMPLE_H);
 
-      colors = found.length > 0 ? found : null;
-    }
+    const found = dominantColors(
+      ctx.getImageData(0, 0, SAMPLE_W, SAMPLE_H).data,
+    );
+
+    return found.length > 0 ? found : null;
   } catch {
     // Another origin without CORS taints the canvas: keep the fixed palette.
-    colors = null;
+    return null;
   }
+};
+
+/** The flag's main colours, or null when it can't be read. Cached per image. */
+export const sampleFlagColors = (img: HTMLImageElement): string[] | null => {
+  const src = img.currentSrc || img.src;
+
+  if (!src || !img.complete) return null;
+  if (cache.has(src)) return cache.get(src)!;
+
+  const colors = readImageColors(img);
 
   cache.set(src, colors);
 
   return colors;
 };
+
+/**
+ * The main colours of a flag image by URL, read the way rows read theirs:
+ * what the custom entry editor starts its colours from. `src` should be
+ * readable (same origin, a data URL or a proxied URL); `crossOrigin` asks
+ * for CORS (the CDN bucket's rules list the app's origins: the backend's
+ * `npm run r2:cors`), and a refusal is a load error. Null when it can't be
+ * read. Not cached with the rows' readings:
+ * a row's own image (no CORS) must not borrow a result it couldn't get.
+ */
+export const loadFlagImageColors = (
+  src: string,
+  { crossOrigin = false }: { crossOrigin?: boolean } = {},
+): Promise<string[] | null> =>
+  new Promise((resolve) => {
+    const img = new Image();
+
+    if (crossOrigin) img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(readImageColors(img));
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
 
 /**
  * The spec palette's keys from up to three `#rrggbb` colours (a flag's, the
@@ -223,6 +248,17 @@ export const paletteFromColors = (
     ...sheenAndShade(lifted(first)),
     ink: inkOn(lifted(first)),
   };
+};
+
+/**
+ * Up to three row colours from a flag's (or an entry's chosen) colours, very
+ * dark ones lifted as in `paletteFromColors`: what the hand-written
+ * animations colour their hearts and blocks with.
+ */
+export const rowColors = (colors: readonly string[]): string[] => {
+  const { c1, c2, c3 } = paletteFromColors([...colors]);
+
+  return [c1, c2, c3].slice(0, Math.min(3, colors.length));
 };
 
 const toHsl = ([r, g, b]: Rgb): [number, number, number] => {

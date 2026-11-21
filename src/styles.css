@@ -813,20 +813,237 @@ h6 {
   display: none;
 }
 
-/* Toasts clear the status bar and the strip (react-toastify injects its CSS
-   after ours, hence the extra specificity). */
+/* ==========================================================================
+   Toasts (react-toastify, src/app/toast-root.tsx; DESIGN.md "Toasts").
+   The menus' floating material in the theme's font, as wide as the text,
+   top centre: no header keeps its actions there. Status is the icon's
+   colour only. react-toastify injects its CSS after this file, hence the
+   `html` in front of every rule. Outside `@layer components`: injected,
+   unlayered CSS would beat any layer.
+   ========================================================================== */
 html:root {
+  /* Clear the status bar and the offline strip. */
   --toastify-toast-top: max(
     var(--toastify-toast-offset),
-    calc(var(--safe-top) + var(--offline-strip-h, 0px))
+    calc(var(--safe-top) + var(--offline-strip-h, 0px) + 8px)
   );
+  --toastify-font-family: var(--dp-font-family);
+  --toastify-toast-width: auto;
+  --toastify-toast-min-height: 46px;
+  --toastify-toast-padding: 13px 14px;
+  --toastify-toast-bd-radius: 14px;
+  --toastify-toast-shadow: 0 14px 34px rgb(0 0 0 / 50%),
+    0 2px 6px rgb(0 0 0 / 28%);
 }
 
+html .Toastify__toast.dp-toast {
+  width: auto;
+  max-width: min(420px, calc(100vw - 20px));
+  margin-bottom: 8px;
+  gap: 11px;
+  align-items: flex-start;
+  background: linear-gradient(
+    180deg,
+    var(--p-950),
+    color-mix(in oklch, var(--p-950) 70%, black)
+  );
+  border: 1px solid var(--hair-2);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 19px;
+  font-synthesis: var(--dp-font-synthesis, weight style);
+  text-wrap: pretty;
+}
+
+html .Toastify__toast.dp-toast:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+html .dp-toast.Toastify__toast--error {
+  border-color: color-mix(in srgb, #ff5d70 38%, transparent);
+}
+
+/* The icon sits on the first line; its colour is the status: the accent for
+   done, the fixed hues of the voting matrix's ballot dots for problems. */
+html .dp-toast .Toastify__toast-icon {
+  width: 18px;
+  height: 19px;
+  margin: 0;
+  align-items: center;
+  color: var(--ink-70);
+  animation: none;
+}
+
+html .dp-toast .Toastify__toast-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.25;
+}
+
+html .dp-toast.Toastify__toast--success .Toastify__toast-icon {
+  color: color-mix(in oklch, var(--accent) 80%, white);
+}
+
+html .dp-toast.Toastify__toast--error .Toastify__toast-icon {
+  color: #ff5d70;
+}
+
+html .dp-toast.Toastify__toast--warning .Toastify__toast-icon {
+  color: #e6b23c;
+}
+
+/* Errors only: they stay long enough to want closing. */
+html .dp-toast .dp-toast-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  margin: -7px -8px -7px auto;
+  border-radius: 9px;
+  color: var(--ink-55);
+  transition: color 0.14s, background-color 0.14s;
+}
+
+html .dp-toast .dp-toast-close:hover {
+  color: var(--ink);
+  background: rgb(255 255 255 / 8%);
+}
+
+html .dp-toast .dp-toast-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+html .dp-toast .dp-toast-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* A message and one text action (ToastBody). Two items, so the wrap is the
+   fit step: the action follows the message, or moves under it with its label
+   lined up with the text when both don't fit on one line. */
+html .dp-toast .dp-toast-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px 14px;
+  min-width: 0;
+}
+
+html .dp-toast .dp-toast-msg {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+html .dp-toast .dp-toast-act {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 33px;
+  margin: -7px -6px -7px -10px;
+  padding: 0 10px;
+  border-radius: 9px;
+  color: color-mix(in oklch, var(--accent) 70%, white);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: background-color 0.14s;
+}
+
+html .dp-toast button.dp-toast-act:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+html .dp-toast button.dp-toast-act:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+html .dp-toast .dp-toast-act[data-done] {
+  color: var(--ink-70);
+}
+
+html .dp-toast .dp-toast-act svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.5;
+}
+
+/* A decision (ActionToast): the message, then its CTA and a quiet Later. */
+html .dp-toast .dp-toast-decide {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  min-width: 0;
+}
+
+/* Phones: a card under the status bar, not a full-width band. */
 @media only screen and (width <= 480px) {
-  html .Toastify__toast-container--top-left,
-  html .Toastify__toast-container--top-center,
-  html .Toastify__toast-container--top-right {
-    top: calc(var(--safe-top) + var(--offline-strip-h, 0px));
+  html .Toastify__toast-container--top-center {
+    top: calc(var(--safe-top) + var(--offline-strip-h, 0px) + 8px);
+    left: 0;
+    width: 100%;
+    padding: 0 10px;
+    align-items: center;
+  }
+
+  html .Toastify__toast.dp-toast {
+    --toastify-toast-width: auto;
+
+    border-radius: var(--toastify-toast-bd-radius);
+    margin-bottom: 8px;
+  }
+}
+
+/* Rises from the top edge and settles; leaves by lifting and fading. */
+html .dp-toast-in {
+  animation: dp-toast-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html .dp-toast-out {
+  animation: dp-toast-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes dp-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dp-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html .dp-toast-in {
+    animation: dp-toast-fade 150ms ease-out both;
+  }
+
+  html .dp-toast-out {
+    animation: dp-toast-fade 150ms ease-in reverse both;
+  }
+}
+
+@keyframes dp-toast-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 
@@ -1779,36 +1996,6 @@ html:root {
       cubic-bezier(0.25, 0.46, 0.45, 0.94) var(--douze-name-in-delay, 0.3s) both,
     douze-fade-out var(--douze-name-fade, 0.4s)
       cubic-bezier(0.55, 0.085, 0.68, 0.53) var(--douze-name-out-delay) forwards;
-}
-
-/* Voter chips: the overhanging badge row is a size container so the channel
-   badge can drop "only" when the row is too tight for both badges. */
-.voter-badge-row {
-  container-type: inline-size;
-}
-
-.voter-channel-badge-short {
-  display: none;
-}
-
-@container (width <= 180px) {
-  .voter-channel-badge--televote .voter-channel-badge-full {
-    display: none;
-  }
-
-  .voter-channel-badge--televote .voter-channel-badge-short {
-    display: inline;
-  }
-}
-
-@container (width <= 120px) {
-  .voter-channel-badge--jury .voter-channel-badge-full {
-    display: none;
-  }
-
-  .voter-channel-badge--jury .voter-channel-badge-short {
-    display: inline;
-  }
 }
 
 /*
@@ -2796,6 +2983,12 @@ html:root {
     display: none !important;
   }
 
+  /* The description ⓘ's enlarged hit area reaches past a wrapped title's
+     edge: not an overflow. */
+  [data-fit-measuring] .dp-cc-desc .double-clickable-area::after {
+    display: none;
+  }
+
   /* Header: one row while everything fits, else the phone layout (combos
      share the first row, the rest stretch across the second). */
   .dp-hub-header {
@@ -2896,6 +3089,180 @@ html:root {
   .dp-entry-bar[data-fit-measuring] > .dp-entry-bar-main,
   .dp-entry-bar[data-fit-measuring] .dp-entry-bar-btn {
     flex: none;
+  }
+
+  /* Stage editor, "Who goes through" (QualifierTargetsSection): one row per
+     stage in running order. The grip column is reserved on every row so
+     the names line up; the clear button keeps its slot while hidden so the
+     fields don't shift when a row gets a value. */
+  .dp-qual-list {
+    container: dp-qual / inline-size;
+  }
+
+  .dp-qual-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 6px 6px 6px 0;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 6%);
+  }
+
+  /* The stage being edited: its place in the order, nothing to set. */
+  .dp-qual-row.is-current {
+    background: transparent;
+    border-color: var(--hair-2);
+  }
+
+  .dp-qual-grip {
+    flex: none;
+    align-self: stretch;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    color: rgb(255 255 255 / 62%);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .dp-qual-grip:empty {
+    cursor: default;
+  }
+
+  .dp-qual-name {
+    flex: 1 1 0%;
+    min-width: 0;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  .dp-qual-note {
+    flex: none;
+    padding-right: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: rgb(255 255 255 / 75%);
+  }
+
+  .dp-qual-controls {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dp-qual-step,
+  .dp-qual-clear {
+    display: grid;
+    place-items: center;
+    height: 38px;
+    border-radius: 10px;
+    color: #fff;
+    transition: background-color 0.14s, opacity 0.14s;
+  }
+
+  .dp-qual-step {
+    width: 38px;
+    background: rgb(255 255 255 / 8%);
+  }
+
+  .dp-qual-clear {
+    width: 32px;
+    color: rgb(255 255 255 / 75%);
+  }
+
+  .dp-qual-step:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .dp-qual-undo {
+    flex: none;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #fff;
+    background: rgb(255 255 255 / 8%);
+    transition: background-color 0.14s;
+  }
+
+  .dp-qual-step:focus-visible,
+  .dp-qual-clear:focus-visible,
+  .dp-qual-undo:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .dp-qual-step:hover:not(:disabled),
+  .dp-qual-clear:hover:not(:disabled),
+  .dp-qual-undo:hover {
+    background: rgb(255 255 255 / 14%);
+    color: #fff;
+  }
+
+  /* Counts and places: a recessed well (`dp-field`), digits aligned. */
+  .dp-qual-num {
+    width: 52px;
+    height: 38px;
+    padding: 0 4px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .dp-qual-num::placeholder {
+    color: color-mix(in oklch, white 62%, var(--p-700));
+    font-weight: 600;
+  }
+
+  @media (width >= 768px) {
+    .dp-qual-num {
+      font-size: 14.5px;
+    }
+  }
+
+  .dp-qual-dash {
+    width: 10px;
+    text-align: center;
+    color: rgb(255 255 255 / 70%);
+    font-weight: 700;
+  }
+
+  /* The row in the hand (react-easy-sort moves a copy under <body>). */
+  .dp-qual-dragged {
+    z-index: 9999999;
+    background: var(--p-800);
+    border-color: var(--hair-2);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+    cursor: grabbing;
+  }
+
+  /* Too narrow for a readable name beside the fields: the fields move
+     under the name. */
+  @container dp-qual (width < 340px) {
+    .dp-qual-row {
+      flex-wrap: wrap;
+      row-gap: 2px;
+    }
+
+    .dp-qual-name {
+      flex-basis: calc(100% - 42px);
+    }
+
+    .dp-qual-controls,
+    .dp-qual-note {
+      margin-left: auto;
+    }
   }
 
   .dp-dialog {
@@ -3256,20 +3623,6 @@ html:root {
     color: var(--accent-ink);
   }
 
-  /* ---------- Allocation draw: running-order halves ---------- */
-  .dp-ro-divider::after {
-    content: '';
-    flex: 1;
-    height: 2px;
-    border-radius: 2px;
-    background: color-mix(in oklch, var(--accent) 55%, transparent);
-  }
-
-  .dp-ro-divider--first::after {
-    height: 1px;
-    background: var(--hair);
-  }
-
   /* ---------- Simulation, column layout (columnLayout/) ----------
      The board is the stage; this chrome stays flat: one tonal surface per
      panel, hairlines, the accent only on Present / Vote / Continue. Floating
@@ -3444,6 +3797,13 @@ html:root {
     background: rgb(255 255 255 / 3%);
   }
 
+  /* The place the next pick takes (QualifiedList). */
+  .dp-sim-chip.is-empty.is-next,
+  .dp-sim-slot.is-next {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
   /* A place's number in its circle: 46% of the circle (at most 12px), and
      gone should a circle ever get too small for two digits. */
   .dp-sim-chip.is-empty {
@@ -3557,6 +3917,1207 @@ html:root {
     .dp-sim-edge-progress > i {
       transition: none;
     }
+  }
+
+  /* ---------- Libraries: Themes and Contests modals (widgets-section/library/) ----------
+     One flat --p-950 surface. The header holds the title and the places
+     (Yours / Saved / Community); phones move the places to a bar at the
+     bottom. Under the header the toolbar and the groups scroll away with
+     the list. */
+  .dp-lib-surface {
+    background: var(--p-950);
+    border: 1px solid var(--hair-2);
+  }
+
+  .dp-lib-foot {
+    background: var(--p-900);
+    border-top: 1px solid var(--hair);
+  }
+
+  /* Search: a recessed frame; the focus ring goes on the frame. */
+  .dp-lib-search {
+    background: rgb(0 0 0 / 28%);
+    border: 1px solid var(--hair-2);
+    transition: border-color 0.14s;
+  }
+
+  .dp-lib-search:hover {
+    border-color: rgb(255 255 255 / 24%);
+  }
+
+  .dp-lib-search:focus-within {
+    border-color: transparent;
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+  }
+
+  /* Toolbar (useFitStep): search, selects and the action on one row; else
+     the selects share the row under the search. */
+  .dp-lib-tools {
+    grid-template-columns: minmax(260px, 1fr) auto;
+    grid-template-areas: 'search filters';
+    gap: 8px;
+    align-items: center;
+  }
+
+  .dp-lib-tools.has-action {
+    grid-template-columns: minmax(260px, 1fr) auto auto;
+    grid-template-areas: 'search filters action';
+  }
+
+  .dp-lib-tools-search {
+    grid-area: search;
+  }
+
+  .dp-lib-tools-filters {
+    grid-area: filters;
+    display: flex;
+    gap: 8px;
+  }
+
+  .dp-lib-tools-filters > .dp-capsel {
+    min-width: 132px;
+  }
+
+  .dp-lib-tools-action {
+    grid-area: action;
+  }
+
+  .dp-lib-tools[data-tools='split'] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'search'
+      'filters';
+  }
+
+  .dp-lib-tools.has-action[data-tools='split'] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'search action'
+      'filters filters';
+  }
+
+  .dp-lib-tools[data-tools='split'] .dp-lib-tools-filters > .dp-capsel {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .dp-lib-tools[data-fit-measuring] .dp-lib-tools-filters > .dp-capsel {
+    flex: none;
+  }
+
+  /* Groups: one row that scrolls sideways; its edges fade while there is
+     more to scroll to. */
+  .dp-lib-rail {
+    scrollbar-width: none;
+    margin: 0 -4px;
+    padding: 2px 4px;
+  }
+
+  .dp-lib-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dp-lib-rail[data-fade-end] {
+    mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+  }
+
+  .dp-lib-rail[data-fade-start] {
+    mask-image: linear-gradient(90deg, transparent, #000 36px);
+  }
+
+  .dp-lib-rail[data-fade-start][data-fade-end] {
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 36px,
+      #000 calc(100% - 36px),
+      transparent
+    );
+  }
+
+  .dp-lib-chip,
+  .dp-lib-chip-edit {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    color: var(--ink-70);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background 0.14s, color 0.14s;
+  }
+
+  .dp-lib-chip {
+    padding: 0 15px;
+  }
+
+  .dp-lib-chip-edit {
+    width: 40px;
+  }
+
+  .dp-lib-chip:hover:not(:disabled),
+  .dp-lib-chip-edit:hover:not(:disabled) {
+    background: rgb(255 255 255 / 11%);
+    color: #fff;
+  }
+
+  .dp-lib-chip[aria-pressed='true'] {
+    background: var(--p-750);
+    border-color: transparent;
+    box-shadow: 0 0 0 1px var(--accent);
+    color: #fff;
+  }
+
+  .dp-lib-chip-add {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 10px;
+    border-radius: 999px;
+    color: var(--ink-70);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: color 0.14s, background 0.14s;
+  }
+
+  .dp-lib-chip-add:hover:not(:disabled) {
+    background: rgb(255 255 255 / 6%);
+    color: #fff;
+  }
+
+  @media (width >= 576px) {
+    .dp-lib-chip,
+    .dp-lib-chip-edit,
+    .dp-lib-chip-add {
+      height: 34px;
+    }
+
+    .dp-lib-chip-edit {
+      width: 34px;
+    }
+  }
+
+  .dp-lib-chip:focus-visible,
+  .dp-lib-chip-edit:focus-visible,
+  .dp-lib-chip-add:focus-visible,
+  .dp-lib-tile:focus-visible,
+  .dp-lib-sortbtn:focus-visible,
+  .dp-lib-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Text actions in the accent's tint: Clear filters, the stats links. */
+  .dp-lib-link {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+    font-weight: 700;
+    transition: color 0.14s;
+  }
+
+  .dp-lib-link:hover:not(:disabled) {
+    color: #fff;
+  }
+
+  /* Phones: the Sort button and the sheet's choices. */
+  .dp-lib-sortbtn {
+    background: linear-gradient(180deg, var(--p-750), var(--p-800));
+    border: 1px solid var(--hair-2);
+  }
+
+  .dp-lib-tile {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    color: var(--ink-70);
+    transition: background 0.14s, color 0.14s;
+  }
+
+  .dp-lib-tile.is-on {
+    background: var(--p-750);
+    border-color: transparent;
+    box-shadow: 0 0 0 1px var(--accent);
+    color: #fff;
+  }
+
+  /* A contest card's Like and Save: quiet until on, then the chosen look
+     (theme cards draw theirs in the card theme's accent). */
+  .dp-lib-toggle {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    color: var(--ink-70);
+    transition: background 0.14s, color 0.14s;
+  }
+
+  .dp-lib-toggle:hover:not(:disabled) {
+    background: rgb(255 255 255 / 11%);
+    color: #fff;
+  }
+
+  .dp-lib-toggle.is-on {
+    background: var(--p-750);
+    border-color: transparent;
+    box-shadow: 0 0 0 1px var(--accent);
+    color: #fff;
+  }
+
+  .dp-lib-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* A theme card's preview state in the preview's top corner: ‹ Jury ›,
+     the arrows stepping through the states, the name opening them all as a
+     menu. A quiet dark tint, readable over any background image; it firms
+     up under the pointer. */
+  .dp-preview-state {
+    background: rgb(0 0 0 / 32%);
+    color: rgb(255 255 255 / 85%);
+    transition: background 0.14s;
+  }
+
+  .dp-preview-state:hover,
+  .dp-preview-state:focus-within {
+    background: rgb(0 0 0 / 55%);
+  }
+
+  .dp-preview-step,
+  .dp-preview-label {
+    transition: color 0.14s, background 0.14s;
+  }
+
+  .dp-preview-step {
+    color: rgb(255 255 255 / 65%);
+  }
+
+  .dp-preview-step:hover,
+  .dp-preview-label:hover,
+  .dp-preview-label[aria-expanded='true'] {
+    color: #fff;
+  }
+
+  .dp-preview-step:focus-visible,
+  .dp-preview-label:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  /* A ticked box in the Includes menu. */
+  .dp-lib-box {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    border: 1.5px solid rgb(255 255 255 / 45%);
+  }
+
+  .dp-lib-box[data-on] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* ---------- Settings modal and its Odds tab (settings/) ----------
+     The libraries' frame: the title with General / Odds / Relations and ×
+     in the header; phones move the tabs to a bar at the bottom. Each tab
+     scrolls on its own. Odds lays out like the simulation: the countries
+     on the left, one column of controls on the right that stays put
+     (sticky); narrower than 700px the column folds above the list. */
+  .dp-settings-surface {
+    background: var(--p-950);
+    border: 1px solid var(--hair-2);
+  }
+
+  .dp-settings-head {
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .dp-settings-foot {
+    background: var(--p-900);
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-odds {
+    container: dp-odds / inline-size;
+  }
+
+  .dp-odds-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dp-odds-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 14px;
+  }
+
+  .dp-odds-toprow {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dp-odds-toprow > .dp-odds-view {
+    flex: 1;
+  }
+
+  .dp-odds-seg-btn {
+    height: 40px;
+  }
+
+  .dp-odds-setall {
+    height: 46px;
+  }
+
+  .dp-odds-setall-long,
+  .dp-odds-sliders {
+    display: none;
+  }
+
+  /* No display utility on it: the container query below hides it. */
+  .dp-odds-combos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .dp-odds-pop {
+    background: var(--p-900);
+    border: 1px solid var(--hair);
+  }
+
+  .dp-odds-undo {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  .dp-odds-undo:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @container dp-odds (width >= 700px) {
+    .dp-odds-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 288px;
+      column-gap: 22px;
+      align-items: start;
+    }
+
+    .dp-odds-side {
+      grid-column: 2;
+      grid-row: 1;
+      position: sticky;
+      top: 0;
+      padding-bottom: 14px;
+    }
+
+    .dp-odds-list {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    /* One column: Numbers / Ranking, Jury / Televote, the line, Set all
+       odds, then the sliders under a hairline. */
+    .dp-odds-toprow {
+      display: contents;
+    }
+
+    .dp-odds-seg-btn {
+      height: 36px;
+    }
+
+    .dp-odds-msg {
+      order: 3;
+    }
+
+    .dp-odds-setall {
+      order: 4;
+      height: 40px;
+    }
+
+    .dp-odds-setall-long {
+      display: block;
+    }
+
+    .dp-odds-setall-short,
+    .dp-odds-combos,
+    .dp-odds-pop {
+      display: none;
+    }
+
+    .dp-odds-sliders {
+      order: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 6px;
+      padding-top: 16px;
+      border-top: 1px solid var(--hair);
+    }
+  }
+
+  /* Numbers: the stats modal's table look. The header stays on top while
+     the rows scroll under it. */
+  .dp-odds-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 72px 72px;
+    column-gap: 8px;
+  }
+
+  .dp-odds-thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 10px;
+    background: var(--p-950);
+    border-bottom: 1px solid var(--hair-2);
+  }
+
+  .dp-odds-thead .dp-odds-grid {
+    min-height: 40px;
+  }
+
+  .dp-odds-sort {
+    color: var(--ink-70);
+    transition: color 0.14s;
+  }
+
+  .dp-odds-sort:hover,
+  .dp-odds-sort.is-on {
+    color: var(--ink);
+  }
+
+  .dp-odds-sort:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* The stats Summary's channel swatches: jury white, televote accent. */
+  .dp-odds-swatch.is-jury {
+    background: rgb(255 255 255 / 45%);
+  }
+
+  .dp-odds-swatch.is-televote {
+    background: var(--accent);
+  }
+
+  .dp-odds-row {
+    min-height: 54px;
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .dp-odds-field {
+    height: 42px;
+    font-size: 16px;
+    background: rgb(0 0 0 / 28%);
+    border: 1px solid var(--hair);
+    transition: border-color 0.14s;
+  }
+
+  .dp-odds-field:hover {
+    border-color: var(--hair-2);
+  }
+
+  .dp-odds-field:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .dp-odds-field.is-invalid,
+  .dp-odds-field.is-invalid:focus {
+    border-color: #ff5d70;
+    box-shadow: 0 0 0 1px #ff5d70;
+  }
+
+  @container dp-odds (width >= 700px) {
+    .dp-odds-grid {
+      grid-template-columns: minmax(0, 1fr) 86px 86px;
+      column-gap: 10px;
+    }
+
+    .dp-odds-thead {
+      padding-top: 14px;
+    }
+
+    .dp-odds-row {
+      min-height: 46px;
+    }
+
+    .dp-odds-field {
+      height: 34px;
+      font-size: 14.5px;
+    }
+  }
+
+  /* Ranking: the theme's board rows, the places in their own column so
+     they stay put while a row is dragged. A slot pads its row to a thumb's
+     height. */
+  .dp-odds-rank {
+    padding-top: 8px;
+  }
+
+  .dp-odds-slot {
+    padding: 6px 0;
+  }
+
+  .dp-odds-place {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--ink-70);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dp-odds-place.is-moved {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  .dp-odds-board {
+    transition: box-shadow 0.14s;
+  }
+
+  /* Picked up (keyboard) or dragged: lifted. Focused or just dropped: the
+     accent ring alone. */
+  .dp-odds-rank-dragged .dp-odds-board,
+  .dp-odds-pick.is-grabbed .dp-odds-board {
+    box-shadow: 0 0 0 2px var(--accent), 0 10px 24px rgb(0 0 0 / 45%);
+  }
+
+  .dp-odds-pick:focus-visible:not(.is-grabbed) .dp-odds-board,
+  .dp-odds-pick.is-moved:not(.is-grabbed) .dp-odds-board {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  /* The dragged copy lives in <body>, above the modal. */
+  .dp-odds-rank-dragged {
+    cursor: grabbing;
+    z-index: 9999999;
+  }
+
+  @container dp-odds (width >= 700px) {
+    .dp-odds-rank {
+      padding-top: 11px;
+    }
+
+    .dp-odds-slot {
+      padding: 3px 0;
+    }
+  }
+
+  /* ---------- Stage setup (post-setup/, PostSetupModal) ----------
+     Opened by Start before each stage. The libraries' frame: the stage's
+     name, the four tabs as the segmented well and × in the header (the tabs
+     under the title when they don't fit: useFitStep, always on phones), a
+     footer that reads the stage back beside Start. Each tab scrolls on its
+     own; Voters keeps its pool in a column of its own. */
+  .dp-ss-surface {
+    background: var(--p-950);
+    border: 1px solid var(--hair-2);
+  }
+
+  .dp-ss-head {
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .dp-ss-head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 16px;
+    min-height: 56px;
+  }
+
+  .dp-ss-title {
+    order: 1;
+    flex: 1 1 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  .dp-ss-close {
+    order: 2;
+    margin-left: auto;
+  }
+
+  /* Stacked: the tabs share a row of their own, each sized to its label. */
+  .dp-ss-tabs {
+    order: 3;
+    flex: 1 1 100%;
+    margin: 0 6px 10px 0;
+  }
+
+  .dp-ss-tabs > [role='tab'] {
+    flex: 1 1 auto;
+    height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  .dp-ss-head-row[data-fit-measuring] .dp-ss-tabs > [role='tab'] {
+    flex: none;
+  }
+
+  /* A near fit counts as overflow: useFitStep forgives 4px, and the
+     labels would truncate to share them. */
+  .dp-ss-head-row[data-fit-measuring] .dp-ss-tabs::after {
+    content: '';
+    flex: none;
+    width: 16px;
+  }
+
+  .dp-ss-tab-short {
+    display: none;
+  }
+
+  .dp-ss-head-row:is([data-tabs='short'], [data-tabs='tight'])
+    .dp-ss-tab-long {
+    display: none;
+  }
+
+  .dp-ss-head-row:is([data-tabs='short'], [data-tabs='tight'])
+    .dp-ss-tab-short {
+    display: inline;
+  }
+
+  .dp-ss-head-row[data-tabs='tight'] .dp-ss-tabs > [role='tab'] {
+    padding: 0 7px;
+    font-size: 13.5px;
+  }
+
+  @media (width >= 576px) {
+    .dp-ss-head-row {
+      min-height: 66px;
+    }
+
+    .dp-ss-tabs {
+      margin-right: 10px;
+    }
+
+    .dp-ss-tabs > [role='tab'] {
+      height: 36px;
+      padding: 0 16px;
+      font-size: 13.5px;
+    }
+
+    .dp-ss-head-row[data-layout='row'] {
+      flex-wrap: nowrap;
+    }
+
+    .dp-ss-head-row[data-layout='row'] .dp-ss-title {
+      flex: none;
+      max-width: 100%;
+      display: block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .dp-ss-head-row[data-layout='row'] .dp-ss-tabs {
+      order: 2;
+      flex: none;
+      margin: 0;
+    }
+
+    .dp-ss-head-row[data-layout='row'] .dp-ss-tabs > [role='tab'] {
+      flex: none;
+    }
+
+    .dp-ss-head-row[data-layout='row'] .dp-ss-close {
+      order: 3;
+    }
+  }
+
+  .dp-ss-foot {
+    background: var(--p-950);
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-ss-recap-sep {
+    display: inline-block;
+    width: 1px;
+    height: 12px;
+    margin: 0 10px;
+    vertical-align: -1px;
+    background: var(--hair-2);
+  }
+
+  /* No jury (or televote) voter: Start waits; both fixes in place. The
+     ballot dots' fixed error hue, as in the toasts. */
+  .dp-ss-error {
+    color: #fff;
+    background: color-mix(in oklch, #ff5d70 16%, var(--p-950));
+    border: 1px solid color-mix(in oklch, #ff5d70 50%, transparent);
+  }
+
+  .dp-ss-error-dot {
+    background: #ff5d70;
+    color: #fff;
+  }
+
+  .dp-ss-error-act {
+    background: rgb(255 255 255 / 10%);
+    border: 1px solid rgb(255 255 255 / 18%);
+    transition: background 0.14s;
+  }
+
+  .dp-ss-error-act:hover {
+    background: rgb(255 255 255 / 18%);
+  }
+
+  .dp-ss-error-act:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* The line under a tab's toolbar: help, or the last change with Undo. */
+  .dp-ss-line {
+    margin: 6px 0 12px;
+    min-height: 19.5px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--ink-70);
+    text-wrap: pretty;
+  }
+
+  .dp-ss-undo {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+    font-weight: 700;
+    border-radius: 4px;
+  }
+
+  .dp-ss-undo:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .dp-ss-undo:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dp-ss-hint {
+    margin-top: 6px;
+    padding: 0 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--ink-70);
+    text-wrap: pretty;
+  }
+
+  .dp-ss-note {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--ink-70);
+    text-wrap: pretty;
+  }
+
+  .dp-ss-x {
+    color: var(--ink-55);
+    transition: color 0.14s, background 0.14s;
+  }
+
+  .dp-ss-x:hover {
+    color: #fff;
+    background: rgb(255 255 255 / 9%);
+  }
+
+  .dp-ss-x:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .dp-ss-num {
+    width: 20px;
+    flex: none;
+    text-align: right;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--ink-55);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Running order: the theme's jury rows, numbered outside the row. One
+     column reading down; two from 600px (the halves, or the order split in
+     two), placed by --ro-col / --ro-row so both read down. */
+  .dp-ss-ro {
+    container: dp-ss-ro / inline-size;
+  }
+
+  .dp-ss-ro-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px 28px;
+  }
+
+  .dp-ss-ro-item {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dp-ss-ro-num {
+    text-align: right;
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--ink-70);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dp-ss-ro-item.is-moved .dp-ss-ro-num {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  .dp-ss-ro-board {
+    transition: box-shadow 0.14s;
+  }
+
+  .dp-ss-ro-item.is-moved .dp-ss-ro-board {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .dp-ss-ro-half {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 30px;
+    padding-left: 34px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-70);
+  }
+
+  .dp-ss-ro-half i {
+    flex: 1;
+    height: 1px;
+    background: var(--hair);
+  }
+
+  .dp-ss-ro-half:not(:first-child) {
+    margin-top: 10px;
+  }
+
+  .dp-ss-ro-move {
+    transition: background 0.14s;
+  }
+
+  .dp-ss-ro-move:hover {
+    background: rgb(255 255 255 / 14%);
+  }
+
+  .dp-ss-ro-move:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .dp-ss-ro-arrow-h {
+    display: none;
+  }
+
+  @container dp-ss-ro (width >= 600px) {
+    .dp-ss-ro-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dp-ss-ro-list > * {
+      grid-column: var(--ro-col);
+      grid-row: var(--ro-row);
+    }
+
+    .dp-ss-ro-half:not(:first-child) {
+      margin-top: 0;
+    }
+
+    .dp-ss-ro-arrow-h {
+      display: contents;
+    }
+
+    .dp-ss-ro-arrow-v {
+      display: none;
+    }
+  }
+
+  /* Voters: numbered quiet tiles; the pool in a column beside them. */
+  .dp-ss-pool {
+    border-left: 1px solid var(--hair);
+  }
+
+  .dp-ss-vgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 7px;
+  }
+
+  .dp-ss-voter {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 46px;
+    padding: 4px 4px 4px 8px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 6%);
+    cursor: grab;
+    touch-action: manipulation;
+    user-select: none;
+    transition: box-shadow 0.14s, background 0.14s;
+  }
+
+  .dp-ss-voter:hover {
+    background: rgb(255 255 255 / 9%);
+  }
+
+  .dp-ss-voter.is-new {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .dp-ss-voter-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    hyphens: auto;
+  }
+
+  /* Channels: a table that keeps its labels (the odds table's look). */
+  .dp-ss-chrow {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) 64px 64px 34px;
+    align-items: center;
+    column-gap: 8px;
+  }
+
+  @media (width >= 576px) {
+    .dp-ss-chrow {
+      grid-template-columns: 20px minmax(0, 1fr) 96px 96px 34px;
+    }
+  }
+
+  .dp-ss-chhead {
+    position: sticky;
+    top: -1px;
+    z-index: 2;
+    min-height: 42px;
+    background: var(--p-950);
+    border-bottom: 1px solid var(--hair-2);
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink-70);
+  }
+
+  .dp-ss-chhead > span {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 6px;
+    text-align: center;
+  }
+
+  .dp-ss-chhead i {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex: none;
+  }
+
+  .dp-ss-chbody {
+    min-height: 46px;
+    background: var(--p-950);
+    border-bottom: 1px solid var(--hair);
+    cursor: grab;
+    touch-action: manipulation;
+    user-select: none;
+  }
+
+  .dp-ss-chbox {
+    border-radius: 10px;
+  }
+
+  .dp-ss-chbox.is-locked {
+    cursor: not-allowed;
+  }
+
+  .dp-ss-chbox.is-locked .dp-check {
+    opacity: 0.55;
+  }
+
+  .dp-ss-chbox:hover:not(.is-locked) .dp-check:not(.is-on) {
+    border-color: var(--ink);
+  }
+
+  .dp-ss-chbox:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -4px;
+  }
+
+  .dp-ss-pool-row {
+    min-height: 46px;
+    transition: background 0.14s;
+  }
+
+  li + li > .dp-ss-pool-row {
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-ss-pool-row:hover {
+    background: rgb(255 255 255 / 6%);
+  }
+
+  .dp-ss-pool-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .dp-ss-pool-plus {
+    background: rgb(255 255 255 / 6%);
+    color: var(--ink-70);
+    transition: background 0.14s, color 0.14s;
+  }
+
+  .dp-ss-pool-row:hover .dp-ss-pool-plus {
+    background: var(--p-750);
+    color: #fff;
+  }
+
+  /* General: on/off settings as pressed buttons; the points as a strip. */
+  .dp-ss-toggle {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    transition: background 0.14s, border-color 0.14s;
+  }
+
+  .dp-ss-toggle:hover {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  .dp-ss-toggle.is-on {
+    border-color: var(--accent);
+    background: rgb(255 255 255 / 8%);
+  }
+
+  .dp-ss-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dp-ss-strip {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 14px;
+    background: rgb(0 0 0 / 22%);
+    border: 1px solid var(--hair);
+  }
+
+  .dp-ss-pt {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 56px;
+    height: 70px;
+    padding: 5px 2px 2px;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    cursor: grab;
+    touch-action: manipulation;
+  }
+
+  @media (width < 576px) {
+    .dp-ss-pt {
+      width: 52px;
+    }
+  }
+
+  .dp-ss-pt.is-add {
+    padding: 0;
+    background: none;
+    border: 1px dashed var(--hair-2);
+    cursor: default;
+  }
+
+  .dp-ss-pt-field {
+    width: 100%;
+    height: 32px;
+    padding: 0;
+    border-radius: 7px;
+    background: transparent;
+    border: 1px solid transparent;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.14s;
+  }
+
+  .dp-ss-pt-field:hover {
+    border-color: var(--hair-2);
+  }
+
+  .dp-ss-pt-field:focus {
+    background: rgb(0 0 0 / 25%);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .dp-ss-pt-star {
+    color: var(--ink-40);
+    transition: color 0.14s;
+  }
+
+  .dp-ss-pt-star:hover {
+    color: #fff;
+  }
+
+  .dp-ss-pt-star:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .dp-ss-pt.is-douze .dp-ss-pt-star {
+    color: var(--accent);
+  }
+
+  .dp-ss-pt.is-douze .dp-ss-pt-star svg,
+  .dp-ss-legend-star {
+    color: var(--accent);
+    fill: var(--accent);
+  }
+
+  /* A row being dragged lives in <body>, above the modal. */
+  .dp-ss-dragged {
+    z-index: 9999999;
+    cursor: grabbing;
+  }
+
+  .dp-ss-dragged.dp-ss-ro-item .dp-ss-ro-board {
+    box-shadow: 0 0 0 2px var(--accent), 0 10px 24px rgb(0 0 0 / 45%);
+  }
+
+  .dp-ss-dragged.dp-ss-voter,
+  .dp-ss-dragged.dp-ss-chrow,
+  .dp-ss-dragged.dp-ss-pt {
+    background: var(--p-800);
+    box-shadow: 0 0 0 2px var(--accent), 0 10px 24px rgb(0 0 0 / 45%);
   }
 
   /* ---------- Final stats modal (finalStats/) ----------
@@ -4040,6 +5601,563 @@ html:root {
     }
   }
 
+  /* ---------- Voting predefinition (setup/voting-predefinition/) ----------
+     The Detailed tab's matrix in the stats Breakdown's look (codes under the
+     voters' flags, hairlines between rows only, white shading that grows
+     with the points, the top value in the accent), plus what editing needs:
+     fields or tap targets, the selected cell, the whole-vote column, and the
+     points bar under the matrix. */
+  .dp-vp {
+    container: dp-vp / inline-size;
+  }
+
+  /* Command bar steps (VotingPredefinitionHeader, useFitStep): one row; the
+     tab's own controls on a second row; then phones: tabs stretched, Reset
+     only in the ⋯ menu, Share and Randomize as icons. */
+  .dp-vp-head,
+  .dp-vp-head-tabs,
+  .dp-vp-head-ctx,
+  .dp-vp-head-end {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .dp-vp-head-tabs,
+  .dp-vp-head-ctx,
+  .dp-vp-head-end {
+    flex: none;
+  }
+
+  .dp-vp-head-tabs {
+    gap: 2px;
+    margin-right: auto;
+  }
+
+  .dp-vp-head:is([data-bar='two'], [data-bar='compact']) {
+    display: grid;
+    grid-template-areas: 'tabs end' 'ctx ctx';
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .dp-vp-head:is([data-bar='two'], [data-bar='compact']) > .dp-vp-head-tabs {
+    grid-area: tabs;
+    justify-self: start;
+    margin-right: 0;
+  }
+
+  .dp-vp-head:is([data-bar='two'], [data-bar='compact']) > .dp-vp-head-ctx {
+    grid-area: ctx;
+  }
+
+  .dp-vp-head:is([data-bar='two'], [data-bar='compact']) > .dp-vp-head-end {
+    grid-area: end;
+  }
+
+  .dp-vp-head[data-bar='compact'] > .dp-vp-head-tabs {
+    justify-self: stretch;
+  }
+
+  .dp-vp-head[data-bar='compact'] > .dp-vp-head-tabs > :is(button) {
+    flex: 1;
+    padding-inline: 8px;
+  }
+
+  .dp-vp-head[data-bar='compact'] .dp-vp-head-ctx > [role='tablist'],
+  .dp-vp-head[data-bar='compact']
+    .dp-vp-head-ctx
+    > [role='tablist']
+    > :is(button) {
+    flex: 1;
+  }
+
+  .dp-vp-head[data-bar='compact'] :is(.dp-vp-lbl, .dp-vp-reset) {
+    display: none;
+  }
+
+  /* Positioned, so it also clips the screen-reader-only labels inside
+     (absolutely positioned against the nearest positioned ancestor). */
+  .dp-vp-scroll {
+    position: relative;
+    overflow: auto;
+    overscroll-behavior: contain;
+    background: var(--p-950);
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+  }
+
+  .dp-vp-matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-variant-numeric: tabular-nums;
+
+    /* Quick taps (a whole vote) must never read as a double-tap zoom. */
+    touch-action: manipulation;
+  }
+
+  .dp-vp-matrix :is(th, td) {
+    border-bottom: 1px solid var(--hair);
+    font-weight: 600;
+  }
+
+  .dp-vp-matrix tbody tr:last-child > :is(th, td) {
+    border-bottom: 0;
+  }
+
+  .dp-vp-matrix thead :is(th) {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--p-950);
+    border-bottom-color: var(--hair-2);
+    color: var(--ink-70);
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    vertical-align: bottom;
+  }
+
+  /* The row's label: place, flag, name (a code on phones), total. */
+  .dp-vp-matrix .dp-vp-rowhead {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    padding: 0;
+    background: var(--p-950);
+    box-shadow: inset -1px 0 0 var(--hair-2);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .dp-vp-matrix thead .dp-vp-rowhead {
+    z-index: 3;
+  }
+
+  .dp-vp-rowhead-in {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 12px 0 8px;
+  }
+
+  .dp-vp-matrix thead .dp-vp-rowhead-in {
+    padding-bottom: 8px;
+  }
+
+  .dp-vp-place {
+    flex: none;
+    width: 20px;
+    color: var(--ink-55);
+    font-size: 12.5px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .dp-vp-rowname {
+    overflow: hidden;
+    flex: none;
+    width: 132px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+  }
+
+  .dp-vp-rowcode {
+    display: none;
+    flex: none;
+    width: 32px;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .dp-vp-rowtotal {
+    min-width: 3ch;
+    margin-left: auto;
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 800;
+    text-align: right;
+  }
+
+  .dp-vp-matrix .dp-vp-voter {
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .dp-vp-voter-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 2px 6px;
+  }
+
+  .dp-vp-voter-btn {
+    display: block;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .dp-vp-voter-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .dp-vp-voter-code-row {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .dp-vp-voter-code {
+    color: var(--ink-70);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* Ballot status: fixed hues, so complete / incomplete / invalid read the
+     same in every theme (as the status colours of the toasts). */
+  .dp-vp-dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 20%);
+  }
+
+  .dp-vp-dot[data-validity='valid'] {
+    background: #3ad29a;
+  }
+
+  .dp-vp-dot[data-validity='incomplete'] {
+    background: #e6b23c;
+  }
+
+  .dp-vp-dot[data-validity='invalid'] {
+    background: #ff5d70;
+  }
+
+  .dp-vp-matrix :is(td) {
+    width: 40px;
+    min-width: 40px;
+    height: 32px;
+    padding: 0;
+    background-color: rgb(255 255 255 / calc(var(--shade, 0) * 1%));
+    color: var(--ink);
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+
+    /* Keyboard moves scroll a field into view clear of the pinned header
+       row and country column. */
+    scroll-margin-top: 60px;
+    scroll-margin-left: 200px;
+  }
+
+  .dp-vp-matrix tbody > tr > :is(th) {
+    height: 32px;
+  }
+
+  .dp-vp-matrix .dp-vp-filler {
+    width: 100%;
+    padding: 0;
+  }
+
+  .dp-vp-matrix td.is-strong {
+    font-weight: 700;
+  }
+
+  .dp-vp-matrix td.is-top {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+    font-weight: 800;
+  }
+
+  .dp-vp-matrix td.is-self {
+    color: var(--ink-25);
+  }
+
+  .dp-vp-cell {
+    display: block;
+    width: 100%;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: center;
+    outline: none;
+  }
+
+  .dp-vp-cell::placeholder {
+    color: transparent;
+  }
+
+  .dp-vp-matrix input.dp-vp-cell:focus {
+    background: rgb(255 255 255 / 10%);
+  }
+
+  /* Touch: rows and cells big enough to tap. */
+  .dp-vp-matrix[data-input='touch'] :is(td, tbody > tr > th),
+  .dp-vp-matrix[data-input='touch'] .dp-vp-cell {
+    height: 40px;
+  }
+
+  .dp-vp-matrix[data-input='touch'] :is(td, .dp-vp-voter) {
+    width: 42px;
+    min-width: 42px;
+  }
+
+  /* The crosshair (VotingPredefinitionTable toggles `is-hl`): the pointed
+     or selected cell's row and column lit. */
+  .dp-vp-matrix tr.is-hl > :is(th, td),
+  .dp-vp-matrix :is(td, th):is(.is-hl) {
+    box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 6%);
+  }
+
+  .dp-vp-matrix tr.is-hl > .dp-vp-rowhead {
+    box-shadow: inset -1px 0 0 var(--hair-2),
+      inset 0 0 0 100vmax rgb(255 255 255 / 6%);
+  }
+
+  .dp-vp-matrix .is-hl > .is-hl {
+    box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 12%);
+  }
+
+  .dp-vp-voter.is-hl .dp-vp-voter-code {
+    color: var(--ink);
+  }
+
+  /* The selected cell, outlined; its voter and country in the accent tint. */
+  .dp-vp-matrix td.is-sel {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .dp-vp-matrix .dp-vp-voter.is-sel .dp-vp-voter-code,
+  .dp-vp-matrix .dp-vp-rowhead.is-sel :is(.dp-vp-rowname, .dp-vp-rowcode) {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  /* Whole-vote mode: the voter's column, a tap on a row gives the next
+     value (shown in an empty field on hover). */
+  .dp-vp-matrix .is-ballot {
+    box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 9%);
+    cursor: pointer;
+  }
+
+  /* Outlined like the selected cell: this voter is the one being edited. */
+  .dp-vp-matrix .dp-vp-voter.is-ballot {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  .dp-vp-matrix .dp-vp-voter.is-ballot .dp-vp-voter-code {
+    color: color-mix(in oklch, var(--accent) 70%, white);
+  }
+
+  .dp-vp-matrix td.is-ballot .dp-vp-cell {
+    caret-color: transparent;
+    cursor: pointer;
+  }
+
+  @media (hover: hover) {
+    .dp-vp-voter-btn:hover {
+      background: rgb(255 255 255 / 6%);
+    }
+
+    .dp-vp-matrix td.is-ballot:not(.is-self):hover {
+      box-shadow: inset 0 0 0 100vmax rgb(255 255 255 / 16%);
+    }
+
+    .dp-vp-matrix td.is-ballot:hover .dp-vp-cell::placeholder {
+      color: var(--ink-40);
+    }
+  }
+
+  /* Phones: the frozen column keeps place, flag, code and total (the name
+     stays for screen readers), unless full names are asked for. */
+  @container dp-vp (width < 560px) {
+    .dp-vp-rowhead-in {
+      gap: 7px;
+      padding: 0 8px 0 4px;
+    }
+
+    .dp-vp-place {
+      width: 18px;
+    }
+
+    .dp-vp-matrix:not([data-names='full']) .dp-vp-rowname {
+      position: absolute;
+      overflow: hidden;
+      width: 1px;
+      height: 1px;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .dp-vp-matrix:not([data-names='full']) .dp-vp-rowcode {
+      display: block;
+    }
+
+    .dp-vp-matrix :is(td) {
+      scroll-margin-left: 130px;
+    }
+  }
+
+  /* "Can't save yet": the voters by name, or on phones just how many (the
+     dots on the columns say which). */
+  .dp-vp-callout-short {
+    display: none;
+  }
+
+  @container dp-vp (width < 560px) {
+    .dp-vp-callout-long {
+      display: none;
+    }
+
+    .dp-vp-callout-short {
+      display: inline;
+    }
+  }
+
+  /* The points bar under the matrix. */
+  .dp-vp-bar {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dp-vp-bar-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+  }
+
+  .dp-vp-readout {
+    display: -webkit-box;
+    overflow: hidden;
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    color: var(--ink-70);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .dp-vp-bar-actions {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dp-vp-bar-top[data-fit-measuring] > :is(img, .dp-vp-bar-actions) {
+    flex: none;
+  }
+
+  .dp-vp-bar-top[data-fit-measuring] > .dp-vp-readout {
+    flex: 0 0 140px;
+  }
+
+  .dp-vp-bar-top[data-bar='icons'] .dp-vp-lbl {
+    display: none;
+  }
+
+  .dp-vp-chips {
+    display: grid;
+    touch-action: manipulation;
+    grid-template-columns: repeat(var(--cols, 10), minmax(0, 52px));
+    gap: 4px;
+  }
+
+  .dp-vp-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    height: 40px;
+    border-radius: 9px;
+    background: rgb(255 255 255 / 7%);
+    color: var(--ink);
+    transition: background-color 0.12s;
+  }
+
+  .dp-vp-chip-v {
+    font-size: 14px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .dp-vp-chip-c {
+    color: var(--ink-55);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .dp-vp-chip-c:empty {
+    display: none;
+  }
+
+  .dp-vp-chip:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .dp-vp-chip[data-state='legend'] {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--hair);
+    color: var(--ink-55);
+    cursor: default;
+  }
+
+  .dp-vp-chip[data-state='used'] {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--hair);
+    color: var(--ink-40);
+  }
+
+  .dp-vp-chip[data-state='here'] {
+    background: rgb(255 255 255 / 10%);
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  .dp-vp-chip[data-state='next'] {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .dp-vp-chip[data-state='next'] .dp-vp-chip-c {
+    color: inherit;
+  }
+
+  @media (hover: hover) {
+    .dp-vp-chip:is([data-state='free'], [data-state='used']):hover {
+      background: rgb(255 255 255 / 12%);
+    }
+  }
+
+  @media (pointer: coarse) {
+    .dp-vp-chip {
+      height: 44px;
+    }
+  }
+
   /* ---------- Share image modal (simulation/share/) ----------
      The picture is the screen: one flat surface, the picture in a dark well,
      options as quiet controls. Save is the only accent fill. */
@@ -4154,4 +6272,440 @@ html:root {
       opacity: 0.6;
     }
   }
+
+  /* stylelint-disable no-descending-specificity -- these blocks only share
+     element selectors (button, svg, *) with unrelated components above. */
+
+  /* ---------- Lists: type switch, sort selects (profiles + libraries) ----------
+     All / Themes / Contests / Designs in the segmented well (`dp-sim-seg`),
+     fitted: icons and labels, labels only, then two rows of two. */
+  .dp-type-seg {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 12px;
+  }
+
+  .dp-type-seg > button {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: color 0.14s;
+  }
+
+  .dp-type-seg > button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .dp-type-seg[data-fit-measuring] > button {
+    flex: none;
+  }
+
+  .dp-type-seg[data-seg='text'] > button > svg,
+  .dp-type-seg[data-seg='grid'] > button > svg {
+    display: none;
+  }
+
+  .dp-type-seg[data-seg='grid'] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* The profile lists' first row: type switch beside the search while both
+     fit (the search at least 220px), else stacked. */
+  .dp-list-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dp-list-tools[data-tools='row'],
+  .dp-list-tools[data-tools='row-icon'] {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dp-list-tools[data-tools='row'] > .dp-type-seg,
+  .dp-list-tools[data-tools='row-icon'] > .dp-type-seg {
+    flex: none;
+  }
+
+  .dp-list-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .dp-list-tools[data-tools='row'] > .dp-list-search,
+  .dp-list-tools[data-tools='row-icon'] > .dp-list-search {
+    flex: 1 1 auto;
+  }
+
+  .dp-list-search > :first-child {
+    min-width: 220px;
+  }
+
+  .dp-list-tools[data-tools='row-icon'] .dp-act-label,
+  .dp-list-tools[data-tools='stack-icon'] .dp-act-label {
+    display: none;
+  }
+
+  /* A select drawn as a button, its name as a caption inside. */
+  .dp-capsel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    height: 46px;
+    min-width: 150px;
+    padding: 0 34px 0 12px;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    text-align: left;
+    transition: background 0.14s, border-color 0.14s;
+  }
+
+  .dp-capsel:hover {
+    background: rgb(255 255 255 / 11%);
+  }
+
+  .dp-capsel[aria-expanded='true'] {
+    border-color: var(--accent);
+  }
+
+  .dp-capsel:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dp-capsel > small {
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--ink-70);
+    white-space: nowrap;
+  }
+
+  .dp-capsel > b {
+    max-width: 100%;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dp-capsel > svg {
+    position: absolute;
+    top: 50%;
+    right: 11px;
+    translate: 0 -50%;
+    opacity: 0.7;
+  }
+
+  /* Sort by and Created, then the count at the row's end; when that doesn't
+     fit, the selects share the row and the count goes under them. */
+  .dp-sort-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dp-sort-row > .dp-capsel {
+    flex: none;
+  }
+
+  .dp-sort-trail {
+    margin-left: auto;
+    padding-left: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-70);
+    white-space: nowrap;
+  }
+
+  .dp-sort-row[data-sort='split'] {
+    flex-wrap: wrap;
+  }
+
+  .dp-sort-row[data-sort='split'] > .dp-capsel {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .dp-sort-row[data-sort='split'] > .dp-sort-trail {
+    flex-basis: 100%;
+    margin: 6px 0 0;
+    padding-left: 0;
+    white-space: normal;
+  }
+
+  /* ---------- Profile modals: identity band / column ----------
+     A band above the list on phones; from 1024px a flat --p-950 column
+     beside it (the spokesperson column's idea) that stays put while the
+     list scrolls. */
+  .dp-profile-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .dp-profile-main-pane {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .dp-profile-id {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .dp-profile-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .dp-profile-who {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .dp-profile-id.has-corner .dp-profile-who {
+    padding-right: 52px;
+  }
+
+  .dp-profile-av {
+    width: 64px;
+    height: 64px;
+    flex: none;
+    border-radius: 999px;
+    object-fit: cover;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 14%);
+  }
+
+  .dp-profile-name {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.022em;
+    line-height: 1.25;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .dp-profile-flag {
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: -3px;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .dp-profile-meta {
+    margin-top: 3px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-70);
+    overflow-wrap: anywhere;
+  }
+
+  .dp-profile-stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 18px;
+    padding: 10px 0;
+    border-top: 1px solid var(--hair);
+    border-bottom: 1px solid var(--hair);
+  }
+
+  .dp-profile-stats > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 13.5px;
+    font-weight: 800;
+    border-radius: 6px;
+    transition: color 0.14s;
+  }
+
+  .dp-profile-stats > button:hover {
+    color: color-mix(in oklch, var(--accent) 60%, white);
+  }
+
+  .dp-profile-stats > button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .dp-profile-stats > span {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-70);
+  }
+
+  .dp-profile-note {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-55);
+  }
+
+  /* Buttons: one row on phones (the first stretches, the others drop their
+     labels when they don't fit), a stack in the column. */
+  .dp-profile-acts {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dp-profile-acts > * {
+    flex: none;
+  }
+
+  .dp-profile-acts > .dp-profile-main {
+    flex: 1 0 auto;
+    justify-content: center;
+  }
+
+  .dp-profile-acts[data-acts='icons'] .dp-act-label {
+    display: none;
+  }
+
+  /* Your profile / Following feed. */
+  .dp-profile-views {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 12px;
+  }
+
+  .dp-profile-views > button {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 4px 12px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    transition: color 0.14s;
+  }
+
+  .dp-profile-views > button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  .dp-profile-views.is-bar > button {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  .dp-profile-foot {
+    background: var(--p-900);
+    border-top: 1px solid var(--hair);
+  }
+
+  /* In the header beside the title (from 2cols), like the libraries'
+     places. */
+  .dp-profile-views.is-header > button {
+    flex: none;
+    min-height: 36px;
+    padding: 0 16px;
+    white-space: nowrap;
+  }
+
+  @media (width >= 64rem) {
+    .dp-profile-layout {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .dp-profile-aside {
+      position: sticky;
+      top: 0;
+      width: 290px;
+      flex: none;
+    }
+
+    .dp-profile-id {
+      gap: 0;
+      padding: 20px;
+      border-radius: 16px;
+      background: var(--p-950);
+      border: 1px solid var(--hair);
+    }
+
+    .dp-profile-corner {
+      top: 14px;
+      right: 14px;
+    }
+
+    .dp-profile-who {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .dp-profile-id.has-corner .dp-profile-who {
+      padding-right: 0;
+    }
+
+    .dp-profile-av {
+      width: 88px;
+      height: 88px;
+    }
+
+    .dp-profile-name {
+      font-size: 22px;
+    }
+
+    .dp-profile-stats {
+      margin: 18px 0;
+    }
+
+    .dp-profile-acts {
+      flex-direction: column;
+    }
+
+    .dp-profile-acts > *,
+    .dp-profile-acts > .dp-profile-main {
+      width: 100%;
+    }
+
+    /* Surface buttons line up on the left; only the accent Follow (in its
+       wrapper) stays centred. */
+    .dp-profile-acts > button,
+    .dp-profile-acts > button.dp-profile-main {
+      justify-content: flex-start;
+    }
+
+    .dp-profile-note {
+      margin-top: 10px;
+    }
+  }
+
+  /* stylelint-enable no-descending-specificity */
 }

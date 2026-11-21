@@ -5,6 +5,7 @@ import { isDefaultPointsSystem } from './pointsSystem';
 import { buildEventStagesFromAssignments } from '@/components/setup/utils/buildEventStagesFromAssignments';
 import { Year } from '@/config';
 import { resolveContestType } from '@/data/contestTypes';
+import { sanitizeEntryColors } from '@/data/countries/entryColors';
 import { POINTS_ARRAY } from '@/data/data';
 import {
   BaseCountry,
@@ -298,6 +299,7 @@ export function buildContestSnapshotFromStores() {
       name: c.name,
       flag: c.flag || '',
       ...(c.shortCode ? { shortCode: c.shortCode } : {}),
+      ...(c.colors?.length ? { colors: c.colors } : {}),
     }));
 
   // Compact odds for setup participants (includes custom entries)
@@ -731,14 +733,20 @@ export async function applyContestSnapshotToStores(
     // Merge custom entries into local custom countries (portable)
     const importedCustoms: BaseCountry[] = (
       snapshot.customEntriesUsed || []
-    ).map((e) => ({
-      code: e.code,
-      name: e.name,
-      category: 'Custom',
-      flag: e.flag,
-      ...(e.shortCode ? { shortCode: e.shortCode } : {}),
-      isImported: true,
-    }));
+    ).map((e) => {
+      // Someone else's contest: keep only colours the app can draw.
+      const colors = sanitizeEntryColors(e.colors);
+
+      return {
+        code: e.code,
+        name: e.name,
+        category: 'Custom',
+        flag: e.flag,
+        ...(e.shortCode ? { shortCode: e.shortCode } : {}),
+        ...(colors ? { colors } : {}),
+        isImported: true,
+      };
+    });
 
     // Store imported entries separately for persistence
     useGeneralStore.setState({ importedCustomEntries: importedCustoms });

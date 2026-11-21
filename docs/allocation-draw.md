@@ -119,16 +119,20 @@ handoff lives in `currentTask/design_handoff_allocation_draw/`.
   set up", "Apply and reset votes") lists only semis with predefined votes
   *enabled* (`stagesWithVotes`); with them off, the stored votes are random
   leftovers from the last Start (persisted) and are cleared silently.
-- Running Order tab: `useRunningOrder` keeps `firstHalfSize`; A–Z / Z–A /
-  Shuffle work inside each half; dragging across the divider moves the
-  country to the other half (the split moves with it, toast), and every row
-  has a "Move to the other half" button that puts it first in that half
-  (keyboard-friendly stand-in for dropping on the divider). Dividers are
-  plain children of the `react-easy-sort` list (only `SortableItem`s register
-  as items, so indices are unaffected). A stage without halves (the Grand
-  Final, custom contests) offers **Draw halves**: a random order split
-  ⌊n/2⌋ / ⌈n/2⌉, the way the final's halves (and the host's exact slot, which
-  is just its position in that order) are drawn; **Remove halves** undoes it.
+- Running order tab: `useRunningOrder` keeps `firstHalfSize`; A–Z / Z–A /
+  Shuffle (the Order menu) work inside each half. From 600px the halves are
+  the two columns (first left, second right, placed with `--ro-col` /
+  `--ro-row`); on phones they stack under "First half" / "Second half"
+  headers. Dragging across moves the country to the other half (the split
+  moves with it), and every row's points box is a "Move to the other half"
+  button that puts it first in that half (keyboard-friendly stand-in for
+  dropping across). Both leave "Greece moved to the second half. Undo" under
+  the toolbar instead of a toast. The headers are plain children of the
+  `react-easy-sort` list (only `SortableItem`s register as items, so indices
+  are unaffected). A stage without halves (the Grand Final, custom contests)
+  offers **Draw halves** in the Order menu: a random order split ⌊n/2⌋ /
+  ⌈n/2⌉, the way the final's halves (and the host's exact slot, which is just
+  its position in that order) are drawn; **Remove halves** undoes it.
 - Default semi voters (no draw): `usePostSetupStageForm` now adds the
   pre-qualified countries whose year-data `aqSemiFinalGroup` names the stage,
   as long as they take part elsewhere in the contest, so year presets vote

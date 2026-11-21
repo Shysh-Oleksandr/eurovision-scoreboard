@@ -50,6 +50,8 @@ type DouzePointsAnimationProps = {
   douzePointsAnimationModeOverride?: DouzePointsAnimationMode;
   /** The theme editor's options (null: none); otherwise the theme's. */
   douzeOptionsOverride?: DouzeOptions | null;
+  /** A custom entry's chosen colours, used in place of its flag's. */
+  entryColors?: readonly string[] | null;
 };
 
 const DOUZE_VISIBLE_ROWS = 3;
@@ -84,6 +86,8 @@ type BaseVariantProps = {
   durationScale: number;
   /** Colour from the row's flag ("Flag colors") instead of the theme's. */
   useFlagColors: boolean;
+  /** A custom entry's chosen colours, used in place of its flag's. */
+  entryColors?: readonly string[] | null;
   /** Parts switched off ("Customize animation"). */
   off: ReadonlySet<string>;
   /** The hearts cover the flag too ("Customize animation"). */
@@ -96,9 +100,14 @@ const LegacyParallelogramsAnimation: React.FC<BaseVariantProps> = ({
   containerClass,
   specialStyle,
   useFlagColors,
+  entryColors,
   off,
 }) => {
-  const flagColors = useRowFlagColors(refs.containerRef, useFlagColors);
+  const flagColors = useRowFlagColors(
+    refs.containerRef,
+    useFlagColors,
+    entryColors,
+  );
   // The blocks stay mounted when switched off: useAnimatePoints' timeline
   // needs them to show the container.
   const blockStyle = (index: number): React.CSSProperties => ({
@@ -145,12 +154,17 @@ const HeartsGridAnimation: React.FC<BaseVariantProps> = ({
   isThemePreview = false,
   durationScale,
   useFlagColors,
+  entryColors,
   off,
   coverFlag,
 }) => {
   const [columns, setColumns] = useState(DOUZE_POINTS_TARGET_COLUMNS);
   // Flag colours run in bands across the row, in the flag's reading order.
-  const flagColors = useRowFlagColors(refs.containerRef, useFlagColors);
+  const flagColors = useRowFlagColors(
+    refs.containerRef,
+    useFlagColors,
+    entryColors,
+  );
   const [sourceName, setSourceName] = useState<{
     width: number;
     style: React.CSSProperties;
@@ -397,6 +411,7 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
   isThemePreview = false,
   douzePointsAnimationModeOverride,
   douzeOptionsOverride,
+  entryColors,
 }) => {
   const globalPointsSystem = useGeneralStore((state) => state.pointsSystem);
   const stageJuryOverride = useScoreboardStore((state) => {
@@ -466,6 +481,7 @@ const DouzePointsAnimation: React.FC<DouzePointsAnimationProps> = ({
       isThemePreview={isThemePreview}
       durationScale={douzeDurationScale(options)}
       useFlagColors={options?.colors === 'flag'}
+      entryColors={entryColors}
       off={new Set(options?.off)}
       coverFlag={!!options?.coverFlag}
     />

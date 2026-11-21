@@ -3,7 +3,6 @@
 import { Settings2, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
 
 import WidgetPager from '../../WidgetPager';
 import WidgetSearchHeader from '../../WidgetSearchHeader';
@@ -22,6 +21,7 @@ import {
 import Button from '@/components/common/Button';
 import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryView } from '@/hooks/useQueryView';

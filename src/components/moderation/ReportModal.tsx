@@ -3,7 +3,6 @@
 import { Flag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { blockDisplayName } from './useBlockActions';
 
@@ -15,6 +14,7 @@ import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseBu
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import SignInButtons from '@/components/common/SignInButtons';
 import { TextareaField } from '@/components/common/TextareaField';
+import { toast } from '@/helpers/toast';
 import { cn } from '@/helpers/utils';
 import {
   type ReportTarget,

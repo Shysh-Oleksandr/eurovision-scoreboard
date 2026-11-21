@@ -143,6 +143,7 @@ export interface ContestSnapshot {
     name: string;
     flag: string;
     shortCode?: string;
+    colors?: string[];
   }>;
   createdAt: string;
   updatedAt: string;

@@ -22,6 +22,11 @@ export interface AnchoredMenuItem {
   trailing?: React.ReactNode;
   /** Keep the menu open after this item is activated. */
   keepOpen?: boolean;
+  /**
+   * An on/off item in a multiple choice (`menuitemcheckbox`): its state for
+   * assistive tech; the caller draws the box (`icon`).
+   */
+  checked?: boolean;
 }
 
 export interface AnchoredMenuHeader {
@@ -63,7 +68,8 @@ interface AnchoredMenuProps {
 
 const MENU_GAP = 6;
 const VIEWPORT_MARGIN = 8;
-const ENABLED_ITEM_SELECTOR = '[role="menuitem"]:not([aria-disabled="true"])';
+const ENABLED_ITEM_SELECTOR =
+  '[role="menuitem"]:not([aria-disabled="true"]), [role="menuitemcheckbox"]:not([aria-disabled="true"])';
 
 const isHeader = (entry: AnchoredMenuEntry): entry is AnchoredMenuHeader =>
   typeof entry === 'object' && entry.variant === 'header';
@@ -336,7 +342,8 @@ const AnchoredMenu: React.FC<AnchoredMenuProps> = ({
           <button
             key={keyFor(`item:${entry.label}`)}
             type="button"
-            role="menuitem"
+            role={entry.checked === undefined ? 'menuitem' : 'menuitemcheckbox'}
+            aria-checked={entry.checked}
             tabIndex={-1}
             aria-disabled={entry.disabled || undefined}
             onClick={() => handleItemClick(entry)}

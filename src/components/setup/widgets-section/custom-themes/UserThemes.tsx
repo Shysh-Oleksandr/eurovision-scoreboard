@@ -1,14 +1,24 @@
-import { User } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
+import {
+  DEFAULT_SORT,
+  serverSort,
+  useSortFilter,
+} from '../library/libraryFilters';
+import LibraryFolderRail from '../library/LibraryFolderRail';
+import {
+  LibraryEmpty,
+  LibraryListHeader,
+  LibraryPlaceLayout,
+  LibrarySignIn,
+} from '../library/LibraryLayout';
+import LibraryToolbar from '../library/LibraryToolbar';
 import WidgetPager from '../WidgetPager';
-import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
-import WidgetSearchHeader from '../WidgetSearchHeader';
-import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
+import type { PublicSortKey } from '../WidgetSortBadges';
 
-import { useApplyCustomTheme } from './hooks/useApplyCustomTheme';
+import { usePublicThemeActions } from './hooks/usePublicThemeActions';
 import ThemeListItem from './ThemeListItem';
 
 import {
@@ -19,20 +29,11 @@ import {
   useSavedThemesListQuery,
   useThemeGroupsQuery,
   useThemesStateQuery,
-  useToggleLikeThemeMutation,
-  useToggleSaveThemeMutation,
   useUpdateThemeGroupMutation,
 } from '@/api/themes';
-import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
-import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
-import { PinIcon } from '@/assets/icons/PinIcon';
-import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
-import Badge from '@/components/common/Badge';
-import Button from '@/components/common/Button';
-import SignInButtons from '@/components/common/SignInButtons';
 import { QueryNotice } from '@/components/offline/OfflineNotice';
 import UserResourceGroupModal from '@/components/setup/UserResourceGroupModal';
-import { useConfirmation } from '@/hooks/useConfirmation';
+import { toast } from '@/helpers/toast';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryView } from '@/hooks/useQueryView';
 import { useIsOffline } from '@/state/connectivityStore';
@@ -43,119 +44,98 @@ import { CustomTheme } from '@/types/customTheme';
 const PAGE_SIZE = 10;
 
 interface UserThemesProps {
-  onLoaded?: () => void;
+  /** Yours: the themes you made, in groups; Saved: the ones you saved. */
+  place: 'yours' | 'saved';
   onCreateNew?: () => void;
   onEdit?: (theme: CustomTheme) => void;
   onDuplicate: (theme: CustomTheme) => void;
+  /** Saved, empty: go and find some. */
+  onBrowseCommunity?: () => void;
 }
 
+/**
+ * The Themes library's Yours and Saved places. Yours opens on the theme in
+ * use (when there is one and the list isn't narrowed), then your themes,
+ * by group.
+ */
 const UserThemes: React.FC<UserThemesProps> = ({
+  place,
   onCreateNew,
   onEdit,
   onDuplicate,
+  onBrowseCommunity,
 }) => {
   const t = useTranslations();
   const user = useAuthStore((state) => state.user);
   const offline = useIsOffline();
+  const isYours = place === 'yours';
 
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
-  const [view, setView] = useState<'yours' | 'saved' | 'current'>('yours');
+  const [sortKey, setSortKey] = useState<PublicSortKey>(DEFAULT_SORT);
   const [page, setPage] = useState(1);
-  const [selectedThemeGroupId, setSelectedThemeGroupId] = useState<
-    string | null
-  >(null);
-  const [themeGroupModalOpen, setThemeGroupModalOpen] = useState(false);
-  const [themeGroupToEdit, setThemeGroupToEdit] = useState<{
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [groupToEdit, setGroupToEdit] = useState<{
     _id: string;
     name: string;
   } | null>(null);
 
-  const { confirm } = useConfirmation();
-
   const debouncedSearch = useDebounce(search, 400);
+  const { sortBy, sortOrder } = serverSort(sortKey);
 
-  const serverSortBy =
-    sortKey === 'likes'
-      ? 'likes'
-      : sortKey === 'saves'
-      ? 'saves'
-      : sortKey === 'copies'
-      ? 'duplicatesCount'
-      : 'createdAt';
-  const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
+  const { data: groups = [] } = useThemeGroupsQuery(!!user && isYours);
 
-  const { data: themeGroups = [] } = useThemeGroupsQuery(
-    !!user && view === 'yours',
-  );
-
-  const { mutateAsync: createThemeGroup, isPending: isCreatingThemeGroup } =
+  const { mutateAsync: createGroup, isPending: isCreatingGroup } =
     useCreateThemeGroupMutation();
-  const { mutateAsync: updateThemeGroup, isPending: isUpdatingThemeGroup } =
+  const { mutateAsync: updateGroup, isPending: isUpdatingGroup } =
     useUpdateThemeGroupMutation();
-  const { mutateAsync: deleteThemeGroup, isPending: isDeletingThemeGroup } =
+  const { mutateAsync: deleteGroup, isPending: isDeletingGroup } =
     useDeleteThemeGroupMutation();
 
+  // A deleted group can't stay picked.
   useEffect(() => {
-    if (
-      selectedThemeGroupId &&
-      !themeGroups.some((g) => g._id === selectedThemeGroupId)
-    ) {
-      setSelectedThemeGroupId(null);
-    }
-  }, [themeGroups, selectedThemeGroupId]);
+    if (groupId && !groups.some((g) => g._id === groupId)) setGroupId(null);
+  }, [groups, groupId]);
 
+  const listParams = {
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedSearch,
+    sortBy,
+    sortOrder,
+  };
   const myThemesQuery = useMyThemesListQuery({
-    page,
-    limit: PAGE_SIZE,
-    search: debouncedSearch,
-    sortBy: serverSortBy,
-    sortOrder: serverSortOrder,
-    groupId: selectedThemeGroupId ?? undefined,
-    enabled: !!user && view === 'yours',
+    ...listParams,
+    groupId: groupId ?? undefined,
+    enabled: !!user && isYours,
   });
-
   const savedThemesQuery = useSavedThemesListQuery({
-    page,
-    limit: PAGE_SIZE,
-    search: debouncedSearch,
-    sortBy: serverSortBy,
-    sortOrder: serverSortOrder,
-    enabled: !!user && view === 'saved',
+    ...listParams,
+    enabled: !!user && !isYours,
   });
+  const listQuery = isYours ? myThemesQuery : savedThemesQuery;
+  const listView = useQueryView(listQuery);
+  const listData = listQuery.data;
 
   const { mutateAsync: deleteTheme } = useDeleteThemeMutation();
-  const { mutateAsync: toggleSave } = useToggleSaveThemeMutation();
-  const { mutateAsync: toggleLike } = useToggleLikeThemeMutation();
+  const { handleLike, handleSave, handleApply } = usePublicThemeActions();
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
 
-  const handleApply = useApplyCustomTheme();
-
-  const listData =
-    view === 'yours'
-      ? myThemesQuery.data
-      : view === 'saved'
-      ? savedThemesQuery.data
-      : undefined;
-
-  const activeListQuery =
-    view === 'yours'
-      ? myThemesQuery
-      : view === 'saved'
-      ? savedThemesQuery
+  // The theme in use heads Yours while the list shows everything from the top.
+  const inUse =
+    isYours && page === 1 && !debouncedSearch.trim() && groupId === null
+      ? currentCustomTheme
       : null;
-  const listView = useQueryView(
-    activeListQuery ?? { data: null, status: 'success', fetchStatus: 'idle' },
-  );
+  const inUseIsMine = !!inUse && inUse.userId.toString() === user?._id;
 
-  const themeIdsForState =
-    view === 'current' && currentCustomTheme
-      ? [currentCustomTheme._id]
-      : listData?.themes.map((th) => th._id) ?? [];
-
+  const themesOnPage = listData?.themes ?? [];
+  const stateIds = [
+    ...(inUse ? [inUse._id] : []),
+    ...themesOnPage.map((theme) => theme._id),
+  ];
   const { data: themeState } = useThemesStateQuery(
-    themeIdsForState,
-    !!themeIdsForState.length && !!user,
+    stateIds,
+    !!stateIds.length && !!user,
   );
 
   const handleDelete = async (id: string) => {
@@ -163,166 +143,106 @@ const UserThemes: React.FC<UserThemesProps> = ({
       await deleteTheme(id);
       toast.success(t('widgets.themes.themeDeletedSuccessfully'));
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to delete theme');
-    }
-  };
-
-  const handleLike = async (id: string) => {
-    try {
-      const res = await toggleLike(id);
-
-      toast.success(
-        res.liked
-          ? t('widgets.themes.themeLikedSuccessfully')
-          : t('widgets.themes.themeUnlikedSuccessfully'),
+      toast.error(
+        error?.response?.data?.message || t('widgets.themes.deleteFailed'),
       );
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to like theme');
     }
   };
 
-  const handleSave = async (id: string, savedByMe: boolean) => {
-    try {
-      if (savedByMe) {
-        confirm({
-          key: 'remove-saved-theme',
-          title: t('widgets.themes.confirmRemoveSavedTheme'),
-          onConfirm: async () => {
-            const res = await toggleSave(id);
-
-            toast.success(
-              res.saved
-                ? t('widgets.themes.themeSavedSuccessfully')
-                : t('widgets.themes.themeRemovedFromSaved'),
-            );
-          },
-        });
-      } else {
-        const res = await toggleSave(id);
-
-        toast.success(
-          res.saved
-            ? t('widgets.themes.themeSavedSuccessfully')
-            : t('widgets.themes.themeRemovedFromSaved'),
-        );
-      }
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to save theme');
-    }
-  };
-
-  const setViewAndResetPage = (next: 'yours' | 'saved' | 'current') => {
-    setView(next);
-    setPage(1);
-  };
-
-  const themeGroupModalSaving =
-    isCreatingThemeGroup || isUpdatingThemeGroup || isDeletingThemeGroup;
+  const sortFilter = useSortFilter(
+    sortKey,
+    (next) => {
+      setSortKey(next);
+      setPage(1);
+    },
+    { remixable: true },
+  );
 
   if (!user) {
     return (
-      <div className="text-white text-center sm:py-8 py-4 flex flex-col items-center gap-4">
-        <p className="text-white/70">
-          {t('widgets.themes.authenticateToViewAndCreateYourOwnThemes')}
-        </p>
-        <SignInButtons />
-      </div>
+      <LibrarySignIn
+        message={t('widgets.themes.authenticateToViewAndCreateYourOwnThemes')}
+      />
     );
   }
 
   const total = listData?.total ?? 0;
-  const themesOnPage = listData?.themes ?? [];
   const totalPages = listData?.totalPages ?? 0;
+  const searching = !!debouncedSearch.trim();
 
-  const headerLabel = search.trim()
-    ? t('widgets.themes.foundNThemes', { count: total })
-    : view === 'yours'
-    ? t('widgets.themes.youHaveNThemes', { count: total })
-    : view === 'saved'
-    ? t('widgets.themes.youSavedNThemes', { count: total })
-    : '';
+  const stateProps = (theme: CustomTheme) => ({
+    likedByMe: !!themeState?.likedIds?.includes(theme._id),
+    savedByMe: !!themeState?.savedIds?.includes(theme._id),
+    quickSelectedByMe: !!themeState?.quickSelectedIds?.includes(theme._id),
+  });
 
-  let content: React.ReactNode = null;
+  const renderTheme = (theme: CustomTheme, mine: boolean) => (
+    <ThemeListItem
+      key={theme._id}
+      theme={theme}
+      variant={mine ? 'user' : 'public'}
+      onEdit={mine ? onEdit : undefined}
+      onDelete={mine ? handleDelete : undefined}
+      onApply={handleApply}
+      onLike={mine ? undefined : handleLike}
+      onSave={mine ? undefined : handleSave}
+      isApplied={currentCustomTheme?._id === theme._id}
+      onDuplicate={onDuplicate}
+      {...stateProps(theme)}
+    />
+  );
 
-  if (view === 'current') {
-    const isOwnedByUser = currentCustomTheme?.userId.toString() === user?._id;
+  let list: React.ReactNode;
 
-    content = currentCustomTheme ? (
-      <div className="grid gap-4">
-        <ThemeListItem
-          key={currentCustomTheme._id}
-          theme={currentCustomTheme}
-          variant={isOwnedByUser ? 'user' : 'public'}
-          onEdit={isOwnedByUser ? onEdit : undefined}
-          onDelete={isOwnedByUser ? handleDelete : undefined}
-          onApply={handleApply}
-          onLike={!isOwnedByUser ? handleLike : undefined}
-          onSave={!isOwnedByUser ? handleSave : undefined}
-          isApplied
-          onDuplicate={onDuplicate}
-          likedByMe={
-            !isOwnedByUser
-              ? !!themeState?.likedIds?.includes(currentCustomTheme._id)
-              : undefined
-          }
-          savedByMe={
-            !isOwnedByUser
-              ? !!themeState?.savedIds?.includes(currentCustomTheme._id)
-              : undefined
-          }
-          quickSelectedByMe={
-            !!themeState?.quickSelectedIds?.includes(currentCustomTheme._id)
-          }
-        />
-      </div>
-    ) : null;
-  } else if (listView !== 'ready') {
-    content = (
+  if (listView !== 'ready') {
+    list = (
       <QueryNotice
         view={listView}
-        onRetry={() => activeListQuery?.refetch()}
+        onRetry={() => listQuery.refetch()}
         className="py-8"
       />
     );
-  } else if (themesOnPage.length > 0) {
-    content = (
+  } else if (themesOnPage.length === 0) {
+    list = searching ? (
+      <LibraryEmpty
+        message={t('widgets.themes.noThemesFoundMatchingYourSearch')}
+        action={{
+          label: t('widgets.library.clearSearch'),
+          onClick: () => {
+            setSearch('');
+            setPage(1);
+          },
+        }}
+      />
+    ) : isYours ? (
+      <LibraryEmpty
+        message={t('widgets.themes.noThemesYet')}
+        action={
+          onCreateNew && {
+            label: t('widgets.themes.newTheme'),
+            onClick: onCreateNew,
+            icon: <Plus className="size-[18px]" aria-hidden="true" />,
+            disabled: offline,
+          }
+        }
+      />
+    ) : (
+      <LibraryEmpty
+        message={t('widgets.themes.savedEmpty')}
+        action={
+          onBrowseCommunity && {
+            label: t('widgets.library.browseCommunity'),
+            onClick: onBrowseCommunity,
+          }
+        }
+      />
+    );
+  } else {
+    list = (
       <>
         <div className="grid gap-4">
-          {view === 'yours'
-            ? themesOnPage.map((theme) => (
-                <ThemeListItem
-                  key={theme._id}
-                  theme={theme}
-                  variant="user"
-                  onEdit={onEdit}
-                  onDelete={handleDelete}
-                  onApply={handleApply}
-                  isApplied={currentCustomTheme?._id === theme._id}
-                  onDuplicate={onDuplicate}
-                  quickSelectedByMe={
-                    !!themeState?.quickSelectedIds?.includes(theme._id)
-                  }
-                />
-              ))
-            : themesOnPage.map((theme) => (
-                <ThemeListItem
-                  key={theme._id}
-                  theme={theme}
-                  variant="public"
-                  onApply={handleApply}
-                  onLike={handleLike}
-                  onSave={handleSave}
-                  isApplied={currentCustomTheme?._id === theme._id}
-                  onDuplicate={onDuplicate}
-                  likedByMe={!!themeState?.likedIds?.includes(theme._id)}
-                  savedByMe={!!themeState?.savedIds?.includes(theme._id)}
-                  quickSelectedByMe={
-                    !!themeState?.quickSelectedIds?.includes(theme._id)
-                  }
-                />
-              ))}
+          {themesOnPage.map((theme) => renderTheme(theme, isYours))}
         </div>
-
         {totalPages > 1 && (
           <WidgetPager
             page={page}
@@ -333,156 +253,121 @@ const UserThemes: React.FC<UserThemesProps> = ({
         )}
       </>
     );
-  } else {
-    content = (
-      <div className="text-center py-12">
-        <p className="text-white/70 mb-4">
-          {debouncedSearch.trim()
-            ? t('widgets.themes.noThemesFoundMatchingYourSearch')
-            : view === 'yours'
-            ? t('widgets.themes.noThemesYetCreateYourFirstTheme')
-            : t('widgets.themes.noSavedThemesYet')}
-        </p>
-        {!debouncedSearch.trim() && view === 'yours' && (
-          <Button variant="tertiary" onClick={onCreateNew}>
-            {t('widgets.themes.createTheme')}
-          </Button>
-        )}
-      </div>
-    );
   }
 
   return (
-    <div className="sm:space-y-4 space-y-2">
-      <div className="sm:space-y-3 space-y-2">
-        <WidgetSearchHeader
-          search={search}
-          onSearchChange={(value) => {
-            setSearch(value);
-            setPage(1);
-          }}
-          onCreateNew={onCreateNew}
-          placeholder={t('widgets.themes.searchThemes')}
-        />
-
-        <div className="flex items-center flex-wrap justify-start gap-2">
-          <Badge
-            label={t('widgets.created')}
-            onClick={() => setViewAndResetPage('yours')}
-            isActive={view === 'yours'}
-            Icon={<User className="w-4 h-4 flex-none" />}
-          />
-          <Badge
-            label={t('widgets.saved')}
-            onClick={() => setViewAndResetPage('saved')}
-            isActive={view === 'saved'}
-            Icon={
-              view === 'saved' ? (
-                <BookmarkCheckIcon className="w-4 h-4 flex-none" />
-              ) : (
-                <BookmarkIcon className="w-4 h-4 flex-none" />
-              )
-            }
-          />
-          {!!currentCustomTheme && (
-            <Badge
-              label={t('widgets.active')}
-              onClick={() => setViewAndResetPage('current')}
-              isActive={view === 'current'}
-              Icon={
-                view === 'current' ? (
-                  <PinSolidIcon className="w-4 h-4 flex-none" />
-                ) : (
-                  <PinIcon className="w-4 h-4 flex-none" />
-                )
-              }
-            />
-          )}
-        </div>
-      </div>
-      {view !== 'current' && (
-        <div className="space-y-1">
-          {listView === 'ready' && (
-            <h3 className="text-white text-lg font-bold">{headerLabel}</h3>
-          )}
-          {listView === 'ready' && offline && (
-            <p className="text-xs text-white/55">{t('offline.cachedCopy')}</p>
-          )}
-          <WidgetSortBadges
-            value={sortKey}
-            onChange={(k: PublicSortKey) => {
-              setSortKey(k);
+    <>
+      <LibraryPlaceLayout
+        scrollKey={`${page}|${debouncedSearch}|${sortKey}|${groupId}`}
+        toolbar={
+          <LibraryToolbar
+            search={search}
+            onSearchChange={(value) => {
+              setSearch(value);
               setPage(1);
             }}
+            searchPlaceholder={
+              isYours
+                ? t('widgets.themes.searchYours')
+                : t('widgets.themes.searchSaved')
+            }
+            shortSearchPlaceholder={t('widgets.library.search')}
+            filters={[sortFilter]}
+            action={
+              isYours && onCreateNew
+                ? {
+                    label: t('widgets.themes.newTheme'),
+                    icon: <Plus className="size-[18px]" aria-hidden="true" />,
+                    onClick: onCreateNew,
+                    disabled: offline,
+                    title: offline ? t('offline.needsConnection') : undefined,
+                  }
+                : undefined
+            }
           />
-          {view === 'yours' && (
-            <WidgetResourceGroupBadges
-              groups={themeGroups}
-              selectedGroupId={selectedThemeGroupId}
-              onSelectAll={() => {
-                setSelectedThemeGroupId(null);
-                setPage(1);
-              }}
-              onSelectGroup={(id) => {
-                setSelectedThemeGroupId(id);
-                setPage(1);
-              }}
-              onAddGroup={() => {
-                setThemeGroupToEdit(null);
-                setThemeGroupModalOpen(true);
-              }}
-              onEditGroup={(g) => {
-                setThemeGroupToEdit(g);
-                setThemeGroupModalOpen(true);
-              }}
-              allLabel={t('widgets.themes.groups.all')}
-              addGroupAriaLabel={t('widgets.themes.groups.addGroupAria')}
-              editGroupAriaLabel={t('widgets.themes.groups.editGroupAria')}
-              className="pt-1"
-            />
-          )}
-        </div>
-      )}
-
-      {/* Content by view */}
-      {content}
-
-      <UserResourceGroupModal
-        isOpen={themeGroupModalOpen}
-        onClose={() => {
-          setThemeGroupModalOpen(false);
-          setThemeGroupToEdit(null);
-        }}
-        groupToEdit={themeGroupToEdit}
-        isSaving={themeGroupModalSaving}
-        confirmDeleteKey="delete-theme-group"
-        confirmDeleteTitle={
-          themeGroupToEdit
-            ? t('settings.confirmations.deleteItem', {
-                name: themeGroupToEdit.name,
-              })
-            : ''
         }
-        confirmDeleteDescription={t(
-          'widgets.themes.groups.deleteGroupConfirmDescription',
+        rail={
+          isYours && (
+            <LibraryFolderRail
+              groups={groups}
+              selectedId={groupId}
+              onSelect={(id) => {
+                setGroupId(id);
+                setPage(1);
+              }}
+              onAdd={() => {
+                setGroupToEdit(null);
+                setGroupModalOpen(true);
+              }}
+              onEdit={(group) => {
+                setGroupToEdit(group);
+                setGroupModalOpen(true);
+              }}
+              allLabel={t('widgets.themes.groups.allThemes')}
+              addLabel={t('widgets.themes.groups.newGroup')}
+              editLabel={t('widgets.themes.groups.editGroupAria')}
+            />
+          )
+        }
+      >
+        {inUse && (
+          <>
+            <LibraryListHeader label={t('widgets.library.inUse')} />
+            {renderTheme(inUse, inUseIsMine)}
+          </>
         )}
-        labels={{
-          createTitle: t('widgets.themes.groups.createTitle'),
-          editTitle: t('widgets.themes.groups.editTitle'),
-          nameRequired: t('widgets.themes.groups.nameRequired'),
-          createdSuccess: t('widgets.themes.groups.createdSuccess'),
-          updatedSuccess: t('widgets.themes.groups.updatedSuccess'),
-          deletedSuccess: t('widgets.themes.groups.deletedSuccess'),
-          failedSave: t('widgets.themes.groups.failedSave'),
-          failedDelete: t('widgets.themes.groups.failedDelete'),
-          nameLabel: t('common.name'),
-          namePlaceholder: t('common.enterName'),
-        }}
-        onCreate={(name) => createThemeGroup({ name })}
-        onUpdate={(id, name) => updateThemeGroup({ id, name })}
-        onDelete={(id) => deleteThemeGroup(id)}
-      />
-    </div>
+        {listView === 'ready' && (
+          <LibraryListHeader
+            className={inUse ? 'mt-3' : ''}
+            label={t('widgets.themes.nThemes', { count: total })}
+          />
+        )}
+        {listView === 'ready' && offline && (
+          <p className="-mt-1 pb-2.5 text-[12.5px] font-semibold text-white/55">
+            {t('offline.cachedCopy')}
+          </p>
+        )}
+        {list}
+      </LibraryPlaceLayout>
+
+      {isYours && (
+        <UserResourceGroupModal
+          isOpen={groupModalOpen}
+          onClose={() => {
+            setGroupModalOpen(false);
+            setGroupToEdit(null);
+          }}
+          groupToEdit={groupToEdit}
+          isSaving={isCreatingGroup || isUpdatingGroup || isDeletingGroup}
+          confirmDeleteKey="delete-theme-group"
+          confirmDeleteTitle={
+            groupToEdit
+              ? t('settings.confirmations.deleteItem', {
+                  name: groupToEdit.name,
+                })
+              : ''
+          }
+          confirmDeleteDescription={t(
+            'widgets.themes.groups.deleteGroupConfirmDescription',
+          )}
+          labels={{
+            createTitle: t('widgets.themes.groups.createTitle'),
+            editTitle: t('widgets.themes.groups.editTitle'),
+            nameRequired: t('widgets.themes.groups.nameRequired'),
+            createdSuccess: t('widgets.themes.groups.createdSuccess'),
+            updatedSuccess: t('widgets.themes.groups.updatedSuccess'),
+            deletedSuccess: t('widgets.themes.groups.deletedSuccess'),
+            failedSave: t('widgets.themes.groups.failedSave'),
+            failedDelete: t('widgets.themes.groups.failedDelete'),
+            nameLabel: t('common.name'),
+            namePlaceholder: t('common.enterName'),
+          }}
+          onCreate={(name) => createGroup({ name })}
+          onUpdate={(id, name) => updateGroup({ id, name })}
+          onDelete={(id) => deleteGroup(id)}
+        />
+      )}
+    </>
   );
 };
 

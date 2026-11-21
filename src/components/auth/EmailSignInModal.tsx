@@ -3,7 +3,6 @@
 import { Mail, MailCheck, Send } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import {
   clearPendingEmailSignIn,
@@ -21,6 +20,7 @@ import { requestLinkEmailCode, verifyLinkEmailCode } from '@/api/signInMethods';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { Input } from '@/components/Input';
+import { toast } from '@/helpers/toast';
 import { useEmailSignInStore } from '@/state/emailSignInStore';
 import { useAuthStore } from '@/state/useAuthStore';
 

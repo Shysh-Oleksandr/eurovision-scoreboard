@@ -71,7 +71,9 @@ VotingPredefinitionModal.tsx         ← shell: command bar wiring, menus, save/
 │                    VotingBarControls (button / icon-button / segmented control)
 │                    VotingBarMenu (anchored popover + menu rows)
 │                    VotingCallout (info / warning notices)
-├── Detailed mode  → VotingPredefinitionTable
+├── Detailed mode  → VotingPredefinitionTable (the matrix)
+│                    VotingPointsBar (readout + points chips under it)
+│                    ballotEdits.ts (pure cell / ballot edits)
 ├── Rank mode      → VotingRankView (+ RankableCountryList)
 ├── Totals mode    → TotalsPredefinitionView (+ BudgetBar + VotingTotalsShareTable)
 │
@@ -83,6 +85,7 @@ Algorithm modules (pure, framework-free, unit-tested):
   state/scoreboard/rankToStageVotes.ts    ← Rank: order → matrix
   state/scoreboard/totalsToStageVotes.ts  ← Totals: target totals → matrix
   state/scoreboard/votesPredefinition.ts  ← the shared random engine
+                                             (+ completeStageVotes: "Fill the rest")
 ```
 
 The hook is the single source of truth for the session's `votes`. The modal is
@@ -100,18 +103,90 @@ tabs never loses data — you're looking at one object three ways.
 ### 3.1 Detailed
 
 The raw N×M matrix. Rows = participants, columns = voting countries, cells =
-numeric point inputs. `applyInputValue` handles the fiddly bits: mapping a typed
-value to an available `pointsId`, transferring an id from another recipient when
-the value is already used, and (when the "multiple points per entry" setting is
-on) a greedy subset-sum to reach a jury total. `getVoterValidity` drives the
-per-column complete/incomplete/invalid dots.
+the points one voter gives one participant in the selected channel. The
+`Total / Jury / Televote` segmented control in the command bar selects the
+channel; `Total` is a read-only aggregate view (a cell there only shows its
+vote in the bar: "Croatia gives Israel 16 points: jury 8, televote 8").
 
-The `Total / Jury / Televote` segmented control in the command bar selects which
-channel you're editing; `Total` is a read-only aggregate view.
+**Look.** The stats Breakdown's (`DESIGN.md` → Voting predefinition): codes
+(`getShortCodes` + `useChosenShortCodes`) under the voters' flags with the
+ballot's validity dot, white shading growing with the points up to the
+channel's top value (`cellTop`: 12, or a jury plus a televote 12 on Total),
+the top value in the accent, a dim "–" for a country's own cell. Below a
+560px container the frozen column shows codes instead of names, unless the
+"Always show full country names" setting is on.
+
+**Selecting a cell** (`selected` in the modal) lights its row and column (the
+crosshair, toggled on the DOM like Breakdown's; it follows the mouse while
+it's over the table) and fills the **points bar** under the matrix
+(`VotingPointsBar`): the readout ("Sweden gives Israel 12 points") and the
+voter's points as chips, top value first. A used chip shows who has it
+("12 / NOR"); picking it moves it to the selected cell, picking the cell's
+own chip takes it back. With nothing selected the chips are the points
+system as a legend and the line is a hint.
+
+- **Mouse or trackpad** (`useHasFinePointer`): cells are fields. Typing
+  still works; Enter / Shift+Enter and the arrows move between fields
+  (skipping a country's own cell) and leaving a field commits it. Chips keep
+  the field focused (`mousedown` is prevented), so clicking and typing mix.
+- **Touch:** cells are buttons (40px rows), so no keyboard opens: a tap
+  selects, the chips give the points.
+
+**Every edit goes through `ballotEdits.ts`** (pure, `ballotEdits.test.ts`),
+which returns the new ballot and what happened, shown as a notice in the bar
+for 5 s:
+
+| Edit | Function | Notes |
+|---|---|---|
+| Typing | `typeCellValue` | A value the voter gave someone else moves from them ("Moved 12 points from Norway"); a value not in the system ("9") keeps the cell as it was and says so; blank or 0 empties it. With several points per entry (jury only), the number is the cell's total, built from free slots by an exact subset-sum search (not greedy), or "No points left add up to 30". |
+| Picking a chip | `pickCellPoint` | Toggle on the cell's own slot; moves a slot held by someone else. |
+| Whole vote tap | `giveNextPoint` | Below. |
+| Clear | `clearCell` | The bar's Clear. |
+
+The hook (`useVotingPredefinition`) runs them through `editBallot`, which
+reads and writes the matrix through a ref as well as state, so two edits in
+one tick (a blur commit, then a pick) never start from a stale matrix.
+
+**Whole vote** (`ballotVoter`): a voter's flag on top (or the bar's "Whole
+vote") gives that country's points in order, the way a spokesperson reads
+them: each tap on a row (its cell or its name) gives the top free value; a
+second tap on the same row takes it back. A free chip picked in the bar goes
+next instead; a used chip is taken back and goes next. When the vote is
+complete the next incomplete voter (in column order) takes over and their
+column scrolls into view; when every vote is complete the mode ends. The
+bar has "Fill at random" (the rest of this vote, then the next voter), Clear
+vote and Done; Escape and Android back end it too, as does selecting a cell
+in another column or switching channel.
+
+**Randomize** acts at once while the open tab has no points. Once it has,
+it opens a menu: **Fill the rest** (`completeStageVotes`: every incomplete
+ballot in the tab's channels gets its missing slots from the random engine,
+every point already given stays; on Total in Combined voting, incomplete
+combined ballots are rebuilt from the jury and televote ones) or **Replace
+all** (`randomizeAll`, as before).
+
+**Size.** From `md` the modal grows, measured, until the matrix fits: the
+table's natural width and height plus the modal's chrome (`--vp-w` /
+`--vp-h` on the container, capped by the viewport, never smaller than the
+usual 64rem × 720px). It's measured with layout sizes (`offsetWidth`), not
+bounding rects: the modal opens scaled to 95% and a transform resizes
+nothing, so a rect measured then would stick. The size is kept while Rank
+and Totals are open, so switching tabs doesn't resize the modal.
+
+**Header.** The command bar is fitted (`useFitStep`): one row; the tab's own
+controls on a second row; then (phones) stretched tabs, Reset only in the ⋯
+menu, Share and Randomize as icons, and no "Predefine votes" caption. On a
+narrow container the "can't save yet" callout gives a count instead of names
+(the dots mark the voters).
 
 Save is gated rather than allowed-then-erroring: `validateAllBeforeSave` runs on
 every `votes` change, disabling Save (with a tooltip) and — once the matrix has
 some votes in it — surfacing a callout naming the offending voters.
+
+> **Known gap (Combined voting):** the standings come from the `combined`
+> ballots, but editing the Jury or Televote cells doesn't rebuild them, so a
+> hand edit there doesn't change the Combined (Total) view. Only "Fill the
+> rest" on Total rebuilds the combined ballots that are incomplete.
 
 ### 3.2 Rank — `rankToStageVotes.ts`
 
@@ -249,7 +324,8 @@ totals"), so the tab-dependent switch is no longer silent.
 ## 8. File map
 
 **Algorithm (pure, tested):**
-- `state/scoreboard/votesPredefinition.ts` — shared Plackett–Luce random engine
+- `state/scoreboard/votesPredefinition.ts` — shared Plackett–Luce random engine,
+  and `completeStageVotes` ("Fill the rest", `completeStageVotes.test.ts`)
 - `state/scoreboard/rankToStageVotes.ts` — Rank pipeline + `swapRecipients` repair
 - `state/scoreboard/rankToOdds.ts` — order → odds band
 - `state/scoreboard/totalsToStageVotes.ts` — Totals clamp + largest-remainder constructor
@@ -261,7 +337,10 @@ totals"), so the tab-dependent switch is no longer silent.
 
 **UI:**
 - `components/setup/voting-predefinition/VotingPredefinitionModal.tsx` — shell
+  (selection, whole-vote mode, the points bar's content, measured size)
 - `useVotingPredefinition.ts` — state hook
+- `ballotEdits.ts` — pure cell / ballot edits and their outcomes (`ballotEdits.test.ts`)
+- `VotingPointsBar.tsx` — the readout line and the points chips under the matrix
 - `VotingPredefinitionHeader.tsx` — command bar + hero (fixed shell header)
 - `VotingBarControls.tsx`, `VotingBarMenu.tsx`, `VotingCallout.tsx` — shell primitives
 - `VotingPredefinitionTable.tsx` — Detailed
@@ -285,7 +364,11 @@ totals"), so the tab-dependent switch is no longer silent.
   `totalsToStageVotes.test.ts` covers budget/clamp math, the largest-remainder
   fit, blank-vs-zero semantics, and save-readiness across all four voting modes;
   `rankToStageVotes.test.ts` covers the monotonic-order guarantee, ballot
-  validity, and the swap repair. Run: `yarn test:run src/state/scoreboard/`.
+  validity, and the swap repair; `completeStageVotes.test.ts` covers "Fill
+  the rest" (kept points, complete ballots untouched, voter filter, several
+  points per entry, combined rebuild); `ballotEdits.test.ts` covers typing,
+  picking, moving and whole-vote taps. Run:
+  `yarn test:run src/state/scoreboard/ src/components/setup/voting-predefinition/`.
 - **Types:** `yarn lint:types-cli` (stricter than the dev build).
 - Per project memory, prefer these targeted checks over the noisy global lint/test.
 
@@ -299,3 +382,6 @@ totals"), so the tab-dependent switch is no longer silent.
    silently produce a broken matrix.
 4. The three modes stay in sync through the shared `votes` state.
 5. Algorithm modules stay pure (no React/store imports) so they remain unit-testable.
+6. A cell edit never changes a ballot silently: every outcome that isn't
+   "set" or "cleared" (moved, not in the system, unreachable) is said in the
+   points bar, and an invalid value keeps the cell as it was.

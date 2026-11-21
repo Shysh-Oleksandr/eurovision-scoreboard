@@ -1,12 +1,16 @@
 'use client';
 
+import { Check, CircleAlert, Info, TriangleAlert, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import React, { useEffect } from 'react';
-import { toast, ToastContainer, Zoom } from 'react-toastify';
+import {
+  type CloseButtonProps,
+  cssTransition,
+  type IconProps,
+  ToastContainer,
+} from 'react-toastify';
 
-import { CheckIcon } from '@/assets/icons/CheckIcon';
-import { CircleXIcon } from '@/assets/icons/CircleXIcon';
-import { InfoIcon } from '@/assets/icons/InfoIcon';
-import { TriangleAlertIcon } from '@/assets/icons/TriangleAlertIcon';
+import { toast } from '@/helpers/toast';
 import {
   msSinceLastHaptic,
   playHaptic,
@@ -66,56 +70,70 @@ function useToastReviewSetbacks() {
   );
 }
 
+/**
+ * Rises from the top edge and settles; leaves by lifting and fading
+ * (styles.css `.dp-toast-in` / `.dp-toast-out`, a fade with reduced motion).
+ */
+const toastTransition = cssTransition({
+  enter: 'dp-toast-in',
+  exit: 'dp-toast-out',
+  collapseDuration: 200,
+});
+
+/** Status is the icon's colour only (styles.css `.dp-toast`). */
+const ToastIcon = ({ type }: IconProps) => {
+  if (type === 'success') return <Check />;
+  if (type === 'error') return <CircleAlert />;
+  if (type === 'warning') return <TriangleAlert />;
+
+  return <Info />;
+};
+
+/**
+ * Toasts look and sit the same everywhere (DESIGN.md "Toasts"): the menus'
+ * material in the theme's font, as wide as their text, top centre, where no
+ * header keeps its actions. Durations and roles come with each toast
+ * (src/helpers/toast.ts); no countdown bar.
+ */
 export default function ToastRoot() {
+  const t = useTranslations('common');
+
   useToastHaptics();
   useToastReviewSetbacks();
 
+  // Only errors stay long enough to need a close button; a tap or an upward
+  // swipe dismisses the rest.
+  const closeButton = ({ closeToast, type }: CloseButtonProps) =>
+    type === 'error' ? (
+      <button
+        type="button"
+        className="dp-toast-close"
+        aria-label={t('close')}
+        onClick={(event) => {
+          event.stopPropagation();
+          closeToast(event);
+        }}
+      >
+        <X aria-hidden="true" />
+      </button>
+    ) : null;
+
   return (
     <ToastContainer
+      position="top-center"
+      newestOnTop
       draggable
-      draggablePercent={20}
-      transition={Zoom}
+      draggableDirection="y"
+      draggablePercent={50}
+      transition={toastTransition}
       theme="dark"
-      closeButton={false}
+      hideProgressBar
+      closeButton={closeButton}
       autoClose={2000}
-      toastClassName={(context) => {
-        const baseClassName = `${context?.defaultClassName} leading-5 bg-gradient-to-tl text-white`;
-
-        if (context?.type === 'error') {
-          return `${baseClassName} from-red-900 to-red-800 bg-red-800`;
-        }
-        if (context?.type === 'warning') {
-          return `${baseClassName} from-yellow-900 to-yellow-800 bg-yellow-800`;
-        }
-
-        return `${baseClassName} from-primary-900 to-primary-800 bg-primary-800`;
-      }}
-      progressClassName={(context) => {
-        const baseClassName = `${context?.defaultClassName} bg-gradient-to-r`;
-
-        if (context?.type === 'error') {
-          return `${baseClassName} from-red-800 to-red-600 bg-red-800`;
-        }
-        if (context?.type === 'warning') {
-          return `${baseClassName} from-yellow-500 to-yellow-400 bg-yellow-500`;
-        }
-
-        return `${baseClassName} from-primary-900 to-primary-700 bg-primary-800`;
-      }}
+      role="status"
       limit={3}
-      icon={(props) => {
-        if (props.type === 'success') {
-          return <CheckIcon />;
-        }
-        if (props.type === 'error') {
-          return <CircleXIcon />;
-        }
-        if (props.type === 'warning') {
-          return <TriangleAlertIcon />;
-        }
-
-        return <InfoIcon className="w-6 h-6" />;
-      }}
+      toastClassName="dp-toast"
+      icon={ToastIcon}
     />
   );
 }

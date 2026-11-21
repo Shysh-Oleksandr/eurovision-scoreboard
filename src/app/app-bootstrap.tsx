@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -14,6 +13,7 @@ import { takePendingWebLink, webLinkToast } from '@/api/signInMethods';
 import { markLatestUpdateAnnounced } from '@/components/feedbackInfo/announcedUpdate';
 import ThemeSoundVolumeHud from '@/components/floating/ThemeSoundVolumeHud';
 import OfflineStrip from '@/components/offline/OfflineStrip';
+import { toast } from '@/helpers/toast';
 import { useActiveContestSync } from '@/hooks/useActiveContestSync';
 import { useActiveThemeSync } from '@/hooks/useActiveThemeSync';
 import { useFullscreen } from '@/hooks/useFullscreen';

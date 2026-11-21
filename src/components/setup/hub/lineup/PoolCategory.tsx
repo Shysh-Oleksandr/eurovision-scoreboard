@@ -2,7 +2,6 @@
 import { ChevronDown, FolderPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { memo, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { useSetupUiStore } from '../state/setupUiStore';
 
@@ -26,6 +25,7 @@ import Button from '@/components/common/Button';
 import SignInButtons from '@/components/common/SignInButtons';
 import { useGetCategoryLabel } from '@/components/setup/hooks/useGetCategoryLabel';
 import { collapsibleRows } from '@/helpers/collapsibleRows';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 
@@ -60,6 +60,7 @@ const ImportedNotice: React.FC<{ codes: string[]; isSignedIn: boolean }> = ({
             name: country.name,
             flagUrl: country.flag!,
             ...(country.shortCode ? { shortCode: country.shortCode } : {}),
+            ...(country.colors?.length ? { colors: country.colors } : {}),
           }));
 
         bulkCreateMutation.mutate(

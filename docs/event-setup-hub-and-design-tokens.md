@@ -361,6 +361,12 @@ the setup edits that weren't saved.
   from the current state.
 - Signed out, Save shows a sign-in toast. Offline it is disabled with "Needs
   a connection".
+- The server limits new contests to 200 per account per UTC day and one
+  contest to 1 MB of storage (backend `contests/contest-limits.ts`).
+  `toastContestSaveError` (`saveContest.ts`) turns its `contest_daily_limit`
+  (429) and `contest_too_large` (413) codes into translated toasts; every
+  save path uses it. Updating a saved contest doesn't count against the
+  daily limit.
 
 `generalStore.loadedContestFingerprint` holds the fingerprint of the setup as
 last loaded from / saved to `activeContest`. `markContestSetupClean()`
@@ -409,3 +415,96 @@ the header's `ProfileButton` (which replaced the Profile widget on
 below `md` one (`shortStat`: custom themes, all contests, local designs).
 Signed out they show just their names. The query is invalidated by follow, theme, contest and design
 visibility mutations and cleared on logout.
+
+## 8. Next year
+
+Starts the following contest from a finished one (a user's suggestion,
+2026-11-21): the winner hosts and goes straight to the final, the year counts
+up, this year's host goes back to the semi-finals, the semi-finalists go back
+into the allocation draw (or keep their semis), and the finished contest can
+be saved first.
+
+**Where the button is.** In four places (the owner kept all of them,
+2026-11-21), all calling `openNextYear(source)` (`state/nextYearStore.ts`)
+and shown only once the final is over with a winner (`useCanStartNextYear`):
+
+1. the winner popup, next to Start over (`WinnerModal`);
+2. the results panel after the final, where Continue sits during the show
+   (`ResultsPanel`: a full-width surface button in the column and the sheet,
+   an icon in the stripe);
+3. the simulation's ⋯ menu (`SimHeader`);
+4. the setup footer, between Close and Start (`SetupFooter` `onNextYear`;
+   icon only below `2cols`).
+
+Each spot carries a "Next year placement N of 4" comment. The classic
+(deprecated) layout's `PhaseActions` has none.
+
+**The plan** is pure: `planNextYear` (`state/nextYear/planNextYear.ts`,
+tested) works on the setup's stages and `eventAssignments`, not the
+simulation's:
+
+- The winner moves into the final, unless its check is off
+  (`winnerPreQualifies`); a chosen host that isn't the winner always does
+  (the UK hosting for Ukraine in 2023). The check shows when the winner's
+  place is a choice (`canChooseWinner`): it was a semi-finalist, or it won at
+  home and holds a host's place. A Big Five winner just stays.
+- "Then: Go to the draw" (`useDraw`), when the draw is available
+  (`drawAvailable`: two or more drawn semis, not Grand Final only): every
+  country in the drawn semis goes to `TO_BE_DRAWN`, with `waitingFrom` set to
+  its semi so "Put them back where they were" works. "Review the setup"
+  skips the draw: the semis keep their line-ups and the Allocation draw
+  button in the setup is one tap away.
+- A country leaving the final (this year's host when it isn't the winner or
+  the new host, or an unticked winner that won at home) goes into the draw
+  (its `waitingFrom` is the smaller semi) or, without it, into the smallest
+  first-round semi. The host's check defaults to on, except for the Big Five
+  at Eurovision (`hostLeavesFinalByDefault`).
+- In Grand Final only mode only the pre-qualifiers change.
+
+**New songs** (`state/nextYear/newSongs.ts`, tested): a check under "What
+changes", on every time the dialog opens. Without it the year's odds carry
+over, so the same favourite wins year after year (the 2026 data gives
+Bulgaria 99 and 99). With it, every performer next year gets the jury and
+televote odds of one of its own past editions in the series, nudged by up to
+±6 and kept within 1–99 in half steps; a country with fewer than three past
+editions (custom entries, newcomers, most of the one-edition ESC Asia) gets
+those of a random past entry of any country. The history is
+`oddsHistory.generated.json`, built from `public/data/countries/*.json` by
+`yarn gen:odds-history` (rerun when odds change; `oddsHistory.test.ts`
+checks it). Each country's draw is seeded with `seed:code`, so the
+"Favourites" preview (top three by jury + televote) is exactly what Start
+applies and moving the host in or out doesn't reshuffle the rest. The preview
+would spoil next year's likely top three, so it stays behind "Show the
+favourites" every time the dialog opens; once shown, the reroll button draws a
+new seed and the eye button hides it again. Applying merges the odds into `countryOdds` and
+clears stages' odds overrides, which belonged to the old songs.
+
+**Applying it** (`components/nextYear/applyNextYear.ts`) writes the
+assignments, drops "Votes in" pins of countries that moved, turns draw mode on
+with the waiting countries, sets `contestYear` / `hostingCountryCode` (the
+lineup preset `year` and the theme stay), clears the description and
+`activeContest`, then `leaveEvent()` opens the setup. Clearing `activeContest`
+matters: Save must create next year's contest, not overwrite this one. With
+the draw it also opens the draw window.
+
+**The dialog** (`NextYearModal`, one instance in `Providers` via
+`NextYearHost`, mounted per open so it reads the finished contest as it is
+then): host and year fields, "What changes" with the old host's check, the
+"Then" choice when countries wait for the draw, and the save section:
+
+- Signed in and online: "Save <contest> first" (or "Save the results to
+  <contest>" for the user's own saved contest, which updates it in place),
+  visibility and group, with "New group" creating one on Start (reused if the
+  save then fails). Signed out or offline it says the results are cleared.
+- A failed save keeps the dialog open and nothing changes.
+- Group and visibility start from the finished contest's own when it's the
+  user's saved contest, read fresh from `GET /contests/:id` on open (its group
+  may have changed in the contest list since it was loaded), until the user
+  picks something here.
+- `prefs` (save on/off, visibility, Then) are remembered. The group is not: it
+  belongs to the chain. Next year stores `chain` = next contest's name, year,
+  group and visibility, and both the next Next year (for an unsaved contest)
+  and the save dialog (`CreateContestModal`, kind `save`) start from it while
+  the open contest still has that name and year (`getChainDefaults`). A
+  deleted group falls back to none.
+

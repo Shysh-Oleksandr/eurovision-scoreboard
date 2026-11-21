@@ -1,6 +1,5 @@
-import { toast } from 'react-toastify';
-
 import { saveFile, shareFile } from '@/helpers/fileActions';
+import { toast } from '@/helpers/toast';
 import { askForReviewSoon } from '@/native/review';
 
 /**

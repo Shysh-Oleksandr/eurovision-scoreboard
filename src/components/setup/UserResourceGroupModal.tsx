@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import Modal from '../common/Modal/Modal';
 import ModalBottomContent from '../common/Modal/ModalBottomContent';
 import { Input } from '../Input';
 
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 
 export interface UserResourceGroupLabels {
@@ -49,9 +49,13 @@ const UserResourceGroupModal: React.FC<UserResourceGroupModalProps> = ({
 }) => {
   const isEditMode = !!groupToEdit;
   const [name, setName] = useState('');
+  // Shown under the field after a save without a name.
+  const [nameError, setNameError] = useState(false);
   const { confirm } = useConfirmation();
 
   useEffect(() => {
+    setNameError(false);
+
     if (groupToEdit) {
       setName(groupToEdit.name);
     } else {
@@ -63,7 +67,8 @@ const UserResourceGroupModal: React.FC<UserResourceGroupModalProps> = ({
     const trimmed = name.trim();
 
     if (!trimmed) {
-      toast(labels.nameRequired, { type: 'error' });
+      setNameError(true);
+      document.getElementById('resource-group-name')?.focus();
 
       return;
     }
@@ -132,9 +137,24 @@ const UserResourceGroupModal: React.FC<UserResourceGroupModalProps> = ({
             id="resource-group-name"
             type="text"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setNameError(false);
+            }}
             placeholder={labels.namePlaceholder}
+            aria-invalid={nameError || undefined}
+            aria-describedby={
+              nameError ? 'resource-group-name-error' : undefined
+            }
           />
+          {nameError && (
+            <span
+              id="resource-group-name-error"
+              className="text-red-400 text-sm"
+            >
+              {labels.nameRequired}
+            </span>
+          )}
         </div>
       </div>
     </Modal>

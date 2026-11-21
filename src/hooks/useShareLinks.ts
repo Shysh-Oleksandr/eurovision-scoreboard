@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { toast } from 'react-toastify';
 
 import { api } from '@/api/client';
 import { fetchDesignById } from '@/api/designs';
@@ -13,6 +12,7 @@ import {
   rememberLandingShareParam,
   type ShareParamKey,
 } from '@/helpers/shareUrl';
+import { toast } from '@/helpers/toast';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import type { ThemeCreator } from '@/types/customTheme';

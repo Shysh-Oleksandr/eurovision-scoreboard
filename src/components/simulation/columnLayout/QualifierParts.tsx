@@ -1,15 +1,20 @@
 'use client';
 import { ArrowRight, ChevronDown, Dices, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { CountryQualificationItem } from '../qualification/CountryQualificationItem';
 
+import { mosaicTiles, useFlagMosaic } from './flagMosaic';
 import Popover from './Popover';
 import { HostingLogo } from './SimHeader';
 import { useSimViewStore } from './simViewStore';
 import { usePhaseResults } from './usePhaseResults';
-import { QualifiersState, useQualifierRandom } from './useQualifiers';
+import {
+  QualifierPlaces,
+  QualifiersState,
+  useQualifierRandom,
+} from './useQualifiers';
 import { WindowFrame } from './VoterWindow';
 
 import Button from '@/components/common/Button';
@@ -32,9 +37,30 @@ import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
 const flagSrc = (country: BaseCountry) => getFlagPath(country, 'big-rectangle');
 
-/** "4 of 10 qualified": the caption under the window, the peek and the stripe. */
-export const useQualifiedCaption = (q: QualifiersState) => {
+/**
+ * "4 of 10 qualified": the caption under the window, the peek and the
+ * stripe. With the places split by target stage, the target stage's own
+ * count instead ("Grand Final, 4 of 10"): the latest qualifier's, or with
+ * `next` (the split screen) the one the next pick goes to.
+ */
+export const useQualifiedCaption = (
+  q: QualifiersState,
+  focus: 'latest' | 'next' = 'latest',
+) => {
   const t = useTranslations('simulation.view');
+  const section =
+    q.split && !q.isOver
+      ? focus === 'next'
+        ? q.activeSection
+        : q.latestSection
+      : undefined;
+
+  if (section) {
+    return `${section.stageName}, ${t('countOfTotal', {
+      count: section.filled,
+      total: section.size,
+    })}`;
+  }
 
   return t('qualifiedCount', { count: q.qualified.length, total: q.total });
 };
@@ -114,7 +140,29 @@ export const SplitTiles = ({
   );
 };
 
-/** The qualifiers' flags in a grid: at most two rows, five across for ten. */
+/** The dark seam between two flags, as in the split screen's tiles. */
+const SEAM = 2;
+
+/**
+ * One axis of a tile, in CSS: its fractions of the box, less half a seam on
+ * every side that meets another flag (none along the box's edges).
+ */
+const seamed = (start: number, size: number) => {
+  const half = SEAM / 2;
+  const before = start > 0.0001 ? half : 0;
+  const after = start + size < 0.9999 ? half : 0;
+
+  return {
+    start: `calc(${start * 100}% + ${before}px)`,
+    size: `calc(${size * 100}% - ${before + after}px)`,
+  };
+};
+
+/**
+ * The qualifiers' flags as a mosaic filling the box (`planFlagMosaic`): rows
+ * (or columns) of flags, the fuller lines smaller, so every flag keeps a
+ * landscape shape and no cell is left empty. In the order they were named.
+ */
 export const QualifiersFlagGrid = ({
   countries,
   className = '',
@@ -122,28 +170,39 @@ export const QualifiersFlagGrid = ({
   countries: BaseCountry[];
   className?: string;
 }) => {
-  const rows = countries.length <= 5 ? 1 : countries.length <= 12 ? 2 : 3;
-  const columns = Math.max(1, Math.ceil(countries.length / rows));
+  const ref = useRef<HTMLDivElement>(null);
+  const mosaic = useFlagMosaic(ref, countries.length);
+  const tiles = useMemo(() => mosaicTiles(mosaic), [mosaic]);
 
   return (
-    <div
-      aria-hidden="true"
-      className={`dp-sim-tiles grid ${className}`}
-      style={{
-        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-        gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-      }}
-    >
-      {countries.map((country, index) => (
-        <img
-          key={country.code}
-          src={flagSrc(country)}
-          onError={(e) => handleFlagError(e.currentTarget, country)}
-          alt=""
-          className="dp-sim-tile-in size-full object-cover"
-          style={{ animationDelay: `${index * 50}ms` }}
-        />
-      ))}
+    <div ref={ref} aria-hidden="true" className={`dp-sim-tiles ${className}`}>
+      <div className="relative size-full">
+        {countries.map((country, index) => {
+          const tile = tiles[index];
+
+          if (!tile) return null;
+
+          const x = seamed(tile.x, tile.width);
+          const y = seamed(tile.y, tile.height);
+
+          return (
+            <img
+              key={country.code}
+              src={flagSrc(country)}
+              onError={(e) => handleFlagError(e.currentTarget, country)}
+              alt=""
+              className="dp-sim-tile-in absolute object-cover"
+              style={{
+                left: x.start,
+                width: x.size,
+                top: y.start,
+                height: y.size,
+                animationDelay: `${index * 50}ms`,
+              }}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -172,6 +231,7 @@ export const QualifierWindow = ({
     (state) => state.settings.shouldShowJuryVotingProgress,
   );
   const caption = useQualifiedCaption(q);
+  const nextCaption = useQualifiedCaption(q, 'next');
   const showsGrid = useShowsClosingGrid(q);
   const progress = showProgress && !q.isOver ? q.progress : undefined;
   const frame = { className, windowClassName, caption, progress };
@@ -196,6 +256,7 @@ export const QualifierWindow = ({
     return (
       <WindowFrame
         {...frame}
+        caption={nextCaption}
         sentenceTitle
         feature={
           <SplitTiles
@@ -329,53 +390,58 @@ export const PlaceChips = ({
   </div>
 );
 
-/**
- * "Qualified for the Grand Final": every place numbered, in two columns
- * filled top to bottom, in the order the qualifiers were named; empty places
- * as outlines of the theme's row.
- */
-export const QualifiedList = ({ q }: { q: QualifiersState }) => {
+/** One target stage's places (or all of them), numbered from `start`. */
+const QualifiedPlaces = ({
+  q,
+  section,
+}: {
+  q: QualifiersState;
+  section: QualifierPlaces;
+}) => {
   const t = useTranslations('simulation.view');
   const { roundedCountryContainer } = useThemeSpecifics();
   const headingId = useId();
-  const rows = Math.ceil(q.total / 2);
+  const rows = Math.ceil(section.places.length / 2);
 
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-2.5">
       <div className="flex items-baseline gap-3">
         <h3
           id={headingId}
-          className="min-w-0 flex-1 text-[15px] font-extrabold leading-tight tracking-[-0.01em] text-white"
+          className="min-w-0 flex-1 text-[15px] font-extrabold leading-tight tracking-[-0.01em] text-white [overflow-wrap:anywhere]"
         >
-          {q.heading}
+          {section.heading}
         </h3>
         <span className="shrink-0 text-[12.5px] font-bold tabular-nums text-white/75">
-          {t('countOfTotal', { count: q.qualified.length, total: q.total })}
+          {t('countOfTotal', { count: section.filled, total: section.size })}
         </span>
       </div>
       <ol
+        start={section.start + 1}
         className="grid grid-flow-col gap-x-2.5 gap-y-1.5"
         style={{
           gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
           gridTemplateRows: `repeat(${rows}, auto)`,
         }}
       >
-        {Array.from({ length: q.total }, (_, index) => {
-          const country = q.qualified[index];
+        {section.places.map((country, index) => {
+          const place = section.start + index;
+          // The next pick lands here: its outline in the accent.
+          const next = !country && place === q.nextPlace ? 'is-next' : '';
 
           return (
             <li
-              key={country?.code ?? `empty-${index}`}
+              key={country?.code ?? `empty-${place}`}
               className="flex min-w-0 items-center gap-1.5"
             >
               <span
                 className={`grid size-[22px] shrink-0 place-items-center rounded-full text-[11px] font-bold tabular-nums ${
                   country
                     ? 'bg-white/[0.12] text-white'
-                    : 'dp-sim-chip is-empty'
+                    : `dp-sim-chip is-empty ${next}`
                 }`}
               >
-                {index + 1}
+                {place + 1}
               </span>
               {country ? (
                 <div className="min-w-0 flex-1">
@@ -383,12 +449,11 @@ export const QualifiedList = ({ q }: { q: QualifiersState }) => {
                     country={country}
                     compact
                     shouldAnimate
-                    targetStageName={q.targetNameFor(country.code)}
                   />
                 </div>
               ) : (
                 <span
-                  className={`dp-sim-slot h-[30px] min-w-0 flex-1 ${
+                  className={`dp-sim-slot h-[30px] min-w-0 flex-1 ${next} ${
                     roundedCountryContainer ? 'rounded-full' : 'rounded-[6px]'
                   }`}
                 />
@@ -400,6 +465,21 @@ export const QualifiedList = ({ q }: { q: QualifiersState }) => {
     </section>
   );
 };
+
+/**
+ * "Qualified for the Grand Final": every place numbered, in two columns
+ * filled top to bottom, in the order the qualifiers were named; empty places
+ * as outlines of the theme's row, the next one in the accent. With several
+ * target stages, one such list per target stage ("Qualified for the Grand
+ * Final", then "…for the Wildcard round"), numbered on from the last.
+ */
+export const QualifiedList = ({ q }: { q: QualifiersState }) => (
+  <div className="flex flex-col gap-4">
+    {q.sections.map((section) => (
+      <QualifiedPlaces key={section.key} q={q} section={section} />
+    ))}
+  </div>
+);
 
 // ---------------------------------------------------------------------------
 // At random

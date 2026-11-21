@@ -1,7 +1,6 @@
 import { Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import {
   connectProvider,
@@ -17,6 +16,7 @@ import AppleIcon from '@/assets/icons/AppleIcon';
 import GoogleIcon from '@/assets/icons/GoogleIcon';
 import Button from '@/components/common/Button';
 import { OfflineNotice } from '@/components/offline/OfflineNotice';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 import { nativePlatform } from '@/native/platform';

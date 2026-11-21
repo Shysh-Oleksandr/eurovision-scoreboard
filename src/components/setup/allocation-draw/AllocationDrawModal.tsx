@@ -19,7 +19,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { toast } from 'react-toastify';
 
 import { useAllocationDrawContext } from './AllocationDrawContext';
 import { applyDrawPlan, stagesWithVotes } from './applyDraw';
@@ -42,6 +41,7 @@ import {
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { toast } from '@/helpers/toast';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import {

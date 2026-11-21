@@ -35,7 +35,8 @@ interface QualifiersSheetProps {
  * Phones, Pick qualifiers mode: the column folded into the bottom sheet.
  * The peek keeps the latest qualifier, Random and the places as flags; with
  * split screen on, the candidates float above it. Pulled up: the full list,
- * At random, the board columns and Present.
+ * At random, the board columns and Present. Once the stage is over the peek
+ * shows the qualifiers' flags and Continue, and pulled up the full list.
  */
 const QualifiersSheet = ({
   isPresenting,
@@ -45,6 +46,7 @@ const QualifiersSheet = ({
   const t = useTranslations('simulation');
   const q = useQualifiers();
   const caption = useQualifiedCaption(q);
+  const nextCaption = useQualifiedCaption(q, 'next');
   const showsGrid = useShowsClosingGrid(q);
   const setPresentationSettings = useGeneralStore(
     (state) => state.setPresentationSettings,
@@ -123,7 +125,7 @@ const QualifiersSheet = ({
                 {t('chooseCountryToQualify')}
               </p>
               <span className="shrink-0 text-[12.5px] font-semibold text-white/75">
-                {caption}
+                {nextCaption}
               </span>
             </div>
             <SplitTiles
@@ -163,7 +165,8 @@ const QualifiersSheet = ({
   return (
     <BottomSheet
       peek={peek}
-      body={q.isOver ? undefined : body}
+      // Once it's over, pulled up: the qualifiers as on the desktop column.
+      body={q.isOver ? <QualifiedList q={q} /> : body}
       progress={showProgress && !q.isOver ? q.progress : undefined}
       resetKey={`${q.isOver}|${isPresenting}`}
       onPeekHeight={onPeekHeight}

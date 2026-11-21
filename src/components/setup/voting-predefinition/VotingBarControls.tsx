@@ -15,6 +15,11 @@ type BarButtonProps = {
   disabled?: boolean;
   title?: string;
   className?: string;
+  /**
+   * The label may hide when the header runs out of room (its compact step):
+   * the label stays the button's accessible name.
+   */
+  collapsible?: boolean;
 };
 
 /**
@@ -35,6 +40,7 @@ export const VotingBarButton = React.forwardRef<
       disabled,
       title,
       className,
+      collapsible,
     },
     ref,
   ) => {
@@ -57,6 +63,9 @@ export const VotingBarButton = React.forwardRef<
         onClick={onClick}
         disabled={disabled}
         title={title}
+        aria-label={
+          collapsible && typeof children === 'string' ? children : undefined
+        }
         className={cn(
           'inline-flex h-[38px] flex-none items-center gap-[7px] whitespace-nowrap rounded-lg px-3',
           'text-[12.5px] font-extrabold tracking-[-0.01em] transition-colors duration-200',
@@ -72,7 +81,7 @@ export const VotingBarButton = React.forwardRef<
         style={variant === 'primary' ? { color: primaryColor } : undefined}
       >
         {icon}
-        {children}
+        {collapsible ? <span className="dp-vp-lbl">{children}</span> : children}
       </button>
     );
   },

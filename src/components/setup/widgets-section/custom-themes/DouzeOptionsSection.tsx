@@ -21,7 +21,7 @@ import {
   sanitizeDouzeOptions,
 } from '@/douze/options';
 import { getDouzeOptionsSupport, getDouzeSpec } from '@/douze/registry';
-import { hslStringToHex, parseColor } from '@/helpers/colorConversion';
+import { colorToHex } from '@/helpers/colorConversion';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { DouzePointsAnimationMode, ThemeColors } from '@/theme/types';
 
@@ -50,22 +50,6 @@ type ColorField = {
 
 /** "1.25×", "0.5×", "2×". */
 const speedLabel = (speed: number) => `${Math.round(speed * 100) / 100}×`;
-
-/** The picker's value as `#rrggbb` (options store plain hex colours). */
-const toHex = (value: string): string | undefined => {
-  const converted = hslStringToHex(parseColor(value));
-
-  if (/^#[0-9a-f]{6}$/i.test(converted)) return converted.toLowerCase();
-
-  const rgb = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(converted);
-
-  return rgb
-    ? `#${rgb
-        .slice(1, 4)
-        .map((channel) => Number(channel).toString(16).padStart(2, '0'))
-        .join('')}`
-    : undefined;
-};
 
 /**
  * "Customize animation" under the douze animation select: a custom theme's
@@ -185,7 +169,9 @@ const DouzeOptionsSection: React.FC<Props> = ({
           defaultValue: specColors[index],
           onChange: (value) => {
             const next = customColors.map((each, i) =>
-              i === index ? (value && toHex(value)) ?? specColors[index] : each,
+              i === index
+                ? (value && colorToHex(value)) ?? specColors[index]
+                : each,
             );
 
             setCustomColors(next);
@@ -201,7 +187,7 @@ const DouzeOptionsSection: React.FC<Props> = ({
           value: shown?.veil,
           defaultValue: DEFAULT_VEIL_COLOR,
           onChange: (value) =>
-            update({ veil: value ? toHex(value) : undefined }),
+            update({ veil: value ? colorToHex(value) : undefined }),
         }
       : null;
 

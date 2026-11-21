@@ -1,25 +1,37 @@
 'use client';
-import { UserCog } from 'lucide-react';
+import { Share2, UserCog } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import dynamic from 'next/dynamic';
 
+import { useHandleShare } from '../../hooks/useHandleShare';
 import { useLoadContest } from '../../hooks/useLoadContest';
+import { ProfileHeader } from '../user-profile/ProfileModalChrome';
 import UserContentSection from '../user-profile/UserContentSection';
-import UserProfileHeader from '../user-profile/UserProfileHeader';
+import UserProfileHeader, {
+  ProfileActions,
+} from '../user-profile/UserProfileHeader';
+import {
+  PROFILE_MODAL_CONTAINER,
+  usePublicItemsCount,
+} from '../user-profile/UserProfileModal';
 
 import FollowingFeedSection from './FollowingFeedSection';
 
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
-import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
 import SignInButtons from '@/components/common/SignInButtons';
-import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
+import { TabContent } from '@/components/common/tabs/Tabs';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
+import { playHaptic } from '@/native/haptics';
 import { useIsOffline } from '@/state/connectivityStore';
+import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
+import { stripCopySuffix } from '@/theme/themeFingerprint';
+import { Contest } from '@/types/contest';
+import { CustomTheme } from '@/types/customTheme';
 
 const EditProfileModal = dynamic(() => import('./EditProfileModal'), {
   ssr: false,
@@ -33,6 +45,90 @@ enum ProfileTab {
   YOUR_PROFILE = 'your-profile',
   FOLLOWING = 'following',
 }
+
+const VIEWS = [ProfileTab.YOUR_PROFILE, ProfileTab.FOLLOWING];
+
+/**
+ * Your profile / Following feed as the segmented well, like the libraries'
+ * places: in the header beside the title from `2cols`, in a bar at the
+ * bottom on phones. Real tabs: the arrow keys, Home and End move between
+ * them.
+ */
+const ProfileViews: React.FC<{
+  value: ProfileTab;
+  onChange: (tab: ProfileTab) => void;
+  ariaLabelledBy: string;
+  /** The phones' bottom bar: 44px segments that share its width. */
+  bar?: boolean;
+}> = ({ value, onChange, ariaLabelledBy, bar = false }) => {
+  const t = useTranslations('widgets.profile');
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const labels: Record<ProfileTab, string> = {
+    [ProfileTab.YOUR_PROFILE]: t('yourProfile'),
+    [ProfileTab.FOLLOWING]: t('followingFeed'),
+  };
+
+  const select = (next: ProfileTab, focus = false) => {
+    if (next !== value) {
+      playHaptic({ id: 'selection' });
+      onChange(next);
+    }
+    if (focus) refs.current[VIEWS.indexOf(next)]?.focus();
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const index = VIEWS.indexOf(value);
+    const last = VIEWS.length - 1;
+    const target =
+      e.key === 'ArrowRight'
+        ? index === last
+          ? 0
+          : index + 1
+        : e.key === 'ArrowLeft'
+        ? index === 0
+          ? last
+          : index - 1
+        : e.key === 'Home'
+        ? 0
+        : e.key === 'End'
+        ? last
+        : null;
+
+    if (target === null) return;
+    e.preventDefault();
+    select(VIEWS[target], true);
+  };
+
+  return (
+    <div
+      role="tablist"
+      aria-labelledby={ariaLabelledBy}
+      onKeyDown={onKeyDown}
+      className={`dp-profile-views dp-sim-seg ${bar ? 'is-bar' : 'is-header'}`}
+    >
+      {VIEWS.map((view, i) => {
+        const isOn = view === value;
+
+        return (
+          <button
+            key={view}
+            ref={(el) => {
+              refs.current[i] = el;
+            }}
+            type="button"
+            role="tab"
+            aria-selected={isOn}
+            tabIndex={isOn ? 0 : -1}
+            onClick={() => select(view)}
+            className={isOn ? 'is-on' : 'text-white/70 hover:text-white'}
+          >
+            {labels[view]}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -66,73 +162,80 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
   const onLoadContest = useLoadContest();
 
+  // Remix and Edit hand the theme or contest to the Themes / Contests modal,
+  // which opens its editor (same as UserProfileModal in EventSetupModal).
+  // Profile closes first so the editor isn't stacked under it.
+  const setIsThemesModalOpen = useGeneralStore((s) => s.setIsThemesModalOpen);
+  const setThemeToDuplicate = useGeneralStore((s) => s.setThemeToDuplicate);
+  const setThemeToEdit = useGeneralStore((s) => s.setThemeToEdit);
+  const setIsContestsModalOpen = useGeneralStore(
+    (s) => s.setIsContestsModalOpen,
+  );
+  const setContestToEdit = useGeneralStore((s) => s.setContestToEdit);
+
+  const onDuplicateTheme = useCallback(
+    (theme: CustomTheme) => {
+      onClose();
+      setThemeToDuplicate({ ...theme, name: stripCopySuffix(theme.name) });
+      setIsThemesModalOpen(true);
+    },
+    [onClose, setThemeToDuplicate, setIsThemesModalOpen],
+  );
+
+  const onEditTheme = useCallback(
+    (theme: CustomTheme) => {
+      onClose();
+      setThemeToEdit(theme);
+      setIsThemesModalOpen(true);
+    },
+    [onClose, setThemeToEdit, setIsThemesModalOpen],
+  );
+
+  const onEditContest = useCallback(
+    (contest: Contest) => {
+      onClose();
+      setContestToEdit(contest);
+      setIsContestsModalOpen(true);
+    },
+    [onClose, setContestToEdit, setIsContestsModalOpen],
+  );
+
   const isAuthenticated = !!user;
 
-  const tabs = useMemo(
+  const handleShare = useHandleShare();
+  const titleId = useId();
+  const publicItems = usePublicItemsCount(user?._id ?? '', isAuthenticated);
+
+  // Both views stay mounted (switching keeps each list's filters and page).
+  const views = useMemo(
     () => [
       {
         value: ProfileTab.YOUR_PROFILE,
         label: t('yourProfile'),
-      },
-      { value: ProfileTab.FOLLOWING, label: t('following') },
-    ],
-    [t],
-  );
-
-  const tabsWithContent = useMemo(
-    () => [
-      {
-        ...tabs[0],
         content: (
-          <div className="space-y-4">
-            {user && (
-              <div className="w-full">
-                <UserProfileHeader
-                  user={user}
-                  additionalContent={
-                    <div className="flex flex-col gap-1.5 min-w-0">
-                      {/* Two buttons: when both don't fit (long
-                          translations on phones), Account goes under Edit
-                          profile. */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Button
-                          label={t('editProfile')}
-                          variant="primary"
-                          onClick={() => setIsEditProfileModalOpen(true)}
-                          disabled={offline}
-                          Icon={<PencilIcon className="w-5 h-5" />}
-                        />
-                        <Button
-                          label={tModeration('account')}
-                          variant="primary"
-                          onClick={() => setIsAccountModalOpen(true)}
-                          disabled={offline}
-                          Icon={<UserCog className="w-5 h-5 flex-none" />}
-                        />
-                      </div>
-                      {offline && (
-                        <p className="text-xs text-white/55">
-                          {tOffline('needsConnection')}
-                        </p>
-                      )}
-                    </div>
-                  }
-                />
-              </div>
-            )}
-            <UserContentSection
-              userId={user?._id ?? ''}
-              onLoadContest={onLoadContest}
-            />
-          </div>
+          <UserContentSection
+            userId={user?._id ?? ''}
+            onDuplicate={onDuplicateTheme}
+            onEditTheme={onEditTheme}
+            onEditContest={onEditContest}
+            onLoadContest={onLoadContest}
+          />
         ),
       },
       {
-        ...tabs[1],
-        content: <FollowingFeedSection onLoadContest={onLoadContest} />,
+        value: ProfileTab.FOLLOWING,
+        label: t('followingFeed'),
+        content: (
+          <FollowingFeedSection
+            onDuplicate={onDuplicateTheme}
+            onEditTheme={onEditTheme}
+            onEditContest={onEditContest}
+            onLoadContest={onLoadContest}
+          />
+        ),
       },
     ],
-    [tabs, user, t, tModeration, tOffline, offline, onLoadContest],
+    [user?._id, t, onDuplicateTheme, onEditTheme, onEditContest, onLoadContest],
   );
 
   useEffectOnce(() => {
@@ -143,30 +246,97 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      containerClassName="!w-[min(100%,750px)]"
+      containerClassName={
+        isAuthenticated ? PROFILE_MODAL_CONTAINER : '!w-[min(100%,750px)]'
+      }
       fullScreenOnPhone
-      contentClassName="!pt-3 sm:h-[75vh] h-[72vh] max-h-[72vh]"
+      contentClassName="dp-flat"
       fixedHeight
       overlayClassName="!z-[1001]"
       withBlur
-      bottomContent={<ModalBottomCloseButton onClose={onClose} />}
+      ariaLabelledBy={titleId}
       topContent={
+        <ProfileHeader
+          title={t('title')}
+          titleId={titleId}
+          onClose={onClose}
+          tabs={
+            isAuthenticated ? (
+              <ProfileViews
+                value={activeTab}
+                onChange={setActiveTab}
+                ariaLabelledBy={titleId}
+              />
+            ) : undefined
+          }
+        />
+      }
+      bottomContent={
         isAuthenticated ? (
-          <Tabs
-            tabs={tabs}
-            activeTab={activeTab}
-            setActiveTab={(tab) => setActiveTab(tab as ProfileTab)}
-          />
+          // Phones: the two views under the thumb.
+          <div className="dp-profile-foot 2cols:hidden px-3 pt-2.5 pb-[calc(10px+var(--modal-safe-bottom,0px))]">
+            <ProfileViews
+              value={activeTab}
+              onChange={setActiveTab}
+              ariaLabelledBy={titleId}
+              bar
+            />
+          </div>
         ) : undefined
       }
     >
-      {isAuthenticated ? (
-        <div className="text-base flex flex-col gap-4">
-          <TabContent
-            tabs={tabsWithContent}
-            activeTab={activeTab}
-            preserveContent
-          />
+      {user ? (
+        <div className="dp-profile-layout">
+          <aside className="dp-profile-aside">
+            <UserProfileHeader
+              user={user}
+              publicItems={publicItems}
+              actions={
+                <ProfileActions>
+                  <Button
+                    variant="surface"
+                    size="lg"
+                    className="dp-profile-main"
+                    onClick={() => setIsEditProfileModalOpen(true)}
+                    disabled={offline}
+                    Icon={<PencilIcon className="size-[18px] flex-none" />}
+                  >
+                    {t('editProfile')}
+                  </Button>
+                  <Button
+                    variant="surface"
+                    size="lg"
+                    onClick={() => setIsAccountModalOpen(true)}
+                    disabled={offline}
+                    aria-label={tModeration('account')}
+                    Icon={<UserCog className="size-[18px] flex-none" />}
+                  >
+                    <span className="dp-act-label">
+                      {tModeration('account')}
+                    </span>
+                  </Button>
+                  <Button
+                    variant="surface"
+                    size="lg"
+                    onClick={() =>
+                      handleShare('profile', user._id, user.name || '')
+                    }
+                    aria-label={t('shareProfile')}
+                    Icon={<Share2 className="size-[18px] flex-none" />}
+                  >
+                    <span className="dp-act-label">{t('shareProfile')}</span>
+                  </Button>
+                </ProfileActions>
+              }
+            >
+              {offline && (
+                <p className="dp-profile-note">{tOffline('needsConnection')}</p>
+              )}
+            </UserProfileHeader>
+          </aside>
+          <div className="dp-profile-main-pane">
+            <TabContent tabs={views} activeTab={activeTab} preserveContent />
+          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center gap-4 mt-8">

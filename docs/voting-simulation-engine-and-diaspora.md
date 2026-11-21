@@ -174,6 +174,12 @@ Users can set odds by dragging countries into a ranked order instead of typing n
 value inside a band from `bandFor(pointsSpread)` (spread 0 → [50,73], 50 → [33,85], 100 → [13,98]);
 `oddsToRankOrder` is the inverse for entering the mode.
 
+The UI (Settings → Odds → Ranking, `settings/odds/OddsRankList.tsx`) shows each country's stored
+odds, not the band's values: the band only applies on a drop, which re-spaces the whole channel
+and leaves "Jury odds now follow this order. Undo". The list keeps its own order after a drop
+(ties after rounding to 0.5 would otherwise re-sort alphabetically) and re-reads it from the odds
+after any other change (Set all odds, Undo, another channel).
+
 > **Follow-up:** `bandFor`'s comments still reference the *old* `odds^exponent` engine (the band was
 > kept narrow because the exponent amplified it). With the new `beta·ln(odds)` engine that coupling
 > no longer applies, so the band widths could be revisited/re-tuned. Functionally it still works.

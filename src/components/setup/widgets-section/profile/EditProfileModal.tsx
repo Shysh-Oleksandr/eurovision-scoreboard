@@ -1,7 +1,6 @@
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 import { z } from 'zod';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,6 +19,7 @@ import Modal from '@/components/common/Modal/Modal';
 import ModalBottomContent from '@/components/common/Modal/ModalBottomContent';
 import { DEFAULT_HOSTING_COUNTRY_CODE } from '@/data/data';
 import { isGoogleAvatarUrl } from '@/helpers/isGoogleAvatarUrl';
+import { toast } from '@/helpers/toast';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 import { useCountriesStore } from '@/state/countriesStore';

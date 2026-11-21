@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
@@ -9,8 +10,9 @@ interface WidgetPagerProps {
 }
 
 const pagerBtnClass =
-  'text-[13px] font-bold tracking-[0.06em] uppercase text-white/70 bg-white/[0.06] border border-white/[0.10] rounded-[10px] px-[18px] py-[9px] transition-colors hover:text-white hover:bg-white/[0.10] disabled:opacity-40 disabled:cursor-not-allowed';
+  'inline-flex items-center gap-1.5 h-10 rounded-xl bg-white/[0.06] border border-white/10 text-white text-[13px] font-bold transition-colors hover:bg-white/[0.11] focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/[0.06]';
 
+/** Previous / "Page 2 of 6" / Next under a library or profile list. */
 const WidgetPager: React.FC<WidgetPagerProps> = ({
   page,
   totalPages,
@@ -20,25 +22,27 @@ const WidgetPager: React.FC<WidgetPagerProps> = ({
   const t = useTranslations();
 
   return (
-    <div className="flex items-center justify-center gap-[14px] pt-2">
+    <div className="flex items-center justify-center gap-3 pt-2">
       <button
         type="button"
         onClick={onPrev}
         disabled={page === 1}
-        className={pagerBtnClass}
+        className={`${pagerBtnClass} pl-2.5 pr-3.5`}
       >
+        <ChevronLeft className="size-4" aria-hidden="true" />
         {t('widgets.previous')}
       </button>
-      <span className="text-[13px] font-semibold text-white/55">
+      <span className="text-[13px] font-semibold text-white/70 tabular-nums">
         {t('widgets.pageNOfM', { page, totalPages })}
       </span>
       <button
         type="button"
         onClick={onNext}
         disabled={page === totalPages}
-        className={pagerBtnClass}
+        className={`${pagerBtnClass} pl-3.5 pr-2.5`}
       >
         {t('widgets.next')}
+        <ChevronRight className="size-4" aria-hidden="true" />
       </button>
     </div>
   );

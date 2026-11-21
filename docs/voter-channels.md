@@ -77,33 +77,35 @@ same way, so a missing ballot for an ineligible voter never blocks Save.
   included in the `isSameAsSetup` dedup comparison. The backend stores stages as
   an opaque blob, so nothing changes there.
 
-## UI — Voters tab (`components/setup/post-setup/EventStageVoters.tsx`)
+## UI — Voters tab (`components/setup/post-setup/voters/VotersTab.tsx`)
 
-Built from the Claude Design handoff in `currentTask/design_handoff_voter_channels/`.
+Redesigned with the stage setup modal on 2026-11-21 (DESIGN.md, "Stage setup").
 
 - Controls exist only for `JURY_AND_TELEVOTE` (the only two-channel mode); the
   Voters tab receives `localVotingMode` from `PostSetupModal` so it follows the
   General tab live. In other modes the feature is invisible; if the stage still
-  holds non-default entries, `VoterChannelsPausedNote` explains they are paused
+  holds non-default entries, a note above the list explains they are paused
   (`getEffectiveVoterChannels` ignores them there — only the Rest of the World
   default remains in effect).
-- The "Voter channels" toolbar button (lucide `Split`, after a hairline
-  separator, `aria-pressed`) reveals the J / T toggles on each chip
-  (`VoterChannelToggles`). It is transient view state — off again whenever the
-  modal opens. While on, the grid widens (5 → 3 columns, 2 → 1 on phones) and
-  the subline shows the explainer instead of the drag hint. A voter's last
-  active channel is locked (`aria-disabled`, dashed inner edge) — exclude a
-  voter with the chip's × instead. The toggles stop `mousedown`/`touchstart`
-  propagation so they never start a react-easy-sort drag.
-- Chips whose mode is not the default carry a `VoterChannelBadge` ("Jury only" /
-  "Televote only") in the overhanging badge row next to the status badge; the
-  status badge truncates first, the channel badge never shrinks but drops
-  "only" in tight rows via the `@container` rules in `styles.css`. Rest of the
-  World therefore reads "Televote only" out of the box and uses a calmer chip.
-- The header subline appends `Jury N · Televote M` when the counts differ.
+- **Channels** (a labelled toggle in the tab's toolbar, lucide `Split`,
+  `aria-pressed`) turns the list into a table with a Jury and a Televote
+  column (`dp-ss-chrow`): the counts sit in the column headers, each voter has
+  two 44px check buttons, rows still drag and still have ×. It is transient
+  view state — off again whenever the modal opens. A voter's last active
+  channel is locked (`aria-disabled`, dimmed, the reason in its title) —
+  exclude a voter with × instead. The buttons use `noDrag` (native
+  `mousedown`/`touchstart` stop) so they never start a react-easy-sort drag.
+- With Channels off, a voter whose mode is not the default says so in the
+  quiet line under its name ("Jury only" / "Televote only"), after its status
+  (Auto-Q, the stage it performs in); Rest of the World therefore reads
+  "Televote only" out of the box.
+- The toolbar shows "16 in the jury, 17 in the televote" beside the count when
+  the counts differ.
 - Per-voter overrides live in the post-setup form store
   (`useWatchVoterChannels`), so `PostSetupModal` can validate live: a Jury and
   Televote stage with no jury-eligible (or no televote-eligible) voter shows
-  `VoterChannelsErrorBar` docked above the footer, disables the Start button,
-  and offers "Give all voters both" (clears the overrides). "Reset list" also
-  clears the overrides. Overrides are pruned to the current list on save.
+  `VoterChannelsErrorBar` docked above the footer, disables Start, and offers
+  both fixes in place: "Give all voters both" (clears the overrides) and "Make
+  it televote only" / "Make it jury only" (switches the stage's voting mode).
+  Set voters → "Give all voters both" also clears them (with Undo). Overrides
+  are pruned to the current list on save.

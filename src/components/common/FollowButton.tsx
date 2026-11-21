@@ -3,7 +3,6 @@
 import { Check, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
-import { toast } from 'react-toastify';
 
 import { useBlockedUserIds } from '@/api/blocks';
 import {
@@ -12,15 +11,21 @@ import {
   useUnfollowMutation,
 } from '@/api/follows';
 import Button from '@/components/common/Button';
+import { toast } from '@/helpers/toast';
 import { cn } from '@/helpers/utils';
 import { useIsOffline } from '@/state/connectivityStore';
 import { useAuthStore } from '@/state/useAuthStore';
 
 interface FollowButtonProps {
   userId: string;
-  variant?: 'sm' | 'md';
+  /**
+   * `block`: the profile's one filled button (46px, accent while not
+   * following, a surface button once following); `className` sizes it.
+   */
+  variant?: 'sm' | 'md' | 'block';
   pill?: boolean;
   onFollowChange?: () => void;
+  className?: string;
 }
 
 const FollowButton: React.FC<FollowButtonProps> = ({
@@ -28,6 +33,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   variant = 'md',
   pill = false,
   onFollowChange,
+  className = '',
 }) => {
   const t = useTranslations();
   const user = useAuthStore((state) => state.user);
@@ -44,6 +50,59 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
   // Blocking ends the follow both ways and the server refuses new ones.
   if (isOwnProfile || isBlocked) return null;
+
+  const isFollowing = status?.isFollowing ?? false;
+  const isMutating = followMutation.isPending || unfollowMutation.isPending;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isMutating) return;
+    // The button turning into Following (or back) is the confirmation; a
+    // toast only when it didn't go through.
+    const onError = () => toast.error(t('common.didntGoThrough'));
+
+    if (isFollowing) {
+      unfollowMutation.mutate(userId, { onSuccess: onFollowChange, onError });
+    } else {
+      followMutation.mutate(userId, { onSuccess: onFollowChange, onError });
+    }
+  };
+
+  if (variant === 'block') {
+    const following = isAuthenticated && isFollowing;
+
+    return (
+      <div
+        onClick={(e) => e.stopPropagation()}
+        role="presentation"
+        className={className}
+      >
+        <Button
+          variant={following || !isAuthenticated ? 'surface' : 'cta'}
+          size="lg"
+          className="w-full justify-center"
+          onClick={isAuthenticated ? handleClick : undefined}
+          disabled={!isAuthenticated || isLoading || offline}
+          isLoading={isMutating}
+          Icon={
+            following ? (
+              <Check className="size-[18px] flex-none" />
+            ) : (
+              <Plus className="size-[18px] flex-none" />
+            )
+          }
+        >
+          {/* Signed out, the button itself says why it can't be pressed
+              (a title doesn't show on touch or on a disabled button). */}
+          {!isAuthenticated
+            ? t('widgets.profile.signInToFollow')
+            : following
+            ? t('widgets.profile.following')
+            : t('widgets.profile.follow')}
+        </Button>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     if (pill) {
@@ -72,21 +131,6 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       />
     );
   }
-
-  const isFollowing = status?.isFollowing ?? false;
-  const isMutating = followMutation.isPending || unfollowMutation.isPending;
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isMutating) return;
-    if (isFollowing) {
-      unfollowMutation.mutate(userId, { onSuccess: onFollowChange });
-      toast.success(t('widgets.profile.unfollowedUser'));
-    } else {
-      followMutation.mutate(userId, { onSuccess: onFollowChange });
-      toast.success(t('widgets.profile.followedUser'));
-    }
-  };
 
   if (pill) {
     return (

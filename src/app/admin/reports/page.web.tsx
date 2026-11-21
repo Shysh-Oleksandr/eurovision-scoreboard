@@ -2,7 +2,6 @@
 
 import { ExternalLink } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { useRouter } from 'next/navigation';
 
@@ -15,6 +14,7 @@ import {
 } from '@/api/moderation';
 import type { ReportTargetType } from '@/api/reports';
 import Button from '@/components/common/Button';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useAuthStore } from '@/state/useAuthStore';
 

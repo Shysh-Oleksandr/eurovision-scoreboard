@@ -33,6 +33,7 @@ import {
 } from '@/components/countryItem/utils/roundedCountryItemGlow';
 import DouzeRowOverlay from '@/douze/DouzeRowOverlay';
 import { getDouzeSpec } from '@/douze/registry';
+import { useEntryColors } from '@/hooks/useEntryColors';
 import { useIsLowPerfDevice } from '@/hooks/useIsLowPerfDevice';
 import { ScoreboardMobileLayout, useGeneralStore } from '@/state/generalStore';
 import { ItemState } from '@/theme/types';
@@ -82,6 +83,8 @@ const CountryItem = ({
   const shouldShowPlaceNumber = alwaysShowRankings || showPlaceAnimation;
   // A host short of width shows a code ("NOR") in place of the name.
   const shortCode = layoutOverride?.shortCodes?.[country.code];
+  // A custom entry's chosen colours stand in for its flag's in the douze.
+  const entryColors = useEntryColors(country.code);
 
   // One shallow-compared primitive selector so memoized items only re-render
   // when the phase actually flips, not on every store write.
@@ -327,6 +330,7 @@ const CountryItem = ({
             flagClassName={flagShape !== 'none' ? flagClassName : undefined}
             nameClassName={nameClassName}
             sourceNameRef={nameRef}
+            entryColors={entryColors}
           />
         ) : null
       }
@@ -338,6 +342,7 @@ const CountryItem = ({
                 mode={douzePointsAnimationMode}
                 options={douzeOptions}
                 pointsAmount={douzePoints ?? 0}
+                entryColors={entryColors}
               />
             )
           : undefined

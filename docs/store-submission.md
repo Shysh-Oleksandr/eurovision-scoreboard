@@ -110,8 +110,8 @@ location, and Device or other IDs is the nearest type.
 in July 2026 (required for submissions since September 2026). A social
 media capability is "the ability to redistribute, amplify, or interact with
 user-generated content through a social feed or similar discovery method";
-Explore, Public Contests and Public Themes, with likes, saves, remixes and
-follows, are that. Answers:
+Graphics → Explore and the Community lists of Contests and Themes, with
+likes, saves, remixes and follows, are that. Answers:
 
 - User-generated content: **Yes.** Social media capabilities: **Yes**
   (reportedly a 13+ floor and a Social Media descriptor; the terms say 13+
@@ -197,7 +197,7 @@ notes' order:
 4. Share → the share sheet → Save Image (the photo library prompt appears
    the first time).
 5. Sign in → Continue with email → the review address and code.
-6. Themes → Public Themes → an item's "…" → Report: show the dialog and
+6. Themes → Community → an item's "…" → Report: show the dialog and
    cancel. On a creator's profile, "…" → Report user and Block user, and
    cancel those too; real reports and blocks would reach the queue and the
    shared review account.
@@ -225,7 +225,7 @@ Signing in saves contests, themes and designs to an account and lets users publi
 * Account deletion: tap the profile button at the top of Event Setup → Account → Delete account.
 
 4. USER-GENERATED CONTENT AND MODERATION
-Users' public content appears under Themes → Public Themes, Contests → Public Contests, Graphics → Explore, and Public fonts in the theme editor's font picker.
+Users' public content appears under Themes → Community, Contests → Community, Graphics → Explore, and Public fonts in the theme editor's font picker.
 * Every item has Report in its "…" menu, and other users' profiles have Report user and Block user in theirs.
 * Blocking hides both users' content from each other.
 * The Terms of Use, linked under the sign-in buttons, forbid objectionable content.
@@ -304,7 +304,7 @@ Slides, in upload order (the first three are what App Store search shows):
 | 01 | `scoreboard` | The real final after 22 of 35 juries, Denmark's 12 to Bulgaria, hearts frozen mid-sweep | 2026 |
 | 02 | `winner` | Bulgaria, 516 points, confetti | 2026 |
 | 03 | `setup` | Event Setup, signed in, library counts | 2026 |
-| 04 | `publicthemes` | Public Themes, most liked first | 2026 |
+| 04 | `publicthemes` | Themes → Community, most liked first | 2026 |
 | 05 | `builder` | The theme builder's Look step editing "2027 Burgas" | that theme |
 | 06 | `contests` | Your Contests: the real final and two random simulations | 2023 |
 | 07 | `stats` | Final stats | 2025 |

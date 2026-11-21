@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl';
 import React, { useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import FontEditorCard from './FontEditorCard';
 import { customSelection, FontSelection } from './fontPickerTypes';
@@ -17,6 +16,7 @@ import {
 import { UploadIcon } from '@/assets/icons/UploadIcon';
 import Button from '@/components/common/Button';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
+import { toast } from '@/helpers/toast';
 import { useFontFilesValidation } from '@/hooks/useFontFilesValidation';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { Font } from '@/types/font';

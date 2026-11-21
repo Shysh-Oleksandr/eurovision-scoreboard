@@ -121,6 +121,110 @@ export const getQualifierTargetStageNames = (
     .filter((name): name is string => !!name);
 };
 
+/**
+ * One target stage's share of a stage's qualifying places: places
+ * `start` … `start + size - 1` (0-based, in rank order) go to it.
+ */
+export interface QualifierSection {
+  targetStageId: string;
+  /** The target stage's name; empty when the stage is gone. */
+  stageName: string;
+  start: number;
+  size: number;
+}
+
+/**
+ * The qualifying places split by target stage, best places first: rank
+ * ranges in rank order, amounts in the order they're listed (as the
+ * qualifiers are handed out when the stage ends).
+ */
+export const getQualifierSections = (
+  qualifiesTo: QualifierTarget[] | undefined,
+  eventStages: EventStage[],
+): QualifierSection[] => {
+  if (!qualifiesTo?.length) return [];
+
+  const targets = isRankBasedQualification(qualifiesTo)
+    ? [...qualifiesTo].sort(
+        (a, b) => (a.minRank ?? Infinity) - (b.minRank ?? Infinity),
+      )
+    : qualifiesTo;
+  let start = 0;
+
+  return targets.flatMap((target) => {
+    const size =
+      target.minRank && target.maxRank
+        ? target.maxRank - target.minRank + 1
+        : target.amount;
+
+    if (!(size > 0)) return [];
+
+    const section = {
+      targetStageId: target.targetStageId,
+      stageName:
+        eventStages.find((stage) => stage.id === target.targetStageId)?.name ??
+        '',
+      start,
+      size,
+    };
+
+    start += size;
+
+    return [section];
+  });
+};
+
+/** The section holding a place (0-based), or -1 past the last place. */
+export const getSectionIndexForPlace = (
+  sections: QualifierSection[],
+  place: number,
+): number =>
+  sections.findIndex(
+    (section) => place >= section.start && place < section.start + section.size,
+  );
+
+/**
+ * Pick qualifiers mode fills the target stages one after another: the first
+ * picks take the best places, so they go to the first target stage. With
+ * `qualifiedCount` picked, how many places the one being filled has left
+ * (0 once every place is taken).
+ */
+export const getOpenPlacesInActiveSection = (
+  qualifiesTo: QualifierTarget[] | undefined,
+  qualifiedCount: number,
+): number => {
+  const sections = getQualifierSections(qualifiesTo, []);
+  const section = sections[getSectionIndexForPlace(sections, qualifiedCount)];
+
+  return section ? section.start + section.size - qualifiedCount : 0;
+};
+
+/**
+ * The qualifiers split by section, each section keeping the given order.
+ * `placeOf` says where a qualifier stands (its rank, or its pick order while
+ * places are being picked); one beyond the places lands in the last section.
+ */
+export const groupQualifiersBySection = <T>(
+  sections: QualifierSection[],
+  qualifiers: T[],
+  placeOf: (qualifier: T, index: number) => number,
+): T[][] => {
+  const groups = sections.map((): T[] => []);
+
+  qualifiers.forEach((qualifier, index) => {
+    const sectionIndex = getSectionIndexForPlace(
+      sections,
+      placeOf(qualifier, index),
+    );
+
+    groups[sectionIndex === -1 ? groups.length - 1 : sectionIndex]?.push(
+      qualifier,
+    );
+  });
+
+  return groups;
+};
+
 export const getGrandFinalStage = (
   eventStages: EventStage[],
 ): EventStage | undefined =>
@@ -142,9 +246,7 @@ export const qualifiesOnlyToGrandFinal = (
     qualifiesTo.map((target) => target.targetStageId),
   );
 
-  return (
-    targetStageIds.size === 1 && targetStageIds.has(grandFinalStage.id)
-  );
+  return targetStageIds.size === 1 && targetStageIds.has(grandFinalStage.id);
 };
 
 export const shouldShowQualifierTargetLabels = (

@@ -1,284 +1,395 @@
 'use client';
 
 import {
-  ArrowDownToLine,
-  ArrowUpToLine,
-  Dices,
-  LayoutGrid,
-  List,
-  ListRestartIcon,
+  ArrowDown,
+  ArrowDownAZ,
+  ArrowDownUp,
+  ArrowDownZA,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ChevronDown,
   Share,
-  ShuffleIcon,
-  X,
+  Shuffle,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useMemo } from 'react';
+import React, { useState } from 'react';
 
-import Tabs from '../../../common/tabs/Tabs';
-import { CountrySortableItem } from '../../event-stage/CountrySortableItem';
+import { noDrag } from '../noDrag';
 
-import SortAZIcon from '@/assets/icons/SortAZIcon';
-import SortZAIcon from '@/assets/icons/SortZAIcon';
+import { useRunningOrder } from './useRunningOrder';
+
+import AnchoredMenu, {
+  AnchoredMenuEntry,
+} from '@/components/common/AnchoredMenu';
 import Button from '@/components/common/Button';
-import { SortableList } from '@/components/common/sort/SortableList';
-import type { Country } from '@/models';
-import { ScoreboardMobileLayout } from '@/state/generalStore';
+import {
+  SortableItem,
+  SortableList,
+} from '@/components/common/sort/SortableList';
+import { BoardCap, BoardFlag } from '@/components/setup/hub/lineup/CountryTile';
+import { useBoardRowLook } from '@/components/setup/hub/lineup/useBoardRowLook';
+import { playHaptic } from '@/native/haptics';
 
-const layoutTabs = [
-  {
-    value: 'grid',
-    label: <LayoutGrid className="w-6 h-6" />,
-  },
-  {
-    value: 'list',
-    label: <List className="w-6 h-6" />,
-  },
-];
+type RunningOrder = ReturnType<typeof useRunningOrder>;
 
-const HalfDivider: React.FC<{ half: 1 | 2; count: number }> = ({
-  half,
-  count,
-}) => {
-  const t = useTranslations('setup.allocationDraw');
+/** What a change replaced, so Undo can put it back. */
+interface LastAction {
+  message: string;
+  codes: string[];
+  firstHalfSize: number | null;
+  movedCode: string | null;
+}
 
-  return (
-    <div
-      role="presentation"
-      // Not a sortable row: SortableList counts rows without it.
-      data-sortable-ignore=""
-      className={`dp-ro-divider ${
-        half === 1 ? 'dp-ro-divider--first' : ''
-      } col-span-full flex items-center gap-2.5 px-0.5 ${
-        half === 1 ? 'pt-1 pb-1 text-white/70' : 'pt-3 pb-1 text-white'
-      } text-[11.5px] font-extrabold tracking-[.09em] uppercase`}
-    >
-      <span>{half === 1 ? t('firstHalf') : t('secondHalf')}</span>
-      <em className="not-italic font-bold tracking-normal text-white/70 order-2">
-        {count}
-      </em>
-    </div>
-  );
-};
-
-export const RunningOrderTab = ({
-  stageId,
-  orderedCountries,
-  firstHalfSize = null,
-  selectedLayout,
-  setSelectedLayout,
-  onSortEnd,
-  onQuickSort,
-  onShare,
-  onDrawHalves,
-  onRemoveHalves,
-  onMoveToOtherHalf,
-}: {
-  stageId: string;
-  orderedCountries: Country[];
-  /** Allocation-draw halves: index where the second half starts; null = no halves. */
-  firstHalfSize?: number | null;
-  selectedLayout: 'list' | 'grid';
-  setSelectedLayout: (layout: 'list' | 'grid') => void;
-  onSortEnd: (oldIndex: number, newIndex: number) => void;
-  onQuickSort: (sort: 'az' | 'za' | 'shuffle' | 'reset') => void;
+interface RunningOrderTabProps {
+  ro: RunningOrder;
+  /** Called before any change, so the modal can tell it was edited. */
+  onTouch: () => void;
   onShare: () => void;
-  /** Allocation draw: draw halves for a stage that has none (e.g. the final). */
-  onDrawHalves?: () => void;
-  onRemoveHalves?: () => void;
-  onMoveToOtherHalf?: (code: string) => void;
-}) => {
-  const t = useTranslations('setup.eventStageModal');
-  const tCommon = useTranslations('common');
-  const tDraw = useTranslations('setup.allocationDraw');
+}
 
-  const layoutValue = useMemo(
-    () => selectedLayout || ScoreboardMobileLayout.ONE_COLUMN,
-    [selectedLayout],
-  );
+/** Grid placement for the two-column layout (styles.css `.dp-ss-ro-list`). */
+const place = (col: number, row: number) =>
+  ({ '--ro-col': col, '--ro-row': row } as React.CSSProperties);
+
+/**
+ * The running order as the board will draw it: the theme's jury rows,
+ * numbered outside the row, in two columns that read down (one on phones).
+ * Drawn halves are the two columns; a row's points box moves it to the other
+ * half. Sorts, the draw and going back live in one Order menu, and each one
+ * (like a move across the halves) leaves a line with Undo.
+ */
+export const RunningOrderTab: React.FC<RunningOrderTabProps> = ({
+  ro,
+  onTouch,
+  onShare,
+}) => {
+  const t = useTranslations('setup.stageSetup');
+  const tDraw = useTranslations('setup.allocationDraw');
+  const tStage = useTranslations('setup.eventStageModal');
+  const look = useBoardRowLook();
+  const {
+    orderedCodes,
+    orderedCountries,
+    firstHalfSize,
+    setOrderedCodes,
+    setFirstHalfSize,
+    handleRunningOrderSortEnd,
+    handleQuickSort,
+    handleDrawHalves,
+    handleRemoveHalves,
+    handleMoveToOtherHalf,
+  } = ro;
+
+  const [last, setLast] = useState<LastAction | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null);
+
+  const count = orderedCountries.length;
   const hasHalves =
     firstHalfSize !== null &&
     firstHalfSize >= 0 &&
-    firstHalfSize <= orderedCountries.length &&
-    orderedCountries.length > 1;
+    firstHalfSize <= count &&
+    count > 1;
+  const half = hasHalves ? firstHalfSize : 0;
+
+  const run = (
+    message: string,
+    apply: () => void,
+    movedCode: string | null = null,
+  ) => {
+    onTouch();
+    const snapshot = { codes: orderedCodes, firstHalfSize };
+
+    apply();
+    setLast({ message, movedCode, ...snapshot });
+  };
+
+  const undo = () => {
+    if (!last) return;
+    setOrderedCodes(last.codes);
+    setFirstHalfSize(last.firstHalfSize);
+    setLast(null);
+    playHaptic({ id: 'undo' });
+  };
+
+  const drawHalves = () => {
+    const first = Math.floor(count / 2);
+
+    run(t('roDoneHalves', { first, second: count - first }), () => {
+      handleDrawHalves();
+    });
+  };
+
+  const nameOf = (code: string) =>
+    orderedCountries.find((c) => c.code === code)?.name ?? '';
+
+  const onSortEnd = (from: number, to: number) => {
+    if (from === to) return;
+    onTouch();
+    const snapshot = { codes: orderedCodes, firstHalfSize };
+    const code = orderedCodes[from];
+    const movedTo = handleRunningOrderSortEnd(from, to);
+
+    setLast(
+      movedTo
+        ? {
+            message: t('roDoneMoved', {
+              name: nameOf(code),
+              half: movedTo === 1 ? 'first' : 'second',
+            }),
+            movedCode: code,
+            ...snapshot,
+          }
+        : null,
+    );
+  };
+
+  const moveToOtherHalf = (code: string) => {
+    const toSecond = orderedCodes.indexOf(code) < half;
+
+    run(
+      t('roDoneMoved', {
+        name: nameOf(code),
+        half: toSecond ? 'second' : 'first',
+      }),
+      () => {
+        handleMoveToOtherHalf(code);
+      },
+      code,
+    );
+  };
+
+  const menuItems: AnchoredMenuEntry[] = [
+    {
+      label: t('sortAZ'),
+      icon: <ArrowDownAZ className="size-[17px]" />,
+      onClick: () =>
+        run(t(hasHalves ? 'roDoneAZHalves' : 'doneAZ'), () =>
+          handleQuickSort('az'),
+        ),
+    },
+    {
+      label: t('sortZA'),
+      icon: <ArrowDownZA className="size-[17px]" />,
+      onClick: () =>
+        run(t(hasHalves ? 'roDoneZAHalves' : 'doneZA'), () =>
+          handleQuickSort('za'),
+        ),
+    },
+    {
+      label: t('shuffle'),
+      icon: <Shuffle className="size-[17px]" />,
+      onClick: () =>
+        run(t(hasHalves ? 'roDoneShuffleHalves' : 'doneShuffle'), () =>
+          handleQuickSort('shuffle'),
+        ),
+    },
+    ...(count > 1
+      ? ([
+          'hr',
+          {
+            label: hasHalves ? t('roDrawHalvesAgain') : tDraw('roDrawHalves'),
+            description: tDraw('roDrawHalvesHint'),
+            onClick: drawHalves,
+          },
+          ...(hasHalves
+            ? [
+                {
+                  label: tDraw('roRemoveHalves'),
+                  description: t('roRemoveHalvesHint'),
+                  onClick: () => run(t('roDoneNoHalves'), handleRemoveHalves),
+                },
+              ]
+            : []),
+        ] as AnchoredMenuEntry[])
+      : []),
+    'hr',
+    {
+      label: t('roBackToSaved'),
+      description: t('roBackToSavedHint'),
+      onClick: () => run(t('roDoneSaved'), () => handleQuickSort('reset')),
+    },
+  ];
+
+  // Two columns: the halves, or the order split in two, each reading down.
+  const rowsPerColumn = hasHalves
+    ? Math.max(half, count - half)
+    : Math.ceil(count / 2);
+  const headerRows = hasHalves ? 1 : 0;
+  const cellFor = (index: number) => {
+    const split = hasHalves ? half : rowsPerColumn;
+    const col = index < split ? 1 : 2;
+    const row = (col === 1 ? index : index - split) + 1 + headerRows;
+
+    return place(col, row);
+  };
+
+  const rows: React.ReactNode[] = [];
+  const halfHeader = (which: 1 | 2) => (
+    <div
+      key={`half-${which}`}
+      role="presentation"
+      // Not a sortable row: SortableList counts rows without it.
+      data-sortable-ignore=""
+      className="dp-ss-ro-half"
+      style={place(which, 1)}
+    >
+      <span>{which === 1 ? tDraw('firstHalf') : tDraw('secondHalf')}</span>
+      <i aria-hidden="true" />
+      <span className="tabular-nums text-white/55">
+        {which === 1 ? half : count - half}
+      </span>
+    </div>
+  );
+
+  orderedCountries.forEach((country, index) => {
+    if (hasHalves && index === 0) rows.push(halfHeader(1));
+    if (hasHalves && index === half) rows.push(halfHeader(2));
+
+    const inFirstHalf = hasHalves && index < half;
+    const moveLabel = inFirstHalf
+      ? tDraw('roMoveToSecondHalf')
+      : tDraw('roMoveToFirstHalf');
+    const moved = last?.movedCode === country.code;
+
+    rows.push(
+      <SortableItem key={country.code}>
+        <div
+          className={`dp-ss-ro-item ${moved ? 'is-moved' : ''}`}
+          style={cellFor(index)}
+        >
+          <span className="dp-ss-ro-num">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <div className="relative min-w-0">
+            <div
+              className={`dp-ss-ro-board dp-scoreboard-font bg-countryItem-juryBg text-countryItem-juryCountryText ${
+                look.rounded ? 'rounded-full' : 'rounded-[3px]'
+              } flex h-10 min-w-0 cursor-grab touch-manipulation select-none items-center gap-[6px] overflow-hidden 2cols:h-9`}
+              style={look.rowStyle}
+            >
+              <BoardFlag country={country} look={look} eager={index < 12} />
+              <span
+                className={`min-w-0 flex-1 truncate font-bold ${
+                  look.uppercase
+                    ? 'uppercase text-[12.5px] 2cols:text-[12.5px]'
+                    : 'text-[13px]'
+                } ${look.flagShape === 'none' ? 'pl-3' : ''}`}
+              >
+                {country.name}
+              </span>
+              <BoardCap look={look} widthClassName="w-[46px]" />
+            </div>
+            {hasHalves && (
+              <button
+                ref={noDrag}
+                type="button"
+                aria-label={`${country.name}: ${moveLabel}`}
+                title={moveLabel}
+                onClick={() => moveToOtherHalf(country.code)}
+                className={`dp-ss-ro-move absolute inset-y-0 right-0 grid w-[46px] place-items-center text-countryItem-juryPointsText ${
+                  look.rounded ? 'rounded-r-full' : 'rounded-r-[3px]'
+                }`}
+              >
+                <span className="dp-ss-ro-arrow-v">
+                  {inFirstHalf ? (
+                    <ArrowDown className="size-4" aria-hidden="true" />
+                  ) : (
+                    <ArrowUp className="size-4" aria-hidden="true" />
+                  )}
+                </span>
+                <span className="dp-ss-ro-arrow-h">
+                  {inFirstHalf ? (
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  ) : (
+                    <ArrowLeft className="size-4" aria-hidden="true" />
+                  )}
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
+      </SortableItem>,
+    );
+  });
+  if (hasHalves && half === count) rows.push(halfHeader(2));
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div>
-          <h3 className="text-base sm:text-lg font-semibold text-white">
-            {t('participants', { count: orderedCountries.length })}
-          </h3>
-          <p className="text-white/50 text-sm">{t('dragAndDropToReorder')}</p>
-        </div>
-        <div className="flex items-center flex-wrap sm:gap-3 gap-2 sm:w-auto w-full">
-          <div className="flex items-center sm:gap-2 gap-1">
-            <ActionButton
-              onClick={() => onQuickSort('az')}
-              title={tCommon('sortAZ')}
-              icon={<SortAZIcon className="w-5 h-5" />}
-            />
-            <ActionButton
-              onClick={() => onQuickSort('za')}
-              title={tCommon('sortZA')}
-              icon={<SortZAIcon className="w-5 h-5" />}
-            />
-            <ActionButton
-              onClick={() => onQuickSort('shuffle')}
-              title={tCommon('shuffle')}
-              icon={<ShuffleIcon className="w-5 h-5" />}
-            />
-            <ActionButton
-              onClick={() => onQuickSort('reset')}
-              title={tCommon('resetList')}
-              icon={<ListRestartIcon className="w-5 h-5" />}
-            />
-          </div>
-          <Tabs
-            tabs={layoutTabs}
-            activeTab={layoutValue}
-            setActiveTab={(tab) => setSelectedLayout(tab as 'list' | 'grid')}
-            containerClassName="!p-[3px] ml-auto !overflow-hidden !h-11 !w-[112px]"
-            overlayClassName="!inset-y-[2px]"
-            buttonClassName="!py-0 !px-0 h-full"
+    <div className="dp-ss-ro">
+      <div className="flex min-h-10 items-center gap-2">
+        <h3 className="min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-[-0.01em]">
+          {t('entries', { count })}
+        </h3>
+        <button
+          ref={setAnchor}
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+          className={`dp-act ${
+            menuOpen ? 'is-on' : ''
+          } flex h-10 flex-none items-center gap-2 rounded-xl pl-3 pr-2.5 text-[13.5px] font-extrabold normal-case`}
+        >
+          <ArrowDownUp
+            className="size-[17px] flex-none text-white/70"
+            aria-hidden="true"
           />
-        </div>
+          {t('order')}
+          <ChevronDown
+            className="size-4 flex-none text-white/70"
+            aria-hidden="true"
+          />
+        </button>
+        <Button
+          variant="surface"
+          size="md"
+          className="flex-none"
+          Icon={<Share className="size-[17px]" />}
+          onClick={onShare}
+          aria-label={tStage('shareRunningOrder')}
+        >
+          <span className="hidden 2cols:inline">{t('share')}</span>
+        </Button>
       </div>
 
-      {hasHalves ? (
-        <div className="flex items-start gap-2 flex-wrap">
-          <p className="flex-1 min-w-[200px] flex gap-2 items-start m-0 text-[12.5px] font-semibold text-white/70 leading-[1.4] text-pretty">
-            <Dices className="dp-accent-ink size-[15px] flex-none mt-px" />
-            <span>{tDraw('roHalvesNote')}</span>
-          </p>
-          {onRemoveHalves && (
-            <Button
-              variant="surface"
-              size="sm"
-              Icon={<X className="size-3.5" />}
-              onClick={onRemoveHalves}
-            >
-              {tDraw('roRemoveHalves')}
-            </Button>
-          )}
-        </div>
-      ) : (
-        onDrawHalves &&
-        orderedCountries.length > 1 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              variant="surface"
-              size="sm"
-              Icon={<Dices className="size-4" />}
-              onClick={onDrawHalves}
-            >
-              {tDraw('roDrawHalves')}
-            </Button>
-            <span className="text-[12.5px] font-semibold text-white/55 text-pretty">
-              {tDraw('roDrawHalvesHint')}
-            </span>
-          </div>
-        )
-      )}
+      <p className="dp-ss-line">
+        {last ? (
+          <>
+            {last.message}{' '}
+            <button type="button" onClick={undo} className="dp-ss-undo">
+              {t('undo')}
+            </button>
+          </>
+        ) : (
+          <span className="text-white/55">
+            {hasHalves ? t('roHintHalves') : t('roHint')}
+          </span>
+        )}
+      </p>
+      <p aria-live="polite" className="sr-only">
+        {last?.message ?? ''}
+      </p>
 
       <SortableList
         onSortEnd={onSortEnd}
-        hapticBoundary={hasHalves ? firstHalfSize : null}
-        className={`${
-          selectedLayout === 'grid'
-            ? 'grid md:grid-cols-4 2cols:grid-cols-3 grid-cols-2 gap-2'
-            : 'flex flex-col gap-2'
-        }`}
-        draggedItemClassName="dragged"
+        hapticBoundary={hasHalves ? half : null}
+        className="dp-ss-ro-list"
+        draggedItemClassName="dp-ss-dragged"
       >
-        {orderedCountries.flatMap((country, index) => {
-          const items: React.ReactNode[] = [];
-
-          if (hasHalves && index === 0) {
-            items.push(
-              <HalfDivider key="half-1" half={1} count={firstHalfSize!} />,
-            );
-          }
-          if (hasHalves && index === firstHalfSize) {
-            items.push(
-              <HalfDivider
-                key="half-2"
-                half={2}
-                count={orderedCountries.length - firstHalfSize!}
-              />,
-            );
-          }
-          const inFirstHalf = hasHalves && index < firstHalfSize!;
-          const moveLabel = inFirstHalf
-            ? tDraw('roMoveToSecondHalf')
-            : tDraw('roMoveToFirstHalf');
-
-          items.push(
-            <CountrySortableItem
-              key={country.code}
-              id={country.code}
-              country={country}
-              stageId={stageId}
-              withGroupLabel={false}
-              index={index}
-              actions={
-                hasHalves && onMoveToOtherHalf ? (
-                  <button
-                    type="button"
-                    aria-label={moveLabel}
-                    title={moveLabel}
-                    className="ml-auto mr-1 w-7 h-7 rounded-lg grid place-items-center text-white/55 hover:text-white hover:bg-white/10 flex-none"
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onMoveToOtherHalf(country.code);
-                    }}
-                  >
-                    {inFirstHalf ? (
-                      <ArrowDownToLine className="size-4" />
-                    ) : (
-                      <ArrowUpToLine className="size-4" />
-                    )}
-                  </button>
-                ) : undefined
-              }
-            />,
-          );
-
-          return items;
-        })}
-        {hasHalves && firstHalfSize === orderedCountries.length && (
-          <HalfDivider key="half-2-end" half={2} count={0} />
-        )}
+        {rows}
       </SortableList>
-      <Button
-        variant="tertiary"
-        className="w-full justify-center mt-2"
-        Icon={<Share className="w-5 h-5" />}
-        onClick={onShare}
-      >
-        {t('shareRunningOrder')}
-      </Button>
-    </div>
-  );
-};
 
-const ActionButton = ({
-  onClick,
-  title,
-  icon,
-}: {
-  onClick: () => void;
-  title: string;
-  icon: React.ReactNode;
-}) => {
-  return (
-    <Button
-      onClick={onClick}
-      className="!p-2.5"
-      aria-label={title}
-      title={title}
-    >
-      {icon}
-    </Button>
+      <AnchoredMenu
+        open={menuOpen}
+        anchor={anchor}
+        onClose={() => setMenuOpen(false)}
+        items={menuItems}
+        placement="bottom-end"
+        className="min-w-[300px] max-w-[min(360px,calc(100vw-16px))]"
+        ariaLabel={t('order')}
+        plainHeaders
+      />
+    </div>
   );
 };

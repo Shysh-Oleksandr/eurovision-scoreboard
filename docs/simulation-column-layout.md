@@ -381,7 +381,26 @@ column sizing, sheet, stripe, minimal view, presenting) and swaps the parts:
   (`qualificationOrder`), the places (`getTotalQualifiersAmount`), the latest
   qualifier, the split screen's candidates while it shows, and the heading
   from the existing `qualifiedForTheGrandFinal` / `qualifiedForStage` /
-  `qualifiedEntries` strings with their line breaks flattened.
+  `qualifiedEntries` strings with their line breaks flattened. The places
+  come as `sections`: one for all of them, or one per target stage when the
+  semi-final qualifies to several and "Show qualifier target stages" is on
+  (`split`), each headed "Qualified for the {stage}" and numbered on from the
+  last. Also `nextPlace`, `activeSection` (where the next pick goes) and
+  `latestSection`.
+- **Several target stages** (e.g. 1-10 to the final, 11-16 to a wildcard
+  round): the picks fill the target stages one after another, so the first
+  10 named go to the final whoever they are. The store keeps that true:
+  `pickQualifier` swaps votes with the last entry that would take the open
+  places of the target stage being filled (`getOpenPlacesInActiveSection`;
+  with one target stage that's every place left, as before), Random and the
+  split screen's anchor reveal one of those entries, and
+  `getRankedCountriesWithPoints` ranks with the same comparator (ties
+  included) that hands the qualifiers out when the stage ends. While picking,
+  the list groups by pick order; once over, by rank
+  (`qualification/useQualifierSections`, shared with the results modal),
+  which comes to the same. Captions name the target stage ("Grand Final,
+  4 of 10"): the latest qualifier's under its name, the next pick's over the
+  split screen.
 - **Board** (`QualifierBoard`, rendered by `BoardStage` instead of `Board`):
   the line-up in running order as the theme's qualification rows
   (`CountryQualificationItem bare as="button"`), in the board's own structure
@@ -397,17 +416,28 @@ column sizing, sheet, stripe, minimal view, presenting) and swaps the parts:
   first pick the hosting heart and the stage's name; with split screen on,
   the candidates as flush tiles (`SplitTiles`, tap one to qualify it; it plays
   the theme's `qualifierReveal` sound and the `qualifierCards` haptic, as the
-  old modal did); once the stage is over the qualifiers' flags in a grid
-  (`QualifiersFlagGrid`, at most two rows for ten). The grid is part of the
-  column, so the "Show qualifiers popup" setting (`showQualificationModal`)
-  doesn't touch it; that setting still governs the popup in the classic
-  layout and after a semi-final with points.
+  old modal did); once the stage is over the qualifiers' flags as a mosaic
+  (`QualifiersFlagGrid`). `flagMosaic.ts` measures the box and splits the
+  flags into rows (or columns) of different lengths, each line sized 1/n, so
+  every flag has the same landscape shape near 3:2 and no cell stays empty:
+  10 in the 3:2 window are columns of 3, 3 and 4, and 10 on the phone's
+  118px strip are two rows of 5. Lines with fewer (bigger) flags come first,
+  and no line holds more than twice the flags of another. The tiles are
+  positioned absolutely, so a re-plan on resize doesn't remount them. The
+  grid is part of the column, so the "Show qualifiers popup" setting
+  (`showQualificationModal`) doesn't touch it; that setting still governs
+  the popup (`QualificationResultsModal`) in the classic layout and after a
+  semi-final with points. The popup names the target stages the same way:
+  a "Qualified for the {stage}" title over each target stage's qualifiers
+  (grouped by rank) when target stages show and they aren't all going to
+  the Grand Final, no label on the rows.
 - **Column** (`QualifiersColumn`): window, the hint (until the first row is
   tapped), "Qualified for the Grand Final" as numbered places in two columns
   filled top to bottom (`QualifiedList`, compact theme rows, dashed outlines
-  for empty places, target-stage labels once over), At random ("Next
-  qualifier" or "One of these 3", "All 6 left"), Present pinned at the bottom.
-  Over: the window's grid, the full list, Share, Continue.
+  for empty places, the next one in the accent; one such list per target
+  stage when split, instead of a target label on every row), At random
+  ("Next qualifier" or "One of these 3", "All 6 left"), Present pinned at the
+  bottom. Over: the window's grid, the full list, Share, Continue.
 - **The places as flags** (`PlaceChips`): one row while every circle can be
   22px or more, otherwise more rows (a contest with 20-odd places); an empty
   place's number is 46% of its circle (`cqi`, the circle is a size
@@ -418,7 +448,9 @@ column sizing, sheet, stripe, minimal view, presenting) and swaps the parts:
   taller peek would change the board's fit (one column, two columns) at
   every step. Open: the list, At random, Board columns, Present. Unlike the
   voting sheet, At random's next qualifier keeps the sheet open (as the
-  peek's Random does); only "All left" closes it.
+  peek's Random does); only "All left" closes it. Over: the peek shows the
+  qualifiers' flags, Share and Continue, and the sheet still pulls up, to
+  the full list (the desktop column's).
 - **Minimal view** (`SimStripe mode="qualifiers"`): the latest qualifier,
   the places as flags in the jury strip's slot, a split Random (next; the
   chevron for all left), Present, options, leave; the split screen floats

@@ -1,7 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 import { useShallow } from 'zustand/shallow';
@@ -11,6 +10,7 @@ import { useCountriesStore } from '../../state/countriesStore';
 import { useScoreboardStore } from '../../state/scoreboardStore';
 import AppPromoCard from '../appPromo/AppPromoCard';
 import Modal from '../common/Modal/Modal';
+import { useCanStartNextYear } from '../nextYear/useCanStartNextYear';
 import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPhase';
 
 import { AllocationDrawProvider } from './allocation-draw/AllocationDrawContext';
@@ -50,10 +50,12 @@ import {
   applyContestSnapshotToStores,
   LoadContestOptions,
 } from '@/helpers/contestSnapshot';
+import { toast } from '@/helpers/toast';
 import { importPostSetupModal } from '@/hooks/simulationChunkImports';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useGeneralStore } from '@/state/generalStore';
+import { openNextYear } from '@/state/nextYearStore';
 import { StageVotes } from '@/state/scoreboard/types';
 import { useSettingsModalStore } from '@/state/settingsModalStore';
 import { useAuthStore } from '@/state/useAuthStore';
@@ -320,6 +322,7 @@ const EventSetupModal = () => {
     : nextSetupStage;
 
   const canClose = !!currentStageId;
+  const canStartNextYear = useCanStartNextYear();
 
   const debouncedCanClose = useDebounce(canClose, 300);
 
@@ -619,6 +622,9 @@ const EventSetupModal = () => {
             onStart={handleStartEvent}
             waitingCount={toBeDrawnCountries.length}
             onOpenDraw={() => useDrawUiStore.getState().setWindowOpen(true)}
+            onNextYear={
+              canStartNextYear ? () => openNextYear('setup') : undefined
+            }
           />
         }
       >

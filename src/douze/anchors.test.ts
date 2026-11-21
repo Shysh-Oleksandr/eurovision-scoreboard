@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { drawsOver, mirrorText, paintCopy } from './anchors';
+import { buildCutMask, drawsOver, mirrorText, paintCopy } from './anchors';
 
 const el = (
   style: Partial<CSSStyleDeclaration> = {},
@@ -16,6 +16,7 @@ const el = (
 
 afterEach(() => {
   document.body.innerHTML = '';
+  vi.restoreAllMocks();
 });
 
 describe('drawsOver', () => {
@@ -73,6 +74,87 @@ describe('paintCopy', () => {
     expect(copy.style.background).toBe('gold');
     expect(path.style.fill).toBe('gold');
     expect(label.style.color).toBe('black');
+  });
+
+  it("wins over the part's own important classes", () => {
+    // A custom theme's transparent points carry `!bg-transparent`: a
+    // normal inline background would leave the gold copy clear.
+    const label = el();
+    const copy = el({}, [label]);
+
+    paintCopy(copy, { fill: 'gold', text: 'black' });
+
+    expect(copy.style.getPropertyPriority('background')).toBe('important');
+    expect(label.style.getPropertyPriority('color')).toBe('important');
+  });
+});
+
+describe('buildCutMask', () => {
+  /** Lays elements out at fixed boxes (jsdom has no layout). */
+  const layOut = (boxes: Map<Element, [number, number, number, number]>) => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(
+      function (this: Element) {
+        const [x, y, w, h] = boxes.get(this) ?? [0, 0, 0, 0];
+
+        return new DOMRect(x, y, w, h);
+      },
+    );
+  };
+  const holes = (mask: string | null) =>
+    mask === null
+      ? 0
+      : (decodeURIComponent(mask).match(/<path /g) ?? []).length;
+
+  const setUp = (coverStyle: Partial<CSSStyleDeclaration>) => {
+    // The 12 box's copy (100 × 40) and the total over its left end, with
+    // no background image, as browsers report it (jsdom leaves it empty).
+    const wrapper = el();
+    const cover = el({ backgroundImage: 'none', ...coverStyle });
+
+    Object.defineProperty(wrapper, 'offsetWidth', { value: 100 });
+    Object.defineProperty(wrapper, 'offsetHeight', { value: 40 });
+    document.body.append(wrapper, cover);
+    layOut(
+      new Map([
+        [wrapper, [0, 0, 100, 40]],
+        [cover, [-60, 0, 80, 40]],
+      ]),
+    );
+
+    return { wrapper, cover };
+  };
+
+  it('cuts a cover whose colour has no blue', () => {
+    // rgb(128, 0, 0) once read as a clear colour (its last number is 0),
+    // so the 12 box copies covered a dark red total's round end.
+    const { wrapper, cover } = setUp({ backgroundColor: 'rgb(128, 0, 0)' });
+
+    expect(holes(buildCutMask(wrapper, [cover]))).toBe(1);
+  });
+
+  it('cuts a clear cover too, so its text stays readable', () => {
+    // A custom theme's transparent points: the gold passing under them
+    // must not hide their text.
+    const { wrapper, cover } = setUp({ backgroundColor: 'transparent' });
+
+    expect(holes(buildCutMask(wrapper, [cover]))).toBe(1);
+  });
+
+  it('cuts nothing when no cover overlaps', () => {
+    const wrapper = el();
+    const cover = el({ backgroundColor: 'navy' });
+
+    Object.defineProperty(wrapper, 'offsetWidth', { value: 100 });
+    Object.defineProperty(wrapper, 'offsetHeight', { value: 40 });
+    document.body.append(wrapper, cover);
+    layOut(
+      new Map([
+        [wrapper, [0, 0, 100, 40]],
+        [cover, [200, 0, 80, 40]],
+      ]),
+    );
+
+    expect(buildCutMask(wrapper, [cover])).toBeNull();
   });
 });
 

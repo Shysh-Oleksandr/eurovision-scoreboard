@@ -1,13 +1,13 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { ExportEngine, exportNode } from '../export/exportNode';
 
 import { ExportFormat, ExportScale, useEditorStore } from './editorStore';
 
 import { saveFile, shareFile } from '@/helpers/fileActions';
+import { toast } from '@/helpers/toast';
 import { askForReviewSoon } from '@/native/review';
 
 export interface ExportResultState {

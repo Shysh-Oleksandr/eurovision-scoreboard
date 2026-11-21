@@ -34,6 +34,7 @@
     "test:run": "vitest run",
     "format": "prettier --write \"./src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "gen:messages": "npx ts-node -P tsconfig.scripts.json scripts/generateMessages.ts",
+    "gen:odds-history": "node scripts/generate-odds-history.mjs",
     "generate-countries-json": "npx ts-node -P tsconfig.scripts.json scripts/generateCountriesJson.ts",
     "calculate-odds": "npx ts-node -P tsconfig.scripts.json scripts/calculateCountriesOdds.ts",
     "analyze-history": "npx ts-node --files -P tsconfig.scripts.json scripts/analyzeHistoricalShape.ts",

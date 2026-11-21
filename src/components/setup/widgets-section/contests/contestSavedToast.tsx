@@ -1,43 +1,16 @@
-import { toast } from 'react-toastify';
-
-import Button from '@/components/common/Button';
+import { toastWithAction } from '@/components/common/ToastBody';
 import { buildShareUrl } from '@/helpers/shareUrl';
+import { toast } from '@/helpers/toast';
 
 interface SavedToastLabels {
   copyLink: string;
-  linkCopied: string;
+  copied: string;
 }
-
-const SavedToastBody = ({
-  message,
-  contestId,
-  labels,
-}: {
-  message: string;
-  contestId: string;
-  labels: SavedToastLabels;
-}) => (
-  <div className="flex flex-col items-start gap-2.5">
-    <p className="text-[13px] font-semibold leading-5 text-balance">
-      {message}
-    </p>
-    <Button
-      size="sm"
-      variant="surface"
-      label={labels.copyLink}
-      onClick={() => {
-        navigator.clipboard
-          .writeText(buildShareUrl({ contest: contestId }))
-          .then(() => toast.success(labels.linkCopied))
-          .catch(() => undefined);
-      }}
-    />
-  </div>
-);
 
 /**
  * The toast after a contest is saved from the dialog. A public contest gets a
- * Copy link button: it can be shared right away.
+ * Copy link action: it can be shared right away. The action answers in place
+ * ("Copied") instead of raising a second toast.
  */
 export const showContestSavedToast = (
   message: string,
@@ -50,13 +23,11 @@ export const showContestSavedToast = (
     return;
   }
 
-  // Long enough to reach the button (toasts close after 2s by default).
-  toast.success(
-    <SavedToastBody
-      message={message}
-      contestId={contest._id}
-      labels={labels}
-    />,
-    { autoClose: 6000 },
-  );
+  toastWithAction({
+    message,
+    action: labels.copyLink,
+    doneLabel: labels.copied,
+    onAction: () =>
+      navigator.clipboard.writeText(buildShareUrl({ contest: contest._id })),
+  });
 };

@@ -20,6 +20,18 @@
         "value": "plus jakarta sans",
         "createdAt": "2026-11-19T10:55:45.503Z",
         "reason": "Claude: user-pickable interface-font slots (html[data-font] rules and their @font-face blocks); DESIGN.md makes the font the theme's/user's slot; lines predate this session and match existing lowercase ignores"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ff5d70",
+        "createdAt": "2026-11-21T11:47:16.564Z",
+        "reason": "agent decision: fixed status hue shared by the voting matrix ballot dots and toasts so problems read the same in every theme; documented in DESIGN.md Toasts"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#e6b23c",
+        "createdAt": "2026-11-21T11:47:16.590Z",
+        "reason": "agent decision: fixed status hue shared by the voting matrix ballot dots and toasts so problems read the same in every theme; documented in DESIGN.md Toasts"
       }
     ]
   }

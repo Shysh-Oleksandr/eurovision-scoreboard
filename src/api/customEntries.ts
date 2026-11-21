@@ -11,6 +11,8 @@ export type CreateCustomEntryInput = {
   flagUrl?: string;
   groupId?: string;
   shortCode?: string;
+  /** 1–3 `#rrggbb` colours; absent: read from the flag. */
+  colors?: string[];
 };
 
 export type BulkCreateCustomEntriesInput = {
@@ -23,6 +25,8 @@ export type UpdateCustomEntryInput = {
   groupId?: string | null;
   /** `null` removes the code: the app makes one from the name again. */
   shortCode?: string | null;
+  /** `null` removes the colours: they're read from the flag again. */
+  colors?: string[] | null;
 };
 
 export type CreateCustomEntryGroupInput = {

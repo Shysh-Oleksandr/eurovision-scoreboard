@@ -3,7 +3,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { fontSampleText } from './fontPickerTypes';
 
@@ -20,6 +19,7 @@ import { Checkbox } from '@/components/common/Checkbox';
 import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import { Input } from '@/components/Input';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFontFilesValidation } from '@/hooks/useFontFilesValidation';
 import { useAuthStore } from '@/state/useAuthStore';

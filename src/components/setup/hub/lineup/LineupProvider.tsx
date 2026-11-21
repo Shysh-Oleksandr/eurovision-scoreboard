@@ -7,7 +7,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { toast } from 'react-toastify';
 
 import { useSetupUiStore } from '../state/setupUiStore';
 
@@ -28,6 +27,7 @@ import {
 } from './useLineupModel';
 
 import CustomEntryGroupModal from '@/components/setup/CustomEntryGroupModal';
+import { toast } from '@/helpers/toast';
 import { BaseCountry, CountryAssignmentGroup, EventStage } from '@/models';
 import { useAllocationDrawStore } from '@/state/allocationDrawStore';
 import { useCountriesStore } from '@/state/countriesStore';

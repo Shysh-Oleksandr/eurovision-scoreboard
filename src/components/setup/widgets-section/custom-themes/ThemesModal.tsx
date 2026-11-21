@@ -1,15 +1,14 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import dynamic from 'next/dynamic';
+
+import LibraryModal, { LibraryPlace } from '../library/LibraryModal';
 
 import PublicThemes from './PublicThemes';
 import UserThemes from './UserThemes';
 
-import Modal from '@/components/common/Modal/Modal';
-import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
-import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { stripCopySuffix } from '@/theme/themeFingerprint';
@@ -18,11 +17,6 @@ import { CustomTheme } from '@/types/customTheme';
 const CustomizeThemeModal = dynamic(() => import('./CustomizeThemeModal'), {
   ssr: false,
 });
-
-enum SettingsTab {
-  YOUR_THEMES = 'Your Themes',
-  PUBLIC_THEMES = 'Public Themes',
-}
 
 interface ThemesModalProps {
   isOpen: boolean;
@@ -43,8 +37,7 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
     (state) => state.setThemeToDuplicate,
   );
 
-  const [activeTab, setActiveTab] = useState(SettingsTab.YOUR_THEMES);
-  const [isPublicThemesLoaded, setIsPublicThemesLoaded] = useState(false);
+  const [place, setPlace] = useState<LibraryPlace>('yours');
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
   const [initialTheme, setInitialTheme] = useState<CustomTheme | undefined>();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -70,14 +63,6 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
     setThemeToDuplicate,
   ]);
 
-  const tabs = useMemo(
-    () => [
-      { value: SettingsTab.YOUR_THEMES, label: t('yourThemes') },
-      { value: SettingsTab.PUBLIC_THEMES, label: t('publicThemes') },
-    ],
-    [t],
-  );
-
   const handleCreateNew = () => {
     setInitialTheme(undefined);
     setIsEditMode(false);
@@ -102,66 +87,32 @@ const ThemesModal: React.FC<ThemesModalProps> = ({
     setIsEditMode(false);
   };
 
-  const tabsWithContent = useMemo(
-    () => [
-      {
-        ...tabs[0],
-        content: (
-          <UserThemes
-            onCreateNew={handleCreateNew}
-            onEdit={handleEdit}
-            onDuplicate={handleDuplicate}
-          />
-        ),
-      },
-      {
-        ...tabs[1],
-        content: (
-          <>
-            {(activeTab === SettingsTab.PUBLIC_THEMES ||
-              isPublicThemesLoaded) && (
-              <PublicThemes
-                onLoaded={() => setIsPublicThemesLoaded(true)}
-                onDuplicate={handleDuplicate}
-                onEdit={handleEdit}
-              />
-            )}
-          </>
-        ),
-      },
-    ],
-    [activeTab, isPublicThemesLoaded, tabs],
-  );
-
   useEffectOnce(onLoaded);
 
   return (
     <>
-      <Modal
+      <LibraryModal
         isOpen={isOpen}
         onClose={onClose}
-        containerClassName="!w-[min(100%,850px)]"
-        fullScreenOnPhone
-        contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh]"
-        overlayClassName="!z-[1001]"
-        bottomContent={<ModalBottomCloseButton onClose={onClose} />}
-        topContent={
-          <Tabs
-            tabs={tabs}
-            activeTab={activeTab}
-            setActiveTab={(tab) => setActiveTab(tab as SettingsTab)}
-            containerClassName="!rounded-none"
-          />
+        title={t('title')}
+        place={place}
+        onPlaceChange={setPlace}
+        widthClassName="!w-[min(100%,850px)]"
+        renderPlace={(p) =>
+          p === 'community' ? (
+            <PublicThemes onDuplicate={handleDuplicate} onEdit={handleEdit} />
+          ) : (
+            <UserThemes
+              place={p}
+              onCreateNew={handleCreateNew}
+              onEdit={handleEdit}
+              onDuplicate={handleDuplicate}
+              onBrowseCommunity={() => setPlace('community')}
+            />
+          )
         }
-      >
-        <TabContent
-          tabs={tabsWithContent}
-          activeTab={activeTab}
-          preserveContent
-        />
-      </Modal>
+      />
 
-      {/* Customize Theme Modal */}
       {isCustomizeModalOpen && (
         <CustomizeThemeModal
           isOpen={isCustomizeModalOpen}

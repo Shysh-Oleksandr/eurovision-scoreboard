@@ -18,6 +18,8 @@ type Props = {
   options?: DouzeOptions | null;
   /** The points just received (a 12 only counts if the points system says so). */
   pointsAmount: number;
+  /** A custom entry's chosen colours, used in place of its flag's. */
+  entryColors?: readonly string[] | null;
   isThemePreview?: boolean;
 };
 
@@ -30,6 +32,7 @@ const DouzeRowOverlay: React.FC<Props> = ({
   mode,
   options,
   pointsAmount,
+  entryColors,
   isThemePreview = false,
 }) => {
   const spec = getDouzeSpec(mode, options);
@@ -58,7 +61,13 @@ const DouzeRowOverlay: React.FC<Props> = ({
 
   if (!spec || !isDouzePoints) return null;
 
-  return <DouzeSpecPlayer spec={spec} lite={isLowPerfDevice} />;
+  return (
+    <DouzeSpecPlayer
+      spec={spec}
+      lite={isLowPerfDevice}
+      entryColors={entryColors}
+    />
+  );
 };
 
 export default DouzeRowOverlay;

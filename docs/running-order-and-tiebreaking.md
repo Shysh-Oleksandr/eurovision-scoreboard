@@ -20,7 +20,7 @@ Key model:
 
 ### Setup UI: selecting running order
 
-- The stage post-setup modal now has a **Running Order** tab where users can drag-and-drop participants.
+- The stage setup modal (`PostSetupModal`) has a **Running order** tab: the entries as the theme's board rows, numbered, in two columns that read down (one on phones); drag a row to move it. Sorts, the halves draw and "Back to the saved order" live in its Order menu, each with an Undo line (DESIGN.md, "Stage setup").
 - Implementation was extracted into:
   - `src/components/setup/post-setup/running-order/useRunningOrder.ts`
   - `src/components/setup/post-setup/running-order/RunningOrderTab.tsx`
@@ -143,12 +143,12 @@ Now:
   - If stage already has voters → use them
   - Else if Grand Final → default to all contest participants
   - Else → default to stage participants
-- `EventStageVoters` no longer overwrites existing voters on mount.
+- The Voters tab (`voters/VotersTab.tsx`) reads and writes the form store directly; it never re-seeds the voters on mount.
 
 Files:
 
 - `src/components/setup/post-setup/hooks/usePostSetupStageForm.ts`
-- `src/components/setup/post-setup/EventStageVoters.tsx`
+- `src/components/setup/post-setup/voters/VotersTab.tsx`
 
 ---
 

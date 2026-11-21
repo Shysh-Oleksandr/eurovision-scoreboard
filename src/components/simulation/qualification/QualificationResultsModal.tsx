@@ -11,7 +11,7 @@ import Modal, { ANIMATION_DURATION } from '../../common/Modal/Modal';
 import { useContinueToNextPhase } from '../hooks/useContinueToNextPhase';
 
 import { CountryQualificationItem } from './CountryQualificationItem';
-import { useQualifierTargetStageNames } from './useQualifierTargetStageNames';
+import { useQualifierSections } from './useQualifierSections';
 
 import { shouldShowQualifierTargetLabels } from '@/helpers/qualifierTargetResolution';
 import { useGeneralStore } from '@/state/generalStore';
@@ -80,16 +80,42 @@ const QualificationResultsModal = () => {
     });
   }, [qualifiedCountries, qualificationOrder, stageId]);
 
-  const targetStageNameByCountryCode = useQualifierTargetStageNames(
+  const sectionGroups = useQualifierSections(
     currentStage,
-    sortedQualifiedCountries.map((country) => country.code),
+    sortedQualifiedCountries,
+    false,
   );
 
-  const showTargetLabels = shouldShowQualifierTargetLabels(
+  // Where the qualifiers go, once per target stage rather than on every row:
+  // "Qualified for the Grand Final" over its qualifiers, then the next.
+  const sections = useMemo(() => {
+    const showTargets =
+      shouldShowQualifierTargetLabels(
+        qualifiesTo,
+        eventStages,
+        showQualifierTargetStages,
+      ) && sectionGroups.length > 0;
+
+    if (!showTargets) {
+      return [
+        { key: 'all', stageName: null, qualifiers: sortedQualifiedCountries },
+      ];
+    }
+
+    return sectionGroups
+      .filter((group) => group.qualifiers.length > 0)
+      .map((group) => ({
+        key: `${group.targetStageId}-${group.start}`,
+        stageName: group.stageName,
+        qualifiers: group.qualifiers,
+      }));
+  }, [
     qualifiesTo,
     eventStages,
     showQualifierTargetStages,
-  );
+    sectionGroups,
+    sortedQualifiedCountries,
+  ]);
 
   useEffect(() => {
     if (shouldShowQualificationModal) {
@@ -127,7 +153,9 @@ const QualificationResultsModal = () => {
           const { default: gsap } = await import('gsap');
 
           gsap.fromTo(
-            countriesContainerRef.current?.children ?? [],
+            countriesContainerRef.current?.querySelectorAll(
+              '[data-qualifier-rows] > *',
+            ) ?? [],
             {
               opacity: 0,
               x: -160,
@@ -188,22 +216,32 @@ const QualificationResultsModal = () => {
         {t('simulation.qualifiers', { stageName: currentStageName ?? '' })}
       </h2>
 
-      <div
-        ref={countriesContainerRef}
-        className="grid grid-cols-2 gap-x-3 md:gap-y-3 xs:gap-y-2 gap-y-1.5"
-      >
-        {sortedQualifiedCountries.map((country) => (
-          <CountryQualificationItem
-            key={country.code}
-            country={country}
-            shouldAnimate={false}
-            isModal
-            targetStageName={
-              showTargetLabels
-                ? targetStageNameByCountryCode.get(country.code)
-                : undefined
-            }
-          />
+      <div ref={countriesContainerRef} className="flex flex-col gap-5">
+        {sections.map((section) => (
+          <section key={section.key} className="flex flex-col gap-2.5">
+            {section.stageName !== null && (
+              <h3 className="text-[15px] font-extrabold leading-tight tracking-[-0.01em] text-white [overflow-wrap:anywhere]">
+                {t.rich('simulation.qualifiedForStage', {
+                  stageName: section.stageName,
+                  br: () => ' ',
+                  span: (chunks) => chunks,
+                })}
+              </h3>
+            )}
+            <div
+              data-qualifier-rows
+              className="grid grid-cols-2 gap-x-3 md:gap-y-3 xs:gap-y-2 gap-y-1.5"
+            >
+              {section.qualifiers.map((country) => (
+                <CountryQualificationItem
+                  key={country.code}
+                  country={country}
+                  shouldAnimate={false}
+                  isModal
+                />
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </Modal>

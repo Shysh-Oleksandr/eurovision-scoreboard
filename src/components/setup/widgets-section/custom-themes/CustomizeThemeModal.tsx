@@ -6,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { toast } from 'react-toastify';
 
 import BackgroundVideoField, {
   BACKGROUND_VIDEO_LINK_PROBLEM_KEYS,
@@ -64,6 +63,7 @@ import {
 import { type DouzeOptions, restrictDouzeOptions } from '@/douze/options';
 import { getDouzeOptionsSupport } from '@/douze/registry';
 import { toastAxiosError } from '@/helpers/parseAxiosError';
+import { toast } from '@/helpers/toast';
 import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { useConfirmModalClose } from '@/hooks/useConfirmModalClose';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -140,6 +140,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   // Form state
   const [name, setName] = useState('');
+  // Shown under the Name field (Identity tab) after a save without one.
+  const [nameError, setNameError] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [baseThemeYear, setBaseThemeYear] = useState(themeYear);
   const [hue, setHue] = useState(themeHue);
@@ -359,6 +361,8 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   // Initialize form with theme to edit
   useEffect(() => {
+    setNameError(null);
+
     if (initialTheme) {
       const resolvedInitialThemeSpecifics =
         resolveThemeSpecificsForCustomTheme(initialTheme);
@@ -675,7 +679,11 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast.error(t('widgets.themes.themeNameIsRequired'));
+      setNameError(t('widgets.themes.themeNameIsRequired'));
+      changeTab('identity');
+      requestAnimationFrame(() =>
+        document.getElementById('themeName')?.focus(),
+      );
 
       return;
     }
@@ -1469,9 +1477,17 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
                 <InputField
                   label={t('common.name')}
                   id="themeName"
+                  errors={
+                    nameError
+                      ? { themeName: { type: 'required', message: nameError } }
+                      : undefined
+                  }
                   inputProps={{
                     value: name,
-                    onChange: (e) => setName(e.target.value),
+                    onChange: (e) => {
+                      setName(e.target.value);
+                      setNameError(null);
+                    },
                   }}
                   placeholder="Eurovision 2026"
                 />

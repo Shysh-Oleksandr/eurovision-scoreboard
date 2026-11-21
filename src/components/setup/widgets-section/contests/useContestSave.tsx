@@ -2,13 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
 import type { SaveContestDialogMode } from './CreateContestModal';
 import { useSaveOpenContest } from './hooks/useSaveOpenContest';
 
+import { toast } from '@/helpers/toast';
 import { useIsOffline } from '@/state/connectivityStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';

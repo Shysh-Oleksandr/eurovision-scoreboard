@@ -1,65 +1,92 @@
 import { useTranslations } from 'next-intl';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
-import { DateRangeFilter } from '../utils/getFilterDateRange';
+import {
+  DEFAULT_SORT,
+  isFilterSet,
+  LibraryMultiFilter,
+  resetFilter,
+  serverSort,
+  useCreatedFilter,
+  useSortFilter,
+} from '../library/libraryFilters';
+import {
+  LibraryEmpty,
+  LibraryListHeader,
+  LibraryPlaceLayout,
+} from '../library/LibraryLayout';
+import LibraryToolbar from '../library/LibraryToolbar';
 import WidgetPager from '../WidgetPager';
-import WidgetSearchHeader from '../WidgetSearchHeader';
-import WidgetSortBadges, { PublicSortKey } from '../WidgetSortBadges';
+import type { PublicSortKey } from '../WidgetSortBadges';
 
 import { usePublicThemeActions } from './hooks/usePublicThemeActions';
 import ThemeListItem from './ThemeListItem';
 
 import { usePublicThemesQuery, useThemesStateQuery } from '@/api/themes';
-import { Checkbox } from '@/components/common/Checkbox';
 import { QueryNotice } from '@/components/offline/OfflineNotice';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useQueryView } from '@/hooks/useQueryView';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import { CustomTheme } from '@/types/customTheme';
 
+type Include = 'audio' | 'fonts' | 'video';
+
 interface PublicThemesProps {
-  onLoaded?: () => void;
   onDuplicate: (theme: CustomTheme) => void;
   onEdit: (theme: CustomTheme) => void;
 }
 
-const PublicThemes: React.FC<PublicThemesProps> = ({
-  onLoaded,
-  onDuplicate,
-  onEdit,
-}) => {
+/** The Themes library's Community place: everyone's public themes. */
+const PublicThemes: React.FC<PublicThemesProps> = ({ onDuplicate, onEdit }) => {
   const t = useTranslations();
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<PublicSortKey>('latest');
+  const [sortKey, setSortKey] = useState<PublicSortKey>(DEFAULT_SORT);
   const [page, setPage] = useState(1);
-  const [dateRange, setDateRange] = useState<DateRangeFilter>(null);
-  const [hasCustomAudio, setHasCustomAudio] = useState(false);
-  const [hasCustomFonts, setHasCustomFonts] = useState(false);
-  const [hasBackgroundVideo, setHasBackgroundVideo] = useState(false);
+  const [includes, setIncludes] = useState<Include[]>([]);
   const debouncedSearch = useDebounce(search, 400);
+  const { sortBy, sortOrder } = serverSort(sortKey);
 
-  const serverSortBy =
-    sortKey === 'likes'
-      ? 'likes'
-      : sortKey === 'saves'
-      ? 'saves'
-      : sortKey === 'copies'
-      ? 'duplicatesCount'
-      : 'createdAt';
-  const serverSortOrder = sortKey === 'oldest' ? 'asc' : 'desc';
+  const toFirstPage = useCallback(() => setPage(1), []);
+  const { filter: createdFilter, range } = useCreatedFilter(toFirstPage);
+  const sortFilter = useSortFilter(
+    sortKey,
+    (next) => {
+      setSortKey(next);
+      setPage(1);
+    },
+    { remixable: true },
+  );
+  const includesFilter: LibraryMultiFilter = {
+    kind: 'multi',
+    id: 'includes',
+    caption: t('widgets.library.includes'),
+    emptyLabel: t('widgets.library.anything'),
+    values: includes,
+    options: [
+      { value: 'audio', label: t('widgets.library.audio') },
+      { value: 'fonts', label: t('widgets.library.customFonts') },
+      { value: 'video', label: t('widgets.library.backgroundVideo') },
+    ],
+    onChange: (values) => {
+      setIncludes(values as Include[]);
+      setPage(1);
+    },
+  };
+  const narrowing = [createdFilter, includesFilter];
+  const narrowed = narrowing.some(isFilterSet);
+  const clearFilters = () => narrowing.forEach(resetFilter);
 
   const publicThemesQuery = usePublicThemesQuery({
     page,
     search: debouncedSearch,
-    sortBy: serverSortBy,
-    sortOrder: serverSortOrder,
-    startDate: dateRange?.startDate,
-    endDate: dateRange?.endDate,
-    hasCustomAudio,
-    hasCustomFonts,
-    hasBackgroundVideo,
+    sortBy,
+    sortOrder,
+    startDate: range?.startDate,
+    endDate: range?.endDate,
+    hasCustomAudio: includes.includes('audio'),
+    hasCustomFonts: includes.includes('fonts'),
+    hasBackgroundVideo: includes.includes('video'),
   });
   const { data } = publicThemesQuery;
   const view = useQueryView(publicThemesQuery);
@@ -67,7 +94,7 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
   const currentCustomTheme = useGeneralStore((state) => state.customTheme);
   const user = useAuthStore((state) => state.user);
 
-  const themeIds = data?.themes?.map((t) => t._id) || [];
+  const themeIds = data?.themes?.map((theme) => theme._id) || [];
   const { data: themeState } = useThemesStateQuery(
     themeIds,
     !!themeIds.length && !!user,
@@ -75,78 +102,44 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
 
   const { handleLike, handleSave, handleApply } = usePublicThemeActions();
 
-  useEffectOnce(onLoaded);
+  const themes = data?.themes ?? [];
+  const totalPages = data?.totalPages ?? 0;
+  const searching = !!debouncedSearch.trim();
 
   return (
-    <div className="sm:space-y-4 space-y-2">
-      <div className="sm:space-y-3 space-y-2">
-        <WidgetSearchHeader
+    <LibraryPlaceLayout
+      scrollKey={`${page}|${debouncedSearch}|${sortKey}|${
+        createdFilter.value
+      }|${includes.join()}`}
+      toolbar={
+        <LibraryToolbar
           search={search}
-          onSearchChange={(search: string) => {
-            setSearch(search);
+          onSearchChange={(value) => {
+            setSearch(value);
             setPage(1);
           }}
-          placeholder={t('widgets.themes.searchThemes')}
+          searchPlaceholder={t('widgets.themes.searchCommunity')}
+          shortSearchPlaceholder={t('widgets.library.search')}
+          filters={[sortFilter, createdFilter, includesFilter]}
         />
-        <WidgetSortBadges
-          value={sortKey}
-          onChange={(k: PublicSortKey) => {
-            setSortKey(k);
-            setPage(1);
-          }}
-          dateRange={dateRange}
-          onDateRangeChange={(range) => {
-            setDateRange(range);
-            setPage(1);
-          }}
+      }
+    >
+      {view === 'ready' && (
+        <LibraryListHeader
+          label={t('widgets.themes.nThemes', { count: data?.total ?? 0 })}
+          onClearFilters={narrowed ? clearFilters : undefined}
         />
-      </div>
-      <div className="flex items-center gap-x-2 justify-between flex-wrap">
-        {view === 'ready' && (
-          <h3 className="text-white text-lg font-bold">
-            {t('widgets.themes.foundNThemes', { count: data?.total ?? 0 })}
-          </h3>
-        )}
-        <div className="flex items-center gap-x-3 flex-wrap">
-          <Checkbox
-            id="public-themes-audio-filter"
-            label={t('widgets.themes.audioFilterWithAudio')}
-            checked={hasCustomAudio}
-            onChange={(v) => {
-              setHasCustomAudio(v.target.checked);
-              setPage(1);
-            }}
-            labelClassName="!mr-0"
-          />
-          <Checkbox
-            id="public-themes-fonts-filter"
-            label={t('widgets.themes.fonts.filterWithFonts')}
-            checked={hasCustomFonts}
-            onChange={(v) => {
-              setHasCustomFonts(v.target.checked);
-              setPage(1);
-            }}
-            labelClassName="!mr-0"
-          />
-          <Checkbox
-            id="public-themes-video-filter"
-            label={t('widgets.themes.backgroundVideo.filterWithVideo')}
-            checked={hasBackgroundVideo}
-            onChange={(v) => {
-              setHasBackgroundVideo(v.target.checked);
-              setPage(1);
-            }}
-            labelClassName="!mr-0"
-          />
-        </div>
-      </div>
-
+      )}
       {view !== 'ready' ? (
-        <QueryNotice view={view} onRetry={() => publicThemesQuery.refetch()} />
-      ) : data && data.themes.length > 0 ? (
+        <QueryNotice
+          view={view}
+          onRetry={() => publicThemesQuery.refetch()}
+          className="py-8"
+        />
+      ) : themes.length > 0 ? (
         <>
           <div className="grid gap-4">
-            {data.themes.map((theme) => (
+            {themes.map((theme) => (
               <ThemeListItem
                 key={theme._id}
                 theme={theme}
@@ -166,23 +159,37 @@ const PublicThemes: React.FC<PublicThemesProps> = ({
             ))}
           </div>
 
-          {data.totalPages > 1 && (
+          {totalPages > 1 && (
             <WidgetPager
               page={page}
-              totalPages={data.totalPages}
+              totalPages={totalPages}
               onPrev={() => setPage((p) => Math.max(1, p - 1))}
-              onNext={() => setPage((p) => Math.min(data.totalPages, p + 1))}
+              onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
             />
           )}
         </>
       ) : (
-        <div className="text-center sm:py-12 py-8">
-          <p className="text-white/70">
-            {t('widgets.themes.noPublicThemesFoundMatchingYourSearch')}
-          </p>
-        </div>
+        <LibraryEmpty
+          message={t('widgets.themes.noPublicThemesFoundMatchingYourSearch')}
+          action={
+            narrowed
+              ? {
+                  label: t('widgets.library.clearFilters'),
+                  onClick: clearFilters,
+                }
+              : searching
+              ? {
+                  label: t('widgets.library.clearSearch'),
+                  onClick: () => {
+                    setSearch('');
+                    setPage(1);
+                  },
+                }
+              : undefined
+          }
+        />
       )}
-    </div>
+    </LibraryPlaceLayout>
   );
 };
 

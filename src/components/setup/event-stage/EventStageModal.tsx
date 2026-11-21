@@ -1,14 +1,19 @@
 'use client';
+import { Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 
 import { EventStage } from '../../../models';
+import Button from '../../common/Button';
 import Modal from '../../common/Modal/Modal';
-import ModalBottomContent from '../../common/Modal/ModalBottomContent';
+import EntryActionBar from '../custom-entry/EntryActionBar';
 
 import EventStageSettings from './EventStageSettings';
-import { useEventStageForm } from './hooks/useEventStageForm';
+import {
+  stageFormFingerprint,
+  useEventStageForm,
+} from './hooks/useEventStageForm';
 
 import { useConfirmation } from '@/hooks/useConfirmation';
 
@@ -35,6 +40,7 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
   const t = useTranslations();
   const isEditMode = !!eventStageToEdit;
   const [shouldClose, setShouldClose] = useState(false);
+  const titleId = `${useId()}-title`;
 
   const { confirm } = useConfirmation();
 
@@ -43,17 +49,27 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
     onSubmit,
     isEditMode: isEditModeFromHook,
     isLastStage,
+    openedFingerprint,
   } = useEventStageForm({
     eventStageToEdit,
     localEventStagesLength,
     isOpen,
   });
 
+  // Editing: Save waits for a change. Adding: the defaults are a stage.
+  const values = form.watch();
+  const hasChanges =
+    !isEditMode ||
+    openedFingerprint === null ||
+    stageFormFingerprint(values) !== openedFingerprint;
+
   const handleTriggerClose = () => {
     setShouldClose(true);
   };
 
   const handleSave = () => {
+    if (!hasChanges) return;
+
     form.handleSubmit((data) => {
       const result = onSubmit(data);
 
@@ -69,6 +85,16 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
         isEditMode ? 0 : 200,
       );
     })();
+  };
+
+  // Enter in a field saves, like any form. The voting select keeps Enter
+  // for itself.
+  const onFormKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+    if (!(e.target instanceof HTMLInputElement)) return;
+
+    e.preventDefault();
+    handleSave();
   };
 
   const handleDelete = () => {
@@ -88,6 +114,8 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
     });
   };
 
+  const canDelete = !!eventStageToEdit && !isLastStage;
+
   return (
     <Modal
       isOpen={isOpen && !shouldClose}
@@ -95,22 +123,44 @@ const EventStageModal: React.FC<EventStageModalProps> = ({
       onClosed={onClose}
       overlayClassName="!z-[1001]"
       containerClassName="!w-[min(100%,500px)]"
+      contentClassName="text-white narrow-scrollbar dp-flat"
+      ariaLabelledBy={titleId}
       fullScreenOnPhone
       withBlur
       bottomContent={
-        <ModalBottomContent
-          onClose={handleTriggerClose}
+        <EntryActionBar
+          leading={
+            canDelete ? (
+              <Button
+                variant="surface"
+                size="lg"
+                className="dp-act--quiet dp-act--danger -ml-2.5"
+                Icon={<Trash2 className="size-[18px]" />}
+                onClick={handleDelete}
+                aria-label={t('setup.eventStageModal.deleteStage')}
+              >
+                <span className="dp-entry-bar-label">
+                  {t('setup.eventStageModal.deleteStage')}
+                </span>
+              </Button>
+            ) : undefined
+          }
+          onCancel={handleTriggerClose}
           onSave={handleSave}
-          onDelete={!eventStageToEdit || isLastStage ? undefined : handleDelete}
+          isSaving={false}
+          saveDisabled={!hasChanges}
         />
       }
     >
       <FormProvider {...(form as any)}>
-        <EventStageSettings
-          isEditMode={isEditModeFromHook}
-          isLastStage={isLastStage}
-          eventStageToEdit={eventStageToEdit}
-        />
+        <div onKeyDown={onFormKeyDown}>
+          <EventStageSettings
+            isEditMode={isEditModeFromHook}
+            isLastStage={isLastStage}
+            eventStageToEdit={eventStageToEdit}
+            titleId={titleId}
+          />
+        </div>
       </FormProvider>
     </Modal>
   );

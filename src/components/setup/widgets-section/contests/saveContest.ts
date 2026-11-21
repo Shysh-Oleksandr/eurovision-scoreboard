@@ -1,3 +1,7 @@
+import type { useTranslations } from 'next-intl';
+
+import { parseAxiosError } from '@/helpers/parseAxiosError';
+import { toast } from '@/helpers/toast';
 import { useGeneralStore } from '@/state/generalStore';
 
 /**
@@ -38,4 +42,42 @@ export const countSnapshotLineup = (snapshot: {
   );
 
   return { stages: stages.length, countries: codes.size };
+};
+
+type Translate = ReturnType<typeof useTranslations>;
+
+/**
+ * What to say when a contest save fails: the server's contest limits in the
+ * user's language (`contest_daily_limit` 429, `contest_too_large` 413), else
+ * the server's message, else the generic failure.
+ */
+export const contestSaveErrorMessage = (
+  error: unknown,
+  t: Translate,
+): string => {
+  const data = (
+    error as {
+      response?: {
+        data?: { code?: string; limit?: number; message?: unknown };
+      };
+    }
+  )?.response?.data;
+
+  if (data?.code === 'contest_daily_limit') {
+    return t('widgets.contests.saveErrors.dailyLimit', {
+      limit: data.limit ?? 200,
+    });
+  }
+  if (data?.code === 'contest_too_large') {
+    return t('widgets.contests.saveErrors.tooLarge');
+  }
+
+  return (
+    (data?.message ? parseAxiosError(error) : '') ||
+    t('widgets.contests.failedToSaveContest')
+  );
+};
+
+export const toastContestSaveError = (error: unknown, t: Translate): void => {
+  toast.error(contestSaveErrorMessage(error, t));
 };

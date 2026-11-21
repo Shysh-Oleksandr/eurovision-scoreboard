@@ -26,6 +26,7 @@ export const SyncCustomEntries: React.FC = () => {
         updatedAt: entry.updatedAt,
         groupId: entry.groupId ?? undefined,
         ...(entry.shortCode ? { shortCode: entry.shortCode } : {}),
+        ...(entry.colors?.length ? { colors: entry.colors } : {}),
       }));
       const ownCodes = new Set(userCustomEntries.map((c) => c.code));
 

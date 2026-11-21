@@ -1,5 +1,5 @@
 'use client';
-import { Dices } from 'lucide-react';
+import { CalendarPlus, Dices } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
 
@@ -14,6 +14,8 @@ type SetupFooterProps = {
   /** Countries waiting in the allocation draw: the CTA becomes "Go to the draw". */
   waitingCount?: number;
   onOpenDraw?: () => void;
+  /** The show behind the setup is over: Next year starts from it. */
+  onNextYear?: () => void;
 };
 
 /** Footer outside the scroll area: ghost Close (when a show is running) + accent Start CTA. */
@@ -24,6 +26,7 @@ const SetupFooter = ({
   onStart,
   waitingCount = 0,
   onOpenDraw,
+  onNextYear,
 }: SetupFooterProps) => {
   const t = useTranslations();
   const toDraw = waitingCount > 0 && !!onOpenDraw;
@@ -42,6 +45,21 @@ const SetupFooter = ({
           snowEffect="middle"
         >
           {closeLabel}
+        </Button>
+      )}
+      {/* Next year placement 4 of 4 (docs/event-setup-hub-and-design-tokens.md
+          §8). Phones keep its icon only: Start keeps its label. */}
+      {onNextYear && (
+        <Button
+          variant="surface"
+          size="xl"
+          className="flex-none justify-center px-4 text-[13.5px]"
+          title={t('nextYear.button')}
+          aria-label={t('nextYear.button')}
+          onClick={onNextYear}
+          Icon={<CalendarPlus className="size-5" />}
+        >
+          <span className="hidden 2cols:inline">{t('nextYear.button')}</span>
         </Button>
       )}
       {toDraw ? (

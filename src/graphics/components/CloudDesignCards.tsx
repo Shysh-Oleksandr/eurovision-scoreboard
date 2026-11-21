@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { parseDesign } from '../model/design';
 
@@ -38,6 +37,7 @@ import Button from '@/components/common/Button';
 import UserInfo from '@/components/common/UserInfo';
 import { useHandleShare } from '@/components/setup/hooks/useHandleShare';
 import { buildShareUrl } from '@/helpers/shareUrl';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { openReportDialog } from '@/state/reportDialogStore';

@@ -1,34 +1,63 @@
 /* eslint-disable eqeqeq */
-import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
+import { Minus, Plus, X } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { EventStage, QualifierTarget } from '../../../models';
-import Button from '../../common/Button';
-import { CustomSortableItem } from '../../common/CustomSortableItem';
-import { Input } from '../../Input';
+import {
+  formatPlaceRange,
+  type PlaceProblem,
+  summarizePlaces,
+} from './qualifierPlaces';
 
-import { MinusIcon } from '@/assets/icons/MinusIcon';
-import { PlusIcon } from '@/assets/icons/PlusIcon';
-import { RestartIcon } from '@/assets/icons/RestartIcon';
-import { SortableList } from '@/components/common/sort/SortableList';
-import { ToggleButton } from '@/components/common/ToggleButton';
+import { DragGripIcon } from '@/assets/icons/DragGripIcon';
+import {
+  SortableItem,
+  SortableKnob,
+  SortableList,
+} from '@/components/common/sort/SortableList';
+import { Segmented } from '@/components/simulation/columnLayout/controls';
+import { languageTag } from '@/i18n/catalog';
+import { EventStage, QualifierTarget } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 
+type QualifyMode = 'count' | 'places';
+
+/** What a stage move took away, to put back with Undo. */
+interface RemovedByMove {
+  stageNames: string[];
+  visualStages: EventStage[];
+  order: number;
+  eventsOrder: string[];
+  qualifiesTo: QualifierTarget[];
+}
+
+/** Digits only: the fields hold place numbers and counts. */
+const digits = (value: string) => value.replace(/\D/g, '').slice(0, 3);
+
+/**
+ * "Who goes through": for every later stage, how many entries of this stage
+ * go there, or which of its places. The rows are also the stage order:
+ * dragging one changes when the stages run.
+ */
 const QualifierTargetsSection: React.FC<{
   isEditMode: boolean;
   eventStageToEdit?: EventStage;
 }> = ({ isEditMode, eventStageToEdit }) => {
-  const t = useTranslations();
+  const t = useTranslations('setup.eventStageModal');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
+  const ids = useId();
   const {
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, submitCount },
   } = useFormContext();
 
   const configuredEventStages = useCountriesStore(
     (state) => state.configuredEventStages,
   );
+  const eventAssignments = useCountriesStore((state) => state.eventAssignments);
   const qualifiesTo = watch('qualifiesTo') as QualifierTarget[] | undefined;
   const currentOrder = watch('order') as number;
   const currentName = watch('name') as string;
@@ -40,14 +69,70 @@ const QualifierTargetsSection: React.FC<{
   // Mode toggle for rank-based qualification
   const [isRankBasedMode, setIsRankBasedMode] = useState(false);
 
+  // The count field being typed in: it may be empty for a moment, while the
+  // form already holds 0 for it.
+  const [amountDraft, setAmountDraft] = useState<{
+    stageId: string;
+    text: string;
+  } | null>(null);
+
+  // The row whose fields have focus: a range is incomplete while you type
+  // it, so that row's "add the last place" waits until you leave it.
+  const [focusedRowId, setFocusedRowId] = useState<string | null>(null);
+
+  const [removedByMove, setRemovedByMove] = useState<RemovedByMove | null>(
+    null,
+  );
+
+  // Set when this section writes qualifiesTo itself. Only data loaded into
+  // the form (a stage being opened) re-detects the mode: clearing a range to
+  // type a new one must not switch rank-based mode off.
+  const isOwnChangeRef = useRef(false);
+
+  const setQualifiesTo = (value: QualifierTarget[]) => {
+    isOwnChangeRef.current = true;
+    setRemovedByMove(null);
+    setValue('qualifiesTo', value);
+  };
+
   // Detect initial mode based on existing data
   useEffect(() => {
+    if (isOwnChangeRef.current) {
+      isOwnChangeRef.current = false;
+
+      return;
+    }
+
     const hasCompleteRankBasedQualifiers = (qualifiesTo || []).some(
       (target) => target.minRank && target.maxRank,
     );
 
     setIsRankBasedMode(hasCompleteRankBasedQualifiers);
   }, [qualifiesTo]);
+
+  // Get all stages sorted by order (including current stage if editing)
+  const allStages = useMemo(() => {
+    const stages = [...configuredEventStages];
+
+    return stages.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [configuredEventStages]);
+
+  // How many entries this stage has, or 0 while that isn't known: a new
+  // stage, or one that other stages send qualifiers into later.
+  const stageSize = useMemo(() => {
+    const isFedByOtherStages = allStages.some(
+      (stage) =>
+        stage.id !== currentId &&
+        stage.qualifiesTo?.some((target) => target.targetStageId === currentId),
+    );
+
+    if (isFedByOtherStages) return 0;
+
+    // The lineup lives in the assignments (country code -> stage id).
+    return Object.values(eventAssignments ?? {}).filter(
+      (stageId) => stageId === currentId,
+    ).length;
+  }, [allStages, currentId, eventAssignments]);
 
   // Convert between amount-based and rank-based qualification
   const convertToRankBased = () => {
@@ -58,16 +143,15 @@ const QualifierTargetsSection: React.FC<{
     );
 
     if (totalQualifiers === 0) {
-      setValue('qualifiesTo', []);
+      setQualifiesTo([]);
 
       return;
     }
 
-    // Get the total number of participants in the current stage
-    const currentStage = allStages.find((s) => s.id === currentId);
-    const totalParticipants = currentStage?.countries.length || totalQualifiers;
+    // Ranges stop at the stage's last place when its size is known.
+    const lastPlace = stageSize || Infinity;
 
-    // Convert amounts to rank ranges
+    // Convert amounts to rank ranges, latest stage first
     const targetStagesInOrder = currentQualifiesTo
       .map((target) => allStages.find((s) => s.id === target.targetStageId))
       .sort((a, b) => (b?.order ?? 0) - (a?.order ?? 0))
@@ -80,10 +164,7 @@ const QualifierTargetsSection: React.FC<{
       )!;
 
       const minRank = currentRank;
-      const maxRank = Math.min(
-        currentRank + target.amount - 1,
-        totalParticipants,
-      );
+      const maxRank = Math.min(currentRank + target.amount - 1, lastPlace);
 
       currentRank = maxRank + 1;
 
@@ -95,39 +176,36 @@ const QualifierTargetsSection: React.FC<{
       };
     });
 
-    setValue('qualifiesTo', newQualifiesTo);
+    setQualifiesTo(newQualifiesTo);
   };
 
   const convertToAmountBased = () => {
-    const currentQualifiesTo = qualifiesTo || [];
-    const newQualifiesTo = currentQualifiesTo.map((target) => {
-      // If rank-based, calculate amount from range
-      if (target.minRank && target.maxRank) {
-        return {
-          targetStageId: target.targetStageId,
-          amount: target.maxRank - target.minRank + 1,
-        };
-      }
-
-      // Otherwise keep the existing amount
-      return {
+    const newQualifiesTo = (qualifiesTo || [])
+      .map((target) => ({
         targetStageId: target.targetStageId,
-        amount: target.amount,
-      };
-    });
+        // If rank-based, calculate amount from range
+        amount:
+          target.minRank && target.maxRank
+            ? target.maxRank - target.minRank + 1
+            : target.amount,
+      }))
+      // A half-typed range has no count to carry over.
+      .filter((target) => target.amount > 0);
 
-    setValue('qualifiesTo', newQualifiesTo);
+    setQualifiesTo(newQualifiesTo);
   };
 
-  const handleModeToggle = (newMode: boolean) => {
-    if (newMode) {
-      // Switching to rank-based mode
+  const handleModeChange = (mode: QualifyMode) => {
+    const toRankBased = mode === 'places';
+
+    if (toRankBased === isRankBasedMode) return;
+
+    if (toRankBased) {
       convertToRankBased();
     } else {
-      // Switching to amount-based mode
       convertToAmountBased();
     }
-    setIsRankBasedMode(newMode);
+    setIsRankBasedMode(toRankBased);
   };
 
   // Create current stage object (for both editing and creating)
@@ -160,13 +238,6 @@ const QualifierTargetsSection: React.FC<{
     configuredEventStages.length,
   ]);
 
-  // Get all stages sorted by order (including current stage if editing)
-  const allStages = useMemo(() => {
-    const stages = [...configuredEventStages];
-
-    return stages.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  }, [configuredEventStages]);
-
   // Initialize visual stages when allStages or currentStage changes
   React.useEffect(() => {
     const stages = [...allStages];
@@ -182,27 +253,11 @@ const QualifierTargetsSection: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allStages]);
 
-  // Get qualifier amount for a specific stage
+  const findTarget = (stageId: string) =>
+    (qualifiesTo || []).find((q) => q.targetStageId === stageId);
 
-  const getQualifierAmount = (stageId: string): number => {
-    const target = (qualifiesTo || []).find((q) => q.targetStageId === stageId);
-
-    return target?.amount || 0;
-  };
-
-  // Get qualifier min rank for a specific stage
-  const getQualifierMinRank = (stageId: string): number | undefined => {
-    const target = (qualifiesTo || []).find((q) => q.targetStageId === stageId);
-
-    return target?.minRank;
-  };
-
-  // Get qualifier max rank for a specific stage
-  const getQualifierMaxRank = (stageId: string): number | undefined => {
-    const target = (qualifiesTo || []).find((q) => q.targetStageId === stageId);
-
-    return target?.maxRank;
-  };
+  const getQualifierAmount = (stageId: string): number =>
+    findTarget(stageId)?.amount || 0;
 
   // Update qualifier amount for a specific stage
   const updateQualifierAmount = (stageId: string, amount: number) => {
@@ -234,7 +289,7 @@ const QualifierTargetsSection: React.FC<{
       updated = current;
     }
 
-    setValue('qualifiesTo', updated);
+    setQualifiesTo(updated);
   };
 
   // Update rank range for a specific stage
@@ -245,6 +300,16 @@ const QualifierTargetsSection: React.FC<{
   ) => {
     const current = qualifiesTo || [];
     const existingIndex = current.findIndex((q) => q.targetStageId === stageId);
+
+    // An emptied range sends nobody there: drop the target, as a count of 0
+    // does (keeping it would save its old count).
+    if (minRank == null && maxRank == null) {
+      if (existingIndex >= 0) {
+        setQualifiesTo(current.filter((_, i) => i !== existingIndex));
+      }
+
+      return;
+    }
 
     let updated: QualifierTarget[];
 
@@ -279,36 +344,23 @@ const QualifierTargetsSection: React.FC<{
       ];
     }
 
-    setValue('qualifiesTo', updated);
-  };
-
-  const incrementQualifier = (stageId: string) => {
-    const currentAmount = getQualifierAmount(stageId);
-
-    updateQualifierAmount(stageId, currentAmount + 1);
-  };
-
-  const decrementQualifier = (stageId: string) => {
-    const currentAmount = getQualifierAmount(stageId);
-
-    if (currentAmount > 0) {
-      updateQualifierAmount(stageId, currentAmount - 1);
-    }
-  };
-
-  const handleInputChange = (stageId: string, value: string) => {
-    const numValue = parseInt(value) || 0;
-
-    updateQualifierAmount(stageId, Math.max(0, numValue));
+    setQualifiesTo(updated);
   };
 
   const handleSortEnd = (oldIndex: number, newIndex: number) => {
     const draggedStage = sortableStages[oldIndex];
 
     // Don't allow reordering the Grand Final
-    if (draggedStage?.id === grandFinalStage?.id) {
+    if (draggedStage?.id === grandFinalStage?.id || oldIndex === newIndex) {
       return;
     }
+
+    const before = {
+      visualStages,
+      order: currentOrder,
+      eventsOrder: (watch('eventsOrder') as string[] | undefined) ?? [],
+      qualifiesTo: qualifiesTo || [],
+    };
 
     // Create new order for sortable stages
     const newSortableStages = [...sortableStages];
@@ -341,48 +393,55 @@ const QualifierTargetsSection: React.FC<{
       (stage) => stage.id === currentId,
     );
 
-    if (currentStageIndex !== -1) {
-      const newCurrentOrder = finalVisualStages[currentStageIndex].order;
+    if (currentStageIndex === -1) {
+      setRemovedByMove(null);
 
-      setValue('order', newCurrentOrder);
-
-      // Reset qualifier targets that are now invalid (preceding stages)
-      const currentQualifiesTo = qualifiesTo || [];
-      const validQualifiesTo = currentQualifiesTo.filter((target) => {
-        const targetStage = finalVisualStages.find(
-          (stage) => stage.id === target.targetStageId,
-        );
-
-        return targetStage && (targetStage.order ?? 0) > newCurrentOrder;
-      });
-
-      if (validQualifiesTo.length !== currentQualifiesTo.length) {
-        setValue('qualifiesTo', validQualifiesTo);
-      }
+      return;
     }
+
+    const newCurrentOrder = finalVisualStages[currentStageIndex].order;
+
+    setValue('order', newCurrentOrder);
+
+    // Reset qualifier targets that are now invalid (preceding stages)
+    const validQualifiesTo = before.qualifiesTo.filter((target) => {
+      const targetStage = finalVisualStages.find(
+        (stage) => stage.id === target.targetStageId,
+      );
+
+      return targetStage && (targetStage.order ?? 0) > newCurrentOrder;
+    });
+
+    if (validQualifiesTo.length === before.qualifiesTo.length) {
+      setRemovedByMove(null);
+
+      return;
+    }
+
+    const removedNames = before.qualifiesTo
+      .filter((target) => !validQualifiesTo.includes(target))
+      .map(
+        (target) =>
+          finalVisualStages.find((stage) => stage.id === target.targetStageId)
+            ?.name ?? '',
+      )
+      .filter(Boolean);
+
+    setQualifiesTo(validQualifiesTo);
+    // After setQualifiesTo, which clears the note of an earlier move.
+    setRemovedByMove({ stageNames: removedNames, ...before });
   };
 
-  // Calculate total qualifiers
-  const totalQualifiers = useMemo(() => {
-    if (isRankBasedMode) {
-      // In rank-based mode, calculate based on ranges
-      const ranges = (qualifiesTo || []).map((target) => {
-        if (target.minRank && target.maxRank) {
-          return target.maxRank - target.minRank + 1;
-        }
+  const undoMove = () => {
+    if (!removedByMove) return;
 
-        return 0;
-      });
-
-      return ranges.reduce((sum, range) => sum + range, 0);
-    }
-
-    // In amount-based mode, use the amounts directly
-    return (qualifiesTo || []).reduce((sum, target) => sum + target.amount, 0);
-  }, [qualifiesTo, isRankBasedMode]);
+    setVisualStages(removedByMove.visualStages);
+    setValue('eventsOrder', removedByMove.eventsOrder);
+    setValue('order', removedByMove.order);
+    setQualifiesTo(removedByMove.qualifiesTo);
+  };
 
   // Separate Grand Final from sortable stages (like StageReorderModal)
-
   const { sortableStages, grandFinalStage } = useMemo(() => {
     const sorted = [...visualStages].sort(
       (a, b) => (a.order ?? 0) - (b.order ?? 0),
@@ -401,340 +460,371 @@ const QualifierTargetsSection: React.FC<{
     );
   }, [currentName, currentId]);
 
-  return (
-    <>
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between border-t border-white/40 border-solid pt-2">
-            <h4 className="text-white text-sm">
-              {t('setup.eventStageModal.qualifierTargets')}
-            </h4>
-            <div className="flex items-center gap-2">
-              <label className="text-white/70 text-xs">
-                {t('setup.eventStageModal.rankBasedQualification')}
-              </label>
-              <ToggleButton
-                isActive={isRankBasedMode}
-                onToggle={() => handleModeToggle(!isRankBasedMode)}
-              />
-            </div>
-          </div>
+  const stageName = (stageId: string) =>
+    visualStages.find((stage) => stage.id === stageId)?.name ?? '';
 
-          <p className="text-white/70 text-sm">
-            {isRankBasedMode
-              ? t('setup.eventStageModal.qualifierTargetsDescriptionRankBased')
-              : t('setup.eventStageModal.qualifierTargetsDescription')}
-          </p>
-        </div>
+  const listNames = (names: string[]) => {
+    // Intl.ListFormat is not in the TS lib target but is everywhere we run.
+    const { ListFormat } = Intl as unknown as {
+      ListFormat?: new (
+        locales: string,
+        options: { style: string; type: string },
+      ) => { format: (items: string[]) => string };
+    };
 
-        <div className="flex flex-col gap-2">
-          <SortableList
-            onSortEnd={handleSortEnd}
-            className="flex flex-col gap-2"
-            draggedItemClassName="dragged"
-          >
-            {sortableStages.map((stage) => {
-              const amount = getQualifierAmount(stage.id);
-              const isCurrentStage = stage.id === currentStage.id;
-              const isPrecedingStage = (stage.order ?? 0) < currentOrder;
+    try {
+      if (ListFormat) {
+        return new ListFormat(languageTag(locale), {
+          style: 'long',
+          type: 'conjunction',
+        }).format(names);
+      }
+    } catch {
+      // fall through
+    }
 
-              return (
-                <CustomSortableItem
-                  key={stage.id}
-                  id={stage.id}
-                  className={`pl-1.5 pr-3 min-h-[42px] shadow-sm ${
-                    isCurrentStage
-                      ? ''
-                      : 'bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/10'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 flex-1">
-                    <div className="flex-1 text-white text-sm flex items-center gap-2">
-                      {stage.name}
-                      {isCurrentStage && ` (${t('common.current')})`}
-                    </div>
+    return names.join(', ');
+  };
 
-                    {!isCurrentStage && (
-                      <div className="flex items-center gap-1">
-                        {isRankBasedMode ? (
-                          // Rank-based mode: show reset button, min-max range inputs
-                          <>
-                            <Button
-                              onClick={() =>
-                                updateQualifierRange(
-                                  stage.id,
-                                  undefined,
-                                  undefined,
-                                )
-                              }
-                              disabled={
-                                !getQualifierMinRank(stage.id) &&
-                                !getQualifierMaxRank(stage.id)
-                              }
-                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title={t('common.clear')}
-                              aria-label={t('common.clearQualifiersFor', {
-                                stage: stage.name,
-                              })}
-                            >
-                              <RestartIcon className="w-5 h-5" />
-                            </Button>
-                            <Input
-                              type="number"
-                              value={getQualifierMinRank(stage.id) || ''}
-                              onChange={(e) => {
-                                const minRank =
-                                  parseInt(e.target.value) || undefined;
-                                const maxRank = getQualifierMaxRank(stage.id);
+  const targets = useMemo(() => qualifiesTo || [], [qualifiesTo]);
+  const places = useMemo(
+    () => summarizePlaces(targets, stageSize),
+    [targets, stageSize],
+  );
 
-                                updateQualifierRange(
-                                  stage.id,
-                                  minRank,
-                                  maxRank,
-                                );
-                              }}
-                              className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
-                                errors.qualifiesTo
-                                  ? 'border border-red-400'
-                                  : ''
-                              }`}
-                              min={1}
-                              placeholder="Min"
-                              disabled={isPrecedingStage}
-                              title="Minimum rank"
-                            />
-                            <MinusIcon className="w-4 h-4 text-white/70" />
-                            <Input
-                              type="number"
-                              value={getQualifierMaxRank(stage.id) || ''}
-                              onChange={(e) => {
-                                const minRank = getQualifierMinRank(stage.id);
-                                const maxRank =
-                                  parseInt(e.target.value) || undefined;
+  // ---------------------------------------------------------------------
+  // The line under the rows: where everyone goes.
 
-                                updateQualifierRange(
-                                  stage.id,
-                                  minRank,
-                                  maxRank,
-                                );
-                              }}
-                              className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
-                                errors.qualifiesTo
-                                  ? 'border border-red-400'
-                                  : ''
-                              }`}
-                              min={1}
-                              placeholder="Max"
-                              disabled={isPrecedingStage}
-                              title="Maximum rank"
-                            />
-                          </>
-                        ) : (
-                          // Amount-based mode: show reset button, +/- buttons and amount input
-                          <>
-                            <Button
-                              onClick={() => updateQualifierAmount(stage.id, 0)}
-                              disabled={amount === 0}
-                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title={t('common.clear')}
-                              aria-label={t('common.clearQualifiersFor', {
-                                stage: stage.name,
-                              })}
-                            >
-                              <RestartIcon className="w-5 h-5" />
-                            </Button>
-                            <Button
-                              onClick={() => decrementQualifier(stage.id)}
-                              disabled={amount === 0 || isPrecedingStage}
-                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title={t('common.decrease')}
-                              aria-label={t('common.decreaseQualifiersFor', {
-                                stage: stage.name,
-                              })}
-                            >
-                              <MinusIcon className="w-5 h-5" />
-                            </Button>
-                            <Input
-                              type="number"
-                              value={amount}
-                              onChange={(e) =>
-                                handleInputChange(stage.id, e.target.value)
-                              }
-                              className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              min={0}
-                              placeholder="0"
-                              disabled={isPrecedingStage}
-                            />
-                            <Button
-                              onClick={() => incrementQualifier(stage.id)}
-                              disabled={isPrecedingStage}
-                              className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                              title={t('common.increase')}
-                              aria-label={t('common.increaseQualifiersFor', {
-                                stage: stage.name,
-                              })}
-                            >
-                              <PlusIcon className="w-5 h-5" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </CustomSortableItem>
-              );
-            })}
-          </SortableList>
+  let summary: string;
 
-          {/* Grand Final - displayed separately, not sortable */}
-          {grandFinalStage && (
-            <div className="flex items-center gap-2 bg-primary-800 bg-gradient-to-tr from-primary-900 to-primary-900/10 px-3 py-1 rounded-md shadow-sm min-h-[42px]">
-              <div className="flex-1 text-white text-sm flex items-center gap-2">
-                {grandFinalStage.name}
-              </div>
-              <div className="flex items-center gap-1">
-                {isRankBasedMode ? (
-                  // Rank-based mode for Grand Final
-                  <>
-                    <Button
-                      onClick={() =>
-                        updateQualifierRange(
-                          grandFinalStage.id,
-                          undefined,
-                          undefined,
-                        )
-                      }
-                      disabled={
-                        !getQualifierMinRank(grandFinalStage.id) &&
-                        !getQualifierMaxRank(grandFinalStage.id)
-                      }
-                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={t('common.clear')}
-                      aria-label={t('common.clearQualifiersFor', {
-                        stage: grandFinalStage.name,
-                      })}
-                    >
-                      <RestartIcon className="w-5 h-5" />
-                    </Button>
-                    <Input
-                      type="number"
-                      value={getQualifierMinRank(grandFinalStage.id) || ''}
-                      onChange={(e) => {
-                        const minRank = parseInt(e.target.value) || undefined;
-                        const maxRank = getQualifierMaxRank(grandFinalStage.id);
+  if (isRankBasedMode) {
+    if (places.bands.length === 0) {
+      summary = t('nobodyGoesThroughYet');
+    } else {
+      const parts = places.bands.map((band) =>
+        t('placeBand', {
+          range: formatPlaceRange(band),
+          stage: stageName(band.targetStageId),
+        }),
+      );
 
-                        updateQualifierRange(
-                          grandFinalStage.id,
-                          minRank,
-                          maxRank,
-                        );
-                      }}
-                      className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
-                        errors.qualifiesTo ? 'border border-red-400' : ''
-                      }`}
-                      min={1}
-                      placeholder="Min"
-                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
-                      title="Minimum rank"
-                    />
-                    <MinusIcon className="w-4 h-4 text-white/70" />
-                    <Input
-                      type="number"
-                      value={getQualifierMaxRank(grandFinalStage.id) || ''}
-                      onChange={(e) => {
-                        const minRank = getQualifierMinRank(grandFinalStage.id);
-                        const maxRank = parseInt(e.target.value) || undefined;
+      if (places.out) {
+        parts.push(t('placeBandOut', { range: formatPlaceRange(places.out) }));
+      }
 
-                        updateQualifierRange(
-                          grandFinalStage.id,
-                          minRank,
-                          maxRank,
-                        );
-                      }}
-                      className={`bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-16 text-center disabled:opacity-50 disabled:cursor-not-allowed ${
-                        errors.qualifiesTo ? 'border border-red-400' : ''
-                      }`}
-                      min={1}
-                      placeholder="Max"
-                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
-                      title="Maximum rank"
-                    />
-                  </>
-                ) : (
-                  // Amount-based mode for Grand Final
-                  <>
-                    <Button
-                      onClick={() =>
-                        updateQualifierAmount(grandFinalStage.id, 0)
-                      }
-                      disabled={getQualifierAmount(grandFinalStage.id) === 0}
-                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={t('common.clear')}
-                      aria-label={t('common.clearQualifiersFor', {
-                        stage: grandFinalStage.name,
-                      })}
-                    >
-                      <RestartIcon className="w-5 h-5" />
-                    </Button>
-                    <Button
-                      onClick={() => decrementQualifier(grandFinalStage.id)}
-                      disabled={
-                        getQualifierAmount(grandFinalStage.id) === 0 ||
-                        (grandFinalStage.order ?? 0) < currentOrder
-                      }
-                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={t('common.decrease')}
-                      aria-label={t('common.decreaseQualifiersFor', {
-                        stage: grandFinalStage.name,
-                      })}
-                    >
-                      <MinusIcon className="w-5 h-5" />
-                    </Button>
-                    <Input
-                      type="number"
-                      value={getQualifierAmount(grandFinalStage.id)}
-                      onChange={(e) =>
-                        handleInputChange(grandFinalStage.id, e.target.value)
-                      }
-                      className="bg-primary-900 bg-gradient-to-bl from-[10%] from-primary-900 to-primary-800/40 shadow-sm !px-3 !py-2 hover:bg-primary-950 focus:bg-primary-950 !w-20 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      min={0}
-                      placeholder="0"
-                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
-                    />
-                    <Button
-                      onClick={() => incrementQualifier(grandFinalStage.id)}
-                      disabled={(grandFinalStage.order ?? 0) < currentOrder}
-                      className="!px-3 h-[34px] flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                      title={t('common.increase')}
-                      aria-label={t('common.increaseQualifiersFor', {
-                        stage: grandFinalStage.name,
-                      })}
-                    >
-                      <PlusIcon className="w-5 h-5" />
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+      const [first] = places.bands;
 
-        <div className="flex items-center gap-2">
-          <span className="text-white font-medium">
-            {t('setup.eventStageModal.numberOfQualifiers')}:
-          </span>
-          <span className="text-white/90 font-semibold bg-primary-800 px-3 py-1.5 shadow-sm rounded-md">
-            {totalQualifiers}
-          </span>
-        </div>
+      summary = t('placesSummary', {
+        count: first.to - first.from + 1,
+        bands: parts.join(', '),
+      });
+    }
 
-        {errors.qualifiesTo && (
-          <span className="text-red-400 text-sm">
-            {errors.qualifiesTo.message as string}
-          </span>
+    if (places.beyondSize) {
+      summary += ` ${t('onlyEntries', { size: stageSize })}`;
+    }
+  } else {
+    const total = targets.reduce((sum, target) => sum + target.amount, 0);
+
+    summary = stageSize
+      ? t('countSummaryOfSize', { count: total, size: stageSize })
+      : t('countSummary', { count: total });
+
+    if (stageSize && total > stageSize) {
+      summary += ` ${t('onlyEntries', { size: stageSize })}`;
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // What keeps the places from saving, named.
+
+  const problemText = (problem: PlaceProblem) => {
+    switch (problem.kind) {
+      case 'incomplete':
+        return problem.missing === 'first'
+          ? t('problemFirstMissing', {
+              stage: stageName(problem.targetStageId),
+            })
+          : t('problemLastMissing', {
+              stage: stageName(problem.targetStageId),
+            });
+      case 'reversed':
+        return t('problemReversed', {
+          stage: stageName(problem.targetStageId),
+        });
+      case 'overlap':
+        return t('problemOverlap', {
+          first: stageName(problem.first),
+          second: stageName(problem.second),
+          place: problem.place,
+        });
+      case 'gap':
+        return t('problemGap', {
+          count: problem.to - problem.from + 1,
+          range: formatPlaceRange(problem),
+        });
+    }
+  };
+
+  const shownProblems = isRankBasedMode
+    ? places.problems.filter(
+        (problem) =>
+          !(
+            problem.kind === 'incomplete' &&
+            problem.targetStageId === focusedRowId &&
+            submitCount === 0
+          ),
+      )
+    : [];
+  // Two rows can break the same rule the same way: say it once.
+  const problemLines = Array.from(new Set(shownProblems.map(problemText)));
+
+  // The form refused to save for a reason not named above.
+  if (problemLines.length === 0 && errors.qualifiesTo) {
+    problemLines.push(t('problemGeneric'));
+  }
+
+  const problemsId = `${ids}-problems`;
+
+  // ---------------------------------------------------------------------
+  // Rows
+
+  const trackFocus = (stageId: string) => ({
+    onFocus: () => setFocusedRowId(stageId),
+    onBlur: (e: React.FocusEvent<HTMLDivElement>) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+        setFocusedRowId((id) => (id === stageId ? null : id));
+      }
+    },
+  });
+
+  const clearButton = (
+    stage: EventStage,
+    hasValue: boolean,
+    onClear: () => void,
+  ) => (
+    <button
+      type="button"
+      onClick={onClear}
+      disabled={!hasValue}
+      tabIndex={hasValue ? undefined : -1}
+      aria-hidden={hasValue ? undefined : true}
+      className={`dp-qual-clear ${hasValue ? '' : 'invisible'}`}
+      aria-label={tCommon('clearQualifiersFor', { stage: stage.name })}
+      title={tCommon('clear')}
+    >
+      <X className="size-4" aria-hidden="true" />
+    </button>
+  );
+
+  const countControls = (stage: EventStage) => {
+    const amount = getQualifierAmount(stage.id);
+    const text =
+      amountDraft?.stageId === stage.id ? amountDraft.text : String(amount);
+
+    return (
+      <div className="dp-qual-controls">
+        <button
+          type="button"
+          className="dp-qual-step"
+          onClick={() => updateQualifierAmount(stage.id, amount - 1)}
+          disabled={amount === 0}
+          aria-label={tCommon('decreaseQualifiersFor', { stage: stage.name })}
+        >
+          <Minus className="size-4" aria-hidden="true" />
+        </button>
+        <input
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={text}
+          onFocus={(e) => e.currentTarget.select()}
+          onChange={(e) => {
+            const next = digits(e.target.value);
+
+            setAmountDraft({ stageId: stage.id, text: next });
+            updateQualifierAmount(stage.id, next ? parseInt(next, 10) : 0);
+          }}
+          onBlur={() => setAmountDraft(null)}
+          className="dp-field dp-qual-num"
+          aria-label={t('countFor', { stage: stage.name })}
+        />
+        <button
+          type="button"
+          className="dp-qual-step"
+          onClick={() => updateQualifierAmount(stage.id, amount + 1)}
+          aria-label={tCommon('increaseQualifiersFor', { stage: stage.name })}
+        >
+          <Plus className="size-4" aria-hidden="true" />
+        </button>
+        {clearButton(stage, amount > 0, () =>
+          updateQualifierAmount(stage.id, 0),
         )}
       </div>
-    </>
+    );
+  };
+
+  const placesControls = (stage: EventStage) => {
+    const target = findTarget(stage.id);
+    const from = target?.minRank;
+    const to = target?.maxRank;
+    const invalid = places.invalidStageIds.has(stage.id);
+    const describedBy =
+      invalid && problemLines.length > 0 ? problemsId : undefined;
+    const parsePlace = (value: string) => {
+      const next = digits(value);
+
+      return next ? parseInt(next, 10) || undefined : undefined;
+    };
+
+    return (
+      <div className="dp-qual-controls">
+        <input
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={from ?? ''}
+          placeholder={from == null ? String(places.nextFreePlace) : undefined}
+          onChange={(e) =>
+            updateQualifierRange(stage.id, parsePlace(e.target.value), to)
+          }
+          data-invalid={invalid || undefined}
+          aria-invalid={invalid || undefined}
+          aria-describedby={describedBy}
+          className="dp-field dp-qual-num"
+          aria-label={t('firstPlaceFor', { stage: stage.name })}
+        />
+        <span className="dp-qual-dash" aria-hidden="true">
+          –
+        </span>
+        <input
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={to ?? ''}
+          onChange={(e) =>
+            updateQualifierRange(stage.id, from, parsePlace(e.target.value))
+          }
+          data-invalid={invalid || undefined}
+          aria-invalid={invalid || undefined}
+          aria-describedby={describedBy}
+          className="dp-field dp-qual-num"
+          aria-label={t('lastPlaceFor', { stage: stage.name })}
+        />
+        {clearButton(stage, from != null || to != null, () =>
+          updateQualifierRange(stage.id, undefined, undefined),
+        )}
+      </div>
+    );
+  };
+
+  const renderRow = (stage: EventStage, sortable: boolean) => {
+    const isCurrentStage = stage.id === currentStage.id;
+    const isPrecedingStage = (stage.order ?? 0) < currentOrder;
+
+    const grip = (
+      <div className="dp-qual-grip" aria-hidden="true">
+        {sortable && <DragGripIcon className="size-5" />}
+      </div>
+    );
+
+    let trailing: React.ReactNode;
+
+    if (isCurrentStage) {
+      trailing = <span className="dp-qual-note">{t('thisStage')}</span>;
+    } else if (isPrecedingStage) {
+      trailing = <span className="dp-qual-note">{t('runsEarlier')}</span>;
+    } else {
+      trailing = isRankBasedMode ? placesControls(stage) : countControls(stage);
+    }
+
+    return (
+      <div
+        className={`dp-qual-row ${isCurrentStage ? 'is-current' : ''}`}
+        data-stage-id={stage.id}
+        {...(!isCurrentStage && !isPrecedingStage ? trackFocus(stage.id) : {})}
+      >
+        {sortable ? <SortableKnob>{grip}</SortableKnob> : grip}
+        <span className="dp-qual-name">{stage.name}</span>
+        {trailing}
+      </div>
+    );
+  };
+
+  const headingId = `${ids}-heading`;
+
+  return (
+    <section aria-labelledby={headingId} className="mt-6 flex flex-col">
+      <h3
+        id={headingId}
+        className="text-[15px] font-extrabold leading-[1.3] tracking-[-.01em]"
+      >
+        {t('qualifierTargets')}
+      </h3>
+
+      <div className="mt-2.5">
+        <Segmented<QualifyMode>
+          ariaLabel={t('qualifyBy')}
+          value={isRankBasedMode ? 'places' : 'count'}
+          onChange={handleModeChange}
+          options={[
+            { value: 'count', label: t('byCount') },
+            { value: 'places', label: t('byPlaces') },
+          ]}
+        />
+      </div>
+
+      <div className="dp-qual-list mt-2.5 flex flex-col gap-1.5">
+        <SortableList
+          onSortEnd={handleSortEnd}
+          className="flex flex-col gap-1.5"
+          draggedItemClassName="dp-qual-dragged"
+        >
+          {sortableStages.map((stage) => (
+            <SortableItem key={stage.id}>{renderRow(stage, true)}</SortableItem>
+          ))}
+        </SortableList>
+
+        {/* The last stage always runs last: not draggable. */}
+        {grandFinalStage && renderRow(grandFinalStage, false)}
+      </div>
+
+      <p className="mt-3 px-1 text-[13px] font-semibold leading-[1.45] text-white/80 text-pretty">
+        {summary}
+      </p>
+
+      {problemLines.length > 0 && (
+        <ul
+          id={problemsId}
+          aria-live="polite"
+          className="mt-1.5 flex flex-col gap-1 px-1 text-[12.5px] font-bold leading-[1.4] text-[var(--badge-red-ink)]"
+        >
+          {problemLines.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      )}
+
+      {removedByMove && (
+        <div className="mt-2 flex items-center gap-3 px-1" aria-live="polite">
+          <p className="min-w-0 flex-1 text-[12.5px] font-semibold leading-[1.4] text-white/80 text-pretty">
+            {t('qualifiersRemoved', {
+              count: removedByMove.stageNames.length,
+              stages: listNames(removedByMove.stageNames),
+            })}
+          </p>
+          <button type="button" onClick={undoMove} className="dp-qual-undo">
+            {t('undo')}
+          </button>
+        </div>
+      )}
+
+      {sortableStages.length > 1 && (
+        <p className="mt-2 px-1 text-[12px] font-semibold leading-[1.4] text-white/70">
+          {t('dragHint')}
+        </p>
+      )}
+    </section>
   );
 };
 

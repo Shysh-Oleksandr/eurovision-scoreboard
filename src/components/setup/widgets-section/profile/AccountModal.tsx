@@ -1,7 +1,6 @@
 import { Ban, Trash2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
 
 import dynamic from 'next/dynamic';
 
@@ -10,6 +9,7 @@ import SignInMethodsSection from './SignInMethodsSection';
 import { LogoutIcon } from '@/assets/icons/LogoutIcon';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useAuthStore } from '@/state/useAuthStore';

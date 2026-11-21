@@ -28,6 +28,11 @@ export interface BaseCountry {
   groupId?: string | null; // custom entry group id
   /** The code the user picked for a custom entry (`getShortCodes`). */
   shortCode?: string;
+  /**
+   * The colours picked for a custom entry, used in place of its flag's
+   * (`data/countries/entryColors.ts`).
+   */
+  colors?: string[];
 }
 
 export type SemiFinalGroup = 'SF1' | 'SF2';

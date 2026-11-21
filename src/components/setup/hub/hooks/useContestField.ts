@@ -1,6 +1,5 @@
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
-import { toast } from 'react-toastify';
 
 import { api } from '@/api/client';
 import { useQuickSelectContestsQuery } from '@/api/quickSelect';
@@ -19,6 +18,7 @@ import {
   ESC_YEAR_OPTIONS,
   JESC_YEAR_OPTIONS,
 } from '@/data/data';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';

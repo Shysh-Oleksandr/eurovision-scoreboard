@@ -1,11 +1,11 @@
 import { useTranslations } from 'next-intl';
 import React, { useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { UndoIcon } from '@/assets/icons/UndoIcon';
 import { UploadIcon } from '@/assets/icons/UploadIcon';
 import Button from '@/components/common/Button';
 import { Input } from '@/components/Input';
+import { toast } from '@/helpers/toast';
 import {
   BACKGROUND_VIDEO_ACCEPT,
   BACKGROUND_VIDEO_MAX_MB,

@@ -39,8 +39,9 @@ export interface RankableCountryListProps {
  * Generic drag-to-rank list with a leaderboard treatment: rank number, flag,
  * name, an optional trailing value, and top-3 medal accents. Controlled — the
  * parent owns `orderedCodes` and seeding. Drag state is scoped via the
- * `.dragged-rank-row` class (see styles.css). Shared by the odds settings and
- * the voting-predefinition rank view.
+ * `.dragged-rank-row` class (see styles.css). Used by the voting-predefinition
+ * rank view; Settings → Odds draws its ranking as board rows instead
+ * (`settings/odds/OddsRankList`).
  */
 export const RankableCountryList: React.FC<RankableCountryListProps> = ({
   countries,

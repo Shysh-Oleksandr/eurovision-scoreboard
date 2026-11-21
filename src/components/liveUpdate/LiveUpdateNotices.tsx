@@ -1,11 +1,12 @@
 'use client';
 
+import { Download, RefreshCw } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useEffect, useSyncExternalStore } from 'react';
-import { toast } from 'react-toastify';
 
 import { ActionToast } from '@/components/common/ActionToast';
 import Button from '@/components/common/Button';
+import { toast } from '@/helpers/toast';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import {
   type BundleNotice,
@@ -76,6 +77,7 @@ export default function LiveUpdateNotices() {
       />,
       {
         toastId: PROMPT_TOAST_ID,
+        icon: <RefreshCw />,
         autoClose: false,
         closeOnClick: false,
         // "Later", a swipe away and a superseding notice all close it; the
@@ -108,7 +110,12 @@ export default function LiveUpdateNotices() {
           toast.dismiss(STORE_TOAST_ID);
         }}
       />,
-      { toastId: STORE_TOAST_ID, autoClose: false, closeOnClick: false },
+      {
+        toastId: STORE_TOAST_ID,
+        icon: <Download />,
+        autoClose: false,
+        closeOnClick: false,
+      },
     );
   }, [recommendedUrl, recommendedVersion, storeName, t]);
 

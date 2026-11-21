@@ -1,7 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import React from 'react';
-import { toast } from 'react-toastify';
 
 import ContestListItem from './ContestListItem';
 import { usePublicContestActions } from './hooks/usePublicContestActions';
@@ -10,6 +10,7 @@ import { api } from '@/api/client';
 import { useContestsStateQuery } from '@/api/contests';
 import Modal from '@/components/common/Modal/Modal';
 import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
+import { toast } from '@/helpers/toast';
 import { useGeneralStore } from '@/state/generalStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import type { Contest } from '@/types/contest';
@@ -25,6 +26,7 @@ const ContestShareModal: React.FC<ContestShareModalProps> = ({
   onClose,
   onEdit,
 }) => {
+  const t = useTranslations('widgets.contests');
   const user = useAuthStore((state) => state.user);
   const activeContest = useGeneralStore((state) => state.activeContest);
   const setContestToLoad = useGeneralStore((state) => state.setContestToLoad);
@@ -46,7 +48,7 @@ const ContestShareModal: React.FC<ContestShareModalProps> = ({
       onClose();
       setContestToLoad({ contest: c, snapshot: data });
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to load contest');
+      toast.error(err?.response?.data?.message || t('failedToLoadContest'));
     }
   };
 

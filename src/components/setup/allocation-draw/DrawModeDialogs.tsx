@@ -2,7 +2,6 @@
 import { ChevronRight, Dices, TriangleAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
-import { toast } from 'react-toastify';
 
 import { useAllocationDrawContext } from './AllocationDrawContext';
 import { useDrawCopy } from './drawCopy';
@@ -11,6 +10,7 @@ import { useDrawUiStore } from './drawUiStore';
 import { codesInDrawSemis } from './useAllocationDraw';
 
 import Modal from '@/components/common/Modal/Modal';
+import { toast } from '@/helpers/toast';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 

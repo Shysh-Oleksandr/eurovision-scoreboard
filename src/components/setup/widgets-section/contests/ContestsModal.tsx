@@ -1,17 +1,16 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import React, { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from 'react';
 
 import dynamic from 'next/dynamic';
+
+import LibraryModal, { LibraryPlace } from '../library/LibraryModal';
 
 import PublicContests from './PublicContests';
 import UserContests from './UserContests';
 
 import { api } from '@/api/client';
-import Modal from '@/components/common/Modal/Modal';
-import ModalBottomCloseButton from '@/components/common/Modal/ModalBottomCloseButton';
-import Tabs, { TabContent } from '@/components/common/tabs/Tabs';
+import { toast } from '@/helpers/toast';
 import { useEffectOnce } from '@/hooks/useEffectOnce';
 import { useGeneralStore } from '@/state/generalStore';
 import { Contest } from '@/types/contest';
@@ -19,11 +18,6 @@ import { Contest } from '@/types/contest';
 const CreateContestModal = dynamic(() => import('./CreateContestModal'), {
   ssr: false,
 });
-
-enum ContestsTab {
-  YOUR_CONTESTS = 'Your Contests',
-  PUBLIC_CONTESTS = 'Public Contests',
-}
 
 interface ContestsModalProps {
   isOpen: boolean;
@@ -43,8 +37,7 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
   const setContestToEdit = useGeneralStore((state) => state.setContestToEdit);
 
   const t = useTranslations();
-  const [activeTab, setActiveTab] = useState(ContestsTab.YOUR_CONTESTS);
-  const [isPublicContestsLoaded, setIsPublicContestsLoaded] = useState(false);
+  const [place, setPlace] = useState<LibraryPlace>('yours');
   const [isCustomizeModalOpen, setIsCustomizeModalOpen] = useState(false);
   const [initialContest, setInitialContest] = useState<Contest | undefined>();
 
@@ -56,20 +49,6 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
       setContestToEdit(null);
     }
   }, [isOpen, contestToEdit, setContestToEdit]);
-
-  const tabs = useMemo(
-    () => [
-      {
-        value: ContestsTab.YOUR_CONTESTS,
-        label: t('widgets.contests.yourContests'),
-      },
-      {
-        value: ContestsTab.PUBLIC_CONTESTS,
-        label: t('widgets.contests.publicContests'),
-      },
-    ],
-    [t],
-  );
 
   const handleCreateNew = () => {
     setInitialContest(undefined);
@@ -98,65 +77,31 @@ const ContestsModal: React.FC<ContestsModalProps> = ({
     }
   };
 
-  const tabsWithContent = useMemo(
-    () => [
-      {
-        ...tabs[0],
-        content: (
-          <UserContests
-            onCreateNew={handleCreateNew}
-            onEdit={handleEdit}
-            onLoad={handleLoadContest}
-          />
-        ),
-      },
-      {
-        ...tabs[1],
-        content: (
-          <>
-            {(activeTab === ContestsTab.PUBLIC_CONTESTS ||
-              isPublicContestsLoaded) && (
-              <PublicContests
-                onLoaded={() => setIsPublicContestsLoaded(true)}
-                onEdit={handleEdit}
-                onLoad={handleLoadContest}
-              />
-            )}
-          </>
-        ),
-      },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeTab, isPublicContestsLoaded, tabs],
-  );
-
   useEffectOnce(onLoaded);
 
   return (
     <>
-      <Modal
+      <LibraryModal
         isOpen={isOpen}
         onClose={onClose}
-        containerClassName="!w-[min(100%,800px)]"
-        fullScreenOnPhone
-        contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh]"
-        overlayClassName="!z-[1001]"
-        bottomContent={<ModalBottomCloseButton onClose={onClose} />}
-        topContent={
-          <Tabs
-            tabs={tabs}
-            activeTab={activeTab}
-            setActiveTab={(tab) => setActiveTab(tab as ContestsTab)}
-            containerClassName="!rounded-none"
-          />
+        title={t('widgets.contests.title')}
+        place={place}
+        onPlaceChange={setPlace}
+        widthClassName="!w-[min(100%,800px)]"
+        renderPlace={(p) =>
+          p === 'community' ? (
+            <PublicContests onEdit={handleEdit} onLoad={handleLoadContest} />
+          ) : (
+            <UserContests
+              place={p}
+              onCreateNew={handleCreateNew}
+              onEdit={handleEdit}
+              onLoad={handleLoadContest}
+              onBrowseCommunity={() => setPlace('community')}
+            />
+          )
         }
-      >
-        <TabContent
-          tabs={tabsWithContent}
-          activeTab={activeTab}
-          preserveContent
-        />
-      </Modal>
+      />
 
       {/* Save the open contest as a new one, or edit a contest's details */}
       {isCustomizeModalOpen && (

@@ -11,6 +11,7 @@ import { toFixedIfDecimalFloat } from '@/helpers/toFixedIfDecimal';
 import { playHaptic } from '@/native/haptics';
 import { askForReviewSoon } from '@/native/review';
 import { useCountriesStore } from '@/state/countriesStore';
+import { openNextYear } from '@/state/nextYearStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { useCoversBackgroundVideo } from '@/theme/backgroundVideo/covers';
 
@@ -67,6 +68,7 @@ const generateSparkle = (): Sparkle => ({
 
 const WinnerModal = () => {
   const t = useTranslations('simulation.winnerModal');
+  const tNextYear = useTranslations('nextYear');
   const winnerCountry = useScoreboardStore((state) => state.winnerCountry);
   const isWinnerAnimationAlreadyDisplayed = useScoreboardStore(
     (state) => state.isWinnerAnimationAlreadyDisplayed,
@@ -153,6 +155,11 @@ const WinnerModal = () => {
   const handleClose = useCallback(() => {
     startClose(() => setEventSetupModalOpen(true));
   }, [startClose, setEventSetupModalOpen]);
+
+  // Next year placement 1 of 4 (docs/event-setup-hub-and-design-tokens.md §8).
+  const handleNextYear = useCallback(() => {
+    startClose(() => openNextYear('winner'));
+  }, [startClose]);
 
   // Re-randomize position/size each time a sparkle loops.
   // The jump is invisible: opacity is 0 at both 0% and 100% of the keyframe.
@@ -351,17 +358,27 @@ const WinnerModal = () => {
           })}
         </p>
 
-        {/* Start Over button */}
-        <Button
-          label={t('startOver')}
-          onClick={handleClose}
-          variant="winner"
-          className="!text-[13px] !py-[13px] !px-0 !rounded-[10px] w-full"
+        {/* Start over, and Next year from this contest */}
+        <div
+          className="grid grid-cols-2 gap-2.5"
           style={{
             opacity: 0,
             animation: 'winner-slide-up 0.45s ease 1.35s both',
           }}
-        />
+        >
+          <Button
+            label={t('startOver')}
+            onClick={handleClose}
+            variant="winner"
+            className="!text-[13px] !py-[13px] !px-0 !rounded-[10px] w-full"
+          />
+          <Button
+            label={tNextYear('button')}
+            onClick={handleNextYear}
+            variant="winner"
+            className="!text-[13px] !py-[13px] !px-0 !rounded-[10px] w-full"
+          />
+        </div>
 
         {/* Phones on the website, now and then: the app, for the next show */}
         <AppPromoReminder

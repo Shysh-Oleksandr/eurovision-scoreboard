@@ -3,11 +3,11 @@
 import { Download, Pencil, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
-import { toast } from 'react-toastify';
 
 import Badge from '@/components/common/Badge';
 import Button from '@/components/common/Button';
 import Modal from '@/components/common/Modal/Modal';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { languageTag } from '@/i18n/catalog';
 import type {

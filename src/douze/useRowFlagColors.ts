@@ -1,23 +1,30 @@
-import { type RefObject, useLayoutEffect, useState } from 'react';
+import { type RefObject, useLayoutEffect, useMemo, useState } from 'react';
 
-import { paletteFromColors, sampleFlagColors } from './flagPalette';
+import { rowColors, sampleFlagColors } from './flagPalette';
 
 /**
  * The flag colours of the row `ref` sits in (up to three, very dark ones
  * lifted), for the hand-written douze animations' "Flag colors" option.
- * Reads the row's own flag image (`data-douze-anchor="flag"`), once it has
- * loaded. Null while disabled, and for a flag the canvas can't read
- * (another origin without CORS): the animation keeps its theme colours.
+ * A custom entry's chosen colours (`entryColors`) take the flag's place;
+ * otherwise it reads the row's own flag image (`data-douze-anchor="flag"`),
+ * once it has loaded. Null while disabled, and for a flag the canvas can't
+ * read (another origin without CORS): the animation keeps its theme colours.
  */
 export const useRowFlagColors = (
   ref: RefObject<HTMLElement | null>,
   enabled: boolean,
+  entryColors?: readonly string[] | null,
 ): string[] | null => {
-  const [colors, setColors] = useState<string[] | null>(null);
+  const [sampled, setSampled] = useState<string[] | null>(null);
+  const own = useMemo(
+    () => (enabled && entryColors?.length ? rowColors(entryColors) : null),
+    [enabled, entryColors],
+  );
+  const readFlag = enabled && !own;
 
   useLayoutEffect(() => {
-    if (!enabled) {
-      setColors(null);
+    if (!readFlag) {
+      setSampled(null);
 
       return undefined;
     }
@@ -29,17 +36,9 @@ export const useRowFlagColors = (
     if (!(flag instanceof HTMLImageElement)) return undefined;
 
     const read = () => {
-      const sampled = sampleFlagColors(flag);
+      const colors = sampleFlagColors(flag);
 
-      if (!sampled) {
-        setColors(null);
-
-        return;
-      }
-
-      const { c1, c2, c3 } = paletteFromColors(sampled);
-
-      setColors([c1, c2, c3].slice(0, sampled.length));
+      setSampled(colors ? rowColors(colors) : null);
     };
 
     if (flag.complete) {
@@ -51,7 +50,7 @@ export const useRowFlagColors = (
     flag.addEventListener('load', read, { once: true });
 
     return () => flag.removeEventListener('load', read);
-  }, [ref, enabled]);
+  }, [ref, readFlag]);
 
-  return colors;
+  return own ?? sampled;
 };

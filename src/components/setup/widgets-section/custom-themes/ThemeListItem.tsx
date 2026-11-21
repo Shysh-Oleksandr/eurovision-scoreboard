@@ -2,14 +2,15 @@ import {
   ALargeSmall,
   Flag,
   Folder,
+  Globe,
   Link2,
+  Lock,
   Share2,
   Video,
   Volume1,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { useHandleShare } from '../../hooks/useHandleShare';
 
@@ -34,6 +35,7 @@ import OverflowMenu, {
 import UserInfo from '@/components/common/UserInfo';
 import { douzeDurationScale } from '@/douze/options';
 import { buildShareUrl } from '@/helpers/shareUrl';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useIsOffline } from '@/state/connectivityStore';
@@ -128,7 +130,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
     const url = buildShareUrl({ theme: theme._id });
 
     navigator.clipboard.writeText(url);
-    toast.success('Link copied to clipboard!');
+    toast.success(t('graphics.gallery.toast.linkCopied'));
   };
 
   // Open the source theme this one was remixed from (same flow as share links).
@@ -258,12 +260,69 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
       : []),
   ].filter(Boolean) as OverflowMenuEntry[];
 
+  // One line of facts under the name: where your own theme lives, its
+  // group, and what it adds beyond colours.
+  const factIconClassName = 'size-3.5';
+  const facts = [
+    ...(isMyTheme
+      ? [
+          {
+            id: 'visibility',
+            icon: theme.isPublic ? (
+              <Globe className={factIconClassName} aria-hidden="true" />
+            ) : (
+              <Lock className={factIconClassName} aria-hidden="true" />
+            ),
+            label: theme.isPublic ? t('widgets.public') : t('widgets.private'),
+          },
+        ]
+      : []),
+    ...(theme.group
+      ? [
+          {
+            id: 'group',
+            icon: <Folder className={factIconClassName} aria-hidden="true" />,
+            label: theme.group.name,
+          },
+        ]
+      : []),
+    ...(theme.hasCustomAudio
+      ? [
+          {
+            id: 'audio',
+            icon: <Volume1 className={factIconClassName} aria-hidden="true" />,
+            label: t('widgets.library.audio'),
+          },
+        ]
+      : []),
+    ...(theme.hasCustomFonts
+      ? [
+          {
+            id: 'fonts',
+            icon: (
+              <ALargeSmall className={factIconClassName} aria-hidden="true" />
+            ),
+            label: t('widgets.library.customFonts'),
+          },
+        ]
+      : []),
+    ...(theme.backgroundVideoUrl
+      ? [
+          {
+            id: 'video',
+            icon: <Video className={factIconClassName} aria-hidden="true" />,
+            label: t('widgets.library.backgroundVideo'),
+          },
+        ]
+      : []),
+  ];
+
   const secondaryActionClassName =
     'inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]';
 
   return (
     <div
-      className="dp-accent-scope relative rounded-[18px] border shadow-xl transition-colors hover:brightness-105 overflow-hidden"
+      className="dp-accent-scope relative rounded-[18px] border overflow-hidden"
       style={{
         ...(cssVars as React.CSSProperties),
         ...(interfaceVars as React.CSSProperties),
@@ -273,16 +332,6 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
         borderColor: 'var(--t-bd)',
       }}
     >
-      {/* Accent top bar — wrapped to clip at card radius */}
-      <div className="overflow-hidden rounded-t-[18px]">
-        <div
-          style={{
-            height: 5,
-            background: 'linear-gradient(90deg, var(--t-acc), transparent)',
-          }}
-        />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
         {/* Left: scoreboard preview */}
         <div className="flex flex-col gap-2 min-w-0">
@@ -305,7 +354,7 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
             roundedCountryContainer={themeSpecifics.roundedCountryContainer}
             douzePointsAnimationMode={themeSpecifics.douzePointsAnimationMode}
             douzeOptions={themeSpecifics.douzeOptions}
-            togglesBelow
+            stateMenu
           />
         </div>
 
@@ -314,47 +363,25 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           {/* Header row */}
           <div className="flex justify-between items-start gap-2">
             <div className="min-w-0 flex-1">
-              {/* Kicker + audio pill */}
-              <div className="flex items-center gap-1.5 mb-[5px] flex-wrap">
-                <span
-                  className="text-[11px] font-[800] tracking-[0.16em] uppercase whitespace-nowrap"
-                  style={{ color: 'var(--t-acc)' }}
-                >
-                  {isMyTheme && !theme.isPublic
-                    ? t('widgets.private')
-                    : t('widgets.public')}{' '}
-                  {t('common.theme').toLowerCase()}
-                </span>
-                {theme.hasCustomAudio && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
-                    <Volume1 className="size-[11px]" />
-                    Audio
-                  </span>
-                )}
-                {!!theme.backgroundVideoUrl && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
-                    <Video className="size-[11px]" />
-                    {t('widgets.themes.backgroundVideo.badge')}
-                  </span>
-                )}
-                {theme.hasCustomFonts && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-white/70 bg-black/[0.28] rounded-full px-2.5 py-[3px]">
-                    <ALargeSmall className="size-[11px]" />
-                    {t('widgets.themes.fonts.badge')}
-                  </span>
-                )}
-                {theme.group && (
-                  <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
-                    <Folder className="size-3 shrink-0" aria-hidden />
-                    <span className="truncate">{theme.group.name}</span>
-                  </div>
-                )}
-              </div>
-
               {/* Theme name */}
-              <h3 className="text-white font-[800] sm:text-[19px] text-[17px] tracking-[-0.02em] leading-tight m-0">
+              <h3 className="text-white font-[800] sm:text-[19px] text-[17px] tracking-[-0.02em] leading-tight m-0 text-balance">
                 {theme.name}
               </h3>
+
+              {/* Facts: where it lives (your own), its group, what it adds */}
+              {facts.length > 0 && (
+                <ul className="flex flex-wrap items-center gap-x-3.5 gap-y-1 mt-1.5 text-[12.5px] font-semibold text-white/70">
+                  {facts.map((fact) => (
+                    <li
+                      key={fact.id}
+                      className="inline-flex items-center gap-1.5 min-w-0 max-w-full"
+                    >
+                      <span className="flex-none opacity-75">{fact.icon}</span>
+                      <span className="truncate">{fact.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
               {/* Remixed-from provenance */}
               {theme.remixedFrom && theme.remixedFromName && (
@@ -392,8 +419,10 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
           </div>
 
           <div className="mt-auto md:pt-2">
-            {/* Creator */}
-            {theme.creator && <UserInfo user={theme.creator} size="sm" />}
+            {/* Creator (not on your own list: it's you) */}
+            {theme.creator && variant !== 'user' && (
+              <UserInfo user={theme.creator} size="sm" />
+            )}
 
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -432,6 +461,8 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                       type="button"
                       onClick={() => onLike?.(theme._id)}
                       disabled={!user || offline}
+                      aria-label={t('widgets.like')}
+                      aria-pressed={!!likedByMe}
                       className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                         likedByMe
                           ? 'text-white border-transparent'
@@ -460,6 +491,8 @@ const ThemeListItem: React.FC<ThemeListItemProps> = ({
                       type="button"
                       onClick={() => onSave?.(theme._id, savedByMe ?? false)}
                       disabled={!user || offline}
+                      aria-label={t('widgets.save')}
+                      aria-pressed={!!savedByMe}
                       className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                         savedByMe
                           ? 'text-white border-transparent'

@@ -9,4 +9,5 @@ vi.mock('react-easy-sort', () => ({
   SortableItem: ({ children }: { children: React.ReactNode }) => (
     <div>{children}</div>
   ),
+  SortableKnob: ({ children }: { children: React.ReactNode }) => children,
 }));

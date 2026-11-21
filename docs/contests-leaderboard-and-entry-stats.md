@@ -92,7 +92,7 @@ Constants in `douze-points-backend/src/contests/leaderboard.constants.ts`:
 - **UI**: `GlobalLeaderboardModal.tsx` — sortable table, scope selector (`CustomSelect`), optional **custom year** via search with no matches → `emptyFilterContent` “Use year {year}” button (see `CustomSelect` `emptyFilterContent`).
 - **Nullable columns** (`winRate`, `avgGrandFinalPoints`): sort uses **`compareMetricValue`** so **nulls sort last** in both asc and desc (avoid “—” floating to top on descending sort).
 
-Entry point: e.g. **Public Contests** widget chart button opens the modal (`PublicContests.tsx`).
+Entry point: the **Country leaderboard** link on the count line of Contests → Community (`PublicContests.tsx`); Contests → Yours has **Your entry stats** in the same place (`UserContests.tsx`).
 
 Strings: `widgets.contests.leaderboard` in locale files.
 

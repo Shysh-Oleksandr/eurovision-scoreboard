@@ -2,7 +2,6 @@
 import { Dices, Trophy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { useAllocationDrawContext } from './AllocationDrawContext';
 import { enterDrawMode, leaveDrawMode } from './drawMode';
@@ -14,6 +13,7 @@ import AnchoredMenu, {
 } from '@/components/common/AnchoredMenu';
 import Button from '@/components/common/Button';
 import { useContestField } from '@/components/setup/hub/hooks/useContestField';
+import { toast } from '@/helpers/toast';
 import { useCountriesStore } from '@/state/countriesStore';
 
 /**

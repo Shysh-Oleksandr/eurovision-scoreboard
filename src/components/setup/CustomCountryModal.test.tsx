@@ -105,6 +105,26 @@ vi.mock('./custom-entry/FlagPicker', () => ({
   ),
 }));
 
+vi.mock('./custom-entry/EntryColorsField', () => ({
+  default: ({
+    value,
+    onChange,
+  }: {
+    value: string[] | null;
+    onChange: (colors: string[] | null) => void;
+  }) => (
+    <>
+      <button type="button" onClick={() => onChange(['#c8102e', '#ffffff'])}>
+        pick colors
+      </button>
+      <button type="button" onClick={() => onChange(null)}>
+        colors from the flag
+      </button>
+      <span data-testid="entry-colors">{value?.join() ?? 'flag'}</span>
+    </>
+  ),
+}));
+
 vi.mock('./custom-entry/EntryActionBar', () => ({
   default: ({
     onSave,
@@ -232,5 +252,47 @@ describe('CustomCountryModal saving', () => {
 
     expect(api.update).not.toHaveBeenCalled();
     expect(screen.getByText('linkInvalid')).toBeInTheDocument();
+  });
+
+  it('saves picked colours with a new entry, and none from the flag', async () => {
+    api.create.mockResolvedValue({ _id: 'new2' });
+
+    render(<CustomCountryModal isOpen onClose={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('name'), {
+      target: { value: 'Westvale' },
+    });
+    await save();
+    expect(api.create.mock.calls[0][0]).not.toHaveProperty('colors');
+
+    cleanup();
+    render(<CustomCountryModal isOpen onClose={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText('name'), {
+      target: { value: 'Eastvale' },
+    });
+    fireEvent.click(screen.getByText('pick colors'));
+    await save();
+    expect(api.create.mock.calls[1][0].colors).toEqual(['#c8102e', '#ffffff']);
+  });
+
+  it('saves changed colours on an edit, and null to read the flag again', async () => {
+    api.update.mockResolvedValue({});
+    const coloured = { ...barnsley, colors: ['#e30613', '#ffffff'] };
+
+    render(
+      <CustomCountryModal isOpen onClose={vi.fn()} countryToEdit={coloured} />,
+    );
+    expect(screen.getByTestId('entry-colors')).toHaveTextContent(
+      '#e30613,#ffffff',
+    );
+    expect(screen.getByText('save entry')).toBeDisabled();
+
+    fireEvent.click(screen.getByText('pick colors'));
+    expect(screen.getByText('save entry')).toBeEnabled();
+    await save();
+    expect(api.update.mock.calls[0][0].colors).toEqual(['#c8102e', '#ffffff']);
+
+    fireEvent.click(screen.getByText('colors from the flag'));
+    await save();
+    expect(api.update.mock.calls[1][0].colors).toBeNull();
   });
 });

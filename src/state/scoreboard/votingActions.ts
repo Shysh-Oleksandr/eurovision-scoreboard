@@ -10,6 +10,7 @@ import { useCountriesStore } from '../countriesStore';
 import { useGeneralStore } from '../generalStore';
 
 import {
+  createCountriesComparator,
   getFinalRevealInfo,
   getLastCountryCodeByPoints,
   getLastCountryIndexByPoints,
@@ -28,6 +29,7 @@ import {
 } from './votingHaptics';
 
 import { ANIMATION_DURATION } from '@/data/data';
+import { getOpenPlacesInActiveSection } from '@/helpers/qualifierTargetResolution';
 import { playHaptic } from '@/native/haptics';
 import {
   isVotingPointsValueDouzeTier,
@@ -205,16 +207,49 @@ const getCountryTotalPoints = (
   return (points?.juryPoints || 0) + (points?.televotePoints || 0);
 };
 
+/**
+ * The stage's entries by their (predefined) points, ranked with the same
+ * comparator that hands the qualifiers to their target stages when the stage
+ * ends, ties included: Pick qualifiers mode's places must end up where it
+ * put them.
+ */
 const getRankedCountriesWithPoints = (
   stage: EventStage,
   stageCountryPoints?: Record<string, any>,
 ): (Country & { totalPoints: number })[] =>
   stage.countries
     .map((country) => ({
-      ...country,
+      ...assignPointsToCountry(
+        stage,
+        stageCountryPoints?.[country.code],
+        country,
+      ),
       totalPoints: getCountryTotalPoints(stage, country, stageCountryPoints),
     }))
-    .sort((a, b) => b.totalPoints - a.totalPoints);
+    .sort(createCountriesComparator(stage.runningOrder));
+
+/**
+ * Who would take the open places of the target stage being filled: the best
+ * ranked entries not picked yet. Pick qualifiers mode fills the target
+ * stages in order (the first picks go to the first one), so a pick from
+ * outside this set swaps votes with its last entry, and a random pick
+ * reveals one of them.
+ */
+const getEntriesForOpenPlaces = (
+  stage: EventStage,
+  stageCountryPoints?: Record<string, any>,
+) => {
+  const remaining = getRankedCountriesWithPoints(
+    stage,
+    stageCountryPoints,
+  ).filter((country) => !hasQualifiedFromStage(country, stage.id));
+  const openPlaces = getOpenPlacesInActiveSection(
+    stage.qualifiesTo,
+    stage.countries.length - remaining.length,
+  );
+
+  return remaining.slice(0, openPlaces);
+};
 
 const getCurrentSplitScreenContext = (state: ScoreboardState) => {
   const currentStage = state.getCurrentStage();
@@ -324,6 +359,10 @@ const pickSplitScreenCandidates = (
 
   if (remainingSlots <= 0) return [];
 
+  const openPlaces = Math.min(
+    getOpenPlacesInActiveSection(currentStage.qualifiesTo, qualifiedCount),
+    rankedRemainingCountries.length,
+  );
   const maxCandidates = clampSplitScreenCandidatesCount(
     useGeneralStore.getState().settings.splitScreenCandidatesCount,
   );
@@ -361,11 +400,11 @@ const pickSplitScreenCandidates = (
     lastShownSet.has(code) ? 0.3 : 1;
   const cutoffBoost = (code: string): number => {
     const rank = rankByCode[code] || Number.MAX_SAFE_INTEGER;
-    const distance = Math.abs(rank - remainingSlots);
+    const distance = Math.abs(rank - openPlaces);
 
     if (distance <= 1) return 1.7;
     if (distance <= 3) return 1.35;
-    if (rank <= remainingSlots) return 1.15;
+    if (rank <= openPlaces) return 1.15;
 
     return 1;
   };
@@ -373,10 +412,9 @@ const pickSplitScreenCandidates = (
   const underSoftCap = (country: Country) =>
     (shownCountByCountry[country.code] || 0) < SPLIT_SCREEN_MAX_EXPOSURE;
 
-  const wouldQualifyNow = rankedRemainingCountries.slice(
-    0,
-    Math.min(remainingSlots, rankedRemainingCountries.length),
-  );
+  // The places of the target stage being filled: the anchor comes from the
+  // entries that would take them, so one candidate always qualifies.
+  const wouldQualifyNow = rankedRemainingCountries.slice(0, openPlaces);
 
   const anchorPoolWithCap = wouldQualifyNow.filter(underSoftCap);
   const anchorPool =
@@ -1815,15 +1853,12 @@ export const createVotingActions: StateCreator<
     )
       return;
 
-    // Get the top N countries by points (excluding already qualified ones)
-    const countriesWithPoints = getRankedCountriesWithPoints(
+    // The entries that would take the open places of the target stage
+    // being filled (with one target stage: every place left).
+    const topCountries = getEntriesForOpenPlaces(
       currentStage,
       stageCountryPoints,
     );
-
-    const topCountries = countriesWithPoints
-      .slice(0, qualifiersAmount)
-      .filter((country) => !hasQualifiedFromStage(country, currentStage.id));
 
     // Check if the selected country would have qualified by predefined votes
     const wouldHaveQualified = topCountries.some(
@@ -2001,15 +2036,12 @@ export const createVotingActions: StateCreator<
 
     if (availableCountries.length === 0) return;
 
-    const countriesWithPoints = getRankedCountriesWithPoints(
+    // A random pick reveals one of the entries that take the open places of
+    // the target stage being filled, so predefined results stand.
+    const topCountries = getEntriesForOpenPlaces(
       currentStage,
       stageCountryPoints,
     );
-
-    // TODO: go through .sort( to always use the running order; fix the issue when selecting televote active country
-    const topCountries = countriesWithPoints
-      .slice(0, qualifiersAmount)
-      .filter((country) => !hasQualifiedFromStage(country, currentStage.id));
 
     if (topCountries.length === 0) return;
 

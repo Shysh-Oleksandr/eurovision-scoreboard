@@ -141,7 +141,7 @@ Outside the simulation:
 | `curtainUp` | `startEvent`, `continueToNextPhase` (eventActions), with the board's rise-in | 2 |
 | `drawPot`, `drawPick`, `drawChip`, `drawFlight` | `useDrawCeremony` step timelines, durations divided by the draw speed; "Draw next" skips a reveal's cues and plays one short landing | 1, 1, 0, 1 |
 | `drawDone` | the ceremony's `finish` (last reveal, Skip to result, Instant result) | 2 |
-| `selection` | `Tabs`, `RelSegmented`, the studio's `Seg` | 0 |
+| `selection` | `Tabs`, `RelSegmented`, the studio's `Seg`, the voting predefinition's points bar (a picked value) and whole-vote taps | 0 |
 | `sliderTick` (firmer at the ends and detents) | `RangeSlider`, `DivergingSlider` (0 is a detent), the studio's `RangeField`, via `useSliderHaptics`: every step, or every 5% past 40 steps | 0 |
 | `toggle` (on: a knock and a catch; off: one softer knock) | `ToggleButton`, settings `SwitchRow` row clicks, `Checkbox`, the studio's `Toggle` | 0 |
 | `snap` | the studio's `useGestures`: a new snap guide, straight rotation, each 15° stop with Shift | 0 |

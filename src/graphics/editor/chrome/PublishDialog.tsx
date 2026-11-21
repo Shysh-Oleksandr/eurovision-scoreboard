@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import { MissingAssetError, publishDesign } from '../../cloud/publishDesign';
 import DesignThumb from '../../components/DesignThumb';
@@ -37,6 +36,7 @@ import { Dialog } from './EditorDialogs';
 
 import { useInvalidateDesigns } from '@/api/designs';
 import Button from '@/components/common/Button';
+import { toast } from '@/helpers/toast';
 import type { CloudDesign } from '@/types/design';
 
 type Visibility = 'public' | 'private';

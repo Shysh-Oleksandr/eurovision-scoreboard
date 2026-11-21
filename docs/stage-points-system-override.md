@@ -52,7 +52,7 @@ overrides?: StageOverrides;
 2. Add a corresponding field to the snapshot type (`src/types/contestSnapshot.ts`).
 3. Add serialization / deserialization in `src/helpers/contestSnapshot.ts`.
 4. Wire a new resolver or extend `resolveStagePointsSystem` for the new field.
-5. Expose a control in `StageGeneralTab.tsx`.
+5. Expose a control in `StageGeneralTab.tsx` (or `general/StagePointsSection.tsx`).
 
 ---
 
@@ -166,8 +166,8 @@ The derived `allowMultiplePointsToSameEntry` is then used in the existing `isDis
 
 ### `src/components/setup/post-setup/PostSetupModal.tsx` — General tab
 
-The modal has three tabs in order: **Running Order**, **Voters**, **General**. The General
-tab is last by design — it is the least frequently needed.
+The modal has four tabs in order: **Running order**, **Voters**, **Odds**, **General**. The
+General tab is last by design — it is the least frequently needed.
 
 The modal integrates `useStagePointsOverrideDraft(stage, isOpen)` and wires its return
 values directly into `StageGeneralTab`:
@@ -175,7 +175,7 @@ values directly into `StageGeneralTab`:
 ```
 useStagePointsOverrideDraft → controller, isOverridden, resetToGlobal, getOverride
 ↓
-StageGeneralTab → PointsSystemSelection (controller prop)
+StageGeneralTab → StagePointsSection (controller prop; general/)
 ```
 
 On **Save**, `handleSave` calls `getOverride()`:
@@ -223,13 +223,16 @@ original global-settings behavior unchanged.
 
 ### Indicator and reset
 
-When `isOverridden` is `true`, `StageGeneralTab` shows a yellow indicator banner above the
-`PointsSystemSelection` component with a **Reset to global** button. The indicator disappears
-immediately when the user resets or edits the override back to match global.
+`StagePointsSection` (the stage's own editor; Settings keeps `PointsSystemSelection`)
+says beside the "Points" title whether the points are "Same as Settings." or "Only this
+stage." with a **Use Settings' points** link (`resetToGlobal`). The line flips as soon as
+the user resets or edits the override back to match global. The points are one strip per
+channel (`PointsStrip`): a field per value, a star for the douze points animation, ×, drag
+to reorder, and a dashed + tile.
 
-i18n keys (all 8 locale files, under `setup.eventStageModal`):
-- `general` — tab label
-- `enablePredefinedVotesForStage` — enable predefined votes for stage label
+i18n keys: the tab label is `setup.eventStageModal.general`; the General tab's own strings
+(predefined votes and its status hints, the points section, the presets) are under
+`setup.stageSetup`.
 
 ---
 

@@ -264,3 +264,39 @@ export function getSpecialColorStyle(colorValue: string | undefined): {
     style: undefined,
   };
 }
+
+/** `#rrggbb` from a hex or rgb()/rgba() string, exactly; else undefined. */
+const hexOrRgbToHex = (value: string): string | undefined => {
+  if (/^#[0-9a-f]{6}$/i.test(value)) return value.toLowerCase();
+
+  const rgb =
+    /^rgba?\(\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)/i.exec(
+      value,
+    );
+
+  return rgb
+    ? `#${rgb
+        .slice(1, 4)
+        .map((channel) =>
+          Math.min(255, Math.round(Number(channel)))
+            .toString(16)
+            .padStart(2, '0'),
+        )
+        .join('')}`
+    : undefined;
+};
+
+/**
+ * A solid colour from the colour picker (rgba(), hex, hsl() or "h s% l%")
+ * as `#rrggbb`, or undefined for anything else (a gradient). Hex and rgb
+ * values convert exactly (a typed #0033a0 stays #0033a0). For values stored
+ * as plain hex: douze options, custom entries' colours.
+ */
+export function colorToHex(value: string): string | undefined {
+  const trimmed = value.trim();
+
+  return (
+    hexOrRgbToHex(trimmed) ??
+    hexOrRgbToHex(hslStringToHex(parseColor(trimmed)).trim())
+  );
+}

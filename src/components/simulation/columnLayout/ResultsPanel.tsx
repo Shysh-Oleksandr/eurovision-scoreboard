@@ -1,6 +1,7 @@
 'use client';
 import {
   ArrowRight,
+  CalendarPlus,
   ChartBar,
   ChevronDown,
   Eye,
@@ -18,9 +19,11 @@ import { WindowFrame } from './VoterWindow';
 import { WINDOW_CLASS } from './VotingColumn';
 
 import Button from '@/components/common/Button';
+import { useCanStartNextYear } from '@/components/nextYear/useCanStartNextYear';
 import { getFlagPath, handleFlagError } from '@/helpers/getFlagPath';
 import { useShortcut } from '@/shortcuts/registry';
 import { useGeneralStore } from '@/state/generalStore';
+import { openNextYear } from '@/state/nextYearStore';
 
 const FinalStatsModal = dynamic(() => import('../finalStats/FinalStatsModal'), {
   ssr: false,
@@ -105,8 +108,10 @@ const ResultsPanel = ({
   hideStats = false,
 }: ResultsPanelProps) => {
   const t = useTranslations('simulation');
+  const tNextYear = useTranslations('nextYear');
   const eventLabel = useEventLabel();
   const results = usePhaseResults();
+  const canStartNextYear = useCanStartNextYear();
   const [statsOpen, setStatsOpen] = useState(false);
   const [statsLoaded, setStatsLoaded] = useState(false);
 
@@ -215,6 +220,32 @@ const ResultsPanel = ({
     </Button>
   );
 
+  // Next year placement 2 of 4 (docs/event-setup-hub-and-design-tokens.md
+  // §8): where Continue sits during the show. The stripe has room for an
+  // icon only, like Stats and Share there.
+  const nextYearButton =
+    canStartNextYear &&
+    (variant === 'stripe' ? (
+      <Button
+        variant="surface"
+        size="md"
+        title={tNextYear('button')}
+        aria-label={tNextYear('button')}
+        Icon={<CalendarPlus className="size-[18px]" />}
+        onClick={() => openNextYear('results')}
+      />
+    ) : (
+      <Button
+        variant="surface"
+        size="lg"
+        className="w-full justify-center"
+        Icon={<CalendarPlus className="size-[18px]" />}
+        onClick={() => openNextYear('results')}
+      >
+        {tNextYear('button')}
+      </Button>
+    ));
+
   const stageSelect = showStageSelect && viewedStage && (
     <StageSelect
       value={viewedStage.id}
@@ -267,8 +298,10 @@ const ResultsPanel = ({
           </div>
           {stageSelect}
           {nqToggle}
-          {continueButton && (
-            <div className="mt-auto pt-1">{continueButton}</div>
+          {(continueButton || nextYearButton) && (
+            <div className="mt-auto pt-1">
+              {continueButton || nextYearButton}
+            </div>
           )}
         </div>
         {statsModal}
@@ -330,6 +363,7 @@ const ResultsPanel = ({
         {!hideStats && statsButton}
         {shareButton}
         {continueButton && <div className="shrink-0">{continueButton}</div>}
+        {nextYearButton}
         {viewScoreboardButton && (
           <div className="shrink-0">{viewScoreboardButton}</div>
         )}
@@ -354,6 +388,7 @@ const ResultsPanel = ({
       )}
       {continueButton}
       {viewScoreboardButton}
+      {nextYearButton}
       {statsModal}
     </div>
   );

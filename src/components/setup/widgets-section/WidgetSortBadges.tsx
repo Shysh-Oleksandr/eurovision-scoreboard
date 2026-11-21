@@ -1,13 +1,73 @@
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { DateRangeFilter, getDateRange } from './utils/getFilterDateRange';
 
-import { CalendarSearchIcon } from '@/assets/icons/CalendarSearchIcon';
-import { FilterIcon } from '@/assets/icons/FilterIcon';
-import Badge from '@/components/common/Badge';
+import CaptionSelect from '@/components/common/CaptionSelect';
+import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 
 export type PublicSortKey = 'latest' | 'oldest' | 'likes' | 'saves' | 'copies';
+
+type DateRangeKey =
+  | 'all'
+  | 'today'
+  | 'thisWeek'
+  | 'lastWeek'
+  | 'thisMonth'
+  | 'lastMonth';
+
+const SORT_KEYS: PublicSortKey[] = [
+  'latest',
+  'oldest',
+  'likes',
+  'saves',
+  'copies',
+];
+
+const DATE_RANGE_KEYS: DateRangeKey[] = [
+  'all',
+  'today',
+  'thisWeek',
+  'lastWeek',
+  'thisMonth',
+  'lastMonth',
+];
+
+const SORT_LABEL_KEYS: Record<PublicSortKey, string> = {
+  latest: 'latest',
+  oldest: 'oldest',
+  likes: 'mostLiked',
+  saves: 'mostSaved',
+  copies: 'mostCopied',
+};
+
+const DATE_LABEL_KEYS: Record<DateRangeKey, string> = {
+  all: 'allTime',
+  today: 'today',
+  thisWeek: 'thisWeek',
+  lastWeek: 'lastWeek',
+  thisMonth: 'thisMonth',
+  lastMonth: 'lastMonth',
+};
+
+/** Selects and the trailing text on one row; then the text under them. */
+const SORT_ROW_STEPS = [{ sort: 'row' }, { sort: 'split' }] as const;
+
+const activeDateRangeKey = (dateRange: DateRangeFilter): DateRangeKey => {
+  if (!dateRange) return 'all';
+
+  return (
+    DATE_RANGE_KEYS.find((key) => {
+      if (key === 'all') return false;
+      const expected = getDateRange(key);
+
+      return (
+        expected?.startDate === dateRange.startDate &&
+        expected?.endDate === dateRange.endDate
+      );
+    }) ?? 'all'
+  );
+};
 
 interface WidgetSortBadgesProps {
   value: PublicSortKey;
@@ -16,138 +76,65 @@ interface WidgetSortBadgesProps {
   dateRange?: DateRangeFilter;
   onDateRangeChange?: (range: DateRangeFilter) => void;
   hideCopies?: boolean;
-  /** Restrict which sort badges render (e.g. fonts have no likes/saves). Default: all. */
+  /** Restrict which sort options show (e.g. fonts have no likes/saves). Default: all. */
   visibleKeys?: PublicSortKey[];
+  /** Text at the row's right end, e.g. how many items the list found. */
+  trailing?: React.ReactNode;
 }
 
+/**
+ * Sort and date filters of the library and profile lists: two selects with
+ * their name inside ("Sort by" over "Latest", "Created" over "All time")
+ * instead of a row of chips each.
+ */
 const WidgetSortBadges: React.FC<WidgetSortBadgesProps> = ({
   value,
   onChange,
-  className,
+  className = '',
   dateRange,
   onDateRangeChange,
   hideCopies = false,
   visibleKeys,
+  trailing,
 }) => {
   const t = useTranslations('widgets.sortBadges');
-  const show = (key: PublicSortKey) =>
-    !visibleKeys || visibleKeys.includes(key);
+  const ref = useRef<HTMLDivElement>(null);
+  const step = useFitStep(ref, SORT_ROW_STEPS);
 
-  const handleDateRangeClick = (
-    range:
-      | 'today'
-      | 'thisWeek'
-      | 'lastWeek'
-      | 'thisMonth'
-      | 'lastMonth'
-      | 'all',
-  ) => {
-    if (!onDateRangeChange) return;
+  const sortOptions = SORT_KEYS.filter(
+    (key) =>
+      (!visibleKeys || visibleKeys.includes(key)) &&
+      !(hideCopies && key === 'copies'),
+  ).map((key) => ({ value: key, label: t(SORT_LABEL_KEYS[key]) }));
 
-    if (range === 'all') {
-      onDateRangeChange(null);
-    } else {
-      onDateRangeChange(getDateRange(range));
-    }
-  };
-
-  const isDateRangeActive = (
-    range:
-      | 'today'
-      | 'thisWeek'
-      | 'lastWeek'
-      | 'thisMonth'
-      | 'lastMonth'
-      | 'all',
-  ): boolean => {
-    if (!dateRange && range === 'all') return true;
-    if (!dateRange || range === 'all') return false;
-
-    const expectedRange = getDateRange(range);
-
-    if (!expectedRange) return false;
-
-    return (
-      dateRange.startDate === expectedRange.startDate &&
-      dateRange.endDate === expectedRange.endDate
-    );
-  };
+  const dateOptions = DATE_RANGE_KEYS.map((key) => ({
+    value: key,
+    label: t(DATE_LABEL_KEYS[key]),
+  }));
 
   return (
-    <div className={`space-y-3 ${className || ''}`}>
-      <div className="flex items-center flex-wrap justify-start gap-2">
-        <FilterIcon className="w-6 h-6" />
-        {show('latest') && (
-          <Badge
-            label={t('latest')}
-            onClick={() => onChange('latest')}
-            isActive={value === 'latest'}
-          />
-        )}
-        {show('oldest') && (
-          <Badge
-            label={t('oldest')}
-            onClick={() => onChange('oldest')}
-            isActive={value === 'oldest'}
-          />
-        )}
-        {show('likes') && (
-          <Badge
-            label={t('mostLiked')}
-            onClick={() => onChange('likes')}
-            isActive={value === 'likes'}
-          />
-        )}
-        {show('saves') && (
-          <Badge
-            label={t('mostSaved')}
-            onClick={() => onChange('saves')}
-            isActive={value === 'saves'}
-          />
-        )}
-        {!hideCopies && show('copies') && (
-          <Badge
-            label={t('mostCopied')}
-            onClick={() => onChange('copies')}
-            isActive={value === 'copies'}
-          />
-        )}
-      </div>
+    <div
+      ref={ref}
+      {...fitStepAttributes(SORT_ROW_STEPS[step])}
+      className={`dp-sort-row ${className}`}
+    >
+      <CaptionSelect
+        caption={t('sortBy')}
+        value={value}
+        options={sortOptions}
+        onChange={onChange}
+      />
       {onDateRangeChange && (
-        <div className="flex items-center flex-wrap justify-start gap-2">
-          <CalendarSearchIcon className="w-6 h-6" />
-          <Badge
-            label={t('today')}
-            onClick={() => handleDateRangeClick('today')}
-            isActive={isDateRangeActive('today')}
-          />
-          <Badge
-            label={t('thisWeek')}
-            onClick={() => handleDateRangeClick('thisWeek')}
-            isActive={isDateRangeActive('thisWeek')}
-          />
-          <Badge
-            label={t('lastWeek')}
-            onClick={() => handleDateRangeClick('lastWeek')}
-            isActive={isDateRangeActive('lastWeek')}
-          />
-          <Badge
-            label={t('thisMonth')}
-            onClick={() => handleDateRangeClick('thisMonth')}
-            isActive={isDateRangeActive('thisMonth')}
-          />
-          <Badge
-            label={t('lastMonth')}
-            onClick={() => handleDateRangeClick('lastMonth')}
-            isActive={isDateRangeActive('lastMonth')}
-          />
-          <Badge
-            label={t('allTime')}
-            onClick={() => handleDateRangeClick('all')}
-            isActive={isDateRangeActive('all')}
-          />
-        </div>
+        <CaptionSelect
+          caption={t('created')}
+          value={activeDateRangeKey(dateRange ?? null)}
+          options={dateOptions}
+          onChange={(key) =>
+            onDateRangeChange(key === 'all' ? null : getDateRange(key))
+          }
+        />
       )}
+      {trailing && <div className="dp-sort-trail">{trailing}</div>}
     </div>
   );
 };

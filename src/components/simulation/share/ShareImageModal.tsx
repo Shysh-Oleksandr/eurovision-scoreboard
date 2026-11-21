@@ -12,7 +12,6 @@ import {
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { toast } from 'react-toastify';
 
 import { ShareRowButton } from './controls';
 import SharePicture, { ShareDataProps } from './SharePicture';
@@ -24,6 +23,7 @@ import { canCopyImages, copyImageFrom } from '@/graphics/export/imageActions';
 import { DesignExportOptions } from '@/graphics/export/useDesignExport';
 import { Design } from '@/graphics/model/design';
 import { saveFile, shareFile } from '@/helpers/fileActions';
+import { toast } from '@/helpers/toast';
 import { useBackHandler } from '@/hooks/useBackHandler';
 import { useTouchDevice } from '@/hooks/useTouchDevice';
 import { IS_NATIVE_APP } from '@/native/platform';

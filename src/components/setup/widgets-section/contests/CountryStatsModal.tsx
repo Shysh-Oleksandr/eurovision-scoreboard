@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
 
 import WidgetResourceGroupBadges from '../WidgetResourceGroupBadges';
 
@@ -25,6 +24,7 @@ import {
   sortContestsNewestFirst,
 } from '@/helpers/entryStats';
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { toast } from '@/helpers/toast';
 import { useIsOffline } from '@/state/connectivityStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';

@@ -75,7 +75,8 @@ const SimStripe = ({
   const voter = useVoterInfo();
   const voteProgress = useRoundProgress(voter);
   const q = useQualifiers();
-  const qualifiedCaption = useQualifiedCaption(q);
+  // Shown over the split screen: where the next pick goes.
+  const qualifiedCaption = useQualifiedCaption(q, 'next');
   const showProgress = useGeneralStore(
     (state) => state.settings.shouldShowJuryVotingProgress,
   );

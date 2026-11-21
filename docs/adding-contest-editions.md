@@ -119,6 +119,7 @@ Edit the JSON file and **bump `COUNTRIES_DATA_VERSION`** in every case.
   2. Set `IS_JESC` to match the contest.
   3. Run it and copy each `juryOdds` / `televoteOdds` into the JSON. The scale is ESC finalists 20–99, JESC finalists 5–99, non-finalists 1–20, rounded to 0.5. There is no separate Asia scale: use `IS_JESC = true` (single show, no non-finalists).
   4. Revert the script's pasted data afterwards, unless the user wants it kept.
+  5. Run `yarn gen:odds-history`: Next year's "New songs" draws each country's odds from its past editions (`src/state/nextYear/oddsHistory.generated.json`), and `oddsHistory.test.ts` fails until the file matches the data.
 - **A country withdraws or joins:** remove or add its entry, following §2.
 
 ### 4.4 A country that isn't in `COMMON_COUNTRIES`
@@ -156,7 +157,7 @@ Things that need no change: the snapshot save/load (`contestSnapshot.ts`), the d
 
 1. `yarn lint:types-cli`: must pass.
 2. `npx eslint <changed files>`: no **new** errors. Some touched files already have lint errors, so compare against the errors that were there before your change.
-3. `npx vitest run src/helpers/contestFingerprint.test.ts src/i18n/messagesManifest.test.ts`. The manifest test fails if you edited `messages/*.json` without running `yarn gen:messages`.
+3. `npx vitest run src/helpers/contestFingerprint.test.ts src/i18n/messagesManifest.test.ts src/state/nextYear/oddsHistory.test.ts`. The manifest test fails if you edited `messages/*.json` without running `yarn gen:messages`, the odds history test if odds changed without `yarn gen:odds-history`.
 4. Validate the JSON and the codes:
 
    ```bash
@@ -178,7 +179,7 @@ Things that need no change: the snapshot save/load (`contestSnapshot.ts`), the d
    - Select it. The setup header should read "<Contest name> <year>" and show the expected participant count and stages. For a single show that is one stage, "Grand Final".
    - Run `JSON.parse(localStorage['general-storage']).state.settings`. It should show the expected `contestType` and `hostingCountryCode`.
    - In the Network panel, the expected `…-countries-<year>.json?v=<new version>` should be requested.
-   - Press Start, open the Voters tab and press "Load year data". Rest of the World should be present or absent, as expected for the series.
+   - Press Start, open the Voters tab and pick Set voters → "The year's real voters". Rest of the World should be present or absent, as expected for the series.
    - Switch back to another series and year. The other series' lineup and theme should come back.
 
 ---

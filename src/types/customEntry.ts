@@ -6,6 +6,8 @@ export interface CustomEntry {
   groupId?: string | null;
   /** Up to 3 letters or digits, upper-cased; absent = made from the name. */
   shortCode?: string;
+  /** 1–3 `#rrggbb` colours; absent = read from the flag (entryColors.ts). */
+  colors?: string[];
   createdAt: string;
   updatedAt: string;
 }

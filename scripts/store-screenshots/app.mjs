@@ -553,6 +553,26 @@ const openSession = async ({ browser, url, device, locale, rawDir, account, publ
   return session;
 };
 
+/**
+ * A library list (Themes, Contests) sorted by `label`: the toolbar's Sort by
+ * select, or on phones the Sort button's sheet.
+ */
+const pickLibrarySort = async ({ page, button, t }, label) => {
+  const sheetButton = page.locator('.dp-lib-sortbtn:visible').first();
+
+  if (await sheetButton.count()) {
+    await sheetButton.click();
+    await page.getByRole('radio', { name: label, exact: true }).click();
+    await button(t.common.done).last().click();
+  } else {
+    await page
+      .locator('.dp-capsel:visible', { hasText: t.widgets.sortBadges.sortBy })
+      .first()
+      .click();
+    await page.getByRole('menuitem', { name: label, exact: true }).click();
+  }
+};
+
 /** Scores the real final up to Denmark's douze points, then the winner. */
 const mainSession = async (session, want) => {
   const { page, button, t } = session;
@@ -560,7 +580,7 @@ const mainSession = async (session, want) => {
   if (want('publicthemes')) {
     await page.getByText(t.widgets.themes.title, { exact: true }).first().click();
     await page
-      .getByText(t.widgets.themes.publicThemes, { exact: true })
+      .locator('[role="tab"]:visible', { hasText: t.widgets.community })
       .first()
       .click();
     await page.waitForTimeout(1500);
@@ -571,7 +591,7 @@ const mainSession = async (session, want) => {
       { timeout: 45000 },
     );
 
-    await button(t.widgets.sortBadges.mostLiked).first().click();
+    await pickLibrarySort(session, t.widgets.sortBadges.mostLiked);
     await sorted;
     // The cards and their preview images.
     await page.waitForTimeout(3500);
@@ -700,7 +720,7 @@ const contestsSession = async (session) => {
   await signIn(session);
   await page.getByText(t.widgets.contests.title, { exact: true }).first().click();
   await page.waitForTimeout(2500);
-  await button(t.widgets.sortBadges.oldest).first().click();
+  await pickLibrarySort(session, t.widgets.sortBadges.oldest);
   await page.waitForTimeout(2500);
   await capture(session, 'contests');
 };

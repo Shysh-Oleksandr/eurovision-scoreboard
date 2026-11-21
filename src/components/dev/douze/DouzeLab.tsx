@@ -11,9 +11,10 @@ import {
 } from '@/douze/options';
 import { year2022Douze } from '@/douze/specs/year2022';
 import { year2026Douze } from '@/douze/specs/year2026';
+import { hexToHsl, hslToString } from '@/helpers/colorConversion';
 import { getThemeBackground } from '@/theme/themes';
 import { resolveThemeSpecificsForBaseThemeYear } from '@/theme/themeSpecifics';
-import type { FlagShape } from '@/theme/types';
+import type { FlagShape, PointsContainerShape } from '@/theme/types';
 
 const SPECS: { label: string; year: string; spec: DouzeAnimationSpec }[] = [
   { label: '2022', year: '2022', spec: year2022Douze },
@@ -41,6 +42,26 @@ const FLAG_SHAPES: FlagShape[] = [
   'none',
 ];
 
+/** Points shapes a custom theme can pick (the base theme's own by default). */
+const POINTS_SHAPES: PointsContainerShape[] = [
+  'triangle',
+  'square',
+  'transparent',
+];
+
+/**
+ * A custom theme's row look over the base theme's: pill or square rows,
+ * the points' shape and the total's colour (a theme colour variable, as
+ * a custom theme's overrides set it).
+ */
+type RowLook = {
+  flagShape: FlagShape | null;
+  rounded: boolean | null;
+  pointsShape: PointsContainerShape | null;
+  /** `#rrggbb`. */
+  pointsColor: string | null;
+};
+
 /** A row with the player held at `heldAtMs` (or playing when null). */
 const LabRow: React.FC<{
   spec: DouzeAnimationSpec;
@@ -51,7 +72,7 @@ const LabRow: React.FC<{
   runKey: number;
   playbackRate: number;
   lite: boolean;
-  flagShape: FlagShape | null;
+  look: RowLook;
   label?: string;
 }> = ({
   spec,
@@ -62,10 +83,17 @@ const LabRow: React.FC<{
   runKey,
   playbackRate,
   lite,
-  flagShape,
+  look,
   label,
 }) => {
   const specifics = resolveThemeSpecificsForBaseThemeYear(year);
+  const colorStyle = look.pointsColor
+    ? ({
+        '--twc-countryItem-juryPointsBg': hslToString(
+          hexToHsl(look.pointsColor),
+        ),
+      } as React.CSSProperties)
+    : undefined;
 
   return (
     <div className="flex items-center gap-3">
@@ -75,7 +103,11 @@ const LabRow: React.FC<{
         </span>
       )}
       {/* data-lab-t: the strip rows' boxes, for scripts/douze-frames.mjs compare. */}
-      <div className="relative" style={{ width }} data-lab-t={label}>
+      <div
+        className="relative"
+        style={{ width, ...colorStyle }}
+        data-lab-t={label}
+      >
         <ThemePreviewCountryItemUI
           baseThemeYear={year}
           state="jury"
@@ -84,9 +116,13 @@ const LabRow: React.FC<{
           showDouzePointsAnimation={false}
           previewCountryCode={countryCode}
           uppercaseEntryName={specifics.uppercaseEntryName}
-          flagShape={flagShape ?? specifics.flagShape}
-          pointsContainerShape={specifics.pointsContainerShape}
-          roundedCountryContainer={specifics.roundedCountryContainer}
+          flagShape={look.flagShape ?? specifics.flagShape}
+          pointsContainerShape={
+            look.pointsShape ?? specifics.pointsContainerShape
+          }
+          roundedCountryContainer={
+            look.rounded ?? specifics.roundedCountryContainer
+          }
         />
         <DouzeSpecPlayer
           spec={spec}
@@ -109,6 +145,17 @@ const DouzeLab: React.FC = () => {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [lite, setLite] = useState(false);
   const [flagShape, setFlagShape] = useState<FlagShape | null>(null);
+  const [rounded, setRounded] = useState<boolean | null>(null);
+  const [pointsShape, setPointsShape] = useState<PointsContainerShape | null>(
+    null,
+  );
+  const [pointsColor, setPointsColor] = useState<string | null>(null);
+  const look = useMemo<RowLook>(
+    () => ({ flagShape, rounded, pointsShape, pointsColor }),
+    [flagShape, rounded, pointsShape, pointsColor],
+  );
+  // Rows are measured once per run: a new look remounts them.
+  const lookKey = `${flagShape}-${rounded}-${pointsShape}-${pointsColor}`;
   const [options, setOptions] = useState<DouzeOptions | null>(null);
   const [zoom, setZoom] = useState(1.5);
   const [stepMs, setStepMs] = useState(100);
@@ -240,6 +287,49 @@ const DouzeLab: React.FC = () => {
             <option key={shape}>{shape}</option>
           ))}
         </select>
+        <select
+          className="rounded bg-black/50 px-2 py-1"
+          data-lab-rows=""
+          value={rounded === null ? '' : rounded ? 'rounded' : 'square'}
+          onChange={(e) =>
+            setRounded(e.target.value ? e.target.value === 'rounded' : null)
+          }
+        >
+          <option value="">Theme's rows</option>
+          <option value="rounded">Pill rows</option>
+          <option value="square">Square rows</option>
+        </select>
+        <select
+          className="rounded bg-black/50 px-2 py-1"
+          data-lab-points=""
+          value={pointsShape ?? ''}
+          onChange={(e) =>
+            setPointsShape(
+              (e.target.value || null) as PointsContainerShape | null,
+            )
+          }
+        >
+          <option value="">Theme's points</option>
+          {POINTS_SHAPES.map((shape) => (
+            <option key={shape}>{shape}</option>
+          ))}
+        </select>
+        <label className="flex items-center gap-1">
+          <input
+            type="checkbox"
+            checked={pointsColor !== null}
+            onChange={(e) =>
+              setPointsColor(e.target.checked ? '#800000' : null)
+            }
+          />
+          total
+          <input
+            type="color"
+            data-lab-points-color=""
+            value={pointsColor ?? '#800000'}
+            onChange={(e) => setPointsColor(e.target.value)}
+          />
+        </label>
         <label className="flex items-center gap-1">
           Zoom
           <input
@@ -436,7 +526,7 @@ const DouzeLab: React.FC = () => {
       <div className="flex flex-wrap items-start gap-8">
         <div style={{ zoom }} data-lab-main="">
           <LabRow
-            key={`${countryCode}-${width}-${specIndex}-${year}-${flagShape}`}
+            key={`${countryCode}-${width}-${specIndex}-${year}-${lookKey}`}
             spec={spec}
             year={year}
             countryCode={countryCode}
@@ -445,7 +535,7 @@ const DouzeLab: React.FC = () => {
             runKey={runKey}
             playbackRate={playbackRate}
             lite={lite}
-            flagShape={flagShape}
+            look={look}
           />
         </div>
         {videoUrl && (
@@ -469,7 +559,7 @@ const DouzeLab: React.FC = () => {
       >
         {timeline.map((t) => (
           <LabRow
-            key={`${t}-${countryCode}-${width}-${specIndex}-${year}-${flagShape}`}
+            key={`${t}-${countryCode}-${width}-${specIndex}-${year}-${lookKey}`}
             spec={spec}
             year={year}
             countryCode={countryCode}
@@ -478,7 +568,7 @@ const DouzeLab: React.FC = () => {
             runKey={0}
             playbackRate={1}
             lite={lite}
-            flagShape={flagShape}
+            look={look}
             label={`${t}`}
           />
         ))}

@@ -338,6 +338,262 @@ export const buildCombinedBallotsFromJuryTelevote = (
   return combined;
 };
 
+/**
+ * The usable part of a hand-made ballot: slots of this points system, each
+ * once, to other stage countries, one slot per recipient unless several per
+ * entry are allowed. Whatever else a ballot holds can't be saved anyway.
+ */
+const sanitizeBallot = (
+  ballot: readonly Vote[],
+  voterCode: string,
+  stageCodes: ReadonlySet<string>,
+  pointsSystem: readonly PointsItem[],
+  allowMultiplePointsToSameEntry: boolean,
+): Vote[] => {
+  const ids = new Set(pointsSystem.map((item) => item.id));
+  const usedIds = new Set<number>();
+  const recipients = new Set<string>();
+
+  return ballot.filter((vote) => {
+    if (
+      !ids.has(vote.pointsId) ||
+      usedIds.has(vote.pointsId) ||
+      vote.countryCode === voterCode ||
+      !stageCodes.has(vote.countryCode) ||
+      (!allowMultiplePointsToSameEntry && recipients.has(vote.countryCode))
+    ) {
+      return false;
+    }
+
+    usedIds.add(vote.pointsId);
+    recipients.add(vote.countryCode);
+
+    return true;
+  });
+};
+
+const isCompleteBallot = (
+  ballot: readonly Vote[],
+  pointsSystem: readonly PointsItem[],
+) => {
+  const ids = ballot.map((vote) => vote.pointsId);
+
+  return (
+    ids.length === pointsSystem.length &&
+    new Set(ids).size === ids.length &&
+    pointsSystem.every((item) => ids.includes(item.id))
+  );
+};
+
+/**
+ * Gives a ballot's missing slots at random, keeping what it already has: the
+ * same Plackett-Luce draw as `generateVotesForSource`, over the countries the
+ * voter hasn't given points to yet (any non-self country with several per
+ * entry), top missing value first.
+ */
+const completeBallot = (
+  kept: Vote[],
+  votingCountry: BaseCountry,
+  stageCountries: (Country | BaseCountry)[],
+  theta: ThetaByCode,
+  pointsSystem: PointsItem[],
+  allowMultiplePointsToSameEntry: boolean,
+  offset?: Offset,
+): Vote[] => {
+  const usedIds = new Set(kept.map((vote) => vote.pointsId));
+  const missing = sortedPointsDesc(pointsSystem).filter(
+    (item) => !usedIds.has(item.id),
+  );
+
+  if (missing.length === 0) return kept;
+
+  const candidates = candidatesFor(votingCountry, stageCountries);
+
+  if (allowMultiplePointsToSameEntry) {
+    if (candidates.length === 0) return kept;
+
+    return [
+      ...kept,
+      ...missing.map((item) => {
+        let [bestCode] = candidates;
+        let bestKey = -Infinity;
+
+        for (const code of candidates) {
+          const key =
+            theta[code] + (offset ? offset(code) : 0) + sampleGumbel();
+
+          if (key > bestKey) {
+            bestKey = key;
+            bestCode = code;
+          }
+        }
+
+        return toVote(bestCode, item);
+      }),
+    ];
+  }
+
+  const taken = new Set(kept.map((vote) => vote.countryCode));
+  const ranking = rankByTheta(
+    candidates.filter((code) => !taken.has(code)),
+    theta,
+    offset,
+  );
+
+  return [
+    ...kept,
+    ...missing
+      .slice(0, ranking.length)
+      .map((item, index) => toVote(ranking[index], item)),
+  ];
+};
+
+export type CompleteStageVotesArgs = {
+  votes: Partial<StageVotes> | null | undefined;
+  /** The channels to complete; channels the voting mode doesn't use are skipped. */
+  channels: readonly ('jury' | 'televote')[];
+  /** Only these voters (default: every voter of each channel). */
+  voterCodes?: readonly string[];
+  /**
+   * Combined voting: also rebuild each incomplete combined ballot from the
+   * voter's jury and televote ballots.
+   */
+  completeCombined?: boolean;
+  stageCountries: (Country | BaseCountry)[];
+  votingCountries: VotingCountry[];
+  votingMode: StageVotingMode;
+  countryOdds: CountryOdds;
+  randomnessLevel: number;
+  pointsSpread: number;
+  juryPointsSystem: PointsItem[];
+  televotePointsSystem: PointsItem[];
+  allowMultiplePointsToSameEntry?: boolean;
+  diaspora?: ResolvedDiaspora | null;
+  voterChannels?: VoterChannels;
+};
+
+/**
+ * "Fill the rest": every incomplete ballot in `channels` gets its missing
+ * slots from the random engine, while every point already given stays where
+ * it is. Complete ballots are untouched; anything a ballot holds that can't
+ * be saved (a slot twice, a self-vote) is dropped first. Other channels are
+ * returned as they were.
+ */
+export const completeStageVotes = ({
+  votes,
+  channels,
+  voterCodes,
+  completeCombined = false,
+  stageCountries,
+  votingCountries,
+  votingMode,
+  countryOdds,
+  randomnessLevel,
+  pointsSpread,
+  juryPointsSystem,
+  televotePointsSystem,
+  allowMultiplePointsToSameEntry = false,
+  diaspora,
+  voterChannels,
+}: CompleteStageVotesArgs): Partial<StageVotes> => {
+  const { betaJury, betaTele, luckMag } = deriveEngineParams(
+    randomnessLevel,
+    pointsSpread,
+  );
+  const betaTeleEffective = betaTele + (diaspora?.betaTeleBoost ?? 0);
+  const juryScale = diaspora?.juryScale ?? 0;
+  const stageCodes = new Set(stageCountries.map((country) => country.code));
+  const onlyVoters = voterCodes ? new Set(voterCodes) : null;
+
+  const usesJury =
+    votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+    votingMode === StageVotingMode.JURY_ONLY ||
+    votingMode === StageVotingMode.COMBINED;
+  const usesTelevote =
+    votingMode === StageVotingMode.JURY_AND_TELEVOTE ||
+    votingMode === StageVotingMode.TELEVOTE_ONLY ||
+    votingMode === StageVotingMode.COMBINED;
+
+  const next: Partial<StageVotes> = { ...(votes ?? {}) };
+
+  channels.forEach((channel) => {
+    if (channel === 'jury' ? !usesJury : !usesTelevote) return;
+
+    const pointsSystem =
+      channel === 'jury' ? juryPointsSystem : televotePointsSystem;
+    // One luck shock per channel and call, shared by every voter filled.
+    const theta = buildTheta(
+      stageCountries,
+      countryOdds,
+      channel === 'jury' ? 'juryOdds' : 'televoteOdds',
+      channel === 'jury' ? betaJury : betaTeleEffective,
+      luckMag,
+    );
+    const byVoter: Record<string, Vote[]> = { ...(next[channel] ?? {}) };
+
+    votingCountries.forEach((votingCountry) => {
+      if (onlyVoters && !onlyVoters.has(votingCountry.code)) return;
+      if (!isVoterInChannel(votingCountry.code, channel, voterChannels)) {
+        return;
+      }
+
+      const ballot = byVoter[votingCountry.code] ?? [];
+
+      if (isCompleteBallot(ballot, pointsSystem)) return;
+
+      byVoter[votingCountry.code] = completeBallot(
+        sanitizeBallot(
+          ballot,
+          votingCountry.code,
+          stageCodes,
+          pointsSystem,
+          allowMultiplePointsToSameEntry,
+        ),
+        votingCountry,
+        stageCountries,
+        theta,
+        pointsSystem,
+        allowMultiplePointsToSameEntry,
+        makeAffinityOffset(
+          diaspora,
+          votingCountry.code,
+          channel === 'jury' ? juryScale : 1,
+        ),
+      );
+    });
+
+    next[channel] = byVoter;
+  });
+
+  if (completeCombined && votingMode === StageVotingMode.COMBINED) {
+    const combined: Record<string, Vote[]> = { ...(next.combined ?? {}) };
+
+    votingCountries.forEach((votingCountry) => {
+      if (onlyVoters && !onlyVoters.has(votingCountry.code)) return;
+      if (!isVoterInChannel(votingCountry.code, 'combined', voterChannels)) {
+        return;
+      }
+      if (
+        isCompleteBallot(combined[votingCountry.code] ?? [], juryPointsSystem)
+      ) {
+        return;
+      }
+
+      combined[votingCountry.code] = buildCombinedBallotForVoter(
+        votingCountry,
+        stageCountries,
+        next.jury?.[votingCountry.code] ?? [],
+        next.televote?.[votingCountry.code] ?? [],
+        juryPointsSystem,
+      );
+    });
+
+    next.combined = combined;
+  }
+
+  return next;
+};
+
 export const predefineStageVotes = (
   stageCountries: (Country | BaseCountry)[],
   votingCountries: VotingCountry[],

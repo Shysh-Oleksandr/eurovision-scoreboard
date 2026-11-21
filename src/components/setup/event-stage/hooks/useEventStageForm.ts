@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -133,6 +133,26 @@ const eventStageSchema = z
 
 export type EventStageFormData = z.infer<typeof eventStageSchema>;
 
+/**
+ * The stage as Save would store it, as a string: equal strings mean nothing
+ * changed. Qualifier targets compare by content, whatever their key order.
+ */
+export const stageFormFingerprint = (data: Partial<EventStageFormData>) =>
+  JSON.stringify([
+    data.name ?? '',
+    data.votingMode ?? '',
+    data.order ?? 0,
+    data.eventsOrder ?? [],
+    [...(data.qualifiesTo ?? [])]
+      .map((target) => [
+        target.targetStageId,
+        target.amount,
+        target.minRank ?? null,
+        target.maxRank ?? null,
+      ])
+      .sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+  ]);
+
 interface UseEventStageFormProps {
   eventStageToEdit?: EventStage;
   localEventStagesLength: number;
@@ -186,6 +206,12 @@ export const useEventStageForm = ({
     },
   });
 
+  // What the form held when it was opened, to tell whether Save has
+  // anything to store.
+  const [openedFingerprint, setOpenedFingerprint] = useState<string | null>(
+    null,
+  );
+
   // Reset form when modal opens or eventStageToEdit changes
   useEffect(() => {
     if (!isOpen) return;
@@ -195,17 +221,17 @@ export const useEventStageForm = ({
       .map((s) => s.id);
 
     if (eventStageToEdit) {
-      form.reset(
-        {
-          id: eventStageToEdit.id,
-          name: eventStageToEdit.name,
-          order: eventStageToEdit.order ?? 0,
-          votingMode: eventStageToEdit.votingMode,
-          qualifiesTo: (eventStageToEdit.qualifiesTo as any) || [],
-          eventsOrder: sortedStagesIds,
-        },
-        { keepDefaultValues: false },
-      );
+      const values = {
+        id: eventStageToEdit.id,
+        name: eventStageToEdit.name,
+        order: eventStageToEdit.order ?? 0,
+        votingMode: eventStageToEdit.votingMode,
+        qualifiesTo: (eventStageToEdit.qualifiesTo as any) || [],
+        eventsOrder: sortedStagesIds,
+      };
+
+      form.reset(values, { keepDefaultValues: false });
+      setOpenedFingerprint(stageFormFingerprint(values));
     } else {
       // When creating a new stage, initialize qualifiesTo with the last stage
       // Default: 10 qualifiers for the last stage (highest order)
@@ -234,6 +260,7 @@ export const useEventStageForm = ({
         },
         { keepDefaultValues: false },
       );
+      setOpenedFingerprint(null);
     }
   }, [eventStageToEdit, isOpen, localEventStagesLength, form]);
 
@@ -274,5 +301,7 @@ export const useEventStageForm = ({
     isEditMode,
     isLastStage,
     configuredEventStages,
+    /** The edited stage as it was opened; null while adding a stage. */
+    openedFingerprint,
   };
 };

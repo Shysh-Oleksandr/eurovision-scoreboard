@@ -1,6 +1,5 @@
 import { useLocale, useTranslations } from 'next-intl';
 import React from 'react';
-import { toast } from 'react-toastify';
 
 import { useRouter } from 'next/navigation';
 
@@ -10,6 +9,7 @@ import { useAuthStore } from '../../state/useAuthStore';
 import CustomSelect from '../common/customSelect/CustomSelect';
 
 import { getFlagPath } from '@/helpers/getFlagPath';
+import { toast } from '@/helpers/toast';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { PreferredLocale } from '@/types/profile';
 
@@ -73,7 +73,7 @@ export const LanguageSelector: React.FC = () => {
 
       router.refresh();
     } catch (error) {
-      toast.error('Failed to update language');
+      toast.error(t('languageChangeFailed'));
     }
   };
 

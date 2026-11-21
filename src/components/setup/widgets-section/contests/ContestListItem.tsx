@@ -1,7 +1,6 @@
-import { Flag, Folder, Link2, Share2 } from 'lucide-react';
+import { Flag, Link2, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
-import { toast } from 'react-toastify';
 
 import Image from 'next/image';
 
@@ -11,21 +10,15 @@ import { useToggleContestQuickSelectMutation } from '@/api/quickSelect';
 import { BookmarkCheckIcon } from '@/assets/icons/BookmarkCheckIcon';
 import { BookmarkIcon } from '@/assets/icons/BookmarkIcon';
 import { CircleDashedIcon } from '@/assets/icons/CircleDashedIcon';
-import { ListIcon } from '@/assets/icons/ListIcon';
 import { LoaderCircleIcon } from '@/assets/icons/LoaderCircleIcon';
-import { MapPinIcon } from '@/assets/icons/MapPinIcon';
-import { MicIcon } from '@/assets/icons/MicIcon';
 import { PencilIcon } from '@/assets/icons/PencilIcon';
 import { PinIcon } from '@/assets/icons/PinIcon';
 import { PinSolidIcon } from '@/assets/icons/PinSolidIcon';
-import { ThemeIcon } from '@/assets/icons/ThemeIcon';
 import { ThumbsUpIcon } from '@/assets/icons/ThumbsUpIcon';
 import { ThumbsUpSolidIcon } from '@/assets/icons/ThumbsUpSolidIcon';
 import { TrashIcon } from '@/assets/icons/TrashIcon';
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
-import { UserCogIcon } from '@/assets/icons/UserCogIcon';
-import { UsersIcon } from '@/assets/icons/UsersIcon';
-import { UserStarIcon } from '@/assets/icons/UserStarIcon';
+import Button from '@/components/common/Button';
 import OverflowMenu, {
   type OverflowMenuEntry,
 } from '@/components/common/OverflowMenu';
@@ -33,6 +26,7 @@ import UserInfo from '@/components/common/UserInfo';
 import { POINTS_ARRAY } from '@/data/data';
 import { getFlagPath } from '@/helpers/getFlagPath';
 import { buildShareUrl } from '@/helpers/shareUrl';
+import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { useFormatItemTime } from '@/hooks/useFormatItemTime';
 import { useIsOffline } from '@/state/connectivityStore';
@@ -153,7 +147,7 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     const url = buildShareUrl({ contest: contest._id });
 
     navigator.clipboard.writeText(url);
-    toast.success('Link copied to clipboard!');
+    toast.success(t('graphics.gallery.toast.linkCopied'));
   };
 
   const overflowItems = [
@@ -240,24 +234,123 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
       : []),
   ].filter(Boolean) as OverflowMenuEntry[];
 
+  // Line 1: the stages; line 2: the entries.
+  const stagesLine =
+    contest.stageNames.length === 0
+      ? null
+      : contest.stageNames.length <= 3
+      ? contest.stageNames.join(' → ')
+      : `${contest.stageNames[0]} → … → ${
+          contest.stageNames[contest.stageNames.length - 1]
+        } (${contest.stageNames.length})`;
+  const finalists = t('widgets.contests.nGrandFinalParticipants', {
+    count: contest.grandFinalParticipants,
+  });
+  const entriesLine =
+    contest.totalParticipants > 0
+      ? contest.stageNames.length > 1 ||
+        contest.grandFinalParticipants !== contest.totalParticipants
+        ? `${t('widgets.contests.nParticipants', {
+            count: contest.totalParticipants,
+          })}, ${finalists}`
+        : finalists
+      : null;
+
+  // The rest, quietly: when, where your own lives, then the details.
+  const details = [
+    { id: 'date', text: formatTime(contest.createdAt) },
+    ...(isMyContest
+      ? [
+          {
+            id: 'visibility',
+            text: contest.isPublic ? t('widgets.public') : t('widgets.private'),
+          },
+        ]
+      : []),
+    ...(contest.group ? [{ id: 'group', text: contest.group.name }] : []),
+    ...(contest.customEntriesCount > 0
+      ? [
+          {
+            id: 'custom',
+            text: t('widgets.contests.nCustom', {
+              count: contest.customEntriesCount,
+            }),
+          },
+        ]
+      : []),
+    ...(contest.themeId || contest.standardThemeId
+      ? [
+          {
+            id: 'theme',
+            text: `${t('common.theme')}: ${
+              contest.themeId
+                ? t('common.custom')
+                : contest.standardThemeId?.replace('-', ' ')
+            }`,
+          },
+        ]
+      : []),
+    ...(contest.venue
+      ? [
+          {
+            id: 'venue',
+            text: `${t('widgets.contests.venue')}: ${contest.venue}`,
+          },
+        ]
+      : []),
+    ...(contest.hosts
+      ? [
+          {
+            id: 'hosts',
+            text: `${t('widgets.contests.hosts')}: ${contest.hosts}`,
+          },
+        ]
+      : []),
+    ...(isCustomPointsSystem
+      ? [
+          {
+            id: 'points',
+            text: `${t(
+              'widgets.contests.pointsSystem',
+            )}: ${contest.customPointsSystem?.join(', ')}`,
+          },
+        ]
+      : []),
+    ...(hasSplitPointsSystem && contest.juryPointsSystem
+      ? [
+          {
+            id: 'jury-points',
+            text: `${t(
+              'widgets.contests.juryPointsSystem',
+            )}: ${contest.juryPointsSystem.join(', ')}`,
+          },
+        ]
+      : []),
+    ...(hasSplitPointsSystem && contest.televotePointsSystem
+      ? [
+          {
+            id: 'televote-points',
+            text: `${t(
+              'widgets.contests.televotePointsSystem',
+            )}: ${contest.televotePointsSystem.join(', ')}`,
+          },
+        ]
+      : []),
+  ];
+
   const secondaryActionClassName =
     'inline-flex items-center justify-center h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]';
 
   return (
-    <div className="relative rounded-[18px] border shadow-xl transition-colors border-white/10 bg-gradient-to-bl from-primary-900 to-primary-800 overflow-hidden">
-      {/* Accent top bar — wrapped to clip at card radius */}
-      <div className="overflow-hidden rounded-t-[18px]">
-        <div className="h-[5px] bg-gradient-to-r from-primary-700 to-transparent" />
-      </div>
-
+    <div className="relative rounded-[18px] border border-hair bg-p-900 overflow-hidden">
       <div className="grid gap-4 p-4 sm:[grid-template-columns:minmax(0,230px)_1fr] grid-cols-1">
         {/* Left: status panel */}
-        <div className="relative flex sm:flex-col items-center sm:justify-center justify-between gap-2.5 rounded-[12px] text-center sm:border-b sm:border-r border-white/10 sm:py-[18px] sm:px-[14px] sm:bg-black/25 sm:shadow-[inset 0 0 0 1px rgba(255,255,255,0.06)] sm:flex-nowrap flex-wrap overflow-hidden">
+        <div className="relative flex sm:flex-col items-center sm:justify-center justify-between gap-2.5 rounded-[12px] text-left sm:text-center sm:py-[18px] sm:px-[14px] sm:bg-black/20 sm:flex-nowrap flex-wrap overflow-hidden">
           {/* Contest logo/banner */}
           {contest.logoUrl && (
             <Image
               src={contest.logoUrl}
-              alt="Contest logo"
+              alt=""
               unoptimized
               className="object-cover absolute top-0 left-0 bottom-0 right-0 z-10"
               fill
@@ -282,76 +375,53 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
             />
 
             {/* Contest name + year */}
-            <div
-              className="text-white font-[800] leading-tight sm:text-[17px] text-[16px]"
-              style={{
-                letterSpacing: '-0.02em',
-                textShadow: '0 0 10px rgba(0, 0, 0, 0.2)',
-              }}
-            >
+            <h3 className="text-white font-[800] leading-tight sm:text-[17px] text-[16px] tracking-[-0.02em] text-balance">
               {contest.name} {contest.year}
-            </div>
+            </h3>
           </div>
 
           <div className="z-20">
-            {/* Status badge */}
-            {contest.winner ? (
-              <ContestBadge variant="gold">
-                {winnerFlag && (
-                  <Image
-                    src={winnerFlag}
-                    alt={winnerName ?? 'Winner flag'}
-                    className="w-[18px] h-[13px] rounded-sm object-cover flex-none"
-                    width={18}
-                    height={13}
-                    onError={(e) => {
-                      e.currentTarget.src = getFlagPath('ww');
-                    }}
-                    unoptimized
-                  />
-                )}
-                {winnerName} 🏆
-              </ContestBadge>
-            ) : contest.isSimulationStarted ? (
-              <ContestBadge variant="green">
-                <LoaderCircleIcon className="size-3.5 flex-none" />
-                {t('widgets.contests.inProgress')}
-              </ContestBadge>
-            ) : (
-              <ContestBadge variant="red">
-                <CircleDashedIcon className="size-3.5 flex-none" />
-                {t('widgets.contests.notStarted')}
-              </ContestBadge>
-            )}
+            {/* Status: the winner, or how far the simulation got */}
+            <ContestStatus>
+              {contest.winner ? (
+                <>
+                  <TrophyIcon className="size-4 flex-none text-accent" />
+                  {winnerFlag && (
+                    <Image
+                      src={winnerFlag}
+                      alt=""
+                      className="w-[18px] h-[13px] rounded-sm object-cover flex-none"
+                      width={18}
+                      height={13}
+                      onError={(e) => {
+                        e.currentTarget.src = getFlagPath('ww');
+                      }}
+                      unoptimized
+                    />
+                  )}
+                  <span className="truncate">{winnerName}</span>
+                </>
+              ) : contest.isSimulationStarted ? (
+                <>
+                  <LoaderCircleIcon className="size-3.5 flex-none opacity-75" />
+                  {t('widgets.contests.inProgress')}
+                </>
+              ) : (
+                <>
+                  <CircleDashedIcon className="size-3.5 flex-none opacity-75" />
+                  {t('widgets.contests.notStarted')}
+                </>
+              )}
+            </ContestStatus>
           </div>
         </div>
 
         {/* Right: info + actions */}
         <div className="flex flex-col min-w-0">
-          <div className="flex justify-between items-start gap-2">
-            <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-              <span className="text-[11px] font-[800] tracking-[0.16em] uppercase whitespace-nowrap text-white/40">
-                {isMyContest && !contest.isPublic
-                  ? t('widgets.private')
-                  : t('widgets.public')}{' '}
-                {t('common.contest').toLowerCase()}
-              </span>
-              {contest.group && (
-                <div className="flex items-center gap-1 text-xs text-white/70 bg-primary-800/90 font-medium rounded-full px-2 leading-[0.8rem] py-1 w-fit max-w-full">
-                  <Folder className="size-3 shrink-0" aria-hidden />
-                  <span className="truncate">{contest.group.name}</span>
-                </div>
-              )}
-            </div>
-            <span className="sm:text-[12.5px] text-[11px] text-white/40 whitespace-nowrap flex-shrink-0">
-              {formatTime(contest.createdAt)}
-            </span>
-          </div>
-
           {/* Description */}
           {contest.description && (
             <p
-              className="text-white/70 line-clamp-2 mt-1.5 leading-[1.5]"
+              className="text-white/70 line-clamp-2 leading-[1.5] mb-2.5"
               style={{ fontSize: '13.5px' }}
               title={contest.description}
             >
@@ -359,110 +429,60 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
             </p>
           )}
 
-          {/* Metadata badges */}
-          <div className="flex flex-wrap gap-[7px] mt-2.5">
-            {contest.venue && (
-              <ContestBadge>
-                <MapPinIcon className="size-3.5 flex-none" />
-                {contest.venue}
-              </ContestBadge>
-            )}
-            {contest.hosts && (
-              <ContestBadge>
-                <MicIcon className="size-3.5 flex-none" />
-                {contest.hosts}
-              </ContestBadge>
-            )}
-            {contest.stageNames.length > 0 && (
-              <ContestBadge>
-                <ListIcon className="size-3.5 flex-none" />
-                {contest.stageNames.length <= 3
-                  ? contest.stageNames.join(' → ')
-                  : `${contest.stageNames[0]} → … → ${
-                      contest.stageNames[contest.stageNames.length - 1]
-                    } (${contest.stageNames.length})`}
-              </ContestBadge>
-            )}
-            {contest.totalParticipants > 0 && (
-              <ContestBadge>
-                <UsersIcon className="size-3.5 flex-none" />
-                {contest.stageNames.length > 1 ||
-                contest.grandFinalParticipants !== contest.totalParticipants
-                  ? t('widgets.contests.nParticipants', {
-                      count: contest.totalParticipants,
-                    }) + ' | '
-                  : ''}
-                {t('widgets.contests.nGrandFinalParticipants', {
-                  count: contest.grandFinalParticipants,
-                })}
-              </ContestBadge>
-            )}
-            {contest.customEntriesCount > 0 && (
-              <ContestBadge variant="amber">
-                <UserCogIcon className="size-3.5 flex-none" />
-                {t('widgets.contests.nCustom', {
-                  count: contest.customEntriesCount,
-                })}
-              </ContestBadge>
-            )}
-            {isCustomPointsSystem && (
-              <ContestBadge variant="purple">
-                <UserStarIcon className="size-3.5 flex-none" />
-                {t('widgets.contests.pointsSystem')}:{' '}
-                {contest.customPointsSystem?.join(', ')}
-              </ContestBadge>
-            )}
-            {hasSplitPointsSystem && contest.juryPointsSystem && (
-              <ContestBadge variant="purple">
-                <UserStarIcon className="size-3.5 flex-none" />
-                {t('widgets.contests.juryPointsSystem')}:{' '}
-                {contest.juryPointsSystem.join(', ')}
-              </ContestBadge>
-            )}
-            {hasSplitPointsSystem && contest.televotePointsSystem && (
-              <ContestBadge variant="violet">
-                <UserStarIcon className="size-3.5 flex-none" />
-                {t('widgets.contests.televotePointsSystem')}:{' '}
-                {contest.televotePointsSystem.join(', ')}
-              </ContestBadge>
-            )}
-            {(contest.themeId || contest.standardThemeId) && (
-              <ContestBadge variant="pink">
-                <ThemeIcon className="size-3.5 flex-none" />
-                {t('common.theme')}:{' '}
-                {contest.themeId
-                  ? t('common.custom')
-                  : contest.standardThemeId?.replace('-', ' ')}
-              </ContestBadge>
-            )}
-          </div>
+          {/* What the contest is, by weight instead of icons: its stages,
+              then its entries, then the rest quietly in two lines at most. */}
+          {stagesLine && (
+            <p className="text-[14px] font-bold leading-snug text-white text-pretty">
+              {stagesLine}
+            </p>
+          )}
+          {entriesLine && (
+            <p className="mt-0.5 text-[13px] font-semibold leading-snug text-white/75">
+              {entriesLine}
+            </p>
+          )}
+          <p
+            className="mt-1.5 line-clamp-2 text-[12.5px] font-semibold leading-[1.45] text-white/55"
+            title={details.map((detail) => detail.text).join('\n')}
+          >
+            {details.map((detail) => (
+              <span
+                key={detail.id}
+                className="mr-3.5 inline-block max-w-full truncate align-bottom last:mr-0"
+              >
+                {detail.id === 'date' ? (
+                  <time dateTime={contest.createdAt}>{detail.text}</time>
+                ) : (
+                  detail.text
+                )}
+              </span>
+            ))}
+          </p>
 
           {/* Spacer */}
           <div className="flex-1 min-h-[12px]" />
 
-          {/* Creator */}
-          {contest.creator && <UserInfo user={contest.creator} size="sm" />}
+          {/* Creator (not on your own list: it's you) */}
+          {contest.creator && variant !== 'user' && (
+            <UserInfo user={contest.creator} size="sm" />
+          )}
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2 mt-3">
             {/* Load */}
-            <button
-              type="button"
+            <Button
+              variant="cta"
+              size="lg"
               onClick={() => onLoad(contest)}
               disabled={offline}
               title={offline ? t('offline.loadContest') : undefined}
-              className="flex-1 min-w-[120px] h-11 rounded-[11px] flex items-center justify-center gap-2 text-[14.5px] font-[800] uppercase tracking-[0.02em] text-white transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{
-                background:
-                  'linear-gradient(180deg, hsl(var(--twc-primary-700)), hsl(var(--twc-primary-750)))',
-                boxShadow:
-                  '0 6px 18px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.25)',
-                filter: isActive ? 'grayscale(0.3) brightness(0.8)' : undefined,
-              }}
+              className={`flex-1 min-w-[120px] justify-center !uppercase ${
+                isActive ? 'opacity-80' : ''
+              }`}
+              Icon={<TrophyIcon className="size-5 flex-none" />}
             >
-              <TrophyIcon className="size-5 flex-none" />
               {isActive ? t('common.loaded') : t('common.load')}
-            </button>
+            </Button>
 
             {/* Secondary actions — grouped so they wrap as a unit */}
             <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
@@ -487,19 +507,11 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                     type="button"
                     onClick={() => onLike?.(contest._id)}
                     disabled={!user || offline}
-                    className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                      likedByMe
-                        ? 'text-white border-transparent'
-                        : 'text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]'
+                    aria-label={t('widgets.like')}
+                    aria-pressed={!!likedByMe}
+                    className={`dp-lib-toggle inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] text-[13.5px] font-bold disabled:opacity-40 disabled:cursor-not-allowed ${
+                      likedByMe ? 'is-on' : ''
                     }`}
-                    style={
-                      likedByMe
-                        ? {
-                            background: 'hsl(var(--twc-primary-700))',
-                            borderColor: 'transparent',
-                          }
-                        : {}
-                    }
                   >
                     {likedByMe ? (
                       <ThumbsUpSolidIcon className="size-[19px]" />
@@ -515,19 +527,11 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
                     type="button"
                     onClick={() => onSave?.(contest._id, savedByMe ?? false)}
                     disabled={!user || offline}
-                    className={`inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] border text-[13.5px] font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                      savedByMe
-                        ? 'text-white border-transparent'
-                        : 'text-white/70 bg-white/[0.06] border-white/10 hover:text-white hover:bg-white/[0.12]'
+                    aria-label={t('widgets.save')}
+                    aria-pressed={!!savedByMe}
+                    className={`dp-lib-toggle inline-flex items-center gap-1.5 h-11 px-3 rounded-[10px] text-[13.5px] font-bold disabled:opacity-40 disabled:cursor-not-allowed ${
+                      savedByMe ? 'is-on' : ''
                     }`}
-                    style={
-                      savedByMe
-                        ? {
-                            background: 'hsl(var(--twc-primary-700))',
-                            borderColor: 'transparent',
-                          }
-                        : {}
-                    }
                   >
                     {savedByMe ? (
                       <BookmarkCheckIcon className="size-[19px]" />
@@ -552,83 +556,9 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
 
 export default ContestListItem;
 
-type BadgeVariant =
-  | 'default'
-  | 'purple'
-  | 'violet'
-  | 'pink'
-  | 'amber'
-  | 'gold'
-  | 'green'
-  | 'red';
-
-const badgeVariantStyles: Record<
-  BadgeVariant,
-  { background: string; border: string; color: string }
-> = {
-  default: {
-    background: 'rgba(255,255,255,0.06)',
-    border: 'rgba(255,255,255,0.10)',
-    color: 'rgba(255,255,255,0.72)',
-  },
-  purple: {
-    background: 'rgba(150,108,255,0.16)',
-    border: 'rgba(150,108,255,0.32)',
-    color: '#c3acff',
-  },
-  violet: {
-    background: 'rgba(124,92,255,0.14)',
-    border: 'rgba(124,92,255,0.30)',
-    color: '#b9a4ff',
-  },
-  pink: {
-    background: 'rgba(255,61,132,0.14)',
-    border: 'rgba(255,61,132,0.32)',
-    color: '#ff9bbe',
-  },
-  amber: {
-    background: 'rgba(217,160,40,0.14)',
-    border: 'rgba(217,160,40,0.30)',
-    color: '#f0cd78',
-  },
-  gold: {
-    background: 'rgba(245,200,60,0.16)',
-    border: 'rgba(245,200,60,0.36)',
-    color: '#ffe08a',
-  },
-  green: {
-    background: 'rgba(46,196,138,0.14)',
-    border: 'rgba(46,196,138,0.30)',
-    color: '#8ff0c8',
-  },
-  red: {
-    background: 'rgba(255,84,104,0.14)',
-    border: 'rgba(255,84,104,0.32)',
-    color: '#ffa6b1',
-  },
-};
-
-const ContestBadge = ({
-  variant = 'default',
-  children,
-}: {
-  children: React.ReactNode;
-  variant?: BadgeVariant;
-}) => {
-  const styles = badgeVariantStyles[variant];
-
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 font-semibold leading-none rounded-full"
-      style={{
-        fontSize: '12.5px',
-        padding: '7px 11px',
-        background: styles.background,
-        border: `1px solid ${styles.border}`,
-        color: styles.color,
-      }}
-    >
-      {children}
-    </span>
-  );
-};
+/** The left panel's status line: neutral, readable over a logo banner. */
+const ContestStatus = ({ children }: { children: React.ReactNode }) => (
+  <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/10 bg-black/35 px-3 py-[7px] text-[12.5px] font-bold leading-none text-white">
+    {children}
+  </span>
+);

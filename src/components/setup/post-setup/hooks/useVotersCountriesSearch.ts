@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useDebounce } from '../../../../hooks/useDebounce';
 import { BaseCountry, CountryAssignmentGroup } from '../../../../models';
@@ -7,16 +7,18 @@ import { CATEGORY_ORDER } from '../../constants';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
+/**
+ * The voters pool's search and groups: the countries that don't vote yet,
+ * grouped by the map (continents, all-time participants) and, in front,
+ * by the stages ("In stage", "Other stage"; a country is in both kinds).
+ * The search is debounced; `search` is what the field shows.
+ */
 export const useVotersCountriesSearch = (
   availableCountries: BaseCountry[],
   currentStageId?: string,
 ) => {
-  const [countriesSearch, setCountriesSearch] = useState('');
-  const [expandedCategories, setExpandedCategories] = useState<
-    Record<string, boolean>
-  >({});
-  const debouncedSearch = useDebounce(countriesSearch, 300);
-  const prevDebouncedSearchRef = useRef<string>(undefined);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const eventAssignments = useCountriesStore((state) => state.eventAssignments);
   const eventStages = useScoreboardStore((state) => state.eventStages);
 
@@ -24,21 +26,14 @@ export const useVotersCountriesSearch = (
     return eventStages.find((s) => s.id === currentStageId);
   }, [currentStageId, eventStages]);
 
-  const handleCountriesSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCountriesSearch(e.target.value);
-  };
-
-  const clearSearch = () => {
-    setCountriesSearch('');
-  };
-
   const { groupedAvailableCountries, sortedCategories } = useMemo(() => {
     const groups: Record<string, BaseCountry[]> = {};
+    const query = debouncedSearch.trim().toLowerCase();
     const filteredAvailableCountries = availableCountries.filter((country) =>
-      country.name.toLowerCase().includes(debouncedSearch.trim().toLowerCase()),
+      country.name.toLowerCase().includes(query),
     );
 
-    // 1) Base grouping by continent/category (original behavior)
+    // 1) By continent / category
     filteredAvailableCountries.forEach((country) => {
       const category = country.category || 'Other';
 
@@ -48,7 +43,7 @@ export const useVotersCountriesSearch = (
       groups[category].push(country);
     });
 
-    // 2) Additional participation-based groups: "In stage" and "Other stage"
+    // 2) By participation: "In stage" and "Other stage"
     if (currentStageId) {
       const assignments = eventAssignments || {};
 
@@ -100,37 +95,19 @@ export const useVotersCountriesSearch = (
       groupedAvailableCountries: groups,
       sortedCategories,
     };
-  }, [availableCountries, debouncedSearch, currentStageId, eventAssignments]);
-
-  useEffect(() => {
-    if (debouncedSearch !== prevDebouncedSearchRef.current) {
-      if (debouncedSearch.trim()) {
-        const newExpanded: Record<string, boolean> = {};
-
-        sortedCategories.forEach((category) => {
-          newExpanded[category] = true;
-        });
-        setExpandedCategories(newExpanded);
-      } else {
-        setExpandedCategories({});
-      }
-    }
-    prevDebouncedSearchRef.current = debouncedSearch;
-  }, [debouncedSearch, sortedCategories]);
-
-  const handleToggleCategory = (category: string) => {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
-  };
+  }, [
+    availableCountries,
+    debouncedSearch,
+    currentStageId,
+    eventAssignments,
+    currentStage,
+  ]);
 
   return {
-    countriesSearch,
-    handleCountriesSearch,
-    clearSearch,
-    expandedCategories,
-    handleToggleCategory,
+    search,
+    setSearch,
+    /** The search the groups are filtered by (debounced). */
+    query: debouncedSearch.trim(),
     groupedAvailableCountries,
     sortedCategories,
   };
