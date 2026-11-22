@@ -1,5 +1,6 @@
 import { BaseCountry } from '../models';
 
+import { countryFlagCode } from '@/data/countries/entryOverrides';
 import { IS_NATIVE_APP } from '@/native/platform';
 import { FlagShape } from '@/theme/types';
 
@@ -436,29 +437,29 @@ export const getFlagPath = (
     return `/flags/${country.toLowerCase()}.svg`;
   }
 
-  // Custom entry flag
-  if (country.flag) return country.flag;
+  const code = flagSourceCode(country);
 
-  if (country.code.startsWith('custom')) return '/flags/ww.svg';
+  // An image of its own: a custom entry's flag, or a preset or upload a
+  // contest picked for a standard country.
+  if (!code) return country.flag as string;
 
-  if (
-    (shape === 'round' || shape === 'round-border') &&
-    (enableMinimalisticFlags
-      ? supportedRoundFlags.includes(country.code.toUpperCase())
-      : minimalSupportedRoundFlags.includes(country.code.toUpperCase()))
-  ) {
-    return `/flags-shapes/round/${country.code.toLowerCase()}.svg`;
-  } else if (
-    shape === 'square' &&
-    (enableMinimalisticFlags
-      ? supportedSquareFlags.includes(country.code.toUpperCase())
-      : minimalSupportedSquareFlags.includes(country.code.toUpperCase()))
-  ) {
-    return `/flags-shapes/square/${country.code.toLowerCase()}.svg`;
-  }
+  if (code.startsWith('custom')) return '/flags/ww.svg';
 
-  return `/flags/${country.code.toLowerCase()}.svg`;
+  return getFlagPath(code, shape, enableMinimalisticFlags);
 };
+
+/**
+ * The code whose flag files draw `country` (its shapes, hearts), or null
+ * when its flag is an image of its own. A standard country whose contest
+ * picked another country's flag (`/flags/yu.svg`, see
+ * data/countries/entryOverrides.ts) is drawn from that country's files.
+ */
+export function flagSourceCode(country: BaseCountry): string | null {
+  if (!country.flag) return country.code;
+  if (country.code.startsWith('custom')) return null;
+
+  return countryFlagCode(country.flag);
+}
 
 /**
  * Same-origin proxy URL for a foreign image, so exports can read its pixels.

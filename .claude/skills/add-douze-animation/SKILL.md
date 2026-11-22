@@ -7,9 +7,11 @@ description: Recreate a contest's douze points (12 points) animation from broadc
 
 A broadcast's 12 points animation, rebuilt as a `DouzeAnimationSpec`: layers placed against the row's parts on one clock, played by `DouzeSpecPlayer`. Read `docs/theme-animations-and-specifics.md` §10 before step 4: it holds the model, the layer kinds and options, the player and the board timing. The worked example is 2022: `src/douze/specs/year2022.ts` and its notes in `.scratch/douze-animations/esc-2022-breakdown.md` (v1 to v3, with what the owner rejected and why).
 
+Paths and commands below are relative to the frontend package, `eurovision-scoreboard/`. The skill is also linked into the monorepo root's `.claude/skills/`, so in a session started at the root, run them from `eurovision-scoreboard/` (`yarn`, `node scripts/…`). The backend list in step 8 is in the sibling `douze-points-backend/`.
+
 Names used below:
 - **mode**: `year<YYYY>` for ESC (`year2022`); another series gets its own prefix (`jesc2023`). The spec's `id` is the mode.
-- **`$S`**: the work folder, `.scratch/douze-animations/<year>/` (gitignored). The clips sit one level up, as `Douze<year>_<n>.mov`.
+- **`$S`**: the work folder, `.scratch/douze-animations/<year>/` (gitignored). The clips, `Douze<year>_<n>.mov`, sit in it or one level up.
 - **t**: ms from the animation's first changed frame (**t0**), the lab's clock.
 
 ## 1. Footage
@@ -58,7 +60,7 @@ Done when: the answers are recorded in the breakdown.
 
 Register first, so the lab and the tests see it:
 - `src/douze/specs/year<YYYY>.ts` exports `year<YYYY>Douze`, with `id: '<mode>'`.
-- Add the mode to `DouzePointsAnimationMode` (`src/theme/types.ts`), `DOUZE_POINTS_ANIMATION_MODES` (`src/theme/themeSpecifics.ts`) and `SPECS` in `src/douze/registry.ts`.
+- Add the mode to `DouzePointsAnimationMode` (`src/theme/types.ts`), `DOUZE_POINTS_ANIMATION_MODES` (`src/theme/themeSpecifics.ts`, at its year: the theme editor lists them by the year in their labels, and a test checks it) and `SPECS` in `src/douze/registry.ts`.
 - Add it to the lab's `SPECS` (`src/components/dev/douze/DouzeLab.tsx`), with the year whose theme it belongs to.
 
 `src/douze/registry.test.ts` checks every registered spec. Its labels test fails until step 8.
@@ -110,6 +112,7 @@ Run a real simulation on the year's theme. Choose it through a custom theme with
 
 Record with the MCP's `screencast_start` / `screencast_stop` into `$S/board.mp4`, plus a slowed copy (`ffmpeg -i board.mp4 -vf setpts=4*PTS board-slow4x.mp4`). The screencast gets no frames while an `evaluate_script` is running or the tab is in the background: start the clicks from an `evaluate_script` that schedules them and returns at once, then start the screencast, and wait with a Bash `node -e 'setTimeout(() => {}, 15000)'`. For timing, sample the row and the player (`data-douze-layer` nodes, their `getAnimations()[0].currentTime`) from inside the page. The 2026 theme's board teleports; to check a flipping board, set `boardAnimationMode: 'flip'` on the year's `themeSpecifics` for the test and revert it. Cover these cases:
 - a 12 to a low row;
+- a 12 to the leader, whose row doesn't move (the next jury clears the 12 at once; the overlay must still play to its end);
 - the same country given 12 twice in a row;
 - a jury vote given all at once.
 

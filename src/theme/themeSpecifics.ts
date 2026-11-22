@@ -20,13 +20,18 @@ export const DEFAULT_THEME_SPECIFICS: ThemeSpecifics = {
 const BOARD_ANIMATION_MODES = ['flip', 'teleport'] as const;
 
 /**
- * Douze animations a theme may use, in the custom-theme editor's order.
- * Mirrored by the backend's THEME_DOUZE_POINTS_ANIMATION_MODES.
+ * Douze animations a theme may use, in the custom-theme editor's order: by
+ * the year of the show each recreates (its label's "(ESC 2024)"; a test
+ * keeps it sorted). Mirrored by the backend's
+ * THEME_DOUZE_POINTS_ANIMATION_MODES.
  */
 export const DOUZE_POINTS_ANIMATION_MODES = [
-  'parallelograms',
-  'heartsGrid',
+  'year2021',
   'year2022',
+  'parallelograms',
+  'year2023',
+  'year2024',
+  'heartsGrid',
   'year2026',
 ] as const satisfies readonly DouzePointsAnimationMode[];
 

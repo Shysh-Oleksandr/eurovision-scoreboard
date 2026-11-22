@@ -14,6 +14,7 @@ import { useGeneralStore } from '@/state/generalStore';
 export const useCountryAssignments = () => {
   const isGfOnly = useGeneralStore((state) => state.isGfOnly);
   const customCountries = useCountriesStore((state) => state.customCountries);
+  const entryOverrides = useCountriesStore((state) => state.entryOverrides);
   const allCountriesForYear = useCountriesStore(
     (state) => state.allCountriesForYear,
   );
@@ -158,9 +159,13 @@ export const useCountryAssignments = () => {
       toBeDrawnCountries,
       assignments: eventAssignments,
     };
+    // customCountries and entryOverrides are the inputs of getAllCountries
+    // that change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     eventAssignments,
     customCountries,
+    entryOverrides,
     getAllCountries,
     configuredEventStages,
   ]);

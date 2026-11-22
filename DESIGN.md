@@ -558,6 +558,29 @@ theme's flag shape, not in a loose rectangle.
 - Each custom-entry group's header has a + that opens a new entry in that
   group.
 
+### Name and flag editor (`EntryOverrideModal`, `setup/entry-override/`)
+
+A standard country's own name and flag in one contest (docs/entry-overrides.md)
+uses the custom entry editor's parts, so the two read as one tool: the
+board-row preview drawn with the country's code (its flag in the theme's
+shapes), one Name field and the same flag picker. One quiet line under the
+title says the change is for this contest only and the results still count
+as the country in the stats. The name is prefilled; the built-in name is the
+placeholder and the hint, and an empty field means the built-in name. The
+country's own flag is the ringed tile of Countries until another is picked.
+The flag group's label line holds Upload image and the same hint line
+(rules, staged upload with Undo, or the error) as the custom entry editor;
+an image dropped on the modal on desktop does the same. Under the picker, one
+check row like "Add another": "Use in my new contests", with its hint. The
+footer's leading slot holds a quiet "Use the original" (RotateCcw) while
+the draft differs from the country as it ships. The tile menu's "Edit name
+and flag" opens it; "Use the original name and flag" there resets in one tap.
+
+Settings → Contest has a "Country names and flags" subhead: the Historical
+names switch, then "Your names and flags", the account's defaults as plain
+rows (28×20 flag, name, what it replaces, a quiet ✕), like the keyboard
+shortcuts list.
+
 ### Stage editor (`EventStageModal`, `setup/event-stage/`)
 
 **Say where everyone goes, in places.** A stage ends as a ranking, so "Who

@@ -9,6 +9,8 @@ export const queryKeys = {
     profile: () => ['user', 'profile'] as const,
     customEntries: () => ['user', 'custom-entries'] as const,
     customEntryGroups: () => ['user', 'custom-entry-groups'] as const,
+    /** Flags uploaded for contests' own country flags (`src/api/entryFlags.ts`). */
+    entryFlags: () => ['user', 'entry-flags'] as const,
     /** Prefix for invalidating all current-user theme list queries */
     themes: () => ['user', 'themes'] as const,
     themeGroups: () => ['user', 'theme-groups'] as const,
@@ -221,6 +223,7 @@ export const getUserQueryKeyPrefixes = () => [
   queryKeys.user.profile(),
   queryKeys.user.customEntries(),
   queryKeys.user.customEntryGroups(),
+  queryKeys.user.entryFlags(),
   queryKeys.user.themes(),
   queryKeys.user.savedThemes(),
   queryKeys.user.themeGroups(),

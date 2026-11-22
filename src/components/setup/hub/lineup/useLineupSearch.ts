@@ -6,6 +6,8 @@ import { useStageAccordionStore } from '../state/stageAccordionStore';
 import { useLineupModelContext } from './LineupProvider';
 import { isStageCardList } from './listIds';
 
+import { getCanonicalCountry } from '@/data/countries/entryOverrides';
+
 /**
  * Deferred search over every list. `matches` is null when the search is
  * empty (render everything), otherwise the set of matching country codes.
@@ -23,7 +25,17 @@ export const useLineupSearch = () => {
     const set = new Set<string>();
 
     byCode.forEach((country, code) => {
-      if (country.name.toLowerCase().includes(q)) set.add(code);
+      // A country this contest renamed is found by either name.
+      const builtIn = getCanonicalCountry(code)?.name;
+
+      if (
+        country.name.toLowerCase().includes(q) ||
+        (builtIn &&
+          builtIn !== country.name &&
+          builtIn.toLowerCase().includes(q))
+      ) {
+        set.add(code);
+      }
     });
 
     return set;

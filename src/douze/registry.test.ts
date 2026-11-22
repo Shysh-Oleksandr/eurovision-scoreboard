@@ -88,6 +88,49 @@ describe.each(DOUZE_SPEC_MODES)('the %s spec', (mode) => {
       expect(getDouzeMoveDelayMs(mode)).toBeGreaterThan(spec.durationMs);
     }
   });
+
+  it('moves a flipping board mid-animation only when it plays first', () => {
+    if (spec.moveAtMs === undefined) return;
+
+    // `after` specs make the board wait for the end anyway.
+    expect(spec.reorder).toBe('before');
+    expect(spec.moveAtMs).toBeGreaterThan(0);
+    expect(spec.moveAtMs).toBeLessThan(spec.durationMs);
+    expect(getDouzeMoveDelayMs(mode, null, 'flip')).toBe(spec.moveAtMs);
+    // A teleporting board moves first and the animation plays at the new place.
+    expect(getDouzeMoveDelayMs(mode, null, 'teleport')).toBe(1000);
+  });
+
+  it('draws slabs around a part layer of its own', () => {
+    spec.layers.forEach((layer) => {
+      if (
+        layer.kind !== 'canvas' ||
+        (layer.painter.type !== 'slabSides' &&
+          layer.painter.type !== 'slabLines')
+      ) {
+        return;
+      }
+
+      const { follow } = layer.painter;
+      const followed = spec.layers.find((other) => other.id === follow);
+
+      expect(followed?.kind, layer.id).toBe('part');
+      // The sides go wherever the part does: they can't be switched off
+      // while it still moves.
+      expect(followed?.group, layer.id).toBeUndefined();
+    });
+  });
+
+  it('places a part layer on the part it moves', () => {
+    spec.layers.forEach((layer) => {
+      if (layer.kind !== 'part') return;
+
+      expect(layer.box, layer.id).toEqual({ anchor: layer.part });
+      // The real part plays its whole run: it's the row, not decoration.
+      expect(layer.heavy, layer.id).toBeFalsy();
+      expect(layer.group, layer.id).toBeUndefined();
+    });
+  });
 });
 
 describe('douze modes', () => {
@@ -100,6 +143,24 @@ describe('douze modes', () => {
     DOUZE_POINTS_ANIMATION_MODES.forEach((mode) =>
       expect(getDouzeOptionsSupport(mode), mode).not.toBeNull(),
     );
+  });
+
+  it('are listed by the year they recreate, as the theme editor shows them', () => {
+    const labels = JSON.parse(
+      readFileSync(
+        path.join(__dirname, '..', '..', 'messages', 'en.json'),
+        'utf8',
+      ),
+    ).widgets.themes.visualDetails.douzePointsAnimations;
+    // "Color wipe (ESC 2024)" → 2024.
+    const years = DOUZE_POINTS_ANIMATION_MODES.map((mode) =>
+      Number(/(\d{4})\)$/.exec(labels[mode])?.[1]),
+    );
+
+    years.forEach((year, index) =>
+      expect(year, DOUZE_POINTS_ANIMATION_MODES[index]).toBeGreaterThan(0),
+    );
+    expect(years).toEqual([...years].sort((a, b) => a - b));
   });
 
   it('have labels in every language (the theme editor lists them all)', () => {

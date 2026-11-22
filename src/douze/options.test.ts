@@ -254,7 +254,20 @@ describe('applyDouzeOptions', () => {
     expect(applied.layers[0].keyframes.map((frame) => frame.t)).toEqual([
       0, 320,
     ]);
-    expect(waves.kind === 'canvas' && waves.painter.speed).toBe(1);
+    expect(
+      waves.kind === 'canvas' &&
+        waves.painter.type === 'waveFlow' &&
+        waves.painter.speed,
+    ).toBe(1);
+  });
+
+  it('moves a flipping board at the same moment of a faster animation', () => {
+    const applied = applyDouzeOptions(
+      { ...spec, reorder: 'before', moveAtMs: 1500 },
+      { speed: 1.5 },
+    );
+
+    expect(applied.moveAtMs).toBe(1000);
   });
 
   it('takes the colours from the theme, or from custom colours as picked', () => {
@@ -305,6 +318,22 @@ describe('the registry with options', () => {
       veilColor: false,
       coverFlag: false,
       customColors: 1,
+      themeColorsHint: false,
+    });
+    // Three colours, all the theme's douze ones (the 2023 theme's yellow,
+    // magenta and blue), and its two text parts.
+    expect(getDouzeOptionsSupport('year2023')).toEqual({
+      colors: ['original', 'flag', 'theme', 'custom'],
+      themeColors: [
+        { key: 'douzePointsBg', label: 'douze', when: 'theme' },
+        { key: 'douzePointsText', label: 'text', when: 'theme' },
+        { key: 'douzePointsBlock1', label: 'block1', when: 'theme' },
+      ],
+      parts: ['label', 'flashText'],
+      strengths: [],
+      veilColor: false,
+      coverFlag: false,
+      customColors: 3,
       themeColorsHint: false,
     });
     expect(getDouzeOptionsSupport('parallelograms')?.parts).toEqual([

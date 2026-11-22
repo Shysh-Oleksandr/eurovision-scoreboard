@@ -52,7 +52,10 @@ const RelationsSettings: React.FC<RelationsSettingsProps> = ({ onLoaded }) => {
     (s) => s.settings.shouldUse2026WhiteHeartFlags,
   );
   const isLoggedIn = useAuthStore((s) => !!s.user);
-  const getAllCountries = useCountriesStore((s) => s.getAllCountries);
+  // Built-in names: relations aren't this contest's.
+  const getCanonicalCountries = useCountriesStore(
+    (s) => s.getCanonicalCountries,
+  );
 
   const [showAdd, setShowAdd] = useState(false);
   const [lens, setLens] = useState<Lens>('blocs');
@@ -66,7 +69,7 @@ const RelationsSettings: React.FC<RelationsSettingsProps> = ({ onLoaded }) => {
 
   const countryOptions: Option[] = useMemo(
     () =>
-      getAllCountries().map((c) => {
+      getCanonicalCountries().map((c) => {
         const { logo, isExisting } = getHostingCountryLogo(
           c,
           true,
@@ -75,7 +78,7 @@ const RelationsSettings: React.FC<RelationsSettingsProps> = ({ onLoaded }) => {
 
         return { label: c.name, value: c.code, imageUrl: logo, isExisting };
       }),
-    [getAllCountries, shouldUse2026WhiteHeartFlags],
+    [getCanonicalCountries, shouldUse2026WhiteHeartFlags],
   );
 
   const { enabled } = diaspora;

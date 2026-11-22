@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { ANIMATION_DURATION } from '@/data/data';
 import { type DouzeOptions, douzeDurationScale } from '@/douze/options';
-import { doesDouzePlayBeforeMove } from '@/douze/registry';
+import { doesDouzePlayBeforeMove, getDouzeSpec } from '@/douze/registry';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import useThemeSpecifics from '@/theme/useThemeSpecifics';
 
@@ -56,11 +56,17 @@ const useDouzePointsAnimation = (
   );
   const { boardAnimationMode, douzePointsAnimationMode, douzeOptions } =
     useThemeSpecifics();
+  const options =
+    douzeOptionsOverride !== undefined ? douzeOptionsOverride : douzeOptions;
   // The overlay stays up as long as the animation runs ("Customize
   // animation" speed: longer when slower, shorter when faster).
-  const slow = douzeDurationScale(
-    douzeOptionsOverride !== undefined ? douzeOptionsOverride : douzeOptions,
-  );
+  const slow = douzeDurationScale(options);
+  // A spec animation also outlasts the 12 being cleared: with no move to
+  // wait for, the next jury clears it at once, and the overlay would go
+  // 1.5 s later, mid-animation (2024's tail, 2026's exit). Its duration
+  // is already at the options' speed.
+  const specMs =
+    getDouzeSpec(douzePointsAnimationMode, options)?.durationMs ?? 0;
   // Spec animations that play before the move (2022) start at once; the
   // board waits for them instead (useBoardAnimations' move delay).
   const playsBeforeMove = doesDouzePlayBeforeMove(douzePointsAnimationMode);
@@ -86,7 +92,7 @@ const useDouzePointsAnimation = (
       timerRef.current = setTimeout(() => {
         setShouldRender(false);
         setAnimationPoints(null);
-      }, (ANIMATION_DURATION / 2) * slow);
+      }, Math.max((ANIMATION_DURATION / 2) * slow, specMs));
     }
 
     return () => {
@@ -107,6 +113,7 @@ const useDouzePointsAnimation = (
     // A new 12 with the flag still up restarts the timers too.
     awardKey,
     slow,
+    specMs,
   ]);
 
   return { shouldRender, points: animationPoints, runId };

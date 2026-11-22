@@ -14,6 +14,15 @@
 > below is still open. The 2026 gold sweep (`year2026`, 2026-11-20) uses
 > it as built: one custom colour (`customColors`), theme colours = the
 > douze colour (the spec's `themeColors`), part "Gold points" (the 12 box on pill rows, the total on square ones), glow.
+> The 2023 circles and words (`year2023`, 2026-11-22) uses it as built too:
+> three custom colours, theme colours = the douze colour, its text colour
+> and block 1 (all three editable in the section), parts "Points text" and
+> "Flashing text" (the giant words, the owner's ask), no strengths.
+> The 2021 pop-out row (`year2021`, 2026-11-22) uses it as built: flag
+> colours (bottom side `c1`, right side `c2`), two custom colours, theme
+> colours = the douze colour and the 12 box, part "Light lines", no
+> strengths; speed also rescales its `moveAtMs` (when a flipping board
+> moves the raised row).
 
 ## Goal
 

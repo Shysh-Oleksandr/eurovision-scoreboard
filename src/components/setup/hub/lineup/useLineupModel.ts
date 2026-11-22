@@ -113,14 +113,16 @@ export const useLineupModel = ({
   isSignedIn,
 }: UseLineupModelInput): LineupModel => {
   const customCountries = useCountriesStore((state) => state.customCountries);
+  const entryOverrides = useCountriesStore((state) => state.entryOverrides);
   const getAllCountries = useCountriesStore((state) => state.getAllCountries);
   const stable = useStableLists();
 
   const byCode = useMemo(
     () => new Map(getAllCountries().map((c) => [c.code, c])),
-    // customCountries is the only input of getAllCountries that changes.
+    // customCountries and entryOverrides are the inputs of getAllCountries
+    // that change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [customCountries, getAllCountries],
+    [customCountries, entryOverrides, getAllCountries],
   );
 
   const stages = useMemo<LineupStage[]>(() => {

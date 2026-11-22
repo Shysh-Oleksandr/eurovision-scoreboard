@@ -239,6 +239,8 @@
       "moveAllTo": "Move all to…",
       "moveToGroup": "Move to group",
       "editEntry": "Edit entry",
+      "editNameAndFlag": "Edit name and flag",
+      "useOriginalNameAndFlag": "Use the original name and flag",
       "dropCountriesHere": "Drop countries here",
       "emptyDropHere": "Empty — drop countries here",
       "noMatches": "No matches",
@@ -466,6 +468,17 @@
       "saveFailed": "Couldn't save the entry. Try again.",
       "deleteFailed": "Couldn't delete the entry. Try again.",
       "deleteEntry": "Delete entry"
+    },
+    "entryOverrideModal": {
+      "title": "Name and flag",
+      "intro": "Only in this contest. Its results still count as {name} in your stats.",
+      "nameHint": "Leave it empty to use {name}.",
+      "flag": "Flag",
+      "useOriginal": "Use the original",
+      "signInToUpload": "Sign in to upload a flag.",
+      "uploadFailed": "Couldn't upload the flag. Try again.",
+      "useByDefault": "Use in my new contests",
+      "useByDefaultHint": "New contests start with this name and flag. They’re listed in Settings → Contest."
     },
     "customEntryGroupModal": {
       "createGroup": "Create Group",
@@ -1493,7 +1506,10 @@
         "douzePointsAnimations": {
           "parallelograms": "Parallelograms (ESC 2023)",
           "heartsGrid": "Hearts grid (ESC 2025)",
+          "year2021": "Pop-out row (ESC 2021)",
           "year2022": "Sound waves (ESC 2022)",
+          "year2023": "Circles and words (ESC 2023)",
+          "year2024": "Color wipe (ESC 2024)",
           "year2026": "Gold sweep (ESC 2026)"
         },
         "douzeOptions": {
@@ -1533,7 +1549,9 @@
             "name": "Country name",
             "blocks": "Sweeping blocks",
             "label": "Points text",
-            "points": "Gold points"
+            "flashText": "Flashing text",
+            "points": "Gold points",
+            "lines": "Light lines"
           },
           "coverFlag": "Hearts over the flag",
           "glow": "Glow strength",
@@ -1985,7 +2003,8 @@
         "popupsChrome": "Popups & chrome",
         "personalization": "Personalization",
         "suppressedDialogs": "Suppressed dialogs",
-        "reset": "Reset"
+        "reset": "Reset",
+        "countryNames": "Country names and flags"
       },
       "danger": {
         "confirm": "Yes, reset everything"
@@ -2236,7 +2255,16 @@
     "contest": {
       "enterContestName": "Enter contest name...",
       "enterContestYear": "Enter contest year...",
-      "showHostingCountryFlag": "Show hosting country flag"
+      "showHostingCountryFlag": "Show hosting country flag",
+      "historicalNames": "Historical names",
+      "historicalNamesDesc": "Each edition uses the names countries had then: F.Y.R. Macedonia until 2018, Czech Republic until 2022.",
+      "yourNamesAndFlags": "Your names and flags",
+      "yourNamesAndFlagsDesc": "New contests start with these.",
+      "noNamesAndFlags": "None yet. In the setup, open a country’s menu, choose Edit name and flag, then tick Use in my new contests.",
+      "insteadOf": "Instead of {name}",
+      "ownFlag": "Own flag",
+      "ownFlagInsteadOf": "Own flag, instead of {name}",
+      "removeDefault": "Remove {name}"
     },
     "confirmations": {
       "description": "Configure which confirmation popups are shown when you perform certain actions.",

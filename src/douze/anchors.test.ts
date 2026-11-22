@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { buildCutMask, drawsOver, mirrorText, paintCopy } from './anchors';
+import {
+  buildCutMask,
+  drawsOver,
+  mirrorText,
+  paintCopy,
+  resizeType,
+  shownTextOf,
+  typeStyleOf,
+} from './anchors';
 
 const el = (
   style: Partial<CSSStyleDeclaration> = {},
@@ -178,5 +186,66 @@ describe('mirrorText', () => {
     label.textContent = '68';
     await settle();
     expect(copy.textContent).toBe('62');
+  });
+});
+
+describe('typeStyleOf', () => {
+  it("takes a part's type as an inline style, without its colour", () => {
+    // The 2024 "12 POINTS" set like the row's names.
+    const name = el({
+      fontFamily: 'Gotham, sans-serif',
+      fontSize: '18px',
+      fontWeight: '700',
+      letterSpacing: '0.5px',
+      textTransform: 'uppercase',
+      color: 'rgb(255, 255, 255)',
+    });
+
+    document.body.appendChild(name);
+
+    expect(typeStyleOf(name)).toMatchObject({
+      fontFamily: 'Gotham, sans-serif',
+      fontSize: '18px',
+      fontWeight: '700',
+      letterSpacing: '0.5px',
+      textTransform: 'uppercase',
+    });
+    expect(typeStyleOf(name)).not.toHaveProperty('color');
+  });
+});
+
+describe('resizeType', () => {
+  it('sets the size and scales the spacing with it', () => {
+    // The 2023 giant words: the name's type, two row heights tall.
+    expect(
+      resizeType(
+        {
+          fontFamily: 'Gotham',
+          fontSize: '18px',
+          letterSpacing: '0.5px',
+          wordSpacing: 'normal',
+        },
+        72,
+      ),
+    ).toEqual({
+      fontFamily: 'Gotham',
+      fontSize: '72px',
+      letterSpacing: '2px',
+      wordSpacing: 'normal',
+    });
+  });
+});
+
+describe('shownTextOf', () => {
+  it("is a part's text without screen-reader-only copies", () => {
+    // A phone row showing a short code keeps the full name for readers.
+    const name = document.createElement('h4');
+
+    name.innerHTML =
+      '<span aria-hidden="true">GBR</span><span class="sr-only">United Kingdom</span>';
+    expect(shownTextOf(name)).toBe('GBR');
+
+    name.innerHTML = '  United\n  Kingdom ';
+    expect(shownTextOf(name)).toBe('United Kingdom');
   });
 });

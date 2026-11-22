@@ -13,6 +13,10 @@ import { AppStoresItem } from '../custom/AppStoresItem';
 import { ConfettiPreviewItem } from '../custom/ConfettiPreviewItem';
 import { ConfirmationsListItem } from '../custom/ConfirmationsListItem';
 import { DangerResetItem } from '../custom/DangerResetItem';
+import {
+  ENTRY_DEFAULTS_SEARCH_KEYS,
+  EntryDefaultsList,
+} from '../custom/EntryDefaultsList';
 import { HapticsLabLink } from '../custom/HapticsLabLink';
 import { HostingCountryDropdown } from '../custom/HostingCountryDropdown';
 import {
@@ -30,8 +34,26 @@ import {
   CONFETTI_SPEED_RANGE,
 } from '@/components/effects/confetti/confettiPlan';
 import { APP_STORES_LIVE } from '@/config/appStores';
+import { historicalNamesFor } from '@/data/countries/entryOverrides';
 import { DISPLAY_SIZES } from '@/native/displaySize';
+import { useCountriesStore } from '@/state/countriesStore';
+import { useGeneralStore } from '@/state/generalStore';
 import { getInterfaceFontSelectOptions } from '@/theme/fontAliases';
+
+/**
+ * "Historical names" flipped: the open contest gains or loses the names of
+ * its year; names the user picked stay (`rebaseHistoricalNames`).
+ */
+const applyHistoricalNames = (on: boolean) => {
+  const { settings, year } = useGeneralStore.getState();
+  const names = historicalNamesFor(
+    Number(settings.contestYear) || Number(year),
+  );
+
+  useCountriesStore
+    .getState()
+    .swapHistoricalNames(on ? {} : names, on ? names : {});
+};
 
 /**
  * Declarative source of truth for the redesigned General tab. Drives the sidebar /
@@ -81,6 +103,25 @@ export const CATEGORIES: Category[] = [
             render: () => <HostingCountryDropdown />,
           },
         ],
+      },
+      {
+        kind: 'subhead',
+        id: 'sh-countryNames',
+        labelKey: 'settings.general2.subhead.countryNames',
+      },
+      {
+        kind: 'switch',
+        id: 'useHistoricalNames',
+        settingKey: 'useHistoricalNames',
+        labelKey: 'settings.contest.historicalNames',
+        descKey: 'settings.contest.historicalNamesDesc',
+        onChange: applyHistoricalNames,
+      },
+      {
+        kind: 'custom',
+        id: 'defaultEntryOverrides',
+        searchTextKeys: ENTRY_DEFAULTS_SEARCH_KEYS,
+        render: ({ query }) => <EntryDefaultsList query={query} />,
       },
     ],
   },

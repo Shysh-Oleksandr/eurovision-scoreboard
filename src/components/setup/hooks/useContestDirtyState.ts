@@ -44,6 +44,7 @@ export const useContestDirtyState = (): boolean => {
       eventAssignments: state.eventAssignments,
       countryOdds: state.countryOdds,
       customCountries: state.customCountries,
+      entryOverrides: state.entryOverrides,
     })),
   );
 

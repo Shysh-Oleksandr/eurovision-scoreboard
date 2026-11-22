@@ -57,6 +57,9 @@ vi.mock('@/api/customEntries', () => ({
 }));
 
 vi.mock('@/api/client', () => ({ isNetworkError: () => false }));
+vi.mock('@/api/entryFlags', () => ({
+  useEntryFlagsQuery: () => ({ data: [] }),
+}));
 vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => false }));
 vi.mock('@/hooks/useConfirmation', () => ({
   useConfirmation: () => ({ confirm: vi.fn() }),

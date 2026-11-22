@@ -82,15 +82,17 @@ export const useAllocationDraw = (active = true): AllocationDrawModel => {
   const stages = useCountriesStore((s) => s.configuredEventStages);
   const assignments = useCountriesStore((s) => s.eventAssignments);
   const customCountries = useCountriesStore((s) => s.customCountries);
+  const entryOverrides = useCountriesStore((s) => s.entryOverrides);
   const allCountriesForYear = useCountriesStore((s) => s.allCountriesForYear);
   const getAllCountries = useCountriesStore((s) => s.getAllCountries);
   const affinity = useDrawAffinity(active && (enabled || !isGfOnly));
 
   const countries = useMemo(
     () => getAllCountries(),
-    // customCountries is the only input of getAllCountries that changes.
+    // customCountries and entryOverrides are the inputs of getAllCountries
+    // that change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [customCountries, getAllCountries],
+    [customCountries, entryOverrides, getAllCountries],
   );
   const byCode = useMemo(
     () => new Map(countries.map((c) => [c.code, c])),

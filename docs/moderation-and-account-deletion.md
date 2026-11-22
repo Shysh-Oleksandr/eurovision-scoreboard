@@ -120,7 +120,9 @@ same local cleanup as logout (`clearSignedInState`).
      `forkedFromUserId` is cleared on forks);
    - contests (snapshots, logos, groups, pins, likes and saves);
    - designs (uploads, likes, saves, duplicate markers, remix provenance);
-   - custom entries and their groups (flags no other entry uses).
+   - custom entries and their groups (flags no other entry uses), then the
+     flags uploaded for contests' own country flags (`EntryFlagsService`,
+     [entry-overrides.md](entry-overrides.md) §5).
 3. **Social data:** follows in both directions (follower counts are
    adjusted), blocks in both directions, and the reports the user filed
    or that are about them.

@@ -36,24 +36,27 @@ const CountryStatsPickerModal: React.FC<CountryStatsPickerModalProps> = ({
     (state) => state.settings.shouldUse2026WhiteHeartFlags,
   );
 
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  // Built-in names: the stats span contests.
+  const getCanonicalCountries = useCountriesStore(
+    (state) => state.getCanonicalCountries,
+  );
   const allCountriesForYear = useCountriesStore(
     (state) => state.allCountriesForYear,
   );
 
   const [availableCountries, setAvailableCountries] = useState(() =>
-    getAllCountries(true),
+    getCanonicalCountries(true),
   );
 
   useEffect(() => {
-    const countries = getAllCountries(true).map((country) => ({
+    const countries = getCanonicalCountries(true).map((country) => ({
       ...country,
       aqSemiFinalGroup: allCountriesForYear.find((c) => c.code === country.code)
         ?.aqSemiFinalGroup,
     }));
 
     setAvailableCountries(countries);
-  }, [allCountriesForYear, getAllCountries, isOpen]);
+  }, [allCountriesForYear, getCanonicalCountries, isOpen]);
 
   const {
     countriesSearch,

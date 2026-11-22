@@ -94,7 +94,8 @@ launch). Queries pause while offline and refetch on reconnect.
 `src/api/persistedQueries.ts` + `src/api/queryPersistence.ts` (lazy,
 `@tanstack/react-query-persist-client`) keep the account's own lists in
 IndexedDB (`DouzePoints` / `appAssets` / key `queryCache`): profile summary,
-custom entries and groups, theme and contest groups, quick-select lists, and
+custom entries and groups, uploaded contest flags (`entry-flags`), theme and
+contest groups, quick-select lists, and
 the first page of yours/saved themes, yours/saved contests and your fonts
 (no search, no group filter). Not: preferences (`§6` decides those),
 per-item state, public content.

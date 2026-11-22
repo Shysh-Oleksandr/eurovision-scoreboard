@@ -7,10 +7,18 @@ import { BaseCountry } from '@/models';
 
 interface EntryRowPreviewProps {
   name: string;
-  /** The flag to draw: a URL, a `/flags/` path or a staged upload's data URL. */
+  /**
+   * The flag to draw: a URL, a `/flags/` path or a staged upload's data URL.
+   * Empty with a standard `code`: that country's own flag.
+   */
   flag: string;
   /** Stands in for the name while the field is empty. */
   placeholder: string;
+  /**
+   * A standard country's code (its name and flag being changed for a
+   * contest), so its flag is drawn in the theme's own shapes.
+   */
+  code?: string;
 }
 
 /**
@@ -22,16 +30,20 @@ const EntryRowPreview: React.FC<EntryRowPreviewProps> = ({
   name,
   flag,
   placeholder,
+  code,
 }) => {
   const look = useBoardRowLook();
   const country: BaseCountry = useMemo(
-    () => ({
-      code: 'custom-preview',
-      name: name || placeholder,
-      category: 'Custom',
-      flag,
-    }),
-    [flag, name, placeholder],
+    () =>
+      code
+        ? { code, name: name || placeholder, ...(flag ? { flag } : {}) }
+        : {
+            code: 'custom-preview',
+            name: name || placeholder,
+            category: 'Custom',
+            flag,
+          },
+    [code, flag, name, placeholder],
   );
 
   return (

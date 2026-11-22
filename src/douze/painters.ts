@@ -1,4 +1,4 @@
-import type { DouzePainter } from './model';
+import type { DouzePainter, DouzeSlabLine } from './model';
 
 /**
  * Canvas painters: effects that change shape over time, so they are drawn
@@ -19,7 +19,249 @@ export interface PainterFrame {
   /** The row's size, the unit painters' params are given in. */
   rowW: number;
   rowH: number;
+  /** Slab painters: the followed part's resting box and where it is now. */
+  slab?: SlabFrame;
 }
+
+/** A rounded box: x, y, w, h and the corner radii (tl, tr, br, bl), in px. */
+export interface RoundedBox {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  radii: [number, number, number, number];
+}
+
+/** A slab painter's inputs, in the canvas's own px. */
+export interface SlabFrame {
+  /** Where the part rests (the slab's back). */
+  back: RoundedBox;
+  /** Where the part's transform puts it now (its face). */
+  front: RoundedBox;
+}
+
+type Point = [number, number];
+
+/**
+ * The part of a rounded box's outline a lift up and to the left uncovers
+ * (outward normals pointing right or down), as points: `right` from the
+ * top-right corner's middle down to the bottom-right's middle, `bottom`
+ * from there along the bottom to the bottom-left corner's middle.
+ */
+export const slabChains = (
+  box: RoundedBox,
+): { right: Point[]; bottom: Point[] } => {
+  const [, tr, br, bl] = box.radii;
+  const { x, y, w, h } = box;
+  const arc = (
+    cx: number,
+    cy: number,
+    r: number,
+    from: number,
+    to: number,
+  ): Point[] => {
+    if (r <= 0) return [[cx, cy]];
+
+    const steps = Math.max(2, Math.ceil(r / 4));
+
+    return Array.from({ length: steps + 1 }, (_, i) => {
+      const angle = ((from + ((to - from) * i) / steps) * Math.PI) / 180;
+
+      return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+    });
+  };
+  // Canvas angles: 0 is right, 90 is down.
+  const right = [
+    ...arc(x + w - tr, y + tr, tr, -45, 0),
+    ...arc(x + w - br, y + h - br, br, 0, 45),
+  ];
+  const bottom = [
+    ...arc(x + w - br, y + h - br, br, 45, 90),
+    ...arc(x + bl, y + h - bl, bl, 90, 135),
+  ];
+
+  return { right, bottom };
+};
+
+/** The convex hull of points (monotone chain), counter-clockwise. */
+export const convexHull = (points: Point[]): Point[] => {
+  const sorted = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+
+  if (sorted.length < 3) return sorted;
+
+  const cross = (o: Point, a: Point, b: Point) =>
+    (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const half = (list: Point[]) => {
+    const chain: Point[] = [];
+
+    list.forEach((point) => {
+      while (
+        chain.length >= 2 &&
+        cross(chain[chain.length - 2], chain[chain.length - 1], point) <= 0
+      ) {
+        chain.pop();
+      }
+      chain.push(point);
+    });
+    chain.pop();
+
+    return chain;
+  };
+
+  return [...half(sorted), ...half([...sorted].reverse())];
+};
+
+const polygonPath = (points: Point[]): Path2D => {
+  const path = new Path2D();
+
+  points.forEach(([px, py], index) =>
+    index === 0 ? path.moveTo(px, py) : path.lineTo(px, py),
+  );
+  path.closePath();
+
+  return path;
+};
+
+const roundedBoxPath = (box: RoundedBox): Path2D => {
+  const path = new Path2D();
+
+  path.roundRect(box.x, box.y, box.w, box.h, box.radii);
+
+  return path;
+};
+
+/** No visible lift: nothing to draw (the slab lies flat). */
+const isFlat = ({ back, front }: SlabFrame) =>
+  Math.abs(front.x - back.x) < 0.25 &&
+  Math.abs(front.y - back.y) < 0.25 &&
+  Math.abs(front.w - back.w) < 0.25 &&
+  Math.abs(front.h - back.h) < 0.25;
+
+/** The slab's sides: everything between the back and the face. */
+const sidesRegion = (slab: SlabFrame) => {
+  const back = slabChains(slab.back);
+  const front = slabChains(slab.front);
+
+  return {
+    // The right side is drawn over the whole region, so the two colours
+    // meet without a seam of background between their edges.
+    all: convexHull([
+      ...back.right,
+      ...back.bottom,
+      ...front.right,
+      ...front.bottom,
+    ]),
+    right: convexHull([...back.right, ...front.right]),
+  };
+};
+
+/** The face stays the part's own: whatever was drawn over it goes. */
+const eraseFace = (ctx: CanvasRenderingContext2D, slab: SlabFrame) => {
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fill(roundedBoxPath(slab.front));
+  ctx.restore();
+};
+
+const paintSlabSides = (
+  ctx: CanvasRenderingContext2D,
+  slab: SlabFrame,
+  colors: string[],
+) => {
+  if (isFlat(slab)) return;
+
+  const { all, right } = sidesRegion(slab);
+
+  ctx.fillStyle = colors[0] ?? '#fff';
+  ctx.fill(polygonPath(all));
+  ctx.fillStyle = colors[1] ?? colors[0] ?? '#fff';
+  ctx.fill(polygonPath(right));
+  eraseFace(ctx, slab);
+};
+
+const parseHex = (color: string): [number, number, number] | null => {
+  const match = /^#([0-9a-f]{6})$/i.exec(color.trim());
+
+  if (!match) return null;
+
+  const value = parseInt(match[1], 16);
+
+  return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+};
+
+/**
+ * The slab lines' colour: the side's own, lighter on a dark side and darker
+ * on a light one (the broadcast's light blue lines on France's blue, dark
+ * red on Iceland's red, orange on Lithuania's yellow).
+ */
+export const slabLineColor = (color: string): string => {
+  const rgb = parseHex(color);
+
+  if (!rgb) return color;
+
+  const linear = rgb.map((channel) => {
+    const c = channel / 255;
+
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  const luminance =
+    0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+  const [r, g, b] = rgb.map((channel) => channel / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+  }
+
+  const lightness = Math.min(
+    0.92,
+    Math.max(0.08, l + (luminance < 0.15 ? 0.2 : -0.07)),
+  );
+
+  return `hsl(${Math.round(((h * 60 + 360) % 360) * 10) / 10}, ${
+    Math.round(s * 1000) / 10
+  }%, ${Math.round(lightness * 1000) / 10}%)`;
+};
+
+const paintSlabLines = (
+  ctx: CanvasRenderingContext2D,
+  slab: SlabFrame,
+  lines: DouzeSlabLine[],
+  width: number,
+  colors: string[],
+) => {
+  if (isFlat(slab)) return;
+
+  const { all } = sidesRegion(slab);
+  const { front, back } = slab;
+  const depth = back.y + back.h - (front.y + front.h);
+
+  if (depth <= 0) return;
+
+  ctx.save();
+  ctx.clip(polygonPath(all));
+  ctx.strokeStyle = slabLineColor(colors[0] ?? '#fff');
+  ctx.lineWidth = width;
+  ctx.lineCap = 'butt';
+  ctx.beginPath();
+  lines.forEach(({ at, slant }) => {
+    const x = front.x + at * front.w;
+    const top = front.y + front.h;
+
+    ctx.moveTo(x, top);
+    ctx.lineTo(x + slant * depth, top + depth);
+  });
+  ctx.stroke();
+  ctx.restore();
+  eraseFace(ctx, slab);
+};
 
 const smoothstep = (value: number) => {
   const x = Math.min(1, Math.max(0, value));
@@ -148,6 +390,20 @@ export const paint = (
   switch (painter.type) {
     case 'waveFlow':
       paintWaveFlow(ctx, w, h, painter, frame, colors);
+      break;
+    case 'slabSides':
+      if (frame.slab) paintSlabSides(ctx, frame.slab, colors);
+      break;
+    case 'slabLines':
+      if (frame.slab) {
+        paintSlabLines(
+          ctx,
+          frame.slab,
+          painter.lines,
+          Math.max(1, painter.width * frame.rowH),
+          colors,
+        );
+      }
       break;
     default:
       break;

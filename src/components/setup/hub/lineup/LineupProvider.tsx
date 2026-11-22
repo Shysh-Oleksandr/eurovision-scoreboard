@@ -39,6 +39,8 @@ export interface LineupActions {
   openTileMenu: (code: string, listId: ListId, anchor: HTMLElement) => void;
   openMoveAllMenu: (listId: ListId, anchor: HTMLElement) => void;
   onEditCustomEntry: (country: BaseCountry) => void;
+  /** A standard country's own name and flag in this contest. */
+  onEditEntryOverride: (code: string) => void;
   onEditStage: (stage: EventStage) => void;
   /** Opens a new custom entry, in `groupId` when given (a group's +). */
   onCreateCustomEntry: (groupId?: string) => void;
@@ -96,6 +98,7 @@ interface LineupProviderProps {
   isSignedIn: boolean;
   assignMany: (codes: string[], group: string) => void;
   onEditCustomEntry: (country: BaseCountry) => void;
+  onEditEntryOverride: (code: string) => void;
   onEditStage: (stage: EventStage) => void;
   onCreateCustomEntry: (groupId?: string) => void;
   children: React.ReactNode;
@@ -111,6 +114,7 @@ const LineupProvider: React.FC<LineupProviderProps> = ({
   isSignedIn,
   assignMany,
   onEditCustomEntry,
+  onEditEntryOverride,
   onEditStage,
   onCreateCustomEntry,
   children,
@@ -204,12 +208,19 @@ const LineupProvider: React.FC<LineupProviderProps> = ({
           .getState()
           .openMenu({ kind: 'moveAll', listId }, anchor),
       onEditCustomEntry,
+      onEditEntryOverride,
       onEditStage,
       onCreateCustomEntry,
       onCreateGroup: () => setGroupModal({ open: true, group: null }),
       onEditGroup: (group) => setGroupModal({ open: true, group }),
     }),
-    [move, onCreateCustomEntry, onEditCustomEntry, onEditStage],
+    [
+      move,
+      onCreateCustomEntry,
+      onEditCustomEntry,
+      onEditEntryOverride,
+      onEditStage,
+    ],
   );
 
   return (

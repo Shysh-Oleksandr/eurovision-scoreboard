@@ -6,6 +6,7 @@ import { buildEventStagesFromAssignments } from '@/components/setup/utils/buildE
 import { Year } from '@/config';
 import { resolveContestType } from '@/data/contestTypes';
 import { sanitizeEntryColors } from '@/data/countries/entryColors';
+import { sanitizeEntryOverrides } from '@/data/countries/entryOverrides';
 import { POINTS_ARRAY } from '@/data/data';
 import {
   BaseCountry,
@@ -547,6 +548,11 @@ export function buildContestSnapshotFromStores() {
         : {}),
       stages: setupStagesPayload,
       ...(allocationDraw ? { allocationDraw } : {}),
+      // Every override, not just the line-up's: one picked for a pool
+      // country is part of the contest too.
+      ...(Object.keys(countriesStore.entryOverrides).length > 0
+        ? { entryOverrides: countriesStore.entryOverrides }
+        : {}),
     },
     ...(customEntriesUsed.length > 0 ? { customEntriesUsed } : {}),
   };
@@ -756,6 +762,15 @@ export async function applyContestSnapshotToStores(
     );
 
     useCountriesStore.setState({ customCountries: mergedCustomCountries });
+
+    // The contest's own names and flags replace the previous contest's
+    // (none saved: every country as it ships). Before the lookup below,
+    // so voters and stages are built with them.
+    useCountriesStore
+      .getState()
+      .replaceEntryOverrides(
+        sanitizeEntryOverrides(snapshot.setup.entryOverrides),
+      );
   }
 
   const allCountries = countriesStore.getAllCountries(true);

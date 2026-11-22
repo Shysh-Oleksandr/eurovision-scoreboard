@@ -239,6 +239,8 @@
       "moveAllTo": "Sposta tutti in…",
       "moveToGroup": "Sposta nel gruppo",
       "editEntry": "Modifica voce",
+      "editNameAndFlag": "Modifica nome e bandiera",
+      "useOriginalNameAndFlag": "Usa nome e bandiera originali",
       "dropCountriesHere": "Rilascia qui i paesi",
       "emptyDropHere": "Vuoto — rilascia qui i paesi",
       "noMatches": "Nessun risultato",
@@ -466,6 +468,17 @@
       "saveFailed": "Impossibile salvare la voce. Riprova.",
       "deleteFailed": "Impossibile eliminare la voce. Riprova.",
       "deleteEntry": "Elimina voce"
+    },
+    "entryOverrideModal": {
+      "title": "Nome e bandiera",
+      "intro": "Solo in questo concorso. Nelle tue statistiche i risultati contano ancora come {name}.",
+      "nameHint": "Lascia vuoto per usare {name}.",
+      "flag": "Bandiera",
+      "useOriginal": "Usa l’originale",
+      "signInToUpload": "Accedi per caricare una bandiera.",
+      "uploadFailed": "Non è stato possibile caricare la bandiera. Riprova.",
+      "useByDefault": "Usa nei miei nuovi concorsi",
+      "useByDefaultHint": "I nuovi concorsi iniziano con questo nome e questa bandiera. Li trovi in Impostazioni → Concorso."
     },
     "customEntryGroupModal": {
       "createGroup": "Crea Gruppo",
@@ -1493,7 +1506,10 @@
         "douzePointsAnimations": {
           "parallelograms": "Parallelogrammi (ESC 2023)",
           "heartsGrid": "Griglia di Corazioni (ESC 2025)",
+          "year2021": "Riga in rilievo (ESC 2021)",
           "year2022": "Onde sonore (ESC 2022)",
+          "year2023": "Cerchi e parole (ESC 2023)",
+          "year2024": "Scia di colori (ESC 2024)",
           "year2026": "Scia dorata (ESC 2026)"
         },
         "douzeOptions": {
@@ -1533,7 +1549,9 @@
             "name": "Nome del paese",
             "blocks": "Blocchi in movimento",
             "label": "Testo dei punti",
-            "points": "Punti dorati"
+            "flashText": "Testo lampeggiante",
+            "points": "Punti dorati",
+            "lines": "Linee di luce"
           },
           "coverFlag": "Cuori sopra la bandiera",
           "glow": "Intensità del bagliore",
@@ -1985,7 +2003,8 @@
         "popupsChrome": "Popup e interfaccia",
         "personalization": "Personalizzazione",
         "suppressedDialogs": "Dialoghi soppressi",
-        "reset": "Ripristina"
+        "reset": "Ripristina",
+        "countryNames": "Nomi e bandiere dei paesi"
       },
       "danger": {
         "confirm": "Sì, ripristina tutto"
@@ -2236,7 +2255,16 @@
     "contest": {
       "enterContestName": "Inserisci il nome del concorso...",
       "enterContestYear": "Inserisci l'anno del concorso...",
-      "showHostingCountryFlag": "Mostra bandiera del paese ospitante"
+      "showHostingCountryFlag": "Mostra bandiera del paese ospitante",
+      "historicalNames": "Nomi storici",
+      "historicalNamesDesc": "Ogni edizione usa i nomi che i paesi avevano allora: F.Y.R. Macedonia fino al 2018, Czech Republic fino al 2022.",
+      "yourNamesAndFlags": "I tuoi nomi e bandiere",
+      "yourNamesAndFlagsDesc": "I nuovi concorsi iniziano con questi.",
+      "noNamesAndFlags": "Ancora nessuno. Nella configurazione, apri il menu di un paese, scegli Modifica nome e bandiera e spunta Usa nei miei nuovi concorsi.",
+      "insteadOf": "Al posto di {name}",
+      "ownFlag": "Bandiera personalizzata",
+      "ownFlagInsteadOf": "Bandiera personalizzata, al posto di {name}",
+      "removeDefault": "Rimuovi {name}"
     },
     "confirmations": {
       "description": "Configura quali popup di conferma vengono mostrati quando esegui determinate azioni.",

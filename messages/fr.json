@@ -239,6 +239,8 @@
       "moveAllTo": "Tout déplacer vers…",
       "moveToGroup": "Déplacer vers un groupe",
       "editEntry": "Modifier l'entrée",
+      "editNameAndFlag": "Modifier le nom et le drapeau",
+      "useOriginalNameAndFlag": "Reprendre le nom et le drapeau d’origine",
       "dropCountriesHere": "Déposez les pays ici",
       "emptyDropHere": "Vide — déposez des pays ici",
       "noMatches": "Aucun résultat",
@@ -466,6 +468,17 @@
       "saveFailed": "Impossible d’enregistrer l’entrée. Réessayez.",
       "deleteFailed": "Impossible de supprimer l’entrée. Réessayez.",
       "deleteEntry": "Supprimer l’entrée"
+    },
+    "entryOverrideModal": {
+      "title": "Nom et drapeau",
+      "intro": "Uniquement dans ce concours. Dans vos statistiques, ses résultats comptent toujours pour {name}.",
+      "nameHint": "Laissez vide pour utiliser {name}.",
+      "flag": "Drapeau",
+      "useOriginal": "Reprendre l’original",
+      "signInToUpload": "Connectez-vous pour importer un drapeau.",
+      "uploadFailed": "Impossible d’importer le drapeau. Réessayez.",
+      "useByDefault": "Utiliser dans mes nouveaux concours",
+      "useByDefaultHint": "Les nouveaux concours commencent avec ce nom et ce drapeau. Ils sont listés dans Paramètres → Concours."
     },
     "customEntryGroupModal": {
       "createGroup": "Créer un groupe",
@@ -1493,7 +1506,10 @@
         "douzePointsAnimations": {
           "parallelograms": "Parallelogrammes (ESC 2023)",
           "heartsGrid": "Grille de cœurs (ESC 2025)",
+          "year2021": "Rangée en relief (ESC 2021)",
           "year2022": "Ondes sonores (ESC 2022)",
+          "year2023": "Cercles et mots (ESC 2023)",
+          "year2024": "Balayage de couleurs (ESC 2024)",
           "year2026": "Balayage doré (ESC 2026)"
         },
         "douzeOptions": {
@@ -1533,7 +1549,9 @@
             "name": "Nom du pays",
             "blocks": "Blocs glissants",
             "label": "Texte des points",
-            "points": "Points dorés"
+            "flashText": "Texte clignotant",
+            "points": "Points dorés",
+            "lines": "Lignes de lumière"
           },
           "coverFlag": "Cœurs sur le drapeau",
           "glow": "Intensité de la lueur",
@@ -1985,7 +2003,8 @@
         "popupsChrome": "Popups et interface",
         "personalization": "Personnalisation",
         "suppressedDialogs": "Dialogues supprimés",
-        "reset": "Réinitialiser"
+        "reset": "Réinitialiser",
+        "countryNames": "Noms et drapeaux des pays"
       },
       "danger": {
         "confirm": "Oui, tout réinitialiser"
@@ -2236,7 +2255,16 @@
     "contest": {
       "enterContestName": "Entrez le nom du concours...",
       "enterContestYear": "Entrez l’année du concours...",
-      "showHostingCountryFlag": "Afficher le drapeau du pays hôte"
+      "showHostingCountryFlag": "Afficher le drapeau du pays hôte",
+      "historicalNames": "Noms historiques",
+      "historicalNamesDesc": "Chaque édition utilise les noms des pays à l’époque : F.Y.R. Macedonia jusqu’en 2018, Czech Republic jusqu’en 2022.",
+      "yourNamesAndFlags": "Vos noms et drapeaux",
+      "yourNamesAndFlagsDesc": "Les nouveaux concours commencent avec eux.",
+      "noNamesAndFlags": "Aucun pour l’instant. Dans la configuration, ouvrez le menu d’un pays, choisissez Modifier le nom et le drapeau, puis cochez Utiliser dans mes nouveaux concours.",
+      "insteadOf": "À la place de {name}",
+      "ownFlag": "Drapeau personnalisé",
+      "ownFlagInsteadOf": "Drapeau personnalisé, à la place de {name}",
+      "removeDefault": "Retirer {name}"
     },
     "confirmations": {
       "description": "Configurez les popups de confirmation qui s’affichent lorsque vous effectuez certaines actions.",

@@ -20,7 +20,7 @@
  *       labelled with t: <out-prefix>_0000.png, _0100.png, ...
  *
  *   node scripts/douze-frames.mjs compare <screenshot.png> <rects.json>
- *       <ref-prefix> <out.png> [--height 120] [--dpr 2]
+ *       <ref-prefix> <out.png> [--height 120] [--dpr 2] [--pad 10]
  *       Every lab strip row cut from a full-page screenshot of
  *       /dev/douze-lab, to the right of the reference frame at the same t,
  *       one pair per line. rects.json holds what the lab's rect snippet
@@ -189,6 +189,8 @@ const commands = {
     const rects = readRects(rectsFile);
     const dpr = number(flags.dpr, rects.dpr ?? 2);
     const height = number(flags.height, 120);
+    // More room for an animation that moves the row itself (2021's lift).
+    const pad = number(flags.pad, ROW_PAD);
     const [shotW, shotH] = probe(shot, 'width,height').map(Number);
     const rows = rects.rows.filter((row) => {
       const exists = fs.existsSync(`${refPrefix}_${pad4(row.t)}.png`);
@@ -201,10 +203,10 @@ const commands = {
     if (rows.length === 0) fail('No lab row has a reference frame');
 
     const crops = rows.map((row) => {
-      const x = Math.max(0, Math.round((row.x - ROW_PAD) * dpr));
-      const y = Math.max(0, Math.round((row.y - ROW_PAD) * dpr));
-      const w = Math.min(shotW - x, Math.round((row.w + 2 * ROW_PAD) * dpr));
-      const h = Math.min(shotH - y, Math.round((row.h + 2 * ROW_PAD) * dpr));
+      const x = Math.max(0, Math.round((row.x - pad) * dpr));
+      const y = Math.max(0, Math.round((row.y - pad) * dpr));
+      const w = Math.min(shotW - x, Math.round((row.w + 2 * pad) * dpr));
+      const h = Math.min(shotH - y, Math.round((row.h + 2 * pad) * dpr));
 
       if (w <= 0 || h <= 0) {
         fail(`Row ${row.t} ms is outside the screenshot: use a full-page one`);

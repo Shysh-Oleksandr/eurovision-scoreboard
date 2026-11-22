@@ -122,7 +122,10 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
     }
   }, [isOpen, contestGroups, selectedGroupId]);
 
-  const getAllCountries = useCountriesStore((s) => s.getAllCountries);
+  // Built-in names: the leaderboard spans contests.
+  const getCanonicalCountries = useCountriesStore(
+    (s) => s.getCanonicalCountries,
+  );
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
   );
@@ -143,7 +146,9 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
   }, [data?.customEntries]);
 
   const resolveEntry = (code: string) => {
-    const localCountry = getAllCountries(true).find((c) => c.code === code);
+    const localCountry = getCanonicalCountries(true).find(
+      (c) => c.code === code,
+    );
 
     if (localCountry) {
       return {
@@ -217,7 +222,7 @@ export const MyLeaderboardModal: React.FC<MyLeaderboardModalProps> = ({
     sortDir,
     search,
     onlyEurovisionCountries,
-    getAllCountries,
+    getCanonicalCountries,
     customEntriesMap,
     customEntryFallback,
     shouldShowHeartFlagIcon,

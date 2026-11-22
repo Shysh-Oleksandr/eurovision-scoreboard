@@ -880,6 +880,11 @@ export const escThemes: Partial<ThemeRecord> = {
       },
     },
     backgroundImage: '/bgImages/BlueBg2021.webp',
+    themeSpecifics: {
+      // The broadcast's rows slide; the 12's flies raised (year2021).
+      boardAnimationMode: 'flip',
+      douzePointsAnimationMode: 'year2021',
+    },
   },
   '2022': {
     colors: {
@@ -1029,7 +1034,7 @@ export const escThemes: Partial<ThemeRecord> = {
     backgroundImage: '/bgImages/BlueBg2023.webp',
     themeSpecifics: {
       boardAnimationMode: 'flip',
-      douzePointsAnimationMode: 'parallelograms',
+      douzePointsAnimationMode: 'year2023',
       usePointsCountUpAnimation: false,
     },
   },
@@ -1104,6 +1109,9 @@ export const escThemes: Partial<ThemeRecord> = {
       },
     },
     backgroundImage: '/bgImages/PurpleBg2024.webp',
+    themeSpecifics: {
+      douzePointsAnimationMode: 'year2024',
+    },
   },
   '2025': {
     colors: {

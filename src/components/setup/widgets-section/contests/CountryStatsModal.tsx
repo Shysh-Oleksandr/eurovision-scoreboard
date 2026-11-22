@@ -77,7 +77,10 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   const shouldUse2026WhiteHeartFlags = useGeneralStore(
     (s) => s.settings.shouldUse2026WhiteHeartFlags,
   );
-  const getAllCountries = useCountriesStore((s) => s.getAllCountries);
+  // Built-in names: the stats span contests.
+  const getCanonicalCountries = useCountriesStore(
+    (s) => s.getCanonicalCountries,
+  );
 
   const { data: contestGroups = [] } = useContestGroupsQuery(
     isOpen && !isUserScope,
@@ -128,7 +131,9 @@ const CountryStatsModal: React.FC<CountryStatsModalProps> = ({
   const resolveEntry = (code: string | null | undefined) => {
     if (!code) return { name: '—', logo: getFlagPath('ww'), isExisting: false };
 
-    const localCountry = getAllCountries(true).find((c) => c.code === code);
+    const localCountry = getCanonicalCountries(true).find(
+      (c) => c.code === code,
+    );
 
     if (localCountry) {
       return {

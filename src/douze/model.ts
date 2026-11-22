@@ -234,11 +234,62 @@ export interface DouzeCloneLayer extends DouzeLayerBase {
 }
 
 /**
+ * Moves one of the row's real parts, not a copy: the keyframes' transform
+ * and opacity play on the part itself, so everything in it stays live (the
+ * 12 box's own entrance, the total counting up, the name). The 2021 row
+ * pops out of the board. Its `box` is the part's own (`{ anchor: part }`),
+ * `origin` is set on the part, and the part is as it was once the
+ * animation ends. Clips, cuts, filters and blends don't apply.
+ */
+export interface DouzePartLayer extends DouzeLayerBase {
+  kind: 'part';
+  part: 'row';
+}
+
+/** A thin line across a slab's bottom side (`slabLines`). */
+export interface DouzeSlabLine {
+  /** Where it meets the face's bottom edge, a share of the face's width. */
+  at: number;
+  /** px across per px down (0: upright; the side's own slant is about 1). */
+  slant: number;
+}
+
+/**
  * Effects drawn per frame on a canvas from the animation's clock, because
  * their shape changes over time (see painters.ts). Lengths are in row
  * heights (`…` of the band's shape) or row widths (positions and speeds).
  */
-export type DouzePainter = {
+export type DouzePainter =
+  | {
+      /**
+       * The sides of a slab: what shows between a `part` layer's resting
+       * box and where its transform puts it (`follow`, the part layer's
+       * id), as if the part were a block lifted off the board. The bottom
+       * side in `colors[0]`, the right side in `colors[1]` (a lift up and
+       * to the left shows those two), rounded corners extruded as arcs, so
+       * a pill row is a pill-shaped slab. Never over the part's face.
+       */
+      type: 'slabSides';
+      follow: string;
+      colors: string[];
+    }
+  | {
+      /**
+       * Thin lines across the bottom side of the same slab (the 2021
+       * facets), in `colors[0]` turned a little lighter on a dark colour
+       * and darker on a light one, as the broadcast's are.
+       */
+      type: 'slabLines';
+      follow: string;
+      colors: string[];
+      lines: DouzeSlabLine[];
+      /** In row heights. */
+      width: number;
+    }
+  | DouzeWaveFlowPainter;
+
+/** The 2022 mesh (see `DouzePainter`). */
+export type DouzeWaveFlowPainter = {
   /** The 2022 mesh: waves flowing right through a moving pinch. */
   type: 'waveFlow';
   /** Stroke colours, cycled line by line (CSS colours or `var(--douze-…)`). */
@@ -272,18 +323,50 @@ export interface DouzeCanvasLayer extends DouzeLayerBase {
   painter: DouzePainter;
 }
 
+/**
+ * A line of text in its box, set in the type of one of the row's parts
+ * (its face, weight, size, spacing and case), so it reads as part of the
+ * row on any theme: the 2024 "12 POINTS" is set like the names. One line,
+ * never wrapped: what runs past the box overflows to the side away from
+ * `align`, and `clipTo` cuts it (the 2023 giant words).
+ */
+export interface DouzeTextLayer extends DouzeLayerBase {
+  kind: 'text';
+  /**
+   * What it says. `points`: the points just given, in the app's language
+   * ("12 points", `simulation.douzePoints`), from the player's
+   * `pointsLabel`. `name`: the country's name as the row shows it (its
+   * short code where the row shows one). Without it the layer isn't drawn.
+   */
+  text: 'points' | 'name';
+  /** The row part whose type it takes. */
+  font: Exclude<DouzeAnchor, 'row' | 'strip'>;
+  /**
+   * Font size in row heights, in place of the part's own (the 2023 words
+   * two row heights tall, cut by the row).
+   */
+  size?: number;
+  /** Where the line sits in its box. Default centre. */
+  align?: 'left' | 'centre' | 'right';
+  /** CSS colour. */
+  color: string;
+}
+
 export type DouzeLayer =
   | DouzeRectLayer
   | DouzeEffectLayer
   | DouzeCloneLayer
-  | DouzeCanvasLayer;
+  | DouzeCanvasLayer
+  | DouzeTextLayer
+  | DouzePartLayer;
 
 /** Theme colours a spec can take its palette from (`themeColors`). */
 export type DouzeThemeColorKey =
   | 'juryLastPointsBg'
   | 'douzePointsBg'
   | 'juryCountryText'
-  | 'douzePointsText';
+  | 'douzePointsText'
+  | 'douzePointsBlock1';
 
 export interface DouzeAnimationSpec {
   id: string;
@@ -293,6 +376,26 @@ export interface DouzeAnimationSpec {
    * `before`: the board moves first and the animation plays at the new place.
    */
   reorder: 'after' | 'before';
+  /**
+   * With `reorder: 'before'`, when a flipping board moves the row (ms after
+   * the 12; the board's own 1000 without it): the 2021 row lifts, holds,
+   * flies to its new place raised and lands there. A teleporting board
+   * keeps its 1000 and plays the animation at the new place.
+   */
+  moveAtMs?: number;
+  /**
+   * Draw the row's whole item over its neighbours while the animation plays
+   * (the 2021 row's face reaches over the row above, and on a flipping
+   * board the raised row flies over the rows it passes).
+   */
+  raise?: boolean;
+  /**
+   * With flag or theme colours, colours darker than this (relative
+   * luminance) are lifted toward white so they read on the dark board
+   * (default 0.12: navy and deep blues are lifted). 2021 keeps the flags'
+   * own blues and only lifts near-black.
+   */
+  liftBelow?: number;
   /**
    * Values for `var(--douze-<key>)` in the layers. With `paletteFrom` (or a
    * custom theme's colours), `c1`, `c2`, `c3`, `glow` (a tint of c1) and
@@ -307,10 +410,18 @@ export interface DouzeAnimationSpec {
    */
   paletteFrom?: 'flag' | 'theme';
   /**
+   * With flag colours, what `c3` is for a flag of two colours: the first
+   * (default: the 2022 ring) or the second (2023, whose blue words sit on
+   * the `c1` fill and would vanish into it).
+   */
+  twoColorFlagC3?: 'first' | 'second';
+  /**
    * The theme colours `c1`, `c2` and `c3` come from with theme colours
    * (`--twc-countryItem-<key>`, in order). Default: the 12 box, the douze
    * colour and the name text (2022: the sweeps take the box's colour). The
-   * 2026 gold is the theme's douze colour.
+   * 2026 gold is the theme's douze colour; 2023 takes the douze colour, its
+   * text colour and the parallelograms' first block (the 2023 theme's
+   * yellow, magenta and blue).
    */
   themeColors?: DouzeThemeColorKey[];
   /**

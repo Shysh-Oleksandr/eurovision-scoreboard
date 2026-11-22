@@ -1,5 +1,6 @@
 import { enterDrawMode } from '@/components/setup/allocation-draw/drawMode';
 import { useDrawUiStore } from '@/components/setup/allocation-draw/drawUiStore';
+import { historicalNamesFor } from '@/data/countries/entryOverrides';
 import { useAllocationDrawStore } from '@/state/allocationDrawStore';
 import { CountryOdds, useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
@@ -64,6 +65,20 @@ export const applyNextYear = ({
     draw.clearWaitingFrom();
     draw.rememberWaitingFrom(plan.waitingFrom);
     enterDrawMode(false);
+  }
+
+  // The same contest a year on: historical names follow the year (North
+  // Macedonia from 2019); the user's own names stay.
+  const { contestYear: fromYear, useHistoricalNames } =
+    useGeneralStore.getState().settings;
+
+  if (useHistoricalNames) {
+    useCountriesStore
+      .getState()
+      .swapHistoricalNames(
+        historicalNamesFor(Number(fromYear)),
+        historicalNamesFor(Number(year)),
+      );
   }
 
   useGeneralStore.setState((state) => ({

@@ -11,11 +11,14 @@ export type FlagShape =
   | 'round-border'
   | 'none';
 export type BoardAnimationMode = 'flip' | 'teleport';
-/** `year2022` and later year modes are played from specs in src/douze/. */
+/** `year2021` and later year modes are played from specs in src/douze/. */
 export type DouzePointsAnimationMode =
   | 'parallelograms'
   | 'heartsGrid'
+  | 'year2021'
   | 'year2022'
+  | 'year2023'
+  | 'year2024'
   | 'year2026';
 
 export interface ThemeSpecifics {

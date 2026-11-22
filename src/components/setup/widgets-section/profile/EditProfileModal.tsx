@@ -73,7 +73,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const t = useTranslations('widgets.profile');
   const tCommon = useTranslations('common');
   const tError = useTranslations('error.imageUpload');
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  // Built-in names: the profile isn't this contest's.
+  const getCanonicalCountries = useCountriesStore(
+    (state) => state.getCanonicalCountries,
+  );
   const shouldUse2026WhiteHeartFlags = useGeneralStore(
     (state) => state.settings.shouldUse2026WhiteHeartFlags,
   );
@@ -121,7 +124,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   const [removeAvatar, setRemoveAvatar] = useState(false);
 
   const options = useMemo(() => {
-    return getAllCountries(false).map((country) => {
+    return getCanonicalCountries(false).map((country) => {
       const { logo, isExisting } = getHostingCountryLogo(
         country,
         true,
@@ -135,7 +138,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         isExisting,
       };
     });
-  }, [getAllCountries, shouldUse2026WhiteHeartFlags]);
+  }, [getCanonicalCountries, shouldUse2026WhiteHeartFlags]);
 
   useEffectOnce(onLoaded);
 

@@ -74,6 +74,9 @@ export const SYNCED_SETTINGS_KEYS = [
   'enablePredefinedVotes',
   'autoStartPresentation',
   'presentationModeEnabled',
+  // country names and flags new contests start with
+  'useHistoricalNames',
+  'defaultEntryOverrides',
 ] as const satisfies readonly (keyof Settings)[];
 
 export const SYNCED_PRESENTATION_KEYS = [

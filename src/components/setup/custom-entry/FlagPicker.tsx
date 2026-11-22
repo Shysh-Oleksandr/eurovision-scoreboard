@@ -52,20 +52,23 @@ const FlagPicker: React.FC<FlagPickerProps> = ({
   staged,
 }) => {
   const t = useTranslations('setup.customCountryModal');
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  // The flags as they ship, whatever names and flags the contest gave them.
+  const getCanonicalCountries = useCountriesStore(
+    (state) => state.getCanonicalCountries,
+  );
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<FlagTab | null>(null);
 
   const countryTiles = useMemo<FlagTile[]>(
     () =>
-      getAllCountries(false)
+      getCanonicalCountries(false)
         .map((country) => ({
           flag: getFlagPath(country),
           label: country.name,
           search: country.name.toLowerCase(),
         }))
         .sort((a, b) => a.label.localeCompare(b.label)),
-    [getAllCountries],
+    [getCanonicalCountries],
   );
 
   const tiles = useMemo<FlagTile[]>(() => {
@@ -81,7 +84,7 @@ const FlagPicker: React.FC<FlagPickerProps> = ({
 
     return yourFlags.map((yourFlag) => ({
       flag: yourFlag.url,
-      label: yourFlag.names.join(', '),
+      label: yourFlag.names.join(', ') || t('uploadedFlag'),
       search: yourFlag.names.join(' ').toLowerCase(),
     }));
   }, [countryTiles, t, tab, yourFlags]);

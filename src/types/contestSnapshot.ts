@@ -86,6 +86,11 @@ export interface ContestSnapshot {
         };
       };
     }>;
+    /**
+     * Standard countries' own names and flags in this contest, by code
+     * (`data/countries/entryOverrides.ts`). Only saved when there are any.
+     */
+    entryOverrides?: Record<string, { name?: string; flag?: string }>;
     /** Allocation draw: rules that differ from official and what a draw left on each stage. */
     allocationDraw?: {
       rules?: Record<string, unknown>;

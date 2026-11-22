@@ -1,8 +1,24 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 
 import useDouzePointsAnimation from './useDouzePointsAnimation';
+
+import { getDouzeSpec } from '@/douze/registry';
+
+// A spec animation longer than the overlay's usual 1.5 s after the 12 is
+// cleared (the 2024 band runs 2.15 s).
+vi.mock('@/theme/useThemeSpecifics', () => ({
+  default: () => ({
+    boardAnimationMode: 'teleport',
+    douzePointsAnimationMode: 'year2024',
+    douzeOptions: null,
+  }),
+}));
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 type Props = { isDouze: boolean; total: number };
 
@@ -45,5 +61,31 @@ describe('useDouzePointsAnimation run id', () => {
     rerender({ isDouze: true, total: 12 });
     rerender({ isDouze: true, total: 12 });
     expect(result.current.runId).toBe(1);
+  });
+});
+
+describe('useDouzePointsAnimation overlay', () => {
+  it('stays up until a spec animation has played out, though the 12 is cleared sooner', () => {
+    vi.useFakeTimers();
+
+    const { durationMs } = getDouzeSpec('year2024')!;
+    const { result, rerender } = renderHook(
+      ({ isDouze }: { isDouze: boolean }) =>
+        useDouzePointsAnimation(isDouze, 'XX', 12, false, 12),
+      { initialProps: { isDouze: false } },
+    );
+
+    rerender({ isDouze: true });
+    expect(result.current.shouldRender).toBe(true);
+
+    // The row doesn't move, so the next jury clears the 12 at once.
+    act(() => vi.advanceTimersByTime(300));
+    rerender({ isDouze: false });
+
+    act(() => vi.advanceTimersByTime(durationMs - 100));
+    expect(result.current.shouldRender).toBe(true);
+
+    act(() => vi.advanceTimersByTime(100));
+    expect(result.current.shouldRender).toBe(false);
   });
 });

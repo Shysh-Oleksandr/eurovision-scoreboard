@@ -30,6 +30,7 @@ import {
   useUpdateCustomEntryMutation,
   useUploadCustomEntryFlagMutation,
 } from '@/api/customEntries';
+import { useEntryFlagsQuery } from '@/api/entryFlags';
 import {
   normalizeShortCode,
   suggestShortCode,
@@ -124,9 +125,11 @@ const CustomCountryModal: React.FC<CustomCountryModalProps> = ({
   const isEditMode = !!countryToEdit;
   const isAuthenticated = useAuthStore((s) => !!s.user);
   const customEntries = useCountriesStore((state) => state.customCountries);
+  // Flags uploaded for contests' own country flags can dress an entry too.
+  const { data: entryFlags } = useEntryFlagsQuery(isAuthenticated);
   const yourFlags = useMemo(
-    () => collectYourFlags(customEntries),
-    [customEntries],
+    () => collectYourFlags(customEntries, entryFlags),
+    [customEntries, entryFlags],
   );
 
   const { data: customEntryGroups = [] } =

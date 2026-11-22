@@ -37,6 +37,8 @@ Implementation: `COMPLETED_WINNER_FILTER` in `douze-points-backend/src/contests/
 
 Participant codes are taken from every stage’s `participants` array. Codes whose string starts with **`custom-`** are **excluded** from aggregation (custom entries are not part of the country leaderboard).
 
+A contest that renamed or reflagged a country (`setup.entryOverrides`, see [entry-overrides.md](./entry-overrides.md)) still saves it under its code, so its results count towards that country here and in the entry stats; these surfaces show the built-in names (`getCanonicalCountries`).
+
 ### 1.3 Per-contest merge (`mergeContestIntoAgg`)
 
 For each **standard** country code that appears in any stage’s participants:

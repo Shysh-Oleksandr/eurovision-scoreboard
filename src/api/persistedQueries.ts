@@ -11,6 +11,7 @@ const PERSISTED_PREFIXES: readonly (readonly string[])[] = [
   ['user', 'profile-summary'],
   ['user', 'custom-entries'],
   ['user', 'custom-entry-groups'],
+  ['user', 'entry-flags'],
   ['user', 'themes', 'me'],
   ['user', 'saved-themes'],
   ['user', 'theme-groups'],

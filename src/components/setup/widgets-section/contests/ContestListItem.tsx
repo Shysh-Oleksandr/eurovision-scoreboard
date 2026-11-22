@@ -65,7 +65,10 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
   isActive,
 }) => {
   const formatTime = useFormatItemTime();
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  // Built-in names: the list spans contests.
+  const getCanonicalCountries = useCountriesStore(
+    (state) => state.getCanonicalCountries,
+  );
   const handleShare = useHandleShare();
   const t = useTranslations();
   const { confirm } = useConfirmation();
@@ -84,28 +87,29 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     variant === 'user' || contest.userId.toString() === user?._id;
 
   const { winnerName, winnerFlag } = useMemo(() => {
-    if (!contest.winner)
-      return { winnerName: undefined, winnerFlag: undefined };
-    const isCustomWinner = !!contest.winner?.name;
+    const { winner } = contest;
 
-    if (isCustomWinner) {
-      return {
-        winnerName: contest.winner.name,
-        winnerFlag: contest.winner.flag,
-      };
-    }
+    if (!winner) return { winnerName: undefined, winnerFlag: undefined };
 
-    const winnerCountry = getAllCountries().find(
-      (country) => country.code === contest.winner?.code,
+    // The backend stores a name and flag for a custom entry and for a
+    // standard country the contest renamed or reflagged; otherwise the
+    // country is shown as it ships.
+    const builtIn = getCanonicalCountries(false).find(
+      (country) => country.code === winner.code,
     );
+    const name = winner.name ?? builtIn?.name;
 
-    if (!winnerCountry) return { winnerName: undefined, winnerFlag: undefined };
+    if (!name) return { winnerName: undefined, winnerFlag: undefined };
 
     return {
-      winnerName: winnerCountry.name,
-      winnerFlag: getFlagPath(winnerCountry.code),
+      winnerName: name,
+      winnerFlag: winner.flag
+        ? getFlagPath({ code: winner.code, name, flag: winner.flag })
+        : builtIn
+        ? getFlagPath(builtIn.code)
+        : undefined,
     };
-  }, [contest.winner, getAllCountries]);
+  }, [contest, getCanonicalCountries]);
 
   const hasSplitPointsSystem = !!(
     contest.juryPointsSystem?.length || contest.televotePointsSystem?.length

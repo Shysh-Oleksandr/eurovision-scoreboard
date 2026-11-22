@@ -218,6 +218,83 @@ export const mirrorText = (
   return () => observer.disconnect();
 };
 
+/** What sets a part's type, beyond its colour. */
+const TYPE_PROPERTIES = [
+  'font-family',
+  'font-size',
+  'font-weight',
+  'font-style',
+  'font-stretch',
+  'font-feature-settings',
+  'font-variation-settings',
+  'letter-spacing',
+  'word-spacing',
+  'text-transform',
+] as const;
+
+/**
+ * A row part's type as an inline style object (camelCase; computed values,
+ * so a theme's font, a custom font, the board's size and an uppercase name
+ * all carry over), for text that should read as part of the row (`text`
+ * layers).
+ */
+export const typeStyleOf = (el: Element): Record<string, string> => {
+  const style = getComputedStyle(el);
+
+  return Object.fromEntries(
+    TYPE_PROPERTIES.map((property) => [
+      property.replace(/-([a-z])/g, (_, letter: string) =>
+        letter.toUpperCase(),
+      ),
+      style.getPropertyValue(property),
+    ]).filter(([, value]) => value !== ''),
+  );
+};
+
+/**
+ * A type style at another font size: letter and word spacing in px scale
+ * with it, so giant words keep the part's spacing.
+ */
+export const resizeType = (
+  type: Record<string, string>,
+  fontSizePx: number,
+): Record<string, string> => {
+  const from = parseFloat(type.fontSize ?? '');
+  const ratio = from > 0 ? fontSizePx / from : 1;
+  const scaled = (value?: string) =>
+    value && /^-?[\d.]+px$/.test(value)
+      ? `${parseFloat(value) * ratio}px`
+      : value;
+
+  return Object.fromEntries(
+    Object.entries({
+      ...type,
+      fontSize: `${fontSizePx}px`,
+      letterSpacing: scaled(type.letterSpacing),
+      wordSpacing: scaled(type.wordSpacing),
+    }).filter((entry): entry is [string, string] => entry[1] !== undefined),
+  );
+};
+
+/**
+ * The text a part shows: its text without screen-reader-only copies (a
+ * row showing a short code keeps the full name in an `sr-only` span).
+ */
+export const shownTextOf = (el: Element): string => {
+  const parts: string[] = [];
+  const walk = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      parts.push(node.textContent ?? '');
+    } else if (node instanceof Element && !node.classList.contains('sr-only')) {
+      node.childNodes.forEach(walk);
+    }
+  };
+
+  el.childNodes.forEach(walk);
+
+  return parts.join('').replace(/\s+/g, ' ').trim();
+};
+
 /** A static copy of a row part, sized to fill its layer. */
 export const cloneRowPart = (source: HTMLElement): HTMLElement => {
   const copy = source.cloneNode(true) as HTMLElement;

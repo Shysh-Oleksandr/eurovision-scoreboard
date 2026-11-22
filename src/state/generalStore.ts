@@ -27,6 +27,7 @@ import { useScoreboardStore } from './scoreboardStore';
 
 import { api } from '@/api/client';
 import { ContestType, resolveContestType } from '@/data/contestTypes';
+import type { EntryOverrides } from '@/data/countries/entryOverrides';
 import { deleteLegacyCustomBgImage } from '@/helpers/indexedDB';
 import { BaseCountry, PointsItem } from '@/models';
 import { DEFAULT_DISPLAY_SIZE } from '@/native/displaySize';
@@ -149,6 +150,8 @@ const DEFAULT_SETTINGS: Settings = {
   enableKeyboardShortcuts: true,
   showShortcutHints: true,
   keyboardShortcuts: {},
+  useHistoricalNames: true,
+  defaultEntryOverrides: {},
 };
 
 const DEFAULT_PRESENTATION_SETTINGS: PresentationSettings = {
@@ -310,6 +313,18 @@ export interface Settings {
   showShortcutHints: boolean;
   /** Only the keys the user changed; the rest follow `SHORTCUT_ACTIONS`. */
   keyboardShortcuts: ShortcutOverrides;
+  /**
+   * A new edition shows countries under the names they had that year
+   * (F.Y.R. Macedonia until 2018; `HISTORICAL_NAMES` in
+   * data/countries/entryOverrides.ts).
+   */
+  useHistoricalNames: boolean;
+  /**
+   * The account's own names and flags for standard countries, by code: every
+   * new edition starts with them (`freshEntryOverrides`). Set from the name
+   * and flag editor's "Use in my new contests".
+   */
+  defaultEntryOverrides: EntryOverrides;
 }
 
 export interface PresentationSettings {

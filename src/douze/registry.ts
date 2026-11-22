@@ -1,18 +1,28 @@
-import type { DouzeAnimationSpec } from './model';
+import type { DouzeAnimationSpec, DouzeThemeColorKey } from './model';
 import {
   type DouzeOptions,
   type DouzeOptionsSupport,
+  type DouzeThemeColorField,
   withDouzeOptions,
 } from './options';
+import { year2021Douze } from './specs/year2021';
 import { year2022Douze } from './specs/year2022';
+import { year2023Douze } from './specs/year2023';
+import { year2024Douze } from './specs/year2024';
 import { year2026Douze } from './specs/year2026';
 import { DEFAULT_THEME_COLORS } from './themePalette';
 
-import type { DouzePointsAnimationMode } from '@/theme/types';
+import type {
+  BoardAnimationMode,
+  DouzePointsAnimationMode,
+} from '@/theme/types';
 
 /** Douze modes played from a spec (the rest are the hand-written variants). */
 const SPECS: Partial<Record<DouzePointsAnimationMode, DouzeAnimationSpec>> = {
+  year2021: year2021Douze,
   year2022: year2022Douze,
+  year2023: year2023Douze,
+  year2024: year2024Douze,
   year2026: year2026Douze,
 };
 
@@ -90,6 +100,23 @@ const HAND_WRITTEN_SUPPORT: Partial<
 };
 
 /**
+ * The theme's douze colours a spec's palette can take, edited in "Customize
+ * animation" while theme colours are chosen (the 12 box and name colours
+ * are row colours, from the Colors step).
+ */
+const THEME_COLOR_FIELDS: Partial<
+  Record<DouzeThemeColorKey, DouzeThemeColorField>
+> = {
+  douzePointsBg: { key: 'douzePointsBg', label: 'douze', when: 'theme' },
+  douzePointsText: { key: 'douzePointsText', label: 'text', when: 'theme' },
+  douzePointsBlock1: {
+    key: 'douzePointsBlock1',
+    label: 'block1',
+    when: 'theme',
+  },
+};
+
+/**
  * How many of `c1`–`c3` the spec's layers use (the custom colours the
  * editor shows): the highest one referenced. The derived keys (`glow`,
  * `sheen`, `shade`, `ink`) come from c1.
@@ -137,11 +164,8 @@ export const getDouzeOptionsSupport = (
         (source) => source !== spec.paletteFrom,
       ),
     ],
-    // With the theme's colours, the douze colour is one of them
-    // (themePalette.ts; the 12 box and name colours are row colours).
-    themeColors: themeKeys.includes('douzePointsBg')
-      ? [{ key: 'douzePointsBg', label: 'douze', when: 'theme' }]
-      : [],
+    // With the theme's colours, the douze ones among them (themePalette.ts).
+    themeColors: themeKeys.flatMap((key) => THEME_COLOR_FIELDS[key] ?? []),
     parts: spec.parts ?? [],
     strengths,
     veilColor: strengths.includes('wash') && 'veil' in spec.palette,
@@ -158,12 +182,22 @@ export const doesDouzePlayBeforeMove = (
   mode: DouzePointsAnimationMode | undefined,
 ) => getDouzeSpec(mode)?.reorder === 'after';
 
-/** How long the board waits after a 12 before it moves (ms). */
+/**
+ * How long the board waits after a 12 before it moves (ms): past the
+ * animation for one that plays first (`reorder: 'after'`), the spec's
+ * `moveAtMs` on a flipping board (the 2021 row flies raised), else 1000.
+ */
 export const getDouzeMoveDelayMs = (
   mode: DouzePointsAnimationMode | undefined,
   options?: DouzeOptions | null,
+  boardAnimationMode?: BoardAnimationMode,
 ): number => {
   const spec = getDouzeSpec(mode, options);
 
-  return spec?.reorder === 'after' ? Math.round(spec.durationMs) + 150 : 1000;
+  if (spec?.reorder === 'after') return Math.round(spec.durationMs) + 150;
+  if (spec?.moveAtMs !== undefined && boardAnimationMode === 'flip') {
+    return Math.round(spec.moveAtMs);
+  }
+
+  return 1000;
 };

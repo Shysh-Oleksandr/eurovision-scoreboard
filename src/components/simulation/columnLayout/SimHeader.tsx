@@ -276,8 +276,9 @@ export const SimHeaderTitle = React.memo(
         } ${isDesktop ? 'min-h-[46px]' : 'min-h-[44px]'}`}
       >
         <HostingLogo size={isDesktop ? 40 : 32} />
+        {/* Soft shadow keeps the white title legible over bright backgrounds. */}
         <h2
-          className={`min-w-0 text-white [text-wrap:balance] ${
+          className={`min-w-0 text-white [text-wrap:balance] [text-shadow:0_1px_2px_rgb(0_0_0/0.35),0_0_12px_rgb(0_0_0/0.2)] ${
             centered ? '' : 'flex-1'
           }`}
         >

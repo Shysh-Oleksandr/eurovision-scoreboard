@@ -229,6 +229,176 @@ export const painterSampler = (
   };
 };
 
+/** A cubic-bezier timing function (CSS), solved for x by Newton then bisection. */
+const cubicBezier = (x1: number, y1: number, x2: number, y2: number) => {
+  const at = (a: number, b: number, s: number) =>
+    3 * a * s * (1 - s) ** 2 + 3 * b * s * s * (1 - s) + s ** 3;
+  const slope = (a: number, b: number, s: number) =>
+    3 * a * (1 - s) ** 2 + 6 * (b - a) * s * (1 - s) + 3 * (1 - b) * s * s;
+
+  return (x: number) => {
+    if (x <= 0 || x >= 1) return x <= 0 ? 0 : 1;
+
+    let s = x;
+
+    for (let i = 0; i < 8; i += 1) {
+      const error = at(x1, x2, s) - x;
+      const d = slope(x1, x2, s);
+
+      if (Math.abs(error) < 1e-6) return at(y1, y2, s);
+      if (Math.abs(d) < 1e-6) break;
+      s -= error / d;
+    }
+
+    let lo = 0;
+    let hi = 1;
+
+    s = x;
+    for (let i = 0; i < 40; i += 1) {
+      if (at(x1, x2, s) < x) lo = s;
+      else hi = s;
+      s = (lo + hi) / 2;
+    }
+
+    return at(y1, y2, s);
+  };
+};
+
+const NAMED_EASES: Record<string, [number, number, number, number]> = {
+  ease: [0.25, 0.1, 0.25, 1],
+  'ease-in': [0.42, 0, 1, 1],
+  'ease-out': [0, 0, 0.58, 1],
+  'ease-in-out': [0.42, 0, 0.58, 1],
+};
+
+/**
+ * A CSS easing as a function of progress (0..1), as the browser plays a
+ * keyframe's `easing`: linear, the named ones, `cubic-bezier()` and
+ * `steps()`. Anything else is linear.
+ */
+export const easingFunction = (ease?: string): ((x: number) => number) => {
+  const value = (ease ?? 'linear').trim();
+
+  if (NAMED_EASES[value]) return cubicBezier(...NAMED_EASES[value]);
+
+  const bezier = /^cubic-bezier\(([^)]+)\)$/.exec(value);
+
+  if (bezier) {
+    const [x1, y1, x2, y2] = bezier[1].split(',').map(Number);
+
+    if ([x1, y1, x2, y2].every(Number.isFinite)) {
+      return cubicBezier(x1, y1, x2, y2);
+    }
+  }
+
+  const steps = /^steps\(\s*(\d+)\s*(?:,\s*([\w-]+)\s*)?\)$/.exec(value);
+
+  if (steps) {
+    const count = Math.max(1, Number(steps[1]));
+    const start = steps[2] === 'start' || steps[2] === 'jump-start';
+
+    return (x) =>
+      x >= 1 ? 1 : Math.min(1, Math.floor(x * count + (start ? 1 : 0)) / count);
+  }
+
+  return (x) => x;
+};
+
+/** A transform-origin (`'170% 460%'`, px or keywords) as a point in px. */
+export const resolveOrigin = (
+  origin: string | undefined,
+  box: PxRect,
+): { x: number; y: number } => {
+  const keywords: Record<string, number> = {
+    left: 0,
+    top: 0,
+    center: 0.5,
+    right: 1,
+    bottom: 1,
+  };
+  const [xPart = '50%', yPart = '50%'] = (origin ?? '').trim().split(/\s+/);
+  const length = (part: string, size: number) => {
+    if (part in keywords) return keywords[part] * size;
+    if (part.endsWith('%')) return (parseFloat(part) / 100) * size;
+
+    const px = parseFloat(part);
+
+    return Number.isFinite(px) ? px : size / 2;
+  };
+
+  return {
+    x: box.x + length(xPart || '50%', box.w),
+    y: box.y + length(yPart || '50%', box.h),
+  };
+};
+
+/** Where a layer's transform puts it at one moment (px; scale about `origin`). */
+export interface TransformState {
+  tx: number;
+  ty: number;
+  sx: number;
+  sy: number;
+  opacity: number;
+}
+
+/**
+ * Samples a layer's transform at any moment, as its Web Animation plays it
+ * (`toWebKeyframes`: each keyframe's ease to the next; placements resolved
+ * up front). For painters that draw around a moving layer (`slabSides`).
+ * Rotation isn't sampled.
+ */
+export const transformSampler = (
+  layer: DouzeLayer,
+  layerBox: PxRect,
+  anchors: AnchorRects,
+): ((t: number) => TransformState) => {
+  const rowW = anchors.row?.w || 1;
+  const rowH = anchors.row?.h ?? 0;
+  const frames = fillKeyframes(
+    layer.keyframes.map((k) =>
+      k.x !== undefined && typeof k.x !== 'number'
+        ? { ...k, x: resolveX(k.x, layerBox, anchors) / rowW }
+        : k,
+    ),
+  );
+  const eases = frames.map((frame) => easingFunction(frame.ease));
+  const stateOf = (frame: (typeof frames)[number]): TransformState => ({
+    tx: (frame.x as number) * rowW,
+    ty: frame.y * rowH,
+    sx: frame.scale * frame.scaleX,
+    sy: frame.scale * frame.scaleY,
+    opacity: frame.opacity,
+  });
+
+  return (t) => {
+    if (frames.length === 0) {
+      return { tx: 0, ty: 0, sx: 1, sy: 1, opacity: 1 };
+    }
+
+    const index = frames.findIndex((frame) => frame.t > t);
+
+    if (index === 0) return stateOf(frames[0]);
+    if (index === -1) return stateOf(frames[frames.length - 1]);
+
+    const before = frames[index - 1];
+    const after = frames[index];
+    const share = eases[index - 1](
+      after.t === before.t ? 1 : (t - before.t) / (after.t - before.t),
+    );
+    const a = stateOf(before);
+    const b = stateOf(after);
+    const lerp = (from: number, to: number) => from + (to - from) * share;
+
+    return {
+      tx: lerp(a.tx, b.tx),
+      ty: lerp(a.ty, b.ty),
+      sx: lerp(a.sx, b.sx),
+      sy: lerp(a.sy, b.sy),
+      opacity: lerp(a.opacity, b.opacity),
+    };
+  };
+};
+
 const round = (value: number) => Math.round(value * 100) / 100;
 
 /**

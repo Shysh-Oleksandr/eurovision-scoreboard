@@ -6,6 +6,7 @@ import {
   Globe,
   Layers,
   Pencil,
+  RotateCcw,
   Trash2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -28,6 +29,7 @@ import AnchoredMenu, {
 } from '@/components/common/AnchoredMenu';
 import { useAllocationDrawContext } from '@/components/setup/allocation-draw/AllocationDrawContext';
 import { getCustomEntryId } from '@/components/setup/utils/getCustomEntryId';
+import { canOverrideEntry } from '@/data/countries/entryOverrides';
 import { useConfirmation } from '@/hooks/useConfirmation';
 import { CountryAssignmentGroup } from '@/models';
 import { useAllocationDrawStore } from '@/state/allocationDrawStore';
@@ -56,7 +58,8 @@ const LineupMenus: React.FC<LineupMenusProps> = ({ isSignedIn }) => {
   const activeMenu = useSetupUiStore((state) => state.activeMenu);
   const closeMenu = useSetupUiStore((state) => state.closeMenu);
   const { byCode, moveTargets, lists } = useLineupModelContext();
-  const { move, onEditCustomEntry } = useLineupActions();
+  const { move, onEditCustomEntry, onEditEntryOverride } = useLineupActions();
+  const entryOverrides = useCountriesStore((state) => state.entryOverrides);
   const draw = useAllocationDrawContext();
   const { confirm } = useConfirmation();
   const { data: customEntryGroups = [] } =
@@ -164,6 +167,26 @@ const LineupMenus: React.FC<LineupMenusProps> = ({ isSignedIn }) => {
       });
     }
 
+    // A standard country's own name and flag in this contest.
+    if (activeMenu.kind === 'tile' && canOverrideEntry(activeMenu.code)) {
+      const { code } = activeMenu;
+
+      entries.push('hr', {
+        label: t('setup.eventSetupModal.editNameAndFlag'),
+        icon: <Pencil className="size-4" />,
+        onClick: () => onEditEntryOverride(code),
+      });
+
+      if (entryOverrides[code]) {
+        entries.push({
+          label: t('setup.eventSetupModal.useOriginalNameAndFlag'),
+          icon: <RotateCcw className="size-4" />,
+          onClick: () =>
+            useCountriesStore.getState().setEntryOverride(code, null),
+        });
+      }
+    }
+
     // Custom-entry extras: regroup / delete / edit.
     const customIds = codes
       .map((code) => getCustomEntryId(code))
@@ -252,12 +275,14 @@ const LineupMenus: React.FC<LineupMenusProps> = ({ isSignedIn }) => {
     draw.rules.preq,
     draw.semis,
     draw.votesIn,
+    entryOverrides,
     groupLabel,
     isSignedIn,
     lists,
     move,
     moveTargets,
     onEditCustomEntry,
+    onEditEntryOverride,
     t,
   ]);
 

@@ -22,7 +22,9 @@ The facts every answer below rests on:
 - **Content saved to the account.** Contests (setup, results, name,
   description, logo), custom themes with uploaded images, sounds and fonts,
   designs with uploaded images, the font library, custom entries and their
-  flags, folders, quick-select pins, synced preferences.
+  flags, flags uploaded for a contest's own country flags, folders,
+  quick-select pins, synced preferences (including the user's own country
+  names and flags for new contests).
 - **Activity.** Follows, likes, saves, remix origins, reports (reason and
   note), blocks.
 - **Technical.** Session records (hashed token, user agent, IP address);

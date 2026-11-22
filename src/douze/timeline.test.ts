@@ -3,10 +3,13 @@ import { describe, expect, it } from 'vitest';
 import type { DouzeLayer } from './model';
 import {
   type AnchorRects,
+  easingFunction,
   fillKeyframes,
   resolveBox,
+  resolveOrigin,
   toWebKeyframes,
   toWindowKeyframes,
+  transformSampler,
 } from './timeline';
 
 const anchors: AnchorRects = {
@@ -218,5 +221,73 @@ describe('toWebKeyframes', () => {
     expect(past[0].clipPath).toBe(
       'inset(0px -24px 0px 0px round 0 20px 20px 0)',
     );
+  });
+});
+
+describe('easingFunction', () => {
+  it('plays a keyframe ease as the browser does', () => {
+    expect(easingFunction()(0.3)).toBeCloseTo(0.3);
+    expect(easingFunction('linear')(0.7)).toBeCloseTo(0.7);
+    // ease-in starts slow, ease-out fast; both reach the ends.
+    expect(easingFunction('ease-in')(0.5)).toBeLessThan(0.5);
+    expect(easingFunction('ease-out')(0.5)).toBeGreaterThan(0.5);
+    expect(easingFunction('cubic-bezier(0.42, 0, 0.58, 1)')(0.5)).toBeCloseTo(
+      0.5,
+      4,
+    );
+    expect(easingFunction('cubic-bezier(0, 0, 1, 1)')(0.25)).toBeCloseTo(
+      0.25,
+      4,
+    );
+    expect(easingFunction('ease')(0)).toBe(0);
+    expect(easingFunction('ease')(1)).toBe(1);
+  });
+
+  it('jumps on steps', () => {
+    const end = easingFunction('steps(1, end)');
+
+    expect(end(0.99)).toBe(0);
+    expect(end(1)).toBe(1);
+    expect(easingFunction('steps(4)')(0.5)).toBe(0.5);
+    expect(easingFunction('steps(2, start)')(0.1)).toBe(0.5);
+  });
+});
+
+describe('resolveOrigin', () => {
+  const box = { x: 40, y: 10, w: 400, h: 40 };
+
+  it('turns a transform-origin into a point, shares of the box by default', () => {
+    expect(resolveOrigin(undefined, box)).toEqual({ x: 240, y: 30 });
+    // 2021's vanishing point, far below and right of the row.
+    expect(resolveOrigin('170% 460%', box)).toEqual({ x: 720, y: 194 });
+    expect(resolveOrigin('left bottom', box)).toEqual({ x: 40, y: 50 });
+    expect(resolveOrigin('12px 4px', box)).toEqual({ x: 52, y: 14 });
+  });
+});
+
+describe('transformSampler', () => {
+  it('samples a layer where its Web Animation has it, eases and placements included', () => {
+    const sample = transformSampler(
+      rect({
+        keyframes: [
+          { t: 0, scale: 1, x: 0, y: 0, ease: 'ease-in' },
+          // 0.5 row heights left of the row's own left edge, a row height up.
+          { t: 100, scale: 1.2, x: { on: 'row', offsetRh: -0.5 }, y: -1 },
+          { t: 200, scale: 1 },
+        ],
+      }),
+      anchors.row!,
+      anchors,
+    );
+
+    expect(sample(-10)).toEqual({ tx: 0, ty: 0, sx: 1, sy: 1, opacity: 1 });
+    expect(sample(100)).toMatchObject({ tx: -20, ty: -40, sx: 1.2, sy: 1.2 });
+
+    const eased = easingFunction('ease-in')(0.5);
+
+    expect(sample(50).tx).toBeCloseTo(-20 * eased);
+    expect(sample(50).sx).toBeCloseTo(1 + 0.2 * eased);
+    // Held after the last keyframe (x and y hold their last values).
+    expect(sample(500)).toMatchObject({ tx: -20, ty: -40, sx: 1, sy: 1 });
   });
 });

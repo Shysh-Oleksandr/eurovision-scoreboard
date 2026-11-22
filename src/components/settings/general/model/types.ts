@@ -46,6 +46,8 @@ interface ItemBase {
 export interface SwitchItem extends ItemBase {
   kind: 'switch';
   settingKey: BooleanSettingKey;
+  /** Runs after the user flips it (not when preferences load). */
+  onChange?: (value: boolean) => void;
 }
 
 export interface SelectItem extends ItemBase {

@@ -239,6 +239,8 @@
       "moveAllTo": "Alle verschieben nach…",
       "moveToGroup": "In Gruppe verschieben",
       "editEntry": "Beitrag bearbeiten",
+      "editNameAndFlag": "Name und Flagge bearbeiten",
+      "useOriginalNameAndFlag": "Ursprünglichen Namen und Flagge verwenden",
       "dropCountriesHere": "Länder hier ablegen",
       "emptyDropHere": "Leer — Länder hier ablegen",
       "noMatches": "Keine Treffer",
@@ -466,6 +468,17 @@
       "saveFailed": "Der Beitrag konnte nicht gespeichert werden. Versuch es noch einmal.",
       "deleteFailed": "Der Beitrag konnte nicht gelöscht werden. Versuch es noch einmal.",
       "deleteEntry": "Beitrag löschen"
+    },
+    "entryOverrideModal": {
+      "title": "Name und Flagge",
+      "intro": "Nur in diesem Wettbewerb. In deiner Statistik zählen die Ergebnisse weiter als {name}.",
+      "nameHint": "Leer lassen, um {name} zu verwenden.",
+      "flag": "Flagge",
+      "useOriginal": "Original verwenden",
+      "signInToUpload": "Melde dich an, um eine Flagge hochzuladen.",
+      "uploadFailed": "Die Flagge konnte nicht hochgeladen werden. Versuch es noch einmal.",
+      "useByDefault": "In meinen neuen Wettbewerben verwenden",
+      "useByDefaultHint": "Neue Wettbewerbe beginnen mit diesem Namen und dieser Flagge. Du findest sie unter Einstellungen → Wettbewerb."
     },
     "customEntryGroupModal": {
       "createGroup": "Gruppe erstellen",
@@ -1493,7 +1506,10 @@
         "douzePointsAnimations": {
           "parallelograms": "Parallelogramme (ESC 2023)",
           "heartsGrid": "Herzen-Gitter (ESC 2025)",
+          "year2021": "Hervortretende Zeile (ESC 2021)",
           "year2022": "Schallwellen (ESC 2022)",
+          "year2023": "Kreise und Wörter (ESC 2023)",
+          "year2024": "Farbblende (ESC 2024)",
           "year2026": "Goldwelle (ESC 2026)"
         },
         "douzeOptions": {
@@ -1533,7 +1549,9 @@
             "name": "Ländername",
             "blocks": "Gleitende Blöcke",
             "label": "Punktetext",
-            "points": "Goldene Punkte"
+            "flashText": "Aufblitzender Text",
+            "points": "Goldene Punkte",
+            "lines": "Lichtlinien"
           },
           "coverFlag": "Herzen über der Flagge",
           "glow": "Leuchtstärke",
@@ -1985,7 +2003,8 @@
         "popupsChrome": "Popups & Oberfläche",
         "personalization": "Personalisierung",
         "suppressedDialogs": "Unterdrückte Dialoge",
-        "reset": "Zurücksetzen"
+        "reset": "Zurücksetzen",
+        "countryNames": "Ländernamen und Flaggen"
       },
       "danger": {
         "confirm": "Ja, alles zurücksetzen"
@@ -2236,7 +2255,16 @@
     "contest": {
       "enterContestName": "Wettbewerbsname eingeben...",
       "enterContestYear": "Wettbewerbsjahr eingeben...",
-      "showHostingCountryFlag": "Gastgeberland-Flagge anzeigen"
+      "showHostingCountryFlag": "Gastgeberland-Flagge anzeigen",
+      "historicalNames": "Historische Namen",
+      "historicalNamesDesc": "Jede Ausgabe verwendet die damaligen Namen: F.Y.R. Macedonia bis 2018, Czech Republic bis 2022.",
+      "yourNamesAndFlags": "Deine Namen und Flaggen",
+      "yourNamesAndFlagsDesc": "Neue Wettbewerbe beginnen damit.",
+      "noNamesAndFlags": "Noch keine. Öffne im Setup das Menü eines Landes, wähle „Name und Flagge bearbeiten“ und hake „In meinen neuen Wettbewerben verwenden“ an.",
+      "insteadOf": "Statt {name}",
+      "ownFlag": "Eigene Flagge",
+      "ownFlagInsteadOf": "Eigene Flagge, statt {name}",
+      "removeDefault": "{name} entfernen"
     },
     "confirmations": {
       "description": "Konfiguriere, welche Bestätigungspopups angezeigt werden, wenn du bestimmte Aktionen ausführst.",

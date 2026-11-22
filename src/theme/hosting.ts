@@ -3,6 +3,7 @@ import { years, Year } from '../config';
 import type { ContestType } from '@/data/contestTypes';
 import { BaseCountry } from '@/models';
 import {
+  flagSourceCode,
   getFlagPath,
   getFlagPathForImageGeneration,
 } from '@/helpers/getFlagPath';
@@ -330,12 +331,14 @@ export function getHostingCountryLogo(
     return { logo: getFlagPath(country), isExisting: false };
   }
 
-  const countryCode = typeof country === 'string' ? country : country.code;
+  // A flag of its own (a custom entry's, or one a contest picked) has no
+  // official heart; another country's flag brings that country's heart.
+  const countryCode =
+    typeof country === 'string' ? country : flagSourceCode(country);
 
-  const existing = getHostingLogoByCountryCode(
-    countryCode,
-    shouldUse2026WhiteHeartFlags,
-  );
+  const existing = countryCode
+    ? getHostingLogoByCountryCode(countryCode, shouldUse2026WhiteHeartFlags)
+    : null;
   if (existing) {
     return { logo: existing, isExisting: true };
   }
@@ -361,12 +364,12 @@ export function getHostingCountryLogoForImageGeneration(
     return { logo: getFlagPathForImageGeneration(country), isExisting: false };
   }
 
-  const countryCode = typeof country === 'string' ? country : country.code;
+  const countryCode =
+    typeof country === 'string' ? country : flagSourceCode(country);
 
-  const existing = getHostingLogoByCountryCode(
-    countryCode,
-    shouldUse2026WhiteHeartFlags,
-  );
+  const existing = countryCode
+    ? getHostingLogoByCountryCode(countryCode, shouldUse2026WhiteHeartFlags)
+    : null;
   if (existing) {
     return { logo: existing, isExisting: true };
   }

@@ -100,7 +100,11 @@ const Board = (): JSX.Element => {
     isDouzePointsAwarded,
     boardItemAnimationMode,
     layoutOverride?.appearReady,
-    getDouzeMoveDelayMs(douzePointsAnimationMode, douzeOptions),
+    getDouzeMoveDelayMs(
+      douzePointsAnimationMode,
+      douzeOptions,
+      boardItemAnimationMode,
+    ),
   );
 
   const renderItem = useCallback(

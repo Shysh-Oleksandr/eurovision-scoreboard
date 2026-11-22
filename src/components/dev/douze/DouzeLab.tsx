@@ -9,7 +9,10 @@ import {
   sanitizeDouzeOptions,
   withDouzeOptions,
 } from '@/douze/options';
+import { year2021Douze } from '@/douze/specs/year2021';
 import { year2022Douze } from '@/douze/specs/year2022';
+import { year2023Douze } from '@/douze/specs/year2023';
+import { year2024Douze } from '@/douze/specs/year2024';
 import { year2026Douze } from '@/douze/specs/year2026';
 import { hexToHsl, hslToString } from '@/helpers/colorConversion';
 import { getThemeBackground } from '@/theme/themes';
@@ -17,14 +20,32 @@ import { resolveThemeSpecificsForBaseThemeYear } from '@/theme/themeSpecifics';
 import type { FlagShape, PointsContainerShape } from '@/theme/types';
 
 const SPECS: { label: string; year: string; spec: DouzeAnimationSpec }[] = [
+  { label: '2021', year: '2021', spec: year2021Douze },
   { label: '2022', year: '2022', spec: year2022Douze },
+  { label: '2023', year: '2023', spec: year2023Douze },
+  { label: '2024', year: '2024', spec: year2024Douze },
   { label: '2026', year: '2026', spec: year2026Douze },
 ];
 
 /** Base themes to try a spec on (2026: rounded pill rows). */
-const BASE_YEARS = ['2022', '2025', '2026'];
+const BASE_YEARS = ['2021', '2022', '2023', '2024', '2025', '2026'];
 
-const COUNTRIES = ['UA', 'RS', 'AZ', 'IT', 'GB', 'MK', 'IL', 'DK'];
+const COUNTRIES = [
+  'UA',
+  'RS',
+  'AZ',
+  'IT',
+  'GB',
+  'MK',
+  'IL',
+  'DK',
+  'LU',
+  'SE',
+  'IS',
+  'FR',
+  'LT',
+  'DE',
+];
 const WIDTHS = [
   { label: 'Board (416)', value: 416 },
   { label: 'Phone (320)', value: 320 },
@@ -130,6 +151,7 @@ const LabRow: React.FC<{
           runKey={runKey}
           playbackRate={playbackRate}
           lite={lite}
+          pointsLabel="12 points"
         />
       </div>
     </div>
@@ -550,7 +572,9 @@ const DouzeLab: React.FC = () => {
       </div>
 
       <div
-        className="mt-8 grid w-fit gap-x-12 gap-y-3"
+        // Room between the rows: some animations lift the row out of its
+        // place (2021), and the compare script cuts each with its margin.
+        className="mt-8 grid w-fit gap-x-12 gap-y-10"
         style={{
           gridAutoFlow: 'column',
           gridTemplateRows: `repeat(${Math.ceil(timeline.length / 2)}, auto)`,

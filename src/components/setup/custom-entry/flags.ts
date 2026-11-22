@@ -54,7 +54,10 @@ export const isImageLink = (value: string) => /^https?:\/\/\S+$/i.test(value);
 
 export interface YourFlag {
   url: string;
-  /** The entries that use it, for its label and the search. */
+  /**
+   * The entries that use it, for its label and the search; empty for a flag
+   * uploaded for a contest's own country flag that no entry uses.
+   */
   names: string[];
   updatedAt: number;
 }
@@ -62,10 +65,24 @@ export interface YourFlag {
 /**
  * The flags of the user's custom entries that aren't presets or country
  * flags (those have their own tabs): uploads and image links, one per URL,
- * the most recently changed first.
+ * the most recently changed first. `uploads` adds the flags uploaded for
+ * contests' own country flags (`useEntryFlagsQuery`).
  */
-export const collectYourFlags = (entries: readonly BaseCountry[]) => {
+export const collectYourFlags = (
+  entries: readonly BaseCountry[],
+  uploads: readonly { url: string; createdAt?: string }[] = [],
+) => {
   const byUrl = new Map<string, YourFlag>();
+
+  uploads.forEach(({ url, createdAt }) => {
+    if (!url || byUrl.has(url)) return;
+
+    byUrl.set(url, {
+      url,
+      names: [],
+      updatedAt: createdAt ? Date.parse(createdAt) || 0 : 0,
+    });
+  });
 
   entries.forEach((entry) => {
     const url = entry.flag;

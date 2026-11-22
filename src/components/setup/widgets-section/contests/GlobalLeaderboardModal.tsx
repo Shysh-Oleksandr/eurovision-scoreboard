@@ -103,7 +103,10 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
   });
   const offline = useIsOffline();
 
-  const getAllCountries = useCountriesStore((s) => s.getAllCountries);
+  // Built-in names: the leaderboard spans contests.
+  const getCanonicalCountries = useCountriesStore(
+    (s) => s.getCanonicalCountries,
+  );
   const shouldShowHeartFlagIcon = useGeneralStore(
     (s) => s.settings.shouldShowHeartFlagIcon,
   );
@@ -124,9 +127,11 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
     rows.sort((a, b) => {
       if (sortKey === 'country') {
         const na =
-          getAllCountries(true).find((c) => c.code === a.code)?.name ?? a.code;
+          getCanonicalCountries(true).find((c) => c.code === a.code)?.name ??
+          a.code;
         const nb =
-          getAllCountries(true).find((c) => c.code === b.code)?.name ?? b.code;
+          getCanonicalCountries(true).find((c) => c.code === b.code)?.name ??
+          b.code;
 
         const cmp = na.localeCompare(nb);
 
@@ -137,7 +142,13 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
     });
 
     return rows;
-  }, [data?.rows, sortKey, sortDir, getAllCountries, onlyEurovisionCountries]);
+  }, [
+    data?.rows,
+    sortKey,
+    sortDir,
+    getCanonicalCountries,
+    onlyEurovisionCountries,
+  ]);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -308,8 +319,9 @@ export const GlobalLeaderboardModal: React.FC<GlobalLeaderboardModalProps> = ({
                 <tbody>
                   {sortedRows.map((row, index) => {
                     const country =
-                      getAllCountries(true).find((c) => c.code === row.code) ??
-                      null;
+                      getCanonicalCountries(true).find(
+                        (c) => c.code === row.code,
+                      ) ?? null;
                     const { logo, isExisting } = country
                       ? getHostingCountryLogo(
                           country,

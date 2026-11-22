@@ -17,6 +17,9 @@ import {
   measureAnchors,
   mirrorText,
   paintCopy,
+  resizeType,
+  shownTextOf,
+  typeStyleOf,
 } from './anchors';
 import { renderEffect } from './effects';
 import { paletteFromColors, sampleFlagColors } from './flagPalette';
@@ -25,8 +28,10 @@ import type {
   DouzeAnimationSpec,
   DouzeCloneLayer,
   DouzeLayer,
+  DouzePartLayer,
+  DouzeTextLayer,
 } from './model';
-import { paint } from './painters';
+import { paint, type RoundedBox, type SlabFrame } from './painters';
 import { readThemeColors } from './themePalette';
 import {
   type AnchorRects,
@@ -34,12 +39,45 @@ import {
   painterSampler,
   type PxRect,
   resolveBox,
+  resolveOrigin,
   toWebKeyframes,
   toWindowKeyframes,
+  transformSampler,
 } from './timeline';
 
 /** A canvas layer ready to draw any moment. */
 type PainterEntry = { draw: (t: number) => void };
+
+/** The item is drawn over its neighbours' parts (the 2026 strip is z-21). */
+const RAISED_Z_INDEX = '40';
+
+/**
+ * A computed `border-radius` as the four corners' radii in px (tl, tr, br,
+ * bl; horizontal radii, percentages of the width), each at most half the
+ * box's shorter side, as the browser draws them.
+ */
+const cornerRadii = (
+  radius: string | undefined,
+  w: number,
+  h: number,
+): RoundedBox['radii'] => {
+  const values = (radius ?? '').split('/')[0].trim().split(/\s+/);
+  const px = (value?: string) => {
+    if (!value) return 0;
+
+    const number = parseFloat(value);
+
+    if (!Number.isFinite(number)) return 0;
+
+    return Math.min(
+      value.endsWith('%') ? (number / 100) * w : number,
+      Math.min(w, h) / 2,
+    );
+  };
+  const [tl, tr = tl, br = tl, bl = tr] = values;
+
+  return [px(tl), px(tr), px(br), px(bl)];
+};
 
 /** `var(--douze-c2)` → its value on `el`; other colours pass through. */
 const resolveColor = (color: string, el: Element) => {
@@ -59,6 +97,11 @@ type Props = {
    * `paletteFrom: 'flag'` they're used instead of reading the row's flag.
    */
   entryColors?: readonly string[] | null;
+  /**
+   * The points just given, in the app's language ("12 points"), for
+   * `text: 'points'` layers; without it they aren't drawn.
+   */
+  pointsLabel?: string;
   /** Hold the animation at this moment (ms) instead of playing it (the lab). */
   heldAtMs?: number | null;
   playbackRate?: number;
@@ -72,6 +115,10 @@ type Geometry = {
   /** Computed border-radius of each anchor. */
   radii: Partial<Record<DouzeAnchor, string>>;
   boxes: Map<string, PxRect>;
+  /** Text layers' type, taken from their `font` part. */
+  type: Map<string, Record<string, string>>;
+  /** What text layers say (`DouzeTextLayer.text`). */
+  texts: Partial<Record<DouzeTextLayer['text'], string>>;
   palette: Record<string, string>;
 };
 
@@ -90,6 +137,7 @@ const DouzeSpecPlayer: React.FC<Props> = ({
   spec,
   lite = false,
   entryColors = null,
+  pointsLabel,
   heldAtMs = null,
   playbackRate = 1,
   runKey = 0,
@@ -100,6 +148,8 @@ const DouzeSpecPlayer: React.FC<Props> = ({
   /** `clipTo` wrappers, which carry a layer's moving window. */
   const windowNodesRef = useRef(new Map<string, HTMLDivElement>());
   const animationsRef = useRef<Animation[]>([]);
+  /** The running animations on the row's real parts (`part` layers). */
+  const partAnimationsRef = useRef<Animation[]>([]);
   const paintersRef = useRef<PainterEntry[]>([]);
   const onCompleteRef = useRef(onComplete);
   const heldAtRef = useRef(heldAtMs);
@@ -115,8 +165,13 @@ const DouzeSpecPlayer: React.FC<Props> = ({
   playbackRateRef.current = playbackRate;
 
   const layers = useMemo(
-    () => spec.layers.filter((layer) => !(lite && layer.heavy)),
-    [spec, lite],
+    () =>
+      spec.layers.filter(
+        (layer) =>
+          !(lite && layer.heavy) &&
+          !(layer.kind === 'text' && layer.text === 'points' && !pointsLabel),
+      ),
+    [spec, lite, pointsLabel],
   );
 
   // Measure the row once per run: the animation is short, and its boxes
@@ -131,18 +186,45 @@ const DouzeSpecPlayer: React.FC<Props> = ({
       return;
     }
 
+    // Measured at rest: a run still applied to a real part (a flag that
+    // loaded mid-run measures again) would count its lift as its place.
+    partAnimationsRef.current.forEach((animation) => animation.cancel());
+
     const anchors = measureAnchors(parent);
     const boxes = new Map<string, PxRect>();
     // Layers for another row layout get no box, so they aren't drawn.
     const layout = findAnchor(parent, 'row')?.dataset.douzeLayout;
 
+    const type = new Map<string, Record<string, string>>();
+    const nameEl = findAnchor(parent, 'name');
+    const texts: Geometry['texts'] = {
+      points: pointsLabel,
+      name: nameEl ? shownTextOf(nameEl) : undefined,
+    };
+
     layers.forEach((layer) => {
+      // Text with nothing to say (a row without a name) isn't drawn.
       const box =
-        layer.layout && layer.layout !== layout
+        (layer.layout && layer.layout !== layout) ||
+        (layer.kind === 'text' && !texts[layer.text])
           ? null
           : resolveBox(layer.box, anchors);
 
       if (box) boxes.set(layer.id, box);
+
+      const font =
+        layer.kind === 'text' ? findAnchor(parent, layer.font) : null;
+
+      if (font && layer.kind === 'text') {
+        const own = typeStyleOf(font);
+
+        type.set(
+          layer.id,
+          layer.size && anchors.row
+            ? resizeType(own, layer.size * anchors.row.h)
+            : own,
+        );
+      }
     });
 
     // The country's own colours: a custom entry's chosen ones, or read from
@@ -176,8 +258,16 @@ const DouzeSpecPlayer: React.FC<Props> = ({
       anchors,
       radii: measureAnchorRadii(parent),
       boxes,
+      type,
+      texts,
       palette: colors
-        ? { ...spec.palette, ...paletteFromColors(colors) }
+        ? {
+            ...spec.palette,
+            ...paletteFromColors(colors, {
+              third: spec.twoColorFlagC3,
+              lift: spec.liftBelow ?? true,
+            }),
+          }
         : spec.palette,
     });
 
@@ -185,8 +275,11 @@ const DouzeSpecPlayer: React.FC<Props> = ({
   }, [
     layers,
     runKey,
+    pointsLabel,
     spec.paletteFrom,
     spec.themeColors,
+    spec.twoColorFlagC3,
+    spec.liftBelow,
     spec.palette,
     entryColors,
     flagLoads,
@@ -200,12 +293,23 @@ const DouzeSpecPlayer: React.FC<Props> = ({
     const hidden: { el: HTMLElement; visibility: string }[] = [];
     const copies: HTMLElement[] = [];
     const stopMirrors: (() => void)[] = [];
+    /** Animations on the row's real parts (`part` layers). */
+    const partAnimations: Animation[] = [];
+    // The item over its neighbours while it plays (`raise`).
+    const ownZIndex = parent.style.zIndex;
+
+    if (spec.raise) parent.style.zIndex = RAISED_Z_INDEX;
+
     // Latest first: two copies hiding the same part restore its own value.
     const restore = () => {
       [...hidden].reverse().forEach(({ el, visibility }) => {
         el.style.visibility = visibility;
       });
       hidden.length = 0;
+      // The real parts are as they were.
+      partAnimations.forEach((animation) => animation.cancel());
+      partAnimations.length = 0;
+      if (spec.raise) parent.style.zIndex = ownZIndex;
     };
 
     layers.forEach((layer) => {
@@ -278,10 +382,40 @@ const DouzeSpecPlayer: React.FC<Props> = ({
     const animations: Animation[] = [];
 
     layers.forEach((layer) => {
+      if (layer.kind !== 'part') return;
+
+      const el = findAnchor(parent, layer.part);
+      const box = geometry.boxes.get(layer.id);
+
+      if (!el || !box) return;
+
+      const keyframes = toWebKeyframes(
+        layer,
+        box,
+        geometry.anchors,
+        spec.durationMs,
+      ).map((frame) => ({
+        ...frame,
+        transformOrigin: layer.origin ?? '50% 50%',
+      }));
+
+      if (keyframes.length === 0) return;
+
+      const animation = el.animate(keyframes, {
+        duration: spec.durationMs,
+        fill: 'both',
+      });
+
+      partAnimations.push(animation);
+      animations.push(animation);
+    });
+    partAnimationsRef.current = partAnimations;
+
+    layers.forEach((layer) => {
       const node = layerNodesRef.current.get(layer.id);
       const box = geometry.boxes.get(layer.id);
 
-      if (!node || !box) return;
+      if (layer.kind === 'part' || !node || !box) return;
 
       const keyframes = toWebKeyframes(
         layer,
@@ -339,6 +473,7 @@ const DouzeSpecPlayer: React.FC<Props> = ({
         resolveColor(color, canvas),
       );
       const offsetX = box.x - row.x;
+      const slabAt = slabSampler(layer, box, geometry, layers);
 
       painters.push({
         draw: (t) => {
@@ -357,6 +492,7 @@ const DouzeSpecPlayer: React.FC<Props> = ({
               windowRightX: (1 - tracks.windowRight) * box.w,
               rowW: row.w,
               rowH: row.h,
+              slab: slabAt?.(t),
             },
             colors,
           );
@@ -420,7 +556,7 @@ const DouzeSpecPlayer: React.FC<Props> = ({
       restore();
     };
     // Held/rate changes are applied by the effects below, not by a rebuild.
-  }, [geometry, layers, spec.durationMs]);
+  }, [geometry, layers, spec.durationMs, spec.raise]);
 
   useEffect(() => {
     if (heldAtMs === null) return;
@@ -499,7 +635,8 @@ const DouzeSpecPlayer: React.FC<Props> = ({
         layers.map((layer) => {
           const box = geometry.boxes.get(layer.id);
 
-          if (!box) return null;
+          // A part layer moves the row's own part: nothing to render.
+          if (!box || layer.kind === 'part') return null;
 
           return (
             <LayerView
@@ -513,6 +650,10 @@ const DouzeSpecPlayer: React.FC<Props> = ({
               row={geometry.anchors.row}
               rowRadius={geometry.radii.row}
               anchorRadius={geometry.radii[layer.box.anchor]}
+              typeStyle={geometry.type.get(layer.id)}
+              text={
+                layer.kind === 'text' ? geometry.texts[layer.text] : undefined
+              }
               filterId={
                 layer.kind === 'clone' && layer.glitch
                   ? `${filterPrefix}-${layer.id}`
@@ -533,6 +674,73 @@ const DouzeSpecPlayer: React.FC<Props> = ({
   );
 };
 
+/**
+ * For slab painters: the followed part layer's resting box and where its
+ * transform puts it at any moment, in the canvas's px (the canvas is at
+ * `box`). Null for other painters, or when the part isn't on the row.
+ */
+const slabSampler = (
+  layer: DouzeLayer,
+  box: PxRect,
+  geometry: Geometry,
+  layers: DouzeLayer[],
+): ((t: number) => SlabFrame) | null => {
+  if (
+    layer.kind !== 'canvas' ||
+    (layer.painter.type !== 'slabSides' && layer.painter.type !== 'slabLines')
+  ) {
+    return null;
+  }
+
+  const { follow } = layer.painter;
+  const followed = layers.find(
+    (other): other is DouzePartLayer =>
+      other.id === follow && other.kind === 'part',
+  );
+  const partBox = followed && geometry.boxes.get(followed.id);
+
+  if (!followed || !partBox) return null;
+
+  const sample = transformSampler(followed, partBox, geometry.anchors);
+  const origin = resolveOrigin(followed.origin, partBox);
+  const radii = cornerRadii(
+    geometry.radii[followed.part],
+    partBox.w,
+    partBox.h,
+  );
+  const back: RoundedBox = {
+    x: partBox.x - box.x,
+    y: partBox.y - box.y,
+    w: partBox.w,
+    h: partBox.h,
+    radii,
+  };
+
+  return (t) => {
+    const { tx, ty, sx, sy } = sample(t);
+    const x = origin.x + sx * (partBox.x - origin.x) + tx;
+    const y = origin.y + sy * (partBox.y - origin.y) + ty;
+    const scale = Math.min(sx, sy);
+
+    return {
+      back,
+      front: {
+        x: x - box.x,
+        y: y - box.y,
+        w: partBox.w * sx,
+        h: partBox.h * sy,
+        radii: radii.map((r) => r * scale) as RoundedBox['radii'],
+      },
+    };
+  };
+};
+
+const JUSTIFY = {
+  left: 'flex-start',
+  centre: 'center',
+  right: 'flex-end',
+} as const;
+
 const LayerView: React.FC<{
   layer: DouzeLayer;
   box: PxRect;
@@ -545,6 +753,9 @@ const LayerView: React.FC<{
   rowRadius?: string;
   /** The layer's anchor's corner radii, for `radius: 'anchor'`. */
   anchorRadius?: string;
+  /** A text layer's type (its `font` part's) and words. */
+  typeStyle?: Record<string, string>;
+  text?: string;
   filterId?: string;
   nodeRef: (node: HTMLDivElement | null) => void;
   windowRef: (node: HTMLDivElement | null) => void;
@@ -556,6 +767,8 @@ const LayerView: React.FC<{
   row,
   rowRadius,
   anchorRadius,
+  typeStyle,
+  text,
   filterId,
   nodeRef,
   windowRef,
@@ -613,6 +826,27 @@ const LayerView: React.FC<{
     view = (
       <div ref={nodeRef} data-douze-layer={layer.id} style={style}>
         <canvas style={{ display: 'block', width: '100%', height: '100%' }} />
+      </div>
+    );
+  } else if (layer.kind === 'text') {
+    // One line in the box; what runs past it overflows away from its
+    // alignment, and the row clips it.
+    view = (
+      <div
+        ref={nodeRef}
+        data-douze-layer={layer.id}
+        style={{
+          ...style,
+          ...typeStyle,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: JUSTIFY[layer.align ?? 'centre'],
+          whiteSpace: 'nowrap',
+          lineHeight: 1,
+          color: layer.color,
+        }}
+      >
+        {text}
       </div>
     );
   } else {

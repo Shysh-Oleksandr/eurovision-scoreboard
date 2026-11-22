@@ -1400,7 +1400,7 @@ const CustomizeThemeModal: React.FC<CustomizeThemeModalProps> = ({
       onClose={onClickOutside}
       containerClassName="!w-[min(100%,950px)]"
       fullScreenOnPhone
-      contentClassName="text-white sm:h-[75vh] h-[72vh] max-h-[72vh] sm:!pb-0 !pb-3"
+      contentClassName="text-white sm:!h-[calc(90vh-50px)] h-[72vh] max-h-[72vh] sm:!pb-0 !pb-3"
       overlayClassName="!z-[1002]"
       bottomContent={
         <ModalBottomContent

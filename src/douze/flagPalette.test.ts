@@ -87,6 +87,17 @@ describe('paletteFromColors', () => {
     expect(palette.glow).toMatch(/^#[0-9a-f]{6}$/);
   });
 
+  it('can reuse the second for a third instead', () => {
+    // 2023: the blue words on the c1 fill would vanish into it.
+    expect(
+      paletteFromColors(['#005bbb', '#ffd500'], { third: 'second' }).c3,
+    ).toBe('#ffd500');
+    expect(
+      paletteFromColors(['#005bbb', '#ffd500', '#ffffff'], { third: 'second' })
+        .c3,
+    ).toBe('#ffffff');
+  });
+
   it('lifts very dark colours so they show on the dark rows', () => {
     expect(paletteFromColors(['#000000']).c1).toBe('#666666');
   });

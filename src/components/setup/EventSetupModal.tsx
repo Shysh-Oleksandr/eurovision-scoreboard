@@ -67,6 +67,10 @@ const EventStageModal = dynamic(() => import('./event-stage/EventStageModal'), {
 const CustomCountryModal = dynamic(() => import('./CustomCountryModal'), {
   ssr: false,
 });
+const EntryOverrideModal = dynamic(
+  () => import('./entry-override/EntryOverrideModal'),
+  { ssr: false },
+);
 const SettingsModal = dynamic(() => import('../settings/SettingsModal'), {
   ssr: false,
 });
@@ -248,6 +252,10 @@ const EventSetupModal = () => {
     handleOpenEditModal,
     handleCloseModal,
   } = useCustomCountryModal();
+  /** The standard country whose name and flag are being changed. */
+  const [entryOverrideCode, setEntryOverrideCode] = useState<string | null>(
+    null,
+  );
 
   const handleStageOrderChange = useCallback(
     (oldIndex: number, newIndex: number) => {
@@ -642,6 +650,13 @@ const EventSetupModal = () => {
             initialGroupId={initialGroupId}
           />
         )}
+        {entryOverrideCode && (
+          <EntryOverrideModal
+            isOpen
+            onClose={() => setEntryOverrideCode(null)}
+            code={entryOverrideCode}
+          />
+        )}
         {isEventStageModalOpen && (
           <EventStageModal
             isOpen={isEventStageModalOpen}
@@ -676,6 +691,7 @@ const EventSetupModal = () => {
             isSignedIn={!!user}
             assignMany={handleBulkCountryAssignmentByCodes}
             onEditCustomEntry={handleOpenEditModal}
+            onEditEntryOverride={setEntryOverrideCode}
             onEditStage={handleOpenEditEventStageModal}
             onCreateCustomEntry={handleOpenCreateModal}
           >

@@ -55,14 +55,17 @@ export const FieldError = ({
 
 /** Every country as a hosting-country option, with its hosting logo. */
 export const useHostingCountryOptions = () => {
-  const getAllCountries = useCountriesStore((state) => state.getAllCountries);
+  // Built-in names: these details may be another contest's.
+  const getCanonicalCountries = useCountriesStore(
+    (state) => state.getCanonicalCountries,
+  );
   const shouldUse2026WhiteHeartFlags = useGeneralStore(
     (state) => state.settings.shouldUse2026WhiteHeartFlags,
   );
 
   return useMemo(
     () =>
-      getAllCountries(false).map((country) => {
+      getCanonicalCountries(false).map((country) => {
         const { logo, isExisting } = getHostingCountryLogo(
           country,
           true,
@@ -76,7 +79,7 @@ export const useHostingCountryOptions = () => {
           isExisting,
         };
       }),
-    [getAllCountries, shouldUse2026WhiteHeartFlags],
+    [getCanonicalCountries, shouldUse2026WhiteHeartFlags],
   );
 };
 

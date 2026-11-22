@@ -227,18 +227,25 @@ export const loadFlagImageColors = (
 /**
  * The spec palette's keys from up to three `#rrggbb` colours (a flag's, the
  * theme's or a custom theme's own): `c1`, `c2`, `c3` in order (with fewer,
- * the first fills in), `glow` a pale tint of the first. With `lift` (the
- * default), very dark colours are lightened so they still read on the dark
- * rows; colours someone picked by hand are kept as they are.
+ * the first fills in, or for `c3` the second with `third: 'second'`),
+ * `glow` a pale tint of the first. With `lift` (the default), very dark
+ * colours are lightened so they still read on the dark rows (below a
+ * relative luminance of 0.12, or the number given: a spec's `liftBelow`);
+ * colours someone picked by hand are kept as they are.
  */
 export const paletteFromColors = (
   colors: string[],
-  { lift = true }: { lift?: boolean } = {},
+  {
+    lift = true,
+    third: thirdFallback = 'first',
+  }: { lift?: boolean | number; third?: 'first' | 'second' } = {},
 ): Record<string, string> => {
   const rgb = colors.map(fromHex);
+  const liftBelow = lift === true ? 0.12 : lift === false ? -1 : lift;
   const lifted = (color: Rgb) =>
-    lift && luminance(color) < 0.12 ? mix(color, [255, 255, 255], 0.4) : color;
-  const [first, second = first, third = first] = rgb;
+    luminance(color) < liftBelow ? mix(color, [255, 255, 255], 0.4) : color;
+  const [first, second = first] = rgb;
+  const third = rgb[2] ?? (thirdFallback === 'second' ? second : first);
 
   return {
     c1: toHex(lifted(first)),

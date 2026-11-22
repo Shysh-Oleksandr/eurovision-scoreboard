@@ -1,4 +1,5 @@
 import { ALL_COUNTRIES } from '@/data/countries/common-countries';
+import { sanitizeEntryOverrides } from '@/data/countries/entryOverrides';
 import { Country } from '@/models';
 import type { ContestSnapshot } from '@/types/contestSnapshot';
 
@@ -30,7 +31,8 @@ export function snapshotStages(snapshot: ContestSnapshot): SnapshotStage[] {
 /**
  * Rows of one stage of a saved contest, ranked by points. `stageId` picks a
  * stage with results; otherwise the last stage that has any. Custom entries
- * keep the name and flag the contest stored for them.
+ * keep the name and flag the contest stored for them, and standard countries
+ * the contest's own name and flag (`setup.entryOverrides`).
  */
 export function resolveSnapshotCountries(
   snapshot: ContestSnapshot,
@@ -49,17 +51,19 @@ export function resolveSnapshotCountries(
   const customByCode = new Map(
     (snapshot.customEntriesUsed ?? []).map((e) => [e.code, e]),
   );
+  const overrides = sanitizeEntryOverrides(snapshot.setup.entryOverrides);
 
   const countries: Country[] = byStage[chosen.id].map((item) => {
     const common = ALL_COUNTRIES.find((c) => c.code === item.code);
     const custom = customByCode.get(item.code);
+    const override = common ? overrides[item.code] : undefined;
     const jury = item.juryPoints ?? 0;
     const tele = item.televotePoints ?? 0;
 
     return {
-      name: custom?.name ?? common?.name ?? item.code,
+      name: custom?.name ?? override?.name ?? common?.name ?? item.code,
       code: item.code,
-      flag: custom?.flag,
+      flag: custom?.flag ?? override?.flag,
       juryPoints: jury,
       televotePoints: tele,
       points: jury + tele,

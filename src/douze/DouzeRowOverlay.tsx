@@ -1,5 +1,6 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import React, { useEffect, useRef, useState } from 'react';
 
 import DouzeSpecPlayer from './DouzeSpecPlayer';
 import type { DouzeOptions } from './options';
@@ -35,7 +36,12 @@ const DouzeRowOverlay: React.FC<Props> = ({
   entryColors,
   isThemePreview = false,
 }) => {
-  const spec = getDouzeSpec(mode, options);
+  const t = useTranslations('simulation');
+  // One run per mount, with the spec it started with. The player restarts
+  // when its spec changes, and the theme editor's overlay stays mounted a
+  // few seconds after its run: every option change played it at once, then
+  // again when the preview's replay (a new 12, a new mount) came.
+  const [spec] = useState(() => getDouzeSpec(mode, options));
   const isLowPerfDevice = useIsLowPerfDevice();
   const globalPointsSystem = useGeneralStore((state) => state.pointsSystem);
   const stageJuryOverride = useScoreboardStore((state) =>
@@ -66,6 +72,7 @@ const DouzeRowOverlay: React.FC<Props> = ({
       spec={spec}
       lite={isLowPerfDevice}
       entryColors={entryColors}
+      pointsLabel={t('douzePoints', { count: pointsAmount })}
     />
   );
 };

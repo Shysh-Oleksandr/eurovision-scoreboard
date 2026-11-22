@@ -225,7 +225,7 @@ const atSpeed = (layer: DouzeLayer, speed: number): DouzeLayer => {
     t: frame.t / speed,
   }));
 
-  return layer.kind === 'canvas'
+  return layer.kind === 'canvas' && layer.painter.type === 'waveFlow'
     ? {
         ...layer,
         keyframes,
@@ -268,6 +268,8 @@ export const applyDouzeOptions = (
     durationMs: spec.durationMs / speed,
     layers,
   };
+
+  if (spec.moveAtMs !== undefined) applied.moveAtMs = spec.moveAtMs / speed;
 
   if (options.veil) {
     applied.palette = { ...spec.palette, veil: options.veil };

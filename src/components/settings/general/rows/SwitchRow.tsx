@@ -20,8 +20,10 @@ export const SwitchRow: React.FC<SwitchRowProps> = ({ item, query }) => {
   const setSettings = useGeneralStore((s) => s.setSettings);
 
   const label = t(item.labelKey ?? '');
-  const toggle = () =>
+  const toggle = () => {
     setSettings({ [item.settingKey]: !value } as Partial<Settings>);
+    item.onChange?.(!value);
+  };
 
   return (
     <SettingsRow
