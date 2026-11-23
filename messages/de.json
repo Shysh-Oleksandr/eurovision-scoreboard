@@ -702,7 +702,16 @@
       "roDrawHalvesHint": "Eine zufällige Reihenfolge, aufgeteilt in eine erste und eine zweite Hälfte – wie beim Finale.",
       "roRemoveHalves": "Hälften entfernen",
       "roMoveToFirstHalf": "In die erste Hälfte verschieben",
-      "roMoveToSecondHalf": "In die zweite Hälfte verschieben"
+      "roMoveToSecondHalf": "In die zweite Hälfte verschieben",
+      "shareTitle": "Auslosung teilen",
+      "shareSubtitle": "Auslosung der Halbfinals",
+      "shareAlsoVoting": "Stimmen auch ab",
+      "shareFlags": "Flaggen",
+      "shareHearts": "Herzen",
+      "shareThemeFlags": "Flaggen des Themes",
+      "shareShowVoters": "Vorqualifizierte Abstimmende",
+      "shareCustomizeSummary": "Text, Flaggen, Abstimmende",
+      "shareCustomizeSummaryShort": "Text, Flaggen"
     },
     "stageSetup": {
       "tabRunningOrderShort": "Reihenfolge",
@@ -1133,6 +1142,8 @@
       "enterContestName": "Wettbewerb-Name eingeben",
       "makeContestPublic": "Wettbewerb öffentlich machen",
       "hostingCountry": "Gastgeberland",
+      "hostingCustomEntries": "Benutzerdefinierte Beiträge",
+      "hostingCountries": "Länder",
       "overwriteContestSetupAndResults": "Wettbewerb-Setup und -Ergebnisse überschreiben",
       "overwriteContestSetupAndResultsTooltip": "Wenn aktiviert, wird das Wettbewerb-Setup und -Ergebnisse mit dem aktuellen Zustand aktualisiert. Wenn deaktiviert, wird nur die grundlegende Info (Name, Jahr, Gastgeberland, etc.) aktualisiert.",
       "foundNContests": "Gefunden: {count} {count, plural, =1 {Wettbewerb} other {Wettbewerbe}}",
@@ -2343,7 +2354,8 @@
       "openInEditor": "Im Editor öffnen",
       "resultsDesign": "Ergebnisse",
       "runningOrderDesign": "Startreihenfolge",
-      "statsDesign": "Statistiken"
+      "statsDesign": "Statistiken",
+      "drawDesign": "Halbfinal-Auslosung"
     },
     "gallery": {
       "title": "Grafiken",
@@ -2414,6 +2426,10 @@
         "stats": {
           "name": "Statistiken",
           "description": "Eine Statistiktabelle, passend zu ihrem Inhalt."
+        },
+        "participants": {
+          "name": "Teilnehmende Länder",
+          "description": "Alle Länder des Wettbewerbs von A bis Z mit Herzflaggen, im Hochformat."
         }
       },
       "savedContest": "Gespeicherter Wettbewerb",
@@ -2599,6 +2615,10 @@
       "stats": {
         "name": "Statistiken",
         "description": "Aufschlüsselung, Split oder Übersicht"
+      },
+      "participants": {
+        "name": "Teilnehmer",
+        "description": "Alle Länder des Wettbewerbs, A–Z"
       }
     },
     "templates": {
@@ -2624,9 +2644,13 @@
         },
         "stats": {
           "name": "Statistiken"
+        },
+        "participants": {
+          "name": "Teilnehmende Länder"
         }
       },
-      "browseCommunity": "Community-Designs entdecken"
+      "browseCommunity": "Community-Designs entdecken",
+      "participatingCountries": "Teilnehmende Länder"
     },
     "layers": {
       "title": "Ebenen",
@@ -2664,7 +2688,8 @@
       "statsNeedLive": "Statistiktabellen verwenden das Live-Scoreboard. Stelle die Datenquelle auf Live, um diese Tabelle zu füllen.",
       "pickContestHint": "Wähle unten einen Wettbewerb. Bis dahin behält das Design seine aktuelle Datenquelle.",
       "statsNeedLiveHint": "Daten → Live im Editor",
-      "sampleHint": "Es läuft kein Wettbewerb, daher zeigen Scoreboards und Statistiken Beispielergebnisse (Eurovision 2026 Grand Final, erfundene Stimmen). Starte einen Wettbewerb, um deine eigenen zu verwenden."
+      "sampleHint": "Es läuft kein Wettbewerb, daher zeigen Scoreboards und Statistiken Beispielergebnisse (Eurovision 2026 Grand Final, erfundene Stimmen). Starte einen Wettbewerb, um deine eigenen zu verwenden.",
+      "participantsHint": "Teilnehmer zeigt jedes Land der Aufstellung des Wettbewerbs, egal in welcher Runde, von A bis Z. Live ist der Wettbewerb, den du gerade einrichtest, Länder, die auf die Auslosung warten, eingeschlossen."
     },
     "inspector": {
       "properties": "Eigenschaften",
@@ -2703,7 +2728,9 @@
         "scoreboard": "Scoreboard",
         "stats": "Statistiken",
         "branding": "Branding",
-        "stack": "Stapel"
+        "stack": "Stapel",
+        "draw": "Auslosung",
+        "participants": "Teilnehmer"
       },
       "sections": {
         "content": "Inhalt",
@@ -2880,6 +2907,21 @@
         "myThemes": "Meine Themes",
         "useAppTheme": "Theme der App verwenden ({name})",
         "savedWithDesign": "Wird mit dem Design gespeichert, damit es diesen Look behält, egal welches Theme die App verwendet."
+      },
+      "draw": {
+        "semiName": "Halbfinale {number}",
+        "firstHalf": "Überschrift erste Hälfte",
+        "secondHalf": "Überschrift zweite Hälfte",
+        "votersLabel": "Überschrift Abstimmende",
+        "fromTheDraw": "Die Länder stammen aus der Auslosung. Um sie zu ändern, teile die Auslosung erneut.",
+        "flags": "Flaggen",
+        "hearts": "Herzen",
+        "themeFlags": "Flaggen des Themes",
+        "showVoters": "Vorqualifizierte Abstimmende zeigen",
+        "fitHint": "Zeilen, Überschriften und Abstände wachsen und schrumpfen gemeinsam, damit alles in den Rahmen passt."
+      },
+      "participants": {
+        "fitHint": "{count, plural, =1 {# Land} other {# Länder}} aus der Datenquelle, A–Z. Zeilen wachsen und schrumpfen gemeinsam, damit alles in den Rahmen passt."
       }
     },
     "export": {
@@ -2968,7 +3010,12 @@
         "Jury": "Jury",
         "Televote": "Televote"
       },
-      "sizeHint": "Passt das gesamte Layout an die neue Größe an."
+      "sizeHint": "Passt das gesamte Layout an die neue Größe an.",
+      "flags": "Flaggen",
+      "flagStyles": {
+        "heart": "Herzen",
+        "theme": "Normale Flaggen"
+      }
     },
     "sheet": {
       "explore": "Entdecken",

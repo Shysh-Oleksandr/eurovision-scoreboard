@@ -7,8 +7,10 @@ import {
 } from '../model/design';
 
 import BrandingElement from './BrandingElement';
+import DrawElement from './DrawElement';
 import FlagElement from './FlagElement';
 import ImageElement from './ImageElement';
+import ParticipantsElement from './ParticipantsElement';
 import ScoreboardElement from './ScoreboardElement';
 import ShapeElement from './ShapeElement';
 import StatsElement from './StatsElement';
@@ -125,6 +127,10 @@ export const ElementView: React.FC<{ el: DesignElement }> = ({ el }) => {
       return <StatsElement el={el} />;
     case 'branding':
       return <BrandingElement el={el} />;
+    case 'draw':
+      return <DrawElement el={el} />;
+    case 'participants':
+      return <ParticipantsElement el={el} />;
     case 'stack':
       return <StackElement el={el} />;
     default:

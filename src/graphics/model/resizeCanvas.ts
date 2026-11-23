@@ -45,6 +45,8 @@ export function resizeCanvas(
       case 'stats':
         break;
       case 'scoreboard':
+      case 'draw':
+      case 'participants':
         if (next.w !== undefined) next.w = r(next.w * kx);
         // Auto-fit box: rows re-fit to the new height.
         if (!inFlow && next.h !== undefined) next.h = r(next.h * ky);

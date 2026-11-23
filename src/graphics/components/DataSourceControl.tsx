@@ -17,6 +17,11 @@ interface Props {
   onChange: (binding: DataBinding) => void;
   /** Offer "Manual" (keeps the rows the binding already has). */
   manualRows?: DataBinding | null;
+  /**
+   * Offer the stage select. Off for designs whose elements don't read a
+   * stage (participants list the whole contest).
+   */
+  stagePicker?: boolean;
 }
 
 /** Live stage select (the running event's stages). */
@@ -81,6 +86,7 @@ const DataSourceControl: React.FC<Props> = ({
   value,
   onChange,
   manualRows,
+  stagePicker = true,
 }) => {
   const t = useTranslations('graphics.data');
   const [pickingContest, setPickingContest] = useState(false);
@@ -116,7 +122,7 @@ const DataSourceControl: React.FC<Props> = ({
           }
         }}
       />
-      {value.source === 'live' && !pickingContest && (
+      {stagePicker && value.source === 'live' && !pickingContest && (
         <LiveStagePicker
           stageId={value.stageId}
           onChange={(stageId) => onChange({ source: 'live', stageId })}
@@ -131,7 +137,7 @@ const DataSourceControl: React.FC<Props> = ({
               onChange({ source: 'contest', ...picked, stageId: undefined });
             }}
           />
-          {value.source === 'contest' && (
+          {stagePicker && value.source === 'contest' && (
             <ContestStagePicker
               stageId={value.stageId}
               onChange={(stageId) => onChange({ ...value, stageId })}

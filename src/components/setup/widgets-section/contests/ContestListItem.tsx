@@ -34,7 +34,7 @@ import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { openReportDialog } from '@/state/reportDialogStore';
 import { useAuthStore } from '@/state/useAuthStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
+import { contestHostCountry, getHostingCountryLogo } from '@/theme/hosting';
 import { Contest } from '@/types/contest';
 
 interface ContestListItemProps {
@@ -127,8 +127,9 @@ const ContestListItem: React.FC<ContestListItemProps> = ({
     return false;
   }, [contest.customPointsSystem, hasSplitPointsSystem]);
 
+  const customCountries = useCountriesStore((state) => state.customCountries);
   const { logo, isExisting } = getHostingCountryLogo(
-    contest.hostingCountryCode,
+    contestHostCountry(contest, customCountries),
     true,
     shouldUse2026WhiteHeartFlags,
   );

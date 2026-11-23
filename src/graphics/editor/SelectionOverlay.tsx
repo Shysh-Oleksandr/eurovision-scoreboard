@@ -201,7 +201,9 @@ const SelectionOverlay: React.FC<Props> = ({
         const sizeText = `${Math.round(box.w)} × ${Math.round(box.h)}`;
         const angle = signedAngle(el.rotation);
         const label =
-          el.type === 'scoreboard' && el.fit === 'auto'
+          (el.type === 'scoreboard' && el.fit === 'auto') ||
+          el.type === 'draw' ||
+          el.type === 'participants'
             ? {
                 text: `${elementLabel(el)} · ${sizeText}`,
                 note: labels.rowsFitBox,

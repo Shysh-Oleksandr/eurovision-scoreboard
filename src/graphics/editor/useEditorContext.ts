@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { Design } from '../model/design';
 import { designThemeFromActive, designThemeLabel } from '../model/designTheme';
 import { useDesignData } from '../render/DesignDataContext';
+import type { TemplateContext } from '../templates/editor';
 
 import { useEditorStore } from './editorStore';
 
@@ -60,8 +61,12 @@ export function useThemeName(design?: Design): string {
 }
 
 /** Title / subtitle defaults for new designs and templates. */
-export function useTemplateContext(): { title: string; subtitle: string } {
+export function useTemplateContext(): TemplateContext {
+  const t = useTranslations('graphics.templates');
   const contestName = useGeneralStore((s) => s.settings.contestName);
+  const white2026Hearts = useGeneralStore(
+    (s) => s.settings.shouldUse2026WhiteHeartFlags,
+  );
   const contestYear = useGeneralStore((s) => s.settings.contestYear);
   const stageName = useScoreboardStore((s) => {
     const stage =
@@ -75,8 +80,10 @@ export function useTemplateContext(): { title: string; subtitle: string } {
     () => ({
       title: `${contestName} ${contestYear}`.trim(),
       subtitle: stageName || 'Grand Final',
+      participants: t('participatingCountries'),
+      white2026Hearts,
     }),
-    [contestName, contestYear, stageName],
+    [contestName, contestYear, stageName, t, white2026Hearts],
   );
 }
 

@@ -702,7 +702,16 @@
       "roDrawHalvesHint": "Losowa kolejność podzielona na pierwszą i drugą połowę, tak jak losuje się Wielki Finał.",
       "roRemoveHalves": "Usuń połowy",
       "roMoveToFirstHalf": "Przenieś do pierwszej połowy",
-      "roMoveToSecondHalf": "Przenieś do drugiej połowy"
+      "roMoveToSecondHalf": "Przenieś do drugiej połowy",
+      "shareTitle": "Udostępnij losowanie",
+      "shareSubtitle": "Losowanie półfinałów",
+      "shareAlsoVoting": "Głosują też",
+      "shareFlags": "Flagi",
+      "shareHearts": "Serca",
+      "shareThemeFlags": "Flagi motywu",
+      "shareShowVoters": "Głosujący prekwalifikowani",
+      "shareCustomizeSummary": "Tekst, flagi, głosujący",
+      "shareCustomizeSummaryShort": "Tekst, flagi"
     },
     "stageSetup": {
       "tabRunningOrderShort": "Kolejność",
@@ -1133,6 +1142,8 @@
       "enterContestName": "Wprowadź nazwę konkursu",
       "makeContestPublic": "Udostępnij konkurs publicznie",
       "hostingCountry": "Kraj gospodarza",
+      "hostingCustomEntries": "Własne wpisy",
+      "hostingCountries": "Kraje",
       "overwriteContestSetupAndResults": "Zastąp ustawienia i wyniki konkursu",
       "overwriteContestSetupAndResultsTooltip": "Gdy włączone, aktualizuje strukturę konkursu i wyniki symulacji przy użyciu bieżącego stanu. Gdy wyłączone, aktualizowane są tylko podstawowe informacje (nazwa, rok, kraj gospodarza, itp.)",
       "foundNContests": "Znaleziono {count} {count, plural, =1 {konkurs} other {konkursów}}",
@@ -2343,7 +2354,8 @@
       "openInEditor": "Otwórz w edytorze",
       "resultsDesign": "Wyniki",
       "runningOrderDesign": "Kolejność startowa",
-      "statsDesign": "Statystyki"
+      "statsDesign": "Statystyki",
+      "drawDesign": "Losowanie półfinałów"
     },
     "gallery": {
       "title": "Grafiki",
@@ -2414,6 +2426,10 @@
         "stats": {
           "name": "Statystyki",
           "description": "Jedna tabela statystyk, dopasowana do zawartości."
+        },
+        "participants": {
+          "name": "Kraje uczestniczące",
+          "description": "Wszystkie kraje konkursu od A do Z, z flagami w kształcie serc, w pionie."
         }
       },
       "savedContest": "Zapisany konkurs",
@@ -2599,6 +2615,10 @@
       "stats": {
         "name": "Statystyki",
         "description": "Tabela rozkładu, podziału lub podsumowania"
+      },
+      "participants": {
+        "name": "Uczestnicy",
+        "description": "Wszystkie kraje konkursu, A–Z"
       }
     },
     "templates": {
@@ -2624,9 +2644,13 @@
         },
         "stats": {
           "name": "Statystyki"
+        },
+        "participants": {
+          "name": "Kraje uczestniczące"
         }
       },
-      "browseCommunity": "Odkrywaj projekty społeczności"
+      "browseCommunity": "Odkrywaj projekty społeczności",
+      "participatingCountries": "Kraje uczestniczące"
     },
     "layers": {
       "title": "Warstwy",
@@ -2664,7 +2688,8 @@
       "statsNeedLive": "Tabele statystyk korzystają z tablicy na żywo. Przełącz źródło danych na Na żywo, aby wypełnić tę tabelę.",
       "pickContestHint": "Wybierz konkurs poniżej. Do tego czasu projekt zachowuje obecne źródło danych.",
       "statsNeedLiveHint": "Dane → Na żywo w edytorze",
-      "sampleHint": "Żaden konkurs nie trwa, więc tablice i statystyki pokazują przykładowe wyniki (Finał Eurovision 2026, zmyślone głosy). Rozpocznij konkurs, aby użyć własnych."
+      "sampleHint": "Żaden konkurs nie trwa, więc tablice i statystyki pokazują przykładowe wyniki (Finał Eurovision 2026, zmyślone głosy). Rozpocznij konkurs, aby użyć własnych.",
+      "participantsHint": "Uczestnicy pokazuje każdy kraj ze składu konkursu, niezależnie od etapu, od A do Z. Na żywo to konkurs, który przygotowujesz, łącznie z krajami czekającymi na losowanie."
     },
     "inspector": {
       "properties": "Właściwości",
@@ -2703,7 +2728,9 @@
         "scoreboard": "Tablica wyników",
         "stats": "Statystyki",
         "branding": "Branding",
-        "stack": "Stos"
+        "stack": "Stos",
+        "draw": "Losowanie",
+        "participants": "Uczestnicy"
       },
       "sections": {
         "content": "Zawartość",
@@ -2880,6 +2907,21 @@
         "myThemes": "Moje motywy",
         "useAppTheme": "Użyj motywu aplikacji ({name})",
         "savedWithDesign": "Zapisywany razem z projektem, więc wygląda tak samo bez względu na motyw aplikacji."
+      },
+      "draw": {
+        "semiName": "Półfinał {number}",
+        "firstHalf": "Nagłówek pierwszej połowy",
+        "secondHalf": "Nagłówek drugiej połowy",
+        "votersLabel": "Nagłówek głosujących",
+        "fromTheDraw": "Kraje pochodzą z losowania półfinałów. Aby je zmienić, udostępnij losowanie ponownie.",
+        "flags": "Flagi",
+        "hearts": "Serca",
+        "themeFlags": "Flagi motywu",
+        "showVoters": "Pokaż głosujących prekwalifikowanych",
+        "fitHint": "Wiersze, nagłówki i odstępy rosną i maleją razem, by zmieścić się w ramce."
+      },
+      "participants": {
+        "fitHint": "{count, plural, =1 {# kraj} few {# kraje} many {# krajów} other {# kraju}} ze źródła danych, A–Z. Wiersze rosną i maleją razem, by zmieścić się w ramce."
       }
     },
     "export": {
@@ -2968,7 +3010,12 @@
         "Jury": "Jury",
         "Televote": "Televote"
       },
-      "sizeHint": "Dopasowuje cały układ do nowego rozmiaru."
+      "sizeHint": "Dopasowuje cały układ do nowego rozmiaru.",
+      "flags": "Flagi",
+      "flagStyles": {
+        "heart": "Serca",
+        "theme": "Zwykłe flagi"
+      }
     },
     "sheet": {
       "explore": "Odkrywaj",

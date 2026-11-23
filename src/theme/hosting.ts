@@ -281,6 +281,30 @@ const get2026WhiteHeartLogo = (countryCode: string): string | null =>
     ? `/hostingCountryLogos/2026-white/${countryCode}.svg`
     : null;
 
+/** A custom entry's code (`custom-<id>`), as opposed to a standard country's. */
+export const isCustomEntryCode = (code: string | null | undefined): boolean =>
+  !!code && code.startsWith('custom-');
+
+/**
+ * A saved contest's hosting country for its logo: a custom entry comes with
+ * its name and flag (`Contest.host`, or the entry when it's loaded here);
+ * a standard country is its code.
+ */
+export function contestHostCountry(
+  contest: {
+    hostingCountryCode: string;
+    host?: { code: string; name: string; flag?: string };
+  },
+  localCountries: BaseCountry[] = [],
+): BaseCountry | string {
+  const code = contest.hostingCountryCode;
+
+  if (!isCustomEntryCode(code)) return code;
+  if (contest.host?.code === code) return { ...contest.host };
+
+  return localCountries.find((country) => country.code === code) ?? code;
+}
+
 export function getHostingCountryByYear(
   year: Year,
   contestType: ContestType = 'esc',
@@ -322,8 +346,8 @@ export function getHostingCountryLogo(
   shouldShowHeartFlagIcon = true,
   shouldUse2026WhiteHeartFlags = false,
 ): { logo: string; isExisting: boolean } {
-  // Handle undefined/null country - return default flag
-  if (!country) {
+  // No country, or a custom entry known only by its code: the globe.
+  if (!country || (typeof country === 'string' && isCustomEntryCode(country))) {
     return { logo: getFlagPath('WW'), isExisting: false };
   }
 
@@ -355,8 +379,8 @@ export function getHostingCountryLogoForImageGeneration(
   shouldShowHeartFlagIcon = true,
   shouldUse2026WhiteHeartFlags = false,
 ): { logo: string; isExisting: boolean } {
-  // Handle undefined/null country - return default flag
-  if (!country) {
+  // No country, or a custom entry known only by its code: the globe.
+  if (!country || (typeof country === 'string' && isCustomEntryCode(country))) {
     return { logo: getFlagPathForImageGeneration('WW'), isExisting: false };
   }
 

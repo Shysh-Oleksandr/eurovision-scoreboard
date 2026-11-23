@@ -3,6 +3,8 @@
  * stage assignments, running orders with halves, pre-qualified voters — and
  * turns draw mode off. Any votes already predefined for those semis reset.
  */
+import { drawOrderOf } from './drawShare';
+
 import { EventStage, VotingCountry } from '@/models';
 import { createRng, shuffle } from '@/state/allocationDraw/rng';
 import type { DrawInput, DrawPlan } from '@/state/allocationDraw/types';
@@ -138,6 +140,7 @@ export const applyDrawPlan = (plan: DrawPlan, input: DrawInput): void => {
         order: plan.order,
         members: [...members].sort(),
         voters: drawnVoters,
+        drawOrder: drawOrderOf(plan, stage.id),
       };
 
       return {

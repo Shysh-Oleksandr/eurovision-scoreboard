@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl';
 import React, { useMemo } from 'react';
 
 import { DataBinding, Design, ManualRow } from '../model/design';
+import { usesStageData } from '../model/elements';
 import { CANVAS_PRESETS } from '../model/presets';
 import {
   applyTemplateField,
@@ -143,6 +144,7 @@ const FieldInput: React.FC<{
           manualRows={
             manualRows ?? (design.data.source === 'manual' ? design.data : null)
           }
+          stagePicker={usesStageData(design.elements)}
         />
       );
     default:

@@ -9,6 +9,7 @@ import {
   LiveStagePicker,
 } from '../../components/DataSourceControl';
 import { DataBinding, ManualRow } from '../../model/design';
+import { hasElementOfType, usesStageData } from '../../model/elements';
 import { useDesignData } from '../../render/DesignDataContext';
 import { useEditorStore } from '../editorStore';
 import { Chip, Hint, IconButton, Seg, SelectInput } from '../ui/controls';
@@ -35,6 +36,10 @@ const DEFAULT_ROWS: ManualRow[] = [
 const DataPanel: React.FC = () => {
   const t = useTranslations('graphics.data');
   const data = useEditorStore((s) => s.design.data);
+  const readsStage = useEditorStore((s) => usesStageData(s.design.elements));
+  const listsParticipants = useEditorStore((s) =>
+    hasElementOfType(s.design.elements, ['participants']),
+  );
   const setData = useEditorStore((s) => s.setData);
   const label = useDataLabel(data);
   const { countries, inaccessible, status, isSample } = useDesignData();
@@ -82,8 +87,9 @@ const DataPanel: React.FC = () => {
       <Hint strong icon>
         {t('elementsUseThisData')}
       </Hint>
+      {listsParticipants && <Hint>{t('participantsHint')}</Hint>}
 
-      {data.source === 'live' && !pickingContest && (
+      {readsStage && data.source === 'live' && !pickingContest && (
         <>
           <LiveStagePicker
             stageId={data.stageId}
@@ -104,7 +110,7 @@ const DataPanel: React.FC = () => {
             }}
           />
           {pickingContest && <Hint>{t('pickContestHint')}</Hint>}
-          {data.source === 'contest' && !inaccessible && (
+          {readsStage && data.source === 'contest' && !inaccessible && (
             <ContestStagePicker
               stageId={data.stageId}
               onChange={(stageId) => setData({ ...data, stageId })}

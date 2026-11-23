@@ -6,6 +6,7 @@ import {
   Pause,
   Play,
   RotateCcw,
+  Share2,
   SkipForward,
   SlidersHorizontal,
   X,
@@ -20,10 +21,13 @@ import React, {
   useState,
 } from 'react';
 
+import dynamic from 'next/dynamic';
+
 import { useAllocationDrawContext } from './AllocationDrawContext';
 import { applyDrawPlan, stagesWithVotes } from './applyDraw';
 import CustomizePanel from './CustomizePanel';
 import { DrawFixId, errorCopy, useDrawCopy } from './drawCopy';
+import { drawShareFromPlan } from './drawShare';
 import { flashTiles } from './drawUiStore';
 import {
   LaneView,
@@ -53,6 +57,11 @@ import { useAllocationDrawStore } from '@/state/allocationDrawStore';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { getHostingCountryLogo } from '@/theme/hosting';
+
+// The share image pulls in the graphics engine: only when asked for.
+const ShareDrawModal = dynamic(() => import('./ShareDrawModal'), {
+  ssr: false,
+});
 
 interface AllocationDrawModalProps {
   isOpen: boolean;
@@ -85,6 +94,8 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
   const rules = useAllocationDrawStore((s) => s.rules);
   const [customizeOpen, setCustomizeOpen] = useState(false);
   const [customizeEntering, setCustomizeEntering] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareLoaded, setShareLoaded] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const flyRef = useRef<HTMLDivElement | null>(null);
   const liveRef = useRef<HTMLDivElement | null>(null);
@@ -147,15 +158,24 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!isOpen) setCustomizeOpen(false);
+    if (!isOpen) {
+      setCustomizeOpen(false);
+      setShareOpen(false);
+    }
   }, [isOpen]);
+
+  // A new draw (Redraw, rule change) closes the image of the last one.
+  useEffect(() => {
+    if (phase !== 'done') setShareOpen(false);
+  }, [phase]);
 
   // Android back closes Customize before the window (the Modal's handler).
   useBackHandler(isOpen && customizeOpen, () => setCustomizeOpen(false));
 
-  // Keyboard: Space draws, Esc closes Customize then the window.
+  // Keyboard: Space draws, Esc closes Customize then the window. The share
+  // image (and the graphics editor it opens) has the keys while it is open.
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || shareOpen) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -184,7 +204,7 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
     document.addEventListener('keydown', onKeyDown);
 
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [isOpen, customizeOpen, close, phase, ceremony]);
+  }, [isOpen, shareOpen, customizeOpen, close, phase, ceremony]);
 
   // Focus the primary control of each state.
   useEffect(() => {
@@ -362,6 +382,14 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
       toast.info(t('toastRuleChanged'));
     },
     [close, openCustomize, state.error, t],
+  );
+
+  const shareData = useMemo(
+    () =>
+      phase === 'done' && plan
+        ? drawShareFromPlan(plan, input, (code) => byCode.get(code))
+        : null,
+    [phase, plan, input, byCode],
   );
 
   const apply = useCallback(() => {
@@ -575,6 +603,15 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
                 variant="surface"
                 size="md"
                 className="flex-1 justify-center md:flex-none !h-[42px]"
+                Icon={<Share2 className="size-4" />}
+                onClick={() => setShareOpen(true)}
+              >
+                <ShareLabel />
+              </Button>
+              <Button
+                variant="surface"
+                size="md"
+                className="flex-1 justify-center md:flex-none !h-[42px]"
                 Icon={<RotateCcw className="size-4" />}
                 onClick={() => {
                   ceremony.redraw();
@@ -607,6 +644,14 @@ const AllocationDrawModal: React.FC<AllocationDrawModalProps> = ({
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none z-30 overflow-hidden"
       />
+      {shareData && (shareOpen || shareLoaded) && (
+        <ShareDrawModal
+          isOpen={shareOpen}
+          onClose={() => setShareOpen(false)}
+          onLoaded={() => setShareLoaded(true)}
+          data={shareData}
+        />
+      )}
     </>
   );
 
@@ -676,6 +721,12 @@ const CloseLabel = () => {
   const t = useTranslations('common');
 
   return <>{t('close')}</>;
+};
+
+const ShareLabel = () => {
+  const t = useTranslations('common');
+
+  return <>{t('share')}</>;
 };
 
 export default AllocationDrawModal;

@@ -1,6 +1,7 @@
 'use client';
 import {
   Copy,
+  Dices,
   Eye,
   EyeOff,
   Flag,
@@ -15,6 +16,7 @@ import {
   Trash2,
   Type,
   Unlock,
+  Users,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React from 'react';
@@ -49,6 +51,8 @@ export const TYPE_ICONS: Record<ElementType, React.ReactNode> = {
   scoreboard: <Rows3 className="size-[14px]" />,
   stats: <Table className="size-[14px]" />,
   branding: <Mic className="size-[14px]" />,
+  draw: <Dices className="size-[14px]" />,
+  participants: <Users className="size-[14px]" />,
   stack: <Group className="size-[14px]" />,
 };
 

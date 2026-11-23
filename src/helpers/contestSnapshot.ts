@@ -292,6 +292,10 @@ export function buildContestSnapshotFromStores() {
       if (v.code.startsWith('custom-')) customCodes.add(v.code);
     });
   }
+  // A custom entry hosting travels with the contest too, in the line-up or
+  // not: whoever opens it gets its name and flag.
+  if (general.settings.hostingCountryCode?.startsWith('custom-'))
+    customCodes.add(general.settings.hostingCountryCode);
 
   const customEntriesUsed = countriesStore.customCountries
     .filter((c) => customCodes.has(c.code))
@@ -1013,6 +1017,9 @@ export async function applyContestSnapshotToStores(
           order: (info.order as DrawnStageInfo['order']) ?? 'halves',
           members: info.members,
           voters: Array.isArray(info.voters) ? info.voters : [],
+          ...(Array.isArray(info.drawOrder)
+            ? { drawOrder: info.drawOrder }
+            : {}),
         };
       }
     });

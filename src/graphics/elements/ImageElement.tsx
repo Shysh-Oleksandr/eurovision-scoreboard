@@ -36,14 +36,17 @@ export function useImageSource(src: string): string | null {
   const themeBg = useShareBgImage();
   const local = useLocalAssetUrl(src);
   const contestLogo = useGeneralStore((s) => s.activeContest?.logoUrl ?? null);
-  const hostingCode = useGeneralStore((s) => s.settings.hostingCountryCode);
+
+  // `getHostingCountry` reads other stores; subscribing keeps it fresh.
+  useGeneralStore((s) => s.settings.hostingCountryCode);
+  const getHostingCountry = useGeneralStore((s) => s.getHostingCountry);
 
   if (src === THEME_BG_SRC)
     return getBackgroundImageForImageGeneration(themeBg);
   if (src === CONTEST_LOGO_SRC) {
     return contestLogo
       ? getBackgroundImageForImageGeneration(contestLogo)
-      : getHostingCountryLogoForImageGeneration(hostingCode).logo;
+      : getHostingCountryLogoForImageGeneration(getHostingCountry()).logo;
   }
   if (local === null) return null;
   if (local.startsWith('data:') || local.startsWith('blob:')) return local;

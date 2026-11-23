@@ -611,7 +611,8 @@ const NextYearModal: React.FC<NextYearModalProps> = ({
                 caption={t('widgets.contests.hostingCountry')}
                 ariaLabel={t('widgets.contests.hostingCountry')}
                 chevronOnPhone
-                options={hostingCountryOptions}
+                options={hostingCountryOptions.options}
+                groups={hostingCountryOptions.groups}
                 value={hostCode}
                 onChange={setHostCode}
                 id={`${ids}-host`}

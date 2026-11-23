@@ -413,6 +413,11 @@ const OLD_WHATS_NEW = [
 
 const WEBSITE_UPDATES: UpdateItem[] = [
   {
+    date: '2026-11-23',
+    title:
+      '<list><item>Share the semi-final allocation draw as an image</item><item>Added a Participating countries design to Graphics: every country in the contest, A–Z, with heart flags, as a portrait card</item><item>A contest’s hosting country can now be one of your custom entries, with its own name and flag</item></list>',
+  },
+  {
     date: '2026-11-22',
     title:
       '<list><item>Added three more douze points animations: ESC 2021 (pop-out row), ESC 2023 (circles and words) and ESC 2024 (colour wipe), each in its year’s theme. Custom themes can use them too</item><item>Give a country its own name and flag in a contest (e.g., F.Y.R. Macedonia, or a purple globe for the Rest of the World): open the country’s menu in the setup and choose "Edit name and flag". Pick another flag or upload your own. The country keeps its stats</item><item>Older editions use the names countries competed under back then (F.Y.R. Macedonia, Czech Republic, Turkey). Turn it off with Historical names in Settings → Contest</item><item>Keep your names and flags for every new contest with "Use in my new contests", and manage them in Settings → Contest</item></list>',

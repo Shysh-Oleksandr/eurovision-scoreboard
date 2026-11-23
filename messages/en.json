@@ -702,7 +702,16 @@
       "roDrawHalvesHint": "A random order, split into a first and a second half, the way the Grand Final is drawn.",
       "roRemoveHalves": "Remove halves",
       "roMoveToFirstHalf": "Move to the first half",
-      "roMoveToSecondHalf": "Move to the second half"
+      "roMoveToSecondHalf": "Move to the second half",
+      "shareTitle": "Share the draw",
+      "shareSubtitle": "Semi-final allocation draw",
+      "shareAlsoVoting": "Also voting",
+      "shareFlags": "Flags",
+      "shareHearts": "Hearts",
+      "shareThemeFlags": "Theme flags",
+      "shareShowVoters": "Pre-qualified voters",
+      "shareCustomizeSummary": "Text, flags, voters",
+      "shareCustomizeSummaryShort": "Text, flags"
     },
     "stageSetup": {
       "tabRunningOrderShort": "Order",
@@ -1133,6 +1142,8 @@
       "enterContestName": "Enter contest name",
       "makeContestPublic": "Make contest public",
       "hostingCountry": "Hosting country",
+      "hostingCustomEntries": "Custom entries",
+      "hostingCountries": "Countries",
       "overwriteContestSetupAndResults": "Overwrite contest setup & results",
       "overwriteContestSetupAndResultsTooltip": "When enabled, updates the contest structure and simulation results using the current state. When disabled, only the basic info (name, year, hosting country, etc.) will be updated.",
       "foundNContests": "Found {count} {count, plural, =1 {contest} other {contests}}",
@@ -2343,7 +2354,8 @@
       "openInEditor": "Open in editor",
       "resultsDesign": "Results",
       "runningOrderDesign": "Running order",
-      "statsDesign": "Stats"
+      "statsDesign": "Stats",
+      "drawDesign": "Semi-final draw"
     },
     "gallery": {
       "title": "Graphics",
@@ -2414,6 +2426,10 @@
         "stats": {
           "name": "Stats",
           "description": "One stats table, sized to its content."
+        },
+        "participants": {
+          "name": "Participating countries",
+          "description": "Every country in the contest, A–Z, with heart flags, on a portrait card."
         }
       },
       "savedContest": "Saved contest",
@@ -2599,6 +2615,10 @@
       "stats": {
         "name": "Stats",
         "description": "Breakdown, split or summary table"
+      },
+      "participants": {
+        "name": "Participants",
+        "description": "Every country in the contest, A–Z"
       }
     },
     "templates": {
@@ -2624,9 +2644,13 @@
         },
         "stats": {
           "name": "Stats"
+        },
+        "participants": {
+          "name": "Participating countries"
         }
       },
-      "browseCommunity": "Explore community designs"
+      "browseCommunity": "Explore community designs",
+      "participatingCountries": "Participating countries"
     },
     "layers": {
       "title": "Layers",
@@ -2664,7 +2688,8 @@
       "statsNeedLive": "Stats tables use the live scoreboard. Switch the data source to Live to fill this table.",
       "pickContestHint": "Pick a contest below. Until then the design keeps its current data source.",
       "statsNeedLiveHint": "Data → Live in the editor",
-      "sampleHint": "No contest is running, so scoreboards and stats show sample results (Eurovision 2026 Grand Final, made-up votes). Start a contest to use your own."
+      "sampleHint": "No contest is running, so scoreboards and stats show sample results (Eurovision 2026 Grand Final, made-up votes). Start a contest to use your own.",
+      "participantsHint": "Participants list every country in the contest’s line-up, whatever its stage, A–Z. Live is the contest you’re setting up, countries waiting for the draw included."
     },
     "inspector": {
       "properties": "Properties",
@@ -2703,7 +2728,9 @@
         "scoreboard": "Scoreboard",
         "stats": "Stats",
         "branding": "Branding",
-        "stack": "Stack"
+        "stack": "Stack",
+        "draw": "Draw",
+        "participants": "Participants"
       },
       "sections": {
         "content": "Content",
@@ -2880,6 +2907,21 @@
         "myThemes": "My themes",
         "useAppTheme": "Use the app’s theme ({name})",
         "savedWithDesign": "Saved with the design, so it keeps this look whatever theme the app is on."
+      },
+      "draw": {
+        "semiName": "Semi-final {number}",
+        "firstHalf": "First half heading",
+        "secondHalf": "Second half heading",
+        "votersLabel": "Voters heading",
+        "fromTheDraw": "The countries come from the allocation draw. To change them, share the draw again.",
+        "flags": "Flags",
+        "hearts": "Hearts",
+        "themeFlags": "Theme flags",
+        "showVoters": "Show pre-qualified voters",
+        "fitHint": "Rows, headings and gaps grow and shrink together to fit the box."
+      },
+      "participants": {
+        "fitHint": "{count, plural, =1 {# country} other {# countries}} from the data source, A–Z. Rows grow and shrink together to fit the box."
       }
     },
     "export": {
@@ -2968,7 +3010,12 @@
         "Jury": "Jury",
         "Televote": "Televote"
       },
-      "sizeHint": "Re-fits the whole layout to the new size."
+      "sizeHint": "Re-fits the whole layout to the new size.",
+      "flags": "Flags",
+      "flagStyles": {
+        "heart": "Hearts",
+        "theme": "Regular flags"
+      }
     },
     "sheet": {
       "explore": "Explore",

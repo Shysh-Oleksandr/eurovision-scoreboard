@@ -20,7 +20,8 @@ handoff lives in `currentTask/design_handoff_allocation_draw/`.
   persisted as `allocation-draw-storage`): `enabled` (draw mode), `waitingFrom`
   (where each waiting country came from, for "Put them back where they were"),
   `votesIn` (pre-qualified "Votes in" pins), `rules` and `drawn` (what a
-  finished draw left per stage: code, members, voters, order mode). It resets
+  finished draw left per stage: code, members, voters, order mode, and the
+  order the countries were drawn in, `drawOrder`, for the share image). It resets
   with the line-up on a year change (`updateCountriesForYear`) and is hydrated
   from `snapshot.setup.allocationDraw` on contest load.
 - **Pins live in the line-up, not in Customize.** In draw mode every country
@@ -85,6 +86,8 @@ handoff lives in `currentTask/design_handoff_allocation_draw/`.
 
 ## 3. UI (`src/components/setup/allocation-draw/`)
 
+- `drawShare.ts` (+ test) — the share image's rows from a plan or from the
+  line-up (see "Share the draw" below).
 - `useAllocationDraw` computes the model once in `EventSetupModal` and shares
   it through `AllocationDrawProvider`: availability (needs ≥ 2 drawable semis
   and not GF-only), input, `check` error, target sizes, waiting codes.
@@ -133,6 +136,24 @@ handoff lives in `currentTask/design_handoff_allocation_draw/`.
   offers **Draw halves** in the Order menu: a random order split ⌊n/2⌋ /
   ⌈n/2⌉, the way the final's halves (and the host's exact slot, which is just
   its position in that order) are drawn; **Remove halves** undoes it.
+- **Share the draw** (`ShareDrawModal`, the share modal's frame from
+  graphics-studio.md §6): an image of the semi-finals, from two places. The
+  draw window's Done state has a Share button next to Redraw (the plan,
+  before Apply: `drawShareFromPlan`); after Apply, a semi's "Drawn" chip is
+  a button that opens the same image for every semi still holding that
+  draw's countries (`LineupDrawShare` → `drawShareFromLineup`, by draw
+  `code` + `isDrawnInfoCurrent`). Halves follow the current running order
+  and `firstHalfSize` (a country moved across shows there); inside a half
+  countries keep the order they were drawn in (`drawn[stage].drawOrder`,
+  recorded by Apply; older draws fall back to the running order), so the
+  image is the same before and after Apply. Exact positions list the
+  running order numbered; "no order" lists A–Z. Options: Format, Text,
+  Flags (hearts by default, or the theme's flags), and "Pre-qualified
+  voters" (off by default; only shown when the draw placed any). The
+  choices live in `drawUiStore.shareOptions` for the session. The image is
+  a design with one `draw` element (graphics-studio.md §3), so "Open in
+  the graphics editor" works as for the other share images. While the
+  share modal is open the draw window ignores Space / Esc.
 - Default semi voters (no draw): `usePostSetupStageForm` now adds the
   pre-qualified countries whose year-data `aqSemiFinalGroup` names the stage,
   as long as they take part elsewhere in the contest, so year presets vote

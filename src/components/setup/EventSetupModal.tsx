@@ -16,6 +16,7 @@ import { useContinueToNextPhase } from '../simulation/hooks/useContinueToNextPha
 import { AllocationDrawProvider } from './allocation-draw/AllocationDrawContext';
 import DrawModeDialogs from './allocation-draw/DrawModeDialogs';
 import { useDrawUiStore } from './allocation-draw/drawUiStore';
+import LineupDrawShare from './allocation-draw/LineupDrawShare';
 import { useAllocationDraw } from './allocation-draw/useAllocationDraw';
 import { useContestDirtyState } from './hooks/useContestDirtyState';
 import { useCountryAssignments } from './hooks/useCountryAssignments';
@@ -563,6 +564,7 @@ const EventSetupModal = () => {
     <AllocationDrawProvider value={drawModel}>
       <SyncCustomEntries />
       <DrawModeDialogs />
+      <LineupDrawShare stages={eventStagesWithCountries} />
       {(drawWindowOpen || isDrawWindowLoaded) && (
         <AllocationDrawModal
           isOpen={drawWindowOpen}

@@ -355,6 +355,13 @@ the setup edits that weren't saved.
 
 - Cleared description, venue and hosts are sent as `''` (the backend only
   writes strings).
+- The host can be a custom entry (`useHostingCountryOptions`: the account's
+  and the open contest's entries in a "Custom entries" group above the
+  countries), so a custom winner hosts next year. The snapshot carries the
+  host entry in `customEntriesUsed` even outside the line-up, and the
+  backend stores its name and flag as `Contest.host` (`customEntryHost`,
+  re-read from the stored snapshot when only the host changes). Lists draw
+  it with `contestHostCountry()`; a custom code with neither shows the globe.
 - A create whose later step fails (logo upload, loading it) is remembered,
   so Save again updates that contest instead of creating a second one.
 - The parents remount the dialog per open (`key`), so its form always starts

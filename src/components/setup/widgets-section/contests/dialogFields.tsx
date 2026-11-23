@@ -1,9 +1,12 @@
 import React, { useMemo } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import type { Option } from '@/components/common/customSelect/CustomSelect';
+import type { BaseCountry } from '@/models';
 import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
-import { getHostingCountryLogo } from '@/theme/hosting';
+import { getHostingCountryLogo, isCustomEntryCode } from '@/theme/hosting';
 
 /**
  * Form parts shared by the contest dialogs (save / edit details, Next year):
@@ -53,34 +56,67 @@ export const FieldError = ({
   </p>
 );
 
-/** Every country as a hosting-country option, with its hosting logo. */
-export const useHostingCountryOptions = () => {
+/**
+ * Every country as a hosting-country option, with its hosting logo, and the
+ * custom entries (the account's own and the open contest's) as a group of
+ * their own above them: a custom entry that wins hosts next year. `extra`
+ * keeps a host that isn't among them (another contest's custom entry)
+ * pickable and shown.
+ */
+export const useHostingCountryOptions = (extra?: BaseCountry | null) => {
+  const t = useTranslations('widgets.contests');
   // Built-in names: these details may be another contest's.
   const getCanonicalCountries = useCountriesStore(
     (state) => state.getCanonicalCountries,
   );
+  const customCountries = useCountriesStore((state) => state.customCountries);
   const shouldUse2026WhiteHeartFlags = useGeneralStore(
     (state) => state.settings.shouldUse2026WhiteHeartFlags,
   );
 
-  return useMemo(
-    () =>
-      getCanonicalCountries(false).map((country) => {
-        const { logo, isExisting } = getHostingCountryLogo(
-          country,
-          true,
-          shouldUse2026WhiteHeartFlags,
-        );
+  return useMemo(() => {
+    const toOption = (country: BaseCountry): Option => {
+      const { logo, isExisting } = getHostingCountryLogo(
+        country,
+        true,
+        shouldUse2026WhiteHeartFlags,
+      );
 
-        return {
-          label: country.name,
-          value: country.code,
-          imageUrl: logo,
-          isExisting,
-        };
-      }),
-    [getCanonicalCountries, shouldUse2026WhiteHeartFlags],
-  );
+      return {
+        label: country.name,
+        value: country.code,
+        imageUrl: logo,
+        isExisting,
+      };
+    };
+    const countries = getCanonicalCountries(false).map(toOption);
+    const customs = [
+      ...customCountries,
+      ...(extra && isCustomEntryCode(extra.code) ? [extra] : []),
+    ]
+      .filter(
+        (entry, index, all) =>
+          all.findIndex((other) => other.code === entry.code) === index,
+      )
+      .map(toOption);
+
+    return {
+      options: [...customs, ...countries],
+      groups:
+        customs.length > 0
+          ? [
+              { label: t('hostingCustomEntries'), options: customs },
+              { label: t('hostingCountries'), options: countries },
+            ]
+          : undefined,
+    };
+  }, [
+    getCanonicalCountries,
+    customCountries,
+    extra,
+    shouldUse2026WhiteHeartFlags,
+    t,
+  ]);
 };
 
 /** Logo sizes for the hosting-country select (`getImageClassName`). */

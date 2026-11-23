@@ -76,3 +76,32 @@ export function resolveSnapshotCountries(
 
   return { countries, stage: chosen };
 }
+
+/**
+ * Every country taking part in a saved contest (the union of its stages'
+ * line-ups), named and flagged the way the contest shows them.
+ */
+export function resolveSnapshotParticipants(
+  snapshot: ContestSnapshot,
+): { code: string; name: string; flag?: string }[] {
+  const customByCode = new Map(
+    (snapshot.customEntriesUsed ?? []).map((e) => [e.code, e]),
+  );
+  const overrides = sanitizeEntryOverrides(snapshot.setup.entryOverrides);
+  const codes = new Set(
+    snapshot.setup.stages.flatMap((stage) => stage.participants ?? []),
+  );
+
+  return [...codes].map((code) => {
+    const common = ALL_COUNTRIES.find((c) => c.code === code);
+    const custom = customByCode.get(code);
+    const override = common ? overrides[code] : undefined;
+    const flag = custom?.flag ?? override?.flag;
+
+    return {
+      code,
+      name: custom?.name ?? override?.name ?? common?.name ?? code,
+      ...(flag ? { flag } : {}),
+    };
+  });
+}

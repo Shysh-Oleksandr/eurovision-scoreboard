@@ -122,6 +122,20 @@ const elementCandidates = (el: DesignElement): FieldCandidate[] => {
           labelKey: 'voteType',
         },
       ];
+    case 'participants':
+    case 'draw':
+      return [
+        {
+          path: `el.${el.id}.flagStyle`,
+          control: {
+            kind: 'select',
+            options: ['heart', 'theme'],
+            labelKeys: 'flagStyles',
+          },
+          defaultOn: true,
+          labelKey: 'flags',
+        },
+      ];
     case 'flag':
       return [
         {

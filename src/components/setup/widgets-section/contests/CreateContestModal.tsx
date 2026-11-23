@@ -234,7 +234,11 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, onClose]);
 
-  const hostingCountryOptions = useHostingCountryOptions();
+  // Another contest's details: its custom-entry host may not be loaded here.
+  const [savedHost] = useState(() =>
+    setup.kind === 'details' && contest?.host ? { ...contest.host } : null,
+  );
+  const hostingCountryOptions = useHostingCountryOptions(savedHost);
 
   const groupOptions = useMemo(
     () => [
@@ -537,7 +541,8 @@ const CreateContestModal: React.FC<CreateContestModalProps> = ({
                 caption={t('widgets.contests.hostingCountry')}
                 ariaLabel={t('widgets.contests.hostingCountry')}
                 chevronOnPhone
-                options={hostingCountryOptions}
+                options={hostingCountryOptions.options}
+                groups={hostingCountryOptions.groups}
                 value={hostingCountryCode}
                 onChange={setHostingCountryCode}
                 id={`${ids}-host`}

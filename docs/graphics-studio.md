@@ -37,7 +37,10 @@ not used yet; Phase 3 turns them into user-publishable templates.
 | `model/design.ts` | zod schema + types: fills, elements, stack, data binding, canvas, `Design`; `parseDesign`, `walkElements` |
 | `model/serialize.ts` | canonical (sorted-key) `serializeDesign` / `deserializeDesign`, `getAtPath` / `setAtPath`, `newElementId` |
 | `elements/registry.tsx` | `ElementView` (type → renderer), `AbsoluteChild`, flow children, the stack renderer |
-| `elements/*Element.tsx` | one renderer per type: text, image, shape, flag, scoreboard, stats, branding |
+| `elements/*Element.tsx` | one renderer per type: text, image, shape, flag, scoreboard, stats, branding, draw, participants |
+| `elements/CountryRow.tsx` | the board row the draw and participants elements share (hearts or theme flags), the theme row look, the hidden name probe |
+| `model/rowGeometry.ts` | where the heart / flag and the name sit in that row, per row shape |
+| `model/participantsFit.ts` | the participants element's fit: chip row height + evenly filled lines (pure, tested) |
 | `elements/eurovisionHeart.ts` | the official Eurovision heart geometry (silhouette + black outline paths, `heartMaskStyle`, `heartBox`) shared by flag hearts and the image Heart mask |
 | `model/designTheme.ts` | `design.theme` helpers: snapshot of the active theme, `ThemeScope` value, inline CSS variables, labels |
 | `render/DesignStage.tsx` | renders a design at design size inside a wrapper scaled by `zoom`; auto-sized canvases are measured with a ResizeObserver; scopes the node to `design.theme` |
@@ -48,7 +51,10 @@ not used yet; Phase 3 turns them into user-publishable templates.
 | `export/useDesignExport.ts` | hook: `nodeRef`, `generate(size)`, `isGenerating` |
 | `templates/results.ts` | `buildResultsDesign` (share results / running order) |
 | `templates/stats.ts` | `buildStatsDesign` (share stats; content-sized) |
-| `templates/editor.ts` | built-in templates (Blank, Results, Running order, Qualifiers, Top 10, Announcement poster, Stats) with their `templateFields`, and `toEditableDesign` for "Open in editor" |
+| `templates/draw.ts` | `buildDrawDesign` (share the allocation draw) |
+| `model/drawFit.ts` | the draw element's columns and its one-row-height fit (pure, tested) |
+| `render/fitArea.ts` | `measureFitArea` / `useFitArea`: the space an auto-fit element (scoreboard, draw) has |
+| `templates/editor.ts` | built-in templates (Blank, Results, Running order, Participating countries, Qualifiers, Top 10, Announcement poster, Stats) with their `templateFields`, and `toEditableDesign` for "Open in editor" |
 | `templates/fields.ts` | template fields: candidates per element, control derivation, `applyTemplateField` (see §9) |
 | `data/contestRows.ts` | saved-contest snapshot → ranked rows / stage list |
 | `cloud/publishDesign.ts` | publish pipeline: create/update, upload `asset:` images, rewrite refs, thumbnail |
@@ -115,6 +121,49 @@ silhouette (`HEART_2026_*` in `eurovisionHeart.ts`, 226.683 × 233.658) with a
 white outline. It is saved per element, so a design looks the same for every
 viewer; the app-wide `shouldUse2026WhiteHeartFlags` setting only picks the
 default for newly added flags (`elementFactory`).
+
+`DrawElement` (`type: 'draw'`) is the allocation draw's result
+(allocation-draw.md "Share the draw"): every semi-final with its title,
+First / Second half columns (or a numbered running order, or an A–Z list),
+and optionally a line of the pre-qualified countries voting in it. It
+carries its rows (`semis[].entries`, names and custom flags included), so
+it needs no data binding and a saved design keeps its draw. Rows are
+`CountryRow`: the theme's board row in its neutral look
+(`televoteUnfinished` colours, special backgrounds, rounded pills,
+uppercase, scoreboard font) with a Eurovision heart (`FlagElement` renders
+it, so custom entries get the masked heart), or the theme's own flag
+shape. Hearts follow the official graphics on every theme
+(`rowGeometry`): a heart about 1.4× the row's height covers the row's left
+end and reaches a little past it, tall enough that the dip between the
+lobes clears the row's top edge. Square-cornered themes get softly rounded
+rows here (`rowRadius`, 0.16 rh) whose left end starts under the heart's
+body so no corner peeks out.
+Every size is a multiple of one row height; `fitDraw` picks the largest
+that fits the element's space (its box, or what a fixed-height stack
+leaves, `useFitArea`), semis side by side or stacked. Name widths are
+measured, not guessed: a hidden, zero-size probe renders every name in the
+row font and is re-read when the font loads. Like an auto-fit scoreboard
+it renders `data-fit-pending` until measured, resizes on every side in the
+editor, and its labels ("First half"…) are stored in the element so the
+editor can change them.
+
+`ParticipantsElement` (`type: 'participants'`, in the Add panel and the
+"Participating countries" starter) lists every country of the bound
+contest A–Z as `CountryRow`s as wide as their names, in centred lines
+(the official "participating countries" look). It reads
+`useDesignData().participants`: for `live` the Event Setup line-up
+(`getContestParticipants`, so countries still waiting for the draw count:
+the 2027 line-up before its draw works), for `contest` the union of the
+saved contest's stage line-ups (`resolveSnapshotParticipants`), else the
+manual / provided rows. `fitChips` picks the largest row height whose
+lines fit the box from the measured name widths, then spreads the chips
+evenly over that many lines (least-squares split), so the last line isn't
+left with one country. The starter exposes a Flags field (hearts or
+the theme's flags; `flagStyle` is a template field of draw and
+participants elements) and takes the app's "2026 style (white outline)"
+heart setting (`TemplateContext.white2026Hearts`). Designs without a scoreboard or stats element hide
+the stage select (sheet and Data panel, `usesStageData`): the
+participants list the whole contest.
 
 Adding an element type: extend `design.ts` (schema + union), add a renderer,
 add a `case` in `ElementView`. The stack is defined in `registry.tsx`
@@ -188,7 +237,8 @@ design when it changes by more than 10 px.
 
 ## 6. Share modals (simple mode)
 
-`ShareResultsModal` (results and running order) and `ShareStatsModal` build a
+`ShareResultsModal` (results and running order), `ShareStatsModal` and
+`ShareDrawModal` (allocation-draw.md, "Share the draw") build a
 design from their stores (`imageCustomization` in generalStore,
 `statsCustomizationStore`) and hand it to `ShareImageModal`
 (`src/components/simulation/share/`), the shared frame described in

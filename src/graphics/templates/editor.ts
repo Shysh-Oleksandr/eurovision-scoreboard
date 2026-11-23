@@ -25,6 +25,10 @@ import { DEFAULT_IMAGE_CUSTOMIZATION } from '@/state/generalStore';
 export interface TemplateContext {
   title: string;
   subtitle: string;
+  /** "Participating countries", translated. */
+  participants?: string;
+  /** The app's "2026 style (white outline)" heart setting. */
+  white2026Hearts?: boolean;
 }
 
 export type TemplateTag = 'scoreboard' | 'stats';
@@ -324,6 +328,91 @@ const topTen = (ctx: TemplateContext): Design => {
   };
 };
 
+/**
+ * Every country in the contest (the Event Setup line-up, countries waiting
+ * for the draw included), A–Z, as hearts on board rows in centred lines:
+ * the announcement graphic a contest posts once its line-up is known.
+ */
+const participants = (ctx: TemplateContext): Design => {
+  const base = {
+    x: 0,
+    y: 0,
+    rotation: 0,
+    opacity: 1,
+    locked: false,
+    hidden: false,
+  };
+
+  return named({
+    id: newElementId('design'),
+    name: 'Participating countries',
+    version: 1,
+    canvas: {
+      width: 1080,
+      height: 1350,
+      autoSize: false,
+      background: [{ kind: 'theme-bg', opacity: 1 }],
+    },
+    data: { source: 'live' },
+    elements: [
+      {
+        ...base,
+        id: 'layout',
+        type: 'stack',
+        fillCanvas: true,
+        direction: 'column',
+        align: 'center',
+        justify: 'center',
+        gap: 0,
+        paddingX: 56,
+        paddingY: 64,
+        locked: true,
+        children: [
+          textElement({
+            id: 'title',
+            name: 'Title',
+            text: ctx.title,
+            fontSize: 64,
+            fontWeight: 700,
+            lineHeight: 1.1,
+            shadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+            w: undefined,
+            h: undefined,
+          }),
+          textElement({
+            id: 'subtitle',
+            name: 'Subtitle',
+            text: ctx.participants ?? 'Participating countries',
+            fontSize: 36,
+            fontWeight: 500,
+            lineHeight: 1.1,
+            shadow: '0 0 10px rgba(0, 0, 0, 0.2)',
+            marginTop: 14,
+            w: undefined,
+            h: undefined,
+          }),
+          {
+            ...base,
+            id: 'participants',
+            type: 'participants',
+            flagStyle: 'heart',
+            use2026WhiteHeart: !!ctx.white2026Hearts,
+            paddingY: 40,
+          },
+          { ...base, id: 'branding', type: 'branding', fontSize: 22 },
+        ],
+      },
+    ],
+    templateFields: [
+      field('el.title.text', 'Title'),
+      field('el.subtitle.text', 'Subtitle'),
+      field('el.participants.flagStyle', 'Flags'),
+      field('data', 'Data source'),
+      field('canvas.size', 'Size'),
+    ],
+  });
+};
+
 const poster = (): Design => {
   const canvas = {
     width: 1080,
@@ -505,6 +594,14 @@ export const EDITOR_TEMPLATES: EditorTemplate[] = [
     height: 630,
     tags: ['scoreboard'],
     build: runningOrder,
+  },
+  {
+    id: 'participants',
+    inEditor: true,
+    width: 1080,
+    height: 1350,
+    tags: [],
+    build: participants,
   },
   {
     id: 'qualifiers',

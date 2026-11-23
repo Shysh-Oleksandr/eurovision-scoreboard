@@ -127,6 +127,20 @@ export function createElement(
         y: canvas.height - 60,
         fontSize: 20,
       };
+    case 'participants':
+      // The rows fit a box most of the canvas.
+      return {
+        ...base('participants'),
+        type: 'participants',
+        x: 60,
+        y: 60,
+        w: canvas.width - 120,
+        h: canvas.height - 120,
+        flagStyle: 'heart',
+        use2026WhiteHeart:
+          useGeneralStore.getState().settings.shouldUse2026WhiteHeartFlags,
+        paddingY: 0,
+      };
     case 'stack':
     default:
       return {

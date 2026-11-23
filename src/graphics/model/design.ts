@@ -202,6 +202,76 @@ export const brandingElementSchema = z.object({
   uppercase: z.boolean().optional(),
 });
 
+/** A country in a draw element; names and custom flags travel with the document. */
+export const drawEntrySchema = z.object({
+  code: z.string().min(2),
+  name: z.string().min(1),
+  /** A custom entry's flag image; ignored for built-in country codes. */
+  flag: z.string().optional(),
+});
+export type DrawEntry = z.infer<typeof drawEntrySchema>;
+
+export const drawSemiSchema = z.object({
+  id: z.string().min(1),
+  name: z.string(),
+  /** In show order: halves / running order, or A–Z (`order: 'none'`). */
+  entries: z.array(drawEntrySchema),
+  /**
+   * `order: 'halves'`: how many entries open the show. Absent = this semi
+   * has no halves (they were removed after the draw): one plain list.
+   */
+  firstHalfSize: z.number().int().min(0).optional(),
+  /** Pre-qualified countries voting in this semi-final. */
+  voters: z.array(drawEntrySchema).default([]),
+});
+export type DrawSemi = z.infer<typeof drawSemiSchema>;
+
+/**
+ * The semi-final allocation draw's result (docs/allocation-draw.md): every
+ * semi-final with its countries, by half, by running-order position or as a
+ * plain list. The rows carry their data, so a design keeps the draw it was
+ * made from. Rows, headings and gaps all scale with one row height that
+ * fits the box (`model/drawFit.ts`).
+ */
+export const drawElementSchema = z.object({
+  ...elementBase,
+  type: z.literal('draw'),
+  semis: z.array(drawSemiSchema),
+  /** `halves`: First / Second half columns; `positions`: numbered; `none`: A–Z. */
+  order: z.enum(['halves', 'positions', 'none']).default('halves'),
+  /** `heart`: the Eurovision hearts; `theme`: the theme's board-row flags. */
+  flagStyle: z.enum(['heart', 'theme']).default('heart'),
+  use2026WhiteHeart: z.boolean().default(false),
+  /** A line under each semi with the pre-qualified countries voting in it. */
+  showVoters: z.boolean().default(false),
+  labels: z
+    .object({
+      firstHalf: z.string(),
+      secondHalf: z.string(),
+      voters: z.string(),
+    })
+    .default({
+      firstHalf: 'First half',
+      secondHalf: 'Second half',
+      voters: 'Also voting',
+    }),
+  paddingY: z.number().min(0).default(0),
+});
+
+/**
+ * Every country taking part in the contest the design is bound to (the
+ * line-up of a live or saved contest, or the manual rows), A–Z, as board
+ * rows as wide as their names in centred lines (model/participantsFit.ts).
+ */
+export const participantsElementSchema = z.object({
+  ...elementBase,
+  type: z.literal('participants'),
+  /** `heart`: the Eurovision hearts; `theme`: the theme's board-row flags. */
+  flagStyle: z.enum(['heart', 'theme']).default('heart'),
+  use2026WhiteHeart: z.boolean().default(false),
+  paddingY: z.number().min(0).default(0),
+});
+
 const leafElementSchema = z.discriminatedUnion('type', [
   textElementSchema,
   imageElementSchema,
@@ -210,6 +280,8 @@ const leafElementSchema = z.discriminatedUnion('type', [
   scoreboardElementSchema,
   statsElementSchema,
   brandingElementSchema,
+  drawElementSchema,
+  participantsElementSchema,
 ]);
 
 export type LeafElement = z.infer<typeof leafElementSchema>;
@@ -253,6 +325,8 @@ export type FlagElement = z.infer<typeof flagElementSchema>;
 export type ScoreboardElement = z.infer<typeof scoreboardElementSchema>;
 export type StatsElement = z.infer<typeof statsElementSchema>;
 export type BrandingElement = z.infer<typeof brandingElementSchema>;
+export type DrawElement = z.infer<typeof drawElementSchema>;
+export type ParticipantsElement = z.infer<typeof participantsElementSchema>;
 export type ElementType = DesignElement['type'];
 
 /* ------------------------------------------------------------------ */

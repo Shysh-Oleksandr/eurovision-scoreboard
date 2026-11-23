@@ -15,6 +15,7 @@ import {
 } from '@/components/setup/allocation-draw/drawCopy';
 import DrawnChip from '@/components/setup/allocation-draw/DrawnChip';
 import DrawPlaceholderTile from '@/components/setup/allocation-draw/DrawPlaceholderTile';
+import { useDrawUiStore } from '@/components/setup/allocation-draw/drawUiStore';
 import ToBeDrawnCard from '@/components/setup/allocation-draw/ToBeDrawnCard';
 import {
   isDrawnInfoCurrent,
@@ -130,7 +131,15 @@ const StageList: React.FC<StageListProps> = ({ isGfOnly }) => {
                   ? finalDescription
                   : undefined
               }
-              chip={!drawMode && drawnInfo ? <DrawnChip /> : undefined}
+              chip={
+                !drawMode && drawnInfo ? (
+                  <DrawnChip
+                    onShare={() =>
+                      useDrawUiStore.getState().setShareStageId(id)
+                    }
+                  />
+                ) : undefined
+              }
               pinnedFor={
                 inDraw
                   ? () => pinLabel

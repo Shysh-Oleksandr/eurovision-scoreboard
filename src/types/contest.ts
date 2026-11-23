@@ -48,6 +48,12 @@ export interface Contest {
     name?: string;
     flag?: string;
   };
+  /** Set when the host is a custom entry: its name and flag at save time. */
+  host?: {
+    code: string;
+    name: string;
+    flag?: string;
+  };
 }
 
 export interface ContestListResponse {

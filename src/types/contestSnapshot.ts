@@ -96,7 +96,13 @@ export interface ContestSnapshot {
       rules?: Record<string, unknown>;
       drawn?: Record<
         string,
-        { code: string; order: string; members: string[]; voters: string[] }
+        {
+          code: string;
+          order: string;
+          members: string[];
+          voters: string[];
+          drawOrder?: string[];
+        }
       >;
     };
   };

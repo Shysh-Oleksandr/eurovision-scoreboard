@@ -20,10 +20,12 @@ import {
 } from '@/data/data';
 import { toast } from '@/helpers/toast';
 import { useConfirmation } from '@/hooks/useConfirmation';
+import { useCountriesStore } from '@/state/countriesStore';
 import { useGeneralStore } from '@/state/generalStore';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 import { useAuthStore } from '@/state/useAuthStore';
 import {
+  contestHostCountry,
   getHostingCountryByYear,
   getHostingCountryLogo,
   getHostingLogoByCountryCode,
@@ -90,6 +92,7 @@ export const useContestField = () => {
   const setEventStages = useScoreboardStore((state) => state.setEventStages);
   const { confirm } = useConfirmation();
   const { data: quickSelectContestsData } = useQuickSelectContestsQuery(!!user);
+  const customCountries = useCountriesStore((state) => state.customCountries);
 
   const handleYearChange = useCallback(
     async (newValue: string, shouldToggleGfOnly = false) => {
@@ -209,7 +212,7 @@ export const useContestField = () => {
           .filter((contest) => contest._id !== activeContest?._id)
           .map((contest) => {
             const { logo, isExisting } = getHostingCountryLogo(
-              contest.hostingCountryCode,
+              contestHostCountry(contest, customCountries),
               true,
               shouldUse2026WhiteHeartFlags,
             );
@@ -250,6 +253,7 @@ export const useContestField = () => {
     t,
     getHostingCountry,
     quickSelectContestsData,
+    customCountries,
     shouldUse2026WhiteHeartFlags,
   ]);
 

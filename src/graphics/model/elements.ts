@@ -125,6 +125,8 @@ export const BOUND_TYPES: ReadonlySet<ElementType> = new Set<ElementType>([
   'scoreboard',
   'stats',
   'branding',
+  'draw',
+  'participants',
 ]);
 
 export const isBound = (el: DesignElement): boolean => BOUND_TYPES.has(el.type);
@@ -140,6 +142,8 @@ export const resizeModeOf = (el: DesignElement): ResizeMode => {
   // An auto-fit scoreboard fits its rows into a box; a fixed one is as tall
   // as its rows.
   if (el.type === 'scoreboard') return el.fit === 'auto' ? 'all' : 'horizontal';
+  // The draw's rows fit its box (model/drawFit.ts).
+  if (el.type === 'draw' || el.type === 'participants') return 'all';
   if (el.type === 'stack') return 'horizontal';
   if (el.type === 'stats' || el.type === 'branding') return 'none';
 
@@ -160,6 +164,7 @@ export const ADDABLE_TYPES: ElementType[] = [
   'shape',
   'flag',
   'scoreboard',
+  'participants',
 ];
 
 export const DEFAULT_ELEMENT_NAMES: Record<ElementType, string> = {
@@ -170,6 +175,8 @@ export const DEFAULT_ELEMENT_NAMES: Record<ElementType, string> = {
   scoreboard: 'Scoreboard',
   stats: 'Stats',
   branding: 'Branding',
+  draw: 'Draw',
+  participants: 'Participants',
   stack: 'Stack',
 };
 
@@ -178,3 +185,18 @@ export const elementLabel = (el: DesignElement): string =>
   (el.type === 'text' && el.text.trim()
     ? el.text.trim().slice(0, 24)
     : DEFAULT_ELEMENT_NAMES[el.type]);
+
+/** Some element of `types` appears in the tree. */
+export const hasElementOfType = (
+  elements: DesignElement[],
+  types: readonly ElementType[],
+): boolean =>
+  elements.some(
+    (el) =>
+      types.includes(el.type) ||
+      (isStack(el) && hasElementOfType(el.children, types)),
+  );
+
+/** Scoreboards and stats read one stage of the data source. */
+export const usesStageData = (elements: DesignElement[]): boolean =>
+  hasElementOfType(elements, ['scoreboard', 'stats']);

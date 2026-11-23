@@ -1,7 +1,11 @@
 'use client';
 import React, { createContext, useContext, useMemo } from 'react';
 
-import { resolveSnapshotCountries, snapshotStages } from '../data/contestRows';
+import {
+  resolveSnapshotCountries,
+  resolveSnapshotParticipants,
+  snapshotStages,
+} from '../data/contestRows';
 import {
   SAMPLE_COUNTRIES,
   SAMPLE_RUNNING_ORDER,
@@ -20,6 +24,7 @@ import {
   StatsTableType,
   VotingCountry,
 } from '@/models';
+import { useCountriesStore } from '@/state/countriesStore';
 import type { StageVotes } from '@/state/scoreboard/types';
 import { useScoreboardStore } from '@/state/scoreboardStore';
 
@@ -53,9 +58,22 @@ export interface ContestAccessProblem {
   reason: 'private' | 'missing' | 'error';
 }
 
+/** A country taking part in the contest (participants elements). */
+export interface ParticipantCountry {
+  code: string;
+  name: string;
+  flag?: string;
+}
+
 export interface ResolvedDesignData {
   /** Ranked rows for scoreboard elements. */
   countries: Country[];
+  /**
+   * Every country in the contest, whatever its stage: the Event Setup
+   * line-up for `live`, the saved contest's stages, the manual or provided
+   * rows. Unsorted.
+   */
+  participants?: ParticipantCountry[];
   /** The stage the rows come from is over (affects NQ display). */
   isVotingOver: boolean;
   /** Name of the stage the rows come from ("Grand Final"); '' when unknown. */
@@ -158,6 +176,26 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
       : viewedCountries;
   const sortedLive = useCountrySorter(pickedCountries ?? EMPTY);
 
+  // The contest's line-up (Event Setup), countries waiting for the draw
+  // included: the "participating countries" of the live contest.
+  const eventAssignments = useCountriesStore((s) => s.eventAssignments);
+  const customCountries = useCountriesStore((s) => s.customCountries);
+  const entryOverrides = useCountriesStore((s) => s.entryOverrides);
+  const liveParticipants = useMemo<ParticipantCountry[]>(
+    () =>
+      useCountriesStore
+        .getState()
+        .getContestParticipants()
+        .map(({ code, name, flag }) => ({
+          code,
+          name,
+          ...(flag ? { flag } : {}),
+        })),
+    // The store's inputs to getContestParticipants.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [eventAssignments, customCountries, entryOverrides],
+  );
+
   const contestId = binding.source === 'contest' ? binding.contestId : '';
   const snapshotQuery = useContestSnapshotQuery(contestId, !!contestId);
   const snapshot = snapshotQuery.data;
@@ -180,9 +218,11 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
             voters: SAMPLE_VOTERS,
           },
           isSample: true,
+          participants: liveParticipants,
         }
       : {
           countries: sortedLive,
+          participants: liveParticipants,
           isVotingOver: !!liveStage?.isOver,
           stageName: liveStage?.name ?? '',
           runningOrder: liveStage?.runningOrder?.length
@@ -199,6 +239,7 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
       case 'provided':
         return {
           countries: providedCountries ?? EMPTY,
+          participants: providedCountries ?? EMPTY,
           isVotingOver: false,
           stageName: liveStage?.name ?? '',
           status: 'ready',
@@ -209,6 +250,11 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
           countries: [...manualToCountries(binding.rows)].sort(
             (a, b) => b.points - a.points,
           ),
+          participants: binding.rows.map(({ code, name, flag }) => ({
+            code,
+            name,
+            ...(flag ? { flag } : {}),
+          })),
           isVotingOver: true,
           stageName: '',
           status: 'ready',
@@ -229,6 +275,7 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
 
           return {
             countries,
+            participants: resolveSnapshotParticipants(snapshot),
             isVotingOver: stage?.isOver ?? true,
             stageName: stage?.name ?? '',
             runningOrder: setupStage?.participants,
@@ -258,6 +305,7 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
         return {
           ...live,
           countries: EMPTY,
+          participants: EMPTY,
           status: 'loading',
           stats,
           isSample: false,
@@ -277,6 +325,7 @@ export const DesignDataProvider: React.FC<ProviderProps> = ({
     snapshot,
     snapshotQuery.isError,
     snapshotError,
+    liveParticipants,
   ]);
 
   return (

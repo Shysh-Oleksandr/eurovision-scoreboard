@@ -13,6 +13,7 @@ import {
 } from '../model/design';
 import { fitScoreboard, rowsHeightIn } from '../model/scoreboardFit';
 import { useDesignData } from '../render/DesignDataContext';
+import { FitArea, measureFitArea } from '../render/fitArea';
 import { useLayoutSignal } from '../render/layoutSignal';
 
 import ShareCountryItem from '@/components/simulation/share/ShareCountryItem';
@@ -37,53 +38,6 @@ const GAP_CLASS: Record<ItemSize, string> = {
   xl: 'gap-x-5',
   '2xl': 'gap-x-5',
 };
-
-interface FitArea {
-  /** Width of the element's slot. */
-  w: number;
-  /** Height of the element's box or flow slot (margins and padding included). */
-  h: number;
-}
-
-const px = (value: string) => parseFloat(value) || 0;
-
-/**
- * The space an auto-fit scoreboard may fill: its own box when it has a
- * height, else (in flow) what a fixed-height stack leaves after its other
- * children. `null` when the space depends on the scoreboard itself
- * (content-sized canvas, free element without a height) — the element then
- * keeps its stored columns and row size.
- */
-function measureFitArea(
-  wrapper: HTMLElement,
-  hasHeight: boolean,
-): FitArea | null {
-  const w = wrapper.clientWidth;
-
-  if (hasHeight) return { w, h: wrapper.clientHeight };
-  const stack = wrapper.parentElement;
-
-  if (!stack?.hasAttribute('data-stack')) return null;
-  if (stack.closest('[data-auto-size]')) return null;
-  const cs = getComputedStyle(stack);
-  const inner = stack.clientHeight - px(cs.paddingTop) - px(cs.paddingBottom);
-
-  if (!cs.flexDirection.startsWith('column')) return { w, h: inner };
-  const others = Array.from(stack.children).filter(
-    (child): child is HTMLElement =>
-      child !== wrapper && child instanceof HTMLElement,
-  );
-  const taken = others.reduce((sum, child) => {
-    const style = getComputedStyle(child);
-
-    return (
-      sum + child.offsetHeight + px(style.marginTop) + px(style.marginBottom)
-    );
-  }, 0);
-  const gaps = px(cs.rowGap) * Math.max(0, stack.children.length - 1);
-
-  return { w, h: Math.max(0, inner - taken - gaps) };
-}
 
 /**
  * The share-image country grid: rows are the real `ShareCountryItem`, filled

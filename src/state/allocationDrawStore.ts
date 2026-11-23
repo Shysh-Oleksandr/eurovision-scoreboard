@@ -34,6 +34,12 @@ export interface DrawnStageInfo {
   members: string[];
   /** Pre-qualified countries drawn to vote in this stage. */
   voters: string[];
+  /**
+   * The stage's countries in the order they were drawn (fixed ones
+   * included): the order inside each half on the "Share the draw" image.
+   * Absent for draws made before it was recorded.
+   */
+  drawOrder?: string[];
 }
 
 export interface AllocationDrawValues {

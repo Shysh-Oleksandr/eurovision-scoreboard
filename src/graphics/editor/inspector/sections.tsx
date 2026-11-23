@@ -17,9 +17,11 @@ import { useStatsSource } from '../../elements/StatsElement';
 import {
   BrandingElement,
   DesignElement,
+  DrawElement,
   Fill,
   FlagElement,
   ITEM_SIZES,
+  ParticipantsElement,
   ItemSize,
   ShapeElement,
   StackElement,
@@ -49,6 +51,7 @@ import {
   Seg,
   SelectInput,
   TextArea,
+  TextInput,
   Toggle,
 } from '../ui/controls';
 import {
@@ -830,6 +833,128 @@ const StackContent: React.FC<{ el: StackElement }> = ({ el }) => {
  * Built-in countries, then the user's custom entries; picking an entry copies
  * its flag into the element so the design renders without it.
  */
+/** The draw's words: semi-final names, half headers, the voters label. */
+const DrawContent: React.FC<{ el: DrawElement }> = ({ el }) => {
+  const t = useTranslations('graphics.inspector.draw');
+  const update = useEditorStore((s) => s.updateElement);
+  const hasHalves =
+    el.order === 'halves' &&
+    el.semis.some((semi) => semi.firstHalfSize !== undefined);
+  const hasVoters = el.semis.some((semi) => semi.voters.length > 0);
+  const setLabel = (key: keyof DrawElement['labels'], value: string) =>
+    update(el.id, { labels: { ...el.labels, [key]: value } });
+
+  return (
+    <>
+      {el.semis.map((semi, i) => (
+        <Field key={semi.id} label={t('semiName', { number: i + 1 })}>
+          <TextInput
+            value={semi.name}
+            onValue={(name) =>
+              update(el.id, {
+                semis: el.semis.map((s) =>
+                  s.id === semi.id ? { ...s, name } : s,
+                ),
+              })
+            }
+            aria-label={t('semiName', { number: i + 1 })}
+          />
+        </Field>
+      ))}
+      {hasHalves && (
+        <Row>
+          <Field label={t('firstHalf')}>
+            <TextInput
+              value={el.labels.firstHalf}
+              onValue={(v) => setLabel('firstHalf', v)}
+              aria-label={t('firstHalf')}
+            />
+          </Field>
+          <Field label={t('secondHalf')}>
+            <TextInput
+              value={el.labels.secondHalf}
+              onValue={(v) => setLabel('secondHalf', v)}
+              aria-label={t('secondHalf')}
+            />
+          </Field>
+        </Row>
+      )}
+      {hasVoters && el.showVoters && (
+        <Field label={t('votersLabel')}>
+          <TextInput
+            value={el.labels.voters}
+            onValue={(v) => setLabel('voters', v)}
+            aria-label={t('votersLabel')}
+          />
+        </Field>
+      )}
+      <Hint>{t('fromTheDraw')}</Hint>
+    </>
+  );
+};
+
+const DrawStyle: React.FC<{ el: DrawElement }> = ({ el }) => {
+  const t = useTranslations('graphics.inspector');
+  const update = useEditorStore((s) => s.updateElement);
+  const hasVoters = el.semis.some((semi) => semi.voters.length > 0);
+
+  return (
+    <>
+      <RowFlagsStyle el={el} />
+      {hasVoters && (
+        <Toggle
+          label={t('draw.showVoters')}
+          checked={el.showVoters}
+          onChange={(showVoters) => update(el.id, { showVoters })}
+        />
+      )}
+      <Hint>{t('draw.fitHint')}</Hint>
+    </>
+  );
+};
+
+/** Hearts or theme flags for the draw and participants elements. */
+const RowFlagsStyle: React.FC<{
+  el: DrawElement | ParticipantsElement;
+}> = ({ el }) => {
+  const t = useTranslations('graphics.inspector');
+  const update = useEditorStore((s) => s.updateElement);
+
+  return (
+    <>
+      <Field label={t('draw.flags')}>
+        <Seg<DrawElement['flagStyle']>
+          value={el.flagStyle}
+          onChange={(flagStyle) => update(el.id, { flagStyle })}
+          options={[
+            { value: 'heart', label: t('draw.hearts') },
+            { value: 'theme', label: t('draw.themeFlags') },
+          ]}
+        />
+      </Field>
+      {el.flagStyle === 'heart' && (
+        <Toggle
+          label={t('flag.use2026WhiteHeart')}
+          checked={el.use2026WhiteHeart}
+          onChange={(use2026WhiteHeart) => update(el.id, { use2026WhiteHeart })}
+        />
+      )}
+    </>
+  );
+};
+
+const ParticipantsStyle: React.FC<{ el: ParticipantsElement }> = ({ el }) => {
+  const t = useTranslations('graphics.inspector.participants');
+  const { participants = [] } = useDesignData();
+
+  return (
+    <>
+      <RowFlagsStyle el={el} />
+      <Hint>{t('fitHint', { count: participants.length })}</Hint>
+    </>
+  );
+};
+
 const FlagCountryField: React.FC<{ el: FlagElement }> = ({ el }) => {
   const t = useTranslations('graphics.inspector.flag');
   const update = useEditorStore((s) => s.updateElement);
@@ -1085,6 +1210,40 @@ export function useElementSections(
         content: <BrandingStyle el={el} />,
       });
       break;
+    case 'participants':
+      out.push({
+        id: 'data',
+        title: t('sections.data'),
+        content: <DataSection openDataPanel={ctx.openDataPanel} />,
+      });
+      out.push({
+        id: 'style',
+        title: t('sections.style'),
+        content: <ParticipantsStyle el={el} />,
+      });
+      out.push({
+        id: 'rowstyle',
+        title: t('sections.rowStyle'),
+        content: <RowStyleNote />,
+      });
+      break;
+    case 'draw':
+      out.push({
+        id: 'content',
+        title: t('sections.content'),
+        content: <DrawContent el={el} />,
+      });
+      out.push({
+        id: 'style',
+        title: t('sections.style'),
+        content: <DrawStyle el={el} />,
+      });
+      out.push({
+        id: 'rowstyle',
+        title: t('sections.rowStyle'),
+        content: <RowStyleNote />,
+      });
+      break;
     case 'stack':
       out.push({
         id: 'content',
@@ -1223,7 +1382,13 @@ const CanvasData: React.FC<{ openDataPanel: () => void }> = ({
     let n = 0;
     const walk = (els: DesignElement[]) =>
       els.forEach((el) => {
-        if (el.type === 'scoreboard' || el.type === 'stats') n += 1;
+        if (
+          el.type === 'scoreboard' ||
+          el.type === 'stats' ||
+          el.type === 'participants'
+        ) {
+          n += 1;
+        }
         if (el.type === 'stack') walk(el.children);
       });
 
