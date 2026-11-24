@@ -24,6 +24,16 @@ export const CONTEST_TYPE_SHORT_NAMES: Record<ContestType, string> = {
   asia: 'ESC Asia',
 };
 
+/**
+ * Series names where the series is a choice beside the others: the setup
+ * header picker's tabs and the captions of its Latest tiles.
+ */
+export const CONTEST_TYPE_TAB_NAMES: Record<ContestType, string> = {
+  esc: 'Eurovision',
+  jesc: 'Junior',
+  asia: 'Asia',
+};
+
 /** Contest select / theme registry key for a year of a series (`2026`, `JESC-2025`, `ASIA-2026`). */
 export const getContestKey = (year: string, contestType: ContestType) =>
   contestType === 'esc' ? year : `${CONTEST_KEY_PREFIXES[contestType]}${year}`;

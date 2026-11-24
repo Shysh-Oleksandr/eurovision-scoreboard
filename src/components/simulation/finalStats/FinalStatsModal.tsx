@@ -20,6 +20,7 @@ import StatsSegmented from './StatsSegmented';
 import StatsStagePicker from './StatsStagePicker';
 import SummaryView from './SummaryView';
 import { useFinalStats } from './useFinalStats';
+import VotesView from './votes/VotesView';
 
 import { ShareIcon } from '@/assets/icons/ShareIcon';
 import Button from '@/components/common/Button';
@@ -44,18 +45,29 @@ enum FinalStatsTab {
   SUMMARY = 'Summary',
   SPLIT = 'Split',
   BREAKDOWN = 'Breakdown',
+  VOTES = 'Votes',
 }
 
 const TAB_ORDER = [
   FinalStatsTab.SUMMARY,
   FinalStatsTab.SPLIT,
   FinalStatsTab.BREAKDOWN,
+  FinalStatsTab.VOTES,
 ];
 
+/** The tabs the share image can draw, and the table each one is. */
+const TABLE_TABS = [
+  FinalStatsTab.SUMMARY,
+  FinalStatsTab.SPLIT,
+  FinalStatsTab.BREAKDOWN,
+] as const;
+
+// The Votes graphic has no share image yet: Share opens on the Summary.
 const TABLE_TYPES: Record<FinalStatsTab, StatsTableType> = {
   [FinalStatsTab.SUMMARY]: StatsTableType.SUMMARY,
   [FinalStatsTab.SPLIT]: StatsTableType.SPLIT,
   [FinalStatsTab.BREAKDOWN]: StatsTableType.BREAKDOWN,
+  [FinalStatsTab.VOTES]: StatsTableType.SUMMARY,
 };
 
 /** The controls row: everything on one line, else the switch on its own. */
@@ -69,10 +81,11 @@ interface FinalStatsModalProps {
 
 /**
  * A finished stage's stats: Summary (the result with its jury and televote
- * split, the view it opens on), Split (the three rankings side by side) and
- * Breakdown (every voter's points to every entry). The views are the
- * modal's own; the share image draws the same data with `SummaryStats`,
- * `SplitStats` and `StatsTable` (graphics `StatsElement`).
+ * split, the view it opens on), Split (the three rankings side by side),
+ * Breakdown (every voter's points to every entry) and Votes (one country's
+ * points as a ring of flags, `votes/`). The views are the modal's own; the
+ * share image draws the tables with `SummaryStats`, `SplitStats` and
+ * `StatsTable` (graphics `StatsElement`).
  */
 const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   isOpen,
@@ -84,6 +97,7 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
   const tHeader = useTranslations('simulation.header');
 
   const viewedStageId = useScoreboardStore((state) => state.viewedStageId);
+  const eventStages = useScoreboardStore((state) => state.eventStages);
   const predefinedVotes = useScoreboardStore((state) => state.predefinedVotes);
   const getStageVotingCountries = useCountriesStore(
     (state) => state.getStageVotingCountries,
@@ -118,10 +132,25 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
     [selectedStage, rankedCountries, getPoints],
   );
 
+  // The Votes graphic: every voter of the stage, and totals that don't
+  // follow the Breakdown's channel switch.
+  const stageVoters = useMemo(
+    () =>
+      selectedStage
+        ? getStageVotingCountries(selectedStage.id, { channel: 'all' })
+        : [],
+    [selectedStage, getStageVotingCountries],
+  );
+  const getTotalPoints = useCallback(
+    (country: Country) => getPoints(country, 'combined'),
+    [getPoints],
+  );
+
   const tabLabels: Record<FinalStatsTab, string> = {
     [FinalStatsTab.SUMMARY]: t('summary'),
     [FinalStatsTab.SPLIT]: t('split'),
     [FinalStatsTab.BREAKDOWN]: t('breakdown'),
+    [FinalStatsTab.VOTES]: t('votesTab'),
   };
 
   const selectTab = (tab: FinalStatsTab) => {
@@ -381,6 +410,22 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
                 />
               </div>
             )}
+            {isViewMounted(FinalStatsTab.VOTES) && (
+              <div className={viewClass(FinalStatsTab.VOTES)}>
+                <div className="h-full px-3 2cols:px-4 pb-3 2cols:pb-4">
+                  <VotesView
+                    stage={selectedStage}
+                    stages={eventStages}
+                    ranked={rankings.byTotal}
+                    voters={stageVoters}
+                    votes={
+                      selectedStageId ? predefinedVotes[selectedStageId] : null
+                    }
+                    getPoints={getTotalPoints}
+                  />
+                </div>
+              </div>
+            )}
             {isViewMounted(FinalStatsTab.BREAKDOWN) && (
               <div className={viewClass(FinalStatsTab.BREAKDOWN)}>
                 <BreakdownView
@@ -410,10 +455,10 @@ const FinalStatsModal: React.FC<FinalStatsModalProps> = ({
           onLoaded={() => setIsShareModalLoaded(true)}
           activeTab={TABLE_TYPES[activeTab]}
           // The share modal's Table switch moves this modal's tab with it.
-          tableOptions={TAB_ORDER.map((tab) => TABLE_TYPES[tab])}
+          tableOptions={TABLE_TABS.map((tab) => TABLE_TYPES[tab])}
           onTableChange={(table) =>
             setActiveTab(
-              TAB_ORDER.find((tab) => TABLE_TYPES[tab] === table) ?? activeTab,
+              TABLE_TABS.find((tab) => TABLE_TYPES[tab] === table) ?? activeTab,
             )
           }
           rankedCountries={rankedCountries}

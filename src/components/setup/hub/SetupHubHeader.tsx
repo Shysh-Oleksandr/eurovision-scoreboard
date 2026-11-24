@@ -4,18 +4,15 @@ import React, { useRef } from 'react';
 
 import ComboChip from './ComboChip';
 import ComboField from './ComboField';
-import {
-  getContestImageClassName,
-  useContestField,
-} from './hooks/useContestField';
+import { useContestField } from './hooks/useContestField';
 import { useThemeField } from './hooks/useThemeField';
+import EditionPicker from './picker/EditionPicker';
 import ProfileButton from './ProfileButton';
 
 import { SettingsIcon } from '@/assets/icons/SettingsIcon';
 import SyncIcon from '@/assets/icons/SyncIcon';
 import { TrophyIcon } from '@/assets/icons/TrophyIcon';
 import Button from '@/components/common/Button';
-import CustomSelect from '@/components/common/customSelect/CustomSelect';
 import FeedbackInfoButton from '@/components/feedbackInfo/FeedbackInfoButton';
 import GuideButton from '@/components/guide/GuideButton';
 import {
@@ -26,12 +23,12 @@ import {
 import { fitStepAttributes, useFitStep } from '@/hooks/useFitStep';
 
 /** Built-in JESC / ESC Asia themes read "JESC 2025" instead of a bare year. */
-const themeDisplayLabel = (option: { value: string; label: string }) => {
-  const { contestType } = parseContestKey(option.value);
+const themeDisplayLabel = (value: string) => {
+  const { year, contestType } = parseContestKey(value);
 
   return contestType === 'esc'
-    ? option.label
-    : `${CONTEST_TYPE_SHORT_NAMES[contestType]} ${option.label}`;
+    ? year
+    : `${CONTEST_TYPE_SHORT_NAMES[contestType]} ${year}`;
 };
 
 /**
@@ -101,16 +98,22 @@ export const SetupHubHeader: React.FC<SetupHubHeaderProps> = ({
           />
         }
       >
-        <CustomSelect
-          variant="combo"
-          options={contest.contestOptions}
-          groups={contest.contestGroups}
-          value={contest.contestValue}
-          onChange={contest.handleYearChange}
+        <EditionPicker
           id="year-select-box"
-          className="w-full"
-          getImageClassName={getContestImageClassName}
+          title={t('common.contest')}
           caption={contestCaption}
+          current={contest.current}
+          currentLabel={
+            contest.activeContest || !contest.current?.year
+              ? undefined
+              : String(contest.current.year)
+          }
+          value={contest.contestValue}
+          editions={contest.editions}
+          pinned={contest.pinned}
+          onChange={contest.handleYearChange}
+          fallbackSeries={contest.contestType}
+          searchPlaceholder={t('setup.eventSetupModal.picker.searchContests')}
         />
       </ComboField>
 
@@ -124,17 +127,20 @@ export const SetupHubHeader: React.FC<SetupHubHeaderProps> = ({
           />
         }
       >
-        <CustomSelect
-          variant="combo"
-          options={theme.themeOptions}
-          groups={theme.themeGroups}
-          value={theme.themeValue}
-          onChange={theme.handleThemeChange}
+        <EditionPicker
           id="theme-select-box"
-          className="w-full"
-          customThemeColor={theme.customThemeColor}
+          title={t('common.theme')}
           caption={themeCaption}
-          getDisplayLabel={themeDisplayLabel}
+          current={theme.current}
+          currentLabel={
+            theme.customTheme ? undefined : themeDisplayLabel(theme.themeValue)
+          }
+          value={theme.themeValue}
+          editions={theme.editions}
+          pinned={theme.pinned}
+          onChange={theme.handleThemeChange}
+          fallbackSeries={theme.contestType}
+          searchPlaceholder={t('setup.eventSetupModal.picker.searchThemes')}
         />
       </ComboField>
 

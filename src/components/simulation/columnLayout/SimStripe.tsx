@@ -159,7 +159,6 @@ const SimStripe = ({
           onShare={onShare}
           onBackToScoreboard={onBackToScoreboard}
           trailing={leaveButton}
-          hideStats={isQualifiers}
         />
       </div>
     );

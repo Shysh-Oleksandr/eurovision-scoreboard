@@ -177,6 +177,10 @@ after each render of the host, on width changes, on text changes inside
 - Header (`HEADER_STEPS`): one row → combos on the first row with the rest
   stretched across the second → the same with the profile button reduced to
   the avatar.
+- Header picker tabs (`TAB_STEPS` in `hub/picker/PickerBody.tsx`, `targets:
+  '.dp-pick-tab-text'`): labels → the Quick select tab as its pin alone
+  (visually hidden text), when a label would be cut (long locales, four tabs
+  on a phone). The picker itself is described in DESIGN.md, "Header".
 - Contest card (`CARD_STEPS`, measured on the padding-free `.dp-cc-layout`
   inside the card): one row → short draw label → buttons under the title →
   Reset / Reorder / Add stage into ⋯ → Select without its label → the draw

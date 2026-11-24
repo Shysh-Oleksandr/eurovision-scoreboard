@@ -437,7 +437,8 @@ column sizing, sheet, stripe, minimal view, presenting) and swaps the parts:
   for empty places, the next one in the accent; one such list per target
   stage when split, instead of a target label on every row), At random
   ("Next qualifier" or "One of these 3", "All 6 left"), Present pinned at the
-  bottom. Over: the window's grid, the full list, Share, Continue.
+  bottom. Over: the window's grid, the full list, Stats and Share side by
+  side, Continue.
 - **The places as flags** (`PlaceChips`): one row while every circle can be
   22px or more, otherwise more rows (a contest with 20-odd places); an empty
   place's number is 46% of its circle (`cqi`, the circle is a size
@@ -449,13 +450,13 @@ column sizing, sheet, stripe, minimal view, presenting) and swaps the parts:
   every step. Open: the list, At random, Board columns, Present. Unlike the
   voting sheet, At random's next qualifier keeps the sheet open (as the
   peek's Random does); only "All left" closes it. Over: the peek shows the
-  qualifiers' flags, Share and Continue, and the sheet still pulls up, to
+  qualifiers' flags, Stats, Share and Continue (Stats and Share as icons
+  next to the title), and the sheet still pulls up, to
   the full list (the desktop column's).
 - **Minimal view** (`SimStripe mode="qualifiers"`): the latest qualifier,
   the places as flags in the jury strip's slot, a split Random (next; the
   chevron for all left), Present, options, leave; the split screen floats
-  above the stripe. Results use `ResultsPanel` without Stats (`hideStats`:
-  the picked semi-final's points stay hidden).
+  above the stripe. Results use `ResultsPanel`, Stats included.
 - **Random**: `useQualifierRandom().next` picks among the split's candidates
   while it shows (`pickQualifierFromSplitScreenCandidatesRandomly`),
   otherwise `pickQualifierRandomly`; `pickAllQualifiersRandomly` fills every

@@ -413,6 +413,11 @@ const OLD_WHATS_NEW = [
 
 const WEBSITE_UPDATES: UpdateItem[] = [
   {
+    date: '2026-11-24',
+    title:
+      '<list><item>Added a Votes tab to the stats: pick a country and see its points as a ring of flags, received or given</item><item>Redesigned the contest and theme pickers in the setup: Latest, a tab for each series and a year grid, plus search and Quick select. Default themes show a preview of their background</item></list>',
+  },
+  {
     date: '2026-11-23',
     title:
       '<list><item>Share the semi-final allocation draw as an image</item><item>Added a Participating countries design to Graphics: every country in the contest, A–Z, with heart flags, as a portrait card</item><item>A contest’s hosting country can now be one of your custom entries, with its own name and flag</item></list>',

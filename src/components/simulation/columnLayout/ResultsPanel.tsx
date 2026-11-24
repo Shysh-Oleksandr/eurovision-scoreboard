@@ -39,8 +39,6 @@ interface ResultsPanelProps {
   onBackToScoreboard?: () => void;
   /** Stripe only: leaves the minimal view. */
   trailing?: React.ReactNode;
-  /** No Stats (Pick qualifiers mode: the points stay hidden). */
-  hideStats?: boolean;
 }
 
 const useEventLabel = () => {
@@ -105,7 +103,6 @@ const ResultsPanel = ({
   onShare,
   onBackToScoreboard,
   trailing,
-  hideStats = false,
 }: ResultsPanelProps) => {
   const t = useTranslations('simulation');
   const tNextYear = useTranslations('nextYear');
@@ -146,7 +143,7 @@ const ResultsPanel = ({
     onBackToScoreboard ?? (canContinue ? handleContinue : undefined);
 
   useShortcut('continue', () => mainAction?.(), !!mainAction);
-  useShortcut('stats', () => setStatsOpen(true), !hideStats);
+  useShortcut('stats', () => setStatsOpen(true));
 
   const title =
     winner?.name ?? t('view.stageOver', { stage: viewedStage?.name ?? '' });
@@ -360,7 +357,7 @@ const ResultsPanel = ({
         {summary}
         {stageSelect && <div className="w-[180px]">{stageSelect}</div>}
         {nqToggle}
-        {!hideStats && statsButton}
+        {statsButton}
         {shareButton}
         {continueButton && <div className="shrink-0">{continueButton}</div>}
         {nextYearButton}

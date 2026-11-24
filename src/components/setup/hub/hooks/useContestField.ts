@@ -1,18 +1,19 @@
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
 
+import { PickerItem } from '../picker/pickerItems';
+
 import { api } from '@/api/client';
 import { useQuickSelectContestsQuery } from '@/api/quickSelect';
-import {
-  Option,
-  OptionGroup,
-} from '@/components/common/customSelect/CustomSelect';
+import { Option } from '@/components/common/customSelect/CustomSelect';
 import { Year } from '@/config';
 import {
   CONTEST_TYPE_NAMES,
+  ContestType,
   getContestKey,
   parseContestKey,
 } from '@/data/contestTypes';
+import { ALL_COUNTRIES } from '@/data/countries/common-countries';
 import {
   ASIA_YEAR_OPTIONS,
   ESC_YEAR_OPTIONS,
@@ -34,42 +35,42 @@ import { applyThemeForContestYear } from '@/theme/syncThemeToContest';
 import { Contest } from '@/types/contest';
 import { ContestSnapshot } from '@/types/contestSnapshot';
 
-const YEAR_OPTIONS = [
-  ...ESC_YEAR_OPTIONS,
-  ...JESC_YEAR_OPTIONS,
-  ...ASIA_YEAR_OPTIONS,
+const SERIES_OPTIONS: [ContestType, Option[]][] = [
+  ['esc', ESC_YEAR_OPTIONS],
+  ['jesc', JESC_YEAR_OPTIONS],
+  ['asia', ASIA_YEAR_OPTIONS],
 ];
 
-/** Swaps the year options' host logos for the white 2026 hearts when that setting is on. */
-const withHeartFlagStyle = (
-  options: Option[],
-  shouldUse2026WhiteHeartFlags: boolean,
-): Option[] => {
-  if (!shouldUse2026WhiteHeartFlags) return options;
+const HOST_NAMES = new Map(
+  ALL_COUNTRIES.map((country) => [country.code, country.name]),
+);
 
-  return options.map((option) => {
-    const { year, contestType } = parseContestKey(option.value);
-    const { code } = getHostingCountryByYear(year as Year, contestType);
+/**
+ * Every official edition as a picker item, with the white 2026 hearts when
+ * that setting is on.
+ */
+const buildEditions = (shouldUse2026WhiteHeartFlags: boolean): PickerItem[] =>
+  SERIES_OPTIONS.flatMap(([series, options]) =>
+    options.map((option) => {
+      const { year } = parseContestKey(option.value);
+      const { code } = getHostingCountryByYear(year as Year, series);
 
-    return {
-      ...option,
-      imageUrl: getHostingLogoByCountryCode(code, true) ?? option.imageUrl,
-    };
-  });
-};
+      return {
+        value: option.value,
+        series,
+        year: Number(year),
+        name: `${CONTEST_TYPE_NAMES[series]} ${year}`,
+        host: HOST_NAMES.get(code),
+        imageUrl:
+          (shouldUse2026WhiteHeartFlags &&
+            getHostingLogoByCountryCode(code, true)) ||
+          option.imageUrl,
+        isHeart: true,
+      };
+    }),
+  );
 
-export const getContestImageClassName = (
-  option: Option,
-  type: 'display' | 'select',
-) => {
-  if (option.isExisting) return '';
-
-  if (type === 'display') return 'w-8 h-6 rounded-sm';
-
-  return 'w-7 h-5 rounded-sm';
-};
-
-/** Options, value and handlers of the header "Contest" combo (year / saved contest / GF-only). */
+/** Picker items, value and handlers of the header "Contest" combo (year / saved contest / GF-only). */
 export const useContestField = () => {
   const t = useTranslations();
   const user = useAuthStore((state) => state.user);
@@ -180,113 +181,65 @@ export const useContestField = () => {
     });
   }, [confirm, contestType, handleYearChange, isGfOnly, t, year]);
 
-  const contestGroups = useMemo(() => {
-    const groups: OptionGroup[] = [
-      {
-        label: 'ESC',
-        options: withHeartFlagStyle(
-          ESC_YEAR_OPTIONS,
+  const editions = useMemo(
+    () => buildEditions(shouldUse2026WhiteHeartFlags),
+    [shouldUse2026WhiteHeartFlags],
+  );
+
+  // The account's quick select, the loaded contest included (marked there).
+  const pinned = useMemo<PickerItem[]>(
+    () =>
+      (quickSelectContestsData ?? []).map((contest) => {
+        const { logo, isExisting } = getHostingCountryLogo(
+          contestHostCountry(contest, customCountries),
+          true,
           shouldUse2026WhiteHeartFlags,
-        ),
-      },
-      {
-        label: 'JESC',
-        options: withHeartFlagStyle(
-          JESC_YEAR_OPTIONS,
-          shouldUse2026WhiteHeartFlags,
-        ),
-      },
-      {
-        label: 'ESC Asia',
-        options: withHeartFlagStyle(
-          ASIA_YEAR_OPTIONS,
-          shouldUse2026WhiteHeartFlags,
-        ),
-      },
-    ];
+        );
 
-    if (quickSelectContestsData && quickSelectContestsData.length > 0) {
-      groups.unshift({
-        label: t('widgets.quickSelect'),
-        options: quickSelectContestsData
-          .filter((contest) => contest._id !== activeContest?._id)
-          .map((contest) => {
-            const { logo, isExisting } = getHostingCountryLogo(
-              contestHostCountry(contest, customCountries),
-              true,
-              shouldUse2026WhiteHeartFlags,
-            );
-
-            return {
-              label: `${contest.name} ${contest.year || ''}`.trim(),
-              value: contest._id,
-              imageUrl: logo,
-              isExisting,
-            };
-          }),
-      });
-    }
-
-    if (activeContest) {
-      const { logo, isExisting } = getHostingCountryLogo(
-        getHostingCountry(),
-        true,
-        shouldUse2026WhiteHeartFlags,
-      );
-
-      groups.unshift({
-        label: t('common.custom'),
-        options: [
-          {
-            label: activeContest.name,
-            value: activeContest._id,
-            imageUrl: logo,
-            isExisting,
-          },
-        ],
-      });
-    }
-
-    return groups;
-  }, [
-    activeContest,
-    t,
-    getHostingCountry,
-    quickSelectContestsData,
-    customCountries,
-    shouldUse2026WhiteHeartFlags,
-  ]);
-
-  const contestOptions = useMemo(() => {
-    const options: Option[] = [
-      ...withHeartFlagStyle(YEAR_OPTIONS, shouldUse2026WhiteHeartFlags),
-    ];
-
-    if (activeContest) {
-      const { logo, isExisting } = getHostingCountryLogo(
-        getHostingCountry(),
-        true,
-        shouldUse2026WhiteHeartFlags,
-      );
-
-      options.push({
-        label: activeContest.name,
-        value: activeContest._id,
-        imageUrl: logo,
-        isExisting,
-      });
-    }
-
-    return options;
-  }, [activeContest, getHostingCountry, shouldUse2026WhiteHeartFlags]);
+        return {
+          value: contest._id,
+          name: `${contest.name} ${contest.year || ''}`.trim(),
+          imageUrl: logo,
+          isHeart: isExisting,
+        };
+      }),
+    [quickSelectContestsData, customCountries, shouldUse2026WhiteHeartFlags],
+  );
 
   const contestValue = activeContest
     ? activeContest._id
     : getContestKey(year, contestType);
 
+  // What the combo shows: the loaded saved contest, else the edition.
+  const current = useMemo<PickerItem | undefined>(() => {
+    if (!activeContest) {
+      return editions.find((item) => item.value === contestValue);
+    }
+
+    const { logo, isExisting } = getHostingCountryLogo(
+      getHostingCountry(),
+      true,
+      shouldUse2026WhiteHeartFlags,
+    );
+
+    return {
+      value: activeContest._id,
+      name: activeContest.name,
+      imageUrl: logo,
+      isHeart: isExisting,
+    };
+  }, [
+    activeContest,
+    contestValue,
+    editions,
+    getHostingCountry,
+    shouldUse2026WhiteHeartFlags,
+  ]);
+
   return {
-    contestOptions,
-    contestGroups,
+    editions,
+    pinned,
+    current,
     contestValue,
     handleYearChange,
     handleGfOnlyChange,

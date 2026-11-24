@@ -327,6 +327,31 @@ share the first row and Profile / Settings stretch across the second; on
 narrow screens the profile button shrinks to the avatar. The feedback button
 is the original bare 40px icon.
 
+**The picker (`EditionPicker`, `src/components/setup/hub/picker/`): a
+series, then a year.** What opens from either combo, the same content in two
+shells: a `.dp-menu` panel under the combo on desktop and tablets (392px,
+no entrance animation, the combo turns into its search field), the
+simulation's ⋯ sheet on phones (below 576px wide or 521px tall; the search
+field isn't focused on open). Never a native select.
+
+- **Latest** first: the newest edition of each series plus every edition of
+  the current year, newest first, at most four (`getLatestEditions`). Tiles
+  are a heart over the year over the series' tab name.
+- **Tabs** in the segmented well: Quick select (only when it has entries),
+  then the series ("Eurovision", "Junior", "Asia"). A series whose editions
+  all show in Latest gets no tab (ESC Asia while it has one edition). The
+  picker opens on the tab holding the current pick. Too long for the row, the
+  Quick select tab keeps only its pin.
+- **The grid**: four across, newest first, heart + year. The tab panel is as
+  tall as the tallest tab, so switching tabs moves nothing; search results
+  keep that height too.
+- **Built-in themes show their background**: the tile is a 2 kB thumbnail
+  (`public/bgImages/thumbs/`, `scripts/theme-thumbnails.mjs`) darkened under
+  the year; quick select themes keep their swatch.
+- The current pick has the accent ring (1px, 2px on pictures). Search matches
+  series names (Eurovision, Junior, JESC, Asia), years, host countries and
+  quick select names, and lists full names ("Eurovision 2026", "Austria").
+
 ### Contest card (`ContestCard`, `.dp-contest-card`)
 
 Hosting heart, title, then one line of facts: where the contest lives
@@ -786,12 +811,13 @@ by the theme and never restyled here, only sized.
 
 ### Stats modal (`simulation/finalStats/`, `.dp-stats-*`)
 
-**Tables that keep their labels.** A finished stage's stats in three views:
-Summary (the one it opens on), Split and Breakdown. One flat `--p-950`
-surface; the views are the modal's own components (`SummaryView`,
-`SplitView`, `BreakdownView`), and the share image keeps drawing its own
-tables (`SummaryStats`, `SplitStats`, `StatsTable`), so changing one never
-changes the other.
+**Tables that keep their labels.** A finished stage's stats in four views:
+Summary (the one it opens on), Split, Breakdown and Votes (the voting
+graphic). One flat `--p-950` surface; the views are the modal's own
+components (`SummaryView`, `SplitView`, `BreakdownView`, `VotesView`), and
+the share image keeps drawing its own tables (`SummaryStats`, `SplitStats`,
+`StatsTable`), so changing one never changes the other. Votes has no share
+image yet: Share opens on the Summary there.
 
 - **Header:** the views as the simulation's segmented well (`dp-sim-seg`),
   Share (`cta`) and × on the right from `2cols`. Phones move Close and Share
@@ -820,6 +846,51 @@ changes the other.
   cell lights its row and column, outlines the cell in the accent and says
   the vote in the line above the table ("Croatia gave Israel 16 points: jury
   8, televote 8"); a ramp on that line's right reads the shading.
+- **Votes** (`votes/`) is the one graphic among the tables, so it gets the
+  boldness: one country in the middle, a ring of round flags around it
+  (everyone who gave it points, or every entry it gave points to), sized
+  by area, the biggest just after 12 o'clock and clockwise down to the
+  least, each joined to the middle by a spoke (white, stronger with the
+  points; an arrowhead past its middle shows the way). It sits in a dark
+  well (the share picture slot's) under the controls row: a band with the
+  middle's name (20px / 17px, 800), one plain line ("Winner, 576 points
+  from 36 countries") and the key to the pills with the view's totals
+  ("289 Jury, 287 Televote" as pills), Received / Given on the right; a
+  toolbar with Countries, the "Jury and televote" toggle (a check and the
+  two swatches; the label goes before the swatches do), and Replay / Full
+  screen. Jury pills are near-white with `--p-950` ink, televote pills the
+  accent with its ink (the stats' swatches), just outside the flag's rim
+  so they never cover its number, always jury counter-clockwise of
+  televote. They start hidden when the ring is too crowded for them
+  (under 44px of ring per flag: a final on a phone) until the toggle says
+  otherwise. Numbers sit on a dark radial scrim inside the flag with a
+  tight dark edge, so they read on white fields. The middle flag is
+  ringed in the accent, and when its country both got and gave points a
+  click on it switches Received / Given (it grows 4% when pointed at, and
+  a small pill over it says "Switch to Given"); a pointed flag grows 7% with an accent ring and
+  its spoke in the accent, and its card floats beside it (the popovers'
+  shadow): name, place line, the Breakdown's sentence ("Denmark gave
+  Bulgaria 24 points"), the two pills. On touch the first tap shows the
+  card with Open, so a tap never opens a country by surprise. Countries
+  lists the entries as the theme's board rows (numbered by place, reading
+  down the columns) and the voting-only countries as quiet tiles whose
+  names wrap rather than cut, the middle one ringed. Zero points is "Nul
+  points" (the surface's one fan line).
+- **The voting graphic moves, the tables don't.** Entrance (and Replay, and
+  a pick from the list): the middle opens, the ring's flags land as dots
+  (from just outside for Received, out of the middle for Given), then the
+  sweep: clockwise each flag grows to its size, its spoke draws in and the
+  middle's total counts up with it (about 1.5s for a final). A clicked
+  flag (the usual way to explore) is quicker: it comes in to the middle
+  while the flags in both views travel round the ring to their new places
+  (elliptic polar paths, so nothing cuts across the middle; clockwise
+  movers take an inner lane a flag's width inside the ring, the others
+  stay on it), the old middle leaving a beat later beneath it, then a
+  short sweep; numbers read within about a second. A flag that
+  lands under a resting pointer isn't hovered until the pointer moves.
+  Resizes snap, except during a move: then the move re-aims at the new
+  layout (the band gains a line as the list closes or the name changes);
+  reduced motion fades the finished ring in.
 
 ### Voting predefinition (`setup/voting-predefinition/`, `.dp-vp-*`)
 

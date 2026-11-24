@@ -2315,6 +2315,86 @@ html .dp-toast-out {
     box-shadow: inset 0 0 0 2px rgb(255 255 255 / 28%);
   }
 
+  /* --- Header picker (EditionPicker): what opens from the combos. The
+     current pick has the accent ring, as a chosen segment does. --- */
+  .dp-pick-latest {
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    transition: background 0.14s;
+  }
+
+  .dp-pick-tile {
+    background: rgb(255 255 255 / 5%);
+    transition: background 0.14s;
+  }
+
+  .dp-pick-latest:hover,
+  .dp-pick-tile:hover {
+    background: rgb(255 255 255 / 11%);
+  }
+
+  .dp-pick-row {
+    transition: background 0.14s;
+  }
+
+  .dp-pick-row:hover {
+    background: rgb(255 255 255 / 7%);
+  }
+
+  .dp-pick-latest.is-on,
+  .dp-pick-tile.is-on,
+  .dp-pick-row.is-on {
+    background: var(--p-750);
+    border-color: transparent;
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  /* Built-in themes: the tile is the theme's background (a 2 kB thumbnail),
+     darkened under the label. The ring is 2px to show on any picture. */
+  .dp-pick-thumb {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--p-900);
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 70%);
+  }
+
+  .dp-pick-thumb::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: rgb(0 0 0 / 30%);
+    transition: background 0.14s;
+  }
+
+  .dp-pick-thumb:hover::before {
+    background: rgb(0 0 0 / 12%);
+  }
+
+  .dp-pick-thumb.is-on {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  /* Inset: the tab panel scrolls, and would clip an outer ring. */
+  .dp-pick-options [role='option']:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+
+  /* Tabs too long for the row: Quick select keeps only its pin. */
+  [data-quick='icon'] .dp-pick-quick-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   /* --- Library buttons (Themes / Contests / Graphics): one neutral surface,
      the accent only on the icon. --- */
   .dp-lib {
@@ -5598,6 +5678,780 @@ html .dp-toast-out {
 
     .dp-stats-sub {
       display: none;
+    }
+  }
+
+  /* ---------- Stats modal: Votes (finalStats/votes/) ----------
+     One country in the middle, a ring of flags around it sized by the
+     points, spokes to the middle. The frame is a dark well like the share
+     picture slot; flags are laid out at 150px and scaled (VotesRing's
+     BASE), so their rings and numbers are sized for 150px. Jury pills are
+     near-white, televote pills the accent (the stats' swatches). */
+  .dp-votes {
+    --votes-well: color-mix(in srgb, var(--p-950) 76%, #000);
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    min-height: 0;
+    background: var(--votes-well);
+    border: 1px solid var(--hair);
+    border-radius: 14px;
+  }
+
+  .dp-votes-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1060;
+    display: flex;
+    padding: calc(var(--safe-top, 0px) + 10px)
+      calc(var(--safe-right, 0px) + 10px) calc(var(--safe-bottom, 0px) + 10px)
+      calc(var(--safe-left, 0px) + 10px);
+    background: var(--p-950);
+    color: var(--ink);
+  }
+
+  .dp-votes-overlay > .dp-votes {
+    flex: 1;
+    height: auto;
+  }
+
+  /* Band (useFitStep): name and line beside Received / Given, else the
+     switch under them. */
+  .dp-votes-band {
+    display: flex;
+    align-items: center;
+    gap: 10px 16px;
+    padding: 12px 14px 2px;
+  }
+
+  .dp-votes-band[data-band='stack'] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dp-votes-heading {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dp-votes-title {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+
+  .dp-votes-sub {
+    margin-top: 2px;
+    color: var(--ink-70);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-wrap: balance;
+  }
+
+  /* The key to the pills, with the view's two totals. */
+  .dp-votes-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin-top: 7px;
+  }
+
+  .dp-votes-dir {
+    flex: none;
+  }
+
+  /* While measuring, the name on one line beside the switch decides. */
+  .dp-votes-band[data-fit-measuring] > :is(.dp-votes-heading, .dp-votes-dir) {
+    flex: none;
+  }
+
+  .dp-votes-band[data-fit-measuring] :is(.dp-votes-sub, .dp-votes-legend) {
+    display: none;
+  }
+
+  .dp-votes-band[data-fit-measuring] .dp-votes-title {
+    white-space: nowrap;
+  }
+
+  @media (width >= 576px) {
+    .dp-votes-title {
+      font-size: 20px;
+    }
+
+    .dp-votes-band {
+      padding: 14px 16px 2px;
+    }
+  }
+
+  .dp-votes-stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .dp-votes-ring {
+    position: absolute;
+    inset: 0;
+    outline: none;
+    touch-action: manipulation;
+    user-select: none;
+  }
+
+  .dp-votes-ring.is-hidden {
+    visibility: hidden;
+  }
+
+  .dp-votes-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .dp-votes-spokes {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .dp-votes-spokes g {
+    visibility: hidden;
+  }
+
+  .dp-votes-spokes line,
+  .dp-votes-spokes path {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .dp-votes-spokes g.is-hl :is(line, path) {
+    stroke: var(--accent);
+    stroke-opacity: 1;
+    stroke-width: 2.25;
+  }
+
+  .dp-votes-node {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    padding: 0;
+    visibility: hidden;
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .dp-votes-node:focus-visible {
+    outline: none;
+  }
+
+  /* Taps near a small flag count (VotesRing sets --hit). */
+  .dp-votes-node::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--hit, 0px));
+    border-radius: 50%;
+  }
+
+  .dp-votes-node.is-center {
+    z-index: 2;
+    cursor: default;
+  }
+
+  /* Over the middle flag while it's pointed at: what a click does. */
+  .dp-votes-hint {
+    position: absolute;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 10px;
+    background: var(--p-900);
+    border: 1px solid var(--hair-2);
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 40%);
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, -100%);
+    animation: dp-votes-fade 0.14s ease-out both;
+  }
+
+  .dp-votes-disc {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--p-800);
+    border-radius: 50%;
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Under the number: the flag darkens towards its middle, so white
+     numbers read on white flag fields too (150px units, like the rest). */
+  .dp-votes-disc::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgb(0 0 0 / 42%) 0,
+      rgb(0 0 0 / 30%) 34%,
+      rgb(0 0 0 / 0%) 72%
+    );
+    transition: opacity 0.15s;
+  }
+
+  .dp-votes-node:has(.dp-votes-num:empty) .dp-votes-disc::before {
+    opacity: 0;
+  }
+
+  .dp-votes-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  /* The flag's ring, drawn over it (150px scale: about 1px on the ring). */
+  .dp-votes-disc::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 4px rgb(255 255 255 / 18%);
+    transition: box-shadow 0.15s;
+  }
+
+  .dp-votes-node.is-hl .dp-votes-disc,
+  .dp-votes-node:focus-visible .dp-votes-disc {
+    transform: scale(1.07);
+  }
+
+  .dp-votes-node.is-hl .dp-votes-disc::after,
+  .dp-votes-node:focus-visible .dp-votes-disc::after {
+    box-shadow: inset 0 0 0 10px var(--accent);
+  }
+
+  .dp-votes-node.is-center .dp-votes-disc::after {
+    box-shadow: inset 0 0 0 5px var(--accent);
+  }
+
+  /* The middle flag switches Received / Given when both exist. */
+  .dp-votes-node.is-toggle {
+    cursor: pointer;
+  }
+
+  .dp-votes-node.is-toggle:focus-visible .dp-votes-disc {
+    transform: scale(1.04);
+  }
+
+  .dp-votes-node.is-toggle:focus-visible .dp-votes-disc::after {
+    box-shadow: inset 0 0 0 8px var(--accent);
+  }
+
+  @media (hover: hover) {
+    .dp-votes-node.is-toggle:hover .dp-votes-disc {
+      transform: scale(1.04);
+    }
+
+    .dp-votes-node.is-toggle:hover .dp-votes-disc::after {
+      box-shadow: inset 0 0 0 8px var(--accent);
+    }
+  }
+
+  .dp-votes-num {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    visibility: hidden;
+    color: var(--ink);
+    font-size: 66px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-shadow: 0 0 5px rgb(0 0 0 / 90%), 0 3px 9px rgb(0 0 0 / 60%),
+      0 0 26px rgb(0 0 0 / 45%);
+    pointer-events: none;
+  }
+
+  .dp-votes-node.is-center .dp-votes-num {
+    font-size: 46px;
+  }
+
+  .dp-votes-pills {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .dp-votes-ring.is-pills-off .dp-votes-pills {
+    opacity: 0;
+  }
+
+  .dp-votes-pill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    visibility: hidden;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1.5px var(--votes-well);
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    line-height: 19px;
+    text-align: center;
+  }
+
+  .dp-votes-pill.is-jury {
+    background: rgb(255 255 255 / 92%);
+    color: var(--p-950);
+  }
+
+  .dp-votes-pill.is-tele {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .dp-votes-pill.is-static {
+    position: static;
+    display: inline-block;
+    visibility: visible;
+    box-shadow: none;
+  }
+
+  .dp-votes-empty {
+    position: absolute;
+    right: 0;
+    left: 0;
+    padding: 0 24px;
+    text-align: center;
+    pointer-events: none;
+    animation: dp-votes-rise 0.5s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .dp-votes-empty-title {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .dp-votes-empty-text {
+    margin-top: 2px;
+    color: var(--ink-70);
+    font-size: 13px;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  @keyframes dp-votes-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes dp-votes-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* The card beside a flag: floats, so it has the popovers' shadow. */
+  .dp-votes-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    width: 236px;
+    padding: 12px;
+    visibility: hidden;
+    background: var(--p-900);
+    border: 1px solid var(--hair-2);
+    border-radius: 14px;
+    box-shadow: 0 14px 34px rgb(0 0 0 / 45%);
+    pointer-events: none;
+    animation: dp-votes-fade 0.14s ease-out both;
+  }
+
+  .dp-votes-card.is-interactive {
+    pointer-events: auto;
+  }
+
+  .dp-votes-card-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  .dp-votes-card-name {
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+  }
+
+  .dp-votes-card-facts {
+    margin-top: 5px;
+    color: var(--ink-70);
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .dp-votes-card-link {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hair);
+  }
+
+  .dp-votes-card-flow {
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  .dp-votes-card-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-top: 8px;
+  }
+
+  .dp-votes-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ink-70);
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .dp-votes-card-open {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    height: 42px;
+    margin-top: 12px;
+    padding: 0 12px;
+    background: var(--p-750);
+    border: 1px solid var(--hair-2);
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 800;
+  }
+
+  .dp-votes-card-open:active {
+    transform: scale(0.985);
+  }
+
+  /* Toolbar (useFitStep): every label, then Countries as its icon. */
+  .dp-votes-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px 10px;
+  }
+
+  .dp-votes-tools[data-fit-measuring]
+    > :is(.dp-votes-tool, .dp-votes-toggle, .dp-votes-icon) {
+    flex: none;
+  }
+
+  .dp-votes-tools-gap {
+    flex: 1;
+  }
+
+  .dp-votes-tool,
+  .dp-votes-toggle {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    height: 40px;
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid var(--hair);
+    border-radius: 12px;
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background 0.14s, border-color 0.14s, opacity 0.14s;
+  }
+
+  .dp-votes-tool {
+    gap: 8px;
+    padding: 0 14px 0 12px;
+  }
+
+  .dp-votes-toggle {
+    gap: 9px;
+    padding: 0 14px 0 11px;
+  }
+
+  .dp-votes-toggle:disabled {
+    opacity: 0.4;
+  }
+
+  .dp-votes-tool:hover,
+  .dp-votes-toggle:hover:not(:disabled) {
+    background: rgb(255 255 255 / 11%);
+  }
+
+  .dp-votes-tool.is-on {
+    background: var(--p-800);
+    border-color: var(--accent);
+  }
+
+  .dp-votes-tools:is([data-tools='compact'], [data-tools='tight'])
+    .dp-votes-tool {
+    justify-content: center;
+    width: 40px;
+    padding: 0;
+  }
+
+  .dp-votes-tools:is([data-tools='compact'], [data-tools='tight'])
+    .dp-votes-tool
+    .dp-votes-tool-label,
+  .dp-votes-tools[data-tools='tight'] .dp-votes-toggle .dp-votes-tool-label {
+    display: none;
+  }
+
+  .dp-votes-tools[data-tools='tight'] .dp-votes-toggle {
+    padding: 0 11px;
+  }
+
+  .dp-votes-toggle-check {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--hair-2);
+    border-radius: 6px;
+  }
+
+  .dp-votes-toggle.is-on .dp-votes-toggle-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* The pills' two colours, drawn as the toggle's icon. */
+  .dp-votes-swatches {
+    display: inline-flex;
+    flex: none;
+  }
+
+  .dp-votes-swatches > i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px var(--votes-well);
+  }
+
+  .dp-votes-swatches > .is-jury {
+    background: rgb(255 255 255 / 92%);
+  }
+
+  .dp-votes-swatches > .is-tele {
+    margin-left: -4px;
+    background: var(--accent);
+  }
+
+  .dp-votes-toggle:not(.is-on) .dp-votes-swatches {
+    opacity: 0.55;
+  }
+
+  .dp-votes-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .dp-votes-icon:disabled {
+    opacity: 0.4;
+  }
+
+  :is(
+      .dp-votes-tool,
+      .dp-votes-toggle,
+      .dp-votes-icon,
+      .dp-votes-card-open
+    ):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Countries: the entries as the theme's board rows reading down the
+     columns, then the countries that only vote as quiet tiles. */
+  .dp-votes-picker {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    overflow: auto;
+    padding: 4px 14px 16px;
+    background: var(--votes-well);
+    overscroll-behavior: contain;
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 14px), transparent);
+    animation: dp-votes-fade 0.18s ease-out both;
+  }
+
+  .dp-votes-picker-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 12px;
+    padding: 6px 0 12px;
+  }
+
+  .dp-votes-picker-title {
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .dp-votes-rows {
+    column-gap: 24px;
+    columns: 3 230px;
+  }
+
+  .dp-votes-rows > li {
+    padding-bottom: 6px;
+    break-inside: avoid;
+  }
+
+  .dp-votes-row {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 0;
+    background: none;
+    border: 0;
+  }
+
+  .dp-votes-row:focus-visible {
+    outline: none;
+  }
+
+  .dp-votes-row-place {
+    color: var(--ink-70);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    text-align: right;
+  }
+
+  .dp-votes-row-board {
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    height: 36px;
+    transition: box-shadow 0.14s, filter 0.14s;
+  }
+
+  .dp-votes-row:hover .dp-votes-row-board {
+    filter: brightness(1.1);
+  }
+
+  .dp-votes-row.is-current .dp-votes-row-board,
+  .dp-votes-row:focus-visible .dp-votes-row-board {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .dp-votes-picker-sub {
+    margin: 12px 0 8px;
+    color: var(--ink-70);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .dp-votes-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+    gap: 6px;
+  }
+
+  .dp-votes-tile {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    min-height: 40px;
+    padding: 5px 10px;
+    background: rgb(255 255 255 / 6%);
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    transition: background 0.14s, box-shadow 0.14s;
+  }
+
+  .dp-votes-tile-name {
+    min-width: 0;
+    flex: 1;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    text-align: left;
+    text-wrap: balance;
+  }
+
+  .dp-votes-tile:hover {
+    background: rgb(255 255 255 / 11%);
+  }
+
+  .dp-votes-tile.is-current,
+  .dp-votes-tile:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dp-votes-empty,
+    .dp-votes-card,
+    .dp-votes-hint,
+    .dp-votes-picker {
+      animation: none;
+    }
+
+    .dp-votes-disc {
+      transition: none;
     }
   }
 

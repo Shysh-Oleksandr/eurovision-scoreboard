@@ -1,7 +1,9 @@
 'use client';
-import { ArrowRight, ChevronDown, Dices, Share2 } from 'lucide-react';
+import { ArrowRight, ChartBar, ChevronDown, Dices, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+
+import dynamic from 'next/dynamic';
 
 import { CountryQualificationItem } from '../qualification/CountryQualificationItem';
 
@@ -34,6 +36,10 @@ import useThemeSpecifics from '@/theme/useThemeSpecifics';
  * splits it into the candidates; once the stage is over it becomes the
  * qualifiers' flags, the broadcast's closing shot.
  */
+
+const FinalStatsModal = dynamic(() => import('../finalStats/FinalStatsModal'), {
+  ssr: false,
+});
 
 const flagSrc = (country: BaseCountry) => getFlagPath(country, 'big-rectangle');
 
@@ -698,13 +704,63 @@ export const QualifierHint = ({ className = '' }: { className?: string }) => {
 // ---------------------------------------------------------------------------
 // Results
 
-/** Share, then Continue: the stage is over. */
+/**
+ * Stats for the stage that's over, with its modal and the S shortcut. One
+ * per screen: the column's results, or the sheet's title row.
+ */
+export const QualifierStatsButton = ({
+  iconOnly = false,
+}: {
+  iconOnly?: boolean;
+}) => {
+  const t = useTranslations('simulation');
+  const [open, setOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useShortcut('stats', () => setOpen(true));
+
+  return (
+    <>
+      {iconOnly ? (
+        <Button
+          variant="surface"
+          size="lg"
+          title={t('phaseActions.viewStats')}
+          aria-label={t('phaseActions.viewStats')}
+          Icon={<ChartBar className="size-[18px]" />}
+          onClick={() => setOpen(true)}
+          shortcut="stats"
+        />
+      ) : (
+        <Button
+          variant="surface"
+          size="lg"
+          className="justify-center"
+          Icon={<ChartBar className="size-[18px]" />}
+          onClick={() => setOpen(true)}
+          shortcut="stats"
+        >
+          {t('phaseActions.viewStats')}
+        </Button>
+      )}
+      {(open || loaded) && (
+        <FinalStatsModal
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          onLoaded={() => setLoaded(true)}
+        />
+      )}
+    </>
+  );
+};
+
+/** Stats and Share, then Continue: the stage is over. */
 export const QualifierResultsActions = ({
   onShare,
   compact = false,
 }: {
   onShare: () => void;
-  /** The sheet: Share as an icon next to the title instead. */
+  /** The sheet: Stats and Share as icons next to the title instead. */
   compact?: boolean;
 }) => {
   const t = useTranslations('simulation');
@@ -715,16 +771,19 @@ export const QualifierResultsActions = ({
   return (
     <div className="flex flex-col gap-3">
       {!compact && (
-        <Button
-          variant="surface"
-          size="lg"
-          className="justify-center"
-          Icon={<Share2 className="size-[18px]" />}
-          onClick={onShare}
-          shortcut="share"
-        >
-          {t('header.share')}
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <QualifierStatsButton />
+          <Button
+            variant="surface"
+            size="lg"
+            className="justify-center"
+            Icon={<Share2 className="size-[18px]" />}
+            onClick={onShare}
+            shortcut="share"
+          >
+            {t('header.share')}
+          </Button>
+        </div>
       )}
       {canContinue && (
         <Button

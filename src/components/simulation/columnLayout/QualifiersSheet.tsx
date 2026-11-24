@@ -14,6 +14,7 @@ import {
   QualifierRandomGroup,
   QualifierRandomQuickButton,
   QualifierResultsActions,
+  QualifierStatsButton,
   SplitTiles,
   useQualifiedCaption,
   useShowsClosingGrid,
@@ -84,6 +85,7 @@ const QualifiersSheet = ({
               {caption}
             </p>
           </div>
+          <QualifierStatsButton iconOnly />
           <Button
             variant="surface"
             size="lg"

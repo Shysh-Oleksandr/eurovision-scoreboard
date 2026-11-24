@@ -18,10 +18,10 @@ There are three tasks:
 | Contest key | `getContestKey` / `parseContestKey` in `contestTypes.ts` | The value of a select option and the key of its theme: `2026`, `JESC-2026`, `ASIA-2026`. ESC keys have no prefix. |
 | Default contest name | `CONTEST_TYPE_NAMES` in `contestTypes.ts` | Written to `settings.contestName` when the user switches series ("Eurovision", "Junior Eurovision", "Eurovision Asia"). |
 | Supported years per series | `src/data/data.ts`: `SUPPORTED_YEARS`, `JUNIOR_SUPPORTED_YEARS`, `ASIA_SUPPORTED_YEARS` | These lists build the select options (`ESC_YEAR_OPTIONS`, `JESC_YEAR_OPTIONS`, `ASIA_YEAR_OPTIONS`). |
-| Select groups | `src/components/setup/hub/hooks/useContestField.ts` (`contestGroups`, `YEAR_OPTIONS`) | Groups are labelled "ESC", "JESC" and "ESC Asia". |
+| Header picker items | `src/components/setup/hub/hooks/useContestField.ts` (`SERIES_OPTIONS`, `buildEditions`) | Every edition becomes a picker item with its full name ("Eurovision Asia 2026") and host. The picker (`src/components/setup/hub/picker/`, DESIGN.md "Header") shows Latest, then a tab per series (`CONTEST_TYPE_TAB_NAMES`: "Eurovision", "Junior", "Asia") over a grid of years, newest first. A series whose editions all show in Latest gets no tab. |
 | Lineup data | `public/data/countries/{countries,junior-countries,asia-countries}-<year>.json` | Fetched at runtime by `buildCountriesUrl` in `src/data/countries/countriesDataUrl.ts`. **These JSON files are the source of truth.** |
-| Hosting country and logo | `src/theme/hosting.ts`: `hostingLogosByYear`, `juniorHostingLogosByYear`, `asiaHostingLogosByYear` | Sets the select option icon and `settings.hostingCountryCode`. |
-| Built-in theme (optional) | `src/theme/themes.ts`: `escThemes`, `juniorThemes`, `asiaThemes` | Keyed by contest key. If a year has no theme, "sync theme to contest" leaves the current theme in place. Each record feeds its own theme-select group (`THEME_OPTIONS`, `JESC_THEME_OPTIONS`, `ASIA_THEME_OPTIONS` in `data.ts`) in the setup header, the theme editor's base theme and the graphics editor. |
+| Hosting country and logo | `src/theme/hosting.ts`: `hostingLogosByYear`, `juniorHostingLogosByYear`, `asiaHostingLogosByYear` | Sets the picker tile's heart, the host name search matches, and `settings.hostingCountryCode`. |
+| Built-in theme (optional) | `src/theme/themes.ts`: `escThemes`, `juniorThemes`, `asiaThemes` | Keyed by contest key. If a year has no theme, "sync theme to contest" leaves the current theme in place. Each record feeds the setup header's theme picker (`THEME_OPTIONS`, `JESC_THEME_OPTIONS`, `ASIA_THEME_OPTIONS` in `data.ts`; the tile shows the background's thumbnail), the theme editor's base theme and the graphics editor. |
 | `Year` type | `src/config/index.ts` (`years`) | Lists ESC years. Other series cast their year strings to `Year`. |
 
 Legacy data: settings and snapshots saved before `contestType` existed carry `isJuniorContest: boolean`. `resolveContestType()` maps that to `'jesc'` / `'esc'`. Never write `isJuniorContest` again.
@@ -100,7 +100,7 @@ Example: JESC 2027 (single show).
      Only do this when the user asks for it.
    - JESC and ESC Asia years do **not** need to be added to `years`.
 6. **Cache-bust:** set `COUNTRIES_DATA_VERSION` in `src/data/countries/countriesDataUrl.ts` to today's date. The JSON is fetched with `cache: 'force-cache'`, so without this browsers keep stale data. Do this for **any** change to a countries JSON file.
-7. **Theme (optional and separate):** a built-in theme for the edition is a separate design task. See `docs/theme-animations-and-specifics.md`. The edition works without one.
+7. **Theme (optional and separate):** a built-in theme for the edition is a separate design task. See `docs/theme-animations-and-specifics.md`. The edition works without one. A new background in `public/bgImages/` needs its picker thumbnail: run `node scripts/theme-thumbnails.mjs` (`src/theme/themeThumbnails.test.ts` fails until you do).
 8. **User-facing copy:**
    - Add an entry at the top of `WHATS_NEW` in `src/components/feedbackInfo/data.ts`: `{ date: 'YYYY-MM-DD', title: 'Added JESC 2027' }`. This shows the "new updates" dot to users.
    - The guidebook in `messages/*.json` (9 locales) states the year range of each series, for example `"JESC (2016–2026)"`. Find it with `grep -n "2016–20" messages/*.json` and update every locale, then run `yarn gen:messages` (this regenerates `src/i18n/messagesManifest.generated.ts` and `public/messages/`).
@@ -138,10 +138,10 @@ ESC Asia was added this way and is the reference implementation. Search for `asi
 1. `src/data/contestTypes.ts`:
    - extend `ContestType`
    - add a prefix to `CONTEST_KEY_PREFIXES` (for example `'CAN-'`)
-   - add a default name to `CONTEST_TYPE_NAMES`
+   - add a default name to `CONTEST_TYPE_NAMES`, a short one to `CONTEST_TYPE_SHORT_NAMES` and a tab name to `CONTEST_TYPE_TAB_NAMES`, and the type to `PICKER_SERIES` in `src/components/setup/hub/picker/pickerItems.ts`
 2. `src/data/countries/countriesDataUrl.ts`: add the file prefix to `COUNTRIES_FILE_PREFIXES`, for example `'canada-countries'`.
 3. `src/data/data.ts`: add `<SERIES>_SUPPORTED_YEARS` and `<SERIES>_YEAR_OPTIONS` (copy `ASIA_YEAR_OPTIONS`).
-4. `src/components/setup/hub/hooks/useContestField.ts`: add the options to `YEAR_OPTIONS` and add a group to `contestGroups`.
+4. `src/components/setup/hub/hooks/useContestField.ts`: add the options to `SERIES_OPTIONS` (and the series' themes to `SERIES_THEMES` in `useThemeField.ts`).
 5. `src/theme/hosting.ts`: add a `<series>HostingLogosByYear` map and a branch in `getHostingCountryByYear`.
 6. Check the series-specific rules that branch on `contestType`. `grep -rn "contestType ===\|contestType !==" src` lists them:
    - **Rest of the World voter:** `getInitialVotingCountries` in `src/state/countriesStore.ts` adds RoW unless the type is `jesc`, and only from 2023 on. Decide whether the new series has a RoW vote.
@@ -175,7 +175,7 @@ Things that need no change: the snapshot save/load (`contestSnapshot.ts`), the d
    ```
 
 5. **In the browser:** start `yarn dev` (port 3000) and use a **fresh isolated context**, because persisted Zustand state hides first-load bugs. Then:
-   - Open the Contest select. The new option should be in the right group, with the right host logo.
+   - Open the Contest picker. A new year shows in Latest when it's the series' newest, and in its series' tab (newest first) with the right host heart. Searching the host country finds it.
    - Select it. The setup header should read "<Contest name> <year>" and show the expected participant count and stages. For a single show that is one stage, "Grand Final".
    - Run `JSON.parse(localStorage['general-storage']).state.settings`. It should show the expected `contestType` and `hostingCountryCode`.
    - In the Network panel, the expected `…-countries-<year>.json?v=<new version>` should be requested.

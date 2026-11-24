@@ -1,12 +1,16 @@
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
 
+import { PickerItem } from '../picker/pickerItems';
+
 import { useQuickSelectThemesQuery } from '@/api/quickSelect';
-import {
-  Option,
-  OptionGroup,
-} from '@/components/common/customSelect/CustomSelect';
+import { Option } from '@/components/common/customSelect/CustomSelect';
 import { useApplyCustomTheme } from '@/components/setup/widgets-section/custom-themes/hooks/useApplyCustomTheme';
+import {
+  CONTEST_TYPE_NAMES,
+  ContestType,
+  parseContestKey,
+} from '@/data/contestTypes';
 import {
   ASIA_THEME_OPTIONS,
   JESC_THEME_OPTIONS,
@@ -19,18 +23,37 @@ import {
   applyThemeForContestYear,
   getExpectedThemeKey,
 } from '@/theme/syncThemeToContest';
+import { themes } from '@/theme/themes';
+import { getThemeThumbnail } from '@/theme/themeThumbnails';
 import { buildPrimaryFromHsva } from '@/theme/themeUtils';
 
-const ALL_THEME_OPTIONS = [
-  ...THEME_OPTIONS,
-  ...JESC_THEME_OPTIONS,
-  ...ASIA_THEME_OPTIONS,
+const SERIES_THEMES: [ContestType, Option[]][] = [
+  ['esc', THEME_OPTIONS],
+  ['jesc', JESC_THEME_OPTIONS],
+  ['asia', ASIA_THEME_OPTIONS],
 ];
+
+/** Every built-in theme as a picker item: swatch and background thumbnail. */
+const THEME_EDITIONS: PickerItem[] = SERIES_THEMES.flatMap(
+  ([series, options]) =>
+    options.map((option) => {
+      const { year } = parseContestKey(option.value);
+
+      return {
+        value: option.value,
+        series,
+        year: Number(year),
+        name: `${CONTEST_TYPE_NAMES[series]} ${year}`,
+        color: themes[option.value as keyof typeof themes]?.colors.primary[700],
+        thumbnailUrl: getThemeThumbnail(option.value),
+      };
+    }),
+);
 
 const swatchFor = (hue: number, shadeValue?: number) =>
   `hsl(${buildPrimaryFromHsva({ h: hue, s: 80, v: shadeValue ?? 60 })['700']})`;
 
-/** Options, value and handlers of the header "Theme" combo, incl. the sync chip. */
+/** Picker items, value and handlers of the header "Theme" combo, incl. the sync chip. */
 export const useThemeField = () => {
   const t = useTranslations();
   const user = useAuthStore((state) => state.user);
@@ -103,58 +126,42 @@ export const useThemeField = () => {
     [customTheme],
   );
 
-  const themeGroups = useMemo(() => {
-    const groups: OptionGroup[] = [
-      { label: 'ESC', options: THEME_OPTIONS },
-      { label: 'JESC', options: JESC_THEME_OPTIONS },
-      { label: 'ESC Asia', options: ASIA_THEME_OPTIONS },
-    ];
+  // The account's quick select, the applied custom theme included.
+  const pinned = useMemo<PickerItem[]>(
+    () =>
+      (quickSelectThemesData ?? []).map((theme) => ({
+        value: theme._id,
+        name: theme.name,
+        color: swatchFor(theme.hue, theme.shadeValue),
+      })),
+    [quickSelectThemesData],
+  );
 
-    if (quickSelectThemesData && quickSelectThemesData.length > 0) {
-      groups.unshift({
-        label: t('widgets.quickSelect'),
-        options: quickSelectThemesData
-          .filter((theme) => theme._id !== customTheme?._id)
-          .map((theme) => ({
-            label: theme.name,
-            value: theme._id,
-            color: swatchFor(theme.hue, theme.shadeValue),
-          })),
-      });
-    }
+  const themeValue = customTheme ? customTheme._id : themeYear;
 
-    if (customTheme) {
-      groups.unshift({
-        label: t('common.custom'),
-        options: [
-          {
-            label: customTheme.name,
+  // What the combo shows: the applied custom theme, else the built-in one.
+  const current = useMemo<PickerItem>(
+    () =>
+      customTheme
+        ? {
             value: customTheme._id,
+            name: customTheme.name,
             color: customThemeColor,
+          }
+        : THEME_EDITIONS.find((item) => item.value === themeYear) ?? {
+            value: themeYear,
+            name: themeYear,
           },
-        ],
-      });
-    }
-
-    return groups;
-  }, [customTheme, customThemeColor, t, quickSelectThemesData]);
-
-  const themeOptions = useMemo(() => {
-    const options: Option[] = [...ALL_THEME_OPTIONS];
-
-    if (customTheme) {
-      options.push({ label: customTheme.name, value: customTheme._id });
-    }
-
-    return options;
-  }, [customTheme]);
+    [customTheme, customThemeColor, themeYear],
+  );
 
   return {
-    themeOptions,
-    themeGroups,
-    themeValue: customTheme ? customTheme._id : themeYear,
+    editions: THEME_EDITIONS,
+    pinned,
+    current,
+    themeValue,
+    contestType,
     customTheme,
-    customThemeColor,
     handleThemeChange,
     syncEnabled,
     toggleSync,

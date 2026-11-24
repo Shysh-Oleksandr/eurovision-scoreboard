@@ -21,6 +21,11 @@ interface SegmentedTabsProps<T extends string> {
   panelId?: (value: T) => string;
   /** Phones' bottom bar: 44px segments that share its width. */
   large?: boolean;
+  /**
+   * Segments share the width by their labels' length (a long label gets
+   * more), instead of `large`'s equal split or the default's own widths.
+   */
+  fill?: boolean;
   className?: string;
 }
 
@@ -38,6 +43,7 @@ function SegmentedTabs<T extends string>({
   tabId,
   panelId,
   large = false,
+  fill = false,
   className = '',
 }: SegmentedTabsProps<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -91,9 +97,13 @@ function SegmentedTabs<T extends string>({
             tabIndex={on ? 0 : -1}
             onClick={() => select(tab.value)}
             className={`${on ? 'is-on' : 'text-white/70 hover:text-white'} ${
-              large
-                ? 'h-11 min-w-0 flex-1 px-2 text-[14px]'
-                : 'h-[36px] px-4 text-[13.5px]'
+              large ? 'h-11 text-[14px]' : 'h-[36px] text-[13.5px]'
+            } ${
+              fill
+                ? 'min-w-0 flex-auto px-2.5'
+                : large
+                ? 'min-w-0 flex-1 px-2'
+                : 'px-4'
             } truncate whitespace-nowrap rounded-[9px] font-bold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent`}
           >
             {tab.label}
